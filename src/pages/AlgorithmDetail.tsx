@@ -1,18 +1,23 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Play, Pause, SkipForward, RotateCcw, Code2, Eye } from 'lucide-react';
+import { ArrowLeft, BookOpen, Code2, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { algorithms } from '@/data/algorithms';
+import { getAlgorithmImplementation } from '@/data/algorithmImplementations';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ArrayVisualization } from '@/components/visualizations/ArrayVisualization';
+import { LinkedListVisualization } from '@/components/visualizations/LinkedListVisualization';
+import { TreeVisualization } from '@/components/visualizations/TreeVisualization';
+import { GraphVisualization } from '@/components/visualizations/GraphVisualization';
 
 const AlgorithmDetail = () => {
   const { id } = useParams();
   const algorithm = algorithms.find((a) => a.id === id);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
+  const implementation = getAlgorithmImplementation(id || '');
+  const [codeLanguage, setCodeLanguage] = useState<'typescript' | 'python' | 'cpp' | 'java'>('typescript');
 
   if (!algorithm) {
     return (
@@ -33,13 +38,39 @@ const AlgorithmDetail = () => {
     advanced: 'bg-red-500/10 text-red-500 border-red-500/20',
   };
 
-  // Sample code - will be replaced with actual algorithm implementations
-  const sampleCode = `function ${algorithm.id.replace(/-/g, '')}(arr) {
-  // Implementation coming soon
-  // This will contain the actual algorithm code
-  
-  return result;
-}`;
+  const renderVisualization = () => {
+    if (!implementation) {
+      return (
+        <div className="text-center space-y-2">
+          <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
+            <Eye className="w-8 h-8 text-primary" />
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Visualization coming soon
+          </p>
+        </div>
+      );
+    }
+
+    switch (implementation.visualizationType) {
+      case 'array':
+        return <ArrayVisualization algorithmId={algorithm.id} />;
+      case 'linkedList':
+        return <LinkedListVisualization algorithmId={algorithm.id} />;
+      case 'tree':
+        return <TreeVisualization algorithmId={algorithm.id} />;
+      case 'graph':
+        return <GraphVisualization algorithmId={algorithm.id} />;
+      default:
+        return (
+          <div className="text-center space-y-2">
+            <p className="text-sm text-muted-foreground">
+              Visualization not available for this algorithm
+            </p>
+          </div>
+        );
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -74,48 +105,12 @@ const AlgorithmDetail = () => {
           <div className="space-y-4">
             <Card className="p-6 glass-card">
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold flex items-center gap-2">
-                    <Eye className="w-5 h-5 text-primary" />
-                    Visualization
-                  </h2>
-                  <div className="flex items-center gap-2">
-                    <Button size="sm" variant="outline" onClick={() => setCurrentStep(0)}>
-                      <RotateCcw className="w-4 h-4" />
-                    </Button>
-                    <Button size="sm" onClick={() => setIsPlaying(!isPlaying)}>
-                      {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                    </Button>
-                    <Button size="sm" variant="outline">
-                      <SkipForward className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Visualization Area - Placeholder */}
-                <div className="aspect-video rounded-lg bg-muted/30 border border-border/50 flex items-center justify-center">
-                  <div className="text-center space-y-2">
-                    <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
-                      <Play className="w-8 h-8 text-primary" />
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      Interactive visualization coming soon
-                    </p>
-                  </div>
-                </div>
-
-                {/* Controls */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Step {currentStep} of 10</span>
-                    <span className="text-muted-foreground">Speed: 1x</span>
-                  </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-primary transition-all duration-300"
-                      style={{ width: `${(currentStep / 10) * 100}%` }}
-                    />
-                  </div>
+                <h2 className="text-lg font-semibold flex items-center gap-2">
+                  <Eye className="w-5 h-5 text-primary" />
+                  Interactive Visualization
+                </h2>
+                <div className="rounded-lg bg-muted/30 border border-border/50 p-4">
+                  {renderVisualization()}
                 </div>
               </div>
             </Card>
@@ -123,8 +118,13 @@ const AlgorithmDetail = () => {
             {/* Algorithm Info */}
             <Card className="p-6 glass-card">
               <div className="space-y-4">
-                <h3 className="font-semibold">About this Algorithm</h3>
-                <p className="text-sm text-muted-foreground">{algorithm.description}</p>
+                <h3 className="font-semibold flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-primary" />
+                  Algorithm Overview
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {implementation?.explanation.overview || algorithm.description}
+                </p>
                 
                 <Separator />
                 
@@ -148,51 +148,88 @@ const AlgorithmDetail = () => {
 
           {/* Right Panel - Code & Explanation */}
           <div className="space-y-4">
-            <Tabs defaultValue="code" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="code">
-                  <Code2 className="w-4 h-4 mr-2" />
-                  Code
-                </TabsTrigger>
-                <TabsTrigger value="explanation">Explanation</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="code" className="mt-4">
-                <Card className="p-6 glass-card">
-                  <pre className="code-block">
-                    <code className="text-sm">{sampleCode}</code>
-                  </pre>
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="explanation" className="mt-4">
-                <Card className="p-6 glass-card">
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="font-semibold mb-2">How it works</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Detailed explanation of the algorithm will be provided here, including:
-                      </p>
-                      <ul className="list-disc list-inside mt-2 space-y-1 text-sm text-muted-foreground ml-4">
-                        <li>Key concepts and intuition</li>
-                        <li>Step-by-step walkthrough</li>
-                        <li>Common use cases</li>
-                        <li>Tips and tricks</li>
-                      </ul>
+            <Card className="p-6 glass-card">
+              <div className="space-y-4">
+                <h3 className="font-semibold flex items-center gap-2">
+                  <Code2 className="w-5 h-5 text-primary" />
+                  Implementation
+                </h3>
+                
+                <Tabs value={codeLanguage} onValueChange={(v) => setCodeLanguage(v as any)}>
+                  <TabsList className="grid w-full grid-cols-4">
+                    <TabsTrigger value="typescript">TypeScript</TabsTrigger>
+                    <TabsTrigger value="python">Python</TabsTrigger>
+                    <TabsTrigger value="cpp">C++</TabsTrigger>
+                    <TabsTrigger value="java">Java</TabsTrigger>
+                  </TabsList>
+                  
+                  {implementation ? (
+                    <>
+                      <TabsContent value="typescript" className="mt-4">
+                        <pre className="code-block overflow-x-auto">
+                          <code className="text-sm">{implementation.code.typescript}</code>
+                        </pre>
+                      </TabsContent>
+                      
+                      <TabsContent value="python" className="mt-4">
+                        <pre className="code-block overflow-x-auto">
+                          <code className="text-sm">{implementation.code.python}</code>
+                        </pre>
+                      </TabsContent>
+                      
+                      <TabsContent value="cpp" className="mt-4">
+                        <pre className="code-block overflow-x-auto">
+                          <code className="text-sm">{implementation.code.cpp}</code>
+                        </pre>
+                      </TabsContent>
+                      
+                      <TabsContent value="java" className="mt-4">
+                        <pre className="code-block overflow-x-auto">
+                          <code className="text-sm">{implementation.code.java}</code>
+                        </pre>
+                      </TabsContent>
+                    </>
+                  ) : (
+                    <div className="mt-4 p-4 bg-muted/30 rounded-lg text-center text-sm text-muted-foreground">
+                      Code implementation coming soon
                     </div>
-                    
-                    <Separator />
-                    
-                    <div>
-                      <h4 className="font-semibold mb-2">When to use</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Use cases and scenarios where this algorithm excels.
-                      </p>
-                    </div>
+                  )}
+                </Tabs>
+              </div>
+            </Card>
+
+            {implementation && (
+              <Card className="p-6 glass-card">
+                <div className="space-y-4">
+                  <h4 className="font-semibold">Step-by-Step Explanation</h4>
+                  <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
+                    {implementation.explanation.steps.map((step, index) => (
+                      <li key={index} className="ml-2">{step}</li>
+                    ))}
+                  </ol>
+                  
+                  <Separator />
+                  
+                  <div>
+                    <h4 className="font-semibold mb-2">When to Use</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {implementation.explanation.useCase}
+                    </p>
                   </div>
-                </Card>
-              </TabsContent>
-            </Tabs>
+
+                  <Separator />
+                  
+                  <div>
+                    <h4 className="font-semibold mb-2">Pro Tips</h4>
+                    <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground ml-2">
+                      {implementation.explanation.tips.map((tip, index) => (
+                        <li key={index}>{tip}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </Card>
+            )}
 
             {/* Practice Problems */}
             <Card className="p-6 glass-card">
