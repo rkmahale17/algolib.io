@@ -13,6 +13,11 @@ export interface AlgorithmImplementation {
     tips: string[];
   };
   visualizationType: 'array' | 'linkedList' | 'tree' | 'graph' | 'matrix' | 'none';
+  practiceProblems?: Array<{
+    title: string;
+    url: string;
+    difficulty: 'easy' | 'medium' | 'hard';
+  }>;
 }
 
 export const algorithmImplementations: Record<string, AlgorithmImplementation> = {
@@ -4242,6 +4247,2447 @@ public:
       ]
     },
     visualizationType: 'matrix'
+  },
+  'serialize-tree': {
+    id: 'serialize-tree',
+    code: {
+      typescript: `function serialize(root: TreeNode | null): string {
+  if (!root) return 'null';
+  return \`\${root.val},\${serialize(root.left)},\${serialize(root.right)}\`;
+}
+
+function deserialize(data: string): TreeNode | null {
+  const values = data.split(',');
+  let index = 0;
+  
+  function build(): TreeNode | null {
+    if (index >= values.length || values[index] === 'null') {
+      index++;
+      return null;
+    }
+    const node = new TreeNode(parseInt(values[index++]));
+    node.left = build();
+    node.right = build();
+    return node;
+  }
+  
+  return build();
+}`,
+      python: `def serialize(root):
+    if not root:
+        return 'null'
+    return f"{root.val},{serialize(root.left)},{serialize(root.right)}"
+
+def deserialize(data):
+    values = data.split(',')
+    index = [0]
+    
+    def build():
+        if index[0] >= len(values) or values[index[0]] == 'null':
+            index[0] += 1
+            return None
+        node = TreeNode(int(values[index[0]]))
+        index[0] += 1
+        node.left = build()
+        node.right = build()
+        return node
+    
+    return build()`,
+      cpp: `string serialize(TreeNode* root) {
+    if (!root) return "null";
+    return to_string(root->val) + "," + serialize(root->left) + "," + serialize(root->right);
+}
+
+TreeNode* deserialize(string data) {
+    stringstream ss(data);
+    string val;
+    vector<string> values;
+    while (getline(ss, val, ',')) {
+        values.push_back(val);
+    }
+    int index = 0;
+    return build(values, index);
+}
+
+TreeNode* build(vector<string>& values, int& index) {
+    if (index >= values.size() || values[index] == "null") {
+        index++;
+        return nullptr;
+    }
+    TreeNode* node = new TreeNode(stoi(values[index++]));
+    node->left = build(values, index);
+    node->right = build(values, index);
+    return node;
+}`,
+      java: `public String serialize(TreeNode root) {
+    if (root == null) return "null";
+    return root.val + "," + serialize(root.left) + "," + serialize(root.right);
+}
+
+public TreeNode deserialize(String data) {
+    String[] values = data.split(",");
+    int[] index = {0};
+    return build(values, index);
+}
+
+private TreeNode build(String[] values, int[] index) {
+    if (index[0] >= values.length || values[index[0]].equals("null")) {
+        index[0]++;
+        return null;
+    }
+    TreeNode node = new TreeNode(Integer.parseInt(values[index[0]++]));
+    node.left = build(values, index);
+    node.right = build(values, index);
+    return node;
+}`
+    },
+    explanation: {
+      overview: "Serialize a binary tree to a string and deserialize it back. Uses preorder traversal with null markers.",
+      steps: [
+        "Serialize: Use preorder DFS, add 'null' for empty nodes",
+        "Create comma-separated string of values",
+        "Deserialize: Split string and rebuild tree",
+        "Use index to track position in array",
+        "Recursively build left and right subtrees"
+      ],
+      useCase: "Save tree to file, network transmission, deep copy of tree structure.",
+      tips: [
+        "Preorder traversal maintains structure",
+        "Handle null nodes explicitly",
+        "Use index pointer for parsing",
+        "BFS serialization also works"
+      ]
+    },
+    visualizationType: 'none',
+    practiceProblems: [
+      { title: "Serialize and Deserialize Binary Tree", url: "https://leetcode.com/problems/serialize-and-deserialize-binary-tree/", difficulty: "hard" }
+    ]
+  },
+  'recover-bst': {
+    id: 'recover-bst',
+    code: {
+      typescript: `function recoverTree(root: TreeNode | null): void {
+  let first: TreeNode | null = null;
+  let second: TreeNode | null = null;
+  let prev: TreeNode | null = null;
+  
+  function inorder(node: TreeNode | null): void {
+    if (!node) return;
+    
+    inorder(node.left);
+    
+    if (prev && prev.val > node.val) {
+      if (!first) first = prev;
+      second = node;
+    }
+    prev = node;
+    
+    inorder(node.right);
+  }
+  
+  inorder(root);
+  if (first && second) {
+    [first.val, second.val] = [second.val, first.val];
+  }
+}`,
+      python: `def recoverTree(root):
+    first = second = prev = None
+    
+    def inorder(node):
+        nonlocal first, second, prev
+        if not node:
+            return
+        
+        inorder(node.left)
+        
+        if prev and prev.val > node.val:
+            if not first:
+                first = prev
+            second = node
+        prev = node
+        
+        inorder(node.right)
+    
+    inorder(root)
+    if first and second:
+        first.val, second.val = second.val, first.val`,
+      cpp: `void recoverTree(TreeNode* root) {
+    TreeNode *first = nullptr, *second = nullptr, *prev = nullptr;
+    
+    function<void(TreeNode*)> inorder = [&](TreeNode* node) {
+        if (!node) return;
+        
+        inorder(node->left);
+        
+        if (prev && prev->val > node->val) {
+            if (!first) first = prev;
+            second = node;
+        }
+        prev = node;
+        
+        inorder(node->right);
+    };
+    
+    inorder(root);
+    if (first && second) {
+        swap(first->val, second->val);
+    }
+}`,
+      java: `private TreeNode first = null;
+private TreeNode second = null;
+private TreeNode prev = null;
+
+public void recoverTree(TreeNode root) {
+    inorder(root);
+    if (first != null && second != null) {
+        int temp = first.val;
+        first.val = second.val;
+        second.val = temp;
+    }
+}
+
+private void inorder(TreeNode node) {
+    if (node == null) return;
+    
+    inorder(node.left);
+    
+    if (prev != null && prev.val > node.val) {
+        if (first == null) first = prev;
+        second = node;
+    }
+    prev = node;
+    
+    inorder(node.right);
+}`
+    },
+    explanation: {
+      overview: "Two nodes of a BST are swapped by mistake. Recover the tree without changing its structure by finding and swapping the two nodes.",
+      steps: [
+        "Do inorder traversal (should be sorted in BST)",
+        "Find first violation: prev.val > curr.val",
+        "Mark first as prev, continue searching",
+        "Find second violation (or update second)",
+        "Swap values of first and second nodes"
+      ],
+      useCase: "Fix corrupted BST, data structure repair, validation and correction.",
+      tips: [
+        "Inorder of BST is sorted",
+        "Two violations for adjacent swaps, one for distant",
+        "O(1) space with Morris traversal",
+        "Keep track of previous node"
+      ]
+    },
+    visualizationType: 'none',
+    practiceProblems: [
+      { title: "Recover Binary Search Tree", url: "https://leetcode.com/problems/recover-binary-search-tree/", difficulty: "medium" }
+    ]
+  },
+  'kruskals': {
+    id: 'kruskals',
+    code: {
+      typescript: `function kruskalMST(n: number, edges: [number, number, number][]): [number, [number, number][]] {
+  // Sort edges by weight
+  edges.sort((a, b) => a[2] - b[2]);
+  
+  const parent = Array.from({length: n}, (_, i) => i);
+  const rank = Array(n).fill(0);
+  
+  function find(x: number): number {
+    if (parent[x] !== x) parent[x] = find(parent[x]);
+    return parent[x];
+  }
+  
+  function union(x: number, y: number): boolean {
+    const px = find(x), py = find(y);
+    if (px === py) return false;
+    
+    if (rank[px] < rank[py]) parent[px] = py;
+    else if (rank[px] > rank[py]) parent[py] = px;
+    else { parent[py] = px; rank[px]++; }
+    return true;
+  }
+  
+  const mst: [number, number][] = [];
+  let totalWeight = 0;
+  
+  for (const [u, v, w] of edges) {
+    if (union(u, v)) {
+      mst.push([u, v]);
+      totalWeight += w;
+      if (mst.length === n - 1) break;
+    }
+  }
+  
+  return [totalWeight, mst];
+}`,
+      python: `def kruskal_mst(n, edges):
+    edges.sort(key=lambda x: x[2])
+    
+    parent = list(range(n))
+    rank = [0] * n
+    
+    def find(x):
+        if parent[x] != x:
+            parent[x] = find(parent[x])
+        return parent[x]
+    
+    def union(x, y):
+        px, py = find(x), find(y)
+        if px == py:
+            return False
+        
+        if rank[px] < rank[py]:
+            parent[px] = py
+        elif rank[px] > rank[py]:
+            parent[py] = px
+        else:
+            parent[py] = px
+            rank[px] += 1
+        return True
+    
+    mst = []
+    total_weight = 0
+    
+    for u, v, w in edges:
+        if union(u, v):
+            mst.append((u, v))
+            total_weight += w
+            if len(mst) == n - 1:
+                break
+    
+    return total_weight, mst`,
+      cpp: `class UnionFind {
+public:
+    vector<int> parent, rank;
+    UnionFind(int n) : parent(n), rank(n, 0) {
+        iota(parent.begin(), parent.end(), 0);
+    }
+    
+    int find(int x) {
+        if (parent[x] != x) parent[x] = find(parent[x]);
+        return parent[x];
+    }
+    
+    bool unite(int x, int y) {
+        int px = find(x), py = find(y);
+        if (px == py) return false;
+        
+        if (rank[px] < rank[py]) parent[px] = py;
+        else if (rank[px] > rank[py]) parent[py] = px;
+        else { parent[py] = px; rank[px]++; }
+        return true;
+    }
+};
+
+pair<int, vector<pair<int,int>>> kruskalMST(int n, vector<array<int,3>>& edges) {
+    sort(edges.begin(), edges.end(), [](auto& a, auto& b) { return a[2] < b[2]; });
+    
+    UnionFind uf(n);
+    vector<pair<int,int>> mst;
+    int totalWeight = 0;
+    
+    for (auto& [u, v, w] : edges) {
+        if (uf.unite(u, v)) {
+            mst.push_back({u, v});
+            totalWeight += w;
+            if (mst.size() == n - 1) break;
+        }
+    }
+    
+    return {totalWeight, mst};
+}`,
+      java: `public int[] kruskalMST(int n, int[][] edges) {
+    Arrays.sort(edges, (a, b) -> a[2] - b[2]);
+    
+    UnionFind uf = new UnionFind(n);
+    List<int[]> mst = new ArrayList<>();
+    int totalWeight = 0;
+    
+    for (int[] edge : edges) {
+        if (uf.union(edge[0], edge[1])) {
+            mst.add(new int[]{edge[0], edge[1]});
+            totalWeight += edge[2];
+            if (mst.size() == n - 1) break;
+        }
+    }
+    
+    return new int[]{totalWeight};
+}`
+    },
+    explanation: {
+      overview: "Kruskal's algorithm finds the Minimum Spanning Tree by greedily selecting smallest edges that don't form cycles, using Union-Find.",
+      steps: [
+        "Sort all edges by weight in ascending order",
+        "Initialize Union-Find data structure",
+        "For each edge, check if it connects different components",
+        "If yes, add to MST and union the components",
+        "Continue until MST has n-1 edges"
+      ],
+      useCase: "Network design, clustering, circuit design, minimum cost infrastructure.",
+      tips: [
+        "Greedy approach with sorting",
+        "Use Union-Find for cycle detection",
+        "O(E log E) time complexity",
+        "Works on edge list representation"
+      ]
+    },
+    visualizationType: 'none',
+    practiceProblems: [
+      { title: "Min Cost to Connect All Points", url: "https://leetcode.com/problems/min-cost-to-connect-all-points/", difficulty: "medium" }
+    ]
+  },
+  'prims': {
+    id: 'prims',
+    code: {
+      typescript: `function primMST(n: number, graph: number[][][]): [number, [number, number][]] {
+  const visited = new Array(n).fill(false);
+  const minHeap: [number, number, number][] = [[0, 0, -1]]; // [weight, node, parent]
+  const mst: [number, number][] = [];
+  let totalWeight = 0;
+  
+  while (minHeap.length && mst.length < n - 1) {
+    minHeap.sort((a, b) => a[0] - b[0]);
+    const [weight, node, parent] = minHeap.shift()!;
+    
+    if (visited[node]) continue;
+    visited[node] = true;
+    
+    if (parent !== -1) {
+      mst.push([parent, node]);
+      totalWeight += weight;
+    }
+    
+    for (const [neighbor, w] of graph[node]) {
+      if (!visited[neighbor]) {
+        minHeap.push([w, neighbor, node]);
+      }
+    }
+  }
+  
+  return [totalWeight, mst];
+}`,
+      python: `import heapq
+
+def prim_mst(n, graph):
+    visited = [False] * n
+    min_heap = [(0, 0, -1)]  # (weight, node, parent)
+    mst = []
+    total_weight = 0
+    
+    while min_heap and len(mst) < n - 1:
+        weight, node, parent = heapq.heappop(min_heap)
+        
+        if visited[node]:
+            continue
+        visited[node] = True
+        
+        if parent != -1:
+            mst.append((parent, node))
+            total_weight += weight
+        
+        for neighbor, w in graph[node]:
+            if not visited[neighbor]:
+                heapq.heappush(min_heap, (w, neighbor, node))
+    
+    return total_weight, mst`,
+      cpp: `pair<int, vector<pair<int,int>>> primMST(int n, vector<vector<pair<int,int>>>& graph) {
+    vector<bool> visited(n, false);
+    priority_queue<array<int,3>, vector<array<int,3>>, greater<>> minHeap;
+    minHeap.push({0, 0, -1}); // {weight, node, parent}
+    
+    vector<pair<int,int>> mst;
+    int totalWeight = 0;
+    
+    while (!minHeap.empty() && mst.size() < n - 1) {
+        auto [weight, node, parent] = minHeap.top();
+        minHeap.pop();
+        
+        if (visited[node]) continue;
+        visited[node] = true;
+        
+        if (parent != -1) {
+            mst.push_back({parent, node});
+            totalWeight += weight;
+        }
+        
+        for (auto [neighbor, w] : graph[node]) {
+            if (!visited[neighbor]) {
+                minHeap.push({w, neighbor, node});
+            }
+        }
+    }
+    
+    return {totalWeight, mst};
+}`,
+      java: `public int[] primMST(int n, List<int[]>[] graph) {
+    boolean[] visited = new boolean[n];
+    PriorityQueue<int[]> minHeap = new PriorityQueue<>((a, b) -> a[0] - b[0]);
+    minHeap.offer(new int[]{0, 0, -1}); // {weight, node, parent}
+    
+    List<int[]> mst = new ArrayList<>();
+    int totalWeight = 0;
+    
+    while (!minHeap.isEmpty() && mst.size() < n - 1) {
+        int[] curr = minHeap.poll();
+        int weight = curr[0], node = curr[1], parent = curr[2];
+        
+        if (visited[node]) continue;
+        visited[node] = true;
+        
+        if (parent != -1) {
+            mst.add(new int[]{parent, node});
+            totalWeight += weight;
+        }
+        
+        for (int[] edge : graph[node]) {
+            if (!visited[edge[0]]) {
+                minHeap.offer(new int[]{edge[1], edge[0], node});
+            }
+        }
+    }
+    
+    return new int[]{totalWeight};
+}`
+    },
+    explanation: {
+      overview: "Prim's algorithm builds MST by starting from a node and greedily adding the minimum weight edge connecting to unvisited nodes.",
+      steps: [
+        "Start from any vertex (usually vertex 0)",
+        "Mark it as visited",
+        "Add all edges from visited to unvisited nodes to min heap",
+        "Pick minimum weight edge to unvisited node",
+        "Repeat until all nodes are visited"
+      ],
+      useCase: "Dense graphs, network design, when graph is given as adjacency list.",
+      tips: [
+        "Uses priority queue for efficiency",
+        "O(E log V) with binary heap",
+        "Better for dense graphs",
+        "Builds MST incrementally from one node"
+      ]
+    },
+    visualizationType: 'none',
+    practiceProblems: [
+      { title: "Min Cost to Connect All Points", url: "https://leetcode.com/problems/min-cost-to-connect-all-points/", difficulty: "medium" }
+    ]
+  },
+  'bellman-ford': {
+    id: 'bellman-ford',
+    code: {
+      typescript: `function bellmanFord(n: number, edges: [number, number, number][], source: number): number[] | null {
+  const dist = Array(n).fill(Infinity);
+  dist[source] = 0;
+  
+  // Relax edges n-1 times
+  for (let i = 0; i < n - 1; i++) {
+    for (const [u, v, w] of edges) {
+      if (dist[u] !== Infinity && dist[u] + w < dist[v]) {
+        dist[v] = dist[u] + w;
+      }
+    }
+  }
+  
+  // Check for negative cycles
+  for (const [u, v, w] of edges) {
+    if (dist[u] !== Infinity && dist[u] + w < dist[v]) {
+      return null; // Negative cycle detected
+    }
+  }
+  
+  return dist;
+}`,
+      python: `def bellman_ford(n, edges, source):
+    dist = [float('inf')] * n
+    dist[source] = 0
+    
+    # Relax edges n-1 times
+    for _ in range(n - 1):
+        for u, v, w in edges:
+            if dist[u] != float('inf') and dist[u] + w < dist[v]:
+                dist[v] = dist[u] + w
+    
+    # Check for negative cycles
+    for u, v, w in edges:
+        if dist[u] != float('inf') and dist[u] + w < dist[v]:
+            return None  # Negative cycle detected
+    
+    return dist`,
+      cpp: `vector<int> bellmanFord(int n, vector<array<int,3>>& edges, int source) {
+    vector<int> dist(n, INT_MAX);
+    dist[source] = 0;
+    
+    // Relax edges n-1 times
+    for (int i = 0; i < n - 1; i++) {
+        for (auto& [u, v, w] : edges) {
+            if (dist[u] != INT_MAX && dist[u] + w < dist[v]) {
+                dist[v] = dist[u] + w;
+            }
+        }
+    }
+    
+    // Check for negative cycles
+    for (auto& [u, v, w] : edges) {
+        if (dist[u] != INT_MAX && dist[u] + w < dist[v]) {
+            return {}; // Negative cycle detected
+        }
+    }
+    
+    return dist;
+}`,
+      java: `public int[] bellmanFord(int n, int[][] edges, int source) {
+    int[] dist = new int[n];
+    Arrays.fill(dist, Integer.MAX_VALUE);
+    dist[source] = 0;
+    
+    // Relax edges n-1 times
+    for (int i = 0; i < n - 1; i++) {
+        for (int[] edge : edges) {
+            int u = edge[0], v = edge[1], w = edge[2];
+            if (dist[u] != Integer.MAX_VALUE && dist[u] + w < dist[v]) {
+                dist[v] = dist[u] + w;
+            }
+        }
+    }
+    
+    // Check for negative cycles
+    for (int[] edge : edges) {
+        int u = edge[0], v = edge[1], w = edge[2];
+        if (dist[u] != Integer.MAX_VALUE && dist[u] + w < dist[v]) {
+            return null; // Negative cycle detected
+        }
+    }
+    
+    return dist;
+}`
+    },
+    explanation: {
+      overview: "Bellman-Ford finds shortest paths from source to all vertices, handles negative weights, and detects negative cycles.",
+      steps: [
+        "Initialize distances: source = 0, others = infinity",
+        "Relax all edges V-1 times",
+        "For each edge (u,v,w): if dist[u] + w < dist[v], update dist[v]",
+        "Run one more iteration to detect negative cycles",
+        "If any distance updates, negative cycle exists"
+      ],
+      useCase: "Graphs with negative weights, currency arbitrage, detecting negative cycles.",
+      tips: [
+        "Handles negative edge weights",
+        "Detects negative cycles",
+        "O(VE) time complexity",
+        "Slower than Dijkstra but more versatile"
+      ]
+    },
+    visualizationType: 'none',
+    practiceProblems: [
+      { title: "Network Delay Time", url: "https://leetcode.com/problems/network-delay-time/", difficulty: "medium" },
+      { title: "Cheapest Flights Within K Stops", url: "https://leetcode.com/problems/cheapest-flights-within-k-stops/", difficulty: "medium" }
+    ]
+  },
+  'floyd-warshall': {
+    id: 'floyd-warshall',
+    code: {
+      typescript: `function floydWarshall(n: number, edges: [number, number, number][]): number[][] {
+  const dist: number[][] = Array.from({length: n}, () => Array(n).fill(Infinity));
+  
+  // Initialize distances
+  for (let i = 0; i < n; i++) dist[i][i] = 0;
+  for (const [u, v, w] of edges) dist[u][v] = w;
+  
+  // Floyd-Warshall
+  for (let k = 0; k < n; k++) {
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+        if (dist[i][k] !== Infinity && dist[k][j] !== Infinity) {
+          dist[i][j] = Math.min(dist[i][j], dist[i][k] + dist[k][j]);
+        }
+      }
+    }
+  }
+  
+  return dist;
+}`,
+      python: `def floyd_warshall(n, edges):
+    dist = [[float('inf')] * n for _ in range(n)]
+    
+    # Initialize distances
+    for i in range(n):
+        dist[i][i] = 0
+    for u, v, w in edges:
+        dist[u][v] = w
+    
+    # Floyd-Warshall
+    for k in range(n):
+        for i in range(n):
+            for j in range(n):
+                if dist[i][k] != float('inf') and dist[k][j] != float('inf'):
+                    dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])
+    
+    return dist`,
+      cpp: `vector<vector<int>> floydWarshall(int n, vector<array<int,3>>& edges) {
+    vector<vector<int>> dist(n, vector<int>(n, INT_MAX / 2));
+    
+    // Initialize distances
+    for (int i = 0; i < n; i++) dist[i][i] = 0;
+    for (auto& [u, v, w] : edges) dist[u][v] = w;
+    
+    // Floyd-Warshall
+    for (int k = 0; k < n; k++) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
+            }
+        }
+    }
+    
+    return dist;
+}`,
+      java: `public int[][] floydWarshall(int n, int[][] edges) {
+    int[][] dist = new int[n][n];
+    for (int[] row : dist) Arrays.fill(row, Integer.MAX_VALUE / 2);
+    
+    // Initialize distances
+    for (int i = 0; i < n; i++) dist[i][i] = 0;
+    for (int[] edge : edges) {
+        dist[edge[0]][edge[1]] = edge[2];
+    }
+    
+    // Floyd-Warshall
+    for (int k = 0; k < n; k++) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                dist[i][j] = Math.min(dist[i][j], dist[i][k] + dist[k][j]);
+            }
+        }
+    }
+    
+    return dist;
+}`
+    },
+    explanation: {
+      overview: "Floyd-Warshall computes shortest paths between all pairs of vertices using dynamic programming.",
+      steps: [
+        "Initialize dist[i][j] = edge weight or infinity",
+        "Set dist[i][i] = 0 for all i",
+        "For each intermediate vertex k",
+        "Try using k as intermediate: dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])",
+        "After k iterations, dist contains all shortest paths"
+      ],
+      useCase: "All-pairs shortest paths, transitive closure, graph reachability.",
+      tips: [
+        "O(V³) time and O(V²) space",
+        "Works with negative edges (not negative cycles)",
+        "Simple triple nested loop",
+        "Can detect negative cycles"
+      ]
+    },
+    visualizationType: 'none',
+    practiceProblems: [
+      { title: "Find the City With the Smallest Number of Neighbors at a Threshold Distance", url: "https://leetcode.com/problems/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/", difficulty: "medium" }
+    ]
+  },
+  'a-star': {
+    id: 'a-star',
+    code: {
+      typescript: `function aStar(grid: number[][], start: [number, number], goal: [number, number]): [number, number][] {
+  const rows = grid.length, cols = grid[0].length;
+  const heuristic = (a: [number, number], b: [number, number]) => 
+    Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
+  
+  const openSet: [number, [number, number]][] = [[heuristic(start, goal), start]];
+  const cameFrom = new Map<string, [number, number]>();
+  const gScore = new Map<string, number>();
+  gScore.set(\`\${start[0]},\${start[1]}\`, 0);
+  
+  while (openSet.length) {
+    openSet.sort((a, b) => a[0] - b[0]);
+    const [, current] = openSet.shift()!;
+    const key = \`\${current[0]},\${current[1]}\`;
+    
+    if (current[0] === goal[0] && current[1] === goal[1]) {
+      const path: [number, number][] = [current];
+      let curr = current;
+      while (cameFrom.has(\`\${curr[0]},\${curr[1]}\`)) {
+        curr = cameFrom.get(\`\${curr[0]},\${curr[1]}\`)!;
+        path.unshift(curr);
+      }
+      return path;
+    }
+    
+    const dirs = [[0,1], [1,0], [0,-1], [-1,0]];
+    for (const [dx, dy] of dirs) {
+      const [nx, ny] = [current[0] + dx, current[1] + dy];
+      if (nx < 0 || ny < 0 || nx >= rows || ny >= cols || grid[nx][ny] === 1) continue;
+      
+      const neighborKey = \`\${nx},\${ny}\`;
+      const tentativeG = gScore.get(key)! + 1;
+      
+      if (!gScore.has(neighborKey) || tentativeG < gScore.get(neighborKey)!) {
+        cameFrom.set(neighborKey, current);
+        gScore.set(neighborKey, tentativeG);
+        const fScore = tentativeG + heuristic([nx, ny], goal);
+        openSet.push([fScore, [nx, ny]]);
+      }
+    }
+  }
+  
+  return [];
+}`,
+      python: `import heapq
+
+def a_star(grid, start, goal):
+    rows, cols = len(grid), len(grid[0])
+    heuristic = lambda a, b: abs(a[0] - b[0]) + abs(a[1] - b[1])
+    
+    open_set = [(heuristic(start, goal), start)]
+    came_from = {}
+    g_score = {start: 0}
+    
+    while open_set:
+        _, current = heapq.heappop(open_set)
+        
+        if current == goal:
+            path = [current]
+            while current in came_from:
+                current = came_from[current]
+                path.append(current)
+            return path[::-1]
+        
+        for dx, dy in [(0,1), (1,0), (0,-1), (-1,0)]:
+            nx, ny = current[0] + dx, current[1] + dy
+            if 0 <= nx < rows and 0 <= ny < cols and grid[nx][ny] != 1:
+                neighbor = (nx, ny)
+                tentative_g = g_score[current] + 1
+                
+                if neighbor not in g_score or tentative_g < g_score[neighbor]:
+                    came_from[neighbor] = current
+                    g_score[neighbor] = tentative_g
+                    f_score = tentative_g + heuristic(neighbor, goal)
+                    heapq.heappush(open_set, (f_score, neighbor))
+    
+    return []`,
+      cpp: `vector<pair<int,int>> aStar(vector<vector<int>>& grid, pair<int,int> start, pair<int,int> goal) {
+    int rows = grid.size(), cols = grid[0].size();
+    auto heuristic = [](auto a, auto b) {
+        return abs(a.first - b.first) + abs(a.second - b.second);
+    };
+    
+    priority_queue<pair<int, pair<int,int>>, vector<pair<int, pair<int,int>>>, greater<>> openSet;
+    openSet.push({heuristic(start, goal), start});
+    
+    map<pair<int,int>, pair<int,int>> cameFrom;
+    map<pair<int,int>, int> gScore;
+    gScore[start] = 0;
+    
+    int dirs[][2] = {{0,1}, {1,0}, {0,-1}, {-1,0}};
+    
+    while (!openSet.empty()) {
+        auto [_, current] = openSet.top();
+        openSet.pop();
+        
+        if (current == goal) {
+            vector<pair<int,int>> path = {current};
+            while (cameFrom.count(current)) {
+                current = cameFrom[current];
+                path.insert(path.begin(), current);
+            }
+            return path;
+        }
+        
+        for (auto [dx, dy] : dirs) {
+            int nx = current.first + dx, ny = current.second + dy;
+            if (nx < 0 || ny < 0 || nx >= rows || ny >= cols || grid[nx][ny] == 1) continue;
+            
+            pair<int,int> neighbor = {nx, ny};
+            int tentativeG = gScore[current] + 1;
+            
+            if (!gScore.count(neighbor) || tentativeG < gScore[neighbor]) {
+                cameFrom[neighbor] = current;
+                gScore[neighbor] = tentativeG;
+                int fScore = tentativeG + heuristic(neighbor, goal);
+                openSet.push({fScore, neighbor});
+            }
+        }
+    }
+    
+    return {};
+}`,
+      java: `public List<int[]> aStar(int[][] grid, int[] start, int[] goal) {
+    int rows = grid.length, cols = grid[0].length;
+    PriorityQueue<Node> openSet = new PriorityQueue<>((a, b) -> a.f - b.f);
+    openSet.offer(new Node(start[0], start[1], 0, heuristic(start, goal)));
+    
+    Map<String, int[]> cameFrom = new HashMap<>();
+    Map<String, Integer> gScore = new HashMap<>();
+    gScore.put(start[0] + "," + start[1], 0);
+    
+    int[][] dirs = {{0,1}, {1,0}, {0,-1}, {-1,0}};
+    
+    while (!openSet.isEmpty()) {
+        Node current = openSet.poll();
+        if (current.x == goal[0] && current.y == goal[1]) {
+            return reconstructPath(cameFrom, current);
+        }
+        
+        for (int[] dir : dirs) {
+            int nx = current.x + dir[0], ny = current.y + dir[1];
+            if (nx < 0 || ny < 0 || nx >= rows || ny >= cols || grid[nx][ny] == 1) continue;
+            
+            String key = nx + "," + ny;
+            int tentativeG = gScore.get(current.x + "," + current.y) + 1;
+            
+            if (!gScore.containsKey(key) || tentativeG < gScore.get(key)) {
+                cameFrom.put(key, new int[]{current.x, current.y});
+                gScore.put(key, tentativeG);
+                int f = tentativeG + heuristic(new int[]{nx, ny}, goal);
+                openSet.offer(new Node(nx, ny, tentativeG, f));
+            }
+        }
+    }
+    
+    return new ArrayList<>();
+}
+
+private int heuristic(int[] a, int[] b) {
+    return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
+}`
+    },
+    explanation: {
+      overview: "A* is an informed search algorithm using heuristics to find shortest path efficiently. Combines Dijkstra with heuristic guidance.",
+      steps: [
+        "Use f(n) = g(n) + h(n) where g is cost so far, h is heuristic",
+        "Start with source in open set",
+        "Pop node with minimum f score",
+        "If goal, reconstruct path",
+        "Explore neighbors, update g and f scores"
+      ],
+      useCase: "Pathfinding in games, GPS navigation, robotics, AI planning.",
+      tips: [
+        "Heuristic must be admissible (never overestimate)",
+        "Manhattan distance for grid, Euclidean for continuous",
+        "Better than Dijkstra with good heuristic",
+        "Optimal if heuristic is consistent"
+      ]
+    },
+    visualizationType: 'none',
+    practiceProblems: [
+      { title: "Shortest Path in Binary Matrix", url: "https://leetcode.com/problems/shortest-path-in-binary-matrix/", difficulty: "medium" }
+    ]
+  },
+  'matrix-path-dp': {
+    id: 'matrix-path-dp',
+    code: {
+      typescript: `function uniquePaths(m: number, n: number): number {
+  const dp: number[][] = Array.from({length: m}, () => Array(n).fill(0));
+  
+  // Base case: first row and column
+  for (let i = 0; i < m; i++) dp[i][0] = 1;
+  for (let j = 0; j < n; j++) dp[0][j] = 1;
+  
+  // Fill DP table
+  for (let i = 1; i < m; i++) {
+    for (let j = 1; j < n; j++) {
+      dp[i][j] = dp[i-1][j] + dp[i][j-1];
+    }
+  }
+  
+  return dp[m-1][n-1];
+}
+
+function minPathSum(grid: number[][]): number {
+  const m = grid.length, n = grid[0].length;
+  const dp: number[][] = Array.from({length: m}, () => Array(n).fill(0));
+  
+  dp[0][0] = grid[0][0];
+  for (let i = 1; i < m; i++) dp[i][0] = dp[i-1][0] + grid[i][0];
+  for (let j = 1; j < n; j++) dp[0][j] = dp[0][j-1] + grid[0][j];
+  
+  for (let i = 1; i < m; i++) {
+    for (let j = 1; j < n; j++) {
+      dp[i][j] = grid[i][j] + Math.min(dp[i-1][j], dp[i][j-1]);
+    }
+  }
+  
+  return dp[m-1][n-1];
+}`,
+      python: `def unique_paths(m, n):
+    dp = [[0] * n for _ in range(m)]
+    
+    for i in range(m):
+        dp[i][0] = 1
+    for j in range(n):
+        dp[0][j] = 1
+    
+    for i in range(1, m):
+        for j in range(1, n):
+            dp[i][j] = dp[i-1][j] + dp[i][j-1]
+    
+    return dp[m-1][n-1]
+
+def min_path_sum(grid):
+    m, n = len(grid), len(grid[0])
+    dp = [[0] * n for _ in range(m)]
+    
+    dp[0][0] = grid[0][0]
+    for i in range(1, m):
+        dp[i][0] = dp[i-1][0] + grid[i][0]
+    for j in range(1, n):
+        dp[0][j] = dp[0][j-1] + grid[0][j]
+    
+    for i in range(1, m):
+        for j in range(1, n):
+            dp[i][j] = grid[i][j] + min(dp[i-1][j], dp[i][j-1])
+    
+    return dp[m-1][n-1]`,
+      cpp: `int uniquePaths(int m, int n) {
+    vector<vector<int>> dp(m, vector<int>(n, 0));
+    
+    for (int i = 0; i < m; i++) dp[i][0] = 1;
+    for (int j = 0; j < n; j++) dp[0][j] = 1;
+    
+    for (int i = 1; i < m; i++) {
+        for (int j = 1; j < n; j++) {
+            dp[i][j] = dp[i-1][j] + dp[i][j-1];
+        }
+    }
+    
+    return dp[m-1][n-1];
+}
+
+int minPathSum(vector<vector<int>>& grid) {
+    int m = grid.size(), n = grid[0].size();
+    vector<vector<int>> dp(m, vector<int>(n));
+    
+    dp[0][0] = grid[0][0];
+    for (int i = 1; i < m; i++) dp[i][0] = dp[i-1][0] + grid[i][0];
+    for (int j = 1; j < n; j++) dp[0][j] = dp[0][j-1] + grid[0][j];
+    
+    for (int i = 1; i < m; i++) {
+        for (int j = 1; j < n; j++) {
+            dp[i][j] = grid[i][j] + min(dp[i-1][j], dp[i][j-1]);
+        }
+    }
+    
+    return dp[m-1][n-1];
+}`,
+      java: `public int uniquePaths(int m, int n) {
+    int[][] dp = new int[m][n];
+    
+    for (int i = 0; i < m; i++) dp[i][0] = 1;
+    for (int j = 0; j < n; j++) dp[0][j] = 1;
+    
+    for (int i = 1; i < m; i++) {
+        for (int j = 1; j < n; j++) {
+            dp[i][j] = dp[i-1][j] + dp[i][j-1];
+        }
+    }
+    
+    return dp[m-1][n-1];
+}
+
+public int minPathSum(int[][] grid) {
+    int m = grid.length, n = grid[0].length;
+    int[][] dp = new int[m][n];
+    
+    dp[0][0] = grid[0][0];
+    for (int i = 1; i < m; i++) dp[i][0] = dp[i-1][0] + grid[i][0];
+    for (int j = 1; j < n; j++) dp[0][j] = dp[0][j-1] + grid[0][j];
+    
+    for (int i = 1; i < m; i++) {
+        for (int j = 1; j < n; j++) {
+            dp[i][j] = grid[i][j] + Math.min(dp[i-1][j], dp[i][j-1]);
+        }
+    }
+    
+    return dp[m-1][n-1];
+}`
+    },
+    explanation: {
+      overview: "Use dynamic programming to count unique paths or find minimum/maximum path sum in a matrix with movement constraints.",
+      steps: [
+        "Create DP table same size as matrix",
+        "Initialize base cases (first row/column)",
+        "For each cell, compute based on where you can come from",
+        "dp[i][j] = operation(dp[i-1][j], dp[i][j-1])",
+        "Answer is at dp[m-1][n-1]"
+      ],
+      useCase: "Grid path problems, robot movement, minimum cost paths, counting paths.",
+      tips: [
+        "Can optimize space to O(n)",
+        "Base cases are crucial",
+        "Direction constraints affect recurrence",
+        "Works for obstacles too"
+      ]
+    },
+    visualizationType: 'none',
+    practiceProblems: [
+      { title: "Unique Paths", url: "https://leetcode.com/problems/unique-paths/", difficulty: "medium" },
+      { title: "Minimum Path Sum", url: "https://leetcode.com/problems/minimum-path-sum/", difficulty: "medium" }
+    ]
+  },
+  'partition-equal-subset': {
+    id: 'partition-equal-subset',
+    code: {
+      typescript: `function canPartition(nums: number[]): boolean {
+  const total = nums.reduce((a, b) => a + b, 0);
+  if (total % 2 !== 0) return false;
+  
+  const target = total / 2;
+  const dp: boolean[] = Array(target + 1).fill(false);
+  dp[0] = true;
+  
+  for (const num of nums) {
+    for (let j = target; j >= num; j--) {
+      dp[j] = dp[j] || dp[j - num];
+    }
+  }
+  
+  return dp[target];
+}`,
+      python: `def can_partition(nums):
+    total = sum(nums)
+    if total % 2 != 0:
+        return False
+    
+    target = total // 2
+    dp = [False] * (target + 1)
+    dp[0] = True
+    
+    for num in nums:
+        for j in range(target, num - 1, -1):
+            dp[j] = dp[j] or dp[j - num]
+    
+    return dp[target]`,
+      cpp: `bool canPartition(vector<int>& nums) {
+    int total = accumulate(nums.begin(), nums.end(), 0);
+    if (total % 2 != 0) return false;
+    
+    int target = total / 2;
+    vector<bool> dp(target + 1, false);
+    dp[0] = true;
+    
+    for (int num : nums) {
+        for (int j = target; j >= num; j--) {
+            dp[j] = dp[j] || dp[j - num];
+        }
+    }
+    
+    return dp[target];
+}`,
+      java: `public boolean canPartition(int[] nums) {
+    int total = 0;
+    for (int num : nums) total += num;
+    if (total % 2 != 0) return false;
+    
+    int target = total / 2;
+    boolean[] dp = new boolean[target + 1];
+    dp[0] = true;
+    
+    for (int num : nums) {
+        for (int j = target; j >= num; j--) {
+            dp[j] = dp[j] || dp[j - num];
+        }
+    }
+    
+    return dp[target];
+}`
+    },
+    explanation: {
+      overview: "Determine if an array can be partitioned into two subsets with equal sum. This is a variant of the 0/1 knapsack problem.",
+      steps: [
+        "Calculate total sum, if odd return false",
+        "Target is sum/2",
+        "Use DP array: dp[i] = can we make sum i",
+        "For each number, update dp in reverse order",
+        "dp[j] = dp[j] OR dp[j - num]"
+      ],
+      useCase: "Subset sum problems, fair division, resource allocation.",
+      tips: [
+        "Early exit if sum is odd",
+        "Space optimized to O(sum)",
+        "Reverse iteration prevents reuse",
+        "Similar to 0/1 knapsack"
+      ]
+    },
+    visualizationType: 'none',
+    practiceProblems: [
+      { title: "Partition Equal Subset Sum", url: "https://leetcode.com/problems/partition-equal-subset-sum/", difficulty: "medium" }
+    ]
+  },
+  'word-break': {
+    id: 'word-break',
+    code: {
+      typescript: `function wordBreak(s: string, wordDict: string[]): boolean {
+  const wordSet = new Set(wordDict);
+  const dp: boolean[] = Array(s.length + 1).fill(false);
+  dp[0] = true;
+  
+  for (let i = 1; i <= s.length; i++) {
+    for (let j = 0; j < i; j++) {
+      if (dp[j] && wordSet.has(s.substring(j, i))) {
+        dp[i] = true;
+        break;
+      }
+    }
+  }
+  
+  return dp[s.length];
+}`,
+      python: `def word_break(s, word_dict):
+    word_set = set(word_dict)
+    dp = [False] * (len(s) + 1)
+    dp[0] = True
+    
+    for i in range(1, len(s) + 1):
+        for j in range(i):
+            if dp[j] and s[j:i] in word_set:
+                dp[i] = True
+                break
+    
+    return dp[len(s)]`,
+      cpp: `bool wordBreak(string s, vector<string>& wordDict) {
+    unordered_set<string> wordSet(wordDict.begin(), wordDict.end());
+    vector<bool> dp(s.length() + 1, false);
+    dp[0] = true;
+    
+    for (int i = 1; i <= s.length(); i++) {
+        for (int j = 0; j < i; j++) {
+            if (dp[j] && wordSet.count(s.substr(j, i - j))) {
+                dp[i] = true;
+                break;
+            }
+        }
+    }
+    
+    return dp[s.length()];
+}`,
+      java: `public boolean wordBreak(String s, List<String> wordDict) {
+    Set<String> wordSet = new HashSet<>(wordDict);
+    boolean[] dp = new boolean[s.length() + 1];
+    dp[0] = true;
+    
+    for (int i = 1; i <= s.length(); i++) {
+        for (int j = 0; j < i; j++) {
+            if (dp[j] && wordSet.contains(s.substring(j, i))) {
+                dp[i] = true;
+                break;
+            }
+        }
+    }
+    
+    return dp[s.length()];
+}`
+    },
+    explanation: {
+      overview: "Determine if a string can be segmented into words from a dictionary using dynamic programming.",
+      steps: [
+        "dp[i] = can we break s[0..i-1]",
+        "dp[0] = true (empty string)",
+        "For each position i, check all j < i",
+        "If dp[j] is true and s[j..i-1] is in dict, dp[i] = true",
+        "Return dp[n]"
+      ],
+      useCase: "Text segmentation, natural language processing, spell checking.",
+      tips: [
+        "Use set for O(1) lookup",
+        "Break early when found",
+        "Can be optimized with trie",
+        "DFS with memoization also works"
+      ]
+    },
+    visualizationType: 'none',
+    practiceProblems: [
+      { title: "Word Break", url: "https://leetcode.com/problems/word-break/", difficulty: "medium" },
+      { title: "Word Break II", url: "https://leetcode.com/problems/word-break-ii/", difficulty: "hard" }
+    ]
+  },
+  'activity-selection': {
+    id: 'activity-selection',
+    code: {
+      typescript: `function activitySelection(start: number[], finish: number[]): number {
+  const n = start.length;
+  const activities: [number, number][] = start.map((s, i) => [s, finish[i]]);
+  activities.sort((a, b) => a[1] - b[1]);
+  
+  let count = 1;
+  let lastFinish = activities[0][1];
+  
+  for (let i = 1; i < n; i++) {
+    if (activities[i][0] >= lastFinish) {
+      count++;
+      lastFinish = activities[i][1];
+    }
+  }
+  
+  return count;
+}`,
+      python: `def activity_selection(start, finish):
+    activities = sorted(zip(start, finish), key=lambda x: x[1])
+    
+    count = 1
+    last_finish = activities[0][1]
+    
+    for s, f in activities[1:]:
+        if s >= last_finish:
+            count += 1
+            last_finish = f
+    
+    return count`,
+      cpp: `int activitySelection(vector<int>& start, vector<int>& finish) {
+    int n = start.size();
+    vector<pair<int,int>> activities;
+    for (int i = 0; i < n; i++) {
+        activities.push_back({finish[i], start[i]});
+    }
+    sort(activities.begin(), activities.end());
+    
+    int count = 1;
+    int lastFinish = activities[0].first;
+    
+    for (int i = 1; i < n; i++) {
+        if (activities[i].second >= lastFinish) {
+            count++;
+            lastFinish = activities[i].first;
+        }
+    }
+    
+    return count;
+}`,
+      java: `public int activitySelection(int[] start, int[] finish) {
+    int n = start.length;
+    int[][] activities = new int[n][2];
+    for (int i = 0; i < n; i++) {
+        activities[i] = new int[]{start[i], finish[i]};
+    }
+    Arrays.sort(activities, (a, b) -> a[1] - b[1]);
+    
+    int count = 1;
+    int lastFinish = activities[0][1];
+    
+    for (int i = 1; i < n; i++) {
+        if (activities[i][0] >= lastFinish) {
+            count++;
+            lastFinish = activities[i][1];
+        }
+    }
+    
+    return count;
+}`
+    },
+    explanation: {
+      overview: "Select maximum number of non-overlapping activities. Greedy approach: always pick activity that finishes earliest.",
+      steps: [
+        "Sort activities by finish time",
+        "Pick first activity",
+        "For each activity, if start >= last finish, pick it",
+        "Update last finish time",
+        "Count selected activities"
+      ],
+      useCase: "Scheduling meetings, resource allocation, interval selection.",
+      tips: [
+        "Sort by finish time, not start",
+        "Greedy choice property",
+        "O(n log n) due to sorting",
+        "Proves optimal substructure"
+      ]
+    },
+    visualizationType: 'none',
+    practiceProblems: [
+      { title: "Non-overlapping Intervals", url: "https://leetcode.com/problems/non-overlapping-intervals/", difficulty: "medium" }
+    ]
+  },
+  'interval-scheduling': {
+    id: 'interval-scheduling',
+    code: {
+      typescript: `function intervalScheduling(intervals: [number, number][]): [number, number][] {
+  intervals.sort((a, b) => a[1] - b[1]);
+  
+  const selected: [number, number][] = [intervals[0]];
+  let lastEnd = intervals[0][1];
+  
+  for (let i = 1; i < intervals.length; i++) {
+    if (intervals[i][0] >= lastEnd) {
+      selected.push(intervals[i]);
+      lastEnd = intervals[i][1];
+    }
+  }
+  
+  return selected;
+}`,
+      python: `def interval_scheduling(intervals):
+    intervals.sort(key=lambda x: x[1])
+    
+    selected = [intervals[0]]
+    last_end = intervals[0][1]
+    
+    for start, end in intervals[1:]:
+        if start >= last_end:
+            selected.append((start, end))
+            last_end = end
+    
+    return selected`,
+      cpp: `vector<pair<int,int>> intervalScheduling(vector<pair<int,int>>& intervals) {
+    sort(intervals.begin(), intervals.end(), 
+         [](auto& a, auto& b) { return a.second < b.second; });
+    
+    vector<pair<int,int>> selected = {intervals[0]};
+    int lastEnd = intervals[0].second;
+    
+    for (int i = 1; i < intervals.size(); i++) {
+        if (intervals[i].first >= lastEnd) {
+            selected.push_back(intervals[i]);
+            lastEnd = intervals[i].second;
+        }
+    }
+    
+    return selected;
+}`,
+      java: `public List<int[]> intervalScheduling(int[][] intervals) {
+    Arrays.sort(intervals, (a, b) -> a[1] - b[1]);
+    
+    List<int[]> selected = new ArrayList<>();
+    selected.add(intervals[0]);
+    int lastEnd = intervals[0][1];
+    
+    for (int i = 1; i < intervals.length; i++) {
+        if (intervals[i][0] >= lastEnd) {
+            selected.add(intervals[i]);
+            lastEnd = intervals[i][1];
+        }
+    }
+    
+    return selected;
+}`
+    },
+    explanation: {
+      overview: "Schedule maximum number of non-overlapping intervals. Greedy algorithm that selects intervals finishing earliest.",
+      steps: [
+        "Sort intervals by end time",
+        "Select first interval",
+        "Iterate through remaining intervals",
+        "If interval starts after last selected ends, add it",
+        "Update last end time"
+      ],
+      useCase: "Meeting scheduling, resource booking, event planning.",
+      tips: [
+        "Same as activity selection",
+        "Greedy choice is optimal",
+        "Sort by end time crucial",
+        "O(n log n) complexity"
+      ]
+    },
+    visualizationType: 'none',
+    practiceProblems: [
+      { title: "Non-overlapping Intervals", url: "https://leetcode.com/problems/non-overlapping-intervals/", difficulty: "medium" }
+    ]
+  },
+  'huffman-encoding': {
+    id: 'huffman-encoding',
+    code: {
+      typescript: `class HuffmanNode {
+  constructor(
+    public char: string,
+    public freq: number,
+    public left: HuffmanNode | null = null,
+    public right: HuffmanNode | null = null
+  ) {}
+}
+
+function huffmanEncoding(text: string): Map<string, string> {
+  const freqMap = new Map<string, number>();
+  for (const char of text) {
+    freqMap.set(char, (freqMap.get(char) || 0) + 1);
+  }
+  
+  const heap: HuffmanNode[] = Array.from(freqMap.entries())
+    .map(([char, freq]) => new HuffmanNode(char, freq));
+  
+  while (heap.length > 1) {
+    heap.sort((a, b) => a.freq - b.freq);
+    const left = heap.shift()!;
+    const right = heap.shift()!;
+    const parent = new HuffmanNode('', left.freq + right.freq, left, right);
+    heap.push(parent);
+  }
+  
+  const codes = new Map<string, string>();
+  function buildCodes(node: HuffmanNode | null, code: string): void {
+    if (!node) return;
+    if (!node.left && !node.right) {
+      codes.set(node.char, code || '0');
+      return;
+    }
+    buildCodes(node.left, code + '0');
+    buildCodes(node.right, code + '1');
+  }
+  buildCodes(heap[0], '');
+  
+  return codes;
+}`,
+      python: `import heapq
+
+class HuffmanNode:
+    def __init__(self, char, freq, left=None, right=None):
+        self.char = char
+        self.freq = freq
+        self.left = left
+        self.right = right
+    
+    def __lt__(self, other):
+        return self.freq < other.freq
+
+def huffman_encoding(text):
+    freq_map = {}
+    for char in text:
+        freq_map[char] = freq_map.get(char, 0) + 1
+    
+    heap = [HuffmanNode(char, freq) for char, freq in freq_map.items()]
+    heapq.heapify(heap)
+    
+    while len(heap) > 1:
+        left = heapq.heappop(heap)
+        right = heapq.heappop(heap)
+        parent = HuffmanNode('', left.freq + right.freq, left, right)
+        heapq.heappush(heap, parent)
+    
+    codes = {}
+    def build_codes(node, code):
+        if not node:
+            return
+        if not node.left and not node.right:
+            codes[node.char] = code or '0'
+            return
+        build_codes(node.left, code + '0')
+        build_codes(node.right, code + '1')
+    
+    build_codes(heap[0], '')
+    return codes`,
+      cpp: `struct HuffmanNode {
+    char ch;
+    int freq;
+    HuffmanNode *left, *right;
+    
+    HuffmanNode(char c, int f) : ch(c), freq(f), left(nullptr), right(nullptr) {}
+};
+
+struct Compare {
+    bool operator()(HuffmanNode* a, HuffmanNode* b) {
+        return a->freq > b->freq;
+    }
+};
+
+map<char, string> huffmanEncoding(string text) {
+    map<char, int> freqMap;
+    for (char c : text) freqMap[c]++;
+    
+    priority_queue<HuffmanNode*, vector<HuffmanNode*>, Compare> minHeap;
+    for (auto [ch, freq] : freqMap) {
+        minHeap.push(new HuffmanNode(ch, freq));
+    }
+    
+    while (minHeap.size() > 1) {
+        auto left = minHeap.top(); minHeap.pop();
+        auto right = minHeap.top(); minHeap.pop();
+        auto parent = new HuffmanNode('\\0', left->freq + right->freq);
+        parent->left = left;
+        parent->right = right;
+        minHeap.push(parent);
+    }
+    
+    map<char, string> codes;
+    function<void(HuffmanNode*, string)> buildCodes = [&](HuffmanNode* node, string code) {
+        if (!node) return;
+        if (!node->left && !node->right) {
+            codes[node->ch] = code.empty() ? "0" : code;
+            return;
+        }
+        buildCodes(node->left, code + "0");
+        buildCodes(node->right, code + "1");
+    };
+    buildCodes(minHeap.top(), "");
+    
+    return codes;
+}`,
+      java: `class HuffmanNode implements Comparable<HuffmanNode> {
+    char ch;
+    int freq;
+    HuffmanNode left, right;
+    
+    HuffmanNode(char c, int f) {
+        ch = c;
+        freq = f;
+    }
+    
+    public int compareTo(HuffmanNode other) {
+        return this.freq - other.freq;
+    }
+}
+
+public Map<Character, String> huffmanEncoding(String text) {
+    Map<Character, Integer> freqMap = new HashMap<>();
+    for (char c : text.toCharArray()) {
+        freqMap.put(c, freqMap.getOrDefault(c, 0) + 1);
+    }
+    
+    PriorityQueue<HuffmanNode> minHeap = new PriorityQueue<>();
+    for (Map.Entry<Character, Integer> entry : freqMap.entrySet()) {
+        minHeap.offer(new HuffmanNode(entry.getKey(), entry.getValue()));
+    }
+    
+    while (minHeap.size() > 1) {
+        HuffmanNode left = minHeap.poll();
+        HuffmanNode right = minHeap.poll();
+        HuffmanNode parent = new HuffmanNode('\\0', left.freq + right.freq);
+        parent.left = left;
+        parent.right = right;
+        minHeap.offer(parent);
+    }
+    
+    Map<Character, String> codes = new HashMap<>();
+    buildCodes(minHeap.poll(), "", codes);
+    return codes;
+}
+
+private void buildCodes(HuffmanNode node, String code, Map<Character, String> codes) {
+    if (node == null) return;
+    if (node.left == null && node.right == null) {
+        codes.put(node.ch, code.isEmpty() ? "0" : code);
+        return;
+    }
+    buildCodes(node.left, code + "0", codes);
+    buildCodes(node.right, code + "1", codes);
+}`
+    },
+    explanation: {
+      overview: "Huffman encoding creates optimal prefix-free codes for data compression using a greedy algorithm with a priority queue.",
+      steps: [
+        "Count frequency of each character",
+        "Create leaf nodes and add to min heap",
+        "While heap has >1 node, pop two minimum",
+        "Create parent with combined frequency",
+        "Build codes by traversing tree (0 left, 1 right)"
+      ],
+      useCase: "Data compression (ZIP, JPEG), encoding optimization, file compression.",
+      tips: [
+        "Greedy algorithm is optimal",
+        "Use min heap for efficiency",
+        "More frequent = shorter code",
+        "Prefix-free property crucial"
+      ]
+    },
+    visualizationType: 'none',
+    practiceProblems: [
+      { title: "Huffman Coding", url: "https://practice.geeksforgeeks.org/problems/huffman-encoding/0", difficulty: "medium" }
+    ]
+  },
+  'combinations': {
+    id: 'combinations',
+    code: {
+      typescript: `function combine(n: number, k: number): number[][] {
+  const result: number[][] = [];
+  
+  function backtrack(start: number, path: number[]): void {
+    if (path.length === k) {
+      result.push([...path]);
+      return;
+    }
+    
+    for (let i = start; i <= n; i++) {
+      path.push(i);
+      backtrack(i + 1, path);
+      path.pop();
+    }
+  }
+  
+  backtrack(1, []);
+  return result;
+}`,
+      python: `def combine(n, k):
+    result = []
+    
+    def backtrack(start, path):
+        if len(path) == k:
+            result.append(path[:])
+            return
+        
+        for i in range(start, n + 1):
+            path.append(i)
+            backtrack(i + 1, path)
+            path.pop()
+    
+    backtrack(1, [])
+    return result`,
+      cpp: `vector<vector<int>> combine(int n, int k) {
+    vector<vector<int>> result;
+    vector<int> path;
+    
+    function<void(int)> backtrack = [&](int start) {
+        if (path.size() == k) {
+            result.push_back(path);
+            return;
+        }
+        
+        for (int i = start; i <= n; i++) {
+            path.push_back(i);
+            backtrack(i + 1);
+            path.pop_back();
+        }
+    };
+    
+    backtrack(1);
+    return result;
+}`,
+      java: `public List<List<Integer>> combine(int n, int k) {
+    List<List<Integer>> result = new ArrayList<>();
+    backtrack(1, n, k, new ArrayList<>(), result);
+    return result;
+}
+
+private void backtrack(int start, int n, int k, List<Integer> path, List<List<Integer>> result) {
+    if (path.size() == k) {
+        result.add(new ArrayList<>(path));
+        return;
+    }
+    
+    for (int i = start; i <= n; i++) {
+        path.add(i);
+        backtrack(i + 1, n, k, path, result);
+        path.remove(path.size() - 1);
+    }
+}`
+    },
+    explanation: {
+      overview: "Generate all k-combinations from numbers 1 to n using backtracking. Each combination is a unique set of k numbers.",
+      steps: [
+        "Use backtracking with start index",
+        "If path length equals k, add to result",
+        "For each number from start to n",
+        "Add to path, recurse with next start",
+        "Remove last element (backtrack)"
+      ],
+      useCase: "Combinatorics, lottery numbers, team selection, subset problems.",
+      tips: [
+        "Pruning: if remaining < needed, skip",
+        "Start index prevents duplicates",
+        "Time: O(C(n,k))",
+        "Space: O(k) for recursion"
+      ]
+    },
+    visualizationType: 'none',
+    practiceProblems: [
+      { title: "Combinations", url: "https://leetcode.com/problems/combinations/", difficulty: "medium" }
+    ]
+  },
+  'combination-sum': {
+    id: 'combination-sum',
+    code: {
+      typescript: `function combinationSum(candidates: number[], target: number): number[][] {
+  const result: number[][] = [];
+  
+  function backtrack(start: number, path: number[], sum: number): void {
+    if (sum === target) {
+      result.push([...path]);
+      return;
+    }
+    if (sum > target) return;
+    
+    for (let i = start; i < candidates.length; i++) {
+      path.push(candidates[i]);
+      backtrack(i, path, sum + candidates[i]);
+      path.pop();
+    }
+  }
+  
+  backtrack(0, [], 0);
+  return result;
+}`,
+      python: `def combination_sum(candidates, target):
+    result = []
+    
+    def backtrack(start, path, total):
+        if total == target:
+            result.append(path[:])
+            return
+        if total > target:
+            return
+        
+        for i in range(start, len(candidates)):
+            path.append(candidates[i])
+            backtrack(i, path, total + candidates[i])
+            path.pop()
+    
+    backtrack(0, [], 0)
+    return result`,
+      cpp: `vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+    vector<vector<int>> result;
+    vector<int> path;
+    
+    function<void(int, int)> backtrack = [&](int start, int sum) {
+        if (sum == target) {
+            result.push_back(path);
+            return;
+        }
+        if (sum > target) return;
+        
+        for (int i = start; i < candidates.size(); i++) {
+            path.push_back(candidates[i]);
+            backtrack(i, sum + candidates[i]);
+            path.pop_back();
+        }
+    };
+    
+    backtrack(0, 0);
+    return result;
+}`,
+      java: `public List<List<Integer>> combinationSum(int[] candidates, int target) {
+    List<List<Integer>> result = new ArrayList<>();
+    backtrack(candidates, target, 0, new ArrayList<>(), 0, result);
+    return result;
+}
+
+private void backtrack(int[] candidates, int target, int start, 
+                       List<Integer> path, int sum, List<List<Integer>> result) {
+    if (sum == target) {
+        result.add(new ArrayList<>(path));
+        return;
+    }
+    if (sum > target) return;
+    
+    for (int i = start; i < candidates.length; i++) {
+        path.add(candidates[i]);
+        backtrack(candidates, target, i, path, sum + candidates[i], result);
+        path.remove(path.size() - 1);
+    }
+}`
+    },
+    explanation: {
+      overview: "Find all unique combinations that sum to target. Numbers can be reused unlimited times.",
+      steps: [
+        "Use backtracking with current sum",
+        "If sum equals target, add combination",
+        "If sum exceeds target, prune branch",
+        "For each candidate from start index",
+        "Can reuse same element (pass i, not i+1)"
+      ],
+      useCase: "Coin change combinations, subset sum, resource allocation.",
+      tips: [
+        "Reuse elements: pass same index",
+        "Early pruning when sum > target",
+        "Sorting helps optimization",
+        "Track sum to avoid recalculation"
+      ]
+    },
+    visualizationType: 'none',
+    practiceProblems: [
+      { title: "Combination Sum", url: "https://leetcode.com/problems/combination-sum/", difficulty: "medium" },
+      { title: "Combination Sum II", url: "https://leetcode.com/problems/combination-sum-ii/", difficulty: "medium" }
+    ]
+  },
+  'word-search-grid': {
+    id: 'word-search-grid',
+    code: {
+      typescript: `function exist(board: string[][], word: string): boolean {
+  const rows = board.length, cols = board[0].length;
+  
+  function dfs(r: number, c: number, index: number): boolean {
+    if (index === word.length) return true;
+    if (r < 0 || c < 0 || r >= rows || c >= cols || 
+        board[r][c] !== word[index]) return false;
+    
+    const temp = board[r][c];
+    board[r][c] = '#';
+    
+    const found = dfs(r+1, c, index+1) || dfs(r-1, c, index+1) ||
+                  dfs(r, c+1, index+1) || dfs(r, c-1, index+1);
+    
+    board[r][c] = temp;
+    return found;
+  }
+  
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (dfs(r, c, 0)) return true;
+    }
+  }
+  
+  return false;
+}`,
+      python: `def exist(board, word):
+    rows, cols = len(board), len(board[0])
+    
+    def dfs(r, c, index):
+        if index == len(word):
+            return True
+        if (r < 0 or c < 0 or r >= rows or c >= cols or 
+            board[r][c] != word[index]):
+            return False
+        
+        temp = board[r][c]
+        board[r][c] = '#'
+        
+        found = (dfs(r+1, c, index+1) or dfs(r-1, c, index+1) or
+                 dfs(r, c+1, index+1) or dfs(r, c-1, index+1))
+        
+        board[r][c] = temp
+        return found
+    
+    for r in range(rows):
+        for c in range(cols):
+            if dfs(r, c, 0):
+                return True
+    
+    return False`,
+      cpp: `bool exist(vector<vector<char>>& board, string word) {
+    int rows = board.size(), cols = board[0].size();
+    
+    function<bool(int, int, int)> dfs = [&](int r, int c, int index) -> bool {
+        if (index == word.length()) return true;
+        if (r < 0 || c < 0 || r >= rows || c >= cols || 
+            board[r][c] != word[index]) return false;
+        
+        char temp = board[r][c];
+        board[r][c] = '#';
+        
+        bool found = dfs(r+1, c, index+1) || dfs(r-1, c, index+1) ||
+                     dfs(r, c+1, index+1) || dfs(r, c-1, index+1);
+        
+        board[r][c] = temp;
+        return found;
+    };
+    
+    for (int r = 0; r < rows; r++) {
+        for (int c = 0; c < cols; c++) {
+            if (dfs(r, c, 0)) return true;
+        }
+    }
+    
+    return false;
+}`,
+      java: `public boolean exist(char[][] board, String word) {
+    int rows = board.length, cols = board[0].length;
+    
+    for (int r = 0; r < rows; r++) {
+        for (int c = 0; c < cols; c++) {
+            if (dfs(board, word, r, c, 0)) return true;
+        }
+    }
+    
+    return false;
+}
+
+private boolean dfs(char[][] board, String word, int r, int c, int index) {
+    if (index == word.length()) return true;
+    if (r < 0 || c < 0 || r >= board.length || c >= board[0].length || 
+        board[r][c] != word.charAt(index)) return false;
+    
+    char temp = board[r][c];
+    board[r][c] = '#';
+    
+    boolean found = dfs(board, word, r+1, c, index+1) || 
+                    dfs(board, word, r-1, c, index+1) ||
+                    dfs(board, word, r, c+1, index+1) || 
+                    dfs(board, word, r, c-1, index+1);
+    
+    board[r][c] = temp;
+    return found;
+}`
+    },
+    explanation: {
+      overview: "Search for a word in a 2D grid using DFS backtracking. Word must be constructed from adjacent cells.",
+      steps: [
+        "Try starting from each cell",
+        "Use DFS to explore 4 directions",
+        "Mark cell as visited temporarily",
+        "If word completed, return true",
+        "Backtrack: restore cell value"
+      ],
+      useCase: "Word games, crossword validation, pattern matching in grids.",
+      tips: [
+        "Mark visited with special char",
+        "Restore on backtrack",
+        "Prune early if char doesn't match",
+        "Time: O(m*n*4^L)"
+      ]
+    },
+    visualizationType: 'none',
+    practiceProblems: [
+      { title: "Word Search", url: "https://leetcode.com/problems/word-search/", difficulty: "medium" },
+      { title: "Word Search II", url: "https://leetcode.com/problems/word-search-ii/", difficulty: "hard" }
+    ]
+  },
+  'sudoku-solver': {
+    id: 'sudoku-solver',
+    code: {
+      typescript: `function solveSudoku(board: string[][]): void {
+  function isValid(row: number, col: number, num: string): boolean {
+    for (let i = 0; i < 9; i++) {
+      if (board[row][i] === num || board[i][col] === num) return false;
+      const boxRow = 3 * Math.floor(row / 3) + Math.floor(i / 3);
+      const boxCol = 3 * Math.floor(col / 3) + (i % 3);
+      if (board[boxRow][boxCol] === num) return false;
+    }
+    return true;
+  }
+  
+  function solve(): boolean {
+    for (let row = 0; row < 9; row++) {
+      for (let col = 0; col < 9; col++) {
+        if (board[row][col] === '.') {
+          for (let num = 1; num <= 9; num++) {
+            const char = num.toString();
+            if (isValid(row, col, char)) {
+              board[row][col] = char;
+              if (solve()) return true;
+              board[row][col] = '.';
+            }
+          }
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+  
+  solve();
+}`,
+      python: `def solve_sudoku(board):
+    def is_valid(row, col, num):
+        for i in range(9):
+            if board[row][i] == num or board[i][col] == num:
+                return False
+            box_row = 3 * (row // 3) + i // 3
+            box_col = 3 * (col // 3) + i % 3
+            if board[box_row][box_col] == num:
+                return False
+        return True
+    
+    def solve():
+        for row in range(9):
+            for col in range(9):
+                if board[row][col] == '.':
+                    for num in '123456789':
+                        if is_valid(row, col, num):
+                            board[row][col] = num
+                            if solve():
+                                return True
+                            board[row][col] = '.'
+                    return False
+        return True
+    
+    solve()`,
+      cpp: `void solveSudoku(vector<vector<char>>& board) {
+    function<bool(int, int, char)> isValid = [&](int row, int col, char num) {
+        for (int i = 0; i < 9; i++) {
+            if (board[row][i] == num || board[i][col] == num) return false;
+            int boxRow = 3 * (row / 3) + i / 3;
+            int boxCol = 3 * (col / 3) + i % 3;
+            if (board[boxRow][boxCol] == num) return false;
+        }
+        return true;
+    };
+    
+    function<bool()> solve = [&]() {
+        for (int row = 0; row < 9; row++) {
+            for (int col = 0; col < 9; col++) {
+                if (board[row][col] == '.') {
+                    for (char num = '1'; num <= '9'; num++) {
+                        if (isValid(row, col, num)) {
+                            board[row][col] = num;
+                            if (solve()) return true;
+                            board[row][col] = '.';
+                        }
+                    }
+                    return false;
+                }
+            }
+        }
+        return true;
+    };
+    
+    solve();
+}`,
+      java: `public void solveSudoku(char[][] board) {
+    solve(board);
+}
+
+private boolean solve(char[][] board) {
+    for (int row = 0; row < 9; row++) {
+        for (int col = 0; col < 9; col++) {
+            if (board[row][col] == '.') {
+                for (char num = '1'; num <= '9'; num++) {
+                    if (isValid(board, row, col, num)) {
+                        board[row][col] = num;
+                        if (solve(board)) return true;
+                        board[row][col] = '.';
+                    }
+                }
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+private boolean isValid(char[][] board, int row, int col, char num) {
+    for (int i = 0; i < 9; i++) {
+        if (board[row][i] == num || board[i][col] == num) return false;
+        int boxRow = 3 * (row / 3) + i / 3;
+        int boxCol = 3 * (col / 3) + i % 3;
+        if (board[boxRow][boxCol] == num) return false;
+    }
+    return true;
+}`
+    },
+    explanation: {
+      overview: "Solve Sudoku puzzle using backtracking. Try each number 1-9 in empty cells, backtrack if invalid.",
+      steps: [
+        "Find empty cell ('.')",
+        "Try digits 1-9",
+        "Check if valid (row, col, 3x3 box)",
+        "If valid, place and recurse",
+        "If solution found, return true, else backtrack"
+      ],
+      useCase: "Puzzle solving, constraint satisfaction, game AI.",
+      tips: [
+        "Validate row, column, and 3x3 box",
+        "Use backtracking pattern",
+        "Optimization: choose cell with fewest options",
+        "Memoization can help"
+      ]
+    },
+    visualizationType: 'none',
+    practiceProblems: [
+      { title: "Sudoku Solver", url: "https://leetcode.com/problems/sudoku-solver/", difficulty: "hard" },
+      { title: "Valid Sudoku", url: "https://leetcode.com/problems/valid-sudoku/", difficulty: "medium" }
+    ]
+  },
+  'subset-generation-bits': {
+    id: 'subset-generation-bits',
+    code: {
+      typescript: `function subsetsWithBits(nums: number[]): number[][] {
+  const n = nums.length;
+  const result: number[][] = [];
+  
+  for (let mask = 0; mask < (1 << n); mask++) {
+    const subset: number[] = [];
+    for (let i = 0; i < n; i++) {
+      if (mask & (1 << i)) {
+        subset.push(nums[i]);
+      }
+    }
+    result.push(subset);
+  }
+  
+  return result;
+}`,
+      python: `def subsets_with_bits(nums):
+    n = len(nums)
+    result = []
+    
+    for mask in range(1 << n):
+        subset = []
+        for i in range(n):
+            if mask & (1 << i):
+                subset.append(nums[i])
+        result.append(subset)
+    
+    return result`,
+      cpp: `vector<vector<int>> subsetsWithBits(vector<int>& nums) {
+    int n = nums.size();
+    vector<vector<int>> result;
+    
+    for (int mask = 0; mask < (1 << n); mask++) {
+        vector<int> subset;
+        for (int i = 0; i < n; i++) {
+            if (mask & (1 << i)) {
+                subset.push_back(nums[i]);
+            }
+        }
+        result.push_back(subset);
+    }
+    
+    return result;
+}`,
+      java: `public List<List<Integer>> subsetsWithBits(int[] nums) {
+    int n = nums.length;
+    List<List<Integer>> result = new ArrayList<>();
+    
+    for (int mask = 0; mask < (1 << n); mask++) {
+        List<Integer> subset = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            if ((mask & (1 << i)) != 0) {
+                subset.add(nums[i]);
+            }
+        }
+        result.add(subset);
+    }
+    
+    return result;
+}`
+    },
+    explanation: {
+      overview: "Generate all subsets using bit manipulation. Each bit in a number represents whether to include that element.",
+      steps: [
+        "Iterate from 0 to 2^n - 1",
+        "Each number represents a subset",
+        "Check each bit position",
+        "If bit is 1, include nums[i] in subset",
+        "Add subset to result"
+      ],
+      useCase: "Subset generation, combinatorics, power set problems.",
+      tips: [
+        "2^n total subsets",
+        "Bit i represents nums[i]",
+        "Elegant iterative solution",
+        "No recursion needed"
+      ]
+    },
+    visualizationType: 'none',
+    practiceProblems: [
+      { title: "Subsets", url: "https://leetcode.com/problems/subsets/", difficulty: "medium" }
+    ]
+  },
+  'merge-k-lists': {
+    id: 'merge-k-lists',
+    code: {
+      typescript: `function mergeKLists(lists: (ListNode | null)[]): ListNode | null {
+  const minHeap: [number, number, ListNode][] = [];
+  
+  for (let i = 0; i < lists.length; i++) {
+    if (lists[i]) {
+      minHeap.push([lists[i].val, i, lists[i]]);
+    }
+  }
+  
+  const dummy = new ListNode(0);
+  let curr = dummy;
+  
+  while (minHeap.length) {
+    minHeap.sort((a, b) => a[0] - b[0]);
+    const [val, listIdx, node] = minHeap.shift()!;
+    
+    curr.next = node;
+    curr = curr.next;
+    
+    if (node.next) {
+      minHeap.push([node.next.val, listIdx, node.next]);
+    }
+  }
+  
+  return dummy.next;
+}`,
+      python: `import heapq
+
+def merge_k_lists(lists):
+    min_heap = []
+    
+    for i, lst in enumerate(lists):
+        if lst:
+            heapq.heappush(min_heap, (lst.val, i, lst))
+    
+    dummy = ListNode(0)
+    curr = dummy
+    
+    while min_heap:
+        val, list_idx, node = heapq.heappop(min_heap)
+        
+        curr.next = node
+        curr = curr.next
+        
+        if node.next:
+            heapq.heappush(min_heap, (node.next.val, list_idx, node.next))
+    
+    return dummy.next`,
+      cpp: `ListNode* mergeKLists(vector<ListNode*>& lists) {
+    auto cmp = [](pair<int, ListNode*> a, pair<int, ListNode*> b) {
+        return a.first > b.first;
+    };
+    priority_queue<pair<int, ListNode*>, vector<pair<int, ListNode*>>, decltype(cmp)> minHeap(cmp);
+    
+    for (auto list : lists) {
+        if (list) minHeap.push({list->val, list});
+    }
+    
+    ListNode dummy(0);
+    ListNode* curr = &dummy;
+    
+    while (!minHeap.empty()) {
+        auto [val, node] = minHeap.top();
+        minHeap.pop();
+        
+        curr->next = node;
+        curr = curr->next;
+        
+        if (node->next) {
+            minHeap.push({node->next->val, node->next});
+        }
+    }
+    
+    return dummy.next;
+}`,
+      java: `public ListNode mergeKLists(ListNode[] lists) {
+    PriorityQueue<ListNode> minHeap = new PriorityQueue<>((a, b) -> a.val - b.val);
+    
+    for (ListNode list : lists) {
+        if (list != null) minHeap.offer(list);
+    }
+    
+    ListNode dummy = new ListNode(0);
+    ListNode curr = dummy;
+    
+    while (!minHeap.isEmpty()) {
+        ListNode node = minHeap.poll();
+        curr.next = node;
+        curr = curr.next;
+        
+        if (node.next != null) {
+            minHeap.offer(node.next);
+        }
+    }
+    
+    return dummy.next;
+}`
+    },
+    explanation: {
+      overview: "Merge k sorted linked lists using a min heap to efficiently find the smallest element among list heads.",
+      steps: [
+        "Add head of each list to min heap",
+        "Extract minimum from heap",
+        "Add to result list",
+        "Add next node from same list to heap",
+        "Repeat until heap is empty"
+      ],
+      useCase: "External sorting, merging sorted data streams, distributed systems.",
+      tips: [
+        "Min heap of size k",
+        "O(N log k) time complexity",
+        "N = total nodes",
+        "Better than merging pairs"
+      ]
+    },
+    visualizationType: 'none',
+    practiceProblems: [
+      { title: "Merge k Sorted Lists", url: "https://leetcode.com/problems/merge-k-sorted-lists/", difficulty: "hard" }
+    ]
+  },
+  'sliding-window-maximum': {
+    id: 'sliding-window-maximum',
+    code: {
+      typescript: `function maxSlidingWindow(nums: number[], k: number): number[] {
+  const result: number[] = [];
+  const deque: number[] = [];
+  
+  for (let i = 0; i < nums.length; i++) {
+    // Remove indices outside window
+    while (deque.length && deque[0] < i - k + 1) {
+      deque.shift();
+    }
+    
+    // Remove smaller elements
+    while (deque.length && nums[deque[deque.length - 1]] < nums[i]) {
+      deque.pop();
+    }
+    
+    deque.push(i);
+    
+    if (i >= k - 1) {
+      result.push(nums[deque[0]]);
+    }
+  }
+  
+  return result;
+}`,
+      python: `from collections import deque
+
+def max_sliding_window(nums, k):
+    result = []
+    dq = deque()
+    
+    for i in range(len(nums)):
+        # Remove indices outside window
+        while dq and dq[0] < i - k + 1:
+            dq.popleft()
+        
+        # Remove smaller elements
+        while dq and nums[dq[-1]] < nums[i]:
+            dq.pop()
+        
+        dq.append(i)
+        
+        if i >= k - 1:
+            result.append(nums[dq[0]])
+    
+    return result`,
+      cpp: `vector<int> maxSlidingWindow(vector<int>& nums, int k) {
+    vector<int> result;
+    deque<int> dq;
+    
+    for (int i = 0; i < nums.size(); i++) {
+        // Remove indices outside window
+        while (!dq.empty() && dq.front() < i - k + 1) {
+            dq.pop_front();
+        }
+        
+        // Remove smaller elements
+        while (!dq.empty() && nums[dq.back()] < nums[i]) {
+            dq.pop_back();
+        }
+        
+        dq.push_back(i);
+        
+        if (i >= k - 1) {
+            result.push_back(nums[dq.front()]);
+        }
+    }
+    
+    return result;
+}`,
+      java: `public int[] maxSlidingWindow(int[] nums, int k) {
+    int n = nums.length;
+    int[] result = new int[n - k + 1];
+    Deque<Integer> deque = new LinkedList<>();
+    
+    for (int i = 0; i < n; i++) {
+        // Remove indices outside window
+        while (!deque.isEmpty() && deque.peekFirst() < i - k + 1) {
+            deque.pollFirst();
+        }
+        
+        // Remove smaller elements
+        while (!deque.isEmpty() && nums[deque.peekLast()] < nums[i]) {
+            deque.pollLast();
+        }
+        
+        deque.offerLast(i);
+        
+        if (i >= k - 1) {
+            result[i - k + 1] = nums[deque.peekFirst()];
+        }
+    }
+    
+    return result;
+}`
+    },
+    explanation: {
+      overview: "Find maximum in each sliding window of size k using a monotonic decreasing deque.",
+      steps: [
+        "Maintain deque of indices in decreasing order of values",
+        "Remove indices outside current window",
+        "Remove smaller elements from back",
+        "Add current index",
+        "Front of deque is maximum for window"
+      ],
+      useCase: "Stock price analysis, real-time data monitoring, streaming max queries.",
+      tips: [
+        "Monotonic deque pattern",
+        "O(n) time complexity",
+        "Store indices, not values",
+        "Front always has maximum"
+      ]
+    },
+    visualizationType: 'none',
+    practiceProblems: [
+      { title: "Sliding Window Maximum", url: "https://leetcode.com/problems/sliding-window-maximum/", difficulty: "hard" }
+    ]
   }
 };
 
