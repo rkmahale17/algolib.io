@@ -1,19 +1,20 @@
-import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, BookOpen, Code2, Eye, ExternalLink } from 'lucide-react';
-import { ShareButton } from '@/components/ShareButton';
-import { CopyCodeButton } from '@/components/CopyCodeButton';
+import { ArrowLeft, BookOpen, Code2, ExternalLink, Eye } from 'lucide-react';
+import { Link, useParams } from 'react-router-dom';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
+import { ArrayVisualization } from '@/components/visualizations/ArrayVisualization';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { CopyCodeButton } from '@/components/CopyCodeButton';
+import { GraphVisualization } from '@/components/visualizations/GraphVisualization';
+import { LinkedListVisualization } from '@/components/visualizations/LinkedListVisualization';
+import { Separator } from '@/components/ui/separator';
+import { ShareButton } from '@/components/ShareButton';
+import { TreeVisualization } from '@/components/visualizations/TreeVisualization';
 import { algorithms } from '@/data/algorithms';
 import { getAlgorithmImplementation } from '@/data/algorithmImplementations';
-import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrayVisualization } from '@/components/visualizations/ArrayVisualization';
-import { LinkedListVisualization } from '@/components/visualizations/LinkedListVisualization';
-import { TreeVisualization } from '@/components/visualizations/TreeVisualization';
-import { GraphVisualization } from '@/components/visualizations/GraphVisualization';
+import { useState } from 'react';
 
 const AlgorithmDetail = () => {
   const { id } = useParams();
@@ -167,11 +168,11 @@ const AlgorithmDetail = () => {
                   setCodeLanguage(lang);
                   localStorage.setItem('preferredLanguage', lang);
                 }}>
-                  <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
-                    <TabsTrigger value="typescript">TypeScript</TabsTrigger>
+                  <TabsList className="grid h-100 w-full grid-cols-1 sm:grid-cols-4">
                     <TabsTrigger value="python">Python</TabsTrigger>
                     <TabsTrigger value="cpp">C++</TabsTrigger>
                     <TabsTrigger value="java">Java</TabsTrigger>
+                    <TabsTrigger value="typescript">TypeScript</TabsTrigger>
                   </TabsList>
                   
                   {implementation ? (
@@ -179,7 +180,9 @@ const AlgorithmDetail = () => {
                       <TabsContent value="typescript" className="mt-4">
                         <div className="relative">
                           <CopyCodeButton code={implementation.code.typescript} />
-                          <pre className="code-block overflow-x-auto">
+                          <pre className="code-block overflow-x-auto whitespace-pr " style={{  overflowX: 'auto',
+    WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
+    maxWidth: '100%'}}>
                             <code className="text-sm">{implementation.code.typescript}</code>
                           </pre>
                         </div>
@@ -188,7 +191,9 @@ const AlgorithmDetail = () => {
                       <TabsContent value="python" className="mt-4">
                         <div className="relative">
                           <CopyCodeButton code={implementation.code.python} />
-                          <pre className="code-block overflow-x-auto">
+                          <pre className="code-block overflow-x-auto whitespace-pr " style={{  overflowX: 'auto',
+    WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
+    maxWidth: '100%'}}>
                             <code className="text-sm">{implementation.code.python}</code>
                           </pre>
                         </div>
@@ -197,7 +202,9 @@ const AlgorithmDetail = () => {
                       <TabsContent value="cpp" className="mt-4">
                         <div className="relative">
                           <CopyCodeButton code={implementation.code.cpp} />
-                          <pre className="code-block overflow-x-auto">
+                          <pre className="code-block overflow-x-auto whitespace-pr " style={{  overflowX: 'auto',
+    WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
+    maxWidth: '100%'}}>
                             <code className="text-sm">{implementation.code.cpp}</code>
                           </pre>
                         </div>
@@ -206,7 +213,11 @@ const AlgorithmDetail = () => {
                       <TabsContent value="java" className="mt-4">
                         <div className="relative">
                           <CopyCodeButton code={implementation.code.java} />
-                          <pre className="code-block overflow-x-auto">
+                          <pre className="code-block overflow-x-auto whitespace-pr   style={{  overflowX: 'auto',
+    WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
+    maxWidth: '100%'}}whitespace-pr " style={{  overflowX: 'auto',
+    WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
+    maxWidth: '100%'}}>
                             <code className="text-sm">{implementation.code.java}</code>
                           </pre>
                         </div>
