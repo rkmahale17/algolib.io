@@ -1,7 +1,7 @@
 # Build container
 FROM node:18-alpine AS builder
 
-# Make sure we got brotli
+# Make sure we got brotli compression
 RUN apk update
 RUN apk add --upgrade brotli
 WORKDIR /usr
