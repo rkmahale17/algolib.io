@@ -1,8 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { BookOpen, LogOut, MessageSquare, Sparkles, Trophy, User } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,9 +8,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut, BookOpen, Trophy, Sparkles, MessageSquare } from 'lucide-react';
-import { toast } from 'sonner';
+import { useEffect, useState } from 'react';
+
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 import { ThemeToggle } from './ThemeToggle';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const Navbar = () => {
   const [user, setUser] = useState<any>(null);
@@ -135,7 +136,7 @@ const Navbar = () => {
               </>
             ) : (
               <Link to="/auth">
-                <Button>Sign In</Button>
+                {/* <Button className='none'>Sign In</Button> */}
               </Link>
             )}
           </div>

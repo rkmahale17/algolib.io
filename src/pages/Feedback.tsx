@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { ExternalLink, Loader2, MessageSquare } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { MessageSquare, Loader2, ExternalLink } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
+import { useState } from 'react';
 
 const Feedback = () => {
   const [title, setTitle] = useState('');
@@ -101,7 +102,7 @@ const Feedback = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => window.open('https://github.com/yourusername/yourrepo/issues', '_blank')}
+                  onClick={() => window.open('https://github.com/rkmahale17/learn-algo-animate/issues', '_blank')}
                 >
                   <ExternalLink className="w-4 h-4 mr-2" />
                   View All
