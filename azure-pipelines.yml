@@ -10,6 +10,9 @@ trigger:
 
 # Do NOT run on PRs
 pr: none
+# Pool
+pool:
+  vmImage: "ubuntu-latest"
 
 # Variables
 variables:
