@@ -1,10 +1,15 @@
-# Trigger
+# Trigger only on pushes to main (after merge)
 trigger:
-  - main
+  branches:
+    include:
+      - main
+  # Optional: path filters to reduce noise
+  # paths:
+  #   include: [ src/**, package.json, package-lock.json, Dockerfile ]
+  #   exclude: [ docs/**, .github/** ]
 
-# Pool
-pool:
-  vmImage: "ubuntu-latest"
+# Do NOT run on PRs
+pr: none
 
 # Variables
 variables:
