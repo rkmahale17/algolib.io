@@ -3,7 +3,7 @@ trigger:
   branches:
     include:
       - main
-  # Optional: path filters to reduce noise
+  # Optional: path filters to reduce noise ok
   # paths:
   #   include: [ src/**, package.json, package-lock.json, Dockerfile ]
   #   exclude: [ docs/**, .github/** ]
