@@ -11,8 +11,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut, BookOpen, Trophy, Sparkles } from 'lucide-react';
+import { User, LogOut, BookOpen, Trophy, Sparkles, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
+import { ThemeToggle } from './ThemeToggle';
 
 const Navbar = () => {
   const [user, setUser] = useState<any>(null);
@@ -76,7 +77,8 @@ const Navbar = () => {
           </Link>
 
           {/* Right side */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
             {user ? (
               <>
                 {/* Progress indicator */}
@@ -118,6 +120,10 @@ const Navbar = () => {
                     <DropdownMenuItem>
                       <BookOpen className="mr-2 h-4 w-4" />
                       <span>My Progress</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => window.location.href = '/feedback'}>
+                      <MessageSquare className="mr-2 h-4 w-4" />
+                      <span>Feedback</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleSignOut} className="text-destructive">

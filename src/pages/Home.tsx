@@ -60,8 +60,8 @@ const Home = () => {
               </div>
               <div className="h-12 w-px bg-border" />
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary">Free</div>
-                <div className="text-sm text-muted-foreground">First 20 Algos</div>
+                <div className="text-3xl font-bold text-primary">100%</div>
+                <div className="text-sm text-muted-foreground">Free Forever</div>
               </div>
             </div>
           </div>

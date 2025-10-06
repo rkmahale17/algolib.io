@@ -6688,6 +6688,95 @@ def max_sliding_window(nums, k):
     practiceProblems: [
       { title: "Sliding Window Maximum", url: "https://leetcode.com/problems/sliding-window-maximum/", difficulty: "hard" }
     ]
+  },
+  'sieve-of-eratosthenes': {
+    id: 'sieve-of-eratosthenes',
+    code: {
+      typescript: `function sieveOfEratosthenes(n: number): number[] {
+  const isPrime = new Array(n + 1).fill(true);
+  isPrime[0] = isPrime[1] = false;
+  
+  for (let i = 2; i * i <= n; i++) {
+    if (isPrime[i]) {
+      for (let j = i * i; j <= n; j += i) {
+        isPrime[j] = false;
+      }
+    }
+  }
+  
+  return isPrime.map((prime, i) => prime ? i : -1).filter(x => x !== -1);
+}`,
+      python: `def sieve_of_eratosthenes(n: int) -> list[int]:
+    is_prime = [True] * (n + 1)
+    is_prime[0] = is_prime[1] = False
+    
+    for i in range(2, int(n**0.5) + 1):
+        if is_prime[i]:
+            for j in range(i*i, n + 1, i):
+                is_prime[j] = False
+    
+    return [i for i, prime in enumerate(is_prime) if prime]`,
+      cpp: `#include <vector>
+using namespace std;
+
+vector<int> sieveOfEratosthenes(int n) {
+    vector<bool> isPrime(n + 1, true);
+    isPrime[0] = isPrime[1] = false;
+    
+    for (int i = 2; i * i <= n; i++) {
+        if (isPrime[i]) {
+            for (int j = i * i; j <= n; j += i) {
+                isPrime[j] = false;
+            }
+        }
+    }
+    
+    vector<int> primes;
+    for (int i = 2; i <= n; i++) {
+        if (isPrime[i]) primes.push_back(i);
+    }
+    return primes;
+}`,
+      java: `import java.util.*;
+
+public List<Integer> sieveOfEratosthenes(int n) {
+    boolean[] isPrime = new boolean[n + 1];
+    Arrays.fill(isPrime, true);
+    isPrime[0] = isPrime[1] = false;
+    
+    for (int i = 2; i * i <= n; i++) {
+        if (isPrime[i]) {
+            for (int j = i * i; j <= n; j += i) {
+                isPrime[j] = false;
+            }
+        }
+    }
+    
+    List<Integer> primes = new ArrayList<>();
+    for (int i = 2; i <= n; i++) {
+        if (isPrime[i]) primes.add(i);
+    }
+    return primes;
+}`
+    },
+    explanation: {
+      overview: 'Efficiently finds all prime numbers up to n by iteratively marking multiples of each prime.',
+      steps: [
+        'Create boolean array marking all as prime',
+        'Mark 0 and 1 as non-prime',
+        'For each prime p, mark all multiples starting from p² as composite',
+        'Continue until p² > n',
+        'Collect all remaining marked primes'
+      ],
+      useCase: 'Prime generation, cryptography, number theory problems.',
+      tips: [
+        'Time: O(n log log n)',
+        'Space: O(n)',
+        'Start marking from i² for efficiency',
+        'Only check up to √n'
+      ]
+    },
+    visualizationType: 'array'
   }
 };
 

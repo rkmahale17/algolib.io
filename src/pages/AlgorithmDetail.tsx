@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, BookOpen, Code2, Eye } from 'lucide-react';
+import { ArrowLeft, BookOpen, Code2, Eye, ExternalLink } from 'lucide-react';
+import { ShareButton } from '@/components/ShareButton';
+import { CopyCodeButton } from '@/components/CopyCodeButton';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -17,7 +19,9 @@ const AlgorithmDetail = () => {
   const { id } = useParams();
   const algorithm = algorithms.find((a) => a.id === id);
   const implementation = getAlgorithmImplementation(id || '');
-  const [codeLanguage, setCodeLanguage] = useState<'typescript' | 'python' | 'cpp' | 'java'>('typescript');
+  const [codeLanguage, setCodeLanguage] = useState<'typescript' | 'python' | 'cpp' | 'java'>(() => {
+    return (localStorage.getItem('preferredLanguage') as any) || 'python';
+  });
 
   if (!algorithm) {
     return (
@@ -91,9 +95,12 @@ const AlgorithmDetail = () => {
                 <p className="text-sm text-muted-foreground">{algorithm.category}</p>
               </div>
             </div>
-            <Badge variant="outline" className={difficultyColors[algorithm.difficulty]}>
-              {algorithm.difficulty}
-            </Badge>
+                <div className="flex items-center gap-2">
+                  <ShareButton title={algorithm.name} description={algorithm.description} />
+                  <Badge variant="outline" className={difficultyColors[algorithm.difficulty]}>
+                    {algorithm.difficulty}
+                  </Badge>
+                </div>
           </div>
         </div>
       </div>
@@ -155,8 +162,12 @@ const AlgorithmDetail = () => {
                   Implementation
                 </h3>
                 
-                <Tabs value={codeLanguage} onValueChange={(v) => setCodeLanguage(v as any)}>
-                  <TabsList className="grid w-full grid-cols-4">
+                <Tabs value={codeLanguage} onValueChange={(v) => {
+                  const lang = v as any;
+                  setCodeLanguage(lang);
+                  localStorage.setItem('preferredLanguage', lang);
+                }}>
+                  <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
                     <TabsTrigger value="typescript">TypeScript</TabsTrigger>
                     <TabsTrigger value="python">Python</TabsTrigger>
                     <TabsTrigger value="cpp">C++</TabsTrigger>
@@ -166,27 +177,39 @@ const AlgorithmDetail = () => {
                   {implementation ? (
                     <>
                       <TabsContent value="typescript" className="mt-4">
-                        <pre className="code-block overflow-x-auto">
-                          <code className="text-sm">{implementation.code.typescript}</code>
-                        </pre>
+                        <div className="relative">
+                          <CopyCodeButton code={implementation.code.typescript} />
+                          <pre className="code-block overflow-x-auto">
+                            <code className="text-sm">{implementation.code.typescript}</code>
+                          </pre>
+                        </div>
                       </TabsContent>
                       
                       <TabsContent value="python" className="mt-4">
-                        <pre className="code-block overflow-x-auto">
-                          <code className="text-sm">{implementation.code.python}</code>
-                        </pre>
+                        <div className="relative">
+                          <CopyCodeButton code={implementation.code.python} />
+                          <pre className="code-block overflow-x-auto">
+                            <code className="text-sm">{implementation.code.python}</code>
+                          </pre>
+                        </div>
                       </TabsContent>
                       
                       <TabsContent value="cpp" className="mt-4">
-                        <pre className="code-block overflow-x-auto">
-                          <code className="text-sm">{implementation.code.cpp}</code>
-                        </pre>
+                        <div className="relative">
+                          <CopyCodeButton code={implementation.code.cpp} />
+                          <pre className="code-block overflow-x-auto">
+                            <code className="text-sm">{implementation.code.cpp}</code>
+                          </pre>
+                        </div>
                       </TabsContent>
                       
                       <TabsContent value="java" className="mt-4">
-                        <pre className="code-block overflow-x-auto">
-                          <code className="text-sm">{implementation.code.java}</code>
-                        </pre>
+                        <div className="relative">
+                          <CopyCodeButton code={implementation.code.java} />
+                          <pre className="code-block overflow-x-auto">
+                            <code className="text-sm">{implementation.code.java}</code>
+                          </pre>
+                        </div>
                       </TabsContent>
                     </>
                   ) : (
@@ -232,22 +255,30 @@ const AlgorithmDetail = () => {
             )}
 
             {/* Practice Problems */}
-            <Card className="p-6 glass-card">
-              <h3 className="font-semibold mb-4">Practice Problems</h3>
-              <div className="space-y-2">
-                {[1, 2, 3].map((i) => (
-                  <div 
-                    key={i}
-                    className="p-3 rounded-lg bg-muted/30 hover:bg-muted/50 cursor-pointer transition-colors"
-                  >
-                    <p className="text-sm font-medium">Practice Problem {i}</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Apply this algorithm to solve real problems
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </Card>
+            {implementation?.practiceProblems && implementation.practiceProblems.length > 0 && (
+              <Card className="p-6 glass-card">
+                <h3 className="font-semibold mb-4">Practice Problems</h3>
+                <div className="space-y-2">
+                  {implementation.practiceProblems.map((problem, i) => (
+                    <a
+                      key={i}
+                      href={problem.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{problem.title}</p>
+                        <p className="text-xs text-muted-foreground mt-1 capitalize">
+                          {problem.difficulty}
+                        </p>
+                      </div>
+                      <ExternalLink className="w-4 h-4 text-muted-foreground" />
+                    </a>
+                  ))}
+                </div>
+              </Card>
+            )}
           </div>
         </div>
       </div>

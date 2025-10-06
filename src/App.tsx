@@ -7,6 +7,7 @@ import Home from "./pages/Home";
 import AlgorithmDetail from "./pages/AlgorithmDetail";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import Feedback from "./pages/Feedback";
 import Navbar from "./components/Navbar";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/" element={<Home />} />
           <Route path="/algorithm/:id" element={<AlgorithmDetail />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/feedback" element={<Feedback />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
