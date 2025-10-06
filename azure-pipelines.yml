@@ -1,0 +1,125 @@
+# Trigger
+trigger:
+  - main
+
+# Pool
+pool:
+  vmImage: "ubuntu-latest"
+
+# Variables
+variables:
+  nodeVersion: "22"
+  projectId: "playgroundforcode" # single project
+  region: "us-west1"
+  imageName: "playground-image"
+  qaService: "qaplayground"
+  prodService: "prodplaygroundforcode"
+
+stages:
+  # =========================
+  # QA STAGE (no approval)
+  # =========================
+  - stage: QA
+    displayName: "Build & Deploy to QA"
+    jobs:
+      - job: BuildAndDeployQA
+        displayName: "Build image and deploy to QA"
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: $(nodeVersion)
+            displayName: "Install Node.js"
+
+          - script: |
+              npm ci
+              npm run build
+            displayName: "Build app"
+
+          - task: DownloadSecureFile@1
+            name: gcpKey
+            inputs:
+              secureFile: "playgroundkeyfile.json" # stored in Pipelines > Library > Secure Files
+
+          - script: |
+              set -e
+              sudo apt-get update -y
+              sudo apt-get install -y apt-transport-https ca-certificates gnupg
+              echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
+              curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+              sudo apt-get update -y && sudo apt-get install -y google-cloud-sdk
+            displayName: "Install Google Cloud SDK"
+
+          - script: |
+              gcloud auth activate-service-account --key-file="$(gcpKey.secureFilePath)"
+              gcloud config set project $(projectId)
+              gcloud config set run/region $(region)
+            displayName: "Authenticate to Google Cloud"
+
+          # Build once and tag with BuildId for promotion to PROD
+          - script: |
+              gcloud builds submit --tag gcr.io/$(projectId)/$(imageName):$(Build.BuildId)
+            displayName: "Cloud Build -> GCR (single build)"
+
+          # Deploy to QA service
+          - script: |
+              gcloud run deploy $(qaService) \
+                --image gcr.io/$(projectId)/$(imageName):$(Build.BuildId) \
+                --platform managed \
+                --region $(region) \
+                --allow-unauthenticated \
+                --memory 512Mi \
+                --cpu 1 \
+                --min-instances 0 \
+                --max-instances 1 \
+                --set-env-vars "APP_ENV=qa"
+            displayName: "Deploy to Cloud Run (QA)"
+
+  # =========================
+  # PROD STAGE (approval required)
+  # =========================
+  - stage: PROD
+    displayName: "Deploy to PROD"
+    dependsOn: QA
+    condition: succeeded() # only if QA succeeded
+    jobs:
+      # Use a 'deployment' job tied to an Environment with approvals
+      - deployment: DeployToProd
+        displayName: "Deploy approved image to PROD"
+        environment: "Production" # <-- create this Environment and add approvers in Azure DevOps
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: DownloadSecureFile@1
+                  name: gcpKey
+                  inputs:
+                    secureFile: "playgroundkeyfile.json" # same project -> same key
+
+                - script: |
+                    set -e
+                    sudo apt-get update -y
+                    sudo apt-get install -y apt-transport-https ca-certificates gnupg
+                    echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
+                    curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+                    sudo apt-get update -y && sudo apt-get install -y google-cloud-sdk
+                  displayName: "Install Google Cloud SDK"
+
+                - script: |
+                    gcloud auth activate-service-account --key-file="$(gcpKey.secureFilePath)"
+                    gcloud config set project $(projectId)
+                    gcloud config set run/region $(region)
+                  displayName: "Authenticate to Google Cloud"
+
+                # No rebuild: deploy the EXACT same image built in QA
+                - script: |
+                    gcloud run deploy $(prodService) \
+                      --image gcr.io/$(projectId)/$(imageName):$(Build.BuildId) \
+                      --platform managed \
+                      --region $(region) \
+                      --allow-unauthenticated \
+                      --memory 512Mi \
+                      --cpu 1 \
+                      --min-instances 0 \
+                      --max-instances 1 \
+                      --set-env-vars "APP_ENV=prod"
+                  displayName: "Deploy to Cloud Run (PROD)"
