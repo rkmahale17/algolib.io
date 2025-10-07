@@ -180,10 +180,8 @@ const AlgorithmDetail = () => {
                       <TabsContent value="typescript" className="mt-4">
                         <div className="relative">
                           <CopyCodeButton code={implementation.code.typescript} />
-                          <pre className="code-block overflow-x-auto whitespace-pr " style={{  overflowX: 'auto',
-    WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
-    maxWidth: '100%'}}>
-                            <code className="text-sm">{implementation.code.typescript}</code>
+                          <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full">
+                            <code>{implementation.code.typescript}</code>
                           </pre>
                         </div>
                       </TabsContent>
@@ -191,10 +189,8 @@ const AlgorithmDetail = () => {
                       <TabsContent value="python" className="mt-4">
                         <div className="relative">
                           <CopyCodeButton code={implementation.code.python} />
-                          <pre className="code-block overflow-x-auto whitespace-pr " style={{  overflowX: 'auto',
-    WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
-    maxWidth: '100%'}}>
-                            <code className="text-sm">{implementation.code.python}</code>
+                          <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full">
+                            <code>{implementation.code.python}</code>
                           </pre>
                         </div>
                       </TabsContent>
@@ -202,10 +198,8 @@ const AlgorithmDetail = () => {
                       <TabsContent value="cpp" className="mt-4">
                         <div className="relative">
                           <CopyCodeButton code={implementation.code.cpp} />
-                          <pre className="code-block overflow-x-auto whitespace-pr " style={{  overflowX: 'auto',
-    WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
-    maxWidth: '100%'}}>
-                            <code className="text-sm">{implementation.code.cpp}</code>
+                          <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full">
+                            <code>{implementation.code.cpp}</code>
                           </pre>
                         </div>
                       </TabsContent>
@@ -213,12 +207,8 @@ const AlgorithmDetail = () => {
                       <TabsContent value="java" className="mt-4">
                         <div className="relative">
                           <CopyCodeButton code={implementation.code.java} />
-                          <pre className="code-block overflow-x-auto whitespace-pr   style={{  overflowX: 'auto',
-    WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
-    maxWidth: '100%'}}whitespace-pr " style={{  overflowX: 'auto',
-    WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
-    maxWidth: '100%'}}>
-                            <code className="text-sm">{implementation.code.java}</code>
+                          <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full">
+                            <code>{implementation.code.java}</code>
                           </pre>
                         </div>
                       </TabsContent>
