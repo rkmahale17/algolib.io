@@ -1,4 +1,4 @@
-# Welcome to Algo Learn 🚀
+# Welcome to AlgoLib.io 🚀
 
 AlgoLib.io is an open-source platform to **learn, visualize, and master algorithms** with interactive explanations and multi-language code snippets (Python, Java, C++, and TypeScript).
 
@@ -62,7 +62,7 @@ AlgoLib.io is an open-source platform to **learn, visualize, and master algorith
 - [Dijkstra's Algorithm](https://algolib.io/algorithms/dijkstras) — Single-source shortest path
 - [Bellman-Ford](https://algolib.io/algorithms/bellman-ford) — Shortest path with negative weights
 - [Floyd-Warshall](https://algolib.io/algorithms/floyd-warshall) — All-pairs shortest paths
-- [A* Search](https://algolib.io/algorithms/a-star) — Heuristic pathfinding algorithm
+- [A\* Search](https://algolib.io/algorithms/a-star) — Heuristic pathfinding algorithm
 
 </details>
 
@@ -187,11 +187,11 @@ npm run dev
 
 ## 🧰 Tech Stack
 
-- ⚡ Vite  
-- 💎 TypeScript  
-- ⚛️ React  
-- 🎨 shadcn/ui  
-- 💨 Tailwind CSS  
+- ⚡ Vite
+- 💎 TypeScript
+- ⚛️ React
+- 🎨 shadcn/ui
+- 💨 Tailwind CSS
 
 ---
 
