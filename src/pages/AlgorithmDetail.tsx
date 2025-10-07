@@ -107,24 +107,26 @@ const AlgorithmDetail = () => {
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 overflow-x-hidden">
         <div className="grid lg:grid-cols-2 gap-6">
           {/* Left Panel - Visualization */}
-          <div className="space-y-4">
-            <Card className="p-6 glass-card">
+          <div className="space-y-4 min-w-0">
+            <Card className="p-4 sm:p-6 glass-card overflow-hidden">
               <div className="space-y-4">
                 <h2 className="text-lg font-semibold flex items-center gap-2">
                   <Eye className="w-5 h-5 text-primary" />
                   Interactive Visualization
                 </h2>
-                <div className="rounded-lg bg-muted/30 border border-border/50 p-4">
-                  {renderVisualization()}
+                <div className="rounded-lg bg-muted/30 border border-border/50 p-2 sm:p-4 overflow-x-auto">
+                  <div className="min-w-[280px]">
+                    {renderVisualization()}
+                  </div>
                 </div>
               </div>
             </Card>
 
             {/* Algorithm Info */}
-            <Card className="p-6 glass-card">
+            <Card className="p-4 sm:p-6 glass-card overflow-hidden">
               <div className="space-y-4">
                 <h3 className="font-semibold flex items-center gap-2">
                   <BookOpen className="w-5 h-5 text-primary" />
@@ -155,8 +157,8 @@ const AlgorithmDetail = () => {
           </div>
 
           {/* Right Panel - Code & Explanation */}
-          <div className="space-y-4">
-            <Card className="p-6 glass-card">
+          <div className="space-y-4 min-w-0">
+            <Card className="p-4 sm:p-6 glass-card overflow-hidden">
               <div className="space-y-4">
                 <h3 className="font-semibold flex items-center gap-2">
                   <Code2 className="w-5 h-5 text-primary" />
@@ -178,37 +180,37 @@ const AlgorithmDetail = () => {
                   {implementation ? (
                     <>
                       <TabsContent value="typescript" className="mt-4">
-                        <div className="relative">
+                        <div className="relative overflow-hidden rounded-lg">
                           <CopyCodeButton code={implementation.code.typescript} />
-                          <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full">
-                            <code>{implementation.code.typescript}</code>
+                          <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
+                            <code className="block">{implementation.code.typescript}</code>
                           </pre>
                         </div>
                       </TabsContent>
                       
                       <TabsContent value="python" className="mt-4">
-                        <div className="relative">
+                        <div className="relative overflow-hidden rounded-lg">
                           <CopyCodeButton code={implementation.code.python} />
-                          <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full">
-                            <code>{implementation.code.python}</code>
+                          <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
+                            <code className="block">{implementation.code.python}</code>
                           </pre>
                         </div>
                       </TabsContent>
                       
                       <TabsContent value="cpp" className="mt-4">
-                        <div className="relative">
+                        <div className="relative overflow-hidden rounded-lg">
                           <CopyCodeButton code={implementation.code.cpp} />
-                          <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full">
-                            <code>{implementation.code.cpp}</code>
+                          <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
+                            <code className="block">{implementation.code.cpp}</code>
                           </pre>
                         </div>
                       </TabsContent>
                       
                       <TabsContent value="java" className="mt-4">
-                        <div className="relative">
+                        <div className="relative overflow-hidden rounded-lg">
                           <CopyCodeButton code={implementation.code.java} />
-                          <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full">
-                            <code>{implementation.code.java}</code>
+                          <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
+                            <code className="block">{implementation.code.java}</code>
                           </pre>
                         </div>
                       </TabsContent>
@@ -223,7 +225,7 @@ const AlgorithmDetail = () => {
             </Card>
 
             {implementation && (
-              <Card className="p-6 glass-card">
+              <Card className="p-4 sm:p-6 glass-card overflow-hidden">
                 <div className="space-y-4">
                   <h4 className="font-semibold">Step-by-Step Explanation</h4>
                   <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
@@ -257,7 +259,7 @@ const AlgorithmDetail = () => {
 
             {/* Practice Problems */}
             {implementation?.practiceProblems && implementation.practiceProblems.length > 0 && (
-              <Card className="p-6 glass-card">
+              <Card className="p-4 sm:p-6 glass-card overflow-hidden">
                 <h3 className="font-semibold mb-4">Practice Problems</h3>
                 <div className="space-y-2">
                   {implementation.practiceProblems.map((problem, i) => (
