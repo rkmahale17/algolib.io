@@ -84,12 +84,13 @@ const AlgorithmDetail: React.FC = () => {
   };
 
   return (
-    <>
-      {/* Dynamic SEO meta for this algorithm */}
+    <div>
+       {/* Dynamic SEO meta for this algorithm */}
       <AlgoMetaHead id={id} />
 
       <div className="min-h-screen bg-background">
         {/* Header */}
+        
         <div className="border-b border-border/50 bg-card/30 backdrop-blur-sm sticky top-0 z-10">
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
@@ -165,7 +166,33 @@ const AlgorithmDetail: React.FC = () => {
                 </div>
               </div>
             </Card>
-          </div>
+
+             {algorithm?.problems && algorithm.problems.length > 0 && (
+              <Card className="p-4 sm:p-6 glass-card overflow-hidden">
+                <h3 className="font-semibold mb-4">Practice Problems</h3>
+                <div className="space-y-2">
+                  {algorithm.problems.map((problem, i) => (
+                    <a
+                      key={i}
+                      href={problem.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{problem.title}</p>
+                        <p className="text-xs text-muted-foreground mt-1 capitalize">
+                          {problem.difficulty}
+                        </p>
+                      </div>
+                      <ExternalLink className="w-4 h-4 text-muted-foreground" />
+                    </a>
+                  ))}
+                </div>
+              </Card>
+             )}
+             </div>
+         
 
           {/* Right Panel - Code & Explanation */}
           <div className="space-y-4 min-w-0">
@@ -235,209 +262,52 @@ const AlgorithmDetail: React.FC = () => {
               </div>
             </Card>
 
-            {implementation && (
+                {implementation && (
               <Card className="p-4 sm:p-6 glass-card overflow-hidden">
                 <div className="space-y-4">
-                  <h2 className="text-lg font-semibold flex items-center gap-2">
-                    <Eye className="w-5 h-5 text-primary" />
-                    Interactive Visualization
-                  </h2>
-                  <div className="rounded-lg bg-muted/30 border border-border/50 p-4">
-                    {renderVisualization()}
+                  <h4 className="font-semibold">Step-by-Step Explanation</h4>
+                  <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
+                    {implementation.explanation.steps.map((step, index) => (
+                      <li key={index} className="ml-2">{step}</li>
+                    ))}
+                  </ol>
+                  
+                  <Separator />
+                  
+                  <div>
+                    <h4 className="font-semibold mb-2">When to Use</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {implementation.explanation.useCase}
+                    </p>
+                  </div>
+
+                  <Separator />
+                  
+                  <div>
+                    <h4 className="font-semibold mb-2">Pro Tips</h4>
+                    <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground ml-2">
+                      {implementation.explanation.tips.map((tip, index) => (
+                        <li key={index}>{tip}</li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
               </Card>
             )}
 
-            {/* Practice Problems */}
-            {implementation?.practiceProblems && implementation.practiceProblems.length > 0 && (
-              <Card className="p-4 sm:p-6 glass-card overflow-hidden">
-                <h3 className="font-semibold mb-4">Practice Problems</h3>
-                <div className="space-y-2">
-                  {implementation.practiceProblems.map((problem, i) => (
-                    <a
-                      key={i}
-                      href={problem.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
-                    >
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">{problem.title}</p>
-                        <p className="text-xs text-muted-foreground mt-1 capitalize">
-                          {problem.difficulty}
-                        </p>
-                      </div>
-                      <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                    </a>
-                  ))}
-                </div>
-              </Card>
+       
+            
             </div>
+            
 
-            {/* Right Panel - Code & Explanation */}
-            <div className="space-y-4">
-              <Card className="p-6 glass-card">
-                <div className="space-y-4">
-                  <h3 className="font-semibold flex items-center gap-2">
-                    <Code2 className="w-5 h-5 text-primary" />
-                    Implementation
-                  </h3>
-
-                  <Tabs
-                    value={codeLanguage}
-                    onValueChange={(v) => {
-                      const lang = v as any;
-                      setCodeLanguage(lang);
-                      localStorage.setItem('preferredLanguage', lang);
-                    }}
-                  >
-                    <TabsList className="grid h-100 w-full grid-cols-1 sm:grid-cols-4">
-                      <TabsTrigger value="python">Python</TabsTrigger>
-                      <TabsTrigger value="cpp">C++</TabsTrigger>
-                      <TabsTrigger value="java">Java</TabsTrigger>
-                      <TabsTrigger value="typescript">TypeScript</TabsTrigger>
-                    </TabsList>
-
-                    {implementation ? (
-                      <>
-                        <TabsContent value="typescript" className="mt-4">
-                          <div className="relative">
-                            <CopyCodeButton code={implementation.code.typescript} />
-                            <pre
-                              className="code-block overflow-x-auto whitespace-pre"
-                              style={{
-                                overflowX: 'auto',
-                                WebkitOverflowScrolling: 'touch',
-                                maxWidth: '100%',
-                              }}
-                            >
-                              <code className="text-sm">{implementation.code.typescript}</code>
-                            </pre>
-                          </div>
-                        </TabsContent>
-
-                        <TabsContent value="python" className="mt-4">
-                          <div className="relative">
-                            <CopyCodeButton code={implementation.code.python} />
-                            <pre
-                              className="code-block overflow-x-auto whitespace-pre"
-                              style={{
-                                overflowX: 'auto',
-                                WebkitOverflowScrolling: 'touch',
-                                maxWidth: '100%',
-                              }}
-                            >
-                              <code className="text-sm">{implementation.code.python}</code>
-                            </pre>
-                          </div>
-                        </TabsContent>
-
-                        <TabsContent value="cpp" className="mt-4">
-                          <div className="relative">
-                            <CopyCodeButton code={implementation.code.cpp} />
-                            <pre
-                              className="code-block overflow-x-auto whitespace-pre"
-                              style={{
-                                overflowX: 'auto',
-                                WebkitOverflowScrolling: 'touch',
-                                maxWidth: '100%',
-                              }}
-                            >
-                              <code className="text-sm">{implementation.code.cpp}</code>
-                            </pre>
-                          </div>
-                        </TabsContent>
-
-                        <TabsContent value="java" className="mt-4">
-                          <div className="relative">
-                            <CopyCodeButton code={implementation.code.java} />
-                            <pre
-                              className="code-block overflow-x-auto whitespace-pre"
-                              style={{
-                                overflowX: 'auto',
-                                WebkitOverflowScrolling: 'touch',
-                                maxWidth: '100%',
-                              }}
-                            >
-                              <code className="text-sm">{implementation.code.java}</code>
-                            </pre>
-                          </div>
-                        </TabsContent>
-                      </>
-                    ) : (
-                      <div className="mt-4 p-4 bg-muted/30 rounded-lg text-center text-sm text-muted-foreground">
-                        Code implementation coming soon
-                      </div>
-                    )}
-                  </Tabs>
-                </div>
-              </Card>
-
-              {implementation && (
-                <Card className="p-6 glass-card">
-                  <div className="space-y-4">
-                    <h4 className="font-semibold">Step-by-Step Explanation</h4>
-                    <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
-                      {implementation.explanation.steps.map((step: string, index: number) => (
-                        <li key={index} className="ml-2">
-                          {step}
-                        </li>
-                      ))}
-                    </ol>
-
-                    <Separator />
-
-                    <div>
-                      <h4 className="font-semibold mb-2">When to Use</h4>
-                      <p className="text-sm text-muted-foreground">
-                        {implementation.explanation.useCase}
-                      </p>
-                    </div>
-
-                    <Separator />
-
-                    <div>
-                      <h4 className="font-semibold mb-2">Pro Tips</h4>
-                      <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground ml-2">
-                        {implementation.explanation.tips.map((tip: string, index: number) => (
-                          <li key={index}>{tip}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </Card>
-              )}
-
-              {/* Practice Problems */}
-              {implementation?.practiceProblems && implementation.practiceProblems.length > 0 && (
-                <Card className="p-6 glass-card">
-                  <h3 className="font-semibold mb-4">Practice Problems</h3>
-                  <div className="space-y-2">
-                    {implementation.practiceProblems.map((problem: any, i: number) => (
-                      <a
-                        key={i}
-                        href={problem.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
-                      >
-                        <div className="flex-1">
-                          <p className="text-sm font-medium">{problem.title}</p>
-                          <p className="text-xs text-muted-foreground mt-1 capitalize">{problem.difficulty}</p>
-                        </div>
-                        <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                      </a>
-                    ))}
-                  </div>
-                </Card>
-              )}
-            </div>
+          
           </div>
         </div>
+      
       </div>
-    </>
-  );
-};
+      </div>
+  )
+}
+      
 
 export default AlgorithmDetail;
