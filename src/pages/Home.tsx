@@ -1,11 +1,12 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Search, Sparkles, BookOpen, Trophy, TrendingUp } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { BookOpen, Search, Sparkles, TrendingUp, Trophy } from 'lucide-react';
 import { algorithms, categories } from '@/data/algorithms';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Link } from 'react-router-dom';
+import { useState } from 'react';
 
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -44,7 +45,7 @@ const Home = () => {
             </h1>
             
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Step-by-step visualizations of 80+ algorithms. Watch code come to life with interactive animations.
+              Step-by-step visualizations of 75+ algorithms. Watch code come to life with interactive animations.
             </p>
 
             {/* Stats */}
