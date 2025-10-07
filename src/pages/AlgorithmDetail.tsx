@@ -1,7 +1,10 @@
 import { ArrowLeft, BookOpen, Code2, ExternalLink, Eye } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
+// src/pages/AlgorithmDetail.tsx
+import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
+import AlgoMetaHead from '@/services/meta.injectot';
 import { ArrayVisualization } from '@/components/visualizations/ArrayVisualization';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -14,30 +17,37 @@ import { ShareButton } from '@/components/ShareButton';
 import { TreeVisualization } from '@/components/visualizations/TreeVisualization';
 import { algorithms } from '@/data/algorithms';
 import { getAlgorithmImplementation } from '@/data/algorithmImplementations';
-import { useState } from 'react';
 
-const AlgorithmDetail = () => {
-  const { id } = useParams();
+const AlgorithmDetail: React.FC = () => {
+  const { id } = useParams<{ id?: string }>();
   const algorithm = algorithms.find((a) => a.id === id);
   const implementation = getAlgorithmImplementation(id || '');
   const [codeLanguage, setCodeLanguage] = useState<'typescript' | 'python' | 'cpp' | 'java'>(() => {
     return (localStorage.getItem('preferredLanguage') as any) || 'python';
   });
 
+  // If algorithm not found - show friendly 404 and still inject meta if id present
   if (!algorithm) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <h2 className="text-2xl font-bold">Algorithm not found</h2>
-          <Link to="/">
-            <Button>Go Home</Button>
-          </Link>
+      <>
+        <AlgoMetaHead id={id} />
+
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <h2 className="text-2xl font-bold">Algorithm not found</h2>
+            <p className="text-sm text-muted-foreground">
+              The algorithm <code>{id}</code> could not be found.
+            </p>
+            <Link to="/">
+              <Button>Go Home</Button>
+            </Link>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
-  const difficultyColors = {
+  const difficultyColors: Record<string, string> = {
     beginner: 'bg-green-500/10 text-green-500 border-green-500/20',
     intermediate: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
     advanced: 'bg-red-500/10 text-red-500 border-red-500/20',
@@ -50,9 +60,7 @@ const AlgorithmDetail = () => {
           <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
             <Eye className="w-8 h-8 text-primary" />
           </div>
-          <p className="text-sm text-muted-foreground">
-            Visualization coming soon
-          </p>
+          <p className="text-sm text-muted-foreground">Visualization coming soon</p>
         </div>
       );
     }
@@ -69,42 +77,46 @@ const AlgorithmDetail = () => {
       default:
         return (
           <div className="text-center space-y-2">
-            <p className="text-sm text-muted-foreground">
-              Visualization not available for this algorithm
-            </p>
+            <p className="text-sm text-muted-foreground">Visualization not available for this algorithm</p>
           </div>
         );
     }
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="border-b border-border/50 bg-card/30 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link to="/">
-                <Button variant="ghost" size="sm">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back
-                </Button>
-              </Link>
-              <Separator orientation="vertical" className="h-8" />
-              <div>
-                <h1 className="text-2xl font-bold">{algorithm.name}</h1>
-                <p className="text-sm text-muted-foreground">{algorithm.category}</p>
+    <div>
+       {/* Dynamic SEO meta for this algorithm */}
+      <AlgoMetaHead id={id} />
+
+      <div className="min-h-screen bg-background">
+        {/* Header */}
+        
+        <div className="border-b border-border/50 bg-card/30 backdrop-blur-sm sticky top-0 z-10">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Link to="/">
+                  <Button variant="ghost" size="sm">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back
+                  </Button>
+                </Link>
+                <Separator orientation="vertical" className="h-8" />
+                <div>
+                  <h1 className="text-2xl font-bold">{algorithm.name}</h1>
+                  <p className="text-sm text-muted-foreground">{algorithm.category}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <ShareButton title={algorithm.name} description={algorithm.description} />
+                <Badge variant="outline" className={difficultyColors[algorithm.difficulty]}>
+                  {algorithm.difficulty}
+                </Badge>
               </div>
             </div>
-                <div className="flex items-center gap-2">
-                  <ShareButton title={algorithm.name} description={algorithm.description} />
-                  <Badge variant="outline" className={difficultyColors[algorithm.difficulty]}>
-                    {algorithm.difficulty}
-                  </Badge>
-                </div>
           </div>
         </div>
-      </div>
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8 overflow-x-hidden">
@@ -154,7 +166,33 @@ const AlgorithmDetail = () => {
                 </div>
               </div>
             </Card>
-          </div>
+
+             {algorithm?.problems && algorithm.problems.length > 0 && (
+              <Card className="p-4 sm:p-6 glass-card overflow-hidden">
+                <h3 className="font-semibold mb-4">Practice Problems</h3>
+                <div className="space-y-2">
+                  {algorithm.problems.map((problem, i) => (
+                    <a
+                      key={i}
+                      href={problem.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{problem.title}</p>
+                        <p className="text-xs text-muted-foreground mt-1 capitalize">
+                          {problem.difficulty}
+                        </p>
+                      </div>
+                      <ExternalLink className="w-4 h-4 text-muted-foreground" />
+                    </a>
+                  ))}
+                </div>
+              </Card>
+             )}
+             </div>
+         
 
           {/* Right Panel - Code & Explanation */}
           <div className="space-y-4 min-w-0">
@@ -224,7 +262,7 @@ const AlgorithmDetail = () => {
               </div>
             </Card>
 
-            {implementation && (
+                {implementation && (
               <Card className="p-4 sm:p-6 glass-card overflow-hidden">
                 <div className="space-y-4">
                   <h4 className="font-semibold">Step-by-Step Explanation</h4>
@@ -257,36 +295,19 @@ const AlgorithmDetail = () => {
               </Card>
             )}
 
-            {/* Practice Problems */}
-            {implementation?.practiceProblems && implementation.practiceProblems.length > 0 && (
-              <Card className="p-4 sm:p-6 glass-card overflow-hidden">
-                <h3 className="font-semibold mb-4">Practice Problems</h3>
-                <div className="space-y-2">
-                  {implementation.practiceProblems.map((problem, i) => (
-                    <a
-                      key={i}
-                      href={problem.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
-                    >
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">{problem.title}</p>
-                        <p className="text-xs text-muted-foreground mt-1 capitalize">
-                          {problem.difficulty}
-                        </p>
-                      </div>
-                      <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                    </a>
-                  ))}
-                </div>
-              </Card>
-            )}
+       
+            
+            </div>
+            
+
+          
           </div>
         </div>
+      
       </div>
-    </div>
-  );
-};
+      </div>
+  )
+}
+      
 
 export default AlgorithmDetail;

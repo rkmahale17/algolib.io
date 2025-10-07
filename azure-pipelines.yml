@@ -17,11 +17,11 @@ pool:
 # Variables
 variables:
   nodeVersion: "22"
-  projectId: "playgroundforcode" # single project
+  projectId: "algolib" # single project
   region: "us-west1"
-  imageName: "playground-image"
-  qaService: "qaplayground"
-  prodService: "prodplaygroundforcode"
+  imageName: "algo-image"
+  qaService: "qaalgo"
+  prodService: "prodalgolib"
 
 stages:
   # =========================
@@ -46,7 +46,7 @@ stages:
           - task: DownloadSecureFile@1
             name: gcpKey
             inputs:
-              secureFile: "playgroundkeyfile.json" # stored in Pipelines > Library > Secure Files
+              secureFile: "algolib.json" # stored in Pipelines > Library > Secure Files
 
           - script: |
               set -e
@@ -101,7 +101,7 @@ stages:
                 - task: DownloadSecureFile@1
                   name: gcpKey
                   inputs:
-                    secureFile: "playgroundkeyfile.json" # same project -> same key
+                    secureFile: "algolib.json" # same project -> same key
 
                 - script: |
                     set -e
