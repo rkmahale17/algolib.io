@@ -117,12 +117,126 @@ const AlgorithmDetail: React.FC = () => {
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid lg:grid-cols-2 gap-6">
-            {/* Left Panel - Visualization */}
-            <div className="space-y-4">
-              <Card className="p-6 glass-card">
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-8 overflow-x-hidden">
+        <div className="grid lg:grid-cols-2 gap-6">
+          {/* Left Panel - Visualization */}
+          <div className="space-y-4 min-w-0">
+            <Card className="p-4 sm:p-6 glass-card overflow-hidden">
+              <div className="space-y-4">
+                <h2 className="text-lg font-semibold flex items-center gap-2">
+                  <Eye className="w-5 h-5 text-primary" />
+                  Interactive Visualization
+                </h2>
+                <div className="rounded-lg bg-muted/30 border border-border/50 p-2 sm:p-4 overflow-x-auto">
+                  <div className="min-w-[280px]">
+                    {renderVisualization()}
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            {/* Algorithm Info */}
+            <Card className="p-4 sm:p-6 glass-card overflow-hidden">
+              <div className="space-y-4">
+                <h3 className="font-semibold flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-primary" />
+                  Algorithm Overview
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {implementation?.explanation.overview || algorithm.description}
+                </p>
+                
+                <Separator />
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-medium mb-1">Time Complexity</p>
+                    <Badge variant="outline" className="font-mono">
+                      {algorithm.timeComplexity}
+                    </Badge>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium mb-1">Space Complexity</p>
+                    <Badge variant="outline" className="font-mono">
+                      {algorithm.spaceComplexity}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          {/* Right Panel - Code & Explanation */}
+          <div className="space-y-4 min-w-0">
+            <Card className="p-4 sm:p-6 glass-card overflow-hidden">
+              <div className="space-y-4">
+                <h3 className="font-semibold flex items-center gap-2">
+                  <Code2 className="w-5 h-5 text-primary" />
+                  Implementation
+                </h3>
+                
+                <Tabs value={codeLanguage} onValueChange={(v) => {
+                  const lang = v as any;
+                  setCodeLanguage(lang);
+                  localStorage.setItem('preferredLanguage', lang);
+                }}>
+                  <TabsList className="grid h-100 w-full grid-cols-1 sm:grid-cols-4">
+                    <TabsTrigger value="python">Python</TabsTrigger>
+                    <TabsTrigger value="cpp">C++</TabsTrigger>
+                    <TabsTrigger value="java">Java</TabsTrigger>
+                    <TabsTrigger value="typescript">TypeScript</TabsTrigger>
+                  </TabsList>
+                  
+                  {implementation ? (
+                    <>
+                      <TabsContent value="typescript" className="mt-4">
+                        <div className="relative overflow-hidden rounded-lg">
+                          <CopyCodeButton code={implementation.code.typescript} />
+                          <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
+                            <code className="block">{implementation.code.typescript}</code>
+                          </pre>
+                        </div>
+                      </TabsContent>
+                      
+                      <TabsContent value="python" className="mt-4">
+                        <div className="relative overflow-hidden rounded-lg">
+                          <CopyCodeButton code={implementation.code.python} />
+                          <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
+                            <code className="block">{implementation.code.python}</code>
+                          </pre>
+                        </div>
+                      </TabsContent>
+                      
+                      <TabsContent value="cpp" className="mt-4">
+                        <div className="relative overflow-hidden rounded-lg">
+                          <CopyCodeButton code={implementation.code.cpp} />
+                          <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
+                            <code className="block">{implementation.code.cpp}</code>
+                          </pre>
+                        </div>
+                      </TabsContent>
+                      
+                      <TabsContent value="java" className="mt-4">
+                        <div className="relative overflow-hidden rounded-lg">
+                          <CopyCodeButton code={implementation.code.java} />
+                          <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
+                            <code className="block">{implementation.code.java}</code>
+                          </pre>
+                        </div>
+                      </TabsContent>
+                    </>
+                  ) : (
+                    <div className="mt-4 p-4 bg-muted/30 rounded-lg text-center text-sm text-muted-foreground">
+                      Code implementation coming soon
+                    </div>
+                  )}
+                </Tabs>
+              </div>
+            </Card>
+
+            {implementation && (
+              <Card className="p-4 sm:p-6 glass-card overflow-hidden">
                 <div className="space-y-4">
                   <h2 className="text-lg font-semibold flex items-center gap-2">
                     <Eye className="w-5 h-5 text-primary" />
@@ -133,34 +247,30 @@ const AlgorithmDetail: React.FC = () => {
                   </div>
                 </div>
               </Card>
+            )}
 
-              {/* Algorithm Info */}
-              <Card className="p-6 glass-card">
-                <div className="space-y-4">
-                  <h3 className="font-semibold flex items-center gap-2">
-                    <BookOpen className="w-5 h-5 text-primary" />
-                    Algorithm Overview
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {implementation?.explanation.overview || algorithm.description}
-                  </p>
-
-                  <Separator />
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm font-medium mb-1">Time Complexity</p>
-                      <Badge variant="outline" className="font-mono">
-                        {algorithm.timeComplexity}
-                      </Badge>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium mb-1">Space Complexity</p>
-                      <Badge variant="outline" className="font-mono">
-                        {algorithm.spaceComplexity}
-                      </Badge>
-                    </div>
-                  </div>
+            {/* Practice Problems */}
+            {implementation?.practiceProblems && implementation.practiceProblems.length > 0 && (
+              <Card className="p-4 sm:p-6 glass-card overflow-hidden">
+                <h3 className="font-semibold mb-4">Practice Problems</h3>
+                <div className="space-y-2">
+                  {implementation.practiceProblems.map((problem, i) => (
+                    <a
+                      key={i}
+                      href={problem.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{problem.title}</p>
+                        <p className="text-xs text-muted-foreground mt-1 capitalize">
+                          {problem.difficulty}
+                        </p>
+                      </div>
+                      <ExternalLink className="w-4 h-4 text-muted-foreground" />
+                    </a>
+                  ))}
                 </div>
               </Card>
             </div>
