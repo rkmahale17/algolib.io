@@ -216,18 +216,17 @@ export const DutchNationalFlagVisualization = () => {
           </div>
         </div>
 
-        <div className="space-y-4">
-          <VariablePanel
-            variables={{
-              low: currentStep.low,
-              mid: currentStep.mid,
-              high: currentStep.high,
-              'nums[mid]': currentStep.mid <= currentStep.high ? currentStep.array[currentStep.mid] : 'done'
-            }}
-          />
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
-        </div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
       </div>
+
+      <VariablePanel
+        variables={{
+          low: currentStep.low,
+          mid: currentStep.mid,
+          high: currentStep.high,
+          'nums[mid]': currentStep.mid <= currentStep.high ? currentStep.array[currentStep.mid] : 'done'
+        }}
+      />
     </div>
   );
 };

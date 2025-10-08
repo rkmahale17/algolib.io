@@ -211,52 +211,59 @@ export const FenwickTreeVisualization: React.FC = () => {
         onSpeedChange={setSpeed}
       />
 
-      <div className="bg-card rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4">Input Array</h3>
-        <div className="flex gap-2 mb-6">
-          {currentStep.array.map((val, idx) => (
-            <div
-              key={idx}
-              className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
-                idx === currentStep.index && currentStep.operation !== 'init'
-                  ? 'bg-primary/20 border-primary'
-                  : 'bg-card border-border'
-              }`}
-            >
-              {val}
-            </div>
-          ))}
-        </div>
-
-        <h3 className="text-lg font-semibold mb-4">Fenwick Tree (1-indexed)</h3>
-        <div className="flex gap-2 mb-6">
-          {currentStep.tree.slice(1).map((val, idx) => (
-            <div key={idx} className="flex flex-col items-center">
-              <div className="text-xs text-muted-foreground mb-1">[{idx + 1}]</div>
-              <div
-                className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
-                  idx === currentStep.index && currentStep.operation !== 'init'
-                    ? 'bg-green-500/20 border-green-500'
-                    : val !== 0
-                    ? 'bg-blue-500/20 border-blue-500'
-                    : 'bg-card border-border'
-                }`}
-              >
-                {val}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-card rounded-lg p-6 border space-y-4">
+          <h3 className="text-lg font-semibold">Fenwick Tree</h3>
+          <h3 className="text-lg font-semibold">Original Array</h3>
+          <div className="flex gap-2">
+            {currentStep.array.map((val, idx) => (
+              <div key={idx} className="flex flex-col items-center">
+                <div className="text-xs text-muted-foreground mb-1">[{idx}]</div>
+                <div
+                  className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
+                    idx === currentStep.index
+                      ? 'bg-primary/20 border-primary'
+                      : 'bg-blue-500/20 border-blue-500'
+                  }`}
+                >
+                  {val}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-
-        {currentStep.result !== null && (
-          <div className="mb-4 p-4 bg-green-500/10 border border-green-500 rounded">
-            <p className="text-sm font-semibold">Prefix Sum Result: {currentStep.result}</p>
+            ))}
           </div>
-        )}
 
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
+          <h3 className="text-lg font-semibold">Fenwick Tree (1-indexed)</h3>
+          <div className="flex gap-2">
+            {currentStep.tree.slice(1).map((val, idx) => (
+              <div key={idx} className="flex flex-col items-center">
+                <div className="text-xs text-muted-foreground mb-1">[{idx + 1}]</div>
+                <div
+                  className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
+                    idx === currentStep.index && currentStep.operation !== 'init'
+                      ? 'bg-green-500/20 border-green-500'
+                      : val !== 0
+                      ? 'bg-blue-500/20 border-blue-500'
+                      : 'bg-card border-border'
+                  }`}
+                >
+                  {val}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {currentStep.result !== null && (
+            <div className="p-4 bg-green-500/10 border border-green-500 rounded">
+              <p className="text-sm font-semibold">Prefix Sum Result: {currentStep.result}</p>
+            </div>
+          )}
+
+          <div className="p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
+          </div>
         </div>
+
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
       </div>
 
       <VariablePanel
@@ -267,8 +274,6 @@ export const FenwickTreeVisualization: React.FC = () => {
           'result': currentStep.result !== null ? currentStep.result : 'pending'
         }}
       />
-
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
     </div>
   );
 };

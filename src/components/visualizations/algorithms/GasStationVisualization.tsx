@@ -172,82 +172,64 @@ export const GasStationVisualization: React.FC = () => {
         onSpeedChange={setSpeed}
       />
 
-      <div className="bg-card rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4">Gas Stations (Circular Route)</h3>
-        
-        <div className="space-y-3 mb-6">
-          <div className="flex gap-2">
-            <div className="w-20 text-sm font-semibold">Gas:</div>
-            {currentStep.gas.map((val, idx) => (
-              <div
-                key={idx}
-                className={`w-16 h-16 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
-                  idx === currentStep.current
-                    ? 'bg-primary/20 border-primary'
-                    : idx === currentStep.start
-                    ? 'bg-green-500/20 border-green-500'
-                    : 'bg-card border-border'
-                }`}
-              >
-                {val}
-              </div>
-            ))}
-          </div>
-          <div className="flex gap-2">
-            <div className="w-20 text-sm font-semibold">Cost:</div>
-            {currentStep.cost.map((val, idx) => (
-              <div
-                key={idx}
-                className={`w-16 h-16 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
-                  idx === currentStep.current
-                    ? 'bg-primary/20 border-primary'
-                    : 'bg-card border-border'
-                }`}
-              >
-                {val}
-              </div>
-            ))}
-          </div>
-          <div className="flex gap-2">
-            <div className="w-20 text-sm font-semibold">Net:</div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-card rounded-lg p-6 border space-y-4">
+          <h3 className="text-lg font-semibold">Gas Stations</h3>
+          <div className="flex justify-center gap-2">
             {currentStep.gas.map((gas, idx) => {
-              const net = gas - currentStep.cost[idx];
+              const cost = currentStep.cost[idx];
+              const net = gas - cost;
               return (
                 <div
                   key={idx}
-                  className={`w-16 h-16 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
-                    net >= 0 ? 'bg-green-500/10 border-green-500/50' : 'bg-red-500/10 border-red-500/50'
+                  className={`flex flex-col items-center p-3 rounded border-2 transition-all ${
+                    idx === currentStep.current
+                      ? 'bg-primary/20 border-primary scale-110'
+                      : idx === currentStep.start
+                      ? 'bg-green-500/20 border-green-500'
+                      : 'bg-card border-border'
                   }`}
                 >
-                  {net >= 0 ? '+' : ''}{net}
+                  <div className="text-xs text-muted-foreground mb-1">{idx}</div>
+                  <div className="text-sm font-bold text-green-500">G: {gas}</div>
+                  <div className="text-sm font-bold text-red-500">C: {cost}</div>
+                  <div
+                    className={`text-xs font-bold ${
+                      net >= 0 ? 'text-green-500' : 'text-red-500'
+                    }`}
+                  >
+                    {net >= 0 ? '+' : ''}{net}
+                  </div>
                 </div>
               );
             })}
           </div>
-        </div>
 
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="p-4 bg-muted rounded border">
-            <div className="text-sm text-muted-foreground mb-1">Start Station</div>
-            <div className="text-2xl font-bold text-green-500">{currentStep.start}</div>
-          </div>
-          <div className="p-4 bg-muted rounded border">
-            <div className="text-sm text-muted-foreground mb-1">Current Tank</div>
-            <div className={`text-2xl font-bold ${currentStep.tank >= 0 ? 'text-primary' : 'text-red-500'}`}>
-              {currentStep.tank}
+          <div className="grid grid-cols-3 gap-4">
+            <div className="p-4 bg-muted rounded border">
+              <div className="text-sm text-muted-foreground mb-1">Start Station</div>
+              <div className="text-2xl font-bold text-green-500">{currentStep.start}</div>
+            </div>
+            <div className="p-4 bg-muted rounded border">
+              <div className="text-sm text-muted-foreground mb-1">Current Tank</div>
+              <div className={`text-2xl font-bold ${currentStep.tank >= 0 ? 'text-primary' : 'text-red-500'}`}>
+                {currentStep.tank}
+              </div>
+            </div>
+            <div className="p-4 bg-muted rounded border">
+              <div className="text-sm text-muted-foreground mb-1">Total Balance</div>
+              <div className={`text-2xl font-bold ${currentStep.totalGas >= currentStep.totalCost ? 'text-green-500' : 'text-red-500'}`}>
+                {currentStep.totalGas - currentStep.totalCost}
+              </div>
             </div>
           </div>
-          <div className="p-4 bg-muted rounded border">
-            <div className="text-sm text-muted-foreground mb-1">Total Balance</div>
-            <div className={`text-2xl font-bold ${currentStep.totalGas >= currentStep.totalCost ? 'text-green-500' : 'text-red-500'}`}>
-              {currentStep.totalGas - currentStep.totalCost}
-            </div>
+
+          <div className="p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
           </div>
         </div>
 
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
-        </div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
       </div>
 
       <VariablePanel
@@ -258,8 +240,6 @@ export const GasStationVisualization: React.FC = () => {
           'total cost': currentStep.totalCost
         }}
       />
-
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
     </div>
   );
 };

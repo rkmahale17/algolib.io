@@ -213,19 +213,18 @@ export const KadanesVisualization = () => {
           </div>
         </div>
 
-        <div className="space-y-4">
-          <VariablePanel
-            variables={{
-              i: currentStep.currentIndex,
-              'arr[i]': currentStep.array[currentStep.currentIndex],
-              currentSum: currentStep.currentSum,
-              maxSum: currentStep.maxSum,
-              subarrayRange: `[${currentStep.subarrayStart}, ${currentStep.subarrayEnd}]`
-            }}
-          />
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
-        </div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
       </div>
+
+      <VariablePanel
+        variables={{
+          i: currentStep.currentIndex,
+          'arr[i]': currentStep.array[currentStep.currentIndex],
+          currentSum: currentStep.currentSum,
+          maxSum: currentStep.maxSum,
+          subarrayRange: `[${currentStep.subarrayStart}, ${currentStep.subarrayEnd}]`
+        }}
+      />
     </div>
   );
 };

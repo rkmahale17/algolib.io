@@ -161,24 +161,22 @@ export const HouseRobberVisualization: React.FC = () => {
         onSpeedChange={setSpeed}
       />
 
-      <div className="bg-card rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4">House Robber</h3>
-        
-        <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-card rounded-lg p-6 border space-y-4">
+          <h3 className="text-lg font-semibold">House Robber</h3>
           <div>
-            <div className="text-sm text-muted-foreground mb-2">Houses ($ value)</div>
+            <div className="text-sm text-muted-foreground mb-2">Houses ($)</div>
             <div className="flex gap-3 justify-center">
               {currentStep.houses.map((value, idx) => (
-                <div key={idx} className="flex flex-col items-center gap-2">
+                <div key={idx} className="flex flex-col items-center gap-1">
                   <div
-                    className={`w-16 h-20 rounded border-2 flex flex-col items-center justify-center transition-all ${
+                    className={`w-16 h-16 rounded border-2 flex items-center justify-center font-bold text-lg transition-all ${
                       idx === currentStep.currentIndex
                         ? 'bg-primary/20 border-primary text-primary scale-110'
                         : 'bg-card border-border'
                     }`}
                   >
-                    <div className="text-2xl">🏠</div>
-                    <div className="text-xs font-bold">${value}</div>
+                    ${value}
                   </div>
                   <div className="text-xs text-muted-foreground">{idx}</div>
                 </div>
@@ -207,11 +205,13 @@ export const HouseRobberVisualization: React.FC = () => {
               ))}
             </div>
           </div>
+
+          <div className="p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
+          </div>
         </div>
 
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
-        </div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
       </div>
 
       <VariablePanel
@@ -223,8 +223,6 @@ export const HouseRobberVisualization: React.FC = () => {
           maxMoney: `$${currentStep.dp[currentStep.dp.length - 1]}`
         }}
       />
-
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
     </div>
   );
 };

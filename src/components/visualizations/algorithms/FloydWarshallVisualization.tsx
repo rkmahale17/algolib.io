@@ -195,17 +195,16 @@ export const FloydWarshallVisualization = () => {
           </div>
         </div>
 
-        <div className="space-y-4">
-          <VariablePanel
-            variables={{
-              k: currentStep.k >= 0 ? currentStep.k : 'N/A',
-              i: currentStep.i >= 0 ? currentStep.i : 'N/A',
-              j: currentStep.j >= 0 ? currentStep.j : 'N/A'
-            }}
-          />
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
-        </div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
       </div>
+
+      <VariablePanel
+        variables={{
+          k: currentStep.k >= 0 ? currentStep.k : 'N/A',
+          i: currentStep.i >= 0 ? currentStep.i : 'N/A',
+          j: currentStep.j >= 0 ? currentStep.j : 'N/A'
+        }}
+      />
     </div>
   );
 };

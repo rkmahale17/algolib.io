@@ -173,51 +173,54 @@ export const ActivitySelectionVisualization: React.FC = () => {
         onSpeedChange={setSpeed}
       />
 
-      <div className="bg-card rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4">Activities Timeline</h3>
-        
-        <div className="space-y-3 mb-6">
-          {currentStep.activities.map((activity, idx) => (
-            <div key={idx} className="flex items-center gap-4">
-              <div className="w-16 text-sm font-mono">A{idx}</div>
-              <div className="flex-1 relative h-12">
-                <div className="absolute inset-y-0 left-0 right-0 flex items-center">
-                  <div className="w-full h-2 bg-muted rounded"></div>
-                </div>
-                <div
-                  className={`absolute h-8 rounded border-2 flex items-center justify-center text-xs font-bold transition-all ${
-                    currentStep.selected.includes(idx)
-                      ? 'bg-green-500/20 border-green-500'
-                      : idx === currentStep.current
-                      ? 'bg-primary/20 border-primary'
-                      : 'bg-blue-500/10 border-blue-500/50'
-                  }`}
-                  style={{
-                    left: `${(activity.start / 10) * 100}%`,
-                    width: `${((activity.end - activity.start) / 10) * 100}%`
-                  }}
-                >
-                  {activity.start}-{activity.end}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-card rounded-lg p-6 border space-y-4">
+          <h3 className="text-lg font-semibold">Activity Selection Timeline</h3>
+          <div className="space-y-2">
+            {currentStep.activities.map((activity, idx) => (
+              <div key={idx} className="relative">
+                <div className="flex items-center gap-2 text-xs mb-1">
+                  <span className="w-8">A{idx}</span>
+                  <div className="flex-1 relative h-10">
+                    <div className="w-full h-2 bg-muted rounded"></div>
+                  </div>
+                  <div
+                    className={`absolute h-8 rounded border-2 flex items-center justify-center text-xs font-bold transition-all ${
+                      currentStep.selected.includes(idx)
+                        ? 'bg-green-500/20 border-green-500'
+                        : idx === currentStep.current
+                        ? 'bg-primary/20 border-primary'
+                        : 'bg-blue-500/10 border-blue-500/50'
+                    }`}
+                    style={{
+                      left: `${(activity.start / 10) * 100}%`,
+                      width: `${((activity.end - activity.start) / 10) * 100}%`
+                    }}
+                  >
+                    {activity.start}-{activity.end}
+                  </div>
                 </div>
               </div>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-4 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded bg-green-500/20 border-2 border-green-500"></div>
+              <span>Selected</span>
             </div>
-          ))}
-        </div>
-
-        <div className="flex items-center gap-4 text-sm mb-4">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-green-500/20 border-2 border-green-500"></div>
-            <span>Selected</span>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded bg-primary/20 border-2 border-primary"></div>
+              <span>Current</span>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-primary/20 border-2 border-primary"></div>
-            <span>Current</span>
+
+          <div className="p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
           </div>
         </div>
 
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
-        </div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
       </div>
 
       <VariablePanel
@@ -227,8 +230,6 @@ export const ActivitySelectionVisualization: React.FC = () => {
           'selected count': currentStep.selected.length
         }}
       />
-
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
     </div>
   );
 };

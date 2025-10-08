@@ -142,30 +142,34 @@ export const CoinChangeVisualization: React.FC = () => {
         onSpeedChange={setSpeed}
       />
 
-      <div className="bg-card rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4">DP Array (Coins: [1, 2, 5])</h3>
-        <div className="flex flex-wrap gap-2 justify-center">
-          {currentStep.dp.map((val, idx) => (
-            <div key={idx} className="flex flex-col items-center">
-              <div className="text-xs text-muted-foreground mb-1">{idx}</div>
-              <div
-                className={`w-12 h-12 rounded border-2 flex items-center justify-center font-bold text-sm transition-all ${
-                  idx === currentStep.amount
-                    ? 'bg-primary/20 border-primary text-primary scale-110'
-                    : val === Infinity
-                    ? 'bg-muted border-border text-muted-foreground'
-                    : 'bg-green-500/20 border-green-500 text-green-500'
-                }`}
-              >
-                {val === Infinity ? '∞' : val}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-card rounded-lg p-6 border space-y-4">
+          <h3 className="text-lg font-semibold">DP Array (Coins: [1, 2, 5])</h3>
+          <div className="flex flex-wrap gap-2 justify-center">
+            {currentStep.dp.map((val, idx) => (
+              <div key={idx} className="flex flex-col items-center">
+                <div className="text-xs text-muted-foreground mb-1">{idx}</div>
+                <div
+                  className={`w-12 h-12 rounded border-2 flex items-center justify-center font-bold text-sm transition-all ${
+                    idx === currentStep.amount
+                      ? 'bg-primary/20 border-primary text-primary scale-110'
+                      : val === Infinity
+                      ? 'bg-muted border-border text-muted-foreground'
+                      : 'bg-green-500/20 border-green-500 text-green-500'
+                  }`}
+                >
+                  {val === Infinity ? '∞' : val}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          <div className="p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
+          </div>
         </div>
 
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
-        </div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
       </div>
 
       <VariablePanel
@@ -175,8 +179,6 @@ export const CoinChangeVisualization: React.FC = () => {
           minCoins: currentStep.dp[currentStep.amount] === Infinity ? 'Not possible' : currentStep.dp[currentStep.amount]
         }}
       />
-
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
     </div>
   );
 };

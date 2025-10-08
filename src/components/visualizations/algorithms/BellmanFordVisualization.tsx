@@ -264,16 +264,15 @@ export const BellmanFordVisualization = () => {
           </div>
         </div>
 
-        <div className="space-y-4">
-          <VariablePanel
-            variables={{
-              iteration: currentStep.iteration,
-              distances: currentStep.distances.map(d => d === Infinity ? '∞' : d)
-            }}
-          />
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
-        </div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
       </div>
+
+      <VariablePanel
+        variables={{
+          iteration: currentStep.iteration,
+          distances: currentStep.distances.map(d => d === Infinity ? '∞' : d)
+        }}
+      />
     </div>
   );
 };

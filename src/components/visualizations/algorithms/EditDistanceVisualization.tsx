@@ -187,48 +187,52 @@ export const EditDistanceVisualization: React.FC = () => {
         onSpeedChange={setSpeed}
       />
 
-      <div className="bg-card rounded-lg p-6 border overflow-x-auto">
-        <h3 className="text-lg font-semibold mb-4">Edit Distance: "{currentStep.word1}" → "{currentStep.word2}"</h3>
-        <div className="inline-block min-w-full">
-          <table className="w-full text-sm">
-            <thead>
-              <tr>
-                <th className="border border-border p-2 bg-muted"></th>
-                <th className="border border-border p-2 bg-muted">∅</th>
-                {currentStep.word2.split('').map((char, idx) => (
-                  <th key={idx} className="border border-border p-2 bg-muted">{char}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {currentStep.dp.map((row, i) => (
-                <tr key={i}>
-                  <td className="border border-border p-2 bg-muted font-semibold">
-                    {i === 0 ? '∅' : currentStep.word1[i-1]}
-                  </td>
-                  {row.map((val, j) => (
-                    <td
-                      key={j}
-                      className={`border border-border p-2 text-center transition-all ${
-                        i === currentStep.i && j === currentStep.j
-                          ? 'bg-primary/20 font-bold'
-                          : val > 0
-                          ? 'bg-green-500/10'
-                          : ''
-                      }`}
-                    >
-                      {val}
-                    </td>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-card rounded-lg p-6 border space-y-4">
+          <h3 className="text-lg font-semibold">Edit Distance DP Table</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-sm">
+              <thead>
+                <tr>
+                  <th className="border border-border p-2 bg-muted"></th>
+                  <th className="border border-border p-2 bg-muted">∅</th>
+                  {currentStep.word2.split('').map((char, idx) => (
+                    <th key={idx} className="border border-border p-2 bg-muted">{char}</th>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {currentStep.dp.map((row, i) => (
+                  <tr key={i}>
+                    <td className="border border-border p-2 bg-muted font-semibold">
+                      {i === 0 ? '∅' : currentStep.word1[i-1]}
+                    </td>
+                    {row.map((val, j) => (
+                      <td
+                        key={j}
+                        className={`border border-border p-2 text-center transition-all ${
+                          i === currentStep.i && j === currentStep.j
+                            ? 'bg-primary/20 font-bold'
+                            : val > 0
+                            ? 'bg-green-500/10'
+                            : ''
+                        }`}
+                      >
+                        {val}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
+          </div>
         </div>
 
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
-        </div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
       </div>
 
       <VariablePanel
@@ -239,8 +243,6 @@ export const EditDistanceVisualization: React.FC = () => {
           minDistance: currentStep.dp[currentStep.dp.length - 1][currentStep.dp[0].length - 1]
         }}
       />
-
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
     </div>
   );
 };

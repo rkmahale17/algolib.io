@@ -218,20 +218,19 @@ export const BinarySearchVisualization = () => {
           </div>
         </div>
 
-        <div className="space-y-4">
-          <VariablePanel
-            variables={{
-              left: currentStep.left,
-              right: currentStep.right,
-              mid: currentStep.mid >= 0 ? currentStep.mid : 'calculating...',
-              target: currentStep.target,
-              'arr[mid]': currentStep.mid >= 0 ? currentStep.array[currentStep.mid] : 'N/A',
-              searchSpace: currentStep.right - currentStep.left + 1
-            }}
-          />
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
-        </div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
       </div>
+
+      <VariablePanel
+        variables={{
+          left: currentStep.left,
+          right: currentStep.right,
+          mid: currentStep.mid >= 0 ? currentStep.mid : 'calculating...',
+          target: currentStep.target,
+          'arr[mid]': currentStep.mid >= 0 ? currentStep.array[currentStep.mid] : 'N/A',
+          searchSpace: currentStep.right - currentStep.left + 1
+        }}
+      />
     </div>
   );
 };

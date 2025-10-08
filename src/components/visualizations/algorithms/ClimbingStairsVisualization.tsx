@@ -158,39 +158,30 @@ export const ClimbingStairsVisualization: React.FC = () => {
         onSpeedChange={setSpeed}
       />
 
-      <div className="bg-card rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4">Climbing Stairs</h3>
-        
-        <div className="space-y-6">
-          <div className="flex justify-center items-end gap-1 h-48">
-            {currentStep.dp.slice(1).map((ways, idx) => {
-              const step = idx + 1;
-              const maxHeight = Math.max(...currentStep.dp.filter(v => v > 0));
-              const height = ways > 0 ? (ways / maxHeight) * 100 : 0;
-              
-              return (
-                <div
-                  key={step}
-                  className="flex flex-col items-center gap-2 flex-1 max-w-[70px]"
-                >
-                  <div className="text-xs font-bold text-muted-foreground">{ways || '-'}</div>
-                  <div
-                    className={`w-full rounded-t transition-all duration-300 ${
-                      step === currentStep.currentStep
-                        ? 'bg-primary shadow-lg shadow-primary/50'
-                        : ways > 0
-                        ? 'bg-gradient-to-t from-green-500/60 to-green-500/40'
-                        : 'bg-muted'
-                    }`}
-                    style={{
-                      height: height > 0 ? `${height}%` : '8px',
-                      minHeight: ways > 0 ? '20px' : '8px'
-                    }}
-                  />
-                  <div className="text-xs font-mono text-muted-foreground">Step {step}</div>
-                </div>
-              );
-            })}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-card rounded-lg p-6 border space-y-4">
+          <h3 className="text-lg font-semibold">Climbing Stairs</h3>
+          <div className="relative">
+            <div className="flex items-end justify-center gap-2">
+              {currentStep.dp.slice(1).map((ways, idx) => {
+                const step = idx + 1;
+                const maxWays = Math.max(...currentStep.dp.slice(1));
+                return (
+                  <div key={step} className="flex flex-col items-center gap-2">
+                    <div className="text-sm font-bold text-primary">{ways}</div>
+                    <div
+                      className={`w-12 rounded-t transition-all duration-300 ${
+                        step === currentStep.currentStep
+                          ? 'bg-primary scale-110'
+                          : 'bg-primary/40'
+                      }`}
+                      style={{ height: `${(ways / maxWays) * 120}px`, minHeight: '30px' }}
+                    />
+                    <div className="text-xs text-muted-foreground">{step}</div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           <div className="flex gap-3 justify-center flex-wrap">
@@ -214,11 +205,13 @@ export const ClimbingStairsVisualization: React.FC = () => {
               );
             })}
           </div>
+
+          <div className="p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
+          </div>
         </div>
 
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
-        </div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
       </div>
 
       <VariablePanel
@@ -229,8 +222,6 @@ export const ClimbingStairsVisualization: React.FC = () => {
           totalWays: currentStep.dp[currentStep.n] || 0
         }}
       />
-
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
     </div>
   );
 };

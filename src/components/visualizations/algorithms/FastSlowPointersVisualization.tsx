@@ -211,48 +211,53 @@ export const FastSlowPointersVisualization: React.FC = () => {
         onSpeedChange={setSpeed}
       />
 
-      <div className="bg-card rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4">Linked List Visualization</h3>
-        <div className="flex items-center gap-4 overflow-x-auto pb-4">
-          {nodes.map((val, idx) => (
-            <div key={idx} className="flex items-center">
-              <div
-                className={`w-16 h-16 flex items-center justify-center rounded-lg border-2 font-bold text-lg transition-all ${
-                  currentStep.slow === idx && currentStep.fast === idx
-                    ? 'bg-purple-500/20 border-purple-500 text-purple-500'
-                    : currentStep.slow === idx
-                    ? 'bg-blue-500/20 border-blue-500 text-blue-500'
-                    : currentStep.fast === idx
-                    ? 'bg-green-500/20 border-green-500 text-green-500'
-                    : 'bg-card border-border'
-                }`}
-              >
-                {val}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-card rounded-lg p-6 border space-y-4">
+          <h3 className="text-lg font-semibold">Linked List with Cycle</h3>
+          <div className="flex items-center justify-center flex-wrap gap-2">
+            {nodes.map((val, idx) => (
+              <div key={idx} className="flex items-center">
+                <div
+                  className={`w-16 h-16 rounded-full flex flex-col items-center justify-center font-bold text-lg border-2 transition-all ${
+                    currentStep.slow === idx && currentStep.fast === idx
+                      ? 'bg-purple-500/20 border-purple-500 scale-110'
+                      : currentStep.slow === idx
+                      ? 'bg-blue-500/20 border-blue-500 scale-110'
+                      : currentStep.fast === idx
+                      ? 'bg-green-500/20 border-green-500 scale-110'
+                      : 'bg-card border-border'
+                  }`}
+                >
+                  <span className="text-xs text-muted-foreground">Node</span>
+                  {val}
+                </div>
+                {idx < nodes.length - 1 && (
+                  <div className="text-2xl mx-2 text-muted-foreground">→</div>
+                )}
               </div>
-              {idx < nodes.length - 1 && (
-                <div className="text-2xl mx-2 text-muted-foreground">→</div>
-              )}
+            ))}
+            {currentStep.hasCycle && (
+              <div className="text-2xl mx-2 text-muted-foreground">↺</div>
+            )}
+          </div>
+          
+          <div className="flex gap-4 text-sm justify-center">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded bg-blue-500/20 border-2 border-blue-500"></div>
+              <span>Slow Pointer</span>
             </div>
-          ))}
-          {currentStep.hasCycle && (
-            <div className="text-2xl mx-2 text-muted-foreground">↺</div>
-          )}
-        </div>
-        
-        <div className="mt-4 flex gap-4 text-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-blue-500/20 border-2 border-blue-500"></div>
-            <span>Slow Pointer</span>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded bg-green-500/20 border-2 border-green-500"></div>
+              <span>Fast Pointer</span>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-green-500/20 border-2 border-green-500"></div>
-            <span>Fast Pointer</span>
+          
+          <div className="p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
           </div>
         </div>
-        
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
-        </div>
+
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
       </div>
 
       <VariablePanel
@@ -262,8 +267,6 @@ export const FastSlowPointersVisualization: React.FC = () => {
           hasCycle: currentStep.hasCycle !== null ? String(currentStep.hasCycle) : 'checking...'
         }}
       />
-
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
     </div>
   );
 };

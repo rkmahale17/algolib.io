@@ -253,16 +253,15 @@ export const BSTInsertVisualization = () => {
           </div>
         </div>
 
-        <div className="space-y-4">
-          <VariablePanel
-            variables={{
-              insertValue: currentStep.insertValue,
-              current: currentStep.current || 'null'
-            }}
-          />
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
-        </div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
       </div>
+
+      <VariablePanel
+        variables={{
+          insertValue: currentStep.insertValue,
+          current: currentStep.current || 'null'
+        }}
+      />
     </div>
   );
 };

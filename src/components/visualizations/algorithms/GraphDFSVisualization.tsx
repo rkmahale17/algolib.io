@@ -176,45 +176,49 @@ export const GraphDFSVisualization: React.FC = () => {
         onSpeedChange={setSpeed}
       />
 
-      <div className="bg-card rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4">Graph Visualization</h3>
-        <div className="grid grid-cols-3 gap-4 max-w-md mx-auto">
-          {[0, 1, 2, 3, 4, 5].map((node) => (
-            <div
-              key={node}
-              className={`w-16 h-16 rounded-full border-2 flex items-center justify-center font-bold text-lg transition-all ${
-                currentStep.currentNode === node
-                  ? 'bg-primary/20 border-primary text-primary scale-110'
-                  : currentStep.visited.includes(node)
-                  ? 'bg-green-500/20 border-green-500 text-green-500'
-                  : currentStep.stack.includes(node)
-                  ? 'bg-blue-500/20 border-blue-500 text-blue-500'
-                  : 'bg-card border-border'
-              }`}
-            >
-              {node}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-card rounded-lg p-6 border space-y-4">
+          <h3 className="text-lg font-semibold">Graph Nodes</h3>
+          <div className="flex flex-wrap gap-4 justify-center">
+            {[0, 1, 2, 3, 4, 5].map(node => (
+              <div
+                key={node}
+                className={`w-16 h-16 rounded-full flex items-center justify-center font-bold text-lg border-2 transition-all ${
+                  currentStep.currentNode === node
+                    ? 'bg-primary/20 border-primary text-primary scale-110 animate-pulse'
+                    : currentStep.visited.includes(node)
+                    ? 'bg-green-500/20 border-green-500 text-green-500'
+                    : currentStep.stack.includes(node)
+                    ? 'bg-blue-500/20 border-blue-500 text-blue-500'
+                    : 'bg-card border-border text-muted-foreground'
+                }`}
+              >
+                {node}
+              </div>
+            ))}
+          </div>
+          
+          <div className="flex gap-4 text-sm justify-center flex-wrap">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded-full bg-primary/20 border-2 border-primary"></div>
+              <span>Current</span>
             </div>
-          ))}
-        </div>
-        
-        <div className="mt-6 flex gap-4 text-sm justify-center flex-wrap">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full bg-primary/20 border-2 border-primary"></div>
-            <span>Current</span>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded-full bg-green-500/20 border-2 border-green-500"></div>
+              <span>Visited</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded-full bg-blue-500/20 border-2 border-blue-500"></div>
+              <span>In Stack</span>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full bg-green-500/20 border-2 border-green-500"></div>
-            <span>Visited</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full bg-blue-500/20 border-2 border-blue-500"></div>
-            <span>In Stack</span>
+
+          <div className="p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
           </div>
         </div>
 
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
-        </div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
       </div>
 
       <VariablePanel
@@ -225,8 +229,6 @@ export const GraphDFSVisualization: React.FC = () => {
           stack: currentStep.stack.join(', ') || 'empty'
         }}
       />
-
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
     </div>
   );
 };

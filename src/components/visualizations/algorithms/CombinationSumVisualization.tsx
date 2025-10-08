@@ -162,53 +162,49 @@ export const CombinationSumVisualization: React.FC = () => {
         onSpeedChange={setSpeed}
       />
 
-      <div className="bg-card rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4">Candidates (Target: {currentStep.target})</h3>
-        <div className="flex gap-2 mb-6">
-          {currentStep.candidates.map((val, idx) => (
-            <div
-              key={idx}
-              className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
-                idx === currentStep.start ? 'bg-primary/20 border-primary' : 'bg-card border-border'
-              }`}
-            >
-              {val}
-            </div>
-          ))}
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-card rounded-lg p-6 border space-y-4">
+          <h3 className="text-lg font-semibold">Candidates: [{currentStep.candidates.join(', ')}]</h3>
+          <div className="text-center p-4 bg-muted rounded border">
+            <div className="text-sm text-muted-foreground mb-1">Target</div>
+            <div className="text-3xl font-bold text-primary">{currentStep.target}</div>
+          </div>
 
-        <h3 className="text-lg font-semibold mb-4">Current Combination (Sum: {currentStep.currentSum})</h3>
-        <div className="flex gap-2 mb-6 min-h-[3rem]">
-          {currentStep.current.length > 0 ? (
-            currentStep.current.map((val, idx) => (
-              <div
-                key={idx}
-                className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold ${
-                  currentStep.currentSum === currentStep.target ? 'bg-green-500/20 border-green-500' :
-                  currentStep.currentSum > currentStep.target ? 'bg-red-500/20 border-red-500' :
-                  'bg-blue-500/20 border-blue-500'
-                }`}
-              >
-                {val}
+          <h3 className="text-lg font-semibold">Current Combination (Sum: {currentStep.currentSum})</h3>
+          <div className="flex gap-2 min-h-[3rem]">
+            {currentStep.current.length > 0 ? (
+              currentStep.current.map((val, idx) => (
+                <div
+                  key={idx}
+                  className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold ${
+                    currentStep.currentSum === currentStep.target ? 'bg-green-500/20 border-green-500' :
+                    currentStep.currentSum > currentStep.target ? 'bg-red-500/20 border-red-500' :
+                    'bg-blue-500/20 border-blue-500'
+                  }`}
+                >
+                  {val}
+                </div>
+              ))
+            ) : (
+              <div className="text-muted-foreground italic">Empty</div>
+            )}
+          </div>
+
+          <h3 className="text-lg font-semibold">Valid Combinations ({currentStep.allCombinations.length})</h3>
+          <div className="flex flex-wrap gap-2">
+            {currentStep.allCombinations.map((comb, idx) => (
+              <div key={idx} className="px-3 py-1 bg-muted rounded border text-sm">
+                [{comb.join(' + ')}] = {currentStep.target}
               </div>
-            ))
-          ) : (
-            <div className="text-muted-foreground italic">Empty</div>
-          )}
+            ))}
+          </div>
+
+          <div className="p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
+          </div>
         </div>
 
-        <h3 className="text-lg font-semibold mb-4">Valid Combinations ({currentStep.allCombinations.length})</h3>
-        <div className="flex flex-wrap gap-2">
-          {currentStep.allCombinations.map((comb, idx) => (
-            <div key={idx} className="px-3 py-1 bg-muted rounded border text-sm">
-              [{comb.join(' + ')}] = {currentStep.target}
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
-        </div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
       </div>
 
       <VariablePanel
@@ -219,8 +215,6 @@ export const CombinationSumVisualization: React.FC = () => {
           'valid combinations': currentStep.allCombinations.length
         }}
       />
-
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
     </div>
   );
 };
