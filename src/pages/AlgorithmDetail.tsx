@@ -625,11 +625,11 @@ const AlgorithmDetail: React.FC = () => {
                 setCodeLanguage(lang);
                 localStorage.setItem('preferredLanguage', lang);
               }}>
-                <TabsList className="grid h-auto w-full grid-cols-2 sm:grid-cols-4 gap-1" onClick={(e) => e.preventDefault()}>
-                  <TabsTrigger value="python" className="text-xs sm:text-sm" onClick={(e) => e.stopPropagation()}>Python</TabsTrigger>
-                  <TabsTrigger value="typescript" className="text-xs sm:text-sm" onClick={(e) => e.stopPropagation()}>TypeScript</TabsTrigger>
-                  <TabsTrigger value="cpp" className="text-xs sm:text-sm" onClick={(e) => e.stopPropagation()}>C++</TabsTrigger>
-                  <TabsTrigger value="java" className="text-xs sm:text-sm" onClick={(e) => e.stopPropagation()}>Java</TabsTrigger>
+                <TabsList className="grid h-auto w-full grid-cols-2 sm:grid-cols-4 gap-1">
+                  <TabsTrigger value="python" className="text-xs sm:text-sm">Python</TabsTrigger>
+                  <TabsTrigger value="typescript" className="text-xs sm:text-sm">TypeScript</TabsTrigger>
+                  <TabsTrigger value="cpp" className="text-xs sm:text-sm">C++</TabsTrigger>
+                  <TabsTrigger value="java" className="text-xs sm:text-sm">Java</TabsTrigger>
                 </TabsList>
                 
                 {implementation ? (
