@@ -54,24 +54,80 @@ const AlgorithmDetail: React.FC = () => {
   };
 
   const renderVisualization = () => {
-    // Enhanced visualizations for specific algorithms
-    const algorithmMap: Record<string, string> = {
-      'two-pointers': 'TwoPointersVisualization',
-      'sliding-window': 'SlidingWindowVisualization',
-      'prefix-sum': 'PrefixSumVisualization',
-      'binary-search': 'BinarySearchVisualization',
-      'kadanes-algorithm': 'KadanesVisualization',
-      'dutch-national-flag': 'DutchNationalFlagVisualization',
-      'merge-intervals': 'MergeIntervalsVisualization'
-    };
-
-    if (algorithmMap[algorithm.id]) {
-      const Component = React.lazy(() => 
-        import(`@/components/visualizations/algorithms/${algorithmMap[algorithm.id]}`).then(m => ({ default: m[algorithmMap[algorithm.id]] }))
+    // Enhanced visualizations with static imports
+    if (algorithm.id === 'two-pointers') {
+      const TwoPointersVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/TwoPointersVisualization').then(m => ({ default: m.TwoPointersVisualization }))
       );
       return (
-        <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}>
-          <Component />
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
+          <TwoPointersVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algorithm.id === 'sliding-window') {
+      const SlidingWindowVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/SlidingWindowVisualization').then(m => ({ default: m.SlidingWindowVisualization }))
+      );
+      return (
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
+          <SlidingWindowVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algorithm.id === 'prefix-sum') {
+      const PrefixSumVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/PrefixSumVisualization').then(m => ({ default: m.PrefixSumVisualization }))
+      );
+      return (
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
+          <PrefixSumVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algorithm.id === 'binary-search') {
+      const BinarySearchVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/BinarySearchVisualization').then(m => ({ default: m.BinarySearchVisualization }))
+      );
+      return (
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
+          <BinarySearchVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algorithm.id === 'kadanes-algorithm') {
+      const KadanesVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/KadanesVisualization').then(m => ({ default: m.KadanesVisualization }))
+      );
+      return (
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
+          <KadanesVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algorithm.id === 'dutch-national-flag') {
+      const DutchNationalFlagVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/DutchNationalFlagVisualization').then(m => ({ default: m.DutchNationalFlagVisualization }))
+      );
+      return (
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
+          <DutchNationalFlagVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algorithm.id === 'merge-intervals') {
+      const MergeIntervalsVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/MergeIntervalsVisualization').then(m => ({ default: m.MergeIntervalsVisualization }))
+      );
+      return (
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
+          <MergeIntervalsVisualization />
         </React.Suspense>
       );
     }
