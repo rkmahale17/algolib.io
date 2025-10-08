@@ -1,5 +1,7 @@
 import { BookOpen, Search, Sparkles, TrendingUp, Trophy } from 'lucide-react';
 import { algorithms, categories } from '@/data/algorithms';
+import { Helmet } from 'react-helmet-async';
+import { FAQ } from '@/components/FAQ';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -27,8 +29,67 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Hero Section */}
+    <>
+      <Helmet>
+        <title>AlgoLib.io - Master 72+ Algorithms with Interactive Visualizations | Free & Open Source</title>
+        <meta 
+          name="description" 
+          content="Learn data structures and algorithms with step-by-step visualizations. 72+ algorithm animations in Python, Java, C++, TypeScript. Perfect for coding interviews, LeetCode practice, and competitive programming. 100% free and open source." 
+        />
+        <meta 
+          name="keywords" 
+          content="algorithms, data structures, leetcode, coding interviews, competitive programming, algorithm visualization, learn algorithms, DSA, python algorithms, java algorithms, c++ algorithms, typescript algorithms, free algorithm library" 
+        />
+        <link rel="canonical" href="https://algolib.io/" />
+        
+        {/* Open Graph */}
+        <meta property="og:title" content="AlgoLib.io - Master 72+ Algorithms with Interactive Visualizations" />
+        <meta property="og:description" content="Free open-source algorithm library with interactive visualizations. Learn DSA for coding interviews and competitive programming." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://algolib.io/" />
+        <meta property="og:image" content="https://algolib.io/og-image.png" />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="AlgoLib.io - Master 72+ Algorithms Visually" />
+        <meta name="twitter:description" content="Free interactive algorithm visualizations for coding interviews and competitive programming" />
+        <meta name="twitter:image" content="https://algolib.io/og-image.png" />
+        
+        {/* Structured Data - WebSite */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "AlgoLib.io",
+            "url": "https://algolib.io",
+            "description": "Free and open-source algorithm library with interactive visualizations for learning data structures and algorithms",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": "https://algolib.io/?search={search_term_string}",
+              "query-input": "required name=search_term_string"
+            }
+          })}
+        </script>
+        
+        {/* Structured Data - Organization */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "EducationalOrganization",
+            "name": "AlgoLib.io",
+            "url": "https://algolib.io",
+            "logo": "https://algolib.io/favicon.png",
+            "sameAs": [
+              "https://x.com/algolib_io",
+              "https://github.com/rkmahale17/algolib.io"
+            ],
+            "description": "AlgoLib.io is a free and open-source algorithm library that helps developers learn and visualize algorithms with interactive animations and clean code snippets in multiple programming languages."
+          })}
+        </script>
+      </Helmet>
+      
+      <div className="min-h-screen bg-background">
+        {/* Hero Section */}
       <div className="relative overflow-hidden bg-gradient-to-b from-background via-muted/20 to-background border-b border-border/50">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
         
@@ -164,8 +225,12 @@ const Home = () => {
         )}
       </div>
       
+      {/* FAQ Section */}
+      <FAQ />
+      
       <Footer />
     </div>
+    </>
   );
 };
 

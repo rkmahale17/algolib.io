@@ -2,11 +2,46 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Code2, Github, Heart, Users } from "lucide-react";
 import { Footer } from "@/components/Footer";
+import { Helmet } from "react-helmet-async";
 
 export default function About() {
   return (
-    <div className="min-h-screen bg-background">
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
+    <>
+      <Helmet>
+        <title>About AlgoLib.io - Free Open Source Algorithm Learning Platform</title>
+        <meta 
+          name="description" 
+          content="Learn about AlgoLib.io's mission to make algorithm learning accessible through interactive visualizations. 100% free, open-source, and community-driven platform for developers and competitive programmers." 
+        />
+        <meta 
+          name="keywords" 
+          content="about algolib, algorithm learning platform, open source algorithms, free coding education, interactive algorithm visualizations" 
+        />
+        <link rel="canonical" href="https://algolib.io/about" />
+        
+        <meta property="og:title" content="About AlgoLib.io - Free Algorithm Learning Platform" />
+        <meta property="og:description" content="100% free and open-source platform for learning algorithms with interactive visualizations" />
+        <meta property="og:url" content="https://algolib.io/about" />
+        
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "AboutPage",
+            "name": "About AlgoLib.io",
+            "description": "AlgoLib.io is an open-source platform designed to make algorithm learning accessible, interactive, and enjoyable for everyone",
+            "url": "https://algolib.io/about",
+            "mainEntity": {
+              "@type": "EducationalOrganization",
+              "name": "AlgoLib.io",
+              "description": "Free and open-source algorithm library for competitive programming and coding interviews",
+              "url": "https://algolib.io"
+            }
+          })}
+        </script>
+      </Helmet>
+      
+      <div className="min-h-screen bg-background">
+        <main className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="space-y-8">
           <div className="text-center space-y-4">
             <h1 className="text-4xl font-bold text-foreground">About AlgoLib.io</h1>
@@ -124,8 +159,9 @@ export default function About() {
             </CardContent>
           </Card>
         </div>
-      </main>
-      <Footer />
-    </div>
+        </main>
+        <Footer />
+      </div>
+    </>
   );
 }

@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 // src/pages/AlgorithmDetail.tsx
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
 
 import AlgoMetaHead from '@/services/meta.injectot';
 import { ArrayVisualization } from '@/components/visualizations/ArrayVisualization';
@@ -583,6 +584,17 @@ const AlgorithmDetail: React.FC = () => {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8 overflow-x-hidden">
+        {/* Breadcrumbs */}
+        <div className="max-w-5xl mx-auto">
+          <Breadcrumbs 
+            items={[
+              { label: 'Algorithms' },
+              { label: algorithm.category },
+              { label: algorithm.name }
+            ]} 
+          />
+        </div>
+        
         {/* Single column layout for all screen sizes */}
         <div className="space-y-6 max-w-5xl mx-auto">
           {/* 1. Animation */}
