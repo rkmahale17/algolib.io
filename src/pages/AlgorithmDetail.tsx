@@ -341,16 +341,18 @@ const AlgorithmDetail: React.FC = () => {
       );
     }
 
-    if (!implementation) {
-      return (
-        <div className="text-center space-y-2">
-          <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
-            <Eye className="w-8 h-8 text-primary" />
-          </div>
-          <p className="text-sm text-muted-foreground">Visualization coming soon</p>
+    // Default: Show coming soon for all algorithms without explicit visualization
+    return (
+      <div className="text-center space-y-3 py-12">
+        <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
+          <Eye className="w-8 h-8 text-primary" />
         </div>
-      );
-    }
+        <div>
+          <p className="text-lg font-semibold text-foreground">Visualization Coming Soon</p>
+          <p className="text-sm text-muted-foreground mt-1">We're working on an interactive visualization for this algorithm</p>
+        </div>
+      </div>
+    );
 
     switch (implementation.visualizationType) {
       case 'array':
