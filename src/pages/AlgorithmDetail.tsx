@@ -297,6 +297,50 @@ const AlgorithmDetail: React.FC = () => {
       );
     }
 
+    if (algorithm.id === 'fast-slow-pointers') {
+      const FastSlowPointersVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/FastSlowPointersVisualization').then(m => ({ default: m.FastSlowPointersVisualization }))
+      );
+      return (
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
+          <FastSlowPointersVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algorithm.id === 'reverse-linked-list') {
+      const ReverseLinkedListVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/ReverseLinkedListVisualization').then(m => ({ default: m.ReverseLinkedListVisualization }))
+      );
+      return (
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
+          <ReverseLinkedListVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algorithm.id === 'detect-cycle') {
+      const DetectCycleVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/DetectCycleVisualization').then(m => ({ default: m.DetectCycleVisualization }))
+      );
+      return (
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
+          <DetectCycleVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algorithm.id === 'middle-node') {
+      const MiddleNodeVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/MiddleNodeVisualization').then(m => ({ default: m.MiddleNodeVisualization }))
+      );
+      return (
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
+          <MiddleNodeVisualization />
+        </React.Suspense>
+      );
+    }
+
     if (!implementation) {
       return (
         <div className="text-center space-y-2">
