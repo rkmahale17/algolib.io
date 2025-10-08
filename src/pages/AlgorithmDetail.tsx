@@ -228,9 +228,11 @@ const AlgorithmDetail: React.FC = () => {
                 setCodeLanguage(lang);
                 localStorage.setItem('preferredLanguage', lang);
               }}>
-                <TabsList className="grid h-100 w-full grid-cols-2">
-                  <TabsTrigger value="python">Python</TabsTrigger>
-                  <TabsTrigger value="typescript">TypeScript</TabsTrigger>
+                <TabsList className="grid h-auto w-full grid-cols-2 gap-1">
+                  <TabsTrigger value="python" className="text-xs">Python</TabsTrigger>
+                  <TabsTrigger value="typescript" className="text-xs">TypeScript</TabsTrigger>
+                  <TabsTrigger value="cpp" className="text-xs">C++</TabsTrigger>
+                  <TabsTrigger value="java" className="text-xs">Java</TabsTrigger>
                 </TabsList>
                 
                 {implementation ? (
@@ -252,9 +254,27 @@ const AlgorithmDetail: React.FC = () => {
                         </pre>
                       </div>
                     </TabsContent>
+
+                    <TabsContent value="cpp" className="mt-4">
+                      <div className="relative overflow-hidden rounded-lg">
+                        <CopyCodeButton code={implementation.code.cpp} />
+                        <pre className="code-block overflow-x-auto whitespace-pre text-xs max-w-full block">
+                          <code className="block">{implementation.code.cpp}</code>
+                        </pre>
+                      </div>
+                    </TabsContent>
+
+                    <TabsContent value="java" className="mt-4">
+                      <div className="relative overflow-hidden rounded-lg">
+                        <CopyCodeButton code={implementation.code.java} />
+                        <pre className="code-block overflow-x-auto whitespace-pre text-xs max-w-full block">
+                          <code className="block">{implementation.code.java}</code>
+                        </pre>
+                      </div>
+                    </TabsContent>
                   </>
                 ) : (
-                  <p className="text-sm text-muted-foreground">Implementation coming soon</p>
+                  <p className="text-sm text-muted-foreground mt-4">Implementation coming soon</p>
                 )}
               </Tabs>
             </div>
@@ -294,10 +314,10 @@ const AlgorithmDetail: React.FC = () => {
           {implementation && (
             <Card className="p-4 glass-card overflow-hidden">
               <Tabs defaultValue="steps">
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="steps">Steps</TabsTrigger>
-                  <TabsTrigger value="usecase">Use Cases</TabsTrigger>
-                  <TabsTrigger value="tips">Pro Tips</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-3 h-auto">
+                  <TabsTrigger value="steps" className="text-xs">Steps</TabsTrigger>
+                  <TabsTrigger value="usecase" className="text-xs">Use Cases</TabsTrigger>
+                  <TabsTrigger value="tips" className="text-xs">Pro Tips</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="steps" className="mt-4">
