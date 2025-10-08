@@ -474,6 +474,46 @@ const AlgorithmDetail: React.FC = () => {
       const RabinKarpVisualization = React.lazy(() => import('@/components/visualizations/algorithms/RabinKarpVisualization').then(m => ({ default: m.RabinKarpVisualization })));
       return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><RabinKarpVisualization /></React.Suspense>;
     }
+    if (algorithm.id === 'activity-selection') {
+      const ActivitySelectionVisualization = React.lazy(() => import('@/components/visualizations/algorithms/ActivitySelectionVisualization').then(m => ({ default: m.ActivitySelectionVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><ActivitySelectionVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'xor-trick') {
+      const XORTrickVisualization = React.lazy(() => import('@/components/visualizations/algorithms/XORTrickVisualization').then(m => ({ default: m.XORTrickVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><XORTrickVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'count-bits') {
+      const CountBitsVisualization = React.lazy(() => import('@/components/visualizations/algorithms/CountBitsVisualization').then(m => ({ default: m.CountBitsVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><CountBitsVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'kth-largest-element') {
+      const KthLargestVisualization = React.lazy(() => import('@/components/visualizations/algorithms/KthLargestVisualization').then(m => ({ default: m.KthLargestVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><KthLargestVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'merge-k-sorted-lists') {
+      const MergeKSortedListsVisualization = React.lazy(() => import('@/components/visualizations/algorithms/MergeKSortedListsVisualization').then(m => ({ default: m.MergeKSortedListsVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><MergeKSortedListsVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'sliding-window-maximum') {
+      const SlidingWindowMaxVisualization = React.lazy(() => import('@/components/visualizations/algorithms/SlidingWindowMaxVisualization').then(m => ({ default: m.SlidingWindowMaxVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><SlidingWindowMaxVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'gcd') {
+      const GCDVisualization = React.lazy(() => import('@/components/visualizations/algorithms/GCDVisualization').then(m => ({ default: m.GCDVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><GCDVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'sieve-of-eratosthenes') {
+      const SieveVisualization = React.lazy(() => import('@/components/visualizations/algorithms/SieveVisualization').then(m => ({ default: m.SieveVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><SieveVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'modular-exponentiation') {
+      const ModularExpVisualization = React.lazy(() => import('@/components/visualizations/algorithms/ModularExpVisualization').then(m => ({ default: m.ModularExpVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><ModularExpVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'sparse-table') {
+      const SparseTableVisualization = React.lazy(() => import('@/components/visualizations/algorithms/SparseTableVisualization').then(m => ({ default: m.SparseTableVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><SparseTableVisualization /></React.Suspense>;
+    }
 
     // Default: Show coming soon for all algorithms without explicit visualization
     return (
