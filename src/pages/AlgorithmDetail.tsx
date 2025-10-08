@@ -341,6 +341,64 @@ const AlgorithmDetail: React.FC = () => {
       );
     }
 
+    // Trees & BSTs
+    if (algorithm.id === 'trie') {
+      const TrieVisualization = React.lazy(() => import('@/components/visualizations/algorithms/TrieVisualization').then(m => ({ default: m.TrieVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><TrieVisualization /></React.Suspense>;
+    }
+
+    // Graphs
+    if (algorithm.id === 'graph-dfs') {
+      const GraphDFSVisualization = React.lazy(() => import('@/components/visualizations/algorithms/GraphDFSVisualization').then(m => ({ default: m.GraphDFSVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><GraphDFSVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'graph-bfs') {
+      const GraphBFSVisualization = React.lazy(() => import('@/components/visualizations/algorithms/GraphBFSVisualization').then(m => ({ default: m.GraphBFSVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><GraphBFSVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'topological-sort') {
+      const TopologicalSortVisualization = React.lazy(() => import('@/components/visualizations/algorithms/TopologicalSortVisualization').then(m => ({ default: m.TopologicalSortVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><TopologicalSortVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'union-find') {
+      const UnionFindVisualization = React.lazy(() => import('@/components/visualizations/algorithms/UnionFindVisualization').then(m => ({ default: m.UnionFindVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><UnionFindVisualization /></React.Suspense>;
+    }
+
+    // Dynamic Programming
+    if (algorithm.id === 'knapsack-01') {
+      const KnapsackVisualization = React.lazy(() => import('@/components/visualizations/algorithms/KnapsackVisualization').then(m => ({ default: m.KnapsackVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><KnapsackVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'coin-change') {
+      const CoinChangeVisualization = React.lazy(() => import('@/components/visualizations/algorithms/CoinChangeVisualization').then(m => ({ default: m.CoinChangeVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><CoinChangeVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'lcs') {
+      const LCSVisualization = React.lazy(() => import('@/components/visualizations/algorithms/LCSVisualization').then(m => ({ default: m.LCSVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><LCSVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'lis') {
+      const LISVisualization = React.lazy(() => import('@/components/visualizations/algorithms/LISVisualization').then(m => ({ default: m.LISVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><LISVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'edit-distance') {
+      const EditDistanceVisualization = React.lazy(() => import('@/components/visualizations/algorithms/EditDistanceVisualization').then(m => ({ default: m.EditDistanceVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><EditDistanceVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'matrix-path-dp') {
+      const MatrixPathVisualization = React.lazy(() => import('@/components/visualizations/algorithms/MatrixPathVisualization').then(m => ({ default: m.MatrixPathVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><MatrixPathVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'house-robber') {
+      const HouseRobberVisualization = React.lazy(() => import('@/components/visualizations/algorithms/HouseRobberVisualization').then(m => ({ default: m.HouseRobberVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><HouseRobberVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'climbing-stairs') {
+      const ClimbingStairsVisualization = React.lazy(() => import('@/components/visualizations/algorithms/ClimbingStairsVisualization').then(m => ({ default: m.ClimbingStairsVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><ClimbingStairsVisualization /></React.Suspense>;
+    }
+
     // Default: Show coming soon for all algorithms without explicit visualization
     return (
       <div className="text-center space-y-3 py-12">
