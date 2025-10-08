@@ -54,6 +54,29 @@ const AlgorithmDetail: React.FC = () => {
   };
 
   const renderVisualization = () => {
+    // Enhanced visualizations for specific algorithms
+    if (algorithm.id === 'two-pointers') {
+      const TwoPointersVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/TwoPointersVisualization').then(m => ({ default: m.TwoPointersVisualization }))
+      );
+      return (
+        <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}>
+          <TwoPointersVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algorithm.id === 'sliding-window') {
+      const SlidingWindowVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/SlidingWindowVisualization').then(m => ({ default: m.SlidingWindowVisualization }))
+      );
+      return (
+        <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}>
+          <SlidingWindowVisualization />
+        </React.Suspense>
+      );
+    }
+
     if (!implementation) {
       return (
         <div className="text-center space-y-2">
