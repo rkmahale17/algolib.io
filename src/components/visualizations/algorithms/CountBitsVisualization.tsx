@@ -137,47 +137,51 @@ export const CountBitsVisualization: React.FC = () => {
         onSpeedChange={setSpeed}
       />
 
-      <div className="bg-card rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4">Count Bits for 0 to {currentStep.n}</h3>
-        
-        {currentStep.current >= 0 && (
-          <div className="mb-6 p-4 bg-muted rounded border">
-            <div className="text-sm text-muted-foreground mb-2">Current Number: {currentStep.current}</div>
-            <div className="flex items-center gap-4">
-              <div>
-                <div className="text-xs text-muted-foreground">Binary</div>
-                <div className="text-xl font-mono font-bold">{currentStep.binary}</div>
-              </div>
-              <div>
-                <div className="text-xs text-muted-foreground">Count of 1s</div>
-                <div className="text-xl font-bold text-primary">{currentStep.bitCount}</div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-card rounded-lg p-6 border">
+          <h3 className="text-lg font-semibold mb-4">Count Bits for 0 to {currentStep.n}</h3>
+          
+          {currentStep.current >= 0 && (
+            <div className="mb-6 p-4 bg-muted rounded border">
+              <div className="text-sm text-muted-foreground mb-2">Current Number: {currentStep.current}</div>
+              <div className="flex items-center gap-4">
+                <div>
+                  <div className="text-xs text-muted-foreground">Binary</div>
+                  <div className="text-xl font-mono font-bold">{currentStep.binary}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground">Count of 1s</div>
+                  <div className="text-xl font-bold text-primary">{currentStep.bitCount}</div>
+                </div>
               </div>
             </div>
+          )}
+
+          <h3 className="text-lg font-semibold mb-4">Result Array</h3>
+          <div className="flex flex-wrap gap-2 mb-6">
+            {currentStep.result.map((val, idx) => (
+              <div key={idx} className="flex flex-col items-center">
+                <div className="text-xs text-muted-foreground mb-1">[{idx}]</div>
+                <div
+                  className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
+                    idx === currentStep.current
+                      ? 'bg-primary/20 border-primary'
+                      : 'bg-blue-500/10 border-blue-500/50'
+                  }`}
+                >
+                  {val}
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">{idx.toString(2)}</div>
+              </div>
+            ))}
           </div>
-        )}
 
-        <h3 className="text-lg font-semibold mb-4">Result Array</h3>
-        <div className="flex flex-wrap gap-2 mb-6">
-          {currentStep.result.map((val, idx) => (
-            <div key={idx} className="flex flex-col items-center">
-              <div className="text-xs text-muted-foreground mb-1">[{idx}]</div>
-              <div
-                className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
-                  idx === currentStep.current
-                    ? 'bg-primary/20 border-primary'
-                    : 'bg-blue-500/10 border-blue-500/50'
-                }`}
-              >
-                {val}
-              </div>
-              <div className="text-xs text-muted-foreground mt-1">{idx.toString(2)}</div>
-            </div>
-          ))}
+          <div className="mt-4 p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
+          </div>
         </div>
 
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
-        </div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
       </div>
 
       <VariablePanel
@@ -188,8 +192,6 @@ export const CountBitsVisualization: React.FC = () => {
           'bit count': currentStep.bitCount
         }}
       />
-
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
     </div>
   );
 };

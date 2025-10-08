@@ -183,17 +183,16 @@ function reverse(nums, left, right) {
           </div>
         </div>
 
-        <div className="space-y-4">
-          <VariablePanel
-            variables={{
-              k: currentStep.k,
-              'array.length': currentStep.array.length,
-              array: currentStep.array
-            }}
-          />
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
-        </div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
       </div>
+
+      <VariablePanel
+        variables={{
+          k: currentStep.k,
+          'array.length': currentStep.array.length,
+          array: currentStep.array
+        }}
+      />
     </div>
   );
 };

@@ -138,51 +138,55 @@ export const MiddleNodeVisualization: React.FC = () => {
         onSpeedChange={setSpeed}
       />
 
-      <div className="bg-card rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4">Linked List Visualization</h3>
-        <div className="flex items-center gap-4 overflow-x-auto pb-4">
-          {currentStep.list.map((val, idx) => (
-            <div key={idx} className="flex items-center">
-              <div
-                className={`w-16 h-16 flex items-center justify-center rounded-lg border-2 font-bold text-lg transition-all ${
-                  currentStep.isMiddle && currentStep.slow === idx
-                    ? 'bg-purple-500/20 border-purple-500 text-purple-500'
-                    : currentStep.slow === idx
-                    ? 'bg-blue-500/20 border-blue-500 text-blue-500'
-                    : currentStep.fast === idx
-                    ? 'bg-green-500/20 border-green-500 text-green-500'
-                    : 'bg-card border-border'
-                }`}
-              >
-                {val}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-card rounded-lg p-6 border">
+          <h3 className="text-lg font-semibold mb-4">Linked List Visualization</h3>
+          <div className="flex items-center gap-4 overflow-x-auto pb-4">
+            {currentStep.list.map((val, idx) => (
+              <div key={idx} className="flex items-center">
+                <div
+                  className={`w-16 h-16 flex items-center justify-center rounded-lg border-2 font-bold text-lg transition-all ${
+                    currentStep.isMiddle && currentStep.slow === idx
+                      ? 'bg-purple-500/20 border-purple-500 text-purple-500'
+                      : currentStep.slow === idx
+                      ? 'bg-blue-500/20 border-blue-500 text-blue-500'
+                      : currentStep.fast === idx
+                      ? 'bg-green-500/20 border-green-500 text-green-500'
+                      : 'bg-card border-border'
+                  }`}
+                >
+                  {val}
+                </div>
+                {idx < currentStep.list.length - 1 && (
+                  <div className="text-2xl mx-2 text-muted-foreground">→</div>
+                )}
               </div>
-              {idx < currentStep.list.length - 1 && (
-                <div className="text-2xl mx-2 text-muted-foreground">→</div>
-              )}
-            </div>
-          ))}
-        </div>
-        
-        <div className="mt-4 flex gap-4 text-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-blue-500/20 border-2 border-blue-500"></div>
-            <span>Slow Pointer</span>
+            ))}
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-green-500/20 border-2 border-green-500"></div>
-            <span>Fast Pointer</span>
-          </div>
-          {currentStep.isMiddle && (
+          
+          <div className="mt-4 flex gap-4 text-sm">
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-purple-500/20 border-2 border-purple-500"></div>
-              <span>Middle Node</span>
+              <div className="w-4 h-4 rounded bg-blue-500/20 border-2 border-blue-500"></div>
+              <span>Slow Pointer</span>
             </div>
-          )}
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded bg-green-500/20 border-2 border-green-500"></div>
+              <span>Fast Pointer</span>
+            </div>
+            {currentStep.isMiddle && (
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded bg-purple-500/20 border-2 border-purple-500"></div>
+                <span>Middle Node</span>
+              </div>
+            )}
+          </div>
+          
+          <div className="mt-4 p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
+          </div>
         </div>
-        
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
-        </div>
+
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
       </div>
 
       <VariablePanel
@@ -192,8 +196,6 @@ export const MiddleNodeVisualization: React.FC = () => {
           'is middle': String(currentStep.isMiddle)
         }}
       />
-
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
     </div>
   );
 };

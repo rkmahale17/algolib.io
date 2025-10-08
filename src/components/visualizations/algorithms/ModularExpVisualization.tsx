@@ -165,31 +165,35 @@ export const ModularExpVisualization: React.FC = () => {
         onSpeedChange={setSpeed}
       />
 
-      <div className="bg-card rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4">Modular Exponentiation: {currentStep.base}^{currentStep.exp} mod {currentStep.mod}</h3>
-        
-        <div className="grid grid-cols-4 gap-4 mb-6">
-          <div className="p-4 bg-muted rounded border">
-            <div className="text-sm text-muted-foreground mb-1">Current Base</div>
-            <div className="text-2xl font-bold text-primary">{currentStep.currentBase}</div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-card rounded-lg p-6 border">
+          <h3 className="text-lg font-semibold mb-4">Modular Exponentiation: {currentStep.base}^{currentStep.exp} mod {currentStep.mod}</h3>
+          
+          <div className="grid grid-cols-4 gap-4 mb-6">
+            <div className="p-4 bg-muted rounded border">
+              <div className="text-sm text-muted-foreground mb-1">Current Base</div>
+              <div className="text-2xl font-bold text-primary">{currentStep.currentBase}</div>
+            </div>
+            <div className="p-4 bg-muted rounded border">
+              <div className="text-sm text-muted-foreground mb-1">Current Exp</div>
+              <div className="text-2xl font-bold text-blue-500">{currentStep.currentExp}</div>
+            </div>
+            <div className="p-4 bg-muted rounded border">
+              <div className="text-sm text-muted-foreground mb-1">Modulo</div>
+              <div className="text-2xl font-bold">{currentStep.mod}</div>
+            </div>
+            <div className="p-4 bg-muted rounded border">
+              <div className="text-sm text-muted-foreground mb-1">Result</div>
+              <div className="text-2xl font-bold text-green-500">{currentStep.result}</div>
+            </div>
           </div>
-          <div className="p-4 bg-muted rounded border">
-            <div className="text-sm text-muted-foreground mb-1">Current Exp</div>
-            <div className="text-2xl font-bold text-blue-500">{currentStep.currentExp}</div>
-          </div>
-          <div className="p-4 bg-muted rounded border">
-            <div className="text-sm text-muted-foreground mb-1">Modulo</div>
-            <div className="text-2xl font-bold">{currentStep.mod}</div>
-          </div>
-          <div className="p-4 bg-muted rounded border">
-            <div className="text-sm text-muted-foreground mb-1">Result</div>
-            <div className="text-2xl font-bold text-green-500">{currentStep.result}</div>
+
+          <div className="mt-4 p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
           </div>
         </div>
 
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
-        </div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
       </div>
 
       <VariablePanel
@@ -200,8 +204,6 @@ export const ModularExpVisualization: React.FC = () => {
           'result': currentStep.result
         }}
       />
-
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
     </div>
   );
 };

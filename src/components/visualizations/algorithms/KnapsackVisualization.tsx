@@ -163,45 +163,49 @@ export const KnapsackVisualization: React.FC = () => {
         onSpeedChange={setSpeed}
       />
 
-      <div className="bg-card rounded-lg p-6 border overflow-x-auto">
-        <h3 className="text-lg font-semibold mb-4">DP Table</h3>
-        <div className="inline-block min-w-full">
-          <table className="w-full text-sm">
-            <thead>
-              <tr>
-                <th className="border border-border p-2 bg-muted">i/w</th>
-                {currentStep.dp[0].map((_, w) => (
-                  <th key={w} className="border border-border p-2 bg-muted">{w}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {currentStep.dp.map((row, i) => (
-                <tr key={i}>
-                  <td className="border border-border p-2 bg-muted font-semibold">{i}</td>
-                  {row.map((val, w) => (
-                    <td
-                      key={w}
-                      className={`border border-border p-2 text-center transition-all ${
-                        i === currentStep.i && w === currentStep.w
-                          ? 'bg-primary/20 font-bold'
-                          : val > 0
-                          ? 'bg-green-500/10'
-                          : ''
-                      }`}
-                    >
-                      {val}
-                    </td>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-card rounded-lg p-6 border overflow-x-auto">
+          <h3 className="text-lg font-semibold mb-4">DP Table</h3>
+          <div className="inline-block min-w-full">
+            <table className="w-full text-sm">
+              <thead>
+                <tr>
+                  <th className="border border-border p-2 bg-muted">i/w</th>
+                  {currentStep.dp[0].map((_, w) => (
+                    <th key={w} className="border border-border p-2 bg-muted">{w}</th>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {currentStep.dp.map((row, i) => (
+                  <tr key={i}>
+                    <td className="border border-border p-2 bg-muted font-semibold">{i}</td>
+                    {row.map((val, w) => (
+                      <td
+                        key={w}
+                        className={`border border-border p-2 text-center transition-all ${
+                          i === currentStep.i && w === currentStep.w
+                            ? 'bg-primary/20 font-bold'
+                            : val > 0
+                            ? 'bg-green-500/10'
+                            : ''
+                        }`}
+                      >
+                        {val}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mt-4 p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
+          </div>
         </div>
 
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
-        </div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
       </div>
 
       <VariablePanel
@@ -211,8 +215,6 @@ export const KnapsackVisualization: React.FC = () => {
           maxValue: currentStep.value
         }}
       />
-
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
     </div>
   );
 };

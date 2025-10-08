@@ -132,37 +132,41 @@ export const XORTrickVisualization: React.FC = () => {
         onSpeedChange={setSpeed}
       />
 
-      <div className="bg-card rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4">Array (Find Single Number)</h3>
-        <div className="flex gap-2 mb-6">
-          {currentStep.array.map((val, idx) => (
-            <div
-              key={idx}
-              className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
-                idx === currentStep.index
-                  ? 'bg-primary/20 border-primary'
-                  : 'bg-card border-border'
-              }`}
-            >
-              {val}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-card rounded-lg p-6 border">
+          <h3 className="text-lg font-semibold mb-4">Array (Find Single Number)</h3>
+          <div className="flex gap-2 mb-6">
+            {currentStep.array.map((val, idx) => (
+              <div
+                key={idx}
+                className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
+                  idx === currentStep.index
+                    ? 'bg-primary/20 border-primary'
+                    : 'bg-card border-border'
+                }`}
+              >
+                {val}
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="p-4 bg-muted rounded border">
+              <div className="text-sm text-muted-foreground mb-1">XOR Result (Decimal)</div>
+              <div className="text-2xl font-bold">{currentStep.xorResult}</div>
             </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="p-4 bg-muted rounded border">
-            <div className="text-sm text-muted-foreground mb-1">XOR Result (Decimal)</div>
-            <div className="text-2xl font-bold">{currentStep.xorResult}</div>
+            <div className="p-4 bg-muted rounded border">
+              <div className="text-sm text-muted-foreground mb-1">XOR Result (Binary)</div>
+              <div className="text-2xl font-mono font-bold">{currentStep.binary}</div>
+            </div>
           </div>
-          <div className="p-4 bg-muted rounded border">
-            <div className="text-sm text-muted-foreground mb-1">XOR Result (Binary)</div>
-            <div className="text-2xl font-mono font-bold">{currentStep.binary}</div>
+
+          <div className="mt-4 p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
           </div>
         </div>
 
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
-        </div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
       </div>
 
       <VariablePanel
@@ -172,8 +176,6 @@ export const XORTrickVisualization: React.FC = () => {
           'binary': currentStep.binary
         }}
       />
-
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
     </div>
   );
 };

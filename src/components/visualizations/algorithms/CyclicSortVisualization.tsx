@@ -174,18 +174,17 @@ export const CyclicSortVisualization = () => {
           </div>
         </div>
 
-        <div className="space-y-4">
-          <VariablePanel
-            variables={{
-              i: currentStep.i,
-              'nums[i]': currentStep.i < currentStep.array.length ? currentStep.array[currentStep.i] : 'N/A',
-              correctIndex: currentStep.correctIndex >= 0 ? currentStep.correctIndex : 'N/A',
-              array: currentStep.array
-            }}
-          />
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
-        </div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
       </div>
+
+      <VariablePanel
+        variables={{
+          i: currentStep.i,
+          'nums[i]': currentStep.i < currentStep.array.length ? currentStep.array[currentStep.i] : 'N/A',
+          correctIndex: currentStep.correctIndex >= 0 ? currentStep.correctIndex : 'N/A',
+          array: currentStep.array
+        }}
+      />
     </div>
   );
 };

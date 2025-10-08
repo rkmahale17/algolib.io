@@ -147,46 +147,50 @@ export const MatrixPathVisualization: React.FC = () => {
         onSpeedChange={setSpeed}
       />
 
-      <div className="bg-card rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4">Unique Paths in Matrix</h3>
-        
-        <div className="inline-block">
-          <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${currentStep.dp[0].length}, minmax(0, 1fr))` }}>
-            {currentStep.dp.map((row, i) => (
-              <React.Fragment key={i}>
-                {row.map((val, j) => (
-                  <div
-                    key={`${i}-${j}`}
-                    className={`w-16 h-16 border-2 flex items-center justify-center font-bold text-lg transition-all ${
-                      i === currentStep.i && j === currentStep.j
-                        ? 'bg-primary/20 border-primary text-primary scale-110'
-                        : val > 0
-                        ? 'bg-green-500/20 border-green-500 text-green-500'
-                        : 'bg-card border-border'
-                    }`}
-                  >
-                    {val}
-                  </div>
-                ))}
-              </React.Fragment>
-            ))}
-          </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-card rounded-lg p-6 border">
+          <h3 className="text-lg font-semibold mb-4">Unique Paths in Matrix</h3>
           
-          <div className="mt-4 flex gap-4 text-sm">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-primary/20 border-2 border-primary"></div>
-              <span>Current</span>
+          <div className="inline-block">
+            <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${currentStep.dp[0].length}, minmax(0, 1fr))` }}>
+              {currentStep.dp.map((row, i) => (
+                <React.Fragment key={i}>
+                  {row.map((val, j) => (
+                    <div
+                      key={`${i}-${j}`}
+                      className={`w-16 h-16 border-2 flex items-center justify-center font-bold text-lg transition-all ${
+                        i === currentStep.i && j === currentStep.j
+                          ? 'bg-primary/20 border-primary text-primary scale-110'
+                          : val > 0
+                          ? 'bg-green-500/20 border-green-500 text-green-500'
+                          : 'bg-card border-border'
+                      }`}
+                    >
+                      {val}
+                    </div>
+                  ))}
+                </React.Fragment>
+              ))}
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-green-500/20 border-2 border-green-500"></div>
-              <span>Computed</span>
+            
+            <div className="mt-4 flex gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded bg-primary/20 border-2 border-primary"></div>
+                <span>Current</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded bg-green-500/20 border-2 border-green-500"></div>
+                <span>Computed</span>
+              </div>
             </div>
+          </div>
+
+          <div className="mt-4 p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
           </div>
         </div>
 
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
-        </div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
       </div>
 
       <VariablePanel
@@ -197,8 +201,6 @@ export const MatrixPathVisualization: React.FC = () => {
           totalPaths: currentStep.dp[currentStep.dp.length - 1][currentStep.dp[0].length - 1]
         }}
       />
-
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
     </div>
   );
 };
