@@ -132,6 +132,61 @@ const AlgorithmDetail: React.FC = () => {
       );
     }
 
+    if (algorithm.id === 'monotonic-stack') {
+      const MonotonicStackVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/MonotonicStackVisualization').then(m => ({ default: m.MonotonicStackVisualization }))
+      );
+      return (
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
+          <MonotonicStackVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algorithm.id === 'quick-select') {
+      const QuickSelectVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/QuickSelectVisualization').then(m => ({ default: m.QuickSelectVisualization }))
+      );
+      return (
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
+          <QuickSelectVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algorithm.id === 'container-with-most-water') {
+      const ContainerWithMostWaterVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/ContainerWithMostWaterVisualization').then(m => ({ default: m.ContainerWithMostWaterVisualization }))
+      );
+      return (
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
+          <ContainerWithMostWaterVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algorithm.id === 'trapping-rain-water') {
+      const TrappingRainWaterVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/TrappingRainWaterVisualization').then(m => ({ default: m.TrappingRainWaterVisualization }))
+      );
+      return (
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
+          <TrappingRainWaterVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algorithm.id === 'dfs-preorder') {
+      const DFSPreorderVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/DFSPreorderVisualization').then(m => ({ default: m.DFSPreorderVisualization }))
+      );
+      return (
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
+          <DFSPreorderVisualization />
+        </React.Suspense>
+      );
+    }
+
     if (!implementation) {
       return (
         <div className="text-center space-y-2">
