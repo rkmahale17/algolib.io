@@ -150,7 +150,14 @@
   }
   
   .code-block {
-    @apply rounded-lg bg-muted/30 p-4 border border-border/50 overflow-x-auto overflow-y-auto max-h-[60vh] min-h-[200px] md:min-h-[280px];
+    @apply rounded-lg bg-muted/30 p-4 border border-border/50 overflow-x-auto overflow-y-auto;
+    height: 40vh;
+  }
+  @media (min-width: 640px) {
+    .code-block { height: 50vh; }
+  }
+  @media (min-width: 1024px) {
+    .code-block { height: 60vh; }
   }
 }
 
