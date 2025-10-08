@@ -1,15 +1,15 @@
 import { BookOpen, Search, Sparkles, TrendingUp, Trophy } from 'lucide-react';
 import { algorithms, categories } from '@/data/algorithms';
-import { Helmet } from 'react-helmet-async';
-import { FAQ } from '@/components/FAQ';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { FAQ } from '@/components/FAQ';
+import { Footer } from '@/components/Footer';
+import { Helmet } from 'react-helmet-async';
 import { Input } from '@/components/ui/input';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
-import { Footer } from '@/components/Footer';
 
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -103,7 +103,7 @@ const Home = () => {
             <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
               <span className="gradient-text">All Competitive Algorithms</span>
               <br />
-              In Your Pocket — Learn, Revise & Master LeetCode!
+              In Your Pocket
             </h1>
             
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
