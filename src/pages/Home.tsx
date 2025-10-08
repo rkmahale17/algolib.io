@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
+import { Footer } from '@/components/Footer';
 
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -162,6 +163,8 @@ const Home = () => {
           </div>
         )}
       </div>
+      
+      <Footer />
     </div>
   );
 };

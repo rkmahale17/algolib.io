@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { BookOpen, LogOut, MessageSquare, Sparkles, Trophy, User } from 'lucide-react';
+import { BookOpen, LogOut, MessageSquare, Sparkles, Trophy, User, Github, Menu as MenuIcon } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -77,8 +77,53 @@ const Navbar = () => {
             <span className="font-bold text-xl">Algo Lib</span>
           </Link>
 
+          {/* Navigation Links */}
+          <div className="hidden lg:flex items-center gap-6 flex-1 justify-center">
+            <Link to="/about" className="text-sm font-medium hover:text-primary transition-colors">
+              About
+            </Link>
+            <Link to="/feedback" className="text-sm font-medium hover:text-primary transition-colors">
+              Feedback
+            </Link>
+            <a 
+              href="https://github.com/rkmahale17/algolib.io" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1"
+            >
+              <Github className="w-4 h-4" />
+              GitHub
+            </a>
+          </div>
+
           {/* Right side */}
           <div className="flex items-center gap-2">
+            {/* Mobile Menu */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild className="lg:hidden">
+                <Button variant="ghost" size="icon">
+                  <MenuIcon className="w-5 h-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link to="/about">About</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/feedback">Feedback</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <a 
+                    href="https://github.com/rkmahale17/algolib.io" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
+                    GitHub
+                  </a>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            
             <ThemeToggle />
             {user ? (
               <>
@@ -122,9 +167,11 @@ const Navbar = () => {
                       <BookOpen className="mr-2 h-4 w-4" />
                       <span>My Progress</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => window.location.href = '/feedback'}>
-                      <MessageSquare className="mr-2 h-4 w-4" />
-                      <span>Feedback</span>
+                    <DropdownMenuItem asChild>
+                      <Link to="/feedback">
+                        <MessageSquare className="mr-2 h-4 w-4" />
+                        <span>Feedback</span>
+                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
