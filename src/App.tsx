@@ -8,6 +8,9 @@ import AlgorithmDetail from "./pages/AlgorithmDetail";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import Feedback from "./pages/Feedback";
+import About from "./pages/About";
+import Privacy from "./pages/Privacy";
+import TermsOfService from "./pages/TermsOfService";
 import Navbar from "./components/Navbar";
 
 const queryClient = new QueryClient();
@@ -24,6 +27,9 @@ const App = () => (
           <Route path="/algorithm/:id" element={<AlgorithmDetail />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/feedback" element={<Feedback />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<TermsOfService />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
