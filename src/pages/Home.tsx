@@ -39,13 +39,13 @@ const Home = () => {
             </div>
             
             <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
-              <span className="gradient-text">Learn Algorithms</span>
+              <span className="gradient-text">All Competitive Algorithms</span>
               <br />
-              Through Animation
+              In Your Pocket — Learn, Revise & Master LeetCode!
             </h1>
             
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Step-by-step visualizations of 75+ algorithms. Watch code come to life with interactive animations.
+              Step-by-step visualizations of 72+ algorithms. Watch code come to life with interactive animations.
             </p>
 
             {/* Stats */}
