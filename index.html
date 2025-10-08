@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>
       AlgoLib.io – Open-Source Algorithm Library for Competitive Programming
@@ -14,12 +15,24 @@
     />
     <meta
       name="keywords"
-      content="algorithms, open source, free, data structures, competitive programming, coding interviews, learn algorithms, algorithm visualization, code snippets, python, java, c++, typescript, algorithm library, algolib"
+      content="algorithms, open source, free, data structures, competitive programming, coding interviews, algorithm visualization, code snippets, python, java, c++, typescript, algolib, algolib.io"
     />
     <meta name="author" content="AlgoLib.io Team" />
     <meta name="robots" content="index, follow" />
 
-    <!-- Open Graph / Facebook -->
+    <link rel="canonical" href="https://algolib.io/" />
+
+    <!-- Favicons (verify these files exist at the paths below) -->
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+
+    <!-- Manifest & theme color (PWA/support mobile UI) -->
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#0b1220" />
+
+    <!-- Social / Open Graph -->
     <meta
       property="og:title"
       content="AlgoLib.io – Free & Open-Source Algorithm Library"
@@ -31,6 +44,7 @@
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://algolib.io/" />
     <meta property="og:image" content="https://algolib.io/og-image.png" />
+    <meta property="og:site_name" content="AlgoLib.io" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -41,37 +55,57 @@
     />
     <meta
       name="twitter:description"
-      content="Free and open-source algorithm library for developers. Learn, visualize, and code algorithms for competitive programming in Python, Java, C++, and TypeScript."
+      content="Free and open-source algorithm library for competitive programming. Learn and visualize algorithms with step-by-step guides and code snippets in multiple languages."
     />
     <meta name="twitter:image" content="https://algolib.io/og-image.png" />
 
-    <!-- Favicon -->
-    <link rel="icon" href="/favicon.ico" />
-    <link rel="canonical" href="https://www.algolib.io/" />
+    <!-- Sitemap hint (ensure /sitemap.xml exists on your server) -->
     <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
 
-    <!-- Structured Data for SEO (JSON-LD) -->
+    <!-- Preconnects / DNS-prefetch for analytics & static hosts to reduce latency -->
+    <link
+      rel="preconnect"
+      href="https://www.googletagmanager.com"
+      crossorigin
+    />
+    <link
+      rel="preconnect"
+      href="https://www.google-analytics.com"
+      crossorigin
+    />
+    <link rel="preconnect" href="https://static.hotjar.com" crossorigin />
+
+    <!-- Structured Data (JSON-LD) — WebSite + Organization -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "EducationalOrganization",
-        "name": "AlgoLib.io",
-        "url": "https://algolib.io",
-        "logo": "https://algolib.io/favicon.png",
-        "sameAs": ["https://x.com/algolib_io", "https://github.com/algolib-io"],
-        "description": "AlgoLib.io is a free and open-source algorithm library that helps developers and competitive programmers learn and visualize algorithms with clean code snippets in multiple languages.",
-        "keywords": "algorithms, open source, free, competitive programming, learn algorithms, data structures, algorithm visualization",
-        "founder": {
-          "@type": "Person",
-          "name": "AlgoLib.io Team"
-        }
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://algolib.io/#website",
+            "url": "https://algolib.io/",
+            "name": "AlgoLib.io",
+            "description": "Free and open-source algorithm library for competitive programming.",
+            "publisher": {
+              "@id": "https://algolib.io/#organization"
+            }
+          },
+          {
+            "@type": "Organization",
+            "@id": "https://algolib.io/#organization",
+            "name": "AlgoLib.io Team",
+            "url": "https://algolib.io/",
+            "logo": "https://algolib.io/favicon.png",
+            "sameAs": [
+              "https://x.com/algolib_io",
+              "https://github.com/algolib-io"
+            ]
+          }
+        ]
       }
     </script>
 
-    <!-- Google tag (gtag.js) -->
+    <!-- Google tag (gtag.js) - keep async -->
     <script
       async
       src="https://www.googletagmanager.com/gtag/js?id=G-B2KTX1L5TF"
@@ -82,10 +116,10 @@
         dataLayer.push(arguments);
       }
       gtag("js", new Date());
-
-      gtag("config", "G-B2KTX1L5TF");
+      gtag("config", "G-B2KTX1L5TF", { anonymize_ip: true });
     </script>
-    <!-- Hotjar Tracking Code for algolib -->
+
+    <!-- Hotjar -->
     <script>
       (function (h, o, t, j, a, r) {
         h.hj =
@@ -101,10 +135,27 @@
         a.appendChild(r);
       })(window, document, "https://static.hotjar.com/c/hotjar-", ".js?sv=");
     </script>
+
+    <!-- Critical CSS preload (uncomment and update if you have a critical stylesheet) -->
+    <!-- <link rel="preload" href="/styles/critical.css" as="style"> -->
+    <!-- <link rel="stylesheet" href="/styles/main.css"> -->
+
+    <!-- Accessibility: set a short title for the browser tab on mobile (optional) -->
+    <meta name="apple-mobile-web-app-title" content="AlgoLib" />
   </head>
 
   <body>
-    <div id="root"></div>
+    <div id="root" role="application" aria-label="AlgoLib application"></div>
+
+    <!-- If your app is JS-only, show a noscript fallback -->
+    <noscript>
+      <div style="padding: 16px; background: #fff3cd; color: #856404">
+        This site requires JavaScript to run. Please enable JavaScript in your
+        browser.
+      </div>
+    </noscript>
+
+    <!-- App entry -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

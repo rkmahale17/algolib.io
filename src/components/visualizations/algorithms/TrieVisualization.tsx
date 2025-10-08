@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { StepControls } from '../shared/StepControls';
+import React, { useEffect, useRef, useState } from 'react';
+
 import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
 interface TrieNode {
@@ -197,8 +198,9 @@ class Trie {
         speed={speed}
         onSpeedChange={setSpeed}
       />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-      <div className="bg-card rounded-lg p-6 border">
+      <div className="bg-card rounded-lg p-6 border space-y-4">
         <h3 className="text-lg font-semibold mb-4">
           {currentStep.operation === 'insert' ? 'Inserting' : 'Searching'}: {currentStep.word}
         </h3>
@@ -231,10 +233,8 @@ class Trie {
         
         <div className="mt-4 p-4 bg-muted rounded">
           <p className="text-sm">{currentStep.message}</p>
-        </div>
-      </div>
-
-      <VariablePanel
+        </div> 
+           <VariablePanel
         variables={{
           operation: currentStep.operation,
           word: currentStep.word,
@@ -244,8 +244,13 @@ class Trie {
           found: currentStep.found !== null ? String(currentStep.found) : 'searching...'
         }}
       />
+      </div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
 
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+     </div>
+   
+
+
     </div>
   );
 };
