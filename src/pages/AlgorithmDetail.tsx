@@ -430,6 +430,50 @@ const AlgorithmDetail: React.FC = () => {
       const WordBreakVisualization = React.lazy(() => import('@/components/visualizations/algorithms/WordBreakVisualization').then(m => ({ default: m.WordBreakVisualization })));
       return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><WordBreakVisualization /></React.Suspense>;
     }
+    if (algorithm.id === 'subsets') {
+      const SubsetsVisualization = React.lazy(() => import('@/components/visualizations/algorithms/SubsetsVisualization').then(m => ({ default: m.SubsetsVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><SubsetsVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'permutations') {
+      const PermutationsVisualization = React.lazy(() => import('@/components/visualizations/algorithms/PermutationsVisualization').then(m => ({ default: m.PermutationsVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><PermutationsVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'combinations') {
+      const CombinationsVisualization = React.lazy(() => import('@/components/visualizations/algorithms/CombinationsVisualization').then(m => ({ default: m.CombinationsVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><CombinationsVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'combination-sum') {
+      const CombinationSumVisualization = React.lazy(() => import('@/components/visualizations/algorithms/CombinationSumVisualization').then(m => ({ default: m.CombinationSumVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><CombinationSumVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'word-search') {
+      const WordSearchVisualization = React.lazy(() => import('@/components/visualizations/algorithms/WordSearchVisualization').then(m => ({ default: m.WordSearchVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><WordSearchVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'n-queens') {
+      const NQueensVisualization = React.lazy(() => import('@/components/visualizations/algorithms/NQueensVisualization').then(m => ({ default: m.NQueensVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><NQueensVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'sudoku-solver') {
+      const SudokuSolverVisualization = React.lazy(() => import('@/components/visualizations/algorithms/SudokuSolverVisualization').then(m => ({ default: m.SudokuSolverVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><SudokuSolverVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'segment-tree') {
+      const SegmentTreeVisualization = React.lazy(() => import('@/components/visualizations/algorithms/SegmentTreeVisualization').then(m => ({ default: m.SegmentTreeVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><SegmentTreeVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'fenwick-tree') {
+      const FenwickTreeVisualization = React.lazy(() => import('@/components/visualizations/algorithms/FenwickTreeVisualization').then(m => ({ default: m.FenwickTreeVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><FenwickTreeVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'kmp-string-matching') {
+      const KMPVisualization = React.lazy(() => import('@/components/visualizations/algorithms/KMPVisualization').then(m => ({ default: m.KMPVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><KMPVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'rabin-karp') {
+      const RabinKarpVisualization = React.lazy(() => import('@/components/visualizations/algorithms/RabinKarpVisualization').then(m => ({ default: m.RabinKarpVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><RabinKarpVisualization /></React.Suspense>;
+    }
 
     // Default: Show coming soon for all algorithms without explicit visualization
     return (
