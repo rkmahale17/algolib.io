@@ -1,0 +1,297 @@
+import { useState, useEffect, useRef } from 'react';
+import { VariablePanel } from '../shared/VariablePanel';
+import { StepControls } from '../shared/StepControls';
+import { CodeHighlighter } from '../shared/CodeHighlighter';
+
+interface Edge {
+  from: number;
+  to: number;
+  weight: number;
+}
+
+interface Step {
+  visited: boolean[];
+  edges: Edge[];
+  mstEdges: Edge[];
+  currentNode: number | null;
+  message: string;
+  lineNumber: number;
+}
+
+export const PrimsVisualization = () => {
+  const [steps, setSteps] = useState<Step[]>([]);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [speed, setSpeed] = useState(1);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const code = `function primMST(graph, n) {
+  const visited = Array(n).fill(false);
+  const mst = [];
+  const pq = new MinHeap();
+  
+  visited[0] = true;
+  addEdges(0, graph, pq);
+  
+  while (!pq.isEmpty() && mst.length < n - 1) {
+    const edge = pq.extractMin();
+    
+    if (visited[edge.to]) continue;
+    
+    mst.push(edge);
+    visited[edge.to] = true;
+    addEdges(edge.to, graph, pq);
+  }
+  return mst;
+}`;
+
+  const generateSteps = () => {
+    const nodes = 5;
+    const graph: Edge[][] = [
+      [{ from: 0, to: 1, weight: 2 }, { from: 0, to: 3, weight: 6 }],
+      [{ from: 1, to: 0, weight: 2 }, { from: 1, to: 2, weight: 3 }, { from: 1, to: 3, weight: 8 }, { from: 1, to: 4, weight: 5 }],
+      [{ from: 2, to: 1, weight: 3 }, { from: 2, to: 4, weight: 7 }],
+      [{ from: 3, to: 0, weight: 6 }, { from: 3, to: 1, weight: 8 }, { from: 3, to: 4, weight: 9 }],
+      [{ from: 4, to: 1, weight: 5 }, { from: 4, to: 2, weight: 7 }, { from: 4, to: 3, weight: 9 }]
+    ];
+
+    const allEdges: Edge[] = [
+      { from: 0, to: 1, weight: 2 },
+      { from: 0, to: 3, weight: 6 },
+      { from: 1, to: 2, weight: 3 },
+      { from: 1, to: 3, weight: 8 },
+      { from: 1, to: 4, weight: 5 },
+      { from: 2, to: 4, weight: 7 },
+      { from: 3, to: 4, weight: 9 }
+    ];
+
+    const newSteps: Step[] = [];
+    const visited = Array(nodes).fill(false);
+    const mstEdges: Edge[] = [];
+    const pq: Edge[] = [];
+
+    newSteps.push({
+      visited: [...visited],
+      edges: allEdges,
+      mstEdges: [],
+      currentNode: null,
+      message: 'Start Prim\'s algorithm from node 0',
+      lineNumber: 0
+    });
+
+    visited[0] = true;
+    graph[0].forEach(edge => pq.push(edge));
+    pq.sort((a, b) => a.weight - b.weight);
+
+    newSteps.push({
+      visited: [...visited],
+      edges: allEdges,
+      mstEdges: [],
+      currentNode: 0,
+      message: 'Mark node 0 as visited, add its edges to priority queue',
+      lineNumber: 5
+    });
+
+    while (pq.length > 0 && mstEdges.length < nodes - 1) {
+      const edge = pq.shift()!;
+
+      newSteps.push({
+        visited: [...visited],
+        edges: allEdges,
+        mstEdges: [...mstEdges],
+        currentNode: edge.to,
+        message: `Consider edge ${edge.from}-${edge.to} (weight: ${edge.weight})`,
+        lineNumber: 9
+      });
+
+      if (visited[edge.to]) {
+        newSteps.push({
+          visited: [...visited],
+          edges: allEdges,
+          mstEdges: [...mstEdges],
+          currentNode: edge.to,
+          message: `Skip edge ${edge.from}-${edge.to} (node ${edge.to} already visited)`,
+          lineNumber: 11
+        });
+        continue;
+      }
+
+      mstEdges.push(edge);
+      visited[edge.to] = true;
+
+      newSteps.push({
+        visited: [...visited],
+        edges: allEdges,
+        mstEdges: [...mstEdges],
+        currentNode: edge.to,
+        message: `Add edge ${edge.from}-${edge.to} to MST`,
+        lineNumber: 13
+      });
+
+      graph[edge.to].forEach(e => {
+        if (!visited[e.to]) pq.push(e);
+      });
+      pq.sort((a, b) => a.weight - b.weight);
+    }
+
+    newSteps.push({
+      visited: [...visited],
+      edges: allEdges,
+      mstEdges: [...mstEdges],
+      currentNode: null,
+      message: `MST complete! Total weight: ${mstEdges.reduce((sum, e) => sum + e.weight, 0)}`,
+      lineNumber: 17
+    });
+
+    setSteps(newSteps);
+    setCurrentStepIndex(0);
+  };
+
+  useEffect(() => {
+    generateSteps();
+  }, []);
+
+  useEffect(() => {
+    if (isPlaying && currentStepIndex < steps.length - 1) {
+      intervalRef.current = setInterval(() => {
+        setCurrentStepIndex(prev => {
+          if (prev >= steps.length - 1) {
+            setIsPlaying(false);
+            return prev;
+          }
+          return prev + 1;
+        });
+      }, 1000 / speed);
+    } else {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    }
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [isPlaying, currentStepIndex, steps.length, speed]);
+
+  const handlePlay = () => setIsPlaying(true);
+  const handlePause = () => setIsPlaying(false);
+  const handleStepForward = () => currentStepIndex < steps.length - 1 && setCurrentStepIndex(prev => prev + 1);
+  const handleStepBack = () => currentStepIndex > 0 && setCurrentStepIndex(prev => prev - 1);
+  const handleReset = () => {
+    setCurrentStepIndex(0);
+    setIsPlaying(false);
+    generateSteps();
+  };
+
+  if (steps.length === 0) return null;
+
+  const currentStep = steps[currentStepIndex];
+
+  const nodePositions = [
+    { x: 100, y: 50 },
+    { x: 200, y: 100 },
+    { x: 300, y: 50 },
+    { x: 150, y: 200 },
+    { x: 250, y: 200 }
+  ];
+
+  return (
+    <div className="space-y-6">
+      <StepControls
+        isPlaying={isPlaying}
+        onPlay={handlePlay}
+        onPause={handlePause}
+        onStepForward={handleStepForward}
+        onStepBack={handleStepBack}
+        onReset={handleReset}
+        speed={speed}
+        onSpeedChange={setSpeed}
+        currentStep={currentStepIndex}
+        totalSteps={steps.length - 1}
+      />
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <div className="bg-muted/30 rounded-lg border border-border/50 p-6">
+            <svg width="400" height="280" className="mx-auto">
+              {currentStep.edges.map((edge, idx) => {
+                const from = nodePositions[edge.from];
+                const to = nodePositions[edge.to];
+                const inMST = currentStep.mstEdges.some(e => 
+                  (e.from === edge.from && e.to === edge.to) || 
+                  (e.from === edge.to && e.to === edge.from)
+                );
+                
+                return (
+                  <g key={idx}>
+                    <line
+                      x1={from.x}
+                      y1={from.y}
+                      x2={to.x}
+                      y2={to.y}
+                      className={`transition-all duration-300 ${
+                        inMST ? 'stroke-green-500' : 'stroke-border'
+                      }`}
+                      strokeWidth={inMST ? 3 : 2}
+                    />
+                    <text
+                      x={(from.x + to.x) / 2}
+                      y={(from.y + to.y) / 2}
+                      className="fill-foreground text-xs font-bold"
+                      textAnchor="middle"
+                    >
+                      {edge.weight}
+                    </text>
+                  </g>
+                );
+              })}
+              
+              {nodePositions.map((pos, idx) => (
+                <g key={idx}>
+                  <circle
+                    cx={pos.x}
+                    cy={pos.y}
+                    r="20"
+                    className={`transition-all duration-300 ${
+                      currentStep.visited[idx]
+                        ? 'fill-green-500 stroke-green-500'
+                        : currentStep.currentNode === idx
+                        ? 'fill-primary stroke-primary'
+                        : 'fill-muted stroke-border'
+                    }`}
+                    strokeWidth="2"
+                  />
+                  <text
+                    x={pos.x}
+                    y={pos.y}
+                    textAnchor="middle"
+                    dy=".3em"
+                    className={`font-bold ${
+                      currentStep.visited[idx] || currentStep.currentNode === idx
+                        ? 'fill-white'
+                        : 'fill-foreground'
+                    }`}
+                  >
+                    {idx}
+                  </text>
+                </g>
+              ))}
+            </svg>
+          </div>
+
+          <div className="bg-accent/50 rounded-lg border border-accent p-4">
+            <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <VariablePanel
+            variables={{
+              'Visited Nodes': currentStep.visited.filter(v => v).length,
+              'MST Edges': currentStep.mstEdges.length,
+              'Total Weight': currentStep.mstEdges.reduce((sum, e) => sum + e.weight, 0)
+            }}
+          />
+          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+        </div>
+      </div>
+    </div>
+  );
+};

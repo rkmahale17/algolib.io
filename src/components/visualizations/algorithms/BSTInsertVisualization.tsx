@@ -75,6 +75,8 @@ export const BSTInsertVisualization = () => {
 
     const insert = (node: TreeNode | null, val: number, tree: TreeNode): TreeNode | null => {
       if (!node) {
+        const newNode = { val, left: null, right: null };
+        calculatePositions(tree, 200, 50, 80);
         newSteps.push({
           tree: deepClone(tree),
           current: null,
@@ -82,9 +84,10 @@ export const BSTInsertVisualization = () => {
           message: `Found empty spot! Insert ${val} here`,
           lineNumber: 1
         });
-        return { val, left: null, right: null };
+        return newNode;
       }
 
+      calculatePositions(tree, 200, 50, 80);
       newSteps.push({
         tree: deepClone(tree),
         current: node.val,
@@ -94,6 +97,7 @@ export const BSTInsertVisualization = () => {
       });
 
       if (val < node.val) {
+        calculatePositions(tree, 200, 50, 80);
         newSteps.push({
           tree: deepClone(tree),
           current: node.val,
@@ -103,6 +107,7 @@ export const BSTInsertVisualization = () => {
         });
         node.left = insert(node.left, val, tree);
       } else {
+        calculatePositions(tree, 200, 50, 80);
         newSteps.push({
           tree: deepClone(tree),
           current: node.val,

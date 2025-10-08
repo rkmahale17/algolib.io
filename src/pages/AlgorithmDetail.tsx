@@ -398,6 +398,38 @@ const AlgorithmDetail: React.FC = () => {
       const ClimbingStairsVisualization = React.lazy(() => import('@/components/visualizations/algorithms/ClimbingStairsVisualization').then(m => ({ default: m.ClimbingStairsVisualization })));
       return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><ClimbingStairsVisualization /></React.Suspense>;
     }
+    if (algorithm.id === 'kruskals') {
+      const KruskalsVisualization = React.lazy(() => import('@/components/visualizations/algorithms/KruskalsVisualization').then(m => ({ default: m.KruskalsVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><KruskalsVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'prims') {
+      const PrimsVisualization = React.lazy(() => import('@/components/visualizations/algorithms/PrimsVisualization').then(m => ({ default: m.PrimsVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><PrimsVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'dijkstras') {
+      const DijkstrasVisualization = React.lazy(() => import('@/components/visualizations/algorithms/DijkstrasVisualization').then(m => ({ default: m.DijkstrasVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><DijkstrasVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'bellman-ford') {
+      const BellmanFordVisualization = React.lazy(() => import('@/components/visualizations/algorithms/BellmanFordVisualization').then(m => ({ default: m.BellmanFordVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><BellmanFordVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'floyd-warshall') {
+      const FloydWarshallVisualization = React.lazy(() => import('@/components/visualizations/algorithms/FloydWarshallVisualization').then(m => ({ default: m.FloydWarshallVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><FloydWarshallVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'a-star') {
+      const AStarVisualization = React.lazy(() => import('@/components/visualizations/algorithms/AStarVisualization').then(m => ({ default: m.AStarVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><AStarVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'partition-equal-subset') {
+      const PartitionEqualSubsetVisualization = React.lazy(() => import('@/components/visualizations/algorithms/PartitionEqualSubsetVisualization').then(m => ({ default: m.PartitionEqualSubsetVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><PartitionEqualSubsetVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'word-break') {
+      const WordBreakVisualization = React.lazy(() => import('@/components/visualizations/algorithms/WordBreakVisualization').then(m => ({ default: m.WordBreakVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><WordBreakVisualization /></React.Suspense>;
+    }
 
     // Default: Show coming soon for all algorithms without explicit visualization
     return (
