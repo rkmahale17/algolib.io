@@ -7,6 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { useState } from 'react';
+import Navbar from '@/components/Navbar';
+import { Footer } from '@/components/Footer';
 
 const Feedback = () => {
   const [title, setTitle] = useState('');
@@ -27,7 +29,7 @@ const Feedback = () => {
       // Create GitHub issue URL with pre-filled data
       const issueTitle = encodeURIComponent(title);
       const issueBody = encodeURIComponent(description);
-      const githubIssueUrl = `https://github.com/yourusername/yourrepo/issues/new?title=${issueTitle}&body=${issueBody}`;
+      const githubIssueUrl = `https://github.com/rkmahale17/algolib.io/issues/new?title=${issueTitle}&body=${issueBody}`;
       
       // Open in new tab
       window.open(githubIssueUrl, '_blank');
@@ -44,6 +46,7 @@ const Feedback = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Navbar />
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-8">
@@ -102,7 +105,7 @@ const Feedback = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => window.open('https://github.com/rkmahale17/learn-algo-animate/issues', '_blank')}
+                  onClick={() => window.open('https://github.com/rkmahale17/algolib.io/issues', '_blank')}
                 >
                   <ExternalLink className="w-4 h-4 mr-2" />
                   View All
@@ -116,6 +119,7 @@ const Feedback = () => {
           </Card>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };
