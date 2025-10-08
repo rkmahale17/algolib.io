@@ -1703,8 +1703,3 @@ export const algorithms: Algorithm[] = [
 
   }
 ];
-let result = [];
-algorithms.forEach((item) => {
-  result.push("https://algolib.io/algorithm/" + item.id)
-});
-console.log(result)
