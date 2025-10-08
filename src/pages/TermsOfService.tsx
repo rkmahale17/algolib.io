@@ -1,11 +1,9 @@
-import Navbar from "@/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Footer } from "@/components/Footer";
 
 export default function TermsOfService() {
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="space-y-8">
           <div className="text-center space-y-4">
