@@ -187,6 +187,116 @@ const AlgorithmDetail: React.FC = () => {
       );
     }
 
+    if (algorithm.id === 'rotate-array') {
+      const RotateArrayVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/RotateArrayVisualization').then(m => ({ default: m.RotateArrayVisualization }))
+      );
+      return (
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
+          <RotateArrayVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algorithm.id === 'cyclic-sort') {
+      const CyclicSortVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/CyclicSortVisualization').then(m => ({ default: m.CyclicSortVisualization }))
+      );
+      return (
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
+          <CyclicSortVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algorithm.id === 'merge-sorted-lists') {
+      const MergeSortedListsVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/MergeSortedListsVisualization').then(m => ({ default: m.MergeSortedListsVisualization }))
+      );
+      return (
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
+          <MergeSortedListsVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algorithm.id === 'dfs-inorder') {
+      const DFSInorderVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/DFSInorderVisualization').then(m => ({ default: m.DFSInorderVisualization }))
+      );
+      return (
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
+          <DFSInorderVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algorithm.id === 'dfs-postorder') {
+      const DFSPostorderVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/DFSPostorderVisualization').then(m => ({ default: m.DFSPostorderVisualization }))
+      );
+      return (
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
+          <DFSPostorderVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algorithm.id === 'bfs-level-order') {
+      const BFSLevelOrderVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/BFSLevelOrderVisualization').then(m => ({ default: m.BFSLevelOrderVisualization }))
+      );
+      return (
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
+          <BFSLevelOrderVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algorithm.id === 'bst-insert') {
+      const BSTInsertVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/BSTInsertVisualization').then(m => ({ default: m.BSTInsertVisualization }))
+      );
+      return (
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
+          <BSTInsertVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algorithm.id === 'lca') {
+      const LowestCommonAncestorVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/LowestCommonAncestorVisualization').then(m => ({ default: m.LowestCommonAncestorVisualization }))
+      );
+      return (
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
+          <LowestCommonAncestorVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algorithm.id === 'serialize-tree') {
+      const SerializeTreeVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/SerializeTreeVisualization').then(m => ({ default: m.SerializeTreeVisualization }))
+      );
+      return (
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
+          <SerializeTreeVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algorithm.id === 'recover-bst') {
+      const RecoverBSTVisualization = React.lazy(() => 
+        import('@/components/visualizations/algorithms/RecoverBSTVisualization').then(m => ({ default: m.RecoverBSTVisualization }))
+      );
+      return (
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
+          <RecoverBSTVisualization />
+        </React.Suspense>
+      );
+    }
+
     if (!implementation) {
       return (
         <div className="text-center space-y-2">
