@@ -25,26 +25,43 @@ const AlgorithmDetail: React.FC = () => {
   const implementation = getAlgorithmImplementation(id || '');
   const [showBreadcrumb, setShowBreadcrumb] = useState(true);
 
+  // Scroll to top on mount/route change
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
+
   React.useEffect(() => {
     let lastScrollY = window.scrollY;
+    let ticking = false;
     
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      
-      // Only apply on mobile (below md breakpoint - 768px)
-      if (window.innerWidth < 768) {
-        if (currentScrollY > lastScrollY && currentScrollY > 50) {
-          // Scrolling down
-          setShowBreadcrumb(false);
-        } else {
-          // Scrolling up or at top
-          setShowBreadcrumb(true);
-        }
-      } else {
-        setShowBreadcrumb(true);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+          const scrollDifference = Math.abs(currentScrollY - lastScrollY);
+          
+          // Only apply on mobile (below md breakpoint - 768px)
+          if (window.innerWidth < 768) {
+            // Only change state if scroll difference is significant (more than 10px)
+            if (scrollDifference > 10) {
+              if (currentScrollY > lastScrollY && currentScrollY > 80) {
+                // Scrolling down
+                setShowBreadcrumb(false);
+              } else if (currentScrollY < lastScrollY) {
+                // Scrolling up
+                setShowBreadcrumb(true);
+              }
+              lastScrollY = currentScrollY;
+            }
+          } else {
+            setShowBreadcrumb(true);
+          }
+          
+          ticking = false;
+        });
+        
+        ticking = true;
       }
-      
-      lastScrollY = currentScrollY;
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
