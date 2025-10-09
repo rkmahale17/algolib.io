@@ -43,7 +43,7 @@ const AlgorithmDetail: React.FC = () => {
           // Only apply on mobile (below md breakpoint - 768px)
           if (window.innerWidth < 768) {
             // Only change state if scroll difference is significant (more than 10px)
-            if (scrollDifference > 10) {
+            if (scrollDifference > 100) {
               if (currentScrollY > lastScrollY && currentScrollY > 80) {
                 // Scrolling down
                 setShowBreadcrumb(false);
@@ -597,7 +597,7 @@ const AlgorithmDetail: React.FC = () => {
                 </Button>
               </Link>
               <Separator orientation="vertical" className="h-6" />
-              <div className={`flex items-center gap-2 text-sm text-muted-foreground transition-all duration-300 md:opacity-100 ${showBreadcrumb ? 'opacity-100 max-h-10' : 'opacity-0 max-h-0 overflow-hidden'}`}>
+              <div className={`flex items-center gap-2 text-sm text-muted-foreground transition-all duration-100 md:opacity-100 ${showBreadcrumb ? 'opacity-100 max-h-4' : 'opacity-0 max-h-0 overflow-hidden'}`}>
                 <Link to="/" className="hover:text-foreground transition-colors">
                   Algorithms
                 </Link>
@@ -609,7 +609,7 @@ const AlgorithmDetail: React.FC = () => {
                   {algorithm.category}
                 </Link>
                 <span>/</span>
-                <span className="text-foreground font-medium text-xl">{algorithm.name}</span>
+                <span className="text-foreground font-medium text-xl sm:text-sm">{algorithm.name}</span>
               </div>
             </div>
           </div>
