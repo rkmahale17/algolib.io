@@ -549,11 +549,18 @@ const AlgorithmDetail: React.FC = () => {
               </Link>
               <Separator orientation="vertical" className="h-6" />
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span>Algorithms</span>
+                <Link to="/" className="hover:text-foreground transition-colors">
+                  Algorithms
+                </Link>
                 <span>/</span>
-                <span>{algorithm.category}</span>
+                <Link 
+                  to={`/?category=${encodeURIComponent(algorithm.category)}`}
+                  className="hover:text-foreground transition-colors"
+                >
+                  {algorithm.category}
+                </Link>
                 <span>/</span>
-                <span className="text-foreground font-medium">{algorithm.name}</span>
+                <span className="text-foreground font-medium text-xl">{algorithm.name}</span>
               </div>
             </div>
           </div>

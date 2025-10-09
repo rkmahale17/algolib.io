@@ -77,10 +77,10 @@ export const StepControls = ({
         </div>
       </div>
       
-      <div className="flex items-center gap-2 md:min-w-[200px]">
-        <label className="text-xs text-muted-foreground whitespace-nowrap">
+      <div className="flex-1">
+        <div className="text-xs text-muted-foreground mb-1">
           Speed: {speed.toFixed(1)}x
-        </label>
+        </div>
         <Slider
           value={[speed]}
           onValueChange={(values) => onSpeedChange(values[0])}
@@ -88,7 +88,6 @@ export const StepControls = ({
           max={3}
           step={0.5}
           disabled={disabled}
-          className="flex-1"
         />
       </div>
     </div>
