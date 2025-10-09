@@ -23,6 +23,38 @@ const AlgorithmDetail: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
   const algorithm = algorithms.find((a) => a.id === id);
   const implementation = getAlgorithmImplementation(id || '');
+  const [showBreadcrumb, setShowBreadcrumb] = useState(true);
+
+  React.useEffect(() => {
+    let lastScrollY = window.scrollY;
+    
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Only apply on mobile (below md breakpoint - 768px)
+      if (window.innerWidth < 768) {
+        if (currentScrollY > lastScrollY && currentScrollY > 50) {
+          // Scrolling down
+          setShowBreadcrumb(false);
+        } else {
+          // Scrolling up or at top
+          setShowBreadcrumb(true);
+        }
+      } else {
+        setShowBreadcrumb(true);
+      }
+      
+      lastScrollY = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, []);
 
 
   // If algorithm not found - show friendly 404 and still inject meta if id present
@@ -548,7 +580,7 @@ const AlgorithmDetail: React.FC = () => {
                 </Button>
               </Link>
               <Separator orientation="vertical" className="h-6" />
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className={`flex items-center gap-2 text-sm text-muted-foreground transition-all duration-300 md:opacity-100 ${showBreadcrumb ? 'opacity-100 max-h-10' : 'opacity-0 max-h-0 overflow-hidden'}`}>
                 <Link to="/" className="hover:text-foreground transition-colors">
                   Algorithms
                 </Link>
