@@ -1,5 +1,5 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { BookOpen, LogOut, MessageSquare, Sparkles, Trophy, User, Github, Menu as MenuIcon } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { BookOpen, LogOut, MessageSquare, Sparkles, Trophy, User, Github, Menu as MenuIcon } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,14 +7,14 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { useEffect, useState } from 'react';
+} from "@/components/ui/dropdown-menu";
+import { useEffect, useState } from "react";
 
-import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
-import { ThemeToggle } from './ThemeToggle';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import { ThemeToggle } from "./ThemeToggle";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Navbar = () => {
   const [user, setUser] = useState<any>(null);
@@ -46,10 +46,10 @@ const Navbar = () => {
 
   const fetchProgress = async (userId: string) => {
     const { data, error } = await supabase
-      .from('user_progress')
-      .select('*', { count: 'exact' })
-      .eq('user_id', userId)
-      .eq('completed', true);
+      .from("user_progress")
+      .select("*", { count: "exact" })
+      .eq("user_id", userId)
+      .eq("completed", true);
 
     if (!error && data) {
       setCompletedCount(data.length);
@@ -59,9 +59,9 @@ const Navbar = () => {
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
-      toast.error('Failed to sign out');
+      toast.error("Failed to sign out");
     } else {
-      toast.success('Signed out successfully');
+      toast.success("Signed out successfully");
     }
   };
 
@@ -85,9 +85,9 @@ const Navbar = () => {
             <Link to="/feedback" className="text-sm font-medium hover:text-primary transition-colors">
               Feedback
             </Link>
-            <a 
-              href="https://github.com/rkmahale17/algolib.io" 
-              target="_blank" 
+            <a
+              href="https://github.com/rkmahale17/algolib.io"
+              target="_blank"
               rel="noopener noreferrer"
               className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1"
             >
@@ -113,26 +113,20 @@ const Navbar = () => {
                   <Link to="/feedback">Feedback</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <a 
-                    href="https://github.com/rkmahale17/algolib.io" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                  >
+                  <a href="https://github.com/rkmahale17/algolib.io" target="_blank" rel="noopener noreferrer">
                     GitHub
                   </a>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            
+
             <ThemeToggle />
             {user ? (
               <>
                 {/* Progress indicator */}
                 <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/50 border border-border/50">
                   <Trophy className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-medium">
-                    {completedCount} / 80 completed
-                  </span>
+                  <span className="text-sm font-medium">{completedCount} / 80 completed</span>
                 </div>
 
                 {/* User menu */}
@@ -141,21 +135,15 @@ const Navbar = () => {
                     <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                       <Avatar className="h-10 w-10">
                         <AvatarImage src={user.user_metadata?.avatar_url} />
-                        <AvatarFallback>
-                          {user.email?.[0]?.toUpperCase() || 'U'}
-                        </AvatarFallback>
+                        <AvatarFallback>{user.email?.[0]?.toUpperCase() || "U"}</AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
                     <DropdownMenuLabel>
                       <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">
-                          {user.user_metadata?.full_name || 'User'}
-                        </p>
-                        <p className="text-xs leading-none text-muted-foreground">
-                          {user.email}
-                        </p>
+                        <p className="text-sm font-medium leading-none">{user.user_metadata?.full_name || "User"}</p>
+                        <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
@@ -183,7 +171,7 @@ const Navbar = () => {
               </>
             ) : (
               <Link to="/auth">
-                { { <Button className='none'>Sign In</Button> } 
+                <Button className="none">Sign In</Button>
               </Link>
             )}
           </div>
