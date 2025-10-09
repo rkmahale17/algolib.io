@@ -609,7 +609,7 @@ const AlgorithmDetail: React.FC = () => {
                   {algorithm.category}
                 </Link>
                 <span>/</span>
-                <span className="text-foreground font-medium text-xl sm:text-sm">{algorithm.name}</span>
+                <span className="text-foreground font-medium text-sm  md:text-xl">{algorithm.name}</span>
               </div>
             </div>
           </div>
