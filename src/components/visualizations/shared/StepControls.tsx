@@ -30,7 +30,7 @@ export const StepControls = ({
   disabled = false
 }: StepControlsProps) => {
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col md:flex-row md:items-center gap-4">
       <div className="flex items-center gap-2">
         <Button
           onClick={onStepBack}
@@ -63,22 +63,22 @@ export const StepControls = ({
         <Button onClick={onReset} disabled={disabled} variant="outline" size="icon">
           <RotateCcw className="h-4 w-4" />
         </Button>
-        
-        <div className="flex-1 ml-4">
-          <div className="text-xs text-muted-foreground mb-1">
-            Step {currentStep} / {totalSteps}
-          </div>
-          <div className="h-2 bg-muted rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-primary transition-all duration-300"
-              style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-            />
-          </div>
+      </div>
+      
+      <div className="flex-1">
+        <div className="text-xs text-muted-foreground mb-1">
+          Step {currentStep} / {totalSteps}
+        </div>
+        <div className="h-2 bg-muted rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-primary transition-all duration-300"
+            style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+          />
         </div>
       </div>
       
-      <div className="space-y-2">
-        <label className="text-xs text-muted-foreground">
+      <div className="flex items-center gap-2 md:min-w-[200px]">
+        <label className="text-xs text-muted-foreground whitespace-nowrap">
           Speed: {speed.toFixed(1)}x
         </label>
         <Slider
@@ -88,6 +88,7 @@ export const StepControls = ({
           max={3}
           step={0.5}
           disabled={disabled}
+          className="flex-1"
         />
       </div>
     </div>

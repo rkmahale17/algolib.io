@@ -540,26 +540,20 @@ const AlgorithmDetail: React.FC = () => {
         
         <div className="border-b border-border/50 bg-card/30 backdrop-blur-sm sticky top-0 z-10">
           <div className="container mx-auto px-4 py-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <Link to="/">
-                  <Button variant="ghost" size="sm">
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back
-                  </Button>
-                </Link>
-                <Separator orientation="vertical" className="h-8" />
-                <div>
-                  <h1 className="text-2xl font-bold">{algorithm.name}</h1>
-                  <p className="text-sm text-muted-foreground">{algorithm.category}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <ShareButton title={algorithm.name} description={algorithm.description} />
-                <Badge variant="outline" className={difficultyColors[algorithm.difficulty]}>
-                  {algorithm.difficulty}
-                </Badge>
+            <div className="flex items-center flex-wrap gap-2">
+              <Link to="/">
+                <Button variant="ghost" size="sm">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back
+                </Button>
+              </Link>
+              <Separator orientation="vertical" className="h-6" />
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span>Algorithms</span>
+                <span>/</span>
+                <span>{algorithm.category}</span>
+                <span>/</span>
+                <span className="text-foreground font-medium">{algorithm.name}</span>
               </div>
             </div>
           </div>
@@ -567,26 +561,23 @@ const AlgorithmDetail: React.FC = () => {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8 overflow-x-hidden">
-        {/* Breadcrumbs */}
-        <div className="max-w-5xl mx-auto">
-          <Breadcrumbs 
-            items={[
-              { label: 'Algorithms' },
-              { label: algorithm.category },
-              { label: algorithm.name }
-            ]} 
-          />
-        </div>
-        
         {/* Single column layout for all screen sizes */}
-        <div className="space-y-6  mx-auto">
+        <div className="space-y-6 mx-auto">
           {/* 1. Animation */}
           <Card className="p-4 sm:p-6 glass-card overflow-hidden">
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold flex items-center gap-2">
-                <Eye className="w-5 h-5 text-primary" />
-                Interactive Visualization
-              </h2>
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <h2 className="text-lg font-semibold flex items-center gap-2">
+                  <Eye className="w-5 h-5 text-primary" />
+                  Interactive Visualization
+                </h2>
+                <div className="flex items-center gap-2">
+                  <ShareButton title={algorithm.name} description={algorithm.description} />
+                  <Badge variant="outline" className={difficultyColors[algorithm.difficulty]}>
+                    {algorithm.difficulty}
+                  </Badge>
+                </div>
+              </div>
               <div className="rounded-lg bg-muted/30 border border-border/50 p-2 sm:p-4 overflow-x-auto">
                 <div className="min-w-[280px]">
                   {renderVisualization()}
