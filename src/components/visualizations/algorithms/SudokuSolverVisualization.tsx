@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { StepControls } from '../shared/StepControls';
+import React, { useEffect, useRef, useState } from 'react';
+
 import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
 interface Step {
@@ -203,6 +204,7 @@ export const SudokuSolverVisualization: React.FC = () => {
         speed={speed}
         onSpeedChange={setSpeed}
       />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
       <div className="bg-card rounded-lg p-6 border">
         <h3 className="text-lg font-semibold mb-4">4x4 Sudoku Board (Simplified)</h3>
@@ -229,9 +231,8 @@ export const SudokuSolverVisualization: React.FC = () => {
         <div className="mt-4 p-4 bg-muted rounded">
           <p className="text-sm">{currentStep.message}</p>
         </div>
-      </div>
-
-      <VariablePanel
+             <div className="mt-4 p-4 bg-muted rounded">
+               <VariablePanel
         variables={{
           'current row': currentStep.row >= 0 ? currentStep.row : 'done',
           'current col': currentStep.col >= 0 ? currentStep.col : 'done',
@@ -239,8 +240,11 @@ export const SudokuSolverVisualization: React.FC = () => {
           'solved': String(currentStep.solved)
         }}
       />
+        </div>
 
+      </div>
       <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
-    </div>
+</div>
+</div>
   );
 };

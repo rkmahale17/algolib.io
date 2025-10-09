@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { BookOpen, LogOut, MessageSquare, Sparkles, Trophy, User, Github, Menu as MenuIcon } from "lucide-react";
+import { BookOpen, Github, LogOut, Menu as MenuIcon, MessageSquare, Sparkles, Trophy, User } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -171,7 +171,7 @@ const Navbar = () => {
               </>
             ) : (
               <Link to="/auth">
-                <Button className="none">Sign In</Button>
+                {/* <Button className="none">Sign In</Button> */}
               </Link>
             )}
           </div>
