@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { StepControls } from '../shared/StepControls';
+import React, { useEffect, useRef, useState } from 'react';
+
 import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
 interface Step {
@@ -152,6 +153,7 @@ export const CombinationsVisualization: React.FC = () => {
         speed={speed}
         onSpeedChange={setSpeed}
       />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
       <div className="bg-card rounded-lg p-6 border">
         <h3 className="text-lg font-semibold mb-4">Range: 1 to {currentStep.n}, Choose {currentStep.k}</h3>
@@ -198,9 +200,8 @@ export const CombinationsVisualization: React.FC = () => {
         <div className="mt-4 p-4 bg-muted rounded">
           <p className="text-sm">{currentStep.message}</p>
         </div>
-      </div>
-
-      <VariablePanel
+           <div className="mt-4 p-4 bg-muted rounded">
+           <VariablePanel
         variables={{
           'n': currentStep.n,
           'k': currentStep.k,
@@ -208,8 +209,11 @@ export const CombinationsVisualization: React.FC = () => {
           'total combinations': currentStep.allCombinations.length
         }}
       />
-
+      </div>
+      </div>
       <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+
+      </div>
     </div>
   );
 };

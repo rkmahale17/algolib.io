@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { StepControls } from '../shared/StepControls';
+import React, { useEffect, useRef, useState } from 'react';
+
 import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
 interface ListNode {

@@ -3,11 +3,11 @@ import { Link, useParams } from 'react-router-dom';
 // src/pages/AlgorithmDetail.tsx
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Breadcrumbs } from '@/components/Breadcrumbs';
 
 import AlgoMetaHead from '@/services/meta.injectot';
 import { ArrayVisualization } from '@/components/visualizations/ArrayVisualization';
 import { Badge } from '@/components/ui/badge';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { CopyCodeButton } from '@/components/CopyCodeButton';
@@ -23,9 +23,7 @@ const AlgorithmDetail: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
   const algorithm = algorithms.find((a) => a.id === id);
   const implementation = getAlgorithmImplementation(id || '');
-  const [codeLanguage, setCodeLanguage] = useState<'typescript' | 'python' | 'cpp' | 'java'>(() => {
-    return (localStorage.getItem('preferredLanguage') as any) || 'python';
-  });
+
 
   // If algorithm not found - show friendly 404 and still inject meta if id present
   if (!algorithm) {
@@ -529,22 +527,7 @@ const AlgorithmDetail: React.FC = () => {
       </div>
     );
 
-    switch (implementation.visualizationType) {
-      case 'array':
-        return <ArrayVisualization algorithmId={algorithm.id} />;
-      case 'linkedList':
-        return <LinkedListVisualization algorithmId={algorithm.id} />;
-      case 'tree':
-        return <TreeVisualization algorithmId={algorithm.id} />;
-      case 'graph':
-        return <GraphVisualization algorithmId={algorithm.id} />;
-      default:
-        return (
-          <div className="text-center space-y-2">
-            <p className="text-sm text-muted-foreground">Visualization not available for this algorithm</p>
-          </div>
-        );
-    }
+
   };
 
   return (
@@ -596,7 +579,7 @@ const AlgorithmDetail: React.FC = () => {
         </div>
         
         {/* Single column layout for all screen sizes */}
-        <div className="space-y-6 max-w-5xl mx-auto">
+        <div className="space-y-6  mx-auto">
           {/* 1. Animation */}
           <Card className="p-4 sm:p-6 glass-card overflow-hidden">
             <div className="space-y-4">
@@ -613,72 +596,73 @@ const AlgorithmDetail: React.FC = () => {
           </Card>
 
           {/* 2. Code Implementation */}
-          <Card className="p-4 sm:p-6 glass-card overflow-hidden">
-            <div className="space-y-4">
+          <Card className="p-4 sm:p-6 glass-card  overflow-hidden  mx-auto">
+            <div className="space-y-4 ">
               <h3 className="font-semibold flex items-center gap-2">
                 <Code2 className="w-5 h-5 text-primary" />
                 Implementation
               </h3>
               
-              <Tabs value={codeLanguage} onValueChange={(v) => {
-                const lang = v as any;
-                setCodeLanguage(lang);
-                localStorage.setItem('preferredLanguage', lang);
-              }}>
-                <TabsList className="grid h-auto w-full grid-cols-2 sm:grid-cols-4 gap-1">
-                  <TabsTrigger value="python" className="text-xs sm:text-sm">Python</TabsTrigger>
-                  <TabsTrigger value="typescript" className="text-xs sm:text-sm">TypeScript</TabsTrigger>
-                  <TabsTrigger value="cpp" className="text-xs sm:text-sm">C++</TabsTrigger>
-                  <TabsTrigger value="java" className="text-xs sm:text-sm">Java</TabsTrigger>
-                </TabsList>
-                
-                {implementation ? (
-                  <>
-                    <TabsContent value="typescript" className="mt-4">
-                      <div className="relative overflow-hidden rounded-lg">
-                        <CopyCodeButton code={implementation.code.typescript} />
-                        <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
-                          <code className="block">{implementation.code.typescript}</code>
-                        </pre>
-                      </div>
-                    </TabsContent>
-                    
-                    <TabsContent value="python" className="mt-4">
-                      <div className="relative overflow-hidden rounded-lg">
-                        <CopyCodeButton code={implementation.code.python} />
-                        <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
-                          <code className="block">{implementation.code.python}</code>
-                        </pre>
-                      </div>
-                    </TabsContent>
+           <Tabs 
+  defaultValue={localStorage.getItem('preferredLanguage') || 'python'}
+  onValueChange={(v) => {
+    localStorage.setItem('preferredLanguage', v);
+  }}
+>
+  <TabsList className="grid h-auto w-full grid-cols-2 sm:grid-cols-4 gap-1">
+    <TabsTrigger value="python" className="text-xs sm:text-sm">Python</TabsTrigger>
+    <TabsTrigger value="typescript" className="text-xs sm:text-sm">TypeScript</TabsTrigger>
+    <TabsTrigger value="cpp" className="text-xs sm:text-sm">C++</TabsTrigger>
+    <TabsTrigger value="java" className="text-xs sm:text-sm">Java</TabsTrigger>
+  </TabsList>
+  
+  {implementation ? (
+    <>
+      <TabsContent value="typescript" className="mt-4">
+        <div className="relative overflow-hidden rounded-lg">
+          <CopyCodeButton code={implementation.code.typescript} />
+          <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
+            <code className="block">{implementation.code.typescript}</code>
+          </pre>
+        </div>
+      </TabsContent>
+      
+      <TabsContent value="python" className="mt-4">
+        <div className="relative overflow-hidden rounded-lg">
+          <CopyCodeButton code={implementation.code.python} />
+          <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
+            <code className="block">{implementation.code.python}</code>
+          </pre>
+        </div>
+      </TabsContent>
 
-                    <TabsContent value="cpp" className="mt-4">
-                      <div className="relative overflow-hidden rounded-lg">
-                        <CopyCodeButton code={implementation.code.cpp} />
-                        <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
-                          <code className="block">{implementation.code.cpp}</code>
-                        </pre>
-                      </div>
-                    </TabsContent>
+      <TabsContent value="cpp" className="mt-4">
+        <div className="relative overflow-hidden rounded-lg">
+          <CopyCodeButton code={implementation.code.cpp} />
+          <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
+            <code className="block">{implementation.code.cpp}</code>
+          </pre>
+        </div>
+      </TabsContent>
 
-                    <TabsContent value="java" className="mt-4">
-                      <div className="relative overflow-hidden rounded-lg">
-                        <CopyCodeButton code={implementation.code.java} />
-                        <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
-                          <code className="block">{implementation.code.java}</code>
-                        </pre>
-                      </div>
-                    </TabsContent>
-                  </>
-                ) : (
-                  <p className="text-sm text-muted-foreground mt-4">Implementation coming soon</p>
-                )}
-              </Tabs>
+      <TabsContent value="java" className="mt-4">
+        <div className="relative overflow-hidden rounded-lg">
+          <CopyCodeButton code={implementation.code.java} />
+          <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
+            <code className="block">{implementation.code.java}</code>
+          </pre>
+        </div>
+      </TabsContent>
+    </>
+  ) : (
+    <p className="text-sm text-muted-foreground mt-4">Implementation coming soon</p>
+  )}
+</Tabs>
             </div>
           </Card>
 
           {/* 3. Algorithm Overview & Complexity */}
-          <Card className="p-4 sm:p-6 glass-card overflow-hidden">
+          <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-5xl mx-auto">
             <div className="space-y-4">
               <h3 className="font-semibold flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-primary" />
@@ -709,7 +693,7 @@ const AlgorithmDetail: React.FC = () => {
 
           {/* 4. Steps, Use Cases & Tips */}
           {implementation && (
-            <Card className="p-4 sm:p-6 glass-card overflow-hidden">
+            <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-5xl mx-auto">
               <Tabs defaultValue="steps">
                 <TabsList className="grid w-full grid-cols-3 h-auto">
                   <TabsTrigger value="steps" className="text-xs sm:text-sm">Steps</TabsTrigger>
@@ -742,7 +726,7 @@ const AlgorithmDetail: React.FC = () => {
 
           {/* 5. Practice Problems */}
           {algorithm?.problems && algorithm.problems.length > 0 && (
-            <Card className="p-4 sm:p-6 glass-card overflow-hidden">
+            <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-5xl mx-auto">
               <h3 className="font-semibold mb-4">Practice Problems</h3>
               <div className="space-y-2">
                 {algorithm.problems.map((problem, i) => (
