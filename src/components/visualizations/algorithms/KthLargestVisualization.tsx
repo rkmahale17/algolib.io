@@ -111,6 +111,11 @@ export const KthLargestVisualization: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
     if (isPlaying && currentStepIndex < steps.length - 1) {
       intervalRef.current = window.setInterval(() => {
         setCurrentStepIndex((prev) => {
@@ -121,15 +126,13 @@ export const KthLargestVisualization: React.FC = () => {
           return prev + 1;
         });
       }, speed);
-    } else {
+    }
+
+    return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
-    }
-
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [isPlaying, currentStepIndex, steps.length, speed]);
 
