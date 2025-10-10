@@ -153,6 +153,11 @@ export const BSTInsertVisualization = () => {
   }, []);
 
   useEffect(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
     if (isPlaying && currentStepIndex < steps.length - 1) {
       intervalRef.current = setInterval(() => {
         setCurrentStepIndex(prev => {
@@ -163,11 +168,13 @@ export const BSTInsertVisualization = () => {
           return prev + 1;
         });
       }, 1000 / speed);
-    } else {
-      if (intervalRef.current) clearInterval(intervalRef.current);
     }
+
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     };
   }, [isPlaying, currentStepIndex, steps.length, speed]);
 
