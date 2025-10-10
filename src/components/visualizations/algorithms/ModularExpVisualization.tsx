@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { StepControls } from '../shared/StepControls';
-import { CodeHighlighter } from '../shared/CodeHighlighter';
-import { VariablePanel } from '../shared/VariablePanel';
+import React, { useEffect, useRef, useState } from "react";
+
+import { CodeHighlighter } from "../shared/CodeHighlighter";
+import { StepControls } from "../shared/StepControls";
+import { VariablePanel } from "../shared/VariablePanel";
 
 interface Step {
   base: number;
@@ -44,7 +45,7 @@ export const ModularExpVisualization: React.FC = () => {
     const originalExp = 13;
     const mod = 7;
     const newSteps: Step[] = [];
-    
+
     let result = 1;
     let base = originalBase % mod;
     let exp = originalExp;
@@ -57,7 +58,7 @@ export const ModularExpVisualization: React.FC = () => {
       currentExp: exp,
       currentBase: base,
       message: `Calculate ${originalBase}^${originalExp} mod ${mod}`,
-      lineNumber: 1
+      lineNumber: 1,
     });
 
     while (exp > 0) {
@@ -72,7 +73,7 @@ export const ModularExpVisualization: React.FC = () => {
           currentExp: exp,
           currentBase: base,
           message: `Exp is odd: result = (${oldResult} * ${base}) mod ${mod} = ${result}`,
-          lineNumber: 7
+          lineNumber: 7,
         });
       }
 
@@ -88,7 +89,7 @@ export const ModularExpVisualization: React.FC = () => {
         currentExp: exp,
         currentBase: base,
         message: `Square base: (${oldBase}^2) mod ${mod} = ${base}, exp = ${exp}`,
-        lineNumber: 12
+        lineNumber: 12,
       });
     }
 
@@ -100,7 +101,7 @@ export const ModularExpVisualization: React.FC = () => {
       currentExp: 0,
       currentBase: base,
       message: `Final result: ${originalBase}^${originalExp} mod ${mod} = ${result}`,
-      lineNumber: 15
+      lineNumber: 15,
     });
 
     setSteps(newSteps);
@@ -136,7 +137,8 @@ export const ModularExpVisualization: React.FC = () => {
   const handlePlay = () => setIsPlaying(true);
   const handlePause = () => setIsPlaying(false);
   const handleStepForward = () => {
-    if (currentStepIndex < steps.length - 1) setCurrentStepIndex(currentStepIndex + 1);
+    if (currentStepIndex < steps.length - 1)
+      setCurrentStepIndex(currentStepIndex + 1);
   };
   const handleStepBack = () => {
     if (currentStepIndex > 0) setCurrentStepIndex(currentStepIndex - 1);
@@ -167,16 +169,27 @@ export const ModularExpVisualization: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-card rounded-lg p-6 border">
-          <h3 className="text-lg font-semibold mb-4">Modular Exponentiation: {currentStep.base}^{currentStep.exp} mod {currentStep.mod}</h3>
-          
+          <h3 className="text-lg font-semibold mb-4">
+            Modular Exponentiation: {currentStep.base}^{currentStep.exp} mod{" "}
+            {currentStep.mod}
+          </h3>
+
           <div className="grid grid-cols-4 gap-4 mb-6">
             <div className="p-4 bg-muted rounded border">
-              <div className="text-sm text-muted-foreground mb-1">Current Base</div>
-              <div className="text-2xl font-bold text-primary">{currentStep.currentBase}</div>
+              <div className="text-sm text-muted-foreground mb-1">
+                Current Base
+              </div>
+              <div className="text-2xl font-bold text-primary">
+                {currentStep.currentBase}
+              </div>
             </div>
             <div className="p-4 bg-muted rounded border">
-              <div className="text-sm text-muted-foreground mb-1">Current Exp</div>
-              <div className="text-2xl font-bold text-blue-500">{currentStep.currentExp}</div>
+              <div className="text-sm text-muted-foreground mb-1">
+                Current Exp
+              </div>
+              <div className="text-2xl font-bold text-blue-500">
+                {currentStep.currentExp}
+              </div>
             </div>
             <div className="p-4 bg-muted rounded border">
               <div className="text-sm text-muted-foreground mb-1">Modulo</div>
@@ -184,26 +197,33 @@ export const ModularExpVisualization: React.FC = () => {
             </div>
             <div className="p-4 bg-muted rounded border">
               <div className="text-sm text-muted-foreground mb-1">Result</div>
-              <div className="text-2xl font-bold text-green-500">{currentStep.result}</div>
+              <div className="text-2xl font-bold text-green-500">
+                {currentStep.result}
+              </div>
             </div>
           </div>
 
           <div className="mt-4 p-4 bg-muted rounded">
             <p className="text-sm">{currentStep.message}</p>
           </div>
+          <div className="rounded-lg">
+            <VariablePanel
+              variables={{
+                original: `${currentStep.base}^${currentStep.exp} mod ${currentStep.mod}`,
+                "current base": currentStep.currentBase,
+                "current exp": currentStep.currentExp,
+                result: currentStep.result,
+              }}
+            />
+          </div>
         </div>
 
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+        <CodeHighlighter
+          code={code}
+          highlightedLine={currentStep.lineNumber}
+          language="typescript"
+        />
       </div>
-
-      <VariablePanel
-        variables={{
-          'original': `${currentStep.base}^${currentStep.exp} mod ${currentStep.mod}`,
-          'current base': currentStep.currentBase,
-          'current exp': currentStep.currentExp,
-          'result': currentStep.result
-        }}
-      />
     </div>
   );
 };

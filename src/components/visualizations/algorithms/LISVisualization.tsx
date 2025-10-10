@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { StepControls } from '../shared/StepControls';
-import { CodeHighlighter } from '../shared/CodeHighlighter';
-import { VariablePanel } from '../shared/VariablePanel';
+import React, { useEffect, useRef, useState } from "react";
+
+import { CodeHighlighter } from "../shared/CodeHighlighter";
+import { StepControls } from "../shared/StepControls";
+import { VariablePanel } from "../shared/VariablePanel";
 
 interface Step {
   array: number[];
@@ -48,8 +49,8 @@ export const LISVisualization: React.FC = () => {
       dp: [...dp],
       currentIndex: 0,
       maxLength,
-      message: 'Initialize: Each element forms a subsequence of length 1',
-      lineNumber: 3
+      message: "Initialize: Each element forms a subsequence of length 1",
+      lineNumber: 3,
     });
 
     for (let i = 1; i < n; i++) {
@@ -57,7 +58,7 @@ export const LISVisualization: React.FC = () => {
         if (array[i] > array[j]) {
           const prev = dp[i];
           dp[i] = Math.max(dp[i], dp[j] + 1);
-          
+
           if (prev !== dp[i]) {
             newSteps.push({
               array: [...array],
@@ -65,20 +66,20 @@ export const LISVisualization: React.FC = () => {
               currentIndex: i,
               maxLength,
               message: `nums[${i}]=${array[i]} > nums[${j}]=${array[j]}: dp[${i}] = max(${prev}, ${dp[j]} + 1) = ${dp[i]}`,
-              lineNumber: 9
+              lineNumber: 9,
             });
           }
         }
       }
       maxLength = Math.max(maxLength, dp[i]);
-      
+
       newSteps.push({
         array: [...array],
         dp: [...dp],
         currentIndex: i,
         maxLength,
         message: `Completed index ${i}: LIS ending at ${array[i]} has length ${dp[i]}`,
-        lineNumber: 12
+        lineNumber: 12,
       });
     }
 
@@ -88,7 +89,7 @@ export const LISVisualization: React.FC = () => {
       currentIndex: n - 1,
       maxLength,
       message: `Maximum LIS length: ${maxLength}`,
-      lineNumber: 15
+      lineNumber: 15,
     });
 
     setSteps(newSteps);
@@ -158,71 +159,86 @@ export const LISVisualization: React.FC = () => {
         speed={speed}
         onSpeedChange={setSpeed}
       />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-card rounded-lg p-6 border">
+          <h3 className="text-lg font-semibold mb-4">
+            Longest Increasing Subsequence
+          </h3>
 
-      <div className="bg-card rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4">Longest Increasing Subsequence</h3>
-        
-        <div className="space-y-6">
-          <div>
-            <div className="text-sm text-muted-foreground mb-2">Array Values</div>
-            <div className="flex items-end justify-center gap-2 h-32">
-              {currentStep.array.map((value, idx) => (
-                <div key={idx} className="flex flex-col items-center gap-2 flex-1 max-w-[60px] relative">
+          <div className="space-y-6">
+            <div>
+              <div className="text-sm text-muted-foreground mb-2">
+                Array Values
+              </div>
+              <div className="flex items-end justify-center gap-2 h-32">
+                {currentStep.array.map((value, idx) => (
                   <div
-                    className={`w-full rounded-t transition-all duration-300 ${
-                      idx === currentStep.currentIndex
-                        ? 'bg-primary shadow-lg shadow-primary/50'
-                        : 'bg-gradient-to-t from-blue-500/60 to-blue-500/40'
-                    }`}
-                    style={{
-                      height: `${(value / maxVal) * 100}%`,
-                      minHeight: '20px'
-                    }}
-                  />
-                  <span className="text-xs font-mono">{value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <div className="text-sm text-muted-foreground mb-2">DP Array (LIS length)</div>
-            <div className="flex gap-2 justify-center">
-              {currentStep.dp.map((length, idx) => (
-                <div key={idx} className="flex flex-col items-center gap-1">
-                  <div
-                    className={`w-12 h-12 rounded border-2 flex items-center justify-center font-bold transition-all ${
-                      idx === currentStep.currentIndex
-                        ? 'bg-primary/20 border-primary text-primary scale-110'
-                        : length === currentStep.maxLength
-                        ? 'bg-green-500/20 border-green-500 text-green-500'
-                        : 'bg-card border-border'
-                    }`}
+                    key={idx}
+                    className="flex flex-col items-center gap-2 flex-1 max-w-[60px] relative"
                   >
-                    {length}
+                    <div
+                      className={`w-full rounded-t transition-all duration-300 ${
+                        idx === currentStep.currentIndex
+                          ? "bg-primary shadow-lg shadow-primary/50"
+                          : "bg-gradient-to-t from-blue-500/60 to-blue-500/40"
+                      }`}
+                      style={{
+                        height: `${(value / maxVal) * 100}%`,
+                        minHeight: "20px",
+                      }}
+                    />
+                    <span className="text-xs font-mono">{value}</span>
                   </div>
-                  <div className="text-xs text-muted-foreground">{idx}</div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
+
+            <div>
+              <div className="text-sm text-muted-foreground mb-2">
+                DP Array (LIS length)
+              </div>
+              <div className="flex gap-2 justify-center overflow-x-auto">
+                {currentStep.dp.map((length, idx) => (
+                  <div key={idx} className="flex flex-col items-center gap-1">
+                    <div
+                      className={`w-12 h-12 rounded border-2 flex items-center justify-center font-bold transition-all ${
+                        idx === currentStep.currentIndex
+                          ? "bg-primary/20 border-primary text-primary scale-110"
+                          : length === currentStep.maxLength
+                          ? "bg-green-500/20 border-green-500 text-green-500"
+                          : "bg-card border-border"
+                      }`}
+                    >
+                      {length}
+                    </div>
+                    <div className="text-xs text-muted-foreground">{idx}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
+          </div>
+          <div className="rounded-lg">
+            <VariablePanel
+              variables={{
+                currentIndex: currentStep.currentIndex,
+                currentValue: currentStep.array[currentStep.currentIndex],
+                lisLength: currentStep.dp[currentStep.currentIndex],
+                maxLength: currentStep.maxLength,
+              }}
+            />
           </div>
         </div>
 
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
-        </div>
+        <CodeHighlighter
+          code={code}
+          highlightedLine={currentStep.lineNumber}
+          language="typescript"
+        />
       </div>
-
-      <VariablePanel
-        variables={{
-          currentIndex: currentStep.currentIndex,
-          currentValue: currentStep.array[currentStep.currentIndex],
-          lisLength: currentStep.dp[currentStep.currentIndex],
-          maxLength: currentStep.maxLength
-        }}
-      />
-
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
     </div>
   );
 };

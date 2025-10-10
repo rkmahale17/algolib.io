@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { StepControls } from '../shared/StepControls';
-import { CodeHighlighter } from '../shared/CodeHighlighter';
-import { VariablePanel } from '../shared/VariablePanel';
+import React, { useEffect, useRef, useState } from "react";
+
+import { CodeHighlighter } from "../shared/CodeHighlighter";
+import { StepControls } from "../shared/StepControls";
+import { VariablePanel } from "../shared/VariablePanel";
 
 interface Step {
   array: number[];
@@ -41,23 +42,25 @@ export const XORTrickVisualization: React.FC = () => {
       array: arr,
       index: -1,
       xorResult: 0,
-      binary: '0000',
-      message: 'Initialize result = 0. XOR property: a ^ a = 0, a ^ 0 = a',
-      lineNumber: 1
+      binary: "0000",
+      message: "Initialize result = 0. XOR property: a ^ a = 0, a ^ 0 = a",
+      lineNumber: 1,
     });
 
     for (let i = 0; i < arr.length; i++) {
       const num = arr[i];
       const prevXor = xorResult;
       xorResult ^= num;
-      
+
       newSteps.push({
         array: arr,
         index: i,
         xorResult,
-        binary: xorResult.toString(2).padStart(4, '0'),
-        message: `${prevXor} ^ ${num} = ${xorResult} (binary: ${prevXor.toString(2)} ^ ${num.toString(2)} = ${xorResult.toString(2)})`,
-        lineNumber: 7
+        binary: xorResult.toString(2).padStart(4, "0"),
+        message: `${prevXor} ^ ${num} = ${xorResult} (binary: ${prevXor.toString(
+          2
+        )} ^ ${num.toString(2)} = ${xorResult.toString(2)})`,
+        lineNumber: 7,
       });
     }
 
@@ -65,9 +68,9 @@ export const XORTrickVisualization: React.FC = () => {
       array: arr,
       index: -1,
       xorResult,
-      binary: xorResult.toString(2).padStart(4, '0'),
+      binary: xorResult.toString(2).padStart(4, "0"),
       message: `Result: ${xorResult} (the single number that appears once)`,
-      lineNumber: 10
+      lineNumber: 10,
     });
 
     setSteps(newSteps);
@@ -103,7 +106,8 @@ export const XORTrickVisualization: React.FC = () => {
   const handlePlay = () => setIsPlaying(true);
   const handlePause = () => setIsPlaying(false);
   const handleStepForward = () => {
-    if (currentStepIndex < steps.length - 1) setCurrentStepIndex(currentStepIndex + 1);
+    if (currentStepIndex < steps.length - 1)
+      setCurrentStepIndex(currentStepIndex + 1);
   };
   const handleStepBack = () => {
     if (currentStepIndex > 0) setCurrentStepIndex(currentStepIndex - 1);
@@ -134,15 +138,17 @@ export const XORTrickVisualization: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-card rounded-lg p-6 border">
-          <h3 className="text-lg font-semibold mb-4">Array (Find Single Number)</h3>
+          <h3 className="text-lg font-semibold mb-4">
+            Array (Find Single Number)
+          </h3>
           <div className="flex gap-2 mb-6">
             {currentStep.array.map((val, idx) => (
               <div
                 key={idx}
                 className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
                   idx === currentStep.index
-                    ? 'bg-primary/20 border-primary'
-                    : 'bg-card border-border'
+                    ? "bg-primary/20 border-primary"
+                    : "bg-card border-border"
                 }`}
               >
                 {val}
@@ -152,30 +158,42 @@ export const XORTrickVisualization: React.FC = () => {
 
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="p-4 bg-muted rounded border">
-              <div className="text-sm text-muted-foreground mb-1">XOR Result (Decimal)</div>
+              <div className="text-sm text-muted-foreground mb-1">
+                XOR Result (Decimal)
+              </div>
               <div className="text-2xl font-bold">{currentStep.xorResult}</div>
             </div>
             <div className="p-4 bg-muted rounded border">
-              <div className="text-sm text-muted-foreground mb-1">XOR Result (Binary)</div>
-              <div className="text-2xl font-mono font-bold">{currentStep.binary}</div>
+              <div className="text-sm text-muted-foreground mb-1">
+                XOR Result (Binary)
+              </div>
+              <div className="text-2xl font-mono font-bold">
+                {currentStep.binary}
+              </div>
             </div>
           </div>
 
           <div className="mt-4 p-4 bg-muted rounded">
             <p className="text-sm">{currentStep.message}</p>
           </div>
+          <div className="rounded-lg">
+            <VariablePanel
+              variables={{
+                "current index":
+                  currentStep.index >= 0 ? currentStep.index : "done",
+                "xor result": currentStep.xorResult,
+                binary: currentStep.binary,
+              }}
+            />
+          </div>
         </div>
 
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+        <CodeHighlighter
+          code={code}
+          highlightedLine={currentStep.lineNumber}
+          language="typescript"
+        />
       </div>
-
-      <VariablePanel
-        variables={{
-          'current index': currentStep.index >= 0 ? currentStep.index : 'done',
-          'xor result': currentStep.xorResult,
-          'binary': currentStep.binary
-        }}
-      />
     </div>
   );
 };

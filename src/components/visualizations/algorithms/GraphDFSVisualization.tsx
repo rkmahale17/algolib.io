@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { StepControls } from '../shared/StepControls';
+import React, { useEffect, useRef, useState } from 'react';
+
 import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
 interface Step {
@@ -216,12 +217,8 @@ export const GraphDFSVisualization: React.FC = () => {
           <div className="p-4 bg-muted rounded">
             <p className="text-sm">{currentStep.message}</p>
           </div>
-        </div>
-
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
-      </div>
-
-      <VariablePanel
+            <div className="rounded-lg">
+  <VariablePanel
         variables={{
           currentNode: currentStep.currentNode !== null ? currentStep.currentNode : 'none',
           visitedCount: currentStep.visited.length,
@@ -229,6 +226,14 @@ export const GraphDFSVisualization: React.FC = () => {
           stack: currentStep.stack.join(', ') || 'empty'
         }}
       />
+        </div>
+        </div>
+      
+
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+      </div>
+
+    
     </div>
   );
 };

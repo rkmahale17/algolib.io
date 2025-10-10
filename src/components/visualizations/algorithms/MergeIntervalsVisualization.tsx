@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
-import { VariablePanel } from '../shared/VariablePanel';
-import { StepControls } from '../shared/StepControls';
+import { useEffect, useRef, useState } from 'react';
+
 import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { StepControls } from '../shared/StepControls';
+import { VariablePanel } from '../shared/VariablePanel';
 
 interface Interval {
   start: number;
@@ -232,10 +233,9 @@ export const MergeIntervalsVisualization = () => {
           <div className="bg-accent/50 rounded-lg border border-accent p-4">
             <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
           </div>
-        </div>
 
-        <div className="space-y-4">
-          <VariablePanel
+            <div className="rounded-lg  p-4">
+               <VariablePanel
             variables={{
               i: currentStep.currentIndex >= 0 ? currentStep.currentIndex : 'init',
               currentInterval: currentStep.currentIndex >= 0 ? `[${currentStep.intervals[currentStep.currentIndex].start}, ${currentStep.intervals[currentStep.currentIndex].end}]` : 'N/A',
@@ -243,6 +243,11 @@ export const MergeIntervalsVisualization = () => {
               lastMerged: currentStep.merged.length > 0 ? `[${currentStep.merged[currentStep.merged.length - 1].start}, ${currentStep.merged[currentStep.merged.length - 1].end}]` : 'N/A'
             }}
           />
+          </div>
+        </div>
+
+        <div className="space-y-4">
+         
           <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
         </div>
       </div>

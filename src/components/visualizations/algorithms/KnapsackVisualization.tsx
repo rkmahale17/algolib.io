@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { StepControls } from '../shared/StepControls';
-import { CodeHighlighter } from '../shared/CodeHighlighter';
-import { VariablePanel } from '../shared/VariablePanel';
+import React, { useEffect, useRef, useState } from "react";
+
+import { CodeHighlighter } from "../shared/CodeHighlighter";
+import { StepControls } from "../shared/StepControls";
+import { VariablePanel } from "../shared/VariablePanel";
 
 interface Step {
   dp: number[][];
@@ -45,55 +46,59 @@ export const KnapsackVisualization: React.FC = () => {
     const values = [3, 4, 5];
     const capacity = 5;
     const n = weights.length;
-    
-    const dp = Array(n + 1).fill(0).map(() => Array(capacity + 1).fill(0));
+
+    const dp = Array(n + 1)
+      .fill(0)
+      .map(() => Array(capacity + 1).fill(0));
     const newSteps: Step[] = [];
 
     newSteps.push({
-      dp: dp.map(row => [...row]),
+      dp: dp.map((row) => [...row]),
       i: 0,
       w: 0,
       value: 0,
-      message: 'Initialize DP table with zeros',
-      lineNumber: 3
+      message: "Initialize DP table with zeros",
+      lineNumber: 3,
     });
 
     for (let i = 1; i <= n; i++) {
       for (let w = 0; w <= capacity; w++) {
-        if (weights[i-1] <= w) {
-          const include = values[i-1] + dp[i-1][w - weights[i-1]];
-          const exclude = dp[i-1][w];
+        if (weights[i - 1] <= w) {
+          const include = values[i - 1] + dp[i - 1][w - weights[i - 1]];
+          const exclude = dp[i - 1][w];
           dp[i][w] = Math.max(include, exclude);
-          
+
           newSteps.push({
-            dp: dp.map(row => [...row]),
+            dp: dp.map((row) => [...row]),
             i,
             w,
             value: dp[i][w],
-            message: `Item ${i-1} (wt=${weights[i-1]}, val=${values[i-1]}): Include(${include}) vs Exclude(${exclude}) = ${dp[i][w]}`,
-            lineNumber: 9
+            message: `Item ${i - 1} (wt=${weights[i - 1]}, val=${
+              values[i - 1]
+            }): Include(${include}) vs Exclude(${exclude}) = ${dp[i][w]}`,
+            lineNumber: 9,
           });
         } else {
-          dp[i][w] = dp[i-1][w];
+          dp[i][w] = dp[i - 1][w];
           newSteps.push({
-            dp: dp.map(row => [...row]),
+            dp: dp.map((row) => [...row]),
             i,
             w,
             value: dp[i][w],
-            message: `Item ${i-1} too heavy for capacity ${w}, skip`,
-            lineNumber: 14
+            message: `Item ${i - 1} too heavy for capacity ${w}, skip`,
+            lineNumber: 14,
           });
         }
       }
     }
 
     newSteps.push({
-      dp: dp.map(row => [...row]),
+      dp: dp.map((row) => [...row]),
       i: n,
       w: capacity,
       value: dp[n][capacity],
       message: `Maximum value: ${dp[n][capacity]}`,
-      lineNumber: 19
+      lineNumber: 19,
     });
 
     setSteps(newSteps);
@@ -172,23 +177,27 @@ export const KnapsackVisualization: React.FC = () => {
                 <tr>
                   <th className="border border-border p-2 bg-muted">i/w</th>
                   {currentStep.dp[0].map((_, w) => (
-                    <th key={w} className="border border-border p-2 bg-muted">{w}</th>
+                    <th key={w} className="border border-border p-2 bg-muted">
+                      {w}
+                    </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {currentStep.dp.map((row, i) => (
                   <tr key={i}>
-                    <td className="border border-border p-2 bg-muted font-semibold">{i}</td>
+                    <td className="border border-border p-2 bg-muted font-semibold">
+                      {i}
+                    </td>
                     {row.map((val, w) => (
                       <td
                         key={w}
                         className={`border border-border p-2 text-center transition-all ${
                           i === currentStep.i && w === currentStep.w
-                            ? 'bg-primary/20 font-bold'
+                            ? "bg-primary/20 font-bold"
                             : val > 0
-                            ? 'bg-green-500/10'
-                            : ''
+                            ? "bg-green-500/10"
+                            : ""
                         }`}
                       >
                         {val}
@@ -203,18 +212,23 @@ export const KnapsackVisualization: React.FC = () => {
           <div className="mt-4 p-4 bg-muted rounded">
             <p className="text-sm">{currentStep.message}</p>
           </div>
+          <div className="rounded-lg">
+            <VariablePanel
+              variables={{
+                item: currentStep.i - 1,
+                capacity: currentStep.w,
+                maxValue: currentStep.value,
+              }}
+            />
+          </div>
         </div>
 
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+        <CodeHighlighter
+          code={code}
+          highlightedLine={currentStep.lineNumber}
+          language="typescript"
+        />
       </div>
-
-      <VariablePanel
-        variables={{
-          item: currentStep.i - 1,
-          capacity: currentStep.w,
-          maxValue: currentStep.value
-        }}
-      />
     </div>
   );
 };

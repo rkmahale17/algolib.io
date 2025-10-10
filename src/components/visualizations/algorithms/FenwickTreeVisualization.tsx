@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { StepControls } from '../shared/StepControls';
-import { CodeHighlighter } from '../shared/CodeHighlighter';
-import { VariablePanel } from '../shared/VariablePanel';
+import React, { useEffect, useRef, useState } from "react";
+
+import { CodeHighlighter } from "../shared/CodeHighlighter";
+import { StepControls } from "../shared/StepControls";
+import { VariablePanel } from "../shared/VariablePanel";
 
 interface Step {
   array: number[];
@@ -61,12 +62,12 @@ export const FenwickTreeVisualization: React.FC = () => {
     newSteps.push({
       array: [...arr],
       tree: [...tree],
-      operation: 'init',
+      operation: "init",
       index: -1,
       value: 0,
       result: null,
-      message: 'Initialize Fenwick Tree (Binary Indexed Tree)',
-      lineNumber: 5
+      message: "Initialize Fenwick Tree (Binary Indexed Tree)",
+      lineNumber: 5,
     });
 
     function update(index: number, delta: number) {
@@ -74,12 +75,12 @@ export const FenwickTreeVisualization: React.FC = () => {
       newSteps.push({
         array: [...arr],
         tree: [...tree],
-        operation: 'update',
+        operation: "update",
         index,
         value: delta,
         result: null,
         message: `Update index ${index} with value ${delta}`,
-        lineNumber: 12
+        lineNumber: 12,
       });
 
       while (idx <= n) {
@@ -87,14 +88,14 @@ export const FenwickTreeVisualization: React.FC = () => {
         newSteps.push({
           array: [...arr],
           tree: [...tree],
-          operation: 'update',
+          operation: "update",
           index: idx - 1,
           value: tree[idx],
           result: null,
           message: `tree[${idx}] += ${delta}, now = ${tree[idx]}`,
-          lineNumber: 14
+          lineNumber: 14,
         });
-        idx += idx & (-idx);
+        idx += idx & -idx;
       }
     }
 
@@ -110,12 +111,12 @@ export const FenwickTreeVisualization: React.FC = () => {
       newSteps.push({
         array: [...arr],
         tree: [...tree],
-        operation: 'query',
+        operation: "query",
         index,
         value: 0,
         result: null,
         message: `Query prefix sum up to index ${index}`,
-        lineNumber: 19
+        lineNumber: 19,
       });
 
       while (idx > 0) {
@@ -123,25 +124,25 @@ export const FenwickTreeVisualization: React.FC = () => {
         newSteps.push({
           array: [...arr],
           tree: [...tree],
-          operation: 'query',
+          operation: "query",
           index: idx - 1,
           value: tree[idx],
           result: sum,
           message: `sum += tree[${idx}] = ${tree[idx]}, total = ${sum}`,
-          lineNumber: 23
+          lineNumber: 23,
         });
-        idx -= idx & (-idx);
+        idx -= idx & -idx;
       }
 
       newSteps.push({
         array: [...arr],
         tree: [...tree],
-        operation: 'query',
+        operation: "query",
         index,
         value: 0,
         result: sum,
         message: `Prefix sum result: ${sum}`,
-        lineNumber: 26
+        lineNumber: 26,
       });
 
       return sum;
@@ -182,7 +183,8 @@ export const FenwickTreeVisualization: React.FC = () => {
   const handlePlay = () => setIsPlaying(true);
   const handlePause = () => setIsPlaying(false);
   const handleStepForward = () => {
-    if (currentStepIndex < steps.length - 1) setCurrentStepIndex(currentStepIndex + 1);
+    if (currentStepIndex < steps.length - 1)
+      setCurrentStepIndex(currentStepIndex + 1);
   };
   const handleStepBack = () => {
     if (currentStepIndex > 0) setCurrentStepIndex(currentStepIndex - 1);
@@ -218,12 +220,14 @@ export const FenwickTreeVisualization: React.FC = () => {
           <div className="flex gap-2">
             {currentStep.array.map((val, idx) => (
               <div key={idx} className="flex flex-col items-center">
-                <div className="text-xs text-muted-foreground mb-1">[{idx}]</div>
+                <div className="text-xs text-muted-foreground mb-1">
+                  [{idx}]
+                </div>
                 <div
                   className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
                     idx === currentStep.index
-                      ? 'bg-primary/20 border-primary'
-                      : 'bg-blue-500/20 border-blue-500'
+                      ? "bg-primary/20 border-primary"
+                      : "bg-blue-500/20 border-blue-500"
                   }`}
                 >
                   {val}
@@ -236,14 +240,17 @@ export const FenwickTreeVisualization: React.FC = () => {
           <div className="flex gap-2">
             {currentStep.tree.slice(1).map((val, idx) => (
               <div key={idx} className="flex flex-col items-center">
-                <div className="text-xs text-muted-foreground mb-1">[{idx + 1}]</div>
+                <div className="text-xs text-muted-foreground mb-1">
+                  [{idx + 1}]
+                </div>
                 <div
                   className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
-                    idx === currentStep.index && currentStep.operation !== 'init'
-                      ? 'bg-green-500/20 border-green-500'
+                    idx === currentStep.index &&
+                    currentStep.operation !== "init"
+                      ? "bg-green-500/20 border-green-500"
                       : val !== 0
-                      ? 'bg-blue-500/20 border-blue-500'
-                      : 'bg-card border-border'
+                      ? "bg-blue-500/20 border-blue-500"
+                      : "bg-card border-border"
                   }`}
                 >
                   {val}
@@ -254,26 +261,35 @@ export const FenwickTreeVisualization: React.FC = () => {
 
           {currentStep.result !== null && (
             <div className="p-4 bg-green-500/10 border border-green-500 rounded">
-              <p className="text-sm font-semibold">Prefix Sum Result: {currentStep.result}</p>
+              <p className="text-sm font-semibold">
+                Prefix Sum Result: {currentStep.result}
+              </p>
             </div>
           )}
 
           <div className="p-4 bg-muted rounded">
             <p className="text-sm">{currentStep.message}</p>
           </div>
+
+          <div className="rounded-lg">
+            <VariablePanel
+              variables={{
+                operation: currentStep.operation,
+                index: currentStep.index >= 0 ? currentStep.index : "none",
+                value: currentStep.value,
+                result:
+                  currentStep.result !== null ? currentStep.result : "pending",
+              }}
+            />
+          </div>
         </div>
 
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+        <CodeHighlighter
+          code={code}
+          highlightedLine={currentStep.lineNumber}
+          language="typescript"
+        />
       </div>
-
-      <VariablePanel
-        variables={{
-          'operation': currentStep.operation,
-          'index': currentStep.index >= 0 ? currentStep.index : 'none',
-          'value': currentStep.value,
-          'result': currentStep.result !== null ? currentStep.result : 'pending'
-        }}
-      />
     </div>
   );
 };

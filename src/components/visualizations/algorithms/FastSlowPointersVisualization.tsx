@@ -256,18 +256,22 @@ export const FastSlowPointersVisualization: React.FC = () => {
           <div className="p-4 bg-muted rounded">
             <p className="text-sm">{currentStep.message}</p>
           </div>
-        </div>
 
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
-      </div>
-
-      <VariablePanel
+          <div className="p-4 bg-muted rounded-lg">
+            <VariablePanel
         variables={{
           slow: currentStep.slow !== null ? `Node ${currentStep.slow}` : 'null',
           fast: currentStep.fast !== null ? `Node ${currentStep.fast}` : 'null',
           hasCycle: currentStep.hasCycle !== null ? String(currentStep.hasCycle) : 'checking...'
         }}
       />
+          </div>
+        </div>
+
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+      </div>
+
+      
     </div>
   );
 };

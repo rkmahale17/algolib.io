@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
-import { VariablePanel } from '../shared/VariablePanel';
-import { StepControls } from '../shared/StepControls';
+import { useEffect, useRef, useState } from 'react';
+
 import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { StepControls } from '../shared/StepControls';
+import { VariablePanel } from '../shared/VariablePanel';
 
 interface Step {
   array: number[];
@@ -253,10 +254,10 @@ export const SlidingWindowVisualization = () => {
           <div className="bg-accent/50 rounded-lg border border-accent p-4">
             <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
           </div>
-        </div>
 
-        <div className="space-y-4">
-          <VariablePanel
+           <div className=" rounded-lg border p-4">
+
+<VariablePanel
             variables={{
               windowStart: currentStep.windowStart,
               windowEnd: currentStep.windowEnd,
@@ -266,6 +267,13 @@ export const SlidingWindowVisualization = () => {
               'window': currentStep.array.slice(currentStep.windowStart, currentStep.windowEnd + 1)
             }}
           />
+          </div>
+
+            
+        </div>
+
+        <div className="space-y-4">
+    
           <CodeHighlighter
             code={code}
             highlightedLine={currentStep.lineNumber}

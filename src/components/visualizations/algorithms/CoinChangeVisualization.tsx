@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { StepControls } from '../shared/StepControls';
-import { CodeHighlighter } from '../shared/CodeHighlighter';
-import { VariablePanel } from '../shared/VariablePanel';
+import React, { useEffect, useRef, useState } from "react";
+
+import { CodeHighlighter } from "../shared/CodeHighlighter";
+import { StepControls } from "../shared/StepControls";
+import { VariablePanel } from "../shared/VariablePanel";
 
 interface Step {
   dp: number[];
@@ -39,29 +40,31 @@ export const CoinChangeVisualization: React.FC = () => {
     const amount = 11;
     const dp = Array(amount + 1).fill(Infinity);
     dp[0] = 0;
-    
+
     const newSteps: Step[] = [];
 
     newSteps.push({
       dp: [...dp],
       amount: 0,
       coin: 0,
-      message: 'Initialize: dp[0] = 0, all others = Infinity',
-      lineNumber: 2
+      message: "Initialize: dp[0] = 0, all others = Infinity",
+      lineNumber: 2,
     });
 
     for (let coin of coins) {
       for (let i = coin; i <= amount; i++) {
         const prev = dp[i];
         dp[i] = Math.min(dp[i], dp[i - coin] + 1);
-        
+
         if (prev !== dp[i]) {
           newSteps.push({
             dp: [...dp],
             amount: i,
             coin,
-            message: `Using coin ${coin}: dp[${i}] = min(${prev === Infinity ? '∞' : prev}, dp[${i - coin}] + 1) = ${dp[i]}`,
-            lineNumber: 7
+            message: `Using coin ${coin}: dp[${i}] = min(${
+              prev === Infinity ? "∞" : prev
+            }, dp[${i - coin}] + 1) = ${dp[i]}`,
+            lineNumber: 7,
           });
         }
       }
@@ -71,8 +74,10 @@ export const CoinChangeVisualization: React.FC = () => {
       dp: [...dp],
       amount,
       coin: 0,
-      message: `Minimum coins needed: ${dp[amount] === Infinity ? 'Not possible' : dp[amount]}`,
-      lineNumber: 13
+      message: `Minimum coins needed: ${
+        dp[amount] === Infinity ? "Not possible" : dp[amount]
+      }`,
+      lineNumber: 13,
     });
 
     setSteps(newSteps);
@@ -152,13 +157,13 @@ export const CoinChangeVisualization: React.FC = () => {
                 <div
                   className={`w-12 h-12 rounded border-2 flex items-center justify-center font-bold text-sm transition-all ${
                     idx === currentStep.amount
-                      ? 'bg-primary/20 border-primary text-primary scale-110'
+                      ? "bg-primary/20 border-primary text-primary scale-110"
                       : val === Infinity
-                      ? 'bg-muted border-border text-muted-foreground'
-                      : 'bg-green-500/20 border-green-500 text-green-500'
+                      ? "bg-muted border-border text-muted-foreground"
+                      : "bg-green-500/20 border-green-500 text-green-500"
                   }`}
                 >
-                  {val === Infinity ? '∞' : val}
+                  {val === Infinity ? "∞" : val}
                 </div>
               </div>
             ))}
@@ -167,18 +172,27 @@ export const CoinChangeVisualization: React.FC = () => {
           <div className="p-4 bg-muted rounded">
             <p className="text-sm">{currentStep.message}</p>
           </div>
+
+          <div className="rounded">
+            <VariablePanel
+              variables={{
+                currentCoin: currentStep.coin,
+                targetAmount: currentStep.amount,
+                minCoins:
+                  currentStep.dp[currentStep.amount] === Infinity
+                    ? "Not possible"
+                    : currentStep.dp[currentStep.amount],
+              }}
+            />
+          </div>
         </div>
 
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+        <CodeHighlighter
+          code={code}
+          highlightedLine={currentStep.lineNumber}
+          language="typescript"
+        />
       </div>
-
-      <VariablePanel
-        variables={{
-          currentCoin: currentStep.coin,
-          targetAmount: currentStep.amount,
-          minCoins: currentStep.dp[currentStep.amount] === Infinity ? 'Not possible' : currentStep.dp[currentStep.amount]
-        }}
-      />
     </div>
   );
 };

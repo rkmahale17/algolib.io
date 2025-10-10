@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
-import { VariablePanel } from '../shared/VariablePanel';
-import { StepControls } from '../shared/StepControls';
+import { useEffect, useRef, useState } from 'react';
+
 import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { StepControls } from '../shared/StepControls';
+import { VariablePanel } from '../shared/VariablePanel';
 
 interface Step {
   array: number[];
@@ -226,10 +227,9 @@ export const TwoPointersVisualization = () => {
           <div className="bg-accent/50 rounded-lg border border-accent p-4">
             <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
           </div>
-        </div>
+                  <div className="rounded-lg border  p-4">
 
-        <div className="space-y-4">
-          <VariablePanel
+               <VariablePanel
             variables={{
               left: currentStep.left,
               right: currentStep.right,
@@ -239,6 +239,11 @@ export const TwoPointersVisualization = () => {
               'arr[right]': currentStep.array[currentStep.right]
             }}
           />
+          </div>
+        </div>
+
+        <div className="space-y-4">
+       
           <CodeHighlighter
             code={code}
             highlightedLine={currentStep.lineNumber}

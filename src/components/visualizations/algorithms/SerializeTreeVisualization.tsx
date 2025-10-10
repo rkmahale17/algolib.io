@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
-import { VariablePanel } from '../shared/VariablePanel';
-import { StepControls } from '../shared/StepControls';
+import { useEffect, useRef, useState } from 'react';
+
 import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { StepControls } from '../shared/StepControls';
+import { VariablePanel } from '../shared/VariablePanel';
 
 interface TreeNode {
   val: number | null;
@@ -218,7 +219,7 @@ function deserialize(data) {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg border border-border/50 p-6">
+          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 overflow-x-auto">
             <svg width="400" height="250" className="mx-auto">
               {renderTree(tree)}
             </svg>
@@ -234,16 +235,20 @@ function deserialize(data) {
               {currentStep.serialized.join(',')}
             </div>
           </div>
-        </div>
 
-        <div className="space-y-4">
-          <VariablePanel
+          <div className="rounder-lg">
+            <VariablePanel
             variables={{
               current: currentStep.current || 'null',
               'serialized.length': currentStep.serialized.length,
               serialized: currentStep.serialized
             }}
           />
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          
           <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
         </div>
       </div>

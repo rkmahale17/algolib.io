@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
-import { VariablePanel } from '../shared/VariablePanel';
-import { StepControls } from '../shared/StepControls';
+import { useEffect, useRef, useState } from 'react';
+
 import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { StepControls } from '../shared/StepControls';
+import { VariablePanel } from '../shared/VariablePanel';
 
 interface TreeNode {
   val: number;
@@ -251,10 +252,8 @@ export const BSTInsertVisualization = () => {
           <div className="bg-accent/50 rounded-lg border border-accent p-4">
             <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
           </div>
-        </div>
 
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
-      </div>
+          <div className='rounded-lg '>
 
       <VariablePanel
         variables={{
@@ -262,6 +261,12 @@ export const BSTInsertVisualization = () => {
           current: currentStep.current || 'null'
         }}
       />
+          </div>
+        </div>
+
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
+      </div>
+
     </div>
   );
 };

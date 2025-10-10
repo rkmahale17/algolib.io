@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { StepControls } from '../shared/StepControls';
-import { CodeHighlighter } from '../shared/CodeHighlighter';
-import { VariablePanel } from '../shared/VariablePanel';
+import React, { useEffect, useRef, useState } from "react";
+
+import { CodeHighlighter } from "../shared/CodeHighlighter";
+import { StepControls } from "../shared/StepControls";
+import { VariablePanel } from "../shared/VariablePanel";
 
 interface Step {
   dp: number[][];
@@ -53,8 +54,10 @@ export const EditDistanceVisualization: React.FC = () => {
     const word2 = "ros";
     const m = word1.length;
     const n = word2.length;
-    
-    const dp = Array(m + 1).fill(0).map(() => Array(n + 1).fill(0));
+
+    const dp = Array(m + 1)
+      .fill(0)
+      .map(() => Array(n + 1).fill(0));
     const newSteps: Step[] = [];
 
     // Initialize
@@ -62,62 +65,73 @@ export const EditDistanceVisualization: React.FC = () => {
     for (let j = 0; j <= n; j++) dp[0][j] = j;
 
     newSteps.push({
-      dp: dp.map(row => [...row]),
+      dp: dp.map((row) => [...row]),
       i: 0,
       j: 0,
       word1,
       word2,
-      operation: 'init',
-      message: 'Initialize base cases: empty string transformations',
-      lineNumber: 8
+      operation: "init",
+      message: "Initialize base cases: empty string transformations",
+      lineNumber: 8,
     });
 
     for (let i = 1; i <= m; i++) {
       for (let j = 1; j <= n; j++) {
-        if (word1[i-1] === word2[j-1]) {
-          dp[i][j] = dp[i-1][j-1];
+        if (word1[i - 1] === word2[j - 1]) {
+          dp[i][j] = dp[i - 1][j - 1];
           newSteps.push({
-            dp: dp.map(row => [...row]),
+            dp: dp.map((row) => [...row]),
             i,
             j,
             word1,
             word2,
-            operation: 'match',
-            message: `Match! '${word1[i-1]}' === '${word2[j-1]}': No operation needed`,
-            lineNumber: 14
+            operation: "match",
+            message: `Match! '${word1[i - 1]}' === '${
+              word2[j - 1]
+            }': No operation needed`,
+            lineNumber: 14,
           });
         } else {
-          const deleteOp = dp[i-1][j];
-          const insertOp = dp[i][j-1];
-          const replaceOp = dp[i-1][j-1];
+          const deleteOp = dp[i - 1][j];
+          const insertOp = dp[i][j - 1];
+          const replaceOp = dp[i - 1][j - 1];
           dp[i][j] = 1 + Math.min(deleteOp, insertOp, replaceOp);
-          
+
           const minOp = Math.min(deleteOp, insertOp, replaceOp);
-          const operation = minOp === deleteOp ? 'delete' : minOp === insertOp ? 'insert' : 'replace';
-          
+          const operation =
+            minOp === deleteOp
+              ? "delete"
+              : minOp === insertOp
+              ? "insert"
+              : "replace";
+
           newSteps.push({
-            dp: dp.map(row => [...row]),
+            dp: dp.map((row) => [...row]),
             i,
             j,
             word1,
             word2,
             operation,
-            message: `'${word1[i-1]}' ≠ '${word2[j-1]}': ${operation} (del=${deleteOp}, ins=${insertOp}, rep=${replaceOp}) → ${dp[i][j]}`,
-            lineNumber: 16
+            message: `'${word1[i - 1]}' ≠ '${
+              word2[j - 1]
+            }': ${operation} (del=${deleteOp}, ins=${insertOp}, rep=${replaceOp}) → ${
+              dp[i][j]
+            }`,
+            lineNumber: 16,
           });
         }
       }
     }
 
     newSteps.push({
-      dp: dp.map(row => [...row]),
+      dp: dp.map((row) => [...row]),
       i: m,
       j: n,
       word1,
       word2,
-      operation: 'complete',
+      operation: "complete",
       message: `Minimum edit distance: ${dp[m][n]}`,
-      lineNumber: 25
+      lineNumber: 25,
     });
 
     setSteps(newSteps);
@@ -196,8 +210,10 @@ export const EditDistanceVisualization: React.FC = () => {
                 <tr>
                   <th className="border border-border p-2 bg-muted"></th>
                   <th className="border border-border p-2 bg-muted">∅</th>
-                  {currentStep.word2.split('').map((char, idx) => (
-                    <th key={idx} className="border border-border p-2 bg-muted">{char}</th>
+                  {currentStep.word2.split("").map((char, idx) => (
+                    <th key={idx} className="border border-border p-2 bg-muted">
+                      {char}
+                    </th>
                   ))}
                 </tr>
               </thead>
@@ -205,17 +221,17 @@ export const EditDistanceVisualization: React.FC = () => {
                 {currentStep.dp.map((row, i) => (
                   <tr key={i}>
                     <td className="border border-border p-2 bg-muted font-semibold">
-                      {i === 0 ? '∅' : currentStep.word1[i-1]}
+                      {i === 0 ? "∅" : currentStep.word1[i - 1]}
                     </td>
                     {row.map((val, j) => (
                       <td
                         key={j}
                         className={`border border-border p-2 text-center transition-all ${
                           i === currentStep.i && j === currentStep.j
-                            ? 'bg-primary/20 font-bold'
+                            ? "bg-primary/20 font-bold"
                             : val > 0
-                            ? 'bg-green-500/10'
-                            : ''
+                            ? "bg-green-500/10"
+                            : ""
                         }`}
                       >
                         {val}
@@ -230,19 +246,27 @@ export const EditDistanceVisualization: React.FC = () => {
           <div className="p-4 bg-muted rounded">
             <p className="text-sm">{currentStep.message}</p>
           </div>
+          <div className="rounded-lg">
+            <VariablePanel
+              variables={{
+                i: currentStep.i,
+                j: currentStep.j,
+                operation: currentStep.operation,
+                minDistance:
+                  currentStep.dp[currentStep.dp.length - 1][
+                    currentStep.dp[0].length - 1
+                  ],
+              }}
+            />
+          </div>
         </div>
 
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+        <CodeHighlighter
+          code={code}
+          highlightedLine={currentStep.lineNumber}
+          language="typescript"
+        />
       </div>
-
-      <VariablePanel
-        variables={{
-          i: currentStep.i,
-          j: currentStep.j,
-          operation: currentStep.operation,
-          minDistance: currentStep.dp[currentStep.dp.length - 1][currentStep.dp[0].length - 1]
-        }}
-      />
     </div>
   );
 };

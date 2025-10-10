@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
-import { VariablePanel } from '../shared/VariablePanel';
-import { StepControls } from '../shared/StepControls';
+import { useEffect, useRef, useState } from 'react';
+
 import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { StepControls } from '../shared/StepControls';
+import { VariablePanel } from '../shared/VariablePanel';
 
 interface Step {
   originalArray: number[];
@@ -193,10 +194,10 @@ export const PrefixSumVisualization = () => {
           <div className="bg-accent/50 rounded-lg border border-accent p-4">
             <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
           </div>
-        </div>
 
-        <div className="space-y-4">
-          <VariablePanel
+          
+          <div className=" rounded-lg border  p-4">
+            <VariablePanel
             variables={{
               i: currentStep.currentIndex >= 0 ? currentStep.currentIndex : 'N/A',
               'arr[i]': currentStep.currentIndex >= 0 ? currentStep.originalArray[currentStep.currentIndex] : 'N/A',
@@ -205,6 +206,11 @@ export const PrefixSumVisualization = () => {
               prefixLength: currentStep.prefixArray.length
             }}
           />
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          
           <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
         </div>
       </div>

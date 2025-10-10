@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { StepControls } from '../shared/StepControls';
-import { CodeHighlighter } from '../shared/CodeHighlighter';
-import { VariablePanel } from '../shared/VariablePanel';
+import React, { useEffect, useRef, useState } from "react";
+
+import { CodeHighlighter } from "../shared/CodeHighlighter";
+import { StepControls } from "../shared/StepControls";
+import { VariablePanel } from "../shared/VariablePanel";
 
 interface Step {
   houses: number[];
@@ -53,8 +54,8 @@ export const HouseRobberVisualization: React.FC = () => {
       currentIndex: 0,
       rob: houses[0],
       notRob: 0,
-      message: 'Base case: Rob first house, money = ' + houses[0],
-      lineNumber: 6
+      message: "Base case: Rob first house, money = " + houses[0],
+      lineNumber: 6,
     });
 
     dp[1] = Math.max(houses[0], houses[1]);
@@ -65,22 +66,24 @@ export const HouseRobberVisualization: React.FC = () => {
       rob: houses[1],
       notRob: houses[0],
       message: `Base case: max(${houses[0]}, ${houses[1]}) = ${dp[1]}`,
-      lineNumber: 7
+      lineNumber: 7,
     });
 
     for (let i = 2; i < n; i++) {
-      const robCurrent = houses[i] + dp[i-2];
-      const skipCurrent = dp[i-1];
+      const robCurrent = houses[i] + dp[i - 2];
+      const skipCurrent = dp[i - 1];
       dp[i] = Math.max(robCurrent, skipCurrent);
-      
+
       newSteps.push({
         houses: [...houses],
         dp: [...dp],
         currentIndex: i,
         rob: robCurrent,
         notRob: skipCurrent,
-        message: `House ${i}: Rob(${houses[i]} + ${dp[i-2]} = ${robCurrent}) vs Skip(${skipCurrent}) → ${dp[i]}`,
-        lineNumber: 15
+        message: `House ${i}: Rob(${houses[i]} + ${
+          dp[i - 2]
+        } = ${robCurrent}) vs Skip(${skipCurrent}) → ${dp[i]}`,
+        lineNumber: 15,
       });
     }
 
@@ -91,7 +94,7 @@ export const HouseRobberVisualization: React.FC = () => {
       rob: 0,
       notRob: 0,
       message: `Maximum money robbed: $${dp[n - 1]}`,
-      lineNumber: 18
+      lineNumber: 18,
     });
 
     setSteps(newSteps);
@@ -166,14 +169,14 @@ export const HouseRobberVisualization: React.FC = () => {
           <h3 className="text-lg font-semibold">House Robber</h3>
           <div>
             <div className="text-sm text-muted-foreground mb-2">Houses ($)</div>
-            <div className="flex gap-3 justify-center">
+            <div className="flex gap-3 justify-center overflow-x-auto">
               {currentStep.houses.map((value, idx) => (
-                <div key={idx} className="flex flex-col items-center gap-1">
+                <div key={idx} className="flex flex-col items-center gap-1  ">
                   <div
                     className={`w-16 h-16 rounded border-2 flex items-center justify-center font-bold text-lg transition-all ${
                       idx === currentStep.currentIndex
-                        ? 'bg-primary/20 border-primary text-primary scale-110'
-                        : 'bg-card border-border'
+                        ? "bg-primary/20 border-primary text-primary scale-110"
+                        : "bg-card border-border"
                     }`}
                   >
                     ${value}
@@ -185,17 +188,19 @@ export const HouseRobberVisualization: React.FC = () => {
           </div>
 
           <div>
-            <div className="text-sm text-muted-foreground mb-2">Max Money (DP Array)</div>
-            <div className="flex gap-3 justify-center">
+            <div className="text-sm text-muted-foreground mb-2">
+              Max Money (DP Array)
+            </div>
+            <div className="flex gap-3 justify-center overflow-x-auto">
               {currentStep.dp.map((value, idx) => (
                 <div key={idx} className="flex flex-col items-center gap-1">
                   <div
                     className={`w-16 h-16 rounded border-2 flex items-center justify-center font-bold text-lg transition-all ${
                       idx === currentStep.currentIndex
-                        ? 'bg-green-500/20 border-green-500 text-green-500 scale-110'
+                        ? "bg-green-500/20 border-green-500 text-green-500 scale-110"
                         : value > 0
-                        ? 'bg-green-500/10 border-green-500/50'
-                        : 'bg-card border-border'
+                        ? "bg-green-500/10 border-green-500/50"
+                        : "bg-card border-border"
                     }`}
                   >
                     ${value}
@@ -209,20 +214,26 @@ export const HouseRobberVisualization: React.FC = () => {
           <div className="p-4 bg-muted rounded">
             <p className="text-sm">{currentStep.message}</p>
           </div>
+
+          <div className="rounded-lg">
+            <VariablePanel
+              variables={{
+                currentHouse: currentStep.currentIndex,
+                houseValue: currentStep.houses[currentStep.currentIndex],
+                robCurrent: `$${currentStep.rob}`,
+                skipCurrent: `$${currentStep.notRob}`,
+                maxMoney: `$${currentStep.dp[currentStep.dp.length - 1]}`,
+              }}
+            />
+          </div>
         </div>
 
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+        <CodeHighlighter
+          code={code}
+          highlightedLine={currentStep.lineNumber}
+          language="typescript"
+        />
       </div>
-
-      <VariablePanel
-        variables={{
-          currentHouse: currentStep.currentIndex,
-          houseValue: currentStep.houses[currentStep.currentIndex],
-          robCurrent: `$${currentStep.rob}`,
-          skipCurrent: `$${currentStep.notRob}`,
-          maxMoney: `$${currentStep.dp[currentStep.dp.length - 1]}`
-        }}
-      />
     </div>
   );
 };

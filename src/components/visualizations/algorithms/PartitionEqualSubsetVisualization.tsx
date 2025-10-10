@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
-import { VariablePanel } from '../shared/VariablePanel';
-import { StepControls } from '../shared/StepControls';
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { useEffect, useRef, useState } from "react";
+
+import { CodeHighlighter } from "../shared/CodeHighlighter";
+import { StepControls } from "../shared/StepControls";
+import { VariablePanel } from "../shared/VariablePanel";
 
 interface Step {
   dp: boolean[][];
@@ -58,7 +59,7 @@ export const PartitionEqualSubsetVisualization = () => {
         j: -1,
         sum,
         message: `Sum ${sum} is odd, cannot partition equally`,
-        lineNumber: 2
+        lineNumber: 2,
       });
       setSteps(newSteps);
       setCurrentStepIndex(0);
@@ -71,13 +72,13 @@ export const PartitionEqualSubsetVisualization = () => {
       .map(() => Array(target + 1).fill(false));
 
     newSteps.push({
-      dp: dp.map(row => [...row]),
+      dp: dp.map((row) => [...row]),
       nums,
       i: -1,
       j: -1,
       sum: target,
       message: `Sum is ${sum}, target is ${target}. Initialize DP table`,
-      lineNumber: 5
+      lineNumber: 5,
     });
 
     for (let i = 0; i <= nums.length; i++) {
@@ -85,13 +86,13 @@ export const PartitionEqualSubsetVisualization = () => {
     }
 
     newSteps.push({
-      dp: dp.map(row => [...row]),
+      dp: dp.map((row) => [...row]),
       nums,
       i: -1,
       j: 0,
       sum: target,
-      message: 'Base case: sum of 0 is always achievable',
-      lineNumber: 10
+      message: "Base case: sum of 0 is always achievable",
+      lineNumber: 10,
     });
 
     for (let i = 1; i <= nums.length; i++) {
@@ -99,13 +100,13 @@ export const PartitionEqualSubsetVisualization = () => {
         dp[i][j] = dp[i - 1][j];
 
         newSteps.push({
-          dp: dp.map(row => [...row]),
+          dp: dp.map((row) => [...row]),
           nums,
           i,
           j,
           sum: target,
           message: `Check if we can make sum ${j} using first ${i} numbers`,
-          lineNumber: 15
+          lineNumber: 15,
         });
 
         if (j >= nums[i - 1]) {
@@ -113,26 +114,28 @@ export const PartitionEqualSubsetVisualization = () => {
           dp[i][j] = dp[i][j] || canInclude;
 
           newSteps.push({
-            dp: dp.map(row => [...row]),
+            dp: dp.map((row) => [...row]),
             nums,
             i,
             j,
             sum: target,
             message: `Include ${nums[i - 1]}: dp[${i}][${j}] = ${dp[i][j]}`,
-            lineNumber: 17
+            lineNumber: 17,
           });
         }
       }
     }
 
     newSteps.push({
-      dp: dp.map(row => [...row]),
+      dp: dp.map((row) => [...row]),
       nums,
       i: nums.length,
       j: target,
       sum: target,
-      message: `Result: ${dp[nums.length][target] ? 'Can partition' : 'Cannot partition'}`,
-      lineNumber: 22
+      message: `Result: ${
+        dp[nums.length][target] ? "Can partition" : "Cannot partition"
+      }`,
+      lineNumber: 22,
     });
 
     setSteps(newSteps);
@@ -146,7 +149,7 @@ export const PartitionEqualSubsetVisualization = () => {
   useEffect(() => {
     if (isPlaying && currentStepIndex < steps.length - 1) {
       intervalRef.current = setInterval(() => {
-        setCurrentStepIndex(prev => {
+        setCurrentStepIndex((prev) => {
           if (prev >= steps.length - 1) {
             setIsPlaying(false);
             return prev;
@@ -164,8 +167,11 @@ export const PartitionEqualSubsetVisualization = () => {
 
   const handlePlay = () => setIsPlaying(true);
   const handlePause = () => setIsPlaying(false);
-  const handleStepForward = () => currentStepIndex < steps.length - 1 && setCurrentStepIndex(prev => prev + 1);
-  const handleStepBack = () => currentStepIndex > 0 && setCurrentStepIndex(prev => prev - 1);
+  const handleStepForward = () =>
+    currentStepIndex < steps.length - 1 &&
+    setCurrentStepIndex((prev) => prev + 1);
+  const handleStepBack = () =>
+    currentStepIndex > 0 && setCurrentStepIndex((prev) => prev - 1);
   const handleReset = () => {
     setCurrentStepIndex(0);
     setIsPlaying(false);
@@ -200,26 +206,30 @@ export const PartitionEqualSubsetVisualization = () => {
                   <tr>
                     <th className="border border-border p-2">i\j</th>
                     {currentStep.dp[0].map((_, j) => (
-                      <th key={j} className="border border-border p-2">{j}</th>
+                      <th key={j} className="border border-border p-2">
+                        {j}
+                      </th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {currentStep.dp.map((row, i) => (
                     <tr key={i}>
-                      <td className="border border-border p-2 font-bold">{i}</td>
+                      <td className="border border-border p-2 font-bold">
+                        {i}
+                      </td>
                       {row.map((cell, j) => (
                         <td
                           key={j}
                           className={`border border-border p-2 text-center transition-all duration-300 ${
                             i === currentStep.i && j === currentStep.j
-                              ? 'bg-primary text-white'
+                              ? "bg-primary text-white"
                               : cell
-                              ? 'bg-green-500/30'
-                              : 'bg-muted/20'
+                              ? "bg-green-500/30"
+                              : "bg-muted/20"
                           }`}
                         >
-                          {cell ? 'T' : 'F'}
+                          {cell ? "T" : "F"}
                         </td>
                       ))}
                     </tr>
@@ -230,20 +240,29 @@ export const PartitionEqualSubsetVisualization = () => {
           </div>
 
           <div className="bg-accent/50 rounded-lg border border-accent p-4">
-            <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
+            <p className="text-sm text-foreground font-medium">
+              {currentStep.message}
+            </p>
+          </div>
+
+          <div className="rounded-lg">
+            <VariablePanel
+              variables={{
+                nums: currentStep.nums,
+                target: currentStep.sum,
+                i: currentStep.i >= 0 ? currentStep.i : "N/A",
+                j: currentStep.j >= 0 ? currentStep.j : "N/A",
+              }}
+            />
           </div>
         </div>
 
         <div className="space-y-4">
-          <VariablePanel
-            variables={{
-              nums: currentStep.nums,
-              target: currentStep.sum,
-              i: currentStep.i >= 0 ? currentStep.i : 'N/A',
-              j: currentStep.j >= 0 ? currentStep.j : 'N/A'
-            }}
+          <CodeHighlighter
+            code={code}
+            highlightedLine={currentStep.lineNumber}
+            language="typescript"
           />
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
         </div>
       </div>
     </div>

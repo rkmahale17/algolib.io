@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { StepControls } from '../shared/StepControls';
-import { CodeHighlighter } from '../shared/CodeHighlighter';
-import { VariablePanel } from '../shared/VariablePanel';
+import React, { useEffect, useRef, useState } from "react";
+
+import { CodeHighlighter } from "../shared/CodeHighlighter";
+import { StepControls } from "../shared/StepControls";
+import { VariablePanel } from "../shared/VariablePanel";
 
 interface Step {
   n: number;
@@ -45,8 +46,8 @@ export const ClimbingStairsVisualization: React.FC = () => {
       currentStep: 0,
       dp: [...dp],
       ways: 0,
-      message: 'Start: Calculate ways to climb ' + n + ' stairs',
-      lineNumber: 1
+      message: "Start: Calculate ways to climb " + n + " stairs",
+      lineNumber: 1,
     });
 
     dp[1] = 1;
@@ -55,8 +56,8 @@ export const ClimbingStairsVisualization: React.FC = () => {
       currentStep: 1,
       dp: [...dp],
       ways: 1,
-      message: 'Base case: 1 way to climb 1 step',
-      lineNumber: 5
+      message: "Base case: 1 way to climb 1 step",
+      lineNumber: 5,
     });
 
     dp[2] = 2;
@@ -65,20 +66,22 @@ export const ClimbingStairsVisualization: React.FC = () => {
       currentStep: 2,
       dp: [...dp],
       ways: 2,
-      message: 'Base case: 2 ways to climb 2 steps (1+1 or 2)',
-      lineNumber: 6
+      message: "Base case: 2 ways to climb 2 steps (1+1 or 2)",
+      lineNumber: 6,
     });
 
     for (let i = 3; i <= n; i++) {
-      dp[i] = dp[i-1] + dp[i-2];
-      
+      dp[i] = dp[i - 1] + dp[i - 2];
+
       newSteps.push({
         n,
         currentStep: i,
         dp: [...dp],
         ways: dp[i],
-        message: `Step ${i}: dp[${i}] = dp[${i-1}] + dp[${i-2}] = ${dp[i-1]} + ${dp[i-2]} = ${dp[i]} ways`,
-        lineNumber: 11
+        message: `Step ${i}: dp[${i}] = dp[${i - 1}] + dp[${i - 2}] = ${
+          dp[i - 1]
+        } + ${dp[i - 2]} = ${dp[i]} ways`,
+        lineNumber: 11,
       });
     }
 
@@ -88,7 +91,7 @@ export const ClimbingStairsVisualization: React.FC = () => {
       dp: [...dp],
       ways: dp[n],
       message: `Total ways to climb ${n} stairs: ${dp[n]}`,
-      lineNumber: 14
+      lineNumber: 14,
     });
 
     setSteps(newSteps);
@@ -162,7 +165,7 @@ export const ClimbingStairsVisualization: React.FC = () => {
         <div className="bg-card rounded-lg p-6 border space-y-4">
           <h3 className="text-lg font-semibold">Climbing Stairs</h3>
           <div className="relative">
-            <div className="flex items-end justify-center gap-2">
+            <div className="flex items-end justify-center gap-2 overflow-auto">
               {currentStep.dp.slice(1).map((ways, idx) => {
                 const step = idx + 1;
                 const maxWays = Math.max(...currentStep.dp.slice(1));
@@ -172,10 +175,13 @@ export const ClimbingStairsVisualization: React.FC = () => {
                     <div
                       className={`w-12 rounded-t transition-all duration-300 ${
                         step === currentStep.currentStep
-                          ? 'bg-primary scale-110'
-                          : 'bg-primary/40'
+                          ? "bg-primary scale-110"
+                          : "bg-primary/40"
                       }`}
-                      style={{ height: `${(ways / maxWays) * 120}px`, minHeight: '30px' }}
+                      style={{
+                        height: `${(ways / maxWays) * 120}px`,
+                        minHeight: "30px",
+                      }}
                     />
                     <div className="text-xs text-muted-foreground">{step}</div>
                   </div>
@@ -192,13 +198,13 @@ export const ClimbingStairsVisualization: React.FC = () => {
                   <div
                     className={`w-12 h-12 rounded border-2 flex items-center justify-center font-bold text-sm transition-all ${
                       step === currentStep.currentStep
-                        ? 'bg-primary/20 border-primary text-primary scale-110'
+                        ? "bg-primary/20 border-primary text-primary scale-110"
                         : ways > 0
-                        ? 'bg-green-500/20 border-green-500 text-green-500'
-                        : 'bg-card border-border text-muted-foreground'
+                        ? "bg-green-500/20 border-green-500 text-green-500"
+                        : "bg-card border-border text-muted-foreground"
                     }`}
                   >
-                    {ways || '0'}
+                    {ways || "0"}
                   </div>
                   <div className="text-xs text-muted-foreground">{step}</div>
                 </div>
@@ -209,19 +215,24 @@ export const ClimbingStairsVisualization: React.FC = () => {
           <div className="p-4 bg-muted rounded">
             <p className="text-sm">{currentStep.message}</p>
           </div>
+          <div className="rounded-lg">
+            <VariablePanel
+              variables={{
+                n: currentStep.n,
+                currentStep: currentStep.currentStep,
+                ways: currentStep.ways,
+                totalWays: currentStep.dp[currentStep.n] || 0,
+              }}
+            />
+          </div>
         </div>
 
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+        <CodeHighlighter
+          code={code}
+          highlightedLine={currentStep.lineNumber}
+          language="typescript"
+        />
       </div>
-
-      <VariablePanel
-        variables={{
-          n: currentStep.n,
-          currentStep: currentStep.currentStep,
-          ways: currentStep.ways,
-          totalWays: currentStep.dp[currentStep.n] || 0
-        }}
-      />
     </div>
   );
 };

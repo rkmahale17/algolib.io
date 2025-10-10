@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { StepControls } from '../shared/StepControls';
+import React, { useEffect, useRef, useState } from 'react';
+
 import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
 interface Step {
@@ -159,7 +160,7 @@ export const ReverseLinkedListVisualization: React.FC = () => {
         speed={speed}
         onSpeedChange={setSpeed}
       />
-
+<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <div className="bg-card rounded-lg p-6 border">
         <h3 className="text-lg font-semibold mb-4">Linked List Visualization</h3>
         <div className="flex items-center gap-4 overflow-x-auto pb-4">
@@ -205,17 +206,23 @@ export const ReverseLinkedListVisualization: React.FC = () => {
         <div className="mt-4 p-4 bg-muted rounded">
           <p className="text-sm">{currentStep.message}</p>
         </div>
-      </div>
 
-      <VariablePanel
+         <div className="mt-4 p-4 bg-muted rounded">
+            <VariablePanel
         variables={{
           prev: currentStep.prev !== null ? `Node ${currentStep.prev}` : 'null',
           current: currentStep.current !== null ? `Node ${currentStep.current}` : 'null',
           next: currentStep.next !== null ? `Node ${currentStep.next}` : 'null'
         }}
       />
+        </div>
+    
+      </div>
+
+
 
       <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+    </div>
     </div>
   );
 };

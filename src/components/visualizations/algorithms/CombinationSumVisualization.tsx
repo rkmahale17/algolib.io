@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { StepControls } from '../shared/StepControls';
-import { CodeHighlighter } from '../shared/CodeHighlighter';
-import { VariablePanel } from '../shared/VariablePanel';
+import React, { useEffect, useRef, useState } from "react";
+
+import { CodeHighlighter } from "../shared/CodeHighlighter";
+import { StepControls } from "../shared/StepControls";
+import { VariablePanel } from "../shared/VariablePanel";
 
 interface Step {
   candidates: number[];
@@ -59,9 +60,11 @@ export const CombinationSumVisualization: React.FC = () => {
           current: [...current],
           currentSum: sum,
           start,
-          allCombinations: result.map(c => [...c]),
-          message: `Found valid combination: [${current.join(', ')}] = ${target}`,
-          lineNumber: 6
+          allCombinations: result.map((c) => [...c]),
+          message: `Found valid combination: [${current.join(
+            ", "
+          )}] = ${target}`,
+          lineNumber: 6,
         });
         return;
       }
@@ -72,9 +75,9 @@ export const CombinationSumVisualization: React.FC = () => {
           current: [...current],
           currentSum: sum,
           start,
-          allCombinations: result.map(c => [...c]),
+          allCombinations: result.map((c) => [...c]),
           message: `Sum ${sum} exceeds target ${target}, backtrack`,
-          lineNumber: 9
+          lineNumber: 9,
         });
         return;
       }
@@ -88,9 +91,9 @@ export const CombinationSumVisualization: React.FC = () => {
           current: [...current],
           currentSum: newSum,
           start: i,
-          allCombinations: result.map(c => [...c]),
+          allCombinations: result.map((c) => [...c]),
           message: `Add ${candidates[i]}, sum = ${newSum}`,
-          lineNumber: 12
+          lineNumber: 12,
         });
 
         backtrack(i, newSum, 13);
@@ -133,7 +136,8 @@ export const CombinationSumVisualization: React.FC = () => {
   const handlePlay = () => setIsPlaying(true);
   const handlePause = () => setIsPlaying(false);
   const handleStepForward = () => {
-    if (currentStepIndex < steps.length - 1) setCurrentStepIndex(currentStepIndex + 1);
+    if (currentStepIndex < steps.length - 1)
+      setCurrentStepIndex(currentStepIndex + 1);
   };
   const handleStepBack = () => {
     if (currentStepIndex > 0) setCurrentStepIndex(currentStepIndex - 1);
@@ -164,22 +168,30 @@ export const CombinationSumVisualization: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-card rounded-lg p-6 border space-y-4">
-          <h3 className="text-lg font-semibold">Candidates: [{currentStep.candidates.join(', ')}]</h3>
+          <h3 className="text-lg font-semibold">
+            Candidates: [{currentStep.candidates.join(", ")}]
+          </h3>
           <div className="text-center p-4 bg-muted rounded border">
             <div className="text-sm text-muted-foreground mb-1">Target</div>
-            <div className="text-3xl font-bold text-primary">{currentStep.target}</div>
+            <div className="text-3xl font-bold text-primary">
+              {currentStep.target}
+            </div>
           </div>
 
-          <h3 className="text-lg font-semibold">Current Combination (Sum: {currentStep.currentSum})</h3>
+          <h3 className="text-lg font-semibold">
+            Current Combination (Sum: {currentStep.currentSum})
+          </h3>
           <div className="flex gap-2 min-h-[3rem]">
             {currentStep.current.length > 0 ? (
               currentStep.current.map((val, idx) => (
                 <div
                   key={idx}
                   className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold ${
-                    currentStep.currentSum === currentStep.target ? 'bg-green-500/20 border-green-500' :
-                    currentStep.currentSum > currentStep.target ? 'bg-red-500/20 border-red-500' :
-                    'bg-blue-500/20 border-blue-500'
+                    currentStep.currentSum === currentStep.target
+                      ? "bg-green-500/20 border-green-500"
+                      : currentStep.currentSum > currentStep.target
+                      ? "bg-red-500/20 border-red-500"
+                      : "bg-blue-500/20 border-blue-500"
                   }`}
                 >
                   {val}
@@ -190,11 +202,16 @@ export const CombinationSumVisualization: React.FC = () => {
             )}
           </div>
 
-          <h3 className="text-lg font-semibold">Valid Combinations ({currentStep.allCombinations.length})</h3>
+          <h3 className="text-lg font-semibold">
+            Valid Combinations ({currentStep.allCombinations.length})
+          </h3>
           <div className="flex flex-wrap gap-2">
             {currentStep.allCombinations.map((comb, idx) => (
-              <div key={idx} className="px-3 py-1 bg-muted rounded border text-sm">
-                [{comb.join(' + ')}] = {currentStep.target}
+              <div
+                key={idx}
+                className="px-3 py-1 bg-muted rounded border text-sm"
+              >
+                [{comb.join(" + ")}] = {currentStep.target}
               </div>
             ))}
           </div>
@@ -202,19 +219,24 @@ export const CombinationSumVisualization: React.FC = () => {
           <div className="p-4 bg-muted rounded">
             <p className="text-sm">{currentStep.message}</p>
           </div>
+          <div className="rounded-lg">
+            <VariablePanel
+              variables={{
+                target: currentStep.target,
+                "current sum": currentStep.currentSum,
+                remaining: currentStep.target - currentStep.currentSum,
+                "valid combinations": currentStep.allCombinations.length,
+              }}
+            />
+          </div>
         </div>
 
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+        <CodeHighlighter
+          code={code}
+          highlightedLine={currentStep.lineNumber}
+          language="typescript"
+        />
       </div>
-
-      <VariablePanel
-        variables={{
-          'target': currentStep.target,
-          'current sum': currentStep.currentSum,
-          'remaining': currentStep.target - currentStep.currentSum,
-          'valid combinations': currentStep.allCombinations.length
-        }}
-      />
     </div>
   );
 };
