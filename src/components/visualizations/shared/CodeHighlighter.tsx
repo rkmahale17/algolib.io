@@ -12,8 +12,8 @@ export const CodeHighlighter = ({ code, highlightedLine, language }: CodeHighlig
       <div className="bg-muted px-4 py-2 border-b border-border">
         <span className="text-xs font-semibold text-foreground">{language}</span>
       </div>
-      <div className="p-4 overflow-x-auto">
-        <pre className="text-sm">
+      <div className="overflow-x-auto">
+        <pre className="text-sm p-4 min-w-max">
           {lines.map((line, index) => (
             <div
               key={index}
@@ -23,10 +23,10 @@ export const CodeHighlighter = ({ code, highlightedLine, language }: CodeHighlig
                   : ''
               } transition-colors duration-300`}
             >
-              <span className="inline-block w-8 text-right pr-2 text-muted-foreground select-none">
+              <span className="inline-block min-w-[2.5rem] w-10 text-right pr-3 text-muted-foreground select-none shrink-0">
                 {index + 1}
               </span>
-              <code className={`flex-1 ${index === highlightedLine ? 'font-bold' : ''}`}>
+              <code className={`flex-1 whitespace-pre ${index === highlightedLine ? 'font-bold' : ''}`}>
                 {line || ' '}
               </code>
             </div>
