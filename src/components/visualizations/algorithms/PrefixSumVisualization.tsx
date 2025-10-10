@@ -174,26 +174,22 @@ export const PrefixSumVisualization = () => {
             <div>
               <h4 className="text-sm font-semibold mb-3 text-muted-foreground">Prefix Sum Array</h4>
               <div className="flex items-end justify-center gap-2 h-32">
-                {currentStep.prefixArray.length > 0 ? (
-                  currentStep.prefixArray.map((value, index) => {
-                    const isActive = index === currentStep.currentIndex;
-                    return (
-                      <div key={index} className="flex flex-col items-center gap-2 flex-1 max-w-[60px]">
-                        <div
-                          className={`w-full rounded-t transition-all duration-300 ${
-                            isActive ? 'bg-primary shadow-lg shadow-primary/50 scale-105' : 'bg-gradient-to-t from-primary/60 to-primary/40'
-                          }`}
-                          style={{ height: `${(value / getMaxValue()) * 100}%`, minHeight: '20px' }}
-                        />
-                        <span className={`text-xs font-mono ${isActive ? 'text-primary font-bold text-base' : 'text-muted-foreground'}`}>
-                          {value}
-                        </span>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <div className="text-sm text-muted-foreground">Building...</div>
-                )}
+                {currentStep.prefixArray.map((value, index) => {
+                  const isActive = index === currentStep.currentIndex;
+                  return (
+                    <div key={index} className="flex flex-col items-center gap-2 flex-1 max-w-[60px]">
+                      <div
+                        className={`w-full rounded-t transition-all duration-300 ${
+                          isActive ? 'bg-primary shadow-lg shadow-primary/50 scale-105' : 'bg-gradient-to-t from-primary/60 to-primary/40'
+                        }`}
+                        style={{ height: `${(value / getMaxValue()) * 100}%`, minHeight: '20px' }}
+                      />
+                      <span className={`text-xs font-mono ${isActive ? 'text-primary font-bold text-base' : 'text-muted-foreground'}`}>
+                        {value}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
