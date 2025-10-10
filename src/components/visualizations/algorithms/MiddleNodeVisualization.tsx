@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { StepControls } from '../shared/StepControls';
+import React, { useEffect, useRef, useState } from 'react';
+
 import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
 interface Step {
@@ -184,18 +185,22 @@ export const MiddleNodeVisualization: React.FC = () => {
           <div className="mt-4 p-4 bg-muted rounded">
             <p className="text-sm">{currentStep.message}</p>
           </div>
-        </div>
-
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
-      </div>
-
-      <VariablePanel
+          <div className='rounded-lg'>
+    <VariablePanel
         variables={{
           slow: currentStep.slow !== null ? `Node ${currentStep.slow} (value: ${currentStep.list[currentStep.slow]})` : 'null',
           fast: currentStep.fast !== null ? `Node ${currentStep.fast} (value: ${currentStep.list[currentStep.fast]})` : 'null',
           'is middle': String(currentStep.isMiddle)
         }}
       />
+</div>
+        </div>
+
+
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+      </div>
+
+    
     </div>
   );
 };

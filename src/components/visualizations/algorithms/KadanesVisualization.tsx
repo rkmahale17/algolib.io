@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
-import { VariablePanel } from '../shared/VariablePanel';
-import { StepControls } from '../shared/StepControls';
+import { useEffect, useRef, useState } from 'react';
+
 import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { StepControls } from '../shared/StepControls';
+import { VariablePanel } from '../shared/VariablePanel';
 
 interface Step {
   array: number[];
@@ -211,12 +212,8 @@ export const KadanesVisualization = () => {
               [{currentStep.subarrayStart}...{currentStep.subarrayEnd}] = {currentStep.maxSum}
             </div>
           </div>
-        </div>
-
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
-      </div>
-
-      <VariablePanel
+           <div className=" border  rounded-lg p-4">
+  <VariablePanel
         variables={{
           i: currentStep.currentIndex,
           'arr[i]': currentStep.array[currentStep.currentIndex],
@@ -225,6 +222,15 @@ export const KadanesVisualization = () => {
           subarrayRange: `[${currentStep.subarrayStart}, ${currentStep.subarrayEnd}]`
         }}
       />
+</div>
+        </div>
+         
+
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
+      </div>
+
+    
+
     </div>
   );
 };

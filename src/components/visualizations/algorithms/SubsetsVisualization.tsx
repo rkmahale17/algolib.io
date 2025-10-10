@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { StepControls } from '../shared/StepControls';
-import { CodeHighlighter } from '../shared/CodeHighlighter';
-import { VariablePanel } from '../shared/VariablePanel';
+import React, { useEffect, useRef, useState } from "react";
+
+import { CodeHighlighter } from "../shared/CodeHighlighter";
+import { StepControls } from "../shared/StepControls";
+import { VariablePanel } from "../shared/VariablePanel";
 
 interface Step {
   array: number[];
@@ -49,9 +50,9 @@ export const SubsetsVisualization: React.FC = () => {
         array: arr,
         current: [...current],
         index: start,
-        allSubsets: result.map(s => [...s]),
-        message: `Add subset [${current.join(', ')}] to result`,
-        lineNumber: line
+        allSubsets: result.map((s) => [...s]),
+        message: `Add subset [${current.join(", ")}] to result`,
+        lineNumber: line,
       });
 
       for (let i = start; i < arr.length; i++) {
@@ -60,21 +61,21 @@ export const SubsetsVisualization: React.FC = () => {
           array: arr,
           current: [...current],
           index: i,
-          allSubsets: result.map(s => [...s]),
+          allSubsets: result.map((s) => [...s]),
           message: `Include ${arr[i]} in current subset`,
-          lineNumber: 7
+          lineNumber: 7,
         });
-        
+
         backtrack(i + 1, 8);
-        
+
         current.pop();
         newSteps.push({
           array: arr,
           current: [...current],
           index: i,
-          allSubsets: result.map(s => [...s]),
+          allSubsets: result.map((s) => [...s]),
           message: `Backtrack: Remove ${arr[i]} from current subset`,
-          lineNumber: 9
+          lineNumber: 9,
         });
       }
     }
@@ -113,7 +114,8 @@ export const SubsetsVisualization: React.FC = () => {
   const handlePlay = () => setIsPlaying(true);
   const handlePause = () => setIsPlaying(false);
   const handleStepForward = () => {
-    if (currentStepIndex < steps.length - 1) setCurrentStepIndex(currentStepIndex + 1);
+    if (currentStepIndex < steps.length - 1)
+      setCurrentStepIndex(currentStepIndex + 1);
   };
   const handleStepBack = () => {
     if (currentStepIndex > 0) setCurrentStepIndex(currentStepIndex - 1);
@@ -150,7 +152,9 @@ export const SubsetsVisualization: React.FC = () => {
               <div
                 key={idx}
                 className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
-                  idx === currentStep.index ? 'bg-primary/20 border-primary' : 'bg-card border-border'
+                  idx === currentStep.index
+                    ? "bg-primary/20 border-primary"
+                    : "bg-card border-border"
                 }`}
               >
                 {val}
@@ -174,11 +178,16 @@ export const SubsetsVisualization: React.FC = () => {
             )}
           </div>
 
-          <h3 className="text-lg font-semibold mb-4">All Subsets ({currentStep.allSubsets.length})</h3>
+          <h3 className="text-lg font-semibold mb-4">
+            All Subsets ({currentStep.allSubsets.length})
+          </h3>
           <div className="flex flex-wrap gap-2">
             {currentStep.allSubsets.map((subset, idx) => (
-              <div key={idx} className="px-3 py-1 bg-muted rounded border text-sm">
-                [{subset.join(', ') || 'empty'}]
+              <div
+                key={idx}
+                className="px-3 py-1 bg-muted rounded border text-sm"
+              >
+                [{subset.join(", ") || "empty"}]
               </div>
             ))}
           </div>
@@ -186,18 +195,23 @@ export const SubsetsVisualization: React.FC = () => {
           <div className="mt-4 p-4 bg-muted rounded">
             <p className="text-sm">{currentStep.message}</p>
           </div>
+          <div className="rounded-lg">
+            <VariablePanel
+              variables={{
+                "start index": currentStep.index,
+                "current subset": `[${currentStep.current.join(", ")}]`,
+                "total subsets": currentStep.allSubsets.length,
+              }}
+            />
+          </div>
         </div>
 
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+        <CodeHighlighter
+          code={code}
+          highlightedLine={currentStep.lineNumber}
+          language="typescript"
+        />
       </div>
-
-      <VariablePanel
-        variables={{
-          'start index': currentStep.index,
-          'current subset': `[${currentStep.current.join(', ')}]`,
-          'total subsets': currentStep.allSubsets.length
-        }}
-      />
     </div>
   );
 };

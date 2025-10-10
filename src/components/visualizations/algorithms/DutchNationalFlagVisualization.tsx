@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
-import { VariablePanel } from '../shared/VariablePanel';
-import { StepControls } from '../shared/StepControls';
+import { useEffect, useRef, useState } from 'react';
+
 import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { StepControls } from '../shared/StepControls';
+import { VariablePanel } from '../shared/VariablePanel';
 
 interface Step {
   array: number[];
@@ -214,12 +215,9 @@ export const DutchNationalFlagVisualization = () => {
           <div className="bg-accent/50 rounded-lg border border-accent p-4">
             <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
           </div>
-        </div>
 
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
-      </div>
-
-      <VariablePanel
+            <div className=" rounded-lg p-4">
+                <VariablePanel
         variables={{
           low: currentStep.low,
           mid: currentStep.mid,
@@ -227,6 +225,13 @@ export const DutchNationalFlagVisualization = () => {
           'nums[mid]': currentStep.mid <= currentStep.high ? currentStep.array[currentStep.mid] : 'done'
         }}
       />
+          </div>
+        </div>
+
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
+      </div>
+
+    
     </div>
   );
 };

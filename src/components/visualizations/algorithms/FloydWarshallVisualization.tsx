@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
-import { VariablePanel } from '../shared/VariablePanel';
-import { StepControls } from '../shared/StepControls';
+import { useEffect, useRef, useState } from 'react';
+
 import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { StepControls } from '../shared/StepControls';
+import { VariablePanel } from '../shared/VariablePanel';
 
 interface Step {
   matrix: number[][];
@@ -193,18 +194,21 @@ export const FloydWarshallVisualization = () => {
           <div className="bg-accent/50 rounded-lg border border-accent p-4">
             <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
           </div>
-        </div>
-
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
-      </div>
-
-      <VariablePanel
+          <div className="rounded-lg">
+            <VariablePanel
         variables={{
           k: currentStep.k >= 0 ? currentStep.k : 'N/A',
           i: currentStep.i >= 0 ? currentStep.i : 'N/A',
           j: currentStep.j >= 0 ? currentStep.j : 'N/A'
         }}
       />
+          </div>
+        </div>
+
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+      </div>
+
+      
     </div>
   );
 };

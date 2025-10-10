@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
-import { VariablePanel } from '../shared/VariablePanel';
-import { StepControls } from '../shared/StepControls';
+import { useEffect, useRef, useState } from 'react';
+
 import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { StepControls } from '../shared/StepControls';
+import { VariablePanel } from '../shared/VariablePanel';
 
 interface Step {
   array: number[];
@@ -216,12 +217,9 @@ export const BinarySearchVisualization = () => {
           <div className={`rounded-lg border p-4 ${currentStep.found ? 'bg-green-500/20 border-green-500' : 'bg-accent/50 border-accent'}`}>
             <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
           </div>
-        </div>
+          <div className={`rounded-lg border p-4 `}>
 
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
-      </div>
-
-      <VariablePanel
+             <VariablePanel
         variables={{
           left: currentStep.left,
           right: currentStep.right,
@@ -231,6 +229,13 @@ export const BinarySearchVisualization = () => {
           searchSpace: currentStep.right - currentStep.left + 1
         }}
       />
+          </div>
+        </div>
+
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
+      </div>
+
+     
     </div>
   );
 };

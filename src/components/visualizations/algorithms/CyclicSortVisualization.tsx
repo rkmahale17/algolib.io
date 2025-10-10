@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
-import { VariablePanel } from '../shared/VariablePanel';
-import { StepControls } from '../shared/StepControls';
+import { useEffect, useRef, useState } from 'react';
+
 import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { StepControls } from '../shared/StepControls';
+import { VariablePanel } from '../shared/VariablePanel';
 
 interface Step {
   array: number[];
@@ -147,7 +148,7 @@ export const CyclicSortVisualization = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
           <div className="bg-muted/30 rounded-lg border border-border/50 p-6">
-            <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center justify-center gap-2 overflow-x-auto">
               {currentStep.array.map((value, index) => (
                 <div key={index} className="flex flex-col items-center gap-2">
                   <div
@@ -172,11 +173,9 @@ export const CyclicSortVisualization = () => {
           <div className="bg-accent/50 rounded-lg border border-accent p-4">
             <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
           </div>
-        </div>
+          <div className=" rounded-lg border  p-4">
 
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
-      </div>
-
+            
       <VariablePanel
         variables={{
           i: currentStep.i,
@@ -185,6 +184,12 @@ export const CyclicSortVisualization = () => {
           array: currentStep.array
         }}
       />
+          </div>
+        </div>
+
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
+      </div>
+
     </div>
   );
 };

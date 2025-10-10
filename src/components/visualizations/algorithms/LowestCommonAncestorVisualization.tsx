@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
-import { VariablePanel } from '../shared/VariablePanel';
-import { StepControls } from '../shared/StepControls';
+import { useEffect, useRef, useState } from 'react';
+
 import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { StepControls } from '../shared/StepControls';
+import { VariablePanel } from '../shared/VariablePanel';
 
 interface TreeNode {
   val: number;
@@ -254,7 +255,7 @@ export const LowestCommonAncestorVisualization = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg border border-border/50 p-6">
+          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 overflow-x-auto">
             <svg width="400" height="250" className="mx-auto">
               {renderTree(tree)}
             </svg>
@@ -278,10 +279,8 @@ export const LowestCommonAncestorVisualization = () => {
               <div className="font-bold text-green-500">{currentStep.lca || 'N/A'}</div>
             </div>
           </div>
-        </div>
-
-        <div className="space-y-4">
-          <VariablePanel
+          <div className="rounded-lg ">
+ <VariablePanel
             variables={{
               current: currentStep.current || 'null',
               p: currentStep.p,
@@ -289,6 +288,11 @@ export const LowestCommonAncestorVisualization = () => {
               lca: currentStep.lca || 'null'
             }}
           />
+          </div>
+        </div>
+
+        <div className="space-y-4">
+         
           <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
         </div>
       </div>

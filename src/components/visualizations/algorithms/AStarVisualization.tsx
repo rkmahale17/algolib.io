@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
-import { VariablePanel } from '../shared/VariablePanel';
-import { StepControls } from '../shared/StepControls';
+import { useEffect, useRef, useState } from 'react';
+
 import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { StepControls } from '../shared/StepControls';
+import { VariablePanel } from '../shared/VariablePanel';
 
 interface Cell {
   x: number;
@@ -221,8 +222,8 @@ export const AStarVisualization = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg border border-border/50 p-6">
-            <div className="inline-block">
+          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 overflow-x-auto">
+            <div className="inline-block ">
               {currentStep.grid.map((row, y) => (
                 <div key={y} className="flex">
                   {row.map((cell, x) => {
@@ -266,16 +267,19 @@ export const AStarVisualization = () => {
           <div className="bg-accent/50 rounded-lg border border-accent p-4">
             <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
           </div>
-        </div>
-
-        <div className="space-y-4">
-          <VariablePanel
+          <div className="rounded-lg">
+             <VariablePanel
             variables={{
               'Open Set': currentStep.openSet.length,
               'Closed Set': currentStep.closedSet.length,
               'Path Length': currentStep.path.length
             }}
           />
+          </div>
+        </div>
+
+        <div className="space-y-4">
+         
           <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
         </div>
       </div>

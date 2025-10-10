@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
-import { VariablePanel } from '../shared/VariablePanel';
-import { StepControls } from '../shared/StepControls';
+import { useEffect, useRef, useState } from 'react';
+
 import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { StepControls } from '../shared/StepControls';
+import { VariablePanel } from '../shared/VariablePanel';
 
 interface Step {
   array: number[];
@@ -234,6 +235,8 @@ export const MonotonicStackVisualization = () => {
         </div>
 
         <div className="space-y-4">
+          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
+
           <VariablePanel
             variables={{
               i: currentStep.currentIndex >= 0 ? currentStep.currentIndex : 'init',
@@ -242,7 +245,6 @@ export const MonotonicStackVisualization = () => {
               stackTop: currentStep.stack.length > 0 ? `${currentStep.stack[currentStep.stack.length - 1]} (${currentStep.array[currentStep.stack[currentStep.stack.length - 1]]})` : 'empty'
             }}
           />
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
         </div>
       </div>
     </div>

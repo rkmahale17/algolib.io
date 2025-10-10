@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
-import { VariablePanel } from '../shared/VariablePanel';
-import { StepControls } from '../shared/StepControls';
+import { useEffect, useRef, useState } from 'react';
+
 import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { StepControls } from '../shared/StepControls';
+import { VariablePanel } from '../shared/VariablePanel';
 
 interface TreeNode {
   val: number;
@@ -217,7 +218,7 @@ export const DFSPostorderVisualization = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg border border-border/50 p-6">
+          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 overflow-x-auto">
             <svg width="400" height="250" className="mx-auto">
               {renderTree(tree)}
             </svg>

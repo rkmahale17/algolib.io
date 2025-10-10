@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
-import { VariablePanel } from '../shared/VariablePanel';
-import { StepControls } from '../shared/StepControls';
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { useEffect, useRef, useState } from "react";
+
+import { CodeHighlighter } from "../shared/CodeHighlighter";
+import { StepControls } from "../shared/StepControls";
+import { VariablePanel } from "../shared/VariablePanel";
 
 interface Edge {
   from: number;
@@ -48,11 +49,30 @@ export const PrimsVisualization = () => {
   const generateSteps = () => {
     const nodes = 5;
     const graph: Edge[][] = [
-      [{ from: 0, to: 1, weight: 2 }, { from: 0, to: 3, weight: 6 }],
-      [{ from: 1, to: 0, weight: 2 }, { from: 1, to: 2, weight: 3 }, { from: 1, to: 3, weight: 8 }, { from: 1, to: 4, weight: 5 }],
-      [{ from: 2, to: 1, weight: 3 }, { from: 2, to: 4, weight: 7 }],
-      [{ from: 3, to: 0, weight: 6 }, { from: 3, to: 1, weight: 8 }, { from: 3, to: 4, weight: 9 }],
-      [{ from: 4, to: 1, weight: 5 }, { from: 4, to: 2, weight: 7 }, { from: 4, to: 3, weight: 9 }]
+      [
+        { from: 0, to: 1, weight: 2 },
+        { from: 0, to: 3, weight: 6 },
+      ],
+      [
+        { from: 1, to: 0, weight: 2 },
+        { from: 1, to: 2, weight: 3 },
+        { from: 1, to: 3, weight: 8 },
+        { from: 1, to: 4, weight: 5 },
+      ],
+      [
+        { from: 2, to: 1, weight: 3 },
+        { from: 2, to: 4, weight: 7 },
+      ],
+      [
+        { from: 3, to: 0, weight: 6 },
+        { from: 3, to: 1, weight: 8 },
+        { from: 3, to: 4, weight: 9 },
+      ],
+      [
+        { from: 4, to: 1, weight: 5 },
+        { from: 4, to: 2, weight: 7 },
+        { from: 4, to: 3, weight: 9 },
+      ],
     ];
 
     const allEdges: Edge[] = [
@@ -62,7 +82,7 @@ export const PrimsVisualization = () => {
       { from: 1, to: 3, weight: 8 },
       { from: 1, to: 4, weight: 5 },
       { from: 2, to: 4, weight: 7 },
-      { from: 3, to: 4, weight: 9 }
+      { from: 3, to: 4, weight: 9 },
     ];
 
     const newSteps: Step[] = [];
@@ -75,12 +95,12 @@ export const PrimsVisualization = () => {
       edges: allEdges,
       mstEdges: [],
       currentNode: null,
-      message: 'Start Prim\'s algorithm from node 0',
-      lineNumber: 0
+      message: "Start Prim's algorithm from node 0",
+      lineNumber: 0,
     });
 
     visited[0] = true;
-    graph[0].forEach(edge => pq.push(edge));
+    graph[0].forEach((edge) => pq.push(edge));
     pq.sort((a, b) => a.weight - b.weight);
 
     newSteps.push({
@@ -88,8 +108,8 @@ export const PrimsVisualization = () => {
       edges: allEdges,
       mstEdges: [],
       currentNode: 0,
-      message: 'Mark node 0 as visited, add its edges to priority queue',
-      lineNumber: 5
+      message: "Mark node 0 as visited, add its edges to priority queue",
+      lineNumber: 5,
     });
 
     while (pq.length > 0 && mstEdges.length < nodes - 1) {
@@ -101,7 +121,7 @@ export const PrimsVisualization = () => {
         mstEdges: [...mstEdges],
         currentNode: edge.to,
         message: `Consider edge ${edge.from}-${edge.to} (weight: ${edge.weight})`,
-        lineNumber: 9
+        lineNumber: 9,
       });
 
       if (visited[edge.to]) {
@@ -111,7 +131,7 @@ export const PrimsVisualization = () => {
           mstEdges: [...mstEdges],
           currentNode: edge.to,
           message: `Skip edge ${edge.from}-${edge.to} (node ${edge.to} already visited)`,
-          lineNumber: 11
+          lineNumber: 11,
         });
         continue;
       }
@@ -125,10 +145,10 @@ export const PrimsVisualization = () => {
         mstEdges: [...mstEdges],
         currentNode: edge.to,
         message: `Add edge ${edge.from}-${edge.to} to MST`,
-        lineNumber: 13
+        lineNumber: 13,
       });
 
-      graph[edge.to].forEach(e => {
+      graph[edge.to].forEach((e) => {
         if (!visited[e.to]) pq.push(e);
       });
       pq.sort((a, b) => a.weight - b.weight);
@@ -139,8 +159,11 @@ export const PrimsVisualization = () => {
       edges: allEdges,
       mstEdges: [...mstEdges],
       currentNode: null,
-      message: `MST complete! Total weight: ${mstEdges.reduce((sum, e) => sum + e.weight, 0)}`,
-      lineNumber: 17
+      message: `MST complete! Total weight: ${mstEdges.reduce(
+        (sum, e) => sum + e.weight,
+        0
+      )}`,
+      lineNumber: 17,
     });
 
     setSteps(newSteps);
@@ -154,7 +177,7 @@ export const PrimsVisualization = () => {
   useEffect(() => {
     if (isPlaying && currentStepIndex < steps.length - 1) {
       intervalRef.current = setInterval(() => {
-        setCurrentStepIndex(prev => {
+        setCurrentStepIndex((prev) => {
           if (prev >= steps.length - 1) {
             setIsPlaying(false);
             return prev;
@@ -172,8 +195,11 @@ export const PrimsVisualization = () => {
 
   const handlePlay = () => setIsPlaying(true);
   const handlePause = () => setIsPlaying(false);
-  const handleStepForward = () => currentStepIndex < steps.length - 1 && setCurrentStepIndex(prev => prev + 1);
-  const handleStepBack = () => currentStepIndex > 0 && setCurrentStepIndex(prev => prev - 1);
+  const handleStepForward = () =>
+    currentStepIndex < steps.length - 1 &&
+    setCurrentStepIndex((prev) => prev + 1);
+  const handleStepBack = () =>
+    currentStepIndex > 0 && setCurrentStepIndex((prev) => prev - 1);
   const handleReset = () => {
     setCurrentStepIndex(0);
     setIsPlaying(false);
@@ -189,7 +215,7 @@ export const PrimsVisualization = () => {
     { x: 200, y: 100 },
     { x: 300, y: 50 },
     { x: 150, y: 200 },
-    { x: 250, y: 200 }
+    { x: 250, y: 200 },
   ];
 
   return (
@@ -209,16 +235,17 @@ export const PrimsVisualization = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg border border-border/50 p-6">
+          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 overflow-x-auto">
             <svg width="400" height="280" className="mx-auto">
               {currentStep.edges.map((edge, idx) => {
                 const from = nodePositions[edge.from];
                 const to = nodePositions[edge.to];
-                const inMST = currentStep.mstEdges.some(e => 
-                  (e.from === edge.from && e.to === edge.to) || 
-                  (e.from === edge.to && e.to === edge.from)
+                const inMST = currentStep.mstEdges.some(
+                  (e) =>
+                    (e.from === edge.from && e.to === edge.to) ||
+                    (e.from === edge.to && e.to === edge.from)
                 );
-                
+
                 return (
                   <g key={idx}>
                     <line
@@ -227,7 +254,7 @@ export const PrimsVisualization = () => {
                       x2={to.x}
                       y2={to.y}
                       className={`transition-all duration-300 ${
-                        inMST ? 'stroke-green-500' : 'stroke-border'
+                        inMST ? "stroke-green-500" : "stroke-border"
                       }`}
                       strokeWidth={inMST ? 3 : 2}
                     />
@@ -242,7 +269,7 @@ export const PrimsVisualization = () => {
                   </g>
                 );
               })}
-              
+
               {nodePositions.map((pos, idx) => (
                 <g key={idx}>
                   <circle
@@ -251,10 +278,10 @@ export const PrimsVisualization = () => {
                     r="20"
                     className={`transition-all duration-300 ${
                       currentStep.visited[idx]
-                        ? 'fill-green-500 stroke-green-500'
+                        ? "fill-green-500 stroke-green-500"
                         : currentStep.currentNode === idx
-                        ? 'fill-primary stroke-primary'
-                        : 'fill-muted stroke-border'
+                        ? "fill-primary stroke-primary"
+                        : "fill-muted stroke-border"
                     }`}
                     strokeWidth="2"
                   />
@@ -264,9 +291,10 @@ export const PrimsVisualization = () => {
                     textAnchor="middle"
                     dy=".3em"
                     className={`font-bold ${
-                      currentStep.visited[idx] || currentStep.currentNode === idx
-                        ? 'fill-white'
-                        : 'fill-foreground'
+                      currentStep.visited[idx] ||
+                      currentStep.currentNode === idx
+                        ? "fill-white"
+                        : "fill-foreground"
                     }`}
                   >
                     {idx}
@@ -277,19 +305,30 @@ export const PrimsVisualization = () => {
           </div>
 
           <div className="bg-accent/50 rounded-lg border border-accent p-4">
-            <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
+            <p className="text-sm text-foreground font-medium">
+              {currentStep.message}
+            </p>
+          </div>
+          <div className="rounded-lg">
+            <VariablePanel
+              variables={{
+                "Visited Nodes": currentStep.visited.filter((v) => v).length,
+                "MST Edges": currentStep.mstEdges.length,
+                "Total Weight": currentStep.mstEdges.reduce(
+                  (sum, e) => sum + e.weight,
+                  0
+                ),
+              }}
+            />
           </div>
         </div>
 
         <div className="space-y-4">
-          <VariablePanel
-            variables={{
-              'Visited Nodes': currentStep.visited.filter(v => v).length,
-              'MST Edges': currentStep.mstEdges.length,
-              'Total Weight': currentStep.mstEdges.reduce((sum, e) => sum + e.weight, 0)
-            }}
+          <CodeHighlighter
+            code={code}
+            highlightedLine={currentStep.lineNumber}
+            language="typescript"
           />
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
         </div>
       </div>
     </div>

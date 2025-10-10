@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
-import { VariablePanel } from '../shared/VariablePanel';
-import { StepControls } from '../shared/StepControls';
+import { useEffect, useRef, useState } from 'react';
+
 import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { StepControls } from '../shared/StepControls';
+import { VariablePanel } from '../shared/VariablePanel';
 
 interface Edge {
   from: number;
@@ -212,7 +213,7 @@ export const KruskalsVisualization = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg border border-border/50 p-6">
+          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 overflow-x-auto">
             <svg width="400" height="280" className="mx-auto">
               {currentStep.edges.map((edge, idx) => {
                 const from = nodePositions[edge.from];
@@ -272,15 +273,18 @@ export const KruskalsVisualization = () => {
           <div className="bg-accent/50 rounded-lg border border-accent p-4">
             <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
           </div>
-        </div>
-
-        <div className="space-y-4">
-          <VariablePanel
+          <div className="rounded-lg">
+            <VariablePanel
             variables={{
               'MST Edges': currentStep.mstEdges.length,
               'Total Weight': currentStep.mstEdges.reduce((sum, e) => sum + e.weight, 0)
             }}
           />
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          
           <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
         </div>
       </div>
