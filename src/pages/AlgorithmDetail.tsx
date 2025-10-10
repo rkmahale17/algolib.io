@@ -494,7 +494,7 @@ const AlgorithmDetail: React.FC = () => {
       const CombinationSumVisualization = React.lazy(() => import('@/components/visualizations/algorithms/CombinationSumVisualization').then(m => ({ default: m.CombinationSumVisualization })));
       return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><CombinationSumVisualization /></React.Suspense>;
     }
-    if (algorithm.id === 'word-search') {
+    if (algorithm.id === 'word-search' || algorithm.id === 'word-search-grid') {
       const WordSearchVisualization = React.lazy(() => import('@/components/visualizations/algorithms/WordSearchVisualization').then(m => ({ default: m.WordSearchVisualization })));
       return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><WordSearchVisualization /></React.Suspense>;
     }
@@ -514,7 +514,7 @@ const AlgorithmDetail: React.FC = () => {
       const FenwickTreeVisualization = React.lazy(() => import('@/components/visualizations/algorithms/FenwickTreeVisualization').then(m => ({ default: m.FenwickTreeVisualization })));
       return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><FenwickTreeVisualization /></React.Suspense>;
     }
-    if (algorithm.id === 'kmp-string-matching') {
+    if (algorithm.id === 'kmp' || algorithm.id === 'kmp-string-matching') {
       const KMPVisualization = React.lazy(() => import('@/components/visualizations/algorithms/KMPVisualization').then(m => ({ default: m.KMPVisualization })));
       return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><KMPVisualization /></React.Suspense>;
     }
@@ -534,11 +534,15 @@ const AlgorithmDetail: React.FC = () => {
       const CountBitsVisualization = React.lazy(() => import('@/components/visualizations/algorithms/CountBitsVisualization').then(m => ({ default: m.CountBitsVisualization })));
       return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><CountBitsVisualization /></React.Suspense>;
     }
-    if (algorithm.id === 'kth-largest-element') {
+    if (algorithm.id === 'subset-generation-bits') {
+      const SubsetBitsVisualization = React.lazy(() => import('@/components/visualizations/algorithms/SubsetBitsVisualization').then(m => ({ default: m.SubsetBitsVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><SubsetBitsVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'kth-largest' || algorithm.id === 'kth-largest-element') {
       const KthLargestVisualization = React.lazy(() => import('@/components/visualizations/algorithms/KthLargestVisualization').then(m => ({ default: m.KthLargestVisualization })));
       return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><KthLargestVisualization /></React.Suspense>;
     }
-    if (algorithm.id === 'merge-k-sorted-lists') {
+    if (algorithm.id === 'merge-k-lists' || algorithm.id === 'merge-k-sorted-lists') {
       const MergeKSortedListsVisualization = React.lazy(() => import('@/components/visualizations/algorithms/MergeKSortedListsVisualization').then(m => ({ default: m.MergeKSortedListsVisualization })));
       return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><MergeKSortedListsVisualization /></React.Suspense>;
     }
@@ -546,11 +550,11 @@ const AlgorithmDetail: React.FC = () => {
       const SlidingWindowMaxVisualization = React.lazy(() => import('@/components/visualizations/algorithms/SlidingWindowMaxVisualization').then(m => ({ default: m.SlidingWindowMaxVisualization })));
       return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><SlidingWindowMaxVisualization /></React.Suspense>;
     }
-    if (algorithm.id === 'gcd') {
+    if (algorithm.id === 'gcd-euclidean' || algorithm.id === 'gcd') {
       const GCDVisualization = React.lazy(() => import('@/components/visualizations/algorithms/GCDVisualization').then(m => ({ default: m.GCDVisualization })));
       return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><GCDVisualization /></React.Suspense>;
     }
-    if (algorithm.id === 'sieve-of-eratosthenes') {
+    if (algorithm.id === 'sieve-eratosthenes' || algorithm.id === 'sieve-of-eratosthenes') {
       const SieveVisualization = React.lazy(() => import('@/components/visualizations/algorithms/SieveVisualization').then(m => ({ default: m.SieveVisualization })));
       return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><SieveVisualization /></React.Suspense>;
     }
