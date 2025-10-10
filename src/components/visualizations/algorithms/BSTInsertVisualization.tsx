@@ -44,7 +44,9 @@ export const BSTInsertVisualization = () => {
     return {
       val: node.val,
       left: deepClone(node.left),
-      right: deepClone(node.right)
+      right: deepClone(node.right),
+      x: node.x,
+      y: node.y
     };
   };
 
