@@ -24,19 +24,17 @@ export const DFSPreorderVisualization = () => {
   const [speed, setSpeed] = useState(1);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const code = `function preorderDFS(root) {
-  const result = [];
-  const stack = [root];
+  const code = `function preorderDFS(node) {
+  if (!node) return;
   
-  while (stack.length > 0) {
-    const node = stack.pop();
-    result.push(node.val);
-    
-    if (node.right) stack.push(node.right);
-    if (node.left) stack.push(node.left);
-  }
+  // Visit root
+  result.push(node.val);
   
-  return result;
+  // Traverse left subtree
+  preorderDFS(node.left);
+  
+  // Traverse right subtree
+  preorderDFS(node.right);
 }`;
 
   // Tree structure: 1 -> 2,3 -> 4,5,6,7
@@ -49,67 +47,90 @@ export const DFSPreorderVisualization = () => {
   const generateSteps = () => {
     const newSteps: Step[] = [];
     const visited: number[] = [];
-    const stack = [tree.val];
-    const nodeMap: Map<number, TreeNode> = new Map();
-    
-    const buildMap = (node: TreeNode | null) => {
-      if (!node) return;
-      nodeMap.set(node.val, node);
-      buildMap(node.left);
-      buildMap(node.right);
-    };
-    buildMap(tree);
+    const stack: number[] = [];
 
     newSteps.push({
       currentNode: null,
-      stack: [...stack],
+      stack: [],
       visited: [],
-      message: 'Initialize: Push root (1) to stack',
-      lineNumber: 2
+      message: 'Starting DFS Preorder traversal from root',
+      lineNumber: 1
     });
 
-    while (stack.length > 0) {
-      const val = stack.pop()!;
-      const node = nodeMap.get(val)!;
-      visited.push(val);
+    const dfs = (node: TreeNode | null, depth: number = 0) => {
+      if (!node) {
+        newSteps.push({
+          currentNode: null,
+          stack: [...stack],
+          visited: [...visited],
+          message: 'Node is null, return',
+          lineNumber: 2
+        });
+        return;
+      }
 
+      // Visit root (preorder)
+      stack.push(node.val);
       newSteps.push({
-        currentNode: val,
+        currentNode: node.val,
         stack: [...stack],
         visited: [...visited],
-        message: `Pop ${val} from stack, add to result`,
+        message: `Visiting node ${node.val} (depth ${depth})`,
         lineNumber: 5
       });
 
-      if (node.right) {
-        stack.push(node.right.val);
+      visited.push(node.val);
+      newSteps.push({
+        currentNode: node.val,
+        stack: [...stack],
+        visited: [...visited],
+        message: `Added ${node.val} to result (Root)`,
+        lineNumber: 5
+      });
+
+      // Traverse left subtree
+      if (node.left) {
         newSteps.push({
-          currentNode: val,
+          currentNode: node.val,
           stack: [...stack],
           visited: [...visited],
-          message: `Push right child ${node.right.val} to stack`,
+          message: `Recursing to left child ${node.left.val}`,
           lineNumber: 8
         });
+        dfs(node.left, depth + 1);
       }
 
-      if (node.left) {
-        stack.push(node.left.val);
+      // Traverse right subtree
+      if (node.right) {
         newSteps.push({
-          currentNode: val,
+          currentNode: node.val,
           stack: [...stack],
           visited: [...visited],
-          message: `Push left child ${node.left.val} to stack`,
-          lineNumber: 9
+          message: `Recursing to right child ${node.right.val}`,
+          lineNumber: 11
         });
+        dfs(node.right, depth + 1);
       }
-    }
+
+      // Backtrack
+      stack.pop();
+      newSteps.push({
+        currentNode: node.val,
+        stack: [...stack],
+        visited: [...visited],
+        message: `Backtracking from node ${node.val}`,
+        lineNumber: 11
+      });
+    };
+
+    dfs(tree);
 
     newSteps.push({
       currentNode: null,
       stack: [],
       visited: [...visited],
       message: `Complete! Preorder: [${visited.join(', ')}]`,
-      lineNumber: 12
+      lineNumber: 11
     });
 
     setSteps(newSteps);
@@ -221,11 +242,11 @@ export const DFSPreorderVisualization = () => {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
-              <h4 className="text-sm font-semibold mb-2">Stack</h4>
+              <h4 className="text-sm font-semibold mb-2">Call Stack</h4>
               <div className="flex flex-col-reverse gap-1">
                 {currentStep.stack.map((val, i) => (
                   <div key={i} className="bg-yellow-500 text-white rounded px-2 py-1 text-center font-mono text-sm">
-                    {val}
+                    dfs({val})
                   </div>
                 ))}
                 {currentStep.stack.length === 0 && <div className="text-xs text-muted-foreground">Empty</div>}
@@ -253,9 +274,9 @@ export const DFSPreorderVisualization = () => {
           <VariablePanel
             variables={{
               current: currentStep.currentNode ?? 'null',
-              stackSize: currentStep.stack.length,
+              callStackDepth: currentStep.stack.length,
               visitedCount: currentStep.visited.length,
-              preorder: currentStep.visited
+              'preorder result': currentStep.visited.join(' → ')
             }}
           />
           <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
