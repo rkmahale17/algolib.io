@@ -566,6 +566,26 @@ const AlgorithmDetail: React.FC = () => {
       const SparseTableVisualization = React.lazy(() => import('@/components/visualizations/algorithms/SparseTableVisualization').then(m => ({ default: m.SparseTableVisualization })));
       return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><SparseTableVisualization /></React.Suspense>;
     }
+    if (algorithm.id === 'gas-station') {
+      const GasStationVisualization = React.lazy(() => import('@/components/visualizations/algorithms/GasStationVisualization').then(m => ({ default: m.GasStationVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><GasStationVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'manachers') {
+      const ManachersVisualization = React.lazy(() => import('@/components/visualizations/algorithms/ManachersVisualization').then(m => ({ default: m.ManachersVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><ManachersVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'karatsuba') {
+      const KaratsubaVisualization = React.lazy(() => import('@/components/visualizations/algorithms/KaratsubaVisualization').then(m => ({ default: m.KaratsubaVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><KaratsubaVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'tarjans') {
+      const TarjansVisualization = React.lazy(() => import('@/components/visualizations/algorithms/TarjansVisualization').then(m => ({ default: m.TarjansVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><TarjansVisualization /></React.Suspense>;
+    }
+    if (algorithm.id === 'binary-lifting') {
+      const BinaryLiftingVisualization = React.lazy(() => import('@/components/visualizations/algorithms/BinaryLiftingVisualization').then(m => ({ default: m.BinaryLiftingVisualization })));
+      return <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}><BinaryLiftingVisualization /></React.Suspense>;
+    }
 
     // Default: Show coming soon for all algorithms without explicit visualization
     return (
