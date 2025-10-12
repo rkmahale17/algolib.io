@@ -1,9 +1,29 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Footer } from "@/components/Footer";
+import { Helmet } from "react-helmet-async";
 
 export default function TermsOfService() {
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <Helmet>
+        <title>Terms of Service - AlgoLib.io | Usage Terms & Conditions</title>
+        <meta 
+          name="description" 
+          content="AlgoLib.io Terms of Service - Learn about usage rights, open-source licensing, and service terms for our free algorithm learning platform. Educational content usage policy." 
+        />
+        <meta 
+          name="keywords" 
+          content="algolib terms of service, usage policy, open source license, algorithm platform terms, educational content terms" 
+        />
+        <link rel="canonical" href="https://algolib.io/terms" />
+        
+        <meta property="og:title" content="Terms of Service - AlgoLib.io" />
+        <meta property="og:description" content="Terms and conditions for using AlgoLib.io platform and educational content" />
+        <meta property="og:url" content="https://algolib.io/terms" />
+        <meta name="robots" content="index, follow" />
+      </Helmet>
+      
+      <div className="min-h-screen bg-background">
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="space-y-8">
           <div className="text-center space-y-4">
@@ -136,5 +156,6 @@ export default function TermsOfService() {
       </main>
       <Footer />
     </div>
+    </>
   );
 }

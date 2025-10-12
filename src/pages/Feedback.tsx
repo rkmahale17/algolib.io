@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { Footer } from '@/components/Footer';
+import { Helmet } from 'react-helmet-async';
 
 const Feedback = () => {
   const [title, setTitle] = useState('');
@@ -44,8 +45,27 @@ const Feedback = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-16">
+    <>
+      <Helmet>
+        <title>Feedback & Suggestions - AlgoLib.io | Report Bugs & Request Features</title>
+        <meta 
+          name="description" 
+          content="Share your feedback, report bugs, or request new features for AlgoLib.io. Help us improve our free algorithm learning platform. Submit issues on GitHub." 
+        />
+        <meta 
+          name="keywords" 
+          content="algolib feedback, report bug, feature request, algorithm platform feedback, contribute feedback" 
+        />
+        <link rel="canonical" href="https://algolib.io/feedback" />
+        
+        <meta property="og:title" content="Feedback & Suggestions - AlgoLib.io" />
+        <meta property="og:description" content="Help us improve AlgoLib.io by sharing your feedback and suggestions" />
+        <meta property="og:url" content="https://algolib.io/feedback" />
+        <meta name="robots" content="index, follow" />
+      </Helmet>
+      
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-16">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
@@ -119,6 +139,7 @@ const Feedback = () => {
       </div>
       <Footer />
     </div>
+    </>
   );
 };
 
