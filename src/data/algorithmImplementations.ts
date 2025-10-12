@@ -6777,6 +6777,925 @@ public List<Integer> sieveOfEratosthenes(int n) {
       ]
     },
     visualizationType: 'array'
+  },
+  'karatsuba': {
+    id: 'karatsuba',
+    code: {
+      typescript: `function karatsuba(x: bigint, y: bigint): bigint {
+  // Base case
+  if (x < 10n || y < 10n) {
+    return x * y;
+  }
+  
+  // Calculate size and split point
+  const n = Math.max(x.toString().length, y.toString().length);
+  const m = Math.floor(n / 2);
+  const power = 10n ** BigInt(m);
+  
+  // Split numbers: x = a*10^m + b, y = c*10^m + d
+  const a = x / power;
+  const b = x % power;
+  const c = y / power;
+  const d = y % power;
+  
+  // Three recursive multiplications
+  const ac = karatsuba(a, c);
+  const bd = karatsuba(b, d);
+  const adbc = karatsuba(a + b, c + d) - ac - bd;
+  
+  // Combine results: ac*10^(2m) + adbc*10^m + bd
+  return ac * (10n ** BigInt(2 * m)) + adbc * power + bd;
+}`,
+      python: `def karatsuba(x: int, y: int) -> int:
+    # Base case
+    if x < 10 or y < 10:
+        return x * y
+    
+    # Calculate size and split point
+    n = max(len(str(x)), len(str(y)))
+    m = n // 2
+    power = 10 ** m
+    
+    # Split numbers
+    a, b = divmod(x, power)
+    c, d = divmod(y, power)
+    
+    # Three recursive multiplications
+    ac = karatsuba(a, c)
+    bd = karatsuba(b, d)
+    adbc = karatsuba(a + b, c + d) - ac - bd
+    
+    # Combine results
+    return ac * (10 ** (2 * m)) + adbc * power + bd`,
+      cpp: `#include <string>
+#include <algorithm>
+using namespace std;
+
+long long karatsuba(long long x, long long y) {
+    // Base case
+    if (x < 10 || y < 10) {
+        return x * y;
+    }
+    
+    // Calculate size and split point
+    int n = max(to_string(x).length(), to_string(y).length());
+    int m = n / 2;
+    long long power = 1;
+    for (int i = 0; i < m; i++) power *= 10;
+    
+    // Split numbers
+    long long a = x / power;
+    long long b = x % power;
+    long long c = y / power;
+    long long d = y % power;
+    
+    // Three recursive multiplications
+    long long ac = karatsuba(a, c);
+    long long bd = karatsuba(b, d);
+    long long adbc = karatsuba(a + b, c + d) - ac - bd;
+    
+    // Combine results
+    long long power2m = power * power;
+    return ac * power2m + adbc * power + bd;
+}`,
+      java: `public class Solution {
+    public long karatsuba(long x, long y) {
+        // Base case
+        if (x < 10 || y < 10) {
+            return x * y;
+        }
+        
+        // Calculate size and split point
+        int n = Math.max(String.valueOf(x).length(), String.valueOf(y).length());
+        int m = n / 2;
+        long power = (long) Math.pow(10, m);
+        
+        // Split numbers
+        long a = x / power;
+        long b = x % power;
+        long c = y / power;
+        long d = y % power;
+        
+        // Three recursive multiplications
+        long ac = karatsuba(a, c);
+        long bd = karatsuba(b, d);
+        long adbc = karatsuba(a + b, c + d) - ac - bd;
+        
+        // Combine results
+        long power2m = power * power;
+        return ac * power2m + adbc * power + bd;
+    }
+}`
+    },
+    explanation: {
+      overview: "Karatsuba multiplication is a divide-and-conquer algorithm that multiplies two numbers faster than traditional long multiplication by reducing the number of recursive multiplications from 4 to 3.",
+      steps: [
+        "Split each number into two halves: x = a*10^m + b, y = c*10^m + d",
+        "Compute three products: ac, bd, and (a+b)(c+d)",
+        "Calculate middle term: adbc = (a+b)(c+d) - ac - bd",
+        "Combine results: ac*10^(2m) + adbc*10^m + bd",
+        "Base case: multiply directly when numbers are single digits"
+      ],
+      useCase: "Efficient multiplication of large numbers, cryptography, polynomial multiplication, FFT-based algorithms.",
+      tips: [
+        "Time complexity: O(n^1.585) vs O(n^2) for traditional",
+        "Requires only 3 recursive calls instead of 4",
+        "Trade-off: more additions but fewer multiplications",
+        "Works well with BigInt for very large numbers"
+      ]
+    },
+    visualizationType: 'none'
+  },
+  'tarjans': {
+    id: 'tarjans',
+    code: {
+      typescript: `function tarjanSCC(graph: number[][]): number[][] {
+  const n = graph.length;
+  const disc = Array(n).fill(-1);
+  const low = Array(n).fill(-1);
+  const onStack = Array(n).fill(false);
+  const stack: number[] = [];
+  const sccs: number[][] = [];
+  let time = 0;
+  
+  function dfs(u: number) {
+    disc[u] = low[u] = time++;
+    stack.push(u);
+    onStack[u] = true;
+    
+    for (const v of graph[u]) {
+      if (disc[v] === -1) {
+        dfs(v);
+        low[u] = Math.min(low[u], low[v]);
+      } else if (onStack[v]) {
+        low[u] = Math.min(low[u], disc[v]);
+      }
+    }
+    
+    // If u is a root node, pop the stack to find SCC
+    if (low[u] === disc[u]) {
+      const scc: number[] = [];
+      let w: number;
+      do {
+        w = stack.pop()!;
+        onStack[w] = false;
+        scc.push(w);
+      } while (w !== u);
+      sccs.push(scc);
+    }
+  }
+  
+  for (let i = 0; i < n; i++) {
+    if (disc[i] === -1) {
+      dfs(i);
+    }
+  }
+  
+  return sccs;
+}`,
+      python: `def tarjan_scc(graph: list[list[int]]) -> list[list[int]]:
+    n = len(graph)
+    disc = [-1] * n
+    low = [-1] * n
+    on_stack = [False] * n
+    stack = []
+    sccs = []
+    time = [0]
+    
+    def dfs(u: int):
+        disc[u] = low[u] = time[0]
+        time[0] += 1
+        stack.append(u)
+        on_stack[u] = True
+        
+        for v in graph[u]:
+            if disc[v] == -1:
+                dfs(v)
+                low[u] = min(low[u], low[v])
+            elif on_stack[v]:
+                low[u] = min(low[u], disc[v])
+        
+        # If u is a root node, pop the stack
+        if low[u] == disc[u]:
+            scc = []
+            while True:
+                w = stack.pop()
+                on_stack[w] = False
+                scc.append(w)
+                if w == u:
+                    break
+            sccs.append(scc)
+    
+    for i in range(n):
+        if disc[i] == -1:
+            dfs(i)
+    
+    return sccs`,
+      cpp: `#include <vector>
+#include <stack>
+using namespace std;
+
+class Solution {
+private:
+    int time;
+    vector<int> disc, low;
+    vector<bool> onStack;
+    stack<int> st;
+    vector<vector<int>> sccs;
+    
+    void dfs(int u, vector<vector<int>>& graph) {
+        disc[u] = low[u] = time++;
+        st.push(u);
+        onStack[u] = true;
+        
+        for (int v : graph[u]) {
+            if (disc[v] == -1) {
+                dfs(v, graph);
+                low[u] = min(low[u], low[v]);
+            } else if (onStack[v]) {
+                low[u] = min(low[u], disc[v]);
+            }
+        }
+        
+        // If u is a root node
+        if (low[u] == disc[u]) {
+            vector<int> scc;
+            int w;
+            do {
+                w = st.top();
+                st.pop();
+                onStack[w] = false;
+                scc.push_back(w);
+            } while (w != u);
+            sccs.push_back(scc);
+        }
+    }
+    
+public:
+    vector<vector<int>> tarjanSCC(vector<vector<int>>& graph) {
+        int n = graph.size();
+        time = 0;
+        disc.assign(n, -1);
+        low.assign(n, -1);
+        onStack.assign(n, false);
+        
+        for (int i = 0; i < n; i++) {
+            if (disc[i] == -1) {
+                dfs(i, graph);
+            }
+        }
+        
+        return sccs;
+    }
+};`,
+      java: `import java.util.*;
+
+public class Solution {
+    private int time;
+    private int[] disc, low;
+    private boolean[] onStack;
+    private Stack<Integer> stack;
+    private List<List<Integer>> sccs;
+    
+    public List<List<Integer>> tarjanSCC(List<List<Integer>> graph) {
+        int n = graph.size();
+        time = 0;
+        disc = new int[n];
+        low = new int[n];
+        onStack = new boolean[n];
+        stack = new Stack<>();
+        sccs = new ArrayList<>();
+        Arrays.fill(disc, -1);
+        Arrays.fill(low, -1);
+        
+        for (int i = 0; i < n; i++) {
+            if (disc[i] == -1) {
+                dfs(i, graph);
+            }
+        }
+        
+        return sccs;
+    }
+    
+    private void dfs(int u, List<List<Integer>> graph) {
+        disc[u] = low[u] = time++;
+        stack.push(u);
+        onStack[u] = true;
+        
+        for (int v : graph.get(u)) {
+            if (disc[v] == -1) {
+                dfs(v, graph);
+                low[u] = Math.min(low[u], low[v]);
+            } else if (onStack[v]) {
+                low[u] = Math.min(low[u], disc[v]);
+            }
+        }
+        
+        // If u is a root node
+        if (low[u] == disc[u]) {
+            List<Integer> scc = new ArrayList<>();
+            int w;
+            do {
+                w = stack.pop();
+                onStack[w] = false;
+                scc.add(w);
+            } while (w != u);
+            sccs.add(scc);
+        }
+    }
+}`
+    },
+    explanation: {
+      overview: "Tarjan's algorithm finds all strongly connected components (SCCs) in a directed graph in linear time using a single DFS traversal with a stack.",
+      steps: [
+        "Perform DFS and assign discovery time (disc) and low-link value (low) to each node",
+        "Maintain a stack of visited nodes and track which nodes are on stack",
+        "For each neighbor: if unvisited, recurse; if on stack, update low value",
+        "When low[u] == disc[u], u is a root of an SCC",
+        "Pop stack until u is found to extract the complete SCC",
+        "Repeat for all unvisited nodes"
+      ],
+      useCase: "Finding strongly connected components, detecting cycles in directed graphs, compiler optimization, analyzing social networks.",
+      tips: [
+        "Time complexity: O(V + E)",
+        "Space complexity: O(V)",
+        "Single pass DFS is more efficient than Kosaraju's",
+        "Low-link values track earliest reachable ancestor"
+      ]
+    },
+    visualizationType: 'graph'
+  },
+  'gas-station': {
+    id: 'gas-station',
+    code: {
+      typescript: `function canCompleteCircuit(gas: number[], cost: number[]): number {
+  let totalGas = 0;
+  let totalCost = 0;
+  let currentGas = 0;
+  let startIndex = 0;
+  
+  for (let i = 0; i < gas.length; i++) {
+    totalGas += gas[i];
+    totalCost += cost[i];
+    currentGas += gas[i] - cost[i];
+    
+    // If current gas becomes negative, reset start
+    if (currentGas < 0) {
+      startIndex = i + 1;
+      currentGas = 0;
+    }
+  }
+  
+  // If total gas < total cost, no solution exists
+  return totalGas >= totalCost ? startIndex : -1;
+}`,
+      python: `def can_complete_circuit(gas: list[int], cost: list[int]) -> int:
+    total_gas = 0
+    total_cost = 0
+    current_gas = 0
+    start_index = 0
+    
+    for i in range(len(gas)):
+        total_gas += gas[i]
+        total_cost += cost[i]
+        current_gas += gas[i] - cost[i]
+        
+        # If current gas becomes negative, reset start
+        if current_gas < 0:
+            start_index = i + 1
+            current_gas = 0
+    
+    # If total gas < total cost, no solution exists
+    return start_index if total_gas >= total_cost else -1`,
+      cpp: `int canCompleteCircuit(vector<int>& gas, vector<int>& cost) {
+    int totalGas = 0;
+    int totalCost = 0;
+    int currentGas = 0;
+    int startIndex = 0;
+    
+    for (int i = 0; i < gas.size(); i++) {
+        totalGas += gas[i];
+        totalCost += cost[i];
+        currentGas += gas[i] - cost[i];
+        
+        // If current gas becomes negative, reset start
+        if (currentGas < 0) {
+            startIndex = i + 1;
+            currentGas = 0;
+        }
+    }
+    
+    // If total gas < total cost, no solution exists
+    return totalGas >= totalCost ? startIndex : -1;
+}`,
+      java: `public int canCompleteCircuit(int[] gas, int[] cost) {
+    int totalGas = 0;
+    int totalCost = 0;
+    int currentGas = 0;
+    int startIndex = 0;
+    
+    for (int i = 0; i < gas.length; i++) {
+        totalGas += gas[i];
+        totalCost += cost[i];
+        currentGas += gas[i] - cost[i];
+        
+        // If current gas becomes negative, reset start
+        if (currentGas < 0) {
+            startIndex = i + 1;
+            currentGas = 0;
+        }
+    }
+    
+    // If total gas < total cost, no solution exists
+    return totalGas >= totalCost ? startIndex : -1;
+}`
+    },
+    explanation: {
+      overview: "Gas Station problem uses a greedy approach to find the starting point for completing a circular route, where each station provides gas and requires cost to reach the next station.",
+      steps: [
+        "Track total gas vs total cost to check if solution exists",
+        "Maintain current gas tank and starting position",
+        "At each station, add net gas (gas[i] - cost[i])",
+        "If current gas becomes negative, reset start to next station",
+        "Continue through all stations once",
+        "Return start index if total gas >= total cost, else -1"
+      ],
+      useCase: "Circular array problems, greedy optimization, resource allocation problems.",
+      tips: [
+        "Time complexity: O(n) - single pass",
+        "Space complexity: O(1)",
+        "Key insight: if total gas >= total cost, solution exists",
+        "No need to check multiple starting points"
+      ]
+    },
+    visualizationType: 'array'
+  },
+  'binary-lifting': {
+    id: 'binary-lifting',
+    code: {
+      typescript: `class BinaryLifting {
+  private n: number;
+  private LOG: number;
+  private up: number[][];
+  private depth: number[];
+  
+  constructor(graph: number[][], root: number = 0) {
+    this.n = graph.length;
+    this.LOG = Math.ceil(Math.log2(this.n)) + 1;
+    this.up = Array.from({ length: this.n }, () => Array(this.LOG).fill(-1));
+    this.depth = Array(this.n).fill(0);
+    
+    this.dfs(root, -1, graph);
+  }
+  
+  private dfs(node: number, parent: number, graph: number[][]) {
+    this.up[node][0] = parent;
+    
+    // Precompute ancestors using binary lifting
+    for (let j = 1; j < this.LOG; j++) {
+      if (this.up[node][j - 1] !== -1) {
+        this.up[node][j] = this.up[this.up[node][j - 1]][j - 1];
+      }
+    }
+    
+    for (const child of graph[node]) {
+      if (child !== parent) {
+        this.depth[child] = this.depth[node] + 1;
+        this.dfs(child, node, graph);
+      }
+    }
+  }
+  
+  // Find k-th ancestor of node
+  kthAncestor(node: number, k: number): number {
+    for (let j = 0; j < this.LOG; j++) {
+      if ((k & (1 << j)) !== 0) {
+        node = this.up[node][j];
+        if (node === -1) break;
+      }
+    }
+    return node;
+  }
+  
+  // Find Lowest Common Ancestor (LCA)
+  lca(u: number, v: number): number {
+    if (this.depth[u] < this.depth[v]) [u, v] = [v, u];
+    
+    // Bring u to same depth as v
+    const diff = this.depth[u] - this.depth[v];
+    u = this.kthAncestor(u, diff);
+    
+    if (u === v) return u;
+    
+    // Binary search for LCA
+    for (let j = this.LOG - 1; j >= 0; j--) {
+      if (this.up[u][j] !== this.up[v][j]) {
+        u = this.up[u][j];
+        v = this.up[v][j];
+      }
+    }
+    
+    return this.up[u][0];
+  }
+}`,
+      python: `class BinaryLifting:
+    def __init__(self, graph: list[list[int]], root: int = 0):
+        self.n = len(graph)
+        self.LOG = self.n.bit_length()
+        self.up = [[-1] * self.LOG for _ in range(self.n)]
+        self.depth = [0] * self.n
+        
+        self._dfs(root, -1, graph)
+    
+    def _dfs(self, node: int, parent: int, graph: list[list[int]]):
+        self.up[node][0] = parent
+        
+        # Precompute ancestors using binary lifting
+        for j in range(1, self.LOG):
+            if self.up[node][j - 1] != -1:
+                self.up[node][j] = self.up[self.up[node][j - 1]][j - 1]
+        
+        for child in graph[node]:
+            if child != parent:
+                self.depth[child] = self.depth[node] + 1
+                self._dfs(child, node, graph)
+    
+    def kth_ancestor(self, node: int, k: int) -> int:
+        """Find k-th ancestor of node"""
+        for j in range(self.LOG):
+            if (k & (1 << j)) != 0:
+                node = self.up[node][j]
+                if node == -1:
+                    break
+        return node
+    
+    def lca(self, u: int, v: int) -> int:
+        """Find Lowest Common Ancestor"""
+        if self.depth[u] < self.depth[v]:
+            u, v = v, u
+        
+        # Bring u to same depth as v
+        diff = self.depth[u] - self.depth[v]
+        u = self.kth_ancestor(u, diff)
+        
+        if u == v:
+            return u
+        
+        # Binary search for LCA
+        for j in range(self.LOG - 1, -1, -1):
+            if self.up[u][j] != self.up[v][j]:
+                u = self.up[u][j]
+                v = self.up[v][j]
+        
+        return self.up[u][0]`,
+      cpp: `#include <vector>
+#include <cmath>
+using namespace std;
+
+class BinaryLifting {
+private:
+    int n, LOG;
+    vector<vector<int>> up;
+    vector<int> depth;
+    
+    void dfs(int node, int parent, vector<vector<int>>& graph) {
+        up[node][0] = parent;
+        
+        // Precompute ancestors
+        for (int j = 1; j < LOG; j++) {
+            if (up[node][j - 1] != -1) {
+                up[node][j] = up[up[node][j - 1]][j - 1];
+            }
+        }
+        
+        for (int child : graph[node]) {
+            if (child != parent) {
+                depth[child] = depth[node] + 1;
+                dfs(child, node, graph);
+            }
+        }
+    }
+    
+public:
+    BinaryLifting(vector<vector<int>>& graph, int root = 0) {
+        n = graph.size();
+        LOG = ceil(log2(n)) + 1;
+        up.assign(n, vector<int>(LOG, -1));
+        depth.assign(n, 0);
+        
+        dfs(root, -1, graph);
+    }
+    
+    // Find k-th ancestor
+    int kthAncestor(int node, int k) {
+        for (int j = 0; j < LOG; j++) {
+            if ((k & (1 << j)) != 0) {
+                node = up[node][j];
+                if (node == -1) break;
+            }
+        }
+        return node;
+    }
+    
+    // Find LCA
+    int lca(int u, int v) {
+        if (depth[u] < depth[v]) swap(u, v);
+        
+        // Bring u to same depth as v
+        int diff = depth[u] - depth[v];
+        u = kthAncestor(u, diff);
+        
+        if (u == v) return u;
+        
+        // Binary search for LCA
+        for (int j = LOG - 1; j >= 0; j--) {
+            if (up[u][j] != up[v][j]) {
+                u = up[u][j];
+                v = up[v][j];
+            }
+        }
+        
+        return up[u][0];
+    }
+};`,
+      java: `import java.util.*;
+
+class BinaryLifting {
+    private int n, LOG;
+    private int[][] up;
+    private int[] depth;
+    
+    public BinaryLifting(List<List<Integer>> graph, int root) {
+        n = graph.size();
+        LOG = (int) Math.ceil(Math.log(n) / Math.log(2)) + 1;
+        up = new int[n][LOG];
+        depth = new int[n];
+        
+        for (int i = 0; i < n; i++) {
+            Arrays.fill(up[i], -1);
+        }
+        
+        dfs(root, -1, graph);
+    }
+    
+    private void dfs(int node, int parent, List<List<Integer>> graph) {
+        up[node][0] = parent;
+        
+        // Precompute ancestors
+        for (int j = 1; j < LOG; j++) {
+            if (up[node][j - 1] != -1) {
+                up[node][j] = up[up[node][j - 1]][j - 1];
+            }
+        }
+        
+        for (int child : graph.get(node)) {
+            if (child != parent) {
+                depth[child] = depth[node] + 1;
+                dfs(child, node, graph);
+            }
+        }
+    }
+    
+    // Find k-th ancestor
+    public int kthAncestor(int node, int k) {
+        for (int j = 0; j < LOG; j++) {
+            if ((k & (1 << j)) != 0) {
+                node = up[node][j];
+                if (node == -1) break;
+            }
+        }
+        return node;
+    }
+    
+    // Find LCA
+    public int lca(int u, int v) {
+        if (depth[u] < depth[v]) {
+            int temp = u;
+            u = v;
+            v = temp;
+        }
+        
+        // Bring u to same depth as v
+        int diff = depth[u] - depth[v];
+        u = kthAncestor(u, diff);
+        
+        if (u == v) return u;
+        
+        // Binary search for LCA
+        for (int j = LOG - 1; j >= 0; j--) {
+            if (up[u][j] != up[v][j]) {
+                u = up[u][j];
+                v = up[v][j];
+            }
+        }
+        
+        return up[u][0];
+    }
+}`
+    },
+    explanation: {
+      overview: "Binary Lifting precomputes ancestors at powers of 2 distances, enabling O(log n) queries for k-th ancestor and Lowest Common Ancestor (LCA) in trees.",
+      steps: [
+        "Precompute up[node][j] = 2^j-th ancestor of node using DFS",
+        "up[node][0] = parent, up[node][j] = up[up[node][j-1]][j-1]",
+        "For k-th ancestor: decompose k in binary, jump by powers of 2",
+        "For LCA: equalize depths, then binary search upward",
+        "Time: O(n log n) preprocessing, O(log n) per query"
+      ],
+      useCase: "Tree queries, LCA problems, range queries on trees, finding distances in trees.",
+      tips: [
+        "Preprocessing: O(n log n) time and space",
+        "Query: O(log n) for both k-th ancestor and LCA",
+        "Key insight: any number can be represented as sum of powers of 2",
+        "Essential for competitive programming tree problems"
+      ]
+    },
+    visualizationType: 'tree'
+  },
+  'manachers': {
+    id: 'manachers',
+    code: {
+      typescript: `function manacher(s: string): string {
+  // Transform string: "abc" -> "#a#b#c#"
+  const t = '#' + s.split('').join('#') + '#';
+  const n = t.length;
+  const p = Array(n).fill(0); // p[i] = radius of palindrome centered at i
+  let center = 0, right = 0;
+  let maxLen = 0, maxCenter = 0;
+  
+  for (let i = 0; i < n; i++) {
+    // Use previously computed values
+    if (i < right) {
+      const mirror = 2 * center - i;
+      p[i] = Math.min(right - i, p[mirror]);
+    }
+    
+    // Expand around center i
+    while (i - p[i] - 1 >= 0 && i + p[i] + 1 < n && 
+           t[i - p[i] - 1] === t[i + p[i] + 1]) {
+      p[i]++;
+    }
+    
+    // Update center and right boundary
+    if (i + p[i] > right) {
+      center = i;
+      right = i + p[i];
+    }
+    
+    // Track longest palindrome
+    if (p[i] > maxLen) {
+      maxLen = p[i];
+      maxCenter = i;
+    }
+  }
+  
+  // Extract longest palindrome from original string
+  const start = Math.floor((maxCenter - maxLen) / 2);
+  return s.substring(start, start + maxLen);
+}`,
+      python: `def manacher(s: str) -> str:
+    # Transform string: "abc" -> "#a#b#c#"
+    t = '#' + '#'.join(s) + '#'
+    n = len(t)
+    p = [0] * n  # p[i] = radius of palindrome centered at i
+    center = right = 0
+    max_len = max_center = 0
+    
+    for i in range(n):
+        # Use previously computed values
+        if i < right:
+            mirror = 2 * center - i
+            p[i] = min(right - i, p[mirror])
+        
+        # Expand around center i
+        while (i - p[i] - 1 >= 0 and i + p[i] + 1 < n and
+               t[i - p[i] - 1] == t[i + p[i] + 1]):
+            p[i] += 1
+        
+        # Update center and right boundary
+        if i + p[i] > right:
+            center = i
+            right = i + p[i]
+        
+        # Track longest palindrome
+        if p[i] > max_len:
+            max_len = p[i]
+            max_center = i
+    
+    # Extract longest palindrome from original string
+    start = (max_center - max_len) // 2
+    return s[start:start + max_len]`,
+      cpp: `#include <string>
+#include <vector>
+using namespace std;
+
+string manacher(string s) {
+    // Transform string
+    string t = "#";
+    for (char c : s) {
+        t += c;
+        t += '#';
+    }
+    
+    int n = t.length();
+    vector<int> p(n, 0);
+    int center = 0, right = 0;
+    int maxLen = 0, maxCenter = 0;
+    
+    for (int i = 0; i < n; i++) {
+        // Use previously computed values
+        if (i < right) {
+            int mirror = 2 * center - i;
+            p[i] = min(right - i, p[mirror]);
+        }
+        
+        // Expand around center i
+        while (i - p[i] - 1 >= 0 && i + p[i] + 1 < n &&
+               t[i - p[i] - 1] == t[i + p[i] + 1]) {
+            p[i]++;
+        }
+        
+        // Update center and right boundary
+        if (i + p[i] > right) {
+            center = i;
+            right = i + p[i];
+        }
+        
+        // Track longest palindrome
+        if (p[i] > maxLen) {
+            maxLen = p[i];
+            maxCenter = i;
+        }
+    }
+    
+    // Extract longest palindrome
+    int start = (maxCenter - maxLen) / 2;
+    return s.substr(start, maxLen);
+}`,
+      java: `public class Solution {
+    public String manacher(String s) {
+        // Transform string
+        StringBuilder t = new StringBuilder("#");
+        for (char c : s.toCharArray()) {
+            t.append(c).append('#');
+        }
+        
+        int n = t.length();
+        int[] p = new int[n];
+        int center = 0, right = 0;
+        int maxLen = 0, maxCenter = 0;
+        
+        for (int i = 0; i < n; i++) {
+            // Use previously computed values
+            if (i < right) {
+                int mirror = 2 * center - i;
+                p[i] = Math.min(right - i, p[mirror]);
+            }
+            
+            // Expand around center i
+            while (i - p[i] - 1 >= 0 && i + p[i] + 1 < n &&
+                   t.charAt(i - p[i] - 1) == t.charAt(i + p[i] + 1)) {
+                p[i]++;
+            }
+            
+            // Update center and right boundary
+            if (i + p[i] > right) {
+                center = i;
+                right = i + p[i];
+            }
+            
+            // Track longest palindrome
+            if (p[i] > maxLen) {
+                maxLen = p[i];
+                maxCenter = i;
+            }
+        }
+        
+        // Extract longest palindrome
+        int start = (maxCenter - maxLen) / 2;
+        return s.substring(start, start + maxLen);
+    }
+}`
+    },
+    explanation: {
+      overview: "Manacher's algorithm finds the longest palindromic substring in linear O(n) time by cleverly reusing previously computed palindrome information.",
+      steps: [
+        "Transform string by inserting '#' between characters to handle even/odd lengths uniformly",
+        "For each position, track the radius of palindrome centered at that position",
+        "Use mirror property: if i is within a known palindrome, use mirror's radius as starting point",
+        "Expand around each center only when necessary",
+        "Update rightmost boundary and center as we find larger palindromes",
+        "Extract the longest palindrome found"
+      ],
+      useCase: "Finding longest palindromic substring, palindrome-related string problems, competitive programming.",
+      tips: [
+        "Time complexity: O(n) - each character expanded at most once",
+        "Space complexity: O(n) for transformed string and radius array",
+        "Key insight: avoid redundant comparisons using symmetry",
+        "Works for both even and odd length palindromes"
+      ]
+    },
+    visualizationType: 'array'
   }
 };
 
