@@ -1,9 +1,29 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Footer } from "@/components/Footer";
+import { Helmet } from "react-helmet-async";
 
 export default function Privacy() {
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <Helmet>
+        <title>Privacy Policy - AlgoLib.io | Data Protection & User Privacy</title>
+        <meta 
+          name="description" 
+          content="AlgoLib.io Privacy Policy - Learn how we protect your data and privacy. Minimal data collection, no ads tracking, open-source transparency. Read our privacy practices for algorithm learning platform." 
+        />
+        <meta 
+          name="keywords" 
+          content="algolib privacy policy, data protection, user privacy, open source privacy, algorithm learning privacy" 
+        />
+        <link rel="canonical" href="https://algolib.io/privacy" />
+        
+        <meta property="og:title" content="Privacy Policy - AlgoLib.io" />
+        <meta property="og:description" content="How AlgoLib.io protects your data and respects your privacy" />
+        <meta property="og:url" content="https://algolib.io/privacy" />
+        <meta name="robots" content="index, follow" />
+      </Helmet>
+      
+      <div className="min-h-screen bg-background">
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="space-y-8">
           <div className="text-center space-y-4">
@@ -181,5 +201,6 @@ export default function Privacy() {
       </main>
       <Footer />
     </div>
+    </>
   );
 }
