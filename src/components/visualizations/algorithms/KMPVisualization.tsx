@@ -164,6 +164,11 @@ function computeLPS(pattern: string): number[] {
   }, []);
 
   useEffect(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
     if (isPlaying && currentStepIndex < steps.length - 1) {
       intervalRef.current = window.setInterval(() => {
         setCurrentStepIndex((prev) => {
@@ -174,15 +179,13 @@ function computeLPS(pattern: string): number[] {
           return prev + 1;
         });
       }, speed);
-    } else {
+    }
+
+    return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
-    }
-
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [isPlaying, currentStepIndex, steps.length, speed]);
 
