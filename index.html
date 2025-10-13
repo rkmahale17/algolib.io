@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -23,13 +23,13 @@
 
     <link rel="canonical" href="https://algolib.io/" />
 
-    <!-- Favicons (verify these files exist at the paths below) -->
+    <!-- Favicons -->
     <link rel="icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
 
-    <!-- Manifest & theme color (PWA/support mobile UI) -->
+    <!-- Manifest & theme color -->
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#0b1220" />
 
@@ -60,10 +60,10 @@
     />
     <meta name="twitter:image" content="https://algolib.io/og-image.png" />
 
-    <!-- Sitemap hint (ensure /sitemap.xml exists on your server) -->
+    <!-- Sitemap -->
     <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
 
-    <!-- Preconnects / DNS-prefetch for analytics & static hosts to reduce latency -->
+    <!-- Preconnects -->
     <link
       rel="preconnect"
       href="https://www.googletagmanager.com"
@@ -76,7 +76,7 @@
     />
     <link rel="preconnect" href="https://static.hotjar.com" crossorigin />
 
-    <!-- Structured Data (JSON-LD) — WebSite + Organization -->
+    <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -106,7 +106,7 @@
       }
     </script>
 
-    <!-- Google tag (gtag.js) - keep async -->
+    <!-- Google tag (gtag.js) -->
     <script
       async
       src="https://www.googletagmanager.com/gtag/js?id=G-B2KTX1L5TF"
@@ -137,18 +137,14 @@
       })(window, document, "https://static.hotjar.com/c/hotjar-", ".js?sv=");
     </script>
 
-    <!-- Critical CSS preload (uncomment and update if you have a critical stylesheet) -->
-    <!-- <link rel="preload" href="/styles/critical.css" as="style"> -->
-    <!-- <link rel="stylesheet" href="/styles/main.css"> -->
-
-    <!-- Accessibility: set a short title for the browser tab on mobile (optional) -->
+    <!-- Accessibility -->
     <meta name="apple-mobile-web-app-title" content="AlgoLib" />
+
+    <!--preload-links-->
   </head>
 
   <body>
-    <div id="root" role="application" aria-label="AlgoLib application"></div>
-
-    <!-- App entry -->
+    <div id="root"><!--app-html--></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

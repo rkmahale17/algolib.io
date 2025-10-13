@@ -2,6 +2,7 @@ import { componentTagger } from "lovable-tagger";
 import compression from 'vite-plugin-compression';
 import { defineConfig } from "vite";
 import path from "path";
+import { prerenderPlugin } from './vite.ssr.plugin'
 import react from "@vitejs/plugin-react-swc";
 
 // https://vitejs.dev/config/
@@ -10,19 +11,27 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
-  plugins: [react(),
-
-  compression({
-    algorithm: 'brotliCompress', // Add Brotli compression
-    ext: '.br',
-    threshold: 10240,
-    deleteOriginFile: false,
-  }),
-
-  mode === "development" && componentTagger()].filter(Boolean),
+  plugins: [
+    react(),
+    compression({
+      algorithm: 'brotliCompress',
+      ext: '.br',
+      threshold: 10240,
+      deleteOriginFile: false,
+    }),
+    mode === 'production' && prerenderPlugin(), // Only in production builds
+    mode === "development" && componentTagger()
+  ].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+    },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+
+      },
     },
   },
 }));
