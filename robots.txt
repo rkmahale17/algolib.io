@@ -1,3 +1,3 @@
 User-agent: *
 Disallow: /maps/
-Sitemap: https://algolib.com/sitemap.xml
+Sitemap: https://algolib.io/sitemap.xml
