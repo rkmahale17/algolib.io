@@ -171,7 +171,7 @@ const Navbar = () => {
               </>
             ) : (
               <Link to="/auth">
-                {/* <Button className="none">Sign In</Button> */}
+                <Button className="none">Sign In</Button>
               </Link>
             )}
           </div>
