@@ -1,5 +1,5 @@
 import { ArrowLeft, BookOpen, Code2, ExternalLink, Eye } from 'lucide-react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 // src/pages/AlgorithmDetail.tsx
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -18,12 +18,37 @@ import { ShareButton } from '@/components/ShareButton';
 import { TreeVisualization } from '@/components/visualizations/TreeVisualization';
 import { algorithms } from '@/data/algorithms';
 import { getAlgorithmImplementation } from '@/data/algorithmImplementations';
+import { supabase } from '@/integrations/supabase/client';
 
 const AlgorithmDetail: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
+  const navigate = useNavigate();
   const algorithm = algorithms.find((a) => a.id === id);
   const implementation = getAlgorithmImplementation(id || '');
   const [showBreadcrumb, setShowBreadcrumb] = useState(true);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+  // Check authentication
+  React.useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate('/auth');
+        return;
+      }
+      setIsCheckingAuth(false);
+    };
+
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!session) {
+        navigate('/auth');
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
 
   // Scroll to top on mount/route change
   React.useEffect(() => {
@@ -73,6 +98,14 @@ const AlgorithmDetail: React.FC = () => {
     };
   }, []);
 
+  // Show loading while checking auth
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
 
   // If algorithm not found - show friendly 404 and still inject meta if id present
   if (!algorithm) {

@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { BookOpen, Github, LogOut, Menu as MenuIcon, MessageSquare, Sparkles, Trophy, User } from "lucide-react";
+import { Github, LogOut, Menu as MenuIcon, MessageSquare, Sparkles, Trophy } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -147,14 +147,6 @@ const Navbar = () => {
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <BookOpen className="mr-2 h-4 w-4" />
-                      <span>My Progress</span>
-                    </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link to="/feedback">
                         <MessageSquare className="mr-2 h-4 w-4" />
