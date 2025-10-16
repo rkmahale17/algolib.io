@@ -47,7 +47,7 @@ const Auth = () => {
           email,
           password,
           options: {
-            emailRedirectTo: 'https://algolib.io/',
+            emailRedirectTo: `${window.location.origin}/`,
             data: {
               full_name: fullName,
             },
@@ -79,7 +79,7 @@ const Auth = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: 'https://algolib.io/',
+          redirectTo: `${window.location.origin}/`,
         },
       });
 
