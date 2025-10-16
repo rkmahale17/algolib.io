@@ -170,9 +170,7 @@ const Navbar = () => {
                 </DropdownMenu>
               </>
             ) : (
-              <Link to="/auth">
-                <Button className="none">Sign In</Button>
-              </Link>
+              <Link to="/auth">{/* <Button className="none">Sign In</Button> */}</Link>
             )}
           </div>
         </div>
