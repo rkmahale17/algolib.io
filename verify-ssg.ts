@@ -72,6 +72,28 @@ for (const test of testPages) {
             name: 'Has algorithm URLs',
             pass: content.includes('/algorithm/')
         });
+    } else if (test.path === 'index.html') {
+        // Home page should have rich content
+        checks.push({
+            name: 'Has main heading',
+            pass: content.includes('<h1>') && content.includes('Master 72+ Algorithms')
+        });
+        checks.push({
+            name: 'Has algorithm categories',
+            pass: content.includes('Algorithm Categories')
+        });
+        checks.push({
+            name: 'Has algorithm links',
+            pass: content.includes('/algorithm/') && content.includes('<a href')
+        });
+        checks.push({
+            name: 'Not empty root div',
+            pass: !content.includes('<div id="root"><!--app-html--></div>')
+        });
+        checks.push({
+            name: 'Has popular algorithms section',
+            pass: content.includes('Popular Algorithms')
+        });
     } else {
         // Static pages
         checks.push({
@@ -81,6 +103,10 @@ for (const test of testPages) {
         checks.push({
             name: 'Has meta description',
             pass: content.includes('<meta name="description"')
+        });
+        checks.push({
+            name: 'Has content (not empty)',
+            pass: !content.includes('<div id="root"><!--app-html--></div>')
         });
     }
     
