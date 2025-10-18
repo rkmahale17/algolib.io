@@ -4,16 +4,6 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 import path from 'path';
 
-// vite-plugin-prerender.ts
-
-
-
-
-
-
-// Import your algorithm IDs
-
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -21,7 +11,7 @@ export function prerenderPlugin(): Plugin {
     return {
         name: 'custom-prerender-plugin',
         apply: 'build',
-        enforce: 'post', // Run after other plugins
+        enforce: 'post',
 
         async closeBundle() {
             console.log('\n🚀 Starting prerender process...\n');
@@ -29,20 +19,41 @@ export function prerenderPlugin(): Plugin {
             const distPath = path.resolve(__dirname, 'dist');
             const indexPath = path.join(distPath, 'index.html');
 
-            // Check if dist folder exists
             if (!fs.existsSync(distPath)) {
                 console.error('❌ dist folder not found. Build may have failed.');
                 return;
             }
 
-            // Check if index.html exists
             if (!fs.existsSync(indexPath)) {
                 console.error('❌ index.html not found in dist folder.');
                 return;
             }
 
             // Read the built index.html
-            const indexHtml = fs.readFileSync(indexPath, 'utf-8');
+            let indexHtml = fs.readFileSync(indexPath, 'utf-8');
+
+            // 🔧 SANITIZATION: Remove any :8080 ports from URLs
+            indexHtml = indexHtml.replace(/:8080/g, '');
+
+            // 🔧 SANITIZATION: Convert any http:// to https:// for production URLs
+            indexHtml = indexHtml.replace(
+                /http:\/\/(qaalgo|prodalgolib|algolib\.io)/g,
+                'https://$1'
+            );
+
+            // 🔧 SANITIZATION: Remove any absolute URLs and make them relative
+            indexHtml = indexHtml.replace(
+                /https?:\/\/[^\/]+\.run\.app:?\d*/g,
+                ''
+            );
+
+            // Debug logging
+            if (indexHtml.includes(':8080')) {
+                console.warn('⚠️  WARNING: Still found :8080 in HTML after sanitization!');
+            }
+            if (indexHtml.match(/http:\/\/(?!localhost)/)) {
+                console.warn('⚠️  WARNING: Found non-localhost http:// URLs in HTML!');
+            }
 
             // Routes to prerender
             const staticRoutes = [
@@ -65,7 +76,7 @@ export function prerenderPlugin(): Plugin {
             let successCount = 0;
             let errorCount = 0;
 
-            // Create directory and copy index.html for each route
+            // Create directory and copy sanitized index.html for each route
             for (const route of allRoutes) {
                 try {
                     const routeDir = path.join(distPath, route.dir);
@@ -73,7 +84,7 @@ export function prerenderPlugin(): Plugin {
                     // Create directory recursively
                     fs.mkdirSync(routeDir, { recursive: true });
 
-                    // Write index.html
+                    // Write sanitized index.html
                     fs.writeFileSync(
                         path.join(routeDir, 'index.html'),
                         indexHtml,
@@ -81,17 +92,22 @@ export function prerenderPlugin(): Plugin {
                     );
 
                     successCount++;
+                    console.log(`✓ ${route.path}`);
                 } catch (error) {
                     console.error(`❌ Failed to create route: ${route.path}`, error);
                     errorCount++;
                 }
             }
 
+            // Also update the main index.html with sanitized version
+            fs.writeFileSync(indexPath, indexHtml, 'utf-8');
+
             console.log(`\n✅ Prerendering complete!`);
             console.log(`   Success: ${successCount} routes`);
             if (errorCount > 0) {
                 console.log(`   Errors: ${errorCount} routes`);
             }
+            console.log('   Main index.html also sanitized');
             console.log('');
         }
     };

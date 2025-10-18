@@ -2,11 +2,15 @@ import { componentTagger } from "lovable-tagger";
 import compression from 'vite-plugin-compression';
 import { defineConfig } from "vite";
 import path from "path";
+import { prerenderPlugin } from './vite.ssr.plugin'
 import react from "@vitejs/plugin-react-swc";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-
+  server: {
+    host: "::",
+    port: 8080,
+  },
   base: '/',
   plugins: [
     react(),
@@ -16,7 +20,7 @@ export default defineConfig(({ mode }) => ({
       threshold: 10240,
       deleteOriginFile: false,
     }),
-    mode === 'production' && componentTagger(), // Only in production builds
+    mode === 'production' && prerenderPlugin(), // Only in production builds
     mode === "development" && componentTagger()
   ].filter(Boolean),
   resolve: {
