@@ -32,7 +32,7 @@ export function prerenderPlugin(): Plugin {
             // Read the built index.html
             let indexHtml = fs.readFileSync(indexPath, 'utf-8');
 
-            // 🔧 SANITIZATION: Remove any :8080 ports from URLs
+            // 🔧 SANITIZATION: Remove any :8080 ports from URLs (including in href, src, content attributes)
             indexHtml = indexHtml.replace(/:8080/g, '');
 
             // 🔧 SANITIZATION: Convert any http:// to https:// for production URLs
@@ -41,10 +41,28 @@ export function prerenderPlugin(): Plugin {
                 'https://$1'
             );
 
-            // 🔧 SANITIZATION: Remove any absolute URLs and make them relative
+            // 🔧 SANITIZATION: Remove any absolute URLs with ports and make them relative
             indexHtml = indexHtml.replace(
                 /https?:\/\/[^\/]+\.run\.app:?\d*/g,
                 ''
+            );
+
+            // 🔧 SANITIZATION: Fix any malformed URLs like "http:path" or "https:path"
+            indexHtml = indexHtml.replace(
+                /(https?):([^\/])/g,
+                '$1://$2'
+            );
+
+            // 🔧 SANITIZATION: Remove any localhost references with ports
+            indexHtml = indexHtml.replace(
+                /https?:\/\/localhost:?\d*/g,
+                ''
+            );
+
+            // 🔧 SANITIZATION: Ensure <base> tag has correct href
+            indexHtml = indexHtml.replace(
+                /<base\s+href=["'][^"']*["']\s*\/?>/gi,
+                '<base href="/" />'
             );
 
             // Debug logging
@@ -53,6 +71,9 @@ export function prerenderPlugin(): Plugin {
             }
             if (indexHtml.match(/http:\/\/(?!localhost)/)) {
                 console.warn('⚠️  WARNING: Found non-localhost http:// URLs in HTML!');
+            }
+            if (indexHtml.match(/https?:[^\/]/)) {
+                console.warn('⚠️  WARNING: Found malformed URLs (missing //) in HTML!');
             }
 
             // Routes to prerender
