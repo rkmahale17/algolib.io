@@ -18,7 +18,7 @@ FROM alpine
 RUN apk add brotli nginx nginx-mod-http-brotli
 
 # Minimal config
-COPY nginx/nginx.conf /etc/nginx/http.d/default.conf
+COPY nginx/nginx.conf /etc/nginx/nginx.conf
 # Actual data
 COPY --from=builder /usr/dist /usr/share/nginx/html
 CMD ["nginx", "-g", "daemon off;"]
