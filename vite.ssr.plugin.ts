@@ -41,9 +41,15 @@ export function prerenderPlugin(): Plugin {
                 'https://$1'
             );
 
+            // 🔧 SANITIZATION: Convert Cloud Run URLs to HTTPS
+            indexHtml = indexHtml.replace(
+                /http:\/\/([^\/]+\.run\.app)/g,
+                'https://$1'
+            );
+
             // 🔧 SANITIZATION: Remove any absolute URLs with ports and make them relative
             indexHtml = indexHtml.replace(
-                /https?:\/\/[^\/]+\.run\.app:?\d*/g,
+                /https?:\/\/[^\/\s"']+\.run\.app:?\d*/g,
                 ''
             );
 
