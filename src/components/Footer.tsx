@@ -105,9 +105,19 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="mt-8 pt-8 border-t">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-muted-foreground text-center sm:text-left">
-              © {new Date().getFullYear()} AlgoLib.io. Open source and free forever.
-            </p>
+            <div className="flex flex-col items-center sm:items-start gap-2">
+              <p className="text-sm text-muted-foreground text-center sm:text-left">
+                © {new Date().getFullYear()} AlgoLib.io. Open source and free forever.
+              </p>
+              <a 
+                href="https://neetcode.io" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Powered by Neetcode videos
+              </a>
+            </div>
             <Button variant="outline" size="sm" asChild>
               <a 
                 href="https://github.com/rkmahale17/algolib.io" 

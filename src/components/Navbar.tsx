@@ -70,12 +70,22 @@ const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
-            <span className="font-bold text-xl">Algo Lib</span>
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-white" />
+              </div>
+              <span className="font-bold text-xl">Algo Lib</span>
+            </Link>
+            <a 
+              href="https://neetcode.io" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hidden md:block text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Powered by Neetcode videos
+            </a>
+          </div>
 
           {/* Navigation Links */}
           <div className="hidden lg:flex items-center gap-6 flex-1 justify-center">
