@@ -83,7 +83,7 @@ const Navbar = () => {
               rel="noopener noreferrer"
               className="hidden md:block text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
-              Powered by Neetcode videos
+              With Neetcode videos
             </a>
           </div>
 

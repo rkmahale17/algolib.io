@@ -115,7 +115,7 @@ export function Footer() {
                 rel="noopener noreferrer"
                 className="text-xs text-muted-foreground hover:text-foreground transition-colors"
               >
-                Powered by Neetcode videos
+                With Neetcode videos
               </a>
             </div>
             <Button variant="outline" size="sm" asChild>
