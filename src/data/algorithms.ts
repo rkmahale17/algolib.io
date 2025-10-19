@@ -68,6 +68,7 @@ export const algorithms: Algorithm[] = [
     "description": "Maintain a window of elements for efficient computation",
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(k)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=wiGpQwVHdE0&list=PLot-Xpze53leOBgcVsJBEGrHPd_7x_koV&index=2",
     "problems": [
       { "number": 3, "title": "Longest Substring Without Repeating Characters", "slug": "longest-substring-without-repeating-characters", "difficulty": "Medium", "link": "https://leetcode.com/problems/longest-substring-without-repeating-characters/" },
       { "number": 76, "title": "Minimum Window Substring", "slug": "minimum-window-substring", "difficulty": "Hard", "link": "https://leetcode.com/problems/minimum-window-substring/" },
@@ -93,6 +94,7 @@ export const algorithms: Algorithm[] = [
     "description": "Pre-compute cumulative sums for range queries",
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(n)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=fFVZt-6sgyo",
     "problems": [
       { "number": 724, "title": "Find Pivot Index", "slug": "find-pivot-index", "difficulty": "Easy", "link": "https://leetcode.com/problems/find-pivot-index/" },
       { "number": 560, "title": "Subarray Sum Equals K", "slug": "subarray-sum-equals-k", "difficulty": "Medium", "link": "https://leetcode.com/problems/subarray-sum-equals-k/" },
@@ -114,6 +116,7 @@ export const algorithms: Algorithm[] = [
     "description": "Search in sorted arrays in logarithmic time",
     "timeComplexity": "O(log n)",
     "spaceComplexity": "O(1)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=s4DPM8ct1pI",
     "problems": [
       { "number": 704, "title": "Binary Search", "slug": "binary-search", "difficulty": "Easy", "link": "https://leetcode.com/problems/binary-search/" },
       { "number": 33, "title": "Search in Rotated Sorted Array", "slug": "search-in-rotated-sorted-array", "difficulty": "Medium", "link": "https://leetcode.com/problems/search-in-rotated-sorted-array/" },
@@ -135,6 +138,7 @@ export const algorithms: Algorithm[] = [
     "description": "Find maximum subarray sum efficiently",
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=5WZl3MMT0Eg",
     "problems": [
       { "number": 53, "title": "Maximum Subarray", "slug": "maximum-subarray", "difficulty": "Easy", "link": "https://leetcode.com/problems/maximum-subarray/" },
       { "number": 152, "title": "Maximum Product Subarray", "slug": "maximum-product-subarray", "difficulty": "Medium", "link": "https://leetcode.com/problems/maximum-product-subarray/" },
@@ -158,6 +162,7 @@ export const algorithms: Algorithm[] = [
     "description": "Sort array of three distinct elements",
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=4RCIcM33nBE",
     "problems": [
       { "number": 75, "title": "Sort Colors", "slug": "sort-colors", "difficulty": "Medium", "link": "https://leetcode.com/problems/sort-colors/" },
       { "number": 215, "title": "Kth Largest Element in an Array", "slug": "kth-largest-element-in-an-array", "difficulty": "Medium", "link": "https://leetcode.com/problems/kth-largest-element-in-an-array/" },
@@ -178,6 +183,7 @@ export const algorithms: Algorithm[] = [
     "description": "Merge overlapping intervals",
     "timeComplexity": "O(n log n)",
     "spaceComplexity": "O(n)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=44H3cEC2fFM",
     "problems": [
       { "number": 56, "title": "Merge Intervals", "slug": "merge-intervals", "difficulty": "Medium", "link": "https://leetcode.com/problems/merge-intervals/" },
       { "number": 435, "title": "Non-overlapping Intervals", "slug": "non-overlapping-intervals", "difficulty": "Medium", "link": "https://leetcode.com/problems/non-overlapping-intervals/" },
@@ -203,6 +209,7 @@ export const algorithms: Algorithm[] = [
     "description": "Stack with monotonic properties for efficient queries",
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(n)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=qkLl7nAwDPo",
     "problems": [
       { "number": 496, "title": "Next Greater Element I", "slug": "next-greater-element-i", "difficulty": "Easy", "link": "https://leetcode.com/problems/next-greater-element-i/" },
       { "number": 503, "title": "Next Greater Element II", "slug": "next-greater-element-ii", "difficulty": "Medium", "link": "https://leetcode.com/problems/next-greater-element-ii/" },
@@ -226,6 +233,7 @@ export const algorithms: Algorithm[] = [
     "description": "Rotate array elements without extra space",
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=BHr381Guz3Y",
     "problems": [
       { "number": 189, "title": "Rotate Array", "slug": "rotate-array", "difficulty": "Easy", "link": "https://leetcode.com/problems/rotate-array/" },
       { "number": 61, "title": "Rotate List", "slug": "rotate-list", "difficulty": "Medium", "link": "https://leetcode.com/problems/rotate-list/" },
@@ -262,6 +270,7 @@ export const algorithms: Algorithm[] = [
     "description": "Detect cycles and find middle using two pointers",
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=gBTe7lFR3vc",
     "problems": [
       { "number": 141, "title": "Linked List Cycle", "slug": "linked-list-cycle", "difficulty": "Easy", "link": "https://leetcode.com/problems/linked-list-cycle/" },
       { "number": 142, "title": "Linked List Cycle II", "slug": "linked-list-cycle-ii", "difficulty": "Medium", "link": "https://leetcode.com/problems/linked-list-cycle-ii/" },
@@ -288,6 +297,7 @@ export const algorithms: Algorithm[] = [
     "description": "Reverse a singly linked list",
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=G0_I-ZF0S38",
     "problems": [
       { "number": 206, "title": "Reverse Linked List", "slug": "reverse-linked-list", "difficulty": "Easy", "link": "https://leetcode.com/problems/reverse-linked-list/" },
       { "number": 92, "title": "Reverse Linked List II", "slug": "reverse-linked-list-ii", "difficulty": "Medium", "link": "https://leetcode.com/problems/reverse-linked-list-ii/" },
@@ -314,6 +324,7 @@ export const algorithms: Algorithm[] = [
     "description": "Merge two sorted linked lists",
     "timeComplexity": "O(n+m)",
     "spaceComplexity": "O(1)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=XIdigk956u0",
     "problems": [
       { "number": 21, "title": "Merge Two Sorted Lists", "slug": "merge-two-sorted-lists", "difficulty": "Easy", "link": "https://leetcode.com/problems/merge-two-sorted-lists/" },
       { "number": 23, "title": "Merge k Sorted Lists", "slug": "merge-k-sorted-lists", "difficulty": "Hard", "link": "https://leetcode.com/problems/merge-k-sorted-lists/" },
@@ -340,6 +351,7 @@ export const algorithms: Algorithm[] = [
     "description": "Floyd's algorithm to detect cycles",
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=gBTe7lFR3vc",
     "problems": [
       { "number": 141, "title": "Linked List Cycle", "slug": "linked-list-cycle", "difficulty": "Easy", "link": "https://leetcode.com/problems/linked-list-cycle/" },
       { "number": 142, "title": "Linked List Cycle II", "slug": "linked-list-cycle-ii", "difficulty": "Medium", "link": "https://leetcode.com/problems/linked-list-cycle-ii/" },
@@ -366,6 +378,7 @@ export const algorithms: Algorithm[] = [
     "description": "Find middle node using fast and slow pointers",
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=A2_ldqM4QcY",
     "problems": [
       { "number": 876, "title": "Middle of the Linked List", "slug": "middle-of-the-linked-list", "difficulty": "Easy", "link": "https://leetcode.com/problems/middle-of-the-linked-list/" },
       { "number": 141, "title": "Linked List Cycle", "slug": "linked-list-cycle", "difficulty": "Easy", "link": "https://leetcode.com/problems/linked-list-cycle/" },
@@ -393,6 +406,7 @@ export const algorithms: Algorithm[] = [
     "description": "Visit root, left, then right subtree",
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(h)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=afTpieEZXck",
     "problems": [
       { "number": 144, "title": "Binary Tree Preorder Traversal", "slug": "binary-tree-preorder-traversal", "difficulty": "Easy", "link": "https://leetcode.com/problems/binary-tree-preorder-traversal/" },
       { "number": 94, "title": "Binary Tree Inorder Traversal", "slug": "binary-tree-inorder-traversal", "difficulty": "Easy", "link": "https://leetcode.com/problems/binary-tree-inorder-traversal/" },
@@ -419,6 +433,7 @@ export const algorithms: Algorithm[] = [
     "description": "Visit left, root, then right subtree",
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(h)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=g_S5WuasWUE",
     "problems": [
       { "number": 94, "title": "Binary Tree Inorder Traversal", "slug": "binary-tree-inorder-traversal", "difficulty": "Easy", "link": "https://leetcode.com/problems/binary-tree-inorder-traversal/" },
       { "number": 98, "title": "Validate Binary Search Tree", "slug": "validate-binary-search-tree", "difficulty": "Medium", "link": "https://leetcode.com/problems/validate-binary-search-tree/" },
@@ -444,6 +459,7 @@ export const algorithms: Algorithm[] = [
     "description": "Visit left, right, then root",
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(h)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=QhszUQhGGlA",
     "problems": [
       { "number": 145, "title": "Binary Tree Postorder Traversal", "slug": "binary-tree-postorder-traversal", "difficulty": "Easy", "link": "https://leetcode.com/problems/binary-tree-postorder-traversal/" },
       { "number": 114, "title": "Flatten Binary Tree to Linked List", "slug": "flatten-binary-tree-to-linked-list", "difficulty": "Medium", "link": "https://leetcode.com/problems/flatten-binary-tree-to-linked-list/" },
@@ -470,6 +486,7 @@ export const algorithms: Algorithm[] = [
     "description": "Traverse tree level by level",
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(w)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=6ZnyEApgFYg",
     "problems": [
       { "number": 102, "title": "Binary Tree Level Order Traversal", "slug": "binary-tree-level-order-traversal", "difficulty": "Easy", "link": "https://leetcode.com/problems/binary-tree-level-order-traversal/" },
       { "number": 107, "title": "Binary Tree Level Order Traversal II", "slug": "binary-tree-level-order-traversal-ii", "difficulty": "Easy", "link": "https://leetcode.com/problems/binary-tree-level-order-traversal-ii/" },
@@ -519,6 +536,7 @@ export const algorithms: Algorithm[] = [
     "description": "Find LCA of two nodes in tree",
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(h)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=gs2LMfuOR9k",
     "problems": [
       { "number": 236, "title": "Lowest Common Ancestor of a Binary Tree", "slug": "lowest-common-ancestor-of-a-binary-tree", "difficulty": "Medium", "link": "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/" },
       { "number": 235, "title": "Lowest Common Ancestor of a Binary Search Tree", "slug": "lowest-common-ancestor-of-a-binary-search-tree", "difficulty": "Easy", "link": "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/" },
@@ -561,6 +579,7 @@ export const algorithms: Algorithm[] = [
     "description": "Serialize and deserialize binary tree",
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(n)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=u4JAi2JJhI8",
     "problems": [
       { "number": 297, "title": "Serialize and Deserialize Binary Tree", "slug": "serialize-and-deserialize-binary-tree", "difficulty": "Hard", "link": "https://leetcode.com/problems/serialize-and-deserialize-binary-tree/" },
 
@@ -584,6 +603,7 @@ export const algorithms: Algorithm[] = [
     "description": "Efficient string storage and retrieval",
     "timeComplexity": "O(m)",
     "spaceComplexity": "O(n*m)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=oobqoCJlHA0",
     "problems": [
       { "number": 208, "title": "Implement Trie (Prefix Tree)", "slug": "implement-trie-prefix-tree", "difficulty": "Medium", "link": "https://leetcode.com/problems/implement-trie-prefix-tree/" },
       { "number": 211, "title": "Design Add and Search Words Data Structure", "slug": "design-add-and-search-words-data-structure", "difficulty": "Medium", "link": "https://leetcode.com/problems/design-add-and-search-words-data-structure/" },
@@ -660,6 +680,7 @@ export const algorithms: Algorithm[] = [
     "description": "Kahn's algorithm for DAG ordering",
     "timeComplexity": "O(V+E)",
     "spaceComplexity": "O(V)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=EgI5nU9etnU",
     "problems": [
       { "number": 207, "title": "Course Schedule", "slug": "course-schedule", "difficulty": "Medium", "link": "https://leetcode.com/problems/course-schedule/" },
       { "number": 210, "title": "Course Schedule II", "slug": "course-schedule-ii", "difficulty": "Medium", "link": "https://leetcode.com/problems/course-schedule-ii/" },
@@ -680,6 +701,7 @@ export const algorithms: Algorithm[] = [
     "description": "Disjoint set data structure",
     "timeComplexity": "O(α(n))",
     "spaceComplexity": "O(n)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=8f1XPm4WOUc",
     "problems": [
       { "number": 547, "title": "Number of Provinces", "slug": "number-of-provinces", "difficulty": "Medium", "link": "https://leetcode.com/problems/number-of-provinces/" },
       { "number": 990, "title": "Satisfiability of Equality Equations", "slug": "satisfiability-of-equality-equations", "difficulty": "Medium", "link": "https://leetcode.com/problems/satisfiability-of-equality-equations/" },
@@ -704,6 +726,7 @@ export const algorithms: Algorithm[] = [
     "description": "Find minimum spanning tree",
     "timeComplexity": "O(E log E)",
     "spaceComplexity": "O(V)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=f7JOBJIC-NA",
     "problems": [
       { "number": 1584, "title": "Min Cost to Connect All Points", "slug": "min-cost-to-connect-all-points", "difficulty": "Medium", "link": "https://leetcode.com/problems/min-cost-to-connect-all-points/" },
       { "number": 1168, "title": "Optimize Water Distribution in a Village", "slug": "optimize-water-distribution-in-a-village", "difficulty": "Medium", "link": "https://leetcode.com/problems/optimize-water-distribution-in-a-village/" },
@@ -725,6 +748,7 @@ export const algorithms: Algorithm[] = [
     "description": "Find MST using greedy approach",
     "timeComplexity": "O(E log V)",
     "spaceComplexity": "O(V)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=f7JOBJIC-NA",
     "problems": [
       { "number": 1584, "title": "Min Cost to Connect All Points", "slug": "min-cost-to-connect-all-points", "difficulty": "Medium", "link": "https://leetcode.com/problems/min-cost-to-connect-all-points/" },
       { "number": 1135, "title": "Connecting Cities With Minimum Cost", "slug": "connecting-cities-with-minimum-cost", "difficulty": "Medium", "link": "https://leetcode.com/problems/connecting-cities-with-minimum-cost/" },
@@ -745,6 +769,7 @@ export const algorithms: Algorithm[] = [
     "description": "Single-source shortest path",
     "timeComplexity": "O((V+E) log V)",
     "spaceComplexity": "O(V)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=EaphyqKU4PQ",
     "problems": [
       { "number": 743, "title": "Network Delay Time", "slug": "network-delay-time", "difficulty": "Medium", "link": "https://leetcode.com/problems/network-delay-time/" },
       { "number": 985, "title": "Sum of Even Numbers After Queries", "slug": "sum-of-even-numbers-after-queries", "difficulty": "Easy", "link": "https://leetcode.com/problems/sum-of-even-numbers-after-queries/" },
@@ -768,6 +793,7 @@ export const algorithms: Algorithm[] = [
     "description": "Shortest path with negative weights",
     "timeComplexity": "O(VE)",
     "spaceComplexity": "O(V)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=5eIK3zUdYmE",
     "problems": [
       { "number": 787, "title": "Cheapest Flights Within K Stops", "slug": "cheapest-flights-within-k-stops", "difficulty": "Medium", "link": "https://leetcode.com/problems/cheapest-flights-within-k-stops/" },
       { "number": 173, "title": "Binary Search Tree Iterator", "slug": "binary-search-tree-iterator", "difficulty": "Medium", "link": "https://leetcode.com/problems/binary-search-tree-iterator/" },
@@ -789,17 +815,13 @@ export const algorithms: Algorithm[] = [
     "category": "Graphs",
     "difficulty": "advanced",
     "description": "All-pairs shortest paths",
-    "timeComplexity": "O(V\u00b3)",
-    "spaceComplexity": "O(V\u00b2)",
+    "timeComplexity": "O(V³)",
+    "spaceComplexity": "O(V²)",
     "problems": [
-      { "number": 743, "title": "Network Delay Time", "slug": "network-delay-time", "difficulty": "Medium", "link": "https://leetcode.com/problems/network-delay-time/" },
-      { "number": 1473, "title": "Paint House", "slug": "paint-house", "difficulty": "Medium", "link": "https://leetcode.com/problems/paint-house/" },
-      { "number": 785, "title": "Is Graph Bipartite?", "slug": "is-graph-bipartite", "difficulty": "Medium", "link": "https://leetcode.com/problems/is-graph-bipartite/" },
-      { "number": 497, "title": "Random Point in Non-overlapping Rectangles", "slug": "random-point-in-non-overlapping-rectangles", "difficulty": "Medium", "link": "https://leetcode.com/problems/random-point-in-non-overlapping-rectangles/" },
       { "number": 1192, "title": "Critical Connections in a Network", "slug": "critical-connections-in-a-network", "difficulty": "Hard", "link": "https://leetcode.com/problems/critical-connections-in-a-network/" },
       { "number": 310, "title": "Minimum Height Trees", "slug": "minimum-height-trees", "difficulty": "Medium", "link": "https://leetcode.com/problems/minimum-height-trees/" },
       { "number": 509, "title": "Fibonacci Number", "slug": "fibonacci-number", "difficulty": "Easy", "link": "https://leetcode.com/problems/fibonacci-number/" },
-      { "number": 997, "title": "Find the Town Judge", "slug": "find-the-town-judge", "difficulty": "Easy", "link": "https://leetcode.com/problems/find-the-town-judge/" },
+      { "number": 997, "title": "Find the Town Judge", "slug": "find-the-town-judge", "difficulty": "Easy", "link": "https://leetcode.com/problems/find-the-town-judge/" }
     ]
   },
 
@@ -855,6 +877,7 @@ export const algorithms: Algorithm[] = [
     "description": "Minimum coins for target amount",
     "timeComplexity": "O(nW)",
     "spaceComplexity": "O(W)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=H9bfqozjoqs",
     "problems": [
       { "number": 322, "title": "Coin Change", "slug": "coin-change", "difficulty": "Medium", "link": "https://leetcode.com/problems/coin-change/" },
       { "number": 518, "title": "Coin Change 2", "slug": "coin-change-2", "difficulty": "Medium", "link": "https://leetcode.com/problems/coin-change-2/" },
@@ -877,6 +900,7 @@ export const algorithms: Algorithm[] = [
     "description": "Find longest common subsequence",
     "timeComplexity": "O(mn)",
     "spaceComplexity": "O(mn)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=Ua0GhsJSlWM",
     "problems": [
       { "number": 1143, "title": "Longest Common Subsequence", "slug": "longest-common-subsequence", "difficulty": "Medium", "link": "https://leetcode.com/problems/longest-common-subsequence/" },
       { "number": 97, "title": "Interleaving String", "slug": "interleaving-string", "difficulty": "Hard", "link": "https://leetcode.com/problems/interleaving-string/" },
@@ -899,6 +923,7 @@ export const algorithms: Algorithm[] = [
     "description": "Find LIS in array",
     "timeComplexity": "O(n log n)",
     "spaceComplexity": "O(n)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=cjWnW0hdF1Y",
     "problems": [
       { "number": 300, "title": "Longest Increasing Subsequence", "slug": "longest-increasing-subsequence", "difficulty": "Medium", "link": "https://leetcode.com/problems/longest-increasing-subsequence/" },
       { "number": 673, "title": "Number of Longest Increasing Subsequence", "slug": "number-of-longest-increasing-subsequence", "difficulty": "Medium", "link": "https://leetcode.com/problems/number-of-longest-increasing-subsequence/" },
@@ -918,6 +943,7 @@ export const algorithms: Algorithm[] = [
     "description": "Minimum edits to transform strings",
     "timeComplexity": "O(mn)",
     "spaceComplexity": "O(mn)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=XYi2-LPrwm4",
     "problems": [
       { "number": 72, "title": "Edit Distance", "slug": "edit-distance", "difficulty": "Hard", "link": "https://leetcode.com/problems/edit-distance/" },
       { "number": 583, "title": "Delete Operation for Two Strings", "slug": "delete-operation-for-two-strings", "difficulty": "Medium", "link": "https://leetcode.com/problems/delete-operation-for-two-strings/" },
@@ -940,6 +966,7 @@ export const algorithms: Algorithm[] = [
     "description": "Find unique or minimum paths in matrix",
     "timeComplexity": "O(mn)",
     "spaceComplexity": "O(mn)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=IlEsdxuD4lY",
     "problems": [
       { "number": 62, "title": "Unique Paths", "slug": "unique-paths", "difficulty": "Medium", "link": "https://leetcode.com/problems/unique-paths/" },
       { "number": 63, "title": "Unique Paths II", "slug": "unique-paths-ii", "difficulty": "Medium", "link": "https://leetcode.com/problems/unique-paths-ii/" },
@@ -964,6 +991,7 @@ export const algorithms: Algorithm[] = [
     "description": "Check if array can be partitioned equally",
     "timeComplexity": "O(n*sum)",
     "spaceComplexity": "O(sum)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=IsvocB5BJhw",
     "problems": [
       { "number": 416, "title": "Partition Equal Subset Sum", "slug": "partition-equal-subset-sum", "difficulty": "Medium", "link": "https://leetcode.com/problems/partition-equal-subset-sum/" },
       { "number": 494, "title": "Target Sum", "slug": "target-sum", "difficulty": "Medium", "link": "https://leetcode.com/problems/target-sum/" },
@@ -984,6 +1012,7 @@ export const algorithms: Algorithm[] = [
     "description": "Maximum sum without adjacent elements",
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=73r3KWiEvyk",
     "problems": [
       { "number": 198, "title": "House Robber", "slug": "house-robber", "difficulty": "Easy", "link": "https://leetcode.com/problems/house-robber/" },
       { "number": 213, "title": "House Robber II", "slug": "house-robber-ii", "difficulty": "Medium", "link": "https://leetcode.com/problems/house-robber-ii/" },
@@ -1003,6 +1032,7 @@ export const algorithms: Algorithm[] = [
     "description": "Count ways to climb n stairs",
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=Y0lT9Fck7qI",
     "problems": [
       { "number": 70, "title": "Climbing Stairs", "slug": "climbing-stairs", "difficulty": "Easy", "link": "https://leetcode.com/problems/climbing-stairs/" },
       { "number": 746, "title": "Min Cost Climbing Stairs", "slug": "min-cost-climbing-stairs", "difficulty": "Easy", "link": "https://leetcode.com/problems/min-cost-climbing-stairs/" },
@@ -1021,6 +1051,7 @@ export const algorithms: Algorithm[] = [
     "description": "Segment string into dictionary words",
     "timeComplexity": "O(n²)",
     "spaceComplexity": "O(n)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=Sx9NNgInc3A",
     "problems": [
       { "number": 139, "title": "Word Break", "slug": "word-break", "difficulty": "Medium", "link": "https://leetcode.com/problems/word-break/" },
       { "number": 140, "title": "Word Break II", "slug": "word-break-ii", "difficulty": "Hard", "link": "https://leetcode.com/problems/word-break-ii/" },
@@ -1041,6 +1072,7 @@ export const algorithms: Algorithm[] = [
     "description": "Select maximum non-overlapping activities",
     "timeComplexity": "O(n log n)",
     "spaceComplexity": "O(1)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=nONCGxWoUfM",
     "problems": [
       { "number": 252, "title": "Meeting Rooms", "slug": "meeting-rooms", "difficulty": "Easy", "link": "https://leetcode.com/problems/meeting-rooms/" },
       { "number": 455, "title": "Assign Cookies", "slug": "assign-cookies", "difficulty": "Easy", "link": "https://leetcode.com/problems/assign-cookies/" },
@@ -1066,6 +1098,7 @@ export const algorithms: Algorithm[] = [
     "description": "Schedule intervals optimally",
     "timeComplexity": "O(n log n)",
     "spaceComplexity": "O(1)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=nONCGxWoUfM",
     "problems": [
       { "number": 435, "title": "Non-overlapping Intervals", "slug": "non-overlapping-intervals", "difficulty": "Medium", "link": "https://leetcode.com/problems/non-overlapping-intervals/" },
       { "number": 452, "title": "Minimum Number of Arrows to Burst Balloons", "slug": "minimum-number-of-arrows-to-burst-balloons", "difficulty": "Medium", "link": "https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons/" },
@@ -1107,6 +1140,7 @@ export const algorithms: Algorithm[] = [
     "description": "Find starting station for circular tour",
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=lJwbPZGo05A",
     "problems": [
       { "number": 134, "title": "Gas Station", "slug": "gas-station", "difficulty": "Medium", "link": "https://leetcode.com/problems/gas-station/" },
       { "number": 665, "title": "Non-decreasing Array", "slug": "non-decreasing-array", "difficulty": "Easy", "link": "https://leetcode.com/problems/non-decreasing-array/" },
@@ -1130,6 +1164,7 @@ export const algorithms: Algorithm[] = [
     "description": "Generate all subsets of a set",
     "timeComplexity": "O(2^n)",
     "spaceComplexity": "O(n)",
+    "youtubeUrl": "https://www.youtube.com/playlist?list=PLot-Xpze53lf5C3HSjCnyFghlW0G1HHXo",
     "problems": [
       { "number": 78, "title": "Subsets", "slug": "subsets", "difficulty": "Medium", "link": "https://leetcode.com/problems/subsets/" },
       { "number": 90, "title": "Subsets II", "slug": "subsets-ii", "difficulty": "Medium", "link": "https://leetcode.com/problems/subsets-ii/" },
@@ -1154,6 +1189,7 @@ export const algorithms: Algorithm[] = [
     "description": "Generate all permutations",
     "timeComplexity": "O(n!)",
     "spaceComplexity": "O(n)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=s7AvT7cGdSo",
     "problems": [
       { "number": 46, "title": "Permutations", "slug": "permutations", "difficulty": "Medium", "link": "https://leetcode.com/problems/permutations/" },
       { "number": 47, "title": "Permutations II", "slug": "permutations-ii", "difficulty": "Medium", "link": "https://leetcode.com/problems/permutations-ii/" },
@@ -1178,6 +1214,7 @@ export const algorithms: Algorithm[] = [
     "description": "Generate all k-combinations",
     "timeComplexity": "O(C(n,k))",
     "spaceComplexity": "O(k)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=q0s6m7AiM7o",
     "problems": [
       { "number": 77, "title": "Combinations", "slug": "combinations", "difficulty": "Medium", "link": "https://leetcode.com/problems/combinations/" },
       { "number": 39, "title": "Combination Sum", "slug": "combination-sum", "difficulty": "Medium", "link": "https://leetcode.com/problems/combination-sum/" },
@@ -1201,6 +1238,7 @@ export const algorithms: Algorithm[] = [
     "description": "Find combinations summing to target",
     "timeComplexity": "O(2^n)",
     "spaceComplexity": "O(target)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=GBKI9VSKdGg",
     "problems": [
       { "number": 39, "title": "Combination Sum", "slug": "combination-sum", "difficulty": "Medium", "link": "https://leetcode.com/problems/combination-sum/" },
       { "number": 40, "title": "Combination Sum II", "slug": "combination-sum-ii", "difficulty": "Medium", "link": "https://leetcode.com/problems/combination-sum-ii/" },
@@ -1223,6 +1261,7 @@ export const algorithms: Algorithm[] = [
     "description": "Find word in 2D grid",
     "timeComplexity": "O(m*n*4^L)",
     "spaceComplexity": "O(L)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=pfiQ_PS1g8E",
     "problems": [
       { "number": 79, "title": "Word Search", "slug": "word-search", "difficulty": "Medium", "link": "https://leetcode.com/problems/word-search/" },
       { "number": 212, "title": "Word Search II", "slug": "word-search-ii", "difficulty": "Hard", "link": "https://leetcode.com/problems/word-search-ii/" },
@@ -1246,6 +1285,7 @@ export const algorithms: Algorithm[] = [
     "description": "Place N queens on N×N board",
     "timeComplexity": "O(N!)",
     "spaceComplexity": "O(N)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=Ph95IHmRp5M",
     "problems": [
       { "number": 51, "title": "N-Queens", "slug": "n-queens", "difficulty": "Hard", "link": "https://leetcode.com/problems/n-queens/" },
       { "number": 52, "title": "N-Queens II", "slug": "n-queens-ii", "difficulty": "Hard", "link": "https://leetcode.com/problems/n-queens-ii/" },
@@ -1266,6 +1306,7 @@ export const algorithms: Algorithm[] = [
     "description": "Solve Sudoku puzzle",
     "timeComplexity": "O(9^(n*n))",
     "spaceComplexity": "O(n*n)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=TV_UepFKHMU",
     "problems": [
       { "number": 37, "title": "Sudoku Solver", "slug": "sudoku-solver", "difficulty": "Hard", "link": "https://leetcode.com/problems/sudoku-solver/" },
       { "number": 36, "title": "Valid Sudoku", "slug": "valid-sudoku", "difficulty": "Medium", "link": "https://leetcode.com/problems/valid-sudoku/" },
@@ -1292,6 +1333,7 @@ export const algorithms: Algorithm[] = [
     "description": "Find single number using XOR",
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=qMPX1AOa83k",
     "problems": [
       { "number": 136, "title": "Single Number", "slug": "single-number", "difficulty": "Easy", "link": "https://leetcode.com/problems/single-number/" },
       { "number": 137, "title": "Single Number II", "slug": "single-number-ii", "difficulty": "Medium", "link": "https://leetcode.com/problems/single-number-ii/" },
@@ -1318,6 +1360,7 @@ export const algorithms: Algorithm[] = [
     "description": "Brian Kernighan's algorithm",
     "timeComplexity": "O(log n)",
     "spaceComplexity": "O(1)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=RyBM56RIWrM",
     "problems": [
       { "number": 338, "title": "Counting Bits", "slug": "counting-bits", "difficulty": "Easy", "link": "https://leetcode.com/problems/counting-bits/" },
       { "number": 191, "title": "Number of 1 Bits", "slug": "number-of-1-bits", "difficulty": "Easy", "link": "https://leetcode.com/problems/number-of-1-bits/" },
@@ -1344,6 +1387,7 @@ export const algorithms: Algorithm[] = [
     "description": "Generate subsets using bitmasks",
     "timeComplexity": "O(2^n * n)",
     "spaceComplexity": "O(1)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=REOH22Xwdkk",
     "problems": [
       { "number": 78, "title": "Subsets", "slug": "subsets", "difficulty": "Medium", "link": "https://leetcode.com/problems/subsets/" },
       { "number": 90, "title": "Subsets II", "slug": "subsets-ii", "difficulty": "Medium", "link": "https://leetcode.com/problems/subsets-ii/" },
@@ -1372,6 +1416,7 @@ export const algorithms: Algorithm[] = [
     "description": "Find kth largest using min heap",
     "timeComplexity": "O(n log k)",
     "spaceComplexity": "O(k)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=XEmy13g1Qxc",
     "problems": [
       { "number": 215, "title": "Kth Largest Element in an Array", "slug": "kth-largest-element-in-an-array", "difficulty": "Medium", "link": "https://leetcode.com/problems/kth-largest-element-in-an-array/" },
       { "number": 703, "title": "Kth Largest Element in a Stream", "slug": "kth-largest-element-in-a-stream", "difficulty": "Easy", "link": "https://leetcode.com/problems/kth-largest-element-in-a-stream/" },
@@ -1398,6 +1443,7 @@ export const algorithms: Algorithm[] = [
     "description": "Merge using min heap",
     "timeComplexity": "O(N log k)",
     "spaceComplexity": "O(k)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=q5a5OiGbT6Q",
     "problems": [
       { "number": 23, "title": "Merge k Sorted Lists", "slug": "merge-k-sorted-lists", "difficulty": "Hard", "link": "https://leetcode.com/problems/merge-k-sorted-lists/" },
       { "number": 21, "title": "Merge Two Sorted Lists", "slug": "merge-two-sorted-lists", "difficulty": "Easy", "link": "https://leetcode.com/problems/merge-two-sorted-lists/" },
@@ -1424,6 +1470,7 @@ export const algorithms: Algorithm[] = [
     "description": "Find max in each window",
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(k)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=DfljaUwZsOk",
     "problems": [
       { "number": 239, "title": "Sliding Window Maximum", "slug": "sliding-window-maximum", "difficulty": "Hard", "link": "https://leetcode.com/problems/sliding-window-maximum/" },
       { "number": 480, "title": "Sliding Window Median", "slug": "sliding-window-median", "difficulty": "Hard", "link": "https://leetcode.com/problems/sliding-window-median/" },

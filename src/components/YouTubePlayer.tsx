@@ -91,7 +91,7 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ youtubeUrl }) => {
         </div>
 
         {/* Video Title */}
-        <h4 className="text-lg font-bold text-foreground">{metadata.title}</h4>
+        {/* <h4 className="text-lg font-bold text-foreground">{metadata.title}</h4> */}
 
         {/* Responsive YouTube Player */}
         <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
@@ -105,19 +105,17 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ youtubeUrl }) => {
         </div>
 
         {/* Channel Info & Credits */}
-        <div className="flex flex-col gap-1">
+        <div className="flex items-center justify-between">
           <a
             href={metadata.author_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1 w-fit"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-2 group ml-auto"
           >
-            Channel: {metadata.author_name}
-            <ExternalLink className="w-3 h-3" />
+            <Youtube className="w-4 h-4 text-red-500" />
+            <span>Video by <span className="font-medium">{metadata.author_name}</span></span>
+            <ExternalLink className="w-3.5 h-3.5" />
           </a>
-          <p className="text-xs text-muted-foreground">
-            🎥 Video by {metadata.author_name} on YouTube
-          </p>
         </div>
       </div>
     </Card>
