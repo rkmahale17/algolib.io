@@ -93,6 +93,17 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ youtubeUrl }) => {
         {/* Video Title */}
         <h4 className="text-lg font-bold text-foreground">{metadata.title}</h4>
 
+        {/* Responsive YouTube Player */}
+        <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+          <iframe
+            className="absolute top-0 left-0 w-full h-full rounded-lg"
+            src={`https://www.youtube.com/embed/${videoId}`}
+            title={metadata.title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+
         {/* Channel Info & Credits */}
         <div className="flex flex-col gap-1">
           <a
@@ -107,17 +118,6 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ youtubeUrl }) => {
           <p className="text-xs text-muted-foreground">
             🎥 Video by {metadata.author_name} on YouTube
           </p>
-        </div>
-
-        {/* Responsive YouTube Player */}
-        <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-          <iframe
-            className="absolute top-0 left-0 w-full h-full rounded-lg"
-            src={`https://www.youtube.com/embed/${videoId}`}
-            title={metadata.title}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
         </div>
       </div>
     </Card>
