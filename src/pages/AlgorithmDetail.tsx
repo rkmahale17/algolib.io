@@ -12,6 +12,7 @@ import { CopyCodeButton } from "@/components/CopyCodeButton";
 import { Separator } from "@/components/ui/separator";
 import { ShareButton } from "@/components/ShareButton";
 import { TreeVisualization } from "@/components/visualizations/TreeVisualization";
+import { YouTubePlayer } from "@/components/YouTubePlayer";
 import { algorithms } from "@/data/algorithms";
 import { getAlgorithmImplementation } from "@/data/algorithmImplementations";
 import { supabase } from "@/integrations/supabase/client";
@@ -1476,7 +1477,12 @@ const AlgorithmDetail: React.FC = () => {
               </Card>
             )}
 
-            {/* 5. Practice Problems */}
+            {/* 5. YouTube Video Player (if available) */}
+            {algorithm.youtubeUrl && (
+              <YouTubePlayer youtubeUrl={algorithm.youtubeUrl} />
+            )}
+
+            {/* 6. Practice Problems */}
             {algorithm?.problems && algorithm.problems.length > 0 && (
               <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-5xl mx-auto">
                 <h3 className="font-semibold mb-4">Practice Problems</h3>

@@ -6,8 +6,8 @@ export interface Algorithm {
   description: string;
   timeComplexity: string;
   spaceComplexity: string;
-  problems?: LeetCodeProblem[]
-
+  problems?: LeetCodeProblem[];
+  youtubeUrl?: string;
 }
 export interface LeetCodeProblem {
   number: number;
@@ -42,6 +42,7 @@ export const algorithms: Algorithm[] = [
     "description": "Use two pointers to traverse arrays efficiently",
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=_d0T_2Lk2qA",
     "problems": [
       { "number": 167, "title": "Two Sum II - Input Array Is Sorted", "slug": "two-sum-ii-input-array-is-sorted", "difficulty": "Easy", "link": "https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/" },
       { "number": 1, "title": "Two Sum", "slug": "two-sum", "difficulty": "Easy", "link": "https://leetcode.com/problems/two-sum/" },
