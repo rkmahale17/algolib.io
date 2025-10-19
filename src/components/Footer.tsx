@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Github, Heart } from "lucide-react";
+import { Github, Heart, ExternalLink } from "lucide-react";
 import { Button } from "./ui/button";
 
 export function Footer() {
@@ -109,14 +109,27 @@ export function Footer() {
               <p className="text-sm text-muted-foreground text-center sm:text-left">
                 © {new Date().getFullYear()} AlgoLib.io. Open source and free forever.
               </p>
-              <a 
-                href="https://neetcode.io" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-              >
-                With Neetcode videos
-              </a>
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-3 text-xs text-muted-foreground">
+                <a 
+                  href="https://neetcode.io" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="hover:text-foreground transition-colors inline-flex items-center gap-1"
+                >
+                  With Neetcode videos
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+                <span className="hidden sm:inline">•</span>
+                <a 
+                  href="https://jsonmaster.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="hover:text-foreground transition-colors inline-flex items-center gap-1"
+                >
+                  Recommended: JSONMaster.com
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
             </div>
             <Button variant="outline" size="sm" asChild>
               <a 
