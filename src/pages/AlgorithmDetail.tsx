@@ -73,7 +73,7 @@ const AlgorithmDetail: React.FC = () => {
       .select("completed")
       .eq("user_id", userId)
       .eq("algorithm_id", id)
-      .single();
+      .maybeSingle();
 
     if (!error && data) {
       setIsCompleted(data.completed);
@@ -102,7 +102,7 @@ const AlgorithmDetail: React.FC = () => {
       .select("id")
       .eq("user_id", user.id)
       .eq("algorithm_id", id)
-      .single();
+      .maybeSingle();
 
     if (existing) {
       // Update existing record
@@ -1400,7 +1400,7 @@ const AlgorithmDetail: React.FC = () => {
               </Card>
             )}
 
-            {/* 1. Animation */}
+            {/* 1. Animation - Login Required */}
             <Card className="p-4 sm:p-6 glass-card overflow-hidden">
               <div className="space-y-4">
                 <div className="flex items-center justify-between flex-wrap gap-2">
@@ -1422,7 +1422,26 @@ const AlgorithmDetail: React.FC = () => {
                   </div>
                 </div>
                 <div className="rounded-lg bg-muted/30 border border-border/50 p-2 sm:p-4 overflow-x-auto">
-                  <div className="min-w-[280px]">{renderVisualization()}</div>
+                  {user ? (
+                    <div className="min-w-[280px]">{renderVisualization()}</div>
+                  ) : (
+                    <div className="text-center space-y-4 py-12">
+                      <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
+                        <Eye className="w-8 h-8 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-lg font-semibold text-foreground">
+                          Sign In to View Visualization
+                        </p>
+                        <p className="text-sm text-muted-foreground mt-2">
+                          Interactive visualizations are exclusive to registered users
+                        </p>
+                      </div>
+                      <Button onClick={() => navigate("/auth")} size="lg">
+                        Sign In to Continue
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             </Card>
