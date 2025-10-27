@@ -1616,25 +1616,11 @@ const AlgorithmDetail: React.FC = () => {
             {/* 5. YouTube Video Player (if available) */}
             {algorithm.youtubeUrl && (
               <>
-                <YouTubePlayer youtubeUrl={algorithm.youtubeUrl} />
+                <YouTubePlayer youtubeUrl={algorithm.youtubeUrl} algorithmName={algorithm.name} />
                 
                 {/* Video Explanation Section */}
                 <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-5xl mx-auto">
                   <div className="space-y-6">
-                    {/* What the video teaches */}
-                    <div className="space-y-3">
-                      <h3 className="text-xl font-semibold flex items-center gap-2">
-                        <Book className="w-5 h-5 text-primary" />
-                        What This Video Teaches
-                      </h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        This tutorial provides a comprehensive walkthrough of the {algorithm.name} algorithm, 
-                        demonstrating its practical application through step-by-step code implementation. 
-                        The video breaks down complex concepts into digestible segments, making it easier to 
-                        understand how the algorithm works under the hood and when to apply it in real-world scenarios.
-                      </p>
-                    </div>
-
                     {/* Code example explanation */}
                     {implementation && (
                       <div className="space-y-3">
@@ -1696,14 +1682,6 @@ const AlgorithmDetail: React.FC = () => {
                         </ul>
                       </div>
                     )}
-
-                    {/* Credits */}
-                    <div className="pt-4 border-t border-border/50">
-                      <p className="text-xs text-muted-foreground">
-                        <strong>Credits:</strong> Video tutorial by NeetCode (used with permission). 
-                        All written explanations, code examples, and additional insights provided by Algolib.io.
-                      </p>
-                    </div>
                   </div>
                 </Card>
               </>

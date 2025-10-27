@@ -11,9 +11,10 @@ interface YouTubeMetadata {
 
 interface YouTubePlayerProps {
   youtubeUrl: string;
+  algorithmName?: string;
 }
 
-export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ youtubeUrl }) => {
+export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ youtubeUrl, algorithmName }) => {
   const [metadata, setMetadata] = useState<YouTubeMetadata | null>(null);
   const [error, setError] = useState(false);
 
@@ -104,18 +105,23 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ youtubeUrl }) => {
           />
         </div>
 
-        {/* Channel Info & Credits */}
-        <div className="flex items-center justify-between">
-          <a
-            href={metadata.author_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-2 group ml-auto"
-          >
-            <Youtube className="w-4 h-4 text-red-500" />
-            <span>Video by <span className="font-medium">{metadata.author_name}</span></span>
-            <ExternalLink className="w-3.5 h-3.5" />
-          </a>
+        {/* What the video teaches */}
+        <div className="space-y-3 pt-2">
+          <h3 className="text-lg font-semibold">What This Video Teaches</h3>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            This tutorial provides a comprehensive walkthrough of the {algorithmName || 'algorithm'}, 
+            demonstrating its practical application through step-by-step code implementation. 
+            The video breaks down complex concepts into digestible segments, making it easier to 
+            understand how the algorithm works under the hood and when to apply it in real-world scenarios.
+          </p>
+        </div>
+
+        {/* Credits */}
+        <div className="pt-4 border-t border-border/50">
+          <p className="text-xs text-muted-foreground">
+            <strong>Credits:</strong> Video tutorial by NeetCode (used with permission). 
+            All written explanations, code examples, and additional insights provided by Algolib.io.
+          </p>
         </div>
       </div>
     </Card>
