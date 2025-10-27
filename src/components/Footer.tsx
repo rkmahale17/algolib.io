@@ -98,6 +98,11 @@ export function Footer() {
                   Terms of Service
                 </Link>
               </li>
+              <li>
+                <Link to="/content-rights" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Content Rights
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
