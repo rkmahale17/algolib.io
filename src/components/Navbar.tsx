@@ -56,6 +56,32 @@ const Navbar = () => {
     }
   };
 
+  // Set up realtime subscription for progress updates
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('user_progress_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'user_progress',
+          filter: `user_id=eq.${user.id}`
+        },
+        () => {
+          // Refetch progress when any change occurs
+          fetchProgress(user.id);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {

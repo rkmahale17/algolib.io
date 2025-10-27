@@ -1,8 +1,10 @@
-import { ArrowLeft, BookOpen, Code2, ExternalLink, Eye } from "lucide-react";
+import { ArrowLeft, BookOpen, CheckCircle2, Code2, ExternalLink, Eye } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 // src/pages/AlgorithmDetail.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "sonner";
 
 import AlgoMetaHead from "@/services/meta.injectot";
 import { Badge } from "@/components/ui/badge";
@@ -24,17 +26,23 @@ const AlgorithmDetail: React.FC = () => {
   const implementation = getAlgorithmImplementation(id || "");
   const [showBreadcrumb, setShowBreadcrumb] = useState(true);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [user, setUser] = useState<any>(null);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [isLoadingProgress, setIsLoadingProgress] = useState(true);
 
-  // Check authentication
-  React.useEffect(() => {
+  // Check authentication and load progress
+  useEffect(() => {
     const checkAuth = async () => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      // if (!session) {
-      //   navigate("/auth");
-      //   return;
-      // }
+      setUser(session?.user ?? null);
+      
+      if (session?.user && id) {
+        await fetchProgress(session.user.id);
+      } else {
+        setIsLoadingProgress(false);
+      }
       setIsCheckingAuth(true);
     };
 
@@ -43,13 +51,99 @@ const AlgorithmDetail: React.FC = () => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!session) {
-        // navigate("/auth");
+      setUser(session?.user ?? null);
+      if (session?.user && id) {
+        fetchProgress(session.user.id);
+      } else {
+        setIsCompleted(false);
+        setIsLoadingProgress(false);
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, id]);
+
+  // Fetch user's progress for this algorithm
+  const fetchProgress = async (userId: string) => {
+    if (!id) return;
+    
+    setIsLoadingProgress(true);
+    const { data, error } = await supabase
+      .from("user_progress")
+      .select("completed")
+      .eq("user_id", userId)
+      .eq("algorithm_id", id)
+      .maybeSingle();
+
+    if (!error && data) {
+      setIsCompleted(data.completed);
+    } else {
+      setIsCompleted(false);
+    }
+    setIsLoadingProgress(false);
+  };
+
+  // Toggle completion status
+  const toggleCompletion = async () => {
+    if (!user || !id) {
+      toast.error("Please sign in to track your progress");
+      navigate("/auth");
+      return;
+    }
+
+    const newCompletedState = !isCompleted;
+    
+    // Optimistic update
+    setIsCompleted(newCompletedState);
+
+    // Check if record exists
+    const { data: existing } = await supabase
+      .from("user_progress")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("algorithm_id", id)
+      .maybeSingle();
+
+    if (existing) {
+      // Update existing record
+      const { error } = await supabase
+        .from("user_progress")
+        .update({ 
+          completed: newCompletedState,
+          completed_at: newCompletedState ? new Date().toISOString() : null
+        })
+        .eq("user_id", user.id)
+        .eq("algorithm_id", id);
+
+      if (error) {
+        // Revert on error
+        setIsCompleted(!newCompletedState);
+        toast.error("Failed to update progress");
+        console.error(error);
+      } else {
+        toast.success(newCompletedState ? "Marked as completed! 🎉" : "Marked as incomplete");
+      }
+    } else {
+      // Insert new record
+      const { error } = await supabase
+        .from("user_progress")
+        .insert({
+          user_id: user.id,
+          algorithm_id: id,
+          completed: newCompletedState,
+          completed_at: newCompletedState ? new Date().toISOString() : null
+        });
+
+      if (error) {
+        // Revert on error
+        setIsCompleted(!newCompletedState);
+        toast.error("Failed to save progress");
+        console.error(error);
+      } else {
+        toast.success("Marked as completed! 🎉");
+      }
+    }
+  };
 
   // Scroll to top on mount/route change
   React.useEffect(() => {
@@ -1283,7 +1377,30 @@ const AlgorithmDetail: React.FC = () => {
         <div className="container mx-auto px-4 py-8 overflow-x-hidden">
           {/* Single column layout for all screen sizes */}
           <div className="space-y-6 mx-auto">
-            {/* 1. Animation */}
+            {/* Completion Tracker (Only for logged-in users) */}
+            {user && (
+              <Card className="p-4 glass-card border-primary/20">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-full ${isCompleted ? 'bg-green-500/20' : 'bg-muted'}`}>
+                      <CheckCircle2 className={`w-5 h-5 ${isCompleted ? 'text-green-500' : 'text-muted-foreground'}`} />
+                    </div>
+                    <div>
+                      <p className="font-medium">Track Your Progress</p>
+                      <p className="text-xs text-muted-foreground">Mark this algorithm as completed</p>
+                    </div>
+                  </div>
+                  <Checkbox
+                    checked={isCompleted}
+                    onCheckedChange={toggleCompletion}
+                    disabled={isLoadingProgress}
+                    className="h-6 w-6"
+                  />
+                </div>
+              </Card>
+            )}
+
+            {/* 1. Animation - Login Required */}
             <Card className="p-4 sm:p-6 glass-card overflow-hidden">
               <div className="space-y-4">
                 <div className="flex items-center justify-between flex-wrap gap-2">
@@ -1305,7 +1422,26 @@ const AlgorithmDetail: React.FC = () => {
                   </div>
                 </div>
                 <div className="rounded-lg bg-muted/30 border border-border/50 p-2 sm:p-4 overflow-x-auto">
-                  <div className="min-w-[280px]">{renderVisualization()}</div>
+                  {user ? (
+                    <div className="min-w-[280px]">{renderVisualization()}</div>
+                  ) : (
+                    <div className="text-center space-y-4 py-12">
+                      <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
+                        <Eye className="w-8 h-8 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-lg font-semibold text-foreground">
+                          Sign In to View Visualization
+                        </p>
+                        <p className="text-sm text-muted-foreground mt-2">
+                          Interactive visualizations are exclusive to registered users
+                        </p>
+                      </div>
+                      <Button onClick={() => navigate("/auth")} size="lg">
+                        Sign In to Continue
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             </Card>
