@@ -11,6 +11,7 @@ import Feedback from "./pages/Feedback";
 import About from "./pages/About";
 import Privacy from "./pages/Privacy";
 import TermsOfService from "./pages/TermsOfService";
+import ContentRights from "./pages/ContentRights";
 import Navbar from "./components/Navbar";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/about" element={<About />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/content-rights" element={<ContentRights />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
