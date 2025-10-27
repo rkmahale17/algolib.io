@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Github, LogOut, Menu as MenuIcon, MessageSquare, Sparkles, Trophy } from "lucide-react";
+import { Github, LogOut, Menu as MenuIcon, MessageSquare, Trophy } from "lucide-react";
+import logo from "@/assets/logo.svg";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -98,9 +99,7 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex items-center gap-4">
             <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
+              <img src={logo} alt="Algo Lib Logo" className="w-10 h-10" />
               <span className="font-bold text-xl">Algo Lib</span>
             </Link>
             <a 
