@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Github, Heart, ExternalLink } from "lucide-react";
+import { Github, Heart, ExternalLink, Coffee } from "lucide-react";
 import { Button } from "./ui/button";
 
 export function Footer() {
@@ -136,17 +136,30 @@ export function Footer() {
                 </a>
               </div>
             </div>
-            <Button variant="outline" size="sm" asChild>
-              <a 
-                href="https://github.com/rkmahale17/algolib.io" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center gap-2"
-              >
-                <Github className="w-4 h-4" />
-                Star on GitHub
-              </a>
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button variant="outline" size="sm" asChild>
+                <a 
+                  href="https://github.com/rkmahale17/algolib.io" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2"
+                >
+                  <Github className="w-4 h-4" />
+                  Star on GitHub
+                </a>
+              </Button>
+              <Button size="sm" asChild className="bg-[#FFDD00] text-[#000000] hover:bg-[#FFDD00]/90">
+                <a 
+                  href="https://www.buymeacoffee.com/yourusername" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2"
+                >
+                  <Coffee className="w-4 h-4" />
+                  Buy Me a Coffee
+                </a>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
