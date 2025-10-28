@@ -89,15 +89,17 @@ const Home = () => {
       </Helmet>
       
       <div className="min-h-screen bg-background">
-        {/* Floating Buy Me a Coffee Button */}
+        {/* Vertical Buy Me a Coffee Button */}
         <a
           href="https://buymeacoffee.com/jsonmaster"
           target="_blank"
           rel="noopener noreferrer"
-          className="fixed right-6 top-24 z-50 hidden lg:flex items-center gap-2 px-4 py-2 bg-[#FFDD00] text-[#000000] rounded-full shadow-lg hover:bg-[#FFDD00]/90 hover:scale-105 transition-all font-medium"
+          className="fixed left-0 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-center gap-2 px-3 py-4 bg-[#FFDD00] text-[#000000] rounded-r-lg shadow-lg hover:bg-[#FFDD00]/90 hover:pl-4 transition-all font-medium group"
         >
-          <Coffee className="w-4 h-4" />
-          <span>Buy Me a Coffee</span>
+          <Coffee className="w-5 h-5" />
+          <span className="writing-mode-vertical text-sm whitespace-nowrap [writing-mode:vertical-lr] rotate-180">
+            Buy Me a Coffee
+          </span>
         </a>
 
         {/* Hero Section */}
