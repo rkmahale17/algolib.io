@@ -1,4 +1,4 @@
-import { BookOpen, Search, Sparkles, TrendingUp, Trophy } from 'lucide-react';
+import { BookOpen, Search, Sparkles, TrendingUp, Trophy, Coffee } from 'lucide-react';
 import { algorithms, categories } from '@/data/algorithms';
 
 import { Badge } from '@/components/ui/badge';
@@ -89,6 +89,17 @@ const Home = () => {
       </Helmet>
       
       <div className="min-h-screen bg-background">
+        {/* Floating Buy Me a Coffee Button */}
+        <a
+          href="https://buymeacoffee.com/jsonmaster"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fixed right-6 top-24 z-50 hidden lg:flex items-center gap-2 px-4 py-2 bg-[#FFDD00] text-[#000000] rounded-full shadow-lg hover:bg-[#FFDD00]/90 hover:scale-105 transition-all font-medium"
+        >
+          <Coffee className="w-4 h-4" />
+          <span>Buy Me a Coffee</span>
+        </a>
+
         {/* Hero Section */}
       <div className="relative overflow-hidden bg-gradient-to-b from-background via-muted/20 to-background border-b border-border/50">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />

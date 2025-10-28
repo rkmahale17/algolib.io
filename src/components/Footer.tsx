@@ -150,7 +150,7 @@ export function Footer() {
               </Button>
               <Button size="sm" asChild className="bg-[#FFDD00] text-[#000000] hover:bg-[#FFDD00]/90">
                 <a 
-                  href="https://www.buymeacoffee.com/yourusername" 
+                  href="https://buymeacoffee.com/jsonmaster" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="flex items-center gap-2"
