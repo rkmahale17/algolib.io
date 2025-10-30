@@ -36,66 +36,23 @@ export function AlgoMetaHead({ id }: { id?: string }) {
     : 'algorithms, open source, free, competitive programming, algorithm library, algolib';
 
   const pageUrl = algo ? `${siteBase}/algorithm/${algo.id}` : siteBase;
-  const ogImage = `${siteBase}/og-image.png`; // Use default OG image for all pages
+  const ogImage = `${siteBase}/og-images/${algo ? algo.id : 'og-image'}.png`;
 
-  // Build JSON-LD structured data
-  const jsonLd = algo ? {
+  // Build JSON-LD that lists all algorithm pages (as requested)
+  const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "TechArticle",
-    "headline": algo.name,
-    "description": algo.description,
-    "url": `${siteBase}/algorithm/${algo.id}`,
-    "author": {
-      "@type": "Organization",
-      "name": "AlgoLib.io",
-      "url": siteBase
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "AlgoLib.io",
-      "url": siteBase,
-      "logo": {
-        "@type": "ImageObject",
-        "url": `${siteBase}/android-chrome-512x512.png`
-      }
-    },
-    "datePublished": "2024-01-01",
-    "dateModified": new Date().toISOString().split('T')[0],
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": `${siteBase}/algorithm/${algo.id}`
-    },
-    "about": {
-      "@type": "Thing",
-      "name": algo.category,
-      "description": `${algo.category} algorithms`
-    },
-    "keywords": [algo.id, algo.name, algo.category, 'algorithm', 'data structure', 'competitive programming'].join(', '),
-    "articleSection": algo.category,
-    "proficiencyLevel": algo.difficulty
-  } : {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "AlgoLib.io",
-    "url": siteBase,
-    "description": "Free and open-source algorithm library for competitive programming",
-    "publisher": {
-      "@type": "Organization",
-      "name": "AlgoLib.io",
-      "url": siteBase,
-      "logo": {
-        "@type": "ImageObject",
-        "url": `${siteBase}/android-chrome-512x512.png`
-      }
-    },
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": {
-        "@type": "EntryPoint",
-        "urlTemplate": `${siteBase}/?search={search_term_string}`
-      },
-      "query-input": "required name=search_term_string"
-    }
+    "@type": "ItemList",
+    "name": "AlgoLib.io Algorithm Index",
+    "description": "Index of algorithms available on AlgoLib.io (free & open-source).",
+    "url": `${siteBase}/algorithm/`,
+    "numberOfItems": algorithms.length,
+    "itemListElement": algorithms.map((a, idx) => ({
+      "@type": "ListItem",
+      "position": idx + 1,
+      "url": `${siteBase}/algorithm/${a.id}`,
+      "name": a.name,
+      "description": a.description
+    }))
   };
 
   return (
