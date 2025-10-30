@@ -91,6 +91,53 @@ const Home = () => {
             "description": "AlgoLib.io is a free and open-source algorithm library that helps developers learn and visualize algorithms with interactive animations and clean code snippets in multiple programming languages."
           })}
         </script>
+        
+        {/* Structured Data - ItemList for Categories */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "name": "Algorithm Categories",
+            "description": "Browse algorithms by category",
+            "itemListElement": categories.map((category, index) => ({
+              "@type": "ListItem",
+              "position": index + 1,
+              "item": {
+                "@type": "Thing",
+                "@id": `https://algolib.io/?category=${encodeURIComponent(category)}`,
+                "name": `${category} Algorithms`,
+                "description": `Learn ${category.toLowerCase()} algorithms with interactive visualizations`
+              }
+            }))
+          })}
+        </script>
+        
+        {/* Structured Data - CollectionPage */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "name": "AlgoLib.io - Algorithm Library",
+            "description": "Browse 72+ algorithms with step-by-step visualizations",
+            "url": "https://algolib.io",
+            "mainEntity": {
+              "@type": "ItemList",
+              "numberOfItems": algorithms.length,
+              "itemListElement": algorithms.slice(0, 20).map((algo, index) => ({
+                "@type": "ListItem",
+                "position": index + 1,
+                "item": {
+                  "@type": "TechArticle",
+                  "name": algo.name,
+                  "description": algo.description,
+                  "url": `https://algolib.io/algorithm/${algo.id}`,
+                  "articleSection": algo.category,
+                  "proficiencyLevel": algo.difficulty
+                }
+              }))
+            }
+          })}
+        </script>
       </Helmet>
       
       <div className="min-h-screen bg-background">

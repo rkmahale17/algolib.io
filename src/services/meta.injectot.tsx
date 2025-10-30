@@ -45,10 +45,22 @@ export function AlgoMetaHead({ id }: { id?: string }) {
     "headline": algo.name,
     "description": algo.description,
     "url": `${siteBase}/algorithm/${algo.id}`,
+    "image": {
+      "@type": "ImageObject",
+      "url": ogImage,
+      "width": 1200,
+      "height": 630
+    },
     "author": {
       "@type": "Organization",
       "name": "AlgoLib.io",
-      "url": siteBase
+      "url": siteBase,
+      "logo": {
+        "@type": "ImageObject",
+        "url": `${siteBase}/android-chrome-512x512.png`,
+        "width": 512,
+        "height": 512
+      }
     },
     "publisher": {
       "@type": "Organization",
@@ -56,7 +68,9 @@ export function AlgoMetaHead({ id }: { id?: string }) {
       "url": siteBase,
       "logo": {
         "@type": "ImageObject",
-        "url": `${siteBase}/android-chrome-512x512.png`
+        "url": `${siteBase}/android-chrome-512x512.png`,
+        "width": 512,
+        "height": 512
       }
     },
     "datePublished": "2024-01-01",
@@ -72,7 +86,9 @@ export function AlgoMetaHead({ id }: { id?: string }) {
     },
     "keywords": [algo.id, algo.name, algo.category, 'algorithm', 'data structure', 'competitive programming'].join(', '),
     "articleSection": algo.category,
-    "proficiencyLevel": algo.difficulty
+    "proficiencyLevel": algo.difficulty,
+    "educationalLevel": algo.difficulty === 'beginner' ? 'Beginner' : algo.difficulty === 'intermediate' ? 'Intermediate' : 'Advanced',
+    "timeRequired": "PT5M"
   } : {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -122,8 +138,44 @@ export function AlgoMetaHead({ id }: { id?: string }) {
       {/* Canonical */}
       <link rel="canonical" href={pageUrl} />
 
-      {/* JSON-LD with full list of algorithms */}
+      {/* JSON-LD - TechArticle or WebSite */}
       <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+      
+      {/* JSON-LD - BreadcrumbList for algorithm pages */}
+      {algo && (
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "item": {
+                  "@id": siteBase,
+                  "name": "Home"
+                }
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "item": {
+                  "@id": `${siteBase}/?category=${encodeURIComponent(algo.category)}`,
+                  "name": algo.category
+                }
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "item": {
+                  "@id": `${siteBase}/algorithm/${algo.id}`,
+                  "name": algo.name
+                }
+              }
+            ]
+          })}
+        </script>
+      )}
     </Helmet>
   );
 }
