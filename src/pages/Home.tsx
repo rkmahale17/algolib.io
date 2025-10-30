@@ -78,7 +78,12 @@ const Home = () => {
             "@type": "EducationalOrganization",
             "name": "AlgoLib.io",
             "url": "https://algolib.io",
-            "logo": "https://algolib.io/favicon.png",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://algolib.io/android-chrome-512x512.png",
+              "width": 512,
+              "height": 512
+            },
             "sameAs": [
               "https://x.com/algolib_io",
               "https://github.com/rkmahale17/algolib.io"
