@@ -9,11 +9,21 @@ import { Footer } from '@/components/Footer';
 import { Helmet } from 'react-helmet-async';
 import { Input } from '@/components/ui/input';
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 const Home = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  // Read category from URL params on mount
+  useEffect(() => {
+    const categoryParam = searchParams.get('category');
+    if (categoryParam) {
+      setSelectedCategory(categoryParam);
+    }
+  }, [searchParams]);
 
   const filteredAlgorithms = algorithms.filter((algo) => {
     const matchesSearch = algo.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -240,7 +250,7 @@ const Home = () => {
       <div className="container mx-auto px-4 pb-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredAlgorithms.map((algo, index) => (
-            <Link key={algo.id} to={`/algorithm/${algo.id}`}>
+            <Link key={algo.id} to={`/algorithm/${algo.id}`} target="_blank" rel="noopener noreferrer">
               <Card 
                 className="p-6 hover-lift cursor-pointer glass-card group"
                 style={{ animationDelay: `${index * 50}ms` }}

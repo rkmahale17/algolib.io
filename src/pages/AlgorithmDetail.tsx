@@ -2,6 +2,7 @@ import { ArrowLeft, Book, BookOpen, CheckCircle2, Clock, Code2, ExternalLink, Ey
 import { Link, useNavigate, useParams } from "react-router-dom";
 // src/pages/AlgorithmDetail.tsx
 import React, { useState, useEffect } from "react";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
@@ -1345,29 +1346,23 @@ const AlgorithmDetail: React.FC = () => {
               </Link>
               <Separator orientation="vertical" className="h-6" />
               <div
-                className={`flex items-center gap-2 text-sm text-muted-foreground transition-all duration-100 md:opacity-100 ${
+                className={`transition-all duration-100 md:opacity-100 ${
                   showBreadcrumb
-                    ? "opacity-100 max-h-4"
+                    ? "opacity-100 max-h-12"
                     : "opacity-0 max-h-0 overflow-hidden"
                 }`}
               >
-                <Link
-                  to="/"
-                  className="hover:text-foreground transition-colors"
-                >
-                  Algorithms
-                </Link>
-                <span>/</span>
-                <Link
-                  to={`/?category=${encodeURIComponent(algorithm.category)}`}
-                  className="hover:text-foreground transition-colors"
-                >
-                  {algorithm.category}
-                </Link>
-                <span>/</span>
-                <span className="text-foreground font-medium text-sm  md:text-xl">
-                  {algorithm.name}
-                </span>
+                <Breadcrumbs 
+                  items={[
+                    {
+                      label: algorithm.category,
+                      href: `/?category=${encodeURIComponent(algorithm.category)}`
+                    },
+                    {
+                      label: algorithm.name
+                    }
+                  ]}
+                />
               </div>
             </div>
           </div>
