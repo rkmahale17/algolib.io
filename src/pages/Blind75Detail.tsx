@@ -427,7 +427,15 @@ const Blind75Detail: React.FC = () => {
                       <Eye className="w-5 h-5 text-primary" />
                       Interactive Visualization
                     </h2>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => window.open(problem.leetcodeSearch, '_blank')}
+                      >
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        Solve on LeetCode
+                      </Button>
                       <ShareButton
                         title={problem.title}
                         description={problem.description}
