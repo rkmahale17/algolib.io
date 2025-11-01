@@ -10,6 +10,9 @@ export interface Blind75Problem {
   spaceComplexity: string;
   companies: string[];
   tags: string[];
+  algorithmId?: string; // Link to existing algorithm for visualization
+  youtubeUrl?: string; // NeetCode video URL
+  useCases?: string[]; // Real-world use cases
 }
 
 export const blind75Problems: Blind75Problem[] = [
@@ -24,7 +27,10 @@ export const blind75Problems: Blind75Problem[] = [
     timeComplexity: "O(n)",
     spaceComplexity: "O(n)",
     companies: ["Amazon", "Google", "Facebook", "Microsoft"],
-    tags: ["Hash Table", "Array"]
+    tags: ["Hash Table", "Array"],
+    algorithmId: "two-pointers",
+    youtubeUrl: "https://www.youtube.com/watch?v=KLlXCFG5TnA",
+    useCases: ["Finding pairs in datasets", "Complement search in databases", "Financial transaction matching"]
   },
   {
     id: 2,
@@ -37,7 +43,9 @@ export const blind75Problems: Blind75Problem[] = [
     timeComplexity: "O(n)",
     spaceComplexity: "O(1)",
     companies: ["Amazon", "Microsoft", "Facebook"],
-    tags: ["Array", "Dynamic Programming"]
+    tags: ["Array", "Dynamic Programming"],
+    youtubeUrl: "https://www.youtube.com/watch?v=1pkOgXD63yU",
+    useCases: ["Stock trading algorithms", "Price optimization", "Timing market entries"]
   },
   {
     id: 3,
@@ -48,9 +56,11 @@ export const blind75Problems: Blind75Problem[] = [
     description: "Given an integer array nums, return true if any value appears at least twice in the array, and return false if every element is distinct.",
     leetcodeSearch: "https://leetcode.com/problemset/all/?search=Contains%20Duplicate",
     timeComplexity: "O(n)",
-    spaceComplexity: "O(n)",
+    spaceComplexity: "O(1)",
     companies: ["Amazon", "Apple", "Adobe"],
-    tags: ["Array", "Hash Table", "Sorting"]
+    tags: ["Array", "Hash Table", "Sorting"],
+    youtubeUrl: "https://www.youtube.com/watch?v=3OamzN90kPg",
+    useCases: ["Duplicate detection in databases", "Data validation", "Unique constraint checking"]
   },
   {
     id: 4,
@@ -63,7 +73,10 @@ export const blind75Problems: Blind75Problem[] = [
     timeComplexity: "O(n)",
     spaceComplexity: "O(1)",
     companies: ["Amazon", "Facebook", "Microsoft"],
-    tags: ["Array", "Prefix Sum"]
+    tags: ["Array", "Prefix Sum"],
+    algorithmId: "prefix-sum",
+    youtubeUrl: "https://www.youtube.com/watch?v=bNvIQI2wAjk",
+    useCases: ["Statistical calculations", "Array transformations", "Mathematical computations"]
   },
   {
     id: 5,
@@ -76,7 +89,10 @@ export const blind75Problems: Blind75Problem[] = [
     timeComplexity: "O(n)",
     spaceComplexity: "O(1)",
     companies: ["Amazon", "Microsoft", "LinkedIn"],
-    tags: ["Array", "Dynamic Programming", "Divide and Conquer"]
+    tags: ["Array", "Dynamic Programming", "Divide and Conquer"],
+    algorithmId: "kadanes-algorithm",
+    youtubeUrl: "https://www.youtube.com/watch?v=5WZl3MMT0Eg",
+    useCases: ["Financial analysis", "Maximum profit calculation", "Pattern recognition in data"]
   },
   {
     id: 6,
@@ -89,7 +105,9 @@ export const blind75Problems: Blind75Problem[] = [
     timeComplexity: "O(n)",
     spaceComplexity: "O(1)",
     companies: ["Amazon", "LinkedIn"],
-    tags: ["Array", "Dynamic Programming"]
+    tags: ["Array", "Dynamic Programming"],
+    youtubeUrl: "https://www.youtube.com/watch?v=lXVy6YWFcRM",
+    useCases: ["Optimization problems", "Product calculations", "Dynamic programming applications"]
   },
   {
     id: 7,
@@ -102,7 +120,10 @@ export const blind75Problems: Blind75Problem[] = [
     timeComplexity: "O(log n)",
     spaceComplexity: "O(1)",
     companies: ["Amazon", "Microsoft"],
-    tags: ["Array", "Binary Search"]
+    tags: ["Array", "Binary Search"],
+    algorithmId: "binary-search",
+    youtubeUrl: "https://www.youtube.com/watch?v=nIVW4P8b1VA",
+    useCases: ["Rotated array operations", "Circular buffer search", "Optimized search algorithms"]
   },
   {
     id: 8,
@@ -115,7 +136,10 @@ export const blind75Problems: Blind75Problem[] = [
     timeComplexity: "O(log n)",
     spaceComplexity: "O(1)",
     companies: ["Facebook", "Microsoft", "Amazon"],
-    tags: ["Array", "Binary Search"]
+    tags: ["Array", "Binary Search"],
+    algorithmId: "binary-search",
+    youtubeUrl: "https://www.youtube.com/watch?v=U8XENwh8Oy8",
+    useCases: ["Circular buffer search", "Rotated data structures", "Database indexing"]
   },
   {
     id: 9,
@@ -128,7 +152,10 @@ export const blind75Problems: Blind75Problem[] = [
     timeComplexity: "O(n²)",
     spaceComplexity: "O(1)",
     companies: ["Amazon", "Facebook", "Microsoft"],
-    tags: ["Array", "Two Pointers", "Sorting"]
+    tags: ["Array", "Two Pointers", "Sorting"],
+    algorithmId: "two-pointers",
+    youtubeUrl: "https://www.youtube.com/watch?v=jzZsG8n2R9A",
+    useCases: ["Finding triplets in datasets", "Combinatorial searches", "Financial reconciliation"]
   },
   {
     id: 10,
@@ -141,7 +168,10 @@ export const blind75Problems: Blind75Problem[] = [
     timeComplexity: "O(n)",
     spaceComplexity: "O(1)",
     companies: ["Amazon", "Google", "Facebook"],
-    tags: ["Array", "Two Pointers", "Greedy"]
+    tags: ["Array", "Two Pointers", "Greedy"],
+    algorithmId: "container-with-most-water",
+    youtubeUrl: "https://www.youtube.com/watch?v=UuiTKBwPgAo",
+    useCases: ["Area optimization", "Resource allocation", "Capacity planning"]
   },
   {
     id: 11,
