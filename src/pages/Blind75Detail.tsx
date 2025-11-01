@@ -358,242 +358,181 @@ const Blind75Detail: React.FC = () => {
 
       <div className="min-h-screen bg-background">
         {/* Sticky Header */}
-        <div
-          className={`
-            sticky top-16 z-30 bg-background/80 backdrop-blur-lg border-b border-border/50 
-            transition-all duration-300
-            ${showBreadcrumb ? "opacity-100 translate-y-0" : "md:opacity-100 md:translate-y-0 opacity-0 -translate-y-full pointer-events-none md:pointer-events-auto"}
-          `}
-        >
-          <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex items-center gap-4 flex-1 min-w-0">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigate("/blind75")}
-                  className="gap-2 shrink-0"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  <span className="hidden sm:inline">Blind 75</span>
+        <div className="border-b border-border/50 bg-card/30 backdrop-blur-sm sticky top-0 z-10">
+          <div className="container mx-auto px-4 py-2">
+            <div className="flex items-center flex-wrap gap-2">
+              <Link to="/blind75">
+                <Button variant="ghost" size="sm">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back
                 </Button>
-
-                <Separator orientation="vertical" className="h-6" />
-
-                <div className="overflow-hidden">
-                  <Breadcrumbs
-                    items={[
-                      {
-                        label: "Blind 75",
-                        href: "/blind75",
-                      },
-                      {
-                        label: problem.category,
-                        href: `/blind75?category=${encodeURIComponent(problem.category)}`,
-                      },
-                      {
-                        label: problem.title,
-                      },
-                    ]}
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 shrink-0">
-                <ShareButton title={problem.title} description={problem.description} />
-                {problem.leetcodeSearch && (
-                  <Button variant="outline" size="sm" asChild>
-                    <a
-                      href={problem.leetcodeSearch}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <ExternalLink className="w-4 h-4 mr-2" />
-                      LeetCode
-                    </a>
-                  </Button>
-                )}
+              </Link>
+              <Separator orientation="vertical" className="h-6" />
+              <div
+                className={`transition-all duration-100 md:opacity-100 ${
+                  showBreadcrumb
+                    ? "opacity-100 max-h-12"
+                    : "opacity-0 max-h-0 overflow-hidden"
+                }`}
+              >
+                <Breadcrumbs 
+                  items={[
+                    {
+                      label: problem.category,
+                      href: `/blind75?category=${encodeURIComponent(problem.category)}`
+                    },
+                    {
+                      label: problem.title
+                    }
+                  ]}
+                />
               </div>
             </div>
           </div>
         </div>
 
         {/* Main Content */}
-        <div className="container mx-auto px-4 py-8">
-          <div className="max-w-6xl mx-auto space-y-8">
-            {/* Problem Header */}
-            <div className="space-y-4">
-              <div className="flex items-start justify-between gap-4">
-                <div className="space-y-2 flex-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
-                      #{problem.id}
-                    </Badge>
-                    <Badge
-                      variant="outline"
-                      className={difficultyColors[problem.difficulty]}
-                    >
-                      {problem.difficulty.charAt(0).toUpperCase() + problem.difficulty.slice(1)}
-                    </Badge>
-                    <Badge variant="outline">{problem.category}</Badge>
-                  </div>
-                  <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
-                    {problem.title}
-                  </h1>
-                </div>
-                
-                {/* Progress Checkbox */}
-                <div className="shrink-0">
-                  <div
-                    onClick={toggleCompletion}
-                    className="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-accent transition-colors"
-                  >
-                    <Checkbox
-                      checked={isCompleted}
-                      disabled={isLoadingProgress}
-                      className="pointer-events-none"
-                    />
-                    <span className="text-sm font-medium hidden sm:inline">
-                      {isCompleted ? "Completed" : "Mark Complete"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Complexity & Companies */}
-              <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4" />
-                  <span>Time: {problem.timeComplexity}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <BookOpen className="w-4 h-4" />
-                  <span>Space: {problem.spaceComplexity}</span>
-                </div>
-              </div>
-
-              {/* Companies */}
-              {problem.companies && problem.companies.length > 0 && (
-                <div className="flex items-start gap-2">
-                  <span className="text-sm font-semibold text-muted-foreground">Companies:</span>
-                  <div className="flex flex-wrap gap-2">
-                    {problem.companies.map((company) => (
-                      <Badge key={company} variant="secondary">
-                        {company}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Tags */}
-              {problem.tags && problem.tags.length > 0 && (
-                <div className="flex items-start gap-2">
-                  <span className="text-sm font-semibold text-muted-foreground">Tags:</span>
-                  <div className="flex flex-wrap gap-2">
-                    {problem.tags.map((tag) => (
-                      <Badge key={tag} variant="outline">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <Separator />
-
-            {/* Main Tabs */}
-            <Tabs defaultValue="description" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:w-auto">
-                <TabsTrigger value="description" className="gap-2">
-                  <Book className="w-4 h-4" />
-                  Description
-                </TabsTrigger>
-                <TabsTrigger value="solution" className="gap-2">
-                  <Code2 className="w-4 h-4" />
-                  Solution
-                </TabsTrigger>
-                {problem.algorithmId && (
-                  <TabsTrigger value="visualization" className="gap-2">
-                    <Eye className="w-4 h-4" />
-                    Visualization
-                  </TabsTrigger>
-                )}
-                {problem.youtubeUrl && (
-                  <TabsTrigger value="video" className="gap-2">
-                    <Youtube className="w-4 h-4" />
-                    Video
-                  </TabsTrigger>
-                )}
-              </TabsList>
-
-              {/* Description Tab */}
-              <TabsContent value="description" className="space-y-6">
-                <Card className="p-6">
-                  <h2 className="text-2xl font-semibold mb-4">Problem Description</h2>
-                  <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                    {problem.description}
-                  </p>
-                </Card>
-
-                {/* Use Cases */}
-                {problem.useCases && problem.useCases.length > 0 && (
-                  <Card className="p-6">
-                    <div className="flex items-center gap-2 mb-4">
-                      <Lightbulb className="w-5 h-5 text-primary" />
-                      <h2 className="text-2xl font-semibold">Real-World Applications</h2>
+        <div className="container mx-auto px-4 py-8 overflow-x-hidden">
+          {/* Single column layout for all screen sizes */}
+          <div className="space-y-6 mx-auto">
+            {/* Completion Tracker (Only for logged-in users) */}
+            {user && (
+              <Card className="p-4 glass-card border-primary/20">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-full ${isCompleted ? 'bg-green-500/20' : 'bg-muted'}`}>
+                      <CheckCircle2 className={`w-5 h-5 ${isCompleted ? 'text-green-500' : 'text-muted-foreground'}`} />
                     </div>
-                    <ul className="space-y-3">
-                      {problem.useCases.map((useCase, index) => (
-                        <li key={index} className="flex items-start gap-2">
-                          <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
-                          <span className="text-muted-foreground">{useCase}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </Card>
-                )}
-              </TabsContent>
+                    <div>
+                      <p className="font-medium">Track Your Progress</p>
+                      <p className="text-xs text-muted-foreground">Mark this problem as completed</p>
+                    </div>
+                  </div>
+                  <Checkbox
+                    checked={isCompleted}
+                    onCheckedChange={toggleCompletion}
+                    disabled={isLoadingProgress}
+                    className="h-6 w-6"
+                  />
+                </div>
+              </Card>
+            )}
 
-              {/* Solution Tab */}
-              <TabsContent value="solution" className="space-y-6">
-                {implementation ? (
-                  <>
-                    {/* Approach Explanation */}
-                    <Card className="p-6">
-                      <h2 className="text-2xl font-semibold mb-4">Approach</h2>
-                      <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                        {implementation.explanation}
-                      </p>
-                    </Card>
-
-                    {/* Code Implementation */}
-                    <Card className="p-6">
-                      <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
-                        <h2 className="text-2xl font-semibold">Implementation</h2>
-                        <Tabs value={selectedLanguage} onValueChange={(value) => setSelectedLanguage(value as any)}>
-                          <TabsList>
-                            {Object.entries(languageMap).map(([key, label]) => (
-                              <TabsTrigger key={key} value={key}>
-                                {label}
-                              </TabsTrigger>
-                            ))}
-                          </TabsList>
-                        </Tabs>
+            {/* 1. Interactive Visualization */}
+            {problem.algorithmId && (
+              <Card className="p-4 sm:p-6 glass-card overflow-hidden">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <h2 className="text-lg font-semibold flex items-center gap-2">
+                      <Eye className="w-5 h-5 text-primary" />
+                      Interactive Visualization
+                    </h2>
+                    <div className="flex items-center gap-2">
+                      <ShareButton
+                        title={problem.title}
+                        description={problem.description}
+                      />
+                      <Badge
+                        variant="outline"
+                        className={difficultyColors[problem.difficulty]}
+                      >
+                        {problem.difficulty.charAt(0).toUpperCase() + problem.difficulty.slice(1)}
+                      </Badge>
+                    </div>
+                  </div>
+                  <div className="rounded-lg bg-muted/30 border border-border/50 p-2 sm:p-4 overflow-x-auto">
+                    {user ? (
+                      <div className="min-w-[280px]">{renderVisualization()}</div>
+                    ) : (
+                      <div className="text-center space-y-4 py-12">
+                        <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
+                          <Eye className="w-8 h-8 text-primary" />
+                        </div>
+                        <div>
+                          <p className="text-lg font-semibold text-foreground">
+                            Sign In to View Visualization
+                          </p>
+                          <p className="text-sm text-muted-foreground mt-2">
+                            Interactive visualizations are exclusive to registered users
+                          </p>
+                        </div>
+                        <Button onClick={() => navigate("/auth")} size="lg">
+                          Sign In to Continue
+                        </Button>
                       </div>
+                    )}
+                  </div>
+                </div>
+              </Card>
+            )}
 
-                      <div className="relative">
-                        <CopyCodeButton code={implementation[selectedLanguage]} />
-                        <pre className="bg-muted/50 rounded-lg border border-border overflow-x-auto p-4">
-                          <code className="text-sm">{implementation[selectedLanguage]}</code>
-                        </pre>
-                      </div>
-                    </Card>
-                  </>
-                ) : (
-                  <Card className="p-6">
-                    <div className="text-center py-8">
+            {/* 2. Code Implementation */}
+            <Card className="p-4 sm:p-6 glass-card overflow-hidden mx-auto">
+              <div className="space-y-4">
+                <h3 className="font-semibold flex items-center gap-2">
+                  <Code2 className="w-5 h-5 text-primary" />
+                  Implementation
+                </h3>
+
+                <Tabs
+                  defaultValue={selectedLanguage}
+                  onValueChange={(v) => setSelectedLanguage(v as any)}
+                >
+                  <TabsList className="grid h-auto w-full grid-cols-2 sm:grid-cols-4 gap-1">
+                    <TabsTrigger value="python" className="text-xs sm:text-sm">
+                      Python
+                    </TabsTrigger>
+                    <TabsTrigger value="typescript" className="text-xs sm:text-sm">
+                      TypeScript
+                    </TabsTrigger>
+                    <TabsTrigger value="cpp" className="text-xs sm:text-sm">
+                      C++
+                    </TabsTrigger>
+                    <TabsTrigger value="java" className="text-xs sm:text-sm">
+                      Java
+                    </TabsTrigger>
+                  </TabsList>
+
+                  {implementation ? (
+                    <>
+                      <TabsContent value="python" className="mt-4">
+                        <div className="relative overflow-hidden rounded-lg">
+                          <CopyCodeButton code={implementation.python} />
+                          <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
+                            <code className="block">{implementation.python}</code>
+                          </pre>
+                        </div>
+                      </TabsContent>
+
+                      <TabsContent value="typescript" className="mt-4">
+                        <div className="relative overflow-hidden rounded-lg">
+                          <CopyCodeButton code={implementation.typescript} />
+                          <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
+                            <code className="block">{implementation.typescript}</code>
+                          </pre>
+                        </div>
+                      </TabsContent>
+
+                      <TabsContent value="cpp" className="mt-4">
+                        <div className="relative overflow-hidden rounded-lg">
+                          <CopyCodeButton code={implementation.cpp} />
+                          <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
+                            <code className="block">{implementation.cpp}</code>
+                          </pre>
+                        </div>
+                      </TabsContent>
+
+                      <TabsContent value="java" className="mt-4">
+                        <div className="relative overflow-hidden rounded-lg">
+                          <CopyCodeButton code={implementation.java} />
+                          <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
+                            <code className="block">{implementation.java}</code>
+                          </pre>
+                        </div>
+                      </TabsContent>
+                    </>
+                  ) : (
+                    <div className="text-center py-8 mt-4">
                       <p className="text-muted-foreground mb-4">
                         Full implementation coming soon!
                       </p>
@@ -608,30 +547,176 @@ const Blind75Detail: React.FC = () => {
                         </a>
                       </Button>
                     </div>
-                  </Card>
+                  )}
+                </Tabs>
+              </div>
+            </Card>
+
+            {/* 3. Problem Overview & Complexity */}
+            <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-5xl mx-auto">
+              <div className="space-y-4">
+                <h3 className="font-semibold flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-primary" />
+                  Problem Description
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+                  {problem.description}
+                </p>
+
+                <Separator />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-medium mb-1">Time Complexity</p>
+                    <Badge variant="outline" className="font-mono">
+                      {problem.timeComplexity}
+                    </Badge>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium mb-1">Space Complexity</p>
+                    <Badge variant="outline" className="font-mono">
+                      {problem.spaceComplexity}
+                    </Badge>
+                  </div>
+                </div>
+
+                {/* Companies */}
+                {problem.companies && problem.companies.length > 0 && (
+                  <>
+                    <Separator />
+                    <div>
+                      <p className="text-sm font-medium mb-2">Asked By</p>
+                      <div className="flex flex-wrap gap-2">
+                        {problem.companies.map((company) => (
+                          <Badge key={company} variant="secondary">
+                            {company}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </>
                 )}
-              </TabsContent>
 
-              {/* Visualization Tab */}
-              {problem.algorithmId && (
-                <TabsContent value="visualization" className="space-y-6">
-                  <Card className="p-6">
-                    <h2 className="text-2xl font-semibold mb-6">Interactive Visualization</h2>
-                    {renderVisualization()}
-                  </Card>
-                </TabsContent>
-              )}
+                {/* Tags */}
+                {problem.tags && problem.tags.length > 0 && (
+                  <>
+                    <Separator />
+                    <div>
+                      <p className="text-sm font-medium mb-2">Tags</p>
+                      <div className="flex flex-wrap gap-2">
+                        {problem.tags.map((tag) => (
+                          <Badge key={tag} variant="outline">
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </Card>
 
-              {/* Video Tab */}
-              {problem.youtubeUrl && (
-                <TabsContent value="video" className="space-y-6">
-                  <Card className="p-6">
-                    <h2 className="text-2xl font-semibold mb-6">NeetCode Explanation</h2>
+            {/* 4. Approach & Use Cases */}
+            {(implementation?.explanation || problem.useCases) && (
+              <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-5xl mx-auto">
+                <Tabs defaultValue={implementation?.explanation ? "approach" : "usecases"}>
+                  <TabsList className="grid w-full grid-cols-2 h-auto">
+                    {implementation?.explanation && (
+                      <TabsTrigger value="approach" className="text-xs sm:text-sm">
+                        Approach
+                      </TabsTrigger>
+                    )}
+                    {problem.useCases && problem.useCases.length > 0 && (
+                      <TabsTrigger value="usecases" className="text-xs sm:text-sm">
+                        Real-World Use Cases
+                      </TabsTrigger>
+                    )}
+                  </TabsList>
+
+                  {implementation?.explanation && (
+                    <TabsContent value="approach" className="mt-4">
+                      <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+                        {implementation.explanation}
+                      </p>
+                    </TabsContent>
+                  )}
+
+                  {problem.useCases && problem.useCases.length > 0 && (
+                    <TabsContent value="usecases" className="mt-4">
+                      <ul className="space-y-3">
+                        {problem.useCases.map((useCase, index) => (
+                          <li key={index} className="flex items-start gap-2">
+                            <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
+                            <span className="text-sm text-muted-foreground">{useCase}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </TabsContent>
+                  )}
+                </Tabs>
+              </Card>
+            )}
+
+            {/* 5. YouTube Video Player (if available) */}
+            {problem.youtubeUrl && (
+              <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-5xl mx-auto">
+                <div className="space-y-6">
+                  {/* Video Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Youtube className="w-5 h-5 text-red-500" />
+                      <h3 className="font-semibold">NeetCode Explanation</h3>
+                    </div>
+
+                    {/* YouTube Player */}
                     <YouTubePlayer youtubeUrl={problem.youtubeUrl} algorithmName={problem.title} />
-                  </Card>
-                </TabsContent>
-              )}
-            </Tabs>
+
+                    {/* What the video teaches */}
+                    <div className="space-y-2">
+                      <h4 className="text-lg font-semibold">What This Video Teaches</h4>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        This tutorial provides a comprehensive walkthrough of the {problem.title} problem, 
+                        demonstrating its practical application through step-by-step code implementation. 
+                        The video breaks down complex concepts into digestible segments, making it easier to 
+                        understand how the solution works and when to apply similar techniques in other problems.
+                      </p>
+                    </div>
+
+                    {/* Credits */}
+                    <div className="pt-2 border-t border-border/50">
+                      <p className="text-xs text-muted-foreground">
+                        <strong>Credits:</strong> Video tutorial by NeetCode (used with permission). 
+                        All written explanations, code examples, and additional insights provided by Algolib.io.
+                      </p>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Complexity Analysis */}
+                  <div className="space-y-3">
+                    <h3 className="text-xl font-semibold flex items-center gap-2">
+                      <Clock className="w-5 h-5 text-primary" />
+                      Time & Space Complexity
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
+                        <div className="text-xs font-medium text-muted-foreground mb-1">Time Complexity</div>
+                        <div className="text-lg font-mono font-semibold text-foreground">
+                          {problem.timeComplexity}
+                        </div>
+                      </div>
+                      <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
+                        <div className="text-xs font-medium text-muted-foreground mb-1">Space Complexity</div>
+                        <div className="text-lg font-mono font-semibold text-foreground">
+                          {problem.spaceComplexity}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            )}
           </div>
         </div>
 
