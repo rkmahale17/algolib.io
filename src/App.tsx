@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import AlgorithmDetail from "./pages/AlgorithmDetail";
+import Blind75 from "./pages/Blind75";
+import Blind75Detail from "./pages/Blind75Detail";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import Feedback from "./pages/Feedback";
@@ -26,6 +28,8 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/algorithm/:id" element={<AlgorithmDetail />} />
+          <Route path="/blind75" element={<Blind75 />} />
+          <Route path="/blind75/:slug" element={<Blind75Detail />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/about" element={<About />} />
