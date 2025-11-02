@@ -114,12 +114,12 @@ const Navbar = () => {
 
           {/* Navigation Links */}
           <div className="hidden lg:flex items-center gap-6 flex-1 justify-center">
+            <Link to="/about" className="text-sm font-medium hover:text-primary transition-colors">
+              About
+            </Link>
             <Link to="/blind75" className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1">
               <Trophy className="w-4 h-4" />
               Blind 75
-            </Link>
-            <Link to="/about" className="text-sm font-medium hover:text-primary transition-colors">
-              About
             </Link>
             <Link to="/feedback" className="text-sm font-medium hover:text-primary transition-colors">
               Feedback
@@ -146,10 +146,10 @@ const Navbar = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
-                  <Link to="/blind75">Blind 75</Link>
+                  <Link to="/about">About</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/about">About</Link>
+                  <Link to="/blind75">Blind 75</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/feedback">Feedback</Link>
