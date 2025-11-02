@@ -1,25 +1,36 @@
-import { ArrowLeft, Book, BookOpen, CheckCircle2, Clock, Code2, ExternalLink, Eye, Lightbulb, Youtube } from "lucide-react";
+import {
+  ArrowLeft,
+  Book,
+  BookOpen,
+  CheckCircle2,
+  Clock,
+  Code2,
+  ExternalLink,
+  Eye,
+  Lightbulb,
+  Youtube,
+} from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import React, { useState, useEffect } from "react";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
+import React, { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Checkbox } from "@/components/ui/checkbox";
-import { toast } from "sonner";
-import { Helmet } from 'react-helmet-async';
 
 import { Badge } from "@/components/ui/badge";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { CopyCodeButton } from "@/components/CopyCodeButton";
+import { Footer } from "@/components/Footer";
+import { Helmet } from "react-helmet-async";
 import { Separator } from "@/components/ui/separator";
 import { ShareButton } from "@/components/ShareButton";
 import { YouTubePlayer } from "@/components/YouTubePlayer";
-import { blind75Problems } from "@/data/blind75";
-import { blind75Implementations } from "@/data/blind75Implementations";
-import { supabase } from "@/integrations/supabase/client";
-import { Footer } from "@/components/Footer";
 import { algorithms } from "@/data/algorithms";
+import { blind75Implementations } from "@/data/blind75Implementations";
+import { blind75Problems } from "@/data/blind75";
 import { getAlgorithmImplementation } from "@/data/algorithmImplementations";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Blind75Detail: React.FC = () => {
   const { slug } = useParams<{ slug?: string }>();
@@ -31,7 +42,9 @@ const Blind75Detail: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const [isCompleted, setIsCompleted] = useState(false);
   const [isLoadingProgress, setIsLoadingProgress] = useState(true);
-  const [selectedLanguage, setSelectedLanguage] = useState<'python' | 'java' | 'cpp' | 'typescript'>('python');
+  const [selectedLanguage, setSelectedLanguage] = useState<
+    "python" | "java" | "cpp" | "typescript"
+  >("python");
 
   // Check authentication and load progress
   useEffect(() => {
@@ -40,7 +53,7 @@ const Blind75Detail: React.FC = () => {
         data: { session },
       } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
-      
+
       if (session?.user && slug) {
         await fetchProgress(session.user.id);
       } else {
@@ -69,7 +82,7 @@ const Blind75Detail: React.FC = () => {
   // Fetch user's progress for this problem
   const fetchProgress = async (userId: string) => {
     if (!slug) return;
-    
+
     setIsLoadingProgress(true);
     const { data, error } = await supabase
       .from("user_progress")
@@ -95,7 +108,7 @@ const Blind75Detail: React.FC = () => {
     }
 
     const newCompletedState = !isCompleted;
-    
+
     // Optimistic update
     setIsCompleted(newCompletedState);
 
@@ -111,9 +124,9 @@ const Blind75Detail: React.FC = () => {
       // Update existing record
       const { error } = await supabase
         .from("user_progress")
-        .update({ 
+        .update({
           completed: newCompletedState,
-          completed_at: newCompletedState ? new Date().toISOString() : null
+          completed_at: newCompletedState ? new Date().toISOString() : null,
         })
         .eq("user_id", user.id)
         .eq("algorithm_id", `blind75-${slug}`);
@@ -124,18 +137,18 @@ const Blind75Detail: React.FC = () => {
         toast.error("Failed to update progress");
         console.error(error);
       } else {
-        toast.success(newCompletedState ? "Marked as completed! 🎉" : "Marked as incomplete");
+        toast.success(
+          newCompletedState ? "Marked as completed! 🎉" : "Marked as incomplete"
+        );
       }
     } else {
       // Insert new record
-      const { error } = await supabase
-        .from("user_progress")
-        .insert({
-          user_id: user.id,
-          algorithm_id: `blind75-${slug}`,
-          completed: newCompletedState,
-          completed_at: newCompletedState ? new Date().toISOString() : null
-        });
+      const { error } = await supabase.from("user_progress").insert({
+        user_id: user.id,
+        algorithm_id: `blind75-${slug}`,
+        completed: newCompletedState,
+        completed_at: newCompletedState ? new Date().toISOString() : null,
+      });
 
       if (error) {
         // Revert on error
@@ -239,7 +252,9 @@ const Blind75Detail: React.FC = () => {
       );
       return (
         <React.Suspense
-          fallback={<div className="text-center py-12">Loading visualization...</div>}
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
         >
           <TwoPointersVisualization />
         </React.Suspense>
@@ -254,7 +269,9 @@ const Blind75Detail: React.FC = () => {
       );
       return (
         <React.Suspense
-          fallback={<div className="text-center py-12">Loading visualization...</div>}
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
         >
           <SlidingWindowVisualization />
         </React.Suspense>
@@ -269,7 +286,9 @@ const Blind75Detail: React.FC = () => {
       );
       return (
         <React.Suspense
-          fallback={<div className="text-center py-12">Loading visualization...</div>}
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
         >
           <PrefixSumVisualization />
         </React.Suspense>
@@ -284,7 +303,9 @@ const Blind75Detail: React.FC = () => {
       );
       return (
         <React.Suspense
-          fallback={<div className="text-center py-12">Loading visualization...</div>}
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
         >
           <BinarySearchVisualization />
         </React.Suspense>
@@ -299,7 +320,9 @@ const Blind75Detail: React.FC = () => {
       );
       return (
         <React.Suspense
-          fallback={<div className="text-center py-12">Loading visualization...</div>}
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
         >
           <KadanesVisualization />
         </React.Suspense>
@@ -314,7 +337,9 @@ const Blind75Detail: React.FC = () => {
       );
       return (
         <React.Suspense
-          fallback={<div className="text-center py-12">Loading visualization...</div>}
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
         >
           <ContainerWithMostWaterVisualization />
         </React.Suspense>
@@ -326,10 +351,10 @@ const Blind75Detail: React.FC = () => {
   };
 
   const languageMap = {
-    python: 'Python',
-    java: 'Java',
-    cpp: 'C++',
-    typescript: 'TypeScript'
+    python: "Python",
+    java: "Java",
+    cpp: "C++",
+    typescript: "TypeScript",
   };
 
   return (
@@ -337,21 +362,24 @@ const Blind75Detail: React.FC = () => {
       <Helmet>
         <title>{problem.title} - Blind 75 | AlgoLib.io</title>
         <meta name="description" content={problem.description} />
-        <link rel="canonical" href={`https://algolib.io/blind75/${problem.slug}`} />
-        
+        <link
+          rel="canonical"
+          href={`https://algolib.io/blind75/${problem.slug}`}
+        />
+
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "TechArticle",
-            "headline": problem.title,
-            "description": problem.description,
-            "url": `https://algolib.io/blind75/${problem.slug}`,
-            "articleSection": problem.category,
-            "proficiencyLevel": problem.difficulty,
-            "author": {
+            headline: problem.title,
+            description: problem.description,
+            url: `https://algolib.io/blind75/${problem.slug}`,
+            articleSection: problem.category,
+            proficiencyLevel: problem.difficulty,
+            author: {
               "@type": "Organization",
-              "name": "AlgoLib.io"
-            }
+              name: "AlgoLib.io",
+            },
           })}
         </script>
       </Helmet>
@@ -375,15 +403,17 @@ const Blind75Detail: React.FC = () => {
                     : "opacity-0 max-h-0 overflow-hidden"
                 }`}
               >
-                <Breadcrumbs 
+                <Breadcrumbs
                   items={[
                     {
                       label: problem.category,
-                      href: `/blind75?category=${encodeURIComponent(problem.category)}`
+                      href: `/blind75?category=${encodeURIComponent(
+                        problem.category
+                      )}`,
                     },
                     {
-                      label: problem.title
-                    }
+                      label: problem.title,
+                    },
                   ]}
                 />
               </div>
@@ -400,13 +430,16 @@ const Blind75Detail: React.FC = () => {
               <div className="space-y-4">
                 <div className="flex items-start justify-between flex-wrap gap-4">
                   <div className="space-y-2 flex-1">
-                    <h1 className="text-2xl sm:text-3xl font-bold">{problem.title}</h1>
+                    <h1 className="text-2xl sm:text-3xl font-bold">
+                      {problem.title}
+                    </h1>
                     <div className="flex items-center gap-2 flex-wrap">
                       <Badge
                         variant="outline"
                         className={difficultyColors[problem.difficulty]}
                       >
-                        {problem.difficulty.charAt(0).toUpperCase() + problem.difficulty.slice(1)}
+                        {problem.difficulty.charAt(0).toUpperCase() +
+                          problem.difficulty.slice(1)}
                       </Badge>
                       <Badge variant="secondary">{problem.category}</Badge>
                     </div>
@@ -415,7 +448,9 @@ const Blind75Detail: React.FC = () => {
                     <Button
                       variant="default"
                       size="lg"
-                      onClick={() => window.open(problem.leetcodeSearch, '_blank')}
+                      onClick={() =>
+                        window.open(problem.leetcodeSearch, "_blank")
+                      }
                       className="font-semibold"
                     >
                       <ExternalLink className="w-4 h-4 mr-2" />
@@ -435,12 +470,24 @@ const Blind75Detail: React.FC = () => {
               <Card className="p-4 glass-card border-primary/20">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-full ${isCompleted ? 'bg-green-500/20' : 'bg-muted'}`}>
-                      <CheckCircle2 className={`w-5 h-5 ${isCompleted ? 'text-green-500' : 'text-muted-foreground'}`} />
+                    <div
+                      className={`p-2 rounded-full ${
+                        isCompleted ? "bg-green-500/20" : "bg-muted"
+                      }`}
+                    >
+                      <CheckCircle2
+                        className={`w-5 h-5 ${
+                          isCompleted
+                            ? "text-green-500"
+                            : "text-muted-foreground"
+                        }`}
+                      />
                     </div>
                     <div>
                       <p className="font-medium">Track Your Progress</p>
-                      <p className="text-xs text-muted-foreground">Mark this problem as completed</p>
+                      <p className="text-xs text-muted-foreground">
+                        Mark this problem as completed
+                      </p>
                     </div>
                   </div>
                   <Checkbox
@@ -537,7 +584,8 @@ const Blind75Detail: React.FC = () => {
                           Coming Soon
                         </p>
                         <p className="text-sm text-muted-foreground mt-2">
-                          Interactive visualization for this problem is being developed
+                          Interactive visualization for this problem is being
+                          developed
                         </p>
                       </div>
                     </div>
@@ -562,7 +610,10 @@ const Blind75Detail: React.FC = () => {
                     <TabsTrigger value="python" className="text-xs sm:text-sm">
                       Python
                     </TabsTrigger>
-                    <TabsTrigger value="typescript" className="text-xs sm:text-sm">
+                    <TabsTrigger
+                      value="typescript"
+                      className="text-xs sm:text-sm"
+                    >
                       TypeScript
                     </TabsTrigger>
                     <TabsTrigger value="cpp" className="text-xs sm:text-sm">
@@ -579,7 +630,9 @@ const Blind75Detail: React.FC = () => {
                         <div className="relative overflow-hidden rounded-lg">
                           <CopyCodeButton code={implementation.python} />
                           <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
-                            <code className="block">{implementation.python}</code>
+                            <code className="block">
+                              {implementation.python}
+                            </code>
                           </pre>
                         </div>
                       </TabsContent>
@@ -588,7 +641,9 @@ const Blind75Detail: React.FC = () => {
                         <div className="relative overflow-hidden rounded-lg">
                           <CopyCodeButton code={implementation.typescript} />
                           <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
-                            <code className="block">{implementation.typescript}</code>
+                            <code className="block">
+                              {implementation.typescript}
+                            </code>
                           </pre>
                         </div>
                       </TabsContent>
@@ -635,15 +690,25 @@ const Blind75Detail: React.FC = () => {
             {/* Approach & Use Cases */}
             {(implementation?.explanation || problem.useCases) && (
               <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-5xl mx-auto">
-                <Tabs defaultValue={implementation?.explanation ? "approach" : "usecases"}>
+                <Tabs
+                  defaultValue={
+                    implementation?.explanation ? "approach" : "usecases"
+                  }
+                >
                   <TabsList className="grid w-full grid-cols-2 h-auto">
                     {implementation?.explanation && (
-                      <TabsTrigger value="approach" className="text-xs sm:text-sm">
+                      <TabsTrigger
+                        value="approach"
+                        className="text-xs sm:text-sm"
+                      >
                         Approach
                       </TabsTrigger>
                     )}
                     {problem.useCases && problem.useCases.length > 0 && (
-                      <TabsTrigger value="usecases" className="text-xs sm:text-sm">
+                      <TabsTrigger
+                        value="usecases"
+                        className="text-xs sm:text-sm"
+                      >
                         Real-World Use Cases
                       </TabsTrigger>
                     )}
@@ -663,7 +728,9 @@ const Blind75Detail: React.FC = () => {
                         {problem.useCases.map((useCase, index) => (
                           <li key={index} className="flex items-start gap-2">
                             <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
-                            <span className="text-sm text-muted-foreground">{useCase}</span>
+                            <span className="text-sm text-muted-foreground">
+                              {useCase}
+                            </span>
                           </li>
                         ))}
                       </ul>
@@ -679,32 +746,13 @@ const Blind75Detail: React.FC = () => {
                 <div className="space-y-6">
                   {/* Video Section */}
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2">
-                      <Youtube className="w-5 h-5 text-red-500" />
-                      <h3 className="font-semibold">NeetCode Explanation</h3>
-                    </div>
-
                     {/* YouTube Player */}
-                    <YouTubePlayer youtubeUrl={problem.youtubeUrl} algorithmName={problem.title} />
-
-                    {/* What the video teaches */}
-                    <div className="space-y-2">
-                      <h4 className="text-lg font-semibold">What This Video Teaches</h4>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        This tutorial provides a comprehensive walkthrough of the {problem.title} problem, 
-                        demonstrating its practical application through step-by-step code implementation. 
-                        The video breaks down complex concepts into digestible segments, making it easier to 
-                        understand how the solution works and when to apply similar techniques in other problems.
-                      </p>
-                    </div>
+                    <YouTubePlayer
+                      youtubeUrl={problem.youtubeUrl}
+                      algorithmName={problem.title}
+                    />
 
                     {/* Credits */}
-                    <div className="pt-2 border-t border-border/50">
-                      <p className="text-xs text-muted-foreground">
-                        <strong>Credits:</strong> Video tutorial by NeetCode (used with permission). 
-                        All written explanations, code examples, and additional insights provided by Algolib.io.
-                      </p>
-                    </div>
                   </div>
 
                   <Separator />
@@ -717,13 +765,17 @@ const Blind75Detail: React.FC = () => {
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
-                        <div className="text-xs font-medium text-muted-foreground mb-1">Time Complexity</div>
+                        <div className="text-xs font-medium text-muted-foreground mb-1">
+                          Time Complexity
+                        </div>
                         <div className="text-lg font-mono font-semibold text-foreground">
                           {problem.timeComplexity}
                         </div>
                       </div>
                       <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
-                        <div className="text-xs font-medium text-muted-foreground mb-1">Space Complexity</div>
+                        <div className="text-xs font-medium text-muted-foreground mb-1">
+                          Space Complexity
+                        </div>
                         <div className="text-lg font-mono font-semibold text-foreground">
                           {problem.spaceComplexity}
                         </div>
