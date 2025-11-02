@@ -36,23 +36,82 @@ export function AlgoMetaHead({ id }: { id?: string }) {
     : 'algorithms, open source, free, competitive programming, algorithm library, algolib';
 
   const pageUrl = algo ? `${siteBase}/algorithm/${algo.id}` : siteBase;
-  const ogImage = `${siteBase}/og-images/${algo ? algo.id : 'og-image'}.png`;
+  const ogImage = `${siteBase}/og-image.png`; // Use default OG image for all pages
 
-  // Build JSON-LD that lists all algorithm pages (as requested)
-  const jsonLd = {
+  // Build JSON-LD structured data
+  const jsonLd = algo ? {
     "@context": "https://schema.org",
-    "@type": "ItemList",
-    "name": "AlgoLib.io Algorithm Index",
-    "description": "Index of algorithms available on AlgoLib.io (free & open-source).",
-    "url": `${siteBase}/algorithm/`,
-    "numberOfItems": algorithms.length,
-    "itemListElement": algorithms.map((a, idx) => ({
-      "@type": "ListItem",
-      "position": idx + 1,
-      "url": `${siteBase}/algorithm/${a.id}`,
-      "name": a.name,
-      "description": a.description
-    }))
+    "@type": "TechArticle",
+    "headline": algo.name,
+    "description": algo.description,
+    "url": `${siteBase}/algorithm/${algo.id}`,
+    "image": {
+      "@type": "ImageObject",
+      "url": ogImage,
+      "width": 1200,
+      "height": 630
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "AlgoLib.io",
+      "url": siteBase,
+      "logo": {
+        "@type": "ImageObject",
+        "url": `${siteBase}/android-chrome-512x512.png`,
+        "width": 512,
+        "height": 512
+      }
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "AlgoLib.io",
+      "url": siteBase,
+      "logo": {
+        "@type": "ImageObject",
+        "url": `${siteBase}/android-chrome-512x512.png`,
+        "width": 512,
+        "height": 512
+      }
+    },
+    "datePublished": "2024-01-01",
+    "dateModified": new Date().toISOString().split('T')[0],
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `${siteBase}/algorithm/${algo.id}`
+    },
+    "about": {
+      "@type": "Thing",
+      "name": algo.category,
+      "description": `${algo.category} algorithms`
+    },
+    "keywords": [algo.id, algo.name, algo.category, 'algorithm', 'data structure', 'competitive programming'].join(', '),
+    "articleSection": algo.category,
+    "proficiencyLevel": algo.difficulty,
+    "educationalLevel": algo.difficulty === 'beginner' ? 'Beginner' : algo.difficulty === 'intermediate' ? 'Intermediate' : 'Advanced',
+    "timeRequired": "PT5M"
+  } : {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "AlgoLib.io",
+    "url": siteBase,
+    "description": "Free and open-source algorithm library for competitive programming",
+    "publisher": {
+      "@type": "Organization",
+      "name": "AlgoLib.io",
+      "url": siteBase,
+      "logo": {
+        "@type": "ImageObject",
+        "url": `${siteBase}/android-chrome-512x512.png`
+      }
+    },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": `${siteBase}/?search={search_term_string}`
+      },
+      "query-input": "required name=search_term_string"
+    }
   };
 
   return (
@@ -79,8 +138,44 @@ export function AlgoMetaHead({ id }: { id?: string }) {
       {/* Canonical */}
       <link rel="canonical" href={pageUrl} />
 
-      {/* JSON-LD with full list of algorithms */}
+      {/* JSON-LD - TechArticle or WebSite */}
       <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+      
+      {/* JSON-LD - BreadcrumbList for algorithm pages */}
+      {algo && (
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "item": {
+                  "@id": siteBase,
+                  "name": "Home"
+                }
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "item": {
+                  "@id": `${siteBase}/?category=${encodeURIComponent(algo.category)}`,
+                  "name": algo.category
+                }
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "item": {
+                  "@id": `${siteBase}/algorithm/${algo.id}`,
+                  "name": algo.name
+                }
+              }
+            ]
+          })}
+        </script>
+      )}
     </Helmet>
   );
 }

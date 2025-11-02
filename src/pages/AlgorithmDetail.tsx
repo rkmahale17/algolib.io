@@ -1,7 +1,8 @@
-import { ArrowLeft, BookOpen, CheckCircle2, Code2, ExternalLink, Eye } from "lucide-react";
+import { ArrowLeft, Book, BookOpen, CheckCircle2, Clock, Code2, ExternalLink, Eye, Lightbulb, Youtube } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 // src/pages/AlgorithmDetail.tsx
 import React, { useState, useEffect } from "react";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
@@ -1345,29 +1346,23 @@ const AlgorithmDetail: React.FC = () => {
               </Link>
               <Separator orientation="vertical" className="h-6" />
               <div
-                className={`flex items-center gap-2 text-sm text-muted-foreground transition-all duration-100 md:opacity-100 ${
+                className={`transition-all duration-100 md:opacity-100 ${
                   showBreadcrumb
-                    ? "opacity-100 max-h-4"
+                    ? "opacity-100 max-h-12"
                     : "opacity-0 max-h-0 overflow-hidden"
                 }`}
               >
-                <Link
-                  to="/"
-                  className="hover:text-foreground transition-colors"
-                >
-                  Algorithms
-                </Link>
-                <span>/</span>
-                <Link
-                  to={`/?category=${encodeURIComponent(algorithm.category)}`}
-                  className="hover:text-foreground transition-colors"
-                >
-                  {algorithm.category}
-                </Link>
-                <span>/</span>
-                <span className="text-foreground font-medium text-sm  md:text-xl">
-                  {algorithm.name}
-                </span>
+                <Breadcrumbs 
+                  items={[
+                    {
+                      label: algorithm.category,
+                      href: `/?category=${encodeURIComponent(algorithm.category)}`
+                    },
+                    {
+                      label: algorithm.name
+                    }
+                  ]}
+                />
               </div>
             </div>
           </div>
@@ -1613,9 +1608,118 @@ const AlgorithmDetail: React.FC = () => {
               </Card>
             )}
 
-            {/* 5. YouTube Video Player (if available) */}
+            {/* 5. YouTube Video Player with Explanations (if available) */}
             {algorithm.youtubeUrl && (
-              <YouTubePlayer youtubeUrl={algorithm.youtubeUrl} />
+              <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-5xl mx-auto">
+                <div className="space-y-6">
+                  {/* Video Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Youtube className="w-5 h-5 text-red-500" />
+                      <h3 className="font-semibold">Video Tutorial</h3>
+                    </div>
+
+                    {/* Responsive YouTube Player */}
+                    <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+                      <iframe
+                        className="absolute top-0 left-0 w-full h-full rounded-lg"
+                        src={`https://www.youtube.com/embed/${algorithm.youtubeUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)?.[1] || algorithm.youtubeUrl}`}
+                        title={`${algorithm.name} Tutorial`}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+
+                    {/* What the video teaches */}
+                    <div className="space-y-2">
+                      <h4 className="text-lg font-semibold">What This Video Teaches</h4>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        This tutorial provides a comprehensive walkthrough of the {algorithm.name} algorithm, 
+                        demonstrating its practical application through step-by-step code implementation. 
+                        The video breaks down complex concepts into digestible segments, making it easier to 
+                        understand how the algorithm works under the hood and when to apply it in real-world scenarios.
+                      </p>
+                    </div>
+
+                    {/* Credits */}
+                    <div className="pt-2 border-t border-border/50">
+                      <p className="text-xs text-muted-foreground">
+                        <strong>Credits:</strong> Video tutorial by NeetCode (used with permission). 
+                        All written explanations, code examples, and additional insights provided by Algolib.io.
+                      </p>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Code example explanation */}
+                  {implementation && (
+                    <div className="space-y-3">
+                      <h3 className="text-xl font-semibold flex items-center gap-2">
+                        <Code2 className="w-5 h-5 text-primary" />
+                        Code Example & Logic
+                      </h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {implementation.explanation.overview || 
+                          `The implementation of ${algorithm.name} follows a systematic approach that ensures optimal performance. 
+                          Each step in the algorithm is carefully designed to handle specific cases while maintaining efficiency.`}
+                      </p>
+                      {implementation.explanation.steps && implementation.explanation.steps.length > 0 && (
+                        <div className="mt-4">
+                          <h4 className="font-medium mb-2">Key Steps:</h4>
+                          <ol className="space-y-2 list-decimal list-inside text-sm text-muted-foreground">
+                            {implementation.explanation.steps.slice(0, 4).map((step, i) => (
+                              <li key={i}>{step}</li>
+                            ))}
+                          </ol>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <Separator />
+
+                  {/* Complexity Analysis */}
+                  <div className="space-y-3">
+                    <h3 className="text-xl font-semibold flex items-center gap-2">
+                      <Clock className="w-5 h-5 text-primary" />
+                      Time & Space Complexity
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
+                        <div className="text-xs font-medium text-muted-foreground mb-1">Time Complexity</div>
+                        <div className="text-lg font-mono font-semibold text-foreground">
+                          {algorithm.timeComplexity}
+                        </div>
+                      </div>
+                      <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
+                        <div className="text-xs font-medium text-muted-foreground mb-1">Space Complexity</div>
+                        <div className="text-lg font-mono font-semibold text-foreground">
+                          {algorithm.spaceComplexity}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Additional Insights */}
+                  {implementation?.explanation.tips && implementation.explanation.tips.length > 0 && (
+                    <>
+                      <Separator />
+                      <div className="space-y-3">
+                        <h3 className="text-xl font-semibold flex items-center gap-2">
+                          <Lightbulb className="w-5 h-5 text-primary" />
+                          Additional Insights & Improvements
+                        </h3>
+                        <ul className="space-y-2 list-disc list-inside text-sm text-muted-foreground">
+                          {implementation.explanation.tips.map((tip, i) => (
+                            <li key={i}>{tip}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </Card>
             )}
 
             {/* 6. Practice Problems */}

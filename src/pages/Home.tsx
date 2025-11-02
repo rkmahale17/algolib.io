@@ -1,4 +1,4 @@
-import { BookOpen, Search, Sparkles, TrendingUp, Trophy } from 'lucide-react';
+import { BookOpen, Search, Sparkles, TrendingUp, Trophy, Coffee } from 'lucide-react';
 import { algorithms, categories } from '@/data/algorithms';
 
 import { Badge } from '@/components/ui/badge';
@@ -9,11 +9,21 @@ import { Footer } from '@/components/Footer';
 import { Helmet } from 'react-helmet-async';
 import { Input } from '@/components/ui/input';
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 const Home = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  // Read category from URL params on mount
+  useEffect(() => {
+    const categoryParam = searchParams.get('category');
+    if (categoryParam) {
+      setSelectedCategory(categoryParam);
+    }
+  }, [searchParams]);
 
   const filteredAlgorithms = algorithms.filter((algo) => {
     const matchesSearch = algo.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -78,7 +88,12 @@ const Home = () => {
             "@type": "EducationalOrganization",
             "name": "AlgoLib.io",
             "url": "https://algolib.io",
-            "logo": "https://algolib.io/favicon.png",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://algolib.io/android-chrome-512x512.png",
+              "width": 512,
+              "height": 512
+            },
             "sameAs": [
               "https://x.com/algolib_io",
               "https://github.com/rkmahale17/algolib.io"
@@ -86,9 +101,69 @@ const Home = () => {
             "description": "AlgoLib.io is a free and open-source algorithm library that helps developers learn and visualize algorithms with interactive animations and clean code snippets in multiple programming languages."
           })}
         </script>
+        
+        {/* Structured Data - ItemList for Categories */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "name": "Algorithm Categories",
+            "description": "Browse algorithms by category",
+            "itemListElement": categories.map((category, index) => ({
+              "@type": "ListItem",
+              "position": index + 1,
+              "item": {
+                "@type": "Thing",
+                "@id": `https://algolib.io/?category=${encodeURIComponent(category)}`,
+                "name": `${category} Algorithms`,
+                "description": `Learn ${category.toLowerCase()} algorithms with interactive visualizations`
+              }
+            }))
+          })}
+        </script>
+        
+        {/* Structured Data - CollectionPage */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "name": "AlgoLib.io - Algorithm Library",
+            "description": "Browse 72+ algorithms with step-by-step visualizations",
+            "url": "https://algolib.io",
+            "mainEntity": {
+              "@type": "ItemList",
+              "numberOfItems": algorithms.length,
+              "itemListElement": algorithms.slice(0, 20).map((algo, index) => ({
+                "@type": "ListItem",
+                "position": index + 1,
+                "item": {
+                  "@type": "TechArticle",
+                  "name": algo.name,
+                  "description": algo.description,
+                  "url": `https://algolib.io/algorithm/${algo.id}`,
+                  "articleSection": algo.category,
+                  "proficiencyLevel": algo.difficulty
+                }
+              }))
+            }
+          })}
+        </script>
       </Helmet>
       
       <div className="min-h-screen bg-background">
+        {/* Vertical Buy Me a Coffee Button */}
+        <a
+          href="https://buymeacoffee.com/jsonmaster"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fixed left-0 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-center gap-2 px-3 py-4 bg-[#FFDD00] text-[#000000] rounded-r-lg shadow-lg hover:bg-[#FFDD00]/90 hover:pl-4 transition-all font-medium group"
+        >
+          <Coffee className="w-5 h-5" />
+          <span className="writing-mode-vertical text-sm whitespace-nowrap [writing-mode:vertical-lr] rotate-180">
+            Buy Me a Coffee
+          </span>
+        </a>
+
         {/* Hero Section */}
       <div className="relative overflow-hidden bg-gradient-to-b from-background via-muted/20 to-background border-b border-border/50">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
@@ -175,7 +250,7 @@ const Home = () => {
       <div className="container mx-auto px-4 pb-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredAlgorithms.map((algo, index) => (
-            <Link key={algo.id} to={`/algorithm/${algo.id}`}>
+            <Link key={algo.id} to={`/algorithm/${algo.id}`} target="_blank" rel="noopener noreferrer">
               <Card 
                 className="p-6 hover-lift cursor-pointer glass-card group"
                 style={{ animationDelay: `${index * 50}ms` }}

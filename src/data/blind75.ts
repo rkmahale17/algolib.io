@@ -1,0 +1,1238 @@
+export interface Blind75Problem {
+  id: number;
+  slug: string;
+  title: string;
+  category: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  description: string;
+  leetcodeSearch: string;
+  timeComplexity: string;
+  spaceComplexity: string;
+  companies: string[];
+  tags: string[];
+  algorithmId?: string; // Link to existing algorithm for visualization
+  youtubeUrl?: string; // NeetCode video URL
+  useCases?: string[]; // Real-world use cases
+}
+
+export const blind75Problems: Blind75Problem[] = [
+  {
+    id: 1,
+    slug: "two-sum",
+    title: "Two Sum",
+    category: "Array",
+    difficulty: "easy",
+    description: `Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.
+
+You may assume that each input would have exactly one solution, and you may not use the same element twice.
+
+You can return the answer in any order.
+
+Example 1:
+Input: nums = [2,7,11,15], target = 9
+Output: [0,1]
+Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].
+
+Example 2:
+Input: nums = [3,2,4], target = 6
+Output: [1,2]
+
+Example 3:
+Input: nums = [3,3], target = 6
+Output: [0,1]
+
+Constraints:
+• 2 <= nums.length <= 10^4
+• -10^9 <= nums[i] <= 10^9
+• -10^9 <= target <= 10^9
+• Only one valid answer exists.`,
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Two%20Sum",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(n)",
+    companies: ["Amazon", "Google", "Facebook", "Microsoft"],
+    tags: ["Hash Table", "Array"],
+    algorithmId: "two-pointers",
+    youtubeUrl: "https://www.youtube.com/watch?v=KLlXCFG5TnA",
+    useCases: ["Finding pairs in datasets", "Complement search in databases", "Financial transaction matching"]
+  },
+  {
+    id: 2,
+    slug: "best-time-to-buy-and-sell-stock",
+    title: "Best Time to Buy and Sell Stock",
+    category: "Array",
+    difficulty: "easy",
+    description: `You are given an array prices where prices[i] is the price of a given stock on the ith day.
+
+You want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future to sell that stock.
+
+Return the maximum profit you can achieve from this transaction. If you cannot achieve any profit, return 0.
+
+Example 1:
+Input: prices = [7,1,5,3,6,4]
+Output: 5
+Explanation: Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5.
+
+Example 2:
+Input: prices = [7,6,4,3,1]
+Output: 0
+Explanation: No transactions are done and the max profit = 0.
+
+Constraints:
+• 1 <= prices.length <= 10^5
+• 0 <= prices[i] <= 10^4`,
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Best%20Time%20to%20Buy%20and%20Sell%20Stock",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(1)",
+    companies: ["Amazon", "Microsoft", "Facebook"],
+    tags: ["Array", "Dynamic Programming"],
+    youtubeUrl: "https://www.youtube.com/watch?v=1pkOgXD63yU",
+    useCases: ["Stock trading algorithms", "Price optimization", "Timing market entries"]
+  },
+  {
+    id: 3,
+    slug: "contains-duplicate",
+    title: "Contains Duplicate",
+    category: "Array",
+    difficulty: "easy",
+    description: `Given an integer array nums, return true if any value appears at least twice in the array, and return false if every element is distinct.
+
+Example 1:
+Input: nums = [1,2,3,1]
+Output: true
+
+Example 2:
+Input: nums = [1,2,3,4]
+Output: false
+
+Example 3:
+Input: nums = [1,1,1,3,3,4,3,2,4,2]
+Output: true
+
+Constraints:
+• 1 <= nums.length <= 10^5
+• -10^9 <= nums[i] <= 10^9`,
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Contains%20Duplicate",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(n)",
+    companies: ["Amazon", "Apple", "Adobe"],
+    tags: ["Array", "Hash Table", "Sorting"],
+    youtubeUrl: "https://www.youtube.com/watch?v=3OamzN90kPg",
+    useCases: ["Duplicate detection in databases", "Data validation", "Unique constraint checking"]
+  },
+  {
+    id: 4,
+    slug: "product-of-array-except-self",
+    title: "Product of Array Except Self",
+    category: "Array",
+    difficulty: "medium",
+    description: `Given an integer array nums, return an array answer such that answer[i] is equal to the product of all the elements of nums except nums[i].
+
+The product of any prefix or suffix of nums is guaranteed to fit in a 32-bit integer.
+
+You must write an algorithm that runs in O(n) time and without using the division operation.
+
+Example 1:
+Input: nums = [1,2,3,4]
+Output: [24,12,8,6]
+
+Example 2:
+Input: nums = [-1,1,0,-3,3]
+Output: [0,0,9,0,0]
+
+Constraints:
+• 2 <= nums.length <= 10^5
+• -30 <= nums[i] <= 30
+• The product of any prefix or suffix of nums is guaranteed to fit in a 32-bit integer.
+
+Follow up: Can you solve the problem in O(1) extra space complexity? (The output array does not count as extra space.)`,
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Product%20of%20Array%20Except%20Self",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(1)",
+    companies: ["Amazon", "Facebook", "Microsoft"],
+    tags: ["Array", "Prefix Sum"],
+    algorithmId: "prefix-sum",
+    youtubeUrl: "https://www.youtube.com/watch?v=bNvIQI2wAjk",
+    useCases: ["Statistical calculations", "Array transformations", "Mathematical computations"]
+  },
+  {
+    id: 5,
+    slug: "maximum-subarray",
+    title: "Maximum Subarray",
+    category: "Array",
+    difficulty: "medium",
+    description: `Given an integer array nums, find the subarray with the largest sum, and return its sum.
+
+A subarray is a contiguous non-empty sequence of elements within an array.
+
+Example 1:
+Input: nums = [-2,1,-3,4,-1,2,1,-5,4]
+Output: 6
+Explanation: The subarray [4,-1,2,1] has the largest sum 6.
+
+Example 2:
+Input: nums = [1]
+Output: 1
+Explanation: The subarray [1] has the largest sum 1.
+
+Example 3:
+Input: nums = [5,4,-1,7,8]
+Output: 23
+Explanation: The subarray [5,4,-1,7,8] has the largest sum 23.
+
+Constraints:
+• 1 <= nums.length <= 10^5
+• -10^4 <= nums[i] <= 10^4
+
+Follow up: If you have figured out the O(n) solution, try coding another solution using the divide and conquer approach.`,
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Maximum%20Subarray",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(1)",
+    companies: ["Amazon", "Microsoft", "LinkedIn"],
+    tags: ["Array", "Dynamic Programming", "Divide and Conquer"],
+    algorithmId: "kadanes-algorithm",
+    youtubeUrl: "https://www.youtube.com/watch?v=5WZl3MMT0Eg",
+    useCases: ["Financial analysis", "Maximum profit calculation", "Pattern recognition in data"]
+  },
+  {
+    id: 6,
+    slug: "maximum-product-subarray",
+    title: "Maximum Product Subarray",
+    category: "Array",
+    difficulty: "medium",
+    description: `Given an integer array nums, find a subarray that has the largest product, and return the product.
+
+The test cases are generated so that the answer will fit in a 32-bit integer.
+
+Example 1:
+Input: nums = [2,3,-2,4]
+Output: 6
+Explanation: [2,3] has the largest product 6.
+
+Example 2:
+Input: nums = [-2,0,-1]
+Output: 0
+Explanation: The result cannot be 2, because [-2,-1] is not a subarray.
+
+Constraints:
+• 1 <= nums.length <= 2 * 10^4
+• -10 <= nums[i] <= 10
+• The product of any prefix or suffix of nums is guaranteed to fit in a 32-bit integer.`,
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Maximum%20Product%20Subarray",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(1)",
+    companies: ["Amazon", "LinkedIn"],
+    tags: ["Array", "Dynamic Programming"],
+    youtubeUrl: "https://www.youtube.com/watch?v=lXVy6YWFcRM",
+    useCases: ["Optimization problems", "Product calculations", "Dynamic programming applications"]
+  },
+  {
+    id: 7,
+    slug: "find-minimum-in-rotated-sorted-array",
+    title: "Find Minimum in Rotated Sorted Array",
+    category: "Array",
+    difficulty: "medium",
+    description: `Suppose an array of length n sorted in ascending order is rotated between 1 and n times. For example, the array nums = [0,1,2,4,5,6,7] might become:
+
+• [4,5,6,7,0,1,2] if it was rotated 4 times.
+• [0,1,2,4,5,6,7] if it was rotated 7 times.
+
+Given the sorted rotated array nums of unique elements, return the minimum element of this array.
+
+You must write an algorithm that runs in O(log n) time.
+
+Example 1:
+Input: nums = [3,4,5,1,2]
+Output: 1
+Explanation: The original array was [1,2,3,4,5] rotated 3 times.
+
+Example 2:
+Input: nums = [4,5,6,7,0,1,2]
+Output: 0
+Explanation: The original array was [0,1,2,4,5,6,7] and it was rotated 4 times.
+
+Example 3:
+Input: nums = [11,13,15,17]
+Output: 11
+Explanation: The original array was [11,13,15,17] and it was rotated 4 times.
+
+Constraints:
+• n == nums.length
+• 1 <= n <= 5000
+• -5000 <= nums[i] <= 5000
+• All the integers of nums are unique.
+• nums is sorted and rotated between 1 and n times.`,
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Find%20Minimum%20in%20Rotated%20Sorted%20Array",
+    timeComplexity: "O(log n)",
+    spaceComplexity: "O(1)",
+    companies: ["Amazon", "Microsoft"],
+    tags: ["Array", "Binary Search"],
+    algorithmId: "binary-search",
+    youtubeUrl: "https://www.youtube.com/watch?v=nIVW4P8b1VA",
+    useCases: ["Rotated array operations", "Circular buffer search", "Optimized search algorithms"]
+  },
+  {
+    id: 8,
+    slug: "search-in-rotated-sorted-array",
+    title: "Search in Rotated Sorted Array",
+    category: "Array",
+    difficulty: "medium",
+    description: `There is an integer array nums sorted in ascending order (with distinct values).
+
+Prior to being passed to your function, nums is possibly rotated at an unknown pivot index k (1 <= k < nums.length) such that the resulting array is [nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]] (0-indexed). For example, [0,1,2,4,5,6,7] might be rotated at pivot index 3 and become [4,5,6,7,0,1,2].
+
+Given the array nums after the possible rotation and an integer target, return the index of target if it is in nums, or -1 if it is not in nums.
+
+You must write an algorithm with O(log n) runtime complexity.
+
+Example 1:
+Input: nums = [4,5,6,7,0,1,2], target = 0
+Output: 4
+
+Example 2:
+Input: nums = [4,5,6,7,0,1,2], target = 3
+Output: -1
+
+Example 3:
+Input: nums = [1], target = 0
+Output: -1
+
+Constraints:
+• 1 <= nums.length <= 5000
+• -10^4 <= nums[i] <= 10^4
+• All values of nums are unique.
+• nums is an ascending array that is possibly rotated.
+• -10^4 <= target <= 10^4`,
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Search%20in%20Rotated%20Sorted%20Array",
+    timeComplexity: "O(log n)",
+    spaceComplexity: "O(1)",
+    companies: ["Facebook", "Microsoft", "Amazon"],
+    tags: ["Array", "Binary Search"],
+    algorithmId: "binary-search",
+    youtubeUrl: "https://www.youtube.com/watch?v=U8XENwh8Oy8",
+    useCases: ["Circular buffer search", "Rotated data structures", "Database indexing"]
+  },
+  {
+    id: 9,
+    slug: "3sum",
+    title: "3Sum",
+    category: "Array",
+    difficulty: "medium",
+    description: `Given an integer array nums, return all the triplets [nums[i], nums[j], nums[k]] such that i != j, i != k, and j != k, and nums[i] + nums[j] + nums[k] == 0.
+
+Notice that the solution set must not contain duplicate triplets.
+
+Example 1:
+Input: nums = [-1,0,1,2,-1,-4]
+Output: [[-1,-1,2],[-1,0,1]]
+Explanation: 
+nums[0] + nums[1] + nums[2] = (-1) + 0 + 1 = 0.
+nums[1] + nums[2] + nums[4] = 0 + 1 + (-1) = 0.
+nums[0] + nums[3] + nums[4] = (-1) + 2 + (-1) = 0.
+The distinct triplets are [-1,0,1] and [-1,-1,2].
+
+Example 2:
+Input: nums = [0,1,1]
+Output: []
+Explanation: The only possible triplet does not sum up to 0.
+
+Example 3:
+Input: nums = [0,0,0]
+Output: [[0,0,0]]
+Explanation: The only possible triplet sums up to 0.
+
+Constraints:
+• 3 <= nums.length <= 3000
+• -10^5 <= nums[i] <= 10^5`,
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=3Sum",
+    timeComplexity: "O(n²)",
+    spaceComplexity: "O(1)",
+    companies: ["Amazon", "Facebook", "Microsoft"],
+    tags: ["Array", "Two Pointers", "Sorting"],
+    algorithmId: "two-pointers",
+    youtubeUrl: "https://www.youtube.com/watch?v=jzZsG8n2R9A",
+    useCases: ["Finding triplets in datasets", "Combinatorial searches", "Financial reconciliation"]
+  },
+  {
+    id: 10,
+    slug: "container-with-most-water",
+    title: "Container With Most Water",
+    category: "Array",
+    difficulty: "medium",
+    description: `You are given an integer array height of length n. There are n vertical lines drawn such that the two endpoints of the ith line are (i, 0) and (i, height[i]).
+
+Find two lines that together with the x-axis form a container, such that the container contains the most water.
+
+Return the maximum amount of water a container can store.
+
+Notice that you may not slant the container.
+
+Example 1:
+Input: height = [1,8,6,2,5,4,8,3,7]
+Output: 49
+Explanation: The vertical lines are represented by array [1,8,6,2,5,4,8,3,7]. The max area of water is 49.
+
+Example 2:
+Input: height = [1,1]
+Output: 1
+
+Constraints:
+• n == height.length
+• 2 <= n <= 10^5
+• 0 <= height[i] <= 10^4`,
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Container%20With%20Most%20Water",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(1)",
+    companies: ["Amazon", "Google", "Facebook"],
+    tags: ["Array", "Two Pointers", "Greedy"],
+    algorithmId: "container-with-most-water",
+    youtubeUrl: "https://www.youtube.com/watch?v=UuiTKBwPgAo",
+    useCases: ["Area optimization", "Resource allocation", "Capacity planning"]
+  },
+  {
+    id: 11,
+    slug: "sum-of-two-integers",
+    title: "Sum of Two Integers",
+    category: "Binary",
+    difficulty: "medium",
+    description: "Given two integers a and b, return the sum of the two integers without using the operators + and -.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Sum%20of%20Two%20Integers",
+    timeComplexity: "O(1)",
+    spaceComplexity: "O(1)",
+    companies: ["Amazon"],
+    tags: ["Math", "Bit Manipulation"]
+  },
+  {
+    id: 12,
+    slug: "number-of-1-bits",
+    title: "Number of 1 Bits",
+    category: "Binary",
+    difficulty: "easy",
+    description: "Write a function that takes the binary representation of a positive integer and returns the number of set bits it has (also known as the Hamming weight).",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Number%20of%201%20Bits",
+    timeComplexity: "O(1)",
+    spaceComplexity: "O(1)",
+    companies: ["Apple", "Microsoft"],
+    tags: ["Bit Manipulation"]
+  },
+  {
+    id: 13,
+    slug: "counting-bits",
+    title: "Counting Bits",
+    category: "Binary",
+    difficulty: "easy",
+    description: "Given an integer n, return an array ans of length n + 1 such that for each i (0 <= i <= n), ans[i] is the number of 1's in the binary representation of i.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Counting%20Bits",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(1)",
+    companies: ["Amazon"],
+    tags: ["Dynamic Programming", "Bit Manipulation"]
+  },
+  {
+    id: 14,
+    slug: "missing-number",
+    title: "Missing Number",
+    category: "Binary",
+    difficulty: "easy",
+    description: "Given an array nums containing n distinct numbers in the range [0, n], return the only number in the range that is missing from the array.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Missing%20Number",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(1)",
+    companies: ["Amazon", "Microsoft"],
+    tags: ["Array", "Math", "Bit Manipulation"]
+  },
+  {
+    id: 15,
+    slug: "reverse-bits",
+    title: "Reverse Bits",
+    category: "Binary",
+    difficulty: "easy",
+    description: "Reverse bits of a given 32 bits unsigned integer.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Reverse%20Bits",
+    timeComplexity: "O(1)",
+    spaceComplexity: "O(1)",
+    companies: ["Amazon", "Apple"],
+    tags: ["Bit Manipulation", "Divide and Conquer"]
+  },
+  {
+    id: 16,
+    slug: "climbing-stairs",
+    title: "Climbing Stairs",
+    category: "Dynamic Programming",
+    difficulty: "easy",
+    description: "You are climbing a staircase. It takes n steps to reach the top. Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Climbing%20Stairs",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(1)",
+    companies: ["Amazon", "Google", "Adobe"],
+    tags: ["Dynamic Programming", "Math", "Memoization"]
+  },
+  {
+    id: 17,
+    slug: "coin-change",
+    title: "Coin Change",
+    category: "Dynamic Programming",
+    difficulty: "medium",
+    description: "You are given an integer array coins representing coins of different denominations and an integer amount representing a total amount of money. Return the fewest number of coins that you need to make up that amount.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Coin%20Change",
+    timeComplexity: "O(n × amount)",
+    spaceComplexity: "O(amount)",
+    companies: ["Amazon", "Bloomberg"],
+    tags: ["Array", "Dynamic Programming", "BFS"]
+  },
+  {
+    id: 18,
+    slug: "longest-increasing-subsequence",
+    title: "Longest Increasing Subsequence",
+    category: "Dynamic Programming",
+    difficulty: "medium",
+    description: "Given an integer array nums, return the length of the longest strictly increasing subsequence.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Longest%20Increasing%20Subsequence",
+    timeComplexity: "O(n log n)",
+    spaceComplexity: "O(n)",
+    companies: ["Amazon", "Microsoft"],
+    tags: ["Array", "Dynamic Programming", "Binary Search"]
+  },
+  {
+    id: 19,
+    slug: "longest-common-subsequence",
+    title: "Longest Common Subsequence",
+    category: "Dynamic Programming",
+    difficulty: "medium",
+    description: "Given two strings text1 and text2, return the length of their longest common subsequence. If there is no common subsequence, return 0.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Longest%20Common%20Subsequence",
+    timeComplexity: "O(m × n)",
+    spaceComplexity: "O(m × n)",
+    companies: ["Google", "Amazon"],
+    tags: ["String", "Dynamic Programming"]
+  },
+  {
+    id: 20,
+    slug: "word-break-problem",
+    title: "Word Break Problem",
+    category: "Dynamic Programming",
+    difficulty: "medium",
+    description: "Given a string s and a dictionary of strings wordDict, return true if s can be segmented into a space-separated sequence of one or more dictionary words.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Word%20Break",
+    timeComplexity: "O(n²)",
+    spaceComplexity: "O(n)",
+    companies: ["Amazon", "Facebook", "Google"],
+    tags: ["Hash Table", "String", "Dynamic Programming"]
+  },
+  {
+    id: 21,
+    slug: "combination-sum",
+    title: "Combination Sum",
+    category: "Dynamic Programming",
+    difficulty: "medium",
+    description: "Given an array of distinct integers candidates and a target integer target, return a list of all unique combinations of candidates where the chosen numbers sum to target.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Combination%20Sum",
+    timeComplexity: "O(n^target)",
+    spaceComplexity: "O(target)",
+    companies: ["Amazon", "Facebook"],
+    tags: ["Array", "Backtracking"]
+  },
+  {
+    id: 22,
+    slug: "house-robber",
+    title: "House Robber",
+    category: "Dynamic Programming",
+    difficulty: "medium",
+    description: "You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed. Adjacent houses have security systems connected that will alert the police if two adjacent houses were broken into on the same night. Determine the maximum amount of money you can rob tonight without alerting the police.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=House%20Robber",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(1)",
+    companies: ["Amazon", "LinkedIn"],
+    tags: ["Array", "Dynamic Programming"]
+  },
+  {
+    id: 23,
+    slug: "house-robber-ii",
+    title: "House Robber II",
+    category: "Dynamic Programming",
+    difficulty: "medium",
+    description: "All houses at this place are arranged in a circle. That means the first house is the neighbor of the last one. Meanwhile, adjacent houses have the same security system as the previous problem. Given an integer array nums representing the amount of money of each house, return the maximum amount of money you can rob tonight without alerting the police.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=House%20Robber%20II",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(1)",
+    companies: ["Amazon", "Microsoft"],
+    tags: ["Array", "Dynamic Programming"]
+  },
+  {
+    id: 24,
+    slug: "decode-ways",
+    title: "Decode Ways",
+    category: "Dynamic Programming",
+    difficulty: "medium",
+    description: "A message containing letters from A-Z can be encoded into numbers using the mapping 'A' -> \"1\", 'B' -> \"2\", ..., 'Z' -> \"26\". Given a string s containing only digits, return the number of ways to decode it.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Decode%20Ways",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(1)",
+    companies: ["Facebook", "Google"],
+    tags: ["String", "Dynamic Programming"]
+  },
+  {
+    id: 25,
+    slug: "unique-paths",
+    title: "Unique Paths",
+    category: "Dynamic Programming",
+    difficulty: "medium",
+    description: "There is a robot on an m x n grid. The robot is initially located at the top-left corner. The robot tries to move to the bottom-right corner. The robot can only move either down or right at any point in time. Given the two integers m and n, return the number of possible unique paths that the robot can take to reach the bottom-right corner.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Unique%20Paths",
+    timeComplexity: "O(m × n)",
+    spaceComplexity: "O(m × n)",
+    companies: ["Google", "Bloomberg"],
+    tags: ["Math", "Dynamic Programming", "Combinatorics"]
+  },
+  {
+    id: 26,
+    slug: "jump-game",
+    title: "Jump Game",
+    category: "Dynamic Programming",
+    difficulty: "medium",
+    description: "You are given an integer array nums. You are initially positioned at the array's first index, and each element in the array represents your maximum jump length at that position. Return true if you can reach the last index, or false otherwise.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Jump%20Game",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(1)",
+    companies: ["Amazon", "Microsoft", "Google"],
+    tags: ["Array", "Dynamic Programming", "Greedy"]
+  },
+  {
+    id: 27,
+    slug: "clone-graph",
+    title: "Clone Graph",
+    category: "Graph",
+    difficulty: "medium",
+    description: "Given a reference of a node in a connected undirected graph, return a deep copy (clone) of the graph.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Clone%20Graph",
+    timeComplexity: "O(V + E)",
+    spaceComplexity: "O(V)",
+    companies: ["Facebook", "Amazon", "Google"],
+    tags: ["Hash Table", "DFS", "BFS", "Graph"]
+  },
+  {
+    id: 28,
+    slug: "course-schedule",
+    title: "Course Schedule",
+    category: "Graph",
+    difficulty: "medium",
+    description: "There are a total of numCourses courses you have to take, labeled from 0 to numCourses - 1. You are given an array prerequisites where prerequisites[i] = [ai, bi] indicates that you must take course bi first if you want to take course ai. Return true if you can finish all courses. Otherwise, return false.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Course%20Schedule",
+    timeComplexity: "O(V + E)",
+    spaceComplexity: "O(V + E)",
+    companies: ["Amazon", "Facebook", "Google"],
+    tags: ["DFS", "BFS", "Graph", "Topological Sort"]
+  },
+  {
+    id: 29,
+    slug: "pacific-atlantic-water-flow",
+    title: "Pacific Atlantic Water Flow",
+    category: "Graph",
+    difficulty: "medium",
+    description: "There is an m x n rectangular island that borders both the Pacific Ocean and Atlantic Ocean. Given an m x n integer matrix heights where heights[r][c] represents the height above sea level of the cell at coordinate (r, c), return a list of grid coordinates where water can flow to both the Pacific and Atlantic oceans.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Pacific%20Atlantic%20Water%20Flow",
+    timeComplexity: "O(m × n)",
+    spaceComplexity: "O(m × n)",
+    companies: ["Google", "Amazon"],
+    tags: ["Array", "DFS", "BFS", "Matrix"]
+  },
+  {
+    id: 30,
+    slug: "number-of-islands",
+    title: "Number of Islands",
+    category: "Graph",
+    difficulty: "medium",
+    description: "Given an m x n 2D binary grid which represents a map of '1's (land) and '0's (water), return the number of islands. An island is surrounded by water and is formed by connecting adjacent lands horizontally or vertically.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Number%20of%20Islands",
+    timeComplexity: "O(m × n)",
+    spaceComplexity: "O(m × n)",
+    companies: ["Amazon", "Facebook", "Microsoft"],
+    tags: ["Array", "DFS", "BFS", "Union Find", "Matrix"]
+  },
+  {
+    id: 31,
+    slug: "longest-consecutive-sequence",
+    title: "Longest Consecutive Sequence",
+    category: "Graph",
+    difficulty: "medium",
+    description: "Given an unsorted array of integers nums, return the length of the longest consecutive elements sequence. You must write an algorithm that runs in O(n) time.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Longest%20Consecutive%20Sequence",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(n)",
+    companies: ["Amazon", "Google", "Facebook"],
+    tags: ["Array", "Hash Table", "Union Find"]
+  },
+  {
+    id: 32,
+    slug: "alien-dictionary",
+    title: "Alien Dictionary (Leetcode Premium)",
+    category: "Graph",
+    difficulty: "hard",
+    description: "There is a new alien language that uses the English alphabet. However, the order among the letters is unknown to you. You are given a list of strings words from the alien language's dictionary, where the strings in words are sorted lexicographically by the rules of this new language. Return a string of the unique letters in the new alien language sorted in lexicographically increasing order by the new language's rules.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Alien%20Dictionary",
+    timeComplexity: "O(C)",
+    spaceComplexity: "O(1)",
+    companies: ["Facebook", "Google", "Airbnb"],
+    tags: ["Array", "String", "DFS", "BFS", "Graph", "Topological Sort"]
+  },
+  {
+    id: 33,
+    slug: "graph-valid-tree",
+    title: "Graph Valid Tree (Leetcode Premium)",
+    category: "Graph",
+    difficulty: "medium",
+    description: "You have a graph of n nodes labeled from 0 to n - 1. You are given an integer n and a list of edges where edges[i] = [ai, bi] indicates that there is an undirected edge between nodes ai and bi in the graph. Return true if the edges of the given graph make up a valid tree, and false otherwise.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Graph%20Valid%20Tree",
+    timeComplexity: "O(V + E)",
+    spaceComplexity: "O(V + E)",
+    companies: ["Facebook", "Google", "Amazon"],
+    tags: ["DFS", "BFS", "Union Find", "Graph"]
+  },
+  {
+    id: 34,
+    slug: "number-of-connected-components-in-an-undirected-graph",
+    title: "Number of Connected Components in an Undirected Graph (Leetcode Premium)",
+    category: "Graph",
+    difficulty: "medium",
+    description: "You have a graph of n nodes. You are given an integer n and an array edges where edges[i] = [ai, bi] indicates that there is an edge between ai and bi in the graph. Return the number of connected components in the graph.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Number%20of%20Connected%20Components%20in%20an%20Undirected%20Graph",
+    timeComplexity: "O(V + E)",
+    spaceComplexity: "O(V + E)",
+    companies: ["Amazon", "Facebook", "Google"],
+    tags: ["DFS", "BFS", "Union Find", "Graph"]
+  },
+  {
+    id: 35,
+    slug: "insert-interval",
+    title: "Insert Interval",
+    category: "Interval",
+    difficulty: "medium",
+    description: "You are given an array of non-overlapping intervals where intervals[i] = [starti, endi] represent the start and the end of the ith interval and intervals is sorted in ascending order by starti. You are also given an interval newInterval = [start, end] that represents the start and end of another interval. Insert newInterval into intervals such that intervals is still sorted in ascending order by starti and intervals still does not have any overlapping intervals.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Insert%20Interval",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(n)",
+    companies: ["Facebook", "Google", "LinkedIn"],
+    tags: ["Array"]
+  },
+  {
+    id: 36,
+    slug: "merge-intervals",
+    title: "Merge Intervals",
+    category: "Interval",
+    difficulty: "medium",
+    description: "Given an array of intervals where intervals[i] = [starti, endi], merge all overlapping intervals, and return an array of the non-overlapping intervals that cover all the intervals in the input.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Merge%20Intervals",
+    timeComplexity: "O(n log n)",
+    spaceComplexity: "O(n)",
+    companies: ["Facebook", "Amazon", "Google"],
+    tags: ["Array", "Sorting"]
+  },
+  {
+    id: 37,
+    slug: "non-overlapping-intervals",
+    title: "Non-overlapping Intervals",
+    category: "Interval",
+    difficulty: "medium",
+    description: "Given an array of intervals where intervals[i] = [starti, endi], return the minimum number of intervals you need to remove to make the rest of the intervals non-overlapping.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Non-overlapping%20Intervals",
+    timeComplexity: "O(n log n)",
+    spaceComplexity: "O(1)",
+    companies: ["Facebook", "Amazon"],
+    tags: ["Array", "Dynamic Programming", "Greedy", "Sorting"]
+  },
+  {
+    id: 38,
+    slug: "meeting-rooms",
+    title: "Meeting Rooms (Leetcode Premium)",
+    category: "Interval",
+    difficulty: "easy",
+    description: "Given an array of meeting time intervals where intervals[i] = [starti, endi], determine if a person could attend all meetings.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Meeting%20Rooms",
+    timeComplexity: "O(n log n)",
+    spaceComplexity: "O(1)",
+    companies: ["Facebook", "Amazon"],
+    tags: ["Array", "Sorting"]
+  },
+  {
+    id: 39,
+    slug: "meeting-rooms-ii",
+    title: "Meeting Rooms II (Leetcode Premium)",
+    category: "Interval",
+    difficulty: "medium",
+    description: "Given an array of meeting time intervals intervals where intervals[i] = [starti, endi], return the minimum number of conference rooms required.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Meeting%20Rooms%20II",
+    timeComplexity: "O(n log n)",
+    spaceComplexity: "O(n)",
+    companies: ["Facebook", "Amazon", "Google"],
+    tags: ["Array", "Two Pointers", "Greedy", "Sorting", "Heap"]
+  },
+  {
+    id: 40,
+    slug: "reverse-linked-list",
+    title: "Reverse a Linked List",
+    category: "Linked List",
+    difficulty: "easy",
+    description: "Given the head of a singly linked list, reverse the list, and return the reversed list.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Reverse%20Linked%20List",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(1)",
+    companies: ["Amazon", "Microsoft", "Apple"],
+    tags: ["Linked List", "Recursion"]
+  },
+  {
+    id: 41,
+    slug: "detect-cycle-in-a-linked-list",
+    title: "Detect Cycle in a Linked List",
+    category: "Linked List",
+    difficulty: "easy",
+    description: "Given head, the head of a linked list, determine if the linked list has a cycle in it. There is a cycle in a linked list if there is some node in the list that can be reached again by continuously following the next pointer.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Linked%20List%20Cycle",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(1)",
+    companies: ["Amazon", "Microsoft", "Bloomberg"],
+    tags: ["Hash Table", "Linked List", "Two Pointers"]
+  },
+  {
+    id: 42,
+    slug: "merge-two-sorted-lists",
+    title: "Merge Two Sorted Lists",
+    category: "Linked List",
+    difficulty: "easy",
+    description: "You are given the heads of two sorted linked lists list1 and list2. Merge the two lists into one sorted list. The list should be made by splicing together the nodes of the first two lists. Return the head of the merged linked list.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Merge%20Two%20Sorted%20Lists",
+    timeComplexity: "O(n + m)",
+    spaceComplexity: "O(1)",
+    companies: ["Amazon", "Facebook", "Microsoft"],
+    tags: ["Linked List", "Recursion"]
+  },
+  {
+    id: 43,
+    slug: "merge-k-sorted-lists",
+    title: "Merge K Sorted Lists",
+    category: "Linked List",
+    difficulty: "hard",
+    description: "You are given an array of k linked-lists lists, each linked-list is sorted in ascending order. Merge all the linked-lists into one sorted linked-list and return it.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Merge%20k%20Sorted%20Lists",
+    timeComplexity: "O(N log k)",
+    spaceComplexity: "O(k)",
+    companies: ["Amazon", "Facebook", "Google"],
+    tags: ["Linked List", "Divide and Conquer", "Heap", "Merge Sort"]
+  },
+  {
+    id: 44,
+    slug: "remove-nth-node-from-end-of-list",
+    title: "Remove Nth Node From End Of List",
+    category: "Linked List",
+    difficulty: "medium",
+    description: "Given the head of a linked list, remove the nth node from the end of the list and return its head.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Remove%20Nth%20Node%20From%20End%20of%20List",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(1)",
+    companies: ["Amazon", "Facebook", "Microsoft"],
+    tags: ["Linked List", "Two Pointers"]
+  },
+  {
+    id: 45,
+    slug: "reorder-list",
+    title: "Reorder List",
+    category: "Linked List",
+    difficulty: "medium",
+    description: "You are given the head of a singly linked-list. The list can be represented as: L0 → L1 → … → Ln - 1 → Ln. Reorder the list to be on the following form: L0 → Ln → L1 → Ln - 1 → L2 → Ln - 2 → …",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Reorder%20List",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(1)",
+    companies: ["Facebook", "Amazon"],
+    tags: ["Linked List", "Two Pointers", "Stack", "Recursion"]
+  },
+  {
+    id: 46,
+    slug: "set-matrix-zeroes",
+    title: "Set Matrix Zeroes",
+    category: "Matrix",
+    difficulty: "medium",
+    description: "Given an m x n integer matrix matrix, if an element is 0, set its entire row and column to 0's. You must do it in place.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Set%20Matrix%20Zeroes",
+    timeComplexity: "O(m × n)",
+    spaceComplexity: "O(1)",
+    companies: ["Amazon", "Microsoft", "Facebook"],
+    tags: ["Array", "Hash Table", "Matrix"]
+  },
+  {
+    id: 47,
+    slug: "spiral-matrix",
+    title: "Spiral Matrix",
+    category: "Matrix",
+    difficulty: "medium",
+    description: "Given an m x n matrix, return all elements of the matrix in spiral order.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Spiral%20Matrix",
+    timeComplexity: "O(m × n)",
+    spaceComplexity: "O(1)",
+    companies: ["Amazon", "Microsoft", "Facebook"],
+    tags: ["Array", "Matrix", "Simulation"]
+  },
+  {
+    id: 48,
+    slug: "rotate-image",
+    title: "Rotate Image",
+    category: "Matrix",
+    difficulty: "medium",
+    description: "You are given an n x n 2D matrix representing an image, rotate the image by 90 degrees (clockwise). You have to rotate the image in-place.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Rotate%20Image",
+    timeComplexity: "O(n²)",
+    spaceComplexity: "O(1)",
+    companies: ["Amazon", "Microsoft", "Apple"],
+    tags: ["Array", "Math", "Matrix"]
+  },
+  {
+    id: 49,
+    slug: "word-search",
+    title: "Word Search",
+    category: "Matrix",
+    difficulty: "medium",
+    description: "Given an m x n grid of characters board and a string word, return true if word exists in the grid. The word can be constructed from letters of sequentially adjacent cells, where adjacent cells are horizontally or vertically neighboring.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Word%20Search",
+    timeComplexity: "O(m × n × 4^L)",
+    spaceComplexity: "O(L)",
+    companies: ["Amazon", "Microsoft", "Facebook"],
+    tags: ["Array", "Backtracking", "Matrix"]
+  },
+  {
+    id: 50,
+    slug: "longest-substring-without-repeating-characters",
+    title: "Longest Substring Without Repeating Characters",
+    category: "String",
+    difficulty: "medium",
+    description: "Given a string s, find the length of the longest substring without repeating characters.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Longest%20Substring%20Without%20Repeating%20Characters",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(min(m,n))",
+    companies: ["Amazon", "Facebook", "Bloomberg"],
+    tags: ["Hash Table", "String", "Sliding Window"]
+  },
+  {
+    id: 51,
+    slug: "longest-repeating-character-replacement",
+    title: "Longest Repeating Character Replacement",
+    category: "String",
+    difficulty: "medium",
+    description: "You are given a string s and an integer k. You can choose any character of the string and change it to any other uppercase English character. You can perform this operation at most k times. Return the length of the longest substring containing the same letter you can get after performing the above operations.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Longest%20Repeating%20Character%20Replacement",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(1)",
+    companies: ["Amazon", "Google"],
+    tags: ["Hash Table", "String", "Sliding Window"]
+  },
+  {
+    id: 52,
+    slug: "minimum-window-substring",
+    title: "Minimum Window Substring",
+    category: "String",
+    difficulty: "hard",
+    description: "Given two strings s and t of lengths m and n respectively, return the minimum window substring of s such that every character in t (including duplicates) is included in the window. If there is no such substring, return the empty string \"\".",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Minimum%20Window%20Substring",
+    timeComplexity: "O(m + n)",
+    spaceComplexity: "O(m + n)",
+    companies: ["Facebook", "Amazon", "LinkedIn"],
+    tags: ["Hash Table", "String", "Sliding Window"]
+  },
+  {
+    id: 53,
+    slug: "valid-anagram",
+    title: "Valid Anagram",
+    category: "String",
+    difficulty: "easy",
+    description: "Given two strings s and t, return true if t is an anagram of s, and false otherwise. An Anagram is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Valid%20Anagram",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(1)",
+    companies: ["Amazon", "Facebook", "Bloomberg"],
+    tags: ["Hash Table", "String", "Sorting"]
+  },
+  {
+    id: 54,
+    slug: "group-anagrams",
+    title: "Group Anagrams",
+    category: "String",
+    difficulty: "medium",
+    description: "Given an array of strings strs, group the anagrams together. You can return the answer in any order.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Group%20Anagrams",
+    timeComplexity: "O(n × k log k)",
+    spaceComplexity: "O(n × k)",
+    companies: ["Amazon", "Facebook", "Bloomberg"],
+    tags: ["Array", "Hash Table", "String", "Sorting"]
+  },
+  {
+    id: 55,
+    slug: "valid-parentheses",
+    title: "Valid Parentheses",
+    category: "String",
+    difficulty: "easy",
+    description: "Given a string s containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid. An input string is valid if open brackets are closed by the same type of brackets and in the correct order.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Valid%20Parentheses",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(n)",
+    companies: ["Amazon", "Facebook", "Bloomberg"],
+    tags: ["String", "Stack"]
+  },
+  {
+    id: 56,
+    slug: "valid-palindrome",
+    title: "Valid Palindrome",
+    category: "String",
+    difficulty: "easy",
+    description: "A phrase is a palindrome if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward. Given a string s, return true if it is a palindrome, or false otherwise.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Valid%20Palindrome",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(1)",
+    companies: ["Facebook", "Amazon", "Microsoft"],
+    tags: ["Two Pointers", "String"]
+  },
+  {
+    id: 57,
+    slug: "longest-palindromic-substring",
+    title: "Longest Palindromic Substring",
+    category: "String",
+    difficulty: "medium",
+    description: "Given a string s, return the longest palindromic substring in s.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Longest%20Palindromic%20Substring",
+    timeComplexity: "O(n²)",
+    spaceComplexity: "O(1)",
+    companies: ["Amazon", "Microsoft", "Facebook"],
+    tags: ["String", "Dynamic Programming"]
+  },
+  {
+    id: 58,
+    slug: "palindromic-substrings",
+    title: "Palindromic Substrings",
+    category: "String",
+    difficulty: "medium",
+    description: "Given a string s, return the number of palindromic substrings in it. A string is a palindrome when it reads the same backward as forward.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Palindromic%20Substrings",
+    timeComplexity: "O(n²)",
+    spaceComplexity: "O(1)",
+    companies: ["Facebook", "Amazon"],
+    tags: ["String", "Dynamic Programming"]
+  },
+  {
+    id: 59,
+    slug: "encode-and-decode-strings",
+    title: "Encode and Decode Strings (Leetcode Premium)",
+    category: "String",
+    difficulty: "medium",
+    description: "Design an algorithm to encode a list of strings to a string. The encoded string is then sent over the network and is decoded back to the original list of strings.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Encode%20and%20Decode%20Strings",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(1)",
+    companies: ["Google", "Facebook"],
+    tags: ["Array", "String", "Design"]
+  },
+  {
+    id: 60,
+    slug: "maximum-depth-of-binary-tree",
+    title: "Maximum Depth of Binary Tree",
+    category: "Tree",
+    difficulty: "easy",
+    description: "Given the root of a binary tree, return its maximum depth. A binary tree's maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf node.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Maximum%20Depth%20of%20Binary%20Tree",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(h)",
+    companies: ["Amazon", "LinkedIn"],
+    tags: ["Tree", "DFS", "BFS"]
+  },
+  {
+    id: 61,
+    slug: "same-tree",
+    title: "Same Tree",
+    category: "Tree",
+    difficulty: "easy",
+    description: "Given the roots of two binary trees p and q, write a function to check if they are the same or not. Two binary trees are considered the same if they are structurally identical, and the nodes have the same value.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Same%20Tree",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(h)",
+    companies: ["Amazon", "Bloomberg"],
+    tags: ["Tree", "DFS", "BFS"]
+  },
+  {
+    id: 62,
+    slug: "invert-binary-tree",
+    title: "Invert/Flip Binary Tree",
+    category: "Tree",
+    difficulty: "easy",
+    description: "Given the root of a binary tree, invert the tree, and return its root.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Invert%20Binary%20Tree",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(h)",
+    companies: ["Google", "Amazon", "Bloomberg"],
+    tags: ["Tree", "DFS", "BFS"]
+  },
+  {
+    id: 63,
+    slug: "binary-tree-maximum-path-sum",
+    title: "Binary Tree Maximum Path Sum",
+    category: "Tree",
+    difficulty: "hard",
+    description: "A path in a binary tree is a sequence of nodes where each pair of adjacent nodes in the sequence has an edge connecting them. A node can only appear in the sequence at most once. Given the root of a binary tree, return the maximum path sum of any non-empty path.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Binary%20Tree%20Maximum%20Path%20Sum",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(h)",
+    companies: ["Facebook", "Amazon", "Microsoft"],
+    tags: ["Dynamic Programming", "Tree", "DFS"]
+  },
+  {
+    id: 64,
+    slug: "binary-tree-level-order-traversal",
+    title: "Binary Tree Level Order Traversal",
+    category: "Tree",
+    difficulty: "medium",
+    description: "Given the root of a binary tree, return the level order traversal of its nodes' values (i.e., from left to right, level by level).",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Binary%20Tree%20Level%20Order%20Traversal",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(n)",
+    companies: ["Amazon", "Facebook", "Microsoft"],
+    tags: ["Tree", "BFS"]
+  },
+  {
+    id: 65,
+    slug: "serialize-and-deserialize-binary-tree",
+    title: "Serialize and Deserialize Binary Tree",
+    category: "Tree",
+    difficulty: "hard",
+    description: "Serialization is the process of converting a data structure or object into a sequence of bits so that it can be stored in a file or memory buffer. Design an algorithm to serialize and deserialize a binary tree.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Serialize%20and%20Deserialize%20Binary%20Tree",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(n)",
+    companies: ["Amazon", "Facebook", "Google"],
+    tags: ["String", "Tree", "DFS", "BFS", "Design"]
+  },
+  {
+    id: 66,
+    slug: "subtree-of-another-tree",
+    title: "Subtree of Another Tree",
+    category: "Tree",
+    difficulty: "easy",
+    description: "Given the roots of two binary trees root and subRoot, return true if there is a subtree of root with the same structure and node values of subRoot and false otherwise.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Subtree%20of%20Another%20Tree",
+    timeComplexity: "O(m × n)",
+    spaceComplexity: "O(h)",
+    companies: ["Facebook", "Amazon"],
+    tags: ["Tree", "DFS", "String Matching"]
+  },
+  {
+    id: 67,
+    slug: "construct-binary-tree-from-preorder-and-inorder-traversal",
+    title: "Construct Binary Tree from Preorder and Inorder Traversal",
+    category: "Tree",
+    difficulty: "medium",
+    description: "Given two integer arrays preorder and inorder where preorder is the preorder traversal of a binary tree and inorder is the inorder traversal of the same tree, construct and return the binary tree.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Construct%20Binary%20Tree%20from%20Preorder%20and%20Inorder%20Traversal",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(n)",
+    companies: ["Facebook", "Amazon", "Microsoft"],
+    tags: ["Array", "Hash Table", "Divide and Conquer", "Tree"]
+  },
+  {
+    id: 68,
+    slug: "validate-binary-search-tree",
+    title: "Validate Binary Search Tree",
+    category: "Tree",
+    difficulty: "medium",
+    description: "Given the root of a binary tree, determine if it is a valid binary search tree (BST).",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Validate%20Binary%20Search%20Tree",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(h)",
+    companies: ["Amazon", "Facebook", "Microsoft"],
+    tags: ["Tree", "DFS", "BFS"]
+  },
+  {
+    id: 69,
+    slug: "kth-smallest-element-in-a-bst",
+    title: "Kth Smallest Element in a BST",
+    category: "Tree",
+    difficulty: "medium",
+    description: "Given the root of a binary search tree, and an integer k, return the kth smallest value (1-indexed) of all the values of the nodes in the tree.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Kth%20Smallest%20Element%20in%20a%20BST",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(h)",
+    companies: ["Amazon", "Facebook", "Bloomberg"],
+    tags: ["Tree", "DFS", "BFS"]
+  },
+  {
+    id: 70,
+    slug: "lowest-common-ancestor-of-bst",
+    title: "Lowest Common Ancestor of BST",
+    category: "Tree",
+    difficulty: "medium",
+    description: "Given a binary search tree (BST), find the lowest common ancestor (LCA) node of two given nodes in the BST.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Lowest%20Common%20Ancestor%20of%20a%20BST",
+    timeComplexity: "O(h)",
+    spaceComplexity: "O(h)",
+    companies: ["Amazon", "Facebook", "Microsoft"],
+    tags: ["Tree", "DFS", "BFS"]
+  },
+  {
+    id: 71,
+    slug: "implement-trie",
+    title: "Implement Trie (Prefix Tree)",
+    category: "Tree",
+    difficulty: "medium",
+    description: "A trie (pronounced as \"try\") or prefix tree is a tree data structure used to efficiently store and retrieve keys in a dataset of strings. Implement the Trie class.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Implement%20Trie",
+    timeComplexity: "O(m)",
+    spaceComplexity: "O(m)",
+    companies: ["Amazon", "Google", "Facebook"],
+    tags: ["Hash Table", "String", "Design", "Trie"]
+  },
+  {
+    id: 72,
+    slug: "add-and-search-word",
+    title: "Add and Search Word",
+    category: "Tree",
+    difficulty: "medium",
+    description: "Design a data structure that supports adding new words and finding if a string matches any previously added string. Implement the WordDictionary class.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Add%20and%20Search%20Word",
+    timeComplexity: "O(m)",
+    spaceComplexity: "O(m)",
+    companies: ["Facebook", "Amazon"],
+    tags: ["String", "DFS", "Design", "Trie"]
+  },
+  {
+    id: 73,
+    slug: "word-search-ii",
+    title: "Word Search II",
+    category: "Tree",
+    difficulty: "hard",
+    description: "Given an m x n board of characters and a list of strings words, return all words on the board. Each word must be constructed from letters of sequentially adjacent cells, where adjacent cells are horizontally or vertically neighboring.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Word%20Search%20II",
+    timeComplexity: "O(m × n × 4^L)",
+    spaceComplexity: "O(k)",
+    companies: ["Amazon", "Google", "Airbnb"],
+    tags: ["Array", "String", "Backtracking", "Trie", "Matrix"]
+  },
+  {
+    id: 74,
+    slug: "top-k-frequent-elements",
+    title: "Top K Frequent Elements",
+    category: "Heap",
+    difficulty: "medium",
+    description: "Given an integer array nums and an integer k, return the k most frequent elements. You may return the answer in any order.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Top%20K%20Frequent%20Elements",
+    timeComplexity: "O(n log k)",
+    spaceComplexity: "O(n + k)",
+    companies: ["Amazon", "Facebook", "Yelp"],
+    tags: ["Array", "Hash Table", "Divide and Conquer", "Sorting", "Heap", "Bucket Sort"]
+  },
+  {
+    id: 75,
+    slug: "find-median-from-data-stream",
+    title: "Find Median from Data Stream",
+    category: "Heap",
+    difficulty: "hard",
+    description: "The median is the middle value in an ordered integer list. Design a data structure that supports adding numbers and finding the median.",
+    leetcodeSearch: "https://leetcode.com/problemset/all/?search=Find%20Median%20from%20Data%20Stream",
+    timeComplexity: "O(log n)",
+    spaceComplexity: "O(n)",
+    companies: ["Amazon", "Google", "Facebook"],
+    tags: ["Two Pointers", "Design", "Sorting", "Heap", "Data Stream"]
+  }
+];
+
+export const blind75Categories = Array.from(new Set(blind75Problems.map(p => p.category)));
