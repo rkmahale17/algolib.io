@@ -395,6 +395,41 @@ const Blind75Detail: React.FC = () => {
         <div className="container mx-auto px-4 py-8 overflow-x-hidden">
           {/* Single column layout for all screen sizes */}
           <div className="space-y-6 mx-auto">
+            {/* Hero Section - Always visible */}
+            <Card className="p-6 glass-card border-primary/20">
+              <div className="space-y-4">
+                <div className="flex items-start justify-between flex-wrap gap-4">
+                  <div className="space-y-2 flex-1">
+                    <h1 className="text-2xl sm:text-3xl font-bold">{problem.title}</h1>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Badge
+                        variant="outline"
+                        className={difficultyColors[problem.difficulty]}
+                      >
+                        {problem.difficulty.charAt(0).toUpperCase() + problem.difficulty.slice(1)}
+                      </Badge>
+                      <Badge variant="secondary">{problem.category}</Badge>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="default"
+                      size="lg"
+                      onClick={() => window.open(problem.leetcodeSearch, '_blank')}
+                      className="font-semibold"
+                    >
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      Solve on LeetCode
+                    </Button>
+                    <ShareButton
+                      title={problem.title}
+                      description={problem.description}
+                    />
+                  </div>
+                </div>
+              </div>
+            </Card>
+
             {/* Completion Tracker (Only for logged-in users) */}
             {user && (
               <Card className="p-4 glass-card border-primary/20">
@@ -418,36 +453,78 @@ const Blind75Detail: React.FC = () => {
               </Card>
             )}
 
-            {/* 1. Interactive Visualization */}
+            {/* Problem Description - Always visible */}
+            <Card className="p-4 sm:p-6 glass-card overflow-hidden">
+              <div className="space-y-4">
+                <h3 className="font-semibold flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-primary" />
+                  Problem Description
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+                  {problem.description}
+                </p>
+
+                <Separator />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-medium mb-1">Time Complexity</p>
+                    <Badge variant="outline" className="font-mono">
+                      {problem.timeComplexity}
+                    </Badge>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium mb-1">Space Complexity</p>
+                    <Badge variant="outline" className="font-mono">
+                      {problem.spaceComplexity}
+                    </Badge>
+                  </div>
+                </div>
+
+                {/* Companies */}
+                {problem.companies && problem.companies.length > 0 && (
+                  <>
+                    <Separator />
+                    <div>
+                      <p className="text-sm font-medium mb-2">Asked By</p>
+                      <div className="flex flex-wrap gap-2">
+                        {problem.companies.map((company) => (
+                          <Badge key={company} variant="secondary">
+                            {company}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* Tags */}
+                {problem.tags && problem.tags.length > 0 && (
+                  <>
+                    <Separator />
+                    <div>
+                      <p className="text-sm font-medium mb-2">Tags</p>
+                      <div className="flex flex-wrap gap-2">
+                        {problem.tags.map((tag) => (
+                          <Badge key={tag} variant="outline">
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </Card>
+
+            {/* Interactive Visualization - Auth protected */}
             {problem.algorithmId && (
               <Card className="p-4 sm:p-6 glass-card overflow-hidden">
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between flex-wrap gap-2">
-                    <h2 className="text-lg font-semibold flex items-center gap-2">
-                      <Eye className="w-5 h-5 text-primary" />
-                      Interactive Visualization
-                    </h2>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Button
-                        variant="default"
-                        size="sm"
-                        onClick={() => window.open(problem.leetcodeSearch, '_blank')}
-                      >
-                        <ExternalLink className="w-4 h-4 mr-2" />
-                        Solve on LeetCode
-                      </Button>
-                      <ShareButton
-                        title={problem.title}
-                        description={problem.description}
-                      />
-                      <Badge
-                        variant="outline"
-                        className={difficultyColors[problem.difficulty]}
-                      >
-                        {problem.difficulty.charAt(0).toUpperCase() + problem.difficulty.slice(1)}
-                      </Badge>
-                    </div>
-                  </div>
+                  <h2 className="text-lg font-semibold flex items-center gap-2">
+                    <Eye className="w-5 h-5 text-primary" />
+                    Interactive Visualization
+                  </h2>
                   <div className="rounded-lg bg-muted/30 border border-border/50 p-2 sm:p-4 overflow-x-auto">
                     {user ? (
                       <div className="min-w-[280px]">{renderVisualization()}</div>
@@ -474,7 +551,7 @@ const Blind75Detail: React.FC = () => {
               </Card>
             )}
 
-            {/* 2. Code Implementation */}
+            {/* Code Implementation */}
             <Card className="p-4 sm:p-6 glass-card overflow-hidden mx-auto">
               <div className="space-y-4">
                 <h3 className="font-semibold flex items-center gap-2">
@@ -560,71 +637,7 @@ const Blind75Detail: React.FC = () => {
               </div>
             </Card>
 
-            {/* 3. Problem Overview & Complexity */}
-            <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-5xl mx-auto">
-              <div className="space-y-4">
-                <h3 className="font-semibold flex items-center gap-2">
-                  <BookOpen className="w-5 h-5 text-primary" />
-                  Problem Description
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
-                  {problem.description}
-                </p>
-
-                <Separator />
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm font-medium mb-1">Time Complexity</p>
-                    <Badge variant="outline" className="font-mono">
-                      {problem.timeComplexity}
-                    </Badge>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium mb-1">Space Complexity</p>
-                    <Badge variant="outline" className="font-mono">
-                      {problem.spaceComplexity}
-                    </Badge>
-                  </div>
-                </div>
-
-                {/* Companies */}
-                {problem.companies && problem.companies.length > 0 && (
-                  <>
-                    <Separator />
-                    <div>
-                      <p className="text-sm font-medium mb-2">Asked By</p>
-                      <div className="flex flex-wrap gap-2">
-                        {problem.companies.map((company) => (
-                          <Badge key={company} variant="secondary">
-                            {company}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {/* Tags */}
-                {problem.tags && problem.tags.length > 0 && (
-                  <>
-                    <Separator />
-                    <div>
-                      <p className="text-sm font-medium mb-2">Tags</p>
-                      <div className="flex flex-wrap gap-2">
-                        {problem.tags.map((tag) => (
-                          <Badge key={tag} variant="outline">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-            </Card>
-
-            {/* 4. Approach & Use Cases */}
+            {/* Approach & Use Cases */}
             {(implementation?.explanation || problem.useCases) && (
               <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-5xl mx-auto">
                 <Tabs defaultValue={implementation?.explanation ? "approach" : "usecases"}>
