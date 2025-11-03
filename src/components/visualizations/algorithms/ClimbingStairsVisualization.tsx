@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { ArrayVisualization } from '../ArrayVisualization';
-import { StepControls } from '../shared/StepControls';
+import { SimpleArrayVisualization } from '../shared/SimpleArrayVisualization';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 import { CodeHighlighter } from '../shared/CodeHighlighter';
 
@@ -52,7 +52,7 @@ export const ClimbingStairsVisualization = () => {
   return (
     <div className="space-y-6">
       <div className="relative">
-        <ArrayVisualization
+        <SimpleArrayVisualization
           array={steps[currentStep].array}
           highlights={steps[currentStep].highlighting}
           label="Ways to reach each step"
@@ -80,7 +80,7 @@ export const ClimbingStairsVisualization = () => {
 
       <CodeHighlighter code={code} language="python" />
       
-      <StepControls
+      <SimpleStepControls
         currentStep={currentStep}
         totalSteps={steps.length}
         onStepChange={setCurrentStep}

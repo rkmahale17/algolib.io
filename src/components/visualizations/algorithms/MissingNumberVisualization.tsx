@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { ArrayVisualization } from '../ArrayVisualization';
-import { StepControls } from '../shared/StepControls';
+import { SimpleArrayVisualization } from '../shared/SimpleArrayVisualization';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 import { CodeHighlighter } from '../shared/CodeHighlighter';
 
@@ -52,7 +52,7 @@ def missingNumber_sum(nums):
 
   return (
     <div className="space-y-6">
-      <ArrayVisualization
+      <SimpleArrayVisualization
         array={steps[currentStep].array}
         highlights={steps[currentStep].highlighting}
         label="Array"
@@ -70,7 +70,7 @@ def missingNumber_sum(nums):
 
       <CodeHighlighter code={code} language="python" />
       
-      <StepControls
+      <SimpleStepControls
         currentStep={currentStep}
         totalSteps={steps.length}
         onStepChange={setCurrentStep}

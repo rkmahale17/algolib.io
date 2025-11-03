@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { ArrayVisualization } from '../ArrayVisualization';
-import { StepControls } from '../shared/StepControls';
+import { SimpleArrayVisualization } from '../shared/SimpleArrayVisualization';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 import { CodeHighlighter } from '../shared/CodeHighlighter';
 
@@ -49,24 +49,21 @@ export const CoinChangeVisualization = () => {
 
   return (
     <div className="space-y-6">
-      <ArrayVisualization
+      <SimpleArrayVisualization
         array={steps[currentStep].array.map(v => v === Infinity ? '∞' : v)}
         highlights={steps[currentStep].highlighting}
-        label="dp[] - Min coins needed for each amount"
+        label="dp[] - Minimum coins needed for each amount"
       />
       
       <VariablePanel variables={steps[currentStep].variables} />
       
       <div className="p-4 bg-muted rounded-lg">
         <p className="text-sm">{steps[currentStep].explanation}</p>
-        <p className="text-xs text-muted-foreground mt-2">
-          For each amount, try using each coin and take minimum
-        </p>
       </div>
 
       <CodeHighlighter code={code} language="python" />
       
-      <StepControls
+      <SimpleStepControls
         currentStep={currentStep}
         totalSteps={steps.length}
         onStepChange={setCurrentStep}

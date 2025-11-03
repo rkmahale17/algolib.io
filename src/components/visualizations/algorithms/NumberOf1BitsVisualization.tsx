@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { StepControls } from '../shared/StepControls';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 import { CodeHighlighter } from '../shared/CodeHighlighter';
 
@@ -68,7 +68,7 @@ def hammingWeight_optimized(n):
 
       <CodeHighlighter code={code} language="python" />
       
-      <StepControls
+      <SimpleStepControls
         currentStep={currentStep}
         totalSteps={steps.length}
         onStepChange={setCurrentStep}

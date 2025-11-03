@@ -1,10 +1,10 @@
 interface CodeHighlighterProps {
   code: string;
-  highlightedLine: number;
+  highlightedLine?: number;
   language: string;
 }
 
-export const CodeHighlighter = ({ code, highlightedLine, language }: CodeHighlighterProps) => {
+export const CodeHighlighter = ({ code, highlightedLine = -1, language }: CodeHighlighterProps) => {
   const lines = code.split('\n');
   
   return (
