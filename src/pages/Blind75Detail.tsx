@@ -581,26 +581,171 @@ const Blind75Detail: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>{problem.title} - Blind 75 | AlgoLib.io</title>
-        <meta name="description" content={problem.description} />
+        <title>{problem.title} - Blind 75 | AlgoLib.io | LeetCode Solution</title>
+        <meta 
+          name="description" 
+          content={`${problem.title} - Complete solution with visualizations in Python, Java, C++, TypeScript. Time: ${problem.timeComplexity}, Space: ${problem.spaceComplexity}. ${problem.description.substring(0, 160)}`}
+        />
+        <meta 
+          name="keywords" 
+          content={`${problem.title}, blind 75, leetcode, ${problem.category}, ${problem.difficulty}, ${problem.tags.join(', ')}, coding interview, algorithm, ${problem.companies.join(', ')}`}
+        />
+        <meta name="author" content="AlgoLib.io" />
+        <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
         <link
           rel="canonical"
           href={`https://algolib.io/blind75/${problem.slug}`}
         />
 
+        {/* Open Graph */}
+        <meta property="og:type" content="article" />
+        <meta property="og:site_name" content="AlgoLib.io" />
+        <meta property="og:title" content={`${problem.title} - Blind 75 LeetCode Solution`} />
+        <meta property="og:description" content={`Learn ${problem.title} with interactive visualizations and multi-language code examples. Difficulty: ${problem.difficulty}. ${problem.category}.`} />
+        <meta property="og:url" content={`https://algolib.io/blind75/${problem.slug}`} />
+        <meta property="og:image" content="https://algolib.io/og-image.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:locale" content="en_US" />
+        <meta property="article:section" content={problem.category} />
+        <meta property="article:tag" content="Blind 75" />
+        {problem.tags.map(tag => (
+          <meta key={tag} property="article:tag" content={tag} />
+        ))}
+
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@algolib_io" />
+        <meta name="twitter:creator" content="@algolib_io" />
+        <meta name="twitter:title" content={`${problem.title} - Blind 75 Solution`} />
+        <meta name="twitter:description" content={`${problem.difficulty} ${problem.category} problem. Time: ${problem.timeComplexity}, Space: ${problem.spaceComplexity}`} />
+        <meta name="twitter:image" content="https://algolib.io/og-image.png" />
+
+        {/* TechArticle Schema */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "TechArticle",
-            headline: problem.title,
-            description: problem.description,
-            url: `https://algolib.io/blind75/${problem.slug}`,
-            articleSection: problem.category,
-            proficiencyLevel: problem.difficulty,
-            author: {
-              "@type": "Organization",
-              name: "AlgoLib.io",
+            "headline": problem.title,
+            "description": problem.description,
+            "url": `https://algolib.io/blind75/${problem.slug}`,
+            "image": {
+              "@type": "ImageObject",
+              "url": "https://algolib.io/og-image.png",
+              "width": 1200,
+              "height": 630
             },
+            "datePublished": "2024-01-01",
+            "dateModified": new Date().toISOString().split('T')[0],
+            "author": {
+              "@type": "Organization",
+              "name": "AlgoLib.io",
+              "url": "https://algolib.io",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://algolib.io/android-chrome-512x512.png"
+              }
+            },
+            "publisher": {
+              "@type": "Organization",
+              "name": "AlgoLib.io",
+              "url": "https://algolib.io",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://algolib.io/android-chrome-512x512.png"
+              }
+            },
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": `https://algolib.io/blind75/${problem.slug}`
+            },
+            "articleSection": problem.category,
+            "articleBody": problem.description,
+            "keywords": [problem.title, "Blind 75", problem.category, problem.difficulty, ...problem.tags].join(", "),
+            "proficiencyLevel": problem.difficulty,
+            "educationalLevel": problem.difficulty === 'easy' ? 'Beginner' : problem.difficulty === 'medium' ? 'Intermediate' : 'Advanced',
+            "timeRequired": "PT10M",
+            "about": {
+              "@type": "Thing",
+              "name": problem.category,
+              "description": `${problem.category} algorithms and data structures`
+            }
+          })}
+        </script>
+
+        {/* BreadcrumbList Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "item": {
+                  "@id": "https://algolib.io",
+                  "name": "Home"
+                }
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "item": {
+                  "@id": "https://algolib.io/blind75",
+                  "name": "Blind 75"
+                }
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "item": {
+                  "@id": `https://algolib.io/blind75?category=${encodeURIComponent(problem.category)}`,
+                  "name": problem.category
+                }
+              },
+              {
+                "@type": "ListItem",
+                "position": 4,
+                "item": {
+                  "@id": `https://algolib.io/blind75/${problem.slug}`,
+                  "name": problem.title
+                }
+              }
+            ]
+          })}
+        </script>
+
+        {/* HowTo Schema for Solution */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "HowTo",
+            "name": `How to solve ${problem.title}`,
+            "description": problem.description,
+            "totalTime": "PT10M",
+            "tool": ["Python", "Java", "C++", "TypeScript"],
+            "step": [
+              {
+                "@type": "HowToStep",
+                "name": "Understand the Problem",
+                "text": problem.description
+              },
+              {
+                "@type": "HowToStep",
+                "name": "Analyze Time Complexity",
+                "text": `Time Complexity: ${problem.timeComplexity}`
+              },
+              {
+                "@type": "HowToStep",
+                "name": "Analyze Space Complexity",
+                "text": `Space Complexity: ${problem.spaceComplexity}`
+              },
+              {
+                "@type": "HowToStep",
+                "name": "Implement Solution",
+                "text": "Choose your preferred programming language and implement the solution"
+              }
+            ]
           })}
         </script>
       </Helmet>
