@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
-import { StepControls } from '../shared/StepControls';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { CodeHighlighter } from '../shared/CodeHighlighter';
 import { VariablePanel } from '../shared/VariablePanel';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
 
 interface Step {
   i: number;
@@ -17,23 +17,26 @@ export const WordBreakVisualization = () => {
   const s = "leetcode";
   const wordDict = ["leet", "code"];
   const [currentStep, setCurrentStep] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1000);
   const [steps, setSteps] = useState<Step[]>([]);
 
-  const code = `def wordBreak(s, wordDict):
-    dp = [False] * (len(s) + 1)
-    dp[0] = True  # Empty string
-    
-    for i in range(1, len(s) + 1):
-        for word in wordDict:
-            start = i - len(word)
-            if start >= 0 and dp[start]:
-                if s[start:i] == word:
-                    dp[i] = True
-                    break
-    
-    return dp[len(s)]`;
+  const code = `function wordBreak(s: string, wordDict: string[]): boolean {
+  const dp = new Array(s.length + 1).fill(false);
+  dp[0] = true;  // Empty string
+  
+  for (let i = 1; i <= s.length; i++) {
+    for (const word of wordDict) {
+      const start = i - word.length;
+      if (start >= 0 && dp[start]) {
+        if (s.substring(start, i) === word) {
+          dp[i] = true;
+          break;
+        }
+      }
+    }
+  }
+  
+  return dp[s.length];
+}`;
 
   useEffect(() => {
     const newSteps: Step[] = [];
@@ -91,60 +94,60 @@ export const WordBreakVisualization = () => {
     setSteps(newSteps);
   }, []);
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isPlaying && currentStep < steps.length - 1) {
-      interval = setInterval(() => {
-        setCurrentStep(prev => prev + 1);
-      }, speed);
-    } else if (currentStep >= steps.length - 1) {
-      setIsPlaying(false);
-    }
-    return () => clearInterval(interval);
-  }, [isPlaying, currentStep, steps.length, speed]);
-
   if (steps.length === 0) return <div>Loading...</div>;
 
   const step = steps[currentStep];
 
-  return (
-    <div className="space-y-4">
-      <Card className="p-4">
-        <h3 className="font-semibold mb-4">Word Break</h3>
-        <div className="space-y-4">
-          <div className="flex gap-1">
-            {s.split('').map((char, i) => (
-              <div key={i} className={`w-10 h-10 flex items-center justify-center border-2 rounded ${i < step.i ? 'border-primary bg-primary/10' : 'border-border'}`}>
-                {char}
-              </div>
-            ))}
-          </div>
-          {step.checking && (
-            <div className={`p-3 rounded ${step.found ? 'bg-green-100 dark:bg-green-900/20' : 'bg-yellow-100 dark:bg-yellow-900/20'}`}>
-              Checking: {step.checking} {step.found && '✓'}
+  const leftContent = (
+    <>
+      <div>
+        <h3 className="font-semibold mb-3 text-sm">Word Break - String: "{s}"</h3>
+        <div className="flex gap-1 mb-4">
+          {s.split('').map((char, i) => (
+            <div key={i} className={`w-10 h-10 flex items-center justify-center border-2 rounded font-mono ${i < step.i ? 'border-primary bg-primary/20' : 'border-border bg-muted/30'}`}>
+              {char}
             </div>
-          )}
-          <div className="p-3 bg-muted rounded">{step.description}</div>
+          ))}
         </div>
-      </Card>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <CodeHighlighter code={code} highlightedLine={step.highlightedLine} language="Python" />
-        <VariablePanel variables={{ i: step.i, result: step.dp[s.length] ? "true" : "false" }} />
+        {step.checking && (
+          <div className={`p-3 rounded border ${step.found ? 'bg-green-500/10 border-green-500/30' : 'bg-yellow-500/10 border-yellow-500/30'}`}>
+            <span className="text-sm">Checking: <span className="font-mono font-bold">{step.checking}</span> {step.found && '✓'}</span>
+          </div>
+        )}
       </div>
 
-      <StepControls
-        currentStep={currentStep}
-        totalSteps={steps.length}
-        isPlaying={isPlaying}
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-        onStepForward={() => setCurrentStep(Math.min(currentStep + 1, steps.length - 1))}
-        onStepBack={() => setCurrentStep(Math.max(currentStep - 1, 0))}
-        onReset={() => { setCurrentStep(0); setIsPlaying(false); }}
-        speed={speed}
-        onSpeedChange={setSpeed}
+      <div className="p-4 bg-primary/20 rounded-lg border border-primary/30">
+        <p className="text-sm font-medium">{step.description}</p>
+      </div>
+
+      <VariablePanel variables={{ i: step.i, result: step.dp[s.length] ? "true" : "false" }} />
+    </>
+  );
+
+  const rightContent = (
+    <>
+      <div className="text-sm font-semibold text-muted-foreground mb-2">TypeScript</div>
+      <CodeHighlighter 
+        code={code} 
+        highlightedLine={step.highlightedLine} 
+        language="typescript" 
       />
-    </div>
+    </>
+  );
+
+  const controls = (
+    <SimpleStepControls
+      currentStep={currentStep}
+      totalSteps={steps.length}
+      onStepChange={setCurrentStep}
+    />
+  );
+
+  return (
+    <VisualizationLayout
+      leftContent={leftContent}
+      rightContent={rightContent}
+      controls={controls}
+    />
   );
 };

@@ -39,8 +39,9 @@ export const SimpleStepControls = ({
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-center gap-2">
+    <div className="flex items-center gap-4 flex-wrap">
+      {/* Playback Controls */}
+      <div className="flex items-center gap-2">
         <Button
           onClick={() => onStepChange(Math.max(0, currentStep - 1))}
           disabled={currentStep === 0 || isPlaying}
@@ -74,22 +75,16 @@ export const SimpleStepControls = ({
         </Button>
       </div>
       
-      <div className="flex-1">
-        <div className="text-xs text-muted-foreground mb-1 text-center">
-          Step {currentStep + 1} / {totalSteps}
-        </div>
-        <div className="h-2 bg-muted rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-primary transition-all duration-300"
-            style={{ width: `${((currentStep + 1) / totalSteps) * 100}%` }}
-          />
-        </div>
+      {/* Step Counter */}
+      <div className="text-sm text-muted-foreground">
+        Step {currentStep + 1} / {totalSteps}
       </div>
 
-      <div className="flex-1">
-        <div className="text-xs text-muted-foreground mb-1 text-center">
+      {/* Speed Control */}
+      <div className="flex items-center gap-2 flex-1 min-w-[200px]">
+        <span className="text-sm text-muted-foreground whitespace-nowrap">
           Speed: {speed.toFixed(1)}x
-        </div>
+        </span>
         <Slider
           value={[speed]}
           onValueChange={(values) => setSpeed(values[0])}
@@ -97,6 +92,7 @@ export const SimpleStepControls = ({
           max={3}
           step={0.5}
           disabled={isPlaying}
+          className="flex-1"
         />
       </div>
     </div>

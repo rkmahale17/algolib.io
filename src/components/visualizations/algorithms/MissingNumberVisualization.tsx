@@ -3,6 +3,7 @@ import { SimpleArrayVisualization } from '../shared/SimpleArrayVisualization';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
 
 export const MissingNumberVisualization = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -13,68 +14,91 @@ export const MissingNumberVisualization = () => {
       array: nums,
       highlighting: [],
       variables: { result: 3, operation: 'Start with n' },
-      explanation: "XOR approach: Start with result = n (length of array) = 3"
+      explanation: "XOR approach: Initialize result = n (array length) = 3",
+      highlightedLine: 2
     },
     {
       array: nums,
       highlighting: [0],
       variables: { result: '3 ^ 0 ^ 3 = 0', operation: 'XOR index 0 and value 3' },
-      explanation: "result ^= 0 (index) ^= 3 (value). 3 ^ 0 ^ 3 = 0"
+      explanation: "result ^= 0 (index) ^= 3 (value). 3 ^ 0 ^ 3 = 0",
+      highlightedLine: 5
     },
     {
       array: nums,
       highlighting: [1],
       variables: { result: '0 ^ 1 ^ 0 = 1', operation: 'XOR index 1 and value 0' },
-      explanation: "result ^= 1 (index) ^= 0 (value). 0 ^ 1 ^ 0 = 1"
+      explanation: "result ^= 1 (index) ^= 0 (value). 0 ^ 1 ^ 0 = 1",
+      highlightedLine: 5
     },
     {
       array: nums,
       highlighting: [2],
       variables: { result: '1 ^ 2 ^ 1 = 2', operation: 'XOR index 2 and value 1' },
-      explanation: "result ^= 2 (index) ^= 1 (value). 1 ^ 2 ^ 1 = 2. Missing number is 2!"
+      explanation: "result ^= 2 (index) ^= 1 (value). 1 ^ 2 ^ 1 = 2. Missing number is 2!",
+      highlightedLine: 8
     }
   ];
 
-  const code = `def missingNumber(nums):
-    result = len(nums)
-    
-    for i in range(len(nums)):
-        result ^= i ^ nums[i]
-    
-    return result
+  const code = `function missingNumber(nums: number[]): number {
+  let result = nums.length;
+  
+  for (let i = 0; i < nums.length; i++) {
+    result ^= i ^ nums[i];
+  }
+  
+  return result;
+}`;
 
-# Alternative: Math formula
-def missingNumber_sum(nums):
-    n = len(nums)
-    expected_sum = n * (n + 1) // 2
-    actual_sum = sum(nums)
-    return expected_sum - actual_sum`;
-
-  return (
-    <div className="space-y-6">
+  const leftContent = (
+    <>
       <SimpleArrayVisualization
         array={steps[currentStep].array}
         highlights={steps[currentStep].highlighting}
         label="Array"
       />
       
-      <VariablePanel variables={steps[currentStep].variables} />
-      
-      <div className="p-4 bg-muted rounded-lg">
-        <p className="text-sm">{steps[currentStep].explanation}</p>
-        <div className="mt-2 text-xs text-muted-foreground">
-          <p>XOR properties: a ^ a = 0, a ^ 0 = a</p>
-          <p>All numbers except missing one will cancel out!</p>
+      <div className="p-4 bg-primary/20 rounded-lg border border-primary/30">
+        <p className="text-sm font-medium">{steps[currentStep].explanation}</p>
+      </div>
+
+      <div className="p-4 bg-muted/50 rounded-lg border">
+        <h3 className="font-semibold mb-2 text-sm">XOR Properties:</h3>
+        <div className="text-xs space-y-1 text-muted-foreground">
+          <p>• a ^ a = 0</p>
+          <p>• a ^ 0 = a</p>
+          <p>• All numbers except missing one will cancel out!</p>
         </div>
       </div>
 
-      <CodeHighlighter code={code} language="python" />
-      
-      <SimpleStepControls
-        currentStep={currentStep}
-        totalSteps={steps.length}
-        onStepChange={setCurrentStep}
+      <VariablePanel variables={steps[currentStep].variables} />
+    </>
+  );
+
+  const rightContent = (
+    <>
+      <div className="text-sm font-semibold text-muted-foreground mb-2">TypeScript</div>
+      <CodeHighlighter 
+        code={code} 
+        language="typescript"
+        highlightedLine={steps[currentStep].highlightedLine}
       />
-    </div>
+    </>
+  );
+
+  const controls = (
+    <SimpleStepControls
+      currentStep={currentStep}
+      totalSteps={steps.length}
+      onStepChange={setCurrentStep}
+    />
+  );
+
+  return (
+    <VisualizationLayout
+      leftContent={leftContent}
+      rightContent={rightContent}
+      controls={controls}
+    />
   );
 };
