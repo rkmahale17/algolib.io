@@ -939,5 +939,1696 @@ export const blind75Implementations: Record<string, {
     return maxArea;
 }`,
     explanation: "Two pointers from both ends. Area is determined by min(height[left], height[right]) × width. Always move the pointer with smaller height inward, as moving the taller one can only decrease area. This greedy approach finds the maximum in O(n) time."
+  },
+  "combination-sum": {
+    python: `def combinationSum(candidates: List[int], target: int) -> List[List[int]]:
+    result = []
+    
+    def backtrack(start, current, total):
+        # Base case: found valid combination
+        if total == target:
+            result.append(current[:])
+            return
+        
+        # Base case: exceeded target
+        if total > target:
+            return
+        
+        # Try each candidate starting from 'start' index
+        for i in range(start, len(candidates)):
+            current.append(candidates[i])
+            # Can reuse same element, so pass 'i' not 'i+1'
+            backtrack(i, current, total + candidates[i])
+            current.pop()
+    
+    backtrack(0, [], 0)
+    return result`,
+    java: `public List<List<Integer>> combinationSum(int[] candidates, int target) {
+    List<List<Integer>> result = new ArrayList<>();
+    backtrack(candidates, target, 0, new ArrayList<>(), 0, result);
+    return result;
+}
+
+private void backtrack(int[] candidates, int target, int start, 
+                       List<Integer> current, int total, 
+                       List<List<Integer>> result) {
+    // Base case: found valid combination
+    if (total == target) {
+        result.add(new ArrayList<>(current));
+        return;
+    }
+    
+    // Base case: exceeded target
+    if (total > target) {
+        return;
+    }
+    
+    // Try each candidate starting from 'start' index
+    for (int i = start; i < candidates.length; i++) {
+        current.add(candidates[i]);
+        // Can reuse same element, so pass 'i' not 'i+1'
+        backtrack(candidates, target, i, current, total + candidates[i], result);
+        current.remove(current.size() - 1);
+    }
+}`,
+    cpp: `vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+    vector<vector<int>> result;
+    vector<int> current;
+    backtrack(candidates, target, 0, current, 0, result);
+    return result;
+}
+
+void backtrack(vector<int>& candidates, int target, int start, 
+               vector<int>& current, int total, 
+               vector<vector<int>>& result) {
+    // Base case: found valid combination
+    if (total == target) {
+        result.push_back(current);
+        return;
+    }
+    
+    // Base case: exceeded target
+    if (total > target) {
+        return;
+    }
+    
+    // Try each candidate starting from 'start' index
+    for (int i = start; i < candidates.size(); i++) {
+        current.push_back(candidates[i]);
+        // Can reuse same element, so pass 'i' not 'i+1'
+        backtrack(candidates, target, i, current, total + candidates[i], result);
+        current.pop_back();
+    }
+}`,
+    typescript: `function combinationSum(candidates: number[], target: number): number[][] {
+    const result: number[][] = [];
+    
+    function backtrack(start: number, current: number[], total: number) {
+        // Base case: found valid combination
+        if (total === target) {
+            result.push([...current]);
+            return;
+        }
+        
+        // Base case: exceeded target
+        if (total > target) {
+            return;
+        }
+        
+        // Try each candidate starting from 'start' index
+        for (let i = start; i < candidates.length; i++) {
+            current.push(candidates[i]);
+            // Can reuse same element, so pass 'i' not 'i+1'
+            backtrack(i, current, total + candidates[i]);
+            current.pop();
+        }
+    }
+    
+    backtrack(0, [], 0);
+    return result;
+}`,
+    explanation: "Use backtracking to explore all combinations. Key insight: since we can reuse elements, pass current index 'i' (not i+1) in recursion. Sort candidates first for optimization (optional). Prune branches when total exceeds target."
+  },
+  "house-robber": {
+    python: `def rob(nums: List[int]) -> int:
+    if not nums:
+        return 0
+    if len(nums) == 1:
+        return nums[0]
+    
+    # Track max money from two previous houses
+    prev2 = 0  # i-2
+    prev1 = 0  # i-1
+    
+    for num in nums:
+        # Either rob current + i-2, or skip current (take i-1)
+        temp = max(num + prev2, prev1)
+        prev2 = prev1
+        prev1 = temp
+    
+    return prev1`,
+    java: `public int rob(int[] nums) {
+    if (nums.length == 0) return 0;
+    if (nums.length == 1) return nums[0];
+    
+    // Track max money from two previous houses
+    int prev2 = 0;  // i-2
+    int prev1 = 0;  // i-1
+    
+    for (int num : nums) {
+        // Either rob current + i-2, or skip current (take i-1)
+        int temp = Math.max(num + prev2, prev1);
+        prev2 = prev1;
+        prev1 = temp;
+    }
+    
+    return prev1;
+}`,
+    cpp: `int rob(vector<int>& nums) {
+    if (nums.empty()) return 0;
+    if (nums.size() == 1) return nums[0];
+    
+    // Track max money from two previous houses
+    int prev2 = 0;  // i-2
+    int prev1 = 0;  // i-1
+    
+    for (int num : nums) {
+        // Either rob current + i-2, or skip current (take i-1)
+        int temp = max(num + prev2, prev1);
+        prev2 = prev1;
+        prev1 = temp;
+    }
+    
+    return prev1;
+}`,
+    typescript: `function rob(nums: number[]): number {
+    if (nums.length === 0) return 0;
+    if (nums.length === 1) return nums[0];
+    
+    // Track max money from two previous houses
+    let prev2 = 0;  // i-2
+    let prev1 = 0;  // i-1
+    
+    for (const num of nums) {
+        // Either rob current + i-2, or skip current (take i-1)
+        const temp = Math.max(num + prev2, prev1);
+        prev2 = prev1;
+        prev1 = temp;
+    }
+    
+    return prev1;
+}`,
+    explanation: "DP pattern: at each house, decide to rob (add current + best from i-2) or skip (keep best from i-1). Use two variables instead of array for O(1) space. Formula: dp[i] = max(nums[i] + dp[i-2], dp[i-1])."
+  },
+  "house-robber-ii": {
+    python: `def rob(nums: List[int]) -> int:
+    if len(nums) == 1:
+        return nums[0]
+    
+    # Helper function from House Robber I
+    def rob_linear(houses):
+        prev2, prev1 = 0, 0
+        for num in houses:
+            temp = max(num + prev2, prev1)
+            prev2 = prev1
+            prev1 = temp
+        return prev1
+    
+    # Case 1: Rob houses 0 to n-2 (exclude last)
+    # Case 2: Rob houses 1 to n-1 (exclude first)
+    return max(rob_linear(nums[:-1]), rob_linear(nums[1:]))`,
+    java: `public int rob(int[] nums) {
+    if (nums.length == 1) return nums[0];
+    
+    // Case 1: Rob houses 0 to n-2 (exclude last)
+    // Case 2: Rob houses 1 to n-1 (exclude first)
+    return Math.max(robLinear(nums, 0, nums.length - 2),
+                    robLinear(nums, 1, nums.length - 1));
+}
+
+private int robLinear(int[] nums, int start, int end) {
+    int prev2 = 0, prev1 = 0;
+    for (int i = start; i <= end; i++) {
+        int temp = Math.max(nums[i] + prev2, prev1);
+        prev2 = prev1;
+        prev1 = temp;
+    }
+    return prev1;
+}`,
+    cpp: `int rob(vector<int>& nums) {
+    if (nums.size() == 1) return nums[0];
+    
+    // Case 1: Rob houses 0 to n-2 (exclude last)
+    // Case 2: Rob houses 1 to n-1 (exclude first)
+    return max(robLinear(nums, 0, nums.size() - 2),
+               robLinear(nums, 1, nums.size() - 1));
+}
+
+int robLinear(vector<int>& nums, int start, int end) {
+    int prev2 = 0, prev1 = 0;
+    for (int i = start; i <= end; i++) {
+        int temp = max(nums[i] + prev2, prev1);
+        prev2 = prev1;
+        prev1 = temp;
+    }
+    return prev1;
+}`,
+    typescript: `function rob(nums: number[]): number {
+    if (nums.length === 1) return nums[0];
+    
+    const robLinear = (start: number, end: number): number => {
+        let prev2 = 0, prev1 = 0;
+        for (let i = start; i <= end; i++) {
+            const temp = Math.max(nums[i] + prev2, prev1);
+            prev2 = prev1;
+            prev1 = temp;
+        }
+        return prev1;
+    };
+    
+    // Case 1: Rob houses 0 to n-2 (exclude last)
+    // Case 2: Rob houses 1 to n-1 (exclude first)
+    return Math.max(robLinear(0, nums.length - 2),
+                    robLinear(1, nums.length - 1));
+}`,
+    explanation: "Houses are circular: can't rob both first and last. Split into two cases: (1) rob houses 0..n-2, (2) rob houses 1..n-1. Apply House Robber I logic to each case and take maximum."
+  },
+  "decode-ways": {
+    python: `def numDecodings(s: str) -> int:
+    if not s or s[0] == '0':
+        return 0
+    
+    # dp[i] = number of ways to decode s[:i]
+    n = len(s)
+    prev2 = 1  # dp[i-2]
+    prev1 = 1  # dp[i-1]
+    
+    for i in range(1, n):
+        current = 0
+        
+        # Single digit decode (1-9)
+        if s[i] != '0':
+            current += prev1
+        
+        # Two digit decode (10-26)
+        two_digit = int(s[i-1:i+1])
+        if 10 <= two_digit <= 26:
+            current += prev2
+        
+        prev2 = prev1
+        prev1 = current
+    
+    return prev1`,
+    java: `public int numDecodings(String s) {
+    if (s == null || s.length() == 0 || s.charAt(0) == '0') {
+        return 0;
+    }
+    
+    int n = s.length();
+    int prev2 = 1;  // dp[i-2]
+    int prev1 = 1;  // dp[i-1]
+    
+    for (int i = 1; i < n; i++) {
+        int current = 0;
+        
+        // Single digit decode (1-9)
+        if (s.charAt(i) != '0') {
+            current += prev1;
+        }
+        
+        // Two digit decode (10-26)
+        int twoDigit = Integer.parseInt(s.substring(i-1, i+1));
+        if (twoDigit >= 10 && twoDigit <= 26) {
+            current += prev2;
+        }
+        
+        prev2 = prev1;
+        prev1 = current;
+    }
+    
+    return prev1;
+}`,
+    cpp: `int numDecodings(string s) {
+    if (s.empty() || s[0] == '0') {
+        return 0;
+    }
+    
+    int n = s.length();
+    int prev2 = 1;  // dp[i-2]
+    int prev1 = 1;  // dp[i-1]
+    
+    for (int i = 1; i < n; i++) {
+        int current = 0;
+        
+        // Single digit decode (1-9)
+        if (s[i] != '0') {
+            current += prev1;
+        }
+        
+        // Two digit decode (10-26)
+        int twoDigit = stoi(s.substr(i-1, 2));
+        if (twoDigit >= 10 && twoDigit <= 26) {
+            current += prev2;
+        }
+        
+        prev2 = prev1;
+        prev1 = current;
+    }
+    
+    return prev1;
+}`,
+    typescript: `function numDecodings(s: string): number {
+    if (!s || s[0] === '0') {
+        return 0;
+    }
+    
+    const n = s.length;
+    let prev2 = 1;  // dp[i-2]
+    let prev1 = 1;  // dp[i-1]
+    
+    for (let i = 1; i < n; i++) {
+        let current = 0;
+        
+        // Single digit decode (1-9)
+        if (s[i] !== '0') {
+            current += prev1;
+        }
+        
+        // Two digit decode (10-26)
+        const twoDigit = parseInt(s.substring(i-1, i+1));
+        if (twoDigit >= 10 && twoDigit <= 26) {
+            current += prev2;
+        }
+        
+        prev2 = prev1;
+        prev1 = current;
+    }
+    
+    return prev1;
+}`,
+    explanation: "DP: at position i, we can decode as single digit (if 1-9) using dp[i-1] ways, or as two digits (if 10-26) using dp[i-2] ways. Handle '0' carefully - it can only be part of 10 or 20. Optimize to O(1) space with two variables."
+  },
+  "unique-paths": {
+    python: `def uniquePaths(m: int, n: int) -> int:
+    # Create DP table
+    dp = [[1] * n for _ in range(m)]
+    
+    # Fill DP table
+    for i in range(1, m):
+        for j in range(1, n):
+            # Paths from top + paths from left
+            dp[i][j] = dp[i-1][j] + dp[i][j-1]
+    
+    return dp[m-1][n-1]`,
+    java: `public int uniquePaths(int m, int n) {
+    // Create DP table
+    int[][] dp = new int[m][n];
+    
+    // Initialize first row and column
+    for (int i = 0; i < m; i++) dp[i][0] = 1;
+    for (int j = 0; j < n; j++) dp[0][j] = 1;
+    
+    // Fill DP table
+    for (int i = 1; i < m; i++) {
+        for (int j = 1; j < n; j++) {
+            // Paths from top + paths from left
+            dp[i][j] = dp[i-1][j] + dp[i][j-1];
+        }
+    }
+    
+    return dp[m-1][n-1];
+}`,
+    cpp: `int uniquePaths(int m, int n) {
+    // Create DP table
+    vector<vector<int>> dp(m, vector<int>(n, 1));
+    
+    // Fill DP table
+    for (int i = 1; i < m; i++) {
+        for (int j = 1; j < n; j++) {
+            // Paths from top + paths from left
+            dp[i][j] = dp[i-1][j] + dp[i][j-1];
+        }
+    }
+    
+    return dp[m-1][n-1];
+}`,
+    typescript: `function uniquePaths(m: number, n: number): number {
+    // Create DP table
+    const dp: number[][] = Array(m).fill(0).map(() => Array(n).fill(1));
+    
+    // Fill DP table
+    for (let i = 1; i < m; i++) {
+        for (let j = 1; j < n; j++) {
+            // Paths from top + paths from left
+            dp[i][j] = dp[i-1][j] + dp[i][j-1];
+        }
+    }
+    
+    return dp[m-1][n-1];
+}`,
+    explanation: "2D DP: dp[i][j] = paths to reach cell (i,j). Since we can only move right or down, dp[i][j] = dp[i-1][j] + dp[i][j-1]. First row and column are all 1s. Can optimize to O(n) space using 1D array."
+  },
+  "jump-game": {
+    python: `def canJump(nums: List[int]) -> bool:
+    # Track the farthest position we can reach
+    max_reach = 0
+    
+    for i in range(len(nums)):
+        # If current position is beyond max reach, can't proceed
+        if i > max_reach:
+            return False
+        
+        # Update max reach from current position
+        max_reach = max(max_reach, i + nums[i])
+        
+        # Early exit if we can reach the end
+        if max_reach >= len(nums) - 1:
+            return True
+    
+    return True`,
+    java: `public boolean canJump(int[] nums) {
+    // Track the farthest position we can reach
+    int maxReach = 0;
+    
+    for (int i = 0; i < nums.length; i++) {
+        // If current position is beyond max reach, can't proceed
+        if (i > maxReach) {
+            return false;
+        }
+        
+        // Update max reach from current position
+        maxReach = Math.max(maxReach, i + nums[i]);
+        
+        // Early exit if we can reach the end
+        if (maxReach >= nums.length - 1) {
+            return true;
+        }
+    }
+    
+    return true;
+}`,
+    cpp: `bool canJump(vector<int>& nums) {
+    // Track the farthest position we can reach
+    int maxReach = 0;
+    
+    for (int i = 0; i < nums.size(); i++) {
+        // If current position is beyond max reach, can't proceed
+        if (i > maxReach) {
+            return false;
+        }
+        
+        // Update max reach from current position
+        maxReach = max(maxReach, i + nums[i]);
+        
+        // Early exit if we can reach the end
+        if (maxReach >= nums.size() - 1) {
+            return true;
+        }
+    }
+    
+    return true;
+}`,
+    typescript: `function canJump(nums: number[]): boolean {
+    // Track the farthest position we can reach
+    let maxReach = 0;
+    
+    for (let i = 0; i < nums.length; i++) {
+        // If current position is beyond max reach, can't proceed
+        if (i > maxReach) {
+            return false;
+        }
+        
+        // Update max reach from current position
+        maxReach = Math.max(maxReach, i + nums[i]);
+        
+        // Early exit if we can reach the end
+        if (maxReach >= nums.length - 1) {
+            return true;
+        }
+    }
+    
+    return true;
+}`,
+    explanation: "Greedy approach: track the farthest index reachable. At each position, if current index > maxReach, we're stuck. Otherwise, update maxReach = max(maxReach, i + nums[i]). If maxReach >= last index, return true."
+  },
+  "clone-graph": {
+    python: `def cloneGraph(node: 'Node') -> 'Node':
+    if not node:
+        return None
+    
+    # Map original node to cloned node
+    cloned = {}
+    
+    def dfs(node):
+        # If already cloned, return the clone
+        if node in cloned:
+            return cloned[node]
+        
+        # Create clone of current node
+        clone = Node(node.val)
+        cloned[node] = clone
+        
+        # Clone all neighbors recursively
+        for neighbor in node.neighbors:
+            clone.neighbors.append(dfs(neighbor))
+        
+        return clone
+    
+    return dfs(node)`,
+    java: `public Node cloneGraph(Node node) {
+    if (node == null) return null;
+    
+    // Map original node to cloned node
+    Map<Node, Node> cloned = new HashMap<>();
+    return dfs(node, cloned);
+}
+
+private Node dfs(Node node, Map<Node, Node> cloned) {
+    // If already cloned, return the clone
+    if (cloned.containsKey(node)) {
+        return cloned.get(node);
+    }
+    
+    // Create clone of current node
+    Node clone = new Node(node.val);
+    cloned.put(node, clone);
+    
+    // Clone all neighbors recursively
+    for (Node neighbor : node.neighbors) {
+        clone.neighbors.add(dfs(neighbor, cloned));
+    }
+    
+    return clone;
+}`,
+    cpp: `Node* cloneGraph(Node* node) {
+    if (!node) return nullptr;
+    
+    // Map original node to cloned node
+    unordered_map<Node*, Node*> cloned;
+    return dfs(node, cloned);
+}
+
+Node* dfs(Node* node, unordered_map<Node*, Node*>& cloned) {
+    // If already cloned, return the clone
+    if (cloned.count(node)) {
+        return cloned[node];
+    }
+    
+    // Create clone of current node
+    Node* clone = new Node(node->val);
+    cloned[node] = clone;
+    
+    // Clone all neighbors recursively
+    for (Node* neighbor : node->neighbors) {
+        clone->neighbors.push_back(dfs(neighbor, cloned));
+    }
+    
+    return clone;
+}`,
+    typescript: `function cloneGraph(node: Node | null): Node | null {
+    if (!node) return null;
+    
+    // Map original node to cloned node
+    const cloned = new Map<Node, Node>();
+    
+    function dfs(node: Node): Node {
+        // If already cloned, return the clone
+        if (cloned.has(node)) {
+            return cloned.get(node)!;
+        }
+        
+        // Create clone of current node
+        const clone = new Node(node.val);
+        cloned.set(node, clone);
+        
+        // Clone all neighbors recursively
+        for (const neighbor of node.neighbors) {
+            clone.neighbors.push(dfs(neighbor));
+        }
+        
+        return clone;
+    }
+    
+    return dfs(node);
+}`,
+    explanation: "Use DFS with a hashmap to track original->clone mappings. For each node: if already cloned, return clone; otherwise create new node, store mapping, then recursively clone all neighbors. BFS works similarly with a queue."
+  },
+  "course-schedule": {
+    python: `def canFinish(numCourses: int, prerequisites: List[List[int]]) -> bool:
+    # Build adjacency list
+    graph = [[] for _ in range(numCourses)]
+    for course, prereq in prerequisites:
+        graph[course].append(prereq)
+    
+    # Track visit states: 0=unvisited, 1=visiting, 2=visited
+    visit = [0] * numCourses
+    
+    def has_cycle(course):
+        if visit[course] == 1:  # Cycle detected
+            return True
+        if visit[course] == 2:  # Already processed
+            return False
+        
+        visit[course] = 1  # Mark as visiting
+        for prereq in graph[course]:
+            if has_cycle(prereq):
+                return True
+        visit[course] = 2  # Mark as visited
+        return False
+    
+    # Check for cycles in each component
+    for course in range(numCourses):
+        if has_cycle(course):
+            return False
+    
+    return True`,
+    java: `public boolean canFinish(int numCourses, int[][] prerequisites) {
+    // Build adjacency list
+    List<List<Integer>> graph = new ArrayList<>();
+    for (int i = 0; i < numCourses; i++) {
+        graph.add(new ArrayList<>());
+    }
+    for (int[] prereq : prerequisites) {
+        graph.get(prereq[0]).add(prereq[1]);
+    }
+    
+    // Track visit states: 0=unvisited, 1=visiting, 2=visited
+    int[] visit = new int[numCourses];
+    
+    // Check for cycles in each component
+    for (int course = 0; course < numCourses; course++) {
+        if (hasCycle(course, graph, visit)) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+private boolean hasCycle(int course, List<List<Integer>> graph, int[] visit) {
+    if (visit[course] == 1) return true;   // Cycle detected
+    if (visit[course] == 2) return false;  // Already processed
+    
+    visit[course] = 1;  // Mark as visiting
+    for (int prereq : graph.get(course)) {
+        if (hasCycle(prereq, graph, visit)) {
+            return true;
+        }
+    }
+    visit[course] = 2;  // Mark as visited
+    return false;
+}`,
+    cpp: `bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+    // Build adjacency list
+    vector<vector<int>> graph(numCourses);
+    for (auto& prereq : prerequisites) {
+        graph[prereq[0]].push_back(prereq[1]);
+    }
+    
+    // Track visit states: 0=unvisited, 1=visiting, 2=visited
+    vector<int> visit(numCourses, 0);
+    
+    function<bool(int)> hasCycle = [&](int course) {
+        if (visit[course] == 1) return true;   // Cycle detected
+        if (visit[course] == 2) return false;  // Already processed
+        
+        visit[course] = 1;  // Mark as visiting
+        for (int prereq : graph[course]) {
+            if (hasCycle(prereq)) {
+                return true;
+            }
+        }
+        visit[course] = 2;  // Mark as visited
+        return false;
+    };
+    
+    // Check for cycles in each component
+    for (int course = 0; course < numCourses; course++) {
+        if (hasCycle(course)) {
+            return false;
+        }
+    }
+    
+    return true;
+}`,
+    typescript: `function canFinish(numCourses: number, prerequisites: number[][]): boolean {
+    // Build adjacency list
+    const graph: number[][] = Array(numCourses).fill(0).map(() => []);
+    for (const [course, prereq] of prerequisites) {
+        graph[course].push(prereq);
+    }
+    
+    // Track visit states: 0=unvisited, 1=visiting, 2=visited
+    const visit: number[] = Array(numCourses).fill(0);
+    
+    function hasCycle(course: number): boolean {
+        if (visit[course] === 1) return true;   // Cycle detected
+        if (visit[course] === 2) return false;  // Already processed
+        
+        visit[course] = 1;  // Mark as visiting
+        for (const prereq of graph[course]) {
+            if (hasCycle(prereq)) {
+                return true;
+            }
+        }
+        visit[course] = 2;  // Mark as visited
+        return false;
+    }
+    
+    // Check for cycles in each component
+    for (let course = 0; course < numCourses; course++) {
+        if (hasCycle(course)) {
+            return false;
+        }
+    }
+    
+    return true;
+}`,
+    explanation: "Cycle detection in directed graph using DFS. Use 3 states: unvisited(0), visiting(1), visited(2). If we encounter a node in 'visiting' state during DFS, there's a cycle. Build adjacency list from prerequisites and check all nodes."
+  },
+  "pacific-atlantic-water-flow": {
+    python: `def pacificAtlantic(heights: List[List[int]]) -> List[List[int]]:
+    if not heights:
+        return []
+    
+    m, n = len(heights), len(heights[0])
+    pacific = set()
+    atlantic = set()
+    
+    def dfs(r, c, visited, prev_height):
+        if (r < 0 or r >= m or c < 0 or c >= n or
+            (r, c) in visited or heights[r][c] < prev_height):
+            return
+        
+        visited.add((r, c))
+        for dr, dc in [(0,1), (0,-1), (1,0), (-1,0)]:
+            dfs(r + dr, c + dc, visited, heights[r][c])
+    
+    # DFS from Pacific borders (top and left)
+    for i in range(m):
+        dfs(i, 0, pacific, heights[i][0])
+    for j in range(n):
+        dfs(0, j, pacific, heights[0][j])
+    
+    # DFS from Atlantic borders (bottom and right)
+    for i in range(m):
+        dfs(i, n-1, atlantic, heights[i][n-1])
+    for j in range(n):
+        dfs(m-1, j, atlantic, heights[m-1][j])
+    
+    # Find cells reachable by both oceans
+    return [[r, c] for r in range(m) for c in range(n) 
+            if (r, c) in pacific and (r, c) in atlantic]`,
+    java: `public List<List<Integer>> pacificAtlantic(int[][] heights) {
+    List<List<Integer>> result = new ArrayList<>();
+    if (heights == null || heights.length == 0) return result;
+    
+    int m = heights.length, n = heights[0].length;
+    boolean[][] pacific = new boolean[m][n];
+    boolean[][] atlantic = new boolean[m][n];
+    
+    // DFS from Pacific borders
+    for (int i = 0; i < m; i++) {
+        dfs(heights, pacific, i, 0);
+    }
+    for (int j = 0; j < n; j++) {
+        dfs(heights, pacific, 0, j);
+    }
+    
+    // DFS from Atlantic borders
+    for (int i = 0; i < m; i++) {
+        dfs(heights, atlantic, i, n-1);
+    }
+    for (int j = 0; j < n; j++) {
+        dfs(heights, atlantic, m-1, j);
+    }
+    
+    // Find cells reachable by both oceans
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            if (pacific[i][j] && atlantic[i][j]) {
+                result.add(Arrays.asList(i, j));
+            }
+        }
+    }
+    
+    return result;
+}
+
+private void dfs(int[][] heights, boolean[][] visited, int r, int c) {
+    int m = heights.length, n = heights[0].length;
+    visited[r][c] = true;
+    
+    int[][] dirs = {{0,1}, {0,-1}, {1,0}, {-1,0}};
+    for (int[] dir : dirs) {
+        int nr = r + dir[0], nc = c + dir[1];
+        if (nr >= 0 && nr < m && nc >= 0 && nc < n &&
+            !visited[nr][nc] && heights[nr][nc] >= heights[r][c]) {
+            dfs(heights, visited, nr, nc);
+        }
+    }
+}`,
+    cpp: `vector<vector<int>> pacificAtlantic(vector<vector<int>>& heights) {
+    vector<vector<int>> result;
+    if (heights.empty()) return result;
+    
+    int m = heights.size(), n = heights[0].size();
+    vector<vector<bool>> pacific(m, vector<bool>(n, false));
+    vector<vector<bool>> atlantic(m, vector<bool>(n, false));
+    
+    function<void(int, int, vector<vector<bool>>&)> dfs = 
+        [&](int r, int c, vector<vector<bool>>& visited) {
+        visited[r][c] = true;
+        vector<pair<int,int>> dirs = {{0,1}, {0,-1}, {1,0}, {-1,0}};
+        for (auto [dr, dc] : dirs) {
+            int nr = r + dr, nc = c + dc;
+            if (nr >= 0 && nr < m && nc >= 0 && nc < n &&
+                !visited[nr][nc] && heights[nr][nc] >= heights[r][c]) {
+                dfs(nr, nc, visited);
+            }
+        }
+    };
+    
+    // DFS from borders
+    for (int i = 0; i < m; i++) {
+        dfs(i, 0, pacific);
+        dfs(i, n-1, atlantic);
+    }
+    for (int j = 0; j < n; j++) {
+        dfs(0, j, pacific);
+        dfs(m-1, j, atlantic);
+    }
+    
+    // Find intersection
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            if (pacific[i][j] && atlantic[i][j]) {
+                result.push_back({i, j});
+            }
+        }
+    }
+    
+    return result;
+}`,
+    typescript: `function pacificAtlantic(heights: number[][]): number[][] {
+    if (!heights.length) return [];
+    
+    const m = heights.length, n = heights[0].length;
+    const pacific = Array(m).fill(0).map(() => Array(n).fill(false));
+    const atlantic = Array(m).fill(0).map(() => Array(n).fill(false));
+    
+    function dfs(r: number, c: number, visited: boolean[][]) {
+        visited[r][c] = true;
+        const dirs = [[0,1], [0,-1], [1,0], [-1,0]];
+        for (const [dr, dc] of dirs) {
+            const nr = r + dr, nc = c + dc;
+            if (nr >= 0 && nr < m && nc >= 0 && nc < n &&
+                !visited[nr][nc] && heights[nr][nc] >= heights[r][c]) {
+                dfs(nr, nc, visited);
+            }
+        }
+    }
+    
+    // DFS from borders
+    for (let i = 0; i < m; i++) {
+        dfs(i, 0, pacific);
+        dfs(i, n-1, atlantic);
+    }
+    for (let j = 0; j < n; j++) {
+        dfs(0, j, pacific);
+        dfs(m-1, j, atlantic);
+    }
+    
+    // Find intersection
+    const result: number[][] = [];
+    for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+            if (pacific[i][j] && atlantic[i][j]) {
+                result.push([i, j]);
+            }
+        }
+    }
+    
+    return result;
+}`,
+    explanation: "Reverse thinking: instead of checking if water flows to oceans from each cell, DFS from ocean borders inward (water can flow uphill in reverse). Mark cells reachable from Pacific and Atlantic. Cells in both sets can reach both oceans."
+  },
+  "number-of-islands": {
+    python: `def numIslands(grid: List[List[str]]) -> int:
+    if not grid:
+        return 0
+    
+    m, n = len(grid), len(grid[0])
+    count = 0
+    
+    def dfs(r, c):
+        if (r < 0 or r >= m or c < 0 or c >= n or 
+            grid[r][c] != '1'):
+            return
+        
+        # Mark as visited by changing to '0'
+        grid[r][c] = '0'
+        
+        # Visit all 4 directions
+        dfs(r+1, c)
+        dfs(r-1, c)
+        dfs(r, c+1)
+        dfs(r, c-1)
+    
+    for i in range(m):
+        for j in range(n):
+            if grid[i][j] == '1':
+                count += 1
+                dfs(i, j)  # Sink the island
+    
+    return count`,
+    java: `public int numIslands(char[][] grid) {
+    if (grid == null || grid.length == 0) return 0;
+    
+    int m = grid.length, n = grid[0].length;
+    int count = 0;
+    
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            if (grid[i][j] == '1') {
+                count++;
+                dfs(grid, i, j);  // Sink the island
+            }
+        }
+    }
+    
+    return count;
+}
+
+private void dfs(char[][] grid, int r, int c) {
+    int m = grid.length, n = grid[0].length;
+    if (r < 0 || r >= m || c < 0 || c >= n || grid[r][c] != '1') {
+        return;
+    }
+    
+    // Mark as visited
+    grid[r][c] = '0';
+    
+    // Visit all 4 directions
+    dfs(grid, r+1, c);
+    dfs(grid, r-1, c);
+    dfs(grid, r, c+1);
+    dfs(grid, r, c-1);
+}`,
+    cpp: `int numIslands(vector<vector<char>>& grid) {
+    if (grid.empty()) return 0;
+    
+    int m = grid.size(), n = grid[0].size();
+    int count = 0;
+    
+    function<void(int, int)> dfs = [&](int r, int c) {
+        if (r < 0 || r >= m || c < 0 || c >= n || grid[r][c] != '1') {
+            return;
+        }
+        
+        // Mark as visited
+        grid[r][c] = '0';
+        
+        // Visit all 4 directions
+        dfs(r+1, c);
+        dfs(r-1, c);
+        dfs(r, c+1);
+        dfs(r, c-1);
+    };
+    
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            if (grid[i][j] == '1') {
+                count++;
+                dfs(i, j);  // Sink the island
+            }
+        }
+    }
+    
+    return count;
+}`,
+    typescript: `function numIslands(grid: string[][]): number {
+    if (!grid.length) return 0;
+    
+    const m = grid.length, n = grid[0].length;
+    let count = 0;
+    
+    function dfs(r: number, c: number) {
+        if (r < 0 || r >= m || c < 0 || c >= n || grid[r][c] !== '1') {
+            return;
+        }
+        
+        // Mark as visited
+        grid[r][c] = '0';
+        
+        // Visit all 4 directions
+        dfs(r+1, c);
+        dfs(r-1, c);
+        dfs(r, c+1);
+        dfs(r, c-1);
+    }
+    
+    for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+            if (grid[i][j] === '1') {
+                count++;
+                dfs(i, j);  // Sink the island
+            }
+        }
+    }
+    
+    return count;
+}`,
+    explanation: "For each unvisited land cell ('1'), increment island count and DFS to mark entire connected island as visited (change to '0'). This flood-fill approach ensures each connected component is counted once. Can use BFS or Union-Find as alternatives."
+  },
+  "longest-consecutive-sequence": {
+    python: `def longestConsecutive(nums: List[int]) -> int:
+    if not nums:
+        return 0
+    
+    num_set = set(nums)
+    max_length = 0
+    
+    for num in num_set:
+        # Only start sequence from the smallest number
+        if num - 1 not in num_set:
+            current = num
+            length = 1
+            
+            # Count consecutive numbers
+            while current + 1 in num_set:
+                current += 1
+                length += 1
+            
+            max_length = max(max_length, length)
+    
+    return max_length`,
+    java: `public int longestConsecutive(int[] nums) {
+    if (nums.length == 0) return 0;
+    
+    Set<Integer> numSet = new HashSet<>();
+    for (int num : nums) {
+        numSet.add(num);
+    }
+    
+    int maxLength = 0;
+    
+    for (int num : numSet) {
+        // Only start sequence from the smallest number
+        if (!numSet.contains(num - 1)) {
+            int current = num;
+            int length = 1;
+            
+            // Count consecutive numbers
+            while (numSet.contains(current + 1)) {
+                current++;
+                length++;
+            }
+            
+            maxLength = Math.max(maxLength, length);
+        }
+    }
+    
+    return maxLength;
+}`,
+    cpp: `int longestConsecutive(vector<int>& nums) {
+    if (nums.empty()) return 0;
+    
+    unordered_set<int> numSet(nums.begin(), nums.end());
+    int maxLength = 0;
+    
+    for (int num : numSet) {
+        // Only start sequence from the smallest number
+        if (numSet.find(num - 1) == numSet.end()) {
+            int current = num;
+            int length = 1;
+            
+            // Count consecutive numbers
+            while (numSet.find(current + 1) != numSet.end()) {
+                current++;
+                length++;
+            }
+            
+            maxLength = max(maxLength, length);
+        }
+    }
+    
+    return maxLength;
+}`,
+    typescript: `function longestConsecutive(nums: number[]): number {
+    if (nums.length === 0) return 0;
+    
+    const numSet = new Set(nums);
+    let maxLength = 0;
+    
+    for (const num of numSet) {
+        // Only start sequence from the smallest number
+        if (!numSet.has(num - 1)) {
+            let current = num;
+            let length = 1;
+            
+            // Count consecutive numbers
+            while (numSet.has(current + 1)) {
+                current++;
+                length++;
+            }
+            
+            maxLength = Math.max(maxLength, length);
+        }
+    }
+    
+    return maxLength;
+}`,
+    explanation: "Use hash set for O(1) lookups. Key insight: only start counting from sequence beginnings (when num-1 not in set). This ensures each number is visited at most twice, achieving O(n) time despite nested loops."
+  },
+  "alien-dictionary": {
+    python: `def alienOrder(words: List[str]) -> str:
+    # Build graph and indegree
+    graph = {c: set() for word in words for c in word}
+    indegree = {c: 0 for word in words for c in word}
+    
+    # Compare adjacent words to find ordering
+    for i in range(len(words) - 1):
+        w1, w2 = words[i], words[i+1]
+        min_len = min(len(w1), len(w2))
+        
+        # Check for invalid case: prefix word comes after longer word
+        if len(w1) > len(w2) and w1[:min_len] == w2[:min_len]:
+            return ""
+        
+        # Find first differing character
+        for j in range(min_len):
+            if w1[j] != w2[j]:
+                if w2[j] not in graph[w1[j]]:
+                    graph[w1[j]].add(w2[j])
+                    indegree[w2[j]] += 1
+                break
+    
+    # Topological sort using Kahn's algorithm
+    queue = deque([c for c in indegree if indegree[c] == 0])
+    result = []
+    
+    while queue:
+        char = queue.popleft()
+        result.append(char)
+        
+        for neighbor in graph[char]:
+            indegree[neighbor] -= 1
+            if indegree[neighbor] == 0:
+                queue.append(neighbor)
+    
+    # Check for cycle
+    if len(result) != len(indegree):
+        return ""
+    
+    return ''.join(result)`,
+    java: `public String alienOrder(String[] words) {
+    // Build graph
+    Map<Character, Set<Character>> graph = new HashMap<>();
+    Map<Character, Integer> indegree = new HashMap<>();
+    
+    for (String word : words) {
+        for (char c : word.toCharArray()) {
+            graph.putIfAbsent(c, new HashSet<>());
+            indegree.putIfAbsent(c, 0);
+        }
+    }
+    
+    // Find ordering from adjacent words
+    for (int i = 0; i < words.length - 1; i++) {
+        String w1 = words[i], w2 = words[i+1];
+        int minLen = Math.min(w1.length(), w2.length());
+        
+        if (w1.length() > w2.length() && w1.startsWith(w2)) {
+            return "";
+        }
+        
+        for (int j = 0; j < minLen; j++) {
+            if (w1.charAt(j) != w2.charAt(j)) {
+                char from = w1.charAt(j), to = w2.charAt(j);
+                if (!graph.get(from).contains(to)) {
+                    graph.get(from).add(to);
+                    indegree.put(to, indegree.get(to) + 1);
+                }
+                break;
+            }
+        }
+    }
+    
+    // Topological sort
+    Queue<Character> queue = new LinkedList<>();
+    for (char c : indegree.keySet()) {
+        if (indegree.get(c) == 0) {
+            queue.offer(c);
+        }
+    }
+    
+    StringBuilder result = new StringBuilder();
+    while (!queue.isEmpty()) {
+        char c = queue.poll();
+        result.append(c);
+        
+        for (char neighbor : graph.get(c)) {
+            indegree.put(neighbor, indegree.get(neighbor) - 1);
+            if (indegree.get(neighbor) == 0) {
+                queue.offer(neighbor);
+            }
+        }
+    }
+    
+    return result.length() == indegree.size() ? result.toString() : "";
+}`,
+    cpp: `string alienOrder(vector<string>& words) {
+    // Build graph
+    unordered_map<char, unordered_set<char>> graph;
+    unordered_map<char, int> indegree;
+    
+    for (const string& word : words) {
+        for (char c : word) {
+            graph[c] = {};
+            indegree[c] = 0;
+        }
+    }
+    
+    // Find ordering
+    for (int i = 0; i < words.size() - 1; i++) {
+        string w1 = words[i], w2 = words[i+1];
+        int minLen = min(w1.length(), w2.length());
+        
+        if (w1.length() > w2.length() && w1.substr(0, minLen) == w2) {
+            return "";
+        }
+        
+        for (int j = 0; j < minLen; j++) {
+            if (w1[j] != w2[j]) {
+                if (graph[w1[j]].find(w2[j]) == graph[w1[j]].end()) {
+                    graph[w1[j]].insert(w2[j]);
+                    indegree[w2[j]]++;
+                }
+                break;
+            }
+        }
+    }
+    
+    // Topological sort
+    queue<char> q;
+    for (auto& [c, deg] : indegree) {
+        if (deg == 0) q.push(c);
+    }
+    
+    string result;
+    while (!q.empty()) {
+        char c = q.front();
+        q.pop();
+        result += c;
+        
+        for (char neighbor : graph[c]) {
+            if (--indegree[neighbor] == 0) {
+                q.push(neighbor);
+            }
+        }
+    }
+    
+    return result.length() == indegree.size() ? result : "";
+}`,
+    typescript: `function alienOrder(words: string[]): string {
+    // Build graph
+    const graph = new Map<string, Set<string>>();
+    const indegree = new Map<string, number>();
+    
+    for (const word of words) {
+        for (const c of word) {
+            if (!graph.has(c)) {
+                graph.set(c, new Set());
+                indegree.set(c, 0);
+            }
+        }
+    }
+    
+    // Find ordering
+    for (let i = 0; i < words.length - 1; i++) {
+        const w1 = words[i], w2 = words[i+1];
+        const minLen = Math.min(w1.length, w2.length);
+        
+        if (w1.length > w2.length && w1.startsWith(w2)) {
+            return "";
+        }
+        
+        for (let j = 0; j < minLen; j++) {
+            if (w1[j] !== w2[j]) {
+                if (!graph.get(w1[j])!.has(w2[j])) {
+                    graph.get(w1[j])!.add(w2[j]);
+                    indegree.set(w2[j], indegree.get(w2[j])! + 1);
+                }
+                break;
+            }
+        }
+    }
+    
+    // Topological sort
+    const queue: string[] = [];
+    for (const [c, deg] of indegree) {
+        if (deg === 0) queue.push(c);
+    }
+    
+    let result = "";
+    while (queue.length) {
+        const c = queue.shift()!;
+        result += c;
+        
+        for (const neighbor of graph.get(c)!) {
+            indegree.set(neighbor, indegree.get(neighbor)! - 1);
+            if (indegree.get(neighbor) === 0) {
+                queue.push(neighbor);
+            }
+        }
+    }
+    
+    return result.length === indegree.size ? result : "";
+}`,
+    explanation: "Build directed graph from adjacent word pairs: first differing character creates edge (c1 -> c2 means c1 before c2). Use topological sort (Kahn's algorithm) with indegree tracking. Invalid if result length ≠ unique chars (cycle exists)."
+  },
+  "graph-valid-tree": {
+    python: `def validTree(n: int, edges: List[List[int]]) -> bool:
+    # Tree must have exactly n-1 edges
+    if len(edges) != n - 1:
+        return False
+    
+    # Build adjacency list
+    graph = [[] for _ in range(n)]
+    for u, v in edges:
+        graph[u].append(v)
+        graph[v].append(u)
+    
+    # Check if graph is connected using DFS
+    visited = set()
+    
+    def dfs(node):
+        visited.add(node)
+        for neighbor in graph[node]:
+            if neighbor not in visited:
+                dfs(neighbor)
+    
+    dfs(0)
+    
+    # Valid tree if all nodes are visited
+    return len(visited) == n`,
+    java: `public boolean validTree(int n, int[][] edges) {
+    // Tree must have exactly n-1 edges
+    if (edges.length != n - 1) {
+        return false;
+    }
+    
+    // Build adjacency list
+    List<List<Integer>> graph = new ArrayList<>();
+    for (int i = 0; i < n; i++) {
+        graph.add(new ArrayList<>());
+    }
+    for (int[] edge : edges) {
+        graph.get(edge[0]).add(edge[1]);
+        graph.get(edge[1]).add(edge[0]);
+    }
+    
+    // Check if graph is connected using DFS
+    Set<Integer> visited = new HashSet<>();
+    dfs(0, graph, visited);
+    
+    // Valid tree if all nodes are visited
+    return visited.size() == n;
+}
+
+private void dfs(int node, List<List<Integer>> graph, Set<Integer> visited) {
+    visited.add(node);
+    for (int neighbor : graph.get(node)) {
+        if (!visited.contains(neighbor)) {
+            dfs(neighbor, graph, visited);
+        }
+    }
+}`,
+    cpp: `bool validTree(int n, vector<vector<int>>& edges) {
+    // Tree must have exactly n-1 edges
+    if (edges.size() != n - 1) {
+        return false;
+    }
+    
+    // Build adjacency list
+    vector<vector<int>> graph(n);
+    for (auto& edge : edges) {
+        graph[edge[0]].push_back(edge[1]);
+        graph[edge[1]].push_back(edge[0]);
+    }
+    
+    // Check if graph is connected using DFS
+    unordered_set<int> visited;
+    
+    function<void(int)> dfs = [&](int node) {
+        visited.insert(node);
+        for (int neighbor : graph[node]) {
+            if (visited.find(neighbor) == visited.end()) {
+                dfs(neighbor);
+            }
+        }
+    };
+    
+    dfs(0);
+    
+    // Valid tree if all nodes are visited
+    return visited.size() == n;
+}`,
+    typescript: `function validTree(n: number, edges: number[][]): boolean {
+    // Tree must have exactly n-1 edges
+    if (edges.length !== n - 1) {
+        return false;
+    }
+    
+    // Build adjacency list
+    const graph: number[][] = Array(n).fill(0).map(() => []);
+    for (const [u, v] of edges) {
+        graph[u].push(v);
+        graph[v].push(u);
+    }
+    
+    // Check if graph is connected using DFS
+    const visited = new Set<number>();
+    
+    function dfs(node: number) {
+        visited.add(node);
+        for (const neighbor of graph[node]) {
+            if (!visited.has(neighbor)) {
+                dfs(neighbor);
+            }
+        }
+    }
+    
+    dfs(0);
+    
+    // Valid tree if all nodes are visited
+    return visited.size === n;
+}`,
+    explanation: "A valid tree with n nodes must have exactly n-1 edges (no cycles) and be fully connected. Check: (1) edges.length === n-1, (2) all nodes reachable from any starting node via DFS/BFS. Union-Find alternative checks for cycles during edge addition."
+  },
+  "number-of-connected-components-in-an-undirected-graph": {
+    python: `def countComponents(n: int, edges: List[List[int]]) -> int:
+    # Build adjacency list
+    graph = [[] for _ in range(n)]
+    for u, v in edges:
+        graph[u].append(v)
+        graph[v].append(u)
+    
+    visited = set()
+    count = 0
+    
+    def dfs(node):
+        visited.add(node)
+        for neighbor in graph[node]:
+            if neighbor not in visited:
+                dfs(neighbor)
+    
+    # Count components by DFS
+    for i in range(n):
+        if i not in visited:
+            dfs(i)
+            count += 1
+    
+    return count`,
+    java: `public int countComponents(int n, int[][] edges) {
+    // Build adjacency list
+    List<List<Integer>> graph = new ArrayList<>();
+    for (int i = 0; i < n; i++) {
+        graph.add(new ArrayList<>());
+    }
+    for (int[] edge : edges) {
+        graph.get(edge[0]).add(edge[1]);
+        graph.get(edge[1]).add(edge[0]);
+    }
+    
+    boolean[] visited = new boolean[n];
+    int count = 0;
+    
+    // Count components by DFS
+    for (int i = 0; i < n; i++) {
+        if (!visited[i]) {
+            dfs(i, graph, visited);
+            count++;
+        }
+    }
+    
+    return count;
+}
+
+private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
+    visited[node] = true;
+    for (int neighbor : graph.get(node)) {
+        if (!visited[neighbor]) {
+            dfs(neighbor, graph, visited);
+        }
+    }
+}`,
+    cpp: `int countComponents(int n, vector<vector<int>>& edges) {
+    // Build adjacency list
+    vector<vector<int>> graph(n);
+    for (auto& edge : edges) {
+        graph[edge[0]].push_back(edge[1]);
+        graph[edge[1]].push_back(edge[0]);
+    }
+    
+    vector<bool> visited(n, false);
+    int count = 0;
+    
+    function<void(int)> dfs = [&](int node) {
+        visited[node] = true;
+        for (int neighbor : graph[node]) {
+            if (!visited[neighbor]) {
+                dfs(neighbor);
+            }
+        }
+    };
+    
+    // Count components by DFS
+    for (int i = 0; i < n; i++) {
+        if (!visited[i]) {
+            dfs(i);
+            count++;
+        }
+    }
+    
+    return count;
+}`,
+    typescript: `function countComponents(n: number, edges: number[][]): number {
+    // Build adjacency list
+    const graph: number[][] = Array(n).fill(0).map(() => []);
+    for (const [u, v] of edges) {
+        graph[u].push(v);
+        graph[v].push(u);
+    }
+    
+    const visited = new Set<number>();
+    let count = 0;
+    
+    function dfs(node: number) {
+        visited.add(node);
+        for (const neighbor of graph[node]) {
+            if (!visited.has(neighbor)) {
+                dfs(neighbor);
+            }
+        }
+    }
+    
+    // Count components by DFS
+    for (let i = 0; i < n; i++) {
+        if (!visited.has(i)) {
+            dfs(i);
+            count++;
+        }
+    }
+    
+    return count;
+}`,
+    explanation: "Build adjacency list from edges. For each unvisited node, start DFS to mark entire component as visited, increment count. Union-Find is more efficient for dynamic graphs with frequent connectivity queries."
+  },
+  "insert-interval": {
+    python: `def insert(intervals: List[List[int]], newInterval: List[int]) -> List[List[int]]:
+    result = []
+    i = 0
+    n = len(intervals)
+    
+    # Add all intervals before newInterval
+    while i < n and intervals[i][1] < newInterval[0]:
+        result.append(intervals[i])
+        i += 1
+    
+    # Merge overlapping intervals
+    while i < n and intervals[i][0] <= newInterval[1]:
+        newInterval[0] = min(newInterval[0], intervals[i][0])
+        newInterval[1] = max(newInterval[1], intervals[i][1])
+        i += 1
+    result.append(newInterval)
+    
+    # Add remaining intervals
+    while i < n:
+        result.append(intervals[i])
+        i += 1
+    
+    return result`,
+    java: `public int[][] insert(int[][] intervals, int[] newInterval) {
+    List<int[]> result = new ArrayList<>();
+    int i = 0, n = intervals.length;
+    
+    // Add all intervals before newInterval
+    while (i < n && intervals[i][1] < newInterval[0]) {
+        result.add(intervals[i]);
+        i++;
+    }
+    
+    // Merge overlapping intervals
+    while (i < n && intervals[i][0] <= newInterval[1]) {
+        newInterval[0] = Math.min(newInterval[0], intervals[i][0]);
+        newInterval[1] = Math.max(newInterval[1], intervals[i][1]);
+        i++;
+    }
+    result.add(newInterval);
+    
+    // Add remaining intervals
+    while (i < n) {
+        result.add(intervals[i]);
+        i++;
+    }
+    
+    return result.toArray(new int[result.size()][]);
+}`,
+    cpp: `vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval) {
+    vector<vector<int>> result;
+    int i = 0, n = intervals.size();
+    
+    // Add all intervals before newInterval
+    while (i < n && intervals[i][1] < newInterval[0]) {
+        result.push_back(intervals[i]);
+        i++;
+    }
+    
+    // Merge overlapping intervals
+    while (i < n && intervals[i][0] <= newInterval[1]) {
+        newInterval[0] = min(newInterval[0], intervals[i][0]);
+        newInterval[1] = max(newInterval[1], intervals[i][1]);
+        i++;
+    }
+    result.push_back(newInterval);
+    
+    // Add remaining intervals
+    while (i < n) {
+        result.push_back(intervals[i]);
+        i++;
+    }
+    
+    return result;
+}`,
+    typescript: `function insert(intervals: number[][], newInterval: number[]): number[][] {
+    const result: number[][] = [];
+    let i = 0;
+    const n = intervals.length;
+    
+    // Add all intervals before newInterval
+    while (i < n && intervals[i][1] < newInterval[0]) {
+        result.push(intervals[i]);
+        i++;
+    }
+    
+    // Merge overlapping intervals
+    while (i < n && intervals[i][0] <= newInterval[1]) {
+        newInterval[0] = Math.min(newInterval[0], intervals[i][0]);
+        newInterval[1] = Math.max(newInterval[1], intervals[i][1]);
+        i++;
+    }
+    result.push(newInterval);
+    
+    // Add remaining intervals
+    while (i < n) {
+        result.push(intervals[i]);
+        i++;
+    }
+    
+    return result;
+}`,
+    explanation: "Three-phase approach: (1) Add all intervals ending before newInterval starts, (2) Merge all overlapping intervals by expanding newInterval's bounds, (3) Add remaining intervals. Linear scan in O(n) time since intervals are pre-sorted."
   }
 };
