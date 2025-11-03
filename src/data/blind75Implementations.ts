@@ -1,12 +1,12 @@
 export const blind75Implementations: Record<string, {
-  python: string;
-  java: string;
-  cpp: string;
-  typescript: string;
-  explanation: string;
+    python: string;
+    java: string;
+    cpp: string;
+    typescript: string;
+    explanation: string;
 }> = {
-  "two-sum": {
-    python: `def twoSum(nums: List[int], target: int) -> List[int]:
+    "two-sum": {
+        python: `def twoSum(nums: List[int], target: int) -> List[int]:
     # Hash map to store number and its index
     seen = {}
     
@@ -21,7 +21,7 @@ export const blind75Implementations: Record<string, {
         seen[num] = i
     
     return []  # No solution found`,
-    java: `public int[] twoSum(int[] nums, int target) {
+        java: `public int[] twoSum(int[] nums, int target) {
     // Hash map to store number and its index
     Map<Integer, Integer> seen = new HashMap<>();
     
@@ -39,7 +39,7 @@ export const blind75Implementations: Record<string, {
     
     return new int[] {}; // No solution found
 }`,
-    cpp: `vector<int> twoSum(vector<int>& nums, int target) {
+        cpp: `vector<int> twoSum(vector<int>& nums, int target) {
     // Hash map to store number and its index
     unordered_map<int, int> seen;
     
@@ -57,7 +57,7 @@ export const blind75Implementations: Record<string, {
     
     return {}; // No solution found
 }`,
-    typescript: `function twoSum(nums: number[], target: number): number[] {
+        typescript: `function twoSum(nums: number[], target: number): number[] {
     // Hash map to store number and its index
     const seen = new Map<number, number>();
     
@@ -75,10 +75,10 @@ export const blind75Implementations: Record<string, {
     
     return []; // No solution found
 }`,
-    explanation: "Use a hash map to store each number and its index as we iterate. For each number, check if its complement (target - current number) exists in the hash map. If found, return both indices. Otherwise, add the current number to the hash map."
-  },
-  "best-time-to-buy-and-sell-stock": {
-    python: `def maxProfit(prices: List[int]) -> int:
+        explanation: "Use a hash map to store each number and its index as we iterate. For each number, check if its complement (target - current number) exists in the hash map. If found, return both indices. Otherwise, add the current number to the hash map."
+    },
+    "best-time-to-buy-and-sell-stock": {
+        python: `def maxProfit(prices: List[int]) -> int:
     if not prices:
         return 0
     
@@ -96,7 +96,7 @@ export const blind75Implementations: Record<string, {
         max_profit = max(max_profit, profit)
     
     return max_profit`,
-    java: `public int maxProfit(int[] prices) {
+        java: `public int maxProfit(int[] prices) {
     if (prices.length == 0) return 0;
     
     int minPrice = Integer.MAX_VALUE;
@@ -115,7 +115,7 @@ export const blind75Implementations: Record<string, {
     
     return maxProfit;
 }`,
-    cpp: `int maxProfit(vector<int>& prices) {
+        cpp: `int maxProfit(vector<int>& prices) {
     if (prices.empty()) return 0;
     
     int minPrice = INT_MAX;
@@ -134,7 +134,7 @@ export const blind75Implementations: Record<string, {
     
     return maxProfit;
 }`,
-    typescript: `function maxProfit(prices: number[]): number {
+        typescript: `function maxProfit(prices: number[]): number {
     if (prices.length === 0) return 0;
     
     let minPrice = Infinity;
@@ -153,10 +153,10 @@ export const blind75Implementations: Record<string, {
     
     return maxProfit;
 }`,
-    explanation: "Track the minimum price seen so far and the maximum profit. For each price, calculate the profit if we sell at that price (current price - minimum price). Update the maximum profit if this profit is greater."
-  },
-  "contains-duplicate": {
-    python: `def containsDuplicate(nums: List[int]) -> bool:
+        explanation: "Track the minimum price seen so far and the maximum profit. For each price, calculate the profit if we sell at that price (current price - minimum price). Update the maximum profit if this profit is greater."
+    },
+    "contains-duplicate": {
+        python: `def containsDuplicate(nums: List[int]) -> bool:
     # Use a set to track seen numbers
     seen = set()
     
@@ -169,7 +169,7 @@ export const blind75Implementations: Record<string, {
 
 # Alternative one-liner
 # return len(nums) != len(set(nums))`,
-    java: `public boolean containsDuplicate(int[] nums) {
+        java: `public boolean containsDuplicate(int[] nums) {
     // Use a HashSet to track seen numbers
     Set<Integer> seen = new HashSet<>();
     
@@ -182,7 +182,7 @@ export const blind75Implementations: Record<string, {
     
     return false;
 }`,
-    cpp: `bool containsDuplicate(vector<int>& nums) {
+        cpp: `bool containsDuplicate(vector<int>& nums) {
     // Use an unordered_set to track seen numbers
     unordered_set<int> seen;
     
@@ -195,7 +195,7 @@ export const blind75Implementations: Record<string, {
     
     return false;
 }`,
-    typescript: `function containsDuplicate(nums: number[]): boolean {
+        typescript: `function containsDuplicate(nums: number[]): boolean {
     // Use a Set to track seen numbers
     const seen = new Set<number>();
     
@@ -208,10 +208,10 @@ export const blind75Implementations: Record<string, {
     
     return false;
 }`,
-    explanation: "Use a hash set to track numbers we've seen. As we iterate through the array, if we encounter a number that's already in the set, we have a duplicate. Otherwise, add the number to the set and continue."
-  },
-  "maximum-subarray": {
-    python: `def maxSubArray(nums: List[int]) -> int:
+        explanation: "Use a hash set to track numbers we've seen. As we iterate through the array, if we encounter a number that's already in the set, we have a duplicate. Otherwise, add the number to the set and continue."
+    },
+    "maximum-subarray": {
+        python: `def maxSubArray(nums: List[int]) -> int:
     # Kadane's Algorithm
     max_sum = nums[0]
     current_sum = nums[0]
@@ -224,7 +224,7 @@ export const blind75Implementations: Record<string, {
         max_sum = max(max_sum, current_sum)
     
     return max_sum`,
-    java: `public int maxSubArray(int[] nums) {
+        java: `public int maxSubArray(int[] nums) {
     // Kadane's Algorithm
     int maxSum = nums[0];
     int currentSum = nums[0];
@@ -239,7 +239,7 @@ export const blind75Implementations: Record<string, {
     
     return maxSum;
 }`,
-    cpp: `int maxSubArray(vector<int>& nums) {
+        cpp: `int maxSubArray(vector<int>& nums) {
     // Kadane's Algorithm
     int maxSum = nums[0];
     int currentSum = nums[0];
@@ -254,7 +254,7 @@ export const blind75Implementations: Record<string, {
     
     return maxSum;
 }`,
-    typescript: `function maxSubArray(nums: number[]): number {
+        typescript: `function maxSubArray(nums: number[]): number {
     // Kadane's Algorithm
     let maxSum = nums[0];
     let currentSum = nums[0];
@@ -269,10 +269,10 @@ export const blind75Implementations: Record<string, {
     
     return maxSum;
 }`,
-    explanation: "Kadane's Algorithm: Maintain current sum of subarray. At each element, decide whether to extend the existing subarray or start a new one from the current element. Track the maximum sum seen so far."
-  },
-  "reverse-linked-list": {
-    python: `def reverseList(head: Optional[ListNode]) -> Optional[ListNode]:
+        explanation: "Kadane's Algorithm: Maintain current sum of subarray. At each element, decide whether to extend the existing subarray or start a new one from the current element. Track the maximum sum seen so far."
+    },
+    "reverse-linked-list": {
+        python: `def reverseList(head: Optional[ListNode]) -> Optional[ListNode]:
     prev = None
     current = head
     
@@ -288,7 +288,7 @@ export const blind75Implementations: Record<string, {
         current = next_node
     
     return prev`,
-    java: `public ListNode reverseList(ListNode head) {
+        java: `public ListNode reverseList(ListNode head) {
     ListNode prev = null;
     ListNode current = head;
     
@@ -306,7 +306,7 @@ export const blind75Implementations: Record<string, {
     
     return prev;
 }`,
-    cpp: `ListNode* reverseList(ListNode* head) {
+        cpp: `ListNode* reverseList(ListNode* head) {
     ListNode* prev = nullptr;
     ListNode* current = head;
     
@@ -324,7 +324,7 @@ export const blind75Implementations: Record<string, {
     
     return prev;
 }`,
-    typescript: `function reverseList(head: ListNode | null): ListNode | null {
+        typescript: `function reverseList(head: ListNode | null): ListNode | null {
     let prev: ListNode | null = null;
     let current = head;
     
@@ -342,10 +342,10 @@ export const blind75Implementations: Record<string, {
     
     return prev;
 }`,
-    explanation: "Use three pointers: prev, current, and next. Iterate through the list, reversing the link direction by pointing current.next to prev. Move all pointers one step forward until we reach the end."
-  },
-  "product-of-array-except-self": {
-    python: `def productExceptSelf(nums: List[int]) -> List[int]:
+        explanation: "Use three pointers: prev, current, and next. Iterate through the list, reversing the link direction by pointing current.next to prev. Move all pointers one step forward until we reach the end."
+    },
+    "product-of-array-except-self": {
+        python: `def productExceptSelf(nums: List[int]) -> List[int]:
     n = len(nums)
     result = [1] * n
     
@@ -362,7 +362,7 @@ export const blind75Implementations: Record<string, {
         right_product *= nums[i]
     
     return result`,
-    java: `public int[] productExceptSelf(int[] nums) {
+        java: `public int[] productExceptSelf(int[] nums) {
     int n = nums.length;
     int[] result = new int[n];
     Arrays.fill(result, 1);
@@ -383,7 +383,7 @@ export const blind75Implementations: Record<string, {
     
     return result;
 }`,
-    cpp: `vector<int> productExceptSelf(vector<int>& nums) {
+        cpp: `vector<int> productExceptSelf(vector<int>& nums) {
     int n = nums.size();
     vector<int> result(n, 1);
     
@@ -403,7 +403,7 @@ export const blind75Implementations: Record<string, {
     
     return result;
 }`,
-    typescript: `function productExceptSelf(nums: number[]): number[] {
+        typescript: `function productExceptSelf(nums: number[]): number[] {
     const n = nums.length;
     const result = new Array(n).fill(1);
     
@@ -423,10 +423,10 @@ export const blind75Implementations: Record<string, {
     
     return result;
 }`,
-    explanation: "Two-pass approach: First pass calculates product of all elements to the left of each index. Second pass calculates product of all elements to the right and multiplies with left products. This avoids division and achieves O(1) space (excluding output array)."
-  },
-  "maximum-product-subarray": {
-    python: `def maxProduct(nums: List[int]) -> int:
+        explanation: "Two-pass approach: First pass calculates product of all elements to the left of each index. Second pass calculates product of all elements to the right and multiplies with left products. This avoids division and achieves O(1) space (excluding output array)."
+    },
+    "maximum-product-subarray": {
+        python: `def maxProduct(nums: List[int]) -> int:
     if not nums:
         return 0
     
@@ -448,7 +448,7 @@ export const blind75Implementations: Record<string, {
         max_product = max(max_product, current_max)
     
     return max_product`,
-    java: `public int maxProduct(int[] nums) {
+        java: `public int maxProduct(int[] nums) {
     if (nums.length == 0) return 0;
     
     int maxProduct = nums[0];
@@ -471,7 +471,7 @@ export const blind75Implementations: Record<string, {
     
     return maxProduct;
 }`,
-    cpp: `int maxProduct(vector<int>& nums) {
+        cpp: `int maxProduct(vector<int>& nums) {
     if (nums.empty()) return 0;
     
     int maxProduct = nums[0];
@@ -494,7 +494,7 @@ export const blind75Implementations: Record<string, {
     
     return maxProduct;
 }`,
-    typescript: `function maxProduct(nums: number[]): number {
+        typescript: `function maxProduct(nums: number[]): number {
     if (nums.length === 0) return 0;
     
     let maxProduct = nums[0];
@@ -517,10 +517,10 @@ export const blind75Implementations: Record<string, {
     
     return maxProduct;
 }`,
-    explanation: "Track both maximum and minimum products at each position. A negative number can turn the minimum into maximum and vice versa. At each step, consider: the current number alone, current number × current max, or current number × current min."
-  },
-  "find-minimum-in-rotated-sorted-array": {
-    python: `def findMin(nums: List[int]) -> int:
+        explanation: "Track both maximum and minimum products at each position. A negative number can turn the minimum into maximum and vice versa. At each step, consider: the current number alone, current number × current max, or current number × current min."
+    },
+    "find-minimum-in-rotated-sorted-array": {
+        python: `def findMin(nums: List[int]) -> int:
     left, right = 0, len(nums) - 1
     
     while left < right:
@@ -535,7 +535,7 @@ export const blind75Implementations: Record<string, {
             right = mid
     
     return nums[left]`,
-    java: `public int findMin(int[] nums) {
+        java: `public int findMin(int[] nums) {
     int left = 0, right = nums.length - 1;
     
     while (left < right) {
@@ -553,7 +553,7 @@ export const blind75Implementations: Record<string, {
     
     return nums[left];
 }`,
-    cpp: `int findMin(vector<int>& nums) {
+        cpp: `int findMin(vector<int>& nums) {
     int left = 0, right = nums.size() - 1;
     
     while (left < right) {
@@ -571,7 +571,7 @@ export const blind75Implementations: Record<string, {
     
     return nums[left];
 }`,
-    typescript: `function findMin(nums: number[]): number {
+        typescript: `function findMin(nums: number[]): number {
     let left = 0, right = nums.length - 1;
     
     while (left < right) {
@@ -589,10 +589,10 @@ export const blind75Implementations: Record<string, {
     
     return nums[left];
 }`,
-    explanation: "Binary search approach. Compare mid element with right element. If mid > right, rotation point (and minimum) is in right half. Otherwise, minimum is in left half. Converge until left equals right."
-  },
-  "search-in-rotated-sorted-array": {
-    python: `def search(nums: List[int], target: int) -> int:
+        explanation: "Binary search approach. Compare mid element with right element. If mid > right, rotation point (and minimum) is in right half. Otherwise, minimum is in left half. Converge until left equals right."
+    },
+    "search-in-rotated-sorted-array": {
+        python: `def search(nums: List[int], target: int) -> int:
     left, right = 0, len(nums) - 1
     
     while left <= right:
@@ -616,7 +616,7 @@ export const blind75Implementations: Record<string, {
                 right = mid - 1
     
     return -1`,
-    java: `public int search(int[] nums, int target) {
+        java: `public int search(int[] nums, int target) {
     int left = 0, right = nums.length - 1;
     
     while (left <= right) {
@@ -646,7 +646,7 @@ export const blind75Implementations: Record<string, {
     
     return -1;
 }`,
-    cpp: `int search(vector<int>& nums, int target) {
+        cpp: `int search(vector<int>& nums, int target) {
     int left = 0, right = nums.size() - 1;
     
     while (left <= right) {
@@ -676,7 +676,7 @@ export const blind75Implementations: Record<string, {
     
     return -1;
 }`,
-    typescript: `function search(nums: number[], target: number): number {
+        typescript: `function search(nums: number[], target: number): number {
     let left = 0, right = nums.length - 1;
     
     while (left <= right) {
@@ -706,10 +706,10 @@ export const blind75Implementations: Record<string, {
     
     return -1;
 }`,
-    explanation: "Modified binary search. At each step, determine which half is properly sorted by comparing endpoints. If target is in the sorted half's range, search that half. Otherwise, search the other half. This maintains O(log n) time."
-  },
-  "3sum": {
-    python: `def threeSum(nums: List[int]) -> List[List[int]]:
+        explanation: "Modified binary search. At each step, determine which half is properly sorted by comparing endpoints. If target is in the sorted half's range, search that half. Otherwise, search the other half. This maintains O(log n) time."
+    },
+    "3sum": {
+        python: `def threeSum(nums: List[int]) -> List[List[int]]:
     nums.sort()
     result = []
     
@@ -741,7 +741,7 @@ export const blind75Implementations: Record<string, {
                 right -= 1
     
     return result`,
-    java: `public List<List<Integer>> threeSum(int[] nums) {
+        java: `public List<List<Integer>> threeSum(int[] nums) {
     Arrays.sort(nums);
     List<List<Integer>> result = new ArrayList<>();
     
@@ -776,7 +776,7 @@ export const blind75Implementations: Record<string, {
     
     return result;
 }`,
-    cpp: `vector<vector<int>> threeSum(vector<int>& nums) {
+        cpp: `vector<vector<int>> threeSum(vector<int>& nums) {
     sort(nums.begin(), nums.end());
     vector<vector<int>> result;
     
@@ -811,7 +811,7 @@ export const blind75Implementations: Record<string, {
     
     return result;
 }`,
-    typescript: `function threeSum(nums: number[]): number[][] {
+        typescript: `function threeSum(nums: number[]): number[][] {
     nums.sort((a, b) => a - b);
     const result: number[][] = [];
     
@@ -846,10 +846,10 @@ export const blind75Implementations: Record<string, {
     
     return result;
 }`,
-    explanation: "Sort array first. For each number, use two pointers to find pairs that sum to its negative. Skip duplicates to avoid duplicate triplets. Time: O(n²), Space: O(1) excluding output."
-  },
-  "container-with-most-water": {
-    python: `def maxArea(height: List[int]) -> int:
+        explanation: "Sort array first. For each number, use two pointers to find pairs that sum to its negative. Skip duplicates to avoid duplicate triplets. Time: O(n²), Space: O(1) excluding output."
+    },
+    "container-with-most-water": {
+        python: `def maxArea(height: List[int]) -> int:
     left, right = 0, len(height) - 1
     max_area = 0
     
@@ -869,7 +869,7 @@ export const blind75Implementations: Record<string, {
             right -= 1
     
     return max_area`,
-    java: `public int maxArea(int[] height) {
+        java: `public int maxArea(int[] height) {
     int left = 0, right = height.length - 1;
     int maxArea = 0;
     
@@ -892,7 +892,7 @@ export const blind75Implementations: Record<string, {
     
     return maxArea;
 }`,
-    cpp: `int maxArea(vector<int>& height) {
+        cpp: `int maxArea(vector<int>& height) {
     int left = 0, right = height.size() - 1;
     int maxArea = 0;
     
@@ -915,7 +915,7 @@ export const blind75Implementations: Record<string, {
     
     return maxArea;
 }`,
-    typescript: `function maxArea(height: number[]): number {
+        typescript: `function maxArea(height: number[]): number {
     let left = 0, right = height.length - 1;
     let maxArea = 0;
     
@@ -938,10 +938,10 @@ export const blind75Implementations: Record<string, {
     
     return maxArea;
 }`,
-    explanation: "Two pointers from both ends. Area is determined by min(height[left], height[right]) × width. Always move the pointer with smaller height inward, as moving the taller one can only decrease area. This greedy approach finds the maximum in O(n) time."
-  },
-  "combination-sum": {
-    python: `def combinationSum(candidates: List[int], target: int) -> List[List[int]]:
+        explanation: "Two pointers from both ends. Area is determined by min(height[left], height[right]) × width. Always move the pointer with smaller height inward, as moving the taller one can only decrease area. This greedy approach finds the maximum in O(n) time."
+    },
+    "combination-sum": {
+        python: `def combinationSum(candidates: List[int], target: int) -> List[List[int]]:
     result = []
     
     def backtrack(start, current, total):
@@ -963,7 +963,7 @@ export const blind75Implementations: Record<string, {
     
     backtrack(0, [], 0)
     return result`,
-    java: `public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        java: `public List<List<Integer>> combinationSum(int[] candidates, int target) {
     List<List<Integer>> result = new ArrayList<>();
     backtrack(candidates, target, 0, new ArrayList<>(), 0, result);
     return result;
@@ -991,7 +991,7 @@ private void backtrack(int[] candidates, int target, int start,
         current.remove(current.size() - 1);
     }
 }`,
-    cpp: `vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+        cpp: `vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
     vector<vector<int>> result;
     vector<int> current;
     backtrack(candidates, target, 0, current, 0, result);
@@ -1020,7 +1020,7 @@ void backtrack(vector<int>& candidates, int target, int start,
         current.pop_back();
     }
 }`,
-    typescript: `function combinationSum(candidates: number[], target: number): number[][] {
+        typescript: `function combinationSum(candidates: number[], target: number): number[][] {
     const result: number[][] = [];
     
     function backtrack(start: number, current: number[], total: number) {
@@ -1047,10 +1047,10 @@ void backtrack(vector<int>& candidates, int target, int start,
     backtrack(0, [], 0);
     return result;
 }`,
-    explanation: "Use backtracking to explore all combinations. Key insight: since we can reuse elements, pass current index 'i' (not i+1) in recursion. Sort candidates first for optimization (optional). Prune branches when total exceeds target."
-  },
-  "house-robber": {
-    python: `def rob(nums: List[int]) -> int:
+        explanation: "Use backtracking to explore all combinations. Key insight: since we can reuse elements, pass current index 'i' (not i+1) in recursion. Sort candidates first for optimization (optional). Prune branches when total exceeds target."
+    },
+    "house-robber": {
+        python: `def rob(nums: List[int]) -> int:
     if not nums:
         return 0
     if len(nums) == 1:
@@ -1067,7 +1067,7 @@ void backtrack(vector<int>& candidates, int target, int start,
         prev1 = temp
     
     return prev1`,
-    java: `public int rob(int[] nums) {
+        java: `public int rob(int[] nums) {
     if (nums.length == 0) return 0;
     if (nums.length == 1) return nums[0];
     
@@ -1084,7 +1084,7 @@ void backtrack(vector<int>& candidates, int target, int start,
     
     return prev1;
 }`,
-    cpp: `int rob(vector<int>& nums) {
+        cpp: `int rob(vector<int>& nums) {
     if (nums.empty()) return 0;
     if (nums.size() == 1) return nums[0];
     
@@ -1101,7 +1101,7 @@ void backtrack(vector<int>& candidates, int target, int start,
     
     return prev1;
 }`,
-    typescript: `function rob(nums: number[]): number {
+        typescript: `function rob(nums: number[]): number {
     if (nums.length === 0) return 0;
     if (nums.length === 1) return nums[0];
     
@@ -1118,10 +1118,10 @@ void backtrack(vector<int>& candidates, int target, int start,
     
     return prev1;
 }`,
-    explanation: "DP pattern: at each house, decide to rob (add current + best from i-2) or skip (keep best from i-1). Use two variables instead of array for O(1) space. Formula: dp[i] = max(nums[i] + dp[i-2], dp[i-1])."
-  },
-  "house-robber-ii": {
-    python: `def rob(nums: List[int]) -> int:
+        explanation: "DP pattern: at each house, decide to rob (add current + best from i-2) or skip (keep best from i-1). Use two variables instead of array for O(1) space. Formula: dp[i] = max(nums[i] + dp[i-2], dp[i-1])."
+    },
+    "house-robber-ii": {
+        python: `def rob(nums: List[int]) -> int:
     if len(nums) == 1:
         return nums[0]
     
@@ -1137,7 +1137,7 @@ void backtrack(vector<int>& candidates, int target, int start,
     # Case 1: Rob houses 0 to n-2 (exclude last)
     # Case 2: Rob houses 1 to n-1 (exclude first)
     return max(rob_linear(nums[:-1]), rob_linear(nums[1:]))`,
-    java: `public int rob(int[] nums) {
+        java: `public int rob(int[] nums) {
     if (nums.length == 1) return nums[0];
     
     // Case 1: Rob houses 0 to n-2 (exclude last)
@@ -1155,7 +1155,7 @@ private int robLinear(int[] nums, int start, int end) {
     }
     return prev1;
 }`,
-    cpp: `int rob(vector<int>& nums) {
+        cpp: `int rob(vector<int>& nums) {
     if (nums.size() == 1) return nums[0];
     
     // Case 1: Rob houses 0 to n-2 (exclude last)
@@ -1173,7 +1173,7 @@ int robLinear(vector<int>& nums, int start, int end) {
     }
     return prev1;
 }`,
-    typescript: `function rob(nums: number[]): number {
+        typescript: `function rob(nums: number[]): number {
     if (nums.length === 1) return nums[0];
     
     const robLinear = (start: number, end: number): number => {
@@ -1191,10 +1191,10 @@ int robLinear(vector<int>& nums, int start, int end) {
     return Math.max(robLinear(0, nums.length - 2),
                     robLinear(1, nums.length - 1));
 }`,
-    explanation: "Houses are circular: can't rob both first and last. Split into two cases: (1) rob houses 0..n-2, (2) rob houses 1..n-1. Apply House Robber I logic to each case and take maximum."
-  },
-  "decode-ways": {
-    python: `def numDecodings(s: str) -> int:
+        explanation: "Houses are circular: can't rob both first and last. Split into two cases: (1) rob houses 0..n-2, (2) rob houses 1..n-1. Apply House Robber I logic to each case and take maximum."
+    },
+    "decode-ways": {
+        python: `def numDecodings(s: str) -> int:
     if not s or s[0] == '0':
         return 0
     
@@ -1219,7 +1219,7 @@ int robLinear(vector<int>& nums, int start, int end) {
         prev1 = current
     
     return prev1`,
-    java: `public int numDecodings(String s) {
+        java: `public int numDecodings(String s) {
     if (s == null || s.length() == 0 || s.charAt(0) == '0') {
         return 0;
     }
@@ -1248,7 +1248,7 @@ int robLinear(vector<int>& nums, int start, int end) {
     
     return prev1;
 }`,
-    cpp: `int numDecodings(string s) {
+        cpp: `int numDecodings(string s) {
     if (s.empty() || s[0] == '0') {
         return 0;
     }
@@ -1277,7 +1277,7 @@ int robLinear(vector<int>& nums, int start, int end) {
     
     return prev1;
 }`,
-    typescript: `function numDecodings(s: string): number {
+        typescript: `function numDecodings(s: string): number {
     if (!s || s[0] === '0') {
         return 0;
     }
@@ -1306,10 +1306,10 @@ int robLinear(vector<int>& nums, int start, int end) {
     
     return prev1;
 }`,
-    explanation: "DP: at position i, we can decode as single digit (if 1-9) using dp[i-1] ways, or as two digits (if 10-26) using dp[i-2] ways. Handle '0' carefully - it can only be part of 10 or 20. Optimize to O(1) space with two variables."
-  },
-  "unique-paths": {
-    python: `def uniquePaths(m: int, n: int) -> int:
+        explanation: "DP: at position i, we can decode as single digit (if 1-9) using dp[i-1] ways, or as two digits (if 10-26) using dp[i-2] ways. Handle '0' carefully - it can only be part of 10 or 20. Optimize to O(1) space with two variables."
+    },
+    "unique-paths": {
+        python: `def uniquePaths(m: int, n: int) -> int:
     # Create DP table
     dp = [[1] * n for _ in range(m)]
     
@@ -1320,7 +1320,7 @@ int robLinear(vector<int>& nums, int start, int end) {
             dp[i][j] = dp[i-1][j] + dp[i][j-1]
     
     return dp[m-1][n-1]`,
-    java: `public int uniquePaths(int m, int n) {
+        java: `public int uniquePaths(int m, int n) {
     // Create DP table
     int[][] dp = new int[m][n];
     
@@ -1338,7 +1338,7 @@ int robLinear(vector<int>& nums, int start, int end) {
     
     return dp[m-1][n-1];
 }`,
-    cpp: `int uniquePaths(int m, int n) {
+        cpp: `int uniquePaths(int m, int n) {
     // Create DP table
     vector<vector<int>> dp(m, vector<int>(n, 1));
     
@@ -1352,7 +1352,7 @@ int robLinear(vector<int>& nums, int start, int end) {
     
     return dp[m-1][n-1];
 }`,
-    typescript: `function uniquePaths(m: number, n: number): number {
+        typescript: `function uniquePaths(m: number, n: number): number {
     // Create DP table
     const dp: number[][] = Array(m).fill(0).map(() => Array(n).fill(1));
     
@@ -1366,10 +1366,10 @@ int robLinear(vector<int>& nums, int start, int end) {
     
     return dp[m-1][n-1];
 }`,
-    explanation: "2D DP: dp[i][j] = paths to reach cell (i,j). Since we can only move right or down, dp[i][j] = dp[i-1][j] + dp[i][j-1]. First row and column are all 1s. Can optimize to O(n) space using 1D array."
-  },
-  "jump-game": {
-    python: `def canJump(nums: List[int]) -> bool:
+        explanation: "2D DP: dp[i][j] = paths to reach cell (i,j). Since we can only move right or down, dp[i][j] = dp[i-1][j] + dp[i][j-1]. First row and column are all 1s. Can optimize to O(n) space using 1D array."
+    },
+    "jump-game": {
+        python: `def canJump(nums: List[int]) -> bool:
     # Track the farthest position we can reach
     max_reach = 0
     
@@ -1386,7 +1386,7 @@ int robLinear(vector<int>& nums, int start, int end) {
             return True
     
     return True`,
-    java: `public boolean canJump(int[] nums) {
+        java: `public boolean canJump(int[] nums) {
     // Track the farthest position we can reach
     int maxReach = 0;
     
@@ -1407,7 +1407,7 @@ int robLinear(vector<int>& nums, int start, int end) {
     
     return true;
 }`,
-    cpp: `bool canJump(vector<int>& nums) {
+        cpp: `bool canJump(vector<int>& nums) {
     // Track the farthest position we can reach
     int maxReach = 0;
     
@@ -1428,7 +1428,7 @@ int robLinear(vector<int>& nums, int start, int end) {
     
     return true;
 }`,
-    typescript: `function canJump(nums: number[]): boolean {
+        typescript: `function canJump(nums: number[]): boolean {
     // Track the farthest position we can reach
     let maxReach = 0;
     
@@ -1449,10 +1449,10 @@ int robLinear(vector<int>& nums, int start, int end) {
     
     return true;
 }`,
-    explanation: "Greedy approach: track the farthest index reachable. At each position, if current index > maxReach, we're stuck. Otherwise, update maxReach = max(maxReach, i + nums[i]). If maxReach >= last index, return true."
-  },
-  "clone-graph": {
-    python: `def cloneGraph(node: 'Node') -> 'Node':
+        explanation: "Greedy approach: track the farthest index reachable. At each position, if current index > maxReach, we're stuck. Otherwise, update maxReach = max(maxReach, i + nums[i]). If maxReach >= last index, return true."
+    },
+    "clone-graph": {
+        python: `def cloneGraph(node: 'Node') -> 'Node':
     if not node:
         return None
     
@@ -1475,7 +1475,7 @@ int robLinear(vector<int>& nums, int start, int end) {
         return clone
     
     return dfs(node)`,
-    java: `public Node cloneGraph(Node node) {
+        java: `public Node cloneGraph(Node node) {
     if (node == null) return null;
     
     // Map original node to cloned node
@@ -1500,7 +1500,7 @@ private Node dfs(Node node, Map<Node, Node> cloned) {
     
     return clone;
 }`,
-    cpp: `Node* cloneGraph(Node* node) {
+        cpp: `Node* cloneGraph(Node* node) {
     if (!node) return nullptr;
     
     // Map original node to cloned node
@@ -1525,7 +1525,7 @@ Node* dfs(Node* node, unordered_map<Node*, Node*>& cloned) {
     
     return clone;
 }`,
-    typescript: `function cloneGraph(node: Node | null): Node | null {
+        typescript: `function cloneGraph(node: Node | null): Node | null {
     if (!node) return null;
     
     // Map original node to cloned node
@@ -1551,10 +1551,10 @@ Node* dfs(Node* node, unordered_map<Node*, Node*>& cloned) {
     
     return dfs(node);
 }`,
-    explanation: "Use DFS with a hashmap to track original->clone mappings. For each node: if already cloned, return clone; otherwise create new node, store mapping, then recursively clone all neighbors. BFS works similarly with a queue."
-  },
-  "course-schedule": {
-    python: `def canFinish(numCourses: int, prerequisites: List[List[int]]) -> bool:
+        explanation: "Use DFS with a hashmap to track original->clone mappings. For each node: if already cloned, return clone; otherwise create new node, store mapping, then recursively clone all neighbors. BFS works similarly with a queue."
+    },
+    "course-schedule": {
+        python: `def canFinish(numCourses: int, prerequisites: List[List[int]]) -> bool:
     # Build adjacency list
     graph = [[] for _ in range(numCourses)]
     for course, prereq in prerequisites:
@@ -1582,7 +1582,7 @@ Node* dfs(Node* node, unordered_map<Node*, Node*>& cloned) {
             return False
     
     return True`,
-    java: `public boolean canFinish(int numCourses, int[][] prerequisites) {
+        java: `public boolean canFinish(int numCourses, int[][] prerequisites) {
     // Build adjacency list
     List<List<Integer>> graph = new ArrayList<>();
     for (int i = 0; i < numCourses; i++) {
@@ -1618,7 +1618,7 @@ private boolean hasCycle(int course, List<List<Integer>> graph, int[] visit) {
     visit[course] = 2;  // Mark as visited
     return false;
 }`,
-    cpp: `bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+        cpp: `bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
     // Build adjacency list
     vector<vector<int>> graph(numCourses);
     for (auto& prereq : prerequisites) {
@@ -1651,7 +1651,7 @@ private boolean hasCycle(int course, List<List<Integer>> graph, int[] visit) {
     
     return true;
 }`,
-    typescript: `function canFinish(numCourses: number, prerequisites: number[][]): boolean {
+        typescript: `function canFinish(numCourses: number, prerequisites: number[][]): boolean {
     // Build adjacency list
     const graph: number[][] = Array(numCourses).fill(0).map(() => []);
     for (const [course, prereq] of prerequisites) {
@@ -1684,10 +1684,10 @@ private boolean hasCycle(int course, List<List<Integer>> graph, int[] visit) {
     
     return true;
 }`,
-    explanation: "Cycle detection in directed graph using DFS. Use 3 states: unvisited(0), visiting(1), visited(2). If we encounter a node in 'visiting' state during DFS, there's a cycle. Build adjacency list from prerequisites and check all nodes."
-  },
-  "pacific-atlantic-water-flow": {
-    python: `def pacificAtlantic(heights: List[List[int]]) -> List[List[int]]:
+        explanation: "Cycle detection in directed graph using DFS. Use 3 states: unvisited(0), visiting(1), visited(2). If we encounter a node in 'visiting' state during DFS, there's a cycle. Build adjacency list from prerequisites and check all nodes."
+    },
+    "pacific-atlantic-water-flow": {
+        python: `def pacificAtlantic(heights: List[List[int]]) -> List[List[int]]:
     if not heights:
         return []
     
@@ -1719,7 +1719,7 @@ private boolean hasCycle(int course, List<List<Integer>> graph, int[] visit) {
     # Find cells reachable by both oceans
     return [[r, c] for r in range(m) for c in range(n) 
             if (r, c) in pacific and (r, c) in atlantic]`,
-    java: `public List<List<Integer>> pacificAtlantic(int[][] heights) {
+        java: `public List<List<Integer>> pacificAtlantic(int[][] heights) {
     List<List<Integer>> result = new ArrayList<>();
     if (heights == null || heights.length == 0) return result;
     
@@ -1768,7 +1768,7 @@ private void dfs(int[][] heights, boolean[][] visited, int r, int c) {
         }
     }
 }`,
-    cpp: `vector<vector<int>> pacificAtlantic(vector<vector<int>>& heights) {
+        cpp: `vector<vector<int>> pacificAtlantic(vector<vector<int>>& heights) {
     vector<vector<int>> result;
     if (heights.empty()) return result;
     
@@ -1810,7 +1810,7 @@ private void dfs(int[][] heights, boolean[][] visited, int r, int c) {
     
     return result;
 }`,
-    typescript: `function pacificAtlantic(heights: number[][]): number[][] {
+        typescript: `function pacificAtlantic(heights: number[][]): number[][] {
     if (!heights.length) return [];
     
     const m = heights.length, n = heights[0].length;
@@ -1851,10 +1851,10 @@ private void dfs(int[][] heights, boolean[][] visited, int r, int c) {
     
     return result;
 }`,
-    explanation: "Reverse thinking: instead of checking if water flows to oceans from each cell, DFS from ocean borders inward (water can flow uphill in reverse). Mark cells reachable from Pacific and Atlantic. Cells in both sets can reach both oceans."
-  },
-  "number-of-islands": {
-    python: `def numIslands(grid: List[List[str]]) -> int:
+        explanation: "Reverse thinking: instead of checking if water flows to oceans from each cell, DFS from ocean borders inward (water can flow uphill in reverse). Mark cells reachable from Pacific and Atlantic. Cells in both sets can reach both oceans."
+    },
+    "number-of-islands": {
+        python: `def numIslands(grid: List[List[str]]) -> int:
     if not grid:
         return 0
     
@@ -1882,7 +1882,7 @@ private void dfs(int[][] heights, boolean[][] visited, int r, int c) {
                 dfs(i, j)  # Sink the island
     
     return count`,
-    java: `public int numIslands(char[][] grid) {
+        java: `public int numIslands(char[][] grid) {
     if (grid == null || grid.length == 0) return 0;
     
     int m = grid.length, n = grid[0].length;
@@ -1915,7 +1915,7 @@ private void dfs(char[][] grid, int r, int c) {
     dfs(grid, r, c+1);
     dfs(grid, r, c-1);
 }`,
-    cpp: `int numIslands(vector<vector<char>>& grid) {
+        cpp: `int numIslands(vector<vector<char>>& grid) {
     if (grid.empty()) return 0;
     
     int m = grid.size(), n = grid[0].size();
@@ -1947,7 +1947,7 @@ private void dfs(char[][] grid, int r, int c) {
     
     return count;
 }`,
-    typescript: `function numIslands(grid: string[][]): number {
+        typescript: `function numIslands(grid: string[][]): number {
     if (!grid.length) return 0;
     
     const m = grid.length, n = grid[0].length;
@@ -1979,10 +1979,10 @@ private void dfs(char[][] grid, int r, int c) {
     
     return count;
 }`,
-    explanation: "For each unvisited land cell ('1'), increment island count and DFS to mark entire connected island as visited (change to '0'). This flood-fill approach ensures each connected component is counted once. Can use BFS or Union-Find as alternatives."
-  },
-  "longest-consecutive-sequence": {
-    python: `def longestConsecutive(nums: List[int]) -> int:
+        explanation: "For each unvisited land cell ('1'), increment island count and DFS to mark entire connected island as visited (change to '0'). This flood-fill approach ensures each connected component is counted once. Can use BFS or Union-Find as alternatives."
+    },
+    "longest-consecutive-sequence": {
+        python: `def longestConsecutive(nums: List[int]) -> int:
     if not nums:
         return 0
     
@@ -2003,7 +2003,7 @@ private void dfs(char[][] grid, int r, int c) {
             max_length = max(max_length, length)
     
     return max_length`,
-    java: `public int longestConsecutive(int[] nums) {
+        java: `public int longestConsecutive(int[] nums) {
     if (nums.length == 0) return 0;
     
     Set<Integer> numSet = new HashSet<>();
@@ -2031,7 +2031,7 @@ private void dfs(char[][] grid, int r, int c) {
     
     return maxLength;
 }`,
-    cpp: `int longestConsecutive(vector<int>& nums) {
+        cpp: `int longestConsecutive(vector<int>& nums) {
     if (nums.empty()) return 0;
     
     unordered_set<int> numSet(nums.begin(), nums.end());
@@ -2055,7 +2055,7 @@ private void dfs(char[][] grid, int r, int c) {
     
     return maxLength;
 }`,
-    typescript: `function longestConsecutive(nums: number[]): number {
+        typescript: `function longestConsecutive(nums: number[]): number {
     if (nums.length === 0) return 0;
     
     const numSet = new Set(nums);
@@ -2079,10 +2079,10 @@ private void dfs(char[][] grid, int r, int c) {
     
     return maxLength;
 }`,
-    explanation: "Use hash set for O(1) lookups. Key insight: only start counting from sequence beginnings (when num-1 not in set). This ensures each number is visited at most twice, achieving O(n) time despite nested loops."
-  },
-  "alien-dictionary": {
-    python: `def alienOrder(words: List[str]) -> str:
+        explanation: "Use hash set for O(1) lookups. Key insight: only start counting from sequence beginnings (when num-1 not in set). This ensures each number is visited at most twice, achieving O(n) time despite nested loops."
+    },
+    "alien-dictionary": {
+        python: `def alienOrder(words: List[str]) -> str:
     # Build graph and indegree
     graph = {c: set() for word in words for c in word}
     indegree = {c: 0 for word in words for c in word}
@@ -2122,7 +2122,7 @@ private void dfs(char[][] grid, int r, int c) {
         return ""
     
     return ''.join(result)`,
-    java: `public String alienOrder(String[] words) {
+        java: `public String alienOrder(String[] words) {
     // Build graph
     Map<Character, Set<Character>> graph = new HashMap<>();
     Map<Character, Integer> indegree = new HashMap<>();
@@ -2178,7 +2178,7 @@ private void dfs(char[][] grid, int r, int c) {
     
     return result.length() == indegree.size() ? result.toString() : "";
 }`,
-    cpp: `string alienOrder(vector<string>& words) {
+        cpp: `string alienOrder(vector<string>& words) {
     // Build graph
     unordered_map<char, unordered_set<char>> graph;
     unordered_map<char, int> indegree;
@@ -2231,7 +2231,7 @@ private void dfs(char[][] grid, int r, int c) {
     
     return result.length() == indegree.size() ? result : "";
 }`,
-    typescript: `function alienOrder(words: string[]): string {
+        typescript: `function alienOrder(words: string[]): string {
     // Build graph
     const graph = new Map<string, Set<string>>();
     const indegree = new Map<string, number>();
@@ -2286,10 +2286,10 @@ private void dfs(char[][] grid, int r, int c) {
     
     return result.length === indegree.size ? result : "";
 }`,
-    explanation: "Build directed graph from adjacent word pairs: first differing character creates edge (c1 -> c2 means c1 before c2). Use topological sort (Kahn's algorithm) with indegree tracking. Invalid if result length ≠ unique chars (cycle exists)."
-  },
-  "graph-valid-tree": {
-    python: `def validTree(n: int, edges: List[List[int]]) -> bool:
+        explanation: "Build directed graph from adjacent word pairs: first differing character creates edge (c1 -> c2 means c1 before c2). Use topological sort (Kahn's algorithm) with indegree tracking. Invalid if result length ≠ unique chars (cycle exists)."
+    },
+    "graph-valid-tree": {
+        python: `def validTree(n: int, edges: List[List[int]]) -> bool:
     # Tree must have exactly n-1 edges
     if len(edges) != n - 1:
         return False
@@ -2313,7 +2313,7 @@ private void dfs(char[][] grid, int r, int c) {
     
     # Valid tree if all nodes are visited
     return len(visited) == n`,
-    java: `public boolean validTree(int n, int[][] edges) {
+        java: `public boolean validTree(int n, int[][] edges) {
     // Tree must have exactly n-1 edges
     if (edges.length != n - 1) {
         return false;
@@ -2345,7 +2345,7 @@ private void dfs(int node, List<List<Integer>> graph, Set<Integer> visited) {
         }
     }
 }`,
-    cpp: `bool validTree(int n, vector<vector<int>>& edges) {
+        cpp: `bool validTree(int n, vector<vector<int>>& edges) {
     // Tree must have exactly n-1 edges
     if (edges.size() != n - 1) {
         return false;
@@ -2375,7 +2375,7 @@ private void dfs(int node, List<List<Integer>> graph, Set<Integer> visited) {
     // Valid tree if all nodes are visited
     return visited.size() == n;
 }`,
-    typescript: `function validTree(n: number, edges: number[][]): boolean {
+        typescript: `function validTree(n: number, edges: number[][]): boolean {
     // Tree must have exactly n-1 edges
     if (edges.length !== n - 1) {
         return false;
@@ -2405,10 +2405,10 @@ private void dfs(int node, List<List<Integer>> graph, Set<Integer> visited) {
     // Valid tree if all nodes are visited
     return visited.size === n;
 }`,
-    explanation: "A valid tree with n nodes must have exactly n-1 edges (no cycles) and be fully connected. Check: (1) edges.length === n-1, (2) all nodes reachable from any starting node via DFS/BFS. Union-Find alternative checks for cycles during edge addition."
-  },
-  "number-of-connected-components-in-an-undirected-graph": {
-    python: `def countComponents(n: int, edges: List[List[int]]) -> int:
+        explanation: "A valid tree with n nodes must have exactly n-1 edges (no cycles) and be fully connected. Check: (1) edges.length === n-1, (2) all nodes reachable from any starting node via DFS/BFS. Union-Find alternative checks for cycles during edge addition."
+    },
+    "number-of-connected-components-in-an-undirected-graph": {
+        python: `def countComponents(n: int, edges: List[List[int]]) -> int:
     # Build adjacency list
     graph = [[] for _ in range(n)]
     for u, v in edges:
@@ -2431,7 +2431,7 @@ private void dfs(int node, List<List<Integer>> graph, Set<Integer> visited) {
             count += 1
     
     return count`,
-    java: `public int countComponents(int n, int[][] edges) {
+        java: `public int countComponents(int n, int[][] edges) {
     // Build adjacency list
     List<List<Integer>> graph = new ArrayList<>();
     for (int i = 0; i < n; i++) {
@@ -2464,7 +2464,7 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
         }
     }
 }`,
-    cpp: `int countComponents(int n, vector<vector<int>>& edges) {
+        cpp: `int countComponents(int n, vector<vector<int>>& edges) {
     // Build adjacency list
     vector<vector<int>> graph(n);
     for (auto& edge : edges) {
@@ -2494,7 +2494,7 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     
     return count;
 }`,
-    typescript: `function countComponents(n: number, edges: number[][]): number {
+        typescript: `function countComponents(n: number, edges: number[][]): number {
     // Build adjacency list
     const graph: number[][] = Array(n).fill(0).map(() => []);
     for (const [u, v] of edges) {
@@ -2524,10 +2524,10 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     
     return count;
 }`,
-    explanation: "Build adjacency list from edges. For each unvisited node, start DFS to mark entire component as visited, increment count. Union-Find is more efficient for dynamic graphs with frequent connectivity queries."
-  },
-  "merge-intervals": {
-    python: `def merge(intervals: List[List[int]]) -> List[List[int]]:
+        explanation: "Build adjacency list from edges. For each unvisited node, start DFS to mark entire component as visited, increment count. Union-Find is more efficient for dynamic graphs with frequent connectivity queries."
+    },
+    "merge-intervals": {
+        python: `def merge(intervals: List[List[int]]) -> List[List[int]]:
     if not intervals:
         return []
     
@@ -2547,7 +2547,7 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
             result.append([start, end])
     
     return result`,
-    java: `public int[][] merge(int[][] intervals) {
+        java: `public int[][] merge(int[][] intervals) {
     if (intervals.length == 0) return new int[0][];
     
     Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));
@@ -2570,7 +2570,7 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     
     return result.toArray(new int[result.size()][]);
 }`,
-    cpp: `vector<vector<int>> merge(vector<vector<int>>& intervals) {
+        cpp: `vector<vector<int>> merge(vector<vector<int>>& intervals) {
     if (intervals.empty()) return {};
     
     sort(intervals.begin(), intervals.end());
@@ -2590,7 +2590,7 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     
     return result;
 }`,
-    typescript: `function merge(intervals: number[][]): number[][] {
+        typescript: `function merge(intervals: number[][]): number[][] {
     if (!intervals.length) return [];
     
     intervals.sort((a, b) => a[0] - b[0]);
@@ -2612,10 +2612,10 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     
     return result;
 }`,
-    explanation: "Sort intervals by start time. Iterate through sorted intervals: if current overlaps with last result (start <= last end), merge them by updating end time. Otherwise add as new interval. O(n log n) for sorting."
-  },
-  "longest-substring-without-repeating-characters": {
-    python: `def lengthOfLongestSubstring(s: str) -> int:
+        explanation: "Sort intervals by start time. Iterate through sorted intervals: if current overlaps with last result (start <= last end), merge them by updating end time. Otherwise add as new interval. O(n log n) for sorting."
+    },
+    "longest-substring-without-repeating-characters": {
+        python: `def lengthOfLongestSubstring(s: str) -> int:
     char_index = {}
     max_length = 0
     left = 0
@@ -2629,7 +2629,7 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
         max_length = max(max_length, right - left + 1)
     
     return max_length`,
-    java: `public int lengthOfLongestSubstring(String s) {
+        java: `public int lengthOfLongestSubstring(String s) {
     Map<Character, Integer> charIndex = new HashMap<>();
     int maxLength = 0;
     int left = 0;
@@ -2647,7 +2647,7 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     
     return maxLength;
 }`,
-    cpp: `int lengthOfLongestSubstring(string s) {
+        cpp: `int lengthOfLongestSubstring(string s) {
     unordered_map<char, int> charIndex;
     int maxLength = 0;
     int left = 0;
@@ -2665,7 +2665,7 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     
     return maxLength;
 }`,
-    typescript: `function lengthOfLongestSubstring(s: string): number {
+        typescript: `function lengthOfLongestSubstring(s: string): number {
     const charIndex = new Map<string, number>();
     let maxLength = 0;
     let left = 0;
@@ -2683,10 +2683,10 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     
     return maxLength;
 }`,
-    explanation: "Sliding window with hashmap. Track last seen index of each character. When duplicate found in current window, move left pointer past previous occurrence. Track maximum window size. O(n) time."
-  },
-  "valid-anagram": {
-    python: `def isAnagram(s: str, t: str) -> bool:
+        explanation: "Sliding window with hashmap. Track last seen index of each character. When duplicate found in current window, move left pointer past previous occurrence. Track maximum window size. O(n) time."
+    },
+    "valid-anagram": {
+        python: `def isAnagram(s: str, t: str) -> bool:
     if len(s) != len(t):
         return False
     
@@ -2703,7 +2703,7 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
             return False
     
     return True`,
-    java: `public boolean isAnagram(String s, String t) {
+        java: `public boolean isAnagram(String s, String t) {
     if (s.length() != t.length()) {
         return false;
     }
@@ -2723,7 +2723,7 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     
     return true;
 }`,
-    cpp: `bool isAnagram(string s, string t) {
+        cpp: `bool isAnagram(string s, string t) {
     if (s.length() != t.length()) {
         return false;
     }
@@ -2743,7 +2743,7 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     
     return true;
 }`,
-    typescript: `function isAnagram(s: string, t: string): boolean {
+        typescript: `function isAnagram(s: string, t: string): boolean {
     if (s.length !== t.length) {
         return false;
     }
@@ -2763,10 +2763,10 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     
     return true;
 }`,
-    explanation: "Count character frequencies. For lowercase English letters, use array of size 26. Increment for s, decrement for t. If any goes negative or lengths differ, not anagram. O(n) time, O(1) space."
-  },
-  "group-anagrams": {
-    python: `def groupAnagrams(strs: List[str]) -> List[List[str]]:
+        explanation: "Count character frequencies. For lowercase English letters, use array of size 26. Increment for s, decrement for t. If any goes negative or lengths differ, not anagram. O(n) time, O(1) space."
+    },
+    "group-anagrams": {
+        python: `def groupAnagrams(strs: List[str]) -> List[List[str]]:
     anagrams = {}
     
     for s in strs:
@@ -2778,7 +2778,7 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
         anagrams[key].append(s)
     
     return list(anagrams.values())`,
-    java: `public List<List<String>> groupAnagrams(String[] strs) {
+        java: `public List<List<String>> groupAnagrams(String[] strs) {
     Map<String, List<String>> anagrams = new HashMap<>();
     
     for (String s : strs) {
@@ -2792,7 +2792,7 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     
     return new ArrayList<>(anagrams.values());
 }`,
-    cpp: `vector<vector<string>> groupAnagrams(vector<string>& strs) {
+        cpp: `vector<vector<string>> groupAnagrams(vector<string>& strs) {
     unordered_map<string, vector<string>> anagrams;
     
     for (const string& s : strs) {
@@ -2808,7 +2808,7 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     
     return result;
 }`,
-    typescript: `function groupAnagrams(strs: string[]): string[][] {
+        typescript: `function groupAnagrams(strs: string[]): string[][] {
     const anagrams = new Map<string, string[]>();
     
     for (const s of strs) {
@@ -2822,10 +2822,10 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     
     return Array.from(anagrams.values());
 }`,
-    explanation: "Use sorted string as key in hashmap. All anagrams have same sorted form. Group strings with same key. O(n × k log k) where n = number of strings, k = max length. Alternative: use character count array as key for O(n × k)."
-  },
-  "valid-parentheses": {
-    python: `def isValid(s: str) -> bool:
+        explanation: "Use sorted string as key in hashmap. All anagrams have same sorted form. Group strings with same key. O(n × k log k) where n = number of strings, k = max length. Alternative: use character count array as key for O(n × k)."
+    },
+    "valid-parentheses": {
+        python: `def isValid(s: str) -> bool:
     stack = []
     mapping = {')': '(', '}': '{', ']': '['}
     
@@ -2840,7 +2840,7 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
             stack.append(char)
     
     return len(stack) == 0`,
-    java: `public boolean isValid(String s) {
+        java: `public boolean isValid(String s) {
     Stack<Character> stack = new Stack<>();
     Map<Character, Character> mapping = new HashMap<>();
     mapping.put(')', '(');
@@ -2859,7 +2859,7 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     
     return stack.isEmpty();
 }`,
-    cpp: `bool isValid(string s) {
+        cpp: `bool isValid(string s) {
     stack<char> st;
     unordered_map<char, char> mapping = {
         {')', '('}, {'}', '{'}, {']', '['}
@@ -2878,7 +2878,7 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     
     return st.empty();
 }`,
-    typescript: `function isValid(s: string): boolean {
+        typescript: `function isValid(s: string): boolean {
     const stack: string[] = [];
     const mapping: { [key: string]: string } = {
         ')': '(',
@@ -2898,10 +2898,10 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     
     return stack.length === 0;
 }`,
-    explanation: "Use stack. Push opening brackets. For closing brackets, check if stack top matches corresponding opening bracket. Pop if match, return false if not. At end, stack should be empty. O(n) time, O(n) space."
-  },
-  "set-matrix-zeroes": {
-    python: `def reverseList(head: Optional[ListNode]) -> Optional[ListNode]:
+        explanation: "Use stack. Push opening brackets. For closing brackets, check if stack top matches corresponding opening bracket. Pop if match, return false if not. At end, stack should be empty. O(n) time, O(n) space."
+    },
+    "set-matrix-zeroes": {
+        python: `def reverseList(head: Optional[ListNode]) -> Optional[ListNode]:
     prev = None
     current = head
     
@@ -2917,7 +2917,7 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
         current = next_temp
     
     return prev`,
-    java: `public ListNode reverseList(ListNode head) {
+        java: `public ListNode reverseList(ListNode head) {
     ListNode prev = null;
     ListNode current = head;
     
@@ -2930,7 +2930,7 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     
     return prev;
 }`,
-    cpp: `ListNode* reverseList(ListNode* head) {
+        cpp: `ListNode* reverseList(ListNode* head) {
     ListNode* prev = nullptr;
     ListNode* current = head;
     
@@ -2943,7 +2943,7 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     
     return prev;
 }`,
-    typescript: `function reverseList(head: ListNode | null): ListNode | null {
+        typescript: `function reverseList(head: ListNode | null): ListNode | null {
     let prev: ListNode | null = null;
     let current = head;
     
@@ -2956,10 +2956,10 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     
     return prev;
 }`,
-    explanation: "Use three pointers: prev (initially null), current (head), and next. Iterate through list: save next node, reverse current's pointer to prev, move prev and current forward. Return prev (new head)."
-  },
-  "detect-cycle-in-a-linked-list": {
-    python: `def hasCycle(head: Optional[ListNode]) -> bool:
+        explanation: "Use three pointers: prev (initially null), current (head), and next. Iterate through list: save next node, reverse current's pointer to prev, move prev and current forward. Return prev (new head)."
+    },
+    "detect-cycle-in-a-linked-list": {
+        python: `def hasCycle(head: Optional[ListNode]) -> bool:
     if not head or not head.next:
         return False
     
@@ -2974,7 +2974,7 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
             return True
     
     return False`,
-    java: `public boolean hasCycle(ListNode head) {
+        java: `public boolean hasCycle(ListNode head) {
     if (head == null || head.next == null) {
         return false;
     }
@@ -2993,7 +2993,7 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     
     return false;
 }`,
-    cpp: `bool hasCycle(ListNode *head) {
+        cpp: `bool hasCycle(ListNode *head) {
     if (!head || !head->next) {
         return false;
     }
@@ -3012,7 +3012,7 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     
     return false;
 }`,
-    typescript: `function hasCycle(head: ListNode | null): boolean {
+        typescript: `function hasCycle(head: ListNode | null): boolean {
     if (!head || !head.next) {
         return false;
     }
@@ -3031,10 +3031,10 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     
     return false;
 }`,
-    explanation: "Floyd's Cycle Detection (Tortoise and Hare): use two pointers, slow (moves 1 step) and fast (moves 2 steps). If they meet, there's a cycle. If fast reaches end, no cycle. O(n) time, O(1) space."
-  },
-  "merge-two-sorted-lists": {
-    python: `def mergeTwoLists(l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
+        explanation: "Floyd's Cycle Detection (Tortoise and Hare): use two pointers, slow (moves 1 step) and fast (moves 2 steps). If they meet, there's a cycle. If fast reaches end, no cycle. O(n) time, O(1) space."
+    },
+    "merge-two-sorted-lists": {
+        python: `def mergeTwoLists(l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
     dummy = ListNode(0)
     current = dummy
     
@@ -3051,7 +3051,7 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     current.next = l1 if l1 else l2
     
     return dummy.next`,
-    java: `public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        java: `public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
     ListNode dummy = new ListNode(0);
     ListNode current = dummy;
     
@@ -3070,7 +3070,7 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     
     return dummy.next;
 }`,
-    cpp: `ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
+        cpp: `ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
     ListNode* dummy = new ListNode(0);
     ListNode* current = dummy;
     
@@ -3089,7 +3089,7 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     
     return dummy->next;
 }`,
-    typescript: `function mergeTwoLists(l1: ListNode | null, l2: ListNode | null): ListNode | null {
+        typescript: `function mergeTwoLists(l1: ListNode | null, l2: ListNode | null): ListNode | null {
     const dummy = new ListNode(0);
     let current = dummy;
     
@@ -3108,10 +3108,10 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     
     return dummy.next;
 }`,
-    explanation: "Use dummy node to simplify edge cases. Compare values from both lists, attach smaller to result, advance that pointer. After loop, attach remaining list. Return dummy.next."
-  },
-  "merge-k-sorted-lists": {
-    python: `import heapq
+        explanation: "Use dummy node to simplify edge cases. Compare values from both lists, attach smaller to result, advance that pointer. After loop, attach remaining list. Return dummy.next."
+    },
+    "merge-k-sorted-lists": {
+        python: `import heapq
 
 def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     # Min heap: (value, index, node)
@@ -3135,7 +3135,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
             heapq.heappush(heap, (node.next.val, i, node.next))
     
     return dummy.next`,
-    java: `public ListNode mergeKLists(ListNode[] lists) {
+        java: `public ListNode mergeKLists(ListNode[] lists) {
     PriorityQueue<ListNode> heap = new PriorityQueue<>((a, b) -> a.val - b.val);
     
     // Add first node from each list
@@ -3160,7 +3160,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     
     return dummy.next;
 }`,
-    cpp: `ListNode* mergeKLists(vector<ListNode*>& lists) {
+        cpp: `ListNode* mergeKLists(vector<ListNode*>& lists) {
     auto cmp = [](ListNode* a, ListNode* b) { return a->val > b->val; };
     priority_queue<ListNode*, vector<ListNode*>, decltype(cmp)> heap(cmp);
     
@@ -3187,7 +3187,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     
     return dummy->next;
 }`,
-    typescript: `function mergeKLists(lists: Array<ListNode | null>): ListNode | null {
+        typescript: `function mergeKLists(lists: Array<ListNode | null>): ListNode | null {
     const heap: Array<ListNode> = [];
     
     // Min heap operations
@@ -3250,10 +3250,10 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     
     return dummy.next;
 }`,
-    explanation: "Use min-heap to efficiently find smallest among k lists. Add first node from each list to heap. Pop minimum, add to result, push its next node to heap. Repeat until heap empty. O(N log k) time where N = total nodes."
-  },
-  "remove-nth-node-from-end-of-list": {
-    python: `def removeNthFromEnd(head: Optional[ListNode], n: int) -> Optional[ListNode]:
+        explanation: "Use min-heap to efficiently find smallest among k lists. Add first node from each list to heap. Pop minimum, add to result, push its next node to heap. Repeat until heap empty. O(N log k) time where N = total nodes."
+    },
+    "remove-nth-node-from-end-of-list": {
+        python: `def removeNthFromEnd(head: Optional[ListNode], n: int) -> Optional[ListNode]:
     dummy = ListNode(0)
     dummy.next = head
     fast = slow = dummy
@@ -3272,7 +3272,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     slow.next = slow.next.next
     
     return dummy.next`,
-    java: `public ListNode removeNthFromEnd(ListNode head, int n) {
+        java: `public ListNode removeNthFromEnd(ListNode head, int n) {
     ListNode dummy = new ListNode(0);
     dummy.next = head;
     ListNode fast = dummy;
@@ -3294,7 +3294,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     
     return dummy.next;
 }`,
-    cpp: `ListNode* removeNthFromEnd(ListNode* head, int n) {
+        cpp: `ListNode* removeNthFromEnd(ListNode* head, int n) {
     ListNode* dummy = new ListNode(0);
     dummy->next = head;
     ListNode* fast = dummy;
@@ -3316,7 +3316,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     
     return dummy->next;
 }`,
-    typescript: `function removeNthFromEnd(head: ListNode | null, n: number): ListNode | null {
+        typescript: `function removeNthFromEnd(head: ListNode | null, n: number): ListNode | null {
     const dummy = new ListNode(0);
     dummy.next = head;
     let fast: ListNode | null = dummy;
@@ -3338,10 +3338,10 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     
     return dummy.next;
 }`,
-    explanation: "Two-pointer technique: use dummy node. Move fast pointer n+1 steps ahead, then move both pointers together. When fast reaches end, slow is before node to remove. One pass, O(1) space."
-  },
-  "reorder-list": {
-    python: `def reorderList(head: Optional[ListNode]) -> None:
+        explanation: "Two-pointer technique: use dummy node. Move fast pointer n+1 steps ahead, then move both pointers together. When fast reaches end, slow is before node to remove. One pass, O(1) space."
+    },
+    "reorder-list": {
+        python: `def reorderList(head: Optional[ListNode]) -> None:
     if not head or not head.next:
         return
     
@@ -3371,7 +3371,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
         second.next = tmp1
         first = tmp1
         second = tmp2`,
-    java: `public void reorderList(ListNode head) {
+        java: `public void reorderList(ListNode head) {
     if (head == null || head.next == null) return;
     
     // Find middle
@@ -3404,7 +3404,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
         second = tmp2;
     }
 }`,
-    cpp: `void reorderList(ListNode* head) {
+        cpp: `void reorderList(ListNode* head) {
     if (!head || !head->next) return;
     
     // Find middle
@@ -3438,7 +3438,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
         second = tmp2;
     }
 }`,
-    typescript: `function reorderList(head: ListNode | null): void {
+        typescript: `function reorderList(head: ListNode | null): void {
     if (!head || !head.next) return;
     
     // Find middle
@@ -3471,10 +3471,10 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
         second = tmp2;
     }
 }`,
-    explanation: "Three steps: 1) Find middle using slow/fast pointers. 2) Reverse second half. 3) Merge alternately. L0→L1→...→Ln becomes L0→Ln→L1→Ln-1→.... O(n) time, O(1) space."
-  },
-  "insert-interval": {
-    python: `def insert(intervals: List[List[int]], newInterval: List[int]) -> List[List[int]]:
+        explanation: "Three steps: 1) Find middle using slow/fast pointers. 2) Reverse second half. 3) Merge alternately. L0→L1→...→Ln becomes L0→Ln→L1→Ln-1→.... O(n) time, O(1) space."
+    },
+    "insert-interval": {
+        python: `def insert(intervals: List[List[int]], newInterval: List[int]) -> List[List[int]]:
     result = []
     i = 0
     n = len(intervals)
@@ -3497,7 +3497,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
         i += 1
     
     return result`,
-    java: `public int[][] insert(int[][] intervals, int[] newInterval) {
+        java: `public int[][] insert(int[][] intervals, int[] newInterval) {
     List<int[]> result = new ArrayList<>();
     int i = 0, n = intervals.length;
     
@@ -3523,7 +3523,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     
     return result.toArray(new int[result.size()][]);
 }`,
-    cpp: `vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval) {
+        cpp: `vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval) {
     vector<vector<int>> result;
     int i = 0, n = intervals.size();
     
@@ -3549,7 +3549,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     
     return result;
 }`,
-    typescript: `function insert(intervals: number[][], newInterval: number[]): number[][] {
+        typescript: `function insert(intervals: number[][], newInterval: number[]): number[][] {
     const result: number[][] = [];
     let i = 0;
     const n = intervals.length;
@@ -3576,10 +3576,10 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     
     return result;
 }`,
-    explanation: "Three-phase approach: (1) Add all intervals ending before newInterval starts, (2) Merge all overlapping intervals by expanding newInterval's bounds, (3) Add remaining intervals. Linear scan in O(n) time since intervals are pre-sorted."
-  },
-  "non-overlapping-intervals": {
-    python: `def eraseOverlapIntervals(intervals: List[List[int]]) -> int:
+        explanation: "Three-phase approach: (1) Add all intervals ending before newInterval starts, (2) Merge all overlapping intervals by expanding newInterval's bounds, (3) Add remaining intervals. Linear scan in O(n) time since intervals are pre-sorted."
+    },
+    "non-overlapping-intervals": {
+        python: `def eraseOverlapIntervals(intervals: List[List[int]]) -> int:
     # Sort by end time
     intervals.sort(key=lambda x: x[1])
     
@@ -3595,7 +3595,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
             count += 1
     
     return count`,
-    java: `public int eraseOverlapIntervals(int[][] intervals) {
+        java: `public int eraseOverlapIntervals(int[][] intervals) {
     // Sort by end time
     Arrays.sort(intervals, (a, b) -> Integer.compare(a[1], b[1]));
     
@@ -3614,7 +3614,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     
     return count;
 }`,
-    cpp: `int eraseOverlapIntervals(vector<vector<int>>& intervals) {
+        cpp: `int eraseOverlapIntervals(vector<vector<int>>& intervals) {
     // Sort by end time
     sort(intervals.begin(), intervals.end(), 
          [](const vector<int>& a, const vector<int>& b) {
@@ -3636,7 +3636,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     
     return count;
 }`,
-    typescript: `function eraseOverlapIntervals(intervals: number[][]): number {
+        typescript: `function eraseOverlapIntervals(intervals: number[][]): number {
     // Sort by end time
     intervals.sort((a, b) => a[1] - b[1]);
     
@@ -3655,10 +3655,10 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     
     return count;
 }`,
-    explanation: "Greedy approach: sort by end time and keep intervals that don't overlap. By always keeping the interval with earliest end time, we maximize room for future intervals. Count overlaps as removals."
-  },
-  "meeting-rooms": {
-    python: `def canAttendMeetings(intervals: List[List[int]]) -> bool:
+        explanation: "Greedy approach: sort by end time and keep intervals that don't overlap. By always keeping the interval with earliest end time, we maximize room for future intervals. Count overlaps as removals."
+    },
+    "meeting-rooms": {
+        python: `def canAttendMeetings(intervals: List[List[int]]) -> bool:
     # Sort intervals by start time
     intervals.sort(key=lambda x: x[0])
     
@@ -3668,7 +3668,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
             return False
     
     return True`,
-    java: `public boolean canAttendMeetings(int[][] intervals) {
+        java: `public boolean canAttendMeetings(int[][] intervals) {
     // Sort intervals by start time
     Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));
     
@@ -3681,7 +3681,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     
     return true;
 }`,
-    cpp: `bool canAttendMeetings(vector<vector<int>>& intervals) {
+        cpp: `bool canAttendMeetings(vector<vector<int>>& intervals) {
     // Sort intervals by start time
     sort(intervals.begin(), intervals.end());
     
@@ -3694,7 +3694,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     
     return true;
 }`,
-    typescript: `function canAttendMeetings(intervals: number[][]): boolean {
+        typescript: `function canAttendMeetings(intervals: number[][]): boolean {
     // Sort intervals by start time
     intervals.sort((a, b) => a[0] - b[0]);
     
@@ -3707,10 +3707,10 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     
     return true;
 }`,
-    explanation: "Sort meetings by start time. If any meeting starts before the previous one ends, there's an overlap and we can't attend all meetings. Simple O(n log n) solution."
-  },
-  "meeting-rooms-ii": {
-    python: `def minMeetingRooms(intervals: List[List[int]]) -> int:
+        explanation: "Sort meetings by start time. If any meeting starts before the previous one ends, there's an overlap and we can't attend all meetings. Simple O(n log n) solution."
+    },
+    "meeting-rooms-ii": {
+        python: `def minMeetingRooms(intervals: List[List[int]]) -> int:
     if not intervals:
         return 0
     
@@ -3735,7 +3735,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
             e += 1
     
     return max_rooms`,
-    java: `public int minMeetingRooms(int[][] intervals) {
+        java: `public int minMeetingRooms(int[][] intervals) {
     if (intervals.length == 0) return 0;
     
     int n = intervals.length;
@@ -3766,7 +3766,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     
     return maxRooms;
 }`,
-    cpp: `int minMeetingRooms(vector<vector<int>>& intervals) {
+        cpp: `int minMeetingRooms(vector<vector<int>>& intervals) {
     if (intervals.empty()) return 0;
     
     vector<int> start, end;
@@ -3794,7 +3794,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     
     return maxRooms;
 }`,
-    typescript: `function minMeetingRooms(intervals: number[][]): number {
+        typescript: `function minMeetingRooms(intervals: number[][]): number {
     if (intervals.length === 0) return 0;
     
     const start = intervals.map(i => i[0]).sort((a, b) => a - b);
@@ -3816,10 +3816,10 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     
     return maxRooms;
 }`,
-    explanation: "Two-pointer sweep line algorithm: separate and sort start/end times. When a meeting starts before another ends, we need an additional room. Track maximum concurrent meetings needed."
-  },
-  "same-tree": {
-    python: `def isSameTree(p: Optional[TreeNode], q: Optional[TreeNode]) -> bool:
+        explanation: "Two-pointer sweep line algorithm: separate and sort start/end times. When a meeting starts before another ends, we need an additional room. Track maximum concurrent meetings needed."
+    },
+    "same-tree": {
+        python: `def isSameTree(p: Optional[TreeNode], q: Optional[TreeNode]) -> bool:
     # Both empty
     if not p and not q:
         return True
@@ -3834,7 +3834,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     
     # Recursively check left and right subtrees
     return isSameTree(p.left, q.left) and isSameTree(p.right, q.right)`,
-    java: `public boolean isSameTree(TreeNode p, TreeNode q) {
+        java: `public boolean isSameTree(TreeNode p, TreeNode q) {
     // Both empty
     if (p == null && q == null) {
         return true;
@@ -3853,7 +3853,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     // Recursively check left and right subtrees
     return isSameTree(p.left, q.left) && isSameTree(p.right, q.right);
 }`,
-    cpp: `bool isSameTree(TreeNode* p, TreeNode* q) {
+        cpp: `bool isSameTree(TreeNode* p, TreeNode* q) {
     // Both empty
     if (!p && !q) {
         return true;
@@ -3872,7 +3872,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     // Recursively check left and right subtrees
     return isSameTree(p->left, q->left) && isSameTree(p->right, q->right);
 }`,
-    typescript: `function isSameTree(p: TreeNode | null, q: TreeNode | null): boolean {
+        typescript: `function isSameTree(p: TreeNode | null, q: TreeNode | null): boolean {
     // Both empty
     if (!p && !q) {
         return true;
@@ -3891,10 +3891,10 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     // Recursively check left and right subtrees
     return isSameTree(p.left, q.left) && isSameTree(p.right, q.right);
 }`,
-    explanation: "Use DFS recursion to compare trees node by node. Check: both null (same), one null (different), values different (different), then recurse on left and right subtrees."
-  },
-  "invert-binary-tree": {
-    python: `def invertTree(root: Optional[TreeNode]) -> Optional[TreeNode]:
+        explanation: "Use DFS recursion to compare trees node by node. Check: both null (same), one null (different), values different (different), then recurse on left and right subtrees."
+    },
+    "invert-binary-tree": {
+        python: `def invertTree(root: Optional[TreeNode]) -> Optional[TreeNode]:
     if not root:
         return None
     
@@ -3906,7 +3906,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     invertTree(root.right)
     
     return root`,
-    java: `public TreeNode invertTree(TreeNode root) {
+        java: `public TreeNode invertTree(TreeNode root) {
     if (root == null) {
         return null;
     }
@@ -3922,7 +3922,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     
     return root;
 }`,
-    cpp: `TreeNode* invertTree(TreeNode* root) {
+        cpp: `TreeNode* invertTree(TreeNode* root) {
     if (!root) {
         return nullptr;
     }
@@ -3938,7 +3938,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     
     return root;
 }`,
-    typescript: `function invertTree(root: TreeNode | null): TreeNode | null {
+        typescript: `function invertTree(root: TreeNode | null): TreeNode | null {
     if (!root) {
         return null;
     }
@@ -3952,10 +3952,10 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     
     return root;
 }`,
-    explanation: "For each node, swap its left and right children, then recursively invert the left and right subtrees. Simple DFS approach."
-  },
-  "binary-tree-maximum-path-sum": {
-    python: `def maxPathSum(root: Optional[TreeNode]) -> int:
+        explanation: "For each node, swap its left and right children, then recursively invert the left and right subtrees. Simple DFS approach."
+    },
+    "binary-tree-maximum-path-sum": {
+        python: `def maxPathSum(root: Optional[TreeNode]) -> int:
     max_sum = float('-inf')
     
     def dfs(node):
@@ -3976,7 +3976,7 @@ def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
     
     dfs(root)
     return max_sum`,
-    java: `private int maxSum = Integer.MIN_VALUE;
+        java: `private int maxSum = Integer.MIN_VALUE;
 
 public int maxPathSum(TreeNode root) {
     dfs(root);
@@ -3998,7 +3998,7 @@ private int dfs(TreeNode node) {
     // Return max path sum including this node to parent
     return node.val + Math.max(left, right);
 }`,
-    cpp: `int maxSum = INT_MIN;
+        cpp: `int maxSum = INT_MIN;
 
 int maxPathSum(TreeNode* root) {
     dfs(root);
@@ -4020,7 +4020,7 @@ int dfs(TreeNode* node) {
     // Return max path sum including this node to parent
     return node->val + max(left, right);
 }`,
-    typescript: `function maxPathSum(root: TreeNode | null): number {
+        typescript: `function maxPathSum(root: TreeNode | null): number {
     let maxSum = -Infinity;
     
     function dfs(node: TreeNode | null): number {
@@ -4042,10 +4042,10 @@ int dfs(TreeNode* node) {
     dfs(root);
     return maxSum;
 }`,
-    explanation: "For each node, calculate max path sum through it (left + node + right). Track global maximum. Return to parent the max single-path sum (node + max of left or right). Ignore negative contributions."
-  },
-  "binary-tree-level-order-traversal": {
-    python: `def levelOrder(root: Optional[TreeNode]) -> List[List[int]]:
+        explanation: "For each node, calculate max path sum through it (left + node + right). Track global maximum. Return to parent the max single-path sum (node + max of left or right). Ignore negative contributions."
+    },
+    "binary-tree-level-order-traversal": {
+        python: `def levelOrder(root: Optional[TreeNode]) -> List[List[int]]:
     if not root:
         return []
     
@@ -4068,7 +4068,7 @@ int dfs(TreeNode* node) {
         result.append(level)
     
     return result`,
-    java: `public List<List<Integer>> levelOrder(TreeNode root) {
+        java: `public List<List<Integer>> levelOrder(TreeNode root) {
     List<List<Integer>> result = new ArrayList<>();
     if (root == null) return result;
     
@@ -4092,7 +4092,7 @@ int dfs(TreeNode* node) {
     
     return result;
 }`,
-    cpp: `vector<vector<int>> levelOrder(TreeNode* root) {
+        cpp: `vector<vector<int>> levelOrder(TreeNode* root) {
     vector<vector<int>> result;
     if (!root) return result;
     
@@ -4117,7 +4117,7 @@ int dfs(TreeNode* node) {
     
     return result;
 }`,
-    typescript: `function levelOrder(root: TreeNode | null): number[][] {
+        typescript: `function levelOrder(root: TreeNode | null): number[][] {
     if (!root) return [];
     
     const result: number[][] = [];
@@ -4140,10 +4140,10 @@ int dfs(TreeNode* node) {
     
     return result;
 }`,
-    explanation: "Use BFS with a queue. Process level by level: store current level size, pop that many nodes, collect values, add children to queue. Each iteration processes one complete level."
-  },
-  "serialize-and-deserialize-binary-tree": {
-    python: `class Codec:
+        explanation: "Use BFS with a queue. Process level by level: store current level size, pop that many nodes, collect values, add children to queue. Each iteration processes one complete level."
+    },
+    "serialize-and-deserialize-binary-tree": {
+        python: `class Codec:
     def serialize(self, root):
         if not root:
             return "null"
@@ -4163,7 +4163,7 @@ int dfs(TreeNode* node) {
             return node
         
         return dfs(iter(data.split(",")))`,
-    java: `public class Codec {
+        java: `public class Codec {
     public String serialize(TreeNode root) {
         if (root == null) return "null";
         
@@ -4185,7 +4185,7 @@ int dfs(TreeNode* node) {
         return node;
     }
 }`,
-    cpp: `class Codec {
+        cpp: `class Codec {
 public:
     string serialize(TreeNode* root) {
         if (!root) return "null";
@@ -4214,7 +4214,7 @@ public:
         return node;
     }
 };`,
-    typescript: `class Codec {
+        typescript: `class Codec {
     serialize(root: TreeNode | null): string {
         if (!root) return "null";
         
@@ -4238,10 +4238,10 @@ public:
         return dfs();
     }
 }`,
-    explanation: "Serialize: use preorder traversal (root, left, right) with 'null' markers for empty nodes. Deserialize: reconstruct using the same preorder sequence by consuming values from queue/iterator."
-  },
-  "subtree-of-another-tree": {
-    python: `def isSubtree(root: Optional[TreeNode], subRoot: Optional[TreeNode]) -> bool:
+        explanation: "Serialize: use preorder traversal (root, left, right) with 'null' markers for empty nodes. Deserialize: reconstruct using the same preorder sequence by consuming values from queue/iterator."
+    },
+    "subtree-of-another-tree": {
+        python: `def isSubtree(root: Optional[TreeNode], subRoot: Optional[TreeNode]) -> bool:
     def isSame(p, q):
         if not p and not q:
             return True
@@ -4258,7 +4258,7 @@ public:
     
     # Check left and right subtrees
     return isSubtree(root.left, subRoot) or isSubtree(root.right, subRoot)`,
-    java: `public boolean isSubtree(TreeNode root, TreeNode subRoot) {
+        java: `public boolean isSubtree(TreeNode root, TreeNode subRoot) {
     if (root == null) return false;
     
     if (isSame(root, subRoot)) return true;
@@ -4272,7 +4272,7 @@ private boolean isSame(TreeNode p, TreeNode q) {
     
     return p.val == q.val && isSame(p.left, q.left) && isSame(p.right, q.right);
 }`,
-    cpp: `bool isSame(TreeNode* p, TreeNode* q) {
+        cpp: `bool isSame(TreeNode* p, TreeNode* q) {
     if (!p && !q) return true;
     if (!p || !q) return false;
     
@@ -4286,7 +4286,7 @@ bool isSubtree(TreeNode* root, TreeNode* subRoot) {
     
     return isSubtree(root->left, subRoot) || isSubtree(root->right, subRoot);
 }`,
-    typescript: `function isSubtree(root: TreeNode | null, subRoot: TreeNode | null): boolean {
+        typescript: `function isSubtree(root: TreeNode | null, subRoot: TreeNode | null): boolean {
     function isSame(p: TreeNode | null, q: TreeNode | null): boolean {
         if (!p && !q) return true;
         if (!p || !q) return false;
@@ -4300,10 +4300,10 @@ bool isSubtree(TreeNode* root, TreeNode* subRoot) {
     
     return isSubtree(root.left, subRoot) || isSubtree(root.right, subRoot);
 }`,
-    explanation: "For each node in root, check if the tree starting at that node is identical to subRoot using a helper function. Use DFS to traverse all nodes in root tree."
-  },
-  "construct-binary-tree-from-preorder-and-inorder-traversal": {
-    python: `def buildTree(preorder: List[int], inorder: List[int]) -> Optional[TreeNode]:
+        explanation: "For each node in root, check if the tree starting at that node is identical to subRoot using a helper function. Use DFS to traverse all nodes in root tree."
+    },
+    "construct-binary-tree-from-preorder-and-inorder-traversal": {
+        python: `def buildTree(preorder: List[int], inorder: List[int]) -> Optional[TreeNode]:
     if not preorder or not inorder:
         return None
     
@@ -4318,7 +4318,7 @@ bool isSubtree(TreeNode* root, TreeNode* subRoot) {
     root.right = buildTree(preorder[mid+1:], inorder[mid+1:])
     
     return root`,
-    java: `private int preIndex = 0;
+        java: `private int preIndex = 0;
 private Map<Integer, Integer> inorderMap = new HashMap<>();
 
 public TreeNode buildTree(int[] preorder, int[] inorder) {
@@ -4341,7 +4341,7 @@ private TreeNode build(int[] preorder, int left, int right) {
     
     return root;
 }`,
-    cpp: `TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        cpp: `TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
     unordered_map<int, int> inMap;
     for (int i = 0; i < inorder.size(); i++) {
         inMap[inorder[i]] = i;
@@ -4364,7 +4364,7 @@ private TreeNode build(int[] preorder, int left, int right) {
     
     return build(0, inorder.size() - 1);
 }`,
-    typescript: `function buildTree(preorder: number[], inorder: number[]): TreeNode | null {
+        typescript: `function buildTree(preorder: number[], inorder: number[]): TreeNode | null {
     const inMap = new Map<number, number>();
     inorder.forEach((val, i) => inMap.set(val, i));
     
@@ -4386,10 +4386,10 @@ private TreeNode build(int[] preorder, int left, int right) {
     
     return build(0, inorder.length - 1);
 }`,
-    explanation: "Use preorder to get root (first element), find root in inorder to determine left/right boundaries. Recursively build left subtree with elements before root in inorder, right subtree with elements after. Use hashmap for O(1) lookups."
-  },
-  "validate-binary-search-tree": {
-    python: `def isValidBST(root: Optional[TreeNode]) -> bool:
+        explanation: "Use preorder to get root (first element), find root in inorder to determine left/right boundaries. Recursively build left subtree with elements before root in inorder, right subtree with elements after. Use hashmap for O(1) lookups."
+    },
+    "validate-binary-search-tree": {
+        python: `def isValidBST(root: Optional[TreeNode]) -> bool:
     def validate(node, min_val, max_val):
         if not node:
             return True
@@ -4404,7 +4404,7 @@ private TreeNode build(int[] preorder, int left, int right) {
                 validate(node.right, node.val, max_val))
     
     return validate(root, float('-inf'), float('inf'))`,
-    java: `public boolean isValidBST(TreeNode root) {
+        java: `public boolean isValidBST(TreeNode root) {
     return validate(root, Long.MIN_VALUE, Long.MAX_VALUE);
 }
 
@@ -4418,7 +4418,7 @@ private boolean validate(TreeNode node, long min, long max) {
     return validate(node.left, min, node.val) && 
            validate(node.right, node.val, max);
 }`,
-    cpp: `bool validate(TreeNode* node, long min, long max) {
+        cpp: `bool validate(TreeNode* node, long min, long max) {
     if (!node) return true;
     
     if (node->val <= min || node->val >= max) {
@@ -4432,7 +4432,7 @@ private boolean validate(TreeNode node, long min, long max) {
 bool isValidBST(TreeNode* root) {
     return validate(root, LONG_MIN, LONG_MAX);
 }`,
-    typescript: `function isValidBST(root: TreeNode | null): boolean {
+        typescript: `function isValidBST(root: TreeNode | null): boolean {
     function validate(node: TreeNode | null, min: number, max: number): boolean {
         if (!node) return true;
         
@@ -4446,10 +4446,10 @@ bool isValidBST(TreeNode* root) {
     
     return validate(root, -Infinity, Infinity);
 }`,
-    explanation: "Use DFS with valid range constraints. For each node, check if value is within (min, max). Pass updated ranges to children: left gets (min, node.val), right gets (node.val, max)."
-  },
-  "kth-smallest-element-in-a-bst": {
-    python: `def kthSmallest(root: Optional[TreeNode], k: int) -> int:
+        explanation: "Use DFS with valid range constraints. For each node, check if value is within (min, max). Pass updated ranges to children: left gets (min, node.val), right gets (node.val, max)."
+    },
+    "kth-smallest-element-in-a-bst": {
+        python: `def kthSmallest(root: Optional[TreeNode], k: int) -> int:
     # Inorder traversal of BST gives sorted order
     stack = []
     curr = root
@@ -4469,7 +4469,7 @@ bool isValidBST(TreeNode* root) {
         
         # Go right
         curr = curr.right`,
-    java: `public int kthSmallest(TreeNode root, int k) {
+        java: `public int kthSmallest(TreeNode root, int k) {
     Stack<TreeNode> stack = new Stack<>();
     TreeNode curr = root;
     
@@ -4489,7 +4489,7 @@ bool isValidBST(TreeNode* root) {
         curr = curr.right;
     }
 }`,
-    cpp: `int kthSmallest(TreeNode* root, int k) {
+        cpp: `int kthSmallest(TreeNode* root, int k) {
     stack<TreeNode*> st;
     TreeNode* curr = root;
     
@@ -4510,7 +4510,7 @@ bool isValidBST(TreeNode* root) {
         curr = curr->right;
     }
 }`,
-    typescript: `function kthSmallest(root: TreeNode | null, k: number): number {
+        typescript: `function kthSmallest(root: TreeNode | null, k: number): number {
     const stack: TreeNode[] = [];
     let curr = root;
     
@@ -4530,10 +4530,10 @@ bool isValidBST(TreeNode* root) {
         curr = curr.right;
     }
 }`,
-    explanation: "Use iterative inorder traversal (left, root, right). In a BST, inorder gives sorted sequence. Stop when we've visited k nodes. Use stack to simulate recursion."
-  },
-  "lowest-common-ancestor-of-bst": {
-    python: `def lowestCommonAncestor(root: TreeNode, p: TreeNode, q: TreeNode) -> TreeNode:
+        explanation: "Use iterative inorder traversal (left, root, right). In a BST, inorder gives sorted sequence. Stop when we've visited k nodes. Use stack to simulate recursion."
+    },
+    "lowest-common-ancestor-of-bst": {
+        python: `def lowestCommonAncestor(root: TreeNode, p: TreeNode, q: TreeNode) -> TreeNode:
     curr = root
     
     while curr:
@@ -4548,7 +4548,7 @@ bool isValidBST(TreeNode* root) {
             return curr
     
     return None`,
-    java: `public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        java: `public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
     TreeNode curr = root;
     
     while (curr != null) {
@@ -4563,7 +4563,7 @@ bool isValidBST(TreeNode* root) {
     
     return null;
 }`,
-    cpp: `TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        cpp: `TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
     TreeNode* curr = root;
     
     while (curr) {
@@ -4578,7 +4578,7 @@ bool isValidBST(TreeNode* root) {
     
     return nullptr;
 }`,
-    typescript: `function lowestCommonAncestor(root: TreeNode, p: TreeNode, q: TreeNode): TreeNode {
+        typescript: `function lowestCommonAncestor(root: TreeNode, p: TreeNode, q: TreeNode): TreeNode {
     let curr: TreeNode | null = root;
     
     while (curr) {
@@ -4593,10 +4593,10 @@ bool isValidBST(TreeNode* root) {
     
     return curr!;
 }`,
-    explanation: "Leverage BST property: if both nodes are smaller than current, go left; if both larger, go right; otherwise current node is the LCA (split point). No recursion needed."
-  },
-  "implement-trie": {
-    python: `class TrieNode:
+        explanation: "Leverage BST property: if both nodes are smaller than current, go left; if both larger, go right; otherwise current node is the LCA (split point). No recursion needed."
+    },
+    "implement-trie": {
+        python: `class TrieNode:
     def __init__(self):
         self.children = {}
         self.is_end = False
@@ -4628,7 +4628,7 @@ class Trie:
                 return False
             node = node.children[char]
         return True`,
-    java: `class TrieNode {
+        java: `class TrieNode {
     Map<Character, TrieNode> children = new HashMap<>();
     boolean isEnd = false;
 }
@@ -4671,7 +4671,7 @@ class Trie {
         return true;
     }
 }`,
-    cpp: `class TrieNode {
+        cpp: `class TrieNode {
 public:
     unordered_map<char, TrieNode*> children;
     bool isEnd = false;
@@ -4719,7 +4719,7 @@ public:
         return true;
     }
 };`,
-    typescript: `class TrieNode {
+        typescript: `class TrieNode {
     children: Map<string, TrieNode> = new Map();
     isEnd: boolean = false;
 }
@@ -4764,10 +4764,10 @@ class Trie {
         return true;
     }
 }`,
-    explanation: "Trie is a tree where each node represents a character. Each node has a map of children and an isEnd flag. Insert: traverse/create path. Search: traverse and check isEnd. StartsWith: just traverse."
-  },
-  "add-and-search-word": {
-    python: `class TrieNode:
+        explanation: "Trie is a tree where each node represents a character. Each node has a map of children and an isEnd flag. Insert: traverse/create path. Search: traverse and check isEnd. StartsWith: just traverse."
+    },
+    "add-and-search-word": {
+        python: `class TrieNode:
     def __init__(self):
         self.children = {}
         self.is_end = False
@@ -4801,7 +4801,7 @@ class WordDictionary:
                 return dfs(node.children[word[i]], i + 1)
         
         return dfs(self.root, 0)`,
-    java: `class TrieNode {
+        java: `class TrieNode {
     Map<Character, TrieNode> children = new HashMap<>();
     boolean isEnd = false;
 }
@@ -4847,7 +4847,7 @@ class WordDictionary {
         }
     }
 }`,
-    cpp: `class TrieNode {
+        cpp: `class TrieNode {
 public:
     unordered_map<char, TrieNode*> children;
     bool isEnd = false;
@@ -4898,7 +4898,7 @@ public:
         return dfs(root, word, 0);
     }
 };`,
-    typescript: `class TrieNode {
+        typescript: `class TrieNode {
     children: Map<string, TrieNode> = new Map();
     isEnd: boolean = false;
 }
@@ -4946,10 +4946,10 @@ class WordDictionary {
         return dfs(this.root, 0);
     }
 }`,
-    explanation: "Same as Trie but search uses DFS. When encountering '.', try all possible children recursively. For regular characters, follow standard Trie search path."
-  },
-  "word-search-ii": {
-    python: `def findWords(board: List[List[str]], words: List[str]) -> List[str]:
+        explanation: "Same as Trie but search uses DFS. When encountering '.', try all possible children recursively. For regular characters, follow standard Trie search path."
+    },
+    "word-search-ii": {
+        python: `def findWords(board: List[List[str]], words: List[str]) -> List[str]:
     # Build Trie
     trie = {}
     for word in words:
@@ -4991,7 +4991,7 @@ class WordDictionary {
             dfs(r, c, trie)
     
     return list(result)`,
-    java: `class TrieNode {
+        java: `class TrieNode {
     Map<Character, TrieNode> children = new HashMap<>();
     String word = null;
 }
@@ -5038,7 +5038,7 @@ private void dfs(char[][] board, int r, int c, TrieNode node, Set<String> result
     dfs(board, r, c-1, node, result);
     board[r][c] = ch;
 }`,
-    cpp: `struct TrieNode {
+        cpp: `struct TrieNode {
     unordered_map<char, TrieNode*> children;
     string word = "";
 };
@@ -5084,7 +5084,7 @@ vector<string> findWords(vector<vector<char>>& board, vector<string>& words) {
     
     return vector<string>(result.begin(), result.end());
 }`,
-    typescript: `function findWords(board: string[][], words: string[]): string[] {
+        typescript: `function findWords(board: string[][], words: string[]): string[] {
     class TrieNode {
         children: Map<string, TrieNode> = new Map();
         word: string | null = null;
@@ -5133,10 +5133,10 @@ vector<string> findWords(vector<vector<char>>& board, vector<string>& words) {
     
     return Array.from(result);
 }`,
-    explanation: "Build Trie from all words. For each cell, do DFS backtracking guided by Trie. Only explore paths that match Trie prefixes. Mark cells visited during DFS. When reaching a word end in Trie, add to results."
-  },
-  "top-k-frequent-elements": {
-    python: `def topKFrequent(nums: List[int], k: int) -> List[int]:
+        explanation: "Build Trie from all words. For each cell, do DFS backtracking guided by Trie. Only explore paths that match Trie prefixes. Mark cells visited during DFS. When reaching a word end in Trie, add to results."
+    },
+    "top-k-frequent-elements": {
+        python: `def topKFrequent(nums: List[int], k: int) -> List[int]:
     # Count frequencies
     count = {}
     for num in nums:
@@ -5156,7 +5156,7 @@ vector<string> findWords(vector<vector<char>>& board, vector<string>& words) {
                 return result
     
     return result`,
-    java: `public int[] topKFrequent(int[] nums, int k) {
+        java: `public int[] topKFrequent(int[] nums, int k) {
     Map<Integer, Integer> count = new HashMap<>();
     for (int num : nums) {
         count.put(num, count.getOrDefault(num, 0) + 1);
@@ -5183,7 +5183,7 @@ vector<string> findWords(vector<vector<char>>& board, vector<string>& words) {
     
     return result;
 }`,
-    cpp: `vector<int> topKFrequent(vector<int>& nums, int k) {
+        cpp: `vector<int> topKFrequent(vector<int>& nums, int k) {
     unordered_map<int, int> count;
     for (int num : nums) {
         count[num]++;
@@ -5204,7 +5204,7 @@ vector<string> findWords(vector<vector<char>>& board, vector<string>& words) {
     
     return result;
 }`,
-    typescript: `function topKFrequent(nums: number[], k: number): number[] {
+        typescript: `function topKFrequent(nums: number[], k: number): number[] {
     const count = new Map<number, number>();
     for (const num of nums) {
         count.set(num, (count.get(num) || 0) + 1);
@@ -5225,10 +5225,10 @@ vector<string> findWords(vector<vector<char>>& board, vector<string>& words) {
     
     return result;
 }`,
-    explanation: "Use bucket sort for O(n) solution. Count frequencies, then create buckets where index=frequency. Iterate from highest frequency bucket collecting elements until we have k elements."
-  },
-  "find-median-from-data-stream": {
-    python: `import heapq
+        explanation: "Use bucket sort for O(n) solution. Count frequencies, then create buckets where index=frequency. Iterate from highest frequency bucket collecting elements until we have k elements."
+    },
+    "find-median-from-data-stream": {
+        python: `import heapq
 
 class MedianFinder:
     def __init__(self):
@@ -5258,7 +5258,7 @@ class MedianFinder:
         if len(self.small) > len(self.large):
             return -self.small[0]
         return (-self.small[0] + self.large[0]) / 2.0`,
-    java: `class MedianFinder {
+        java: `class MedianFinder {
     private PriorityQueue<Integer> small; // max heap
     private PriorityQueue<Integer> large; // min heap
     
@@ -5289,7 +5289,7 @@ class MedianFinder:
         return (small.peek() + large.peek()) / 2.0;
     }
 }`,
-    cpp: `class MedianFinder {
+        cpp: `class MedianFinder {
 private:
     priority_queue<int> small; // max heap
     priority_queue<int, vector<int>, greater<int>> large; // min heap
@@ -5322,7 +5322,7 @@ public:
         return (small.top() + large.top()) / 2.0;
     }
 };`,
-    typescript: `class MedianFinder {
+        typescript: `class MedianFinder {
     private small: MaxHeap;  // smaller half
     private large: MinHeap;  // larger half
     
@@ -5354,10 +5354,10 @@ public:
         return (this.small.peek()! + this.large.peek()!) / 2.0;
     }
 }`,
-    explanation: "Use two heaps: max heap for smaller half, min heap for larger half. Keep sizes balanced (small can have 1 more). Median is either top of small (odd count) or average of both tops (even count). O(log n) per operation."
-  },
-  "spiral-matrix": {
-    python: `def spiralOrder(matrix: List[List[int]]) -> List[int]:
+        explanation: "Use two heaps: max heap for smaller half, min heap for larger half. Keep sizes balanced (small can have 1 more). Median is either top of small (odd count) or average of both tops (even count). O(log n) per operation."
+    },
+    "spiral-matrix": {
+        python: `def spiralOrder(matrix: List[List[int]]) -> List[int]:
     result = []
     if not matrix:
         return result
@@ -5389,7 +5389,7 @@ public:
             left += 1
     
     return result`,
-    java: `public List<Integer> spiralOrder(int[][] matrix) {
+        java: `public List<Integer> spiralOrder(int[][] matrix) {
     List<Integer> result = new ArrayList<>();
     if (matrix.length == 0) return result;
     
@@ -5424,7 +5424,7 @@ public:
     
     return result;
 }`,
-    cpp: `vector<int> spiralOrder(vector<vector<int>>& matrix) {
+        cpp: `vector<int> spiralOrder(vector<vector<int>>& matrix) {
     vector<int> result;
     if (matrix.empty()) return result;
     
@@ -5459,7 +5459,7 @@ public:
     
     return result;
 }`,
-    typescript: `function spiralOrder(matrix: number[][]): number[] {
+        typescript: `function spiralOrder(matrix: number[][]): number[] {
     const result: number[] = [];
     if (!matrix.length) return result;
     
@@ -5494,10 +5494,10 @@ public:
     
     return result;
 }`,
-    explanation: "Track four boundaries: top, bottom, left, right. Traverse right→down→left→up in spiral, shrinking boundaries after each direction. Check boundaries before left/up to avoid duplicates. O(m×n) time, O(1) space."
-  },
-  "rotate-image": {
-    python: `def rotate(matrix: List[List[int]]) -> None:
+        explanation: "Track four boundaries: top, bottom, left, right. Traverse right→down→left→up in spiral, shrinking boundaries after each direction. Check boundaries before left/up to avoid duplicates. O(m×n) time, O(1) space."
+    },
+    "rotate-image": {
+        python: `def rotate(matrix: List[List[int]]) -> None:
     n = len(matrix)
     
     # Transpose matrix
@@ -5508,7 +5508,7 @@ public:
     # Reverse each row
     for i in range(n):
         matrix[i].reverse()`,
-    java: `public void rotate(int[][] matrix) {
+        java: `public void rotate(int[][] matrix) {
     int n = matrix.length;
     
     // Transpose
@@ -5532,7 +5532,7 @@ public:
         }
     }
 }`,
-    cpp: `void rotate(vector<vector<int>>& matrix) {
+        cpp: `void rotate(vector<vector<int>>& matrix) {
     int n = matrix.size();
     
     // Transpose
@@ -5547,7 +5547,7 @@ public:
         reverse(matrix[i].begin(), matrix[i].end());
     }
 }`,
-    typescript: `function rotate(matrix: number[][]): void {
+        typescript: `function rotate(matrix: number[][]): void {
     const n = matrix.length;
     
     // Transpose
@@ -5562,10 +5562,10 @@ public:
         matrix[i].reverse();
     }
 }`,
-    explanation: "Two steps for 90° clockwise rotation: 1) Transpose matrix (swap matrix[i][j] with matrix[j][i]). 2) Reverse each row. For counter-clockwise, reverse columns instead. O(n²) time, O(1) space."
-  },
-  "word-search": {
-    python: `def exist(board: List[List[str]], word: str) -> bool:
+        explanation: "Two steps for 90° clockwise rotation: 1) Transpose matrix (swap matrix[i][j] with matrix[j][i]). 2) Reverse each row. For counter-clockwise, reverse columns instead. O(n²) time, O(1) space."
+    },
+    "word-search": {
+        python: `def exist(board: List[List[str]], word: str) -> bool:
     m, n = len(board), len(board[0])
     
     def dfs(r, c, index):
@@ -5594,7 +5594,7 @@ public:
                 return True
     
     return False`,
-    java: `public boolean exist(char[][] board, String word) {
+        java: `public boolean exist(char[][] board, String word) {
     int m = board.length, n = board[0].length;
     
     for (int i = 0; i < m; i++) {
@@ -5627,7 +5627,7 @@ private boolean dfs(char[][] board, String word, int r, int c, int index) {
     board[r][c] = temp;
     return found;
 }`,
-    cpp: `bool dfs(vector<vector<char>>& board, string& word, int r, int c, int index) {
+        cpp: `bool dfs(vector<vector<char>>& board, string& word, int r, int c, int index) {
     if (index == word.length()) return true;
     
     if (r < 0 || r >= board.size() || c < 0 || c >= board[0].size() ||
@@ -5657,7 +5657,7 @@ bool exist(vector<vector<char>>& board, string word) {
     }
     return false;
 }`,
-    typescript: `function exist(board: string[][], word: string): boolean {
+        typescript: `function exist(board: string[][], word: string): boolean {
     const m = board.length, n = board[0].length;
     
     function dfs(r: number, c: number, index: number): boolean {
@@ -5686,10 +5686,10 @@ bool exist(vector<vector<char>>& board, string word) {
     
     return false;
 }`,
-    explanation: "Backtracking DFS. For each cell, if it matches word[0], start DFS. Mark visited cells, try 4 directions. If path found, return true. Backtrack by unmarking. O(m×n×4^L) worst case."
-  },
-  "longest-repeating-character-replacement": {
-    python: `def characterReplacement(s: str, k: int) -> int:
+        explanation: "Backtracking DFS. For each cell, if it matches word[0], start DFS. Mark visited cells, try 4 directions. If path found, return true. Backtrack by unmarking. O(m×n×4^L) worst case."
+    },
+    "longest-repeating-character-replacement": {
+        python: `def characterReplacement(s: str, k: int) -> int:
     count = {}
     max_length = 0
     max_count = 0
@@ -5707,7 +5707,7 @@ bool exist(vector<vector<char>>& board, string word) {
         max_length = max(max_length, right - left + 1)
     
     return max_length`,
-    java: `public int characterReplacement(String s, int k) {
+        java: `public int characterReplacement(String s, int k) {
     int[] count = new int[26];
     int maxLength = 0;
     int maxCount = 0;
@@ -5727,7 +5727,7 @@ bool exist(vector<vector<char>>& board, string word) {
     
     return maxLength;
 }`,
-    cpp: `int characterReplacement(string s, int k) {
+        cpp: `int characterReplacement(string s, int k) {
     vector<int> count(26, 0);
     int maxLength = 0;
     int maxCount = 0;
@@ -5747,7 +5747,7 @@ bool exist(vector<vector<char>>& board, string word) {
     
     return maxLength;
 }`,
-    typescript: `function characterReplacement(s: string, k: number): number {
+        typescript: `function characterReplacement(s: string, k: number): number {
     const count = new Array(26).fill(0);
     let maxLength = 0;
     let maxCount = 0;
@@ -5767,10 +5767,10 @@ bool exist(vector<vector<char>>& board, string word) {
     
     return maxLength;
 }`,
-    explanation: "Sliding window. Track count of most frequent char in window. If (window size - max frequency) > k, shrink window. Window is valid if we can replace remaining chars within k changes. O(n) time."
-  },
-  "minimum-window-substring": {
-    python: `def minWindow(s: str, t: str) -> str:
+        explanation: "Sliding window. Track count of most frequent char in window. If (window size - max frequency) > k, shrink window. Window is valid if we can replace remaining chars within k changes. O(n) time."
+    },
+    "minimum-window-substring": {
+        python: `def minWindow(s: str, t: str) -> str:
     if not s or not t:
         return ""
     
@@ -5806,7 +5806,7 @@ bool exist(vector<vector<char>>& board, string word) {
             left += 1
     
     return "" if min_len == float('inf') else s[min_left:min_left + min_len]`,
-    java: `public String minWindow(String s, String t) {
+        java: `public String minWindow(String s, String t) {
     if (s.length() == 0 || t.length() == 0) return "";
     
     Map<Character, Integer> need = new HashMap<>();
@@ -5847,7 +5847,7 @@ bool exist(vector<vector<char>>& board, string word) {
     
     return minLen == Integer.MAX_VALUE ? "" : s.substring(minLeft, minLeft + minLen);
 }`,
-    cpp: `string minWindow(string s, string t) {
+        cpp: `string minWindow(string s, string t) {
     if (s.empty() || t.empty()) return "";
     
     unordered_map<char, int> need, window;
@@ -5887,7 +5887,7 @@ bool exist(vector<vector<char>>& board, string word) {
     
     return minLen == INT_MAX ? "" : s.substr(minLeft, minLen);
 }`,
-    typescript: `function minWindow(s: string, t: string): string {
+        typescript: `function minWindow(s: string, t: string): string {
     if (!s || !t) return "";
     
     const need = new Map<string, number>();
@@ -5928,10 +5928,10 @@ bool exist(vector<vector<char>>& board, string word) {
     
     return minLen === Infinity ? "" : s.substring(minLeft, minLeft + minLen);
 }`,
-    explanation: "Sliding window with two hashmaps. Expand right to include chars from t. When window contains all required chars, shrink from left while valid. Track minimum window. O(m+n) time where m,n are lengths of s,t."
-  },
-  "valid-palindrome": {
-    python: `def isPalindrome(s: str) -> bool:
+        explanation: "Sliding window with two hashmaps. Expand right to include chars from t. When window contains all required chars, shrink from left while valid. Track minimum window. O(m+n) time where m,n are lengths of s,t."
+    },
+    "valid-palindrome": {
+        python: `def isPalindrome(s: str) -> bool:
     left, right = 0, len(s) - 1
     
     while left < right:
@@ -5949,7 +5949,7 @@ bool exist(vector<vector<char>>& board, string word) {
         right -= 1
     
     return True`,
-    java: `public boolean isPalindrome(String s) {
+        java: `public boolean isPalindrome(String s) {
     int left = 0, right = s.length() - 1;
     
     while (left < right) {
@@ -5970,7 +5970,7 @@ bool exist(vector<vector<char>>& board, string word) {
     
     return true;
 }`,
-    cpp: `bool isPalindrome(string s) {
+        cpp: `bool isPalindrome(string s) {
     int left = 0, right = s.length() - 1;
     
     while (left < right) {
@@ -5991,7 +5991,7 @@ bool exist(vector<vector<char>>& board, string word) {
     
     return true;
 }`,
-    typescript: `function isPalindrome(s: string): boolean {
+        typescript: `function isPalindrome(s: string): boolean {
     let left = 0, right = s.length - 1;
     
     while (left < right) {
@@ -6016,10 +6016,10 @@ bool exist(vector<vector<char>>& board, string word) {
 function isAlphanumeric(c: string): boolean {
     return /^[a-zA-Z0-9]$/.test(c);
 }`,
-    explanation: "Two pointers from both ends. Skip non-alphanumeric chars. Compare lowercase versions. Move pointers inward. If any mismatch, not palindrome. O(n) time, O(1) space."
-  },
-  "longest-palindromic-substring": {
-    python: `def longestPalindrome(s: str) -> str:
+        explanation: "Two pointers from both ends. Skip non-alphanumeric chars. Compare lowercase versions. Move pointers inward. If any mismatch, not palindrome. O(n) time, O(1) space."
+    },
+    "longest-palindromic-substring": {
+        python: `def longestPalindrome(s: str) -> str:
     if not s:
         return ""
     
@@ -6045,7 +6045,7 @@ function isAlphanumeric(c: string): boolean {
             start = i - (length - 1) // 2
     
     return s[start:start + max_len]`,
-    java: `public String longestPalindrome(String s) {
+        java: `public String longestPalindrome(String s) {
     if (s == null || s.length() == 0) return "";
     
     int start = 0, maxLen = 0;
@@ -6071,7 +6071,7 @@ private int expandAroundCenter(String s, int left, int right) {
     }
     return right - left - 1;
 }`,
-    cpp: `int expandAroundCenter(string& s, int left, int right) {
+        cpp: `int expandAroundCenter(string& s, int left, int right) {
     while (left >= 0 && right < s.length() && s[left] == s[right]) {
         left--;
         right++;
@@ -6097,7 +6097,7 @@ string longestPalindrome(string s) {
     
     return s.substr(start, maxLen);
 }`,
-    typescript: `function longestPalindrome(s: string): string {
+        typescript: `function longestPalindrome(s: string): string {
     if (!s) return "";
     
     function expandAroundCenter(left: number, right: number): number {
@@ -6123,10 +6123,10 @@ string longestPalindrome(string s) {
     
     return s.substring(start, start + maxLen);
 }`,
-    explanation: "Expand around center approach. For each position, try both odd (single center) and even (two centers) length palindromes. Expand outward while chars match. Track longest. O(n²) time, O(1) space."
-  },
-  "palindromic-substrings": {
-    python: `def countSubstrings(s: str) -> int:
+        explanation: "Expand around center approach. For each position, try both odd (single center) and even (two centers) length palindromes. Expand outward while chars match. Track longest. O(n²) time, O(1) space."
+    },
+    "palindromic-substrings": {
+        python: `def countSubstrings(s: str) -> int:
     count = 0
     
     def expand_around_center(left, right):
@@ -6143,7 +6143,7 @@ string longestPalindrome(string s) {
         expand_around_center(i, i + 1)
     
     return count`,
-    java: `public int countSubstrings(String s) {
+        java: `public int countSubstrings(String s) {
     int count = 0;
     
     for (int i = 0; i < s.length(); i++) {
@@ -6163,7 +6163,7 @@ private int expandAroundCenter(String s, int left, int right) {
     }
     return count;
 }`,
-    cpp: `int expandAroundCenter(string& s, int left, int right) {
+        cpp: `int expandAroundCenter(string& s, int left, int right) {
     int count = 0;
     while (left >= 0 && right < s.length() && s[left] == s[right]) {
         count++;
@@ -6183,7 +6183,7 @@ int countSubstrings(string s) {
     
     return count;
 }`,
-    typescript: `function countSubstrings(s: string): number {
+        typescript: `function countSubstrings(s: string): number {
     let count = 0;
     
     function expandAroundCenter(left: number, right: number): void {
@@ -6201,10 +6201,10 @@ int countSubstrings(string s) {
     
     return count;
 }`,
-    explanation: "Similar to longest palindromic substring but count all instead of tracking max. For each center, expand and count valid palindromes. O(n²) time, O(1) space."
-  },
-  "encode-and-decode-strings": {
-    python: `def encode(strs: List[str]) -> str:
+        explanation: "Similar to longest palindromic substring but count all instead of tracking max. For each center, expand and count valid palindromes. O(n²) time, O(1) space."
+    },
+    "encode-and-decode-strings": {
+        python: `def encode(strs: List[str]) -> str:
     result = ""
     for s in strs:
         result += str(len(s)) + "#" + s
@@ -6228,7 +6228,7 @@ def decode(s: str) -> List[str]:
         i = j + 1 + length
     
     return result`,
-    java: `public String encode(List<String> strs) {
+        java: `public String encode(List<String> strs) {
     StringBuilder result = new StringBuilder();
     for (String s : strs) {
         result.append(s.length()).append("#").append(s);
@@ -6253,7 +6253,7 @@ public List<String> decode(String s) {
     
     return result;
 }`,
-    cpp: `string encode(vector<string>& strs) {
+        cpp: `string encode(vector<string>& strs) {
     string result;
     for (const string& s : strs) {
         result += to_string(s.length()) + "#" + s;
@@ -6278,7 +6278,7 @@ vector<string> decode(string s) {
     
     return result;
 }`,
-    typescript: `function encode(strs: string[]): string {
+        typescript: `function encode(strs: string[]): string {
     let result = "";
     for (const s of strs) {
         result += s.length + "#" + s;
@@ -6303,6 +6303,6 @@ function decode(s: string): string[] {
     
     return result;
 }`,
-    explanation: "Length-prefixed encoding: for each string, prepend length + delimiter (#). To decode: read length, skip delimiter, extract that many chars. Handles any characters including delimiters. O(n) time for both."
-  }
+        explanation: "Length-prefixed encoding: for each string, prepend length + delimiter (#). To decode: read length, skip delimiter, extract that many chars. Handles any characters including delimiters. O(n) time for both."
+    }
 };
