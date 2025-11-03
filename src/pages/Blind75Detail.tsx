@@ -346,6 +346,227 @@ const Blind75Detail: React.FC = () => {
       );
     }
 
+    if (algoId === "best-time-to-buy-and-sell-stock") {
+      const BestTimeToBuyAndSellStockVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/BestTimeToBuyAndSellStockVisualization"
+        ).then((m) => ({ default: m.BestTimeToBuyAndSellStockVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <BestTimeToBuyAndSellStockVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "contains-duplicate") {
+      const ContainsDuplicateVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/ContainsDuplicateVisualization"
+        ).then((m) => ({ default: m.ContainsDuplicateVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <ContainsDuplicateVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "maximum-product-subarray") {
+      const MaximumProductSubarrayVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/MaximumProductSubarrayVisualization"
+        ).then((m) => ({ default: m.MaximumProductSubarrayVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <MaximumProductSubarrayVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "sum-of-two-integers") {
+      const SumOfTwoIntegersVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/SumOfTwoIntegersVisualization"
+        ).then((m) => ({ default: m.SumOfTwoIntegersVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <SumOfTwoIntegersVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "number-of-1-bits") {
+      const NumberOf1BitsVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/NumberOf1BitsVisualization"
+        ).then((m) => ({ default: m.NumberOf1BitsVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <NumberOf1BitsVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "counting-bits") {
+      const CountingBitsVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/CountingBitsVisualization"
+        ).then((m) => ({ default: m.CountingBitsVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <CountingBitsVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "missing-number") {
+      const MissingNumberVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/MissingNumberVisualization"
+        ).then((m) => ({ default: m.MissingNumberVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <MissingNumberVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "reverse-bits") {
+      const ReverseBitsVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/ReverseBitsVisualization"
+        ).then((m) => ({ default: m.ReverseBitsVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <ReverseBitsVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "climbing-stairs") {
+      const ClimbingStairsVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/ClimbingStairsVisualization"
+        ).then((m) => ({ default: m.ClimbingStairsVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <ClimbingStairsVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "coin-change") {
+      const CoinChangeVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/CoinChangeVisualization"
+        ).then((m) => ({ default: m.CoinChangeVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <CoinChangeVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "longest-increasing-subsequence") {
+      const LongestIncreasingSubsequenceVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/LongestIncreasingSubsequenceVisualization"
+        ).then((m) => ({ default: m.LongestIncreasingSubsequenceVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <LongestIncreasingSubsequenceVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "longest-common-subsequence") {
+      const LongestCommonSubsequenceVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/LongestCommonSubsequenceVisualization"
+        ).then((m) => ({ default: m.LongestCommonSubsequenceVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <LongestCommonSubsequenceVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "word-break") {
+      const WordBreakVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/WordBreakVisualization"
+        ).then((m) => ({ default: m.WordBreakVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <WordBreakVisualization />
+        </React.Suspense>
+      );
+    }
+
     // Add more visualization mappings as needed
     return null;
   };

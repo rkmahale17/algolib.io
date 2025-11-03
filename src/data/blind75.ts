@@ -509,6 +509,7 @@ Constraints:
     "spaceComplexity": "O(n)",
     "companies": ["Amazon", "Microsoft"],
     "tags": ["Array", "Dynamic Programming", "Binary Search"],
+    "algorithmId": "longest-increasing-subsequence",
     "youtubeUrl": "https://www.youtube.com/watch?v=cjWnW0hdF1Y"
   },
   {
@@ -523,6 +524,7 @@ Constraints:
     "spaceComplexity": "O(m × n)",
     "companies": ["Google", "Amazon"],
     "tags": ["String", "Dynamic Programming"],
+    "algorithmId": "longest-common-subsequence",
     "youtubeUrl": "https://www.youtube.com/watch?v=Ua0GhsJSlWM"
   },
   {
@@ -537,6 +539,7 @@ Constraints:
     "spaceComplexity": "O(n)",
     "companies": ["Amazon", "Facebook", "Google"],
     "tags": ["Hash Table", "String", "Dynamic Programming"],
+    "algorithmId": "word-break",
     "youtubeUrl": "https://www.youtube.com/watch?v=Sx9NNgInc3A"
   },
 
