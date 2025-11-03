@@ -2870,5 +2870,1543 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     return maxRooms;
 }`,
     explanation: "Two-pointer sweep line algorithm: separate and sort start/end times. When a meeting starts before another ends, we need an additional room. Track maximum concurrent meetings needed."
+  },
+  "same-tree": {
+    python: `def isSameTree(p: Optional[TreeNode], q: Optional[TreeNode]) -> bool:
+    # Both empty
+    if not p and not q:
+        return True
+    
+    # One empty, one not
+    if not p or not q:
+        return False
+    
+    # Values different
+    if p.val != q.val:
+        return False
+    
+    # Recursively check left and right subtrees
+    return isSameTree(p.left, q.left) and isSameTree(p.right, q.right)`,
+    java: `public boolean isSameTree(TreeNode p, TreeNode q) {
+    // Both empty
+    if (p == null && q == null) {
+        return true;
+    }
+    
+    // One empty, one not
+    if (p == null || q == null) {
+        return false;
+    }
+    
+    // Values different
+    if (p.val != q.val) {
+        return false;
+    }
+    
+    // Recursively check left and right subtrees
+    return isSameTree(p.left, q.left) && isSameTree(p.right, q.right);
+}`,
+    cpp: `bool isSameTree(TreeNode* p, TreeNode* q) {
+    // Both empty
+    if (!p && !q) {
+        return true;
+    }
+    
+    // One empty, one not
+    if (!p || !q) {
+        return false;
+    }
+    
+    // Values different
+    if (p->val != q->val) {
+        return false;
+    }
+    
+    // Recursively check left and right subtrees
+    return isSameTree(p->left, q->left) && isSameTree(p->right, q->right);
+}`,
+    typescript: `function isSameTree(p: TreeNode | null, q: TreeNode | null): boolean {
+    // Both empty
+    if (!p && !q) {
+        return true;
+    }
+    
+    // One empty, one not
+    if (!p || !q) {
+        return false;
+    }
+    
+    // Values different
+    if (p.val !== q.val) {
+        return false;
+    }
+    
+    // Recursively check left and right subtrees
+    return isSameTree(p.left, q.left) && isSameTree(p.right, q.right);
+}`,
+    explanation: "Use DFS recursion to compare trees node by node. Check: both null (same), one null (different), values different (different), then recurse on left and right subtrees."
+  },
+  "invert-binary-tree": {
+    python: `def invertTree(root: Optional[TreeNode]) -> Optional[TreeNode]:
+    if not root:
+        return None
+    
+    # Swap left and right children
+    root.left, root.right = root.right, root.left
+    
+    # Recursively invert subtrees
+    invertTree(root.left)
+    invertTree(root.right)
+    
+    return root`,
+    java: `public TreeNode invertTree(TreeNode root) {
+    if (root == null) {
+        return null;
+    }
+    
+    // Swap left and right children
+    TreeNode temp = root.left;
+    root.left = root.right;
+    root.right = temp;
+    
+    // Recursively invert subtrees
+    invertTree(root.left);
+    invertTree(root.right);
+    
+    return root;
+}`,
+    cpp: `TreeNode* invertTree(TreeNode* root) {
+    if (!root) {
+        return nullptr;
+    }
+    
+    // Swap left and right children
+    TreeNode* temp = root->left;
+    root->left = root->right;
+    root->right = temp;
+    
+    // Recursively invert subtrees
+    invertTree(root->left);
+    invertTree(root->right);
+    
+    return root;
+}`,
+    typescript: `function invertTree(root: TreeNode | null): TreeNode | null {
+    if (!root) {
+        return null;
+    }
+    
+    // Swap left and right children
+    [root.left, root.right] = [root.right, root.left];
+    
+    // Recursively invert subtrees
+    invertTree(root.left);
+    invertTree(root.right);
+    
+    return root;
+}`,
+    explanation: "For each node, swap its left and right children, then recursively invert the left and right subtrees. Simple DFS approach."
+  },
+  "binary-tree-maximum-path-sum": {
+    python: `def maxPathSum(root: Optional[TreeNode]) -> int:
+    max_sum = float('-inf')
+    
+    def dfs(node):
+        nonlocal max_sum
+        
+        if not node:
+            return 0
+        
+        # Get max sum from left and right (ignore negative paths)
+        left = max(0, dfs(node.left))
+        right = max(0, dfs(node.right))
+        
+        # Update global max considering path through this node
+        max_sum = max(max_sum, node.val + left + right)
+        
+        # Return max path sum including this node to parent
+        return node.val + max(left, right)
+    
+    dfs(root)
+    return max_sum`,
+    java: `private int maxSum = Integer.MIN_VALUE;
+
+public int maxPathSum(TreeNode root) {
+    dfs(root);
+    return maxSum;
+}
+
+private int dfs(TreeNode node) {
+    if (node == null) {
+        return 0;
+    }
+    
+    // Get max sum from left and right (ignore negative paths)
+    int left = Math.max(0, dfs(node.left));
+    int right = Math.max(0, dfs(node.right));
+    
+    // Update global max considering path through this node
+    maxSum = Math.max(maxSum, node.val + left + right);
+    
+    // Return max path sum including this node to parent
+    return node.val + Math.max(left, right);
+}`,
+    cpp: `int maxSum = INT_MIN;
+
+int maxPathSum(TreeNode* root) {
+    dfs(root);
+    return maxSum;
+}
+
+int dfs(TreeNode* node) {
+    if (!node) {
+        return 0;
+    }
+    
+    // Get max sum from left and right (ignore negative paths)
+    int left = max(0, dfs(node->left));
+    int right = max(0, dfs(node->right));
+    
+    // Update global max considering path through this node
+    maxSum = max(maxSum, node->val + left + right);
+    
+    // Return max path sum including this node to parent
+    return node->val + max(left, right);
+}`,
+    typescript: `function maxPathSum(root: TreeNode | null): number {
+    let maxSum = -Infinity;
+    
+    function dfs(node: TreeNode | null): number {
+        if (!node) {
+            return 0;
+        }
+        
+        // Get max sum from left and right (ignore negative paths)
+        const left = Math.max(0, dfs(node.left));
+        const right = Math.max(0, dfs(node.right));
+        
+        // Update global max considering path through this node
+        maxSum = Math.max(maxSum, node.val + left + right);
+        
+        // Return max path sum including this node to parent
+        return node.val + Math.max(left, right);
+    }
+    
+    dfs(root);
+    return maxSum;
+}`,
+    explanation: "For each node, calculate max path sum through it (left + node + right). Track global maximum. Return to parent the max single-path sum (node + max of left or right). Ignore negative contributions."
+  },
+  "binary-tree-level-order-traversal": {
+    python: `def levelOrder(root: Optional[TreeNode]) -> List[List[int]]:
+    if not root:
+        return []
+    
+    result = []
+    queue = [root]
+    
+    while queue:
+        level_size = len(queue)
+        level = []
+        
+        for _ in range(level_size):
+            node = queue.pop(0)
+            level.append(node.val)
+            
+            if node.left:
+                queue.append(node.left)
+            if node.right:
+                queue.append(node.right)
+        
+        result.append(level)
+    
+    return result`,
+    java: `public List<List<Integer>> levelOrder(TreeNode root) {
+    List<List<Integer>> result = new ArrayList<>();
+    if (root == null) return result;
+    
+    Queue<TreeNode> queue = new LinkedList<>();
+    queue.offer(root);
+    
+    while (!queue.isEmpty()) {
+        int levelSize = queue.size();
+        List<Integer> level = new ArrayList<>();
+        
+        for (int i = 0; i < levelSize; i++) {
+            TreeNode node = queue.poll();
+            level.add(node.val);
+            
+            if (node.left != null) queue.offer(node.left);
+            if (node.right != null) queue.offer(node.right);
+        }
+        
+        result.add(level);
+    }
+    
+    return result;
+}`,
+    cpp: `vector<vector<int>> levelOrder(TreeNode* root) {
+    vector<vector<int>> result;
+    if (!root) return result;
+    
+    queue<TreeNode*> q;
+    q.push(root);
+    
+    while (!q.empty()) {
+        int levelSize = q.size();
+        vector<int> level;
+        
+        for (int i = 0; i < levelSize; i++) {
+            TreeNode* node = q.front();
+            q.pop();
+            level.push_back(node->val);
+            
+            if (node->left) q.push(node->left);
+            if (node->right) q.push(node->right);
+        }
+        
+        result.push_back(level);
+    }
+    
+    return result;
+}`,
+    typescript: `function levelOrder(root: TreeNode | null): number[][] {
+    if (!root) return [];
+    
+    const result: number[][] = [];
+    const queue: TreeNode[] = [root];
+    
+    while (queue.length > 0) {
+        const levelSize = queue.length;
+        const level: number[] = [];
+        
+        for (let i = 0; i < levelSize; i++) {
+            const node = queue.shift()!;
+            level.push(node.val);
+            
+            if (node.left) queue.push(node.left);
+            if (node.right) queue.push(node.right);
+        }
+        
+        result.push(level);
+    }
+    
+    return result;
+}`,
+    explanation: "Use BFS with a queue. Process level by level: store current level size, pop that many nodes, collect values, add children to queue. Each iteration processes one complete level."
+  },
+  "serialize-and-deserialize-binary-tree": {
+    python: `class Codec:
+    def serialize(self, root):
+        if not root:
+            return "null"
+        
+        # Preorder traversal with null markers
+        return str(root.val) + "," + self.serialize(root.left) + "," + self.serialize(root.right)
+    
+    def deserialize(self, data):
+        def dfs(vals):
+            val = next(vals)
+            if val == "null":
+                return None
+            
+            node = TreeNode(int(val))
+            node.left = dfs(vals)
+            node.right = dfs(vals)
+            return node
+        
+        return dfs(iter(data.split(",")))`,
+    java: `public class Codec {
+    public String serialize(TreeNode root) {
+        if (root == null) return "null";
+        
+        return root.val + "," + serialize(root.left) + "," + serialize(root.right);
+    }
+    
+    public TreeNode deserialize(String data) {
+        Queue<String> queue = new LinkedList<>(Arrays.asList(data.split(",")));
+        return dfs(queue);
+    }
+    
+    private TreeNode dfs(Queue<String> queue) {
+        String val = queue.poll();
+        if (val.equals("null")) return null;
+        
+        TreeNode node = new TreeNode(Integer.parseInt(val));
+        node.left = dfs(queue);
+        node.right = dfs(queue);
+        return node;
+    }
+}`,
+    cpp: `class Codec {
+public:
+    string serialize(TreeNode* root) {
+        if (!root) return "null";
+        
+        return to_string(root->val) + "," + serialize(root->left) + "," + serialize(root->right);
+    }
+    
+    TreeNode* deserialize(string data) {
+        queue<string> q;
+        stringstream ss(data);
+        string val;
+        while (getline(ss, val, ',')) {
+            q.push(val);
+        }
+        return dfs(q);
+    }
+    
+    TreeNode* dfs(queue<string>& q) {
+        string val = q.front();
+        q.pop();
+        if (val == "null") return nullptr;
+        
+        TreeNode* node = new TreeNode(stoi(val));
+        node->left = dfs(q);
+        node->right = dfs(q);
+        return node;
+    }
+};`,
+    typescript: `class Codec {
+    serialize(root: TreeNode | null): string {
+        if (!root) return "null";
+        
+        return root.val + "," + this.serialize(root.left) + "," + this.serialize(root.right);
+    }
+    
+    deserialize(data: string): TreeNode | null {
+        const vals = data.split(",");
+        let index = 0;
+        
+        const dfs = (): TreeNode | null => {
+            const val = vals[index++];
+            if (val === "null") return null;
+            
+            const node = new TreeNode(parseInt(val));
+            node.left = dfs();
+            node.right = dfs();
+            return node;
+        };
+        
+        return dfs();
+    }
+}`,
+    explanation: "Serialize: use preorder traversal (root, left, right) with 'null' markers for empty nodes. Deserialize: reconstruct using the same preorder sequence by consuming values from queue/iterator."
+  },
+  "subtree-of-another-tree": {
+    python: `def isSubtree(root: Optional[TreeNode], subRoot: Optional[TreeNode]) -> bool:
+    def isSame(p, q):
+        if not p and not q:
+            return True
+        if not p or not q:
+            return False
+        return p.val == q.val and isSame(p.left, q.left) and isSame(p.right, q.right)
+    
+    if not root:
+        return False
+    
+    # Check if trees are same starting from current root
+    if isSame(root, subRoot):
+        return True
+    
+    # Check left and right subtrees
+    return isSubtree(root.left, subRoot) or isSubtree(root.right, subRoot)`,
+    java: `public boolean isSubtree(TreeNode root, TreeNode subRoot) {
+    if (root == null) return false;
+    
+    if (isSame(root, subRoot)) return true;
+    
+    return isSubtree(root.left, subRoot) || isSubtree(root.right, subRoot);
+}
+
+private boolean isSame(TreeNode p, TreeNode q) {
+    if (p == null && q == null) return true;
+    if (p == null || q == null) return false;
+    
+    return p.val == q.val && isSame(p.left, q.left) && isSame(p.right, q.right);
+}`,
+    cpp: `bool isSame(TreeNode* p, TreeNode* q) {
+    if (!p && !q) return true;
+    if (!p || !q) return false;
+    
+    return p->val == q->val && isSame(p->left, q->left) && isSame(p->right, q->right);
+}
+
+bool isSubtree(TreeNode* root, TreeNode* subRoot) {
+    if (!root) return false;
+    
+    if (isSame(root, subRoot)) return true;
+    
+    return isSubtree(root->left, subRoot) || isSubtree(root->right, subRoot);
+}`,
+    typescript: `function isSubtree(root: TreeNode | null, subRoot: TreeNode | null): boolean {
+    function isSame(p: TreeNode | null, q: TreeNode | null): boolean {
+        if (!p && !q) return true;
+        if (!p || !q) return false;
+        
+        return p.val === q.val && isSame(p.left, q.left) && isSame(p.right, q.right);
+    }
+    
+    if (!root) return false;
+    
+    if (isSame(root, subRoot)) return true;
+    
+    return isSubtree(root.left, subRoot) || isSubtree(root.right, subRoot);
+}`,
+    explanation: "For each node in root, check if the tree starting at that node is identical to subRoot using a helper function. Use DFS to traverse all nodes in root tree."
+  },
+  "construct-binary-tree-from-preorder-and-inorder-traversal": {
+    python: `def buildTree(preorder: List[int], inorder: List[int]) -> Optional[TreeNode]:
+    if not preorder or not inorder:
+        return None
+    
+    # First element in preorder is root
+    root = TreeNode(preorder[0])
+    
+    # Find root in inorder to split left/right
+    mid = inorder.index(preorder[0])
+    
+    # Recursively build left and right subtrees
+    root.left = buildTree(preorder[1:mid+1], inorder[:mid])
+    root.right = buildTree(preorder[mid+1:], inorder[mid+1:])
+    
+    return root`,
+    java: `private int preIndex = 0;
+private Map<Integer, Integer> inorderMap = new HashMap<>();
+
+public TreeNode buildTree(int[] preorder, int[] inorder) {
+    for (int i = 0; i < inorder.length; i++) {
+        inorderMap.put(inorder[i], i);
+    }
+    return build(preorder, 0, inorder.length - 1);
+}
+
+private TreeNode build(int[] preorder, int left, int right) {
+    if (left > right) return null;
+    
+    int rootVal = preorder[preIndex++];
+    TreeNode root = new TreeNode(rootVal);
+    
+    int mid = inorderMap.get(rootVal);
+    
+    root.left = build(preorder, left, mid - 1);
+    root.right = build(preorder, mid + 1, right);
+    
+    return root;
+}`,
+    cpp: `TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+    unordered_map<int, int> inMap;
+    for (int i = 0; i < inorder.size(); i++) {
+        inMap[inorder[i]] = i;
+    }
+    
+    int preIndex = 0;
+    function<TreeNode*(int, int)> build = [&](int left, int right) -> TreeNode* {
+        if (left > right) return nullptr;
+        
+        int rootVal = preorder[preIndex++];
+        TreeNode* root = new TreeNode(rootVal);
+        
+        int mid = inMap[rootVal];
+        
+        root->left = build(left, mid - 1);
+        root->right = build(mid + 1, right);
+        
+        return root;
+    };
+    
+    return build(0, inorder.size() - 1);
+}`,
+    typescript: `function buildTree(preorder: number[], inorder: number[]): TreeNode | null {
+    const inMap = new Map<number, number>();
+    inorder.forEach((val, i) => inMap.set(val, i));
+    
+    let preIndex = 0;
+    
+    function build(left: number, right: number): TreeNode | null {
+        if (left > right) return null;
+        
+        const rootVal = preorder[preIndex++];
+        const root = new TreeNode(rootVal);
+        
+        const mid = inMap.get(rootVal)!;
+        
+        root.left = build(left, mid - 1);
+        root.right = build(mid + 1, right);
+        
+        return root;
+    }
+    
+    return build(0, inorder.length - 1);
+}`,
+    explanation: "Use preorder to get root (first element), find root in inorder to determine left/right boundaries. Recursively build left subtree with elements before root in inorder, right subtree with elements after. Use hashmap for O(1) lookups."
+  },
+  "validate-binary-search-tree": {
+    python: `def isValidBST(root: Optional[TreeNode]) -> bool:
+    def validate(node, min_val, max_val):
+        if not node:
+            return True
+        
+        # Check if current node violates BST property
+        if node.val <= min_val or node.val >= max_val:
+            return False
+        
+        # Validate left subtree (all values < node.val)
+        # and right subtree (all values > node.val)
+        return (validate(node.left, min_val, node.val) and 
+                validate(node.right, node.val, max_val))
+    
+    return validate(root, float('-inf'), float('inf'))`,
+    java: `public boolean isValidBST(TreeNode root) {
+    return validate(root, Long.MIN_VALUE, Long.MAX_VALUE);
+}
+
+private boolean validate(TreeNode node, long min, long max) {
+    if (node == null) return true;
+    
+    if (node.val <= min || node.val >= max) {
+        return false;
+    }
+    
+    return validate(node.left, min, node.val) && 
+           validate(node.right, node.val, max);
+}`,
+    cpp: `bool validate(TreeNode* node, long min, long max) {
+    if (!node) return true;
+    
+    if (node->val <= min || node->val >= max) {
+        return false;
+    }
+    
+    return validate(node->left, min, node->val) && 
+           validate(node->right, node->val, max);
+}
+
+bool isValidBST(TreeNode* root) {
+    return validate(root, LONG_MIN, LONG_MAX);
+}`,
+    typescript: `function isValidBST(root: TreeNode | null): boolean {
+    function validate(node: TreeNode | null, min: number, max: number): boolean {
+        if (!node) return true;
+        
+        if (node.val <= min || node.val >= max) {
+            return false;
+        }
+        
+        return validate(node.left, min, node.val) && 
+               validate(node.right, node.val, max);
+    }
+    
+    return validate(root, -Infinity, Infinity);
+}`,
+    explanation: "Use DFS with valid range constraints. For each node, check if value is within (min, max). Pass updated ranges to children: left gets (min, node.val), right gets (node.val, max)."
+  },
+  "kth-smallest-element-in-a-bst": {
+    python: `def kthSmallest(root: Optional[TreeNode], k: int) -> int:
+    # Inorder traversal of BST gives sorted order
+    stack = []
+    curr = root
+    
+    while True:
+        # Go left as far as possible
+        while curr:
+            stack.append(curr)
+            curr = curr.left
+        
+        # Process node
+        curr = stack.pop()
+        k -= 1
+        
+        if k == 0:
+            return curr.val
+        
+        # Go right
+        curr = curr.right`,
+    java: `public int kthSmallest(TreeNode root, int k) {
+    Stack<TreeNode> stack = new Stack<>();
+    TreeNode curr = root;
+    
+    while (true) {
+        while (curr != null) {
+            stack.push(curr);
+            curr = curr.left;
+        }
+        
+        curr = stack.pop();
+        k--;
+        
+        if (k == 0) {
+            return curr.val;
+        }
+        
+        curr = curr.right;
+    }
+}`,
+    cpp: `int kthSmallest(TreeNode* root, int k) {
+    stack<TreeNode*> st;
+    TreeNode* curr = root;
+    
+    while (true) {
+        while (curr) {
+            st.push(curr);
+            curr = curr->left;
+        }
+        
+        curr = st.top();
+        st.pop();
+        k--;
+        
+        if (k == 0) {
+            return curr->val;
+        }
+        
+        curr = curr->right;
+    }
+}`,
+    typescript: `function kthSmallest(root: TreeNode | null, k: number): number {
+    const stack: TreeNode[] = [];
+    let curr = root;
+    
+    while (true) {
+        while (curr) {
+            stack.push(curr);
+            curr = curr.left;
+        }
+        
+        curr = stack.pop()!;
+        k--;
+        
+        if (k === 0) {
+            return curr.val;
+        }
+        
+        curr = curr.right;
+    }
+}`,
+    explanation: "Use iterative inorder traversal (left, root, right). In a BST, inorder gives sorted sequence. Stop when we've visited k nodes. Use stack to simulate recursion."
+  },
+  "lowest-common-ancestor-of-bst": {
+    python: `def lowestCommonAncestor(root: TreeNode, p: TreeNode, q: TreeNode) -> TreeNode:
+    curr = root
+    
+    while curr:
+        # Both p and q are in left subtree
+        if p.val < curr.val and q.val < curr.val:
+            curr = curr.left
+        # Both p and q are in right subtree
+        elif p.val > curr.val and q.val > curr.val:
+            curr = curr.right
+        # Split point found (or one is ancestor of other)
+        else:
+            return curr
+    
+    return None`,
+    java: `public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+    TreeNode curr = root;
+    
+    while (curr != null) {
+        if (p.val < curr.val && q.val < curr.val) {
+            curr = curr.left;
+        } else if (p.val > curr.val && q.val > curr.val) {
+            curr = curr.right;
+        } else {
+            return curr;
+        }
+    }
+    
+    return null;
+}`,
+    cpp: `TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+    TreeNode* curr = root;
+    
+    while (curr) {
+        if (p->val < curr->val && q->val < curr->val) {
+            curr = curr->left;
+        } else if (p->val > curr->val && q->val > curr->val) {
+            curr = curr->right;
+        } else {
+            return curr;
+        }
+    }
+    
+    return nullptr;
+}`,
+    typescript: `function lowestCommonAncestor(root: TreeNode, p: TreeNode, q: TreeNode): TreeNode {
+    let curr: TreeNode | null = root;
+    
+    while (curr) {
+        if (p.val < curr.val && q.val < curr.val) {
+            curr = curr.left;
+        } else if (p.val > curr.val && q.val > curr.val) {
+            curr = curr.right;
+        } else {
+            return curr;
+        }
+    }
+    
+    return curr!;
+}`,
+    explanation: "Leverage BST property: if both nodes are smaller than current, go left; if both larger, go right; otherwise current node is the LCA (split point). No recursion needed."
+  },
+  "implement-trie": {
+    python: `class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.is_end = False
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+    
+    def insert(self, word: str) -> None:
+        node = self.root
+        for char in word:
+            if char not in node.children:
+                node.children[char] = TrieNode()
+            node = node.children[char]
+        node.is_end = True
+    
+    def search(self, word: str) -> bool:
+        node = self.root
+        for char in word:
+            if char not in node.children:
+                return False
+            node = node.children[char]
+        return node.is_end
+    
+    def startsWith(self, prefix: str) -> bool:
+        node = self.root
+        for char in prefix:
+            if char not in node.children:
+                return False
+            node = node.children[char]
+        return True`,
+    java: `class TrieNode {
+    Map<Character, TrieNode> children = new HashMap<>();
+    boolean isEnd = false;
+}
+
+class Trie {
+    private TrieNode root;
+    
+    public Trie() {
+        root = new TrieNode();
+    }
+    
+    public void insert(String word) {
+        TrieNode node = root;
+        for (char c : word.toCharArray()) {
+            node.children.putIfAbsent(c, new TrieNode());
+            node = node.children.get(c);
+        }
+        node.isEnd = true;
+    }
+    
+    public boolean search(String word) {
+        TrieNode node = root;
+        for (char c : word.toCharArray()) {
+            if (!node.children.containsKey(c)) {
+                return false;
+            }
+            node = node.children.get(c);
+        }
+        return node.isEnd;
+    }
+    
+    public boolean startsWith(String prefix) {
+        TrieNode node = root;
+        for (char c : prefix.toCharArray()) {
+            if (!node.children.containsKey(c)) {
+                return false;
+            }
+            node = node.children.get(c);
+        }
+        return true;
+    }
+}`,
+    cpp: `class TrieNode {
+public:
+    unordered_map<char, TrieNode*> children;
+    bool isEnd = false;
+};
+
+class Trie {
+private:
+    TrieNode* root;
+    
+public:
+    Trie() {
+        root = new TrieNode();
+    }
+    
+    void insert(string word) {
+        TrieNode* node = root;
+        for (char c : word) {
+            if (node->children.find(c) == node->children.end()) {
+                node->children[c] = new TrieNode();
+            }
+            node = node->children[c];
+        }
+        node->isEnd = true;
+    }
+    
+    bool search(string word) {
+        TrieNode* node = root;
+        for (char c : word) {
+            if (node->children.find(c) == node->children.end()) {
+                return false;
+            }
+            node = node->children[c];
+        }
+        return node->isEnd;
+    }
+    
+    bool startsWith(string prefix) {
+        TrieNode* node = root;
+        for (char c : prefix) {
+            if (node->children.find(c) == node->children.end()) {
+                return false;
+            }
+            node = node->children[c];
+        }
+        return true;
+    }
+};`,
+    typescript: `class TrieNode {
+    children: Map<string, TrieNode> = new Map();
+    isEnd: boolean = false;
+}
+
+class Trie {
+    private root: TrieNode;
+    
+    constructor() {
+        this.root = new TrieNode();
+    }
+    
+    insert(word: string): void {
+        let node = this.root;
+        for (const char of word) {
+            if (!node.children.has(char)) {
+                node.children.set(char, new TrieNode());
+            }
+            node = node.children.get(char)!;
+        }
+        node.isEnd = true;
+    }
+    
+    search(word: string): boolean {
+        let node = this.root;
+        for (const char of word) {
+            if (!node.children.has(char)) {
+                return false;
+            }
+            node = node.children.get(char)!;
+        }
+        return node.isEnd;
+    }
+    
+    startsWith(prefix: string): boolean {
+        let node = this.root;
+        for (const char of prefix) {
+            if (!node.children.has(char)) {
+                return false;
+            }
+            node = node.children.get(char)!;
+        }
+        return true;
+    }
+}`,
+    explanation: "Trie is a tree where each node represents a character. Each node has a map of children and an isEnd flag. Insert: traverse/create path. Search: traverse and check isEnd. StartsWith: just traverse."
+  },
+  "add-and-search-word": {
+    python: `class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.is_end = False
+
+class WordDictionary:
+    def __init__(self):
+        self.root = TrieNode()
+    
+    def addWord(self, word: str) -> None:
+        node = self.root
+        for char in word:
+            if char not in node.children:
+                node.children[char] = TrieNode()
+            node = node.children[char]
+        node.is_end = True
+    
+    def search(self, word: str) -> bool:
+        def dfs(node, i):
+            if i == len(word):
+                return node.is_end
+            
+            if word[i] == '.':
+                # Try all children
+                for child in node.children.values():
+                    if dfs(child, i + 1):
+                        return True
+                return False
+            else:
+                if word[i] not in node.children:
+                    return False
+                return dfs(node.children[word[i]], i + 1)
+        
+        return dfs(self.root, 0)`,
+    java: `class TrieNode {
+    Map<Character, TrieNode> children = new HashMap<>();
+    boolean isEnd = false;
+}
+
+class WordDictionary {
+    private TrieNode root;
+    
+    public WordDictionary() {
+        root = new TrieNode();
+    }
+    
+    public void addWord(String word) {
+        TrieNode node = root;
+        for (char c : word.toCharArray()) {
+            node.children.putIfAbsent(c, new TrieNode());
+            node = node.children.get(c);
+        }
+        node.isEnd = true;
+    }
+    
+    public boolean search(String word) {
+        return dfs(root, word, 0);
+    }
+    
+    private boolean dfs(TrieNode node, String word, int i) {
+        if (i == word.length()) {
+            return node.isEnd;
+        }
+        
+        char c = word.charAt(i);
+        if (c == '.') {
+            for (TrieNode child : node.children.values()) {
+                if (dfs(child, word, i + 1)) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            if (!node.children.containsKey(c)) {
+                return false;
+            }
+            return dfs(node.children.get(c), word, i + 1);
+        }
+    }
+}`,
+    cpp: `class TrieNode {
+public:
+    unordered_map<char, TrieNode*> children;
+    bool isEnd = false;
+};
+
+class WordDictionary {
+private:
+    TrieNode* root;
+    
+    bool dfs(TrieNode* node, const string& word, int i) {
+        if (i == word.length()) {
+            return node->isEnd;
+        }
+        
+        char c = word[i];
+        if (c == '.') {
+            for (auto& [ch, child] : node->children) {
+                if (dfs(child, word, i + 1)) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            if (node->children.find(c) == node->children.end()) {
+                return false;
+            }
+            return dfs(node->children[c], word, i + 1);
+        }
+    }
+    
+public:
+    WordDictionary() {
+        root = new TrieNode();
+    }
+    
+    void addWord(string word) {
+        TrieNode* node = root;
+        for (char c : word) {
+            if (node->children.find(c) == node->children.end()) {
+                node->children[c] = new TrieNode();
+            }
+            node = node->children[c];
+        }
+        node->isEnd = true;
+    }
+    
+    bool search(string word) {
+        return dfs(root, word, 0);
+    }
+};`,
+    typescript: `class TrieNode {
+    children: Map<string, TrieNode> = new Map();
+    isEnd: boolean = false;
+}
+
+class WordDictionary {
+    private root: TrieNode;
+    
+    constructor() {
+        this.root = new TrieNode();
+    }
+    
+    addWord(word: string): void {
+        let node = this.root;
+        for (const char of word) {
+            if (!node.children.has(char)) {
+                node.children.set(char, new TrieNode());
+            }
+            node = node.children.get(char)!;
+        }
+        node.isEnd = true;
+    }
+    
+    search(word: string): boolean {
+        const dfs = (node: TrieNode, i: number): boolean => {
+            if (i === word.length) {
+                return node.isEnd;
+            }
+            
+            const char = word[i];
+            if (char === '.') {
+                for (const child of node.children.values()) {
+                    if (dfs(child, i + 1)) {
+                        return true;
+                    }
+                }
+                return false;
+            } else {
+                if (!node.children.has(char)) {
+                    return false;
+                }
+                return dfs(node.children.get(char)!, i + 1);
+            }
+        };
+        
+        return dfs(this.root, 0);
+    }
+}`,
+    explanation: "Same as Trie but search uses DFS. When encountering '.', try all possible children recursively. For regular characters, follow standard Trie search path."
+  },
+  "word-search-ii": {
+    python: `def findWords(board: List[List[str]], words: List[str]) -> List[str]:
+    # Build Trie
+    trie = {}
+    for word in words:
+        node = trie
+        for char in word:
+            if char not in node:
+                node[char] = {}
+            node = node[char]
+        node['$'] = word  # Mark end with actual word
+    
+    rows, cols = len(board), len(board[0])
+    result = set()
+    
+    def dfs(r, c, node):
+        char = board[r][c]
+        if char not in node:
+            return
+        
+        node = node[char]
+        
+        # Found a complete word
+        if '$' in node:
+            result.add(node['$'])
+        
+        # Mark visited
+        board[r][c] = '#'
+        
+        # Explore neighbors
+        for dr, dc in [(0,1), (1,0), (0,-1), (-1,0)]:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < rows and 0 <= nc < cols and board[nr][nc] != '#':
+                dfs(nr, nc, node)
+        
+        # Restore
+        board[r][c] = char
+    
+    for r in range(rows):
+        for c in range(cols):
+            dfs(r, c, trie)
+    
+    return list(result)`,
+    java: `class TrieNode {
+    Map<Character, TrieNode> children = new HashMap<>();
+    String word = null;
+}
+
+public List<String> findWords(char[][] board, String[] words) {
+    // Build Trie
+    TrieNode root = new TrieNode();
+    for (String word : words) {
+        TrieNode node = root;
+        for (char c : word.toCharArray()) {
+            node.children.putIfAbsent(c, new TrieNode());
+            node = node.children.get(c);
+        }
+        node.word = word;
+    }
+    
+    Set<String> result = new HashSet<>();
+    int rows = board.length, cols = board[0].length;
+    
+    for (int r = 0; r < rows; r++) {
+        for (int c = 0; c < cols; c++) {
+            dfs(board, r, c, root, result);
+        }
+    }
+    
+    return new ArrayList<>(result);
+}
+
+private void dfs(char[][] board, int r, int c, TrieNode node, Set<String> result) {
+    if (r < 0 || r >= board.length || c < 0 || c >= board[0].length) return;
+    
+    char ch = board[r][c];
+    if (ch == '#' || !node.children.containsKey(ch)) return;
+    
+    node = node.children.get(ch);
+    if (node.word != null) {
+        result.add(node.word);
+    }
+    
+    board[r][c] = '#';
+    dfs(board, r+1, c, node, result);
+    dfs(board, r-1, c, node, result);
+    dfs(board, r, c+1, node, result);
+    dfs(board, r, c-1, node, result);
+    board[r][c] = ch;
+}`,
+    cpp: `struct TrieNode {
+    unordered_map<char, TrieNode*> children;
+    string word = "";
+};
+
+void dfs(vector<vector<char>>& board, int r, int c, TrieNode* node, set<string>& result) {
+    if (r < 0 || r >= board.size() || c < 0 || c >= board[0].size()) return;
+    
+    char ch = board[r][c];
+    if (ch == '#' || node->children.find(ch) == node->children.end()) return;
+    
+    node = node->children[ch];
+    if (!node->word.empty()) {
+        result.insert(node->word);
+    }
+    
+    board[r][c] = '#';
+    dfs(board, r+1, c, node, result);
+    dfs(board, r-1, c, node, result);
+    dfs(board, r, c+1, node, result);
+    dfs(board, r, c-1, node, result);
+    board[r][c] = ch;
+}
+
+vector<string> findWords(vector<vector<char>>& board, vector<string>& words) {
+    TrieNode* root = new TrieNode();
+    for (const string& word : words) {
+        TrieNode* node = root;
+        for (char c : word) {
+            if (node->children.find(c) == node->children.end()) {
+                node->children[c] = new TrieNode();
+            }
+            node = node->children[c];
+        }
+        node->word = word;
+    }
+    
+    set<string> result;
+    for (int r = 0; r < board.size(); r++) {
+        for (int c = 0; c < board[0].size(); c++) {
+            dfs(board, r, c, root, result);
+        }
+    }
+    
+    return vector<string>(result.begin(), result.end());
+}`,
+    typescript: `function findWords(board: string[][], words: string[]): string[] {
+    class TrieNode {
+        children: Map<string, TrieNode> = new Map();
+        word: string | null = null;
+    }
+    
+    // Build Trie
+    const root = new TrieNode();
+    for (const word of words) {
+        let node = root;
+        for (const char of word) {
+            if (!node.children.has(char)) {
+                node.children.set(char, new TrieNode());
+            }
+            node = node.children.get(char)!;
+        }
+        node.word = word;
+    }
+    
+    const result = new Set<string>();
+    const rows = board.length, cols = board[0].length;
+    
+    function dfs(r: number, c: number, node: TrieNode): void {
+        if (r < 0 || r >= rows || c < 0 || c >= cols) return;
+        
+        const char = board[r][c];
+        if (char === '#' || !node.children.has(char)) return;
+        
+        node = node.children.get(char)!;
+        if (node.word) {
+            result.add(node.word);
+        }
+        
+        board[r][c] = '#';
+        dfs(r+1, c, node);
+        dfs(r-1, c, node);
+        dfs(r, c+1, node);
+        dfs(r, c-1, node);
+        board[r][c] = char;
+    }
+    
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            dfs(r, c, root);
+        }
+    }
+    
+    return Array.from(result);
+}`,
+    explanation: "Build Trie from all words. For each cell, do DFS backtracking guided by Trie. Only explore paths that match Trie prefixes. Mark cells visited during DFS. When reaching a word end in Trie, add to results."
+  },
+  "top-k-frequent-elements": {
+    python: `def topKFrequent(nums: List[int], k: int) -> List[int]:
+    # Count frequencies
+    count = {}
+    for num in nums:
+        count[num] = count.get(num, 0) + 1
+    
+    # Bucket sort: index = frequency, value = list of numbers
+    freq = [[] for _ in range(len(nums) + 1)]
+    for num, c in count.items():
+        freq[c].append(num)
+    
+    # Collect top k from highest frequency
+    result = []
+    for i in range(len(freq) - 1, 0, -1):
+        for num in freq[i]:
+            result.append(num)
+            if len(result) == k:
+                return result
+    
+    return result`,
+    java: `public int[] topKFrequent(int[] nums, int k) {
+    Map<Integer, Integer> count = new HashMap<>();
+    for (int num : nums) {
+        count.put(num, count.getOrDefault(num, 0) + 1);
+    }
+    
+    List<Integer>[] freq = new List[nums.length + 1];
+    for (int i = 0; i <= nums.length; i++) {
+        freq[i] = new ArrayList<>();
+    }
+    
+    for (Map.Entry<Integer, Integer> entry : count.entrySet()) {
+        freq[entry.getValue()].add(entry.getKey());
+    }
+    
+    int[] result = new int[k];
+    int idx = 0;
+    
+    for (int i = freq.length - 1; i >= 0 && idx < k; i--) {
+        for (int num : freq[i]) {
+            result[idx++] = num;
+            if (idx == k) return result;
+        }
+    }
+    
+    return result;
+}`,
+    cpp: `vector<int> topKFrequent(vector<int>& nums, int k) {
+    unordered_map<int, int> count;
+    for (int num : nums) {
+        count[num]++;
+    }
+    
+    vector<vector<int>> freq(nums.size() + 1);
+    for (auto& [num, c] : count) {
+        freq[c].push_back(num);
+    }
+    
+    vector<int> result;
+    for (int i = freq.size() - 1; i >= 0 && result.size() < k; i--) {
+        for (int num : freq[i]) {
+            result.push_back(num);
+            if (result.size() == k) return result;
+        }
+    }
+    
+    return result;
+}`,
+    typescript: `function topKFrequent(nums: number[], k: number): number[] {
+    const count = new Map<number, number>();
+    for (const num of nums) {
+        count.set(num, (count.get(num) || 0) + 1);
+    }
+    
+    const freq: number[][] = Array.from({ length: nums.length + 1 }, () => []);
+    for (const [num, c] of count) {
+        freq[c].push(num);
+    }
+    
+    const result: number[] = [];
+    for (let i = freq.length - 1; i >= 0 && result.length < k; i--) {
+        for (const num of freq[i]) {
+            result.push(num);
+            if (result.length === k) return result;
+        }
+    }
+    
+    return result;
+}`,
+    explanation: "Use bucket sort for O(n) solution. Count frequencies, then create buckets where index=frequency. Iterate from highest frequency bucket collecting elements until we have k elements."
+  },
+  "find-median-from-data-stream": {
+    python: `import heapq
+
+class MedianFinder:
+    def __init__(self):
+        # Max heap for smaller half (negate values)
+        self.small = []
+        # Min heap for larger half
+        self.large = []
+    
+    def addNum(self, num: int) -> None:
+        # Add to small heap (max heap using negation)
+        heapq.heappush(self.small, -num)
+        
+        # Balance: ensure max of small <= min of large
+        if self.small and self.large and (-self.small[0] > self.large[0]):
+            val = -heapq.heappop(self.small)
+            heapq.heappush(self.large, val)
+        
+        # Balance sizes (small can have at most 1 more element)
+        if len(self.small) > len(self.large) + 1:
+            val = -heapq.heappop(self.small)
+            heapq.heappush(self.large, val)
+        if len(self.large) > len(self.small):
+            val = heapq.heappop(self.large)
+            heapq.heappush(self.small, -val)
+    
+    def findMedian(self) -> float:
+        if len(self.small) > len(self.large):
+            return -self.small[0]
+        return (-self.small[0] + self.large[0]) / 2.0`,
+    java: `class MedianFinder {
+    private PriorityQueue<Integer> small; // max heap
+    private PriorityQueue<Integer> large; // min heap
+    
+    public MedianFinder() {
+        small = new PriorityQueue<>((a, b) -> b - a);
+        large = new PriorityQueue<>();
+    }
+    
+    public void addNum(int num) {
+        small.offer(num);
+        
+        if (!small.isEmpty() && !large.isEmpty() && small.peek() > large.peek()) {
+            large.offer(small.poll());
+        }
+        
+        if (small.size() > large.size() + 1) {
+            large.offer(small.poll());
+        }
+        if (large.size() > small.size()) {
+            small.offer(large.poll());
+        }
+    }
+    
+    public double findMedian() {
+        if (small.size() > large.size()) {
+            return small.peek();
+        }
+        return (small.peek() + large.peek()) / 2.0;
+    }
+}`,
+    cpp: `class MedianFinder {
+private:
+    priority_queue<int> small; // max heap
+    priority_queue<int, vector<int>, greater<int>> large; // min heap
+    
+public:
+    MedianFinder() {}
+    
+    void addNum(int num) {
+        small.push(num);
+        
+        if (!small.empty() && !large.empty() && small.top() > large.top()) {
+            large.push(small.top());
+            small.pop();
+        }
+        
+        if (small.size() > large.size() + 1) {
+            large.push(small.top());
+            small.pop();
+        }
+        if (large.size() > small.size()) {
+            small.push(large.top());
+            large.pop();
+        }
+    }
+    
+    double findMedian() {
+        if (small.size() > large.size()) {
+            return small.top();
+        }
+        return (small.top() + large.top()) / 2.0;
+    }
+};`,
+    typescript: `class MedianFinder {
+    private small: MaxHeap;  // smaller half
+    private large: MinHeap;  // larger half
+    
+    constructor() {
+        this.small = new MaxHeap();
+        this.large = new MinHeap();
+    }
+    
+    addNum(num: number): void {
+        this.small.push(num);
+        
+        if (this.small.size() > 0 && this.large.size() > 0 && 
+            this.small.peek()! > this.large.peek()!) {
+            this.large.push(this.small.pop()!);
+        }
+        
+        if (this.small.size() > this.large.size() + 1) {
+            this.large.push(this.small.pop()!);
+        }
+        if (this.large.size() > this.small.size()) {
+            this.small.push(this.large.pop()!);
+        }
+    }
+    
+    findMedian(): number {
+        if (this.small.size() > this.large.size()) {
+            return this.small.peek()!;
+        }
+        return (this.small.peek()! + this.large.peek()!) / 2.0;
+    }
+}`,
+    explanation: "Use two heaps: max heap for smaller half, min heap for larger half. Keep sizes balanced (small can have 1 more). Median is either top of small (odd count) or average of both tops (even count). O(log n) per operation."
   }
 };
