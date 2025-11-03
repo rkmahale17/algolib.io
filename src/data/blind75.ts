@@ -85,6 +85,7 @@ Constraints:
     spaceComplexity: "O(1)",
     companies: ["Amazon", "Microsoft", "Facebook"],
     tags: ["Array", "Dynamic Programming"],
+    algorithmId: "best-time-to-buy-and-sell-stock",
     youtubeUrl: "https://www.youtube.com/watch?v=1pkOgXD63yU",
     useCases: ["Stock trading algorithms", "Price optimization", "Timing market entries"]
   },
@@ -116,6 +117,7 @@ Constraints:
     spaceComplexity: "O(n)",
     companies: ["Amazon", "Apple", "Adobe"],
     tags: ["Array", "Hash Table", "Sorting"],
+    algorithmId: "contains-duplicate",
     youtubeUrl: "https://www.youtube.com/watch?v=3OamzN90kPg",
     useCases: ["Duplicate detection in databases", "Data validation", "Unique constraint checking"]
   },
@@ -222,6 +224,7 @@ Constraints:
     spaceComplexity: "O(1)",
     companies: ["Amazon", "LinkedIn"],
     tags: ["Array", "Dynamic Programming"],
+    algorithmId: "maximum-product-subarray",
     youtubeUrl: "https://www.youtube.com/watch?v=lXVy6YWFcRM",
     useCases: ["Optimization problems", "Product calculations", "Dynamic programming applications"]
   },
@@ -401,6 +404,7 @@ Constraints:
     "spaceComplexity": "O(1)",
     "companies": ["Amazon"],
     "tags": ["Math", "Bit Manipulation"],
+    "algorithmId": "sum-of-two-integers",
     "youtubeUrl": "https://www.youtube.com/watch?v=gVUrDV4tZfY"
   },
   {
@@ -415,6 +419,7 @@ Constraints:
     "spaceComplexity": "O(1)",
     "companies": ["Apple", "Microsoft"],
     "tags": ["Bit Manipulation"],
+    "algorithmId": "number-of-1-bits",
     "youtubeUrl": "https://www.youtube.com/watch?v=gVUrDV4tZfY"
   },
   {
@@ -429,6 +434,7 @@ Constraints:
     "spaceComplexity": "O(1)",
     "companies": ["Amazon"],
     "tags": ["Dynamic Programming", "Bit Manipulation"],
+    "algorithmId": "counting-bits",
     "youtubeUrl": "https://www.youtube.com/watch?v=RyBM56RIWrM"
   },
   {
@@ -443,6 +449,7 @@ Constraints:
     "spaceComplexity": "O(1)",
     "companies": ["Amazon", "Microsoft"],
     "tags": ["Array", "Math", "Bit Manipulation"],
+    "algorithmId": "missing-number",
     "youtubeUrl": "https://www.youtube.com/watch?v=WnPLSRLSANE"
   },
   {
@@ -457,6 +464,7 @@ Constraints:
     "spaceComplexity": "O(1)",
     "companies": ["Amazon", "Apple"],
     "tags": ["Bit Manipulation", "Divide and Conquer"],
+    "algorithmId": "reverse-bits",
     "youtubeUrl": "https://www.youtube.com/watch?v=UcoN6UjAI64"
   },
   {
@@ -471,6 +479,7 @@ Constraints:
     "spaceComplexity": "O(1)",
     "companies": ["Amazon", "Google", "Adobe"],
     "tags": ["Dynamic Programming", "Math", "Memoization"],
+    "algorithmId": "climbing-stairs",
     "youtubeUrl": "https://www.youtube.com/watch?v=Y0lT9Fck7qI"
   },
   {
@@ -485,6 +494,7 @@ Constraints:
     "spaceComplexity": "O(amount)",
     "companies": ["Amazon", "Bloomberg"],
     "tags": ["Array", "Dynamic Programming", "BFS"],
+    "algorithmId": "coin-change",
     "youtubeUrl": "https://www.youtube.com/watch?v=H9bfqozjoqs"
   },
   {
