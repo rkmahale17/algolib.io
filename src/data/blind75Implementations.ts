@@ -2630,5 +2630,245 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
     return result;
 }`,
     explanation: "Three-phase approach: (1) Add all intervals ending before newInterval starts, (2) Merge all overlapping intervals by expanding newInterval's bounds, (3) Add remaining intervals. Linear scan in O(n) time since intervals are pre-sorted."
+  },
+  "non-overlapping-intervals": {
+    python: `def eraseOverlapIntervals(intervals: List[List[int]]) -> int:
+    # Sort by end time
+    intervals.sort(key=lambda x: x[1])
+    
+    count = 0
+    end = float('-inf')
+    
+    for start, curr_end in intervals:
+        if start >= end:
+            # No overlap, keep this interval
+            end = curr_end
+        else:
+            # Overlap detected, remove one interval
+            count += 1
+    
+    return count`,
+    java: `public int eraseOverlapIntervals(int[][] intervals) {
+    // Sort by end time
+    Arrays.sort(intervals, (a, b) -> Integer.compare(a[1], b[1]));
+    
+    int count = 0;
+    int end = Integer.MIN_VALUE;
+    
+    for (int[] interval : intervals) {
+        if (interval[0] >= end) {
+            // No overlap, keep this interval
+            end = interval[1];
+        } else {
+            // Overlap detected, remove one interval
+            count++;
+        }
+    }
+    
+    return count;
+}`,
+    cpp: `int eraseOverlapIntervals(vector<vector<int>>& intervals) {
+    // Sort by end time
+    sort(intervals.begin(), intervals.end(), 
+         [](const vector<int>& a, const vector<int>& b) {
+             return a[1] < b[1];
+         });
+    
+    int count = 0;
+    int end = INT_MIN;
+    
+    for (const auto& interval : intervals) {
+        if (interval[0] >= end) {
+            // No overlap, keep this interval
+            end = interval[1];
+        } else {
+            // Overlap detected, remove one interval
+            count++;
+        }
+    }
+    
+    return count;
+}`,
+    typescript: `function eraseOverlapIntervals(intervals: number[][]): number {
+    // Sort by end time
+    intervals.sort((a, b) => a[1] - b[1]);
+    
+    let count = 0;
+    let end = -Infinity;
+    
+    for (const [start, currEnd] of intervals) {
+        if (start >= end) {
+            // No overlap, keep this interval
+            end = currEnd;
+        } else {
+            // Overlap detected, remove one interval
+            count++;
+        }
+    }
+    
+    return count;
+}`,
+    explanation: "Greedy approach: sort by end time and keep intervals that don't overlap. By always keeping the interval with earliest end time, we maximize room for future intervals. Count overlaps as removals."
+  },
+  "meeting-rooms": {
+    python: `def canAttendMeetings(intervals: List[List[int]]) -> bool:
+    # Sort intervals by start time
+    intervals.sort(key=lambda x: x[0])
+    
+    # Check for overlaps
+    for i in range(1, len(intervals)):
+        if intervals[i][0] < intervals[i-1][1]:
+            return False
+    
+    return True`,
+    java: `public boolean canAttendMeetings(int[][] intervals) {
+    // Sort intervals by start time
+    Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));
+    
+    // Check for overlaps
+    for (int i = 1; i < intervals.length; i++) {
+        if (intervals[i][0] < intervals[i-1][1]) {
+            return false;
+        }
+    }
+    
+    return true;
+}`,
+    cpp: `bool canAttendMeetings(vector<vector<int>>& intervals) {
+    // Sort intervals by start time
+    sort(intervals.begin(), intervals.end());
+    
+    // Check for overlaps
+    for (int i = 1; i < intervals.size(); i++) {
+        if (intervals[i][0] < intervals[i-1][1]) {
+            return false;
+        }
+    }
+    
+    return true;
+}`,
+    typescript: `function canAttendMeetings(intervals: number[][]): boolean {
+    // Sort intervals by start time
+    intervals.sort((a, b) => a[0] - b[0]);
+    
+    // Check for overlaps
+    for (let i = 1; i < intervals.length; i++) {
+        if (intervals[i][0] < intervals[i-1][1]) {
+            return false;
+        }
+    }
+    
+    return true;
+}`,
+    explanation: "Sort meetings by start time. If any meeting starts before the previous one ends, there's an overlap and we can't attend all meetings. Simple O(n log n) solution."
+  },
+  "meeting-rooms-ii": {
+    python: `def minMeetingRooms(intervals: List[List[int]]) -> int:
+    if not intervals:
+        return 0
+    
+    # Separate start and end times
+    start_times = sorted([i[0] for i in intervals])
+    end_times = sorted([i[1] for i in intervals])
+    
+    rooms = 0
+    max_rooms = 0
+    s = e = 0
+    
+    # Two-pointer approach
+    while s < len(intervals):
+        if start_times[s] < end_times[e]:
+            # Meeting starts, need a room
+            rooms += 1
+            max_rooms = max(max_rooms, rooms)
+            s += 1
+        else:
+            # Meeting ends, free a room
+            rooms -= 1
+            e += 1
+    
+    return max_rooms`,
+    java: `public int minMeetingRooms(int[][] intervals) {
+    if (intervals.length == 0) return 0;
+    
+    int n = intervals.length;
+    int[] start = new int[n];
+    int[] end = new int[n];
+    
+    for (int i = 0; i < n; i++) {
+        start[i] = intervals[i][0];
+        end[i] = intervals[i][1];
+    }
+    
+    Arrays.sort(start);
+    Arrays.sort(end);
+    
+    int rooms = 0, maxRooms = 0;
+    int s = 0, e = 0;
+    
+    while (s < n) {
+        if (start[s] < end[e]) {
+            rooms++;
+            maxRooms = Math.max(maxRooms, rooms);
+            s++;
+        } else {
+            rooms--;
+            e++;
+        }
+    }
+    
+    return maxRooms;
+}`,
+    cpp: `int minMeetingRooms(vector<vector<int>>& intervals) {
+    if (intervals.empty()) return 0;
+    
+    vector<int> start, end;
+    for (const auto& interval : intervals) {
+        start.push_back(interval[0]);
+        end.push_back(interval[1]);
+    }
+    
+    sort(start.begin(), start.end());
+    sort(end.begin(), end.end());
+    
+    int rooms = 0, maxRooms = 0;
+    int s = 0, e = 0;
+    
+    while (s < intervals.size()) {
+        if (start[s] < end[e]) {
+            rooms++;
+            maxRooms = max(maxRooms, rooms);
+            s++;
+        } else {
+            rooms--;
+            e++;
+        }
+    }
+    
+    return maxRooms;
+}`,
+    typescript: `function minMeetingRooms(intervals: number[][]): number {
+    if (intervals.length === 0) return 0;
+    
+    const start = intervals.map(i => i[0]).sort((a, b) => a - b);
+    const end = intervals.map(i => i[1]).sort((a, b) => a - b);
+    
+    let rooms = 0, maxRooms = 0;
+    let s = 0, e = 0;
+    
+    while (s < intervals.length) {
+        if (start[s] < end[e]) {
+            rooms++;
+            maxRooms = Math.max(maxRooms, rooms);
+            s++;
+        } else {
+            rooms--;
+            e++;
+        }
+    }
+    
+    return maxRooms;
+}`,
+    explanation: "Two-pointer sweep line algorithm: separate and sort start/end times. When a meeting starts before another ends, we need an additional room. Track maximum concurrent meetings needed."
   }
 };
