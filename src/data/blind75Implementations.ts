@@ -939,5 +939,637 @@ export const blind75Implementations: Record<string, {
     return maxArea;
 }`,
     explanation: "Two pointers from both ends. Area is determined by min(height[left], height[right]) × width. Always move the pointer with smaller height inward, as moving the taller one can only decrease area. This greedy approach finds the maximum in O(n) time."
+  },
+  "sum-of-two-integers": {
+    python: `def getSum(a: int, b: int) -> int:
+    # Mask to handle 32-bit integers
+    mask = 0xFFFFFFFF
+    
+    while b != 0:
+        # Calculate sum without carry
+        sum_without_carry = (a ^ b) & mask
+        # Calculate carry
+        carry = ((a & b) << 1) & mask
+        
+        a = sum_without_carry
+        b = carry
+    
+    # Handle negative numbers in Python
+    if a > 0x7FFFFFFF:
+        a = ~(a ^ mask)
+    
+    return a`,
+    java: `public int getSum(int a, int b) {
+    while (b != 0) {
+        // Calculate sum without carry (XOR)
+        int sumWithoutCarry = a ^ b;
+        
+        // Calculate carry (AND, then shift left)
+        int carry = (a & b) << 1;
+        
+        // Update a and b
+        a = sumWithoutCarry;
+        b = carry;
+    }
+    
+    return a;
+}`,
+    cpp: `int getSum(int a, int b) {
+    while (b != 0) {
+        // Calculate sum without carry (XOR)
+        unsigned int sumWithoutCarry = a ^ b;
+        
+        // Calculate carry (AND, then shift left)
+        unsigned int carry = (a & b) << 1;
+        
+        // Update a and b
+        a = sumWithoutCarry;
+        b = carry;
+    }
+    
+    return a;
+}`,
+    typescript: `function getSum(a: number, b: number): number {
+    while (b !== 0) {
+        // Calculate sum without carry (XOR)
+        const sumWithoutCarry = a ^ b;
+        
+        // Calculate carry (AND, then shift left)
+        const carry = (a & b) << 1;
+        
+        // Update a and b
+        a = sumWithoutCarry;
+        b = carry;
+    }
+    
+    return a;
+}`,
+    explanation: "Use bitwise operations: XOR (^) gives sum without carry, AND (&) followed by left shift gives carry. Iterate until carry becomes 0. This simulates binary addition without using + or - operators."
+  },
+  "number-of-1-bits": {
+    python: `def hammingWeight(n: int) -> int:
+    count = 0
+    
+    while n:
+        # Check if last bit is 1
+        count += n & 1
+        # Right shift to check next bit
+        n = n >> 1
+    
+    return count
+
+# Alternative using built-in
+# return bin(n).count('1')`,
+    java: `public int hammingWeight(int n) {
+    int count = 0;
+    
+    while (n != 0) {
+        // Check if last bit is 1
+        count += n & 1;
+        // Right shift to check next bit (unsigned shift)
+        n = n >>> 1;
+    }
+    
+    return count;
+}`,
+    cpp: `int hammingWeight(uint32_t n) {
+    int count = 0;
+    
+    while (n != 0) {
+        // Check if last bit is 1
+        count += n & 1;
+        // Right shift to check next bit
+        n = n >> 1;
+    }
+    
+    return count;
+}`,
+    typescript: `function hammingWeight(n: number): number {
+    let count = 0;
+    
+    // Convert to unsigned 32-bit
+    n = n >>> 0;
+    
+    while (n !== 0) {
+        // Check if last bit is 1
+        count += n & 1;
+        // Right shift to check next bit (unsigned shift)
+        n = n >>> 1;
+    }
+    
+    return count;
+}`,
+    explanation: "Count set bits by checking each bit position. Use bitwise AND (&) with 1 to check if the last bit is set, then right shift to examine the next bit. Continue until all bits are processed."
+  },
+  "counting-bits": {
+    python: `def countBits(n: int) -> List[int]:
+    dp = [0] * (n + 1)
+    
+    for i in range(1, n + 1):
+        # i >> 1 is i // 2
+        # i & 1 checks if i is odd
+        dp[i] = dp[i >> 1] + (i & 1)
+    
+    return dp`,
+    java: `public int[] countBits(int n) {
+    int[] dp = new int[n + 1];
+    
+    for (int i = 1; i <= n; i++) {
+        // i >> 1 is i / 2
+        // i & 1 checks if i is odd
+        dp[i] = dp[i >> 1] + (i & 1);
+    }
+    
+    return dp;
+}`,
+    cpp: `vector<int> countBits(int n) {
+    vector<int> dp(n + 1, 0);
+    
+    for (int i = 1; i <= n; i++) {
+        // i >> 1 is i / 2
+        // i & 1 checks if i is odd
+        dp[i] = dp[i >> 1] + (i & 1);
+    }
+    
+    return dp;
+}`,
+    typescript: `function countBits(n: number): number[] {
+    const dp = new Array(n + 1).fill(0);
+    
+    for (let i = 1; i <= n; i++) {
+        // i >> 1 is i / 2
+        // i & 1 checks if i is odd
+        dp[i] = dp[i >> 1] + (i & 1);
+    }
+    
+    return dp;
+}`,
+    explanation: "Dynamic programming approach: The number of 1s in i equals the number of 1s in i/2 plus whether i is odd. This relationship allows O(n) time computation without recalculating from scratch."
+  },
+  "missing-number": {
+    python: `def missingNumber(nums: List[int]) -> int:
+    # XOR approach
+    missing = len(nums)
+    
+    for i, num in enumerate(nums):
+        missing ^= i ^ num
+    
+    return missing
+
+# Alternative: Sum approach
+# expected_sum = len(nums) * (len(nums) + 1) // 2
+# actual_sum = sum(nums)
+# return expected_sum - actual_sum`,
+    java: `public int missingNumber(int[] nums) {
+    // XOR approach
+    int missing = nums.length;
+    
+    for (int i = 0; i < nums.length; i++) {
+        missing ^= i ^ nums[i];
+    }
+    
+    return missing;
+}`,
+    cpp: `int missingNumber(vector<int>& nums) {
+    // XOR approach
+    int missing = nums.size();
+    
+    for (int i = 0; i < nums.size(); i++) {
+        missing ^= i ^ nums[i];
+    }
+    
+    return missing;
+}`,
+    typescript: `function missingNumber(nums: number[]): number {
+    // XOR approach
+    let missing = nums.length;
+    
+    for (let i = 0; i < nums.length; i++) {
+        missing ^= i ^ nums[i];
+    }
+    
+    return missing;
+}`,
+    explanation: "XOR approach: XOR all indices and numbers together. Since XOR is commutative and x XOR x = 0, the missing number will be the only one not canceled out. This achieves O(n) time and O(1) space."
+  },
+  "reverse-bits": {
+    python: `def reverseBits(n: int) -> int:
+    result = 0
+    
+    for i in range(32):
+        # Extract the i-th bit
+        bit = (n >> i) & 1
+        # Place it at position (31 - i)
+        result |= (bit << (31 - i))
+    
+    return result`,
+    java: `public int reverseBits(int n) {
+    int result = 0;
+    
+    for (int i = 0; i < 32; i++) {
+        // Extract the i-th bit
+        int bit = (n >> i) & 1;
+        // Place it at position (31 - i)
+        result |= (bit << (31 - i));
+    }
+    
+    return result;
+}`,
+    cpp: `uint32_t reverseBits(uint32_t n) {
+    uint32_t result = 0;
+    
+    for (int i = 0; i < 32; i++) {
+        // Extract the i-th bit
+        int bit = (n >> i) & 1;
+        // Place it at position (31 - i)
+        result |= (bit << (31 - i));
+    }
+    
+    return result;
+}`,
+    typescript: `function reverseBits(n: number): number {
+    let result = 0;
+    
+    // Convert to unsigned 32-bit
+    n = n >>> 0;
+    
+    for (let i = 0; i < 32; i++) {
+        // Extract the i-th bit
+        const bit = (n >> i) & 1;
+        // Place it at position (31 - i)
+        result |= (bit << (31 - i));
+    }
+    
+    // Convert result to signed 32-bit
+    return result | 0;
+}`,
+    explanation: "Iterate through all 32 bits. For each bit at position i, extract it using (n >> i) & 1, then place it at the mirrored position (31 - i) using bit shift and OR. This reverses all bits."
+  },
+  "climbing-stairs": {
+    python: `def climbStairs(n: int) -> int:
+    if n <= 2:
+        return n
+    
+    # Space-optimized: only need last two values
+    first, second = 1, 2
+    
+    for i in range(3, n + 1):
+        third = first + second
+        first = second
+        second = third
+    
+    return second
+
+# Alternative: DP array
+# dp = [0] * (n + 1)
+# dp[1], dp[2] = 1, 2
+# for i in range(3, n + 1):
+#     dp[i] = dp[i-1] + dp[i-2]
+# return dp[n]`,
+    java: `public int climbStairs(int n) {
+    if (n <= 2) return n;
+    
+    // Space-optimized: only need last two values
+    int first = 1, second = 2;
+    
+    for (int i = 3; i <= n; i++) {
+        int third = first + second;
+        first = second;
+        second = third;
+    }
+    
+    return second;
+}`,
+    cpp: `int climbStairs(int n) {
+    if (n <= 2) return n;
+    
+    // Space-optimized: only need last two values
+    int first = 1, second = 2;
+    
+    for (int i = 3; i <= n; i++) {
+        int third = first + second;
+        first = second;
+        second = third;
+    }
+    
+    return second;
+}`,
+    typescript: `function climbStairs(n: number): number {
+    if (n <= 2) return n;
+    
+    // Space-optimized: only need last two values
+    let first = 1, second = 2;
+    
+    for (let i = 3; i <= n; i++) {
+        const third = first + second;
+        first = second;
+        second = third;
+    }
+    
+    return second;
+}`,
+    explanation: "This is equivalent to Fibonacci numbers. Ways to reach step n = ways to reach step (n-1) + ways to reach step (n-2). Use space-optimized DP storing only last two values for O(1) space."
+  },
+  "coin-change": {
+    python: `def coinChange(coins: List[int], amount: int) -> int:
+    # dp[i] = minimum coins needed for amount i
+    dp = [float('inf')] * (amount + 1)
+    dp[0] = 0
+    
+    for coin in coins:
+        for i in range(coin, amount + 1):
+            dp[i] = min(dp[i], dp[i - coin] + 1)
+    
+    return dp[amount] if dp[amount] != float('inf') else -1`,
+    java: `public int coinChange(int[] coins, int amount) {
+    // dp[i] = minimum coins needed for amount i
+    int[] dp = new int[amount + 1];
+    Arrays.fill(dp, amount + 1); // Initialize with a value > amount
+    dp[0] = 0;
+    
+    for (int coin : coins) {
+        for (int i = coin; i <= amount; i++) {
+            dp[i] = Math.min(dp[i], dp[i - coin] + 1);
+        }
+    }
+    
+    return dp[amount] > amount ? -1 : dp[amount];
+}`,
+    cpp: `int coinChange(vector<int>& coins, int amount) {
+    // dp[i] = minimum coins needed for amount i
+    vector<int> dp(amount + 1, amount + 1);
+    dp[0] = 0;
+    
+    for (int coin : coins) {
+        for (int i = coin; i <= amount; i++) {
+            dp[i] = min(dp[i], dp[i - coin] + 1);
+        }
+    }
+    
+    return dp[amount] > amount ? -1 : dp[amount];
+}`,
+    typescript: `function coinChange(coins: number[], amount: number): number {
+    // dp[i] = minimum coins needed for amount i
+    const dp = new Array(amount + 1).fill(amount + 1);
+    dp[0] = 0;
+    
+    for (const coin of coins) {
+        for (let i = coin; i <= amount; i++) {
+            dp[i] = Math.min(dp[i], dp[i - coin] + 1);
+        }
+    }
+    
+    return dp[amount] > amount ? -1 : dp[amount];
+}`,
+    explanation: "Unbounded knapsack DP: For each coin, update dp[i] (minimum coins for amount i) by considering using this coin. dp[i] = min(dp[i], dp[i-coin] + 1). Time: O(n × amount), Space: O(amount)."
+  },
+  "longest-increasing-subsequence": {
+    python: `def lengthOfLIS(nums: List[int]) -> int:
+    # Binary search approach - O(n log n)
+    tails = []
+    
+    for num in nums:
+        # Binary search for the smallest tail >= num
+        left, right = 0, len(tails)
+        
+        while left < right:
+            mid = (left + right) // 2
+            if tails[mid] < num:
+                left = mid + 1
+            else:
+                right = mid
+        
+        # If num is larger than all tails, extend
+        if left == len(tails):
+            tails.append(num)
+        else:
+            # Replace the tail at left position
+            tails[left] = num
+    
+    return len(tails)`,
+    java: `public int lengthOfLIS(int[] nums) {
+    // Binary search approach - O(n log n)
+    List<Integer> tails = new ArrayList<>();
+    
+    for (int num : nums) {
+        // Binary search for the smallest tail >= num
+        int left = 0, right = tails.size();
+        
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+            if (tails.get(mid) < num) {
+                left = mid + 1;
+            } else {
+                right = mid;
+            }
+        }
+        
+        // If num is larger than all tails, extend
+        if (left == tails.size()) {
+            tails.add(num);
+        } else {
+            // Replace the tail at left position
+            tails.set(left, num);
+        }
+    }
+    
+    return tails.size();
+}`,
+    cpp: `int lengthOfLIS(vector<int>& nums) {
+    // Binary search approach - O(n log n)
+    vector<int> tails;
+    
+    for (int num : nums) {
+        // Binary search for the smallest tail >= num
+        auto it = lower_bound(tails.begin(), tails.end(), num);
+        
+        if (it == tails.end()) {
+            tails.push_back(num);
+        } else {
+            *it = num;
+        }
+    }
+    
+    return tails.size();
+}`,
+    typescript: `function lengthOfLIS(nums: number[]): number {
+    // Binary search approach - O(n log n)
+    const tails: number[] = [];
+    
+    for (const num of nums) {
+        // Binary search for the smallest tail >= num
+        let left = 0, right = tails.length;
+        
+        while (left < right) {
+            const mid = Math.floor((left + right) / 2);
+            if (tails[mid] < num) {
+                left = mid + 1;
+            } else {
+                right = mid;
+            }
+        }
+        
+        // If num is larger than all tails, extend
+        if (left === tails.length) {
+            tails.push(num);
+        } else {
+            // Replace the tail at left position
+            tails[left] = num;
+        }
+    }
+    
+    return tails.length;
+}`,
+    explanation: "Patience sorting / Binary search: Maintain tails array where tails[i] is the smallest tail of all increasing subsequences of length i+1. For each number, binary search to find where to place it. Time: O(n log n), Space: O(n)."
+  },
+  "longest-common-subsequence": {
+    python: `def longestCommonSubsequence(text1: str, text2: str) -> int:
+    m, n = len(text1), len(text2)
+    
+    # dp[i][j] = LCS length of text1[0:i] and text2[0:j]
+    dp = [[0] * (n + 1) for _ in range(m + 1)]
+    
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            if text1[i - 1] == text2[j - 1]:
+                dp[i][j] = dp[i - 1][j - 1] + 1
+            else:
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
+    
+    return dp[m][n]`,
+    java: `public int longestCommonSubsequence(String text1, String text2) {
+    int m = text1.length(), n = text2.length();
+    
+    // dp[i][j] = LCS length of text1[0:i] and text2[0:j]
+    int[][] dp = new int[m + 1][n + 1];
+    
+    for (int i = 1; i <= m; i++) {
+        for (int j = 1; j <= n; j++) {
+            if (text1.charAt(i - 1) == text2.charAt(j - 1)) {
+                dp[i][j] = dp[i - 1][j - 1] + 1;
+            } else {
+                dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+            }
+        }
+    }
+    
+    return dp[m][n];
+}`,
+    cpp: `int longestCommonSubsequence(string text1, string text2) {
+    int m = text1.length(), n = text2.length();
+    
+    // dp[i][j] = LCS length of text1[0:i] and text2[0:j]
+    vector<vector<int>> dp(m + 1, vector<int>(n + 1, 0));
+    
+    for (int i = 1; i <= m; i++) {
+        for (int j = 1; j <= n; j++) {
+            if (text1[i - 1] == text2[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1] + 1;
+            } else {
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
+            }
+        }
+    }
+    
+    return dp[m][n];
+}`,
+    typescript: `function longestCommonSubsequence(text1: string, text2: string): number {
+    const m = text1.length, n = text2.length;
+    
+    // dp[i][j] = LCS length of text1[0:i] and text2[0:j]
+    const dp: number[][] = Array(m + 1).fill(0).map(() => Array(n + 1).fill(0));
+    
+    for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+            if (text1[i - 1] === text2[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1] + 1;
+            } else {
+                dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+            }
+        }
+    }
+    
+    return dp[m][n];
+}`,
+    explanation: "2D DP: dp[i][j] represents LCS length of text1[0:i] and text2[0:j]. If characters match, extend LCS. Otherwise, take maximum of excluding one character from either string. Time: O(m × n), Space: O(m × n)."
+  },
+  "word-break-problem": {
+    python: `def wordBreak(s: str, wordDict: List[str]) -> bool:
+    word_set = set(wordDict)
+    n = len(s)
+    
+    # dp[i] = True if s[0:i] can be segmented
+    dp = [False] * (n + 1)
+    dp[0] = True  # Empty string can be segmented
+    
+    for i in range(1, n + 1):
+        for j in range(i):
+            # Check if s[j:i] is a word and s[0:j] is valid
+            if dp[j] and s[j:i] in word_set:
+                dp[i] = True
+                break
+    
+    return dp[n]`,
+    java: `public boolean wordBreak(String s, List<String> wordDict) {
+    Set<String> wordSet = new HashSet<>(wordDict);
+    int n = s.length();
+    
+    // dp[i] = true if s[0:i] can be segmented
+    boolean[] dp = new boolean[n + 1];
+    dp[0] = true; // Empty string can be segmented
+    
+    for (int i = 1; i <= n; i++) {
+        for (int j = 0; j < i; j++) {
+            // Check if s[j:i] is a word and s[0:j] is valid
+            if (dp[j] && wordSet.contains(s.substring(j, i))) {
+                dp[i] = true;
+                break;
+            }
+        }
+    }
+    
+    return dp[n];
+}`,
+    cpp: `bool wordBreak(string s, vector<string>& wordDict) {
+    unordered_set<string> wordSet(wordDict.begin(), wordDict.end());
+    int n = s.length();
+    
+    // dp[i] = true if s[0:i] can be segmented
+    vector<bool> dp(n + 1, false);
+    dp[0] = true; // Empty string can be segmented
+    
+    for (int i = 1; i <= n; i++) {
+        for (int j = 0; j < i; j++) {
+            // Check if s[j:i] is a word and s[0:j] is valid
+            if (dp[j] && wordSet.count(s.substr(j, i - j))) {
+                dp[i] = true;
+                break;
+            }
+        }
+    }
+    
+    return dp[n];
+}`,
+    typescript: `function wordBreak(s: string, wordDict: string[]): boolean {
+    const wordSet = new Set(wordDict);
+    const n = s.length;
+    
+    // dp[i] = true if s[0:i] can be segmented
+    const dp: boolean[] = new Array(n + 1).fill(false);
+    dp[0] = true; // Empty string can be segmented
+    
+    for (let i = 1; i <= n; i++) {
+        for (let j = 0; j < i; j++) {
+            // Check if s[j:i] is a word and s[0:j] is valid
+            if (dp[j] && wordSet.has(s.substring(j, i))) {
+                dp[i] = true;
+                break;
+            }
+        }
+    }
+    
+    return dp[n];
+}`,
+    explanation: "DP approach: dp[i] indicates whether s[0:i] can be segmented. For each position i, check all possible splits j where s[j:i] is a word and s[0:j] is valid. Time: O(n²), Space: O(n)."
   }
 };
