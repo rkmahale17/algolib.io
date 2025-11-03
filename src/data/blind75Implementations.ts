@@ -2526,6 +2526,1239 @@ private void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
 }`,
     explanation: "Build adjacency list from edges. For each unvisited node, start DFS to mark entire component as visited, increment count. Union-Find is more efficient for dynamic graphs with frequent connectivity queries."
   },
+  "merge-intervals": {
+    python: `def merge(intervals: List[List[int]]) -> List[List[int]]:
+    if not intervals:
+        return []
+    
+    # Sort by start time
+    intervals.sort(key=lambda x: x[0])
+    
+    result = [intervals[0]]
+    
+    for start, end in intervals[1:]:
+        last_end = result[-1][1]
+        
+        if start <= last_end:
+            # Overlapping, merge
+            result[-1][1] = max(last_end, end)
+        else:
+            # No overlap, add new interval
+            result.append([start, end])
+    
+    return result`,
+    java: `public int[][] merge(int[][] intervals) {
+    if (intervals.length == 0) return new int[0][];
+    
+    Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));
+    
+    List<int[]> result = new ArrayList<>();
+    result.add(intervals[0]);
+    
+    for (int i = 1; i < intervals.length; i++) {
+        int[] current = intervals[i];
+        int[] last = result.get(result.size() - 1);
+        
+        if (current[0] <= last[1]) {
+            // Overlapping, merge
+            last[1] = Math.max(last[1], current[1]);
+        } else {
+            // No overlap, add new interval
+            result.add(current);
+        }
+    }
+    
+    return result.toArray(new int[result.size()][]);
+}`,
+    cpp: `vector<vector<int>> merge(vector<vector<int>>& intervals) {
+    if (intervals.empty()) return {};
+    
+    sort(intervals.begin(), intervals.end());
+    
+    vector<vector<int>> result;
+    result.push_back(intervals[0]);
+    
+    for (int i = 1; i < intervals.size(); i++) {
+        if (intervals[i][0] <= result.back()[1]) {
+            // Overlapping, merge
+            result.back()[1] = max(result.back()[1], intervals[i][1]);
+        } else {
+            // No overlap, add new interval
+            result.push_back(intervals[i]);
+        }
+    }
+    
+    return result;
+}`,
+    typescript: `function merge(intervals: number[][]): number[][] {
+    if (!intervals.length) return [];
+    
+    intervals.sort((a, b) => a[0] - b[0]);
+    
+    const result: number[][] = [intervals[0]];
+    
+    for (let i = 1; i < intervals.length; i++) {
+        const [start, end] = intervals[i];
+        const lastEnd = result[result.length - 1][1];
+        
+        if (start <= lastEnd) {
+            // Overlapping, merge
+            result[result.length - 1][1] = Math.max(lastEnd, end);
+        } else {
+            // No overlap, add new interval
+            result.push([start, end]);
+        }
+    }
+    
+    return result;
+}`,
+    explanation: "Sort intervals by start time. Iterate through sorted intervals: if current overlaps with last result (start <= last end), merge them by updating end time. Otherwise add as new interval. O(n log n) for sorting."
+  },
+  "longest-substring-without-repeating-characters": {
+    python: `def lengthOfLongestSubstring(s: str) -> int:
+    char_index = {}
+    max_length = 0
+    left = 0
+    
+    for right in range(len(s)):
+        # If char seen and in current window
+        if s[right] in char_index and char_index[s[right]] >= left:
+            left = char_index[s[right]] + 1
+        
+        char_index[s[right]] = right
+        max_length = max(max_length, right - left + 1)
+    
+    return max_length`,
+    java: `public int lengthOfLongestSubstring(String s) {
+    Map<Character, Integer> charIndex = new HashMap<>();
+    int maxLength = 0;
+    int left = 0;
+    
+    for (int right = 0; right < s.length(); right++) {
+        char c = s.charAt(right);
+        
+        if (charIndex.containsKey(c) && charIndex.get(c) >= left) {
+            left = charIndex.get(c) + 1;
+        }
+        
+        charIndex.put(c, right);
+        maxLength = Math.max(maxLength, right - left + 1);
+    }
+    
+    return maxLength;
+}`,
+    cpp: `int lengthOfLongestSubstring(string s) {
+    unordered_map<char, int> charIndex;
+    int maxLength = 0;
+    int left = 0;
+    
+    for (int right = 0; right < s.length(); right++) {
+        char c = s[right];
+        
+        if (charIndex.find(c) != charIndex.end() && charIndex[c] >= left) {
+            left = charIndex[c] + 1;
+        }
+        
+        charIndex[c] = right;
+        maxLength = max(maxLength, right - left + 1);
+    }
+    
+    return maxLength;
+}`,
+    typescript: `function lengthOfLongestSubstring(s: string): number {
+    const charIndex = new Map<string, number>();
+    let maxLength = 0;
+    let left = 0;
+    
+    for (let right = 0; right < s.length; right++) {
+        const c = s[right];
+        
+        if (charIndex.has(c) && charIndex.get(c)! >= left) {
+            left = charIndex.get(c)! + 1;
+        }
+        
+        charIndex.set(c, right);
+        maxLength = Math.max(maxLength, right - left + 1);
+    }
+    
+    return maxLength;
+}`,
+    explanation: "Sliding window with hashmap. Track last seen index of each character. When duplicate found in current window, move left pointer past previous occurrence. Track maximum window size. O(n) time."
+  },
+  "valid-anagram": {
+    python: `def isAnagram(s: str, t: str) -> bool:
+    if len(s) != len(t):
+        return False
+    
+    count = {}
+    
+    for char in s:
+        count[char] = count.get(char, 0) + 1
+    
+    for char in t:
+        if char not in count:
+            return False
+        count[char] -= 1
+        if count[char] < 0:
+            return False
+    
+    return True`,
+    java: `public boolean isAnagram(String s, String t) {
+    if (s.length() != t.length()) {
+        return false;
+    }
+    
+    int[] count = new int[26];
+    
+    for (char c : s.toCharArray()) {
+        count[c - 'a']++;
+    }
+    
+    for (char c : t.toCharArray()) {
+        count[c - 'a']--;
+        if (count[c - 'a'] < 0) {
+            return false;
+        }
+    }
+    
+    return true;
+}`,
+    cpp: `bool isAnagram(string s, string t) {
+    if (s.length() != t.length()) {
+        return false;
+    }
+    
+    vector<int> count(26, 0);
+    
+    for (char c : s) {
+        count[c - 'a']++;
+    }
+    
+    for (char c : t) {
+        count[c - 'a']--;
+        if (count[c - 'a'] < 0) {
+            return false;
+        }
+    }
+    
+    return true;
+}`,
+    typescript: `function isAnagram(s: string, t: string): boolean {
+    if (s.length !== t.length) {
+        return false;
+    }
+    
+    const count = new Array(26).fill(0);
+    
+    for (const c of s) {
+        count[c.charCodeAt(0) - 'a'.charCodeAt(0)]++;
+    }
+    
+    for (const c of t) {
+        count[c.charCodeAt(0) - 'a'.charCodeAt(0)]--;
+        if (count[c.charCodeAt(0) - 'a'.charCodeAt(0)] < 0) {
+            return false;
+        }
+    }
+    
+    return true;
+}`,
+    explanation: "Count character frequencies. For lowercase English letters, use array of size 26. Increment for s, decrement for t. If any goes negative or lengths differ, not anagram. O(n) time, O(1) space."
+  },
+  "group-anagrams": {
+    python: `def groupAnagrams(strs: List[str]) -> List[List[str]]:
+    anagrams = {}
+    
+    for s in strs:
+        # Sort string as key
+        key = ''.join(sorted(s))
+        
+        if key not in anagrams:
+            anagrams[key] = []
+        anagrams[key].append(s)
+    
+    return list(anagrams.values())`,
+    java: `public List<List<String>> groupAnagrams(String[] strs) {
+    Map<String, List<String>> anagrams = new HashMap<>();
+    
+    for (String s : strs) {
+        char[] chars = s.toCharArray();
+        Arrays.sort(chars);
+        String key = new String(chars);
+        
+        anagrams.putIfAbsent(key, new ArrayList<>());
+        anagrams.get(key).add(s);
+    }
+    
+    return new ArrayList<>(anagrams.values());
+}`,
+    cpp: `vector<vector<string>> groupAnagrams(vector<string>& strs) {
+    unordered_map<string, vector<string>> anagrams;
+    
+    for (const string& s : strs) {
+        string key = s;
+        sort(key.begin(), key.end());
+        anagrams[key].push_back(s);
+    }
+    
+    vector<vector<string>> result;
+    for (auto& [key, group] : anagrams) {
+        result.push_back(group);
+    }
+    
+    return result;
+}`,
+    typescript: `function groupAnagrams(strs: string[]): string[][] {
+    const anagrams = new Map<string, string[]>();
+    
+    for (const s of strs) {
+        const key = s.split('').sort().join('');
+        
+        if (!anagrams.has(key)) {
+            anagrams.set(key, []);
+        }
+        anagrams.get(key)!.push(s);
+    }
+    
+    return Array.from(anagrams.values());
+}`,
+    explanation: "Use sorted string as key in hashmap. All anagrams have same sorted form. Group strings with same key. O(n × k log k) where n = number of strings, k = max length. Alternative: use character count array as key for O(n × k)."
+  },
+  "valid-parentheses": {
+    python: `def isValid(s: str) -> bool:
+    stack = []
+    mapping = {')': '(', '}': '{', ']': '['}
+    
+    for char in s:
+        if char in mapping:
+            # Closing bracket
+            if not stack or stack[-1] != mapping[char]:
+                return False
+            stack.pop()
+        else:
+            # Opening bracket
+            stack.append(char)
+    
+    return len(stack) == 0`,
+    java: `public boolean isValid(String s) {
+    Stack<Character> stack = new Stack<>();
+    Map<Character, Character> mapping = new HashMap<>();
+    mapping.put(')', '(');
+    mapping.put('}', '{');
+    mapping.put(']', '[');
+    
+    for (char c : s.toCharArray()) {
+        if (mapping.containsKey(c)) {
+            if (stack.isEmpty() || stack.pop() != mapping.get(c)) {
+                return false;
+            }
+        } else {
+            stack.push(c);
+        }
+    }
+    
+    return stack.isEmpty();
+}`,
+    cpp: `bool isValid(string s) {
+    stack<char> st;
+    unordered_map<char, char> mapping = {
+        {')', '('}, {'}', '{'}, {']', '['}
+    };
+    
+    for (char c : s) {
+        if (mapping.find(c) != mapping.end()) {
+            if (st.empty() || st.top() != mapping[c]) {
+                return false;
+            }
+            st.pop();
+        } else {
+            st.push(c);
+        }
+    }
+    
+    return st.empty();
+}`,
+    typescript: `function isValid(s: string): boolean {
+    const stack: string[] = [];
+    const mapping: { [key: string]: string } = {
+        ')': '(',
+        '}': '{',
+        ']': '['
+    };
+    
+    for (const char of s) {
+        if (char in mapping) {
+            if (!stack.length || stack.pop() !== mapping[char]) {
+                return false;
+            }
+        } else {
+            stack.push(char);
+        }
+    }
+    
+    return stack.length === 0;
+}`,
+    explanation: "Use stack. Push opening brackets. For closing brackets, check if stack top matches corresponding opening bracket. Pop if match, return false if not. At end, stack should be empty. O(n) time, O(n) space."
+  },
+  "set-matrix-zeroes": {
+    python: `def reverseList(head: Optional[ListNode]) -> Optional[ListNode]:
+    prev = None
+    current = head
+    
+    while current:
+        # Save next node
+        next_temp = current.next
+        
+        # Reverse the link
+        current.next = prev
+        
+        # Move pointers forward
+        prev = current
+        current = next_temp
+    
+    return prev`,
+    java: `public ListNode reverseList(ListNode head) {
+    ListNode prev = null;
+    ListNode current = head;
+    
+    while (current != null) {
+        ListNode nextTemp = current.next;
+        current.next = prev;
+        prev = current;
+        current = nextTemp;
+    }
+    
+    return prev;
+}`,
+    cpp: `ListNode* reverseList(ListNode* head) {
+    ListNode* prev = nullptr;
+    ListNode* current = head;
+    
+    while (current) {
+        ListNode* nextTemp = current->next;
+        current->next = prev;
+        prev = current;
+        current = nextTemp;
+    }
+    
+    return prev;
+}`,
+    typescript: `function reverseList(head: ListNode | null): ListNode | null {
+    let prev: ListNode | null = null;
+    let current = head;
+    
+    while (current) {
+        const nextTemp = current.next;
+        current.next = prev;
+        prev = current;
+        current = nextTemp;
+    }
+    
+    return prev;
+}`,
+    explanation: "Use three pointers: prev (initially null), current (head), and next. Iterate through list: save next node, reverse current's pointer to prev, move prev and current forward. Return prev (new head)."
+  },
+  "detect-cycle-in-a-linked-list": {
+    python: `def hasCycle(head: Optional[ListNode]) -> bool:
+    if not head or not head.next:
+        return False
+    
+    slow = head
+    fast = head
+    
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+        
+        if slow == fast:
+            return True
+    
+    return False`,
+    java: `public boolean hasCycle(ListNode head) {
+    if (head == null || head.next == null) {
+        return false;
+    }
+    
+    ListNode slow = head;
+    ListNode fast = head;
+    
+    while (fast != null && fast.next != null) {
+        slow = slow.next;
+        fast = fast.next.next;
+        
+        if (slow == fast) {
+            return true;
+        }
+    }
+    
+    return false;
+}`,
+    cpp: `bool hasCycle(ListNode *head) {
+    if (!head || !head->next) {
+        return false;
+    }
+    
+    ListNode* slow = head;
+    ListNode* fast = head;
+    
+    while (fast && fast->next) {
+        slow = slow->next;
+        fast = fast->next->next;
+        
+        if (slow == fast) {
+            return true;
+        }
+    }
+    
+    return false;
+}`,
+    typescript: `function hasCycle(head: ListNode | null): boolean {
+    if (!head || !head.next) {
+        return false;
+    }
+    
+    let slow: ListNode | null = head;
+    let fast: ListNode | null = head;
+    
+    while (fast && fast.next) {
+        slow = slow!.next;
+        fast = fast.next.next;
+        
+        if (slow === fast) {
+            return true;
+        }
+    }
+    
+    return false;
+}`,
+    explanation: "Floyd's Cycle Detection (Tortoise and Hare): use two pointers, slow (moves 1 step) and fast (moves 2 steps). If they meet, there's a cycle. If fast reaches end, no cycle. O(n) time, O(1) space."
+  },
+  "merge-two-sorted-lists": {
+    python: `def mergeTwoLists(l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
+    dummy = ListNode(0)
+    current = dummy
+    
+    while l1 and l2:
+        if l1.val < l2.val:
+            current.next = l1
+            l1 = l1.next
+        else:
+            current.next = l2
+            l2 = l2.next
+        current = current.next
+    
+    # Attach remaining nodes
+    current.next = l1 if l1 else l2
+    
+    return dummy.next`,
+    java: `public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+    ListNode dummy = new ListNode(0);
+    ListNode current = dummy;
+    
+    while (l1 != null && l2 != null) {
+        if (l1.val < l2.val) {
+            current.next = l1;
+            l1 = l1.next;
+        } else {
+            current.next = l2;
+            l2 = l2.next;
+        }
+        current = current.next;
+    }
+    
+    current.next = (l1 != null) ? l1 : l2;
+    
+    return dummy.next;
+}`,
+    cpp: `ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
+    ListNode* dummy = new ListNode(0);
+    ListNode* current = dummy;
+    
+    while (l1 && l2) {
+        if (l1->val < l2->val) {
+            current->next = l1;
+            l1 = l1->next;
+        } else {
+            current->next = l2;
+            l2 = l2->next;
+        }
+        current = current->next;
+    }
+    
+    current->next = l1 ? l1 : l2;
+    
+    return dummy->next;
+}`,
+    typescript: `function mergeTwoLists(l1: ListNode | null, l2: ListNode | null): ListNode | null {
+    const dummy = new ListNode(0);
+    let current = dummy;
+    
+    while (l1 && l2) {
+        if (l1.val < l2.val) {
+            current.next = l1;
+            l1 = l1.next;
+        } else {
+            current.next = l2;
+            l2 = l2.next;
+        }
+        current = current.next;
+    }
+    
+    current.next = l1 || l2;
+    
+    return dummy.next;
+}`,
+    explanation: "Use dummy node to simplify edge cases. Compare values from both lists, attach smaller to result, advance that pointer. After loop, attach remaining list. Return dummy.next."
+  },
+  "merge-k-sorted-lists": {
+    python: `import heapq
+
+def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
+    # Min heap: (value, index, node)
+    heap = []
+    
+    # Add first node from each list
+    for i, head in enumerate(lists):
+        if head:
+            heapq.heappush(heap, (head.val, i, head))
+    
+    dummy = ListNode(0)
+    current = dummy
+    
+    while heap:
+        val, i, node = heapq.heappop(heap)
+        current.next = node
+        current = current.next
+        
+        # Add next node from same list
+        if node.next:
+            heapq.heappush(heap, (node.next.val, i, node.next))
+    
+    return dummy.next`,
+    java: `public ListNode mergeKLists(ListNode[] lists) {
+    PriorityQueue<ListNode> heap = new PriorityQueue<>((a, b) -> a.val - b.val);
+    
+    // Add first node from each list
+    for (ListNode head : lists) {
+        if (head != null) {
+            heap.offer(head);
+        }
+    }
+    
+    ListNode dummy = new ListNode(0);
+    ListNode current = dummy;
+    
+    while (!heap.isEmpty()) {
+        ListNode node = heap.poll();
+        current.next = node;
+        current = current.next;
+        
+        if (node.next != null) {
+            heap.offer(node.next);
+        }
+    }
+    
+    return dummy.next;
+}`,
+    cpp: `ListNode* mergeKLists(vector<ListNode*>& lists) {
+    auto cmp = [](ListNode* a, ListNode* b) { return a->val > b->val; };
+    priority_queue<ListNode*, vector<ListNode*>, decltype(cmp)> heap(cmp);
+    
+    // Add first node from each list
+    for (ListNode* head : lists) {
+        if (head) {
+            heap.push(head);
+        }
+    }
+    
+    ListNode* dummy = new ListNode(0);
+    ListNode* current = dummy;
+    
+    while (!heap.empty()) {
+        ListNode* node = heap.top();
+        heap.pop();
+        current->next = node;
+        current = current->next;
+        
+        if (node->next) {
+            heap.push(node->next);
+        }
+    }
+    
+    return dummy->next;
+}`,
+    typescript: `function mergeKLists(lists: Array<ListNode | null>): ListNode | null {
+    const heap: Array<ListNode> = [];
+    
+    // Min heap operations
+    const parent = (i: number) => Math.floor((i - 1) / 2);
+    const left = (i: number) => 2 * i + 1;
+    const right = (i: number) => 2 * i + 2;
+    
+    const swap = (i: number, j: number) => {
+        [heap[i], heap[j]] = [heap[j], heap[i]];
+    };
+    
+    const heapifyUp = (i: number) => {
+        while (i > 0 && heap[parent(i)].val > heap[i].val) {
+            swap(i, parent(i));
+            i = parent(i);
+        }
+    };
+    
+    const heapifyDown = (i: number) => {
+        let minIndex = i;
+        const l = left(i), r = right(i);
+        
+        if (l < heap.length && heap[l].val < heap[minIndex].val) minIndex = l;
+        if (r < heap.length && heap[r].val < heap[minIndex].val) minIndex = r;
+        
+        if (i !== minIndex) {
+            swap(i, minIndex);
+            heapifyDown(minIndex);
+        }
+    };
+    
+    const push = (node: ListNode) => {
+        heap.push(node);
+        heapifyUp(heap.length - 1);
+    };
+    
+    const pop = (): ListNode => {
+        const min = heap[0];
+        heap[0] = heap[heap.length - 1];
+        heap.pop();
+        if (heap.length > 0) heapifyDown(0);
+        return min;
+    };
+    
+    // Add first node from each list
+    for (const head of lists) {
+        if (head) push(head);
+    }
+    
+    const dummy = new ListNode(0);
+    let current = dummy;
+    
+    while (heap.length > 0) {
+        const node = pop();
+        current.next = node;
+        current = current.next;
+        
+        if (node.next) push(node.next);
+    }
+    
+    return dummy.next;
+}`,
+    explanation: "Use min-heap to efficiently find smallest among k lists. Add first node from each list to heap. Pop minimum, add to result, push its next node to heap. Repeat until heap empty. O(N log k) time where N = total nodes."
+  },
+  "remove-nth-node-from-end-of-list": {
+    python: `def removeNthFromEnd(head: Optional[ListNode], n: int) -> Optional[ListNode]:
+    dummy = ListNode(0)
+    dummy.next = head
+    fast = slow = dummy
+    
+    # Move fast n+1 steps ahead
+    for _ in range(n + 1):
+        if fast:
+            fast = fast.next
+    
+    # Move both until fast reaches end
+    while fast:
+        fast = fast.next
+        slow = slow.next
+    
+    # Remove nth node
+    slow.next = slow.next.next
+    
+    return dummy.next`,
+    java: `public ListNode removeNthFromEnd(ListNode head, int n) {
+    ListNode dummy = new ListNode(0);
+    dummy.next = head;
+    ListNode fast = dummy;
+    ListNode slow = dummy;
+    
+    // Move fast n+1 steps ahead
+    for (int i = 0; i <= n; i++) {
+        fast = fast.next;
+    }
+    
+    // Move both until fast reaches end
+    while (fast != null) {
+        fast = fast.next;
+        slow = slow.next;
+    }
+    
+    // Remove nth node
+    slow.next = slow.next.next;
+    
+    return dummy.next;
+}`,
+    cpp: `ListNode* removeNthFromEnd(ListNode* head, int n) {
+    ListNode* dummy = new ListNode(0);
+    dummy->next = head;
+    ListNode* fast = dummy;
+    ListNode* slow = dummy;
+    
+    // Move fast n+1 steps ahead
+    for (int i = 0; i <= n; i++) {
+        fast = fast->next;
+    }
+    
+    // Move both until fast reaches end
+    while (fast) {
+        fast = fast->next;
+        slow = slow->next;
+    }
+    
+    // Remove nth node
+    slow->next = slow->next->next;
+    
+    return dummy->next;
+}`,
+    typescript: `function removeNthFromEnd(head: ListNode | null, n: number): ListNode | null {
+    const dummy = new ListNode(0);
+    dummy.next = head;
+    let fast: ListNode | null = dummy;
+    let slow: ListNode | null = dummy;
+    
+    // Move fast n+1 steps ahead
+    for (let i = 0; i <= n; i++) {
+        if (fast) fast = fast.next;
+    }
+    
+    // Move both until fast reaches end
+    while (fast) {
+        fast = fast.next;
+        slow = slow!.next;
+    }
+    
+    // Remove nth node
+    slow!.next = slow!.next!.next;
+    
+    return dummy.next;
+}`,
+    explanation: "Two-pointer technique: use dummy node. Move fast pointer n+1 steps ahead, then move both pointers together. When fast reaches end, slow is before node to remove. One pass, O(1) space."
+  },
+  "reorder-list": {
+    python: `def reorderList(head: Optional[ListNode]) -> None:
+    if not head or not head.next:
+        return
+    
+    # Find middle
+    slow = fast = head
+    while fast.next and fast.next.next:
+        slow = slow.next
+        fast = fast.next.next
+    
+    # Reverse second half
+    second = slow.next
+    slow.next = None
+    prev = None
+    while second:
+        temp = second.next
+        second.next = prev
+        prev = second
+        second = temp
+    
+    # Merge two halves
+    first = head
+    second = prev
+    while second:
+        tmp1 = first.next
+        tmp2 = second.next
+        first.next = second
+        second.next = tmp1
+        first = tmp1
+        second = tmp2`,
+    java: `public void reorderList(ListNode head) {
+    if (head == null || head.next == null) return;
+    
+    // Find middle
+    ListNode slow = head, fast = head;
+    while (fast.next != null && fast.next.next != null) {
+        slow = slow.next;
+        fast = fast.next.next;
+    }
+    
+    // Reverse second half
+    ListNode second = slow.next;
+    slow.next = null;
+    ListNode prev = null;
+    while (second != null) {
+        ListNode temp = second.next;
+        second.next = prev;
+        prev = second;
+        second = temp;
+    }
+    
+    // Merge two halves
+    ListNode first = head;
+    second = prev;
+    while (second != null) {
+        ListNode tmp1 = first.next;
+        ListNode tmp2 = second.next;
+        first.next = second;
+        second.next = tmp1;
+        first = tmp1;
+        second = tmp2;
+    }
+}`,
+    cpp: `void reorderList(ListNode* head) {
+    if (!head || !head->next) return;
+    
+    // Find middle
+    ListNode* slow = head;
+    ListNode* fast = head;
+    while (fast->next && fast->next->next) {
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+    
+    // Reverse second half
+    ListNode* second = slow->next;
+    slow->next = nullptr;
+    ListNode* prev = nullptr;
+    while (second) {
+        ListNode* temp = second->next;
+        second->next = prev;
+        prev = second;
+        second = temp;
+    }
+    
+    // Merge two halves
+    ListNode* first = head;
+    second = prev;
+    while (second) {
+        ListNode* tmp1 = first->next;
+        ListNode* tmp2 = second->next;
+        first->next = second;
+        second->next = tmp1;
+        first = tmp1;
+        second = tmp2;
+    }
+}`,
+    typescript: `function reorderList(head: ListNode | null): void {
+    if (!head || !head.next) return;
+    
+    // Find middle
+    let slow = head, fast = head;
+    while (fast.next && fast.next.next) {
+        slow = slow.next!;
+        fast = fast.next.next;
+    }
+    
+    // Reverse second half
+    let second: ListNode | null = slow.next;
+    slow.next = null;
+    let prev: ListNode | null = null;
+    while (second) {
+        const temp = second.next;
+        second.next = prev;
+        prev = second;
+        second = temp;
+    }
+    
+    // Merge two halves
+    let first: ListNode | null = head;
+    second = prev;
+    while (second) {
+        const tmp1 = first!.next;
+        const tmp2 = second.next;
+        first!.next = second;
+        second.next = tmp1;
+        first = tmp1;
+        second = tmp2;
+    }
+}`,
+    explanation: "Three steps: 1) Find middle using slow/fast pointers. 2) Reverse second half. 3) Merge alternately. L0→L1→...→Ln becomes L0→Ln→L1→Ln-1→.... O(n) time, O(1) space."
+  },
+  "longest-substring-without-repeating-characters": {
+    python: `def lengthOfLongestSubstring(s: str) -> int:
+    char_index = {}
+    max_length = 0
+    left = 0
+    
+    for right in range(len(s)):
+        # If char seen and in current window
+        if s[right] in char_index and char_index[s[right]] >= left:
+            left = char_index[s[right]] + 1
+        
+        char_index[s[right]] = right
+        max_length = max(max_length, right - left + 1)
+    
+    return max_length`,
+    java: `public int lengthOfLongestSubstring(String s) {
+    Map<Character, Integer> charIndex = new HashMap<>();
+    int maxLength = 0;
+    int left = 0;
+    
+    for (int right = 0; right < s.length(); right++) {
+        char c = s.charAt(right);
+        
+        if (charIndex.containsKey(c) && charIndex.get(c) >= left) {
+            left = charIndex.get(c) + 1;
+        }
+        
+        charIndex.put(c, right);
+        maxLength = Math.max(maxLength, right - left + 1);
+    }
+    
+    return maxLength;
+}`,
+    cpp: `int lengthOfLongestSubstring(string s) {
+    unordered_map<char, int> charIndex;
+    int maxLength = 0;
+    int left = 0;
+    
+    for (int right = 0; right < s.length(); right++) {
+        char c = s[right];
+        
+        if (charIndex.find(c) != charIndex.end() && charIndex[c] >= left) {
+            left = charIndex[c] + 1;
+        }
+        
+        charIndex[c] = right;
+        maxLength = max(maxLength, right - left + 1);
+    }
+    
+    return maxLength;
+}`,
+    typescript: `function lengthOfLongestSubstring(s: string): number {
+    const charIndex = new Map<string, number>();
+    let maxLength = 0;
+    let left = 0;
+    
+    for (let right = 0; right < s.length; right++) {
+        const c = s[right];
+        
+        if (charIndex.has(c) && charIndex.get(c)! >= left) {
+            left = charIndex.get(c)! + 1;
+        }
+        
+        charIndex.set(c, right);
+        maxLength = Math.max(maxLength, right - left + 1);
+    }
+    
+    return maxLength;
+}`,
+    explanation: "Sliding window with hashmap. Track last seen index of each character. When duplicate found in current window, move left pointer past previous occurrence. Track maximum window size. O(n) time."
+  },
+  "valid-anagram": {
+    python: `def isAnagram(s: str, t: str) -> bool:
+    if len(s) != len(t):
+        return False
+    
+    count = {}
+    
+    for char in s:
+        count[char] = count.get(char, 0) + 1
+    
+    for char in t:
+        if char not in count:
+            return False
+        count[char] -= 1
+        if count[char] < 0:
+            return False
+    
+    return True`,
+    java: `public boolean isAnagram(String s, String t) {
+    if (s.length() != t.length()) {
+        return false;
+    }
+    
+    int[] count = new int[26];
+    
+    for (char c : s.toCharArray()) {
+        count[c - 'a']++;
+    }
+    
+    for (char c : t.toCharArray()) {
+        count[c - 'a']--;
+        if (count[c - 'a'] < 0) {
+            return false;
+        }
+    }
+    
+    return true;
+}`,
+    cpp: `bool isAnagram(string s, string t) {
+    if (s.length() != t.length()) {
+        return false;
+    }
+    
+    vector<int> count(26, 0);
+    
+    for (char c : s) {
+        count[c - 'a']++;
+    }
+    
+    for (char c : t) {
+        count[c - 'a']--;
+        if (count[c - 'a'] < 0) {
+            return false;
+        }
+    }
+    
+    return true;
+}`,
+    typescript: `function isAnagram(s: string, t: string): boolean {
+    if (s.length !== t.length) {
+        return false;
+    }
+    
+    const count = new Array(26).fill(0);
+    
+    for (const c of s) {
+        count[c.charCodeAt(0) - 'a'.charCodeAt(0)]++;
+    }
+    
+    for (const c of t) {
+        count[c.charCodeAt(0) - 'a'.charCodeAt(0)]--;
+        if (count[c.charCodeAt(0) - 'a'.charCodeAt(0)] < 0) {
+            return false;
+        }
+    }
+    
+    return true;
+}`,
+    explanation: "Count character frequencies. For lowercase English letters, use array of size 26. Increment for s, decrement for t. If any goes negative or lengths differ, not anagram. O(n) time, O(1) space."
+  },
+  "group-anagrams": {
+    python: `def groupAnagrams(strs: List[str]) -> List[List[str]]:
+    anagrams = {}
+    
+    for s in strs:
+        # Sort string as key
+        key = ''.join(sorted(s))
+        
+        if key not in anagrams:
+            anagrams[key] = []
+        anagrams[key].append(s)
+    
+    return list(anagrams.values())`,
+    java: `public List<List<String>> groupAnagrams(String[] strs) {
+    Map<String, List<String>> anagrams = new HashMap<>();
+    
+    for (String s : strs) {
+        char[] chars = s.toCharArray();
+        Arrays.sort(chars);
+        String key = new String(chars);
+        
+        anagrams.putIfAbsent(key, new ArrayList<>());
+        anagrams.get(key).add(s);
+    }
+    
+    return new ArrayList<>(anagrams.values());
+}`,
+    cpp: `vector<vector<string>> groupAnagrams(vector<string>& strs) {
+    unordered_map<string, vector<string>> anagrams;
+    
+    for (const string& s : strs) {
+        string key = s;
+        sort(key.begin(), key.end());
+        anagrams[key].push_back(s);
+    }
+    
+    vector<vector<string>> result;
+    for (auto& [key, group] : anagrams) {
+        result.push_back(group);
+    }
+    
+    return result;
+}`,
+    typescript: `function groupAnagrams(strs: string[]): string[][] {
+    const anagrams = new Map<string, string[]>();
+    
+    for (const s of strs) {
+        const key = s.split('').sort().join('');
+        
+        if (!anagrams.has(key)) {
+            anagrams.set(key, []);
+        }
+        anagrams.get(key)!.push(s);
+    }
+    
+    return Array.from(anagrams.values());
+}`,
+    explanation: "Use sorted string as key in hashmap. All anagrams have same sorted form. Group strings with same key. O(n × k log k) where n = number of strings, k = max length. Alternative: use character count array as key for O(n × k)."
+  },
+  "valid-parentheses": {
+    python: `def isValid(s: str) -> bool:
+    stack = []
+    mapping = {')': '(', '}': '{', ']': '['}
+    
+    for char in s:
+        if char in mapping:
+            # Closing bracket
+            if not stack or stack[-1] != mapping[char]:
+                return False
+            stack.pop()
+        else:
+            # Opening bracket
+            stack.append(char)
+    
+    return len(stack) == 0`,
+    java: `public boolean isValid(String s) {
+    Stack<Character> stack = new Stack<>();
+    Map<Character, Character> mapping = new HashMap<>();
+    mapping.put(')', '(');
+    mapping.put('}', '{');
+    mapping.put(']', '[');
+    
+    for (char c : s.toCharArray()) {
+        if (mapping.containsKey(c)) {
+            if (stack.isEmpty() || stack.pop() != mapping.get(c)) {
+                return false;
+            }
+        } else {
+            stack.push(c);
+        }
+    }
+    
+    return stack.isEmpty();
+}`,
+    cpp: `bool isValid(string s) {
+    stack<char> st;
+    unordered_map<char, char> mapping = {
+        {')', '('}, {'}', '{'}, {']', '['}
+    };
+    
+    for (char c : s) {
+        if (mapping.find(c) != mapping.end()) {
+            if (st.empty() || st.top() != mapping[c]) {
+                return false;
+            }
+            st.pop();
+        } else {
+            st.push(c);
+        }
+    }
+    
+    return st.empty();
+}`,
+    typescript: `function isValid(s: string): boolean {
+    const stack: string[] = [];
+    const mapping: { [key: string]: string } = {
+        ')': '(',
+        '}': '{',
+        ']': '['
+    };
+    
+    for (const char of s) {
+        if (char in mapping) {
+            if (!stack.length || stack.pop() !== mapping[char]) {
+                return false;
+            }
+        } else {
+            stack.push(char);
+        }
+    }
+    
+    return stack.length === 0;
+}`,
+    explanation: "Use stack. Push opening brackets. For closing brackets, check if stack top matches corresponding opening bracket. Pop if match, return false if not. At end, stack should be empty. O(n) time, O(n) space."
+  },
   "insert-interval": {
     python: `def insert(intervals: List[List[int]], newInterval: List[int]) -> List[List[int]]:
     result = []
@@ -4408,5 +5641,1139 @@ public:
     }
 }`,
     explanation: "Use two heaps: max heap for smaller half, min heap for larger half. Keep sizes balanced (small can have 1 more). Median is either top of small (odd count) or average of both tops (even count). O(log n) per operation."
+  },
+  "set-matrix-zeroes": {
+    python: `def setZeroes(matrix: List[List[int]]) -> None:
+    m, n = len(matrix), len(matrix[0])
+    first_row_zero = first_col_zero = False
+    
+    # Check if first row/col has zeros
+    for j in range(n):
+        if matrix[0][j] == 0:
+            first_row_zero = True
+            break
+    
+    for i in range(m):
+        if matrix[i][0] == 0:
+            first_col_zero = True
+            break
+    
+    # Use first row/col as markers
+    for i in range(1, m):
+        for j in range(1, n):
+            if matrix[i][j] == 0:
+                matrix[i][0] = 0
+                matrix[0][j] = 0
+    
+    # Set zeros based on markers
+    for i in range(1, m):
+        for j in range(1, n):
+            if matrix[i][0] == 0 or matrix[0][j] == 0:
+                matrix[i][j] = 0
+    
+    # Handle first row and column
+    if first_row_zero:
+        for j in range(n):
+            matrix[0][j] = 0
+    
+    if first_col_zero:
+        for i in range(m):
+            matrix[i][0] = 0`,
+    java: `public void setZeroes(int[][] matrix) {
+    int m = matrix.length, n = matrix[0].length;
+    boolean firstRowZero = false, firstColZero = false;
+    
+    // Check first row
+    for (int j = 0; j < n; j++) {
+        if (matrix[0][j] == 0) {
+            firstRowZero = true;
+            break;
+        }
+    }
+    
+    // Check first column
+    for (int i = 0; i < m; i++) {
+        if (matrix[i][0] == 0) {
+            firstColZero = true;
+            break;
+        }
+    }
+    
+    // Use first row/col as markers
+    for (int i = 1; i < m; i++) {
+        for (int j = 1; j < n; j++) {
+            if (matrix[i][j] == 0) {
+                matrix[i][0] = 0;
+                matrix[0][j] = 0;
+            }
+        }
+    }
+    
+    // Set zeros
+    for (int i = 1; i < m; i++) {
+        for (int j = 1; j < n; j++) {
+            if (matrix[i][0] == 0 || matrix[0][j] == 0) {
+                matrix[i][j] = 0;
+            }
+        }
+    }
+    
+    // Handle first row and column
+    if (firstRowZero) {
+        for (int j = 0; j < n; j++) {
+            matrix[0][j] = 0;
+        }
+    }
+    
+    if (firstColZero) {
+        for (int i = 0; i < m; i++) {
+            matrix[i][0] = 0;
+        }
+    }
+}`,
+    cpp: `void setZeroes(vector<vector<int>>& matrix) {
+    int m = matrix.size(), n = matrix[0].size();
+    bool firstRowZero = false, firstColZero = false;
+    
+    for (int j = 0; j < n; j++) {
+        if (matrix[0][j] == 0) {
+            firstRowZero = true;
+            break;
+        }
+    }
+    
+    for (int i = 0; i < m; i++) {
+        if (matrix[i][0] == 0) {
+            firstColZero = true;
+            break;
+        }
+    }
+    
+    for (int i = 1; i < m; i++) {
+        for (int j = 1; j < n; j++) {
+            if (matrix[i][j] == 0) {
+                matrix[i][0] = 0;
+                matrix[0][j] = 0;
+            }
+        }
+    }
+    
+    for (int i = 1; i < m; i++) {
+        for (int j = 1; j < n; j++) {
+            if (matrix[i][0] == 0 || matrix[0][j] == 0) {
+                matrix[i][j] = 0;
+            }
+        }
+    }
+    
+    if (firstRowZero) {
+        for (int j = 0; j < n; j++) {
+            matrix[0][j] = 0;
+        }
+    }
+    
+    if (firstColZero) {
+        for (int i = 0; i < m; i++) {
+            matrix[i][0] = 0;
+        }
+    }
+}`,
+    typescript: `function setZeroes(matrix: number[][]): void {
+    const m = matrix.length, n = matrix[0].length;
+    let firstRowZero = false, firstColZero = false;
+    
+    for (let j = 0; j < n; j++) {
+        if (matrix[0][j] === 0) {
+            firstRowZero = true;
+            break;
+        }
+    }
+    
+    for (let i = 0; i < m; i++) {
+        if (matrix[i][0] === 0) {
+            firstColZero = true;
+            break;
+        }
+    }
+    
+    for (let i = 1; i < m; i++) {
+        for (let j = 1; j < n; j++) {
+            if (matrix[i][j] === 0) {
+                matrix[i][0] = 0;
+                matrix[0][j] = 0;
+            }
+        }
+    }
+    
+    for (let i = 1; i < m; i++) {
+        for (let j = 1; j < n; j++) {
+            if (matrix[i][0] === 0 || matrix[0][j] === 0) {
+                matrix[i][j] = 0;
+            }
+        }
+    }
+    
+    if (firstRowZero) {
+        for (let j = 0; j < n; j++) {
+            matrix[0][j] = 0;
+        }
+    }
+    
+    if (firstColZero) {
+        for (let i = 0; i < m; i++) {
+            matrix[i][0] = 0;
+        }
+    }
+}`,
+    explanation: "Use first row and column as markers for O(1) space. Check if first row/col have zeros separately. Mark zeros in first row/col. Set matrix zeros based on markers. Finally handle first row/col."
+  },
+  "spiral-matrix": {
+    python: `def spiralOrder(matrix: List[List[int]]) -> List[int]:
+    result = []
+    if not matrix:
+        return result
+    
+    top, bottom = 0, len(matrix) - 1
+    left, right = 0, len(matrix[0]) - 1
+    
+    while top <= bottom and left <= right:
+        # Right
+        for j in range(left, right + 1):
+            result.append(matrix[top][j])
+        top += 1
+        
+        # Down
+        for i in range(top, bottom + 1):
+            result.append(matrix[i][right])
+        right -= 1
+        
+        if top <= bottom:
+            # Left
+            for j in range(right, left - 1, -1):
+                result.append(matrix[bottom][j])
+            bottom -= 1
+        
+        if left <= right:
+            # Up
+            for i in range(bottom, top - 1, -1):
+                result.append(matrix[i][left])
+            left += 1
+    
+    return result`,
+    java: `public List<Integer> spiralOrder(int[][] matrix) {
+    List<Integer> result = new ArrayList<>();
+    if (matrix.length == 0) return result;
+    
+    int top = 0, bottom = matrix.length - 1;
+    int left = 0, right = matrix[0].length - 1;
+    
+    while (top <= bottom && left <= right) {
+        for (int j = left; j <= right; j++) {
+            result.add(matrix[top][j]);
+        }
+        top++;
+        
+        for (int i = top; i <= bottom; i++) {
+            result.add(matrix[i][right]);
+        }
+        right--;
+        
+        if (top <= bottom) {
+            for (int j = right; j >= left; j--) {
+                result.add(matrix[bottom][j]);
+            }
+            bottom--;
+        }
+        
+        if (left <= right) {
+            for (int i = bottom; i >= top; i--) {
+                result.add(matrix[i][left]);
+            }
+            left++;
+        }
+    }
+    
+    return result;
+}`,
+    cpp: `vector<int> spiralOrder(vector<vector<int>>& matrix) {
+    vector<int> result;
+    if (matrix.empty()) return result;
+    
+    int top = 0, bottom = matrix.size() - 1;
+    int left = 0, right = matrix[0].size() - 1;
+    
+    while (top <= bottom && left <= right) {
+        for (int j = left; j <= right; j++) {
+            result.push_back(matrix[top][j]);
+        }
+        top++;
+        
+        for (int i = top; i <= bottom; i++) {
+            result.push_back(matrix[i][right]);
+        }
+        right--;
+        
+        if (top <= bottom) {
+            for (int j = right; j >= left; j--) {
+                result.push_back(matrix[bottom][j]);
+            }
+            bottom--;
+        }
+        
+        if (left <= right) {
+            for (int i = bottom; i >= top; i--) {
+                result.push_back(matrix[i][left]);
+            }
+            left++;
+        }
+    }
+    
+    return result;
+}`,
+    typescript: `function spiralOrder(matrix: number[][]): number[] {
+    const result: number[] = [];
+    if (!matrix.length) return result;
+    
+    let top = 0, bottom = matrix.length - 1;
+    let left = 0, right = matrix[0].length - 1;
+    
+    while (top <= bottom && left <= right) {
+        for (let j = left; j <= right; j++) {
+            result.push(matrix[top][j]);
+        }
+        top++;
+        
+        for (let i = top; i <= bottom; i++) {
+            result.push(matrix[i][right]);
+        }
+        right--;
+        
+        if (top <= bottom) {
+            for (let j = right; j >= left; j--) {
+                result.push(matrix[bottom][j]);
+            }
+            bottom--;
+        }
+        
+        if (left <= right) {
+            for (let i = bottom; i >= top; i--) {
+                result.push(matrix[i][left]);
+            }
+            left++;
+        }
+    }
+    
+    return result;
+}`,
+    explanation: "Track four boundaries: top, bottom, left, right. Traverse right→down→left→up in spiral, shrinking boundaries after each direction. Check boundaries before left/up to avoid duplicates. O(m×n) time, O(1) space."
+  },
+  "rotate-image": {
+    python: `def rotate(matrix: List[List[int]]) -> None:
+    n = len(matrix)
+    
+    # Transpose matrix
+    for i in range(n):
+        for j in range(i + 1, n):
+            matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]
+    
+    # Reverse each row
+    for i in range(n):
+        matrix[i].reverse()`,
+    java: `public void rotate(int[][] matrix) {
+    int n = matrix.length;
+    
+    // Transpose
+    for (int i = 0; i < n; i++) {
+        for (int j = i + 1; j < n; j++) {
+            int temp = matrix[i][j];
+            matrix[i][j] = matrix[j][i];
+            matrix[j][i] = temp;
+        }
+    }
+    
+    // Reverse each row
+    for (int i = 0; i < n; i++) {
+        int left = 0, right = n - 1;
+        while (left < right) {
+            int temp = matrix[i][left];
+            matrix[i][left] = matrix[i][right];
+            matrix[i][right] = temp;
+            left++;
+            right--;
+        }
+    }
+}`,
+    cpp: `void rotate(vector<vector<int>>& matrix) {
+    int n = matrix.size();
+    
+    // Transpose
+    for (int i = 0; i < n; i++) {
+        for (int j = i + 1; j < n; j++) {
+            swap(matrix[i][j], matrix[j][i]);
+        }
+    }
+    
+    // Reverse each row
+    for (int i = 0; i < n; i++) {
+        reverse(matrix[i].begin(), matrix[i].end());
+    }
+}`,
+    typescript: `function rotate(matrix: number[][]): void {
+    const n = matrix.length;
+    
+    // Transpose
+    for (let i = 0; i < n; i++) {
+        for (let j = i + 1; j < n; j++) {
+            [matrix[i][j], matrix[j][i]] = [matrix[j][i], matrix[i][j]];
+        }
+    }
+    
+    // Reverse each row
+    for (let i = 0; i < n; i++) {
+        matrix[i].reverse();
+    }
+}`,
+    explanation: "Two steps for 90° clockwise rotation: 1) Transpose matrix (swap matrix[i][j] with matrix[j][i]). 2) Reverse each row. For counter-clockwise, reverse columns instead. O(n²) time, O(1) space."
+  },
+  "word-search": {
+    python: `def exist(board: List[List[str]], word: str) -> bool:
+    m, n = len(board), len(board[0])
+    
+    def dfs(r, c, index):
+        if index == len(word):
+            return True
+        
+        if (r < 0 or r >= m or c < 0 or c >= n or 
+            board[r][c] != word[index]):
+            return False
+        
+        # Mark as visited
+        temp = board[r][c]
+        board[r][c] = '#'
+        
+        # Try all 4 directions
+        found = (dfs(r+1, c, index+1) or dfs(r-1, c, index+1) or
+                 dfs(r, c+1, index+1) or dfs(r, c-1, index+1))
+        
+        # Backtrack
+        board[r][c] = temp
+        return found
+    
+    for i in range(m):
+        for j in range(n):
+            if dfs(i, j, 0):
+                return True
+    
+    return False`,
+    java: `public boolean exist(char[][] board, String word) {
+    int m = board.length, n = board[0].length;
+    
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            if (dfs(board, word, i, j, 0)) {
+                return true;
+            }
+        }
+    }
+    
+    return false;
+}
+
+private boolean dfs(char[][] board, String word, int r, int c, int index) {
+    if (index == word.length()) return true;
+    
+    if (r < 0 || r >= board.length || c < 0 || c >= board[0].length ||
+        board[r][c] != word.charAt(index)) {
+        return false;
+    }
+    
+    char temp = board[r][c];
+    board[r][c] = '#';
+    
+    boolean found = dfs(board, word, r+1, c, index+1) ||
+                    dfs(board, word, r-1, c, index+1) ||
+                    dfs(board, word, r, c+1, index+1) ||
+                    dfs(board, word, r, c-1, index+1);
+    
+    board[r][c] = temp;
+    return found;
+}`,
+    cpp: `bool dfs(vector<vector<char>>& board, string& word, int r, int c, int index) {
+    if (index == word.length()) return true;
+    
+    if (r < 0 || r >= board.size() || c < 0 || c >= board[0].size() ||
+        board[r][c] != word[index]) {
+        return false;
+    }
+    
+    char temp = board[r][c];
+    board[r][c] = '#';
+    
+    bool found = dfs(board, word, r+1, c, index+1) ||
+                 dfs(board, word, r-1, c, index+1) ||
+                 dfs(board, word, r, c+1, index+1) ||
+                 dfs(board, word, r, c-1, index+1);
+    
+    board[r][c] = temp;
+    return found;
+}
+
+bool exist(vector<vector<char>>& board, string word) {
+    for (int i = 0; i < board.size(); i++) {
+        for (int j = 0; j < board[0].size(); j++) {
+            if (dfs(board, word, i, j, 0)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}`,
+    typescript: `function exist(board: string[][], word: string): boolean {
+    const m = board.length, n = board[0].length;
+    
+    function dfs(r: number, c: number, index: number): boolean {
+        if (index === word.length) return true;
+        
+        if (r < 0 || r >= m || c < 0 || c >= n ||
+            board[r][c] !== word[index]) {
+            return false;
+        }
+        
+        const temp = board[r][c];
+        board[r][c] = '#';
+        
+        const found = dfs(r+1, c, index+1) || dfs(r-1, c, index+1) ||
+                     dfs(r, c+1, index+1) || dfs(r, c-1, index+1);
+        
+        board[r][c] = temp;
+        return found;
+    }
+    
+    for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+            if (dfs(i, j, 0)) return true;
+        }
+    }
+    
+    return false;
+}`,
+    explanation: "Backtracking DFS. For each cell, if it matches word[0], start DFS. Mark visited cells, try 4 directions. If path found, return true. Backtrack by unmarking. O(m×n×4^L) worst case."
+  },
+  "longest-repeating-character-replacement": {
+    python: `def characterReplacement(s: str, k: int) -> int:
+    count = {}
+    max_length = 0
+    max_count = 0
+    left = 0
+    
+    for right in range(len(s)):
+        count[s[right]] = count.get(s[right], 0) + 1
+        max_count = max(max_count, count[s[right]])
+        
+        # If window invalid, shrink from left
+        while (right - left + 1) - max_count > k:
+            count[s[left]] -= 1
+            left += 1
+        
+        max_length = max(max_length, right - left + 1)
+    
+    return max_length`,
+    java: `public int characterReplacement(String s, int k) {
+    int[] count = new int[26];
+    int maxLength = 0;
+    int maxCount = 0;
+    int left = 0;
+    
+    for (int right = 0; right < s.length(); right++) {
+        count[s.charAt(right) - 'A']++;
+        maxCount = Math.max(maxCount, count[s.charAt(right) - 'A']);
+        
+        while ((right - left + 1) - maxCount > k) {
+            count[s.charAt(left) - 'A']--;
+            left++;
+        }
+        
+        maxLength = Math.max(maxLength, right - left + 1);
+    }
+    
+    return maxLength;
+}`,
+    cpp: `int characterReplacement(string s, int k) {
+    vector<int> count(26, 0);
+    int maxLength = 0;
+    int maxCount = 0;
+    int left = 0;
+    
+    for (int right = 0; right < s.length(); right++) {
+        count[s[right] - 'A']++;
+        maxCount = max(maxCount, count[s[right] - 'A']);
+        
+        while ((right - left + 1) - maxCount > k) {
+            count[s[left] - 'A']--;
+            left++;
+        }
+        
+        maxLength = max(maxLength, right - left + 1);
+    }
+    
+    return maxLength;
+}`,
+    typescript: `function characterReplacement(s: string, k: number): number {
+    const count = new Array(26).fill(0);
+    let maxLength = 0;
+    let maxCount = 0;
+    let left = 0;
+    
+    for (let right = 0; right < s.length; right++) {
+        count[s.charCodeAt(right) - 65]++;
+        maxCount = Math.max(maxCount, count[s.charCodeAt(right) - 65]);
+        
+        while ((right - left + 1) - maxCount > k) {
+            count[s.charCodeAt(left) - 65]--;
+            left++;
+        }
+        
+        maxLength = Math.max(maxLength, right - left + 1);
+    }
+    
+    return maxLength;
+}`,
+    explanation: "Sliding window. Track count of most frequent char in window. If (window size - max frequency) > k, shrink window. Window is valid if we can replace remaining chars within k changes. O(n) time."
+  },
+  "minimum-window-substring": {
+    python: `def minWindow(s: str, t: str) -> str:
+    if not s or not t:
+        return ""
+    
+    need = {}
+    for c in t:
+        need[c] = need.get(c, 0) + 1
+    
+    required = len(need)
+    formed = 0
+    window = {}
+    
+    left = 0
+    min_len = float('inf')
+    min_left = 0
+    
+    for right in range(len(s)):
+        char = s[right]
+        window[char] = window.get(char, 0) + 1
+        
+        if char in need and window[char] == need[char]:
+            formed += 1
+        
+        # Shrink window
+        while left <= right and formed == required:
+            if right - left + 1 < min_len:
+                min_len = right - left + 1
+                min_left = left
+            
+            char = s[left]
+            window[char] -= 1
+            if char in need and window[char] < need[char]:
+                formed -= 1
+            left += 1
+    
+    return "" if min_len == float('inf') else s[min_left:min_left + min_len]`,
+    java: `public String minWindow(String s, String t) {
+    if (s.length() == 0 || t.length() == 0) return "";
+    
+    Map<Character, Integer> need = new HashMap<>();
+    for (char c : t.toCharArray()) {
+        need.put(c, need.getOrDefault(c, 0) + 1);
+    }
+    
+    int required = need.size();
+    int formed = 0;
+    Map<Character, Integer> window = new HashMap<>();
+    
+    int left = 0;
+    int minLen = Integer.MAX_VALUE;
+    int minLeft = 0;
+    
+    for (int right = 0; right < s.length(); right++) {
+        char c = s.charAt(right);
+        window.put(c, window.getOrDefault(c, 0) + 1);
+        
+        if (need.containsKey(c) && window.get(c).intValue() == need.get(c).intValue()) {
+            formed++;
+        }
+        
+        while (left <= right && formed == required) {
+            if (right - left + 1 < minLen) {
+                minLen = right - left + 1;
+                minLeft = left;
+            }
+            
+            char leftChar = s.charAt(left);
+            window.put(leftChar, window.get(leftChar) - 1);
+            if (need.containsKey(leftChar) && window.get(leftChar) < need.get(leftChar)) {
+                formed--;
+            }
+            left++;
+        }
+    }
+    
+    return minLen == Integer.MAX_VALUE ? "" : s.substring(minLeft, minLeft + minLen);
+}`,
+    cpp: `string minWindow(string s, string t) {
+    if (s.empty() || t.empty()) return "";
+    
+    unordered_map<char, int> need, window;
+    for (char c : t) {
+        need[c]++;
+    }
+    
+    int required = need.size();
+    int formed = 0;
+    
+    int left = 0;
+    int minLen = INT_MAX;
+    int minLeft = 0;
+    
+    for (int right = 0; right < s.length(); right++) {
+        char c = s[right];
+        window[c]++;
+        
+        if (need.find(c) != need.end() && window[c] == need[c]) {
+            formed++;
+        }
+        
+        while (left <= right && formed == required) {
+            if (right - left + 1 < minLen) {
+                minLen = right - left + 1;
+                minLeft = left;
+            }
+            
+            char leftChar = s[left];
+            window[leftChar]--;
+            if (need.find(leftChar) != need.end() && window[leftChar] < need[leftChar]) {
+                formed--;
+            }
+            left++;
+        }
+    }
+    
+    return minLen == INT_MAX ? "" : s.substr(minLeft, minLen);
+}`,
+    typescript: `function minWindow(s: string, t: string): string {
+    if (!s || !t) return "";
+    
+    const need = new Map<string, number>();
+    for (const c of t) {
+        need.set(c, (need.get(c) || 0) + 1);
+    }
+    
+    const required = need.size;
+    let formed = 0;
+    const window = new Map<string, number>();
+    
+    let left = 0;
+    let minLen = Infinity;
+    let minLeft = 0;
+    
+    for (let right = 0; right < s.length; right++) {
+        const c = s[right];
+        window.set(c, (window.get(c) || 0) + 1);
+        
+        if (need.has(c) && window.get(c) === need.get(c)) {
+            formed++;
+        }
+        
+        while (left <= right && formed === required) {
+            if (right - left + 1 < minLen) {
+                minLen = right - left + 1;
+                minLeft = left;
+            }
+            
+            const leftChar = s[left];
+            window.set(leftChar, window.get(leftChar)! - 1);
+            if (need.has(leftChar) && window.get(leftChar)! < need.get(leftChar)!) {
+                formed--;
+            }
+            left++;
+        }
+    }
+    
+    return minLen === Infinity ? "" : s.substring(minLeft, minLeft + minLen);
+}`,
+    explanation: "Sliding window with two hashmaps. Expand right to include chars from t. When window contains all required chars, shrink from left while valid. Track minimum window. O(m+n) time where m,n are lengths of s,t."
+  },
+  "valid-palindrome": {
+    python: `def isPalindrome(s: str) -> bool:
+    left, right = 0, len(s) - 1
+    
+    while left < right:
+        # Skip non-alphanumeric
+        while left < right and not s[left].isalnum():
+            left += 1
+        while left < right and not s[right].isalnum():
+            right -= 1
+        
+        # Compare
+        if s[left].lower() != s[right].lower():
+            return False
+        
+        left += 1
+        right -= 1
+    
+    return True`,
+    java: `public boolean isPalindrome(String s) {
+    int left = 0, right = s.length() - 1;
+    
+    while (left < right) {
+        while (left < right && !Character.isLetterOrDigit(s.charAt(left))) {
+            left++;
+        }
+        while (left < right && !Character.isLetterOrDigit(s.charAt(right))) {
+            right--;
+        }
+        
+        if (Character.toLowerCase(s.charAt(left)) != Character.toLowerCase(s.charAt(right))) {
+            return false;
+        }
+        
+        left++;
+        right--;
+    }
+    
+    return true;
+}`,
+    cpp: `bool isPalindrome(string s) {
+    int left = 0, right = s.length() - 1;
+    
+    while (left < right) {
+        while (left < right && !isalnum(s[left])) {
+            left++;
+        }
+        while (left < right && !isalnum(s[right])) {
+            right--;
+        }
+        
+        if (tolower(s[left]) != tolower(s[right])) {
+            return false;
+        }
+        
+        left++;
+        right--;
+    }
+    
+    return true;
+}`,
+    typescript: `function isPalindrome(s: string): boolean {
+    let left = 0, right = s.length - 1;
+    
+    while (left < right) {
+        while (left < right && !isAlphanumeric(s[left])) {
+            left++;
+        }
+        while (left < right && !isAlphanumeric(s[right])) {
+            right--;
+        }
+        
+        if (s[left].toLowerCase() !== s[right].toLowerCase()) {
+            return false;
+        }
+        
+        left++;
+        right--;
+    }
+    
+    return true;
+}
+
+function isAlphanumeric(c: string): boolean {
+    return /^[a-zA-Z0-9]$/.test(c);
+}`,
+    explanation: "Two pointers from both ends. Skip non-alphanumeric chars. Compare lowercase versions. Move pointers inward. If any mismatch, not palindrome. O(n) time, O(1) space."
+  },
+  "longest-palindromic-substring": {
+    python: `def longestPalindrome(s: str) -> str:
+    if not s:
+        return ""
+    
+    def expand_around_center(left, right):
+        while left >= 0 and right < len(s) and s[left] == s[right]:
+            left -= 1
+            right += 1
+        return right - left - 1
+    
+    start = 0
+    max_len = 0
+    
+    for i in range(len(s)):
+        # Odd length palindromes
+        len1 = expand_around_center(i, i)
+        # Even length palindromes
+        len2 = expand_around_center(i, i + 1)
+        
+        length = max(len1, len2)
+        
+        if length > max_len:
+            max_len = length
+            start = i - (length - 1) // 2
+    
+    return s[start:start + max_len]`,
+    java: `public String longestPalindrome(String s) {
+    if (s == null || s.length() == 0) return "";
+    
+    int start = 0, maxLen = 0;
+    
+    for (int i = 0; i < s.length(); i++) {
+        int len1 = expandAroundCenter(s, i, i);
+        int len2 = expandAroundCenter(s, i, i + 1);
+        int len = Math.max(len1, len2);
+        
+        if (len > maxLen) {
+            maxLen = len;
+            start = i - (len - 1) / 2;
+        }
+    }
+    
+    return s.substring(start, start + maxLen);
+}
+
+private int expandAroundCenter(String s, int left, int right) {
+    while (left >= 0 && right < s.length() && s.charAt(left) == s.charAt(right)) {
+        left--;
+        right++;
+    }
+    return right - left - 1;
+}`,
+    cpp: `int expandAroundCenter(string& s, int left, int right) {
+    while (left >= 0 && right < s.length() && s[left] == s[right]) {
+        left--;
+        right++;
+    }
+    return right - left - 1;
+}
+
+string longestPalindrome(string s) {
+    if (s.empty()) return "";
+    
+    int start = 0, maxLen = 0;
+    
+    for (int i = 0; i < s.length(); i++) {
+        int len1 = expandAroundCenter(s, i, i);
+        int len2 = expandAroundCenter(s, i, i + 1);
+        int len = max(len1, len2);
+        
+        if (len > maxLen) {
+            maxLen = len;
+            start = i - (len - 1) / 2;
+        }
+    }
+    
+    return s.substr(start, maxLen);
+}`,
+    typescript: `function longestPalindrome(s: string): string {
+    if (!s) return "";
+    
+    function expandAroundCenter(left: number, right: number): number {
+        while (left >= 0 && right < s.length && s[left] === s[right]) {
+            left--;
+            right++;
+        }
+        return right - left - 1;
+    }
+    
+    let start = 0, maxLen = 0;
+    
+    for (let i = 0; i < s.length; i++) {
+        const len1 = expandAroundCenter(i, i);
+        const len2 = expandAroundCenter(i, i + 1);
+        const len = Math.max(len1, len2);
+        
+        if (len > maxLen) {
+            maxLen = len;
+            start = i - Math.floor((len - 1) / 2);
+        }
+    }
+    
+    return s.substring(start, start + maxLen);
+}`,
+    explanation: "Expand around center approach. For each position, try both odd (single center) and even (two centers) length palindromes. Expand outward while chars match. Track longest. O(n²) time, O(1) space."
+  },
+  "palindromic-substrings": {
+    python: `def countSubstrings(s: str) -> int:
+    count = 0
+    
+    def expand_around_center(left, right):
+        nonlocal count
+        while left >= 0 and right < len(s) and s[left] == s[right]:
+            count += 1
+            left -= 1
+            right += 1
+    
+    for i in range(len(s)):
+        # Odd length
+        expand_around_center(i, i)
+        # Even length
+        expand_around_center(i, i + 1)
+    
+    return count`,
+    java: `public int countSubstrings(String s) {
+    int count = 0;
+    
+    for (int i = 0; i < s.length(); i++) {
+        count += expandAroundCenter(s, i, i);
+        count += expandAroundCenter(s, i, i + 1);
+    }
+    
+    return count;
+}
+
+private int expandAroundCenter(String s, int left, int right) {
+    int count = 0;
+    while (left >= 0 && right < s.length() && s.charAt(left) == s.charAt(right)) {
+        count++;
+        left--;
+        right++;
+    }
+    return count;
+}`,
+    cpp: `int expandAroundCenter(string& s, int left, int right) {
+    int count = 0;
+    while (left >= 0 && right < s.length() && s[left] == s[right]) {
+        count++;
+        left--;
+        right++;
+    }
+    return count;
+}
+
+int countSubstrings(string s) {
+    int count = 0;
+    
+    for (int i = 0; i < s.length(); i++) {
+        count += expandAroundCenter(s, i, i);
+        count += expandAroundCenter(s, i, i + 1);
+    }
+    
+    return count;
+}`,
+    typescript: `function countSubstrings(s: string): number {
+    let count = 0;
+    
+    function expandAroundCenter(left: number, right: number): void {
+        while (left >= 0 && right < s.length && s[left] === s[right]) {
+            count++;
+            left--;
+            right++;
+        }
+    }
+    
+    for (let i = 0; i < s.length; i++) {
+        expandAroundCenter(i, i);
+        expandAroundCenter(i, i + 1);
+    }
+    
+    return count;
+}`,
+    explanation: "Similar to longest palindromic substring but count all instead of tracking max. For each center, expand and count valid palindromes. O(n²) time, O(1) space."
+  },
+  "encode-and-decode-strings": {
+    python: `def encode(strs: List[str]) -> str:
+    result = ""
+    for s in strs:
+        result += str(len(s)) + "#" + s
+    return result
+
+def decode(s: str) -> List[str]:
+    result = []
+    i = 0
+    
+    while i < len(s):
+        # Find delimiter
+        j = i
+        while s[j] != '#':
+            j += 1
+        
+        # Get length
+        length = int(s[i:j])
+        
+        # Extract string
+        result.append(s[j+1:j+1+length])
+        i = j + 1 + length
+    
+    return result`,
+    java: `public String encode(List<String> strs) {
+    StringBuilder result = new StringBuilder();
+    for (String s : strs) {
+        result.append(s.length()).append("#").append(s);
+    }
+    return result.toString();
+}
+
+public List<String> decode(String s) {
+    List<String> result = new ArrayList<>();
+    int i = 0;
+    
+    while (i < s.length()) {
+        int j = i;
+        while (s.charAt(j) != '#') {
+            j++;
+        }
+        
+        int length = Integer.parseInt(s.substring(i, j));
+        result.add(s.substring(j + 1, j + 1 + length));
+        i = j + 1 + length;
+    }
+    
+    return result;
+}`,
+    cpp: `string encode(vector<string>& strs) {
+    string result;
+    for (const string& s : strs) {
+        result += to_string(s.length()) + "#" + s;
+    }
+    return result;
+}
+
+vector<string> decode(string s) {
+    vector<string> result;
+    int i = 0;
+    
+    while (i < s.length()) {
+        int j = i;
+        while (s[j] != '#') {
+            j++;
+        }
+        
+        int length = stoi(s.substr(i, j - i));
+        result.push_back(s.substr(j + 1, length));
+        i = j + 1 + length;
+    }
+    
+    return result;
+}`,
+    typescript: `function encode(strs: string[]): string {
+    let result = "";
+    for (const s of strs) {
+        result += s.length + "#" + s;
+    }
+    return result;
+}
+
+function decode(s: string): string[] {
+    const result: string[] = [];
+    let i = 0;
+    
+    while (i < s.length) {
+        let j = i;
+        while (s[j] !== '#') {
+            j++;
+        }
+        
+        const length = parseInt(s.substring(i, j));
+        result.push(s.substring(j + 1, j + 1 + length));
+        i = j + 1 + length;
+    }
+    
+    return result;
+}`,
+    explanation: "Length-prefixed encoding: for each string, prepend length + delimiter (#). To decode: read length, skip delimiter, extract that many chars. Handles any characters including delimiters. O(n) time for both."
   }
 };
