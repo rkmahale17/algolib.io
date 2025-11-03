@@ -9,6 +9,12 @@ import { Input } from '@/components/ui/input';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const Blind75 = () => {
   const [searchParams] = useSearchParams();
@@ -44,6 +50,29 @@ const Blind75 = () => {
     hard: blind75Problems.filter(p => p.difficulty === 'hard').length,
   };
 
+  const faqItems = [
+    {
+      question: "What is the Blind 75 list?",
+      answer: "The Blind 75 is a curated collection of 75 essential LeetCode problems selected by a former Facebook engineer. These problems cover fundamental data structures and algorithms commonly asked in technical interviews at top tech companies like Google, Amazon, Facebook, Apple, and Microsoft (FAANG)."
+    },
+    {
+      question: "How long does it take to complete all 75 problems?",
+      answer: "On average, it takes 4-8 weeks to complete all 75 problems if you practice 2-3 problems per day. The time varies based on your current skill level and the complexity of each problem. Focus on understanding the concepts rather than rushing through the list."
+    },
+    {
+      question: "Are solutions provided in multiple programming languages?",
+      answer: "Yes! Each problem includes complete solutions in Python, Java, C++, and TypeScript. All solutions include detailed explanations, time/space complexity analysis, and interactive visualizations to help you understand the algorithm."
+    },
+    {
+      question: "Do I need to solve problems in order?",
+      answer: "No, you don't have to solve them in order. However, we recommend starting with easier problems and progressing to harder ones. You can also filter by category (Arrays, Strings, Trees, etc.) to focus on specific data structures first."
+    },
+    {
+      question: "How do I track my progress?",
+      answer: "You can filter problems by difficulty and category to organize your practice. We recommend keeping a personal log of completed problems and revisiting challenging ones periodically to reinforce your understanding."
+    }
+  ];
+
   return (
     <>
       <Helmet>
@@ -54,14 +83,32 @@ const Blind75 = () => {
         />
         <meta 
           name="keywords" 
-          content="blind 75, leetcode, coding interview, interview preparation, leetcode problems, algorithm interview, FAANG interview" 
+          content="blind 75, leetcode, coding interview, interview preparation, leetcode problems, algorithm interview, FAANG interview, technical interview, coding practice" 
         />
+        <meta name="author" content="AlgoLib.io" />
+        <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
         <link rel="canonical" href="https://algolib.io/blind75" />
         
+        {/* Open Graph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="AlgoLib.io" />
         <meta property="og:title" content="Blind 75 LeetCode Problems - Complete Interview Guide" />
         <meta property="og:description" content="Master the 75 most important LeetCode problems for coding interviews with detailed solutions and visualizations" />
         <meta property="og:url" content="https://algolib.io/blind75" />
+        <meta property="og:image" content="https://algolib.io/og-image.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:locale" content="en_US" />
         
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@algolib_io" />
+        <meta name="twitter:creator" content="@algolib_io" />
+        <meta name="twitter:title" content="Blind 75 LeetCode Problems - Complete Interview Guide" />
+        <meta name="twitter:description" content="Master the 75 most important LeetCode problems for coding interviews with detailed solutions and visualizations" />
+        <meta name="twitter:image" content="https://algolib.io/og-image.png" />
+        
+        {/* CollectionPage Schema */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
@@ -69,6 +116,12 @@ const Blind75 = () => {
             "name": "Blind 75 LeetCode Problems",
             "description": "Curated list of 75 essential LeetCode problems for interview preparation",
             "url": "https://algolib.io/blind75",
+            "inLanguage": "en-US",
+            "isPartOf": {
+              "@type": "WebSite",
+              "name": "AlgoLib.io",
+              "url": "https://algolib.io"
+            },
             "mainEntity": {
               "@type": "ItemList",
               "numberOfItems": blind75Problems.length,
@@ -85,6 +138,48 @@ const Blind75 = () => {
                 }
               }))
             }
+          })}
+        </script>
+        
+        {/* BreadcrumbList Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "item": {
+                  "@id": "https://algolib.io",
+                  "name": "Home"
+                }
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "item": {
+                  "@id": "https://algolib.io/blind75",
+                  "name": "Blind 75"
+                }
+              }
+            ]
+          })}
+        </script>
+        
+        {/* FAQPage Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": faqItems.map(item => ({
+              "@type": "Question",
+              "name": item.question,
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": item.answer
+              }
+            }))
           })}
         </script>
       </Helmet>
@@ -284,6 +379,28 @@ const Blind75 = () => {
               <p className="text-muted-foreground">No problems found matching your filters.</p>
             </div>
           )}
+        </div>
+
+        {/* FAQ Section */}
+        <div className="container mx-auto px-4 py-16">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl font-bold text-center mb-2">Frequently Asked Questions</h2>
+            <p className="text-center text-muted-foreground mb-8">
+              Everything you need to know about the Blind 75 list
+            </p>
+            <Accordion type="single" collapsible className="w-full">
+              {faqItems.map((faq, index) => (
+                <AccordionItem key={index} value={`item-${index}`}>
+                  <AccordionTrigger className="text-left">
+                    {faq.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground">
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
         </div>
       
       <Footer />
