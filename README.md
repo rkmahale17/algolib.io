@@ -148,6 +148,91 @@ AlgoLib.io is an open-source platform to **learn, visualize, and master algorith
 
 </details>
 
+// ...existing code...
+
+<details>
+<summary><strong>Blind 75 Problems</strong></summary>
+
+- Array & Hashing
+
+  - [Two Sum](https://algolib.io/blind75/two-sum) — Find pair that sums to target
+  - [Contains Duplicate](https://algolib.io/blind75/contains-duplicate) — Check for duplicates in array
+  - [Valid Anagram](https://algolib.io/blind75/valid-anagram) — Check if strings are anagrams
+  - [Group Anagrams](https://algolib.io/blind75/group-anagrams) — Group strings by anagram
+  - [Top K Frequent](https://algolib.io/blind75/top-k-frequent) — Find k most frequent elements
+  - [Product Except Self](https://algolib.io/blind75/product-except-self) — Array product without division
+  - [Encode Decode Strings](https://algolib.io/blind75/encode-decode) — Encode/decode string array
+  - [Longest Consecutive](https://algolib.io/blind75/longest-consecutive) — Longest consecutive sequence
+
+- Two Pointers
+
+  - [Valid Palindrome](https://algolib.io/blind75/valid-palindrome) — Check if string is palindrome
+  - [Three Sum](https://algolib.io/blind75/three-sum) — Find triplets that sum to zero
+  - [Container With Most Water](https://algolib.io/blind75/container-water) — Max water container area
+
+- Sliding Window
+
+  - [Best Time to Buy Sell](https://algolib.io/blind75/best-time-buy-sell) — Max profit from stock prices
+  - [Longest Substring](https://algolib.io/blind75/longest-substring) — Longest substring without repeating chars
+  - [Longest Repeating](https://algolib.io/blind75/longest-repeating) — Longest repeating char replacement
+  - [Minimum Window](https://algolib.io/blind75/minimum-window) — Minimum window substring
+
+- Stack
+
+  - [Valid Parentheses](https://algolib.io/blind75/valid-parentheses) — Check valid bracket sequence
+  - [Min Stack](https://algolib.io/blind75/min-stack) — Stack with constant time minimum
+
+- Binary Search
+
+  - [Find Minimum in Rotated](https://algolib.io/blind75/find-minimum) — Min in rotated sorted array
+  - [Search in Rotated](https://algolib.io/blind75/search-rotated) — Search in rotated sorted array
+
+- Trees
+
+  - [Maximum Depth](https://algolib.io/blind75/maximum-depth) — Max depth of binary tree
+  - [Same Tree](https://algolib.io/blind75/same-tree) — Check if trees are identical
+  - [Invert Binary Tree](https://algolib.io/blind75/invert-tree) — Mirror a binary tree
+  - [Binary Tree Maximum Path](https://algolib.io/blind75/maximum-path) — Max path sum in binary tree
+  - [Binary Tree Level Order](https://algolib.io/blind75/level-order) — Level order traversal
+  - [Serialize Deserialize](https://algolib.io/blind75/serialize) — Serialize/deserialize binary tree
+  - [Subtree of Another](https://algolib.io/blind75/subtree) — Check if tree is subtree
+  - [Construct from Preorder](https://algolib.io/blind75/construct-preorder) — Build tree from traversal
+
+- Tries
+
+  - [Implement Trie](https://algolib.io/blind75/implement-trie) — Implement prefix tree
+  - [Word Search II](https://algolib.io/blind75/word-search-ii) — Find words in board using trie
+
+- Heap / Priority Queue
+
+  - [Find Median from Stream](https://algolib.io/blind75/median-stream) — Running median with heaps
+
+- Backtracking
+
+  - [Combination Sum](https://algolib.io/blind75/combination-sum) — Find combinations that sum to target
+  - [Word Search](https://algolib.io/blind75/word-search) — Find word in board
+
+- Graphs
+
+  - [Number of Islands](https://algolib.io/blind75/number-islands) — Count islands in grid
+  - [Clone Graph](https://algolib.io/blind75/clone-graph) — Deep copy of graph
+  - [Pacific Atlantic](https://algolib.io/blind75/pacific-atlantic) — Water flow between oceans
+  - [Course Schedule](https://algolib.io/blind75/course-schedule) — Course prerequisites graph
+  - [Number of Connected](https://algolib.io/blind75/connected-components) — Count connected components
+  - [Graph Valid Tree](https://algolib.io/blind75/valid-tree) — Check if graph is valid tree
+
+- Dynamic Programming
+  - [Climbing Stairs](https://algolib.io/blind75/climbing-stairs) — Ways to climb n stairs
+  - [House Robber](https://algolib.io/blind75/house-robber) — Max money without adjacent houses
+  - [House Robber II](https://algolib.io/blind75/house-robber-ii) — Circular house robber
+  - [Longest Palindromic](https://algolib.io/blind75/longest-palindromic) — Longest palindromic substring
+  - [Unique Paths](https://algolib.io/blind75/unique-paths) — Unique paths in grid
+  - [Jump Game](https://algolib.io/blind75/jump-game) — Can reach last index
+
+</details>
+
+// ...existing code...
+
 ---
 
 ## 🧠 How can I edit this code?
