@@ -430,9 +430,14 @@ const Blind75Detail: React.FC = () => {
               <div className="space-y-4">
                 <div className="flex items-start justify-between flex-wrap gap-4">
                   <div className="space-y-2 flex-1">
-                    <h1 className="text-2xl sm:text-3xl font-bold">
-                      {problem.title}
-                    </h1>
+                    <div className="flex items-center gap-3">
+                      <Badge variant="outline" className="text-sm">
+                        #{problem.id}
+                      </Badge>
+                      <h1 className="text-2xl sm:text-3xl font-bold">
+                        {problem.title}
+                      </h1>
+                    </div>
                     <div className="flex items-center gap-2 flex-wrap">
                       <Badge
                         variant="outline"
@@ -465,40 +470,6 @@ const Blind75Detail: React.FC = () => {
               </div>
             </Card>
 
-            {/* Completion Tracker (Only for logged-in users) */}
-            {user && (
-              <Card className="p-4 glass-card border-primary/20">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`p-2 rounded-full ${
-                        isCompleted ? "bg-green-500/20" : "bg-muted"
-                      }`}
-                    >
-                      <CheckCircle2
-                        className={`w-5 h-5 ${
-                          isCompleted
-                            ? "text-green-500"
-                            : "text-muted-foreground"
-                        }`}
-                      />
-                    </div>
-                    <div>
-                      <p className="font-medium">Track Your Progress</p>
-                      <p className="text-xs text-muted-foreground">
-                        Mark this problem as completed
-                      </p>
-                    </div>
-                  </div>
-                  <Checkbox
-                    checked={isCompleted}
-                    onCheckedChange={toggleCompletion}
-                    disabled={isLoadingProgress}
-                    className="h-6 w-6"
-                  />
-                </div>
-              </Card>
-            )}
 
             {/* Problem Description - Always visible */}
             <Card className="p-4 sm:p-6 glass-card overflow-hidden">
