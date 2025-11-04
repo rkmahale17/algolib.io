@@ -36,7 +36,7 @@ const Home = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Fetch user progress
+  // Fetch user progress and subscribe to real-time updates
   useEffect(() => {
     const fetchUserProgress = async () => {
       if (!user) {
@@ -56,6 +56,30 @@ const Home = () => {
     };
 
     fetchUserProgress();
+
+    // Subscribe to real-time updates
+    if (!user) return;
+
+    const channel = supabase
+      .channel('user_progress_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'user_progress',
+          filter: `user_id=eq.${user.id}`,
+        },
+        () => {
+          // Refetch progress when changes occur
+          fetchUserProgress();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   // Read category from URL params on mount

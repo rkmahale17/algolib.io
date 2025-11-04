@@ -1016,6 +1016,10 @@ const Blind75Detail: React.FC = () => {
                 <Breadcrumbs
                   items={[
                     {
+                      label: "Blind 75",
+                      href: "/blind75",
+                    },
+                    {
                       label: problem.category,
                       href: `/blind75?category=${encodeURIComponent(
                         problem.category
