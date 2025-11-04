@@ -1,133 +1,211 @@
-import { useState } from 'react';
-import { SimpleArrayVisualization } from '../shared/SimpleArrayVisualization';
-import { SimpleStepControls } from '../shared/SimpleStepControls';
-import { VariablePanel } from '../shared/VariablePanel';
+import { useEffect, useRef, useState } from 'react';
 import { CodeHighlighter } from '../shared/CodeHighlighter';
-import { VisualizationLayout } from '../shared/VisualizationLayout';
+import { StepControls } from '../shared/StepControls';
+import { VariablePanel } from '../shared/VariablePanel';
+
+interface Step {
+  array: number[];
+  highlights: number[];
+  minIndex: number;
+  currentIndex: number;
+  variables: Record<string, any>;
+  explanation: string;
+  lineNumber: number;
+}
 
 export const BestTimeToBuyAndSellStockVisualization = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const prices = [7, 1, 5, 3, 6, 4];
-  
-  const steps = [
-    {
-      array: prices,
-      highlighting: [],
-      variables: { minPrice: 'Infinity', maxProfit: 0 },
-      explanation: "Initialize: minPrice=Infinity, maxProfit=0. We'll track minimum price and max profit.",
-      highlightedLine: 1
-    },
-    {
-      array: prices,
-      highlighting: [0],
-      variables: { minPrice: 7, maxProfit: 0, price: 7 },
-      explanation: "Day 0: price=7. Update minPrice=min(∞,7)=7. profit=7-7=0. maxProfit=0.",
-      highlightedLine: 5
-    },
-    {
-      array: prices,
-      highlighting: [1],
-      variables: { minPrice: 1, maxProfit: 0, price: 1 },
-      explanation: "Day 1: price=1. Update minPrice=min(7,1)=1. profit=1-1=0. maxProfit=0.",
-      highlightedLine: 5
-    },
-    {
-      array: prices,
-      highlighting: [2],
-      variables: { minPrice: 1, maxProfit: 4, price: 5 },
-      explanation: "Day 2: price=5. minPrice=1. profit=5-1=4. Update maxProfit=max(0,4)=4!",
-      highlightedLine: 8
-    },
-    {
-      array: prices,
-      highlighting: [3],
-      variables: { minPrice: 1, maxProfit: 4, price: 3 },
-      explanation: "Day 3: price=3. minPrice=1. profit=3-1=2. maxProfit stays 4.",
-      highlightedLine: 8
-    },
-    {
-      array: prices,
-      highlighting: [4],
-      variables: { minPrice: 1, maxProfit: 5, price: 6 },
-      explanation: "Day 4: price=6. minPrice=1. profit=6-1=5. Update maxProfit=max(4,5)=5!",
-      highlightedLine: 8
-    },
-    {
-      array: prices,
-      highlighting: [5],
-      variables: { minPrice: 1, maxProfit: 5, price: 4 },
-      explanation: "Day 5: price=4. minPrice=1. profit=4-1=3. maxProfit stays 5.",
-      highlightedLine: 8
-    },
-    {
-      array: prices,
-      highlighting: [],
-      variables: { minPrice: 1, maxProfit: 5 },
-      explanation: "Complete! Best strategy: Buy at 1, sell at 6. Maximum profit = 5. Time: O(n).",
-      highlightedLine: 11
-    }
-  ];
+  const [steps, setSteps] = useState<Step[]>([]);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [speed, setSpeed] = useState(1);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const code = `function maxProfit(prices: number[]): number {
-  if (prices.length === 0) return 0;
-  
   let minPrice = Infinity;
   let maxProfit = 0;
   
-  for (const price of prices) {
-    // Update minimum price seen so far
-    minPrice = Math.min(minPrice, price);
-    
-    // Calculate profit if we sell at current price
-    const profit = price - minPrice;
-    
-    // Update maximum profit
-    maxProfit = Math.max(maxProfit, profit);
+  for (let i = 0; i < prices.length; i++) {
+    if (prices[i] < minPrice) {
+      minPrice = prices[i];
+    } else {
+      maxProfit = Math.max(maxProfit, prices[i] - minPrice);
+    }
   }
   
   return maxProfit;
 }`;
 
-  const leftContent = (
-    <>
-      <SimpleArrayVisualization
-        array={steps[currentStep].array}
-        highlights={steps[currentStep].highlighting}
-        label="Stock Prices"
-      />
-      
-      <div className="p-4 bg-primary/20 rounded-lg border border-primary/30">
-        <p className="text-sm font-medium">{steps[currentStep].explanation}</p>
-      </div>
+  const generateSteps = () => {
+    const prices = [7, 1, 5, 3, 6, 4];
+    const newSteps: Step[] = [];
+    let minPrice = Infinity;
+    let maxProfit = 0;
+    let minIndex = -1;
 
-      <VariablePanel variables={steps[currentStep].variables} />
-    </>
-  );
+    newSteps.push({
+      array: [...prices],
+      highlights: [],
+      minIndex: -1,
+      currentIndex: -1,
+      variables: { minPrice: '∞', maxProfit: 0, i: '-' },
+      explanation: 'Initialize: minPrice = ∞, maxProfit = 0',
+      lineNumber: 1
+    });
 
-  const rightContent = (
-    <>
-      <div className="text-sm font-semibold text-muted-foreground mb-2">TypeScript</div>
-      <CodeHighlighter 
-        code={code} 
-        language="typescript"
-        highlightedLine={steps[currentStep].highlightedLine}
-      />
-    </>
-  );
+    for (let i = 0; i < prices.length; i++) {
+      newSteps.push({
+        array: [...prices],
+        highlights: [i],
+        minIndex,
+        currentIndex: i,
+        variables: { i, 'prices[i]': prices[i], minPrice: minPrice === Infinity ? '∞' : minPrice, maxProfit },
+        explanation: `i=${i}: Check prices[${i}]=${prices[i]}`,
+        lineNumber: 5
+      });
 
-  const controls = (
-    <SimpleStepControls
-      currentStep={currentStep}
-      totalSteps={steps.length}
-      onStepChange={setCurrentStep}
-    />
-  );
+      if (prices[i] < minPrice) {
+        minPrice = prices[i];
+        minIndex = i;
+        newSteps.push({
+          array: [...prices],
+          highlights: [i],
+          minIndex: i,
+          currentIndex: i,
+          variables: { i, 'prices[i]': prices[i], minPrice, maxProfit, action: 'Update minPrice' },
+          explanation: `prices[${i}]=${prices[i]} < minPrice. Update minPrice = ${minPrice}`,
+          lineNumber: 6
+        });
+      } else {
+        const profit = prices[i] - minPrice;
+        const oldMaxProfit = maxProfit;
+        maxProfit = Math.max(maxProfit, profit);
+        newSteps.push({
+          array: [...prices],
+          highlights: [minIndex, i],
+          minIndex,
+          currentIndex: i,
+          variables: { i, profit, oldMaxProfit, newMaxProfit: maxProfit },
+          explanation: `Profit = prices[${i}] - minPrice = ${prices[i]} - ${minPrice} = ${profit}. MaxProfit = max(${oldMaxProfit}, ${profit}) = ${maxProfit}`,
+          lineNumber: 8
+        });
+      }
+    }
+
+    newSteps.push({
+      array: [...prices],
+      highlights: [],
+      minIndex,
+      currentIndex: -1,
+      variables: { result: maxProfit },
+      explanation: `Complete! Maximum profit = ${maxProfit}`,
+      lineNumber: 12
+    });
+
+    setSteps(newSteps);
+    setCurrentStepIndex(0);
+  };
+
+  useEffect(() => {
+    generateSteps();
+  }, []);
+
+  useEffect(() => {
+    if (isPlaying && currentStepIndex < steps.length - 1) {
+      intervalRef.current = setInterval(() => {
+        setCurrentStepIndex(prev => {
+          if (prev >= steps.length - 1) {
+            setIsPlaying(false);
+            return prev;
+          }
+          return prev + 1;
+        });
+      }, 1000 / speed);
+    } else {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    }
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [isPlaying, currentStepIndex, steps.length, speed]);
+
+  const handlePlay = () => setIsPlaying(true);
+  const handlePause = () => setIsPlaying(false);
+  const handleStepForward = () => currentStepIndex < steps.length - 1 && setCurrentStepIndex(prev => prev + 1);
+  const handleStepBack = () => currentStepIndex > 0 && setCurrentStepIndex(prev => prev - 1);
+  const handleReset = () => {
+    setCurrentStepIndex(0);
+    setIsPlaying(false);
+    generateSteps();
+  };
+
+  if (steps.length === 0) return null;
+
+  const currentStep = steps[currentStepIndex];
+  const maxPrice = Math.max(...currentStep.array);
 
   return (
-    <VisualizationLayout
-      leftContent={leftContent}
-      rightContent={rightContent}
-      controls={controls}
-    />
+    <div className="space-y-6">
+      <StepControls
+        isPlaying={isPlaying}
+        onPlay={handlePlay}
+        onPause={handlePause}
+        onStepForward={handleStepForward}
+        onStepBack={handleStepBack}
+        onReset={handleReset}
+        speed={speed}
+        onSpeedChange={setSpeed}
+        currentStep={currentStepIndex}
+        totalSteps={steps.length - 1}
+      />
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <div className="bg-muted/30 rounded-lg border border-border/50 p-6">
+            <div className="flex items-end justify-center gap-2 h-48">
+              {currentStep.array.map((value, idx) => {
+                const isMin = idx === currentStep.minIndex;
+                const isCurrent = idx === currentStep.currentIndex;
+                const isHighlighted = currentStep.highlights.includes(idx);
+                
+                return (
+                  <div key={idx} className="flex flex-col items-center gap-2 flex-1 max-w-[50px] relative">
+                    {isMin && <div className="absolute -top-6 text-xs font-bold text-green-500">BUY</div>}
+                    {isCurrent && idx !== currentStep.minIndex && <div className="absolute -top-6 text-xs font-bold text-blue-500">SELL</div>}
+                    <div
+                      className={`w-full rounded-t transition-all duration-300 ${
+                        isHighlighted
+                          ? 'bg-primary shadow-lg shadow-primary/50'
+                          : 'bg-muted/60'
+                      }`}
+                      style={{ height: `${(value / maxPrice) * 100}%`, minHeight: '20px' }}
+                    />
+                    <span className="text-xs font-mono">${value}</span>
+                    <span className="text-xs text-muted-foreground">D{idx + 1}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="bg-accent/50 rounded-lg border border-accent p-4">
+            <p className="text-sm font-medium">{currentStep.explanation}</p>
+          </div>
+
+          <div className="bg-muted/50 rounded-lg border p-4">
+            <h3 className="font-semibold mb-2 text-sm">Strategy:</h3>
+            <div className="text-xs space-y-1 text-muted-foreground">
+              <p>• Track minimum price seen so far</p>
+              <p>• At each day, calculate profit if we sell today</p>
+              <p>• Keep track of maximum profit</p>
+              <p>• Time: O(n), Space: O(1)</p>
+            </div>
+          </div>
+
+          <VariablePanel variables={currentStep.variables} />
+        </div>
+
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+      </div>
+    </div>
   );
 };

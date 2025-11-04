@@ -1,145 +1,183 @@
-import { useState } from 'react';
-import { Card } from '@/components/ui/card';
-import { VisualizationLayout } from '../shared/VisualizationLayout';
-import { SimpleStepControls } from '../shared/SimpleStepControls';
-import { VariablePanel } from '../shared/VariablePanel';
+import { useEffect, useRef, useState } from 'react';
 import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { StepControls } from '../shared/StepControls';
+import { VariablePanel } from '../shared/VariablePanel';
 
 interface Step {
   array: number[];
   highlights: number[];
   variables: Record<string, any>;
   explanation: string;
-  highlightedLine: number;
+  lineNumber: number;
 }
 
 export const TwoSumVisualization = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-
-  const array = [2, 7, 11, 15];
-  const target = 9;
-
-  const steps: Step[] = [
-    {
-      array,
-      highlights: [],
-      variables: { target, seen: '{}', i: -1, complement: null },
-      explanation: "Initialize: Array [2,7,11,15], target=9. We'll use a hash map to store each number and its index.",
-      highlightedLine: 1
-    },
-    {
-      array,
-      highlights: [0],
-      variables: { target, seen: '{}', i: 0, complement: 7 },
-      explanation: "i=0: num=2. Calculate complement = 9-2 = 7. Check if 7 exists in map.",
-      highlightedLine: 4
-    },
-    {
-      array,
-      highlights: [0],
-      variables: { target, seen: '{}', i: 0, complement: 7 },
-      explanation: "7 not in map (map.has(7) is false). Continue to store current number.",
-      highlightedLine: 5
-    },
-    {
-      array,
-      highlights: [0],
-      variables: { target, seen: '{2:0}', i: 0, complement: 7 },
-      explanation: "Store: map[2] = 0. Now map contains {2: 0}. Move to next element.",
-      highlightedLine: 7
-    },
-    {
-      array,
-      highlights: [1],
-      variables: { target, seen: '{2:0}', i: 1, complement: 2 },
-      explanation: "i=1: num=7. Calculate complement = 9-7 = 2. Check if 2 exists in map.",
-      highlightedLine: 4
-    },
-    {
-      array,
-      highlights: [0, 1],
-      variables: { target, seen: '{2:0}', i: 1, complement: 2 },
-      explanation: "Found! 2 exists in map at index 0. map.has(2) is true.",
-      highlightedLine: 5
-    },
-    {
-      array,
-      highlights: [0, 1],
-      variables: { target, seen: '{2:0}', i: 1, complement: 2 },
-      explanation: "Return [0, 1] - indices where 2+7=9. Time: O(n), Space: O(n).",
-      highlightedLine: 6
-    }
-  ];
+  const [steps, setSteps] = useState<Step[]>([]);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [speed, setSpeed] = useState(1);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const code = `function twoSum(nums: number[], target: number): number[] {
-  // Hash map to store number and its index
-  const seen = new Map<number, number>();
+  const map = new Map<number, number>();
   
   for (let i = 0; i < nums.length; i++) {
     const complement = target - nums[i];
     
-    // Check if complement exists in hash map
-    if (seen.has(complement)) {
-      return [seen.get(complement)!, i];
+    if (map.has(complement)) {
+      return [map.get(complement)!, i];
     }
     
-    // Store current number and its index
-    seen.set(nums[i], i);
+    map.set(nums[i], i);
   }
   
-  return []; // No solution found
+  return [];
 }`;
 
-  const step = steps[currentStep];
+  const generateSteps = () => {
+    const nums = [2, 7, 11, 15];
+    const target = 9;
+    const newSteps: Step[] = [];
+    const map = new Map<number, number>();
+
+    newSteps.push({
+      array: [...nums],
+      highlights: [],
+      variables: { target, map: '{}', i: '-', complement: '-' },
+      explanation: `Initialize: Looking for two numbers that sum to ${target}. Create empty hash map.`,
+      lineNumber: 1
+    });
+
+    for (let i = 0; i < nums.length; i++) {
+      const complement = target - nums[i];
+      
+      newSteps.push({
+        array: [...nums],
+        highlights: [i],
+        variables: { target, i, 'nums[i]': nums[i], complement, map: JSON.stringify(Object.fromEntries(map)) },
+        explanation: `i=${i}: Check nums[${i}]=${nums[i]}. Calculate complement = ${target} - ${nums[i]} = ${complement}`,
+        lineNumber: 4
+      });
+
+      if (map.has(complement)) {
+        const j = map.get(complement)!;
+        newSteps.push({
+          array: [...nums],
+          highlights: [j, i],
+          variables: { target, i, j, 'nums[i]': nums[i], 'nums[j]': nums[j], result: `[${j}, ${i}]` },
+          explanation: `Found! nums[${j}]=${nums[j]} + nums[${i}]=${nums[i]} = ${target}. Return [${j}, ${i}]`,
+          lineNumber: 7
+        });
+        break;
+      }
+
+      newSteps.push({
+        array: [...nums],
+        highlights: [i],
+        variables: { target, i, 'nums[i]': nums[i], action: `map.set(${nums[i]}, ${i})` },
+        explanation: `Complement ${complement} not in map. Store nums[${i}]=${nums[i]} with index ${i} in map.`,
+        lineNumber: 10
+      });
+
+      map.set(nums[i], i);
+    }
+
+    setSteps(newSteps);
+    setCurrentStepIndex(0);
+  };
+
+  useEffect(() => {
+    generateSteps();
+  }, []);
+
+  useEffect(() => {
+    if (isPlaying && currentStepIndex < steps.length - 1) {
+      intervalRef.current = setInterval(() => {
+        setCurrentStepIndex(prev => {
+          if (prev >= steps.length - 1) {
+            setIsPlaying(false);
+            return prev;
+          }
+          return prev + 1;
+        });
+      }, 1000 / speed);
+    } else {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    }
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [isPlaying, currentStepIndex, steps.length, speed]);
+
+  const handlePlay = () => setIsPlaying(true);
+  const handlePause = () => setIsPlaying(false);
+  const handleStepForward = () => currentStepIndex < steps.length - 1 && setCurrentStepIndex(prev => prev + 1);
+  const handleStepBack = () => currentStepIndex > 0 && setCurrentStepIndex(prev => prev - 1);
+  const handleReset = () => {
+    setCurrentStepIndex(0);
+    setIsPlaying(false);
+    generateSteps();
+  };
+
+  if (steps.length === 0) return null;
+
+  const currentStep = steps[currentStepIndex];
 
   return (
-    <VisualizationLayout
-      leftContent={
-        <>
-          <Card className="p-6">
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-center">Two Sum - Hash Map Approach</h3>
-              <div className="text-sm text-center text-muted-foreground">
-                Target: {target}
-              </div>
-              <div className="flex items-center justify-center gap-2 min-h-[200px]">
-                {step.array.map((value, index) => (
-                  <div key={index} className="flex flex-col items-center gap-2">
-                    <div
-                      className={`w-16 h-16 rounded flex items-center justify-center font-bold transition-all duration-300 ${
-                        step.highlights.includes(index)
-                          ? 'bg-primary text-primary-foreground scale-110'
-                          : 'bg-muted text-foreground'
-                      }`}
-                    >
-                      {value}
-                    </div>
-                    <span className="text-xs text-muted-foreground">[{index}]</span>
+    <div className="space-y-6">
+      <StepControls
+        isPlaying={isPlaying}
+        onPlay={handlePlay}
+        onPause={handlePause}
+        onStepForward={handleStepForward}
+        onStepBack={handleStepBack}
+        onReset={handleReset}
+        speed={speed}
+        onSpeedChange={setSpeed}
+        currentStep={currentStepIndex}
+        totalSteps={steps.length - 1}
+      />
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <div className="bg-muted/30 rounded-lg border border-border/50 p-6">
+            <div className="flex justify-center gap-2">
+              {currentStep.array.map((value, idx) => (
+                <div key={idx} className="flex flex-col items-center gap-2">
+                  <div
+                    className={`w-16 h-16 rounded-lg flex items-center justify-center border-2 transition-all duration-300 ${
+                      currentStep.highlights.includes(idx)
+                        ? 'bg-primary border-primary scale-110 shadow-lg'
+                        : 'bg-muted/50 border-border'
+                    }`}
+                  >
+                    <span className="font-bold text-lg">{value}</span>
                   </div>
-                ))}
-              </div>
-              <div className="text-sm text-center p-4 bg-muted/50 rounded">
-                {step.explanation}
-              </div>
+                  <span className="text-xs text-muted-foreground">[{idx}]</span>
+                </div>
+              ))}
             </div>
-          </Card>
-          <VariablePanel variables={step.variables} />
-        </>
-      }
-      rightContent={
-        <CodeHighlighter
-          code={code}
-          highlightedLine={step.highlightedLine}
-          language="TypeScript"
-        />
-      }
-      controls={
-        <SimpleStepControls
-          currentStep={currentStep}
-          totalSteps={steps.length}
-          onStepChange={setCurrentStep}
-        />
-      }
-    />
+          </div>
+
+          <div className="bg-accent/50 rounded-lg border border-accent p-4">
+            <p className="text-sm font-medium">{currentStep.explanation}</p>
+          </div>
+
+          <div className="bg-muted/50 rounded-lg border p-4">
+            <h3 className="font-semibold mb-2 text-sm">Hash Map Strategy:</h3>
+            <div className="text-xs space-y-1 text-muted-foreground">
+              <p>• For each number, calculate its complement (target - num)</p>
+              <p>• Check if complement exists in hash map</p>
+              <p>• If yes: found the pair! If no: store current number</p>
+              <p>• Time: O(n), Space: O(n)</p>
+            </div>
+          </div>
+
+          <VariablePanel variables={currentStep.variables} />
+        </div>
+
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+      </div>
+    </div>
   );
 };
