@@ -21,6 +21,7 @@ const Home = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [userProgress, setUserProgress] = useState<any[]>([]);
 
   // Check authentication status
   useEffect(() => {
@@ -35,6 +36,28 @@ const Home = () => {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Fetch user progress
+  useEffect(() => {
+    const fetchUserProgress = async () => {
+      if (!user) {
+        setUserProgress([]);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('user_progress')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('completed', true);
+
+      if (!error && data) {
+        setUserProgress(data);
+      }
+    };
+
+    fetchUserProgress();
+  }, [user]);
+
   // Read category from URL params on mount
   useEffect(() => {
     const categoryParam = searchParams.get('category');
@@ -45,16 +68,20 @@ const Home = () => {
 
   // Calculate progress based on real completion data
   const algorithmProgress = useMemo(() => {
-    const completed = 0; // Real value: no items completed yet
+    const completed = userProgress.filter(p => 
+      algorithms.some(algo => algo.id === p.algorithm_id)
+    ).length;
     const total = algorithms.length;
     return { completed, total, percentage: Math.round((completed / total) * 100) };
-  }, []);
+  }, [userProgress]);
 
   const blind75Progress = useMemo(() => {
-    const completed = 0; // Real value: no items completed yet
+    const completed = userProgress.filter(p => 
+      blind75Problems.some(problem => problem.id === p.algorithm_id)
+    ).length;
     const total = blind75Problems.length;
     return { completed, total, percentage: Math.round((completed / total) * 100) };
-  }, []);
+  }, [userProgress]);
 
   const filteredAlgorithms = algorithms.filter((algo) => {
     const matchesSearch = algo.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
