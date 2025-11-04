@@ -301,11 +301,10 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Progress Tracking Cards - Only show when logged in */}
-      {user && (
+      {/* Progress Tracking Cards - Hidden for now */}
+      {/* {user && (
         <div className="container mx-auto px-4 py-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {/* Algorithms Progress */}
             <Card className={`p-6 relative overflow-hidden transition-all duration-500 ${
               algorithmProgress.percentage === 100 ? 'ring-2 ring-green-500 animate-pulse' : ''
             }`}>
@@ -313,7 +312,7 @@ const Home = () => {
             </Card>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Search and Filter */}
       <div className="container mx-auto px-4 py-8">
