@@ -9,83 +9,215 @@ export const SumOfTwoIntegersVisualization = () => {
   
   const steps = [
     {
-      variables: { a: '0011 (3)', b: '0101 (5)', carry: '0000' },
-      explanation: "Initialize: a = 3 (0011), b = 5 (0101). Add without using + operator",
-      highlightedLine: 1
+      variables: { a: 3, b: 5, aBinary: '0011', bBinary: '0101', carry: '-', result: '-' },
+      explanation: "Start: a = 3 (binary: 0011), b = 5 (binary: 0101). Goal: Add without + operator",
+      highlightedLine: 0,
+      bitsA: ['0', '0', '1', '1'],
+      bitsB: ['0', '1', '0', '1']
     },
     {
-      variables: { a: '0110 (6)', b: '0010 (2)', carry: '0010' },
-      explanation: "XOR for sum: 0011 ^ 0101 = 0110. AND+shift for carry: (0011 & 0101) << 1 = 0010",
-      highlightedLine: 4
+      variables: { a: 3, b: 5, aBinary: '0011', bBinary: '0101', carry: '-', result: '-' },
+      explanation: "Enter while loop: b ≠ 0, so continue processing",
+      highlightedLine: 1,
+      bitsA: ['0', '0', '1', '1'],
+      bitsB: ['0', '1', '0', '1']
     },
     {
-      variables: { a: '0100 (4)', b: '0100 (4)', carry: '0100' },
-      explanation: "Continue: XOR 0110 ^ 0010 = 0100. Carry: (0110 & 0010) << 1 = 0100",
-      highlightedLine: 7
+      variables: { a: 3, b: 5, aBinary: '0011', bBinary: '0101', carry: '0001', result: '-' },
+      explanation: "Calculate carry: a & b = 0011 & 0101 = 0001 (where both bits are 1)",
+      highlightedLine: 2,
+      bitsA: ['0', '0', '1', '1'],
+      bitsB: ['0', '1', '0', '1'],
+      bitsCarry: ['0', '0', '0', '1']
     },
     {
-      variables: { a: '1000 (8)', b: '0000 (0)', carry: '0000' },
-      explanation: "Final: XOR 0100 ^ 0100 = 1000 (8). Carry is 0, done! Result = 8",
-      highlightedLine: 11
+      variables: { a: 6, b: 5, aBinary: '0110', bBinary: '0101', carry: '0001', result: '-' },
+      explanation: "Calculate sum without carry: a = a ^ b = 0011 ^ 0101 = 0110 (XOR adds bits ignoring carry)",
+      highlightedLine: 3,
+      bitsA: ['0', '1', '1', '0'],
+      bitsB: ['0', '1', '0', '1']
+    },
+    {
+      variables: { a: 6, b: 2, aBinary: '0110', bBinary: '0010', carry: '0001', result: '-' },
+      explanation: "Shift carry left: b = carry << 1 = 0001 << 1 = 0010 (move carry to next position)",
+      highlightedLine: 4,
+      bitsA: ['0', '1', '1', '0'],
+      bitsB: ['0', '0', '1', '0']
+    },
+    {
+      variables: { a: 6, b: 2, aBinary: '0110', bBinary: '0010', carry: '-', result: '-' },
+      explanation: "Loop again: b = 2 ≠ 0, continue processing",
+      highlightedLine: 1,
+      bitsA: ['0', '1', '1', '0'],
+      bitsB: ['0', '0', '1', '0']
+    },
+    {
+      variables: { a: 6, b: 2, aBinary: '0110', bBinary: '0010', carry: '0010', result: '-' },
+      explanation: "Calculate carry: a & b = 0110 & 0010 = 0010",
+      highlightedLine: 2,
+      bitsA: ['0', '1', '1', '0'],
+      bitsB: ['0', '0', '1', '0'],
+      bitsCarry: ['0', '0', '1', '0']
+    },
+    {
+      variables: { a: 4, b: 2, aBinary: '0100', bBinary: '0010', carry: '0010', result: '-' },
+      explanation: "Sum without carry: a = a ^ b = 0110 ^ 0010 = 0100",
+      highlightedLine: 3,
+      bitsA: ['0', '1', '0', '0'],
+      bitsB: ['0', '0', '1', '0']
+    },
+    {
+      variables: { a: 4, b: 4, aBinary: '0100', bBinary: '0100', carry: '0010', result: '-' },
+      explanation: "Shift carry: b = carry << 1 = 0010 << 1 = 0100",
+      highlightedLine: 4,
+      bitsA: ['0', '1', '0', '0'],
+      bitsB: ['0', '1', '0', '0']
+    },
+    {
+      variables: { a: 4, b: 4, aBinary: '0100', bBinary: '0100', carry: '-', result: '-' },
+      explanation: "Loop again: b = 4 ≠ 0, continue",
+      highlightedLine: 1,
+      bitsA: ['0', '1', '0', '0'],
+      bitsB: ['0', '1', '0', '0']
+    },
+    {
+      variables: { a: 4, b: 4, aBinary: '0100', bBinary: '0100', carry: '0100', result: '-' },
+      explanation: "Calculate carry: a & b = 0100 & 0100 = 0100",
+      highlightedLine: 2,
+      bitsA: ['0', '1', '0', '0'],
+      bitsB: ['0', '1', '0', '0'],
+      bitsCarry: ['0', '1', '0', '0']
+    },
+    {
+      variables: { a: 0, b: 4, aBinary: '0000', bBinary: '0100', carry: '0100', result: '-' },
+      explanation: "Sum without carry: a = a ^ b = 0100 ^ 0100 = 0000",
+      highlightedLine: 3,
+      bitsA: ['0', '0', '0', '0'],
+      bitsB: ['0', '1', '0', '0']
+    },
+    {
+      variables: { a: 0, b: 8, aBinary: '0000', bBinary: '1000', carry: '0100', result: '-' },
+      explanation: "Shift carry: b = carry << 1 = 0100 << 1 = 1000",
+      highlightedLine: 4,
+      bitsA: ['0', '0', '0', '0'],
+      bitsB: ['1', '0', '0', '0']
+    },
+    {
+      variables: { a: 0, b: 8, aBinary: '0000', bBinary: '1000', carry: '-', result: '-' },
+      explanation: "Loop again: b = 8 ≠ 0, continue",
+      highlightedLine: 1,
+      bitsA: ['0', '0', '0', '0'],
+      bitsB: ['1', '0', '0', '0']
+    },
+    {
+      variables: { a: 0, b: 8, aBinary: '0000', bBinary: '1000', carry: '0000', result: '-' },
+      explanation: "Calculate carry: a & b = 0000 & 1000 = 0000 (no overlap)",
+      highlightedLine: 2,
+      bitsA: ['0', '0', '0', '0'],
+      bitsB: ['1', '0', '0', '0'],
+      bitsCarry: ['0', '0', '0', '0']
+    },
+    {
+      variables: { a: 8, b: 8, aBinary: '1000', bBinary: '1000', carry: '0000', result: '-' },
+      explanation: "Sum: a = a ^ b = 0000 ^ 1000 = 1000",
+      highlightedLine: 3,
+      bitsA: ['1', '0', '0', '0'],
+      bitsB: ['1', '0', '0', '0']
+    },
+    {
+      variables: { a: 8, b: 0, aBinary: '1000', bBinary: '0000', carry: '0000', result: '-' },
+      explanation: "Shift carry: b = carry << 1 = 0000 << 1 = 0000",
+      highlightedLine: 4,
+      bitsA: ['1', '0', '0', '0'],
+      bitsB: ['0', '0', '0', '0']
+    },
+    {
+      variables: { a: 8, b: 0, aBinary: '1000', bBinary: '0000', carry: '0000', result: 8 },
+      explanation: "Exit loop: b = 0. Return a = 8. Success! 3 + 5 = 8",
+      highlightedLine: 5,
+      bitsA: ['1', '0', '0', '0'],
+      bitsB: ['0', '0', '0', '0']
     }
   ];
 
   const code = `function getSum(a: number, b: number): number {
   while (b !== 0) {
-    // Calculate carry
     const carry = a & b;
-    
-    // Calculate sum without carry (XOR)
     a = a ^ b;
-    
-    // Shift carry left by 1
     b = carry << 1;
   }
-  
   return a;
 }`;
 
+  const step = steps[currentStep];
+
   const leftContent = (
     <>
-      <div className="grid grid-cols-3 gap-4">
-        <div className="p-4 bg-primary/10 rounded-lg border border-primary/20">
-          <h3 className="font-semibold mb-2 text-sm">a (binary)</h3>
-          <p className="font-mono text-lg">{steps[currentStep].variables.a}</p>
+      <div className="space-y-4">
+        <div className="flex gap-2 justify-center items-center">
+          <div className="p-4 bg-primary/10 rounded-lg border border-primary/20 flex-1">
+            <h3 className="font-semibold mb-2 text-sm">a (binary)</h3>
+            <div className="flex gap-1 justify-center">
+              {step.bitsA.map((bit, idx) => (
+                <div key={idx} className={`w-10 h-10 flex items-center justify-center font-mono text-lg border-2 rounded ${bit === '1' ? 'bg-primary/30 border-primary' : 'bg-muted border-border'}`}>
+                  {bit}
+                </div>
+              ))}
+            </div>
+            <p className="font-mono text-center mt-2 text-sm">{step.variables.aBinary} = {step.variables.a}</p>
+          </div>
+          
+          <div className="p-4 bg-secondary/10 rounded-lg border border-secondary/20 flex-1">
+            <h3 className="font-semibold mb-2 text-sm">b (carry)</h3>
+            <div className="flex gap-1 justify-center">
+              {step.bitsB.map((bit, idx) => (
+                <div key={idx} className={`w-10 h-10 flex items-center justify-center font-mono text-lg border-2 rounded ${bit === '1' ? 'bg-secondary/30 border-secondary' : 'bg-muted border-border'}`}>
+                  {bit}
+                </div>
+              ))}
+            </div>
+            <p className="font-mono text-center mt-2 text-sm">{step.variables.bBinary} = {step.variables.b}</p>
+          </div>
         </div>
-        <div className="p-4 bg-secondary/10 rounded-lg border border-secondary/20">
-          <h3 className="font-semibold mb-2 text-sm">b (carry)</h3>
-          <p className="font-mono text-lg">{steps[currentStep].variables.b}</p>
-        </div>
-        <div className="p-4 bg-accent/10 rounded-lg border border-accent/20">
-          <h3 className="font-semibold mb-2 text-sm">Operation</h3>
-          <p className="text-sm">{steps[currentStep].variables.carry}</p>
-        </div>
+
+        {step.bitsCarry && (
+          <div className="p-4 bg-accent/10 rounded-lg border border-accent/20">
+            <h3 className="font-semibold mb-2 text-sm text-center">Carry Calculation</h3>
+            <div className="flex gap-1 justify-center">
+              {step.bitsCarry.map((bit, idx) => (
+                <div key={idx} className={`w-10 h-10 flex items-center justify-center font-mono text-lg border-2 rounded ${bit === '1' ? 'bg-accent/30 border-accent' : 'bg-muted border-border'}`}>
+                  {bit}
+                </div>
+              ))}
+            </div>
+            <p className="font-mono text-center mt-2 text-sm">{step.variables.carry}</p>
+          </div>
+        )}
       </div>
       
       <div className="p-4 bg-primary/20 rounded-lg border border-primary/30">
-        <p className="text-sm font-medium">{steps[currentStep].explanation}</p>
+        <p className="text-sm font-medium">{step.explanation}</p>
       </div>
 
       <div className="p-4 bg-muted/50 rounded-lg border">
-        <h3 className="font-semibold mb-2 text-sm">How it works:</h3>
+        <h3 className="font-semibold mb-2 text-sm">Bit Operations:</h3>
         <div className="text-xs space-y-1 text-muted-foreground">
-          <p>• XOR (^) adds bits without carry</p>
-          <p>• AND (&) finds where both bits are 1 (needs carry)</p>
-          <p>• Left shift (&lt;&lt;) moves carry to next position</p>
+          <p>• XOR (^): Adds bits without carry (0^0=0, 0^1=1, 1^0=1, 1^1=0)</p>
+          <p>• AND (&): Finds where both bits are 1 (needs carry)</p>
+          <p>• Left shift (&lt;&lt;): Moves carry to next position</p>
         </div>
       </div>
 
-      <VariablePanel variables={steps[currentStep].variables} />
+      <VariablePanel variables={step.variables} />
     </>
   );
 
   const rightContent = (
     <>
-      <div className="text-sm font-semibold text-muted-foreground mb-2">TypeScript</div>
       <CodeHighlighter 
         code={code} 
-        language="typescript"
-        highlightedLine={steps[currentStep].highlightedLine}
+        language="TypeScript"
+        highlightedLine={step.highlightedLine}
       />
     </>
   );
