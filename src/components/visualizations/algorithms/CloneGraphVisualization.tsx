@@ -1,241 +1,109 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { StepControls } from '../shared/StepControls';
-import { CodeHighlighter } from '../shared/CodeHighlighter';
-import { VariablePanel } from '../shared/VariablePanel';
-
-interface GraphNode {
-  val: number;
-  neighbors: number[];
-}
+import { Button } from '@/components/ui/button';
+import { SkipBack, SkipForward, RotateCcw } from 'lucide-react';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 interface Step {
-  currentNode: number | null;
-  visited: Set<number>;
-  cloned: Set<number>;
-  highlightedLine: number;
-  description: string;
+  currentNode: number;
+  visited: number[];
+  cloned: number[];
+  message: string;
+  lineNumber: number;
 }
 
 export const CloneGraphVisualization = () => {
-  const graph: GraphNode[] = [
-    { val: 1, neighbors: [2, 4] },
-    { val: 2, neighbors: [1, 3] },
-    { val: 3, neighbors: [2, 4] },
-    { val: 4, neighbors: [1, 3] }
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+
+  const steps: Step[] = [
+    { currentNode: -1, visited: [], cloned: [], message: "Graph: 1--2, 2--3, 3--4, 4--1. Clone using DFS", lineNumber: 2 },
+    { currentNode: 1, visited: [1], cloned: [1], message: "Visit node 1, create clone. Add to map", lineNumber: 9 },
+    { currentNode: 2, visited: [1, 2], cloned: [1, 2], message: "Visit neighbor 2, create clone", lineNumber: 11 },
+    { currentNode: 3, visited: [1, 2, 3], cloned: [1, 2, 3], message: "Visit neighbor 3, create clone", lineNumber: 11 },
+    { currentNode: 4, visited: [1, 2, 3, 4], cloned: [1, 2, 3, 4], message: "Visit neighbor 4, create clone", lineNumber: 11 },
+    { currentNode: 1, visited: [1, 2, 3, 4], cloned: [1, 2, 3, 4], message: "Node 1 already cloned (cycle detected). Use existing clone", lineNumber: 5 },
+    { currentNode: -1, visited: [1, 2, 3, 4], cloned: [1, 2, 3, 4], message: "Complete! All nodes cloned with same structure. Time: O(V+E), Space: O(V)", lineNumber: 15 }
   ];
+
+  const code = `function cloneGraph(node: Node | null): Node | null {
+  if (!node) return null;
+  const map = new Map<Node, Node>();
   
-  const [currentStep, setCurrentStep] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1000);
-  const [steps, setSteps] = useState<Step[]>([]);
-
-  const code = `def cloneGraph(node):
-    if not node:
-        return None
+  function dfs(node: Node): Node {
+    if (map.has(node)) return map.get(node)!;
     
-    clones = {}  # original -> clone
+    const clone = new Node(node.val);
+    map.set(node, clone);
     
-    def dfs(node):
-        if node in clones:
-            return clones[node]
-        
-        # Clone current node
-        clone = Node(node.val)
-        clones[node] = clone
-        
-        # Clone neighbors
-        for neighbor in node.neighbors:
-            clone.neighbors.append(dfs(neighbor))
-        
-        return clone
-    
-    return dfs(node)`;
-
-  useEffect(() => {
-    generateSteps();
-  }, []);
-
-  const generateSteps = () => {
-    const newSteps: Step[] = [];
-    const visited = new Set<number>();
-    const cloned = new Set<number>();
-    
-    newSteps.push({
-      currentNode: null,
-      visited: new Set(),
-      cloned: new Set(),
-      highlightedLine: 0,
-      description: "Start: Clone graph using DFS"
-    });
-
-    const dfs = (nodeVal: number) => {
-      if (visited.has(nodeVal)) {
-        newSteps.push({
-          currentNode: nodeVal,
-          visited: new Set(visited),
-          cloned: new Set(cloned),
-          highlightedLine: 7,
-          description: `Node ${nodeVal} already visited, return clone`
-        });
-        return;
-      }
-
-      visited.add(nodeVal);
-      newSteps.push({
-        currentNode: nodeVal,
-        visited: new Set(visited),
-        cloned: new Set(cloned),
-        highlightedLine: 10,
-        description: `Visit node ${nodeVal}, create clone`
-      });
-
-      cloned.add(nodeVal);
-      newSteps.push({
-        currentNode: nodeVal,
-        visited: new Set(visited),
-        cloned: new Set(cloned),
-        highlightedLine: 11,
-        description: `Node ${nodeVal} cloned`
-      });
-
-      const node = graph.find(n => n.val === nodeVal);
-      if (node) {
-        for (const neighbor of node.neighbors) {
-          newSteps.push({
-            currentNode: nodeVal,
-            visited: new Set(visited),
-            cloned: new Set(cloned),
-            highlightedLine: 15,
-            description: `Process neighbor ${neighbor} of node ${nodeVal}`
-          });
-          dfs(neighbor);
-        }
-      }
-    };
-
-    dfs(1);
-
-    newSteps.push({
-      currentNode: null,
-      visited: new Set(visited),
-      cloned: new Set(cloned),
-      highlightedLine: 19,
-      description: "Graph cloning complete!"
-    });
-
-    setSteps(newSteps);
-  };
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isPlaying && currentStep < steps.length - 1) {
-      interval = setInterval(() => {
-        setCurrentStep(prev => prev + 1);
-      }, speed);
-    } else if (currentStep >= steps.length - 1) {
-      setIsPlaying(false);
+    for (const neighbor of node.neighbors) {
+      clone.neighbors.push(dfs(neighbor));
     }
-    return () => clearInterval(interval);
-  }, [isPlaying, currentStep, steps.length, speed]);
+    
+    return clone;
+  }
+  
+  return dfs(node);
+}`;
 
-  if (steps.length === 0) return <div>Loading...</div>;
-
-  const step = steps[currentStep];
-
-  const getNodeColor = (nodeVal: number) => {
-    if (step.currentNode === nodeVal) return 'bg-yellow-200 dark:bg-yellow-900 border-yellow-500';
-    if (step.cloned.has(nodeVal)) return 'bg-green-100 dark:bg-green-900/20 border-green-500';
-    if (step.visited.has(nodeVal)) return 'bg-blue-100 dark:bg-blue-900/20 border-blue-500';
-    return 'bg-muted border-border';
-  };
+  const currentStep = steps[currentStepIndex];
 
   return (
-    <div className="space-y-4">
+    <div className="w-full h-full flex flex-col gap-4 p-4">
       <Card className="p-4">
-        <h3 className="font-semibold mb-4">Clone Graph (DFS)</h3>
-        
-        <div className="space-y-4">
-          <div className="relative h-64 flex items-center justify-center">
-            <svg width="300" height="250" className="absolute">
-              {/* Edges */}
-              <line x1="150" y1="50" x2="50" y2="150" stroke="currentColor" strokeWidth="2" />
-              <line x1="150" y1="50" x2="250" y2="150" stroke="currentColor" strokeWidth="2" />
-              <line x1="50" y1="150" x2="150" y2="200" stroke="currentColor" strokeWidth="2" />
-              <line x1="250" y1="150" x2="150" y2="200" stroke="currentColor" strokeWidth="2" />
-            </svg>
-            
-            {/* Nodes */}
-            <div className="absolute" style={{ top: '20px', left: '50%', transform: 'translateX(-50%)' }}>
-              <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center font-bold ${getNodeColor(1)}`}>
-                1
-              </div>
-            </div>
-            <div className="absolute" style={{ top: '120px', left: '20px' }}>
-              <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center font-bold ${getNodeColor(2)}`}>
-                2
-              </div>
-            </div>
-            <div className="absolute" style={{ top: '120px', right: '20px' }}>
-              <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center font-bold ${getNodeColor(4)}`}>
-                4
-              </div>
-            </div>
-            <div className="absolute" style={{ bottom: '20px', left: '50%', transform: 'translateX(-50%)' }}>
-              <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center font-bold ${getNodeColor(3)}`}>
-                3
-              </div>
-            </div>
+        <div className="flex items-center justify-between">
+          <div className="flex gap-2">
+            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(0)} disabled={currentStepIndex === 0}><RotateCcw className="h-4 w-4" /></Button>
+            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))} disabled={currentStepIndex === 0}><SkipBack className="h-4 w-4" /></Button>
+            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(Math.min(steps.length - 1, currentStepIndex + 1))} disabled={currentStepIndex === steps.length - 1}><SkipForward className="h-4 w-4" /></Button>
           </div>
-
-          <div className="flex gap-4 justify-center">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-yellow-200 dark:bg-yellow-900 border-2 border-yellow-500"></div>
-              <span className="text-sm">Current</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-blue-100 dark:bg-blue-900/20 border-2 border-blue-500"></div>
-              <span className="text-sm">Visited</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-green-100 dark:bg-green-900/20 border-2 border-green-500"></div>
-              <span className="text-sm">Cloned</span>
-            </div>
-          </div>
-
-          <div className="p-3 bg-muted rounded">
-            {step.description}
-          </div>
+          <div className="text-sm">Step {currentStepIndex + 1} / {steps.length}</div>
         </div>
       </Card>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <CodeHighlighter
-          code={code}
-          highlightedLine={step.highlightedLine}
-          language="Python"
-        />
-        <VariablePanel
-          variables={{
-            current: step.currentNode || "null",
-            visited: step.visited.size,
-            cloned: step.cloned.size
-          }}
-        />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1">
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Clone Graph</h3>
+          <div className="space-y-4">
+            <div>
+              <div className="text-sm font-medium mb-2">Original Graph:</div>
+              <div className="flex items-center justify-center gap-8 p-6 bg-muted/30 rounded">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold ${currentStep.currentNode === 1 ? 'bg-primary text-primary-foreground ring-4 ring-primary' : 'bg-secondary'}`}>1</div>
+                <div className="text-2xl">—</div>
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold ${currentStep.currentNode === 2 ? 'bg-primary text-primary-foreground ring-4 ring-primary' : 'bg-secondary'}`}>2</div>
+              </div>
+              <div className="flex items-center justify-center gap-8 p-6 bg-muted/30 rounded mt-2">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold ${currentStep.currentNode === 4 ? 'bg-primary text-primary-foreground ring-4 ring-primary' : 'bg-secondary'}`}>4</div>
+                <div className="text-2xl">—</div>
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold ${currentStep.currentNode === 3 ? 'bg-primary text-primary-foreground ring-4 ring-primary' : 'bg-secondary'}`}>3</div>
+              </div>
+            </div>
+            <div>
+              <div className="text-sm font-medium mb-2">Cloned Nodes:</div>
+              <div className="flex gap-2 flex-wrap">
+                {currentStep.cloned.length === 0 ? (
+                  <div className="text-sm text-muted-foreground">None yet</div>
+                ) : (
+                  currentStep.cloned.map((node, idx) => (
+                    <div key={idx} className="px-4 py-2 rounded-full bg-green-500/20 text-green-600 font-bold">{node}</div>
+                  ))
+                )}
+              </div>
+            </div>
+            <div className="p-4 bg-muted/50 rounded text-sm">{currentStep.message}</div>
+            <div className="p-3 bg-blue-500/10 rounded text-xs">
+              <strong>Key:</strong> Use HashMap to track cloned nodes. Prevents infinite loops in cyclic graphs.
+            </div>
+          </div>
+        </Card>
+        <Card className="p-6 overflow-hidden flex flex-col">
+          <h3 className="text-lg font-semibold mb-4">TypeScript</h3>
+          <div className="flex-1 overflow-auto">
+            <SyntaxHighlighter language="typescript" style={vscDarkPlus} showLineNumbers lineProps={(lineNumber) => ({ style: { backgroundColor: lineNumber === currentStep.lineNumber ? 'rgba(255, 255, 0, 0.2)' : 'transparent', display: 'block' } })}>
+              {code}
+            </SyntaxHighlighter>
+          </div>
+        </Card>
       </div>
-
-      <StepControls
-        currentStep={currentStep}
-        totalSteps={steps.length}
-        isPlaying={isPlaying}
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-        onStepForward={() => setCurrentStep(Math.min(currentStep + 1, steps.length - 1))}
-        onStepBack={() => setCurrentStep(Math.max(currentStep - 1, 0))}
-        onReset={() => { setCurrentStep(0); setIsPlaying(false); }}
-        speed={speed}
-        onSpeedChange={setSpeed}
-      />
     </div>
   );
 };

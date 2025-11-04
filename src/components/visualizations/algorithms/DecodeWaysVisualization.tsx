@@ -1,148 +1,101 @@
 import { useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { SimpleStepControls } from '../shared/SimpleStepControls';
-import { VariablePanel } from '../shared/VariablePanel';
-import { CodeHighlighter } from '../shared/CodeHighlighter';
-import { VisualizationLayout } from '../shared/VisualizationLayout';
+import { Button } from '@/components/ui/button';
+import { SkipBack, SkipForward, RotateCcw } from 'lucide-react';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
+interface Step {
+  s: string;
+  dp: number[];
+  i: number;
+  message: string;
+  lineNumber: number;
+}
 
 export const DecodeWaysVisualization = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const s = "226";
-  
-  const steps = [
-    {
-      s: s,
-      highlighting: [],
-      dp: [1, 1, 0, 0],
-      variables: { i: 0, prev2: 1, prev1: 1 },
-      explanation: "String '226'. Each digit 1-26 can decode to A-Z. Count ways to decode. Init: prev2=1, prev1=1.",
-      highlightedLine: 4
-    },
-    {
-      s: s,
-      highlighting: [0, 1],
-      dp: [1, 1, 2, 0],
-      variables: { i: 1, prev2: 1, prev1: 2, single: '2', twoDigit: '22' },
-      explanation: "i=1: Single '2' (valid) adds prev1=1 way. Two-digit '22' (valid: V) adds prev2=1 way. Total: 2 ways.",
-      highlightedLine: 13
-    },
-    {
-      s: s,
-      highlighting: [1, 2],
-      dp: [1, 1, 2, 3],
-      variables: { i: 2, prev2: 2, prev1: 3, single: '6', twoDigit: '26' },
-      explanation: "i=2: Single '6' (valid: F) adds prev1=2 ways. Two-digit '26' (valid: Z) adds prev2=1 way. Total: 3 ways.",
-      highlightedLine: 13
-    },
-    {
-      s: s,
-      highlighting: [],
-      dp: [1, 1, 2, 3],
-      variables: { result: 3, ways: ['BZ', 'VF', 'BBF'] },
-      explanation: "Complete! 3 ways to decode '226': 'BZ' (2,26), 'VF' (22,6), 'BBF' (2,2,6). Time: O(n), Space: O(1).",
-      highlightedLine: 16
-    }
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+
+  const steps: Step[] = [
+    { s: "226", dp: [1, 0, 0, 0], i: 0, message: "String '226': A=1, B=2, ..., Z=26. dp[i] = ways to decode s[0..i-1]", lineNumber: 3 },
+    { s: "226", dp: [1, 1, 0, 0], i: 1, message: "s[0]='2': Valid single digit. dp[1]=1 way: '2'->B", lineNumber: 5 },
+    { s: "226", dp: [1, 1, 2, 0], i: 2, message: "s[1]='2': Single '2'->B (1 way) + Double '22'->V (1 way). dp[2]=2", lineNumber: 11 },
+    { s: "226", dp: [1, 1, 2, 3], i: 3, message: "s[2]='6': Single '6'->F (2 ways) + Double '26'->Z (1 way). dp[3]=3", lineNumber: 11 },
+    { s: "226", dp: [1, 1, 2, 3], i: 4, message: "Complete! 3 ways to decode '226': 'BBF', 'BZ', 'VF'. Time: O(n), Space: O(n)", lineNumber: 14 }
   ];
 
   const code = `function numDecodings(s: string): number {
-  if (!s || s[0] === '0') {
-    return 0;
+  if (s[0] === '0') return 0;
+  
+  const dp = new Array(s.length + 1).fill(0);
+  dp[0] = 1;
+  dp[1] = 1;
+  
+  for (let i = 2; i <= s.length; i++) {
+    const one = parseInt(s.substring(i-1, i));
+    const two = parseInt(s.substring(i-2, i));
+    
+    if (one >= 1 && one <= 9) dp[i] += dp[i-1];
+    if (two >= 10 && two <= 26) dp[i] += dp[i-2];
   }
   
-  const n = s.length;
-  let prev2 = 1;  // dp[i-2]
-  let prev1 = 1;  // dp[i-1]
-  
-  for (let i = 1; i < n; i++) {
-    let current = 0;
-    
-    // Single digit decode (1-9)
-    if (s[i] !== '0') {
-      current += prev1;
-    }
-    
-    // Two digit decode (10-26)
-    const twoDigit = parseInt(s.substring(i-1, i+1));
-    if (twoDigit >= 10 && twoDigit <= 26) {
-      current += prev2;
-    }
-    
-    prev2 = prev1;
-    prev1 = current;
-  }
-  
-  return prev1;
+  return dp[s.length];
 }`;
 
-  const step = steps[currentStep];
+  const currentStep = steps[currentStepIndex];
 
   return (
-    <VisualizationLayout
-      leftContent={
-        <>
-          <Card className="p-6">
-            <div className="space-y-6">
-              <h3 className="text-lg font-semibold text-center">Decode Ways</h3>
-              
-              <div className="space-y-4">
-                <div className="text-center">
-                  <div className="text-xs font-semibold mb-2">String to Decode</div>
-                  <div className="flex gap-1 justify-center">
-                    {step.s.split('').map((char, i) => (
-                      <div key={i} className={`w-12 h-12 rounded flex items-center justify-center font-mono text-lg font-bold ${
-                        step.highlighting.includes(i) ? 'bg-primary text-primary-foreground' : 'bg-muted'
-                      }`}>
-                        {char}
-                      </div>
-                    ))}
+    <div className="w-full h-full flex flex-col gap-4 p-4">
+      <Card className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex gap-2">
+            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(0)} disabled={currentStepIndex === 0}><RotateCcw className="h-4 w-4" /></Button>
+            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))} disabled={currentStepIndex === 0}><SkipBack className="h-4 w-4" /></Button>
+            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(Math.min(steps.length - 1, currentStepIndex + 1))} disabled={currentStepIndex === steps.length - 1}><SkipForward className="h-4 w-4" /></Button>
+          </div>
+          <div className="text-sm">Step {currentStepIndex + 1} / {steps.length}</div>
+        </div>
+      </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1">
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Decode Ways</h3>
+          <div className="space-y-4">
+            <div>
+              <div className="text-sm font-medium mb-2">Encoded String:</div>
+              <div className="flex gap-1">
+                {currentStep.s.split('').map((char, idx) => (
+                  <div key={idx} className={`px-4 py-3 rounded font-mono text-xl font-bold ${idx < currentStep.i - 1 ? 'bg-secondary' : idx === currentStep.i - 1 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+                    {char}
                   </div>
-                </div>
-
-                <div className="p-3 bg-muted/50 rounded">
-                  <div className="text-xs font-semibold mb-2 text-center">Mapping</div>
-                  <div className="text-xs text-center text-muted-foreground">
-                    1→A, 2→B, ..., 26→Z
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="text-xs font-semibold text-center">DP Array (ways to decode up to i)</div>
-                  <div className="flex gap-2 justify-center">
-                    {step.dp.map((val, i) => (
-                      <div key={i} className="w-10 h-10 bg-accent/20 rounded flex items-center justify-center text-sm font-bold">
-                        {val}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="text-sm text-center p-4 bg-muted/50 rounded">
-                {step.explanation}
-              </div>
-
-              <div className="text-xs text-muted-foreground p-3 bg-muted/30 rounded">
-                <strong>Pattern:</strong> ways(i) = ways(i-1) [if single digit valid] + ways(i-2) [if two digits 10-26]
+                ))}
               </div>
             </div>
-          </Card>
-          <VariablePanel variables={step.variables} />
-        </>
-      }
-      rightContent={
-        <CodeHighlighter
-          code={code}
-          highlightedLine={step.highlightedLine}
-          language="TypeScript"
-        />
-      }
-      controls={
-        <SimpleStepControls
-          currentStep={currentStep}
-          totalSteps={steps.length}
-          onStepChange={setCurrentStep}
-        />
-      }
-    />
+            <div className="p-3 bg-blue-500/10 rounded text-xs">
+              <strong>Mapping:</strong> A=1, B=2, C=3, ..., Z=26
+            </div>
+            <div>
+              <div className="text-sm font-medium mb-2">DP Array (ways to decode):</div>
+              <div className="flex gap-2 flex-wrap">
+                {currentStep.dp.map((val, idx) => (
+                  <div key={idx} className={`px-4 py-3 rounded font-mono text-center ${idx === currentStep.i ? 'bg-green-500/20 ring-2 ring-green-500' : idx < currentStep.i ? 'bg-green-500/10' : 'bg-muted'}`}>
+                    <div className="text-xs">dp[{idx}]</div>
+                    <div className="font-bold text-lg">{val}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="p-4 bg-muted/50 rounded text-sm">{currentStep.message}</div>
+          </div>
+        </Card>
+        <Card className="p-6 overflow-hidden flex flex-col">
+          <h3 className="text-lg font-semibold mb-4">TypeScript</h3>
+          <div className="flex-1 overflow-auto">
+            <SyntaxHighlighter language="typescript" style={vscDarkPlus} showLineNumbers lineProps={(lineNumber) => ({ style: { backgroundColor: lineNumber === currentStep.lineNumber ? 'rgba(255, 255, 0, 0.2)' : 'transparent', display: 'block' } })}>
+              {code}
+            </SyntaxHighlighter>
+          </div>
+        </Card>
+      </div>
+    </div>
   );
 };

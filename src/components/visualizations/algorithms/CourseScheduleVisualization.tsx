@@ -1,267 +1,125 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { StepControls } from '../shared/StepControls';
-import { CodeHighlighter } from '../shared/CodeHighlighter';
-import { VariablePanel } from '../shared/VariablePanel';
+import { Button } from '@/components/ui/button';
+import { SkipBack, SkipForward, RotateCcw } from 'lucide-react';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 interface Step {
-  currentCourse: number | null;
-  visiting: Set<number>;
-  visited: Set<number>;
+  courses: number;
+  prerequisites: [number, number][];
+  currentCourse: number;
+  visiting: number[];
+  visited: number[];
   hasCycle: boolean;
-  highlightedLine: number;
-  description: string;
+  message: string;
+  lineNumber: number;
 }
 
 export const CourseScheduleVisualization = () => {
-  const numCourses = 4;
-  const prerequisites = [[1, 0], [2, 0], [3, 1], [3, 2]];
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+
+  const steps: Step[] = [
+    { courses: 4, prerequisites: [[1,0],[2,0],[3,1],[3,2]], currentCourse: -1, visiting: [], visited: [], hasCycle: false, message: "4 courses, prerequisites: [1,0]=take 0 before 1. Check for cycles", lineNumber: 2 },
+    { courses: 4, prerequisites: [[1,0],[2,0],[3,1],[3,2]], currentCourse: 0, visiting: [0], visited: [], hasCycle: false, message: "DFS from course 0. Mark as visiting", lineNumber: 13 },
+    { courses: 4, prerequisites: [[1,0],[2,0],[3,1],[3,2]], currentCourse: 0, visiting: [], visited: [0], hasCycle: false, message: "Course 0 has no prerequisites. Mark as visited", lineNumber: 18 },
+    { courses: 4, prerequisites: [[1,0],[2,0],[3,1],[3,2]], currentCourse: 1, visiting: [1], visited: [0], hasCycle: false, message: "DFS from course 1. Depends on course 0 (visited ✓)", lineNumber: 13 },
+    { courses: 4, prerequisites: [[1,0],[2,0],[3,1],[3,2]], currentCourse: 1, visiting: [], visited: [0, 1], hasCycle: false, message: "Course 1 valid. Mark as visited", lineNumber: 18 },
+    { courses: 4, prerequisites: [[1,0],[2,0],[3,1],[3,2]], currentCourse: 2, visiting: [2], visited: [0, 1], hasCycle: false, message: "DFS from course 2. Depends on course 0 (visited ✓)", lineNumber: 13 },
+    { courses: 4, prerequisites: [[1,0],[2,0],[3,1],[3,2]], currentCourse: 2, visiting: [], visited: [0, 1, 2], hasCycle: false, message: "Course 2 valid. Mark as visited", lineNumber: 18 },
+    { courses: 4, prerequisites: [[1,0],[2,0],[3,1],[3,2]], currentCourse: 3, visiting: [3], visited: [0, 1, 2], hasCycle: false, message: "DFS from course 3. Depends on 1 and 2 (both visited ✓)", lineNumber: 13 },
+    { courses: 4, prerequisites: [[1,0],[2,0],[3,1],[3,2]], currentCourse: 3, visiting: [], visited: [0, 1, 2, 3], hasCycle: false, message: "No cycle detected! Can finish all courses. Time: O(V+E), Space: O(V)", lineNumber: 24 }
+  ];
+
+  const code = `function canFinish(numCourses: number, prerequisites: number[][]): boolean {
+  const graph = new Map<number, number[]>();
+  for (const [course, prereq] of prerequisites) {
+    if (!graph.has(course)) graph.set(course, []);
+    graph.get(course)!.push(prereq);
+  }
   
-  const [currentStep, setCurrentStep] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1000);
-  const [steps, setSteps] = useState<Step[]>([]);
-
-  const code = `def canFinish(numCourses, prerequisites):
-    graph = {i: [] for i in range(numCourses)}
-    for course, prereq in prerequisites:
-        graph[course].append(prereq)
+  const visiting = new Set<number>();
+  const visited = new Set<number>();
+  
+  function hasCycle(course: number): boolean {
+    if (visiting.has(course)) return true;
+    if (visited.has(course)) return false;
     
-    visiting = set()
-    visited = set()
-    
-    def dfs(course):
-        if course in visiting:
-            return False  # Cycle detected
-        if course in visited:
-            return True
-        
-        visiting.add(course)
-        for prereq in graph[course]:
-            if not dfs(prereq):
-                return False
-        visiting.remove(course)
-        visited.add(course)
-        return True
-    
-    for course in range(numCourses):
-        if not dfs(course):
-            return False
-    return True`;
-
-  useEffect(() => {
-    generateSteps();
-  }, []);
-
-  const generateSteps = () => {
-    const newSteps: Step[] = [];
-    const graph: { [key: number]: number[] } = {};
-    
-    for (let i = 0; i < numCourses; i++) {
-      graph[i] = [];
+    visiting.add(course);
+    for (const prereq of graph.get(course) || []) {
+      if (hasCycle(prereq)) return true;
     }
-    for (const [course, prereq] of prerequisites) {
-      graph[course].push(prereq);
-    }
-    
-    const visiting = new Set<number>();
-    const visited = new Set<number>();
-    let hasCycle = false;
+    visiting.delete(course);
+    visited.add(course);
+    return false;
+  }
+  
+  for (let i = 0; i < numCourses; i++) {
+    if (hasCycle(i)) return false;
+  }
+  return true;
+}`;
 
-    newSteps.push({
-      currentCourse: null,
-      visiting: new Set(),
-      visited: new Set(),
-      hasCycle: false,
-      highlightedLine: 0,
-      description: "Build dependency graph and detect cycles using DFS"
-    });
-
-    const dfs = (course: number): boolean => {
-      if (visiting.has(course)) {
-        newSteps.push({
-          currentCourse: course,
-          visiting: new Set(visiting),
-          visited: new Set(visited),
-          hasCycle: true,
-          highlightedLine: 9,
-          description: `Cycle detected at course ${course}!`
-        });
-        hasCycle = true;
-        return false;
-      }
-
-      if (visited.has(course)) {
-        newSteps.push({
-          currentCourse: course,
-          visiting: new Set(visiting),
-          visited: new Set(visited),
-          hasCycle: false,
-          highlightedLine: 11,
-          description: `Course ${course} already visited, skip`
-        });
-        return true;
-      }
-
-      visiting.add(course);
-      newSteps.push({
-        currentCourse: course,
-        visiting: new Set(visiting),
-        visited: new Set(visited),
-        hasCycle: false,
-        highlightedLine: 13,
-        description: `Start visiting course ${course}`
-      });
-
-      for (const prereq of graph[course]) {
-        newSteps.push({
-          currentCourse: course,
-          visiting: new Set(visiting),
-          visited: new Set(visited),
-          hasCycle: false,
-          highlightedLine: 15,
-          description: `Check prerequisite ${prereq} for course ${course}`
-        });
-        
-        if (!dfs(prereq)) {
-          return false;
-        }
-      }
-
-      visiting.delete(course);
-      visited.add(course);
-      newSteps.push({
-        currentCourse: course,
-        visiting: new Set(visiting),
-        visited: new Set(visited),
-        hasCycle: false,
-        highlightedLine: 18,
-        description: `Course ${course} fully processed`
-      });
-
-      return true;
-    };
-
-    for (let course = 0; course < numCourses; course++) {
-      if (!visited.has(course)) {
-        if (!dfs(course)) {
-          break;
-        }
-      }
-    }
-
-    newSteps.push({
-      currentCourse: null,
-      visiting: new Set(visiting),
-      visited: new Set(visited),
-      hasCycle: hasCycle,
-      highlightedLine: 23,
-      description: hasCycle ? "Cannot finish all courses (cycle exists)" : "Can finish all courses!"
-    });
-
-    setSteps(newSteps);
-  };
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isPlaying && currentStep < steps.length - 1) {
-      interval = setInterval(() => {
-        setCurrentStep(prev => prev + 1);
-      }, speed);
-    } else if (currentStep >= steps.length - 1) {
-      setIsPlaying(false);
-    }
-    return () => clearInterval(interval);
-  }, [isPlaying, currentStep, steps.length, speed]);
-
-  if (steps.length === 0) return <div>Loading...</div>;
-
-  const step = steps[currentStep];
-
-  const getCourseColor = (course: number) => {
-    if (step.currentCourse === course) return 'bg-yellow-200 dark:bg-yellow-900 border-yellow-500';
-    if (step.visiting.has(course)) return 'bg-blue-200 dark:bg-blue-900 border-blue-500';
-    if (step.visited.has(course)) return 'bg-green-100 dark:bg-green-900/20 border-green-500';
-    return 'bg-muted border-border';
-  };
+  const currentStep = steps[currentStepIndex];
 
   return (
-    <div className="space-y-4">
+    <div className="w-full h-full flex flex-col gap-4 p-4">
       <Card className="p-4">
-        <h3 className="font-semibold mb-4">Course Schedule (Cycle Detection)</h3>
-        
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <div className="font-semibold">Prerequisites:</div>
-            {prerequisites.map(([course, prereq], i) => (
-              <div key={i} className="flex items-center gap-2">
-                <span className="px-2 py-1 bg-muted rounded">Course {course}</span>
-                <span>→ requires →</span>
-                <span className="px-2 py-1 bg-muted rounded">Course {prereq}</span>
-              </div>
-            ))}
+        <div className="flex items-center justify-between">
+          <div className="flex gap-2">
+            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(0)} disabled={currentStepIndex === 0}><RotateCcw className="h-4 w-4" /></Button>
+            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))} disabled={currentStepIndex === 0}><SkipBack className="h-4 w-4" /></Button>
+            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(Math.min(steps.length - 1, currentStepIndex + 1))} disabled={currentStepIndex === steps.length - 1}><SkipForward className="h-4 w-4" /></Button>
           </div>
-
-          <div className="flex gap-2 flex-wrap">
-            {Array.from({ length: numCourses }, (_, i) => (
-              <div
-                key={i}
-                className={`w-16 h-16 rounded-lg border-2 flex items-center justify-center font-bold ${getCourseColor(i)}`}
-              >
-                {i}
-              </div>
-            ))}
-          </div>
-
-          <div className="flex gap-4 flex-wrap">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-yellow-200 dark:bg-yellow-900 border-2 border-yellow-500"></div>
-              <span className="text-sm">Current</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-blue-200 dark:bg-blue-900 border-2 border-blue-500"></div>
-              <span className="text-sm">Visiting</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-green-100 dark:bg-green-900/20 border-2 border-green-500"></div>
-              <span className="text-sm">Visited</span>
-            </div>
-          </div>
-
-          <div className={`p-3 rounded ${step.hasCycle ? 'bg-red-100 dark:bg-red-900/20' : 'bg-muted'}`}>
-            {step.description}
-          </div>
+          <div className="text-sm">Step {currentStepIndex + 1} / {steps.length}</div>
         </div>
       </Card>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <CodeHighlighter
-          code={code}
-          highlightedLine={step.highlightedLine}
-          language="Python"
-        />
-        <VariablePanel
-          variables={{
-            current: step.currentCourse !== null ? step.currentCourse : "null",
-            visiting: step.visiting.size,
-            visited: step.visited.size,
-            hasCycle: step.hasCycle ? "yes" : "no"
-          }}
-        />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1">
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Course Schedule</h3>
+          <div className="space-y-4">
+            <div>
+              <div className="text-sm font-medium mb-2">Courses:</div>
+              <div className="flex gap-2 flex-wrap">
+                {Array.from({ length: currentStep.courses }, (_, i) => (
+                  <div key={i} className={`w-16 h-16 rounded-full flex items-center justify-center font-bold text-lg ${
+                    i === currentStep.currentCourse ? 'bg-primary text-primary-foreground ring-4 ring-primary' :
+                    currentStep.visited.includes(i) ? 'bg-green-500/30' :
+                    currentStep.visiting.includes(i) ? 'bg-yellow-500/30' :
+                    'bg-muted'
+                  }`}>
+                    {i}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <div className="text-sm font-medium mb-2">Prerequisites:</div>
+              <div className="space-y-1 text-sm font-mono">
+                {currentStep.prerequisites.map((prereq, idx) => (
+                  <div key={idx} className="p-2 bg-muted/50 rounded">[{prereq[0]}] needs [{prereq[1]}]</div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <div className="text-sm font-medium mb-2">Status:</div>
+              <div className="flex gap-4 text-xs">
+                <div className="flex items-center gap-1"><div className="w-4 h-4 bg-yellow-500/30 rounded-full"></div> Visiting</div>
+                <div className="flex items-center gap-1"><div className="w-4 h-4 bg-green-500/30 rounded-full"></div> Visited</div>
+              </div>
+            </div>
+            <div className="p-4 bg-muted/50 rounded text-sm">{currentStep.message}</div>
+          </div>
+        </Card>
+        <Card className="p-6 overflow-hidden flex flex-col">
+          <h3 className="text-lg font-semibold mb-4">TypeScript</h3>
+          <div className="flex-1 overflow-auto">
+            <SyntaxHighlighter language="typescript" style={vscDarkPlus} showLineNumbers lineProps={(lineNumber) => ({ style: { backgroundColor: lineNumber === currentStep.lineNumber ? 'rgba(255, 255, 0, 0.2)' : 'transparent', display: 'block' } })}>
+              {code}
+            </SyntaxHighlighter>
+          </div>
+        </Card>
       </div>
-
-      <StepControls
-        currentStep={currentStep}
-        totalSteps={steps.length}
-        isPlaying={isPlaying}
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-        onStepForward={() => setCurrentStep(Math.min(currentStep + 1, steps.length - 1))}
-        onStepBack={() => setCurrentStep(Math.max(currentStep - 1, 0))}
-        onReset={() => { setCurrentStep(0); setIsPlaying(false); }}
-        speed={speed}
-        onSpeedChange={setSpeed}
-      />
     </div>
   );
 };
