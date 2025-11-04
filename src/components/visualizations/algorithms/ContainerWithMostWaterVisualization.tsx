@@ -1,37 +1,138 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
+import { Card } from '@/components/ui/card';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { StepControls } from '../shared/StepControls';
 import { CodeHighlighter } from '../shared/CodeHighlighter';
 
 interface Step {
   heights: number[];
   left: number;
   right: number;
-  area: number;
-  maxArea: number;
-  message: string;
-  lineNumber: number;
+  variables: Record<string, any>;
+  explanation: string;
+  highlightedLine: number;
 }
 
 export const ContainerWithMostWaterVisualization = () => {
-  const [steps, setSteps] = useState<Step[]>([]);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [currentStep, setCurrentStep] = useState(0);
 
-  const code = `function maxArea(heights) {
-  let left = 0;
-  let right = heights.length - 1;
+  const heights = [1, 8, 6, 2, 5, 4, 8, 3, 7];
+
+  const steps: Step[] = [
+    {
+      heights,
+      left: 0,
+      right: 8,
+      variables: { left: 0, right: 8, maxArea: 0, width: -1, height: -1, currentArea: -1 },
+      explanation: "Initialize: left=0, right=8. Use two pointers from both ends. We'll calculate area and move the shorter line.",
+      highlightedLine: 1
+    },
+    {
+      heights,
+      left: 0,
+      right: 8,
+      variables: { left: 0, right: 8, maxArea: 0, width: 8, height: 1, currentArea: 8 },
+      explanation: "width=8, height=min(1,7)=1. area=8×1=8. Update maxArea=8. heights[left]=1 < heights[right]=7.",
+      highlightedLine: 7
+    },
+    {
+      heights,
+      left: 1,
+      right: 8,
+      variables: { left: 1, right: 8, maxArea: 8, width: -1, height: -1, currentArea: -1 },
+      explanation: "Move left++ (shorter line). Now left=1, right=8.",
+      highlightedLine: 10
+    },
+    {
+      heights,
+      left: 1,
+      right: 8,
+      variables: { left: 1, right: 8, maxArea: 49, width: 7, height: 7, currentArea: 49 },
+      explanation: "width=7, height=min(8,7)=7. area=7×7=49! Update maxArea=49. heights[left]=8 > heights[right]=7.",
+      highlightedLine: 11
+    },
+    {
+      heights,
+      left: 1,
+      right: 7,
+      variables: { left: 1, right: 7, maxArea: 49, width: -1, height: -1, currentArea: -1 },
+      explanation: "Move right-- (shorter line). Now left=1, right=7.",
+      highlightedLine: 13
+    },
+    {
+      heights,
+      left: 1,
+      right: 7,
+      variables: { left: 1, right: 7, maxArea: 49, width: 6, height: 3, currentArea: 18 },
+      explanation: "width=6, height=min(8,3)=3. area=6×3=18. maxArea stays 49. heights[left]=8 > heights[right]=3.",
+      highlightedLine: 11
+    },
+    {
+      heights,
+      left: 1,
+      right: 6,
+      variables: { left: 1, right: 6, maxArea: 49, width: 5, height: 8, currentArea: 40 },
+      explanation: "Move right--. left=1, right=6. width=5, height=min(8,8)=8. area=5×8=40. maxArea stays 49.",
+      highlightedLine: 11
+    },
+    {
+      heights,
+      left: 2,
+      right: 6,
+      variables: { left: 2, right: 6, maxArea: 49, width: 4, height: 6, currentArea: 24 },
+      explanation: "Move left++. left=2, right=6. width=4, height=min(6,8)=6. area=4×6=24. maxArea stays 49.",
+      highlightedLine: 10
+    },
+    {
+      heights,
+      left: 3,
+      right: 6,
+      variables: { left: 3, right: 6, maxArea: 49, width: 3, height: 2, currentArea: 6 },
+      explanation: "Move left++. left=3, right=6. width=3, height=min(2,8)=2. area=3×2=6. maxArea stays 49.",
+      highlightedLine: 10
+    },
+    {
+      heights,
+      left: 4,
+      right: 6,
+      variables: { left: 4, right: 6, maxArea: 49, width: 2, height: 5, currentArea: 10 },
+      explanation: "Move left++. left=4, right=6. width=2, height=min(5,8)=5. area=2×5=10. maxArea stays 49.",
+      highlightedLine: 10
+    },
+    {
+      heights,
+      left: 5,
+      right: 6,
+      variables: { left: 5, right: 6, maxArea: 49, width: 1, height: 4, currentArea: 4 },
+      explanation: "Move left++. left=5, right=6. width=1, height=min(4,8)=4. area=1×4=4. maxArea stays 49.",
+      highlightedLine: 10
+    },
+    {
+      heights,
+      left: 6,
+      right: 6,
+      variables: { left: 6, right: 6, maxArea: 49, width: 0, height: 0, currentArea: 0 },
+      explanation: "left==right, loop ends. Maximum area = 49 (between indices 1 and 8). Time: O(n), Space: O(1).",
+      highlightedLine: 16
+    }
+  ];
+
+  const code = `function maxArea(height: number[]): number {
+  let left = 0, right = height.length - 1;
   let maxArea = 0;
   
   while (left < right) {
+    // Calculate current area
     const width = right - left;
-    const height = Math.min(heights[left], heights[right]);
-    const area = width * height;
-    maxArea = Math.max(maxArea, area);
+    const currentHeight = Math.min(height[left], height[right]);
+    const currentArea = width * currentHeight;
     
-    if (heights[left] < heights[right]) {
+    // Update maximum area
+    maxArea = Math.max(maxArea, currentArea);
+    
+    // Move pointer with smaller height
+    if (height[left] < height[right]) {
       left++;
     } else {
       right--;
@@ -41,220 +142,102 @@ export const ContainerWithMostWaterVisualization = () => {
   return maxArea;
 }`;
 
-  const generateSteps = () => {
-    const heights = [1, 8, 6, 2, 5, 4, 8, 3, 7];
-    const newSteps: Step[] = [];
-    let left = 0;
-    let right = heights.length - 1;
-    let maxArea = 0;
-
-    newSteps.push({
-      heights: [...heights],
-      left,
-      right,
-      area: 0,
-      maxArea: 0,
-      message: 'Initialize left=0, right=end. Find container with most water',
-      lineNumber: 1
-    });
-
-    while (left < right) {
-      const width = right - left;
-      const height = Math.min(heights[left], heights[right]);
-      const area = width * height;
-
-      newSteps.push({
-        heights: [...heights],
-        left,
-        right,
-        area,
-        maxArea,
-        message: `width=${width}, height=min(${heights[left]},${heights[right]})=${height}, area=${area}`,
-        lineNumber: 6
-      });
-
-      if (area > maxArea) {
-        maxArea = area;
-        newSteps.push({
-          heights: [...heights],
-          left,
-          right,
-          area,
-          maxArea,
-          message: `New max area found: ${maxArea}`,
-          lineNumber: 9
-        });
-      }
-
-      if (heights[left] < heights[right]) {
-        newSteps.push({
-          heights: [...heights],
-          left,
-          right,
-          area,
-          maxArea,
-          message: `heights[${left}]=${heights[left]} < heights[${right}]=${heights[right]}. Move left pointer`,
-          lineNumber: 11
-        });
-        left++;
-      } else {
-        newSteps.push({
-          heights: [...heights],
-          left,
-          right,
-          area,
-          maxArea,
-          message: `heights[${left}]=${heights[left]} ≥ heights[${right}]=${heights[right]}. Move right pointer`,
-          lineNumber: 13
-        });
-        right--;
-      }
-    }
-
-    newSteps.push({
-      heights: [...heights],
-      left,
-      right,
-      area: maxArea,
-      maxArea,
-      message: `Complete! Maximum water container area = ${maxArea}`,
-      lineNumber: 17
-    });
-
-    setSteps(newSteps);
-    setCurrentStepIndex(0);
-  };
-
-  useEffect(() => {
-    generateSteps();
-  }, []);
-
-  useEffect(() => {
-    if (isPlaying && currentStepIndex < steps.length - 1) {
-      intervalRef.current = setInterval(() => {
-        setCurrentStepIndex(prev => {
-          if (prev >= steps.length - 1) {
-            setIsPlaying(false);
-            return prev;
-          }
-          return prev + 1;
-        });
-      }, 1000 / speed);
-    } else {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    }
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [isPlaying, currentStepIndex, steps.length, speed]);
-
-  const handlePlay = () => setIsPlaying(true);
-  const handlePause = () => setIsPlaying(false);
-  const handleStepForward = () => currentStepIndex < steps.length - 1 && setCurrentStepIndex(prev => prev + 1);
-  const handleStepBack = () => currentStepIndex > 0 && setCurrentStepIndex(prev => prev - 1);
-  const handleReset = () => {
-    setCurrentStepIndex(0);
-    setIsPlaying(false);
-    generateSteps();
-  };
-
-  if (steps.length === 0) return null;
-
-  const currentStep = steps[currentStepIndex];
-  const getMaxHeight = () => Math.max(...currentStep.heights);
-  const containerHeight = Math.min(currentStep.heights[currentStep.left], currentStep.heights[currentStep.right]);
+  const step = steps[currentStep];
+  const maxHeight = Math.max(...heights);
 
   return (
-    <div className="space-y-6">
-      <StepControls
-        isPlaying={isPlaying}
-        onPlay={handlePlay}
-        onPause={handlePause}
-        onStepForward={handleStepForward}
-        onStepBack={handleStepBack}
-        onReset={handleReset}
-        speed={speed}
-        onSpeedChange={setSpeed}
-        currentStep={currentStepIndex}
-        totalSteps={steps.length - 1}
-      />
+    <VisualizationLayout
+      leftContent={
+        <>
+          <Card className="p-6">
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-center">Container With Most Water</h3>
+              <div className="relative flex items-end justify-center gap-1 h-64">
+                {step.heights.map((height, index) => {
+                  const isLeft = index === step.left;
+                  const isRight = index === step.right;
+                  const isInContainer = index >= step.left && index <= step.right;
+                  const containerHeight = Math.min(
+                    step.heights[step.left],
+                    step.heights[step.right]
+                  );
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg border border-border/50 p-6">
-            <div className="relative flex items-end justify-center gap-1 h-64">
-              {currentStep.heights.map((height, index) => {
-                const isLeft = index === currentStep.left;
-                const isRight = index === currentStep.right;
-                const isInContainer = index >= currentStep.left && index <= currentStep.right;
-
-                return (
-                  <div key={index} className="flex flex-col items-center gap-2 flex-1 max-w-[50px] relative">
-                    {isLeft && (
-                      <div className="absolute -top-8 text-xs font-bold text-blue-500">LEFT</div>
-                    )}
-                    {isRight && (
-                      <div className="absolute -top-8 text-xs font-bold text-blue-500">RIGHT</div>
-                    )}
-                    <div className="relative w-full" style={{ height: `${(height / getMaxHeight()) * 100}%`, minHeight: '20px' }}>
-                      <div
-                        className={`absolute bottom-0 w-full rounded-t transition-all duration-300 ${
-                          isLeft || isRight
-                            ? 'bg-primary shadow-lg shadow-primary/50'
-                            : 'bg-gradient-to-t from-gray-400 to-gray-300'
-                        }`}
-                        style={{ height: '100%' }}
-                      />
-                      {isInContainer && index !== currentStep.left && index !== currentStep.right && (
-                        <div
-                          className="absolute bottom-0 w-full bg-blue-400/40"
-                          style={{ height: `${(containerHeight / getMaxHeight()) * 100}%` }}
-                        />
+                  return (
+                    <div
+                      key={index}
+                      className="flex flex-col items-center gap-2 flex-1 max-w-[50px] relative"
+                    >
+                      {isLeft && (
+                        <div className="absolute -top-8 text-xs font-bold text-primary">
+                          LEFT
+                        </div>
                       )}
+                      {isRight && (
+                        <div className="absolute -top-8 text-xs font-bold text-primary">
+                          RIGHT
+                        </div>
+                      )}
+                      <div
+                        className="relative w-full"
+                        style={{
+                          height: `${(height / maxHeight) * 100}%`,
+                          minHeight: '20px',
+                        }}
+                      >
+                        <div
+                          className={`absolute bottom-0 w-full rounded-t transition-all duration-300 ${
+                            isLeft || isRight
+                              ? 'bg-primary shadow-lg shadow-primary/50'
+                              : 'bg-muted'
+                          }`}
+                          style={{ height: '100%' }}
+                        />
+                        {isInContainer &&
+                          index !== step.left &&
+                          index !== step.right && (
+                            <div
+                              className="absolute bottom-0 w-full bg-primary/20"
+                              style={{
+                                height: `${(containerHeight / maxHeight) * 100}%`,
+                              }}
+                            />
+                          )}
+                      </div>
+                      <span
+                        className={`text-xs font-mono ${
+                          isLeft || isRight
+                            ? 'text-primary font-bold'
+                            : 'text-muted-foreground'
+                        }`}
+                      >
+                        {height}
+                      </span>
                     </div>
-                    <span className={`text-xs font-mono ${isLeft || isRight ? 'text-primary font-bold' : 'text-muted-foreground'}`}>
-                      {height}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="bg-accent/50 rounded-lg border border-accent p-4">
-            <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
-          </div>
-
-          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <div className="text-muted-foreground">Current Area</div>
-                <div className="font-mono font-bold text-lg">{currentStep.area}</div>
+                  );
+                })}
               </div>
-              <div>
-                <div className="text-muted-foreground">Max Area</div>
-                <div className="font-mono font-bold text-lg text-green-500">{currentStep.maxArea}</div>
+              <div className="text-sm text-center p-4 bg-muted/50 rounded">
+                {step.explanation}
               </div>
             </div>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <VariablePanel
-            variables={{
-              left: currentStep.left,
-              right: currentStep.right,
-              'heights[left]': currentStep.heights[currentStep.left],
-              'heights[right]': currentStep.heights[currentStep.right],
-              width: currentStep.right - currentStep.left,
-              height: containerHeight,
-              area: currentStep.area,
-              maxArea: currentStep.maxArea
-            }}
-          />
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
-        </div>
-      </div>
-    </div>
+          </Card>
+          <VariablePanel variables={step.variables} />
+        </>
+      }
+      rightContent={
+        <CodeHighlighter
+          code={code}
+          highlightedLine={step.highlightedLine}
+          language="TypeScript"
+        />
+      }
+      controls={
+        <SimpleStepControls
+          currentStep={currentStep}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStep}
+        />
+      }
+    />
   );
 };

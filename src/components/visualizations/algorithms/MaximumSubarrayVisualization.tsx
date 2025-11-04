@@ -22,18 +22,10 @@ export const MaximumSubarrayVisualization = () => {
   const steps: Step[] = [
     {
       array,
-      highlights: [],
-      subarrayRange: [],
-      variables: { i: -1, currentSum: 0, maxSum: -Infinity },
-      explanation: "Kadane's Algorithm: Find max sum subarray. Initialize currentSum=0, maxSum=-∞.",
-      highlightedLine: 0
-    },
-    {
-      array,
       highlights: [0],
-      subarrayRange: [],
+      subarrayRange: [0],
       variables: { i: 0, currentSum: -2, maxSum: -2 },
-      explanation: "i=0: nums[0]=-2. currentSum = max(0, 0) + (-2) = -2. maxSum = -2.",
+      explanation: "Initialize with first element: maxSum=-2, currentSum=-2. Start iteration from i=1.",
       highlightedLine: 3
     },
     {
@@ -41,82 +33,88 @@ export const MaximumSubarrayVisualization = () => {
       highlights: [1],
       subarrayRange: [1],
       variables: { i: 1, currentSum: 1, maxSum: 1 },
-      explanation: "i=1: nums[1]=1. currentSum = max(0, -2) + 1 = 1. maxSum = 1. Start new subarray.",
-      highlightedLine: 3
+      explanation: "i=1: nums[1]=1. currentSum = max(1, -2+1) = max(1, -1) = 1. Start new subarray. maxSum=1.",
+      highlightedLine: 7
     },
     {
       array,
       highlights: [1, 2],
       subarrayRange: [1, 2],
       variables: { i: 2, currentSum: -2, maxSum: 1 },
-      explanation: "i=2: nums[2]=-3. currentSum = 1 + (-3) = -2. maxSum stays 1.",
-      highlightedLine: 4
+      explanation: "i=2: nums[2]=-3. currentSum = max(-3, 1+(-3)) = max(-3, -2) = -2. Extend subarray. maxSum stays 1.",
+      highlightedLine: 7
     },
     {
       array,
       highlights: [3],
       subarrayRange: [3],
       variables: { i: 3, currentSum: 4, maxSum: 4 },
-      explanation: "i=3: nums[3]=4. currentSum = max(0, -2) + 4 = 4. maxSum = 4. New subarray starts.",
-      highlightedLine: 3
+      explanation: "i=3: nums[3]=4. currentSum = max(4, -2+4) = max(4, 2) = 4. Start new! maxSum=4.",
+      highlightedLine: 7
     },
     {
       array,
       highlights: [3, 4],
       subarrayRange: [3, 4],
       variables: { i: 4, currentSum: 3, maxSum: 4 },
-      explanation: "i=4: nums[4]=-1. currentSum = 4 + (-1) = 3. maxSum stays 4.",
-      highlightedLine: 4
+      explanation: "i=4: nums[4]=-1. currentSum = max(-1, 4+(-1)) = max(-1, 3) = 3. Extend. maxSum stays 4.",
+      highlightedLine: 10
     },
     {
       array,
       highlights: [3, 4, 5],
       subarrayRange: [3, 4, 5],
       variables: { i: 5, currentSum: 5, maxSum: 5 },
-      explanation: "i=5: nums[5]=2. currentSum = 3 + 2 = 5. maxSum = 5.",
-      highlightedLine: 3
+      explanation: "i=5: nums[5]=2. currentSum = max(2, 3+2) = max(2, 5) = 5. Extend. maxSum=5!",
+      highlightedLine: 10
     },
     {
       array,
       highlights: [3, 4, 5, 6],
       subarrayRange: [3, 4, 5, 6],
       variables: { i: 6, currentSum: 6, maxSum: 6 },
-      explanation: "i=6: nums[6]=1. currentSum = 5 + 1 = 6. maxSum = 6. This is our best subarray!",
-      highlightedLine: 3
+      explanation: "i=6: nums[6]=1. currentSum = max(1, 5+1) = max(1, 6) = 6. Extend. maxSum=6! Best so far.",
+      highlightedLine: 10
     },
     {
       array,
       highlights: [3, 4, 5, 6, 7],
       subarrayRange: [3, 4, 5, 6],
       variables: { i: 7, currentSum: 1, maxSum: 6 },
-      explanation: "i=7: nums[7]=-5. currentSum = 6 + (-5) = 1. maxSum stays 6.",
-      highlightedLine: 4
+      explanation: "i=7: nums[7]=-5. currentSum = max(-5, 6+(-5)) = max(-5, 1) = 1. Extend. maxSum stays 6.",
+      highlightedLine: 10
     },
     {
       array,
       highlights: [3, 4, 5, 6, 7, 8],
       subarrayRange: [3, 4, 5, 6],
       variables: { i: 8, currentSum: 5, maxSum: 6 },
-      explanation: "i=8: nums[8]=4. currentSum = 1 + 4 = 5. maxSum stays 6.",
-      highlightedLine: 4
+      explanation: "i=8: nums[8]=4. currentSum = max(4, 1+4) = max(4, 5) = 5. Extend. maxSum stays 6.",
+      highlightedLine: 10
     },
     {
       array,
       highlights: [3, 4, 5, 6],
       subarrayRange: [3, 4, 5, 6],
       variables: { i: 8, currentSum: 5, maxSum: 6 },
-      explanation: "Complete! Max subarray: [4, -1, 2, 1] with sum = 6. Time: O(n), Space: O(1).",
-      highlightedLine: 6
+      explanation: "Complete! Best subarray: [4,-1,2,1] with sum=6. Time: O(n), Space: O(1).",
+      highlightedLine: 13
     }
   ];
 
   const code = `function maxSubArray(nums: number[]): number {
-  let currentSum = 0;
-  let maxSum = -Infinity;
-  for (let i = 0; i < nums.length; i++) {
-    currentSum = Math.max(0, currentSum) + nums[i];
+  // Kadane's Algorithm
+  let maxSum = nums[0];
+  let currentSum = nums[0];
+  
+  for (let i = 1; i < nums.length; i++) {
+    // Either extend the existing subarray or start new
+    currentSum = Math.max(nums[i], currentSum + nums[i]);
+    
+    // Update maximum sum found
     maxSum = Math.max(maxSum, currentSum);
   }
+  
   return maxSum;
 }`;
 

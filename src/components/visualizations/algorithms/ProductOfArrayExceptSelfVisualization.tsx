@@ -26,41 +26,41 @@ export const ProductOfArrayExceptSelfVisualization = () => {
       array,
       prefix: [0, 0, 0, 0],
       suffix: [0, 0, 0, 0],
-      result: [0, 0, 0, 0],
+      result: [1, 1, 1, 1],
       highlights: [],
-      variables: { i: -1, prefix_prod: 1, suffix_prod: 1 },
-      explanation: "Array: [1,2,3,4]. We'll compute prefix products (left to right) and suffix products (right to left).",
-      highlightedLine: 0
+      variables: { i: -1, leftProduct: 1, rightProduct: 1 },
+      explanation: "Initialize result array with 1s. We'll do two passes: left products, then right products.",
+      highlightedLine: 2
     },
     {
       array,
       prefix: [1, 0, 0, 0],
       suffix: [0, 0, 0, 0],
-      result: [1, 0, 0, 0],
+      result: [1, 1, 1, 1],
       highlights: [0],
-      variables: { i: 0, prefix_prod: 1, suffix_prod: 1 },
-      explanation: "i=0: result[0] = 1 (no elements to the left). prefix_prod = 1.",
-      highlightedLine: 3
+      variables: { i: 0, leftProduct: 1, rightProduct: 1 },
+      explanation: "Pass 1, i=0: result[0]=leftProduct=1 (no elements to left). Then leftProduct *= nums[0] = 1*1 = 1.",
+      highlightedLine: 7
     },
     {
       array,
       prefix: [1, 1, 0, 0],
       suffix: [0, 0, 0, 0],
-      result: [1, 1, 0, 0],
+      result: [1, 1, 1, 1],
       highlights: [1],
-      variables: { i: 1, prefix_prod: 1, suffix_prod: 1 },
-      explanation: "i=1: result[1] = 1 (product of elements left of index 1). Update prefix_prod = 1*1 = 1.",
-      highlightedLine: 3
+      variables: { i: 1, leftProduct: 1, rightProduct: 1 },
+      explanation: "i=1: result[1]=leftProduct=1 (only 1 to the left). Then leftProduct *= nums[1] = 1*2 = 2.",
+      highlightedLine: 8
     },
     {
       array,
       prefix: [1, 1, 2, 0],
       suffix: [0, 0, 0, 0],
-      result: [1, 1, 2, 0],
+      result: [1, 1, 2, 1],
       highlights: [2],
-      variables: { i: 2, prefix_prod: 2, suffix_prod: 1 },
-      explanation: "i=2: result[2] = 2 (1*2). Update prefix_prod = 1*2 = 2.",
-      highlightedLine: 3
+      variables: { i: 2, leftProduct: 2, rightProduct: 1 },
+      explanation: "i=2: result[2]=leftProduct=2 (1*2). Then leftProduct *= nums[2] = 2*3 = 6.",
+      highlightedLine: 8
     },
     {
       array,
@@ -68,9 +68,9 @@ export const ProductOfArrayExceptSelfVisualization = () => {
       suffix: [0, 0, 0, 0],
       result: [1, 1, 2, 6],
       highlights: [3],
-      variables: { i: 3, prefix_prod: 6, suffix_prod: 1 },
-      explanation: "i=3: result[3] = 6 (1*2*3). Update prefix_prod = 2*3 = 6. Prefix pass complete.",
-      highlightedLine: 4
+      variables: { i: 3, leftProduct: 6, rightProduct: 1 },
+      explanation: "i=3: result[3]=leftProduct=6 (1*2*3). Then leftProduct *= nums[3] = 6*4 = 24. Left pass done.",
+      highlightedLine: 8
     },
     {
       array,
@@ -78,9 +78,9 @@ export const ProductOfArrayExceptSelfVisualization = () => {
       suffix: [0, 0, 0, 1],
       result: [1, 1, 2, 6],
       highlights: [3],
-      variables: { i: 3, prefix_prod: 6, suffix_prod: 1 },
-      explanation: "Now suffix pass (right to left). i=3: suffix_prod = 1 (no elements to right).",
-      highlightedLine: 6
+      variables: { i: 3, leftProduct: 24, rightProduct: 1 },
+      explanation: "Pass 2 (right to left), i=3: result[3] *= rightProduct. 6*1=6. Then rightProduct *= nums[3] = 1*4 = 4.",
+      highlightedLine: 14
     },
     {
       array,
@@ -88,9 +88,9 @@ export const ProductOfArrayExceptSelfVisualization = () => {
       suffix: [0, 0, 4, 1],
       result: [1, 1, 8, 6],
       highlights: [2],
-      variables: { i: 2, prefix_prod: 6, suffix_prod: 4 },
-      explanation: "i=2: result[2] = 2 * 4 = 8. Update suffix_prod = 4*1 = 4.",
-      highlightedLine: 8
+      variables: { i: 2, leftProduct: 24, rightProduct: 4 },
+      explanation: "i=2: result[2] *= rightProduct. 2*4=8. Then rightProduct *= nums[2] = 4*3 = 12.",
+      highlightedLine: 15
     },
     {
       array,
@@ -98,9 +98,9 @@ export const ProductOfArrayExceptSelfVisualization = () => {
       suffix: [0, 12, 4, 1],
       result: [1, 12, 8, 6],
       highlights: [1],
-      variables: { i: 1, prefix_prod: 6, suffix_prod: 12 },
-      explanation: "i=1: result[1] = 1 * 12 = 12. Update suffix_prod = 12*1 = 12.",
-      highlightedLine: 8
+      variables: { i: 1, leftProduct: 24, rightProduct: 12 },
+      explanation: "i=1: result[1] *= rightProduct. 1*12=12. Then rightProduct *= nums[1] = 12*2 = 24.",
+      highlightedLine: 15
     },
     {
       array,
@@ -108,9 +108,9 @@ export const ProductOfArrayExceptSelfVisualization = () => {
       suffix: [24, 12, 4, 1],
       result: [24, 12, 8, 6],
       highlights: [0],
-      variables: { i: 0, prefix_prod: 6, suffix_prod: 24 },
-      explanation: "i=0: result[0] = 1 * 24 = 24. Final result: [24, 12, 8, 6]",
-      highlightedLine: 9
+      variables: { i: 0, leftProduct: 24, rightProduct: 24 },
+      explanation: "i=0: result[0] *= rightProduct. 1*24=24. Right pass complete!",
+      highlightedLine: 15
     },
     {
       array,
@@ -118,25 +118,30 @@ export const ProductOfArrayExceptSelfVisualization = () => {
       suffix: [24, 12, 4, 1],
       result: [24, 12, 8, 6],
       highlights: [],
-      variables: { i: -1, prefix_prod: 6, suffix_prod: 24 },
-      explanation: "Complete! Time: O(n), Space: O(1) (output array doesn't count).",
-      highlightedLine: 10
+      variables: { i: 0, leftProduct: 24, rightProduct: 24 },
+      explanation: "Complete! Result: [24,12,8,6]. Time: O(n), Space: O(1) excluding output.",
+      highlightedLine: 18
     }
   ];
 
   const code = `function productExceptSelf(nums: number[]): number[] {
   const n = nums.length;
   const result = new Array(n).fill(1);
-  let prefix = 1;
+  
+  // Calculate left products
+  let leftProduct = 1;
   for (let i = 0; i < n; i++) {
-    result[i] = prefix;
-    prefix *= nums[i];
+    result[i] = leftProduct;
+    leftProduct *= nums[i];
   }
-  let suffix = 1;
+  
+  // Calculate right products and multiply with left
+  let rightProduct = 1;
   for (let i = n - 1; i >= 0; i--) {
-    result[i] *= suffix;
-    suffix *= nums[i];
+    result[i] *= rightProduct;
+    rightProduct *= nums[i];
   }
+  
   return result;
 }`;
 

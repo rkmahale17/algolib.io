@@ -23,57 +23,71 @@ export const TwoSumVisualization = () => {
     {
       array,
       highlights: [],
-      variables: { target, map: {}, i: -1, complement: null, result: null },
-      explanation: "Initialize: We have an array and target=9. We'll use a hash map to store numbers we've seen.",
-      highlightedLine: 0
+      variables: { target, seen: '{}', i: -1, complement: null },
+      explanation: "Initialize: Array [2,7,11,15], target=9. We'll use a hash map to store each number and its index.",
+      highlightedLine: 1
     },
     {
       array,
       highlights: [0],
-      variables: { target, map: {}, i: 0, complement: 7, result: null },
-      explanation: "At index 0: num=2, complement=9-2=7. Check if 7 exists in map. It doesn't.",
-      highlightedLine: 3
+      variables: { target, seen: '{}', i: 0, complement: 7 },
+      explanation: "i=0: num=2. Calculate complement = 9-2 = 7. Check if 7 exists in map.",
+      highlightedLine: 4
     },
     {
       array,
       highlights: [0],
-      variables: { target, map: { 2: 0 }, i: 0, complement: 7, result: null },
-      explanation: "Store map[2]=0 (value 2 at index 0). Continue to next element.",
-      highlightedLine: 6
+      variables: { target, seen: '{}', i: 0, complement: 7 },
+      explanation: "7 not in map (map.has(7) is false). Continue to store current number.",
+      highlightedLine: 5
+    },
+    {
+      array,
+      highlights: [0],
+      variables: { target, seen: '{2:0}', i: 0, complement: 7 },
+      explanation: "Store: map[2] = 0. Now map contains {2: 0}. Move to next element.",
+      highlightedLine: 7
     },
     {
       array,
       highlights: [1],
-      variables: { target, map: { 2: 0 }, i: 1, complement: 2, result: null },
-      explanation: "At index 1: num=7, complement=9-7=2. Check if 2 exists in map.",
-      highlightedLine: 3
-    },
-    {
-      array,
-      highlights: [0, 1],
-      variables: { target, map: { 2: 0 }, i: 1, complement: 2, result: null },
-      explanation: "Found! 2 exists in map at index 0. We found our pair: indices [0, 1].",
+      variables: { target, seen: '{2:0}', i: 1, complement: 2 },
+      explanation: "i=1: num=7. Calculate complement = 9-7 = 2. Check if 2 exists in map.",
       highlightedLine: 4
     },
     {
       array,
       highlights: [0, 1],
-      variables: { target, map: { 2: 0, 7: 1 }, i: 1, complement: 2, result: [0, 1] },
-      explanation: "Return [0, 1]. Time: O(n), Space: O(n) using hash map.",
+      variables: { target, seen: '{2:0}', i: 1, complement: 2 },
+      explanation: "Found! 2 exists in map at index 0. map.has(2) is true.",
       highlightedLine: 5
+    },
+    {
+      array,
+      highlights: [0, 1],
+      variables: { target, seen: '{2:0}', i: 1, complement: 2 },
+      explanation: "Return [0, 1] - indices where 2+7=9. Time: O(n), Space: O(n).",
+      highlightedLine: 6
     }
   ];
 
   const code = `function twoSum(nums: number[], target: number): number[] {
-  const map = new Map<number, number>();
+  // Hash map to store number and its index
+  const seen = new Map<number, number>();
+  
   for (let i = 0; i < nums.length; i++) {
     const complement = target - nums[i];
-    if (map.has(complement)) {
-      return [map.get(complement)!, i];
+    
+    // Check if complement exists in hash map
+    if (seen.has(complement)) {
+      return [seen.get(complement)!, i];
     }
-    map.set(nums[i], i);
+    
+    // Store current number and its index
+    seen.set(nums[i], i);
   }
-  return [];
+  
+  return []; // No solution found
 }`;
 
   const step = steps[currentStep];

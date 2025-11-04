@@ -24,52 +24,94 @@ export const SearchInRotatedSortedArrayVisualization = () => {
       array,
       highlights: [],
       variables: { left: 0, right: 6, mid: -1, target, found: false },
-      explanation: "Search for target=0 in rotated array. Use modified binary search.",
-      highlightedLine: 0
+      explanation: "Search target=0 in rotated array [4,5,6,7,0,1,2]. Use modified binary search.",
+      highlightedLine: 1
+    },
+    {
+      array,
+      highlights: [0, 6],
+      variables: { left: 0, right: 6, mid: -1, target, found: false },
+      explanation: "Initialize: left=0, right=6. We'll check which half is sorted at each step.",
+      highlightedLine: 3
     },
     {
       array,
       highlights: [0, 3, 6],
       variables: { left: 0, right: 6, mid: 3, target, found: false },
-      explanation: "mid=3, nums[mid]=7. Left half [4,5,6,7] is sorted. Target 0 not in range [4,7].",
-      highlightedLine: 3
+      explanation: "mid=3, nums[mid]=7. Check if target==7? No. nums[left]=4 <= nums[mid]=7, so LEFT half is sorted.",
+      highlightedLine: 6
+    },
+    {
+      array,
+      highlights: [0, 3, 6],
+      variables: { left: 0, right: 6, mid: 3, target, found: false },
+      explanation: "Left sorted [4,5,6,7]. Is target=0 in range [4,7]? No. Search RIGHT half instead.",
+      highlightedLine: 16
+    },
+    {
+      array,
+      highlights: [4, 6],
+      variables: { left: 4, right: 6, mid: -1, target, found: false },
+      explanation: "Move left=mid+1=4. Now search in [0,1,2].",
+      highlightedLine: 16
     },
     {
       array,
       highlights: [4, 5, 6],
       variables: { left: 4, right: 6, mid: 5, target, found: false },
-      explanation: "Search right half. mid=5, nums[mid]=1. Right half [1,2] is sorted.",
-      highlightedLine: 6
+      explanation: "mid=5, nums[mid]=1. target==1? No. nums[left]=0 <= nums[mid]=1, so LEFT half [0,1] is sorted.",
+      highlightedLine: 11
     },
     {
       array,
       highlights: [4, 5],
-      variables: { left: 4, right: 5, mid: 4, target, found: false },
-      explanation: "Target 0 not in [1,2]. Search left. mid=4, nums[mid]=0. Found target!",
-      highlightedLine: 8
+      variables: { left: 4, right: 5, mid: 5, target, found: false },
+      explanation: "Is target=0 in sorted range [0,1]? Yes! (0 <= 0 < 1). Search left half.",
+      highlightedLine: 13
+    },
+    {
+      array,
+      highlights: [4, 5],
+      variables: { left: 4, right: 4, mid: -1, target, found: false },
+      explanation: "Move right=mid-1=4. Now left=4, right=4.",
+      highlightedLine: 14
     },
     {
       array,
       highlights: [4],
-      variables: { left: 4, right: 5, mid: 4, target, found: true },
-      explanation: "Target found at index 4. Return 4. Time: O(log n).",
-      highlightedLine: 9
+      variables: { left: 4, right: 4, mid: 4, target, found: false },
+      explanation: "mid=4, nums[mid]=0. Check if target==0? YES!",
+      highlightedLine: 6
+    },
+    {
+      array,
+      highlights: [4],
+      variables: { left: 4, right: 4, mid: 4, target, found: true },
+      explanation: "Found target at index 4! Return 4. Time: O(log n), Space: O(1).",
+      highlightedLine: 7
     }
   ];
 
   const code = `function search(nums: number[], target: number): number {
   let left = 0, right = nums.length - 1;
+  
   while (left <= right) {
     const mid = Math.floor((left + right) / 2);
-    if (nums[mid] === target) return mid;
     
+    if (nums[mid] === target) {
+      return mid;
+    }
+    
+    // Determine which half is sorted
     if (nums[left] <= nums[mid]) {
+      // Left half is sorted
       if (nums[left] <= target && target < nums[mid]) {
         right = mid - 1;
       } else {
         left = mid + 1;
       }
     } else {
+      // Right half is sorted
       if (nums[mid] < target && target <= nums[right]) {
         left = mid + 1;
       } else {
@@ -77,6 +119,7 @@ export const SearchInRotatedSortedArrayVisualization = () => {
       }
     }
   }
+  
   return -1;
 }`;
 

@@ -23,134 +23,136 @@ export const ThreeSumVisualization = () => {
     {
       array: originalArray,
       highlights: [],
-      variables: { result: [], i: -1, left: -1, right: -1, sum: null },
-      explanation: "Start with unsorted array. First, we need to sort it.",
-      highlightedLine: 0
-    },
-    {
-      array: sortedArray,
-      highlights: [],
-      variables: { result: [], i: -1, left: -1, right: -1, sum: null },
-      explanation: "Array sorted: [-4, -1, -1, 0, 1, 2]. Now we'll use three pointers.",
+      variables: { result: '[]', i: -1, left: -1, right: -1, target: 0 },
+      explanation: "Given array: [-1,0,1,2,-1,-4]. First, sort it for two-pointer approach.",
       highlightedLine: 1
     },
     {
       array: sortedArray,
-      highlights: [0],
-      variables: { result: [], i: 0, left: 1, right: 5, sum: null },
-      explanation: "i=0 (val=-4), left=1, right=5. We'll find triplets that sum to 0.",
-      highlightedLine: 3
+      highlights: [],
+      variables: { result: '[]', i: -1, left: -1, right: -1, target: 0 },
+      explanation: "After sorting: [-4,-1,-1,0,1,2]. Now use fixed pointer i + two pointers (left, right).",
+      highlightedLine: 2
     },
     {
       array: sortedArray,
       highlights: [0, 1, 5],
-      variables: { result: [], i: 0, left: 1, right: 5, sum: -3 },
-      explanation: "sum = -4 + (-1) + 2 = -3. Sum < 0, so move left pointer right.",
-      highlightedLine: 6
+      variables: { result: '[]', i: 0, left: 1, right: 5, target: 4 },
+      explanation: "i=0, nums[i]=-4, target=-(-4)=4. left=1, right=5. sum = -1+2 = 1 < 4.",
+      highlightedLine: 14
     },
     {
       array: sortedArray,
       highlights: [0, 2, 5],
-      variables: { result: [], i: 0, left: 2, right: 5, sum: -3 },
-      explanation: "left=2. sum = -4 + (-1) + 2 = -3. Still < 0, move left right.",
-      highlightedLine: 7
+      variables: { result: '[]', i: 0, left: 2, right: 5, target: 4 },
+      explanation: "sum too small, move left++. left=2. sum = -1+2 = 1 < 4.",
+      highlightedLine: 26
     },
     {
       array: sortedArray,
       highlights: [0, 3, 5],
-      variables: { result: [], i: 0, left: 3, right: 5, sum: -2 },
-      explanation: "left=3. sum = -4 + 0 + 2 = -2. Still < 0, move left right.",
-      highlightedLine: 7
+      variables: { result: '[]', i: 0, left: 3, right: 5, target: 4 },
+      explanation: "left=3. sum = 0+2 = 2 < 4. Move left++.",
+      highlightedLine: 26
     },
     {
       array: sortedArray,
       highlights: [0, 4, 5],
-      variables: { result: [], i: 0, left: 4, right: 5, sum: -1 },
-      explanation: "left=4. sum = -4 + 1 + 2 = -1. Still < 0. left >= right, done with i=0.",
-      highlightedLine: 7
-    },
-    {
-      array: sortedArray,
-      highlights: [1],
-      variables: { result: [], i: 1, left: 2, right: 5, sum: null },
-      explanation: "i=1 (val=-1), left=2, right=5. Find triplets starting with -1.",
-      highlightedLine: 3
+      variables: { result: '[]', i: 0, left: 4, right: 5, target: 4 },
+      explanation: "left=4. sum = 1+2 = 3 < 4. Move left++. Now left>=right, done with i=0.",
+      highlightedLine: 26
     },
     {
       array: sortedArray,
       highlights: [1, 2, 5],
-      variables: { result: [], i: 1, left: 2, right: 5, sum: 0 },
-      explanation: "sum = -1 + (-1) + 2 = 0. Found triplet! Add [-1, -1, 2] to result.",
-      highlightedLine: 8
+      variables: { result: '[]', i: 1, left: 2, right: 5, target: 1 },
+      explanation: "i=1, nums[i]=-1, target=1. left=2, right=5. sum = -1+2 = 1. Found triplet!",
+      highlightedLine: 16
+    },
+    {
+      array: sortedArray,
+      highlights: [1, 2, 5],
+      variables: { result: '[[-1,-1,2]]', i: 1, left: 2, right: 5, target: 1 },
+      explanation: "Add [-1,-1,2] to result. Skip duplicates, move both pointers.",
+      highlightedLine: 17
     },
     {
       array: sortedArray,
       highlights: [1, 3, 4],
-      variables: { result: [[-1, -1, 2]], i: 1, left: 3, right: 4, sum: null },
-      explanation: "Move both pointers. left=3, right=4. Continue searching.",
-      highlightedLine: 9
+      variables: { result: '[[-1,-1,2]]', i: 1, left: 3, right: 4, target: 1 },
+      explanation: "After skipping duplicates: left=3, right=4. sum = 0+1 = 1. Another triplet!",
+      highlightedLine: 16
     },
     {
       array: sortedArray,
       highlights: [1, 3, 4],
-      variables: { result: [[-1, -1, 2]], i: 1, left: 3, right: 4, sum: 0 },
-      explanation: "sum = -1 + 0 + 1 = 0. Found another! Add [-1, 0, 1] to result.",
-      highlightedLine: 8
-    },
-    {
-      array: sortedArray,
-      highlights: [1, 3, 4],
-      variables: { result: [[-1, -1, 2], [-1, 0, 1]], i: 1, left: 4, right: 3, sum: null },
-      explanation: "left >= right, done with i=1. Move to next unique element.",
-      highlightedLine: 10
+      variables: { result: '[[-1,-1,2],[-1,0,1]]', i: 1, left: 3, right: 4, target: 1 },
+      explanation: "Add [-1,0,1] to result. Move pointers. Now left>=right, done with i=1.",
+      highlightedLine: 17
     },
     {
       array: sortedArray,
       highlights: [2],
-      variables: { result: [[-1, -1, 2], [-1, 0, 1]], i: 2, left: -1, right: -1, sum: null },
-      explanation: "i=2 has same value as i=1 (-1). Skip to avoid duplicates.",
-      highlightedLine: 4
-    },
-    {
-      array: sortedArray,
-      highlights: [3],
-      variables: { result: [[-1, -1, 2], [-1, 0, 1]], i: 3, left: 4, right: 5, sum: null },
-      explanation: "i=3 (val=0), left=4, right=5. Check remaining elements.",
-      highlightedLine: 3
+      variables: { result: '[[-1,-1,2],[-1,0,1]]', i: 2, left: -1, right: -1, target: 1 },
+      explanation: "i=2. nums[2]=-1 same as nums[1]. Skip duplicate (line 7).",
+      highlightedLine: 7
     },
     {
       array: sortedArray,
       highlights: [3, 4, 5],
-      variables: { result: [[-1, -1, 2], [-1, 0, 1]], i: 3, left: 4, right: 5, sum: 3 },
-      explanation: "sum = 0 + 1 + 2 = 3. Sum > 0, move right pointer left.",
-      highlightedLine: 11
+      variables: { result: '[[-1,-1,2],[-1,0,1]]', i: 3, left: 4, right: 5, target: 0 },
+      explanation: "i=3, nums[i]=0, target=0. left=4, right=5. sum = 1+2 = 3 > 0. Move right--.",
+      highlightedLine: 28
     },
     {
       array: sortedArray,
-      highlights: [3, 4, 5],
-      variables: { result: [[-1, -1, 2], [-1, 0, 1]], i: 3, left: 4, right: 4, sum: null },
-      explanation: "left >= right, done. Final result: [[-1, -1, 2], [-1, 0, 1]]",
-      highlightedLine: 12
+      highlights: [3, 4, 4],
+      variables: { result: '[[-1,-1,2],[-1,0,1]]', i: 3, left: 4, right: 4, target: 0 },
+      explanation: "right=4. Now left>=right, done with i=3. No more valid i values.",
+      highlightedLine: 28
+    },
+    {
+      array: sortedArray,
+      highlights: [],
+      variables: { result: '[[-1,-1,2],[-1,0,1]]', i: 3, left: -1, right: -1, target: 0 },
+      explanation: "Complete! Found 2 triplets: [[-1,-1,2], [-1,0,1]]. Time: O(n²), Space: O(1).",
+      highlightedLine: 33
     }
   ];
 
   const code = `function threeSum(nums: number[]): number[][] {
   nums.sort((a, b) => a - b);
   const result: number[][] = [];
+  
   for (let i = 0; i < nums.length - 2; i++) {
-    if (i > 0 && nums[i] === nums[i - 1]) continue;
+    // Skip duplicates for first number
+    if (i > 0 && nums[i] === nums[i - 1]) {
+      continue;
+    }
+    
     let left = i + 1, right = nums.length - 1;
+    const target = -nums[i];
+    
     while (left < right) {
-      const sum = nums[i] + nums[left] + nums[right];
-      if (sum === 0) {
+      const currentSum = nums[left] + nums[right];
+      
+      if (currentSum === target) {
         result.push([nums[i], nums[left], nums[right]]);
+        
+        // Skip duplicates for second and third numbers
         while (left < right && nums[left] === nums[left + 1]) left++;
         while (left < right && nums[right] === nums[right - 1]) right--;
-        left++; right--;
-      } else if (sum < 0) left++;
-      else right--;
+        
+        left++;
+        right--;
+      } else if (currentSum < target) {
+        left++;
+      } else {
+        right--;
+      }
     }
   }
+  
   return result;
 }`;
 
