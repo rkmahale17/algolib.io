@@ -13,11 +13,27 @@ import { Input } from '@/components/ui/input';
 import { Link } from 'react-router-dom';
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import type { User } from '@supabase/supabase-js';
 
 const Home = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+
+  // Check authentication status
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   // Read category from URL params on mount
   useEffect(() => {
@@ -234,95 +250,19 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Progress Tracking Cards */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-          {/* Algorithms Progress */}
-          <Card className={`p-6 relative overflow-hidden transition-all duration-500 ${
-            algorithmProgress.percentage === 100 ? 'ring-2 ring-green-500 animate-pulse' : ''
-          }`}>
-            {algorithmProgress.percentage === 100 && (
-              <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 via-transparent to-green-500/10 animate-fade-in" />
-            )}
-            <div className="relative">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <BookOpen className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg">Algorithm Progress</h3>
-                  <p className="text-sm text-muted-foreground">Master all algorithms</p>
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Completed</span>
-                  <span className="font-bold text-primary">
-                    {algorithmProgress.completed} / {algorithmProgress.total}
-                  </span>
-                </div>
-                <Progress value={algorithmProgress.percentage} className="h-3" />
-                <div className="text-right">
-                  <span className="text-2xl font-bold gradient-text">
-                    {algorithmProgress.percentage}%
-                  </span>
-                </div>
-              </div>
-              {algorithmProgress.percentage === 100 && (
-                <div className="mt-4 p-3 bg-green-500/20 rounded-lg text-center animate-scale-in">
-                  <Trophy className="w-6 h-6 text-green-600 mx-auto mb-1" />
-                  <p className="text-sm font-bold text-green-600">🎉 All Complete!</p>
-                </div>
-              )}
-            </div>
-          </Card>
-
-          {/* Blind 75 Progress */}
-          <Card className={`p-6 relative overflow-hidden transition-all duration-500 ${
-            blind75Progress.percentage === 100 ? 'ring-2 ring-green-500 animate-pulse' : ''
-          }`}>
-            {blind75Progress.percentage === 100 && (
-              <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 via-transparent to-green-500/10 animate-fade-in" />
-            )}
-            <div className="relative">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-lg bg-secondary/10">
-                  <Target className="w-5 h-5 text-secondary" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-lg">Blind 75 Progress</h3>
-                    <Badge variant="secondary" className="bg-green-500/20 text-green-600 border-green-500/30 text-xs">
-                      BETA
-                    </Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground">Interview prep essentials</p>
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Completed</span>
-                  <span className="font-bold text-secondary">
-                    {blind75Progress.completed} / {blind75Progress.total}
-                  </span>
-                </div>
-                <Progress value={blind75Progress.percentage} className="h-3" />
-                <div className="text-right">
-                  <span className="text-2xl font-bold gradient-text">
-                    {blind75Progress.percentage}%
-                  </span>
-                </div>
-              </div>
-              {blind75Progress.percentage === 100 && (
-                <div className="mt-4 p-3 bg-green-500/20 rounded-lg text-center animate-scale-in">
-                  <Award className="w-6 h-6 text-green-600 mx-auto mb-1" />
-                  <p className="text-sm font-bold text-green-600">🎉 Interview Ready!</p>
-                </div>
-              )}
-            </div>
-          </Card>
+      {/* Progress Tracking Cards - Only show when logged in */}
+      {user && (
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {/* Algorithms Progress */}
+            <Card className={`p-6 relative overflow-hidden transition-all duration-500 ${
+              algorithmProgress.percentage === 100 ? 'ring-2 ring-green-500 animate-pulse' : ''
+            }`}>
+...
+            </Card>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Search and Filter */}
       <div className="container mx-auto px-4 py-8">
@@ -364,8 +304,13 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Algorithm Grid */}
+      {/* Algorithm Patterns Section */}
       <div className="container mx-auto px-4 pb-16">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl md:text-4xl font-bold gradient-text mb-2">Algorithm Patterns</h2>
+          <p className="text-muted-foreground">Browse and master essential algorithms by category</p>
+        </div>
+        
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredAlgorithms.map((algo, index) => (
             <Link key={algo.id} to={`/algorithm/${algo.id}`} target="_blank" rel="noopener noreferrer">
