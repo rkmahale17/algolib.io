@@ -1,24 +1,36 @@
-import React, { useEffect, useRef, useState } from 'react';
-
-import { CodeHighlighter } from '../shared/CodeHighlighter';
-import { StepControls } from '../shared/StepControls';
-import { VariablePanel } from '../shared/VariablePanel';
+import { useState } from 'react';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { SkipBack, SkipForward, RotateCcw } from 'lucide-react';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 interface Step {
   list: number[];
   prev: number | null;
   current: number | null;
   next: number | null;
+  reversed: boolean[];
+  variables: Record<string, any>;
   message: string;
   lineNumber: number;
 }
 
-export const ReverseLinkedListVisualization: React.FC = () => {
-  const [steps, setSteps] = useState<Step[]>([]);
+export const ReverseLinkedListVisualization = () => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1000);
-  const intervalRef = useRef<number | null>(null);
+
+  const list = [1, 2, 3, 4, 5];
+
+  const steps: Step[] = [
+    { list, prev: null, current: 0, next: null, reversed: [false, false, false, false, false], variables: { prev: 'null', current: '1' }, message: "Initialize: prev=null, current=head(1)", lineNumber: 2 },
+    { list, prev: null, current: 0, next: 1, reversed: [false, false, false, false, false], variables: { next: '2' }, message: "Store next pointer: next=2", lineNumber: 6 },
+    { list, prev: null, current: 0, next: 1, reversed: [true, false, false, false, false], variables: { action: 'current.next = prev' }, message: "Reverse pointer: 1->null", lineNumber: 7 },
+    { list, prev: 0, current: 1, next: 1, reversed: [true, false, false, false, false], variables: { prev: '1', current: '2' }, message: "Move forward: prev=1, current=2", lineNumber: 9 },
+    { list, prev: 1, current: 2, next: 2, reversed: [true, true, false, false, false], variables: { action: 'reverse' }, message: "Reverse pointer: 2->1", lineNumber: 7 },
+    { list, prev: 2, current: 3, next: 3, reversed: [true, true, true, false, false], variables: { action: 'reverse' }, message: "Reverse pointer: 3->2", lineNumber: 7 },
+    { list, prev: 3, current: 4, next: 4, reversed: [true, true, true, true, false], variables: { action: 'reverse' }, message: "Reverse pointer: 4->3", lineNumber: 7 },
+    { list, prev: 4, current: null, next: null, reversed: [true, true, true, true, true], variables: { result: 'prev = 5' }, message: "Complete! Return prev(5) as new head. Time: O(n), Space: O(1)", lineNumber: 12 }
+  ];
 
   const code = `function reverseList(head: ListNode | null): ListNode | null {
   let prev = null;
@@ -34,195 +46,57 @@ export const ReverseLinkedListVisualization: React.FC = () => {
   return prev;
 }`;
 
-  const generateSteps = () => {
-    const arr = [1, 2, 3, 4, 5];
-    const newSteps: Step[] = [];
-
-    newSteps.push({
-      list: [...arr],
-      prev: null,
-      current: 0,
-      next: null,
-      message: 'Initialize prev=null, current=head',
-      lineNumber: 2
-    });
-
-    let prev: number | null = null;
-    let current: number | null = 0;
-
-    for (let i = 0; i < arr.length; i++) {
-      const next = i + 1 < arr.length ? i + 1 : null;
-      
-      newSteps.push({
-        list: [...arr],
-        prev,
-        current,
-        next,
-        message: `Store next pointer (node ${next})`,
-        lineNumber: 6
-      });
-
-      newSteps.push({
-        list: [...arr],
-        prev,
-        current,
-        next,
-        message: `Reverse current.next to point to prev`,
-        lineNumber: 7
-      });
-
-      prev = current;
-      current = next;
-
-      newSteps.push({
-        list: [...arr],
-        prev,
-        current,
-        next: current !== null && current + 1 < arr.length ? current + 1 : null,
-        message: `Move prev and current forward`,
-        lineNumber: 9
-      });
-    }
-
-    newSteps.push({
-      list: [...arr],
-      prev,
-      current,
-      next: null,
-      message: 'Return prev as new head',
-      lineNumber: 12
-    });
-
-    setSteps(newSteps);
-  };
-
-  useEffect(() => {
-    generateSteps();
-  }, []);
-
-  useEffect(() => {
-    if (isPlaying && currentStepIndex < steps.length - 1) {
-      intervalRef.current = window.setInterval(() => {
-        setCurrentStepIndex((prev) => {
-          if (prev >= steps.length - 1) {
-            setIsPlaying(false);
-            return prev;
-          }
-          return prev + 1;
-        });
-      }, speed);
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    }
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [isPlaying, currentStepIndex, steps.length, speed]);
-
-  const handlePlay = () => setIsPlaying(true);
-  const handlePause = () => setIsPlaying(false);
-  const handleStepForward = () => {
-    if (currentStepIndex < steps.length - 1) {
-      setCurrentStepIndex(currentStepIndex + 1);
-    }
-  };
-  const handleStepBack = () => {
-    if (currentStepIndex > 0) {
-      setCurrentStepIndex(currentStepIndex - 1);
-    }
-  };
-  const handleReset = () => {
-    setCurrentStepIndex(0);
-    setIsPlaying(false);
-  };
-
-  if (steps.length === 0) return null;
-
   const currentStep = steps[currentStepIndex];
 
   return (
-    <div className="space-y-6">
-      <StepControls
-        onPlay={handlePlay}
-        onPause={handlePause}
-        onStepForward={handleStepForward}
-        onStepBack={handleStepBack}
-        onReset={handleReset}
-        isPlaying={isPlaying}
-        currentStep={currentStepIndex}
-        totalSteps={steps.length}
-        speed={speed}
-        onSpeedChange={setSpeed}
-      />
-<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div className="bg-card rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4">Linked List Visualization</h3>
-        <div className="flex items-center gap-4 overflow-x-auto pb-4">
-          {currentStep.list.map((val, idx) => (
-            <div key={idx} className="flex items-center">
-              <div
-                className={`w-16 h-16 flex items-center justify-center rounded-lg border-2 font-bold text-lg transition-all ${
-                  currentStep.current === idx
-                    ? 'bg-blue-500/20 border-blue-500 text-blue-500'
-                    : currentStep.prev === idx
-                    ? 'bg-green-500/20 border-green-500 text-green-500'
-                    : currentStep.next === idx
-                    ? 'bg-yellow-500/20 border-yellow-500 text-yellow-500'
-                    : 'bg-card border-border'
-                }`}
-              >
-                {val}
-              </div>
-              {idx < currentStep.list.length - 1 && (
-                <div className="text-2xl mx-2 text-muted-foreground">
-                  {currentStep.prev !== null && idx <= currentStep.prev ? '←' : '→'}
+    <div className="w-full h-full flex flex-col gap-4 p-4">
+      <Card className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex gap-2">
+            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(0)} disabled={currentStepIndex === 0}><RotateCcw className="h-4 w-4" /></Button>
+            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))} disabled={currentStepIndex === 0}><SkipBack className="h-4 w-4" /></Button>
+            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(Math.min(steps.length - 1, currentStepIndex + 1))} disabled={currentStepIndex === steps.length - 1}><SkipForward className="h-4 w-4" /></Button>
+          </div>
+          <div className="text-sm">Step {currentStepIndex + 1} / {steps.length}</div>
+        </div>
+      </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1">
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Reverse Linked List</h3>
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 overflow-x-auto pb-2">
+              {currentStep.list.map((val, idx) => (
+                <div key={idx} className="flex items-center">
+                  <div className={`w-14 h-14 flex items-center justify-center rounded font-bold text-lg border-2 ${
+                    currentStep.current === idx ? 'bg-blue-500/20 border-blue-500 text-blue-500' :
+                    currentStep.prev === idx ? 'bg-green-500/20 border-green-500 text-green-500' :
+                    currentStep.next === idx ? 'bg-yellow-500/20 border-yellow-500 text-yellow-500' : 'bg-muted border-border'
+                  }`}>
+                    {val}
+                  </div>
+                  {idx < currentStep.list.length - 1 && (
+                    <div className="text-xl mx-1">{currentStep.reversed[idx] ? '←' : '→'}</div>
+                  )}
                 </div>
-              )}
+              ))}
             </div>
-          ))}
-        </div>
-        
-        <div className="mt-4 flex gap-4 text-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-blue-500/20 border-2 border-blue-500"></div>
-            <span>Current</span>
+            <div className="flex gap-3 text-xs">
+              <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-blue-500/20 border-2 border-blue-500"></div>Current</div>
+              <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-green-500/20 border-2 border-green-500"></div>Prev</div>
+              <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-yellow-500/20 border-2 border-yellow-500"></div>Next</div>
+            </div>
+            <div className="p-4 bg-muted/50 rounded text-sm">{currentStep.message}</div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-green-500/20 border-2 border-green-500"></div>
-            <span>Prev</span>
+        </Card>
+        <Card className="p-6 overflow-hidden flex flex-col">
+          <h3 className="text-lg font-semibold mb-4">TypeScript</h3>
+          <div className="flex-1 overflow-auto">
+            <SyntaxHighlighter language="typescript" style={vscDarkPlus} showLineNumbers lineProps={(lineNumber) => ({ style: { backgroundColor: lineNumber === currentStep.lineNumber ? 'rgba(255, 255, 0, 0.2)' : 'transparent', display: 'block' } })}>
+              {code}
+            </SyntaxHighlighter>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-yellow-500/20 border-2 border-yellow-500"></div>
-            <span>Next</span>
-          </div>
-        </div>
-        
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
-        </div>
-
-         <div className="mt-4 p-4 bg-muted rounded">
-            <VariablePanel
-        variables={{
-          prev: currentStep.prev !== null ? `Node ${currentStep.prev}` : 'null',
-          current: currentStep.current !== null ? `Node ${currentStep.current}` : 'null',
-          next: currentStep.next !== null ? `Node ${currentStep.next}` : 'null'
-        }}
-      />
-        </div>
-    
+        </Card>
       </div>
-
-
-
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
-    </div>
     </div>
   );
 };

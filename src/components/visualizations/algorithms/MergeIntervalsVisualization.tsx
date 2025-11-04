@@ -1,30 +1,35 @@
-import { useEffect, useRef, useState } from 'react';
-
-import { CodeHighlighter } from '../shared/CodeHighlighter';
-import { StepControls } from '../shared/StepControls';
-import { VariablePanel } from '../shared/VariablePanel';
-
-interface Interval {
-  start: number;
-  end: number;
-}
+import { useState } from 'react';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { SkipBack, SkipForward, RotateCcw } from 'lucide-react';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 interface Step {
-  intervals: Interval[];
-  merged: Interval[];
-  currentIndex: number;
+  intervals: [number, number][];
+  merged: [number, number][];
+  currentIdx: number;
+  variables: Record<string, any>;
   message: string;
   lineNumber: number;
 }
 
 export const MergeIntervalsVisualization = () => {
-  const [steps, setSteps] = useState<Step[]>([]);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const code = `function merge(intervals) {
+  const intervals: [number, number][] = [[1, 3], [2, 6], [8, 10], [15, 18]];
+  const sorted = [...intervals].sort((a, b) => a[0] - b[0]);
+
+  const steps: Step[] = [
+    { intervals: sorted, merged: [], currentIdx: -1, variables: {}, message: "Sort intervals by start time", lineNumber: 2 },
+    { intervals: sorted, merged: [[1, 3]], currentIdx: 0, variables: { merged: '[[1,3]]' }, message: "Initialize with first interval [1,3]", lineNumber: 3 },
+    { intervals: sorted, merged: [[1, 6]], currentIdx: 1, variables: { current: '[2,6]', overlap: true }, message: "[2,6] overlaps [1,3]. Merge to [1,6]", lineNumber: 8 },
+    { intervals: sorted, merged: [[1, 6], [8, 10]], currentIdx: 2, variables: { current: '[8,10]', overlap: false }, message: "[8,10] doesn't overlap. Add as new interval", lineNumber: 11 },
+    { intervals: sorted, merged: [[1, 6], [8, 10], [15, 18]], currentIdx: 3, variables: { result: 3 }, message: "Complete! 3 merged intervals. Time: O(n log n), Space: O(n)", lineNumber: 14 }
+  ];
+
+  const code = `function merge(intervals: number[][]): number[][] {
+  if (intervals.length === 0) return [];
   intervals.sort((a, b) => a[0] - b[0]);
   const merged = [intervals[0]];
   
@@ -42,214 +47,57 @@ export const MergeIntervalsVisualization = () => {
   return merged;
 }`;
 
-  const generateSteps = () => {
-    const intervals: Interval[] = [
-      { start: 1, end: 3 },
-      { start: 2, end: 6 },
-      { start: 8, end: 10 },
-      { start: 15, end: 18 },
-      { start: 16, end: 20 }
-    ];
-    
-    const newSteps: Step[] = [];
-    const sorted = [...intervals].sort((a, b) => a.start - b.start);
-    
-    newSteps.push({
-      intervals: sorted.map(i => ({ ...i })),
-      merged: [],
-      currentIndex: -1,
-      message: 'Step 1: Sort intervals by start time',
-      lineNumber: 1
-    });
-
-    const merged: Interval[] = [{ ...sorted[0] }];
-    
-    newSteps.push({
-      intervals: sorted.map(i => ({ ...i })),
-      merged: merged.map(i => ({ ...i })),
-      currentIndex: 0,
-      message: 'Initialize merged with first interval',
-      lineNumber: 2
-    });
-
-    for (let i = 1; i < sorted.length; i++) {
-      const current = sorted[i];
-      const last = merged[merged.length - 1];
-      
-      if (current.start <= last.end) {
-        newSteps.push({
-          intervals: sorted.map(i => ({ ...i })),
-          merged: merged.map(i => ({ ...i })),
-          currentIndex: i,
-          message: `Interval [${current.start}, ${current.end}] overlaps with [${last.start}, ${last.end}]`,
-          lineNumber: 8
-        });
-        
-        last.end = Math.max(last.end, current.end);
-        
-        newSteps.push({
-          intervals: sorted.map(i => ({ ...i })),
-          merged: merged.map(i => ({ ...i })),
-          currentIndex: i,
-          message: `Merge: update end to ${last.end}`,
-          lineNumber: 9
-        });
-      } else {
-        newSteps.push({
-          intervals: sorted.map(i => ({ ...i })),
-          merged: merged.map(i => ({ ...i })),
-          currentIndex: i,
-          message: `No overlap. Add [${current.start}, ${current.end}] as new interval`,
-          lineNumber: 11
-        });
-        
-        merged.push({ ...current });
-      }
-    }
-
-    newSteps.push({
-      intervals: sorted.map(i => ({ ...i })),
-      merged: merged.map(i => ({ ...i })),
-      currentIndex: sorted.length - 1,
-      message: `Complete! ${merged.length} merged intervals`,
-      lineNumber: 15
-    });
-
-    setSteps(newSteps);
-    setCurrentStepIndex(0);
-  };
-
-  useEffect(() => {
-    generateSteps();
-  }, []);
-
-  useEffect(() => {
-    if (isPlaying && currentStepIndex < steps.length - 1) {
-      intervalRef.current = setInterval(() => {
-        setCurrentStepIndex(prev => {
-          if (prev >= steps.length - 1) {
-            setIsPlaying(false);
-            return prev;
-          }
-          return prev + 1;
-        });
-      }, 1200 / speed);
-    } else {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    }
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [isPlaying, currentStepIndex, steps.length, speed]);
-
-  const handlePlay = () => setIsPlaying(true);
-  const handlePause = () => setIsPlaying(false);
-  const handleStepForward = () => currentStepIndex < steps.length - 1 && setCurrentStepIndex(prev => prev + 1);
-  const handleStepBack = () => currentStepIndex > 0 && setCurrentStepIndex(prev => prev - 1);
-  const handleReset = () => {
-    setCurrentStepIndex(0);
-    setIsPlaying(false);
-    generateSteps();
-  };
-
-  if (steps.length === 0) return null;
-
   const currentStep = steps[currentStepIndex];
-  const timelineMax = Math.max(...currentStep.intervals.map(i => i.end), ...currentStep.merged.map(i => i.end)) + 2;
 
   return (
-    <div className="space-y-6">
-      <StepControls
-        isPlaying={isPlaying}
-        onPlay={handlePlay}
-        onPause={handlePause}
-        onStepForward={handleStepForward}
-        onStepBack={handleStepBack}
-        onReset={handleReset}
-        speed={speed}
-        onSpeedChange={setSpeed}
-        currentStep={currentStepIndex}
-        totalSteps={steps.length - 1}
-      />
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 space-y-6">
+    <div className="w-full h-full flex flex-col gap-4 p-4">
+      <Card className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex gap-2">
+            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(0)} disabled={currentStepIndex === 0}><RotateCcw className="h-4 w-4" /></Button>
+            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))} disabled={currentStepIndex === 0}><SkipBack className="h-4 w-4" /></Button>
+            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(Math.min(steps.length - 1, currentStepIndex + 1))} disabled={currentStepIndex === steps.length - 1}><SkipForward className="h-4 w-4" /></Button>
+          </div>
+          <div className="text-sm">Step {currentStepIndex + 1} / {steps.length}</div>
+        </div>
+      </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1">
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Merge Intervals</h3>
+          <div className="space-y-4">
             <div>
-              <h4 className="text-sm font-semibold mb-3 text-muted-foreground">Original Intervals</h4>
-              <div className="space-y-2">
-                {currentStep.intervals.map((interval, index) => {
-                  const isCurrent = index === currentStep.currentIndex;
-                  return (
-                    <div key={index} className="relative h-10">
-                      <div className="absolute inset-0 flex items-center">
-                        <div className="w-full h-1 bg-border"></div>
-                        {Array.from({ length: timelineMax + 1 }, (_, i) => (
-                          <div key={i} className="absolute w-px h-2 bg-border" style={{ left: `${(i / timelineMax) * 100}%` }}></div>
-                        ))}
-                      </div>
-                      <div
-                        className={`absolute h-8 rounded flex items-center justify-center text-xs font-bold transition-all duration-300 ${
-                          isCurrent ? 'bg-primary text-primary-foreground shadow-lg scale-105' : 'bg-accent/60 text-accent-foreground'
-                        }`}
-                        style={{
-                          left: `${(interval.start / timelineMax) * 100}%`,
-                          width: `${((interval.end - interval.start) / timelineMax) * 100}%`
-                        }}
-                      >
-                        [{interval.start}, {interval.end}]
-                      </div>
-                    </div>
-                  );
-                })}
+              <div className="text-sm font-semibold mb-2">Intervals:</div>
+              <div className="flex gap-2 flex-wrap">
+                {currentStep.intervals.map((interval, idx) => (
+                  <div key={idx} className={`px-3 py-2 rounded font-mono ${idx === currentStep.currentIdx ? 'bg-primary text-primary-foreground' : idx < currentStep.currentIdx ? 'bg-secondary/50' : 'bg-muted'}`}>
+                    [{interval[0]}, {interval[1]}]
+                  </div>
+                ))}
               </div>
             </div>
-
             {currentStep.merged.length > 0 && (
               <div>
-                <h4 className="text-sm font-semibold mb-3 text-green-500">Merged Result</h4>
-                <div className="space-y-2">
-                  {currentStep.merged.map((interval, index) => (
-                    <div key={index} className="relative h-10">
-                      <div className="absolute inset-0 flex items-center">
-                        <div className="w-full h-1 bg-border"></div>
-                      </div>
-                      <div
-                        className="absolute h-8 bg-green-500 rounded flex items-center justify-center text-xs font-bold text-white shadow-lg"
-                        style={{
-                          left: `${(interval.start / timelineMax) * 100}%`,
-                          width: `${((interval.end - interval.start) / timelineMax) * 100}%`
-                        }}
-                      >
-                        [{interval.start}, {interval.end}]
-                      </div>
+                <div className="text-sm font-semibold mb-2">Merged:</div>
+                <div className="flex gap-2 flex-wrap">
+                  {currentStep.merged.map((interval, idx) => (
+                    <div key={idx} className="px-3 py-2 rounded bg-green-500/20 text-green-600 font-mono">
+                      [{interval[0]}, {interval[1]}]
                     </div>
                   ))}
                 </div>
               </div>
             )}
+            <div className="p-4 bg-muted/50 rounded text-sm">{currentStep.message}</div>
           </div>
-
-          <div className="bg-accent/50 rounded-lg border border-accent p-4">
-            <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
+        </Card>
+        <Card className="p-6 overflow-hidden flex flex-col">
+          <h3 className="text-lg font-semibold mb-4">TypeScript</h3>
+          <div className="flex-1 overflow-auto">
+            <SyntaxHighlighter language="typescript" style={vscDarkPlus} showLineNumbers lineProps={(lineNumber) => ({ style: { backgroundColor: lineNumber === currentStep.lineNumber ? 'rgba(255, 255, 0, 0.2)' : 'transparent', display: 'block' } })}>
+              {code}
+            </SyntaxHighlighter>
           </div>
-
-            <div className="rounded-lg  p-4">
-               <VariablePanel
-            variables={{
-              i: currentStep.currentIndex >= 0 ? currentStep.currentIndex : 'init',
-              currentInterval: currentStep.currentIndex >= 0 ? `[${currentStep.intervals[currentStep.currentIndex].start}, ${currentStep.intervals[currentStep.currentIndex].end}]` : 'N/A',
-              mergedCount: currentStep.merged.length,
-              lastMerged: currentStep.merged.length > 0 ? `[${currentStep.merged[currentStep.merged.length - 1].start}, ${currentStep.merged[currentStep.merged.length - 1].end}]` : 'N/A'
-            }}
-          />
-          </div>
-        </div>
-
-        <div className="space-y-4">
-         
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
-        </div>
+        </Card>
       </div>
     </div>
   );
