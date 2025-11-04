@@ -1,15 +1,17 @@
-import { BookOpen, Search, Sparkles, TrendingUp, Trophy, Coffee } from 'lucide-react';
+import { BookOpen, Search, Sparkles, TrendingUp, Trophy, Coffee, Target, Award } from 'lucide-react';
 import { algorithms, categories } from '@/data/algorithms';
+import { blind75Problems } from '@/data/blind75';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import { FAQ } from '@/components/FAQ';
 import { Footer } from '@/components/Footer';
 import { Helmet } from 'react-helmet-async';
 import { Input } from '@/components/ui/input';
 import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 const Home = () => {
@@ -24,6 +26,21 @@ const Home = () => {
       setSelectedCategory(categoryParam);
     }
   }, [searchParams]);
+
+  // Calculate progress (mock data - in real app, would come from user's completed problems)
+  const algorithmProgress = useMemo(() => {
+    // For demo: random completed count
+    const completed = 45;
+    const total = algorithms.length;
+    return { completed, total, percentage: Math.round((completed / total) * 100) };
+  }, []);
+
+  const blind75Progress = useMemo(() => {
+    // For demo: random completed count
+    const completed = 52;
+    const total = blind75Problems.length;
+    return { completed, total, percentage: Math.round((completed / total) * 100) };
+  }, []);
 
   const filteredAlgorithms = algorithms.filter((algo) => {
     const matchesSearch = algo.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -185,6 +202,19 @@ const Home = () => {
               Step-by-step visualizations of 72+ algorithms. Watch code come to life with interactive animations.
             </p>
 
+            {/* Blind 75 Badge with Animation */}
+            <Link to="/blind75" className="inline-block">
+              <div className="group relative inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-gradient-to-r from-primary/20 via-secondary/20 to-primary/20 border-2 border-primary/30 hover:border-primary/50 transition-all duration-300 hover:scale-105 animate-fade-in">
+                <Target className="w-5 h-5 text-primary animate-pulse" />
+                <span className="text-lg font-bold gradient-text">Blind 75 Problems</span>
+                <Badge variant="secondary" className="bg-green-500/20 text-green-600 border-green-500/30">
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  BETA
+                </Badge>
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
+              </div>
+            </Link>
+
             {/* Stats */}
             <div className="flex items-center justify-center gap-8 pt-8">
               <div className="text-center">
@@ -203,6 +233,96 @@ const Home = () => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Progress Tracking Cards */}
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          {/* Algorithms Progress */}
+          <Card className={`p-6 relative overflow-hidden transition-all duration-500 ${
+            algorithmProgress.percentage === 100 ? 'ring-2 ring-green-500 animate-pulse' : ''
+          }`}>
+            {algorithmProgress.percentage === 100 && (
+              <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 via-transparent to-green-500/10 animate-fade-in" />
+            )}
+            <div className="relative">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <BookOpen className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg">Algorithm Progress</h3>
+                  <p className="text-sm text-muted-foreground">Master all algorithms</p>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Completed</span>
+                  <span className="font-bold text-primary">
+                    {algorithmProgress.completed} / {algorithmProgress.total}
+                  </span>
+                </div>
+                <Progress value={algorithmProgress.percentage} className="h-3" />
+                <div className="text-right">
+                  <span className="text-2xl font-bold gradient-text">
+                    {algorithmProgress.percentage}%
+                  </span>
+                </div>
+              </div>
+              {algorithmProgress.percentage === 100 && (
+                <div className="mt-4 p-3 bg-green-500/20 rounded-lg text-center animate-scale-in">
+                  <Trophy className="w-6 h-6 text-green-600 mx-auto mb-1" />
+                  <p className="text-sm font-bold text-green-600">🎉 All Complete!</p>
+                </div>
+              )}
+            </div>
+          </Card>
+
+          {/* Blind 75 Progress */}
+          <Card className={`p-6 relative overflow-hidden transition-all duration-500 ${
+            blind75Progress.percentage === 100 ? 'ring-2 ring-green-500 animate-pulse' : ''
+          }`}>
+            {blind75Progress.percentage === 100 && (
+              <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 via-transparent to-green-500/10 animate-fade-in" />
+            )}
+            <div className="relative">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 rounded-lg bg-secondary/10">
+                  <Target className="w-5 h-5 text-secondary" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-lg">Blind 75 Progress</h3>
+                    <Badge variant="secondary" className="bg-green-500/20 text-green-600 border-green-500/30 text-xs">
+                      BETA
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground">Interview prep essentials</p>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Completed</span>
+                  <span className="font-bold text-secondary">
+                    {blind75Progress.completed} / {blind75Progress.total}
+                  </span>
+                </div>
+                <Progress value={blind75Progress.percentage} className="h-3" />
+                <div className="text-right">
+                  <span className="text-2xl font-bold gradient-text">
+                    {blind75Progress.percentage}%
+                  </span>
+                </div>
+              </div>
+              {blind75Progress.percentage === 100 && (
+                <div className="mt-4 p-3 bg-green-500/20 rounded-lg text-center animate-scale-in">
+                  <Award className="w-6 h-6 text-green-600 mx-auto mb-1" />
+                  <p className="text-sm font-bold text-green-600">🎉 Interview Ready!</p>
+                </div>
+              )}
+            </div>
+          </Card>
         </div>
       </div>
 
