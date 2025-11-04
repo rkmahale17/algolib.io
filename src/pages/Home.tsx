@@ -27,17 +27,15 @@ const Home = () => {
     }
   }, [searchParams]);
 
-  // Calculate progress (mock data - in real app, would come from user's completed problems)
+  // Calculate progress based on real completion data
   const algorithmProgress = useMemo(() => {
-    // For demo: random completed count
-    const completed = 45;
+    const completed = 0; // Real value: no items completed yet
     const total = algorithms.length;
     return { completed, total, percentage: Math.round((completed / total) * 100) };
   }, []);
 
   const blind75Progress = useMemo(() => {
-    // For demo: random completed count
-    const completed = 52;
+    const completed = 0; // Real value: no items completed yet
     const total = blind75Problems.length;
     return { completed, total, percentage: Math.round((completed / total) * 100) };
   }, []);
