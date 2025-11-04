@@ -244,6 +244,23 @@ const Blind75Detail: React.FC = () => {
     const algoId = problem.algorithmId;
 
     // Map algorithm IDs to visualization components
+    if (algoId === "two-sum") {
+      const TwoSumVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/TwoSumVisualization"
+        ).then((m) => ({ default: m.TwoSumVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <TwoSumVisualization />
+        </React.Suspense>
+      );
+    }
+
     if (algoId === "two-pointers") {
       const TwoPointersVisualization = React.lazy(() =>
         import(
@@ -274,6 +291,23 @@ const Blind75Detail: React.FC = () => {
           }
         >
           <SlidingWindowVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "product-of-array-except-self") {
+      const ProductOfArrayExceptSelfVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/ProductOfArrayExceptSelfVisualization"
+        ).then((m) => ({ default: m.ProductOfArrayExceptSelfVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <ProductOfArrayExceptSelfVisualization />
         </React.Suspense>
       );
     }
@@ -312,6 +346,23 @@ const Blind75Detail: React.FC = () => {
       );
     }
 
+    if (algoId === "maximum-subarray") {
+      const MaximumSubarrayVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/MaximumSubarrayVisualization"
+        ).then((m) => ({ default: m.MaximumSubarrayVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <MaximumSubarrayVisualization />
+        </React.Suspense>
+      );
+    }
+
     if (algoId === "kadanes-algorithm") {
       const KadanesVisualization = React.lazy(() =>
         import(
@@ -325,6 +376,57 @@ const Blind75Detail: React.FC = () => {
           }
         >
           <KadanesVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "3sum") {
+      const ThreeSumVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/ThreeSumVisualization"
+        ).then((m) => ({ default: m.ThreeSumVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <ThreeSumVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "find-minimum-in-rotated-sorted-array") {
+      const FindMinimumInRotatedSortedArrayVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/FindMinimumInRotatedSortedArrayVisualization"
+        ).then((m) => ({ default: m.FindMinimumInRotatedSortedArrayVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <FindMinimumInRotatedSortedArrayVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "search-in-rotated-sorted-array") {
+      const SearchInRotatedSortedArrayVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/SearchInRotatedSortedArrayVisualization"
+        ).then((m) => ({ default: m.SearchInRotatedSortedArrayVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <SearchInRotatedSortedArrayVisualization />
         </React.Suspense>
       );
     }

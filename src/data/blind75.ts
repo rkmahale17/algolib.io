@@ -36,7 +36,7 @@ export const blind75Problems: Blind75Problem[] = [
       "Hash Table",
       "Array"
     ],
-    "algorithmId": "two-pointers",
+    "algorithmId": "two-sum",
     "youtubeUrl": "https://www.youtube.com/watch?v=KLlXCFG5TnA",
     "useCases": [
       "Finding pairs in datasets",
@@ -118,7 +118,7 @@ export const blind75Problems: Blind75Problem[] = [
       "Array",
       "Prefix Sum"
     ],
-    "algorithmId": "prefix-sum",
+    "algorithmId": "product-of-array-except-self",
     "youtubeUrl": "https://www.youtube.com/watch?v=bNvIQI2wAjk",
     "useCases": [
       "Statistical calculations",
@@ -146,7 +146,7 @@ export const blind75Problems: Blind75Problem[] = [
       "Dynamic Programming",
       "Divide and Conquer"
     ],
-    "algorithmId": "kadanes-algorithm",
+    "algorithmId": "maximum-subarray",
     "youtubeUrl": "https://www.youtube.com/watch?v=5WZl3MMT0Eg",
     "useCases": [
       "Financial analysis",
@@ -198,7 +198,7 @@ export const blind75Problems: Blind75Problem[] = [
       "Array",
       "Binary Search"
     ],
-    "algorithmId": "binary-search",
+    "algorithmId": "find-minimum-in-rotated-sorted-array",
     "youtubeUrl": "https://www.youtube.com/watch?v=nIVW4P8b1VA",
     "useCases": [
       "Rotated array operations",
@@ -225,7 +225,7 @@ export const blind75Problems: Blind75Problem[] = [
       "Array",
       "Binary Search"
     ],
-    "algorithmId": "binary-search",
+    "algorithmId": "search-in-rotated-sorted-array",
     "youtubeUrl": "https://www.youtube.com/watch?v=U8XENwh8Oy8",
     "useCases": [
       "Circular buffer search",
@@ -253,7 +253,7 @@ export const blind75Problems: Blind75Problem[] = [
       "Two Pointers",
       "Sorting"
     ],
-    "algorithmId": "two-pointers",
+    "algorithmId": "3sum",
     "youtubeUrl": "https://www.youtube.com/watch?v=jzZsG8n2R9A",
     "useCases": [
       "Finding triplets in datasets",
