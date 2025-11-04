@@ -571,7 +571,13 @@ export const blind75Problems: Blind75Problem[] = [
       "Array",
       "Backtracking"
     ],
-    "youtubeUrl": "https://www.youtube.com/watch?v=GBKI9VSKdGg"
+    "algorithmId": "combination-sum",
+    "youtubeUrl": "https://www.youtube.com/watch?v=GBKI9VSKdGg",
+    "useCases": [
+      "Subset problems",
+      "Backtracking patterns",
+      "Combinatorial search"
+    ]
   },
   {
     "id": 22,
@@ -655,7 +661,13 @@ export const blind75Problems: Blind75Problem[] = [
       "Dynamic Programming",
       "Combinatorics"
     ],
-    "youtubeUrl": "https://www.youtube.com/watch?v=IlEsdxuD4lY"
+    "algorithmId": "unique-paths",
+    "youtubeUrl": "https://www.youtube.com/watch?v=IlEsdxuD4lY",
+    "useCases": [
+      "Grid path counting",
+      "Robot navigation",
+      "Combinatorics"
+    ]
   },
   {
     "id": 26,
@@ -701,7 +713,13 @@ export const blind75Problems: Blind75Problem[] = [
       "BFS",
       "Graph"
     ],
-    "youtubeUrl": "https://www.youtube.com/watch?v=mQeF6bN8hMk"
+    "algorithmId": "clone-graph",
+    "youtubeUrl": "https://www.youtube.com/watch?v=mQeF6bN8hMk",
+    "useCases": [
+      "Deep copying",
+      "Graph traversal",
+      "Object cloning"
+    ]
   },
   {
     "id": 28,
@@ -724,7 +742,13 @@ export const blind75Problems: Blind75Problem[] = [
       "Graph",
       "Topological Sort"
     ],
-    "youtubeUrl": "https://www.youtube.com/watch?v=EgI5nU9etnU"
+    "algorithmId": "course-schedule",
+    "youtubeUrl": "https://www.youtube.com/watch?v=EgI5nU9etnU",
+    "useCases": [
+      "Cycle detection",
+      "Topological sorting",
+      "Dependency resolution"
+    ]
   },
   {
     "id": 29,
@@ -746,7 +770,13 @@ export const blind75Problems: Blind75Problem[] = [
       "BFS",
       "Matrix"
     ],
-    "youtubeUrl": "https://www.youtube.com/watch?v=s-VkcjHqkGI"
+    "algorithmId": "pacific-atlantic",
+    "youtubeUrl": "https://www.youtube.com/watch?v=s-VkcjHqkGI",
+    "useCases": [
+      "Water flow simulation",
+      "Multi-source BFS/DFS",
+      "Grid traversal"
+    ]
   },
   {
     "id": 30,
@@ -770,7 +800,13 @@ export const blind75Problems: Blind75Problem[] = [
       "Union Find",
       "Matrix"
     ],
-    "youtubeUrl": "https://www.youtube.com/watch?v=pV2kpPD66nE"
+    "algorithmId": "num-islands",
+    "youtubeUrl": "https://www.youtube.com/watch?v=pV2kpPD66nE",
+    "useCases": [
+      "Connected components",
+      "Flood fill",
+      "Image processing"
+    ]
   },
   {
     "id": 31,

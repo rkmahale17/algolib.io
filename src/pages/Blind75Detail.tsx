@@ -570,6 +570,77 @@ const Blind75Detail: React.FC = () => {
       return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><WordBreakVisualization /></React.Suspense>;
     }
 
+    // Problems 21-30
+    if (algoId === "combination-sum") {
+      const CombinationSumVisualization = React.lazy(() =>
+        import("@/components/visualizations/algorithms/CombinationSumVisualization").then((m) => ({ default: m.CombinationSumVisualization }))
+      );
+      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><CombinationSumVisualization /></React.Suspense>;
+    }
+
+    if (algoId === "house-robber") {
+      const HouseRobberVisualization = React.lazy(() =>
+        import("@/components/visualizations/algorithms/HouseRobberVisualization").then((m) => ({ default: m.HouseRobberVisualization }))
+      );
+      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><HouseRobberVisualization /></React.Suspense>;
+    }
+
+    if (algoId === "house-robber-ii") {
+      const HouseRobberIIVisualization = React.lazy(() =>
+        import("@/components/visualizations/algorithms/HouseRobberIIVisualization").then((m) => ({ default: m.HouseRobberIIVisualization }))
+      );
+      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><HouseRobberIIVisualization /></React.Suspense>;
+    }
+
+    if (algoId === "decode-ways") {
+      const DecodeWaysVisualization = React.lazy(() =>
+        import("@/components/visualizations/algorithms/DecodeWaysVisualization").then((m) => ({ default: m.DecodeWaysVisualization }))
+      );
+      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><DecodeWaysVisualization /></React.Suspense>;
+    }
+
+    if (algoId === "unique-paths") {
+      const UniquePathsVisualization = React.lazy(() =>
+        import("@/components/visualizations/algorithms/UniquePathsVisualization").then((m) => ({ default: m.UniquePathsVisualization }))
+      );
+      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><UniquePathsVisualization /></React.Suspense>;
+    }
+
+    if (algoId === "jump-game") {
+      const JumpGameVisualization = React.lazy(() =>
+        import("@/components/visualizations/algorithms/JumpGameVisualization").then((m) => ({ default: m.JumpGameVisualization }))
+      );
+      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><JumpGameVisualization /></React.Suspense>;
+    }
+
+    if (algoId === "clone-graph") {
+      const CloneGraphVisualization = React.lazy(() =>
+        import("@/components/visualizations/algorithms/CloneGraphVisualization").then((m) => ({ default: m.CloneGraphVisualization }))
+      );
+      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><CloneGraphVisualization /></React.Suspense>;
+    }
+
+    if (algoId === "course-schedule") {
+      const CourseScheduleVisualization = React.lazy(() =>
+        import("@/components/visualizations/algorithms/CourseScheduleVisualization").then((m) => ({ default: m.CourseScheduleVisualization }))
+      );
+      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><CourseScheduleVisualization /></React.Suspense>;
+    }
+
+    if (algoId === "pacific-atlantic") {
+      const PacificAtlanticVisualization = React.lazy(() =>
+        import("@/components/visualizations/algorithms/PacificAtlanticVisualization").then((m) => ({ default: m.PacificAtlanticVisualization }))
+      );
+      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><PacificAtlanticVisualization /></React.Suspense>;
+    }
+
+    if (algoId === "num-islands") {
+      const NumberOfIslandsVisualization = React.lazy(() =>
+        import("@/components/visualizations/algorithms/NumberOfIslandsVisualization").then((m) => ({ default: m.NumberOfIslandsVisualization }))
+      );
+      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><NumberOfIslandsVisualization /></React.Suspense>;
+    }
+
     if (algoId === "sum-of-two-integers") {
       const SumOfTwoIntegersVisualization = React.lazy(() =>
         import(
