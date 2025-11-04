@@ -8,7 +8,8 @@ import { Helmet } from 'react-helmet-async';
 import { Input } from '@/components/ui/input';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import {
   Accordion,
   AccordionContent,
@@ -18,9 +19,20 @@ import {
 
 const Blind75 = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate('/auth');
+      }
+    };
+    checkAuth();
+  }, [navigate]);
 
   useEffect(() => {
     const categoryParam = searchParams.get('category');

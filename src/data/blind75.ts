@@ -307,7 +307,12 @@ export const blind75Problems: Blind75Problem[] = [
       "Bit Manipulation"
     ],
     "algorithmId": "sum-of-two-integers",
-    "youtubeUrl": "https://www.youtube.com/watch?v=gVUrDV4tZfY"
+    "youtubeUrl": "https://www.youtube.com/watch?v=gVUrDV4tZfY",
+    "useCases": [
+      "Low-level arithmetic",
+      "Embedded systems",
+      "Bit manipulation practice"
+    ]
   },
   {
     "id": 12,
@@ -327,7 +332,12 @@ export const blind75Problems: Blind75Problem[] = [
       "Bit Manipulation"
     ],
     "algorithmId": "number-of-1-bits",
-    "youtubeUrl": "https://www.youtube.com/watch?v=gVUrDV4tZfY"
+    "youtubeUrl": "https://www.youtube.com/watch?v=gVUrDV4tZfY",
+    "useCases": [
+      "Hamming weight calculation",
+      "Error detection",
+      "Binary analysis"
+    ]
   },
   {
     "id": 13,
@@ -347,7 +357,12 @@ export const blind75Problems: Blind75Problem[] = [
       "Bit Manipulation"
     ],
     "algorithmId": "counting-bits",
-    "youtubeUrl": "https://www.youtube.com/watch?v=RyBM56RIWrM"
+    "youtubeUrl": "https://www.youtube.com/watch?v=RyBM56RIWrM",
+    "useCases": [
+      "Dynamic programming",
+      "Bit counting",
+      "Pattern recognition"
+    ]
   },
   {
     "id": 14,
@@ -369,7 +384,12 @@ export const blind75Problems: Blind75Problem[] = [
       "Bit Manipulation"
     ],
     "algorithmId": "missing-number",
-    "youtubeUrl": "https://www.youtube.com/watch?v=WnPLSRLSANE"
+    "youtubeUrl": "https://www.youtube.com/watch?v=WnPLSRLSANE",
+    "useCases": [
+      "Data validation",
+      "Sequence verification",
+      "XOR properties"
+    ]
   },
   {
     "id": 15,
@@ -390,7 +410,12 @@ export const blind75Problems: Blind75Problem[] = [
       "Divide and Conquer"
     ],
     "algorithmId": "reverse-bits",
-    "youtubeUrl": "https://www.youtube.com/watch?v=UcoN6UjAI64"
+    "youtubeUrl": "https://www.youtube.com/watch?v=UcoN6UjAI64",
+    "useCases": [
+      "Bit reversal",
+      "Network protocols",
+      "Low-level operations"
+    ]
   },
   {
     "id": 16,
@@ -413,7 +438,12 @@ export const blind75Problems: Blind75Problem[] = [
       "Memoization"
     ],
     "algorithmId": "climbing-stairs",
-    "youtubeUrl": "https://www.youtube.com/watch?v=Y0lT9Fck7qI"
+    "youtubeUrl": "https://www.youtube.com/watch?v=Y0lT9Fck7qI",
+    "useCases": [
+      "Fibonacci variations",
+      "Path counting",
+      "Dynamic programming intro"
+    ]
   },
   {
     "id": 17,
@@ -435,7 +465,12 @@ export const blind75Problems: Blind75Problem[] = [
       "BFS"
     ],
     "algorithmId": "coin-change",
-    "youtubeUrl": "https://www.youtube.com/watch?v=H9bfqozjoqs"
+    "youtubeUrl": "https://www.youtube.com/watch?v=H9bfqozjoqs",
+    "useCases": [
+      "Change making",
+      "Minimum resource allocation",
+      "Unbounded knapsack"
+    ]
   },
   {
     "id": 18,
@@ -457,7 +492,12 @@ export const blind75Problems: Blind75Problem[] = [
       "Binary Search"
     ],
     "algorithmId": "longest-increasing-subsequence",
-    "youtubeUrl": "https://www.youtube.com/watch?v=cjWnW0hdF1Y"
+    "youtubeUrl": "https://www.youtube.com/watch?v=cjWnW0hdF1Y",
+    "useCases": [
+      "Patience sorting",
+      "Stock trading patterns",
+      "Sequence analysis"
+    ]
   },
   {
     "id": 19,
@@ -478,7 +518,12 @@ export const blind75Problems: Blind75Problem[] = [
       "Dynamic Programming"
     ],
     "algorithmId": "longest-common-subsequence",
-    "youtubeUrl": "https://www.youtube.com/watch?v=Ua0GhsJSlWM"
+    "youtubeUrl": "https://www.youtube.com/watch?v=Ua0GhsJSlWM",
+    "useCases": [
+      "Diff algorithms",
+      "DNA sequence alignment",
+      "Text comparison"
+    ]
   },
   {
     "id": 20,
@@ -501,7 +546,12 @@ export const blind75Problems: Blind75Problem[] = [
       "Dynamic Programming"
     ],
     "algorithmId": "word-break",
-    "youtubeUrl": "https://www.youtube.com/watch?v=Sx9NNgInc3A"
+    "youtubeUrl": "https://www.youtube.com/watch?v=Sx9NNgInc3A",
+    "useCases": [
+      "Text tokenization",
+      "String segmentation",
+      "Dictionary lookup"
+    ]
   },
   {
     "id": 21,
