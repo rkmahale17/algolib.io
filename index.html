@@ -131,29 +131,51 @@
       crossorigin="anonymous"
     ></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
-      gtag("config", "G-B2KTX1L5TF", { anonymize_ip: true });
+      // Only initialize Google Analytics on production domain (algolib.io)
+      (function() {
+        const hostname = window.location.hostname;
+        const isProduction = hostname === 'algolib.io' || hostname === 'www.algolib.io';
+        
+        if (isProduction) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag("js", new Date());
+          gtag("config", "G-B2KTX1L5TF", { anonymize_ip: true });
+          console.log('✅ Google Analytics initialized for production domain:', hostname);
+        } else {
+          console.log('🚫 Google Analytics disabled for non-production domain:', hostname);
+        }
+      })();
     </script>
 
     <!-- Hotjar -->
     <script>
-      (function (h, o, t, j, a, r) {
-        h.hj =
-          h.hj ||
-          function () {
-            (h.hj.q = h.hj.q || []).push(arguments);
-          };
-        h._hjSettings = { hjid: 6540515, hjsv: 6 };
-        a = o.getElementsByTagName("head")[0];
-        r = o.createElement("script");
-        r.async = 1;
-        r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
-        a.appendChild(r);
-      })(window, document, "https://static.hotjar.com/c/hotjar-", ".js?sv=");
+      // Only initialize Hotjar on production domain (algolib.io)
+      (function() {
+        const hostname = window.location.hostname;
+        const isProduction = hostname === 'algolib.io' || hostname === 'www.algolib.io';
+        
+        if (isProduction) {
+          (function (h, o, t, j, a, r) {
+            h.hj =
+              h.hj ||
+              function () {
+                (h.hj.q = h.hj.q || []).push(arguments);
+              };
+            h._hjSettings = { hjid: 6540515, hjsv: 6 };
+            a = o.getElementsByTagName("head")[0];
+            r = o.createElement("script");
+            r.async = 1;
+            r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
+            a.appendChild(r);
+          })(window, document, "https://static.hotjar.com/c/hotjar-", ".js?sv=");
+          console.log('✅ Hotjar initialized for production domain:', hostname);
+        } else {
+          console.log('🚫 Hotjar disabled for non-production domain:', hostname);
+        }
+      })();
     </script>
 
     <!-- Accessibility -->
