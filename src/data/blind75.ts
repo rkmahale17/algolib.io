@@ -945,6 +945,7 @@ export const blind75Problems: Blind75Problem[] = [
       "Array",
       "Sorting"
     ],
+    "algorithmId": "merge-intervals",
     "youtubeUrl": "https://www.youtube.com/watch?v=44H3cEC2fFM"
   },
   {
@@ -967,6 +968,7 @@ export const blind75Problems: Blind75Problem[] = [
       "Greedy",
       "Sorting"
     ],
+    "algorithmId": "non-overlapping-intervals",
     "youtubeUrl": "https://www.youtube.com/watch?v=nONCGxWoUfM"
   },
   {
@@ -987,6 +989,7 @@ export const blind75Problems: Blind75Problem[] = [
       "Array",
       "Sorting"
     ],
+    "algorithmId": "meeting-rooms",
     "youtubeUrl": "https://www.youtube.com/watch?v=PaJxqZVPhbg&t=67s"
   },
   {
@@ -1011,6 +1014,7 @@ export const blind75Problems: Blind75Problem[] = [
       "Sorting",
       "Heap"
     ],
+    "algorithmId": "meeting-rooms-ii",
     "youtubeUrl": "https://www.youtube.com/watch?v=FdzJmTCVyJU"
   },
   {
@@ -1032,6 +1036,7 @@ export const blind75Problems: Blind75Problem[] = [
       "Linked List",
       "Recursion"
     ],
+    "algorithmId": "reverse-linked-list",
     "youtubeUrl": "https://www.youtube.com/watch?v=G0_I-ZF0S38"
   },
   {

@@ -811,6 +811,176 @@ const Blind75Detail: React.FC = () => {
       );
     }
 
+    if (algoId === "longest-consecutive-sequence") {
+      const LongestConsecutiveSequenceVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/LongestConsecutiveSequenceVisualization"
+        ).then((m) => ({ default: m.LongestConsecutiveSequenceVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <LongestConsecutiveSequenceVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "insert-interval") {
+      const InsertIntervalVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/InsertIntervalVisualization"
+        ).then((m) => ({ default: m.InsertIntervalVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <InsertIntervalVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "connected-components") {
+      const ConnectedComponentsVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/ConnectedComponentsVisualization"
+        ).then((m) => ({ default: m.ConnectedComponentsVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <ConnectedComponentsVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "graph-valid-tree") {
+      const GraphValidTreeVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/GraphValidTreeVisualization"
+        ).then((m) => ({ default: m.GraphValidTreeVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <GraphValidTreeVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "alien-dictionary") {
+      const AlienDictionaryVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/AlienDictionaryVisualization"
+        ).then((m) => ({ default: m.AlienDictionaryVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <AlienDictionaryVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "merge-intervals") {
+      const MergeIntervalsVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/MergeIntervalsVisualization"
+        ).then((m) => ({ default: m.MergeIntervalsVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <MergeIntervalsVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "non-overlapping-intervals") {
+      const NonOverlappingIntervalsVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/NonOverlappingIntervalsVisualization"
+        ).then((m) => ({ default: m.NonOverlappingIntervalsVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <NonOverlappingIntervalsVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "meeting-rooms") {
+      const MeetingRoomsVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/MeetingRoomsVisualization"
+        ).then((m) => ({ default: m.MeetingRoomsVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <MeetingRoomsVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "meeting-rooms-ii") {
+      const MeetingRoomsIIVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/MeetingRoomsIIVisualization"
+        ).then((m) => ({ default: m.MeetingRoomsIIVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <MeetingRoomsIIVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "reverse-linked-list") {
+      const ReverseLinkedListVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/ReverseLinkedListVisualization"
+        ).then((m) => ({ default: m.ReverseLinkedListVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <ReverseLinkedListVisualization />
+        </React.Suspense>
+      );
+    }
+
     // Add more visualization mappings as needed
     return null;
   };
