@@ -492,7 +492,7 @@ export const SpiralMatrixVisualization = () => {
             <AnimatedCodeEditor 
               code={code} 
               language="typescript" 
-              highlightedLines={currentStep.highlightedLines}
+              highlightedLines={(currentStep.highlightedLines || []).filter((n) => n >= 1 && n <= code.split('\n').length)}
             />
           </div>
         </Card>

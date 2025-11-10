@@ -316,7 +316,7 @@ export const RotateImageVisualization = () => {
               </div>
             </motion.div>
 
-            {currentStep.swapWith.length > 0 && (
+            {currentStep.swapWith && currentStep.swapWith.length > 0 && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -365,7 +365,7 @@ export const RotateImageVisualization = () => {
             <AnimatedCodeEditor 
               code={code} 
               language="typescript" 
-              highlightedLines={currentStep.highlightedLines}
+              highlightedLines={(currentStep.highlightedLines || []).filter((n) => n >= 1 && n <= code.split('\n').length)}
             />
           </div>
         </Card>
