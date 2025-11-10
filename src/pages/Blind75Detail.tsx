@@ -1066,6 +1066,57 @@ const Blind75Detail: React.FC = () => {
       );
     }
 
+    if (algoId === "set-matrix-zeroes") {
+      const SetMatrixZeroesVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/SetMatrixZeroesVisualization"
+        ).then((m) => ({ default: m.SetMatrixZeroesVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <SetMatrixZeroesVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "spiral-matrix") {
+      const SpiralMatrixVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/SpiralMatrixVisualization"
+        ).then((m) => ({ default: m.SpiralMatrixVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <SpiralMatrixVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "rotate-image") {
+      const RotateImageVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/RotateImageVisualization"
+        ).then((m) => ({ default: m.RotateImageVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <RotateImageVisualization />
+        </React.Suspense>
+      );
+    }
+
     // Add more visualization mappings as needed
     return null;
   };
