@@ -15,6 +15,7 @@ import Privacy from "./pages/Privacy";
 import TermsOfService from "./pages/TermsOfService";
 import ContentRights from "./pages/ContentRights";
 import Navbar from "./components/Navbar";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -28,8 +29,8 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/algorithm/:id" element={<AlgorithmDetail />} />
-          <Route path="/blind75" element={<Blind75 />} />
-          <Route path="/blind75/:slug" element={<Blind75Detail />} />
+          <Route path="/blind75" element={<ProtectedRoute><Blind75 /></ProtectedRoute>} />
+          <Route path="/blind75/:slug" element={<ProtectedRoute><Blind75Detail /></ProtectedRoute>} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/about" element={<About />} />

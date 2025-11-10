@@ -279,18 +279,57 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Progress Tracking Cards - Hidden for now */}
-      {/* {user && (
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            <Card className={`p-6 relative overflow-hidden transition-all duration-500 ${
-              algorithmProgress.percentage === 100 ? 'ring-2 ring-green-500 animate-pulse' : ''
-            }`}>
-...
-            </Card>
-          </div>
-        </div>
-      )} */}
+      {/* Featured: Blind 75 Section */}
+      <div className="container mx-auto px-4 py-12">
+        <Link to="/blind75">
+          <Card className="p-8 hover-lift cursor-pointer glass-card group relative overflow-hidden max-w-5xl mx-auto">
+            {/* Background gradient */}
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 opacity-50 group-hover:opacity-70 transition-opacity" />
+            
+            <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
+              <div className="flex-shrink-0">
+                <div className="w-20 h-20 rounded-2xl bg-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Trophy className="w-10 h-10 text-primary" />
+                </div>
+              </div>
+              
+              <div className="flex-1 text-center md:text-left">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 border border-primary/30 mb-3">
+                  <Sparkles className="w-3 h-3 text-primary" />
+                  <span className="text-xs font-semibold text-primary">NEW FEATURE</span>
+                </div>
+                <h2 className="text-3xl font-bold mb-2 group-hover:text-primary transition-colors">
+                  Blind 75 LeetCode Problems
+                </h2>
+                <p className="text-muted-foreground text-lg mb-4">
+                  Master the 75 most important coding interview problems curated by top FAANG engineers. Perfect preparation for technical interviews.
+                </p>
+                <div className="flex flex-wrap items-center gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Target className="w-4 h-4 text-primary" />
+                    <span>75 Essential Problems</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Award className="w-4 h-4 text-primary" />
+                    <span>Interview Ready</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-primary" />
+                    <span>Full Solutions</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex-shrink-0">
+                <Button size="lg" className="group-hover:scale-105 transition-transform">
+                  Start Learning
+                  <Trophy className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
+            </div>
+          </Card>
+        </Link>
+      </div>
 
       {/* Search and Filter */}
       <div className="container mx-auto px-4 py-8">
