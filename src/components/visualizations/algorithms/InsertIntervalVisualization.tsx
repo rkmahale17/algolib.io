@@ -176,7 +176,7 @@ export const InsertIntervalVisualization = () => {
       merged: null,
       variables: { result: '[[1,5],[6,9]]' },
       explanation: "Return result: [[1,5],[6,9]]. Original [1,3] merged with [2,5].",
-      highlightedLines: [29],
+      highlightedLines: [26],
       lineExecution: "return result; // [[1,5],[6,9]]"
     },
     {
@@ -187,7 +187,7 @@ export const InsertIntervalVisualization = () => {
       merged: null,
       variables: { intervals: 2, complexity: 'O(n)' },
       explanation: "Algorithm complete! Three phases: add before, merge overlapping, add after. Time: O(n), Space: O(n).",
-      highlightedLines: [29],
+      highlightedLines: [26],
       lineExecution: "Result: [[1,5],[6,9]]"
     }
   ];
