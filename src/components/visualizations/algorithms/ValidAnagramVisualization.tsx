@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { SkipBack, SkipForward, RotateCcw } from 'lucide-react';
 import Editor from '@monaco-editor/react';
 import { motion } from 'framer-motion';
-import { VariablePanel } from '../shared/VariablePanel';
 
 interface Step {
   s: string;
@@ -150,39 +149,21 @@ export const ValidAnagramVisualization = () => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const currentStep = steps[Math.min(currentStepIndex, steps.length - 1)];
 
-  const handleStepForward = () => {
-    if (currentStepIndex < steps.length - 1) {
-      setCurrentStepIndex(currentStepIndex + 1);
-    }
-  };
-
-  const handleStepBack = () => {
-    if (currentStepIndex > 0) {
-      setCurrentStepIndex(currentStepIndex - 1);
-    }
-  };
-
-  const handleReset = () => {
-    setCurrentStepIndex(0);
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
-          <Button onClick={handleReset} variant="outline" size="sm">
+          <Button onClick={() => setCurrentStepIndex(0)} variant="outline" size="sm">
             <RotateCcw className="h-4 w-4" />
           </Button>
-          <Button onClick={handleStepBack} disabled={currentStepIndex === 0} variant="outline" size="sm">
+          <Button onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))} disabled={currentStepIndex === 0} variant="outline" size="sm">
             <SkipBack className="h-4 w-4" />
           </Button>
-          <Button onClick={handleStepForward} disabled={currentStepIndex === steps.length - 1} variant="outline" size="sm">
+          <Button onClick={() => setCurrentStepIndex(Math.min(steps.length - 1, currentStepIndex + 1))} disabled={currentStepIndex === steps.length - 1} variant="outline" size="sm">
             <SkipForward className="h-4 w-4" />
           </Button>
         </div>
-        <span className="text-sm text-muted-foreground">
-          Step {currentStepIndex + 1} of {steps.length}
-        </span>
+        <span className="text-sm text-muted-foreground">Step {currentStepIndex + 1} of {steps.length}</span>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -195,7 +176,7 @@ export const ValidAnagramVisualization = () => {
                   key={idx}
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.3, delay: idx * 0.05 }}
                   className={`w-10 h-10 flex items-center justify-center rounded font-mono font-bold border-2 ${
                     char === currentStep.currentChar || char === currentStep.checking
                       ? 'bg-primary/20 border-primary text-primary'
@@ -208,13 +189,13 @@ export const ValidAnagramVisualization = () => {
             </div>
 
             <h3 className="text-lg font-semibold mb-4">String t: "{currentStep.t}"</h3>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 mb-6">
               {currentStep.t.split('').map((char, idx) => (
                 <motion.div
                   key={idx}
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.3, delay: idx * 0.05 }}
                   className={`w-10 h-10 flex items-center justify-center rounded font-mono font-bold border-2 ${
                     char === currentStep.currentChar || char === currentStep.checking
                       ? 'bg-secondary/20 border-secondary text-secondary-foreground'
@@ -225,106 +206,104 @@ export const ValidAnagramVisualization = () => {
                 </motion.div>
               ))}
             </div>
-          </Card>
 
-          <div className="grid grid-cols-2 gap-4">
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">sCount</h3>
-              <div className="space-y-2">
-                {Object.entries(currentStep.sCount).length > 0 ? (
-                  Object.entries(currentStep.sCount).map(([char, count]) => (
-                    <motion.div
-                      key={char}
-                      initial={{ x: -20, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      className={`flex justify-between items-center p-2 rounded ${
-                        char === currentStep.checking
-                          ? 'bg-primary/20 border border-primary'
-                          : 'bg-muted/50'
-                      }`}
-                    >
-                      <span className="font-mono font-bold">{char}</span>
-                      <span className="font-mono text-primary">{count}</span>
-                    </motion.div>
-                  ))
-                ) : (
-                  <p className="text-sm text-muted-foreground">Empty</p>
-                )}
-              </div>
-            </Card>
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <Card className="p-4">
+                <h4 className="text-sm font-semibold mb-3">sCount</h4>
+                <div className="space-y-2">
+                  {Object.entries(currentStep.sCount).length > 0 ? (
+                    Object.entries(currentStep.sCount).map(([char, count]) => (
+                      <motion.div
+                        key={char}
+                        initial={{ x: -20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        className={`flex justify-between items-center p-2 rounded ${
+                          char === currentStep.checking
+                            ? 'bg-primary/20 border border-primary'
+                            : 'bg-muted/50'
+                        }`}
+                      >
+                        <span className="font-mono font-bold">{char}</span>
+                        <span className="font-mono text-primary">{count}</span>
+                      </motion.div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-muted-foreground">Empty</p>
+                  )}
+                </div>
+              </Card>
 
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">tCount</h3>
-              <div className="space-y-2">
-                {Object.entries(currentStep.tCount).length > 0 ? (
-                  Object.entries(currentStep.tCount).map(([char, count]) => (
-                    <motion.div
-                      key={char}
-                      initial={{ x: 20, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      className={`flex justify-between items-center p-2 rounded ${
-                        char === currentStep.checking
-                          ? 'bg-secondary/20 border border-secondary'
-                          : 'bg-muted/50'
-                      }`}
-                    >
-                      <span className="font-mono font-bold">{char}</span>
-                      <span className="font-mono text-secondary">{count}</span>
-                    </motion.div>
-                  ))
-                ) : (
-                  <p className="text-sm text-muted-foreground">Empty</p>
-                )}
-              </div>
-            </Card>
-          </div>
-
-          {currentStep.isAnagram !== undefined && (
-            <Card className={`p-4 ${currentStep.isAnagram ? 'bg-green-500/10 border-green-500/20' : 'bg-red-500/10 border-red-500/20'}`}>
-              <p className={`text-lg font-bold ${currentStep.isAnagram ? 'text-green-600' : 'text-red-600'}`}>
-                {currentStep.isAnagram ? '✓ Valid Anagram' : '✗ Not an Anagram'}
-              </p>
-            </Card>
-          )}
-
-          <Card className="p-4 bg-primary/5 border-primary/20">
-            <p className="text-sm text-foreground">{currentStep.message}</p>
-          </Card>
-        </div>
-
-        <div className="space-y-4">
-          <Card className="p-4 overflow-hidden">
-            <div className="h-[600px]">
-              <Editor
-                height="100%"
-                defaultLanguage="typescript"
-                value={code}
-                theme="vs-dark"
-                options={{
-                  readOnly: true,
-                  minimap: { enabled: false },
-                  scrollBeyondLastLine: false,
-                  fontSize: 13,
-                  lineNumbers: 'on',
-                  glyphMargin: false,
-                  folding: false,
-                  lineDecorationsWidth: 0,
-                  lineNumbersMinChars: 3,
-                }}
-                onMount={(editor, monaco) => {
-                  const decorations = currentStep.highlightedLines.map(line => ({
-                    range: new monaco.Range(line, 1, line, 1),
-                    options: {
-                      isWholeLine: true,
-                      className: 'highlighted-line',
-                    }
-                  }));
-                  editor.createDecorationsCollection(decorations);
-                }}
-              />
+              <Card className="p-4">
+                <h4 className="text-sm font-semibold mb-3">tCount</h4>
+                <div className="space-y-2">
+                  {Object.entries(currentStep.tCount).length > 0 ? (
+                    Object.entries(currentStep.tCount).map(([char, count]) => (
+                      <motion.div
+                        key={char}
+                        initial={{ x: 20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        className={`flex justify-between items-center p-2 rounded ${
+                          char === currentStep.checking
+                            ? 'bg-secondary/20 border border-secondary'
+                            : 'bg-muted/50'
+                        }`}
+                      >
+                        <span className="font-mono font-bold">{char}</span>
+                        <span className="font-mono text-secondary">{count}</span>
+                      </motion.div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-muted-foreground">Empty</p>
+                  )}
+                </div>
+              </Card>
             </div>
+
+            {currentStep.isAnagram !== undefined && (
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className={`p-4 rounded ${currentStep.isAnagram ? 'bg-green-500/10 border border-green-500/20' : 'bg-red-500/10 border border-red-500/20'}`}
+              >
+                <p className={`text-lg font-bold ${currentStep.isAnagram ? 'text-green-600' : 'text-red-600'}`}>
+                  {currentStep.isAnagram ? '✓ Valid Anagram' : '✗ Not an Anagram'}
+                </p>
+              </motion.div>
+            )}
+
+            <Card className="p-4 mt-4 bg-primary/5 border-primary/20">
+              <p className="text-sm text-foreground">{currentStep.message}</p>
+            </Card>
           </Card>
         </div>
+
+        <Card className="p-4 overflow-hidden">
+          <div className="h-[700px]">
+            <Editor
+              height="100%"
+              defaultLanguage="typescript"
+              value={code}
+              theme="vs-dark"
+              options={{
+                readOnly: true,
+                minimap: { enabled: false },
+                scrollBeyondLastLine: false,
+                fontSize: 13,
+                lineNumbers: 'on',
+              }}
+              onMount={(editor, monaco) => {
+                const decorations = currentStep.highlightedLines.map(line => ({
+                  range: new monaco.Range(line, 1, line, 1),
+                  options: {
+                    isWholeLine: true,
+                    className: 'highlighted-line',
+                  }
+                }));
+                editor.createDecorationsCollection(decorations);
+              }}
+            />
+          </div>
+        </Card>
       </div>
 
       <style>{`
