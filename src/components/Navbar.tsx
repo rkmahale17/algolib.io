@@ -12,7 +12,7 @@ import {
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ThemeToggle } from "./ThemeToggle";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -20,6 +20,8 @@ import { toast } from "sonner";
 const Navbar = () => {
   const [user, setUser] = useState<any>(null);
   const [completedCount, setCompletedCount] = useState(0);
+  const location = useLocation();
+  const isAuthPage = location.pathname === '/auth';
 
   useEffect(() => {
     // Get initial session
@@ -156,7 +158,7 @@ const Navbar = () => {
             </DropdownMenu>
 
             <ThemeToggle />
-            {user ? (
+            {user && !isAuthPage ? (
               <>
                 {/* Progress indicator */}
                 <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/50 border border-border/50">
