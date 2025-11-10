@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SkipBack, SkipForward, RotateCcw } from 'lucide-react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { VariablePanel } from '../shared/VariablePanel';
+import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
 
 interface Step {
   intervals: [number, number][];
@@ -72,15 +72,23 @@ export const MeetingRoomsVisualization = () => {
                 </div>
               </div>
             )}
-            <div className="p-4 bg-muted/50 rounded text-sm">{currentStep.message}</div>
+            <div className="p-4 bg-muted/50 rounded text-sm animate-fade-in">{currentStep.message}</div>
+            <div className="mt-4 animate-fade-in">
+              <VariablePanel
+                variables={{
+                  step: `${currentStepIndex + 1}/${steps.length}`,
+                  currentIdx: currentStep.currentIdx,
+                  current: currentStep.currentIdx >= 0 ? `[${currentStep.intervals[currentStep.currentIdx][0]}, ${currentStep.intervals[currentStep.currentIdx][1]}]` : 'none',
+                  prev: currentStep.currentIdx > 0 ? `[${currentStep.intervals[currentStep.currentIdx - 1][0]}, ${currentStep.intervals[currentStep.currentIdx - 1][1]}]` : 'none',
+                }}
+              />
+            </div>
           </div>
         </Card>
         <Card className="p-6 overflow-hidden flex flex-col">
           <h3 className="text-lg font-semibold mb-4">TypeScript</h3>
-          <div className="flex-1 overflow-auto">
-            <SyntaxHighlighter language="typescript" style={vscDarkPlus} showLineNumbers lineProps={(lineNumber) => ({ style: { backgroundColor: lineNumber === currentStep.lineNumber ? 'rgba(255, 255, 0, 0.2)' : 'transparent', display: 'block' } })}>
-              {code}
-            </SyntaxHighlighter>
+          <div className="flex-1 overflow-auto animate-fade-in">
+            <AnimatedCodeEditor code={code} language="typescript" highlightedLines={[currentStep.lineNumber]} />
           </div>
         </Card>
       </div>
