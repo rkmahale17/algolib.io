@@ -1,27 +1,201 @@
 import { useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { SkipBack, SkipForward, RotateCcw } from 'lucide-react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
+import { VariablePanel } from '../shared/VariablePanel';
+import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
+import { motion } from 'framer-motion';
 
 interface Step {
   s: string;
   dp: number[];
   i: number;
-  message: string;
-  lineNumber: number;
+  one?: number;
+  two?: number;
+  variables: Record<string, any>;
+  explanation: string;
+  highlightedLines: number[];
+  lineExecution: string;
 }
 
 export const DecodeWaysVisualization = () => {
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const s = "226";
 
   const steps: Step[] = [
-    { s: "226", dp: [1, 0, 0, 0], i: 0, message: "String '226': A=1, B=2, ..., Z=26. dp[i] = ways to decode s[0..i-1]", lineNumber: 3 },
-    { s: "226", dp: [1, 1, 0, 0], i: 1, message: "s[0]='2': Valid single digit. dp[1]=1 way: '2'->B", lineNumber: 5 },
-    { s: "226", dp: [1, 1, 2, 0], i: 2, message: "s[1]='2': Single '2'->B (1 way) + Double '22'->V (1 way). dp[2]=2", lineNumber: 11 },
-    { s: "226", dp: [1, 1, 2, 3], i: 3, message: "s[2]='6': Single '6'->F (2 ways) + Double '26'->Z (1 way). dp[3]=3", lineNumber: 11 },
-    { s: "226", dp: [1, 1, 2, 3], i: 4, message: "Complete! 3 ways to decode '226': 'BBF', 'BZ', 'VF'. Time: O(n), Space: O(n)", lineNumber: 14 }
+    {
+      s,
+      dp: [],
+      i: -1,
+      variables: { s: '"226"' },
+      explanation: "String '226' to decode. Mapping: A=1, B=2, C=3, ..., Z=26. Find number of ways to decode.",
+      highlightedLines: [1],
+      lineExecution: "function numDecodings(s: string): number"
+    },
+    {
+      s,
+      dp: [],
+      i: -1,
+      variables: { 's[0]': '2' },
+      explanation: "Check if string starts with '0'. s[0] = '2', not '0', continue.",
+      highlightedLines: [2],
+      lineExecution: "if (s[0] === '0') return 0; // '2' !== '0', continue"
+    },
+    {
+      s,
+      dp: [0, 0, 0, 0],
+      i: -1,
+      variables: { dpLength: 4 },
+      explanation: "Create DP array of length n+1 = 4. dp[i] = ways to decode s[0..i-1].",
+      highlightedLines: [4],
+      lineExecution: "const dp = new Array(s.length + 1).fill(0); // length = 4"
+    },
+    {
+      s,
+      dp: [1, 0, 0, 0],
+      i: 0,
+      variables: { 'dp[0]': 1 },
+      explanation: "Base case: dp[0] = 1 (empty string, one way to decode nothing).",
+      highlightedLines: [5],
+      lineExecution: "dp[0] = 1;"
+    },
+    {
+      s,
+      dp: [1, 1, 0, 0],
+      i: 1,
+      variables: { 'dp[1]': 1 },
+      explanation: "Base case: dp[1] = 1 (first character '2' decodes to 'B', one way).",
+      highlightedLines: [6],
+      lineExecution: "dp[1] = 1;"
+    },
+    {
+      s,
+      dp: [1, 1, 0, 0],
+      i: 2,
+      variables: { i: 2, n: 3 },
+      explanation: "Start loop: i = 2. Check: 2 <= 3? Yes, continue.",
+      highlightedLines: [8],
+      lineExecution: "for (let i = 2; i <= s.length; i++) // i=2"
+    },
+    {
+      s,
+      dp: [1, 1, 0, 0],
+      i: 2,
+      one: 2,
+      variables: { one: 2, substring: 's[1..2]="2"' },
+      explanation: "Extract one digit: s[1..2] = '2', one = 2. Valid single digit (1-9).",
+      highlightedLines: [9],
+      lineExecution: "const one = parseInt(s.substring(i-1, i)); // one = 2"
+    },
+    {
+      s,
+      dp: [1, 1, 0, 0],
+      i: 2,
+      one: 2,
+      two: 22,
+      variables: { two: 22, substring: 's[0..2]="22"' },
+      explanation: "Extract two digits: s[0..2] = '22', two = 22. Valid double digit (10-26).",
+      highlightedLines: [10],
+      lineExecution: "const two = parseInt(s.substring(i-2, i)); // two = 22"
+    },
+    {
+      s,
+      dp: [1, 1, 1, 0],
+      i: 2,
+      one: 2,
+      variables: { one: 2, 'dp[2]': 1 },
+      explanation: "one = 2 is valid (1-9). Add dp[1] to dp[2]. dp[2] += 1.",
+      highlightedLines: [12],
+      lineExecution: "if (one >= 1 && one <= 9) dp[i] += dp[i-1]; // dp[2] = 1"
+    },
+    {
+      s,
+      dp: [1, 1, 2, 0],
+      i: 2,
+      two: 22,
+      variables: { two: 22, 'dp[2]': 2 },
+      explanation: "two = 22 is valid (10-26). Add dp[0] to dp[2]. dp[2] = 1 + 1 = 2.",
+      highlightedLines: [13],
+      lineExecution: "if (two >= 10 && two <= 26) dp[i] += dp[i-2]; // dp[2] = 2"
+    },
+    {
+      s,
+      dp: [1, 1, 2, 0],
+      i: 3,
+      variables: { i: 3 },
+      explanation: "Increment loop: i = 3. Check: 3 <= 3? Yes, continue.",
+      highlightedLines: [8],
+      lineExecution: "for (let i = 3; i <= s.length; i++) // i=3"
+    },
+    {
+      s,
+      dp: [1, 1, 2, 0],
+      i: 3,
+      one: 6,
+      variables: { one: 6, substring: 's[2..3]="6"' },
+      explanation: "Extract one digit: s[2..3] = '6', one = 6. Valid single digit.",
+      highlightedLines: [9],
+      lineExecution: "const one = parseInt(s.substring(i-1, i)); // one = 6"
+    },
+    {
+      s,
+      dp: [1, 1, 2, 0],
+      i: 3,
+      one: 6,
+      two: 26,
+      variables: { two: 26, substring: 's[1..3]="26"' },
+      explanation: "Extract two digits: s[1..3] = '26', two = 26. Valid double digit.",
+      highlightedLines: [10],
+      lineExecution: "const two = parseInt(s.substring(i-2, i)); // two = 26"
+    },
+    {
+      s,
+      dp: [1, 1, 2, 2],
+      i: 3,
+      one: 6,
+      variables: { one: 6, 'dp[3]': 2 },
+      explanation: "one = 6 is valid. Add dp[2] to dp[3]. dp[3] = 0 + 2 = 2.",
+      highlightedLines: [12],
+      lineExecution: "if (one >= 1 && one <= 9) dp[i] += dp[i-1]; // dp[3] = 2"
+    },
+    {
+      s,
+      dp: [1, 1, 2, 3],
+      i: 3,
+      two: 26,
+      variables: { two: 26, 'dp[3]': 3 },
+      explanation: "two = 26 is valid (exactly at limit). Add dp[1] to dp[3]. dp[3] = 2 + 1 = 3.",
+      highlightedLines: [13],
+      lineExecution: "if (two >= 10 && two <= 26) dp[i] += dp[i-2]; // dp[3] = 3"
+    },
+    {
+      s,
+      dp: [1, 1, 2, 3],
+      i: 4,
+      variables: { i: 4, n: 3 },
+      explanation: "Increment loop: i = 4. Check: 4 <= 3? No, exit loop.",
+      highlightedLines: [8],
+      lineExecution: "for (let i = 4; i <= s.length; i++) // 4 <= 3 -> false"
+    },
+    {
+      s,
+      dp: [1, 1, 2, 3],
+      i: 3,
+      variables: { result: 3, 'dp[n]': 3 },
+      explanation: "Return dp[s.length] = dp[3] = 3. Three ways to decode '226'.",
+      highlightedLines: [16],
+      lineExecution: "return dp[s.length]; // dp[3] = 3"
+    },
+    {
+      s,
+      dp: [1, 1, 2, 3],
+      i: 3,
+      variables: { ways: 3, decodings: '"BBF", "BZ", "VF"', complexity: 'O(n)' },
+      explanation: "Algorithm complete! 3 ways: '2-2-6' (BBF), '2-26' (BZ), '22-6' (VF). Time: O(n), Space: O(n).",
+      highlightedLines: [16],
+      lineExecution: "Result: 3 ways"
+    }
   ];
 
   const code = `function numDecodings(s: string): number {
@@ -42,60 +216,115 @@ export const DecodeWaysVisualization = () => {
   return dp[s.length];
 }`;
 
-  const currentStep = steps[currentStepIndex];
+  const step = steps[currentStep];
 
   return (
-    <div className="w-full h-full flex flex-col gap-4 p-4">
-      <Card className="p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex gap-2">
-            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(0)} disabled={currentStepIndex === 0}><RotateCcw className="h-4 w-4" /></Button>
-            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))} disabled={currentStepIndex === 0}><SkipBack className="h-4 w-4" /></Button>
-            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(Math.min(steps.length - 1, currentStepIndex + 1))} disabled={currentStepIndex === steps.length - 1}><SkipForward className="h-4 w-4" /></Button>
-          </div>
-          <div className="text-sm">Step {currentStepIndex + 1} / {steps.length}</div>
-        </div>
-      </Card>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1">
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Decode Ways</h3>
-          <div className="space-y-4">
-            <div>
-              <div className="text-sm font-medium mb-2">Encoded String:</div>
-              <div className="flex gap-1">
-                {currentStep.s.split('').map((char, idx) => (
-                  <div key={idx} className={`px-4 py-3 rounded font-mono text-xl font-bold ${idx < currentStep.i - 1 ? 'bg-secondary' : idx === currentStep.i - 1 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+    <VisualizationLayout
+      leftContent={
+        <>
+          <motion.div
+            key={`string-${currentStep}`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Card className="p-4">
+              <h3 className="text-sm font-semibold mb-3">Encoded String</h3>
+              <div className="flex gap-1 mb-3">
+                {step.s.split('').map((char, idx) => (
+                  <div
+                    key={idx}
+                    className={`px-4 py-3 rounded font-mono text-xl font-bold ${
+                      idx < step.i - 1
+                        ? 'bg-secondary'
+                        : idx === step.i - 1
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted'
+                    }`}
+                  >
                     {char}
                   </div>
                 ))}
               </div>
-            </div>
-            <div className="p-3 bg-blue-500/10 rounded text-xs">
-              <strong>Mapping:</strong> A=1, B=2, C=3, ..., Z=26
-            </div>
-            <div>
-              <div className="text-sm font-medium mb-2">DP Array (ways to decode):</div>
-              <div className="flex gap-2 flex-wrap">
-                {currentStep.dp.map((val, idx) => (
-                  <div key={idx} className={`px-4 py-3 rounded font-mono text-center ${idx === currentStep.i ? 'bg-green-500/20 ring-2 ring-green-500' : idx < currentStep.i ? 'bg-green-500/10' : 'bg-muted'}`}>
-                    <div className="text-xs">dp[{idx}]</div>
-                    <div className="font-bold text-lg">{val}</div>
-                  </div>
-                ))}
+              <div className="text-xs text-muted-foreground bg-blue-500/10 p-2 rounded">
+                <strong>Mapping:</strong> A=1, B=2, C=3, ..., Z=26
               </div>
-            </div>
-            <div className="p-4 bg-muted/50 rounded text-sm">{currentStep.message}</div>
-          </div>
-        </Card>
-        <Card className="p-6 overflow-hidden flex flex-col">
-          <h3 className="text-lg font-semibold mb-4">TypeScript</h3>
-          <div className="flex-1 overflow-auto">
-            <SyntaxHighlighter language="typescript" style={vscDarkPlus} showLineNumbers lineProps={(lineNumber) => ({ style: { backgroundColor: lineNumber === currentStep.lineNumber ? 'rgba(255, 255, 0, 0.2)' : 'transparent', display: 'block' } })}>
-              {code}
-            </SyntaxHighlighter>
-          </div>
-        </Card>
-      </div>
-    </div>
+            </Card>
+          </motion.div>
+
+          {step.dp.length > 0 && (
+            <motion.div
+              key={`dp-${currentStep}`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              <Card className="p-4">
+                <h3 className="text-sm font-semibold mb-3">DP Array (ways to decode)</h3>
+                <div className="flex gap-2 flex-wrap">
+                  {step.dp.map((val, idx) => (
+                    <div
+                      key={idx}
+                      className={`px-4 py-3 rounded font-mono text-center ${
+                        idx === step.i
+                          ? 'bg-green-500/20 ring-2 ring-green-500'
+                          : idx < step.i
+                          ? 'bg-green-500/10'
+                          : 'bg-muted'
+                      }`}
+                    >
+                      <div className="text-xs">dp[{idx}]</div>
+                      <div className="font-bold text-lg">{val}</div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </motion.div>
+          )}
+
+          <motion.div
+            key={`execution-${currentStep}`}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+          >
+            <Card className="p-4 bg-muted/50">
+              <div className="space-y-2">
+                <div className="text-sm font-semibold text-primary">Current Execution:</div>
+                <div className="text-sm font-mono bg-background/50 p-2 rounded">
+                  {step.lineExecution}
+                </div>
+                <div className="text-sm text-muted-foreground pt-2">
+                  {step.explanation}
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            key={`variables-${currentStep}`}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, delay: 0.3 }}
+          >
+            <VariablePanel variables={step.variables} />
+          </motion.div>
+        </>
+      }
+      rightContent={
+        <AnimatedCodeEditor
+          code={code}
+          language="typescript"
+          highlightedLines={step.highlightedLines}
+        />
+      }
+      controls={
+        <SimpleStepControls
+          currentStep={currentStep}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStep}
+        />
+      }
+    />
   );
 };
