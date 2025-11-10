@@ -68,9 +68,9 @@ export const ReverseLinkedListVisualization = () => {
               {currentStep.list.map((val, idx) => (
                 <div key={idx} className="flex items-center">
                   <div className={`w-14 h-14 flex items-center justify-center rounded font-bold text-lg border-2 ${
-                    currentStep.current === idx ? 'bg-blue-500/20 border-blue-500 text-blue-500' :
-                    currentStep.prev === idx ? 'bg-green-500/20 border-green-500 text-green-500' :
-                    currentStep.next === idx ? 'bg-yellow-500/20 border-yellow-500 text-yellow-500' : 'bg-muted border-border'
+                    currentStep.current === idx ? 'bg-primary/20 border-primary text-primary' :
+                    currentStep.prev === idx ? 'bg-accent/20 border-accent text-accent-foreground' :
+                    currentStep.next === idx ? 'bg-secondary/20 border-secondary text-secondary-foreground' : 'bg-muted border-border text-foreground'
                   }`}>
                     {val}
                   </div>
@@ -81,9 +81,9 @@ export const ReverseLinkedListVisualization = () => {
               ))}
             </div>
             <div className="flex gap-3 text-xs">
-              <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-blue-500/20 border-2 border-blue-500"></div>Current</div>
-              <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-green-500/20 border-2 border-green-500"></div>Prev</div>
-              <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-yellow-500/20 border-2 border-yellow-500"></div>Next</div>
+              <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-primary/20 border-2 border-primary"></div>Current</div>
+              <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-accent/20 border-2 border-accent"></div>Prev</div>
+              <div className="flex items-center gap-1"><div className="w-3 h-3 rounded bg-secondary/20 border-2 border-secondary"></div>Next</div>
             </div>
             <div className="p-4 bg-muted/50 rounded text-sm">{currentStep.message}</div>
           </div>

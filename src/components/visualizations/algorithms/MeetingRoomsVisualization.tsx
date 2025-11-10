@@ -66,8 +66,8 @@ export const MeetingRoomsVisualization = () => {
               ))}
             </div>
             {currentStep.canAttend !== null && (
-              <div className={`p-4 rounded ${currentStep.canAttend ? 'bg-green-500/20' : 'bg-red-500/20'}`}>
-                <div className={`text-2xl font-bold ${currentStep.canAttend ? 'text-green-600' : 'text-red-600'}`}>
+              <div className={`p-4 rounded border-2 ${currentStep.canAttend ? 'bg-primary/20 border-primary' : 'bg-destructive/20 border-destructive'}`}>
+                <div className={`text-2xl font-bold ${currentStep.canAttend ? 'text-primary' : 'text-destructive'}`}>
                   {currentStep.canAttend ? '✓ Can attend' : '✗ Cannot attend'}
                 </div>
               </div>

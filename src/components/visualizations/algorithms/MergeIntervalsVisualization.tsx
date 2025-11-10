@@ -80,7 +80,7 @@ export const MergeIntervalsVisualization = () => {
                 <div className="text-sm font-semibold mb-2">Merged:</div>
                 <div className="flex gap-2 flex-wrap">
                   {currentStep.merged.map((interval, idx) => (
-                    <div key={idx} className="px-3 py-2 rounded bg-green-500/20 text-green-600 font-mono">
+                    <div key={idx} className="px-3 py-2 rounded bg-primary/20 border-2 border-primary text-primary font-mono">
                       [{interval[0]}, {interval[1]}]
                     </div>
                   ))}

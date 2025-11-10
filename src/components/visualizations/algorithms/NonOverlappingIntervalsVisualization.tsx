@@ -73,7 +73,7 @@ export const NonOverlappingIntervalsVisualization = () => {
                 </div>
               ))}
             </div>
-            <div className="p-4 bg-red-500/20 rounded"><div className="text-2xl font-bold text-red-600">{currentStep.removals} removed</div></div>
+            <div className="p-4 bg-destructive/20 rounded"><div className="text-2xl font-bold text-destructive">{currentStep.removals} removed</div></div>
             <div className="p-4 bg-muted/50 rounded text-sm">{currentStep.message}</div>
           </div>
         </Card>

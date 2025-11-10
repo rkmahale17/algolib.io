@@ -69,7 +69,7 @@ export const MeetingRoomsIIVisualization = () => {
                 </div>
               ))}
             </div>
-            <div className="p-4 bg-primary/20 rounded"><div className="text-2xl font-bold">{currentStep.minRooms} rooms</div></div>
+            <div className="p-4 bg-primary/20 rounded border-2 border-primary"><div className="text-2xl font-bold text-primary">{currentStep.minRooms} rooms</div></div>
             <div className="p-4 bg-muted/50 rounded text-sm">{currentStep.message}</div>
           </div>
         </Card>
