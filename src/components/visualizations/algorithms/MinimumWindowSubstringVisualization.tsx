@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SkipBack, SkipForward, RotateCcw } from 'lucide-react';
 import Editor from '@monaco-editor/react';
 import { motion } from 'framer-motion';
 import { VariablePanel } from '../shared/VariablePanel';
+import type { editor as MonacoEditor } from 'monaco-editor';
 
 interface Step {
   s: string;
@@ -292,6 +293,21 @@ export const MinimumWindowSubstringVisualization = () => {
 
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const currentStep = steps[Math.min(currentStepIndex, steps.length - 1)];
+  const editorRef = useRef<MonacoEditor.IStandaloneCodeEditor | null>(null);
+  const monacoRef = useRef<typeof import('monaco-editor') | null>(null);
+
+  useEffect(() => {
+    if (editorRef.current && monacoRef.current) {
+      const decorations = currentStep.highlightedLines.map(line => ({
+        range: new monacoRef.current!.Range(line, 1, line, 1),
+        options: {
+          isWholeLine: true,
+          className: 'highlighted-line',
+        }
+      }));
+      editorRef.current.createDecorationsCollection(decorations);
+    }
+  }, [currentStepIndex, currentStep.highlightedLines]);
 
   return (
     <div className="space-y-6">
@@ -407,6 +423,8 @@ export const MinimumWindowSubstringVisualization = () => {
                 lineNumbers: 'on',
               }}
               onMount={(editor, monaco) => {
+                editorRef.current = editor;
+                monacoRef.current = monaco;
                 const decorations = currentStep.highlightedLines.map(line => ({
                   range: new monaco.Range(line, 1, line, 1),
                   options: {
