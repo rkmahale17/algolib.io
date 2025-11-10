@@ -195,11 +195,11 @@ export const MergeKSortedListsVisualization: React.FC = () => {
                     className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
                       idx === currentStep.pointers[listIdx]
                         ? currentStep.comparing.includes(listIdx)
-                          ? 'bg-primary/20 border-primary scale-110'
-                          : 'bg-green-500/20 border-green-500'
+                          ? 'bg-primary/20 border-primary text-primary scale-110'
+                          : 'bg-secondary/20 border-secondary text-secondary-foreground'
                         : idx < currentStep.pointers[listIdx]
-                        ? 'bg-muted/50 border-border opacity-50'
-                        : 'bg-card border-border'
+                        ? 'bg-muted/50 border-border text-muted-foreground opacity-50'
+                        : 'bg-card border-border text-foreground'
                     }`}
                   >
                     {val}
@@ -215,7 +215,7 @@ export const MergeKSortedListsVisualization: React.FC = () => {
           {currentStep.result.map((val, idx) => (
             <div
               key={idx}
-              className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-blue-500/20 border-blue-500 font-bold"
+              className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-accent/20 border-accent text-accent-foreground font-bold"
             >
               {val}
             </div>

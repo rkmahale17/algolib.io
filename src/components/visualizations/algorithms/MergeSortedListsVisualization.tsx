@@ -188,7 +188,7 @@ export const MergeSortedListsVisualization = () => {
                   <div
                     key={idx}
                     className={`w-12 h-12 rounded flex items-center justify-center font-bold transition-all duration-300 ${
-                      idx === currentStep.p1 ? 'bg-blue-500 text-white scale-110' : 'bg-muted text-foreground'
+                      idx === currentStep.p1 ? 'bg-primary/20 border-2 border-primary text-primary scale-110' : 'bg-muted text-foreground border border-border'
                     }`}
                   >
                     {val}
@@ -204,7 +204,7 @@ export const MergeSortedListsVisualization = () => {
                   <div
                     key={idx}
                     className={`w-12 h-12 rounded flex items-center justify-center font-bold transition-all duration-300 ${
-                      idx === currentStep.p2 ? 'bg-green-500 text-white scale-110' : 'bg-muted text-foreground'
+                      idx === currentStep.p2 ? 'bg-secondary/20 border-2 border-secondary text-secondary-foreground scale-110' : 'bg-muted text-foreground border border-border'
                     }`}
                   >
                     {val}

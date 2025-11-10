@@ -1042,6 +1042,7 @@ export const blind75Problems: Blind75Problem[] = [
   {
     "id": 41,
     "slug": "detect-cycle-in-a-linked-list",
+    "algorithmId": "detect-cycle",
     "title": "Detect Cycle in a Linked List",
     "category": "Linked List",
     "difficulty": "easy",
@@ -1064,6 +1065,7 @@ export const blind75Problems: Blind75Problem[] = [
   {
     "id": 42,
     "slug": "merge-two-sorted-lists",
+    "algorithmId": "merge-two-sorted-lists",
     "title": "Merge Two Sorted Lists",
     "category": "Linked List",
     "difficulty": "easy",
@@ -1085,6 +1087,7 @@ export const blind75Problems: Blind75Problem[] = [
   {
     "id": 43,
     "slug": "merge-k-sorted-lists",
+    "algorithmId": "merge-k-sorted-lists",
     "title": "Merge K Sorted Lists",
     "category": "Linked List",
     "difficulty": "hard",
@@ -1108,6 +1111,7 @@ export const blind75Problems: Blind75Problem[] = [
   {
     "id": 44,
     "slug": "remove-nth-node-from-end-of-list",
+    "algorithmId": "remove-nth-node-from-end-of-list",
     "title": "Remove Nth Node From End Of List",
     "category": "Linked List",
     "difficulty": "medium",
@@ -1129,6 +1133,7 @@ export const blind75Problems: Blind75Problem[] = [
   {
     "id": 45,
     "slug": "reorder-list",
+    "algorithmId": "reorder-list",
     "title": "Reorder List",
     "category": "Linked List",
     "difficulty": "medium",

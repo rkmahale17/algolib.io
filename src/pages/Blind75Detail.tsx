@@ -981,6 +981,91 @@ const Blind75Detail: React.FC = () => {
       );
     }
 
+    if (algoId === "detect-cycle") {
+      const DetectCycleVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/DetectCycleVisualization"
+        ).then((m) => ({ default: m.DetectCycleVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <DetectCycleVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "merge-two-sorted-lists") {
+      const MergeSortedListsVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/MergeSortedListsVisualization"
+        ).then((m) => ({ default: m.MergeSortedListsVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <MergeSortedListsVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "merge-k-sorted-lists") {
+      const MergeKSortedListsVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/MergeKSortedListsVisualization"
+        ).then((m) => ({ default: m.MergeKSortedListsVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <MergeKSortedListsVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "remove-nth-node-from-end-of-list") {
+      const RemoveNthNodeVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/RemoveNthNodeVisualization"
+        ).then((m) => ({ default: m.RemoveNthNodeVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <RemoveNthNodeVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "reorder-list") {
+      const ReorderListVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/ReorderListVisualization"
+        ).then((m) => ({ default: m.ReorderListVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <ReorderListVisualization />
+        </React.Suspense>
+      );
+    }
+
     // Add more visualization mappings as needed
     return null;
   };

@@ -216,13 +216,13 @@ export const DetectCycleVisualization: React.FC = () => {
               <div
                 className={`w-16 h-16 flex items-center justify-center rounded-lg border-2 font-bold text-lg transition-all ${
                   currentStep.cycleStart === idx
-                    ? 'bg-red-500/20 border-red-500 text-red-500'
+                    ? 'bg-destructive/20 border-destructive text-destructive'
                     : currentStep.slow === idx && currentStep.fast === idx
-                    ? 'bg-purple-500/20 border-purple-500 text-purple-500'
+                    ? 'bg-accent/20 border-accent text-accent-foreground'
                     : currentStep.slow === idx
-                    ? 'bg-blue-500/20 border-blue-500 text-blue-500'
+                    ? 'bg-primary/20 border-primary text-primary'
                     : currentStep.fast === idx
-                    ? 'bg-green-500/20 border-green-500 text-green-500'
+                    ? 'bg-secondary/20 border-secondary text-secondary-foreground'
                     : 'bg-card border-border'
                 }`}
               >
@@ -238,16 +238,16 @@ export const DetectCycleVisualization: React.FC = () => {
         
         <div className="mt-4 flex gap-4 text-sm flex-wrap">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-blue-500/20 border-2 border-blue-500"></div>
+            <div className="w-4 h-4 rounded bg-primary/20 border-2 border-primary"></div>
             <span>Slow Pointer</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-green-500/20 border-2 border-green-500"></div>
+            <div className="w-4 h-4 rounded bg-secondary/20 border-2 border-secondary"></div>
             <span>Fast Pointer</span>
           </div>
           {currentStep.cycleStart !== null && (
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-red-500/20 border-2 border-red-500"></div>
+              <div className="w-4 h-4 rounded bg-destructive/20 border-2 border-destructive"></div>
               <span>Cycle Start</span>
             </div>
           )}
