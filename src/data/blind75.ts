@@ -828,6 +828,7 @@ export const blind75Problems: Blind75Problem[] = [
       "Hash Table",
       "Union Find"
     ],
+    "algorithmId": "longest-consecutive-sequence",
     "youtubeUrl": "https://www.youtube.com/watch?v=P6RZZMu_maU"
   },
   {
@@ -853,6 +854,7 @@ export const blind75Problems: Blind75Problem[] = [
       "Graph",
       "Topological Sort"
     ],
+    "algorithmId": "alien-dictionary",
     "youtubeUrl": "https://www.youtube.com/watch?v=6kTZYvNNyps"
   },
   {
@@ -876,6 +878,7 @@ export const blind75Problems: Blind75Problem[] = [
       "Union Find",
       "Graph"
     ],
+    "algorithmId": "graph-valid-tree",
     "youtubeUrl": "https://www.youtube.com/watch?v=bXsUuownnoQ"
   },
   {
@@ -899,6 +902,7 @@ export const blind75Problems: Blind75Problem[] = [
       "Union Find",
       "Graph"
     ],
+    "algorithmId": "connected-components",
     "youtubeUrl": "https://www.youtube.com/watch?v=8f1XPm4WOUc"
   },
   {
@@ -919,6 +923,7 @@ export const blind75Problems: Blind75Problem[] = [
     "tags": [
       "Array"
     ],
+    "algorithmId": "insert-interval",
     "youtubeUrl": "https://www.youtube.com/watch?v=A8NUOmlwOlM"
   },
   {
