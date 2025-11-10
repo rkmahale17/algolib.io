@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { SkipBack, SkipForward, RotateCcw } from 'lucide-react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
+import { VariablePanel } from '../shared/VariablePanel';
+import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
+import { motion } from 'framer-motion';
 
 interface Step {
   s: string;
@@ -12,24 +13,216 @@ interface Step {
   currentSubstring: string;
   checking: string;
   variables: Record<string, any>;
-  message: string;
-  lineNumber: number;
+  explanation: string;
+  highlightedLines: number[];
+  lineExecution: string;
 }
 
 export const WordBreakVisualization = () => {
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [currentStep, setCurrentStep] = useState(0);
 
   const s = "leetcode";
   const wordDict = ["leet", "code"];
 
   const steps: Step[] = [
-    { s, dp: [true, false, false, false, false, false, false, false, false], currentIndex: 0, currentSubstring: '', checking: '', variables: { dp: '[T,F,F,F,F,F,F,F,F]' }, message: "Initialize DP array. dp[0]=true (empty string)", lineNumber: 3 },
-    { s, dp: [true, false, false, false, false, false, false, false, false], currentIndex: 1, currentSubstring: 'l', checking: 'l', variables: { i: 1, substring: 'l', found: false }, message: "Check index 1: 'l' not in wordDict", lineNumber: 6 },
-    { s, dp: [true, false, false, false, false, false, false, false, false], currentIndex: 4, currentSubstring: 'leet', checking: 'leet', variables: { i: 4, substring: 'leet', found: true }, message: "Check index 4: 'leet' found in wordDict! dp[4]=true", lineNumber: 8 },
-    { s, dp: [true, false, false, false, true, false, false, false, false], currentIndex: 4, currentSubstring: 'leet', checking: '', variables: { dp: '[T,F,F,F,T,F,F,F,F]' }, message: "Updated dp[4]=true. Can form 'leet'", lineNumber: 9 },
-    { s, dp: [true, false, false, false, true, false, false, false, false], currentIndex: 5, currentSubstring: 'leetc', checking: 'c', variables: { i: 5, substring: 'c', found: false }, message: "Check index 5: 'c' not in wordDict", lineNumber: 6 },
-    { s, dp: [true, false, false, false, true, false, false, false, false], currentIndex: 8, currentSubstring: 'leetcode', checking: 'code', variables: { i: 8, substring: 'code', found: true }, message: "Check index 8: 'code' found in wordDict! dp[8]=true", lineNumber: 8 },
-    { s, dp: [true, false, false, false, true, false, false, false, true], currentIndex: 8, currentSubstring: 'leetcode', checking: '', variables: { dp: '[T,F,F,F,T,F,F,F,T]', result: true }, message: "Complete! dp[8]=true means 'leetcode' can be segmented. Time: O(n²*m), Space: O(n)", lineNumber: 12 }
+    {
+      s,
+      dp: [],
+      currentIndex: 0,
+      currentSubstring: '',
+      checking: '',
+      variables: { s: '"leetcode"', wordDict: '["leet","code"]', n: 8 },
+      explanation: "Starting with s = 'leetcode' and wordDict = ['leet', 'code'].",
+      highlightedLines: [1],
+      lineExecution: "function wordBreak(s: string, wordDict: string[]): boolean {"
+    },
+    {
+      s,
+      dp: [],
+      currentIndex: 0,
+      currentSubstring: '',
+      checking: '',
+      variables: { n: 8, s: '"leetcode"' },
+      explanation: "Get string length: n = s.length = 8.",
+      highlightedLines: [2],
+      lineExecution: "const n = s.length = 8;"
+    },
+    {
+      s,
+      dp: [false, false, false, false, false, false, false, false, false],
+      currentIndex: 0,
+      currentSubstring: '',
+      checking: '',
+      variables: { n: 8, dp: 'array size n+1' },
+      explanation: "Initialize dp array of size n+1 = 9. All values = false initially.",
+      highlightedLines: [3],
+      lineExecution: "const dp = new Array(n + 1).fill(false);"
+    },
+    {
+      s,
+      dp: [true, false, false, false, false, false, false, false, false],
+      currentIndex: 0,
+      currentSubstring: '',
+      checking: '',
+      variables: { 'dp[0]': true },
+      explanation: "Base case: dp[0] = true. Empty string can always be segmented.",
+      highlightedLines: [4],
+      lineExecution: "dp[0] = true;"
+    },
+    {
+      s,
+      dp: [true, false, false, false, false, false, false, false, false],
+      currentIndex: 0,
+      currentSubstring: '',
+      checking: '',
+      variables: { wordSet: 'Set(["leet","code"])' },
+      explanation: "Convert wordDict to Set for O(1) lookup.",
+      highlightedLines: [5],
+      lineExecution: "const wordSet = new Set(wordDict);"
+    },
+    {
+      s,
+      dp: [true, false, false, false, false, false, false, false, false],
+      currentIndex: 1,
+      currentSubstring: 'l',
+      checking: '',
+      variables: { i: 1, n: 8 },
+      explanation: "Start outer loop: i = 1. Check: 1 <= 8? Yes.",
+      highlightedLines: [7],
+      lineExecution: "for (let i = 1; i <= n; i++)"
+    },
+    {
+      s,
+      dp: [true, false, false, false, false, false, false, false, false],
+      currentIndex: 1,
+      currentSubstring: 'l',
+      checking: 'l',
+      variables: { i: 1, j: 0, substring: 'l' },
+      explanation: "i=1, j=0: Check substring 'l' (from 0 to 1). Not in wordDict.",
+      highlightedLines: [8, 9],
+      lineExecution: "s.substring(0, 1) = 'l'"
+    },
+    {
+      s,
+      dp: [true, false, false, false, false, false, false, false, false],
+      currentIndex: 4,
+      currentSubstring: 'leet',
+      checking: '',
+      variables: { i: 4 },
+      explanation: "Skip to i=4. Previous iterations didn't find valid words.",
+      highlightedLines: [7],
+      lineExecution: "for (let i = 4; i <= n; i++)"
+    },
+    {
+      s,
+      dp: [true, false, false, false, false, false, false, false, false],
+      currentIndex: 4,
+      currentSubstring: 'leet',
+      checking: 'leet',
+      variables: { i: 4, j: 0, substring: 'leet', 'dp[0]': true },
+      explanation: "i=4, j=0: Check substring 'leet' (from 0 to 4). dp[0]=true AND 'leet' in wordDict!",
+      highlightedLines: [9],
+      lineExecution: "if (dp[j] && wordSet.has(s.substring(j, i))) -> true"
+    },
+    {
+      s,
+      dp: [true, false, false, false, true, false, false, false, false],
+      currentIndex: 4,
+      currentSubstring: 'leet',
+      checking: '',
+      variables: { 'dp[4]': true },
+      explanation: "Set dp[4] = true. Can form 'leet' from start. Break inner loop.",
+      highlightedLines: [10, 11],
+      lineExecution: "dp[4] = true; break;"
+    },
+    {
+      s,
+      dp: [true, false, false, false, true, false, false, false, false],
+      currentIndex: 5,
+      currentSubstring: 'leetc',
+      checking: '',
+      variables: { i: 5 },
+      explanation: "i=5: Check all possible substrings ending at 5.",
+      highlightedLines: [7],
+      lineExecution: "for (let i = 5; i <= n; i++)"
+    },
+    {
+      s,
+      dp: [true, false, false, false, true, false, false, false, false],
+      currentIndex: 5,
+      currentSubstring: 'leetc',
+      checking: 'c',
+      variables: { i: 5, j: 4, substring: 'c' },
+      explanation: "i=5, j=4: Check 'c' (from 4 to 5). Not in wordDict.",
+      highlightedLines: [9],
+      lineExecution: "s.substring(4, 5) = 'c'"
+    },
+    {
+      s,
+      dp: [true, false, false, false, true, false, false, false, false],
+      currentIndex: 8,
+      currentSubstring: 'leetcode',
+      checking: '',
+      variables: { i: 8 },
+      explanation: "i=8: Final check. Try all possible splits.",
+      highlightedLines: [7],
+      lineExecution: "for (let i = 8; i <= n; i++)"
+    },
+    {
+      s,
+      dp: [true, false, false, false, true, false, false, false, false],
+      currentIndex: 8,
+      currentSubstring: 'leetcode',
+      checking: 'code',
+      variables: { i: 8, j: 4, substring: 'code', 'dp[4]': true },
+      explanation: "i=8, j=4: Check 'code' (from 4 to 8). dp[4]=true AND 'code' in wordDict!",
+      highlightedLines: [9],
+      lineExecution: "if (dp[j] && wordSet.has(s.substring(j, i))) -> true"
+    },
+    {
+      s,
+      dp: [true, false, false, false, true, false, false, false, true],
+      currentIndex: 8,
+      currentSubstring: 'leetcode',
+      checking: '',
+      variables: { 'dp[8]': true },
+      explanation: "Set dp[8] = true. Can form 'code' after 'leet'. Break inner loop.",
+      highlightedLines: [10, 11],
+      lineExecution: "dp[8] = true; break;"
+    },
+    {
+      s,
+      dp: [true, false, false, false, true, false, false, false, true],
+      currentIndex: 8,
+      currentSubstring: 'leetcode',
+      checking: '',
+      variables: { i: 9, n: 8 },
+      explanation: "Check loop condition: i (9) <= n (8)? No, exit loop.",
+      highlightedLines: [7],
+      lineExecution: "for (let i = 9; i <= n; i++) -> false"
+    },
+    {
+      s,
+      dp: [true, false, false, false, true, false, false, false, true],
+      currentIndex: 8,
+      currentSubstring: 'leetcode',
+      checking: '',
+      variables: { result: true },
+      explanation: "Return dp[n] = dp[8] = true. Yes, 'leetcode' can be segmented!",
+      highlightedLines: [15],
+      lineExecution: "return dp[n] = true"
+    },
+    {
+      s,
+      dp: [true, false, false, false, true, false, false, false, true],
+      currentIndex: 8,
+      currentSubstring: 'leetcode',
+      checking: '',
+      variables: { result: true, segmentation: '"leet" + "code"' },
+      explanation: "Algorithm complete! Time: O(n² × m), Space: O(n). m = avg word length.",
+      highlightedLines: [15],
+      lineExecution: "Result: true ('leet' + 'code')"
+    }
   ];
 
   const code = `function wordBreak(s: string, wordDict: string[]): boolean {
@@ -50,49 +243,125 @@ export const WordBreakVisualization = () => {
   return dp[n];
 }`;
 
-  const currentStep = steps[currentStepIndex];
+  const step = steps[currentStep];
 
   return (
-    <div className="w-full h-full flex flex-col gap-4 p-4">
-      <Card className="p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex gap-2">
-            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(0)} disabled={currentStepIndex === 0}><RotateCcw className="h-4 w-4" /></Button>
-            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))} disabled={currentStepIndex === 0}><SkipBack className="h-4 w-4" /></Button>
-            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(Math.min(steps.length - 1, currentStepIndex + 1))} disabled={currentStepIndex === steps.length - 1}><SkipForward className="h-4 w-4" /></Button>
-          </div>
-          <div className="text-sm">Step {currentStepIndex + 1} / {steps.length}</div>
-        </div>
-      </Card>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1">
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Word Break: "{s}"</h3>
-          <div className="space-y-4">
-            <div className="p-3 bg-muted/30 rounded text-sm">Dictionary: [{wordDict.map(w => `"${w}"`).join(', ')}]</div>
-            <div className="flex flex-wrap gap-1">
-              {s.split('').map((char, idx) => (
-                <div key={idx} className={`w-10 h-10 flex items-center justify-center font-bold border-2 ${
-                  idx < currentStep.currentIndex ? 'bg-green-500/20 border-green-500 text-green-500' :
-                  idx === currentStep.currentIndex - 1 ? 'bg-blue-500/20 border-blue-500 text-blue-500' : 'bg-muted border-border'
-                }`}>{char}</div>
-              ))}
-            </div>
-            <div className="p-3 bg-muted/50 rounded"><div className="text-xs font-semibold mb-2">DP Array</div><div className="flex gap-1 overflow-x-auto">{currentStep.dp.map((val, idx) => (
-              <div key={idx} className={`min-w-[2.5rem] h-10 flex items-center justify-center font-bold text-sm border-2 ${val ? 'bg-green-500/20 border-green-500 text-green-500' : 'bg-muted border-border'}`}>{idx}</div>
-            ))}</div></div>
-            {currentStep.checking && (<div className="p-3 bg-blue-500/10 border border-blue-500 rounded text-sm">Checking: "{currentStep.checking}"</div>)}
-            <div className="p-4 bg-muted/50 rounded text-sm">{currentStep.message}</div>
-          </div>
-        </Card>
-        <Card className="p-6 overflow-hidden flex flex-col">
-          <h3 className="text-lg font-semibold mb-4">TypeScript</h3>
-          <div className="flex-1 overflow-auto">
-            <SyntaxHighlighter language="typescript" style={vscDarkPlus} showLineNumbers lineProps={(lineNumber) => ({ style: { backgroundColor: lineNumber === currentStep.lineNumber ? 'rgba(255, 255, 0, 0.2)' : 'transparent', display: 'block' } })}>
-              {code}
-            </SyntaxHighlighter>
-          </div>
-        </Card>
-      </div>
-    </div>
+    <VisualizationLayout
+      leftContent={
+        <>
+          <motion.div
+            key={`string-${currentStep}`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Card className="p-6">
+              <h3 className="text-lg font-semibold mb-4">Word Break: "{s}"</h3>
+              <div className="space-y-4">
+                <div className="p-3 bg-muted/30 rounded text-sm">
+                  Dictionary: [{wordDict.map(w => `"${w}"`).join(', ')}]
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  {s.split('').map((char, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: idx * 0.05 }}
+                      className={`w-10 h-10 flex items-center justify-center font-bold border-2 ${
+                        idx < step.currentIndex ? 'bg-green-500/20 border-green-500 text-green-500' :
+                        idx === step.currentIndex - 1 ? 'bg-blue-500/20 border-blue-500 text-blue-500' : 
+                        'bg-muted border-border'
+                      }`}
+                    >
+                      {char}
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+
+          {step.dp.length > 0 && (
+            <motion.div
+              key={`dp-${currentStep}`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              <Card className="p-3 bg-muted/50">
+                <div className="text-xs font-semibold mb-2">DP Array</div>
+                <div className="flex gap-1 overflow-x-auto">
+                  {step.dp.map((val, idx) => (
+                    <div
+                      key={idx}
+                      className={`min-w-[2.5rem] h-10 flex items-center justify-center font-bold text-sm border-2 ${
+                        val ? 'bg-green-500/20 border-green-500 text-green-500' : 'bg-muted border-border'
+                      }`}
+                    >
+                      {idx}
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </motion.div>
+          )}
+
+          {step.checking && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Card className="p-3 bg-blue-500/10 border border-blue-500">
+                <div className="text-sm">Checking: "{step.checking}"</div>
+              </Card>
+            </motion.div>
+          )}
+          
+          <motion.div
+            key={`execution-${currentStep}`}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+          >
+            <Card className="p-4 bg-muted/50">
+              <div className="space-y-2">
+                <div className="text-sm font-semibold text-primary">Current Execution:</div>
+                <div className="text-sm font-mono bg-background/50 p-2 rounded">
+                  {step.lineExecution}
+                </div>
+                <div className="text-sm text-muted-foreground pt-2">
+                  {step.explanation}
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            key={`variables-${currentStep}`}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, delay: 0.4 }}
+          >
+            <VariablePanel variables={step.variables} />
+          </motion.div>
+        </>
+      }
+      rightContent={
+        <AnimatedCodeEditor
+          code={code}
+          language="typescript"
+          highlightedLines={step.highlightedLines}
+        />
+      }
+      controls={
+        <SimpleStepControls
+          currentStep={currentStep}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStep}
+        />
+      }
+    />
   );
 };
