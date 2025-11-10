@@ -570,6 +570,42 @@ const Blind75Detail: React.FC = () => {
       return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><WordBreakVisualization /></React.Suspense>;
     }
 
+    // String problems
+    if (algoId === "valid-parentheses") {
+      const ValidParenthesesVisualization = React.lazy(() =>
+        import("@/components/visualizations/algorithms/ValidParenthesesVisualization").then((m) => ({ default: m.ValidParenthesesVisualization }))
+      );
+      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><ValidParenthesesVisualization /></React.Suspense>;
+    }
+
+    if (algoId === "longest-palindromic-substring") {
+      const LongestPalindromicSubstringVisualization = React.lazy(() =>
+        import("@/components/visualizations/algorithms/LongestPalindromicSubstringVisualization").then((m) => ({ default: m.LongestPalindromicSubstringVisualization }))
+      );
+      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><LongestPalindromicSubstringVisualization /></React.Suspense>;
+    }
+
+    if (algoId === "palindromic-substrings") {
+      const PalindromicSubstringsVisualization = React.lazy(() =>
+        import("@/components/visualizations/algorithms/PalindromicSubstringsVisualization").then((m) => ({ default: m.PalindromicSubstringsVisualization }))
+      );
+      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><PalindromicSubstringsVisualization /></React.Suspense>;
+    }
+
+    if (algoId === "encode-and-decode-strings") {
+      const EncodeDecodeStringsVisualization = React.lazy(() =>
+        import("@/components/visualizations/algorithms/EncodeDecodeStringsVisualization").then((m) => ({ default: m.EncodeDecodeStringsVisualization }))
+      );
+      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><EncodeDecodeStringsVisualization /></React.Suspense>;
+    }
+
+    if (algoId === "maximum-depth-of-binary-tree") {
+      const MaximumDepthOfBinaryTreeVisualization = React.lazy(() =>
+        import("@/components/visualizations/algorithms/MaximumDepthOfBinaryTreeVisualization").then((m) => ({ default: m.MaximumDepthOfBinaryTreeVisualization }))
+      );
+      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><MaximumDepthOfBinaryTreeVisualization /></React.Suspense>;
+    }
+
     // Problems 21-30
     if (algoId === "combination-sum") {
       const CombinationSumVisualization = React.lazy(() =>

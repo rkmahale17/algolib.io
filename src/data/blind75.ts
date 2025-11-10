@@ -1379,7 +1379,8 @@ export const blind75Problems: Blind75Problem[] = [
       "String",
       "Stack"
     ],
-    "youtubeUrl": "https://www.youtube.com/watch?v=WTzjTskDFMg"
+    "youtubeUrl": "https://www.youtube.com/watch?v=WTzjTskDFMg",
+    "algorithmId": "valid-parentheses"
   },
   {
     "id": 56,
@@ -1422,7 +1423,8 @@ export const blind75Problems: Blind75Problem[] = [
       "String",
       "Dynamic Programming"
     ],
-    "youtubeUrl": "https://www.youtube.com/watch?v=XYQecbcd6_c"
+    "youtubeUrl": "https://www.youtube.com/watch?v=XYQecbcd6_c",
+    "algorithmId": "longest-palindromic-substring"
   },
   {
     "id": 58,
@@ -1442,7 +1444,8 @@ export const blind75Problems: Blind75Problem[] = [
       "String",
       "Dynamic Programming"
     ],
-    "youtubeUrl": "https://www.youtube.com/watch?v=4RACzI5-du8"
+    "youtubeUrl": "https://www.youtube.com/watch?v=4RACzI5-du8",
+    "algorithmId": "palindromic-substrings"
   },
   {
     "id": 59,
@@ -1463,7 +1466,8 @@ export const blind75Problems: Blind75Problem[] = [
       "String",
       "Design"
     ],
-    "youtubeUrl": "https://www.youtube.com/watch?v=B1k_sxOSgv8"
+    "youtubeUrl": "https://www.youtube.com/watch?v=B1k_sxOSgv8",
+    "algorithmId": "encode-and-decode-strings"
   },
   {
     "id": 60,
@@ -1484,7 +1488,8 @@ export const blind75Problems: Blind75Problem[] = [
       "DFS",
       "BFS"
     ],
-    "youtubeUrl": "https://www.youtube.com/watch?v=hTM3phVI6YQ"
+    "youtubeUrl": "https://www.youtube.com/watch?v=hTM3phVI6YQ",
+    "algorithmId": "maximum-depth-of-binary-tree"
   },
   {
     "id": 61,
