@@ -35,7 +35,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { numCourses: 4, prerequisites: '[[1,0],[2,0],[3,1],[3,2]]' },
       explanation: "4 courses with prerequisites. [1,0] means: take course 0 before course 1. Check if all courses can be completed (no cycles).",
-      highlightedLines: [1, 2],
+      highlightedLines: [1, 2, 3, 4],
       lineExecution: "function canFinish(numCourses: number, prerequisites: number[][]): boolean"
     },
     {
@@ -47,7 +47,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { graph: 'Map()' },
       explanation: "Build adjacency list: graph[course] = array of prerequisites for that course.",
-      highlightedLines: [3],
+      highlightedLines: [5],
       lineExecution: "const graph = new Map<number, number[]>();"
     },
     {
@@ -59,7 +59,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { graph: '{1:[0], 2:[0], 3:[1,2]}' },
       explanation: "Populate graph from prerequisites. Course 3 requires both courses 1 and 2.",
-      highlightedLines: [4, 5, 6],
+      highlightedLines: [6, 7, 8],
       lineExecution: "for (const [course, prereq] of prerequisites) graph.set(...)"
     },
     {
@@ -71,7 +71,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { visiting: 'Set()', visited: 'Set()' },
       explanation: "Create two sets: 'visiting' tracks current DFS path (cycle detection), 'visited' tracks completed courses.",
-      highlightedLines: [8, 9],
+      highlightedLines: [10, 11],
       lineExecution: "const visiting = new Set(); const visited = new Set();"
     },
     {
@@ -83,7 +83,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { i: 0, course: 0 },
       explanation: "Start checking courses: i = 0. Call hasCycle(0) to check if course 0 has cycle.",
-      highlightedLines: [23, 24],
+      highlightedLines: [26, 27],
       lineExecution: "for (let i = 0; i < numCourses; i++) if (hasCycle(i)) ..."
     },
     {
@@ -95,7 +95,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { course: 0, 'visiting.has(0)': false },
       explanation: "Check if course 0 is in current DFS path: visiting.has(0)? No, no cycle yet.",
-      highlightedLines: [12],
+      highlightedLines: [14],
       lineExecution: "if (visiting.has(course)) return true; // false"
     },
     {
@@ -107,7 +107,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { 'visited.has(0)': false },
       explanation: "Check if course 0 already processed: visited.has(0)? No, continue DFS.",
-      highlightedLines: [13],
+      highlightedLines: [15],
       lineExecution: "if (visited.has(course)) return false; // false"
     },
     {
@@ -119,7 +119,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { visiting: '{0}' },
       explanation: "Mark course 0 as visiting (in current DFS path). Used for cycle detection.",
-      highlightedLines: [15],
+      highlightedLines: [17],
       lineExecution: "visiting.add(course); // visiting = {0}"
     },
     {
@@ -131,7 +131,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { prerequisites: '[]' },
       explanation: "Check prerequisites for course 0: none. Empty array, loop doesn't execute.",
-      highlightedLines: [16, 17],
+      highlightedLines: [18, 19],
       lineExecution: "for (const prereq of graph.get(course) || []) // []"
     },
     {
@@ -143,7 +143,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { visiting: '{}' },
       explanation: "Course 0 DFS complete. Remove from visiting set (no longer in current path).",
-      highlightedLines: [19],
+      highlightedLines: [21],
       lineExecution: "visiting.delete(course); // visiting = {}"
     },
     {
@@ -155,7 +155,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { visited: '{0}' },
       explanation: "Mark course 0 as visited (fully processed). Can be safely taken.",
-      highlightedLines: [20],
+      highlightedLines: [22],
       lineExecution: "visited.add(course); // visited = {0}"
     },
     {
@@ -167,7 +167,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { course: 1, prerequisites: '[0]' },
       explanation: "Check course 1. Prerequisite: course 0. Add 1 to visiting, recursively check prereq 0.",
-      highlightedLines: [15, 16, 17],
+      highlightedLines: [17, 18, 19],
       lineExecution: "visiting.add(1); for (const prereq of [0]) hasCycle(0)"
     },
     {
@@ -179,7 +179,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { 'visited.has(0)': true },
       explanation: "Checking prereq 0: already in visited set. Return false immediately (no cycle).",
-      highlightedLines: [13],
+      highlightedLines: [15],
       lineExecution: "if (visited.has(course)) return false; // true, return false"
     },
     {
@@ -191,7 +191,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { visited: '{0,1}' },
       explanation: "Course 1 valid. Remove from visiting, add to visited.",
-      highlightedLines: [19, 20],
+      highlightedLines: [21, 22],
       lineExecution: "visiting.delete(1); visited.add(1);"
     },
     {
@@ -203,7 +203,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { course: 2 },
       explanation: "Check course 2. Prerequisite: course 0 (already visited). Course 2 valid.",
-      highlightedLines: [15, 16, 17, 19, 20],
+      highlightedLines: [17, 18, 19, 21, 22],
       lineExecution: "Process course 2: prereq 0 in visited, add 2 to visited"
     },
     {
@@ -215,7 +215,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { course: 3, prerequisites: '[1,2]' },
       explanation: "Check course 3. Prerequisites: courses 1 and 2 (both in visited). Course 3 valid.",
-      highlightedLines: [15, 16, 17],
+      highlightedLines: [17, 18, 19],
       lineExecution: "visiting.add(3); check prereqs 1 and 2 (both visited)"
     },
     {
@@ -227,7 +227,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { visited: '{0,1,2,3}' },
       explanation: "Course 3 valid. All courses processed, no cycles found!",
-      highlightedLines: [19, 20],
+      highlightedLines: [21, 22],
       lineExecution: "visiting.delete(3); visited.add(3);"
     },
     {
@@ -239,7 +239,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { result: true },
       explanation: "Loop complete. No cycle detected. Return true - all courses can be finished!",
-      highlightedLines: [26],
+      highlightedLines: [29],
       lineExecution: "return true;"
     },
     {
@@ -251,7 +251,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { canFinish: true, complexity: 'O(V+E)' },
       explanation: "Algorithm complete! DFS cycle detection. Time: O(V+E) where V=courses, E=prerequisites. Space: O(V).",
-      highlightedLines: [26],
+      highlightedLines: [29],
       lineExecution: "Result: true (can finish all courses)"
     }
   ];

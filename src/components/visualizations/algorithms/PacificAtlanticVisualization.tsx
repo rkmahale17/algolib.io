@@ -30,7 +30,7 @@ export const PacificAtlanticVisualization = () => {
       current: null,
       variables: { m: 3, n: 3 },
       explanation: "3×3 height grid. Pacific Ocean touches top and left edges. Atlantic Ocean touches bottom and right edges. Find cells where water can flow to BOTH oceans.",
-      highlightedLines: [1, 2],
+      highlightedLines: [1, 2, 3],
       lineExecution: "function pacificAtlantic(heights: number[][]): number[][]"
     },
     {
@@ -40,7 +40,7 @@ export const PacificAtlanticVisualization = () => {
       current: null,
       variables: { m: 3, n: 3 },
       explanation: "Get grid dimensions: m = 3 rows, n = 3 columns.",
-      highlightedLines: [3],
+      highlightedLines: [4],
       lineExecution: "const m = heights.length, n = heights[0].length; // m=3, n=3"
     },
     {
@@ -50,7 +50,7 @@ export const PacificAtlanticVisualization = () => {
       current: null,
       variables: { pacificSize: '3×3', atlanticSize: '3×3' },
       explanation: "Create two boolean grids to track cells reachable by each ocean.",
-      highlightedLines: [4, 5],
+      highlightedLines: [5, 6],
       lineExecution: "const pacific = Array(m).fill(0).map(() => Array(n).fill(false));"
     },
     {
@@ -60,7 +60,7 @@ export const PacificAtlanticVisualization = () => {
       current: null,
       variables: {},
       explanation: "Define DFS helper: marks all cells reachable from current cell where water can flow (height increases or stays same).",
-      highlightedLines: [7, 8, 9],
+      highlightedLines: [8, 9, 10],
       lineExecution: "function dfs(r: number, c: number, visited: boolean[][])"
     },
     {
@@ -70,7 +70,7 @@ export const PacificAtlanticVisualization = () => {
       current: [0, 0],
       variables: { r: 0, c: 0 },
       explanation: "Start DFS from Pacific borders. Begin at (0,0) - top-left corner. Mark as Pacific-reachable.",
-      highlightedLines: [21, 22],
+      highlightedLines: [22, 23],
       lineExecution: "for (let i = 0; i < m; i++) dfs(i, 0, pacific); // i=0"
     },
     {
@@ -80,7 +80,7 @@ export const PacificAtlanticVisualization = () => {
       current: [1, 0],
       variables: { pacificCells: 5 },
       explanation: "Continue DFS from all Pacific borders (top row and left column). Mark all cells where water can flow to Pacific.",
-      highlightedLines: [21, 22, 23],
+      highlightedLines: [22, 23, 24],
       lineExecution: "DFS from all Pacific borders (top & left)"
     },
     {
@@ -90,7 +90,7 @@ export const PacificAtlanticVisualization = () => {
       current: null,
       variables: { pacificCount: 5 },
       explanation: "Pacific DFS complete. 5 cells can reach Pacific Ocean.",
-      highlightedLines: [21, 22, 23],
+      highlightedLines: [22, 23, 24],
       lineExecution: "Pacific borders processed"
     },
     {
@@ -130,7 +130,7 @@ export const PacificAtlanticVisualization = () => {
       current: [0, 2],
       variables: { cell: '(0,2)', bothOceans: true },
       explanation: "Find intersection: check each cell. (0,2): pacific[0][2]=true AND atlantic[0][2]=true. Add to result!",
-      highlightedLines: [31, 32, 33, 34],
+      highlightedLines: [30, 31, 32, 33, 34],
       lineExecution: "if (pacific[0][2] && atlantic[0][2]) result.push([0,2]);"
     },
     {
@@ -140,7 +140,7 @@ export const PacificAtlanticVisualization = () => {
       current: [2, 0],
       variables: { cell: '(2,0)', bothOceans: true },
       explanation: "Cell (2,0): pacific[2][0]=true AND atlantic[2][0]=true. Add to result!",
-      highlightedLines: [31, 32, 33, 34],
+      highlightedLines: [30, 31, 32, 33, 34],
       lineExecution: "if (pacific[2][0] && atlantic[2][0]) result.push([2,0]);"
     },
     {
@@ -150,7 +150,7 @@ export const PacificAtlanticVisualization = () => {
       current: null,
       variables: { result: '[[0,2],[2,0]]' },
       explanation: "Return result: [[0,2], [2,0]]. These 2 cells can reach BOTH oceans.",
-      highlightedLines: [38],
+      highlightedLines: [37],
       lineExecution: "return result; // [[0,2],[2,0]]"
     },
     {
@@ -160,7 +160,7 @@ export const PacificAtlanticVisualization = () => {
       current: null,
       variables: { cells: 2, complexity: 'O(m×n)' },
       explanation: "Algorithm complete! DFS from borders inward (reverse flow). Find cells reachable by both. Time: O(m×n), Space: O(m×n).",
-      highlightedLines: [38],
+      highlightedLines: [37],
       lineExecution: "Result: 2 cells reach both oceans"
     }
   ];

@@ -28,7 +28,7 @@ export const CloneGraphVisualization = () => {
       mapSize: 0,
       variables: { graph: '1--2--3--4--1' },
       explanation: "Graph: 1 connects to 2, 2 to 3, 3 to 4, 4 back to 1 (cycle). Clone entire graph structure.",
-      highlightedLines: [1, 2],
+      highlightedLines: [1, 2, 3],
       lineExecution: "function cloneGraph(node: Node | null): Node | null"
     },
     {
@@ -38,7 +38,7 @@ export const CloneGraphVisualization = () => {
       mapSize: 0,
       variables: { node: 'null?' },
       explanation: "Check if input node is null. If so, return null immediately.",
-      highlightedLines: [3],
+      highlightedLines: [4],
       lineExecution: "if (!node) return null; // node exists, continue"
     },
     {
@@ -48,7 +48,7 @@ export const CloneGraphVisualization = () => {
       mapSize: 0,
       variables: { map: 'new Map()' },
       explanation: "Create HashMap to store original -> clone mappings. Prevents infinite loops in cyclic graphs.",
-      highlightedLines: [4],
+      highlightedLines: [5],
       lineExecution: "const map = new Map<Node, Node>();"
     },
     {
@@ -58,7 +58,7 @@ export const CloneGraphVisualization = () => {
       mapSize: 0,
       variables: { node: 1 },
       explanation: "Start DFS from node 1. Define dfs helper function.",
-      highlightedLines: [6],
+      highlightedLines: [7],
       lineExecution: "function dfs(node: Node): Node"
     },
     {
@@ -68,7 +68,7 @@ export const CloneGraphVisualization = () => {
       mapSize: 0,
       variables: { 'map.has(1)': false },
       explanation: "Check if node 1 already cloned: map.has(node)? No, continue cloning.",
-      highlightedLines: [7],
+      highlightedLines: [8],
       lineExecution: "if (map.has(node)) return map.get(node)!; // false"
     },
     {
@@ -78,7 +78,7 @@ export const CloneGraphVisualization = () => {
       mapSize: 0,
       variables: { clone: 'Node(1)' },
       explanation: "Create clone of node 1: new Node(1). Clone has same value but no neighbors yet.",
-      highlightedLines: [9],
+      highlightedLines: [10],
       lineExecution: "const clone = new Node(node.val); // Node(1)"
     },
     {
@@ -88,7 +88,7 @@ export const CloneGraphVisualization = () => {
       mapSize: 1,
       variables: { 'map.size': 1 },
       explanation: "Add to map: map.set(node1, clone1). Now node 1 is marked as cloned.",
-      highlightedLines: [10],
+      highlightedLines: [11],
       lineExecution: "map.set(node, clone); // map: {1 -> clone1}"
     },
     {
@@ -98,7 +98,7 @@ export const CloneGraphVisualization = () => {
       mapSize: 1,
       variables: { neighbor: 2 },
       explanation: "Process neighbor 2 of node 1. Recursively call dfs(2).",
-      highlightedLines: [12, 13],
+      highlightedLines: [13, 14],
       lineExecution: "for (const neighbor of node.neighbors) // neighbor = 2"
     },
     {
@@ -108,7 +108,7 @@ export const CloneGraphVisualization = () => {
       mapSize: 1,
       variables: { clone: 'Node(2)' },
       explanation: "Node 2 not in map. Create clone: new Node(2).",
-      highlightedLines: [9],
+      highlightedLines: [10],
       lineExecution: "const clone = new Node(node.val); // Node(2)"
     },
     {
@@ -118,7 +118,7 @@ export const CloneGraphVisualization = () => {
       mapSize: 2,
       variables: { 'map.size': 2 },
       explanation: "Add to map: map.set(node2, clone2). Node 2 marked as cloned.",
-      highlightedLines: [10],
+      highlightedLines: [11],
       lineExecution: "map.set(node, clone); // map: {1 -> clone1, 2 -> clone2}"
     },
     {
@@ -128,7 +128,7 @@ export const CloneGraphVisualization = () => {
       mapSize: 3,
       variables: { neighbor: 3 },
       explanation: "Process neighbor 3 of node 2. Create clone: Node(3). Add to map.",
-      highlightedLines: [9, 10, 12, 13],
+      highlightedLines: [10, 11, 13, 14],
       lineExecution: "dfs(3) -> clone Node(3), map.set(3, clone3)"
     },
     {
@@ -138,7 +138,7 @@ export const CloneGraphVisualization = () => {
       mapSize: 4,
       variables: { neighbor: 4 },
       explanation: "Process neighbor 4 of node 3. Create clone: Node(4). Add to map.",
-      highlightedLines: [9, 10, 12, 13],
+      highlightedLines: [10, 11, 13, 14],
       lineExecution: "dfs(4) -> clone Node(4), map.set(4, clone4)"
     },
     {
@@ -148,7 +148,7 @@ export const CloneGraphVisualization = () => {
       mapSize: 4,
       variables: { neighbor: 1, 'map.has(1)': true },
       explanation: "Node 4's neighbor is 1 (cycle!). Check map: node 1 already cloned. Return existing clone.",
-      highlightedLines: [7],
+      highlightedLines: [8],
       lineExecution: "if (map.has(node)) return map.get(node)!; // true, return clone1"
     },
     {
@@ -158,7 +158,7 @@ export const CloneGraphVisualization = () => {
       mapSize: 4,
       variables: { 'clone4.neighbors': '[clone1]' },
       explanation: "Add clone1 to clone4's neighbors. Completes the cycle in cloned graph.",
-      highlightedLines: [13],
+      highlightedLines: [14],
       lineExecution: "clone.neighbors.push(dfs(neighbor)); // clone4.neighbors = [clone1]"
     },
     {
@@ -168,7 +168,7 @@ export const CloneGraphVisualization = () => {
       mapSize: 4,
       variables: { result: 'clone1' },
       explanation: "Return clone of starting node (clone1). All neighbors recursively cloned.",
-      highlightedLines: [16, 19],
+      highlightedLines: [17, 20],
       lineExecution: "return clone; // return clone1"
     },
     {
@@ -178,7 +178,7 @@ export const CloneGraphVisualization = () => {
       mapSize: 4,
       variables: { nodes: 4, edges: 4, complexity: 'O(V+E)' },
       explanation: "Algorithm complete! Cloned all nodes and edges. HashMap prevents infinite loops. Time: O(V+E), Space: O(V).",
-      highlightedLines: [19],
+      highlightedLines: [20],
       lineExecution: "Result: cloned graph with same structure"
     }
   ];
