@@ -1117,6 +1117,40 @@ const Blind75Detail: React.FC = () => {
       );
     }
 
+    if (algoId === "word-search") {
+      const WordSearchVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/WordSearchVisualization"
+        ).then((m) => ({ default: m.WordSearchVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <WordSearchVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "longest-substring-without-repeating-characters") {
+      const LongestSubstringVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/LongestSubstringWithoutRepeatingCharactersVisualization"
+        ).then((m) => ({ default: m.LongestSubstringWithoutRepeatingCharactersVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <LongestSubstringVisualization />
+        </React.Suspense>
+      );
+    }
+
     // Add more visualization mappings as needed
     return null;
   };
