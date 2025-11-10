@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Play, Pause, RotateCcw, SkipBack, SkipForward } from 'lucide-react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
+import { VariablePanel } from '../shared/VariablePanel';
+import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
+import { motion } from 'framer-motion';
 
 interface Step {
   intervals: [number, number][];
@@ -11,16 +12,185 @@ interface Step {
   result: [number, number][];
   currentIdx: number;
   merged: [number, number] | null;
-  message: string;
-  lineNumber: number;
+  variables: Record<string, any>;
+  explanation: string;
+  highlightedLines: number[];
+  lineExecution: string;
 }
 
 export const InsertIntervalVisualization = () => {
-  const [steps, setSteps] = useState<Step[]>([]);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1000);
-  const intervalRef = useRef<number | null>(null);
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const intervals: [number, number][] = [[1, 3], [6, 9]];
+  const newInterval: [number, number] = [2, 5];
+
+  const steps: Step[] = [
+    {
+      intervals,
+      newInterval,
+      result: [],
+      currentIdx: -1,
+      merged: null,
+      variables: { intervals: '[[1,3],[6,9]]', newInterval: '[2,5]' },
+      explanation: "Insert new interval [2,5] into sorted intervals [[1,3],[6,9]]. Merge if overlapping.",
+      highlightedLines: [1, 2, 3, 4],
+      lineExecution: "function insert(intervals: number[][], newInterval: number[][]): number[][]"
+    },
+    {
+      intervals,
+      newInterval,
+      result: [],
+      currentIdx: -1,
+      merged: null,
+      variables: { result: '[]' },
+      explanation: "Initialize empty result array.",
+      highlightedLines: [5],
+      lineExecution: "const result: number[][] = [];"
+    },
+    {
+      intervals,
+      newInterval,
+      result: [],
+      currentIdx: 0,
+      merged: null,
+      variables: { i: 0, n: 2 },
+      explanation: "Initialize index i = 0, n = 2.",
+      highlightedLines: [6, 7],
+      lineExecution: "let i = 0; const n = intervals.length;"
+    },
+    {
+      intervals,
+      newInterval,
+      result: [],
+      currentIdx: 0,
+      merged: null,
+      variables: { i: 0, 'intervals[0][1]': 3, 'newInterval[0]': 2 },
+      explanation: "Check: intervals[0][1] (3) < newInterval[0] (2)? No. Skip this phase.",
+      highlightedLines: [10],
+      lineExecution: "while (i < n && intervals[i][1] < newInterval[0]) // 3 < 2 -> false"
+    },
+    {
+      intervals,
+      newInterval,
+      result: [],
+      currentIdx: 0,
+      merged: null,
+      variables: { 'intervals[0][0]': 1, 'newInterval[1]': 5 },
+      explanation: "Check overlap: intervals[0][0] (1) <= newInterval[1] (5)? Yes! Overlapping.",
+      highlightedLines: [16],
+      lineExecution: "while (i < n && intervals[i][0] <= newInterval[1]) // 1 <= 5 -> true"
+    },
+    {
+      intervals,
+      newInterval: [1, 5],
+      result: [],
+      currentIdx: 0,
+      merged: [1, 5],
+      variables: { 'newInterval[0]': 1, merged: '[1,5]' },
+      explanation: "Merge: newInterval[0] = min(2, 1) = 1. Update newInterval to [1,5].",
+      highlightedLines: [17],
+      lineExecution: "newInterval[0] = Math.min(newInterval[0], intervals[i][0]); // min(2,1) = 1"
+    },
+    {
+      intervals,
+      newInterval: [1, 5],
+      result: [],
+      currentIdx: 0,
+      merged: [1, 5],
+      variables: { 'newInterval[1]': 5, merged: '[1,5]' },
+      explanation: "Merge: newInterval[1] = max(5, 3) = 5. Merged interval: [1,5].",
+      highlightedLines: [18],
+      lineExecution: "newInterval[1] = Math.max(newInterval[1], intervals[i][1]); // max(5,3) = 5"
+    },
+    {
+      intervals,
+      newInterval: [1, 5],
+      result: [],
+      currentIdx: 1,
+      merged: [1, 5],
+      variables: { i: 1 },
+      explanation: "Increment i = 1. Check next interval.",
+      highlightedLines: [19],
+      lineExecution: "i++; // i = 1"
+    },
+    {
+      intervals,
+      newInterval: [1, 5],
+      result: [],
+      currentIdx: 1,
+      merged: [1, 5],
+      variables: { 'intervals[1][0]': 6, 'newInterval[1]': 5 },
+      explanation: "Check: intervals[1][0] (6) <= newInterval[1] (5)? No. Exit merge loop.",
+      highlightedLines: [16],
+      lineExecution: "while (i < n && intervals[i][0] <= newInterval[1]) // 6 <= 5 -> false"
+    },
+    {
+      intervals,
+      newInterval: [1, 5],
+      result: [[1, 5]],
+      currentIdx: 1,
+      merged: [1, 5],
+      variables: { result: '[[1,5]]' },
+      explanation: "Push merged interval [1,5] to result.",
+      highlightedLines: [21],
+      lineExecution: "result.push(newInterval); // result = [[1,5]]"
+    },
+    {
+      intervals,
+      newInterval: [1, 5],
+      result: [[1, 5]],
+      currentIdx: 1,
+      merged: null,
+      variables: { i: 1, n: 2 },
+      explanation: "Add remaining intervals: Check i (1) < n (2)? Yes.",
+      highlightedLines: [24],
+      lineExecution: "while (i < n) // 1 < 2 -> true"
+    },
+    {
+      intervals,
+      newInterval: [1, 5],
+      result: [[1, 5], [6, 9]],
+      currentIdx: 1,
+      merged: null,
+      variables: { result: '[[1,5],[6,9]]' },
+      explanation: "Push intervals[1] = [6,9] to result. No overlap with merged interval.",
+      highlightedLines: [25, 26],
+      lineExecution: "result.push(intervals[i]); i++; // result = [[1,5],[6,9]]"
+    },
+    {
+      intervals,
+      newInterval: [1, 5],
+      result: [[1, 5], [6, 9]],
+      currentIdx: 2,
+      merged: null,
+      variables: { i: 2, n: 2 },
+      explanation: "Check: i (2) < n (2)? No. Exit loop.",
+      highlightedLines: [24],
+      lineExecution: "while (i < n) // 2 < 2 -> false"
+    },
+    {
+      intervals,
+      newInterval: [1, 5],
+      result: [[1, 5], [6, 9]],
+      currentIdx: -1,
+      merged: null,
+      variables: { result: '[[1,5],[6,9]]' },
+      explanation: "Return result: [[1,5],[6,9]]. Original [1,3] merged with [2,5].",
+      highlightedLines: [29],
+      lineExecution: "return result; // [[1,5],[6,9]]"
+    },
+    {
+      intervals,
+      newInterval: [1, 5],
+      result: [[1, 5], [6, 9]],
+      currentIdx: -1,
+      merged: null,
+      variables: { intervals: 2, complexity: 'O(n)' },
+      explanation: "Algorithm complete! Three phases: add before, merge overlapping, add after. Time: O(n), Space: O(n).",
+      highlightedLines: [29],
+      lineExecution: "Result: [[1,5],[6,9]]"
+    }
+  ];
 
   const code = `function insert(
   intervals: number[][], 
@@ -30,13 +200,11 @@ export const InsertIntervalVisualization = () => {
   let i = 0;
   const n = intervals.length;
   
-  // Add all intervals before newInterval
   while (i < n && intervals[i][1] < newInterval[0]) {
     result.push(intervals[i]);
     i++;
   }
   
-  // Merge overlapping intervals
   while (i < n && intervals[i][0] <= newInterval[1]) {
     newInterval[0] = Math.min(newInterval[0], intervals[i][0]);
     newInterval[1] = Math.max(newInterval[1], intervals[i][1]);
@@ -44,7 +212,6 @@ export const InsertIntervalVisualization = () => {
   }
   result.push(newInterval);
   
-  // Add remaining intervals
   while (i < n) {
     result.push(intervals[i]);
     i++;
@@ -53,350 +220,124 @@ export const InsertIntervalVisualization = () => {
   return result;
 }`;
 
-  const generateSteps = () => {
-    const intervals: [number, number][] = [[1, 3], [6, 9]];
-    const newInterval: [number, number] = [2, 5];
-    const newSteps: Step[] = [];
+  const step = steps[currentStep];
 
-    // Initial state
-    newSteps.push({
-      intervals: [...intervals],
-      newInterval: [...newInterval] as [number, number],
-      result: [],
-      currentIdx: -1,
-      merged: null,
-      message: "Insert new interval [2,5] into [[1,3],[6,9]]",
-      lineNumber: 0
-    });
-
-    const result: [number, number][] = [];
-    let i = 0;
-    let currentNew: [number, number] = [...newInterval];
-
-    // Add intervals before newInterval
-    while (i < intervals.length && intervals[i][1] < newInterval[0]) {
-      newSteps.push({
-        intervals: [...intervals],
-        newInterval: [...currentNew] as [number, number],
-        result: [...result],
-        currentIdx: i,
-        merged: null,
-        message: `Interval [${intervals[i]}] ends before [${newInterval[0]},${newInterval[1]}] starts. Add to result.`,
-        lineNumber: 10
-      });
-      
-      result.push(intervals[i]);
-      
-      newSteps.push({
-        intervals: [...intervals],
-        newInterval: [...currentNew] as [number, number],
-        result: [...result],
-        currentIdx: i,
-        merged: null,
-        message: `Added [${intervals[i]}] to result.`,
-        lineNumber: 11
-      });
-      
-      i++;
-    }
-
-    // Merge overlapping intervals
-    if (i < intervals.length) {
-      newSteps.push({
-        intervals: [...intervals],
-        newInterval: [...currentNew] as [number, number],
-        result: [...result],
-        currentIdx: i,
-        merged: null,
-        message: `Interval [${intervals[i]}] overlaps with [${currentNew}]. Start merging.`,
-        lineNumber: 15
-      });
-    }
-
-    while (i < intervals.length && intervals[i][0] <= currentNew[1]) {
-      const oldNew = [...currentNew];
-      currentNew[0] = Math.min(currentNew[0], intervals[i][0]);
-      currentNew[1] = Math.max(currentNew[1], intervals[i][1]);
-      
-      newSteps.push({
-        intervals: [...intervals],
-        newInterval: [...currentNew] as [number, number],
-        result: [...result],
-        currentIdx: i,
-        merged: [...currentNew] as [number, number],
-        message: `Merge [${oldNew}] with [${intervals[i]}] → [${currentNew}]`,
-        lineNumber: 16
-      });
-      
-      i++;
-    }
-
-    // Add merged interval
-    result.push([...currentNew]);
-    newSteps.push({
-      intervals: [...intervals],
-      newInterval: [...currentNew] as [number, number],
-      result: [...result],
-      currentIdx: i,
-      merged: [...currentNew] as [number, number],
-      message: `Add merged interval [${currentNew}] to result.`,
-      lineNumber: 20
-    });
-
-    // Add remaining intervals
-    while (i < intervals.length) {
-      newSteps.push({
-        intervals: [...intervals],
-        newInterval: [...currentNew] as [number, number],
-        result: [...result],
-        currentIdx: i,
-        merged: null,
-        message: `Interval [${intervals[i]}] is after merged interval. Add to result.`,
-        lineNumber: 23
-      });
-      
-      result.push(intervals[i]);
-      
-      newSteps.push({
-        intervals: [...intervals],
-        newInterval: [...currentNew] as [number, number],
-        result: [...result],
-        currentIdx: i,
-        merged: null,
-        message: `Added [${intervals[i]}] to result.`,
-        lineNumber: 24
-      });
-      
-      i++;
-    }
-
-    // Final
-    newSteps.push({
-      intervals: [...intervals],
-      newInterval: [...currentNew] as [number, number],
-      result: [...result],
-      currentIdx: -1,
-      merged: null,
-      message: `Complete! Result: [[1,5],[6,9]]. Time: O(n), Space: O(n)`,
-      lineNumber: 28
-    });
-
-    setSteps(newSteps);
-  };
-
-  useEffect(() => {
-    generateSteps();
-  }, []);
-
-  useEffect(() => {
-    if (isPlaying && currentStepIndex < steps.length - 1) {
-      intervalRef.current = window.setInterval(() => {
-        setCurrentStepIndex((prev) => {
-          if (prev >= steps.length - 1) {
-            setIsPlaying(false);
-            return prev;
-          }
-          return prev + 1;
-        });
-      }, speed);
-    }
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [isPlaying, currentStepIndex, steps.length, speed]);
-
-  const handlePlay = () => setIsPlaying(true);
-  const handlePause = () => setIsPlaying(false);
-  const handleStepForward = () => {
-    if (currentStepIndex < steps.length - 1) {
-      setCurrentStepIndex((prev) => prev + 1);
-    }
-  };
-  const handleStepBack = () => {
-    if (currentStepIndex > 0) {
-      setCurrentStepIndex((prev) => prev - 1);
-    }
-  };
-  const handleReset = () => {
-    setCurrentStepIndex(0);
-    setIsPlaying(false);
-  };
-
-  if (steps.length === 0) {
-    return <div>Loading...</div>;
-  }
-
-  const currentStep = steps[currentStepIndex];
-
-  const renderInterval = (interval: [number, number], label: string, color: string) => (
-    <div className="flex items-center gap-2">
-      <span className="text-xs font-medium w-20">{label}</span>
-      <div className={`px-4 py-2 rounded ${color} font-mono text-sm`}>
-        [{interval[0]}, {interval[1]}]
-      </div>
+  const renderInterval = (interval: [number, number], color: string) => (
+    <div className={`px-4 py-2 rounded ${color} font-mono text-sm`}>
+      [{interval[0]}, {interval[1]}]
     </div>
   );
 
   return (
-    <div className="w-full h-full flex flex-col gap-4 p-4">
-      {/* Controls */}
-      <Card className="p-4">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleReset}
-              disabled={currentStepIndex === 0}
-            >
-              <RotateCcw className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleStepBack}
-              disabled={currentStepIndex === 0}
-            >
-              <SkipBack className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={isPlaying ? handlePause : handlePlay}
-              disabled={currentStepIndex === steps.length - 1}
-            >
-              {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleStepForward}
-              disabled={currentStepIndex === steps.length - 1}
-            >
-              <SkipForward className="h-4 w-4" />
-            </Button>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm">Speed:</span>
-            <Button
-              variant={speed === 2000 ? "default" : "outline"}
-              size="sm"
-              onClick={() => setSpeed(2000)}
-            >
-              0.5x
-            </Button>
-            <Button
-              variant={speed === 1000 ? "default" : "outline"}
-              size="sm"
-              onClick={() => setSpeed(1000)}
-            >
-              1x
-            </Button>
-            <Button
-              variant={speed === 500 ? "default" : "outline"}
-              size="sm"
-              onClick={() => setSpeed(500)}
-            >
-              2x
-            </Button>
-          </div>
-          <div className="text-sm font-medium">
-            Step {currentStepIndex + 1} / {steps.length}
-          </div>
-        </div>
-      </Card>
+    <VisualizationLayout
+      leftContent={
+        <>
+          <motion.div
+            key={`intervals-${currentStep}`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Card className="p-4">
+              <h3 className="text-sm font-semibold mb-3">Original Intervals</h3>
+              <div className="space-y-2">
+                {step.intervals.map((interval, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <span className="text-xs w-12">[{idx}]</span>
+                    {renderInterval(
+                      interval,
+                      idx === step.currentIdx
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted'
+                    )}
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 min-h-0">
-        {/* Visualization */}
-        <div className="space-y-4">
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Insert Interval</h3>
-            
-            <div className="space-y-4">
-              {/* Original Intervals */}
-              <div>
-                <div className="text-sm font-semibold mb-2">Original Intervals:</div>
+          <motion.div
+            key={`new-${currentStep}`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            <Card className="p-4">
+              <h3 className="text-sm font-semibold mb-3">New Interval</h3>
+              {renderInterval(step.newInterval, 'bg-accent text-accent-foreground')}
+            </Card>
+          </motion.div>
+
+          {step.result.length > 0 && (
+            <motion.div
+              key={`result-${currentStep}`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <Card className="p-4">
+                <h3 className="text-sm font-semibold mb-3">Result</h3>
                 <div className="space-y-2">
-                  {currentStep.intervals.map((interval, idx) => (
+                  {step.result.map((interval, idx) => (
                     <div key={idx}>
                       {renderInterval(
                         interval,
-                        `[${idx}]`,
-                        idx === currentStep.currentIdx
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-muted'
+                        step.merged &&
+                        interval[0] === step.merged[0] &&
+                        interval[1] === step.merged[1]
+                          ? 'bg-green-500/20 border border-green-500'
+                          : 'bg-secondary/50'
                       )}
                     </div>
                   ))}
                 </div>
-              </div>
+              </Card>
+            </motion.div>
+          )}
 
-              {/* New Interval */}
-              <div>
-                <div className="text-sm font-semibold mb-2">New Interval:</div>
-                {renderInterval(
-                  currentStep.newInterval,
-                  'Insert',
-                  'bg-accent text-accent-foreground'
-                )}
-              </div>
-
-              {/* Result */}
-              <div>
-                <div className="text-sm font-semibold mb-2">Result:</div>
-                <div className="space-y-2">
-                  {currentStep.result.length > 0 ? (
-                    currentStep.result.map((interval, idx) => (
-                      <div key={idx}>
-                        {renderInterval(
-                          interval,
-                          `[${idx}]`,
-                          currentStep.merged && 
-                          interval[0] === currentStep.merged[0] && 
-                          interval[1] === currentStep.merged[1]
-                            ? 'bg-green-500/20 border border-green-500'
-                            : 'bg-secondary/50'
-                        )}
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-sm text-muted-foreground">Empty</div>
-                  )}
+          <motion.div
+            key={`execution-${currentStep}`}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+          >
+            <Card className="p-4 bg-muted/50">
+              <div className="space-y-2">
+                <div className="text-sm font-semibold text-primary">Current Execution:</div>
+                <div className="text-sm font-mono bg-background/50 p-2 rounded">
+                  {step.lineExecution}
+                </div>
+                <div className="text-sm text-muted-foreground pt-2">
+                  {step.explanation}
                 </div>
               </div>
-            </div>
+            </Card>
+          </motion.div>
 
-            <div className="mt-4 p-4 bg-muted/50 rounded text-sm">
-              {currentStep.message}
-            </div>
-          </Card>
-        </div>
-
-        {/* Code */}
-        <Card className="p-6 overflow-hidden flex flex-col">
-          <h3 className="text-lg font-semibold mb-4">TypeScript Code</h3>
-          <div className="flex-1 overflow-auto">
-            <SyntaxHighlighter
-              language="typescript"
-              style={vscDarkPlus}
-              showLineNumbers
-              wrapLines
-              lineProps={(lineNumber) => ({
-                style: {
-                  backgroundColor: lineNumber === currentStep.lineNumber ? 'rgba(255, 255, 0, 0.2)' : 'transparent',
-                  display: 'block',
-                  width: '100%'
-                }
-              })}
-            >
-              {code}
-            </SyntaxHighlighter>
-          </div>
-        </Card>
-      </div>
-    </div>
+          <motion.div
+            key={`variables-${currentStep}`}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, delay: 0.4 }}
+          >
+            <VariablePanel variables={step.variables} />
+          </motion.div>
+        </>
+      }
+      rightContent={
+        <AnimatedCodeEditor
+          code={code}
+          language="typescript"
+          highlightedLines={step.highlightedLines}
+        />
+      }
+      controls={
+        <SimpleStepControls
+          currentStep={currentStep}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStep}
+        />
+      }
+    />
   );
 };
