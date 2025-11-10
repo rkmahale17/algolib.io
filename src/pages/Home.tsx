@@ -1,6 +1,5 @@
 import { BookOpen, Search, Sparkles, TrendingUp, Trophy, Coffee, Target, Award } from 'lucide-react';
 import { algorithms, categories } from '@/data/algorithms';
-import { blind75Problems } from '@/data/blind75';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -96,14 +95,6 @@ const Home = () => {
       algorithms.some(algo => algo.id === p.algorithm_id)
     ).length;
     const total = algorithms.length;
-    return { completed, total, percentage: Math.round((completed / total) * 100) };
-  }, [userProgress]);
-
-  const blind75Progress = useMemo(() => {
-    const completed = userProgress.filter(p => 
-      blind75Problems.some(problem => problem.id === p.algorithm_id)
-    ).length;
-    const total = blind75Problems.length;
     return { completed, total, percentage: Math.round((completed / total) * 100) };
   }, [userProgress]);
 
@@ -266,19 +257,6 @@ const Home = () => {
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Step-by-step visualizations of 72+ algorithms. Watch code come to life with interactive animations.
             </p>
-
-            {/* Blind 75 Badge with Animation */}
-            <Link to="/blind75" className="inline-block">
-              <div className="group relative inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-gradient-to-r from-primary/20 via-secondary/20 to-primary/20 border-2 border-primary/30 hover:border-primary/50 transition-all duration-300 hover:scale-105 animate-fade-in">
-                <Target className="w-5 h-5 text-primary animate-pulse" />
-                <span className="text-lg font-bold gradient-text">Blind 75 Problems</span>
-                <Badge variant="secondary" className="bg-green-500/20 text-green-600 border-green-500/30">
-                  <Sparkles className="w-3 h-3 mr-1" />
-                  BETA
-                </Badge>
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
-              </div>
-            </Link>
 
             {/* Stats */}
             <div className="flex items-center justify-center gap-8 pt-8">
