@@ -431,9 +431,12 @@ export const SetMatrixZeroesVisualization = () => {
   }
 }`;
 
-  const currentStep = steps[currentStepIndex];
+  const currentStep = steps[Math.min(currentStepIndex, steps.length - 1)];
 
   const getCellColor = (row: number, col: number) => {
+    if (!currentStep?.matrix?.[row] || currentStep.matrix[row][col] === undefined) {
+      return 'bg-muted text-muted-foreground border-border';
+    }
     const value = currentStep.matrix[row][col];
     
     if (row === currentStep.currentRow && col === currentStep.currentCol) {

@@ -375,9 +375,10 @@ export const SpiralMatrixVisualization = () => {
   return result;
 }`;
 
-  const currentStep = steps[currentStepIndex];
+  const currentStep = steps[Math.min(currentStepIndex, steps.length - 1)];
 
   const getCellColor = (row: number, col: number) => {
+    if (!currentStep?.matrix || !currentStep?.visited?.[row]) return 'bg-muted text-muted-foreground border-border';
     if (row === currentStep.currentRow && col === currentStep.currentCol) {
       return 'bg-primary text-primary-foreground border-primary shadow-lg scale-110';
     }

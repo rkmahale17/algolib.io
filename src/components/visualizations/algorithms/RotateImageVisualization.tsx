@@ -260,9 +260,10 @@ export const RotateImageVisualization = () => {
   }
 }`;
 
-  const currentStep = steps[currentStepIndex];
+  const currentStep = steps[Math.min(currentStepIndex, steps.length - 1)];
 
   const getCellColor = (row: number, col: number) => {
+    if (!currentStep?.swapWith) return 'bg-muted text-foreground border-border';
     if (currentStep.swapWith.some(([r, c]) => r === row && c === col)) {
       return 'bg-destructive/80 text-destructive-foreground border-destructive shadow-lg';
     }
@@ -271,6 +272,10 @@ export const RotateImageVisualization = () => {
     }
     return 'bg-muted text-foreground border-border';
   };
+
+  if (!currentStep?.matrix) {
+    return <div className="p-4 text-center">Loading visualization...</div>;
+  }
 
   return (
     <div className="w-full h-full flex flex-col gap-4 p-4">
