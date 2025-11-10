@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Editor from '@monaco-editor/react';
 import { motion } from 'framer-motion';
 import { useTheme } from 'next-themes';
@@ -17,7 +17,8 @@ export const AnimatedCodeEditor = ({
   className = '' 
 }: AnimatedCodeEditorProps) => {
   const editorRef = useRef<any>(null);
-  const { theme } = useTheme();
+  const { theme, resolvedTheme } = useTheme();
+  const [decorations, setDecorations] = useState<string[]>([]);
 
   useEffect(() => {
     if (!editorRef.current) return;
@@ -27,14 +28,13 @@ export const AnimatedCodeEditor = ({
     if (!model) return;
 
     // Clear previous decorations
-    editor.deltaDecorations(
-      editor.getModel().getAllDecorations().map((d: any) => d.id),
-      []
-    );
+    const newDecorations = decorations.length > 0 
+      ? editor.deltaDecorations(decorations, [])
+      : [];
 
     // Add new decorations for highlighted lines
     if (highlightedLines.length > 0) {
-      const decorations = highlightedLines.map(lineNumber => ({
+      const newDecs = highlightedLines.map(lineNumber => ({
         range: {
           startLineNumber: lineNumber,
           startColumn: 1,
@@ -48,12 +48,15 @@ export const AnimatedCodeEditor = ({
         },
       }));
 
-      editor.deltaDecorations([], decorations);
+      const ids = editor.deltaDecorations(newDecorations, newDecs);
+      setDecorations(ids);
 
-      // Scroll to highlighted line
+      // Scroll to highlighted line smoothly
       if (highlightedLines.length > 0) {
-        editor.revealLineInCenter(highlightedLines[0]);
+        editor.revealLineInCenter(highlightedLines[0], 1);
       }
+    } else {
+      setDecorations([]);
     }
   }, [highlightedLines]);
 
@@ -75,7 +78,7 @@ export const AnimatedCodeEditor = ({
         height="500px"
         language={language.toLowerCase()}
         value={code}
-        theme={theme === 'dark' ? 'vs-dark' : 'light'}
+        theme={(resolvedTheme || theme) === 'dark' ? 'vs-dark' : 'light'}
         onMount={handleEditorDidMount}
         options={{
           readOnly: true,
@@ -94,6 +97,7 @@ export const AnimatedCodeEditor = ({
           folding: false,
           lineDecorationsWidth: 10,
           lineNumbersMinChars: 3,
+          smoothScrolling: true,
         }}
       />
       <style>{`
