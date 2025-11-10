@@ -33,8 +33,8 @@ export const LongestCommonSubsequenceVisualization = () => {
       char2: '',
       variables: { text1: '"abcde"', text2: '"ace"' },
       explanation: "Starting with text1 = 'abcde' and text2 = 'ace'. Find longest common subsequence.",
-      highlightedLines: [1],
-      lineExecution: "function longestCommonSubsequence(text1: string, text2: string): number {"
+      highlightedLines: [1, 2, 3, 4],
+      lineExecution: "function longestCommonSubsequence(text1: string, text2: string): number"
     },
     {
       dp: [],
@@ -44,8 +44,8 @@ export const LongestCommonSubsequenceVisualization = () => {
       char2: '',
       variables: { m: 5, n: 3 },
       explanation: "Get lengths: m = text1.length = 5, n = text2.length = 3.",
-      highlightedLines: [2],
-      lineExecution: "const m = text1.length, n = text2.length;"
+      highlightedLines: [5],
+      lineExecution: "const m = text1.length, n = text2.length; // m=5, n=3"
     },
     {
       dp: [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
@@ -55,7 +55,7 @@ export const LongestCommonSubsequenceVisualization = () => {
       char2: '',
       variables: { m: 5, n: 3, dpSize: '(6 × 4)' },
       explanation: "Create (m+1) × (n+1) DP table = 6 × 4. Initialize all to 0.",
-      highlightedLines: [3],
+      highlightedLines: [6, 7],
       lineExecution: "const dp = Array(m + 1).fill(0).map(() => Array(n + 1).fill(0));"
     },
     {
@@ -66,8 +66,19 @@ export const LongestCommonSubsequenceVisualization = () => {
       char2: '',
       variables: { i: 1, m: 5 },
       explanation: "Start outer loop: i = 1. Check: 1 <= 5? Yes.",
-      highlightedLines: [5],
-      lineExecution: "for (let i = 1; i <= m; i++)"
+      highlightedLines: [9],
+      lineExecution: "for (let i = 1; i <= m; i++) // i=1"
+    },
+    {
+      dp: [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
+      i: 1,
+      j: 1,
+      char1: '',
+      char2: '',
+      variables: { i: 1, j: 1 },
+      explanation: "Start inner loop: j = 1. Check: 1 <= 3? Yes.",
+      highlightedLines: [10],
+      lineExecution: "for (let j = 1; j <= n; j++) // j=1"
     },
     {
       dp: [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
@@ -77,8 +88,8 @@ export const LongestCommonSubsequenceVisualization = () => {
       char2: 'a',
       variables: { i: 1, j: 1, 'text1[0]': 'a', 'text2[0]': 'a' },
       explanation: "i=1, j=1: Compare text1[0]='a' with text2[0]='a'. Match!",
-      highlightedLines: [6, 7],
-      lineExecution: "if (text1[i - 1] === text2[j - 1]) -> true"
+      highlightedLines: [11],
+      lineExecution: "if (text1[i - 1] === text2[j - 1]) // 'a' === 'a' -> true"
     },
     {
       dp: [[0,0,0,0],[0,1,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
@@ -87,20 +98,64 @@ export const LongestCommonSubsequenceVisualization = () => {
       char1: 'a',
       char2: 'a',
       variables: { 'dp[1][1]': 1 },
-      explanation: "Characters match: dp[1][1] = dp[0][0] + 1 = 1.",
-      highlightedLines: [8],
-      lineExecution: "dp[1][1] = dp[0][0] + 1 = 1"
+      explanation: "Characters match: dp[1][1] = dp[0][0] + 1 = 0 + 1 = 1.",
+      highlightedLines: [12],
+      lineExecution: "dp[i][j] = dp[i - 1][j - 1] + 1; // dp[1][1] = 1"
     },
     {
-      dp: [[0,0,0,0],[0,1,1,1],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
+      dp: [[0,0,0,0],[0,1,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
       i: 1,
       j: 2,
       char1: 'a',
       char2: 'c',
       variables: { i: 1, j: 2, 'text1[0]': 'a', 'text2[1]': 'c' },
-      explanation: "i=1, j=2: Compare 'a' with 'c'. No match. Take max of adjacent cells.",
-      highlightedLines: [10],
-      lineExecution: "dp[1][2] = max(dp[0][2], dp[1][1]) = 1"
+      explanation: "i=1, j=2: Compare text1[0]='a' with text2[1]='c'. No match.",
+      highlightedLines: [11],
+      lineExecution: "if (text1[i - 1] === text2[j - 1]) // 'a' === 'c' -> false"
+    },
+    {
+      dp: [[0,0,0,0],[0,1,1,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
+      i: 1,
+      j: 2,
+      char1: 'a',
+      char2: 'c',
+      variables: { 'dp[1][2]': 1 },
+      explanation: "No match: dp[1][2] = max(dp[0][2], dp[1][1]) = max(0, 1) = 1.",
+      highlightedLines: [14, 15, 16],
+      lineExecution: "dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]); // max(0, 1) = 1"
+    },
+    {
+      dp: [[0,0,0,0],[0,1,1,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
+      i: 1,
+      j: 3,
+      char1: 'a',
+      char2: 'e',
+      variables: { i: 1, j: 3, 'text1[0]': 'a', 'text2[2]': 'e' },
+      explanation: "i=1, j=3: Compare text1[0]='a' with text2[2]='e'. No match.",
+      highlightedLines: [11],
+      lineExecution: "if (text1[i - 1] === text2[j - 1]) // 'a' === 'e' -> false"
+    },
+    {
+      dp: [[0,0,0,0],[0,1,1,1],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
+      i: 1,
+      j: 3,
+      char1: 'a',
+      char2: 'e',
+      variables: { 'dp[1][3]': 1 },
+      explanation: "No match: dp[1][3] = max(dp[0][3], dp[1][2]) = max(0, 1) = 1.",
+      highlightedLines: [14, 15, 16],
+      lineExecution: "dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]); // max(0, 1) = 1"
+    },
+    {
+      dp: [[0,0,0,0],[0,1,1,1],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
+      i: 2,
+      j: 1,
+      char1: 'b',
+      char2: 'a',
+      variables: { i: 2, j: 1, 'text1[1]': 'b', 'text2[0]': 'a' },
+      explanation: "i=2, j=1: Compare text1[1]='b' with text2[0]='a'. No match.",
+      highlightedLines: [11],
+      lineExecution: "if (text1[i - 1] === text2[j - 1]) // 'b' === 'a' -> false"
     },
     {
       dp: [[0,0,0,0],[0,1,1,1],[0,1,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
@@ -108,76 +163,142 @@ export const LongestCommonSubsequenceVisualization = () => {
       j: 1,
       char1: 'b',
       char2: 'a',
-      variables: { i: 2, j: 1, 'text1[1]': 'b', 'text2[0]': 'a' },
-      explanation: "i=2, j=1: Compare 'b' with 'a'. No match. dp[2][1] = max(dp[1][1], dp[2][0]) = 1.",
-      highlightedLines: [10],
-      lineExecution: "dp[2][1] = max(dp[1][1], dp[2][0]) = 1"
+      variables: { 'dp[2][1]': 1 },
+      explanation: "No match: dp[2][1] = max(dp[1][1], dp[2][0]) = max(1, 0) = 1.",
+      highlightedLines: [14, 15, 16],
+      lineExecution: "dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]); // max(1, 0) = 1"
     },
     {
-      dp: [[0,0,0,0],[0,1,1,1],[0,1,1,1],[0,1,0,0],[0,0,0,0],[0,0,0,0]],
+      dp: [[0,0,0,0],[0,1,1,1],[0,1,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
       i: 2,
       j: 2,
       char1: 'b',
       char2: 'c',
-      variables: { i: 2, j: 2 },
-      explanation: "i=2, j=2: Compare 'b' with 'c'. No match. dp[2][2] = 1.",
-      highlightedLines: [10],
-      lineExecution: "dp[2][2] = 1"
+      variables: { i: 2, j: 2, 'text1[1]': 'b', 'text2[1]': 'c' },
+      explanation: "i=2, j=2: Compare text1[1]='b' with text2[1]='c'. No match.",
+      highlightedLines: [11],
+      lineExecution: "if (text1[i - 1] === text2[j - 1]) // 'b' === 'c' -> false"
     },
     {
-      dp: [[0,0,0,0],[0,1,1,1],[0,1,1,1],[0,1,1,1],[0,0,0,0],[0,0,0,0]],
+      dp: [[0,0,0,0],[0,1,1,1],[0,1,1,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
+      i: 2,
+      j: 2,
+      char1: 'b',
+      char2: 'c',
+      variables: { 'dp[2][2]': 1 },
+      explanation: "No match: dp[2][2] = max(dp[1][2], dp[2][1]) = max(1, 1) = 1.",
+      highlightedLines: [14, 15, 16],
+      lineExecution: "dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]); // max(1, 1) = 1"
+    },
+    {
+      dp: [[0,0,0,0],[0,1,1,1],[0,1,1,1],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
+      i: 2,
+      j: 3,
+      char1: 'b',
+      char2: 'e',
+      variables: { i: 2, j: 3 },
+      explanation: "i=2, j=3: Compare 'b' with 'e'. No match. dp[2][3] = 1.",
+      highlightedLines: [14, 15, 16],
+      lineExecution: "dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]); // max(1, 1) = 1"
+    },
+    {
+      dp: [[0,0,0,0],[0,1,1,1],[0,1,1,1],[0,1,0,0],[0,0,0,0],[0,0,0,0]],
       i: 3,
       j: 1,
       char1: 'c',
       char2: 'a',
-      variables: { i: 3, j: 1 },
+      variables: { i: 3, j: 1, 'text1[2]': 'c', 'text2[0]': 'a' },
       explanation: "i=3, j=1: Compare 'c' with 'a'. No match. dp[3][1] = 1.",
-      highlightedLines: [10],
-      lineExecution: "dp[3][1] = 1"
+      highlightedLines: [14, 15, 16],
+      lineExecution: "dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]); // max(1, 0) = 1"
     },
     {
-      dp: [[0,0,0,0],[0,1,1,1],[0,1,1,1],[0,1,1,1],[0,0,0,0],[0,0,0,0]],
+      dp: [[0,0,0,0],[0,1,1,1],[0,1,1,1],[0,1,1,0],[0,0,0,0],[0,0,0,0]],
       i: 3,
       j: 2,
       char1: 'c',
       char2: 'c',
       variables: { i: 3, j: 2, 'text1[2]': 'c', 'text2[1]': 'c' },
       explanation: "i=3, j=2: Compare text1[2]='c' with text2[1]='c'. Match!",
-      highlightedLines: [7],
-      lineExecution: "if (text1[i - 1] === text2[j - 1]) -> true"
+      highlightedLines: [11],
+      lineExecution: "if (text1[i - 1] === text2[j - 1]) // 'c' === 'c' -> true"
     },
     {
-      dp: [[0,0,0,0],[0,1,1,1],[0,1,1,1],[0,1,2,2],[0,0,0,0],[0,0,0,0]],
+      dp: [[0,0,0,0],[0,1,1,1],[0,1,1,1],[0,1,2,0],[0,0,0,0],[0,0,0,0]],
       i: 3,
       j: 2,
       char1: 'c',
       char2: 'c',
       variables: { 'dp[3][2]': 2 },
-      explanation: "Characters match: dp[3][2] = dp[2][1] + 1 = 2. Found 'ac' so far.",
-      highlightedLines: [8],
-      lineExecution: "dp[3][2] = dp[2][1] + 1 = 2"
+      explanation: "Characters match: dp[3][2] = dp[2][1] + 1 = 1 + 1 = 2. Found 'ac' so far.",
+      highlightedLines: [12],
+      lineExecution: "dp[i][j] = dp[i - 1][j - 1] + 1; // dp[3][2] = 2"
     },
     {
-      dp: [[0,0,0,0],[0,1,1,1],[0,1,1,1],[0,1,2,2],[0,1,2,2],[0,0,0,0]],
+      dp: [[0,0,0,0],[0,1,1,1],[0,1,1,1],[0,1,2,2],[0,0,0,0],[0,0,0,0]],
+      i: 3,
+      j: 3,
+      char1: 'c',
+      char2: 'e',
+      variables: { i: 3, j: 3 },
+      explanation: "i=3, j=3: Compare 'c' with 'e'. No match. dp[3][3] = 2.",
+      highlightedLines: [14, 15, 16],
+      lineExecution: "dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]); // max(1, 2) = 2"
+    },
+    {
+      dp: [[0,0,0,0],[0,1,1,1],[0,1,1,1],[0,1,2,2],[0,1,0,0],[0,0,0,0]],
+      i: 4,
+      j: 1,
+      char1: 'd',
+      char2: 'a',
+      variables: { i: 4, j: 1 },
+      explanation: "i=4, j=1: Compare 'd' with 'a'. No match. dp[4][1] = 1.",
+      highlightedLines: [14, 15, 16],
+      lineExecution: "dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]); // max(1, 0) = 1"
+    },
+    {
+      dp: [[0,0,0,0],[0,1,1,1],[0,1,1,1],[0,1,2,2],[0,1,2,0],[0,0,0,0]],
       i: 4,
       j: 2,
       char1: 'd',
       char2: 'c',
       variables: { i: 4, j: 2 },
       explanation: "i=4, j=2: Compare 'd' with 'c'. No match. dp[4][2] = max(dp[3][2], dp[4][1]) = 2.",
-      highlightedLines: [10],
-      lineExecution: "dp[4][2] = 2"
+      highlightedLines: [14, 15, 16],
+      lineExecution: "dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]); // max(2, 1) = 2"
     },
     {
-      dp: [[0,0,0,0],[0,1,1,1],[0,1,1,1],[0,1,2,2],[0,1,2,2],[0,1,2,2]],
+      dp: [[0,0,0,0],[0,1,1,1],[0,1,1,1],[0,1,2,2],[0,1,2,2],[0,0,0,0]],
+      i: 4,
+      j: 3,
+      char1: 'd',
+      char2: 'e',
+      variables: { i: 4, j: 3 },
+      explanation: "i=4, j=3: Compare 'd' with 'e'. No match. dp[4][3] = 2.",
+      highlightedLines: [14, 15, 16],
+      lineExecution: "dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]); // max(2, 2) = 2"
+    },
+    {
+      dp: [[0,0,0,0],[0,1,1,1],[0,1,1,1],[0,1,2,2],[0,1,2,2],[0,1,0,0]],
+      i: 5,
+      j: 1,
+      char1: 'e',
+      char2: 'a',
+      variables: { i: 5, j: 1 },
+      explanation: "i=5, j=1: Compare 'e' with 'a'. No match. dp[5][1] = 1.",
+      highlightedLines: [14, 15, 16],
+      lineExecution: "dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]); // max(1, 0) = 1"
+    },
+    {
+      dp: [[0,0,0,0],[0,1,1,1],[0,1,1,1],[0,1,2,2],[0,1,2,2],[0,1,2,0]],
       i: 5,
       j: 2,
       char1: 'e',
       char2: 'c',
       variables: { i: 5, j: 2 },
       explanation: "i=5, j=2: Compare 'e' with 'c'. No match. dp[5][2] = 2.",
-      highlightedLines: [10],
-      lineExecution: "dp[5][2] = 2"
+      highlightedLines: [14, 15, 16],
+      lineExecution: "dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]); // max(2, 1) = 2"
     },
     {
       dp: [[0,0,0,0],[0,1,1,1],[0,1,1,1],[0,1,2,2],[0,1,2,2],[0,1,2,2]],
@@ -187,8 +308,8 @@ export const LongestCommonSubsequenceVisualization = () => {
       char2: 'e',
       variables: { i: 5, j: 3, 'text1[4]': 'e', 'text2[2]': 'e' },
       explanation: "i=5, j=3: Compare text1[4]='e' with text2[2]='e'. Match!",
-      highlightedLines: [7],
-      lineExecution: "if (text1[i - 1] === text2[j - 1]) -> true"
+      highlightedLines: [11],
+      lineExecution: "if (text1[i - 1] === text2[j - 1]) // 'e' === 'e' -> true"
     },
     {
       dp: [[0,0,0,0],[0,1,1,1],[0,1,1,1],[0,1,2,2],[0,1,2,2],[0,1,2,3]],
@@ -197,9 +318,9 @@ export const LongestCommonSubsequenceVisualization = () => {
       char1: 'e',
       char2: 'e',
       variables: { 'dp[5][3]': 3 },
-      explanation: "Characters match: dp[5][3] = dp[4][2] + 1 = 3. Found 'ace'!",
-      highlightedLines: [8],
-      lineExecution: "dp[5][3] = dp[4][2] + 1 = 3"
+      explanation: "Characters match: dp[5][3] = dp[4][2] + 1 = 2 + 1 = 3. Found 'ace'!",
+      highlightedLines: [12],
+      lineExecution: "dp[i][j] = dp[i - 1][j - 1] + 1; // dp[5][3] = 3"
     },
     {
       dp: [[0,0,0,0],[0,1,1,1],[0,1,1,1],[0,1,2,2],[0,1,2,2],[0,1,2,3]],
@@ -209,8 +330,8 @@ export const LongestCommonSubsequenceVisualization = () => {
       char2: '',
       variables: { i: 6, m: 5 },
       explanation: "Check loop condition: i (6) <= m (5)? No, exit outer loop.",
-      highlightedLines: [5],
-      lineExecution: "for (let i = 6; i <= m; i++) -> false"
+      highlightedLines: [9],
+      lineExecution: "for (let i = 1; i <= m; i++) // i=6, 6 <= 5 -> false, exit"
     },
     {
       dp: [[0,0,0,0],[0,1,1,1],[0,1,1,1],[0,1,2,2],[0,1,2,2],[0,1,2,3]],
@@ -220,8 +341,8 @@ export const LongestCommonSubsequenceVisualization = () => {
       char2: '',
       variables: { m: 5, n: 3, result: 3 },
       explanation: "Return dp[m][n] = dp[5][3] = 3. LCS length is 3.",
-      highlightedLines: [15],
-      lineExecution: "return dp[m][n] = 3"
+      highlightedLines: [20],
+      lineExecution: "return dp[m][n]; // dp[5][3] = 3"
     },
     {
       dp: [[0,0,0,0],[0,1,1,1],[0,1,1,1],[0,1,2,2],[0,1,2,2],[0,1,2,3]],
@@ -231,7 +352,7 @@ export const LongestCommonSubsequenceVisualization = () => {
       char2: '',
       variables: { result: 3, lcs: '"ace"' },
       explanation: "Algorithm complete! Longest common subsequence is 'ace'. Time: O(m×n), Space: O(m×n).",
-      highlightedLines: [15],
+      highlightedLines: [20],
       lineExecution: "Result: 3 (LCS = 'ace')"
     }
   ];
