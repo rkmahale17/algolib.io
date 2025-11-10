@@ -60,7 +60,7 @@ export const ValidPalindromeVisualization = () => {
       left: 0,
       right: 20,
       message: "Initialize: left=0, right=20 (last index)",
-      highlightedLines: [4, 5]
+      highlightedLines: [4]
     },
     {
       s: "A man, a plan, a canal: Panama",
@@ -78,7 +78,7 @@ export const ValidPalindromeVisualization = () => {
       left: 1,
       right: 19,
       message: "Move pointers: left++, right-- → left=1, right=19",
-      highlightedLines: [11, 12]
+      highlightedLines: [11]
     },
     {
       s: "A man, a plan, a canal: Panama",
@@ -98,7 +98,7 @@ export const ValidPalindromeVisualization = () => {
       leftChar: 'a',
       rightChar: 'a',
       message: "Compare: cleaned[2]='a' vs cleaned[18]='a' → Match ✓",
-      highlightedLines: [8, 11, 12]
+      highlightedLines: [8]
     },
     {
       s: "A man, a plan, a canal: Panama",
@@ -108,7 +108,7 @@ export const ValidPalindromeVisualization = () => {
       leftChar: 'n',
       rightChar: 'n',
       message: "Compare: cleaned[3]='n' vs cleaned[17]='n' → Match ✓",
-      highlightedLines: [8, 11, 12]
+      highlightedLines: [8]
     },
     {
       s: "A man, a plan, a canal: Panama",
@@ -118,7 +118,7 @@ export const ValidPalindromeVisualization = () => {
       leftChar: 'a',
       rightChar: 'a',
       message: "Compare: cleaned[4]='a' vs cleaned[16]='a' → Match ✓",
-      highlightedLines: [8, 11, 12]
+      highlightedLines: [8]
     },
     {
       s: "A man, a plan, a canal: Panama",
@@ -128,7 +128,7 @@ export const ValidPalindromeVisualization = () => {
       leftChar: 'p',
       rightChar: 'p',
       message: "Compare: cleaned[5]='p' vs cleaned[15]='p' → Match ✓",
-      highlightedLines: [8, 11, 12]
+      highlightedLines: [8]
     },
     {
       s: "A man, a plan, a canal: Panama",
@@ -138,7 +138,7 @@ export const ValidPalindromeVisualization = () => {
       leftChar: 'l',
       rightChar: 'l',
       message: "Compare: cleaned[6]='l' vs cleaned[14]='l' → Match ✓",
-      highlightedLines: [8, 11, 12]
+      highlightedLines: [8]
     },
     {
       s: "A man, a plan, a canal: Panama",
@@ -148,7 +148,7 @@ export const ValidPalindromeVisualization = () => {
       leftChar: 'a',
       rightChar: 'a',
       message: "Compare: cleaned[7]='a' vs cleaned[13]='a' → Match ✓",
-      highlightedLines: [8, 11, 12]
+      highlightedLines: [8]
     },
     {
       s: "A man, a plan, a canal: Panama",
@@ -158,7 +158,7 @@ export const ValidPalindromeVisualization = () => {
       leftChar: 'n',
       rightChar: 'n',
       message: "Compare: cleaned[8]='n' vs cleaned[12]='n' → Match ✓",
-      highlightedLines: [8, 11, 12]
+      highlightedLines: [8]
     },
     {
       s: "A man, a plan, a canal: Panama",
@@ -168,7 +168,7 @@ export const ValidPalindromeVisualization = () => {
       leftChar: 'a',
       rightChar: 'a',
       message: "Compare: cleaned[9]='a' vs cleaned[11]='a' → Match ✓",
-      highlightedLines: [8, 11, 12]
+      highlightedLines: [8]
     },
     {
       s: "A man, a plan, a canal: Panama",

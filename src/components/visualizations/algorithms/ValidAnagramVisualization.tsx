@@ -64,7 +64,7 @@ export const ValidAnagramVisualization = () => {
       tCount: { n: 1 },
       currentChar: 'a',
       message: "i=0: Count s[0]='a' → sCount['a']=1, t[0]='n' → tCount['n']=1",
-      highlightedLines: [8, 9]
+      highlightedLines: [8]
     },
     {
       s: "anagram",
@@ -73,7 +73,7 @@ export const ValidAnagramVisualization = () => {
       tCount: { n: 1, a: 1 },
       currentChar: 'n',
       message: "i=1: Count s[1]='n' → sCount['n']=1, t[1]='a' → tCount['a']=1",
-      highlightedLines: [8, 9]
+      highlightedLines: [8]
     },
     {
       s: "anagram",
@@ -82,7 +82,7 @@ export const ValidAnagramVisualization = () => {
       tCount: { n: 1, a: 2 },
       currentChar: 'a',
       message: "i=2: Count s[2]='a' → sCount['a']=2, t[2]='a' → tCount['a']=2",
-      highlightedLines: [8, 9]
+      highlightedLines: [8]
     },
     {
       s: "anagram",
@@ -91,7 +91,7 @@ export const ValidAnagramVisualization = () => {
       tCount: { n: 1, a: 2, g: 1 },
       currentChar: 'g',
       message: "i=3: Count s[3]='g' → sCount['g']=1, t[3]='g' → tCount['g']=1",
-      highlightedLines: [8, 9]
+      highlightedLines: [8]
     },
     {
       s: "anagram",
@@ -100,7 +100,7 @@ export const ValidAnagramVisualization = () => {
       tCount: { n: 1, a: 3, g: 1 },
       currentChar: 'a',
       message: "i=4: Count s[4]='a' → sCount['a']=3, t[4]='a' → tCount['a']=3",
-      highlightedLines: [8, 9]
+      highlightedLines: [8]
     },
     {
       s: "anagram",
@@ -109,7 +109,7 @@ export const ValidAnagramVisualization = () => {
       tCount: { n: 1, a: 3, g: 1, r: 1 },
       currentChar: 'r',
       message: "i=5: Count s[5]='r' → sCount['r']=1, t[5]='r' → tCount['r']=1",
-      highlightedLines: [8, 9]
+      highlightedLines: [8]
     },
     {
       s: "anagram",
@@ -118,7 +118,7 @@ export const ValidAnagramVisualization = () => {
       tCount: { n: 1, a: 4, g: 1, r: 1, m: 1 },
       currentChar: 'm',
       message: "i=6: Count s[6]='m' → sCount['m']=1, t[6]='a' → tCount['a']=4",
-      highlightedLines: [8, 9]
+      highlightedLines: [8]
     },
     {
       s: "anagram",
@@ -135,7 +135,7 @@ export const ValidAnagramVisualization = () => {
       tCount: { n: 1, a: 4, g: 1, r: 1, m: 1 },
       checking: 'a',
       message: "Check 'a': sCount['a']=3 vs tCount['a']=4 → NOT EQUAL ✗",
-      highlightedLines: [13, 14]
+      highlightedLines: [13]
     },
     {
       s: "anagram",

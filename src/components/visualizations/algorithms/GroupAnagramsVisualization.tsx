@@ -50,7 +50,7 @@ export const GroupAnagramsVisualization = () => {
       map: {},
       result: [],
       message: "Process str[0]='eat': Split into ['e','a','t']",
-      highlightedLines: [4, 5]
+      highlightedLines: [5]
     },
     {
       strs: ["eat", "tea", "tan", "ate", "nat", "bat"],
@@ -70,7 +70,7 @@ export const GroupAnagramsVisualization = () => {
       map: { aet: [] },
       result: [],
       message: "Key 'aet' not in map, create new array: map['aet']=[]",
-      highlightedLines: [7, 8]
+      highlightedLines: [7]
     },
     {
       strs: ["eat", "tea", "tan", "ate", "nat", "bat"],
@@ -89,7 +89,7 @@ export const GroupAnagramsVisualization = () => {
       map: { aet: ["eat"] },
       result: [],
       message: "Process str[1]='tea': Sort → 'aet' (same key as 'eat'!)",
-      highlightedLines: [4, 5]
+      highlightedLines: [5]
     },
     {
       strs: ["eat", "tea", "tan", "ate", "nat", "bat"],
@@ -108,7 +108,7 @@ export const GroupAnagramsVisualization = () => {
       map: { aet: ["eat", "tea"] },
       result: [],
       message: "Process str[2]='tan': Sort → 'ant'",
-      highlightedLines: [4, 5]
+      highlightedLines: [5]
     },
     {
       strs: ["eat", "tea", "tan", "ate", "nat", "bat"],
@@ -118,7 +118,7 @@ export const GroupAnagramsVisualization = () => {
       map: { aet: ["eat", "tea"], ant: [] },
       result: [],
       message: "New key 'ant', create map['ant']=[]",
-      highlightedLines: [7, 8]
+      highlightedLines: [7]
     },
     {
       strs: ["eat", "tea", "tan", "ate", "nat", "bat"],
@@ -138,7 +138,7 @@ export const GroupAnagramsVisualization = () => {
       map: { aet: ["eat", "tea"], ant: ["tan"] },
       result: [],
       message: "Process str[3]='ate': Sort → 'aet' (matches 'eat','tea')",
-      highlightedLines: [4, 5]
+      highlightedLines: [5]
     },
     {
       strs: ["eat", "tea", "tan", "ate", "nat", "bat"],
@@ -158,7 +158,7 @@ export const GroupAnagramsVisualization = () => {
       map: { aet: ["eat", "tea", "ate"], ant: ["tan"] },
       result: [],
       message: "Process str[4]='nat': Sort → 'ant' (matches 'tan')",
-      highlightedLines: [4, 5]
+      highlightedLines: [5]
     },
     {
       strs: ["eat", "tea", "tan", "ate", "nat", "bat"],
@@ -178,7 +178,7 @@ export const GroupAnagramsVisualization = () => {
       map: { aet: ["eat", "tea", "ate"], ant: ["tan", "nat"] },
       result: [],
       message: "Process str[5]='bat': Sort → 'abt' (new key)",
-      highlightedLines: [4, 5]
+      highlightedLines: [5]
     },
     {
       strs: ["eat", "tea", "tan", "ate", "nat", "bat"],
@@ -188,7 +188,7 @@ export const GroupAnagramsVisualization = () => {
       map: { aet: ["eat", "tea", "ate"], ant: ["tan", "nat"], abt: [] },
       result: [],
       message: "Create map['abt']=[]",
-      highlightedLines: [7, 8]
+      highlightedLines: [7]
     },
     {
       strs: ["eat", "tea", "tan", "ate", "nat", "bat"],

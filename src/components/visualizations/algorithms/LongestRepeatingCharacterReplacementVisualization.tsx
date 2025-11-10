@@ -51,7 +51,7 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
       maxCount: 0,
       maxLength: 0,
       message: "Initialize: left=0, right will start at 0, k=1 (can replace 1 char)",
-      highlightedLines: [2, 3, 4, 5]
+      highlightedLines: [2]
     },
     {
       s: "AABABBA",
@@ -62,7 +62,7 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
       maxCount: 1,
       maxLength: 1,
       message: "right=0: Add 'A' to window, charCount['A']=1, maxCount=1, window='A' (valid)",
-      highlightedLines: [8, 9]
+      highlightedLines: [9]
     },
     {
       s: "AABABBA",
@@ -95,7 +95,7 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
       maxCount: 2,
       maxLength: 2,
       message: "right=1: Add 'A' to window, charCount['A']=2, maxCount=2, window='AA'",
-      highlightedLines: [8, 9]
+      highlightedLines: [9]
     },
     {
       s: "AABABBA",
@@ -106,7 +106,7 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
       maxCount: 2,
       maxLength: 2,
       message: "Window size (2) - maxCount (2) = 0 ≤ k, maxLength=2",
-      highlightedLines: [11, 15]
+      highlightedLines: [15]
     },
     {
       s: "AABABBA",
@@ -117,7 +117,7 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
       maxCount: 2,
       maxLength: 3,
       message: "right=2: Add 'B' to window, charCount['B']=1, window='AAB' (can replace 1 B)",
-      highlightedLines: [8, 9]
+      highlightedLines: [9]
     },
     {
       s: "AABABBA",
@@ -128,7 +128,7 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
       maxCount: 2,
       maxLength: 3,
       message: "Window size (3) - maxCount (2) = 1 ≤ k, valid window, maxLength=3",
-      highlightedLines: [11, 15]
+      highlightedLines: [15]
     },
     {
       s: "AABABBA",
@@ -139,7 +139,7 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
       maxCount: 3,
       maxLength: 4,
       message: "right=3: Add 'A' to window, charCount['A']=3, maxCount=3, window='AABA'",
-      highlightedLines: [8, 9]
+      highlightedLines: [9]
     },
     {
       s: "AABABBA",
@@ -150,7 +150,7 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
       maxCount: 3,
       maxLength: 4,
       message: "Window size (4) - maxCount (3) = 1 ≤ k, maxLength=4",
-      highlightedLines: [11, 15]
+      highlightedLines: [15]
     },
     {
       s: "AABABBA",
@@ -161,7 +161,7 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
       maxCount: 3,
       maxLength: 4,
       message: "right=4: Add 'B' to window, charCount['B']=2, window='AABAB'",
-      highlightedLines: [8, 9]
+      highlightedLines: [9]
     },
     {
       s: "AABABBA",
@@ -183,7 +183,7 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
       maxCount: 3,
       maxLength: 4,
       message: "Shrink: Remove 'A' from left, charCount['A']=2, left=1, window='ABAB'",
-      highlightedLines: [12, 13]
+      highlightedLines: [13]
     },
     {
       s: "AABABBA",
@@ -194,7 +194,7 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
       maxCount: 3,
       maxLength: 4,
       message: "Window size (4) - maxCount (3) = 1 ≤ k, valid again",
-      highlightedLines: [11, 15]
+      highlightedLines: [15]
     },
     {
       s: "AABABBA",
@@ -205,7 +205,7 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
       maxCount: 3,
       maxLength: 5,
       message: "right=5: Add 'B' to window, charCount['B']=3, maxCount=3, window='ABABB'",
-      highlightedLines: [8, 9]
+      highlightedLines: [9]
     },
     {
       s: "AABABBA",
@@ -227,7 +227,7 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
       maxCount: 3,
       maxLength: 5,
       message: "Shrink: Remove 'A' from left, charCount['A']=1, left=2, window='BABB'",
-      highlightedLines: [12, 13]
+      highlightedLines: [13]
     },
     {
       s: "AABABBA",
@@ -238,7 +238,7 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
       maxCount: 3,
       maxLength: 5,
       message: "Window size (4) - maxCount (3) = 1 ≤ k, valid",
-      highlightedLines: [11, 15]
+      highlightedLines: [15]
     },
     {
       s: "AABABBA",
@@ -249,7 +249,7 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
       maxCount: 3,
       maxLength: 5,
       message: "right=6: Add 'A' to window, charCount['A']=2, window='BABBA'",
-      highlightedLines: [8, 9]
+      highlightedLines: [9]
     },
     {
       s: "AABABBA",
@@ -271,7 +271,7 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
       maxCount: 3,
       maxLength: 5,
       message: "Shrink: Remove 'B' from left, charCount['B']=2, left=3, window='ABBA'",
-      highlightedLines: [12, 13]
+      highlightedLines: [13]
     },
     {
       s: "AABABBA",
@@ -282,7 +282,7 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
       maxCount: 3,
       maxLength: 5,
       message: "Window size (4) - maxCount (3) = 1 ≤ k, valid window",
-      highlightedLines: [11, 15]
+      highlightedLines: [15]
     },
     {
       s: "AABABBA",

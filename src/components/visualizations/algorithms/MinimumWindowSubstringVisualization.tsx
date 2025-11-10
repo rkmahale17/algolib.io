@@ -77,7 +77,7 @@ export const MinimumWindowSubstringVisualization = () => {
       result: "",
       resultIndices: [-1, -1],
       message: "Initialize: Build target char count {A:1, B:1, C:1}, need=3 unique chars",
-      highlightedLines: [4, 5, 7, 8, 9, 11, 12]
+      highlightedLines: [4]
     },
     {
       s: "ADOBECODEBANC",
@@ -91,7 +91,7 @@ export const MinimumWindowSubstringVisualization = () => {
       result: "",
       resultIndices: [-1, -1],
       message: "right=0: Add 'A' to window, window['A']=1 matches tCount['A']=1, have=1/3",
-      highlightedLines: [18, 19, 21, 22]
+      highlightedLines: [19]
     },
     {
       s: "ADOBECODEBANC",
@@ -105,7 +105,7 @@ export const MinimumWindowSubstringVisualization = () => {
       result: "",
       resultIndices: [-1, -1],
       message: "right=1: Add 'D' to window (not in target), have=1/3",
-      highlightedLines: [18, 19]
+      highlightedLines: [19]
     },
     {
       s: "ADOBECODEBANC",
@@ -119,7 +119,7 @@ export const MinimumWindowSubstringVisualization = () => {
       result: "",
       resultIndices: [-1, -1],
       message: "right=3: Add 'B' to window, window['B']=1 matches tCount['B']=1, have=2/3",
-      highlightedLines: [18, 19, 21, 22]
+      highlightedLines: [22]
     },
     {
       s: "ADOBECODEBANC",
@@ -133,7 +133,7 @@ export const MinimumWindowSubstringVisualization = () => {
       result: "",
       resultIndices: [-1, -1],
       message: "right=5: Add 'C' to window, window['C']=1 matches tCount['C']=1, have=3/3! Valid window found",
-      highlightedLines: [18, 19, 21, 22]
+      highlightedLines: [22]
     },
     {
       s: "ADOBECODEBANC",
@@ -147,7 +147,7 @@ export const MinimumWindowSubstringVisualization = () => {
       result: "ADOBEC",
       resultIndices: [0, 5],
       message: "Valid window 'ADOBEC' (length=6), save as current result",
-      highlightedLines: [25, 26, 27, 28]
+      highlightedLines: [26]
     },
     {
       s: "ADOBECODEBANC",
@@ -161,7 +161,7 @@ export const MinimumWindowSubstringVisualization = () => {
       result: "ADOBEC",
       resultIndices: [0, 5],
       message: "Shrink: Remove 'A' from left, window['A']=0 < tCount['A']=1, have=2/3, invalid now",
-      highlightedLines: [30, 31, 32, 33, 34]
+      highlightedLines: [32]
     },
     {
       s: "ADOBECODEBANC",
@@ -175,7 +175,7 @@ export const MinimumWindowSubstringVisualization = () => {
       result: "ADOBEC",
       resultIndices: [0, 5],
       message: "Expand to right=9. Found 'A' again. have=3/3, window='DOBECODE' (too long)",
-      highlightedLines: [18, 19, 21, 22]
+      highlightedLines: [19]
     },
     {
       s: "ADOBECODEBANC",
@@ -189,7 +189,7 @@ export const MinimumWindowSubstringVisualization = () => {
       result: "ADOBEC",
       resultIndices: [0, 5],
       message: "Shrink from left: Remove 'D', 'O', 'B', 'E'. Still have=3/3 at left=4",
-      highlightedLines: [30, 34]
+      highlightedLines: [34]
     },
     {
       s: "ADOBECODEBANC",
@@ -203,7 +203,7 @@ export const MinimumWindowSubstringVisualization = () => {
       result: "ADOBEC",
       resultIndices: [0, 5],
       message: "right=10: Add 'B' to window. have=3/3. Window 'CODEAB' length=6",
-      highlightedLines: [18, 19, 21, 22]
+      highlightedLines: [19]
     },
     {
       s: "ADOBECODEBANC",
@@ -217,7 +217,7 @@ export const MinimumWindowSubstringVisualization = () => {
       result: "ADOBEC",
       resultIndices: [0, 5],
       message: "right=12: Add 'C' to window. have=3/3! Window='EBANC' (length=5)",
-      highlightedLines: [18, 19, 21, 22]
+      highlightedLines: [19]
     },
     {
       s: "ADOBECODEBANC",
@@ -273,7 +273,7 @@ export const MinimumWindowSubstringVisualization = () => {
       result: "BANC",
       resultIndices: [9, 12],
       message: "Shrink: Remove 'B' from left, window['B']=0 < tCount['B']=1, have=2/3",
-      highlightedLines: [30, 31, 32, 33, 34]
+      highlightedLines: [32]
     },
     {
       s: "ADOBECODEBANC",
