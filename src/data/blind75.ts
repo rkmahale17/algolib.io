@@ -1287,7 +1287,8 @@ export const blind75Problems: Blind75Problem[] = [
       "String",
       "Sliding Window"
     ],
-    "youtubeUrl": "https://www.youtube.com/watch?v=gqXU1UyA8pk"
+    "youtubeUrl": "https://www.youtube.com/watch?v=gqXU1UyA8pk",
+    "algorithmId": "longest-repeating-character-replacement"
   },
   {
     "id": 52,
@@ -1309,7 +1310,8 @@ export const blind75Problems: Blind75Problem[] = [
       "String",
       "Sliding Window"
     ],
-    "youtubeUrl": "https://www.youtube.com/watch?v=jSto0O4AJbM"
+    "youtubeUrl": "https://www.youtube.com/watch?v=jSto0O4AJbM",
+    "algorithmId": "minimum-window-substring"
   },
   {
     "id": 53,
@@ -1331,7 +1333,8 @@ export const blind75Problems: Blind75Problem[] = [
       "String",
       "Sorting"
     ],
-    "youtubeUrl": "https://www.youtube.com/watch?v=9UtInBqnCgA"
+    "youtubeUrl": "https://www.youtube.com/watch?v=9UtInBqnCgA",
+    "algorithmId": "valid-anagram"
   },
   {
     "id": 54,
@@ -1354,7 +1357,8 @@ export const blind75Problems: Blind75Problem[] = [
       "String",
       "Sorting"
     ],
-    "youtubeUrl": "https://www.youtube.com/watch?v=vzdNOK2oB2E&t=1s"
+    "youtubeUrl": "https://www.youtube.com/watch?v=vzdNOK2oB2E&t=1s",
+    "algorithmId": "group-anagrams"
   },
   {
     "id": 55,
@@ -1396,7 +1400,8 @@ export const blind75Problems: Blind75Problem[] = [
       "Two Pointers",
       "String"
     ],
-    "youtubeUrl": "https://www.youtube.com/watch?v=jJXJ16kPFWg&t=25s"
+    "youtubeUrl": "https://www.youtube.com/watch?v=jJXJ16kPFWg&t=25s",
+    "algorithmId": "valid-palindrome"
   },
   {
     "id": 57,

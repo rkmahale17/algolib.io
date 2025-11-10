@@ -1151,6 +1151,91 @@ const Blind75Detail: React.FC = () => {
       );
     }
 
+    if (algoId === "longest-repeating-character-replacement") {
+      const LongestRepeatingCharacterReplacementVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/LongestRepeatingCharacterReplacementVisualization"
+        ).then((m) => ({ default: m.LongestRepeatingCharacterReplacementVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <LongestRepeatingCharacterReplacementVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "minimum-window-substring") {
+      const MinimumWindowSubstringVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/MinimumWindowSubstringVisualization"
+        ).then((m) => ({ default: m.MinimumWindowSubstringVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <MinimumWindowSubstringVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "valid-anagram") {
+      const ValidAnagramVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/ValidAnagramVisualization"
+        ).then((m) => ({ default: m.ValidAnagramVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <ValidAnagramVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "group-anagrams") {
+      const GroupAnagramsVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/GroupAnagramsVisualization"
+        ).then((m) => ({ default: m.GroupAnagramsVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <GroupAnagramsVisualization />
+        </React.Suspense>
+      );
+    }
+
+    if (algoId === "valid-palindrome") {
+      const ValidPalindromeVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/ValidPalindromeVisualization"
+        ).then((m) => ({ default: m.ValidPalindromeVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <ValidPalindromeVisualization />
+        </React.Suspense>
+      );
+    }
+
     // Add more visualization mappings as needed
     return null;
   };
