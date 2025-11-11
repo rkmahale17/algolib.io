@@ -173,6 +173,63 @@ export const SerializeDeserializeBinaryTreeVisualization = () => {
     }
   }, [idx]);
 
+  const renderTree = () => {
+    const positions = [
+      { x: 200, y: 40, value: 1 },
+      { x: 120, y: 100, value: 2 },
+      { x: 280, y: 100, value: 3 }
+    ];
+
+    return (
+      <div className="space-y-4">
+        <div className="text-sm font-semibold text-center mb-2">
+          {step.phase === 'serialize' ? 'Tree → Array' : 'Array → Tree'}
+        </div>
+        <svg width="400" height="160" className="mx-auto">
+          <line x1={200} y1={40} x2={120} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
+          <line x1={200} y1={40} x2={280} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
+
+          {positions.map((pos, i) => {
+            const isCurrent = step.currentNode === pos.value;
+            const isProcessed = step.phase === 'serialize' 
+              ? step.result.includes(String(pos.value))
+              : step.index > ['1', '2', '3'].indexOf(String(pos.value));
+            
+            return (
+              <g key={i}>
+                <circle
+                  cx={pos.x}
+                  cy={pos.y}
+                  r="24"
+                  className={`transition-all duration-300 ${
+                    isCurrent
+                      ? step.phase === 'serialize' ? 'fill-purple-500' : 'fill-green-500'
+                      : isProcessed
+                      ? 'fill-blue-500'
+                      : 'fill-card'
+                  }`}
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
+                <text
+                  x={pos.x}
+                  y={pos.y + 6}
+                  textAnchor="middle"
+                  className="text-sm font-bold fill-foreground"
+                >
+                  {pos.value}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+        <div className="text-center text-xs text-muted-foreground">
+          Array: [{step.result.slice(0, 7).join(', ')}...]
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between">
@@ -191,7 +248,11 @@ export const SerializeDeserializeBinaryTreeVisualization = () => {
       </div>
 
       <div className="grid grid-cols-2 gap-6">
-        <Card className="p-6">
+        <div className="space-y-4">
+          <Card className="p-4">
+            {renderTree()}
+          </Card>
+          <Card className="p-6">
           <motion.div key={step.phase} className={`p-4 rounded mb-4 ${step.phase === 'serialize' ? 'bg-purple-500/10' : 'bg-green-500/10'}`}>
             <p className={`text-2xl font-bold text-center ${step.phase === 'serialize' ? 'text-purple-600' : 'text-green-600'}`}>
               {step.phase === 'serialize' ? 'SERIALIZE' : 'DESERIALIZE'}
@@ -209,6 +270,7 @@ export const SerializeDeserializeBinaryTreeVisualization = () => {
             <p className="text-sm">{step.message}</p>
           </Card>
         </Card>
+      </div>
 
         <Card className="p-4">
           <div className="h-[700px]">

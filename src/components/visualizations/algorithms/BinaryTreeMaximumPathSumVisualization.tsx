@@ -136,6 +136,63 @@ export const BinaryTreeMaximumPathSumVisualization = () => {
     }
   }, [idx]);
 
+  const renderTree = () => {
+    const positions = [
+      { x: 200, y: 40, value: -10 },
+      { x: 120, y: 100, value: 9 },
+      { x: 280, y: 100, value: 20 },
+      { x: 240, y: 160, value: 15 },
+      { x: 320, y: 160, value: 7 }
+    ];
+
+    return (
+      <div className="space-y-4">
+        <div className="text-sm font-semibold text-center mb-2">Maximum Path Sum</div>
+        <svg width="400" height="220" className="mx-auto">
+          <line x1={200} y1={40} x2={120} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
+          <line x1={200} y1={40} x2={280} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
+          <line x1={280} y1={100} x2={240} y2={160} stroke="currentColor" className="text-border" strokeWidth="2" />
+          <line x1={280} y1={100} x2={320} y2={160} stroke="currentColor" className="text-border" strokeWidth="2" />
+
+          {positions.map((pos, i) => {
+            const isCurrent = step.currentNode === pos.value;
+            const isInPath = (step.maxSum === 42 && [15, 20, 7].includes(pos.value));
+            
+            return (
+              <g key={i}>
+                <circle
+                  cx={pos.x}
+                  cy={pos.y}
+                  r="24"
+                  className={`transition-all duration-300 ${
+                    isInPath
+                      ? 'fill-green-500'
+                      : isCurrent
+                      ? 'fill-yellow-500'
+                      : 'fill-card'
+                  }`}
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
+                <text
+                  x={pos.x}
+                  y={pos.y + 6}
+                  textAnchor="middle"
+                  className="text-sm font-bold fill-foreground"
+                >
+                  {pos.value}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+        <div className="text-center text-xs text-muted-foreground">
+          Max Path: 15 → 20 → 7 = 42
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between">
@@ -154,7 +211,11 @@ export const BinaryTreeMaximumPathSumVisualization = () => {
       </div>
 
       <div className="grid grid-cols-2 gap-6">
-        <Card className="p-6">
+        <div className="space-y-4">
+          <Card className="p-4">
+            {renderTree()}
+          </Card>
+          <Card className="p-6">
           <motion.div key={step.maxSum} className="p-4 bg-green-500/10 rounded mb-4">
             <p className="text-2xl font-bold text-green-600 text-center">Max: {step.maxSum}</p>
           </motion.div>
@@ -171,6 +232,7 @@ export const BinaryTreeMaximumPathSumVisualization = () => {
             <p className="text-sm">{step.message}</p>
           </Card>
         </Card>
+      </div>
 
         <Card className="p-4">
           <div className="h-[700px]">

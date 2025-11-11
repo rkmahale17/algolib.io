@@ -136,6 +136,76 @@ export const BinaryTreeLevelOrderVisualization = () => {
     }
   }, [idx]);
 
+  const renderTree = () => {
+    const positions = [
+      { x: 200, y: 40, value: 3, level: 0 },
+      { x: 120, y: 100, value: 9, level: 1 },
+      { x: 280, y: 100, value: 20, level: 1 },
+      { x: 240, y: 160, value: 15, level: 2 },
+      { x: 320, y: 160, value: 7, level: 2 }
+    ];
+
+    const currentLevelNumber = step.result.length;
+
+    return (
+      <div className="space-y-4">
+        <div className="text-sm font-semibold text-center mb-2">Level Order Traversal</div>
+        <svg width="400" height="220" className="mx-auto">
+          <line x1={200} y1={40} x2={120} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
+          <line x1={200} y1={40} x2={280} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
+          <line x1={280} y1={100} x2={240} y2={160} stroke="currentColor" className="text-border" strokeWidth="2" />
+          <line x1={280} y1={100} x2={320} y2={160} stroke="currentColor" className="text-border" strokeWidth="2" />
+
+          {positions.map((pos, i) => {
+            const isCurrent = step.currentNode === pos.value;
+            const isInQueue = step.queue.includes(pos.value);
+            const isVisited = step.result.flat().includes(pos.value);
+            
+            return (
+              <g key={i}>
+                <circle
+                  cx={pos.x}
+                  cy={pos.y}
+                  r="24"
+                  className={`transition-all duration-300 ${
+                    isCurrent
+                      ? 'fill-yellow-500'
+                      : isVisited
+                      ? 'fill-green-500'
+                      : isInQueue
+                      ? 'fill-blue-500'
+                      : 'fill-card'
+                  }`}
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
+                <text
+                  x={pos.x}
+                  y={pos.y + 6}
+                  textAnchor="middle"
+                  className="text-sm font-bold fill-foreground"
+                >
+                  {pos.value}
+                </text>
+                <text
+                  x={pos.x}
+                  y={pos.y + 45}
+                  textAnchor="middle"
+                  className="text-xs fill-muted-foreground font-bold"
+                >
+                  L{pos.level}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+        <div className="text-center text-xs text-muted-foreground">
+          Queue: [{step.queue.join(', ') || 'empty'}]
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between">
@@ -154,7 +224,11 @@ export const BinaryTreeLevelOrderVisualization = () => {
       </div>
 
       <div className="grid grid-cols-2 gap-6">
-        <Card className="p-6">
+        <div className="space-y-4">
+          <Card className="p-4">
+            {renderTree()}
+          </Card>
+          <Card className="p-6">
           <motion.div key={step.result.length} className="p-4 bg-blue-500/10 rounded mb-4">
             <p className="text-lg font-bold text-blue-600 text-center">Levels Processed: {step.result.length}</p>
           </motion.div>
@@ -170,6 +244,7 @@ export const BinaryTreeLevelOrderVisualization = () => {
             <p className="text-sm">{step.message}</p>
           </Card>
         </Card>
+      </div>
 
         <Card className="p-4">
           <div className="h-[700px]">

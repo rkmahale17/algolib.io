@@ -68,6 +68,65 @@ export const InvertBinaryTreeVisualization = () => {
     }
   }, [currentStepIndex]);
 
+  const renderTree = () => {
+    const tree = currentStep.tree;
+    const positions = [
+      { x: 200, y: 40, value: 4 },
+      { x: 120, y: 100, value: tree[4]?.left ?? 2 },
+      { x: 280, y: 100, value: tree[4]?.right ?? 7 },
+      { x: 80, y: 160, value: tree[tree[4]?.left ?? 2]?.left ?? 1 },
+      { x: 160, y: 160, value: tree[tree[4]?.left ?? 2]?.right ?? 3 },
+      { x: 240, y: 160, value: tree[tree[4]?.right ?? 7]?.left ?? 6 },
+      { x: 320, y: 160, value: tree[tree[4]?.right ?? 7]?.right ?? 9 }
+    ];
+
+    return (
+      <div className="space-y-4">
+        <div className="text-sm font-semibold text-center mb-2">Tree Inversion Progress</div>
+        <svg width="400" height="220" className="mx-auto">
+          <line x1={200} y1={40} x2={120} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
+          <line x1={200} y1={40} x2={280} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
+          <line x1={120} y1={100} x2={80} y2={160} stroke="currentColor" className="text-border" strokeWidth="2" />
+          <line x1={120} y1={100} x2={160} y2={160} stroke="currentColor" className="text-border" strokeWidth="2" />
+          <line x1={280} y1={100} x2={240} y2={160} stroke="currentColor" className="text-border" strokeWidth="2" />
+          <line x1={280} y1={100} x2={320} y2={160} stroke="currentColor" className="text-border" strokeWidth="2" />
+
+          {positions.map((pos, i) => {
+            const isCurrent = currentStep.currentNode === pos.value;
+            const isSwapped = currentStep.swapped && currentStep.currentNode === pos.value;
+            
+            return (
+              <g key={i}>
+                <circle
+                  cx={pos.x}
+                  cy={pos.y}
+                  r="24"
+                  className={`transition-all duration-300 ${
+                    isSwapped
+                      ? 'fill-green-500'
+                      : isCurrent
+                      ? 'fill-yellow-500'
+                      : 'fill-card'
+                  }`}
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
+                <text
+                  x={pos.x}
+                  y={pos.y + 6}
+                  textAnchor="middle"
+                  className="text-sm font-bold fill-foreground"
+                >
+                  {pos.value}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
@@ -80,10 +139,15 @@ export const InvertBinaryTreeVisualization = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="p-6">
-          <VariablePanel variables={{ currentNode: currentStep.currentNode ?? 'null', leftChild: currentStep.leftVal ?? 'null', rightChild: currentStep.rightVal ?? 'null', stackDepth: currentStep.stackDepth }} />
-          <Card className="p-4 mt-4 bg-primary/5 border-primary/20"><p className="text-sm">{currentStep.message}</p></Card>
-        </Card>
+        <div className="space-y-4">
+          <Card className="p-4">
+            {renderTree()}
+          </Card>
+          <Card className="p-6">
+            <VariablePanel variables={{ currentNode: currentStep.currentNode ?? 'null', leftChild: currentStep.leftVal ?? 'null', rightChild: currentStep.rightVal ?? 'null', stackDepth: currentStep.stackDepth }} />
+            <Card className="p-4 mt-4 bg-primary/5 border-primary/20"><p className="text-sm">{currentStep.message}</p></Card>
+          </Card>
+        </div>
         <Card className="p-4"><div className="h-[700px]"><Editor height="100%" defaultLanguage="typescript" value={code} theme="vs-dark" options={{ readOnly: true, minimap: { enabled: false }, fontSize: 13 }} onMount={(editor, monaco) => { editorRef.current = editor; monacoRef.current = monaco; }} /></div></Card>
       </div>
       <style>{`.highlighted-line-purple { background: rgba(168, 85, 247, 0.15); border-left: 3px solid rgb(168, 85, 247); }`}</style>
