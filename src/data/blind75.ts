@@ -1510,6 +1510,7 @@ export const blind75Problems: Blind75Problem[] = [
       "DFS",
       "BFS"
     ],
+    "algorithmId": "same-tree",
     "youtubeUrl": "https://www.youtube.com/watch?v=vRbbcKXCxOw"
   },
   {
@@ -1532,6 +1533,7 @@ export const blind75Problems: Blind75Problem[] = [
       "DFS",
       "BFS"
     ],
+    "algorithmId": "invert-binary-tree",
     "youtubeUrl": "https://www.youtube.com/watch?v=OnSn2XEQ4MY"
   },
   {
@@ -1554,6 +1556,7 @@ export const blind75Problems: Blind75Problem[] = [
       "Tree",
       "DFS"
     ],
+    "algorithmId": "binary-tree-maximum-path-sum",
     "youtubeUrl": "https://www.youtube.com/watch?v=Hr5cWUld4vU"
   },
   {
@@ -1575,6 +1578,7 @@ export const blind75Problems: Blind75Problem[] = [
       "Tree",
       "BFS"
     ],
+    "algorithmId": "binary-tree-level-order-traversal",
     "youtubeUrl": "https://www.youtube.com/watch?v=6ZnyEApgFYg"
   },
   {
@@ -1599,6 +1603,7 @@ export const blind75Problems: Blind75Problem[] = [
       "BFS",
       "Design"
     ],
+    "algorithmId": "serialize-and-deserialize-binary-tree",
     "youtubeUrl": "https://www.youtube.com/watch?v=u4JAi2JJhI8"
   },
   {
@@ -1620,6 +1625,7 @@ export const blind75Problems: Blind75Problem[] = [
       "DFS",
       "String Matching"
     ],
+    "algorithmId": "subtree-of-another-tree",
     "youtubeUrl": "https://www.youtube.com/watch?v=E36O5SWp-LE"
   },
   {
@@ -1643,6 +1649,7 @@ export const blind75Problems: Blind75Problem[] = [
       "Divide and Conquer",
       "Tree"
     ],
+    "algorithmId": "construct-binary-tree-from-preorder-and-inorder-traversal",
     "youtubeUrl": "https://www.youtube.com/watch?v=ihj4IQGZ2zc"
   },
   {
@@ -1665,6 +1672,7 @@ export const blind75Problems: Blind75Problem[] = [
       "DFS",
       "BFS"
     ],
+    "algorithmId": "validate-binary-search-tree",
     "youtubeUrl": "https://www.youtube.com/watch?v=s6ATEkipzow"
   },
   {
@@ -1687,6 +1695,7 @@ export const blind75Problems: Blind75Problem[] = [
       "DFS",
       "BFS"
     ],
+    "algorithmId": "kth-smallest-element-in-a-bst",
     "youtubeUrl": "https://www.youtube.com/watch?v=5LUXSvjmGCw"
   },
   {
@@ -1709,6 +1718,7 @@ export const blind75Problems: Blind75Problem[] = [
       "DFS",
       "BFS"
     ],
+    "algorithmId": "lowest-common-ancestor-of-bst",
     "youtubeUrl": "https://www.youtube.com/watch?v=gs2LMfuOR9k"
   },
   {

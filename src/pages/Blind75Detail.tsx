@@ -1272,6 +1272,77 @@ const Blind75Detail: React.FC = () => {
       );
     }
 
+    // Tree visualizations
+    if (algoId === "same-tree") {
+      const SameTreeVisualization = React.lazy(() =>
+        import("@/components/visualizations/algorithms/SameTreeVisualization").then((m) => ({ default: m.SameTreeVisualization }))
+      );
+      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><SameTreeVisualization /></React.Suspense>;
+    }
+
+    if (algoId === "invert-binary-tree") {
+      const InvertBinaryTreeVisualization = React.lazy(() =>
+        import("@/components/visualizations/algorithms/InvertBinaryTreeVisualization").then((m) => ({ default: m.InvertBinaryTreeVisualization }))
+      );
+      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><InvertBinaryTreeVisualization /></React.Suspense>;
+    }
+
+    if (algoId === "binary-tree-maximum-path-sum") {
+      const BinaryTreeMaximumPathSumVisualization = React.lazy(() =>
+        import("@/components/visualizations/algorithms/BinaryTreeMaximumPathSumVisualization").then((m) => ({ default: m.BinaryTreeMaximumPathSumVisualization }))
+      );
+      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><BinaryTreeMaximumPathSumVisualization /></React.Suspense>;
+    }
+
+    if (algoId === "binary-tree-level-order-traversal") {
+      const BinaryTreeLevelOrderVisualization = React.lazy(() =>
+        import("@/components/visualizations/algorithms/BinaryTreeLevelOrderVisualization").then((m) => ({ default: m.BinaryTreeLevelOrderVisualization }))
+      );
+      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><BinaryTreeLevelOrderVisualization /></React.Suspense>;
+    }
+
+    if (algoId === "serialize-and-deserialize-binary-tree") {
+      const SerializeDeserializeBinaryTreeVisualization = React.lazy(() =>
+        import("@/components/visualizations/algorithms/SerializeDeserializeBinaryTreeVisualization").then((m) => ({ default: m.SerializeDeserializeBinaryTreeVisualization }))
+      );
+      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><SerializeDeserializeBinaryTreeVisualization /></React.Suspense>;
+    }
+
+    if (algoId === "subtree-of-another-tree") {
+      const SubtreeOfAnotherTreeVisualization = React.lazy(() =>
+        import("@/components/visualizations/algorithms/SubtreeOfAnotherTreeVisualization").then((m) => ({ default: m.SubtreeOfAnotherTreeVisualization }))
+      );
+      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><SubtreeOfAnotherTreeVisualization /></React.Suspense>;
+    }
+
+    if (algoId === "construct-binary-tree-from-preorder-and-inorder-traversal") {
+      const ConstructBinaryTreeVisualization = React.lazy(() =>
+        import("@/components/visualizations/algorithms/ConstructBinaryTreeVisualization").then((m) => ({ default: m.ConstructBinaryTreeVisualization }))
+      );
+      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><ConstructBinaryTreeVisualization /></React.Suspense>;
+    }
+
+    if (algoId === "validate-binary-search-tree") {
+      const ValidateBSTVisualization = React.lazy(() =>
+        import("@/components/visualizations/algorithms/ValidateBSTVisualization").then((m) => ({ default: m.ValidateBSTVisualization }))
+      );
+      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><ValidateBSTVisualization /></React.Suspense>;
+    }
+
+    if (algoId === "kth-smallest-element-in-a-bst") {
+      const KthSmallestInBSTVisualization = React.lazy(() =>
+        import("@/components/visualizations/algorithms/KthSmallestInBSTVisualization").then((m) => ({ default: m.KthSmallestInBSTVisualization }))
+      );
+      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><KthSmallestInBSTVisualization /></React.Suspense>;
+    }
+
+    if (algoId === "lowest-common-ancestor-of-bst") {
+      const LowestCommonAncestorBSTVisualization = React.lazy(() =>
+        import("@/components/visualizations/algorithms/LowestCommonAncestorBSTVisualization").then((m) => ({ default: m.LowestCommonAncestorBSTVisualization }))
+      );
+      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><LowestCommonAncestorBSTVisualization /></React.Suspense>;
+    }
+
     // Add more visualization mappings as needed
     return null;
   };
