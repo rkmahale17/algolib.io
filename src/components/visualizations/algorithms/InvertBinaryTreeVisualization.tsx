@@ -1,35 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SkipBack, SkipForward, RotateCcw } from 'lucide-react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import Editor from '@monaco-editor/react';
+import { motion } from 'framer-motion';
+import { VariablePanel } from '../shared/VariablePanel';
+import type { editor as MonacoEditor } from 'monaco-editor';
 
 interface Step {
-  tree: (number | null)[];
-  currentNode: number;
+  currentNode: number | null;
+  leftVal: number | null;
+  rightVal: number | null;
   swapped: boolean;
+  tree: { [key: number]: { left: number | null; right: number | null } };
   message: string;
-  lineNumber: number;
+  highlightedLines: number[];
+  stackDepth: number;
 }
 
 export const InvertBinaryTreeVisualization = () => {
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-
-  const steps: Step[] = [
-    { tree: [4,2,7,1,3,6,9], currentNode: -1, swapped: false, message: "Invert binary tree by swapping left and right children", lineNumber: 1 },
-    { tree: [4,2,7,1,3,6,9], currentNode: 0, swapped: false, message: "At root (4): swap children 2 ↔ 7", lineNumber: 4 },
-    { tree: [4,7,2,1,3,6,9], currentNode: 0, swapped: true, message: "Swapped! Tree now: [4,7,2,...]", lineNumber: 4 },
-    { tree: [4,7,2,9,6,3,1], currentNode: 1, swapped: false, message: "At node 7: swap children 6 ↔ 9", lineNumber: 5 },
-    { tree: [4,7,2,9,6,3,1], currentNode: 2, swapped: false, message: "At node 2: swap children 1 ↔ 3", lineNumber: 6 },
-    { tree: [4,7,2,9,6,3,1], currentNode: -1, swapped: false, message: "Complete! Tree fully inverted. Time: O(n), Space: O(h)", lineNumber: 7 }
-  ];
-
   const code = `function invertTree(root: TreeNode | null): TreeNode | null {
-  if (!root) return null;
+  if (root === null) return null;
   
-  // Swap left and right children
-  [root.left, root.right] = [root.right, root.left];
+  const temp = root.left;
+  root.left = root.right;
+  root.right = temp;
   
   invertTree(root.left);
   invertTree(root.right);
@@ -37,73 +32,61 @@ export const InvertBinaryTreeVisualization = () => {
   return root;
 }`;
 
-  const currentStep = steps[currentStepIndex];
+  const initialTree = { 4: { left: 2, right: 7 }, 2: { left: 1, right: 3 }, 7: { left: 6, right: 9 }, 1: { left: null, right: null }, 3: { left: null, right: null }, 6: { left: null, right: null }, 9: { left: null, right: null } };
+
+  const steps: Step[] = [
+    { currentNode: 4, leftVal: 2, rightVal: 7, swapped: false, tree: initialTree, message: "Start: At root node (4)", highlightedLines: [1], stackDepth: 1 },
+    { currentNode: 4, leftVal: 2, rightVal: 7, swapped: false, tree: initialTree, message: "Check: root is not null, continue", highlightedLines: [2], stackDepth: 1 },
+    { currentNode: 4, leftVal: 2, rightVal: 7, swapped: false, tree: initialTree, message: "Store left child in temp: temp=2", highlightedLines: [4], stackDepth: 1 },
+    { currentNode: 4, leftVal: 7, rightVal: 7, swapped: false, tree: initialTree, message: "Swap: root.left = root.right (7)", highlightedLines: [5], stackDepth: 1 },
+    { currentNode: 4, leftVal: 7, rightVal: 2, swapped: true, tree: { ...initialTree, 4: { left: 7, right: 2 } }, message: "Swap: root.right = temp (2). Children swapped! ✓", highlightedLines: [6], stackDepth: 1 },
+    
+    { currentNode: 7, leftVal: 6, rightVal: 9, swapped: false, tree: { ...initialTree, 4: { left: 7, right: 2 } }, message: "Recurse left: invertTree(7)", highlightedLines: [8], stackDepth: 2 },
+    { currentNode: 7, leftVal: 6, rightVal: 9, swapped: false, tree: { ...initialTree, 4: { left: 7, right: 2 } }, message: "Check: node 7 is not null", highlightedLines: [2], stackDepth: 2 },
+    { currentNode: 7, leftVal: 6, rightVal: 9, swapped: false, tree: { ...initialTree, 4: { left: 7, right: 2 } }, message: "Store left child: temp=6", highlightedLines: [4], stackDepth: 2 },
+    { currentNode: 7, leftVal: 9, rightVal: 9, swapped: false, tree: { ...initialTree, 4: { left: 7, right: 2 } }, message: "Swap: root.left = 9", highlightedLines: [5], stackDepth: 2 },
+    { currentNode: 7, leftVal: 9, rightVal: 6, swapped: true, tree: { 4: { left: 7, right: 2 }, 2: { left: 1, right: 3 }, 7: { left: 9, right: 6 }, 1: { left: null, right: null }, 3: { left: null, right: null }, 6: { left: null, right: null }, 9: { left: null, right: null } }, message: "Swap: root.right = 6. Swapped! ✓", highlightedLines: [6], stackDepth: 2 },
+    
+    { currentNode: 2, leftVal: 1, rightVal: 3, swapped: false, tree: { 4: { left: 7, right: 2 }, 2: { left: 1, right: 3 }, 7: { left: 9, right: 6 }, 1: { left: null, right: null }, 3: { left: null, right: null }, 6: { left: null, right: null }, 9: { left: null, right: null } }, message: "Recurse right: invertTree(2)", highlightedLines: [9], stackDepth: 2 },
+    { currentNode: 2, leftVal: 3, rightVal: 1, swapped: true, tree: { 4: { left: 7, right: 2 }, 2: { left: 3, right: 1 }, 7: { left: 9, right: 6 }, 1: { left: null, right: null }, 3: { left: null, right: null }, 6: { left: null, right: null }, 9: { left: null, right: null } }, message: "Swap: root.right = 1. Swapped! ✓", highlightedLines: [6], stackDepth: 2 },
+    
+    { currentNode: 4, leftVal: 7, rightVal: 2, swapped: true, tree: { 4: { left: 7, right: 2 }, 2: { left: 3, right: 1 }, 7: { left: 9, right: 6 }, 1: { left: null, right: null }, 3: { left: null, right: null }, 6: { left: null, right: null }, 9: { left: null, right: null } }, message: "Complete! Tree fully inverted ✓", highlightedLines: [11], stackDepth: 1 }
+  ];
+
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const currentStep = steps[Math.min(currentStepIndex, steps.length - 1)];
+  const editorRef = useRef<MonacoEditor.IStandaloneCodeEditor | null>(null);
+  const monacoRef = useRef<typeof import('monaco-editor') | null>(null);
+
+  useEffect(() => {
+    if (editorRef.current && monacoRef.current) {
+      const decorations = currentStep.highlightedLines.map(line => ({
+        range: new monacoRef.current!.Range(line, 1, line, 1),
+        options: { isWholeLine: true, className: 'highlighted-line-purple' }
+      }));
+      editorRef.current.createDecorationsCollection(decorations);
+    }
+  }, [currentStepIndex]);
 
   return (
-    <div className="w-full h-full flex flex-col gap-4 p-4">
-      <Card className="p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex gap-2">
-            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(0)} disabled={currentStepIndex === 0}><RotateCcw className="h-4 w-4" /></Button>
-            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))} disabled={currentStepIndex === 0}><SkipBack className="h-4 w-4" /></Button>
-            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(Math.min(steps.length - 1, currentStepIndex + 1))} disabled={currentStepIndex === steps.length - 1}><SkipForward className="h-4 w-4" /></Button>
-          </div>
-          <div className="text-sm">Step {currentStepIndex + 1} / {steps.length}</div>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex gap-2">
+          <Button onClick={() => setCurrentStepIndex(0)} variant="outline" size="sm"><RotateCcw className="h-4 w-4" /></Button>
+          <Button onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))} disabled={currentStepIndex === 0} variant="outline" size="sm"><SkipBack className="h-4 w-4" /></Button>
+          <Button onClick={() => setCurrentStepIndex(Math.min(steps.length - 1, currentStepIndex + 1))} disabled={currentStepIndex === steps.length - 1} variant="outline" size="sm"><SkipForward className="h-4 w-4" /></Button>
         </div>
-      </Card>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1">
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Invert Binary Tree</h3>
-          <div className="space-y-4">
-            <div>
-              <div className="text-sm font-medium mb-2">Tree Structure:</div>
-              <div className="flex flex-col items-center p-4 bg-muted/30 rounded">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold mb-4 ${
-                  currentStep.currentNode === 0 ? 'bg-primary text-primary-foreground ring-4 ring-primary' : 'bg-secondary'
-                }`}>
-                  {currentStep.tree[0]}
-                </div>
-                <div className="flex gap-12 mb-4">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
-                    currentStep.currentNode === 1 ? 'bg-primary text-primary-foreground ring-4 ring-primary' : 'bg-secondary'
-                  }`}>
-                    {currentStep.tree[1]}
-                  </div>
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
-                    currentStep.currentNode === 2 ? 'bg-primary text-primary-foreground ring-4 ring-primary' : 'bg-secondary'
-                  }`}>
-                    {currentStep.tree[2]}
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  {currentStep.tree.slice(3, 7).map((val, idx) => (
-                    <div key={idx} className="w-8 h-8 rounded-full flex items-center justify-center font-bold bg-secondary text-xs">
-                      {val}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-            {currentStep.swapped && (
-              <div className="p-4 bg-green-500/20 rounded text-center">
-                <div className="text-lg font-bold text-green-600">Children Swapped! ↔</div>
-              </div>
-            )}
-            <div className="p-4 bg-muted/50 rounded text-sm">{currentStep.message}</div>
-            <div className="p-3 bg-blue-500/10 rounded text-xs">
-              <strong>Pattern:</strong> For each node, swap its left and right children, then recursively invert subtrees.
-            </div>
-          </div>
-        </Card>
-        <Card className="p-6 overflow-hidden flex flex-col">
-          <h3 className="text-lg font-semibold mb-4">TypeScript</h3>
-          <div className="flex-1 overflow-auto">
-            <SyntaxHighlighter language="typescript" style={vscDarkPlus} showLineNumbers lineProps={(lineNumber) => ({ style: { backgroundColor: lineNumber === currentStep.lineNumber ? 'rgba(255, 255, 0, 0.2)' : 'transparent', display: 'block' } })}>
-              {code}
-            </SyntaxHighlighter>
-          </div>
-        </Card>
+        <span className="text-sm text-muted-foreground">Step {currentStepIndex + 1} of {steps.length}</span>
       </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="p-6">
+          <VariablePanel variables={{ currentNode: currentStep.currentNode ?? 'null', leftChild: currentStep.leftVal ?? 'null', rightChild: currentStep.rightVal ?? 'null', stackDepth: currentStep.stackDepth }} />
+          <Card className="p-4 mt-4 bg-primary/5 border-primary/20"><p className="text-sm">{currentStep.message}</p></Card>
+        </Card>
+        <Card className="p-4"><div className="h-[700px]"><Editor height="100%" defaultLanguage="typescript" value={code} theme="vs-dark" options={{ readOnly: true, minimap: { enabled: false }, fontSize: 13 }} onMount={(editor, monaco) => { editorRef.current = editor; monacoRef.current = monaco; }} /></div></Card>
+      </div>
+      <style>{`.highlighted-line-purple { background: rgba(168, 85, 247, 0.15); border-left: 3px solid rgb(168, 85, 247); }`}</style>
     </div>
   );
 };
