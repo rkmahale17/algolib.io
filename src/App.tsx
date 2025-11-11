@@ -14,6 +14,7 @@ import About from "./pages/About";
 import Privacy from "./pages/Privacy";
 import TermsOfService from "./pages/TermsOfService";
 import ContentRights from "./pages/ContentRights";
+import SortHero from "./pages/SortHero";
 import Navbar from "./components/Navbar";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -37,6 +38,8 @@ const App = () => (
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/content-rights" element={<ContentRights />} />
+          {/* BETA FEATURE - Not visible in production navigation */}
+          <Route path="/sort-hero" element={<SortHero />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
