@@ -116,6 +116,10 @@ const Navbar = () => {
 
           {/* Navigation Links */}
           <div className="hidden lg:flex items-center gap-6 flex-1 justify-center">
+            <Link to="/games" className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1">
+              <Trophy className="w-4 h-4" />
+              Games
+            </Link>
             <Link to="/blind75" className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1">
               <Trophy className="w-4 h-4" />
               Blind 75
@@ -147,6 +151,9 @@ const Navbar = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link to="/games">Games</Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/blind75">Blind 75</Link>
                 </DropdownMenuItem>

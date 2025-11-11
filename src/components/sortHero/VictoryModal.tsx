@@ -4,6 +4,7 @@ import { Trophy, ArrowRight, Home } from "lucide-react";
 
 interface VictoryModalProps {
   isOpen: boolean;
+  score: number;
   moves: number;
   errors: number;
   grade: string;
@@ -12,7 +13,8 @@ interface VictoryModalProps {
 }
 
 export const VictoryModal = ({ 
-  isOpen, 
+  isOpen,
+  score, 
   moves, 
   errors, 
   grade, 
@@ -35,7 +37,16 @@ export const VictoryModal = ({
         </DialogHeader>
         
         <div className="space-y-4">
-          <div className="grid grid-cols-3 gap-4 py-4">
+          <div className="text-center py-4 bg-primary/10 rounded-lg">
+            <p className="text-sm text-muted-foreground mb-1">Final Score</p>
+            <p className="text-5xl font-bold text-primary">{score}</p>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            <div className="text-center space-y-1">
+              <p className="text-sm text-muted-foreground">Grade</p>
+              <p className="text-3xl font-bold text-secondary">{grade}</p>
+            </div>
             <div className="text-center space-y-1">
               <p className="text-sm text-muted-foreground">Moves</p>
               <p className="text-2xl font-bold">{moves}</p>
@@ -43,10 +54,6 @@ export const VictoryModal = ({
             <div className="text-center space-y-1">
               <p className="text-sm text-muted-foreground">Errors</p>
               <p className="text-2xl font-bold text-destructive">{errors}</p>
-            </div>
-            <div className="text-center space-y-1">
-              <p className="text-sm text-muted-foreground">Grade</p>
-              <p className="text-3xl font-bold text-primary">{grade}</p>
             </div>
           </div>
 

@@ -50,6 +50,13 @@ export const GameBoard = ({ mode, level, onBackToMenu, onNextLevel }: GameBoardP
     return "C";
   };
 
+  const getScoreColor = () => {
+    if (gameState.score >= 800) return "text-green-500";
+    if (gameState.score >= 600) return "text-blue-500";
+    if (gameState.score >= 400) return "text-yellow-500";
+    return "text-orange-500";
+  };
+
   return (
     <>
       <Card className="backdrop-blur-sm bg-card/80">
@@ -64,7 +71,11 @@ export const GameBoard = ({ mode, level, onBackToMenu, onNextLevel }: GameBoardP
         </CardHeader>
         <CardContent className="space-y-8">
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 text-center">
+          <div className="grid grid-cols-4 gap-4 text-center">
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground">Score</p>
+              <p className={`text-2xl font-bold ${getScoreColor()}`}>{gameState.score}</p>
+            </div>
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">Moves</p>
               <p className="text-2xl font-bold text-primary">{gameState.moves}</p>
@@ -127,6 +138,7 @@ export const GameBoard = ({ mode, level, onBackToMenu, onNextLevel }: GameBoardP
 
       <VictoryModal
         isOpen={gameState.isComplete}
+        score={gameState.score}
         moves={gameState.moves}
         errors={gameState.errors}
         grade={getGrade()}

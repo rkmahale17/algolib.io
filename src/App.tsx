@@ -14,7 +14,9 @@ import About from "./pages/About";
 import Privacy from "./pages/Privacy";
 import TermsOfService from "./pages/TermsOfService";
 import ContentRights from "./pages/ContentRights";
+import Games from "./pages/Games";
 import SortHero from "./pages/SortHero";
+import Leaderboard from "./pages/Leaderboard";
 import Navbar from "./components/Navbar";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -38,8 +40,9 @@ const App = () => (
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/content-rights" element={<ContentRights />} />
-          {/* BETA FEATURE - Not visible in production navigation */}
-          <Route path="/sort-hero" element={<SortHero />} />
+          <Route path="/games" element={<ProtectedRoute><Games /></ProtectedRoute>} />
+          <Route path="/games/sort-hero" element={<ProtectedRoute><SortHero /></ProtectedRoute>} />
+          <Route path="/games/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      game_sessions: {
+        Row: {
+          completed_at: string
+          created_at: string
+          duration_seconds: number | null
+          errors: number
+          game_type: Database["public"]["Enums"]["game_type"]
+          grade: string | null
+          hints_used: number
+          id: string
+          level: number
+          moves: number
+          score: number
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          created_at?: string
+          duration_seconds?: number | null
+          errors?: number
+          game_type: Database["public"]["Enums"]["game_type"]
+          grade?: string | null
+          hints_used?: number
+          id?: string
+          level: number
+          moves?: number
+          score: number
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          created_at?: string
+          duration_seconds?: number | null
+          errors?: number
+          game_type?: Database["public"]["Enums"]["game_type"]
+          grade?: string | null
+          hints_used?: number
+          id?: string
+          level?: number
+          moves?: number
+          score?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -82,7 +127,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      game_type: "sort_hero"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -209,6 +254,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      game_type: ["sort_hero"],
+    },
   },
 } as const
