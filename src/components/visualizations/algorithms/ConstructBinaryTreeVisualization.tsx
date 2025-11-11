@@ -126,6 +126,66 @@ export const ConstructBinaryTreeVisualization = () => {
     return () => clearInterval(intervalRef.current);
   }, [isPlaying]);
 
+  const renderTree = () => {
+    const positions = [
+      { x: 200, y: 40, offset: 80, value: 3 },
+      { x: 120, y: 100, offset: 40, value: 9 },
+      { x: 280, y: 100, offset: 40, value: 20 },
+      { x: 240, y: 160, offset: 0, value: 15 },
+      { x: 320, y: 160, offset: 0, value: 7 }
+    ];
+
+    return (
+      <div className="space-y-4">
+        <div className="text-sm font-semibold text-center mb-2">Tree Construction Progress</div>
+        <svg width="400" height="220" className="mx-auto">
+          <line x1={200} y1={40} x2={120} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
+          <line x1={200} y1={40} x2={280} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
+          <line x1={280} y1={100} x2={240} y2={160} stroke="currentColor" className="text-border" strokeWidth="2" />
+          <line x1={280} y1={100} x2={320} y2={160} stroke="currentColor" className="text-border" strokeWidth="2" />
+
+          {positions.map((pos, i) => {
+            const isBuilt = step.builtNodes.includes(pos.value);
+            const isCurrent = step.rootVal === pos.value;
+            
+            return (
+              <g key={i}>
+                <circle
+                  cx={pos.x}
+                  cy={pos.y}
+                  r="24"
+                  className={`transition-all duration-300 ${
+                    isCurrent
+                      ? 'fill-yellow-500'
+                      : isBuilt
+                      ? 'fill-green-500'
+                      : 'fill-muted/30'
+                  }`}
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeDasharray={isBuilt ? '0' : '4'}
+                />
+                <text
+                  x={pos.x}
+                  y={pos.y + 6}
+                  textAnchor="middle"
+                  className={`text-sm font-bold ${
+                    isBuilt ? 'fill-foreground' : 'fill-muted-foreground'
+                  }`}
+                >
+                  {pos.value}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+        <div className="text-center text-xs text-muted-foreground">
+          Nodes Built: {step.builtNodes.join(', ') || 'None'}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -148,6 +208,10 @@ export const ConstructBinaryTreeVisualization = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
+          <Card className="p-4">
+            {renderTree()}
+          </Card>
+
           <AnimatePresence mode="wait">
             <motion.div
               key={idx}

@@ -116,6 +116,99 @@ function isSameTree(p: TreeNode | null, q: TreeNode | null): boolean {
     return () => clearInterval(intervalRef.current);
   }, [isPlaying]);
 
+  const renderTree = () => {
+    const mainTreePositions = [
+      { x: 200, y: 40, offset: 80, value: 3 },
+      { x: 120, y: 100, offset: 40, value: 4 },
+      { x: 280, y: 100, offset: 40, value: 5 },
+      { x: 80, y: 160, offset: 0, value: 1 },
+      { x: 160, y: 160, offset: 0, value: 2 }
+    ];
+
+    const subTreePositions = [
+      { x: 550, y: 60, offset: 40, value: 4 },
+      { x: 510, y: 120, offset: 0, value: 1 },
+      { x: 590, y: 120, offset: 0, value: 2 }
+    ];
+
+    const currentNodeValue = step.rootNode;
+    const subNodeValue = step.subNode;
+
+    return (
+      <div className="space-y-4">
+        <div className="text-sm font-semibold text-center mb-2">Main Tree vs Subtree</div>
+        <svg width="700" height="200" className="mx-auto">
+          <g>
+            <line x1={200} y1={40} x2={120} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
+            <line x1={200} y1={40} x2={280} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
+            <line x1={120} y1={100} x2={80} y2={160} stroke="currentColor" className="text-border" strokeWidth="2" />
+            <line x1={120} y1={100} x2={160} y2={160} stroke="currentColor" className="text-border" strokeWidth="2" />
+
+            {mainTreePositions.map((pos, i) => (
+              <g key={`main-${i}`}>
+                <circle
+                  cx={pos.x}
+                  cy={pos.y}
+                  r="24"
+                  className={`transition-all duration-300 ${
+                    pos.value === currentNodeValue && step.comparing
+                      ? 'fill-yellow-500'
+                      : step.found && [1, 2, 4].includes(pos.value)
+                      ? 'fill-green-500'
+                      : 'fill-card'
+                  }`}
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
+                <text
+                  x={pos.x}
+                  y={pos.y + 6}
+                  textAnchor="middle"
+                  className="text-sm font-bold fill-foreground"
+                >
+                  {pos.value}
+                </text>
+              </g>
+            ))}
+          </g>
+
+          <g>
+            <line x1={550} y1={60} x2={510} y2={120} stroke="currentColor" className="text-border" strokeWidth="2" />
+            <line x1={550} y1={60} x2={590} y2={120} stroke="currentColor" className="text-border" strokeWidth="2" />
+
+            {subTreePositions.map((pos, i) => (
+              <g key={`sub-${i}`}>
+                <circle
+                  cx={pos.x}
+                  cy={pos.y}
+                  r="24"
+                  className={`transition-all duration-300 ${
+                    pos.value === subNodeValue && step.comparing
+                      ? 'fill-purple-500'
+                      : 'fill-card'
+                  }`}
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
+                <text
+                  x={pos.x}
+                  y={pos.y + 6}
+                  textAnchor="middle"
+                  className="text-sm font-bold fill-foreground"
+                >
+                  {pos.value}
+                </text>
+              </g>
+            ))}
+          </g>
+
+          <text x="200" y="190" textAnchor="middle" className="text-xs fill-muted-foreground">Main Tree</text>
+          <text x="550" y="150" textAnchor="middle" className="text-xs fill-muted-foreground">Subtree to Find</text>
+        </svg>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -138,6 +231,10 @@ function isSameTree(p: TreeNode | null, q: TreeNode | null): boolean {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
+          <Card className="p-4">
+            {renderTree()}
+          </Card>
+
           <AnimatePresence mode="wait">
             <motion.div
               key={idx}

@@ -102,6 +102,71 @@ export const LowestCommonAncestorBSTVisualization = () => {
     return () => clearInterval(intervalRef.current);
   }, [isPlaying]);
 
+  const renderTree = () => {
+    const positions = [
+      { x: 200, y: 40, offset: 80, value: 6 },
+      { x: 120, y: 100, offset: 40, value: 2 },
+      { x: 280, y: 100, offset: 40, value: 8 },
+      { x: 160, y: 160, offset: 0, value: 4 }
+    ];
+
+    return (
+      <div className="space-y-4">
+        <div className="text-sm font-semibold text-center mb-2">Finding LCA</div>
+        <svg width="400" height="200" className="mx-auto">
+          <line x1={200} y1={40} x2={120} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
+          <line x1={200} y1={40} x2={280} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
+          <line x1={120} y1={100} x2={160} y2={160} stroke="currentColor" className="text-border" strokeWidth="2" />
+
+          {positions.map((pos, i) => {
+            const isCurrent = step.currentNode === pos.value;
+            const isTarget = pos.value === step.p || pos.value === step.q;
+            const isLCA = step.found && step.currentNode === pos.value;
+            
+            return (
+              <g key={i}>
+                <circle
+                  cx={pos.x}
+                  cy={pos.y}
+                  r="24"
+                  className={`transition-all duration-300 ${
+                    isLCA
+                      ? 'fill-green-500'
+                      : isCurrent
+                      ? 'fill-yellow-500'
+                      : isTarget
+                      ? 'fill-blue-500'
+                      : 'fill-card'
+                  }`}
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
+                <text
+                  x={pos.x}
+                  y={pos.y + 6}
+                  textAnchor="middle"
+                  className="text-sm font-bold fill-foreground"
+                >
+                  {pos.value}
+                </text>
+                {isTarget && (
+                  <text
+                    x={pos.x}
+                    y={pos.y + 45}
+                    textAnchor="middle"
+                    className="text-xs fill-blue-600 font-bold"
+                  >
+                    {pos.value === step.p ? 'p' : 'q'}
+                  </text>
+                )}
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -124,6 +189,10 @@ export const LowestCommonAncestorBSTVisualization = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
+          <Card className="p-4">
+            {renderTree()}
+          </Card>
+
           <AnimatePresence mode="wait">
             <motion.div
               key={idx}

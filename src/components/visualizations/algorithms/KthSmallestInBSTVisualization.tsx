@@ -112,6 +112,73 @@ export const KthSmallestInBSTVisualization = () => {
     return () => clearInterval(intervalRef.current);
   }, [isPlaying]);
 
+  const renderTree = () => {
+    const positions = [
+      { x: 200, y: 40, offset: 80, value: 3 },
+      { x: 120, y: 100, offset: 40, value: 1 },
+      { x: 280, y: 100, offset: 40, value: 4 }
+    ];
+
+    return (
+      <div className="space-y-4">
+        <div className="text-sm font-semibold text-center mb-2">Inorder Traversal (k={step.k})</div>
+        <svg width="400" height="180" className="mx-auto">
+          <line x1={200} y1={40} x2={120} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
+          <line x1={200} y1={40} x2={280} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
+
+          {positions.map((pos, i) => {
+            const isCurrent = step.currentNode === pos.value;
+            const isVisited = step.visited.includes(pos.value);
+            const isResult = step.found && step.result === pos.value;
+            const visitOrder = step.visited.indexOf(pos.value) + 1;
+            
+            return (
+              <g key={i}>
+                <circle
+                  cx={pos.x}
+                  cy={pos.y}
+                  r="24"
+                  className={`transition-all duration-300 ${
+                    isResult
+                      ? 'fill-green-500'
+                      : isCurrent
+                      ? 'fill-yellow-500'
+                      : isVisited
+                      ? 'fill-blue-500'
+                      : 'fill-card'
+                  }`}
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
+                <text
+                  x={pos.x}
+                  y={pos.y + 6}
+                  textAnchor="middle"
+                  className="text-sm font-bold fill-foreground"
+                >
+                  {pos.value}
+                </text>
+                {isVisited && visitOrder > 0 && (
+                  <text
+                    x={pos.x}
+                    y={pos.y + 45}
+                    textAnchor="middle"
+                    className="text-xs fill-primary font-bold"
+                  >
+                    #{visitOrder}
+                  </text>
+                )}
+              </g>
+            );
+          })}
+        </svg>
+        <div className="text-center text-xs text-muted-foreground">
+          Visit Order: {step.visited.join(' → ') || 'None'}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -134,6 +201,10 @@ export const KthSmallestInBSTVisualization = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
+          <Card className="p-4">
+            {renderTree()}
+          </Card>
+
           <AnimatePresence mode="wait">
             <motion.div
               key={idx}

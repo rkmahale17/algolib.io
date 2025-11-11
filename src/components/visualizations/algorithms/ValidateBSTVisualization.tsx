@@ -95,6 +95,61 @@ export const ValidateBSTVisualization = () => {
     return () => clearInterval(intervalRef.current);
   }, [isPlaying]);
 
+  const renderTree = () => {
+    const positions = [
+      { x: 200, y: 40, offset: 80, value: 5 },
+      { x: 120, y: 100, offset: 40, value: 1 },
+      { x: 280, y: 100, offset: 40, value: 4 }
+    ];
+
+    return (
+      <div className="space-y-4">
+        <div className="text-sm font-semibold text-center mb-2">BST Validation</div>
+        <svg width="400" height="160" className="mx-auto">
+          <line x1={200} y1={40} x2={120} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
+          <line x1={200} y1={40} x2={280} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
+
+          {positions.map((pos, i) => {
+            const isCurrent = step.currentNode === pos.value;
+            const isInvalid = step.isValid === false && step.currentNode === pos.value;
+            
+            return (
+              <g key={i}>
+                <circle
+                  cx={pos.x}
+                  cy={pos.y}
+                  r="24"
+                  className={`transition-all duration-300 ${
+                    isInvalid
+                      ? 'fill-red-500'
+                      : isCurrent
+                      ? 'fill-yellow-500'
+                      : step.isValid === true && i < 2
+                      ? 'fill-green-500'
+                      : 'fill-card'
+                  }`}
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
+                <text
+                  x={pos.x}
+                  y={pos.y + 6}
+                  textAnchor="middle"
+                  className="text-sm font-bold fill-foreground"
+                >
+                  {pos.value}
+                </text>
+              </g>
+            );
+          })}
+
+          <text x="120" y="135" textAnchor="middle" className="text-xs fill-muted-foreground">min: -∞, max: 5</text>
+          <text x="280" y="135" textAnchor="middle" className="text-xs fill-red-500 font-semibold">✗ 4 ≤ 5</text>
+        </svg>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -117,6 +172,10 @@ export const ValidateBSTVisualization = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
+          <Card className="p-4">
+            {renderTree()}
+          </Card>
+
           <AnimatePresence mode="wait">
             <motion.div
               key={idx}
