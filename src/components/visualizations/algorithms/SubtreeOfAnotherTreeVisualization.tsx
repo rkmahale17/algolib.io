@@ -1,98 +1,207 @@
 import { useState, useEffect, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { SkipBack, SkipForward, RotateCcw } from 'lucide-react';
+import { SkipBack, SkipForward, RotateCcw, Play, Pause } from 'lucide-react';
 import Editor from '@monaco-editor/react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { VariablePanel } from '../shared/VariablePanel';
-import type { editor as MonacoEditor } from 'monaco-editor';
 
 interface Step {
   rootNode: number | null;
   subNode: number | null;
-  checking: string;
+  comparing: boolean;
   isSame: boolean | null;
   found: boolean;
   message: string;
   highlightedLines: number[];
-  stackDepth: number;
+  variables: Record<string, any>;
 }
 
 export const SubtreeOfAnotherTreeVisualization = () => {
   const code = `function isSubtree(root: TreeNode | null, subRoot: TreeNode | null): boolean {
-  if (root === null) return false;
+  if (!subRoot) return true;
+  if (!root) return false;
   if (isSameTree(root, subRoot)) return true;
   return isSubtree(root.left, subRoot) || isSubtree(root.right, subRoot);
 }
 
 function isSameTree(p: TreeNode | null, q: TreeNode | null): boolean {
-  if (p === null && q === null) return true;
-  if (p === null || q === null) return false;
+  if (!p && !q) return true;
+  if (!p || !q) return false;
   if (p.val !== q.val) return false;
   return isSameTree(p.left, q.left) && isSameTree(p.right, q.right);
 }`;
 
   const steps: Step[] = [
-    { rootNode: 3, subNode: 4, checking: "start", isSame: null, found: false, message: "Start: Check if subRoot (4,1,2) is subtree of root", highlightedLines: [1], stackDepth: 1 },
-    { rootNode: 3, subNode: 4, checking: "null-check", isSame: null, found: false, message: "Check: root is not null, continue", highlightedLines: [2], stackDepth: 1 },
-    { rootNode: 3, subNode: 4, checking: "same-tree", isSame: null, found: false, message: "Check: Is tree at node 3 same as subRoot?", highlightedLines: [3], stackDepth: 1 },
-    { rootNode: 3, subNode: 4, checking: "compare", isSame: null, found: false, message: "isSameTree: Compare node 3 with node 4", highlightedLines: [7], stackDepth: 2 },
-    { rootNode: 3, subNode: 4, checking: "value-check", isSame: false, found: false, message: "Values differ: 3 ≠ 4. Not same tree ✗", highlightedLines: [10], stackDepth: 2 },
-    { rootNode: 3, subNode: 4, checking: "result", isSame: false, found: false, message: "Return false. Trees not same at root", highlightedLines: [3], stackDepth: 1 },
-    { rootNode: 4, subNode: 4, checking: "left-recurse", isSame: null, found: false, message: "Recurse left: Check if node 4 contains subtree", highlightedLines: [4], stackDepth: 2 },
-    { rootNode: 4, subNode: 4, checking: "null-check", isSame: null, found: false, message: "Check: node 4 is not null", highlightedLines: [2], stackDepth: 2 },
-    { rootNode: 4, subNode: 4, checking: "same-tree", isSame: null, found: false, message: "Check: Is tree at node 4 same as subRoot?", highlightedLines: [3], stackDepth: 2 },
-    { rootNode: 4, subNode: 4, checking: "compare", isSame: null, found: false, message: "isSameTree: Compare node 4 with node 4", highlightedLines: [7], stackDepth: 3 },
-    { rootNode: 4, subNode: 4, checking: "value-check", isSame: null, found: false, message: "Values match: 4 = 4 ✓", highlightedLines: [10], stackDepth: 3 },
-    { rootNode: 1, subNode: 1, checking: "left-left", isSame: null, found: false, message: "Recurse: Compare left children (1, 1)", highlightedLines: [11], stackDepth: 4 },
-    { rootNode: 1, subNode: 1, checking: "compare", isSame: null, found: false, message: "Both not null, values match: 1 = 1 ✓", highlightedLines: [10], stackDepth: 4 },
-    { rootNode: null, subNode: null, checking: "leaf", isSame: true, found: false, message: "Both children null: return true ✓", highlightedLines: [8], stackDepth: 5 },
-    { rootNode: 2, subNode: 2, checking: "right-right", isSame: null, found: false, message: "Recurse: Compare right children (2, 2)", highlightedLines: [11], stackDepth: 4 },
-    { rootNode: 2, subNode: 2, checking: "compare", isSame: null, found: false, message: "Both not null, values match: 2 = 2 ✓", highlightedLines: [10], stackDepth: 4 },
-    { rootNode: null, subNode: null, checking: "leaf", isSame: true, found: false, message: "Both children null: return true ✓", highlightedLines: [8], stackDepth: 5 },
-    { rootNode: 4, subNode: 4, checking: "result", isSame: true, found: true, message: "All nodes match! Trees are identical ✓", highlightedLines: [11], stackDepth: 3 },
-    { rootNode: 4, subNode: 4, checking: "found", isSame: true, found: true, message: "Found matching subtree at node 4!", highlightedLines: [3], stackDepth: 2 },
-    { rootNode: 4, subNode: 4, checking: "return", isSame: true, found: true, message: "Return true. Subtree found! ✓", highlightedLines: [4], stackDepth: 1 }
+    { rootNode: null, subNode: null, comparing: false, isSame: null, found: false, message: "Start: Check if subRoot is null", highlightedLines: [2], variables: { root: '3', subRoot: '4' } },
+    { rootNode: null, subNode: null, comparing: false, isSame: null, found: false, message: "subRoot is not null, continue", highlightedLines: [2], variables: { root: '3', subRoot: '4' } },
+    { rootNode: null, subNode: null, comparing: false, isSame: null, found: false, message: "Check if root is null", highlightedLines: [3], variables: { root: '3', subRoot: '4' } },
+    { rootNode: null, subNode: null, comparing: false, isSame: null, found: false, message: "root is not null, continue", highlightedLines: [3], variables: { root: '3', subRoot: '4' } },
+    { rootNode: 3, subNode: 4, comparing: true, isSame: null, found: false, message: "Check if tree at node 3 matches subRoot", highlightedLines: [4], variables: { root: '3', subRoot: '4' } },
+    { rootNode: 3, subNode: 4, comparing: true, isSame: null, found: false, message: "Call isSameTree(3, 4)", highlightedLines: [8], variables: { p: '3', q: '4' } },
+    { rootNode: 3, subNode: 4, comparing: true, isSame: null, found: false, message: "Check if both nodes are null", highlightedLines: [9], variables: { p: '3', q: '4' } },
+    { rootNode: 3, subNode: 4, comparing: true, isSame: null, found: false, message: "Not both null, continue", highlightedLines: [9], variables: { p: '3', q: '4' } },
+    { rootNode: 3, subNode: 4, comparing: true, isSame: null, found: false, message: "Check if either node is null", highlightedLines: [10], variables: { p: '3', q: '4' } },
+    { rootNode: 3, subNode: 4, comparing: true, isSame: null, found: false, message: "Neither is null, continue", highlightedLines: [10], variables: { p: '3', q: '4' } },
+    { rootNode: 3, subNode: 4, comparing: true, isSame: false, found: false, message: "Compare values: 3 ≠ 4, not same", highlightedLines: [11], variables: { p: '3', q: '4', 'p.val': 3, 'q.val': 4 } },
+    { rootNode: 3, subNode: 4, comparing: false, isSame: false, found: false, message: "Trees not same at root, check left subtree", highlightedLines: [5], variables: { root: '3', subRoot: '4' } },
+    { rootNode: 4, subNode: 4, comparing: true, isSame: null, found: false, message: "Check left child: node 4", highlightedLines: [4], variables: { root: '4', subRoot: '4' } },
+    { rootNode: 4, subNode: 4, comparing: true, isSame: null, found: false, message: "Call isSameTree(4, 4)", highlightedLines: [8], variables: { p: '4', q: '4' } },
+    { rootNode: 4, subNode: 4, comparing: true, isSame: null, found: false, message: "Check if both nodes are null", highlightedLines: [9], variables: { p: '4', q: '4' } },
+    { rootNode: 4, subNode: 4, comparing: true, isSame: null, found: false, message: "Not both null, continue", highlightedLines: [9], variables: { p: '4', q: '4' } },
+    { rootNode: 4, subNode: 4, comparing: true, isSame: null, found: false, message: "Check if either node is null", highlightedLines: [10], variables: { p: '4', q: '4' } },
+    { rootNode: 4, subNode: 4, comparing: true, isSame: null, found: false, message: "Neither is null, continue", highlightedLines: [10], variables: { p: '4', q: '4' } },
+    { rootNode: 4, subNode: 4, comparing: true, isSame: true, found: false, message: "Compare values: 4 = 4 ✓", highlightedLines: [11], variables: { p: '4', q: '4', 'p.val': 4, 'q.val': 4 } },
+    { rootNode: 4, subNode: 4, comparing: true, isSame: true, found: false, message: "Values match, check left children", highlightedLines: [12], variables: { p: '4', q: '4' } },
+    { rootNode: 1, subNode: 1, comparing: true, isSame: null, found: false, message: "Call isSameTree(1, 1)", highlightedLines: [8], variables: { p: '1', q: '1' } },
+    { rootNode: 1, subNode: 1, comparing: true, isSame: null, found: false, message: "Check if both nodes are null", highlightedLines: [9], variables: { p: '1', q: '1' } },
+    { rootNode: 1, subNode: 1, comparing: true, isSame: null, found: false, message: "Not both null, continue", highlightedLines: [9], variables: { p: '1', q: '1' } },
+    { rootNode: 1, subNode: 1, comparing: true, isSame: null, found: false, message: "Check if either node is null", highlightedLines: [10], variables: { p: '1', q: '1' } },
+    { rootNode: 1, subNode: 1, comparing: true, isSame: null, found: false, message: "Neither is null, continue", highlightedLines: [10], variables: { p: '1', q: '1' } },
+    { rootNode: 1, subNode: 1, comparing: true, isSame: true, found: false, message: "Compare values: 1 = 1 ✓", highlightedLines: [11], variables: { p: '1', q: '1', 'p.val': 1, 'q.val': 1 } },
+    { rootNode: 1, subNode: 1, comparing: true, isSame: true, found: false, message: "Values match, check left children", highlightedLines: [12], variables: { p: '1', q: '1' } },
+    { rootNode: null, subNode: null, comparing: true, isSame: true, found: false, message: "Both left children are null ✓", highlightedLines: [9], variables: { p: 'null', q: 'null' } },
+    { rootNode: 1, subNode: 1, comparing: true, isSame: true, found: false, message: "Left match, check right children", highlightedLines: [12], variables: { p: '1', q: '1' } },
+    { rootNode: null, subNode: null, comparing: true, isSame: true, found: false, message: "Both right children are null ✓", highlightedLines: [9], variables: { p: 'null', q: 'null' } },
+    { rootNode: 1, subNode: 1, comparing: true, isSame: true, found: false, message: "Node 1 matches completely ✓", highlightedLines: [12], variables: { p: '1', q: '1' } },
+    { rootNode: 4, subNode: 4, comparing: true, isSame: true, found: false, message: "Left child matched, check right child", highlightedLines: [12], variables: { p: '4', q: '4' } },
+    { rootNode: 2, subNode: 2, comparing: true, isSame: null, found: false, message: "Call isSameTree(2, 2)", highlightedLines: [8], variables: { p: '2', q: '2' } },
+    { rootNode: 2, subNode: 2, comparing: true, isSame: null, found: false, message: "Check if both nodes are null", highlightedLines: [9], variables: { p: '2', q: '2' } },
+    { rootNode: 2, subNode: 2, comparing: true, isSame: null, found: false, message: "Not both null, continue", highlightedLines: [9], variables: { p: '2', q: '2' } },
+    { rootNode: 2, subNode: 2, comparing: true, isSame: null, found: false, message: "Check if either node is null", highlightedLines: [10], variables: { p: '2', q: '2' } },
+    { rootNode: 2, subNode: 2, comparing: true, isSame: null, found: false, message: "Neither is null, continue", highlightedLines: [10], variables: { p: '2', q: '2' } },
+    { rootNode: 2, subNode: 2, comparing: true, isSame: true, found: false, message: "Compare values: 2 = 2 ✓", highlightedLines: [11], variables: { p: '2', q: '2', 'p.val': 2, 'q.val': 2 } },
+    { rootNode: 2, subNode: 2, comparing: true, isSame: true, found: false, message: "Values match, check left children", highlightedLines: [12], variables: { p: '2', q: '2' } },
+    { rootNode: null, subNode: null, comparing: true, isSame: true, found: false, message: "Both left children are null ✓", highlightedLines: [9], variables: { p: 'null', q: 'null' } },
+    { rootNode: 2, subNode: 2, comparing: true, isSame: true, found: false, message: "Left match, check right children", highlightedLines: [12], variables: { p: '2', q: '2' } },
+    { rootNode: null, subNode: null, comparing: true, isSame: true, found: false, message: "Both right children are null ✓", highlightedLines: [9], variables: { p: 'null', q: 'null' } },
+    { rootNode: 2, subNode: 2, comparing: true, isSame: true, found: false, message: "Node 2 matches completely ✓", highlightedLines: [12], variables: { p: '2', q: '2' } },
+    { rootNode: 4, subNode: 4, comparing: true, isSame: true, found: true, message: "Both children match! Tree at node 4 is same ✓", highlightedLines: [12], variables: { p: '4', q: '4' } },
+    { rootNode: 4, subNode: 4, comparing: false, isSame: true, found: true, message: "Found subtree match! Return true", highlightedLines: [4], variables: { root: '4', subRoot: '4', result: true } },
+    { rootNode: null, subNode: null, comparing: false, isSame: null, found: true, message: "Complete! Subtree found at node 4 ✓", highlightedLines: [5], variables: { result: true } }
   ];
 
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const currentStep = steps[Math.min(currentStepIndex, steps.length - 1)];
-  const editorRef = useRef<MonacoEditor.IStandaloneCodeEditor | null>(null);
-  const monacoRef = useRef<typeof import('monaco-editor') | null>(null);
+  const [idx, setIdx] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const step = steps[idx];
+  const editorRef = useRef<any>(null);
+  const monacoRef = useRef<any>(null);
+  const intervalRef = useRef<any>(null);
 
   useEffect(() => {
     if (editorRef.current && monacoRef.current) {
-      const decorations = currentStep.highlightedLines.map(line => ({
-        range: new monacoRef.current!.Range(line, 1, line, 1),
-        options: { isWholeLine: true, className: 'highlighted-line-purple' }
+      const decorations = step.highlightedLines.map(lineNum => ({
+        range: new monacoRef.current.Range(lineNum, 1, lineNum, 1),
+        options: {
+          isWholeLine: true,
+          className: 'highlighted-line-purple'
+        }
       }));
       editorRef.current.createDecorationsCollection(decorations);
     }
-  }, [currentStepIndex]);
+  }, [idx, step.highlightedLines]);
+
+  useEffect(() => {
+    if (isPlaying) {
+      intervalRef.current = setInterval(() => {
+        setIdx(prev => {
+          if (prev >= steps.length - 1) {
+            setIsPlaying(false);
+            return prev;
+          }
+          return prev + 1;
+        });
+      }, 1200);
+    }
+    return () => clearInterval(intervalRef.current);
+  }, [isPlaying]);
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex justify-between items-center">
         <div className="flex gap-2">
-          <Button onClick={() => setCurrentStepIndex(0)} variant="outline" size="sm"><RotateCcw className="h-4 w-4" /></Button>
-          <Button onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))} disabled={currentStepIndex === 0} variant="outline" size="sm"><SkipBack className="h-4 w-4" /></Button>
-          <Button onClick={() => setCurrentStepIndex(Math.min(steps.length - 1, currentStepIndex + 1))} disabled={currentStepIndex === steps.length - 1} variant="outline" size="sm"><SkipForward className="h-4 w-4" /></Button>
+          <Button onClick={() => setIdx(0)} variant="outline" size="sm">
+            <RotateCcw className="h-4 w-4" />
+          </Button>
+          <Button onClick={() => setIsPlaying(!isPlaying)} variant="outline" size="sm">
+            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+          </Button>
+          <Button onClick={() => setIdx(Math.max(0, idx - 1))} disabled={idx === 0} variant="outline" size="sm">
+            <SkipBack className="h-4 w-4" />
+          </Button>
+          <Button onClick={() => setIdx(Math.min(steps.length - 1, idx + 1))} disabled={idx === steps.length - 1} variant="outline" size="sm">
+            <SkipForward className="h-4 w-4" />
+          </Button>
         </div>
-        <span className="text-sm text-muted-foreground">Step {currentStepIndex + 1} of {steps.length}</span>
+        <span className="text-sm text-muted-foreground">Step {idx + 1} / {steps.length}</span>
       </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <h3 className="text-lg font-semibold">Subtree Check</h3>
-            <motion.div className="px-2 py-1 rounded text-xs font-semibold bg-blue-500/20 text-blue-600">Depth: {currentStep.stackDepth}</motion.div>
-            {currentStep.found && <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="px-2 py-1 rounded text-xs font-semibold bg-green-500/20 text-green-600">FOUND ✓</motion.div>}
+        <div className="space-y-4">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <VariablePanel variables={step.variables} />
+            </motion.div>
+          </AnimatePresence>
+
+          <Card className="p-4 bg-primary/5 border-primary/20">
+            <motion.p 
+              key={`msg-${idx}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-sm font-medium"
+            >
+              {step.message}
+            </motion.p>
+          </Card>
+
+          {step.found && (
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg"
+            >
+              <p className="text-green-600 dark:text-green-400 font-semibold">✓ Subtree Match Found!</p>
+            </motion.div>
+          )}
+        </div>
+
+        <Card className="p-4">
+          <div className="h-[700px]">
+            <Editor
+              height="100%"
+              defaultLanguage="typescript"
+              value={code}
+              theme="vs-dark"
+              options={{
+                readOnly: true,
+                minimap: { enabled: false },
+                fontSize: 13,
+                lineNumbers: 'on',
+                scrollBeyondLastLine: false,
+                automaticLayout: true
+              }}
+              onMount={(editor, monaco) => {
+                editorRef.current = editor;
+                monacoRef.current = monaco;
+              }}
+            />
           </div>
-          <VariablePanel variables={{ rootNode: currentStep.rootNode ?? 'null', subNode: currentStep.subNode ?? 'null', checking: currentStep.checking, isSame: currentStep.isSame === null ? 'checking' : currentStep.isSame, stackDepth: currentStep.stackDepth }} />
-          <Card className="p-4 mt-4 bg-primary/5 border-primary/20"><p className="text-sm">{currentStep.message}</p></Card>
         </Card>
-        <Card className="p-4"><div className="h-[700px]"><Editor height="100%" defaultLanguage="typescript" value={code} theme="vs-dark" options={{ readOnly: true, minimap: { enabled: false }, fontSize: 13 }} onMount={(editor, monaco) => { editorRef.current = editor; monacoRef.current = monaco; }} /></div></Card>
       </div>
-      <style>{`.highlighted-line-purple { background: rgba(168, 85, 247, 0.15); border-left: 3px solid rgb(168, 85, 247); }`}</style>
+
+      <style>{`
+        .highlighted-line-purple {
+          background: rgba(168, 85, 247, 0.15);
+          border-left: 3px solid rgb(168, 85, 247);
+        }
+      `}</style>
     </div>
   );
 };
