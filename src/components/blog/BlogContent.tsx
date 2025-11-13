@@ -1,8 +1,7 @@
 import { BlogContent as BlogContentType } from '@/data/blogPosts';
 import { CodeHighlighter } from '@/components/visualizations/shared/CodeHighlighter';
-import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { Play } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import '../../styles/blog.css';
 
 interface BlogContentProps {
@@ -15,10 +14,35 @@ export const BlogContent = ({ content }: BlogContentProps) => {
       {content.map((block, index) => {
         switch (block.type) {
           case 'heading':
+            // Main heading - H2
             return (
-              <h2 key={index}>
+              <h2 key={index} className="blog-section">
                 {block.content}
               </h2>
+            );
+          
+          case 'subheading':
+            // Topic section - H3
+            return (
+              <h3 key={index} className={block.large ? 'section-large' : ''}>
+                {block.content}
+              </h3>
+            );
+          
+          case 'h4':
+            // Subsection - H4
+            return (
+              <h4 key={index}>
+                {block.content}
+              </h4>
+            );
+          
+          case 'h5':
+            // Specific point - H5
+            return (
+              <h5 key={index}>
+                {block.content}
+              </h5>
             );
           
           case 'paragraph':
@@ -52,12 +76,12 @@ export const BlogContent = ({ content }: BlogContentProps) => {
               <figure key={index}>
                 <img 
                   src={block.content} 
-                  alt={block.alt || ''} 
+                  alt={block.alt || block.caption || 'Blog illustration'} 
                   loading="lazy"
                 />
-                {block.alt && (
+                {(block.caption || block.alt) && (
                   <figcaption>
-                    {block.alt}
+                    {block.caption || block.alt}
                   </figcaption>
                 )}
               </figure>
@@ -72,13 +96,14 @@ export const BlogContent = ({ content }: BlogContentProps) => {
           
           case 'cta':
             return (
-              <div key={index} style={{ marginTop: '2rem', marginBottom: '2rem' }}>
-                <Button asChild className="blog-cta-button">
-                  <Link to={block.link || '#'}>
-                    <Play className="w-4 h-4" />
-                    {block.content}
-                  </Link>
-                </Button>
+              <div key={index} style={{ marginTop: '1.5rem', marginBottom: '1.5rem' }}>
+                <Link 
+                  to={block.link || '#'} 
+                  className="blog-cta-button"
+                >
+                  {block.content}
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
               </div>
             );
           

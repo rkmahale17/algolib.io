@@ -3,11 +3,10 @@ import { Helmet } from 'react-helmet-async';
 import { getBlogPost, getRelatedPosts } from '@/data/blogPosts';
 import { BlogContent } from '@/components/blog/BlogContent';
 import { ShareButton } from '@/components/ShareButton';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Calendar, Clock, User } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import '../../src/styles/blog.css';
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -17,6 +16,8 @@ const BlogPost = () => {
   if (!post) {
     return <Navigate to="/blog" replace />;
   }
+
+  const popularTags = ["Blind 75", "Two Pointers", "Dynamic Programming", "Arrays", "Graphs", "Recursion"];
 
   return (
     <>
@@ -31,35 +32,47 @@ const BlogPost = () => {
       <div className="min-h-screen bg-background py-12 px-4 blog-post-container">
         <div className="container mx-auto max-w-7xl">
           {/* Back Button */}
-          <Button asChild variant="ghost" className="mb-8">
-            <Link to="/blog">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Blog
-            </Link>
-          </Button>
+          <Link 
+            to="/blog" 
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Blog
+          </Link>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Main Content */}
-            <div className="lg:col-span-2">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Main Content - Centered */}
+            <div className="lg:col-span-8">
               <article>
+                {/* Hero Image */}
+                {post.image && (
+                  <img 
+                    src={post.image} 
+                    alt={post.title}
+                    className="blog-hero-image"
+                  />
+                )}
+
                 {/* Header */}
-                <header className="mb-12">
+                <header className="mb-8">
                   <div className="flex items-center gap-2 mb-4">
-                    <Badge variant="secondary">
+                    <Badge variant="secondary" className="font-roboto">
                       {post.category}
                     </Badge>
                   </div>
-                  <h1 className="text-4xl md:text-5xl font-bold mb-6 text-foreground" style={{ maxWidth: '680px', fontFamily: 'Inter, sans-serif', letterSpacing: '-0.02em' }}>
+                  
+                  <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground font-roboto">
                     {post.title}
                   </h1>
+                  
                   {post.subtitle && (
-                    <p className="text-xl text-muted-foreground mb-6">
+                    <p className="text-xl text-muted-foreground mb-6 font-roboto">
                       {post.subtitle}
                     </p>
                   )}
                   
                   {/* Meta Info */}
-                  <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground mb-6">
+                  <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground mb-6 font-roboto">
                     <div className="flex items-center gap-2">
                       <User className="w-4 h-4" />
                       <span>{post.author}</span>
@@ -74,15 +87,6 @@ const BlogPost = () => {
                     </div>
                   </div>
 
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {post.tags.map(tag => (
-                      <Badge key={tag} variant="outline">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-
                   <Separator className="mb-8" />
                 </header>
 
@@ -90,77 +94,73 @@ const BlogPost = () => {
                 <BlogContent content={post.content} />
 
                 {/* Share Section */}
-                <div className="mt-12 pt-8 border-t border-border">
+                <div className="mt-16 pt-8 border-t border-border">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold">Share this article</h3>
-                    <ShareButton title={post.title} description={post.description} />
+                    <h3 className="text-lg font-semibold font-roboto">Share this article</h3>
+                    <ShareButton 
+                      title={post.title}
+                      description={post.description}
+                    />
                   </div>
                 </div>
               </article>
             </div>
 
-            {/* Sidebar */}
-            <aside className="lg:col-span-1">
-              <div className="sticky top-24 space-y-6">
+            {/* Sidebar - Right Side (Sticky on desktop, bottom on mobile) */}
+            <aside className="lg:col-span-4">
+              <div className="blog-sidebar">
+                {/* Popular Tags */}
+                <div className="blog-sidebar-card">
+                  <h3 className="blog-sidebar-title">Popular Tags</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {popularTags.map(tag => (
+                      <Badge 
+                        key={tag} 
+                        variant="outline" 
+                        className="cursor-pointer hover:bg-accent transition-colors font-roboto"
+                      >
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Related Posts */}
                 {relatedPosts.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">More Posts</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
+                  <div className="blog-sidebar-card">
+                    <h3 className="blog-sidebar-title">More Posts</h3>
+                    <div className="space-y-4">
                       {relatedPosts.map(relatedPost => (
                         <Link 
-                          key={relatedPost.id}
+                          key={relatedPost.slug} 
                           to={`/blog/${relatedPost.slug}`}
                           className="block group"
                         >
-                          <div className="space-y-2">
-                            <h4 className="font-semibold text-sm group-hover:text-primary transition-colors line-clamp-2">
-                              {relatedPost.title}
-                            </h4>
-                            <p className="text-xs text-muted-foreground">
-                              {relatedPost.readTime}
-                            </p>
-                          </div>
-                          {relatedPost !== relatedPosts[relatedPosts.length - 1] && (
-                            <Separator className="mt-4" />
-                          )}
+                          <h4 className="text-sm font-medium text-foreground group-hover:text-primary transition-colors mb-1 font-roboto">
+                            {relatedPost.title}
+                          </h4>
+                          <p className="text-xs text-muted-foreground font-roboto">
+                            {relatedPost.readTime}
+                          </p>
                         </Link>
                       ))}
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 )}
 
-                {/* Popular Tags */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Popular Tags</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-wrap gap-2">
-                      <Badge variant="secondary">Two Pointers</Badge>
-                      <Badge variant="secondary">Sliding Window</Badge>
-                      <Badge variant="secondary">Dynamic Programming</Badge>
-                      <Badge variant="secondary">Graphs</Badge>
-                      <Badge variant="secondary">Arrays</Badge>
-                      <Badge variant="secondary">Recursion</Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* CTA Card */}
-                <Card className="bg-gradient-to-br from-primary/10 to-secondary/10 border-primary/20">
-                  <CardContent className="pt-6">
-                    <h3 className="font-bold mb-2">Try the Two Pointer Game!</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Practice the concepts from this article interactively
-                    </p>
-                    <Button asChild className="w-full">
-                      <Link to="/games/two-pointer">Play Now</Link>
-                    </Button>
-                  </CardContent>
-                </Card>
+                {/* Try Game CTA */}
+                <div className="blog-sidebar-card bg-primary/5 border-primary/20">
+                  <h3 className="blog-sidebar-title">Practice Your Skills</h3>
+                  <p className="text-sm text-muted-foreground mb-4 font-roboto">
+                    Master algorithms through interactive games
+                  </p>
+                  <Link 
+                    to="/games/two-pointer" 
+                    className="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md shadow-sm hover:bg-primary/90 transition-all hover:shadow-md font-roboto"
+                  >
+                    Try Two Pointer Game
+                  </Link>
+                </div>
               </div>
             </aside>
           </div>

@@ -10,16 +10,19 @@ export interface BlogPost {
   category: string;
   tags: string[];
   thumbnail?: string;
+  image?: string; // Hero image
   content: BlogContent[];
 }
 
 export interface BlogContent {
-  type: 'heading' | 'paragraph' | 'image' | 'code' | 'list' | 'quote' | 'cta';
+  type: 'heading' | 'subheading' | 'h4' | 'h5' | 'paragraph' | 'image' | 'code' | 'list' | 'quote' | 'cta';
   content?: string;
   language?: string;
   items?: string[];
   alt?: string;
+  caption?: string;
   link?: string;
+  large?: boolean; // For larger section spacing
 }
 
 export const blogPosts: BlogPost[] = [
@@ -35,6 +38,7 @@ export const blogPosts: BlogPost[] = [
     category: 'Interview Prep',
     tags: ['Blind 75', 'DSA Practice', 'Leetcode', 'Visual Learning', 'FAANG'],
     thumbnail: '/blog/blind75-patterns-diagram.jpg',
+    image: '/blog/blind75-patterns-diagram.jpg', // Hero image
     content: [
       {
         type: 'paragraph',
