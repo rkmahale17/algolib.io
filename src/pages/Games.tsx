@@ -35,6 +35,14 @@ const Games = () => {
       icon: Brain,
       difficulty: "Intermediate to Advanced",
       category: "Dynamic Programming"
+    },
+    {
+      id: "sliding-window",
+      name: "Sliding Window Ninja",
+      description: "Master the sliding window technique by expanding and shrinking to find optimal subarrays",
+      icon: Brain,
+      difficulty: "Beginner to Advanced",
+      category: "Two Pointers"
     }
   ];
 
