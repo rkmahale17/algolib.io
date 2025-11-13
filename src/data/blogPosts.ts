@@ -34,7 +34,7 @@ export const blogPosts: BlogPost[] = [
     readTime: '12 min read',
     category: 'Interview Prep',
     tags: ['Blind 75', 'DSA Practice', 'Leetcode', 'Visual Learning'],
-    thumbnail: '/blog/blind75-coding.jpg',
+    thumbnail: '/blog/blind75-patterns-diagram.jpg',
     content: [
       {
         type: 'paragraph',
@@ -121,8 +121,8 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: 'image',
-        content: '/blog/algorithms-visualization.jpg',
-        alt: 'Algorithm visualization showing step-by-step execution'
+        content: '/blog/blind75-patterns-diagram.jpg',
+        alt: 'The 7 essential algorithm patterns in Blind 75 - circular diagram showing Two Pointers, Sliding Window, Fast & Slow Pointers, Dynamic Programming, Binary Search, Tree Traversal, and Graph Algorithms'
       },
       {
         type: 'heading',
@@ -225,11 +225,17 @@ export const blogPosts: BlogPost[] = [
     subtitle: 'Master BFS, DFS, and shortest-path algorithms through interactive gameplay',
     description: 'Visualize BFS, DFS, and shortest-path algorithms with the Graph Explorer game. Learn graph logic by playing.',
     author: 'AlgoLib Team',
-    date: '2024-01-18',
+    date: '2025-02-20',
     readTime: '9 min read',
     category: 'DSA Games',
     tags: ['Graphs', 'BFS', 'DFS', 'Algorithms', 'Visualization'],
+    thumbnail: '/blog/graph-traversal-diagram.jpg',
     content: [
+      {
+        type: 'image',
+        content: '/blog/graph-traversal-diagram.jpg',
+        alt: 'Side-by-side comparison of BFS (breadth-first) and DFS (depth-first) graph traversal algorithms with queue and stack visualization'
+      },
       {
         type: 'heading',
         content: 'Why Graph Algorithms Matter'
@@ -370,10 +376,11 @@ function dfsIterative(graph: number[][], start: number): void {
     subtitle: 'Understand stack operations through real-time visualization',
     description: 'Understand how stacks work through AlgoLib\'s Stack Master — visualize push/pop operations in real time.',
     author: 'AlgoLib Team',
-    date: '2024-01-16',
+    date: '2025-02-15',
     readTime: '7 min read',
     category: 'Data Structures',
     tags: ['Stack', 'LIFO', 'Data Structures', 'Visualization'],
+    thumbnail: '/blog/stack-data-structure.jpg',
     content: [
       {
         type: 'heading',
