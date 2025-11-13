@@ -40,11 +40,10 @@ const BlogPost = () => {
             Back to Blog
           </Link>
 
-          {/* Content wrapper with relative positioning */}
-          <div className="relative">
-            {/* Main Content - Full Width */}
-            <div className="w-full">
-              <article>
+          {/* Content wrapper - Centered */}
+          <div className="max-w-4xl mx-auto">
+            {/* Main Content */}
+            <article>
                 {/* Hero Image */}
                 {post.image && (
                   <img 
@@ -105,100 +104,6 @@ const BlogPost = () => {
                   </div>
                 </div>
               </article>
-            </div>
-
-            {/* Floating Sidebar - Right Side */}
-            <aside className="hidden xl:block fixed right-8 top-32 w-64 z-10">
-              <div className="blog-sidebar">
-                {/* Popular Tags */}
-                <div className="blog-sidebar-card">
-                  <h3 className="blog-sidebar-title">Popular Tags</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {popularTags.map(tag => (
-                      <Badge 
-                        key={tag} 
-                        variant="outline" 
-                        className="cursor-pointer hover:bg-accent transition-colors font-roboto"
-                      >
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Related Posts */}
-                {relatedPosts.length > 0 && (
-                  <div className="blog-sidebar-card">
-                    <h3 className="blog-sidebar-title">More Posts</h3>
-                    <div className="space-y-4">
-                      {relatedPosts.map(relatedPost => (
-                        <Link 
-                          key={relatedPost.slug} 
-                          to={`/blog/${relatedPost.slug}`}
-                          className="block group"
-                        >
-                          <h4 className="text-sm font-medium text-foreground group-hover:text-primary transition-colors mb-1 font-roboto">
-                            {relatedPost.title}
-                          </h4>
-                          <p className="text-xs text-muted-foreground font-roboto">
-                            {relatedPost.readTime}
-                          </p>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Try Game CTA */}
-                <div className="blog-sidebar-card bg-primary/5 border-primary/20">
-                  <h3 className="blog-sidebar-title">Practice Your Skills</h3>
-                  <p className="text-sm text-muted-foreground mb-4 font-roboto">
-                    Master algorithms through interactive games
-                  </p>
-                  <Link 
-                    to="/games/two-pointer" 
-                    className="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md shadow-sm hover:bg-primary/90 transition-all hover:shadow-md font-roboto"
-                  >
-                    Try Two Pointer Game
-                  </Link>
-                </div>
-              </div>
-            </aside>
-
-            {/* Mobile Sidebar - Bottom */}
-            <div className="xl:hidden mt-12">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Popular Tags */}
-                <div className="blog-sidebar-card">
-                  <h3 className="blog-sidebar-title">Popular Tags</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {popularTags.map(tag => (
-                      <Badge 
-                        key={tag} 
-                        variant="outline" 
-                        className="cursor-pointer hover:bg-accent transition-colors font-roboto"
-                      >
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Try Game CTA */}
-                <div className="blog-sidebar-card bg-primary/5 border-primary/20">
-                  <h3 className="blog-sidebar-title">Practice Your Skills</h3>
-                  <p className="text-sm text-muted-foreground mb-4 font-roboto">
-                    Master algorithms through interactive games
-                  </p>
-                  <Link 
-                    to="/games/two-pointer" 
-                    className="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md shadow-sm hover:bg-primary/90 transition-all hover:shadow-md font-roboto"
-                  >
-                    Try Two Pointer Game
-                  </Link>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
