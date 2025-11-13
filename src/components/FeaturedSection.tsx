@@ -5,6 +5,14 @@ import { Code2, ListChecks, BookOpen, Gamepad2, ArrowRight } from 'lucide-react'
 
 const features = [
   {
+    id: 'core-algorithms',
+    title: 'Core Algorithms',
+    description: 'Explore step-by-step visualizations of 200+ essential algorithms across 20 categories.',
+    icon: Code2,
+    link: '#algorithms',
+    action: 'Browse Algorithms'
+  },
+  {
     id: 'blind-75',
     title: 'Blind 75',
     description: 'Master the most important 75 LeetCode problems curated for technical interviews.',
@@ -20,27 +28,45 @@ const features = [
     icon: BookOpen,
     link: '/blog',
     action: 'Read Articles'
+  },
+  {
+    id: 'games',
+    title: 'Interactive Games',
+    description: 'Practice algorithms through fun, interactive games that reinforce your understanding.',
+    icon: Gamepad2,
+    link: '/games',
+    action: 'Play Now'
   }
 ];
 
 export const FeaturedSection = () => {
+  const handleCoreAlgorithmsClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (features[0].link.startsWith('#')) {
+      e.preventDefault();
+      const element = document.getElementById('algorithms');
+      element?.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section className="py-12 px-4">
-      <div className="container mx-auto max-w-4xl">
+      <div className="container mx-auto max-w-5xl">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {features.map((feature) => {
+          {features.map((feature, index) => {
             const Icon = feature.icon;
+            const isFirstCard = index === 0;
             
             return (
               <Link
                 key={feature.id}
                 to={feature.link}
+                onClick={isFirstCard ? handleCoreAlgorithmsClick : undefined}
                 className="group block"
               >
                 <Card className="overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg bg-card">
                   <div className="relative h-32 bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center overflow-hidden">
                     {feature.badge ? (
-                      <div className="text-6xl font-bold text-primary/40 group-hover:text-primary/60 transition-colors duration-300 group-hover:scale-110 transform">
+                      <div className="text-6xl font-bold text-primary/40 group-hover:text-primary/60 transition-all duration-500 group-hover:scale-110 transform animate-pulse">
                         {feature.badge}
                       </div>
                     ) : (

@@ -114,28 +114,28 @@ const Home = () => {
   return (
     <>
       <Helmet>
-        <title>AlgoLib.io - Master 72+ Algorithms with Interactive Visualizations | Free & Open Source</title>
+        <title>AlgoLib.io - Master 200+ Algorithms with Interactive Visualizations | Free & Open Source</title>
         <meta 
           name="description" 
-          content="Learn data structures and algorithms with step-by-step visualizations. 72+ algorithm animations in Python, Java, C++, TypeScript. Perfect for coding interviews, LeetCode practice, and competitive programming. 100% free and open source." 
+          content="Learn data structures and algorithms with step-by-step visualizations across 20 categories. 200+ algorithm animations, Blind 75 problems, interactive games, and tutorials. Perfect for coding interviews, LeetCode practice, and competitive programming. 100% free and open source." 
         />
         <meta 
           name="keywords" 
-          content="algorithms, data structures, leetcode, coding interviews, competitive programming, algorithm visualization, learn algorithms, DSA, python algorithms, java algorithms, c++ algorithms, typescript algorithms, free algorithm library" 
+          content="algorithms, data structures, leetcode, coding interviews, blind 75, competitive programming, algorithm visualization, learn algorithms, DSA, python algorithms, java algorithms, c++ algorithms, typescript algorithms, free algorithm library, interactive games" 
         />
         <link rel="canonical" href="https://algolib.io/" />
         
         {/* Open Graph */}
-        <meta property="og:title" content="AlgoLib.io - Master 72+ Algorithms with Interactive Visualizations" />
-        <meta property="og:description" content="Free open-source algorithm library with interactive visualizations. Learn DSA for coding interviews and competitive programming." />
+        <meta property="og:title" content="AlgoLib.io - Master 200+ Algorithms with Interactive Visualizations" />
+        <meta property="og:description" content="Free open-source algorithm library with 200+ interactive visualizations across 20 categories. Learn DSA for coding interviews with Blind 75, games, and tutorials." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://algolib.io/" />
         <meta property="og:image" content="https://algolib.io/og-image.png" />
         
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="AlgoLib.io - Master 72+ Algorithms Visually" />
-        <meta name="twitter:description" content="Free interactive algorithm visualizations for coding interviews and competitive programming" />
+        <meta name="twitter:title" content="AlgoLib.io - Master 200+ Algorithms Visually" />
+        <meta name="twitter:description" content="Free interactive algorithm visualizations with 20 categories, Blind 75, and games for coding interviews" />
         <meta name="twitter:image" content="https://algolib.io/og-image.png" />
         
         {/* Structured Data - WebSite */}
@@ -201,7 +201,7 @@ const Home = () => {
             "@context": "https://schema.org",
             "@type": "CollectionPage",
             "name": "AlgoLib.io - Algorithm Library",
-            "description": "Browse 72+ algorithms with step-by-step visualizations",
+            "description": "Browse 200+ algorithms with step-by-step visualizations across 20 categories",
             "url": "https://algolib.io",
             "mainEntity": {
               "@type": "ItemList",
