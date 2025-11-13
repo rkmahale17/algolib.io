@@ -43,16 +43,7 @@ const BlogPost = () => {
           {/* Content wrapper - Centered */}
           <div className="max-w-4xl mx-auto">
             {/* Main Content */}
-            <article>
-                {/* Hero Image */}
-                {post.image && (
-                  <img 
-                    src={post.image} 
-                    alt={post.title}
-                    className="blog-hero-image"
-                  />
-                )}
-
+              <article>
                 {/* Header */}
                 <header className="mb-8">
                   <div className="flex items-center gap-2 mb-4">
@@ -89,6 +80,17 @@ const BlogPost = () => {
 
                   <Separator className="mb-8" />
                 </header>
+
+                {/* Hero Image - Inside Content */}
+                {post.image && (
+                  <div className="blog-image-container">
+                    <img 
+                      src={post.image} 
+                      alt={post.title}
+                      className="blog-hero-image"
+                    />
+                  </div>
+                )}
 
                 {/* Blog Content */}
                 <BlogContent content={post.content} />

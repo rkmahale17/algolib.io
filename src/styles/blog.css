@@ -15,9 +15,23 @@
 .blog-hero-image {
   width: 100%;
   height: auto;
+  max-height: 300px;
+  object-fit: cover;
   border-radius: 8px;
   margin-bottom: 2rem;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid hsl(var(--border));
+}
+
+/* Image Container */
+.blog-image-container {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 8px;
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+  border: 1px solid hsl(var(--border));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 /* Main Heading - H2 */
@@ -103,10 +117,13 @@
 .blog-article img {
   width: 100%;
   height: auto;
+  max-height: 500px;
+  object-fit: cover;
   border-radius: 8px;
   margin-top: 1.5rem; /* 24px */
   margin-bottom: 2rem; /* 32px */
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid hsl(var(--border));
 }
 
 .blog-article figure {
@@ -149,40 +166,41 @@
 
 /* Links - Simple, clean, modern */
 .blog-article a {
-  color: hsl(var(--primary));
+  color: hsl(var(--foreground));
   text-decoration: none;
   transition: all 0.2s ease;
   font-weight: 500;
+  border-bottom: 1px solid hsl(var(--foreground) / 0.2);
 }
 
 .blog-article a:hover {
-  color: hsl(var(--primary) / 0.8);
-  text-decoration: underline;
+  border-bottom-color: hsl(var(--foreground));
 }
 
-/* CTA Button - Simple with shadow */
+/* CTA Button - Clean black and white design */
 .blog-cta-button {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
+  padding: 0.875rem 1.75rem;
   font-size: 0.9375rem;
   font-weight: 500;
-  background: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
-  border-radius: 6px;
+  background: hsl(var(--foreground));
+  color: hsl(var(--background));
+  border-radius: 4px;
   text-decoration: none;
   transition: all 0.2s ease;
   margin-top: 1.5rem;
-  box-shadow: 0 2px 8px hsl(var(--primary) / 0.2);
-  border: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid hsl(var(--foreground));
   font-family: 'Roboto', sans-serif;
 }
 
 .blog-cta-button:hover {
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px hsl(var(--primary) / 0.3);
-  color: hsl(var(--primary-foreground));
 }
 
 /* Section spacing */
