@@ -40,9 +40,9 @@ const BlogPost = () => {
             Back to Blog
           </Link>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="flex flex-col lg:flex-row gap-8 justify-center">
             {/* Main Content - Centered */}
-            <div className="lg:col-span-8">
+            <div className="flex-1 max-w-4xl mx-auto lg:mx-0">
               <article>
                 {/* Hero Image */}
                 {post.image && (
@@ -106,8 +106,8 @@ const BlogPost = () => {
               </article>
             </div>
 
-            {/* Sidebar - Right Side (Sticky on desktop, bottom on mobile) */}
-            <aside className="lg:col-span-4">
+            {/* Sidebar - Right Side (Sticky, minimal width) */}
+            <aside className="w-full lg:w-72 flex-shrink-0">
               <div className="blog-sidebar">
                 {/* Popular Tags */}
                 <div className="blog-sidebar-card">
