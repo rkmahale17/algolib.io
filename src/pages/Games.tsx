@@ -27,6 +27,14 @@ const Games = () => {
       icon: Brain,
       difficulty: "All Levels",
       category: "Data Structures"
+    },
+    {
+      id: "dp-puzzle",
+      name: "DP Puzzle Grid",
+      description: "Master Dynamic Programming by filling tables for Fibonacci, Knapsack, LCS, and more",
+      icon: Brain,
+      difficulty: "Intermediate to Advanced",
+      category: "Dynamic Programming"
     }
   ];
 
