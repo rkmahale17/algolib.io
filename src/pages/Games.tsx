@@ -11,6 +11,14 @@ const Games = () => {
       icon: Brain,
       difficulty: "Beginner to Advanced",
       category: "Algorithms"
+    },
+    {
+      id: "graph-explorer",
+      name: "Graph Explorer",
+      description: "Traverse mazes and learn BFS/DFS graph algorithms visually",
+      icon: Brain,
+      difficulty: "Intermediate",
+      category: "Graph Algorithms"
     }
   ];
 
