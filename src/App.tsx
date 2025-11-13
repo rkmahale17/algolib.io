@@ -17,6 +17,7 @@ import ContentRights from "./pages/ContentRights";
 import Games from "./pages/Games";
 import SortHero from "./pages/SortHero";
 import GraphExplorer from "./pages/GraphExplorer";
+import StackMaster from "./pages/StackMaster";
 import Leaderboard from "./pages/Leaderboard";
 import Navbar from "./components/Navbar";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -44,6 +45,7 @@ const App = () => (
           <Route path="/games" element={<ProtectedRoute><Games /></ProtectedRoute>} />
           <Route path="/games/sort-hero" element={<ProtectedRoute><SortHero /></ProtectedRoute>} />
           <Route path="/games/graph-explorer" element={<ProtectedRoute><GraphExplorer /></ProtectedRoute>} />
+          <Route path="/games/stack-master" element={<ProtectedRoute><StackMaster /></ProtectedRoute>} />
           <Route path="/games/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

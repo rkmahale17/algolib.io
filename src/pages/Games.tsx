@@ -19,6 +19,14 @@ const Games = () => {
       icon: Brain,
       difficulty: "Intermediate",
       category: "Graph Algorithms"
+    },
+    {
+      id: "stack-master",
+      name: "Stack Master",
+      description: "Master stack operations with fast-paced symbol matching",
+      icon: Brain,
+      difficulty: "All Levels",
+      category: "Data Structures"
     }
   ];
 
