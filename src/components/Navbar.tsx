@@ -124,6 +124,9 @@ const Navbar = () => {
               <Trophy className="w-4 h-4" />
               Blind 75
             </Link>
+            <Link to="/blog" className="text-sm font-medium hover:text-primary transition-colors">
+              Blog
+            </Link>
             <Link to="/about" className="text-sm font-medium hover:text-primary transition-colors">
               About
             </Link>
