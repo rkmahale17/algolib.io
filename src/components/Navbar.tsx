@@ -115,29 +115,22 @@ const Navbar = () => {
           </div>
 
           {/* Navigation Links */}
-          <div className="hidden lg:flex items-center gap-6 flex-1 justify-center">
-            <Link to="/games" className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1">
-              <Trophy className="w-4 h-4" />
-              Games
-            </Link>
-            <Link to="/blind75" className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1">
-              <Trophy className="w-4 h-4" />
-              Blind 75
+          <div className="hidden lg:flex items-center gap-8 flex-1 justify-center">
+            <Link to="/about" className="text-sm font-medium hover:text-primary transition-colors">
+              About
             </Link>
             <Link to="/blog" className="text-sm font-medium hover:text-primary transition-colors">
               Blog
             </Link>
-            <Link to="/about" className="text-sm font-medium hover:text-primary transition-colors">
-              About
-            </Link>
-            <Link to="/feedback" className="text-sm font-medium hover:text-primary transition-colors">
+            <Link to="/feedback" className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1.5">
+              <MessageSquare className="w-4 h-4" />
               Feedback
             </Link>
             <a
-              href="https://github.com/rkmahale17/algolib.io"
+              href="https://github.com/chandeldivyam/AlgoLib"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1"
+              className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1.5"
             >
               <Github className="w-4 h-4" />
               GitHub
@@ -153,21 +146,29 @@ const Navbar = () => {
                   <MenuIcon className="w-5 h-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuLabel>Menu</DropdownMenuLabel>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link to="/games">Games</Link>
+                  <Link to="/about" className="cursor-pointer">About</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/blind75">Blind 75</Link>
+                  <Link to="/blog" className="cursor-pointer">Blog</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/about">About</Link>
+                  <Link to="/feedback" className="flex items-center gap-2 cursor-pointer">
+                    <MessageSquare className="w-4 h-4" />
+                    Feedback
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/feedback">Feedback</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <a href="https://github.com/rkmahale17/algolib.io" target="_blank" rel="noopener noreferrer">
+                  <a 
+                    href="https://github.com/chandeldivyam/AlgoLib"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <Github className="w-4 h-4" />
                     GitHub
                   </a>
                 </DropdownMenuItem>
