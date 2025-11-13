@@ -17,7 +17,7 @@ interface LeaderboardEntry {
   profiles?: {
     display_name: string;
     email: string;
-  };
+  } | null;
 }
 
 const Leaderboard = () => {
@@ -29,52 +29,52 @@ const Leaderboard = () => {
   const fetchLeaderboard = async () => {
     setLoading(true);
     
-    // All-time leaderboard with profile data
-    const { data: allTime } = await supabase
+    // All-time leaderboard - fetch sessions and profiles separately
+    const { data: allTimeSessions } = await supabase
       .from('game_sessions')
-      .select(`
-        id, 
-        user_id, 
-        score, 
-        level, 
-        moves, 
-        grade, 
-        completed_at,
-        profiles:user_id (
-          display_name,
-          email
-        )
-      `)
+      .select('id, user_id, score, level, moves, grade, completed_at')
       .eq('game_type', 'sort_hero')
       .order('score', { ascending: false })
       .limit(100);
 
-    // Today's leaderboard with profile data
+    // Fetch profiles for all users
+    const userIds = allTimeSessions?.map(s => s.user_id) || [];
+    const { data: allProfiles } = await supabase
+      .from('profiles')
+      .select('id, display_name, email')
+      .in('id', userIds);
+
+    // Merge data
+    const allTime = allTimeSessions?.map(session => ({
+      ...session,
+      profiles: allProfiles?.find(p => p.id === session.user_id) || null
+    })) || [];
+
+    // Today's leaderboard
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
     
-    const { data: today } = await supabase
+    const { data: todaySessions } = await supabase
       .from('game_sessions')
-      .select(`
-        id, 
-        user_id, 
-        score, 
-        level, 
-        moves, 
-        grade, 
-        completed_at,
-        profiles:user_id (
-          display_name,
-          email
-        )
-      `)
+      .select('id, user_id, score, level, moves, grade, completed_at')
       .eq('game_type', 'sort_hero')
       .gte('completed_at', todayStart.toISOString())
       .order('score', { ascending: false })
       .limit(100);
 
-    setAllTimeData(allTime || []);
-    setTodayData(today || []);
+    const todayUserIds = todaySessions?.map(s => s.user_id) || [];
+    const { data: todayProfiles } = await supabase
+      .from('profiles')
+      .select('id, display_name, email')
+      .in('id', todayUserIds);
+
+    const today = todaySessions?.map(session => ({
+      ...session,
+      profiles: todayProfiles?.find(p => p.id === session.user_id) || null
+    })) || [];
+
+    setAllTimeData(allTime);
+    setTodayData(today);
     setLoading(false);
   };
 
