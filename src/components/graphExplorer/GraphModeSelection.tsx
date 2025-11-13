@@ -1,7 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Layers, GitBranch, ArrowRight } from "lucide-react";
+import { Layers, GitBranch, ArrowRight, ArrowLeft } from "lucide-react";
 import { GraphMode } from "@/hooks/useGraphGame";
+import { useNavigate } from "react-router-dom";
 
 interface GraphModeSelectionProps {
   onSelectMode: (mode: GraphMode) => void;
@@ -29,8 +30,21 @@ const modes = [
 ];
 
 export const GraphModeSelection = ({ onSelectMode }: GraphModeSelectionProps) => {
+  const navigate = useNavigate();
+  
   return (
     <div className="space-y-6">
+      <div className="mb-6">
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate('/games')}
+          className="gap-2"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Games
+        </Button>
+      </div>
+      
       <div className="text-center space-y-2">
         <h2 className="text-2xl font-bold">Choose Your Algorithm</h2>
         <p className="text-muted-foreground">

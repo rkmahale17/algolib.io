@@ -1,7 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Zap, Layers, Code, Gauge } from "lucide-react";
+import { Zap, Layers, Code, Gauge, ArrowLeft } from "lucide-react";
 import { StackMode } from "@/hooks/useStackGame";
+import { useNavigate } from "react-router-dom";
 
 interface StackModeSelectionProps {
   onSelectMode: (mode: StackMode) => void;
@@ -51,8 +52,21 @@ const modes = [
 ];
 
 export const StackModeSelection = ({ onSelectMode }: StackModeSelectionProps) => {
+  const navigate = useNavigate();
+  
   return (
     <div className="space-y-6">
+      <div className="mb-6">
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate('/games')}
+          className="gap-2"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Games
+        </Button>
+      </div>
+      
       <div className="text-center space-y-2">
         <h2 className="text-2xl font-bold">Choose Your Challenge</h2>
         <p className="text-muted-foreground">

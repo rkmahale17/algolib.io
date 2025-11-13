@@ -1,13 +1,15 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { WindowMode } from "@/hooks/useSlidingWindowGame";
-import { TrendingUp, Grid3x3, Type, Target } from "lucide-react";
+import { TrendingUp, Grid3x3, Type, Target, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface SlidingWindowModeSelectionProps {
   onSelectMode: (mode: WindowMode) => void;
 }
 
 export const SlidingWindowModeSelection = ({ onSelectMode }: SlidingWindowModeSelectionProps) => {
+  const navigate = useNavigate();
   const modes = [
     {
       id: "maxSum" as WindowMode,
@@ -49,6 +51,17 @@ export const SlidingWindowModeSelection = ({ onSelectMode }: SlidingWindowModeSe
   
   return (
     <div className="space-y-6">
+      <div className="mb-6">
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate('/games')}
+          className="gap-2"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Games
+        </Button>
+      </div>
+      
       <div className="text-center space-y-2">
         <h2 className="text-2xl font-bold">Choose Your Challenge</h2>
         <p className="text-muted-foreground">Master the sliding window technique</p>

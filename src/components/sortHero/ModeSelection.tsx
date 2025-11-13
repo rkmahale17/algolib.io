@@ -1,13 +1,15 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Shuffle, Target, Zap } from "lucide-react";
+import { ArrowRight, Shuffle, Target, Zap, ArrowLeft } from "lucide-react";
 import { SortMode } from "@/pages/SortHero";
+import { useNavigate } from "react-router-dom";
 
 interface ModeSelectionProps {
   onSelectMode: (mode: SortMode) => void;
 }
 
 export const ModeSelection = ({ onSelectMode }: ModeSelectionProps) => {
+  const navigate = useNavigate();
   const modes = [
     {
       id: "bubble" as SortMode,
@@ -36,7 +38,19 @@ export const ModeSelection = ({ onSelectMode }: ModeSelectionProps) => {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div>
+      <div className="mb-6">
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate('/games')}
+          className="gap-2"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Games
+        </Button>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {modes.map((mode) => {
         const Icon = mode.icon;
         return (
@@ -65,6 +79,7 @@ export const ModeSelection = ({ onSelectMode }: ModeSelectionProps) => {
           </Card>
         );
       })}
+      </div>
     </div>
   );
 };

@@ -1,8 +1,11 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trophy, Brain } from "lucide-react";
+import { Trophy, Brain, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Games = () => {
+  const navigate = useNavigate();
+  
   const games = [
     {
       id: "sort-hero",
@@ -57,6 +60,17 @@ const Games = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-8 px-4">
       <div className="container mx-auto max-w-6xl">
+        <div className="mb-6">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/')}
+            className="gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Home
+          </Button>
+        </div>
+        
         <div className="text-center mb-8">
           <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">
             ALGORITHMIC GAMES

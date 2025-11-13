@@ -1,13 +1,15 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PointerMode } from "@/hooks/useTwoPointerGame";
-import { Plus, Minus, X } from "lucide-react";
+import { Plus, Minus, X, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface TwoPointerModeSelectionProps {
   onSelectMode: (mode: PointerMode) => void;
 }
 
 export const TwoPointerModeSelection = ({ onSelectMode }: TwoPointerModeSelectionProps) => {
+  const navigate = useNavigate();
   const modes = [
     {
       id: "sum" as PointerMode,
@@ -40,6 +42,17 @@ export const TwoPointerModeSelection = ({ onSelectMode }: TwoPointerModeSelectio
   
   return (
     <div className="space-y-6">
+      <div className="mb-6">
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate('/games')}
+          className="gap-2"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Games
+        </Button>
+      </div>
+      
       <div className="text-center space-y-2">
         <h2 className="text-2xl font-bold">Choose Your Challenge</h2>
         <p className="text-muted-foreground">Master the two-pointer technique for finding pairs</p>
