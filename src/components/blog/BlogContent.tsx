@@ -1,7 +1,7 @@
 import { BlogContent as BlogContentType } from '@/data/blogPosts';
 import { CodeHighlighter } from '@/components/visualizations/shared/CodeHighlighter';
 import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import '../../styles/blog.css';
 
 interface BlogContentProps {
@@ -100,9 +100,11 @@ export const BlogContent = ({ content }: BlogContentProps) => {
                 <Link 
                   to={block.link || '#'} 
                   className="blog-cta-button"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   {block.content}
-                  <ArrowRight className="w-4 h-4" />
+                  <ExternalLink className="w-4 h-4" />
                 </Link>
               </div>
             );
