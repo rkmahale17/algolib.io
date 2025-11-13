@@ -159,7 +159,7 @@ const computeCorrectGrid = (mode: DPMode, data: ProblemData): number[][] => {
 };
 
 // Create game grid with some cells hidden
-const createGameGrid = (correctGrid: number[][], level: number): Cell[][] => {
+const createGameGrid = (correctGrid: number[][], level: number, mode: DPMode): Cell[][] => {
   const rows = correctGrid.length;
   const cols = correctGrid[0]?.length || 0;
   
@@ -176,7 +176,7 @@ const createGameGrid = (correctGrid: number[][], level: number): Cell[][] => {
     }))
   );
   
-  // Hide cells (but not first row/col which are usually base cases)
+  // Hide cells (but not base cases)
   let hidden = 0;
   const attempts = hiddenCellsCount * 3; // Try multiple times
   
@@ -184,8 +184,13 @@ const createGameGrid = (correctGrid: number[][], level: number): Cell[][] => {
     const row = Math.floor(Math.random() * rows);
     const col = Math.floor(Math.random() * cols);
     
-    // Don't hide first row/col (base cases) or already hidden cells
-    if ((row === 0 || col === 0) || grid[row][col].isEditable) {
+    // For Fibonacci (1D), only protect first 2 columns (base cases)
+    // For 2D problems, protect first row/col
+    const isBaseCase = mode === "fibonacci" 
+      ? col < 2  // Protect fib[0] and fib[1]
+      : (row === 0 || col === 0);  // Protect first row/col for 2D problems
+    
+    if (isBaseCase || grid[row][col].isEditable) {
       continue;
     }
     
@@ -203,7 +208,7 @@ export const useDPGame = (mode: DPMode, level: number) => {
   const initializeGame = (): DPGameState => {
     const problemData = generateProblemData(mode, level);
     const correctGrid = computeCorrectGrid(mode, problemData);
-    const grid = createGameGrid(correctGrid, level);
+    const grid = createGameGrid(correctGrid, level, mode);
     
     const totalEditableCells = grid.flat().filter(c => c.isEditable).length;
     
