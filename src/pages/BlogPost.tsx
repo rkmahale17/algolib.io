@@ -40,9 +40,10 @@ const BlogPost = () => {
             Back to Blog
           </Link>
 
-          <div className="flex flex-col lg:flex-row gap-8 justify-center">
-            {/* Main Content - Centered */}
-            <div className="flex-1 max-w-4xl mx-auto lg:mx-0">
+          {/* Content wrapper with relative positioning */}
+          <div className="relative">
+            {/* Main Content - Full Width */}
+            <div className="w-full">
               <article>
                 {/* Hero Image */}
                 {post.image && (
@@ -106,8 +107,8 @@ const BlogPost = () => {
               </article>
             </div>
 
-            {/* Sidebar - Right Side (Sticky, minimal width) */}
-            <aside className="w-full lg:w-72 flex-shrink-0">
+            {/* Floating Sidebar - Right Side */}
+            <aside className="hidden xl:block fixed right-8 top-32 w-64 z-10">
               <div className="blog-sidebar">
                 {/* Popular Tags */}
                 <div className="blog-sidebar-card">
@@ -163,6 +164,41 @@ const BlogPost = () => {
                 </div>
               </div>
             </aside>
+
+            {/* Mobile Sidebar - Bottom */}
+            <div className="xl:hidden mt-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Popular Tags */}
+                <div className="blog-sidebar-card">
+                  <h3 className="blog-sidebar-title">Popular Tags</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {popularTags.map(tag => (
+                      <Badge 
+                        key={tag} 
+                        variant="outline" 
+                        className="cursor-pointer hover:bg-accent transition-colors font-roboto"
+                      >
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Try Game CTA */}
+                <div className="blog-sidebar-card bg-primary/5 border-primary/20">
+                  <h3 className="blog-sidebar-title">Practice Your Skills</h3>
+                  <p className="text-sm text-muted-foreground mb-4 font-roboto">
+                    Master algorithms through interactive games
+                  </p>
+                  <Link 
+                    to="/games/two-pointer" 
+                    className="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md shadow-sm hover:bg-primary/90 transition-all hover:shadow-md font-roboto"
+                  >
+                    Try Two Pointer Game
+                  </Link>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
