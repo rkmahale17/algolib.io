@@ -20,6 +20,7 @@ import GraphExplorer from "./pages/GraphExplorer";
 import StackMaster from "./pages/StackMaster";
 import DPPuzzle from "./pages/DPPuzzle";
 import SlidingWindow from "./pages/SlidingWindow";
+import TwoPointer from "./pages/TwoPointer";
 import Leaderboard from "./pages/Leaderboard";
 import Navbar from "./components/Navbar";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -50,6 +51,7 @@ const App = () => (
           <Route path="/games/stack-master" element={<ProtectedRoute><StackMaster /></ProtectedRoute>} />
           <Route path="/games/dp-puzzle" element={<ProtectedRoute><DPPuzzle /></ProtectedRoute>} />
           <Route path="/games/sliding-window" element={<ProtectedRoute><SlidingWindow /></ProtectedRoute>} />
+          <Route path="/games/two-pointer" element={<ProtectedRoute><TwoPointer /></ProtectedRoute>} />
           <Route path="/games/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

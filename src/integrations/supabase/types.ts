@@ -133,6 +133,7 @@ export type Database = {
         | "stack_master"
         | "dp_puzzle"
         | "sliding_window"
+        | "two_pointer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -266,6 +267,7 @@ export const Constants = {
         "stack_master",
         "dp_puzzle",
         "sliding_window",
+        "two_pointer",
       ],
     },
   },

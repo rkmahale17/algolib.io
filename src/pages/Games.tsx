@@ -43,6 +43,14 @@ const Games = () => {
       icon: Brain,
       difficulty: "Beginner to Advanced",
       category: "Two Pointers"
+    },
+    {
+      id: "two-pointer",
+      name: "Two Pointer Race",
+      description: "Find valid pairs using two pointers moving from opposite ends of the array",
+      icon: Brain,
+      difficulty: "Beginner to Intermediate",
+      category: "Two Pointers"
     }
   ];
 
