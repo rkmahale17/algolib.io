@@ -6,6 +6,8 @@ import { SortMode } from "@/pages/SortHero";
 import { useSortGame } from "@/hooks/useSortGame";
 import { NumberTile } from "./NumberTile";
 import { VictoryModal } from "./VictoryModal";
+import { AlgorithmExplainer } from "./AlgorithmExplainer";
+import { MoveValidationFeedback } from "./MoveValidationFeedback";
 
 interface GameBoardProps {
   mode: SortMode;
@@ -59,17 +61,24 @@ export const GameBoard = ({ mode, level, onBackToMenu, onNextLevel }: GameBoardP
 
   return (
     <>
-      <Card className="backdrop-blur-sm bg-card/80">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <Button variant="ghost" onClick={onBackToMenu}>
-              <ArrowLeft className="mr-2 h-4 w-4" /> Back
-            </Button>
-            <CardTitle>{modeNames[mode]} - Level {level}</CardTitle>
-            <div className="w-20" />
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-8">
+      <MoveValidationFeedback 
+        isValid={gameState.lastMoveValid} 
+        message={gameState.feedbackMessage}
+      />
+      
+      <div className="grid lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          <Card className="backdrop-blur-sm bg-card/80">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <Button variant="ghost" onClick={onBackToMenu}>
+                  <ArrowLeft className="mr-2 h-4 w-4" /> Back
+                </Button>
+                <CardTitle>{modeNames[mode]} - Level {level}</CardTitle>
+                <div className="w-20" />
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-8">
           {/* Stats */}
           <div className="grid grid-cols-4 gap-4 text-center">
             <div className="space-y-1">
@@ -133,8 +142,14 @@ export const GameBoard = ({ mode, level, onBackToMenu, onNextLevel }: GameBoardP
             {mode === "selection" && "Select the smallest unsorted number and move it to its correct position."}
             {mode === "quick" && `Partition numbers around the pivot (${gameState.pivotIndex !== null ? gameState.numbers[gameState.pivotIndex] : ""}). Smaller left, larger right!`}
           </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <div className="lg:col-span-1">
+          <AlgorithmExplainer mode={mode} />
+        </div>
+      </div>
 
       <VictoryModal
         isOpen={gameState.isComplete}

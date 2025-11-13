@@ -14,6 +14,8 @@ export interface GameState {
   errors: number;
   score: number;
   startTime: number;
+  lastMoveValid: boolean | null;
+  feedbackMessage: string;
 }
 
 const generateNumbers = (count: number): number[] => {
@@ -36,12 +38,31 @@ export const useSortGame = (mode: SortMode, level: number) => {
   const { playSuccess, playError, playLevelComplete } = useGameAudio();
   const numberCount = 4 + (level - 1) * 2;
   
-  const calculateScore = useCallback((moves: number, errors: number, hintsUsed: number, level: number) => {
-    const baseScore = 100 * level;
-    const movePenalty = moves * 2;
-    const errorPenalty = errors * 10;
-    const hintPenalty = hintsUsed * 15;
-    return Math.max(0, Math.min(1000, baseScore - movePenalty - errorPenalty - hintPenalty));
+  const calculateScore = useCallback((moves: number, errors: number, hintsUsed: number, level: number, numberCount: number) => {
+    // Optimal moves for each algorithm varies, but generally n-1 to n*log(n)
+    const optimalMoves = numberCount * 2; // Reasonable baseline
+    
+    // Start with base points for completing the level
+    let score = 200 * level;
+    
+    // Reward efficiency - more points for fewer moves
+    const moveEfficiency = Math.max(0, 1 - (moves - optimalMoves) / optimalMoves);
+    score += Math.floor(moveEfficiency * 300);
+    
+    // Reward accuracy - fewer errors = more points
+    const accuracyBonus = Math.max(0, 300 - (errors * 30));
+    score += accuracyBonus;
+    
+    // Hint penalty (learning by doing is better)
+    const hintPenalty = hintsUsed * 50;
+    score -= hintPenalty;
+    
+    // Perfect play bonus
+    if (errors === 0 && moves <= optimalMoves) {
+      score += 200;
+    }
+    
+    return Math.max(0, Math.min(1000, Math.floor(score)));
   }, []);
 
   const saveGameSession = useCallback(async (finalState: GameState) => {
@@ -81,6 +102,8 @@ export const useSortGame = (mode: SortMode, level: number) => {
     errors: 0,
     score: 0,
     startTime: Date.now(),
+    lastMoveValid: null,
+    feedbackMessage: "",
   });
 
   useEffect(() => {
@@ -95,18 +118,20 @@ export const useSortGame = (mode: SortMode, level: number) => {
       errors: 0,
       score: 0,
       startTime: Date.now(),
+      lastMoveValid: null,
+      feedbackMessage: "",
     });
   }, [level, mode, numberCount]);
 
   useEffect(() => {
     if (gameState.isComplete) {
-      const finalScore = calculateScore(gameState.moves, gameState.errors, gameState.hintsUsed, level);
+      const finalScore = calculateScore(gameState.moves, gameState.errors, gameState.hintsUsed, level, numberCount);
       const finalState = { ...gameState, score: finalScore };
       setGameState(prev => ({ ...prev, score: finalScore }));
       saveGameSession(finalState);
       playLevelComplete();
     }
-  }, [gameState.isComplete, gameState.moves, gameState.errors, gameState.hintsUsed, level, calculateScore, saveGameSession, playLevelComplete]);
+  }, [gameState.isComplete, gameState.moves, gameState.errors, gameState.hintsUsed, level, numberCount, calculateScore, saveGameSession, playLevelComplete]);
 
   const selectTile = useCallback((index: number) => {
     setGameState(prev => ({
@@ -122,15 +147,52 @@ export const useSortGame = (mode: SortMode, level: number) => {
       
       // Validate move based on mode
       let isValid = false;
+      let feedbackMessage = "";
+      
       if (mode === "bubble") {
-        isValid = Math.abs(index1 - index2) === 1 && newNumbers[index1] > newNumbers[index2];
+        const isAdjacent = Math.abs(index1 - index2) === 1;
+        const shouldSwap = newNumbers[index1] > newNumbers[index2];
+        
+        if (!isAdjacent) {
+          feedbackMessage = "❌ Bubble sort only swaps adjacent elements!";
+        } else if (!shouldSwap) {
+          feedbackMessage = "❌ Only swap if left > right!";
+        } else {
+          isValid = true;
+          feedbackMessage = "✅ Great! Larger number bubbles right!";
+        }
       } else if (mode === "selection") {
         const minIndex = prev.numbers.indexOf(Math.min(...prev.numbers.slice(prev.moves)));
-        isValid = index1 === minIndex && index2 === prev.moves;
+        const isMinimum = index1 === minIndex;
+        const isCorrectPosition = index2 === prev.moves;
+        
+        if (!isMinimum) {
+          feedbackMessage = "❌ Select the smallest unsorted number!";
+        } else if (!isCorrectPosition) {
+          feedbackMessage = "❌ Place it in the next sorted position!";
+        } else {
+          isValid = true;
+          feedbackMessage = "✅ Perfect! Minimum found and placed!";
+        }
       } else if (mode === "quick" && prev.pivotIndex !== null) {
         const pivot = newNumbers[prev.pivotIndex];
-        isValid = (newNumbers[index1] < pivot && index2 < prev.pivotIndex) ||
-                  (newNumbers[index1] > pivot && index2 > prev.pivotIndex);
+        const element = newNumbers[index1];
+        const movingLeft = index2 < prev.pivotIndex;
+        const movingRight = index2 > prev.pivotIndex;
+        
+        if (element < pivot && movingLeft) {
+          isValid = true;
+          feedbackMessage = "✅ Correct! Smaller than pivot → left!";
+        } else if (element > pivot && movingRight) {
+          isValid = true;
+          feedbackMessage = "✅ Correct! Larger than pivot → right!";
+        } else if (element < pivot && movingRight) {
+          feedbackMessage = `❌ ${element} < pivot (${pivot}), should go left!`;
+        } else if (element > pivot && movingLeft) {
+          feedbackMessage = `❌ ${element} > pivot (${pivot}), should go right!`;
+        } else {
+          feedbackMessage = "❌ Invalid partition move!";
+        }
       }
 
       if (!isValid) {
@@ -151,6 +213,8 @@ export const useSortGame = (mode: SortMode, level: number) => {
         highlightIndices: [],
         isComplete: sorted,
         errors: isValid ? prev.errors : prev.errors + 1,
+        lastMoveValid: isValid,
+        feedbackMessage,
       };
     });
   }, [mode, playSuccess, playError]);
@@ -197,6 +261,8 @@ export const useSortGame = (mode: SortMode, level: number) => {
       errors: 0,
       score: 0,
       startTime: Date.now(),
+      lastMoveValid: null,
+      feedbackMessage: "",
     });
   }, [mode, numberCount]);
 
