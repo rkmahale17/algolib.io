@@ -223,125 +223,168 @@ const Home = () => {
         </script>
       </Helmet>
       
-      <main className="min-h-screen bg-gradient-to-b from-background to-background/50">
-        <div className="container mx-auto px-4 py-8 md:py-16">
-          {/* Hero Section */}
-          <div className="text-center space-y-6 mb-12 max-w-4xl mx-auto">
-            <div className="space-y-4">
-              <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent animate-fade-in">
-                Master Algorithms with Interactive Visualizations
+      <div className="min-h-screen bg-background">
+        {/* Vertical Buy Me a Coffee Button */}
+        <a
+          href="https://buymeacoffee.com/jsonmaster"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fixed left-0 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-center gap-2 px-3 py-4 bg-[#FFDD00] text-[#000000] rounded-r-lg shadow-lg hover:bg-[#FFDD00]/90 hover:pl-4 transition-all font-medium group"
+        >
+          <Coffee className="w-5 h-5" />
+          <span className="writing-mode-vertical text-sm whitespace-nowrap [writing-mode:vertical-lr] rotate-180">
+            Buy Me a Coffee
+          </span>
+        </a>
+
+        {/* Hero Section */}
+        <div className="relative overflow-hidden bg-gradient-to-b from-background via-muted/20 to-background border-b border-border/50">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
+          
+          <div className="container mx-auto px-4 py-16 relative">
+            <div className="text-center max-w-4xl mx-auto space-y-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
+                <Sparkles className="w-4 h-4 text-primary" />
+                <span className="text-sm font-medium text-primary">Master Algorithms Visually</span>
+              </div>
+              
+              <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
+                <span className="gradient-text">All Competitive Algorithms</span>
+                <br />
+                In Your Pocket
               </h1>
-              <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto">
+              
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                 Step-by-step visualizations of all required algorithms. Watch code come to life with interactive animations.
               </p>
-            </div>
-          </div>
 
-          {/* Featured Section */}
-          <FeaturedSection />
-
-          {/* Algorithms Section */}
-          <div id="algorithms" className="space-y-8 scroll-mt-20">
-            <div className="text-center space-y-2">
-              <h2 className="text-3xl md:text-4xl font-bold">
-                Core Algorithms
-              </h2>
-            </div>
-
-            {/* Search and Filters */}
-            <div className="space-y-4">
-              <div className="max-w-2xl mx-auto">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-                  <Input
-                    type="text"
-                    placeholder="Search algorithms..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 h-12"
-                  />
+              {/* Stats */}
+              <div className="flex items-center justify-center gap-8 pt-8">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-primary">{algorithms.length}</div>
+                  <div className="text-sm text-muted-foreground">Algorithms</div>
+                </div>
+                <div className="h-12 w-px bg-border" />
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-secondary">{categories.length}</div>
+                  <div className="text-sm text-muted-foreground">Categories</div>
+                </div>
+                <div className="h-12 w-px bg-border" />
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-primary">100%</div>
+                  <div className="text-sm text-muted-foreground">Free Forever</div>
                 </div>
               </div>
-
-              {/* Category Filter Pills */}
-              <div className="flex flex-wrap justify-center gap-3">
-                <button
-                  onClick={() => setSelectedCategory(null)}
-                  className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
-                    selectedCategory === null
-                      ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-105'
-                      : 'bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  All
-                </button>
-                {categories.map((category) => (
-                  <button
-                    key={category}
-                    onClick={() => setSelectedCategory(category)}
-                    className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
-                      selectedCategory === category
-                        ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-105'
-                        : 'bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    {category}
-                  </button>
-                ))}
-              </div>
             </div>
-
-            {/* Algorithm Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-6">
-              {filteredAlgorithms.map((algo) => (
-                <Link key={algo.id} to={`/algorithm/${algo.id}`}>
-                  <Card className="h-full p-6 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] hover:border-primary/50 cursor-pointer group">
-                    <div className="space-y-4">
-                      <div className="flex items-start justify-between gap-2">
-                        <h3 className="text-xl font-bold group-hover:text-primary transition-colors line-clamp-2">
-                          {algo.name}
-                        </h3>
-                        <Badge 
-                          variant="outline" 
-                          className={difficultyColors[algo.difficulty as keyof typeof difficultyColors]}
-                        >
-                          {algo.difficulty}
-                        </Badge>
-                      </div>
-                      
-                      <p className="text-muted-foreground text-sm line-clamp-2">
-                        {algo.description}
-                      </p>
-                      
-                      <div className="flex flex-wrap gap-2">
-                        <Badge variant="secondary" className="text-xs">
-                          {algo.category}
-                        </Badge>
-                        <Badge variant="outline" className="text-xs">
-                          Time: {algo.timeComplexity}
-                        </Badge>
-                        <Badge variant="outline" className="text-xs">
-                          Space: {algo.spaceComplexity}
-                        </Badge>
-                      </div>
-                    </div>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-
-            {filteredAlgorithms.length === 0 && (
-              <div className="text-center py-16">
-                <p className="text-muted-foreground">No algorithms found matching your search.</p>
-              </div>
-            )}
           </div>
         </div>
 
-        {/* FAQ and Footer */}
+        {/* Featured Section */}
+        <FeaturedSection />
+
+        {/* Search and Filter */}
+        <div className="container mx-auto px-4 py-8" id="algorithms">
+          <div className="max-w-4xl mx-auto space-y-6">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl md:text-4xl font-bold gradient-text mb-2">Core Algorithms</h2>
+            </div>
+
+            {/* Search Bar */}
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search algorithms..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-12 h-14 text-lg bg-card border-border/50"
+              />
+            </div>
+
+            {/* Category Filter */}
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant={selectedCategory === null ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setSelectedCategory(null)}
+                className="rounded-full"
+              >
+                All
+              </Button>
+              {categories.map((category) => (
+                <Button
+                  key={category}
+                  variant={selectedCategory === category ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedCategory(category)}
+                  className="rounded-full"
+                >
+                  {category}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Algorithm Cards Section */}
+        <div className="container mx-auto px-4 pb-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredAlgorithms.map((algo, index) => (
+              <Link key={algo.id} to={`/algorithm/${algo.id}`} target="_blank" rel="noopener noreferrer">
+                <Card 
+                  className="p-6 hover-lift cursor-pointer glass-card group"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <div className="space-y-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-lg group-hover:text-primary transition-colors truncate">
+                          {algo.name}
+                        </h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {algo.category}
+                        </p>
+                      </div>
+                      <Badge 
+                        variant="outline" 
+                        className={`${difficultyColors[algo.difficulty]} shrink-0`}
+                      >
+                        {algo.difficulty}
+                      </Badge>
+                    </div>
+
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {algo.description}
+                    </p>
+
+                    <div className="flex items-center gap-4 text-xs">
+                      <div className="flex items-center gap-1">
+                        <TrendingUp className="w-3 h-3" />
+                        <span className="text-muted-foreground">Time: {algo.timeComplexity}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <BookOpen className="w-3 h-3" />
+                        <span className="text-muted-foreground">Space: {algo.spaceComplexity}</span>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
+            ))}
+          </div>
+
+          {filteredAlgorithms.length === 0 && (
+            <div className="text-center py-16">
+              <p className="text-muted-foreground">No algorithms found matching your search.</p>
+            </div>
+          )}
+        </div>
+
+        {/* FAQ Section */}
         <FAQ />
+        
         <Footer />
-      </main>
+      </div>
     </>
   );
 };
