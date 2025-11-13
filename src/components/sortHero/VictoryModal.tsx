@@ -1,6 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Trophy, ArrowRight, Home } from "lucide-react";
+import { Trophy, ArrowRight, Home, Gamepad2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface VictoryModalProps {
   isOpen: boolean;
@@ -21,8 +22,10 @@ export const VictoryModal = ({
   onNextLevel, 
   onBackToMenu 
 }: VictoryModalProps) => {
+  const navigate = useNavigate();
+
   return (
-    <Dialog open={isOpen}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onBackToMenu()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <div className="flex justify-center mb-4">
@@ -58,6 +61,9 @@ export const VictoryModal = ({
           </div>
 
           <div className="flex gap-2">
+            <Button variant="outline" onClick={() => navigate('/games')} className="flex-1">
+              <Gamepad2 className="mr-2 h-4 w-4" /> Games
+            </Button>
             <Button variant="outline" onClick={onBackToMenu} className="flex-1">
               <Home className="mr-2 h-4 w-4" /> Menu
             </Button>

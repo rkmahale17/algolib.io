@@ -14,6 +14,10 @@ interface LeaderboardEntry {
   moves: number;
   grade: string;
   completed_at: string;
+  profiles?: {
+    display_name: string;
+    email: string;
+  };
 }
 
 const Leaderboard = () => {
@@ -25,21 +29,45 @@ const Leaderboard = () => {
   const fetchLeaderboard = async () => {
     setLoading(true);
     
-    // All-time leaderboard
+    // All-time leaderboard with profile data
     const { data: allTime } = await supabase
       .from('game_sessions')
-      .select('id, user_id, score, level, moves, grade, completed_at')
+      .select(`
+        id, 
+        user_id, 
+        score, 
+        level, 
+        moves, 
+        grade, 
+        completed_at,
+        profiles:user_id (
+          display_name,
+          email
+        )
+      `)
       .eq('game_type', 'sort_hero')
       .order('score', { ascending: false })
       .limit(100);
 
-    // Today's leaderboard
+    // Today's leaderboard with profile data
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
     
     const { data: today } = await supabase
       .from('game_sessions')
-      .select('id, user_id, score, level, moves, grade, completed_at')
+      .select(`
+        id, 
+        user_id, 
+        score, 
+        level, 
+        moves, 
+        grade, 
+        completed_at,
+        profiles:user_id (
+          display_name,
+          email
+        )
+      `)
       .eq('game_type', 'sort_hero')
       .gte('completed_at', todayStart.toISOString())
       .order('score', { ascending: false })
@@ -83,22 +111,26 @@ const Leaderboard = () => {
 
   const LeaderboardTable = ({ data }: { data: LeaderboardEntry[] }) => (
     <div className="space-y-2">
-      {data.map((entry, index) => (
-        <div
-          key={entry.id}
-          className="flex items-center gap-4 p-4 bg-card/50 rounded-lg hover:bg-card transition-colors"
-        >
-          <div className="flex-shrink-0">{getRankIcon(index)}</div>
-          <div className="flex-1 min-w-0">
-            <p className="font-semibold truncate">Player {entry.user_id.slice(0, 8)}</p>
-            <p className="text-sm text-muted-foreground">Level {entry.level} • {entry.moves} moves</p>
+      {data.map((entry, index) => {
+        const displayName = entry.profiles?.display_name || entry.profiles?.email?.split('@')[0] || `Player ${entry.user_id.slice(0, 8)}`;
+        
+        return (
+          <div
+            key={entry.id}
+            className="flex items-center gap-4 p-4 bg-card/50 rounded-lg hover:bg-card transition-colors"
+          >
+            <div className="flex-shrink-0">{getRankIcon(index)}</div>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold truncate">{displayName}</p>
+              <p className="text-sm text-muted-foreground">Level {entry.level} • {entry.moves} moves</p>
+            </div>
+            <div className="text-right">
+              <p className="text-2xl font-bold text-primary">{entry.score} pts</p>
+              <p className="text-sm text-muted-foreground">Grade: {entry.grade}</p>
+            </div>
           </div>
-          <div className="text-right">
-            <p className="text-2xl font-bold text-primary">{entry.score}</p>
-            <p className="text-sm text-muted-foreground">Grade: {entry.grade}</p>
-          </div>
-        </div>
-      ))}
+        );
+      })}
       {data.length === 0 && (
         <p className="text-center text-muted-foreground py-8">No data yet. Be the first to play!</p>
       )}

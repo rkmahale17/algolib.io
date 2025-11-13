@@ -42,27 +42,27 @@ export const useSortGame = (mode: SortMode, level: number) => {
     // Optimal moves for each algorithm varies, but generally n-1 to n*log(n)
     const optimalMoves = numberCount * 2; // Reasonable baseline
     
-    // Start with base points for completing the level
-    let score = 200 * level;
+    // Start with base points (max 10 points system)
+    let score = 3; // Base points for completion
     
     // Reward efficiency - more points for fewer moves
     const moveEfficiency = Math.max(0, 1 - (moves - optimalMoves) / optimalMoves);
-    score += Math.floor(moveEfficiency * 300);
+    score += Math.floor(moveEfficiency * 3);
     
     // Reward accuracy - fewer errors = more points
-    const accuracyBonus = Math.max(0, 300 - (errors * 30));
+    const accuracyBonus = Math.max(0, 3 - (errors * 0.5));
     score += accuracyBonus;
     
     // Hint penalty (learning by doing is better)
-    const hintPenalty = hintsUsed * 50;
+    const hintPenalty = hintsUsed * 0.5;
     score -= hintPenalty;
     
     // Perfect play bonus
     if (errors === 0 && moves <= optimalMoves) {
-      score += 200;
+      score += 1;
     }
     
-    return Math.max(0, Math.min(1000, Math.floor(score)));
+    return Math.max(0, Math.min(10, Math.floor(score)));
   }, []);
 
   const saveGameSession = useCallback(async (finalState: GameState) => {
