@@ -28,7 +28,7 @@ const BlogPost = () => {
         <meta property="og:type" content="article" />
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 py-12 px-4">
+      <div className="min-h-screen bg-background py-12 px-4 blog-post-container">
         <div className="container mx-auto max-w-7xl">
           {/* Back Button */}
           <Button asChild variant="ghost" className="mb-8">
@@ -44,10 +44,12 @@ const BlogPost = () => {
               <article>
                 {/* Header */}
                 <header className="mb-12">
-                  <Badge variant="secondary" className="mb-4">
-                    {post.category}
-                  </Badge>
-                  <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Badge variant="secondary">
+                      {post.category}
+                    </Badge>
+                  </div>
+                  <h1 className="text-4xl md:text-5xl font-bold mb-6 text-foreground" style={{ maxWidth: '680px', fontFamily: 'Inter, sans-serif', letterSpacing: '-0.02em' }}>
                     {post.title}
                   </h1>
                   {post.subtitle && (

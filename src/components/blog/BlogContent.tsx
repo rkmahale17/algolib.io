@@ -1,6 +1,9 @@
 import { BlogContent as BlogContentType } from '@/data/blogPosts';
-import { Card } from '@/components/ui/card';
 import { CodeHighlighter } from '@/components/visualizations/shared/CodeHighlighter';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
+import { Play } from 'lucide-react';
+import '../../styles/blog.css';
 
 interface BlogContentProps {
   content: BlogContentType[];
@@ -8,37 +11,35 @@ interface BlogContentProps {
 
 export const BlogContent = ({ content }: BlogContentProps) => {
   return (
-    <article className="prose prose-lg max-w-none">
+    <article className="blog-article">
       {content.map((block, index) => {
         switch (block.type) {
           case 'heading':
             return (
-              <h2 key={index} className="text-3xl font-bold mt-12 mb-6 text-foreground">
+              <h2 key={index}>
                 {block.content}
               </h2>
             );
           
           case 'paragraph':
             return (
-              <p key={index} className="text-lg leading-relaxed mb-6 text-foreground/90">
+              <p key={index}>
                 {block.content}
               </p>
             );
           
           case 'list':
             return (
-              <ul key={index} className="space-y-3 mb-8 ml-6">
+              <ul key={index}>
                 {block.items?.map((item, i) => (
-                  <li key={i} className="text-lg text-foreground/90 leading-relaxed">
-                    {item}
-                  </li>
+                  <li key={i} dangerouslySetInnerHTML={{ __html: item }} />
                 ))}
               </ul>
             );
           
           case 'code':
             return (
-              <div key={index} className="my-8">
+              <div key={index}>
                 <CodeHighlighter 
                   code={block.content} 
                   language={block.language || 'typescript'}
@@ -48,14 +49,14 @@ export const BlogContent = ({ content }: BlogContentProps) => {
           
           case 'image':
             return (
-              <figure key={index} className="my-8">
+              <figure key={index}>
                 <img 
                   src={block.content} 
                   alt={block.alt || ''} 
-                  className="w-full rounded-lg shadow-lg"
+                  loading="lazy"
                 />
                 {block.alt && (
-                  <figcaption className="text-center text-sm text-muted-foreground mt-2">
+                  <figcaption>
                     {block.alt}
                   </figcaption>
                 )}
@@ -64,11 +65,21 @@ export const BlogContent = ({ content }: BlogContentProps) => {
           
           case 'quote':
             return (
-              <Card key={index} className="my-8 p-6 border-l-4 border-primary bg-primary/5">
-                <p className="text-lg italic text-foreground/90">
-                  {block.content}
-                </p>
-              </Card>
+              <blockquote key={index}>
+                {block.content}
+              </blockquote>
+            );
+          
+          case 'cta':
+            return (
+              <div key={index} style={{ marginTop: '2rem', marginBottom: '2rem' }}>
+                <Button asChild className="blog-cta-button">
+                  <Link to={block.link || '#'}>
+                    <Play className="w-4 h-4" />
+                    {block.content}
+                  </Link>
+                </Button>
+              </div>
             );
           
           default:
