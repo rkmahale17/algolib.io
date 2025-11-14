@@ -1304,7 +1304,21 @@ const AlgorithmDetail: React.FC = () => {
         <React.Suspense
           fallback={<div className="text-center py-12">Loading...</div>}
         >
-          <BinaryLiftingVisualization />
+      <BinaryLiftingVisualization />
+        </React.Suspense>
+      );
+    }
+    if (algorithm.id === "lru-cache") {
+      const LRUCacheVisualization = React.lazy(() =>
+        import(
+          "@/components/visualizations/algorithms/LRUCacheVisualization"
+        ).then((m) => ({ default: m.LRUCacheVisualization }))
+      );
+      return (
+        <React.Suspense
+          fallback={<div className="text-center py-12">Loading...</div>}
+        >
+          <LRUCacheVisualization />
         </React.Suspense>
       );
     }

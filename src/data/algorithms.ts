@@ -1747,7 +1747,21 @@ export const algorithms: Algorithm[] = [
       { "number": 109, "title": "Convert Sorted List to Binary Search Tree", "slug": "convert-sorted-list-to-binary-search-tree", "difficulty": "Medium", "link": "https://leetcode.com/problems/convert-sorted-list-to-binary-search-tree/" },
       { "number": 888, "title": "Fair Candy Swap (auxiliary)", "slug": "fair-candy-swap", "difficulty": "Easy", "link": "https://leetcode.com/problems/fair-candy-swap/" },
     ]
+  },
 
-
+  {
+    "id": "lru-cache",
+    "name": "LRU Cache",
+    "category": "Advanced",
+    "difficulty": "intermediate",
+    "description": "Least Recently Used cache implementation using HashMap and Doubly Linked List",
+    "timeComplexity": "O(1)",
+    "spaceComplexity": "O(capacity)",
+    "youtubeUrl": "https://www.youtube.com/watch?v=7ABFKPK2hD4",
+    "problems": [
+      { "number": 146, "title": "LRU Cache", "slug": "lru-cache", "difficulty": "Medium", "link": "https://leetcode.com/problems/lru-cache/" },
+      { "number": 460, "title": "LFU Cache", "slug": "lfu-cache", "difficulty": "Hard", "link": "https://leetcode.com/problems/lfu-cache/" },
+      { "number": 432, "title": "All O`one Data Structure", "slug": "all-oone-data-structure", "difficulty": "Hard", "link": "https://leetcode.com/problems/all-oone-data-structure/" }
+    ]
   }
 ];
