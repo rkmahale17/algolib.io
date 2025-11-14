@@ -7696,6 +7696,339 @@ string manacher(string s) {
       ]
     },
     visualizationType: 'array'
+  },
+  'lru-cache': {
+    id: 'lru-cache',
+    code: {
+      typescript: `class LRUCache {
+  private capacity: number;
+  private cache: Map<number, DLLNode>;
+  private head: DLLNode | null;
+  private tail: DLLNode | null;
+
+  constructor(capacity: number) {
+    this.capacity = capacity;
+    this.cache = new Map();
+    this.head = null;
+    this.tail = null;
+  }
+
+  get(key: number): number {
+    if (!this.cache.has(key)) return -1;
+    
+    const node = this.cache.get(key)!;
+    this.moveToHead(node);
+    return node.value;
+  }
+
+  put(key: number, value: number): void {
+    if (this.cache.has(key)) {
+      const node = this.cache.get(key)!;
+      node.value = value;
+      this.moveToHead(node);
+    } else {
+      const newNode = { key, value, prev: null, next: null };
+      this.cache.set(key, newNode);
+      this.addToHead(newNode);
+      
+      if (this.cache.size > this.capacity) {
+        const removed = this.removeTail();
+        this.cache.delete(removed.key);
+      }
+    }
+  }
+
+  private moveToHead(node: DLLNode): void {
+    this.removeNode(node);
+    this.addToHead(node);
+  }
+
+  private removeNode(node: DLLNode): void {
+    if (node.prev) node.prev.next = node.next;
+    if (node.next) node.next.prev = node.prev;
+    if (node === this.head) this.head = node.next;
+    if (node === this.tail) this.tail = node.prev;
+  }
+
+  private addToHead(node: DLLNode): void {
+    node.next = this.head;
+    node.prev = null;
+    if (this.head) this.head.prev = node;
+    this.head = node;
+    if (!this.tail) this.tail = node;
+  }
+
+  private removeTail(): DLLNode {
+    const removed = this.tail!;
+    this.removeNode(removed);
+    return removed;
+  }
+}
+
+interface DLLNode {
+  key: number;
+  value: number;
+  prev: DLLNode | null;
+  next: DLLNode | null;
+}`,
+      python: `class DLLNode:
+    def __init__(self, key, value):
+        self.key = key
+        self.value = value
+        self.prev = None
+        self.next = None
+
+class LRUCache:
+    def __init__(self, capacity: int):
+        self.capacity = capacity
+        self.cache = {}
+        self.head = None
+        self.tail = None
+
+    def get(self, key: int) -> int:
+        if key not in self.cache:
+            return -1
+        
+        node = self.cache[key]
+        self._move_to_head(node)
+        return node.value
+
+    def put(self, key: int, value: int) -> None:
+        if key in self.cache:
+            node = self.cache[key]
+            node.value = value
+            self._move_to_head(node)
+        else:
+            new_node = DLLNode(key, value)
+            self.cache[key] = new_node
+            self._add_to_head(new_node)
+            
+            if len(self.cache) > self.capacity:
+                removed = self._remove_tail()
+                del self.cache[removed.key]
+
+    def _move_to_head(self, node):
+        self._remove_node(node)
+        self._add_to_head(node)
+
+    def _remove_node(self, node):
+        if node.prev:
+            node.prev.next = node.next
+        if node.next:
+            node.next.prev = node.prev
+        if node == self.head:
+            self.head = node.next
+        if node == self.tail:
+            self.tail = node.prev
+
+    def _add_to_head(self, node):
+        node.next = self.head
+        node.prev = None
+        if self.head:
+            self.head.prev = node
+        self.head = node
+        if not self.tail:
+            self.tail = node
+
+    def _remove_tail(self):
+        removed = self.tail
+        self._remove_node(removed)
+        return removed`,
+      cpp: `class DLLNode {
+public:
+    int key;
+    int value;
+    DLLNode* prev;
+    DLLNode* next;
+    
+    DLLNode(int k, int v) : key(k), value(v), prev(nullptr), next(nullptr) {}
+};
+
+class LRUCache {
+private:
+    int capacity;
+    unordered_map<int, DLLNode*> cache;
+    DLLNode* head;
+    DLLNode* tail;
+    
+public:
+    LRUCache(int capacity) {
+        this->capacity = capacity;
+        head = nullptr;
+        tail = nullptr;
+    }
+    
+    int get(int key) {
+        if (cache.find(key) == cache.end()) {
+            return -1;
+        }
+        
+        DLLNode* node = cache[key];
+        moveToHead(node);
+        return node->value;
+    }
+    
+    void put(int key, int value) {
+        if (cache.find(key) != cache.end()) {
+            DLLNode* node = cache[key];
+            node->value = value;
+            moveToHead(node);
+        } else {
+            DLLNode* newNode = new DLLNode(key, value);
+            cache[key] = newNode;
+            addToHead(newNode);
+            
+            if (cache.size() > capacity) {
+                DLLNode* removed = removeTail();
+                cache.erase(removed->key);
+                delete removed;
+            }
+        }
+    }
+    
+private:
+    void moveToHead(DLLNode* node) {
+        removeNode(node);
+        addToHead(node);
+    }
+    
+    void removeNode(DLLNode* node) {
+        if (node->prev) node->prev->next = node->next;
+        if (node->next) node->next->prev = node->prev;
+        if (node == head) head = node->next;
+        if (node == tail) tail = node->prev;
+    }
+    
+    void addToHead(DLLNode* node) {
+        node->next = head;
+        node->prev = nullptr;
+        if (head) head->prev = node;
+        head = node;
+        if (!tail) tail = node;
+    }
+    
+    DLLNode* removeTail() {
+        DLLNode* removed = tail;
+        removeNode(removed);
+        return removed;
+    }
+};`,
+      java: `class DLLNode {
+    int key;
+    int value;
+    DLLNode prev;
+    DLLNode next;
+    
+    DLLNode(int key, int value) {
+        this.key = key;
+        this.value = value;
+    }
+}
+
+class LRUCache {
+    private int capacity;
+    private Map<Integer, DLLNode> cache;
+    private DLLNode head;
+    private DLLNode tail;
+
+    public LRUCache(int capacity) {
+        this.capacity = capacity;
+        this.cache = new HashMap<>();
+        this.head = null;
+        this.tail = null;
+    }
+    
+    public int get(int key) {
+        if (!cache.containsKey(key)) {
+            return -1;
+        }
+        
+        DLLNode node = cache.get(key);
+        moveToHead(node);
+        return node.value;
+    }
+    
+    public void put(int key, int value) {
+        if (cache.containsKey(key)) {
+            DLLNode node = cache.get(key);
+            node.value = value;
+            moveToHead(node);
+        } else {
+            DLLNode newNode = new DLLNode(key, value);
+            cache.put(key, newNode);
+            addToHead(newNode);
+            
+            if (cache.size() > capacity) {
+                DLLNode removed = removeTail();
+                cache.remove(removed.key);
+            }
+        }
+    }
+    
+    private void moveToHead(DLLNode node) {
+        removeNode(node);
+        addToHead(node);
+    }
+    
+    private void removeNode(DLLNode node) {
+        if (node.prev != null) node.prev.next = node.next;
+        if (node.next != null) node.next.prev = node.prev;
+        if (node == head) head = node.next;
+        if (node == tail) tail = node.prev;
+    }
+    
+    private void addToHead(DLLNode node) {
+        node.next = head;
+        node.prev = null;
+        if (head != null) head.prev = node;
+        head = node;
+        if (tail == null) tail = node;
+    }
+    
+    private DLLNode removeTail() {
+        DLLNode removed = tail;
+        removeNode(removed);
+        return removed;
+    }
+}`
+    },
+    explanation: {
+      overview: "LRU (Least Recently Used) Cache is a data structure that stores a limited number of items and evicts the least recently used item when capacity is reached. It uses a HashMap for O(1) lookups and a Doubly Linked List to maintain LRU order.",
+      steps: [
+        "Use HashMap to store key-value pairs for O(1) access time",
+        "Use Doubly Linked List to track usage order (head = most recent, tail = least recent)",
+        "On get(): Return value and move accessed node to head (mark as most recently used)",
+        "On put() with existing key: Update value and move to head",
+        "On put() with new key: Add to head, if capacity exceeded evict tail node",
+        "Maintain both HashMap and DLL in sync during all operations"
+      ],
+      useCase: "Caching systems, browser cache, database query cache, operating system page replacement, CDN caching.",
+      tips: [
+        "Time complexity: O(1) for both get and put operations",
+        "Space complexity: O(capacity) for storing the cache",
+        "HashMap provides fast access, DLL maintains order efficiently",
+        "Always update both HashMap and DLL together to keep them in sync",
+        "Head pointer points to most recently used, tail to least recently used"
+      ]
+    },
+    visualizationType: 'none',
+    practiceProblems: [
+      {
+        title: "LRU Cache",
+        url: "https://leetcode.com/problems/lru-cache/",
+        difficulty: "medium"
+      },
+      {
+        title: "LFU Cache",
+        url: "https://leetcode.com/problems/lfu-cache/",
+        difficulty: "hard"
+      },
+      {
+        title: "Design Browser History",
+        url: "https://leetcode.com/problems/design-browser-history/",
+        difficulty: "medium"
+      }
+    ]
   }
 };
 
