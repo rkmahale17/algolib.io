@@ -1,23 +1,30 @@
-import { BookOpen, Coffee, Search, Sparkles, TrendingUp, Trophy } from 'lucide-react';
-import { algorithms, categories } from '@/data/algorithms';
+import {
+  BookOpen,
+  Coffee,
+  Search,
+  Sparkles,
+  TrendingUp,
+  Trophy,
+} from "lucide-react";
+import { algorithms, categories } from "@/data/algorithms";
+import { useEffect, useMemo, useState } from "react";
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { FAQ } from '@/components/FAQ';
-import { Footer } from '@/components/Footer';
-import { FeaturedSection } from '@/components/FeaturedSection';
-import { Helmet } from 'react-helmet-async';
-import { Input } from '@/components/ui/input';
-import { Link } from 'react-router-dom';
-import { useState, useEffect, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import type { User } from '@supabase/supabase-js';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { FAQ } from "@/components/FAQ";
+import { FeaturedSection } from "@/components/FeaturedSection";
+import { Footer } from "@/components/Footer";
+import { Helmet } from "react-helmet-async";
+import { Input } from "@/components/ui/input";
+import { Link } from "react-router-dom";
+import type { User } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
+import { useSearchParams } from "react-router-dom";
 
 const Home = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [userProgress, setUserProgress] = useState<any[]>([]);
@@ -28,7 +35,9 @@ const Home = () => {
       setUser(session?.user ?? null);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
 
@@ -44,10 +53,10 @@ const Home = () => {
       }
 
       const { data, error } = await supabase
-        .from('user_progress')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('completed', true);
+        .from("user_progress")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("completed", true);
 
       if (!error && data) {
         setUserProgress(data);
@@ -60,13 +69,13 @@ const Home = () => {
     if (!user) return;
 
     const channel = supabase
-      .channel('user_progress_changes')
+      .channel("user_progress_changes")
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: '*',
-          schema: 'public',
-          table: 'user_progress',
+          event: "*",
+          schema: "public",
+          table: "user_progress",
           filter: `user_id=eq.${user.id}`,
         },
         () => {
@@ -83,7 +92,7 @@ const Home = () => {
 
   // Read category from URL params on mount
   useEffect(() => {
-    const categoryParam = searchParams.get('category');
+    const categoryParam = searchParams.get("category");
     if (categoryParam) {
       setSelectedCategory(categoryParam);
     }
@@ -91,138 +100,164 @@ const Home = () => {
 
   // Calculate progress based on real completion data
   const algorithmProgress = useMemo(() => {
-    const completed = userProgress.filter(p => 
-      algorithms.some(algo => algo.id === p.algorithm_id)
+    const completed = userProgress.filter((p) =>
+      algorithms.some((algo) => algo.id === p.algorithm_id)
     ).length;
     const total = algorithms.length;
-    return { completed, total, percentage: Math.round((completed / total) * 100) };
+    return {
+      completed,
+      total,
+      percentage: Math.round((completed / total) * 100),
+    };
   }, [userProgress]);
 
   const filteredAlgorithms = algorithms.filter((algo) => {
-    const matchesSearch = algo.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         algo.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = !selectedCategory || algo.category === selectedCategory;
+    const matchesSearch =
+      algo.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      algo.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory =
+      !selectedCategory || algo.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
   const difficultyColors = {
-    beginner: 'bg-green-500/10 text-green-500 border-green-500/20',
-    intermediate: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
-    advanced: 'bg-red-500/10 text-red-500 border-red-500/20',
+    beginner: "bg-green-500/10 text-green-500 border-green-500/20",
+    intermediate: "bg-yellow-500/10 text-yellow-500 border-yellow-500/20",
+    advanced: "bg-red-500/10 text-red-500 border-red-500/20",
   };
 
   return (
     <>
       <Helmet>
-        <title>AlgoLib.io - Master 200+ Algorithms with Interactive Visualizations | Free & Open Source</title>
-        <meta 
-          name="description" 
-          content="Learn data structures and algorithms with step-by-step visualizations across 20 categories. 200+ algorithm animations, Blind 75 problems, interactive games, and tutorials. Perfect for coding interviews, LeetCode practice, and competitive programming. 100% free and open source." 
+        <title>
+          AlgoLib.io - Master 200+ Algorithms with Interactive Visualizations |
+          Free & Open Source
+        </title>
+        <meta
+          name="description"
+          content="Learn data structures and algorithms with step-by-step visualizations across 20 categories. 200+ algorithm animations, Blind 75 problems, interactive games, and tutorials. Perfect for coding interviews, LeetCode practice, and competitive programming. 100% free and open source."
         />
-        <meta 
-          name="keywords" 
-          content="algorithms, data structures, leetcode, coding interviews, blind 75, competitive programming, algorithm visualization, learn algorithms, DSA, python algorithms, java algorithms, c++ algorithms, typescript algorithms, free algorithm library, interactive games" 
+        <meta
+          name="keywords"
+          content="algorithms, data structures, leetcode, coding interviews, blind 75, competitive programming, algorithm visualization, learn algorithms, DSA, python algorithms, java algorithms, c++ algorithms, typescript algorithms, free algorithm library, interactive games"
         />
         <link rel="canonical" href="https://algolib.io/" />
-        
+
         {/* Open Graph */}
-        <meta property="og:title" content="AlgoLib.io - Master 200+ Algorithms with Interactive Visualizations" />
-        <meta property="og:description" content="Free open-source algorithm library with 200+ interactive visualizations across 20 categories. Learn DSA for coding interviews with Blind 75, games, and tutorials." />
+        <meta
+          property="og:title"
+          content="AlgoLib.io - Master 200+ Algorithms with Interactive Visualizations"
+        />
+        <meta
+          property="og:description"
+          content="Free open-source algorithm library with 200+ interactive visualizations across 20 categories. Learn DSA for coding interviews with Blind 75, games, and tutorials."
+        />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://algolib.io/" />
         <meta property="og:image" content="https://algolib.io/og-image.png" />
-        
+
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="AlgoLib.io - Master 200+ Algorithms Visually" />
-        <meta name="twitter:description" content="Free interactive algorithm visualizations with 20 categories, Blind 75, and games for coding interviews" />
+        <meta
+          name="twitter:title"
+          content="AlgoLib.io - Master 200+ Algorithms Visually"
+        />
+        <meta
+          name="twitter:description"
+          content="Free interactive algorithm visualizations with 20 categories, Blind 75, and games for coding interviews"
+        />
         <meta name="twitter:image" content="https://algolib.io/og-image.png" />
-        
+
         {/* Structured Data - WebSite */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebSite",
-            "name": "AlgoLib.io",
-            "url": "https://algolib.io",
-            "description": "Free and open-source algorithm library with interactive visualizations for learning data structures and algorithms",
-            "potentialAction": {
+            name: "AlgoLib.io",
+            url: "https://algolib.io",
+            description:
+              "Free and open-source algorithm library with interactive visualizations for learning data structures and algorithms",
+            potentialAction: {
               "@type": "SearchAction",
-              "target": "https://algolib.io/?search={search_term_string}",
-              "query-input": "required name=search_term_string"
-            }
+              target: "https://algolib.io/?search={search_term_string}",
+              "query-input": "required name=search_term_string",
+            },
           })}
         </script>
-        
+
         {/* Structured Data - Organization */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "EducationalOrganization",
-            "name": "AlgoLib.io",
-            "url": "https://algolib.io",
-            "logo": {
+            name: "AlgoLib.io",
+            url: "https://algolib.io",
+            logo: {
               "@type": "ImageObject",
-              "url": "https://algolib.io/android-chrome-512x512.png",
-              "width": 512,
-              "height": 512
+              url: "https://algolib.io/android-chrome-512x512.png",
+              width: 512,
+              height: 512,
             },
-            "sameAs": [
+            sameAs: [
               "https://x.com/algolib_io",
-              "https://github.com/rkmahale17/algolib.io"
+              "https://github.com/rkmahale17/algolib.io",
             ],
-            "description": "AlgoLib.io is a free and open-source algorithm library that helps developers learn and visualize algorithms with interactive animations and clean code snippets in multiple programming languages."
+            description:
+              "AlgoLib.io is a free and open-source algorithm library that helps developers learn and visualize algorithms with interactive animations and clean code snippets in multiple programming languages.",
           })}
         </script>
-        
+
         {/* Structured Data - ItemList for Categories */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "ItemList",
-            "name": "Algorithm Categories",
-            "description": "Browse algorithms by category",
-            "itemListElement": categories.map((category, index) => ({
+            name: "Algorithm Categories",
+            description: "Browse algorithms by category",
+            itemListElement: categories.map((category, index) => ({
               "@type": "ListItem",
-              "position": index + 1,
-              "item": {
+              position: index + 1,
+              item: {
                 "@type": "Thing",
-                "@id": `https://algolib.io/?category=${encodeURIComponent(category)}`,
-                "name": `${category} Algorithms`,
-                "description": `Learn ${category.toLowerCase()} algorithms with interactive visualizations`
-              }
-            }))
+                "@id": `https://algolib.io/?category=${encodeURIComponent(
+                  category
+                )}`,
+                name: `${category} Algorithms`,
+                description: `Learn ${category.toLowerCase()} algorithms with interactive visualizations`,
+              },
+            })),
           })}
         </script>
-        
+
         {/* Structured Data - CollectionPage */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "CollectionPage",
-            "name": "AlgoLib.io - Algorithm Library",
-            "description": "Browse 200+ algorithms with step-by-step visualizations across 20 categories",
-            "url": "https://algolib.io",
-            "mainEntity": {
+            name: "AlgoLib.io - Algorithm Library",
+            description:
+              "Browse 200+ algorithms with step-by-step visualizations across 20 categories",
+            url: "https://algolib.io",
+            mainEntity: {
               "@type": "ItemList",
-              "numberOfItems": algorithms.length,
-              "itemListElement": algorithms.slice(0, 20).map((algo, index) => ({
+              numberOfItems: algorithms.length,
+              itemListElement: algorithms.slice(0, 20).map((algo, index) => ({
                 "@type": "ListItem",
-                "position": index + 1,
-                "item": {
+                position: index + 1,
+                item: {
                   "@type": "TechArticle",
-                  "name": algo.name,
-                  "description": algo.description,
-                  "url": `https://algolib.io/algorithm/${algo.id}`,
-                  "articleSection": algo.category,
-                  "proficiencyLevel": algo.difficulty
-                }
-              }))
-            }
+                  name: algo.name,
+                  description: algo.description,
+                  url: `https://algolib.io/algorithm/${algo.id}`,
+                  articleSection: algo.category,
+                  proficiencyLevel: algo.difficulty,
+                },
+              })),
+            },
           })}
         </script>
       </Helmet>
-      
+
       <div className="min-h-screen bg-background">
         {/* Vertical Buy Me a Coffee Button */}
         <a
@@ -240,39 +275,50 @@ const Home = () => {
         {/* Hero Section */}
         <div className="relative overflow-hidden bg-gradient-to-b from-background via-muted/20 to-background border-b border-border/50">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
-          
+
           <div className="container mx-auto px-4 py-16 relative">
             <div className="text-center max-w-4xl mx-auto space-y-6">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
                 <Sparkles className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium text-primary">Master Algorithms Visually</span>
+                <span className="text-sm font-medium text-primary">
+                  Master Algorithms Visually
+                </span>
               </div>
-              
+
               <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
-                <span className="gradient-text">All Competitive Algorithms</span>
+                <span className="gradient-text">
+                  All Competitive Algorithms
+                </span>
                 <br />
                 In Your Pocket
               </h1>
-              
+
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Step-by-step visualizations of all required algorithms. Watch code come to life with interactive animations.
+                Step-by-step visualizations of all required algorithms. Watch
+                code come to life with interactive animations.
               </p>
 
               {/* Stats */}
               <div className="flex items-center justify-center gap-8 pt-8">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-primary">{algorithms.length}</div>
-                  <div className="text-sm text-muted-foreground">Algorithms</div>
+                  <div className="text-3xl font-bold text-primary">200+</div>
+                  <div className="text-sm text-muted-foreground">
+                    Algorithms
+                  </div>
                 </div>
                 <div className="h-12 w-px bg-border" />
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-secondary">{categories.length}</div>
-                  <div className="text-sm text-muted-foreground">Categories</div>
+                  <div className="text-3xl font-bold text-secondary">20</div>
+                  <div className="text-sm text-muted-foreground">
+                    Categories
+                  </div>
                 </div>
                 <div className="h-12 w-px bg-border" />
                 <div className="text-center">
                   <div className="text-3xl font-bold text-primary">100%</div>
-                  <div className="text-sm text-muted-foreground">Free Forever</div>
+                  <div className="text-sm text-muted-foreground">
+                    Free Forever
+                  </div>
                 </div>
               </div>
             </div>
@@ -286,7 +332,9 @@ const Home = () => {
         <div className="container mx-auto px-4 py-8" id="algorithms">
           <div className="max-w-4xl mx-auto space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-3xl md:text-4xl font-bold gradient-text mb-2">Core Algorithms</h2>
+              <h2 className="text-3xl md:text-4xl font-bold gradient-text mb-2">
+                Core Algorithms
+              </h2>
             </div>
 
             {/* Search Bar */}
@@ -304,7 +352,7 @@ const Home = () => {
             {/* Category Filter */}
             <div className="flex flex-wrap gap-2">
               <Button
-                variant={selectedCategory === null ? 'default' : 'outline'}
+                variant={selectedCategory === null ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedCategory(null)}
                 className="rounded-full"
@@ -314,7 +362,9 @@ const Home = () => {
               {categories.map((category) => (
                 <Button
                   key={category}
-                  variant={selectedCategory === category ? 'default' : 'outline'}
+                  variant={
+                    selectedCategory === category ? "default" : "outline"
+                  }
                   size="sm"
                   onClick={() => setSelectedCategory(category)}
                   className="rounded-full"
@@ -330,8 +380,13 @@ const Home = () => {
         <div className="container mx-auto px-4 pb-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredAlgorithms.map((algo, index) => (
-              <Link key={algo.id} to={`/algorithm/${algo.id}`} target="_blank" rel="noopener noreferrer">
-                <Card 
+              <Link
+                key={algo.id}
+                to={`/algorithm/${algo.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Card
                   className="p-6 hover-lift cursor-pointer glass-card group"
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
@@ -345,9 +400,11 @@ const Home = () => {
                           {algo.category}
                         </p>
                       </div>
-                      <Badge 
-                        variant="outline" 
-                        className={`${difficultyColors[algo.difficulty]} shrink-0`}
+                      <Badge
+                        variant="outline"
+                        className={`${
+                          difficultyColors[algo.difficulty]
+                        } shrink-0`}
                       >
                         {algo.difficulty}
                       </Badge>
@@ -360,11 +417,15 @@ const Home = () => {
                     <div className="flex items-center gap-4 text-xs">
                       <div className="flex items-center gap-1">
                         <TrendingUp className="w-3 h-3" />
-                        <span className="text-muted-foreground">Time: {algo.timeComplexity}</span>
+                        <span className="text-muted-foreground">
+                          Time: {algo.timeComplexity}
+                        </span>
                       </div>
                       <div className="flex items-center gap-1">
                         <BookOpen className="w-3 h-3" />
-                        <span className="text-muted-foreground">Space: {algo.spaceComplexity}</span>
+                        <span className="text-muted-foreground">
+                          Space: {algo.spaceComplexity}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -375,14 +436,16 @@ const Home = () => {
 
           {filteredAlgorithms.length === 0 && (
             <div className="text-center py-16">
-              <p className="text-muted-foreground">No algorithms found matching your search.</p>
+              <p className="text-muted-foreground">
+                No algorithms found matching your search.
+              </p>
             </div>
           )}
         </div>
 
         {/* FAQ Section */}
         <FAQ />
-        
+
         <Footer />
       </div>
     </>

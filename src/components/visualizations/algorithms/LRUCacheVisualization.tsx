@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
-import { Play, Pause, RotateCcw, SkipForward, SkipBack } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
-import { CodeHighlighter } from '../shared/CodeHighlighter';
-import { VariablePanel } from '../shared/VariablePanel';
-import { VisualizationLayout } from '../shared/VisualizationLayout';
+import { Pause, Play, RotateCcw, SkipBack, SkipForward } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import { CodeHighlighter } from "../shared/CodeHighlighter";
+import { Slider } from "@/components/ui/slider";
+import { VariablePanel } from "../shared/VariablePanel";
+import { VisualizationLayout } from "../shared/VisualizationLayout";
 
 interface DLLNode {
   key: number;
@@ -14,7 +15,7 @@ interface DLLNode {
 }
 
 interface Step {
-  type: 'get' | 'put';
+  type: "get" | "put";
   key: number;
   value?: number;
   result?: number;
@@ -94,229 +95,6 @@ const codeExamples = {
     return removed;
   }
 }`,
-  
-  python: `class DLLNode:
-    def __init__(self, key, value):
-        self.key = key
-        self.value = value
-        self.prev = None
-        self.next = None
-
-class LRUCache:
-    def __init__(self, capacity: int):
-        self.capacity = capacity
-        self.cache = {}
-        self.head = None
-        self.tail = None
-
-    def get(self, key: int) -> int:
-        if key not in self.cache:
-            return -1
-        
-        node = self.cache[key]
-        self._move_to_head(node)
-        return node.value
-
-    def put(self, key: int, value: int) -> None:
-        if key in self.cache:
-            node = self.cache[key]
-            node.value = value
-            self._move_to_head(node)
-        else:
-            new_node = DLLNode(key, value)
-            self.cache[key] = new_node
-            self._add_to_head(new_node)
-            
-            if len(self.cache) > self.capacity:
-                removed = self._remove_tail()
-                del self.cache[removed.key]
-
-    def _move_to_head(self, node):
-        self._remove_node(node)
-        self._add_to_head(node)
-
-    def _remove_node(self, node):
-        if node.prev:
-            node.prev.next = node.next
-        if node.next:
-            node.next.prev = node.prev
-        if node == self.head:
-            self.head = node.next
-        if node == self.tail:
-            self.tail = node.prev
-
-    def _add_to_head(self, node):
-        node.next = self.head
-        node.prev = None
-        if self.head:
-            self.head.prev = node
-        self.head = node
-        if not self.tail:
-            self.tail = node
-
-    def _remove_tail(self):
-        removed = self.tail
-        self._remove_node(removed)
-        return removed`,
-
-  java: `class DLLNode {
-    int key;
-    int value;
-    DLLNode prev;
-    DLLNode next;
-    
-    DLLNode(int key, int value) {
-        this.key = key;
-        this.value = value;
-    }
-}
-
-class LRUCache {
-    private int capacity;
-    private Map<Integer, DLLNode> cache;
-    private DLLNode head;
-    private DLLNode tail;
-
-    public LRUCache(int capacity) {
-        this.capacity = capacity;
-        this.cache = new HashMap<>();
-        this.head = null;
-        this.tail = null;
-    }
-    
-    public int get(int key) {
-        if (!cache.containsKey(key)) {
-            return -1;
-        }
-        
-        DLLNode node = cache.get(key);
-        moveToHead(node);
-        return node.value;
-    }
-    
-    public void put(int key, int value) {
-        if (cache.containsKey(key)) {
-            DLLNode node = cache.get(key);
-            node.value = value;
-            moveToHead(node);
-        } else {
-            DLLNode newNode = new DLLNode(key, value);
-            cache.put(key, newNode);
-            addToHead(newNode);
-            
-            if (cache.size() > capacity) {
-                DLLNode removed = removeTail();
-                cache.remove(removed.key);
-            }
-        }
-    }
-    
-    private void moveToHead(DLLNode node) {
-        removeNode(node);
-        addToHead(node);
-    }
-    
-    private void removeNode(DLLNode node) {
-        if (node.prev != null) node.prev.next = node.next;
-        if (node.next != null) node.next.prev = node.prev;
-        if (node == head) head = node.next;
-        if (node == tail) tail = node.prev;
-    }
-    
-    private void addToHead(DLLNode node) {
-        node.next = head;
-        node.prev = null;
-        if (head != null) head.prev = node;
-        head = node;
-        if (tail == null) tail = node;
-    }
-    
-    private DLLNode removeTail() {
-        DLLNode removed = tail;
-        removeNode(removed);
-        return removed;
-    }
-}`,
-
-  cpp: `class DLLNode {
-public:
-    int key;
-    int value;
-    DLLNode* prev;
-    DLLNode* next;
-    
-    DLLNode(int k, int v) : key(k), value(v), prev(nullptr), next(nullptr) {}
-};
-
-class LRUCache {
-private:
-    int capacity;
-    unordered_map<int, DLLNode*> cache;
-    DLLNode* head;
-    DLLNode* tail;
-    
-public:
-    LRUCache(int capacity) {
-        this->capacity = capacity;
-        head = nullptr;
-        tail = nullptr;
-    }
-    
-    int get(int key) {
-        if (cache.find(key) == cache.end()) {
-            return -1;
-        }
-        
-        DLLNode* node = cache[key];
-        moveToHead(node);
-        return node->value;
-    }
-    
-    void put(int key, int value) {
-        if (cache.find(key) != cache.end()) {
-            DLLNode* node = cache[key];
-            node->value = value;
-            moveToHead(node);
-        } else {
-            DLLNode* newNode = new DLLNode(key, value);
-            cache[key] = newNode;
-            addToHead(newNode);
-            
-            if (cache.size() > capacity) {
-                DLLNode* removed = removeTail();
-                cache.erase(removed->key);
-                delete removed;
-            }
-        }
-    }
-    
-private:
-    void moveToHead(DLLNode* node) {
-        removeNode(node);
-        addToHead(node);
-    }
-    
-    void removeNode(DLLNode* node) {
-        if (node->prev) node->prev->next = node->next;
-        if (node->next) node->next->prev = node->prev;
-        if (node == head) head = node->next;
-        if (node == tail) tail = node->prev;
-    }
-    
-    void addToHead(DLLNode* node) {
-        node->next = head;
-        node->prev = nullptr;
-        if (head) head->prev = node;
-        head = node;
-        if (!tail) tail = node;
-    }
-    
-    DLLNode* removeTail() {
-        DLLNode* removed = tail;
-        removeNode(removed);
-        return removed;
-    }
-};`
 };
 
 export const LRUCacheVisualization = () => {
@@ -324,21 +102,23 @@ export const LRUCacheVisualization = () => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
-  const [language, setLanguage] = useState<'typescript' | 'python' | 'java' | 'cpp'>('typescript');
+  const [language, setLanguage] = useState<
+    "typescript" | "python" | "java" | "cpp"
+  >("typescript");
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Generate steps for demonstration
   useEffect(() => {
     const capacity = 3;
     const operations = [
-      { type: 'put' as const, key: 1, value: 1 },
-      { type: 'put' as const, key: 2, value: 2 },
-      { type: 'put' as const, key: 3, value: 3 },
-      { type: 'get' as const, key: 2 },
-      { type: 'put' as const, key: 4, value: 4 },
-      { type: 'get' as const, key: 1 },
-      { type: 'get' as const, key: 3 },
-      { type: 'put' as const, key: 5, value: 5 },
+      { type: "put" as const, key: 1, value: 1 },
+      { type: "put" as const, key: 2, value: 2 },
+      { type: "put" as const, key: 3, value: 3 },
+      { type: "get" as const, key: 2 },
+      { type: "put" as const, key: 4, value: 4 },
+      { type: "get" as const, key: 1 },
+      { type: "get" as const, key: 3 },
+      { type: "put" as const, key: 5, value: 5 },
     ];
 
     const generatedSteps: Step[] = [];
@@ -349,12 +129,12 @@ export const LRUCacheVisualization = () => {
     let nodeIdCounter = 0;
 
     const findNodeIndex = (key: number): number => {
-      return nodes.findIndex(n => n.key === key);
+      return nodes.findIndex((n) => n.key === key);
     };
 
     const moveToHead = (nodeIdx: number) => {
       const node = nodes[nodeIdx];
-      
+
       // Remove from current position
       if (node.prev !== null) {
         nodes[node.prev].next = node.next;
@@ -388,10 +168,10 @@ export const LRUCacheVisualization = () => {
         prev: null,
         next: head,
       };
-      
+
       const newIdx = nodes.length;
       nodes.push(newNode);
-      
+
       if (head !== null) {
         nodes[head].prev = newIdx;
       }
@@ -399,38 +179,38 @@ export const LRUCacheVisualization = () => {
       if (tail === null) {
         tail = newIdx;
       }
-      
+
       cache.set(key, newIdx);
       return newIdx;
     };
 
     const removeTail = (): number | null => {
       if (tail === null) return null;
-      
+
       const removedKey = nodes[tail].key;
       const newTail = nodes[tail].prev;
-      
+
       if (newTail !== null) {
         nodes[newTail].next = null;
       } else {
         head = null;
       }
-      
+
       cache.delete(removedKey);
       const removedIdx = tail;
       tail = newTail;
-      
+
       return removedIdx;
     };
 
     operations.forEach((op) => {
-      if (op.type === 'get') {
+      if (op.type === "get") {
         if (cache.has(op.key)) {
           const nodeIdx = cache.get(op.key)!;
           const value = nodes[nodeIdx].value;
-          
+
           generatedSteps.push({
-            type: 'get',
+            type: "get",
             key: op.key,
             result: value,
             hashMap: new Map(cache),
@@ -446,7 +226,7 @@ export const LRUCacheVisualization = () => {
           moveToHead(nodeIdx);
 
           generatedSteps.push({
-            type: 'get',
+            type: "get",
             key: op.key,
             result: value,
             hashMap: new Map(cache),
@@ -460,7 +240,7 @@ export const LRUCacheVisualization = () => {
           });
         } else {
           generatedSteps.push({
-            type: 'get',
+            type: "get",
             key: op.key,
             result: -1,
             hashMap: new Map(cache),
@@ -477,9 +257,9 @@ export const LRUCacheVisualization = () => {
         if (cache.has(op.key)) {
           const nodeIdx = cache.get(op.key)!;
           nodes[nodeIdx].value = op.value!;
-          
+
           generatedSteps.push({
-            type: 'put',
+            type: "put",
             key: op.key,
             value: op.value,
             hashMap: new Map(cache),
@@ -495,7 +275,7 @@ export const LRUCacheVisualization = () => {
           moveToHead(nodeIdx);
 
           generatedSteps.push({
-            type: 'put',
+            type: "put",
             key: op.key,
             value: op.value,
             hashMap: new Map(cache),
@@ -509,9 +289,9 @@ export const LRUCacheVisualization = () => {
           });
         } else {
           const newIdx = addToHead(op.key, op.value!);
-          
+
           generatedSteps.push({
-            type: 'put',
+            type: "put",
             key: op.key,
             value: op.value,
             hashMap: new Map(cache),
@@ -526,16 +306,18 @@ export const LRUCacheVisualization = () => {
 
           if (cache.size > capacity) {
             const evictedIdx = removeTail();
-            
+
             generatedSteps.push({
-              type: 'put',
+              type: "put",
               key: op.key,
               value: op.value,
               hashMap: new Map(cache),
               nodes: JSON.parse(JSON.stringify(nodes)),
               head,
               tail,
-              message: `Capacity exceeded - Evicted LRU node (key: ${nodes[evictedIdx!].key})`,
+              message: `Capacity exceeded - Evicted LRU node (key: ${
+                nodes[evictedIdx!].key
+              })`,
               highlightedLine: 31,
               evictedNode: evictedIdx!,
               operation: `put(${op.key}, ${op.value})`,
@@ -552,7 +334,7 @@ export const LRUCacheVisualization = () => {
   useEffect(() => {
     if (isPlaying && currentStepIndex < steps.length - 1) {
       intervalRef.current = setInterval(() => {
-        setCurrentStepIndex(prev => {
+        setCurrentStepIndex((prev) => {
           if (prev >= steps.length - 1) {
             setIsPlaying(false);
             return prev;
@@ -577,12 +359,12 @@ export const LRUCacheVisualization = () => {
   const handlePause = () => setIsPlaying(false);
   const handleStepForward = () => {
     if (currentStepIndex < steps.length - 1) {
-      setCurrentStepIndex(prev => prev + 1);
+      setCurrentStepIndex((prev) => prev + 1);
     }
   };
   const handleStepBack = () => {
     if (currentStepIndex > 0) {
-      setCurrentStepIndex(prev => prev - 1);
+      setCurrentStepIndex((prev) => prev - 1);
     }
   };
   const handleReset = () => {
@@ -613,7 +395,11 @@ export const LRUCacheVisualization = () => {
               variant="default"
               size="icon"
             >
-              {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+              {isPlaying ? (
+                <Pause className="h-4 w-4" />
+              ) : (
+                <Play className="h-4 w-4" />
+              )}
             </Button>
             <Button
               onClick={handleStepForward}
@@ -652,39 +438,51 @@ export const LRUCacheVisualization = () => {
           {/* Operation Display */}
           <div className="bg-card border border-border rounded-lg p-4">
             <h3 className="text-sm font-semibold mb-2">Current Operation</h3>
-            <p className="text-lg font-mono text-primary">{currentStep.operation}</p>
-            <p className="text-sm text-muted-foreground mt-1">{currentStep.message}</p>
+            <p className="text-lg font-mono text-primary">
+              {currentStep.operation}
+            </p>
+            <p className="text-sm text-muted-foreground mt-1">
+              {currentStep.message}
+            </p>
           </div>
 
           {/* HashMap Visualization */}
           <div className="bg-card border border-border rounded-lg p-4">
             <h3 className="text-sm font-semibold mb-3">HashMap (Cache)</h3>
             <div className="grid grid-cols-3 gap-2">
-              {Array.from(currentStep.hashMap.entries()).map(([key, nodeIdx]) => (
-                <div
-                  key={key}
-                  className={`p-2 rounded border-2 transition-all ${
-                    currentStep.highlightedNode === nodeIdx
-                      ? 'border-primary bg-primary/20 scale-105'
-                      : 'border-border bg-muted/30'
-                  }`}
-                >
-                  <div className="text-xs text-muted-foreground">Key</div>
-                  <div className="font-mono font-bold">{key}</div>
-                </div>
-              ))}
+              {Array.from(currentStep.hashMap.entries()).map(
+                ([key, nodeIdx]) => (
+                  <div
+                    key={key}
+                    className={`p-2 rounded border-2 transition-all ${
+                      currentStep.highlightedNode === nodeIdx
+                        ? "border-primary bg-primary/20 scale-105"
+                        : "border-border bg-muted/30"
+                    }`}
+                  >
+                    <div className="text-xs text-muted-foreground">Key</div>
+                    <div className="font-mono font-bold">{key}</div>
+                  </div>
+                )
+              )}
             </div>
             {currentStep.hashMap.size === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-4">Empty cache</p>
+              <p className="text-sm text-muted-foreground text-center py-4">
+                Empty cache
+              </p>
             )}
           </div>
 
           {/* Doubly Linked List Visualization */}
           <div className="bg-card border border-border rounded-lg p-4">
-            <h3 className="text-sm font-semibold mb-3">Doubly Linked List (LRU Order)</h3>
+            <h3 className="text-sm font-semibold mb-3">
+              Doubly Linked List (LRU Order)
+            </h3>
             <div className="flex items-center gap-2 overflow-x-auto pb-2">
               {currentStep.head !== null && (
-                <div className="text-xs text-primary font-semibold whitespace-nowrap">HEAD →</div>
+                <div className="text-xs text-primary font-semibold whitespace-nowrap">
+                  HEAD →
+                </div>
               )}
               {currentStep.nodes.map((node, idx) => {
                 let currentIdx: number | null = currentStep.head;
@@ -704,16 +502,28 @@ export const LRUCacheVisualization = () => {
                     <div
                       className={`flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all min-w-[80px] ${
                         isEvicted
-                          ? 'border-destructive bg-destructive/20 opacity-50'
+                          ? "border-destructive bg-destructive/20 opacity-50"
                           : isHighlighted
-                          ? 'border-primary bg-primary/20 scale-110 shadow-lg'
-                          : 'border-border bg-muted/30'
+                          ? "border-primary bg-primary/20 scale-110 shadow-lg"
+                          : "border-border bg-muted/30"
                       }`}
                     >
-                      <div className="text-xs text-muted-foreground">K: {node.key}</div>
-                      <div className="font-mono font-bold text-lg">V: {node.value}</div>
-                      {node.prev !== null && <div className="text-xs text-muted-foreground">← prev</div>}
-                      {node.next !== null && <div className="text-xs text-muted-foreground">next →</div>}
+                      <div className="text-xs text-muted-foreground">
+                        K: {node.key}
+                      </div>
+                      <div className="font-mono font-bold text-lg">
+                        V: {node.value}
+                      </div>
+                      {node.prev !== null && (
+                        <div className="text-xs text-muted-foreground">
+                          ← prev
+                        </div>
+                      )}
+                      {node.next !== null && (
+                        <div className="text-xs text-muted-foreground">
+                          next →
+                        </div>
+                      )}
                     </div>
                     {node.next !== null && orderedNodes.includes(node.next) && (
                       <div className="text-xl text-muted-foreground">↔</div>
@@ -722,21 +532,31 @@ export const LRUCacheVisualization = () => {
                 );
               })}
               {currentStep.tail !== null && (
-                <div className="text-xs text-destructive font-semibold whitespace-nowrap">← TAIL</div>
+                <div className="text-xs text-destructive font-semibold whitespace-nowrap">
+                  ← TAIL
+                </div>
               )}
             </div>
             {currentStep.head === null && (
-              <p className="text-sm text-muted-foreground text-center py-4">Empty list</p>
+              <p className="text-sm text-muted-foreground text-center py-4">
+                Empty list
+              </p>
             )}
           </div>
 
           {/* Variables Panel */}
           <VariablePanel
             variables={{
-              'Capacity': 3,
-              'Size': currentStep.hashMap.size,
-              'Head Key': currentStep.head !== null ? currentStep.nodes[currentStep.head].key : 'null',
-              'Tail Key': currentStep.tail !== null ? currentStep.nodes[currentStep.tail].key : 'null',
+              Capacity: 3,
+              Size: currentStep.hashMap.size,
+              "Head Key":
+                currentStep.head !== null
+                  ? currentStep.nodes[currentStep.head].key
+                  : "null",
+              "Tail Key":
+                currentStep.tail !== null
+                  ? currentStep.nodes[currentStep.tail].key
+                  : "null",
             }}
           />
         </div>
@@ -745,24 +565,27 @@ export const LRUCacheVisualization = () => {
         <div className="space-y-4">
           {/* Language Selector */}
           <div className="flex gap-2">
-            {(['typescript', 'python', 'java', 'cpp'] as const).map((lang) => (
+            {(["typescript"] as const).map((lang) => (
               <Button
                 key={lang}
                 onClick={() => setLanguage(lang)}
-                variant={language === lang ? 'default' : 'outline'}
+                variant={language === lang ? "default" : "outline"}
                 size="sm"
               >
-                {lang === 'typescript' ? 'TypeScript' : lang === 'cpp' ? 'C++' : lang.charAt(0).toUpperCase() + lang.slice(1)}
+                {lang.charAt(0).toUpperCase() + lang.slice(1)}
               </Button>
             ))}
           </div>
 
           {/* Code Display */}
-          <CodeHighlighter
-            code={codeExamples[language]}
-            language={language === 'cpp' ? 'cpp' : language}
-            highlightedLine={currentStep.highlightedLine}
-          />
+
+          <div>
+            <CodeHighlighter
+              code={codeExamples[language]}
+              language={language === "cpp" ? "cpp" : language}
+              highlightedLine={currentStep.highlightedLine}
+            />
+          </div>
         </div>
       }
     />
