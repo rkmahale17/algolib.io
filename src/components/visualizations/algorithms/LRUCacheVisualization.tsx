@@ -24,10 +24,15 @@ interface Step {
   head: number | null;
   tail: number | null;
   message: string;
+  detailedMessage: string;
   highlightedLine: number;
   highlightedNode?: number;
+  highlightedHashMapKey?: number;
   evictedNode?: number;
   operation: string;
+  substep: number;
+  totalSubsteps: number;
+  animationType: "none" | "move" | "create" | "delete" | "update" | "search";
 }
 
 const codeExamples = {
@@ -107,7 +112,7 @@ export const LRUCacheVisualization = () => {
   >("typescript");
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Generate steps for demonstration
+  // Generate granular steps for demonstration
   useEffect(() => {
     const capacity = 3;
     const operations = [
@@ -126,10 +131,42 @@ export const LRUCacheVisualization = () => {
     let nodes: DLLNode[] = [];
     let head: number | null = null;
     let tail: number | null = null;
-    let nodeIdCounter = 0;
 
-    const findNodeIndex = (key: number): number => {
-      return nodes.findIndex((n) => n.key === key);
+    const createStep = (
+      type: "get" | "put",
+      key: number,
+      value: number | undefined,
+      message: string,
+      detailedMessage: string,
+      highlightedLine: number,
+      substep: number,
+      totalSubsteps: number,
+      animationType: Step["animationType"],
+      result?: number,
+      highlightedNode?: number,
+      highlightedHashMapKey?: number,
+      evictedNode?: number
+    ): Step => {
+      return {
+        type,
+        key,
+        value,
+        result,
+        hashMap: new Map(cache),
+        nodes: JSON.parse(JSON.stringify(nodes)),
+        head,
+        tail,
+        message,
+        detailedMessage,
+        highlightedLine,
+        highlightedNode,
+        highlightedHashMapKey,
+        evictedNode,
+        operation: type === "get" ? `get(${key})` : `put(${key}, ${value})`,
+        substep,
+        totalSubsteps,
+        animationType,
+      };
     };
 
     const moveToHead = (nodeIdx: number) => {
