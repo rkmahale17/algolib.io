@@ -1,8 +1,12 @@
-import { BlogContent as BlogContentType } from '@/data/blogPosts';
-import { CodeHighlighter } from '@/components/visualizations/shared/CodeHighlighter';
-import { Link } from 'react-router-dom';
-import { ExternalLink } from 'lucide-react';
-import '../../styles/blog.css';
+import "../../styles/blog.css";
+
+import { ArrowRight, ExternalLink } from "lucide-react";
+
+import { Arrow } from "@radix-ui/react-tooltip";
+import { BlogContent as BlogContentType } from "@/data/blogPosts";
+import { Button } from "../ui/button";
+import { CodeHighlighter } from "@/components/visualizations/shared/CodeHighlighter";
+import { Link } from "react-router-dom";
 
 interface BlogContentProps {
   content: BlogContentType[];
@@ -13,46 +17,39 @@ export const BlogContent = ({ content }: BlogContentProps) => {
     <article className="blog-article">
       {content.map((block, index) => {
         switch (block.type) {
-          case 'heading':
+          case "heading":
             // Main heading - H2
             return (
               <h2 key={index} className="blog-section">
                 {block.content}
               </h2>
             );
-          
-          case 'subheading':
+
+          case "subheading":
             // Topic section - H3
             return (
-              <h3 key={index} className={block.large ? 'section-large' : ''}>
+              <h3 key={index} className={block.large ? "section-large" : ""}>
                 {block.content}
               </h3>
             );
-          
-          case 'h4':
+
+          case "h4":
             // Subsection - H4
-            return (
-              <h4 key={index}>
-                {block.content}
-              </h4>
-            );
-          
-          case 'h5':
+            return <h4 key={index}>{block.content}</h4>;
+
+          case "h5":
             // Specific point - H5
+            return <h5 key={index}>{block.content}</h5>;
+
+          case "paragraph":
             return (
-              <h5 key={index}>
-                {block.content}
-              </h5>
+              <p
+                key={index}
+                dangerouslySetInnerHTML={{ __html: block.content }}
+              ></p>
             );
-          
-          case 'paragraph':
-            return (
-              <p key={index}>
-                {block.content}
-              </p>
-            );
-          
-          case 'list':
+
+          case "list":
             return (
               <ul key={index}>
                 {block.items?.map((item, i) => (
@@ -60,55 +57,72 @@ export const BlogContent = ({ content }: BlogContentProps) => {
                 ))}
               </ul>
             );
-          
-          case 'code':
+
+          case "code":
             return (
               <div key={index}>
-                <CodeHighlighter 
-                  code={block.content} 
-                  language={block.language || 'typescript'}
+                <CodeHighlighter
+                  code={block.content}
+                  language={block.language || "typescript"}
                 />
               </div>
             );
-          
-          case 'image':
+
+          case "image":
             return (
+              // <header style={background:block.content}></header>
               <figure key={index}>
-                <img 
-                  src={block.content} 
-                  alt={block.alt || block.caption || 'Blog illustration'} 
+                <img
+                  src={block.content}
+                  alt={block.alt || block.caption || "Blog illustration"}
                   loading="lazy"
                 />
                 {(block.caption || block.alt) && (
-                  <figcaption>
-                    {block.caption || block.alt}
-                  </figcaption>
+                  <figcaption>{block.caption || block.alt}</figcaption>
                 )}
               </figure>
             );
-          
-          case 'quote':
+
+          case "quote":
+            return <blockquote key={index}>{block.content}</blockquote>;
+
+          case "cta":
             return (
-              <blockquote key={index}>
-                {block.content}
-              </blockquote>
-            );
-          
-          case 'cta':
-            return (
-              <div key={index} style={{ marginTop: '1.5rem', marginBottom: '1.5rem' }}>
-                <Link 
-                  to={block.link || '#'} 
-                  className="blog-cta-button"
-                  target="_blank"
-                  rel="noopener noreferrer"
+              // <div
+              //   key={index}
+              //   style={{ marginTop: "1.5rem", marginBottom: "1.5rem" }}
+              // >
+              //   <Link
+              //     to={block.link || "#"}
+              //     className="text-primary hover:text-primary hover:bg-primary/10 underline-offset-0 "
+              //     target="_blank"
+              //     rel="noopener noreferrer"
+              //   >
+              //     {block.content}
+              //     <ArrowRight className="w-4 h-4" />
+              //   </Link>
+              // </div>
+              <Link
+                key={index}
+                to={block.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group block border-b-0"
+              >
+                <Button
+                  style={{ marginTop: "1.5rem", marginBottom: "1.5rem" }}
+                  key={index}
+                  variant="ghost"
+                  size="sm"
+                  className="text-primary hover:text-primary hover:bg-primary/10 gap-1"
                 >
                   {block.content}
-                  <ExternalLink className="w-4 h-4" />
-                </Link>
-              </div>
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </Link>
+              // </div>
             );
-          
+
           default:
             return null;
         }

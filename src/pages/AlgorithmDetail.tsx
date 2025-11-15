@@ -1,16 +1,26 @@
-import { ArrowLeft, Book, BookOpen, CheckCircle2, Clock, Code2, ExternalLink, Eye, Lightbulb, Youtube } from "lucide-react";
+import {
+  ArrowLeft,
+  Book,
+  BookOpen,
+  CheckCircle2,
+  Clock,
+  Code2,
+  ExternalLink,
+  Eye,
+  Lightbulb,
+  Youtube,
+} from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 // src/pages/AlgorithmDetail.tsx
-import React, { useState, useEffect } from "react";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
+import React, { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Checkbox } from "@/components/ui/checkbox";
-import { toast } from "sonner";
 
 import AlgoMetaHead from "@/services/meta.injectot";
 import { Badge } from "@/components/ui/badge";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { CopyCodeButton } from "@/components/CopyCodeButton";
 import { Separator } from "@/components/ui/separator";
 import { ShareButton } from "@/components/ShareButton";
@@ -19,6 +29,7 @@ import { YouTubePlayer } from "@/components/YouTubePlayer";
 import { algorithms } from "@/data/algorithms";
 import { getAlgorithmImplementation } from "@/data/algorithmImplementations";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const AlgorithmDetail: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
@@ -38,7 +49,7 @@ const AlgorithmDetail: React.FC = () => {
         data: { session },
       } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
-      
+
       if (session?.user && id) {
         await fetchProgress(session.user.id);
       } else {
@@ -67,7 +78,7 @@ const AlgorithmDetail: React.FC = () => {
   // Fetch user's progress for this algorithm
   const fetchProgress = async (userId: string) => {
     if (!id) return;
-    
+
     setIsLoadingProgress(true);
     const { data, error } = await supabase
       .from("user_progress")
@@ -93,7 +104,7 @@ const AlgorithmDetail: React.FC = () => {
     }
 
     const newCompletedState = !isCompleted;
-    
+
     // Optimistic update
     setIsCompleted(newCompletedState);
 
@@ -109,9 +120,9 @@ const AlgorithmDetail: React.FC = () => {
       // Update existing record
       const { error } = await supabase
         .from("user_progress")
-        .update({ 
+        .update({
           completed: newCompletedState,
-          completed_at: newCompletedState ? new Date().toISOString() : null
+          completed_at: newCompletedState ? new Date().toISOString() : null,
         })
         .eq("user_id", user.id)
         .eq("algorithm_id", id);
@@ -122,18 +133,18 @@ const AlgorithmDetail: React.FC = () => {
         toast.error("Failed to update progress");
         console.error(error);
       } else {
-        toast.success(newCompletedState ? "Marked as completed! 🎉" : "Marked as incomplete");
+        toast.success(
+          newCompletedState ? "Marked as completed! 🎉" : "Marked as incomplete"
+        );
       }
     } else {
       // Insert new record
-      const { error } = await supabase
-        .from("user_progress")
-        .insert({
-          user_id: user.id,
-          algorithm_id: id,
-          completed: newCompletedState,
-          completed_at: newCompletedState ? new Date().toISOString() : null
-        });
+      const { error } = await supabase.from("user_progress").insert({
+        user_id: user.id,
+        algorithm_id: id,
+        completed: newCompletedState,
+        completed_at: newCompletedState ? new Date().toISOString() : null,
+      });
 
       if (error) {
         // Revert on error
@@ -1304,7 +1315,7 @@ const AlgorithmDetail: React.FC = () => {
         <React.Suspense
           fallback={<div className="text-center py-12">Loading...</div>}
         >
-      <BinaryLiftingVisualization />
+          <BinaryLiftingVisualization />
         </React.Suspense>
       );
     }
@@ -1366,15 +1377,17 @@ const AlgorithmDetail: React.FC = () => {
                     : "opacity-0 max-h-0 overflow-hidden"
                 }`}
               >
-                <Breadcrumbs 
+                <Breadcrumbs
                   items={[
                     {
                       label: algorithm.category,
-                      href: `/?category=${encodeURIComponent(algorithm.category)}`
+                      href: `/?category=${encodeURIComponent(
+                        algorithm.category
+                      )}`,
                     },
                     {
-                      label: algorithm.name
-                    }
+                      label: algorithm.name,
+                    },
                   ]}
                 />
               </div>
@@ -1391,12 +1404,24 @@ const AlgorithmDetail: React.FC = () => {
               <Card className="p-4 glass-card border-primary/20">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-full ${isCompleted ? 'bg-green-500/20' : 'bg-muted'}`}>
-                      <CheckCircle2 className={`w-5 h-5 ${isCompleted ? 'text-green-500' : 'text-muted-foreground'}`} />
+                    <div
+                      className={`p-2 rounded-full ${
+                        isCompleted ? "bg-green-500/20" : "bg-muted"
+                      }`}
+                    >
+                      <CheckCircle2
+                        className={`w-5 h-5 ${
+                          isCompleted
+                            ? "text-green-500"
+                            : "text-muted-foreground"
+                        }`}
+                      />
                     </div>
                     <div>
                       <p className="font-medium">Track Your Progress</p>
-                      <p className="text-xs text-muted-foreground">Mark this algorithm as completed</p>
+                      <p className="text-xs text-muted-foreground">
+                        Mark this algorithm as completed
+                      </p>
                     </div>
                   </div>
                   <Checkbox
@@ -1431,7 +1456,7 @@ const AlgorithmDetail: React.FC = () => {
                   </div>
                 </div>
                 <div className="rounded-lg bg-muted/30 border border-border/50 p-2 sm:p-4 overflow-x-auto">
-                  {user ? (
+                  {user || true ? (
                     <div className="min-w-[280px]">{renderVisualization()}</div>
                   ) : (
                     <div className="text-center space-y-4 py-12">
@@ -1443,7 +1468,8 @@ const AlgorithmDetail: React.FC = () => {
                           Sign In to View Visualization
                         </p>
                         <p className="text-sm text-muted-foreground mt-2">
-                          Interactive visualizations are exclusive to registered users
+                          Interactive visualizations are exclusive to registered
+                          users
                         </p>
                       </div>
                       <Button onClick={() => navigate("/auth")} size="lg">
@@ -1634,10 +1660,17 @@ const AlgorithmDetail: React.FC = () => {
                     </div>
 
                     {/* Responsive YouTube Player */}
-                    <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+                    <div
+                      className="relative w-full"
+                      style={{ paddingBottom: "56.25%" }}
+                    >
                       <iframe
                         className="absolute top-0 left-0 w-full h-full rounded-lg"
-                        src={`https://www.youtube.com/embed/${algorithm.youtubeUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)?.[1] || algorithm.youtubeUrl}`}
+                        src={`https://www.youtube.com/embed/${
+                          algorithm.youtubeUrl.match(
+                            /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/
+                          )?.[1] || algorithm.youtubeUrl
+                        }`}
                         title={`${algorithm.name} Tutorial`}
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
@@ -1646,20 +1679,27 @@ const AlgorithmDetail: React.FC = () => {
 
                     {/* What the video teaches */}
                     <div className="space-y-2">
-                      <h4 className="text-lg font-semibold">What This Video Teaches</h4>
+                      <h4 className="text-lg font-semibold">
+                        What This Video Teaches
+                      </h4>
                       <p className="text-sm text-muted-foreground leading-relaxed">
-                        This tutorial provides a comprehensive walkthrough of the {algorithm.name} algorithm, 
-                        demonstrating its practical application through step-by-step code implementation. 
-                        The video breaks down complex concepts into digestible segments, making it easier to 
-                        understand how the algorithm works under the hood and when to apply it in real-world scenarios.
+                        This tutorial provides a comprehensive walkthrough of
+                        the {algorithm.name} algorithm, demonstrating its
+                        practical application through step-by-step code
+                        implementation. The video breaks down complex concepts
+                        into digestible segments, making it easier to understand
+                        how the algorithm works under the hood and when to apply
+                        it in real-world scenarios.
                       </p>
                     </div>
 
                     {/* Credits */}
                     <div className="pt-2 border-t border-border/50">
                       <p className="text-xs text-muted-foreground">
-                        <strong>Credits:</strong> Video tutorial by NeetCode (used with permission). 
-                        All written explanations, code examples, and additional insights provided by Algolib.io.
+                        <strong>Credits:</strong> Video tutorial by NeetCode
+                        (used with permission). All written explanations, code
+                        examples, and additional insights provided by
+                        Algolib.io.
                       </p>
                     </div>
                   </div>
@@ -1674,20 +1714,23 @@ const AlgorithmDetail: React.FC = () => {
                         Code Example & Logic
                       </h3>
                       <p className="text-sm text-muted-foreground leading-relaxed">
-                        {implementation.explanation.overview || 
+                        {implementation.explanation.overview ||
                           `The implementation of ${algorithm.name} follows a systematic approach that ensures optimal performance. 
                           Each step in the algorithm is carefully designed to handle specific cases while maintaining efficiency.`}
                       </p>
-                      {implementation.explanation.steps && implementation.explanation.steps.length > 0 && (
-                        <div className="mt-4">
-                          <h4 className="font-medium mb-2">Key Steps:</h4>
-                          <ol className="space-y-2 list-decimal list-inside text-sm text-muted-foreground">
-                            {implementation.explanation.steps.slice(0, 4).map((step, i) => (
-                              <li key={i}>{step}</li>
-                            ))}
-                          </ol>
-                        </div>
-                      )}
+                      {implementation.explanation.steps &&
+                        implementation.explanation.steps.length > 0 && (
+                          <div className="mt-4">
+                            <h4 className="font-medium mb-2">Key Steps:</h4>
+                            <ol className="space-y-2 list-decimal list-inside text-sm text-muted-foreground">
+                              {implementation.explanation.steps
+                                .slice(0, 4)
+                                .map((step, i) => (
+                                  <li key={i}>{step}</li>
+                                ))}
+                            </ol>
+                          </div>
+                        )}
                     </div>
                   )}
 
@@ -1701,13 +1744,17 @@ const AlgorithmDetail: React.FC = () => {
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
-                        <div className="text-xs font-medium text-muted-foreground mb-1">Time Complexity</div>
+                        <div className="text-xs font-medium text-muted-foreground mb-1">
+                          Time Complexity
+                        </div>
                         <div className="text-lg font-mono font-semibold text-foreground">
                           {algorithm.timeComplexity}
                         </div>
                       </div>
                       <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
-                        <div className="text-xs font-medium text-muted-foreground mb-1">Space Complexity</div>
+                        <div className="text-xs font-medium text-muted-foreground mb-1">
+                          Space Complexity
+                        </div>
                         <div className="text-lg font-mono font-semibold text-foreground">
                           {algorithm.spaceComplexity}
                         </div>
@@ -1716,22 +1763,23 @@ const AlgorithmDetail: React.FC = () => {
                   </div>
 
                   {/* Additional Insights */}
-                  {implementation?.explanation.tips && implementation.explanation.tips.length > 0 && (
-                    <>
-                      <Separator />
-                      <div className="space-y-3">
-                        <h3 className="text-xl font-semibold flex items-center gap-2">
-                          <Lightbulb className="w-5 h-5 text-primary" />
-                          Additional Insights & Improvements
-                        </h3>
-                        <ul className="space-y-2 list-disc list-inside text-sm text-muted-foreground">
-                          {implementation.explanation.tips.map((tip, i) => (
-                            <li key={i}>{tip}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    </>
-                  )}
+                  {implementation?.explanation.tips &&
+                    implementation.explanation.tips.length > 0 && (
+                      <>
+                        <Separator />
+                        <div className="space-y-3">
+                          <h3 className="text-xl font-semibold flex items-center gap-2">
+                            <Lightbulb className="w-5 h-5 text-primary" />
+                            Additional Insights & Improvements
+                          </h3>
+                          <ul className="space-y-2 list-disc list-inside text-sm text-muted-foreground">
+                            {implementation.explanation.tips.map((tip, i) => (
+                              <li key={i}>{tip}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </>
+                    )}
                 </div>
               </Card>
             )}
