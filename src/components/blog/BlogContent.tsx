@@ -1,8 +1,6 @@
 import "../../styles/blog.css";
 
-import { ArrowRight, ExternalLink } from "lucide-react";
-
-import { Arrow } from "@radix-ui/react-tooltip";
+import { ArrowRight } from "lucide-react";
 import { BlogContent as BlogContentType } from "@/data/blogPosts";
 import { Button } from "../ui/button";
 import { CodeHighlighter } from "@/components/visualizations/shared/CodeHighlighter";
