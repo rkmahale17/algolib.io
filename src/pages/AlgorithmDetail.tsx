@@ -1456,7 +1456,7 @@ const AlgorithmDetail: React.FC = () => {
                   </div>
                 </div>
                 <div className="rounded-lg bg-muted/30 border border-border/50 p-2 sm:p-4 overflow-x-auto">
-                  {user || true ? (
+                  {user ? (
                     <div className="min-w-[280px]">{renderVisualization()}</div>
                   ) : (
                     <div className="text-center space-y-4 py-12">
