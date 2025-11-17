@@ -9,6 +9,7 @@ import {
   Eye,
   Lightbulb,
   Youtube,
+  Palette,
 } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
@@ -1606,6 +1607,15 @@ const Blind75Detail: React.FC = () => {
                     >
                       <ExternalLink className="w-4 h-4 mr-2" />
                       Solve on LeetCode
+                    </Button>
+                    <Button
+                      onClick={() => navigate('/brainstorm')}
+                      variant="outline"
+                      size="lg"
+                      className="gap-2"
+                    >
+                      <Palette className="w-4 h-4" />
+                      Brainstorm
                     </Button>
                     <ShareButton
                       title={problem.title}
