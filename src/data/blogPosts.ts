@@ -1168,62 +1168,6 @@ class LRUCache:
         "content": "If a problem can be solved using recursion, but recursion repeats work, then DP is simply the optimized version of that recursion — with memory and structure."
       },
 
-      {
-        "type": "heading",
-        "content": "Why You Should Avoid Recursion in Fibonacci"
-      },
-      {
-        "type": "paragraph",
-        "content": "Fibonacci is the perfect example of why plain recursion becomes extremely slow. The recursive formula looks simple: f(n) = f(n-1) + f(n-2). But the moment you try to compute even f(40), your program becomes painfully slow. Why? Because recursion repeats the same calculations thousands of times."
-      },
-      {
-        "type": "subheading",
-        "content": "The Problem: Exponential Explosion"
-      },
-      {
-        "type": "paragraph",
-        "content": "Each recursive call splits into two more calls. Those calls again split into two more. This creates a massive recursion tree where the same values (like f(3), f(4), f(5)) get computed again and again. This leads to an exponential time complexity: O(2^n)."
-      },
-
-      {
-        "type": "paragraph",
-        "content": "For example, while computing f(6), recursion computes f(3) three separate times. For f(40), the number of repeated calculations rises to millions. This is why naive recursion is extremely inefficient and should be avoided for Fibonacci."
-      },
-      {
-        "type": "subheading",
-        "content": "Proof With Code"
-      },
-      {
-        "type": "code",
-        "language": "typescript",
-        "content": "function fib(n: number): number {\n  if (n <= 1) return n;\n  return fib(n - 1) + fib(n - 2); // Repeated work!\n}\n\nconsole.time('fib40');\nconsole.log(fib(40)); // Slow\nconsole.timeEnd('fib40');"
-      },
-      {
-        "type": "paragraph",
-        "content": "This code works, but it grows extremely slow when n increases. It wastes time recomputing the same values over and over."
-      },
-      {
-        "type": "subheading",
-        "content": "The Fix: Memoization (Top-Down DP)"
-      },
-      {
-        "type": "paragraph",
-        "content": "Memoization stores previously calculated Fibonacci values so they don't repeat. This turns the complexity from O(2^n) to O(n)."
-      },
-      {
-        "type": "code",
-        "language": "typescript",
-        "content": "const memo: Record<number, number> = {};\n\nfunction fibMemo(n: number): number {\n  if (n <= 1) return n;\n  if (memo[n] !== undefined) return memo[n];\n  memo[n] = fibMemo(n - 1) + fibMemo(n - 2);\n  return memo[n];\n}\n\nconsole.time('fib40_memo');\nconsole.log(fibMemo(40)); // Fast\nconsole.timeEnd('fib40_memo');"
-      },
-      {
-        "type": "paragraph",
-        "content": "With memoization, each Fibonacci number is calculated only once. This dramatically speeds up execution and removes repeated branching from the recursion tree."
-      },
-      {
-        "type": "cta",
-        "content": "See the recursion tree and memoization animation for Fibonacci on AlgoLib.io",
-        "link": "https://algolib.io"
-      },
 
 
 
