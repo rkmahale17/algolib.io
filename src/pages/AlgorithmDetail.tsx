@@ -9,6 +9,7 @@ import {
   Eye,
   Lightbulb,
   Youtube,
+  Palette,
 } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 // src/pages/AlgorithmDetail.tsx
@@ -1443,6 +1444,15 @@ const AlgorithmDetail: React.FC = () => {
                     Interactive Visualization
                   </h2>
                   <div className="flex items-center gap-2">
+                    <Button
+                      onClick={() => navigate('/brainstorm')}
+                      variant="outline"
+                      size="sm"
+                      className="gap-2"
+                    >
+                      <Palette className="w-4 h-4" />
+                      Brainstorm
+                    </Button>
                     <ShareButton
                       title={algorithm.name}
                       description={algorithm.description}
