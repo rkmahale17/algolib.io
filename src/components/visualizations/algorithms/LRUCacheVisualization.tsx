@@ -24,10 +24,15 @@ interface Step {
   head: number | null;
   tail: number | null;
   message: string;
+  detailedMessage: string;
   highlightedLine: number;
   highlightedNode?: number;
+  highlightedHashMapKey?: number;
   evictedNode?: number;
   operation: string;
+  substep: number;
+  totalSubsteps: number;
+  animationType: "none" | "move" | "create" | "delete" | "update" | "search";
 }
 
 const codeExamples = {
@@ -107,7 +112,7 @@ export const LRUCacheVisualization = () => {
   >("typescript");
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Generate steps for demonstration
+  // Generate granular steps for demonstration
   useEffect(() => {
     const capacity = 3;
     const operations = [
@@ -126,204 +131,209 @@ export const LRUCacheVisualization = () => {
     let nodes: DLLNode[] = [];
     let head: number | null = null;
     let tail: number | null = null;
-    let nodeIdCounter = 0;
 
-    const findNodeIndex = (key: number): number => {
-      return nodes.findIndex((n) => n.key === key);
-    };
-
-    const moveToHead = (nodeIdx: number) => {
-      const node = nodes[nodeIdx];
-
-      // Remove from current position
-      if (node.prev !== null) {
-        nodes[node.prev].next = node.next;
-      }
-      if (node.next !== null) {
-        nodes[node.next].prev = node.prev;
-      }
-      if (head === nodeIdx) {
-        head = node.next;
-      }
-      if (tail === nodeIdx) {
-        tail = node.prev;
-      }
-
-      // Add to head
-      node.next = head;
-      node.prev = null;
-      if (head !== null) {
-        nodes[head].prev = nodeIdx;
-      }
-      head = nodeIdx;
-      if (tail === null) {
-        tail = nodeIdx;
-      }
-    };
-
-    const addToHead = (key: number, value: number) => {
-      const newNode: DLLNode = {
+    const createStep = (
+      type: "get" | "put",
+      key: number,
+      value: number | undefined,
+      message: string,
+      detailedMessage: string,
+      highlightedLine: number,
+      substep: number,
+      totalSubsteps: number,
+      animationType: Step["animationType"],
+      result?: number,
+      highlightedNode?: number,
+      highlightedHashMapKey?: number,
+      evictedNode?: number
+    ): Step => {
+      return {
+        type,
         key,
         value,
-        prev: null,
-        next: head,
+        result,
+        hashMap: new Map(cache),
+        nodes: JSON.parse(JSON.stringify(nodes)),
+        head,
+        tail,
+        message,
+        detailedMessage,
+        highlightedLine,
+        highlightedNode,
+        highlightedHashMapKey,
+        evictedNode,
+        operation: type === "get" ? `get(${key})` : `put(${key}, ${value})`,
+        substep,
+        totalSubsteps,
+        animationType,
       };
-
-      const newIdx = nodes.length;
-      nodes.push(newNode);
-
-      if (head !== null) {
-        nodes[head].prev = newIdx;
-      }
-      head = newIdx;
-      if (tail === null) {
-        tail = newIdx;
-      }
-
-      cache.set(key, newIdx);
-      return newIdx;
     };
 
-    const removeTail = (): number | null => {
-      if (tail === null) return null;
+    const generateGetSteps = (key: number) => {
+      const hasKey = cache.has(key);
+      
+      if (hasKey) {
+        const nodeIdx = cache.get(key)!;
+        const value = nodes[nodeIdx].value;
+        let substep = 1;
+        const totalSubsteps = 11;
 
-      const removedKey = nodes[tail].key;
-      const newTail = nodes[tail].prev;
+        generatedSteps.push(createStep("get", key, undefined, `Called get(${key})`, `Starting GET operation for key ${key}`, 14, substep++, totalSubsteps, "none"));
+        generatedSteps.push(createStep("get", key, undefined, `Checking HashMap for key ${key}...`, `Searching in HashMap to see if key ${key} exists`, 15, substep++, totalSubsteps, "search", undefined, undefined, key));
+        generatedSteps.push(createStep("get", key, undefined, `Key ${key} found in HashMap!`, `HashMap contains key ${key}, pointing to node at index ${nodeIdx}`, 15, substep++, totalSubsteps, "search", undefined, nodeIdx, key));
+        generatedSteps.push(createStep("get", key, undefined, `Retrieved node from HashMap`, `Got reference to node: {key: ${key}, value: ${value}}`, 17, substep++, totalSubsteps, "update", undefined, nodeIdx));
+        generatedSteps.push(createStep("get", key, undefined, `Need to move node to HEAD`, `Mark this node as most recently used by moving it to the front of the list`, 18, substep++, totalSubsteps, "none", undefined, nodeIdx));
 
-      if (newTail !== null) {
-        nodes[newTail].next = null;
+        const node = nodes[nodeIdx];
+        const isAlreadyHead = head === nodeIdx;
+
+        if (!isAlreadyHead) {
+          generatedSteps.push(createStep("get", key, undefined, `Disconnecting node from current position...`, `Removing node from its current position in the doubly linked list`, 38, substep++, totalSubsteps, "delete", undefined, nodeIdx));
+          
+          if (node.prev !== null) {
+            generatedSteps.push(createStep("get", key, undefined, `Updating previous node's next pointer`, `Setting node[${node.prev}].next = ${node.next}`, 43, substep++, totalSubsteps, "update", undefined, node.prev));
+            nodes[node.prev].next = node.next;
+          }
+          if (node.next !== null) {
+            generatedSteps.push(createStep("get", key, undefined, `Updating next node's prev pointer`, `Setting node[${node.next}].prev = ${node.prev}`, 44, substep++, totalSubsteps, "update", undefined, node.next));
+            nodes[node.next].prev = node.prev;
+          }
+          if (head === nodeIdx) head = node.next;
+          if (tail === nodeIdx) tail = node.prev;
+
+          generatedSteps.push(createStep("get", key, undefined, `Reconnecting node at HEAD position...`, `Adding node to the front of the doubly linked list`, 40, substep++, totalSubsteps, "create", undefined, nodeIdx));
+          
+          node.next = head;
+          node.prev = null;
+          if (head !== null) nodes[head].prev = nodeIdx;
+          head = nodeIdx;
+          if (tail === null) tail = nodeIdx;
+
+          generatedSteps.push(createStep("get", key, undefined, `Updated HEAD pointer and reconnected links`, `Node is now at HEAD position with all pointers correctly updated`, 47, substep++, totalSubsteps, "update", undefined, head!));
+        } else {
+          generatedSteps.push(createStep("get", key, undefined, `Node already at HEAD position`, `No movement needed - node is already the most recently used`, 18, substep++, totalSubsteps, "none", undefined, nodeIdx));
+        }
+
+        generatedSteps.push(createStep("get", key, undefined, `Returning value: ${value}`, `GET operation complete - returning node value ${value}`, 19, substep++, totalSubsteps, "none", value, nodeIdx));
       } else {
-        head = null;
+        let substep = 1;
+        const totalSubsteps = 3;
+        generatedSteps.push(createStep("get", key, undefined, `Checking HashMap for key ${key}...`, `Searching in HashMap to see if key ${key} exists`, 15, substep++, totalSubsteps, "search"));
+        generatedSteps.push(createStep("get", key, undefined, `Key ${key} not found in cache!`, `HashMap does not contain key ${key} - cache miss`, 15, substep++, totalSubsteps, "none", -1));
+        generatedSteps.push(createStep("get", key, undefined, `Returning -1 (cache miss)`, `GET operation complete - key not found, returning -1`, 15, substep++, totalSubsteps, "none", -1));
       }
+    };
 
-      cache.delete(removedKey);
-      const removedIdx = tail;
-      tail = newTail;
+    const generatePutSteps = (key: number, value: number) => {
+      const hasKey = cache.has(key);
 
-      return removedIdx;
+      if (hasKey) {
+        const nodeIdx = cache.get(key)!;
+        let substep = 1;
+        const totalSubsteps = 10;
+
+        generatedSteps.push(createStep("put", key, value, `Called put(${key}, ${value})`, `Starting PUT operation for key ${key} with value ${value}`, 21, substep++, totalSubsteps, "none"));
+        generatedSteps.push(createStep("put", key, value, `Checking if key ${key} exists...`, `Searching HashMap to check if key already exists in cache`, 22, substep++, totalSubsteps, "search", undefined, undefined, key));
+        generatedSteps.push(createStep("put", key, value, `Key ${key} found in cache`, `Key exists - will update the value instead of creating new node`, 22, substep++, totalSubsteps, "search", undefined, nodeIdx, key));
+        generatedSteps.push(createStep("put", key, value, `Retrieved node from HashMap`, `Got reference to existing node at index ${nodeIdx}`, 23, substep++, totalSubsteps, "update", undefined, nodeIdx));
+        
+        const oldValue = nodes[nodeIdx].value;
+        nodes[nodeIdx].value = value;
+        generatedSteps.push(createStep("put", key, value, `Updated value: ${oldValue} → ${value}`, `Changed node value from ${oldValue} to ${value}`, 24, substep++, totalSubsteps, "update", undefined, nodeIdx));
+        generatedSteps.push(createStep("put", key, value, `Moving node to HEAD...`, `Mark this node as most recently used by moving to front`, 25, substep++, totalSubsteps, "move", undefined, nodeIdx));
+
+        const node = nodes[nodeIdx];
+        const isAlreadyHead = head === nodeIdx;
+
+        if (!isAlreadyHead) {
+          generatedSteps.push(createStep("put", key, value, `Disconnecting from current position...`, `Removing node from its current position in the list`, 38, substep++, totalSubsteps, "delete", undefined, nodeIdx));
+          
+          if (node.prev !== null) nodes[node.prev].next = node.next;
+          if (node.next !== null) nodes[node.next].prev = node.prev;
+          if (head === nodeIdx) head = node.next;
+          if (tail === nodeIdx) tail = node.prev;
+
+          generatedSteps.push(createStep("put", key, value, `Reconnecting at HEAD position...`, `Adding node to front of the doubly linked list`, 40, substep++, totalSubsteps, "create", undefined, nodeIdx));
+          
+          node.next = head;
+          node.prev = null;
+          if (head !== null) nodes[head].prev = nodeIdx;
+          head = nodeIdx;
+          if (tail === null) tail = nodeIdx;
+
+          generatedSteps.push(createStep("put", key, value, `Updated HEAD and all pointers`, `Node is now at HEAD with all links correctly set`, 47, substep++, totalSubsteps, "update", undefined, head!));
+        } else {
+          generatedSteps.push(createStep("put", key, value, `Node already at HEAD`, `No movement needed - already most recently used`, 25, substep++, totalSubsteps, "none", undefined, nodeIdx));
+        }
+
+        generatedSteps.push(createStep("put", key, value, `PUT operation complete`, `Successfully updated key ${key} with value ${value}`, 26, substep++, totalSubsteps, "none", undefined, head!));
+      } else {
+        const needsEviction = cache.size >= capacity;
+        const totalSubsteps = needsEviction ? 18 : 12;
+        let substep = 1;
+
+        generatedSteps.push(createStep("put", key, value, `Called put(${key}, ${value})`, `Starting PUT operation for new key ${key} with value ${value}`, 21, substep++, totalSubsteps, "none"));
+        generatedSteps.push(createStep("put", key, value, `Checking if key ${key} exists...`, `Searching HashMap to check if key already in cache`, 22, substep++, totalSubsteps, "search"));
+        generatedSteps.push(createStep("put", key, value, `Key ${key} not found - creating new node`, `Key doesn't exist, will create and insert new node`, 27, substep++, totalSubsteps, "none"));
+        generatedSteps.push(createStep("put", key, value, `Creating new node {key: ${key}, value: ${value}}`, `Allocating new doubly linked list node with provided key and value`, 28, substep++, totalSubsteps, "create"));
+
+        const newIdx = nodes.length;
+        const newNode: DLLNode = { key, value, prev: null, next: head };
+        nodes.push(newNode);
+        cache.set(key, newIdx);
+
+        generatedSteps.push(createStep("put", key, value, `Added entry to HashMap: ${key} → node[${newIdx}]`, `HashMap now maps key ${key} to node index ${newIdx}`, 29, substep++, totalSubsteps, "create", undefined, newIdx, key));
+        generatedSteps.push(createStep("put", key, value, `Adding new node to HEAD of DLL...`, `Inserting node at the front of the doubly linked list`, 30, substep++, totalSubsteps, "create", undefined, newIdx));
+        generatedSteps.push(createStep("put", key, value, `Setting node.next = ${head !== null ? `node[${head}]` : "null"}`, `New node's next pointer points to current HEAD`, 49, substep++, totalSubsteps, "update", undefined, newIdx));
+        generatedSteps.push(createStep("put", key, value, `Setting node.prev = null`, `New node's prev pointer is null (it will be the first node)`, 50, substep++, totalSubsteps, "update", undefined, newIdx));
+
+        if (head !== null) {
+          nodes[head].prev = newIdx;
+          generatedSteps.push(createStep("put", key, value, `Updating old HEAD's prev pointer`, `Old HEAD node[${head}] now points back to new node`, 51, substep++, totalSubsteps, "update", undefined, head));
+        }
+
+        head = newIdx;
+        generatedSteps.push(createStep("put", key, value, `Updated HEAD pointer to node[${newIdx}]`, `HEAD now points to the newly inserted node`, 52, substep++, totalSubsteps, "update", undefined, head));
+
+        if (tail === null) {
+          tail = newIdx;
+          generatedSteps.push(createStep("put", key, value, `Updated TAIL pointer (list was empty)`, `TAIL also points to node[${newIdx}] since it's the only node`, 53, substep++, totalSubsteps, "update", undefined, tail));
+        }
+
+        if (needsEviction) {
+          generatedSteps.push(createStep("put", key, value, `Cache full! Size: ${cache.size}/${capacity}`, `Capacity exceeded - need to evict least recently used node`, 32, substep++, totalSubsteps, "none"));
+          generatedSteps.push(createStep("put", key, value, `Removing TAIL node (LRU)...`, `The TAIL node is the least recently used - will be evicted`, 33, substep++, totalSubsteps, "delete", undefined, tail!, undefined, tail!));
+
+          const tailIdx = tail!;
+          const evictedKey = nodes[tailIdx].key;
+
+          generatedSteps.push(createStep("put", key, value, `Getting reference to TAIL node[${tailIdx}]`, `Saving reference to node that will be removed: key=${evictedKey}`, 55, substep++, totalSubsteps, "delete", undefined, undefined, undefined, tailIdx));
+          generatedSteps.push(createStep("put", key, value, `Disconnecting TAIL from DLL...`, `Removing node[${tailIdx}] from doubly linked list`, 56, substep++, totalSubsteps, "delete", undefined, undefined, undefined, tailIdx));
+
+          const newTail = nodes[tailIdx].prev;
+          if (newTail !== null) {
+            nodes[newTail].next = null;
+          } else {
+            head = null;
+          }
+          tail = newTail;
+
+          generatedSteps.push(createStep("put", key, value, `Updated new TAIL's next = null`, `New TAIL node[${tail}]'s next pointer now points to null`, 60, substep++, totalSubsteps, "update", undefined, tail!));
+          generatedSteps.push(createStep("put", key, value, `Moved TAIL pointer to node[${tail}]`, `TAIL now points to the previous node in the list`, 67, substep++, totalSubsteps, "update", undefined, tail!));
+
+          cache.delete(evictedKey);
+          generatedSteps.push(createStep("put", key, value, `Deleted key ${evictedKey} from HashMap`, `Eviction complete! Removed HashMap entry for key ${evictedKey}. Size: ${cache.size}/${capacity}`, 34, substep++, totalSubsteps, "delete", undefined, tail!, evictedKey, tailIdx));
+        } else {
+          generatedSteps.push(createStep("put", key, value, `Capacity check: ${cache.size}/${capacity} - No eviction needed`, `Cache size within capacity, no eviction required`, 32, substep++, totalSubsteps, "none", undefined, head));
+        }
+      }
     };
 
     operations.forEach((op) => {
       if (op.type === "get") {
-        if (cache.has(op.key)) {
-          const nodeIdx = cache.get(op.key)!;
-          const value = nodes[nodeIdx].value;
-
-          generatedSteps.push({
-            type: "get",
-            key: op.key,
-            result: value,
-            hashMap: new Map(cache),
-            nodes: JSON.parse(JSON.stringify(nodes)),
-            head,
-            tail,
-            message: `get(${op.key}) - Key found in cache`,
-            highlightedLine: 14,
-            highlightedNode: nodeIdx,
-            operation: `get(${op.key})`,
-          });
-
-          moveToHead(nodeIdx);
-
-          generatedSteps.push({
-            type: "get",
-            key: op.key,
-            result: value,
-            hashMap: new Map(cache),
-            nodes: JSON.parse(JSON.stringify(nodes)),
-            head,
-            tail,
-            message: `Moved node to head (most recently used)`,
-            highlightedLine: 16,
-            highlightedNode: head!,
-            operation: `get(${op.key}) → ${value}`,
-          });
-        } else {
-          generatedSteps.push({
-            type: "get",
-            key: op.key,
-            result: -1,
-            hashMap: new Map(cache),
-            nodes: JSON.parse(JSON.stringify(nodes)),
-            head,
-            tail,
-            message: `get(${op.key}) - Key not found`,
-            highlightedLine: 15,
-            operation: `get(${op.key}) → -1`,
-          });
-        }
+        generateGetSteps(op.key);
       } else {
-        // put operation
-        if (cache.has(op.key)) {
-          const nodeIdx = cache.get(op.key)!;
-          nodes[nodeIdx].value = op.value!;
-
-          generatedSteps.push({
-            type: "put",
-            key: op.key,
-            value: op.value,
-            hashMap: new Map(cache),
-            nodes: JSON.parse(JSON.stringify(nodes)),
-            head,
-            tail,
-            message: `put(${op.key}, ${op.value}) - Updating existing key`,
-            highlightedLine: 22,
-            highlightedNode: nodeIdx,
-            operation: `put(${op.key}, ${op.value})`,
-          });
-
-          moveToHead(nodeIdx);
-
-          generatedSteps.push({
-            type: "put",
-            key: op.key,
-            value: op.value,
-            hashMap: new Map(cache),
-            nodes: JSON.parse(JSON.stringify(nodes)),
-            head,
-            tail,
-            message: `Moved updated node to head`,
-            highlightedLine: 24,
-            highlightedNode: head!,
-            operation: `put(${op.key}, ${op.value})`,
-          });
-        } else {
-          const newIdx = addToHead(op.key, op.value!);
-
-          generatedSteps.push({
-            type: "put",
-            key: op.key,
-            value: op.value,
-            hashMap: new Map(cache),
-            nodes: JSON.parse(JSON.stringify(nodes)),
-            head,
-            tail,
-            message: `put(${op.key}, ${op.value}) - Added new node`,
-            highlightedLine: 27,
-            highlightedNode: newIdx,
-            operation: `put(${op.key}, ${op.value})`,
-          });
-
-          if (cache.size > capacity) {
-            const evictedIdx = removeTail();
-
-            generatedSteps.push({
-              type: "put",
-              key: op.key,
-              value: op.value,
-              hashMap: new Map(cache),
-              nodes: JSON.parse(JSON.stringify(nodes)),
-              head,
-              tail,
-              message: `Capacity exceeded - Evicted LRU node (key: ${
-                nodes[evictedIdx!].key
-              })`,
-              highlightedLine: 31,
-              evictedNode: evictedIdx!,
-              operation: `put(${op.key}, ${op.value})`,
-            });
-          }
-        }
+        generatePutSteps(op.key, op.value!);
       }
     });
 
@@ -441,9 +451,15 @@ export const LRUCacheVisualization = () => {
             <p className="text-lg font-mono text-primary">
               {currentStep.operation}
             </p>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-base font-semibold text-foreground mt-2">
               {currentStep.message}
             </p>
+            <p className="text-sm text-muted-foreground mt-1">
+              {currentStep.detailedMessage}
+            </p>
+            <div className="mt-2 text-xs text-muted-foreground">
+              Substep {currentStep.substep} of {currentStep.totalSubsteps}
+            </div>
           </div>
 
           {/* HashMap Visualization */}
@@ -455,13 +471,16 @@ export const LRUCacheVisualization = () => {
                   <div
                     key={key}
                     className={`p-2 rounded border-2 transition-all ${
-                      currentStep.highlightedNode === nodeIdx
-                        ? "border-primary bg-primary/20 scale-105"
+                      currentStep.highlightedHashMapKey === key
+                        ? "border-primary bg-primary/20 scale-110 animate-pulse"
+                        : currentStep.highlightedNode === nodeIdx
+                        ? "border-secondary bg-secondary/20 scale-105"
                         : "border-border bg-muted/30"
                     }`}
                   >
                     <div className="text-xs text-muted-foreground">Key</div>
                     <div className="font-mono font-bold">{key}</div>
+                    <div className="text-xs text-muted-foreground mt-1">→ node[{nodeIdx}]</div>
                   </div>
                 )
               )}
@@ -496,17 +515,31 @@ export const LRUCacheVisualization = () => {
 
                 const isHighlighted = currentStep.highlightedNode === idx;
                 const isEvicted = currentStep.evictedNode === idx;
+                const animType = currentStep.animationType;
+
+                let colorClass = "border-border bg-muted/30";
+                if (isEvicted) {
+                  colorClass = "border-destructive bg-destructive/20 animate-pulse";
+                } else if (isHighlighted) {
+                  if (animType === "create") {
+                    colorClass = "border-success bg-success/20 scale-110";
+                  } else if (animType === "delete") {
+                    colorClass = "border-destructive bg-destructive/10 scale-90";
+                  } else if (animType === "move") {
+                    colorClass = "border-primary bg-primary/20 scale-105 animate-pulse";
+                  } else if (animType === "update") {
+                    colorClass = "border-secondary bg-secondary/20 scale-105";
+                  } else if (animType === "search") {
+                    colorClass = "border-primary bg-primary/10 scale-105";
+                  } else {
+                    colorClass = "border-primary bg-primary/20 scale-110 shadow-lg";
+                  }
+                }
 
                 return (
                   <div key={idx} className="flex items-center gap-2">
                     <div
-                      className={`flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all min-w-[80px] ${
-                        isEvicted
-                          ? "border-destructive bg-destructive/20 opacity-50"
-                          : isHighlighted
-                          ? "border-primary bg-primary/20 scale-110 shadow-lg"
-                          : "border-border bg-muted/30"
-                      }`}
+                      className={`flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all min-w-[80px] ${colorClass}`}
                     >
                       <div className="text-xs text-muted-foreground">
                         K: {node.key}
