@@ -10,6 +10,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 interface WhiteboardComponentProps {
   algorithmId: string;
+  restoreData?: any;
 }
 
 const SaveButton = ({ algorithmId }: WhiteboardComponentProps) => {
@@ -141,10 +142,12 @@ const SaveButton = ({ algorithmId }: WhiteboardComponentProps) => {
   );
 };
 
-export const WhiteboardComponent = ({ algorithmId }: WhiteboardComponentProps) => {
+export const WhiteboardComponent = ({ algorithmId, restoreData }: WhiteboardComponentProps) => {
   return (
     <div className="relative w-full h-[600px] border rounded-lg overflow-hidden">
-      <Tldraw>
+      <Tldraw
+        snapshot={restoreData}
+      >
         <SaveButton algorithmId={algorithmId} />
       </Tldraw>
     </div>
