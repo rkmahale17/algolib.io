@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Loader2, FileText, Palette, Trash2, Eye } from 'lucide-react';
+import { Loader2, FileText, Palette, Trash2, Eye, RotateCcw } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
 import { useState } from 'react';
@@ -12,9 +12,11 @@ import ReactMarkdown from 'react-markdown';
 
 interface HistoryTabProps {
   algorithmId: string;
+  onRestoreWhiteboard?: (boardData: any) => void;
+  onRestoreNote?: (noteData: any) => void;
 }
 
-export const HistoryTab = ({ algorithmId }: HistoryTabProps) => {
+export const HistoryTab = ({ algorithmId, onRestoreWhiteboard, onRestoreNote }: HistoryTabProps) => {
   const queryClient = useQueryClient();
   const [viewingNote, setViewingNote] = useState<any>(null);
 
@@ -97,95 +99,134 @@ export const HistoryTab = ({ algorithmId }: HistoryTabProps) => {
   }
 
   return (
-    <Tabs defaultValue="whiteboards" className="space-y-4">
-      <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="whiteboards" className="gap-2">
-          <Palette className="w-4 h-4" />
-          Whiteboards ({whiteboards?.length || 0})
-        </TabsTrigger>
-        <TabsTrigger value="notes" className="gap-2">
-          <FileText className="w-4 h-4" />
-          Notes ({notes?.length || 0})
-        </TabsTrigger>
-      </TabsList>
+    <>
+      <Tabs defaultValue="whiteboards" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="whiteboards" className="gap-2">
+            <Palette className="w-4 h-4" />
+            Whiteboards ({whiteboards?.length || 0})
+          </TabsTrigger>
+          <TabsTrigger value="notes" className="gap-2">
+            <FileText className="w-4 h-4" />
+            Notes ({notes?.length || 0})
+          </TabsTrigger>
+        </TabsList>
 
-      <TabsContent value="whiteboards" className="space-y-4">
-          {!whiteboards || whiteboards.length === 0 ? (
-            <Card>
-              <CardContent className="pt-6">
-                <p className="text-center text-muted-foreground">No saved whiteboards yet for this algorithm</p>
-              </CardContent>
-            </Card>
-          ) : (
-          whiteboards.map((board) => (
-            <Card key={board.id}>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-lg">{board.title}</CardTitle>
-                    <CardDescription>
-                      Last updated {formatDistanceToNow(new Date(board.updated_at), { addSuffix: true })}
-                    </CardDescription>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => deleteWhiteboardMutation.mutate(board.id)}
-                    disabled={deleteWhiteboardMutation.isPending}
-                  >
-                    <Trash2 className="w-4 h-4 text-destructive" />
-                  </Button>
-                </div>
-              </CardHeader>
-            </Card>
-          ))
-        )}
-      </TabsContent>
-
-      <TabsContent value="notes" className="space-y-4">
-          {!notes || notes.length === 0 ? (
-            <Card>
-              <CardContent className="pt-6">
-                <p className="text-center text-muted-foreground">No saved notes yet for this algorithm</p>
-              </CardContent>
-            </Card>
-          ) : (
-          notes.map((note) => (
-            <Card key={note.id}>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-lg">{note.title}</CardTitle>
-                    <CardDescription>
-                      Last updated {formatDistanceToNow(new Date(note.updated_at), { addSuffix: true })}
-                    </CardDescription>
-                    <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
-                      {note.notes_text || 'Empty note'}
-                    </p>
+        <TabsContent value="whiteboards" className="space-y-4">
+            {!whiteboards || whiteboards.length === 0 ? (
+              <Card>
+                <CardContent className="pt-6">
+                  <p className="text-center text-muted-foreground">No saved whiteboards yet for this algorithm</p>
+                </CardContent>
+              </Card>
+            ) : (
+            whiteboards.map((board) => (
+              <Card key={board.id}>
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle className="text-lg">{board.title}</CardTitle>
+                      <CardDescription>
+                        Last updated {formatDistanceToNow(new Date(board.updated_at), { addSuffix: true })}
+                      </CardDescription>
                     </div>
                     <div className="flex gap-2">
+                      {onRestoreWhiteboard && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            onRestoreWhiteboard(board.board_json);
+                            toast.success('Whiteboard restored');
+                          }}
+                        >
+                          <RotateCcw className="w-4 h-4" />
+                        </Button>
+                      )}
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => setViewingNote(note)}
-                      >
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => deleteNoteMutation.mutate(note.id)}
-                        disabled={deleteNoteMutation.isPending}
+                        onClick={() => deleteWhiteboardMutation.mutate(board.id)}
+                        disabled={deleteWhiteboardMutation.isPending}
                       >
                         <Trash2 className="w-4 h-4 text-destructive" />
                       </Button>
                     </div>
                   </div>
-              </CardHeader>
-            </Card>
-          ))
-        )}
-      </TabsContent>
-    </Tabs>
+                </CardHeader>
+              </Card>
+            ))
+          )}
+        </TabsContent>
+
+        <TabsContent value="notes" className="space-y-4">
+            {!notes || notes.length === 0 ? (
+              <Card>
+                <CardContent className="pt-6">
+                  <p className="text-center text-muted-foreground">No saved notes yet for this algorithm</p>
+                </CardContent>
+              </Card>
+            ) : (
+            notes.map((note) => (
+              <Card key={note.id}>
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <CardTitle className="text-lg">{note.title}</CardTitle>
+                      <CardDescription>
+                        Last updated {formatDistanceToNow(new Date(note.updated_at), { addSuffix: true })}
+                      </CardDescription>
+                      <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
+                        {note.notes_text || 'Empty note'}
+                      </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setViewingNote(note)}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        {onRestoreNote && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              onRestoreNote({ title: note.title, notes_text: note.notes_text });
+                              toast.success('Note restored');
+                            }}
+                          >
+                            <RotateCcw className="w-4 h-4" />
+                          </Button>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => deleteNoteMutation.mutate(note.id)}
+                          disabled={deleteNoteMutation.isPending}
+                        >
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </div>
+                </CardHeader>
+              </Card>
+            ))
+          )}
+        </TabsContent>
+      </Tabs>
+
+      <Dialog open={!!viewingNote} onOpenChange={() => setViewingNote(null)}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{viewingNote?.title}</DialogTitle>
+          </DialogHeader>
+          <div className="prose dark:prose-invert max-w-none">
+            <ReactMarkdown>{viewingNote?.notes_text || ''}</ReactMarkdown>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };

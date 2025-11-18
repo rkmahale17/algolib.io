@@ -10,13 +10,22 @@ import ReactMarkdown from 'react-markdown';
 
 interface NotesComponentProps {
   algorithmId: string;
+  restoreData?: { title: string; notes_text: string };
 }
 
-export const NotesComponent = ({ algorithmId }: NotesComponentProps) => {
+export const NotesComponent = ({ algorithmId, restoreData }: NotesComponentProps) => {
   const [title, setTitle] = useState('Untitled Note');
   const [notes, setNotes] = useState('');
   const [isPreview, setIsPreview] = useState(false);
   const queryClient = useQueryClient();
+
+  // Restore data when provided
+  useEffect(() => {
+    if (restoreData) {
+      setTitle(restoreData.title);
+      setNotes(restoreData.notes_text);
+    }
+  }, [restoreData]);
 
   const saveMutation = useMutation({
     mutationFn: async () => {
