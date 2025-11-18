@@ -1,6 +1,4 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Github, LogOut, Menu as MenuIcon, MessageSquare, Trophy } from "lucide-react";
-import logo from "@/assets/logo.svg";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,11 +7,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Github,
+  LogOut,
+  Menu as MenuIcon,
+  MessageSquare,
+  Trophy,
+} from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Link, useLocation } from "react-router-dom";
 import { ThemeToggle } from "./ThemeToggle";
+import logo from "@/assets/logo.svg";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -21,7 +27,7 @@ const Navbar = () => {
   const [user, setUser] = useState<any>(null);
   const [completedCount, setCompletedCount] = useState(0);
   const location = useLocation();
-  const isAuthPage = location.pathname === '/auth';
+  const isAuthPage = location.pathname === "/auth";
 
   useEffect(() => {
     // Get initial session
@@ -64,14 +70,14 @@ const Navbar = () => {
     if (!user) return;
 
     const channel = supabase
-      .channel('user_progress_changes')
+      .channel("user_progress_changes")
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: '*',
-          schema: 'public',
-          table: 'user_progress',
-          filter: `user_id=eq.${user.id}`
+          event: "*",
+          schema: "public",
+          table: "user_progress",
+          filter: `user_id=eq.${user.id}`,
         },
         () => {
           // Refetch progress when any change occurs
@@ -100,13 +106,16 @@ const Navbar = () => {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-4">
-            <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <Link
+              to="/"
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+            >
               <img src={logo} alt="Algo Lib Logo" className="w-8 h-8" />
               <span className="font-bold text-xl">Algo Lib</span>
             </Link>
-            <a 
-              href="https://neetcode.io" 
-              target="_blank" 
+            <a
+              href="https://neetcode.io"
+              target="_blank"
               rel="noopener noreferrer"
               className="hidden md:block text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
@@ -116,18 +125,27 @@ const Navbar = () => {
 
           {/* Navigation Links */}
           <div className="hidden lg:flex items-center gap-8 flex-1 justify-center">
-            <Link to="/about" className="text-sm font-medium hover:text-primary transition-colors">
+            <Link
+              to="/about"
+              className="text-sm font-medium hover:text-primary transition-colors"
+            >
               About
             </Link>
-            <Link to="/blog" className="text-sm font-medium hover:text-primary transition-colors">
+            <Link
+              to="/blog"
+              className="text-sm font-medium hover:text-primary transition-colors"
+            >
               Blog
             </Link>
-            <Link to="/feedback" className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1.5">
+            <Link
+              to="/feedback"
+              className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1.5"
+            >
               <MessageSquare className="w-4 h-4" />
               Feedback
             </Link>
             <a
-              href="https://github.com/chandeldivyam/AlgoLib"
+              href="https://github.com/rkmahale17/algolib.io"
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1.5"
@@ -150,19 +168,26 @@ const Navbar = () => {
                 <DropdownMenuLabel>Menu</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link to="/about" className="cursor-pointer">About</Link>
+                  <Link to="/about" className="cursor-pointer">
+                    About
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/blog" className="cursor-pointer">Blog</Link>
+                  <Link to="/blog" className="cursor-pointer">
+                    Blog
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/feedback" className="flex items-center gap-2 cursor-pointer">
+                  <Link
+                    to="/feedback"
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
                     <MessageSquare className="w-4 h-4" />
                     Feedback
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <a 
+                  <a
                     href="https://github.com/chandeldivyam/AlgoLib"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -181,24 +206,35 @@ const Navbar = () => {
                 {/* Progress indicator */}
                 <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/50 border border-border/50">
                   <Trophy className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-medium">{completedCount} / 80 completed</span>
+                  <span className="text-sm font-medium">
+                    {completedCount} / 80 completed
+                  </span>
                 </div>
 
                 {/* User menu */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                    <Button
+                      variant="ghost"
+                      className="relative h-10 w-10 rounded-full"
+                    >
                       <Avatar className="h-10 w-10">
                         <AvatarImage src={user.user_metadata?.avatar_url} />
-                        <AvatarFallback>{user.email?.[0]?.toUpperCase() || "U"}</AvatarFallback>
+                        <AvatarFallback>
+                          {user.email?.[0]?.toUpperCase() || "U"}
+                        </AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
                     <DropdownMenuLabel>
                       <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">{user.user_metadata?.full_name || "User"}</p>
-                        <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                        <p className="text-sm font-medium leading-none">
+                          {user.user_metadata?.full_name || "User"}
+                        </p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user.email}
+                        </p>
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
@@ -209,7 +245,10 @@ const Navbar = () => {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
+                    <DropdownMenuItem
+                      onClick={handleSignOut}
+                      className="text-destructive"
+                    >
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Sign out</span>
                     </DropdownMenuItem>
