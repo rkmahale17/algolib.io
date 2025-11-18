@@ -8,8 +8,8 @@ import {
   ExternalLink,
   Eye,
   Lightbulb,
-  Youtube,
   Palette,
+  Youtube,
 } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 // src/pages/AlgorithmDetail.tsx
@@ -18,6 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import AlgoMetaHead from "@/services/meta.injectot";
 import { Badge } from "@/components/ui/badge";
+import { BrainstormSection } from "@/components/brainstorm/BrainstormSection";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -27,7 +28,6 @@ import { Separator } from "@/components/ui/separator";
 import { ShareButton } from "@/components/ShareButton";
 import { TreeVisualization } from "@/components/visualizations/TreeVisualization";
 import { YouTubePlayer } from "@/components/YouTubePlayer";
-import { BrainstormSection } from "@/components/brainstorm/BrainstormSection";
 import { algorithms } from "@/data/algorithms";
 import { getAlgorithmImplementation } from "@/data/algorithmImplementations";
 import { supabase } from "@/integrations/supabase/client";
@@ -1435,7 +1435,16 @@ const AlgorithmDetail: React.FC = () => {
                 </div>
               </Card>
             )}
+            {/* Brainstorm Section - Only visible when logged in */}
 
+            {(user && id) || (
+              <div className="max-w-5xl mx-auto">
+                <BrainstormSection
+                  algorithmId={id}
+                  algorithmTitle={algorithm.name}
+                />
+              </div>
+            )}
             {/* 1. Animation - Login Required */}
             <Card className="p-4 sm:p-6 glass-card overflow-hidden">
               <div className="space-y-4">
@@ -1446,7 +1455,7 @@ const AlgorithmDetail: React.FC = () => {
                   </h2>
                   <div className="flex items-center gap-2">
                     <Button
-                      onClick={() => navigate('/brainstorm')}
+                      onClick={() => navigate("/brainstorm")}
                       variant="outline"
                       size="sm"
                       className="gap-2"
@@ -1819,16 +1828,6 @@ const AlgorithmDetail: React.FC = () => {
                   ))}
                 </div>
               </Card>
-            )}
-
-            {/* Brainstorm Section - Only visible when logged in */}
-            {user && id && (
-              <div className="max-w-5xl mx-auto">
-                <BrainstormSection 
-                  algorithmId={id}
-                  algorithmTitle={algorithm.name}
-                />
-              </div>
             )}
           </div>
         </div>
