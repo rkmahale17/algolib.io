@@ -1437,14 +1437,14 @@ const AlgorithmDetail: React.FC = () => {
             )}
             {/* Brainstorm Section - Only visible when logged in */}
 
-            {
-              <div className=" ">
+            {(user && id) || (
+              <div className="max-w-5xl mx-auto">
                 <BrainstormSection
                   algorithmId={id}
                   algorithmTitle={algorithm.name}
                 />
               </div>
-            }
+            )}
             {/* 1. Animation - Login Required */}
             <Card className="p-4 sm:p-6 glass-card overflow-hidden">
               <div className="space-y-4">
