@@ -1031,6 +1031,7 @@ class LRUCache:
 
     ]
   },
+
   {
     "id": "3",
     "slug": "dynamic-programming-for-people-who-hate-dynamic-programming",
@@ -1407,12 +1408,346 @@ class LRUCache:
         "type": "cta",
         "content": "Try any Dynamic Programming problem now on AlgoLib.io and see the code come alive.",
         "link": "https://algolib.io"
+      },
+    ]
+  },
+
+  {
+    "id": "4",
+    "slug": "graph-algorithms-for-people-who-hate-graphs",
+    "title": "Graph Algorithms for People Who Hate Graph Algorithms",
+    "subtitle": "Understand BFS & DFS using visuals, animations, and intuitive examples — not scary graph theory.",
+    "description": "A beginner-friendly visual guide to Graph Algorithms. Learn BFS and DFS using real-world metaphors, animations, and AlgoLib.io visualizations.",
+    "author": "AlgoLib Team",
+    "date": "2025-02-10",
+    "readTime": "8 min read",
+    "category": "Algorithms",
+    "tags": ["Graphs", "BFS", "DFS", "Graph Traversal", "Visual Learning", "Algolib", "DSA", "LeetCode"],
+    "thumbnail": "/blog/4/hero.png",
+    "image": "/blog/4/hero.png",
+
+    "content": [
+
+      {
+        "type": "heading",
+        "content": "Introduction: Graphs Look Scary… But They Aren’t"
+      },
+      {
+        "type": "paragraph",
+        "content": "<strong>Why do graphs feel hard?</strong><br>Because graphs are invisible until you visualize them."
+      },
+      {
+        "type": "paragraph",
+        "content": "<italic>You don’t <b>see</b> the connections, neighbors, or traversal order. Everything happens in your head — which makes BFS/DFS feel magical and confusing.</italic>"
+      },
+      {
+        "type": "paragraph",
+        "content": "But here’s the truth:"
+      },
+      {
+        "type": "paragraph",
+        "content": "Graph algorithms become simple when you visualize how the search spreads across nodes."
+      },
+
+      {
+        "type": "list",
+        "items": [
+          "Instead of abstract nodes, you see a real graph.",
+          "Instead of guessing traversal order, you see animations.",
+          "Instead of memorizing BFS/DFS rules, you watch them unfold."
+        ]
+      },
+
+      {
+        "type": "paragraph",
+        "content": "This article teaches graphs using visuals and real examples — not heavy theory."
+      },
+
+      {
+        "type": "paragraph",
+        "content": "Most people avoid graph algorithms because they feel too abstract — nodes, edges, adjacency lists, levels, recursion… it’s a lot to imagine inside your mind. But with visuals, BFS & DFS become as easy as exploring a neighborhood."
+      },
+
+      {
+        "type": "heading",
+        "content": "Why Graph Algorithms Feel Hard"
+      },
+      {
+        "type": "paragraph",
+        "content": "Graphs confuse beginners for four simple reasons: invisibility, messy notations, recursion fear, and lack of traversal visualization."
+      },
+
+      {
+        "type": "subheading",
+        "content": "1. You Can’t See Graphs"
+      },
+      {
+        "type": "paragraph",
+        "content": "Unlike arrays and trees, graphs don’t have a fixed structure. Without visuals, it's hard to imagine neighbors or traversal paths."
+      },
+      
+      {
+        "type": "subheading",
+        "content": "2. Graph definitions sound complicated"
+      },
+      {
+        "type": "paragraph",
+        "content": "Terms like adjacency list, connected components, or bipartite graphs feel intimidating — but they are just simple relationships between nodes."
+      },
+
+      {
+        "type": "subheading",
+        "content": "3. Recursion in DFS looks like black magic"
+      },
+      {
+        "type": "paragraph",
+        "content": "DFS uses recursion, which makes people panic when the call stack grows. But visually, it’s just walking deeper into neighbors."
+      },
+
+      {
+        "type": "subheading",
+        "content": "4. Traversal order is rarely explained visually"
+      },
+      {
+        "type": "paragraph",
+        "content": "The difference between BFS and DFS becomes obvious when you SEE how the algorithm spreads through the graph."
+      },
+
+      {
+        "type": "heading",
+        "content": "The Core Idea of Graph Traversal in One Simple Line"
+      },
+      {
+        "type": "quote",
+        "content": "Graph Traversal = Systematically exploring nodes + remembering what you’ve visited"
+      },
+      {
+        "type": "paragraph",
+        "content": "Both BFS and DFS simply explore nodes — just in different orders."
+      },
+
+      {
+        "type": "heading",
+        "content": "How to Instantly Identify a Graph Problem"
+      },
+      {
+        "type": "paragraph",
+        "content": "Ask these questions:"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Is the problem describing relationships or connections?",
+          "Do states depend on neighboring states?",
+          "Is there any reference to levels, distances, or shortest paths?",
+          "Is recursion, backtracking, or component discovery needed?"
+        ]
+      },
+
+      {
+        "type": "heading",
+        "content": "Why Visualizing BFS and DFS Makes Everything Easier"
+      },
+      {
+        "type": "paragraph",
+        "content": "AlgoLib.io visually shows queue expansion, recursion depth, visited nodes, level building, and backtracking. Suddenly, BFS and DFS become obvious instead of mysterious."
+      },
+
+      {
+        "type": "heading",
+        "content": "Understanding BFS (Breadth First Search)"
+      },
+
+      {
+        "type": "paragraph",
+        "content": "BFS explores nodes level-by-level using a queue. Think of BFS like a ripple spreading across water."
+      },
+      {
+        "type": "image",
+        "alt": "Graph BFS visualization",
+        "content": "/blog/4/bfs.png",
+        "caption": "BFS spreading level by level",
+        "large": true
+      },
+      {
+        "type": "cta",
+        "content": "Visualize BFS on AlgoLib.io",
+        "link": "/algorithm/graph-bfs/"
+      },
+
+
+      {
+        "type": "subheading",
+        "content": "Why BFS is useful"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Shortest path in an unweighted graph",
+          "Level order traversal",
+          "Checking bipartite graphs",
+          "Finding connected components"
+        ]
+      },
+
+      {
+        "type": "subheading",
+        "content": "BFS Code Example"
+      },
+      {
+        "type": "code",
+        "language": "typescript",
+        "content": "function bfs(graph: number[][], start: number): number[] {\n  const visited = new Set<number>();\n  const queue: number[] = [start];\n  const result: number[] = [];\n\n  visited.add(start);\n\n  while (queue.length > 0) {\n    const node = queue.shift()!;\n    result.push(node);\n\n    for (const neighbor of graph[node]) {\n      if (!visited.has(neighbor)) {\n        visited.add(neighbor);\n        queue.push(neighbor);\n      }\n    }\n  }\n\n  return result;\n}"
+      },
+
+      {
+        "type": "paragraph",
+        "content": "BFS guarantees the shortest path in an unweighted graph because it explores in layers."
+      },
+
+      {
+        "type": "heading",
+        "content": "Understanding DFS (Depth First Search)"
+      },
+      {
+        "type": "paragraph",
+        "content": "DFS dives deep into one branch before backtracking. Think of DFS like exploring a maze by always choosing one direction first."
+      },
+      {
+        "type": "image",
+        "content": "/blog/4/dfs.png",
+        "caption": "DFS recursion tree visualization",
+        "large": true
+      },
+      {
+        "type": "cta",
+        "content": "Visualize DFS on AlgoLib.io",
+        "link": "/algorithm/graph-dfs/"
+      },
+
+
+      {
+        "type": "subheading",
+        "content": "Why DFS is useful"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Detecting cycles",
+          "Topological sorting",
+          "Backtracking problems",
+          "Exploring connected components",
+          "Solving mazes"
+        ]
+      },
+
+      {
+        "type": "subheading",
+        "content": "DFS Code Example"
+      },
+      {
+        "type": "code",
+        "language": "typescript",
+        "content": "function dfs(graph: number[][], start: number): number[] {\n  const visited = new Set<number>();\n  const result: number[] = [];\n  \n  function explore(node: number) {\n    visited.add(node);\n    result.push(node);\n    \n    for (const neighbor of graph[node]) {\n      if (!visited.has(neighbor)) {\n        explore(neighbor);\n      }\n    }\n  }\n  \n  explore(start);\n  return result;\n}"
+      },
+
+      {
+        "type": "paragraph",
+        "content": "DFS is recursion-heavy, but visualization removes the fear by showing the call stack and backtracking."
+      },
+
+      {
+        "type": "heading",
+        "content": "Let's Solve a Real Graph Example: Number of Islands"
+      },
+      {
+        "type": "paragraph",
+        "content": "You are given a grid of land (1) and water (0). Count how many islands exist. An island is a group of connected land cells."
+      },
+
+      {
+        "type": "subheading",
+        "content": "Step 1: Think Recursively – Explore neighbors"
+      },
+      {
+        "type": "paragraph",
+        "content": "Each time we find new land, DFS explores all connected land cells and marks them as visited."
+      },
+      {
+        "type": "code",
+        "language": "typescript",
+        "content": "function dfs(grid, i, j) {\n  if (i < 0 || j < 0 || i >= grid.length || j >= grid[0].length) return;\n  if (grid[i][j] === '0') return;\n\n  grid[i][j] = '0';\n  dfs(grid, i + 1, j);\n  dfs(grid, i - 1, j);\n  dfs(grid, i, j + 1);\n  dfs(grid, i, j - 1);\n}"
+      },
+
+      {
+        "type": "subheading",
+        "content": "Step 2: Count components"
+      },
+      {
+        "type": "paragraph",
+        "content": "Every time DFS starts, we discovered a new island."
+      },
+
+      {
+        "type": "image",
+        "content": "/blog/4/islands.png",
+        "caption": "Island DFS visualization",
+        "large": false
+      },
+      {
+        "type": "cta",
+        "content": "Visualize Island DFS on AlgoLib.io",
+        "link": "/blind75/number-of-islands"
+      },
+
+      {
+        "type": "heading",
+        "content": "The Only 5 Graph Patterns You Ever Need"
+      },
+      {
+        "type": "list",
+        "items": [
+          "BFS for shortest paths",
+          "DFS for deep exploration",
+          "Connected components (BFS/DFS)",
+          "Topological sorting (DFS/Trees/DAGs)",
+          "Cycle detection (DFS)"
+        ]
+      },
+
+      {
+        "type": "cta",
+        "content": "Check all graph problems on AlgoLib.io",
+        "link": "https://algolib.io"
+      },
+
+      {
+        "type": "heading",
+        "content": "How AlgoLib.io Helps You Master Graph Algorithms"
+      },
+      {
+        "type": "paragraph",
+        "content": "AlgoLib.io turns graph exploration into an interactive experience:"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Queue and recursion animations",
+          "Node and edge highlighting",
+          "Visited tracking in real time",
+          "Level-by-level BFS visualization",
+          "Deep path tracing for DFS",
+          "Code execution with visual layers"
+        ]
+      },
+
+      {
+        "type": "cta",
+        "content": "Try BFS and DFS interactively on AlgoLib.io — graphs finally make sense.",
+        "link": "https://algolib.io"
       }
     ]
   }
-
-
-
 ];
 
 export const getBlogPost = (slug: string): BlogPost | undefined => {
