@@ -4,16 +4,15 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Save, Loader2 } from 'lucide-react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Save, Loader2, Eye, Edit } from 'lucide-react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import ReactMarkdown from 'react-markdown';
 
 interface NotesComponentProps {
-  algorithmId?: string;
-  onSave?: () => void;
+  algorithmId: string;
 }
 
-export const NotesComponent = ({ algorithmId, onSave }: NotesComponentProps) => {
+export const NotesComponent = ({ algorithmId }: NotesComponentProps) => {
   const [title, setTitle] = useState('Untitled Note');
   const [notes, setNotes] = useState('');
   const [isPreview, setIsPreview] = useState(false);
@@ -31,6 +30,7 @@ export const NotesComponent = ({ algorithmId, onSave }: NotesComponentProps) => 
         .from('user_notes')
         .insert({
           user_id: user.id,
+          algorithm_id: algorithmId,
           title: title || 'Untitled Note',
           notes_text: notes,
         });
@@ -39,8 +39,7 @@ export const NotesComponent = ({ algorithmId, onSave }: NotesComponentProps) => 
     },
     onSuccess: () => {
       toast.success('Notes saved successfully!');
-      queryClient.invalidateQueries({ queryKey: ['notes'] });
-      onSave?.();
+      queryClient.invalidateQueries({ queryKey: ['notes', algorithmId] });
     },
     onError: (error: any) => {
       console.error('Error saving notes:', error);
@@ -50,11 +49,10 @@ export const NotesComponent = ({ algorithmId, onSave }: NotesComponentProps) => 
 
   // Auto-save functionality
   useEffect(() => {
+    if (!notes.trim()) return;
+
     const autoSaveTimer = setTimeout(() => {
-      if (notes.trim()) {
-        // Auto-save silently in background
-        saveMutation.mutate();
-      }
+      saveMutation.mutate();
     }, 5000); // Auto-save after 5 seconds of inactivity
 
     return () => clearTimeout(autoSaveTimer);
@@ -73,8 +71,19 @@ export const NotesComponent = ({ algorithmId, onSave }: NotesComponentProps) => 
           onClick={() => setIsPreview(!isPreview)}
           variant="outline"
           size="sm"
+          className="gap-2"
         >
-          {isPreview ? 'Edit' : 'Preview'}
+          {isPreview ? (
+            <>
+              <Edit className="w-4 h-4" />
+              Edit
+            </>
+          ) : (
+            <>
+              <Eye className="w-4 h-4" />
+              Preview
+            </>
+          )}
         </Button>
         <Button
           onClick={() => saveMutation.mutate()}

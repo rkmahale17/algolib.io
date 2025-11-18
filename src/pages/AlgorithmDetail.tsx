@@ -27,6 +27,7 @@ import { Separator } from "@/components/ui/separator";
 import { ShareButton } from "@/components/ShareButton";
 import { TreeVisualization } from "@/components/visualizations/TreeVisualization";
 import { YouTubePlayer } from "@/components/YouTubePlayer";
+import { BrainstormSection } from "@/components/brainstorm/BrainstormSection";
 import { algorithms } from "@/data/algorithms";
 import { getAlgorithmImplementation } from "@/data/algorithmImplementations";
 import { supabase } from "@/integrations/supabase/client";
@@ -1818,6 +1819,16 @@ const AlgorithmDetail: React.FC = () => {
                   ))}
                 </div>
               </Card>
+            )}
+
+            {/* Brainstorm Section - Only visible when logged in */}
+            {user && id && (
+              <div className="max-w-5xl mx-auto">
+                <BrainstormSection 
+                  algorithmId={id}
+                  algorithmTitle={algorithm.name}
+                />
+              </div>
             )}
           </div>
         </div>

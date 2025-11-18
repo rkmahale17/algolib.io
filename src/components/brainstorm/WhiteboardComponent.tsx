@@ -1,19 +1,18 @@
-import { useCallback, useEffect, useState } from 'react';
-import { Tldraw, useEditor, createShapeId, TLStoreSnapshot } from 'tldraw';
+import { useCallback, useState } from 'react';
+import { Tldraw, useEditor } from 'tldraw';
 import 'tldraw/tldraw.css';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Download, Save, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface WhiteboardComponentProps {
-  algorithmId?: string;
-  onSave?: () => void;
+  algorithmId: string;
 }
 
-const SaveButton = ({ algorithmId, onSave }: WhiteboardComponentProps) => {
+const SaveButton = ({ algorithmId }: WhiteboardComponentProps) => {
   const editor = useEditor();
   const [title, setTitle] = useState('Untitled Whiteboard');
   const [isSaving, setIsSaving] = useState(false);
@@ -24,7 +23,7 @@ const SaveButton = ({ algorithmId, onSave }: WhiteboardComponentProps) => {
     
     setIsSaving(true);
     try {
-      const snapshot = editor.store.serialize('document');
+      const snapshot = editor.store.getSnapshot();
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
@@ -36,6 +35,7 @@ const SaveButton = ({ algorithmId, onSave }: WhiteboardComponentProps) => {
         .from('user_whiteboards')
         .insert({
           user_id: user.id,
+          algorithm_id: algorithmId,
           title: title || 'Untitled Whiteboard',
           board_json: snapshot as any,
         });
@@ -43,8 +43,7 @@ const SaveButton = ({ algorithmId, onSave }: WhiteboardComponentProps) => {
       if (error) throw error;
 
       toast.success('Whiteboard saved successfully!');
-      queryClient.invalidateQueries({ queryKey: ['whiteboards'] });
-      onSave?.();
+      queryClient.invalidateQueries({ queryKey: ['whiteboards', algorithmId] });
     } catch (error) {
       console.error('Error saving whiteboard:', error);
       toast.error('Failed to save whiteboard');
@@ -63,9 +62,18 @@ const SaveButton = ({ algorithmId, onSave }: WhiteboardComponentProps) => {
         return;
       }
 
-      const svg = await editor.getSvgString(Array.from(shapeIds), {
+      const svgElement = await editor.getSvg(Array.from(shapeIds), {
         background: true,
+        darkMode: false,
       });
+
+      if (!svgElement) {
+        toast.error('Failed to generate SVG');
+        return;
+      }
+
+      // Convert SVG element to string
+      const svgString = new XMLSerializer().serializeToString(svgElement);
 
       // Convert SVG to PNG using canvas
       const canvas = document.createElement('canvas');
@@ -90,7 +98,9 @@ const SaveButton = ({ algorithmId, onSave }: WhiteboardComponentProps) => {
         }, 'image/png');
       };
       
-      img.src = 'data:image/svg+xml;base64,' + btoa(svg.svg);
+      const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(svgBlob);
+      img.src = url;
     } catch (error) {
       console.error('Error exporting:', error);
       toast.error('Failed to export');
@@ -131,11 +141,11 @@ const SaveButton = ({ algorithmId, onSave }: WhiteboardComponentProps) => {
   );
 };
 
-export const WhiteboardComponent = ({ algorithmId, onSave }: WhiteboardComponentProps) => {
+export const WhiteboardComponent = ({ algorithmId }: WhiteboardComponentProps) => {
   return (
     <div className="relative w-full h-[600px] border rounded-lg overflow-hidden">
       <Tldraw>
-        <SaveButton algorithmId={algorithmId} onSave={onSave} />
+        <SaveButton algorithmId={algorithmId} />
       </Tldraw>
     </div>
   );

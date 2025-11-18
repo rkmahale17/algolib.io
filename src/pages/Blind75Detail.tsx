@@ -26,6 +26,7 @@ import { Helmet } from "react-helmet-async";
 import { Separator } from "@/components/ui/separator";
 import { ShareButton } from "@/components/ShareButton";
 import { YouTubePlayer } from "@/components/YouTubePlayer";
+import { BrainstormSection } from "@/components/brainstorm/BrainstormSection";
 import { algorithms } from "@/data/algorithms";
 import { blind75Implementations } from "@/data/blind75Implementations";
 import { blind75Problems } from "@/data/blind75";
@@ -1914,6 +1915,16 @@ const Blind75Detail: React.FC = () => {
             )}
           </div>
         </div>
+
+        {/* Brainstorm Section - Only visible when logged in */}
+        {user && slug && (
+          <div className="container mx-auto px-4 mb-8">
+            <BrainstormSection 
+              algorithmId={`blind75-${slug}`}
+              algorithmTitle={problem.title}
+            />
+          </div>
+        )}
 
         <Footer />
       </div>
