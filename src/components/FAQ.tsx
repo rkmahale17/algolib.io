@@ -9,7 +9,7 @@ import { Helmet } from "react-helmet-async";
 const faqs = [
   {
     question: "What is AlgoLib.io?",
-    answer: "AlgoLib.io is a free, open-source platform that helps you learn data structures and algorithms through interactive visualizations. We provide step-by-step animated explanations of 72+ popular algorithms with code implementations in Python, Java, C++, and TypeScript."
+    answer: "AlgoLib.io is a free, open-source platform that helps you learn data structures and algorithms through interactive visualizations. We provide step-by-step animated explanations of 200+ popular algorithms with code implementations in Python, Java, C++, and TypeScript."
   },
   {
     question: "Is AlgoLib.io really free?",

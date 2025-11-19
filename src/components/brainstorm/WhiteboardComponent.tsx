@@ -159,12 +159,12 @@ const SaveButton = ({ algorithmId, algorithmTitle }: WhiteboardComponentProps) =
   }, [editor, title]);
 
   return (
-    <div className="absolute top-4 right-4 z-10 flex gap-2 bg-background/95 backdrop-blur-sm p-3 rounded-lg border shadow-lg">
+    <div className="absolute top-4 right-4 z-10 flex gap-2 bg-background border border-border p-3 rounded-lg shadow-lg">
       <Input
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Whiteboard title"
-        className="w-48"
+        className="w-48 bg-background text-foreground border-border"
       />
       <Button
         onClick={handleSave}
