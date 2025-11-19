@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Loader2, FileText, Palette, Trash2, Eye, RotateCcw } from 'lucide-react';
+import { Loader2, FileText, Palette, Trash2, Eye, Pencil } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
 import { useState } from 'react';
@@ -140,7 +140,7 @@ export const HistoryTab = ({ algorithmId, onRestoreWhiteboard, onRestoreNote }: 
                             toast.success('Whiteboard restored');
                           }}
                         >
-                          <RotateCcw className="w-4 h-4" />
+                          <Pencil className="w-4 h-4" />
                         </Button>
                       )}
                       <Button
@@ -197,7 +197,7 @@ export const HistoryTab = ({ algorithmId, onRestoreWhiteboard, onRestoreNote }: 
                               toast.success('Note restored');
                             }}
                           >
-                            <RotateCcw className="w-4 h-4" />
+                            <Pencil className="w-4 h-4" />
                           </Button>
                         )}
                         <Button
