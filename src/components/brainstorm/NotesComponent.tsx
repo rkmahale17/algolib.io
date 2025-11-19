@@ -5,27 +5,54 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Save, Loader2, Eye, Edit } from 'lucide-react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import ReactMarkdown from 'react-markdown';
 
 interface NotesComponentProps {
   algorithmId: string;
+  algorithmTitle: string;
   restoreData?: { title: string; notes_text: string };
 }
 
-export const NotesComponent = ({ algorithmId, restoreData }: NotesComponentProps) => {
-  const [title, setTitle] = useState('Untitled Note');
+export const NotesComponent = ({ algorithmId, algorithmTitle, restoreData }: NotesComponentProps) => {
+  const [title, setTitle] = useState(algorithmTitle);
   const [notes, setNotes] = useState('');
   const [isPreview, setIsPreview] = useState(false);
+  const [noteId, setNoteId] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
-  // Restore data when provided
+  // Fetch the latest note for this algorithm
+  const { data: latestNote } = useQuery({
+    queryKey: ['latest-note', algorithmId],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const { data, error } = await supabase
+        .from('user_notes')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('algorithm_id', algorithmId)
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error;
+      return data;
+    },
+  });
+
+  // Load the latest note on mount or restore data
   useEffect(() => {
     if (restoreData) {
       setTitle(restoreData.title);
       setNotes(restoreData.notes_text);
+    } else if (latestNote) {
+      setNoteId(latestNote.id);
+      setTitle(latestNote.title);
+      setNotes(latestNote.notes_text);
     }
-  }, [restoreData]);
+  }, [restoreData, latestNote]);
 
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -35,16 +62,34 @@ export const NotesComponent = ({ algorithmId, restoreData }: NotesComponentProps
         throw new Error('Please sign in to save notes');
       }
 
-      const { error } = await supabase
-        .from('user_notes')
-        .insert({
-          user_id: user.id,
-          algorithm_id: algorithmId,
-          title: title || 'Untitled Note',
-          notes_text: notes,
-        });
+      if (noteId) {
+        // Update existing note
+        const { error } = await supabase
+          .from('user_notes')
+          .update({
+            title: title || algorithmTitle,
+            notes_text: notes,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', noteId);
 
-      if (error) throw error;
+        if (error) throw error;
+      } else {
+        // Create new note
+        const { data, error } = await supabase
+          .from('user_notes')
+          .insert({
+            user_id: user.id,
+            algorithm_id: algorithmId,
+            title: title || algorithmTitle,
+            notes_text: notes,
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+        if (data) setNoteId(data.id);
+      }
     },
     onSuccess: () => {
       toast.success('Notes saved successfully!');
