@@ -14,11 +14,45 @@ const Blog = () => {
   return (
     <>
       <Helmet>
-        <title>AlgoLib Blog - Algorithm Tutorials & DSA Patterns</title>
+        <title>AlgoLib Blog - Algorithm Tutorials & DSA Patterns | 200+ Free Guides</title>
         <meta
           name="description"
-          content="Explore algorithms, coding tips, and system design guides. Learn DSA patterns, interview strategies, and master data structures through clear explanations and examples."
+          content="Explore algorithms, coding tips, and system design guides. Learn DSA patterns, interview strategies, and master data structures through clear explanations and examples. Free resources for competitive programming."
         />
+        <meta name="keywords" content="algorithm tutorials, DSA patterns, data structures, competitive programming, coding interview preparation, Blind 75, LeetCode solutions" />
+        <link rel="canonical" href="https://algolib.io/blog" />
+        
+        {/* Open Graph */}
+        <meta property="og:title" content="AlgoLib Blog - Algorithm Tutorials & DSA Patterns" />
+        <meta property="og:description" content="Master algorithms through interactive tutorials and comprehensive guides." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://algolib.io/blog" />
+        <meta property="og:image" content="https://algolib.io/og-image.png" />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="AlgoLib Blog - Algorithm Tutorials" />
+        <meta name="twitter:description" content="Master algorithms through interactive tutorials and guides." />
+        <meta name="twitter:image" content="https://algolib.io/og-image.png" />
+        
+        {/* JSON-LD Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Blog",
+            "name": "AlgoLib Blog",
+            "description": "Algorithm tutorials, DSA patterns, and competitive programming guides",
+            "url": "https://algolib.io/blog",
+            "publisher": {
+              "@type": "Organization",
+              "name": "AlgoLib.io",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://algolib.io/android-chrome-512x512.png"
+              }
+            }
+          })}
+        </script>
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 py-12 px-4">

@@ -78,9 +78,9 @@ const Blind75 = () => {
   return (
     <>
       <Helmet>
-        <title>Blind 75 LeetCode Problems - AlgoLib.io | Interview Preparation Guide</title>
+        <title>Blind 75 LeetCode Problems - AlgoLib.io | FAANG Interview Preparation Guide</title>
         <meta 
-          name="description" 
+          name="description"
           content="Master the Blind 75 - curated list of 75 essential LeetCode problems for coding interviews. Complete solutions in Python, Java, C++, TypeScript with detailed explanations and visualizations." 
         />
         <meta 

@@ -53,6 +53,7 @@
     "framer-motion": "^12.23.24",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.462.0",
+    "monaco-editor": "^0.54.0",
     "next-themes": "^0.3.0",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
@@ -67,7 +68,7 @@
     "sonner": "^1.7.4",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
-    "tldraw": "^4.1.2",
+    "tldraw": "^3.9.0",
     "vaul": "^0.9.9",
     "vite-plugin-compression": "^0.5.1",
     "zod": "^3.25.76"

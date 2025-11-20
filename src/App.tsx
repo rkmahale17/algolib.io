@@ -22,7 +22,6 @@ import DPPuzzle from "./pages/DPPuzzle";
 import SlidingWindow from "./pages/SlidingWindow";
 import TwoPointer from "./pages/TwoPointer";
 import Leaderboard from "./pages/Leaderboard";
-import Brainstorm from "./pages/Brainstorm";
 import Navbar from "./components/Navbar";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import Blog from "./pages/Blog";
@@ -58,7 +57,6 @@ const App = () => (
           <Route path="/games/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
-          <Route path="/brainstorm" element={<ProtectedRoute><Brainstorm /></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

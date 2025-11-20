@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trophy, Brain, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Helmet } from "react-helmet-async";
 
 const Games = () => {
   const navigate = useNavigate();
@@ -58,8 +59,53 @@ const Games = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-8 px-4">
-      <div className="container mx-auto max-w-6xl">
+    <>
+      <Helmet>
+        <title>Algorithmic Games - Learn Algorithms Interactively | AlgoLib.io</title>
+        <meta
+          name="description"
+          content="Master data structures and algorithms through interactive games. Play Sort Hero, Graph Explorer, Stack Master, DP Puzzle, Sliding Window Ninja, and Two Pointer Race. Free educational games for coding interview preparation."
+        />
+        <meta name="keywords" content="algorithm games, coding games, interactive learning, data structures games, competitive programming practice, sorting algorithms game, graph algorithms game" />
+        <link rel="canonical" href="https://algolib.io/games" />
+        
+        {/* Open Graph */}
+        <meta property="og:title" content="Algorithmic Games - Learn Through Play" />
+        <meta property="og:description" content="Master algorithms through interactive games and challenges." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://algolib.io/games" />
+        <meta property="og:image" content="https://algolib.io/og-image.png" />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Algorithmic Games - Interactive Learning" />
+        <meta name="twitter:description" content="Master algorithms through fun, interactive games." />
+        
+        {/* JSON-LD */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "Algorithmic Games",
+            "description": "Interactive algorithm learning games",
+            "url": "https://algolib.io/games",
+            "mainEntity": {
+              "@type": "ItemList",
+              "itemListElement": games.map((game, index) => ({
+                "@type": "Game",
+                "position": index + 1,
+                "name": game.name,
+                "description": game.description,
+                "gamePlatform": "Web Browser",
+                "educationalLevel": game.difficulty
+              }))
+            }
+          })}
+        </script>
+      </Helmet>
+      
+      <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-8 px-4">
+        <div className="container mx-auto max-w-6xl">
         <div className="mb-6">
           <Button 
             variant="ghost" 
@@ -126,8 +172,9 @@ const Games = () => {
             </Card>
           </Link>
         </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

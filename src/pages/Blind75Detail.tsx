@@ -8,14 +8,15 @@ import {
   ExternalLink,
   Eye,
   Lightbulb,
-  Youtube,
   Palette,
+  Youtube,
 } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { Badge } from "@/components/ui/badge";
+import { BrainstormSection } from "@/components/brainstorm/BrainstormSection";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -402,7 +403,9 @@ const Blind75Detail: React.FC = () => {
       const FindMinimumInRotatedSortedArrayVisualization = React.lazy(() =>
         import(
           "@/components/visualizations/algorithms/FindMinimumInRotatedSortedArrayVisualization"
-        ).then((m) => ({ default: m.FindMinimumInRotatedSortedArrayVisualization }))
+        ).then((m) => ({
+          default: m.FindMinimumInRotatedSortedArrayVisualization,
+        }))
       );
       return (
         <React.Suspense
@@ -503,179 +506,431 @@ const Blind75Detail: React.FC = () => {
     // Problems 11-20 visualizations
     if (algoId === "sum-of-two-integers") {
       const SumOfTwoIntegersVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/SumOfTwoIntegersVisualization").then((m) => ({ default: m.SumOfTwoIntegersVisualization }))
+        import(
+          "@/components/visualizations/algorithms/SumOfTwoIntegersVisualization"
+        ).then((m) => ({ default: m.SumOfTwoIntegersVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><SumOfTwoIntegersVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <SumOfTwoIntegersVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "number-of-1-bits") {
       const NumberOf1BitsVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/NumberOf1BitsVisualization").then((m) => ({ default: m.NumberOf1BitsVisualization }))
+        import(
+          "@/components/visualizations/algorithms/NumberOf1BitsVisualization"
+        ).then((m) => ({ default: m.NumberOf1BitsVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><NumberOf1BitsVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <NumberOf1BitsVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "counting-bits") {
       const CountingBitsVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/CountingBitsVisualization").then((m) => ({ default: m.CountingBitsVisualization }))
+        import(
+          "@/components/visualizations/algorithms/CountingBitsVisualization"
+        ).then((m) => ({ default: m.CountingBitsVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><CountingBitsVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <CountingBitsVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "missing-number") {
       const MissingNumberVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/MissingNumberVisualization").then((m) => ({ default: m.MissingNumberVisualization }))
+        import(
+          "@/components/visualizations/algorithms/MissingNumberVisualization"
+        ).then((m) => ({ default: m.MissingNumberVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><MissingNumberVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <MissingNumberVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "reverse-bits") {
       const ReverseBitsVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/ReverseBitsVisualization").then((m) => ({ default: m.ReverseBitsVisualization }))
+        import(
+          "@/components/visualizations/algorithms/ReverseBitsVisualization"
+        ).then((m) => ({ default: m.ReverseBitsVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><ReverseBitsVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <ReverseBitsVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "climbing-stairs") {
       const ClimbingStairsVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/ClimbingStairsVisualization").then((m) => ({ default: m.ClimbingStairsVisualization }))
+        import(
+          "@/components/visualizations/algorithms/ClimbingStairsVisualization"
+        ).then((m) => ({ default: m.ClimbingStairsVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><ClimbingStairsVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <ClimbingStairsVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "coin-change") {
       const CoinChangeVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/CoinChangeVisualization").then((m) => ({ default: m.CoinChangeVisualization }))
+        import(
+          "@/components/visualizations/algorithms/CoinChangeVisualization"
+        ).then((m) => ({ default: m.CoinChangeVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><CoinChangeVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <CoinChangeVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "longest-increasing-subsequence") {
       const LongestIncreasingSubsequenceVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/LongestIncreasingSubsequenceVisualization").then((m) => ({ default: m.LongestIncreasingSubsequenceVisualization }))
+        import(
+          "@/components/visualizations/algorithms/LongestIncreasingSubsequenceVisualization"
+        ).then((m) => ({
+          default: m.LongestIncreasingSubsequenceVisualization,
+        }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><LongestIncreasingSubsequenceVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <LongestIncreasingSubsequenceVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "longest-common-subsequence") {
       const LongestCommonSubsequenceVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/LongestCommonSubsequenceVisualization").then((m) => ({ default: m.LongestCommonSubsequenceVisualization }))
+        import(
+          "@/components/visualizations/algorithms/LongestCommonSubsequenceVisualization"
+        ).then((m) => ({ default: m.LongestCommonSubsequenceVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><LongestCommonSubsequenceVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <LongestCommonSubsequenceVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "word-break") {
       const WordBreakVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/WordBreakVisualization").then((m) => ({ default: m.WordBreakVisualization }))
+        import(
+          "@/components/visualizations/algorithms/WordBreakVisualization"
+        ).then((m) => ({ default: m.WordBreakVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><WordBreakVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <WordBreakVisualization />
+        </React.Suspense>
+      );
     }
 
     // String problems
     if (algoId === "valid-parentheses") {
       const ValidParenthesesVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/ValidParenthesesVisualization").then((m) => ({ default: m.ValidParenthesesVisualization }))
+        import(
+          "@/components/visualizations/algorithms/ValidParenthesesVisualization"
+        ).then((m) => ({ default: m.ValidParenthesesVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><ValidParenthesesVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <ValidParenthesesVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "longest-palindromic-substring") {
       const LongestPalindromicSubstringVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/LongestPalindromicSubstringVisualization").then((m) => ({ default: m.LongestPalindromicSubstringVisualization }))
+        import(
+          "@/components/visualizations/algorithms/LongestPalindromicSubstringVisualization"
+        ).then((m) => ({ default: m.LongestPalindromicSubstringVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><LongestPalindromicSubstringVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <LongestPalindromicSubstringVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "palindromic-substrings") {
       const PalindromicSubstringsVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/PalindromicSubstringsVisualization").then((m) => ({ default: m.PalindromicSubstringsVisualization }))
+        import(
+          "@/components/visualizations/algorithms/PalindromicSubstringsVisualization"
+        ).then((m) => ({ default: m.PalindromicSubstringsVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><PalindromicSubstringsVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <PalindromicSubstringsVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "encode-and-decode-strings") {
       const EncodeDecodeStringsVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/EncodeDecodeStringsVisualization").then((m) => ({ default: m.EncodeDecodeStringsVisualization }))
+        import(
+          "@/components/visualizations/algorithms/EncodeDecodeStringsVisualization"
+        ).then((m) => ({ default: m.EncodeDecodeStringsVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><EncodeDecodeStringsVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <EncodeDecodeStringsVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "maximum-depth-of-binary-tree") {
       const MaximumDepthOfBinaryTreeVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/MaximumDepthOfBinaryTreeVisualization").then((m) => ({ default: m.MaximumDepthOfBinaryTreeVisualization }))
+        import(
+          "@/components/visualizations/algorithms/MaximumDepthOfBinaryTreeVisualization"
+        ).then((m) => ({ default: m.MaximumDepthOfBinaryTreeVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><MaximumDepthOfBinaryTreeVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <MaximumDepthOfBinaryTreeVisualization />
+        </React.Suspense>
+      );
     }
 
     // Problems 21-30
     if (algoId === "combination-sum") {
       const CombinationSumVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/CombinationSumVisualization").then((m) => ({ default: m.CombinationSumVisualization }))
+        import(
+          "@/components/visualizations/algorithms/CombinationSumVisualization"
+        ).then((m) => ({ default: m.CombinationSumVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><CombinationSumVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <CombinationSumVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "house-robber") {
       const HouseRobberVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/HouseRobberVisualization").then((m) => ({ default: m.HouseRobberVisualization }))
+        import(
+          "@/components/visualizations/algorithms/HouseRobberVisualization"
+        ).then((m) => ({ default: m.HouseRobberVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><HouseRobberVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <HouseRobberVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "house-robber-ii") {
       const HouseRobberIIVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/HouseRobberIIVisualization").then((m) => ({ default: m.HouseRobberIIVisualization }))
+        import(
+          "@/components/visualizations/algorithms/HouseRobberIIVisualization"
+        ).then((m) => ({ default: m.HouseRobberIIVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><HouseRobberIIVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <HouseRobberIIVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "decode-ways") {
       const DecodeWaysVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/DecodeWaysVisualization").then((m) => ({ default: m.DecodeWaysVisualization }))
+        import(
+          "@/components/visualizations/algorithms/DecodeWaysVisualization"
+        ).then((m) => ({ default: m.DecodeWaysVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><DecodeWaysVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <DecodeWaysVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "unique-paths") {
       const UniquePathsVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/UniquePathsVisualization").then((m) => ({ default: m.UniquePathsVisualization }))
+        import(
+          "@/components/visualizations/algorithms/UniquePathsVisualization"
+        ).then((m) => ({ default: m.UniquePathsVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><UniquePathsVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <UniquePathsVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "jump-game") {
       const JumpGameVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/JumpGameVisualization").then((m) => ({ default: m.JumpGameVisualization }))
+        import(
+          "@/components/visualizations/algorithms/JumpGameVisualization"
+        ).then((m) => ({ default: m.JumpGameVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><JumpGameVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <JumpGameVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "clone-graph") {
       const CloneGraphVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/CloneGraphVisualization").then((m) => ({ default: m.CloneGraphVisualization }))
+        import(
+          "@/components/visualizations/algorithms/CloneGraphVisualization"
+        ).then((m) => ({ default: m.CloneGraphVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><CloneGraphVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <CloneGraphVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "course-schedule") {
       const CourseScheduleVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/CourseScheduleVisualization").then((m) => ({ default: m.CourseScheduleVisualization }))
+        import(
+          "@/components/visualizations/algorithms/CourseScheduleVisualization"
+        ).then((m) => ({ default: m.CourseScheduleVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><CourseScheduleVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <CourseScheduleVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "pacific-atlantic") {
       const PacificAtlanticVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/PacificAtlanticVisualization").then((m) => ({ default: m.PacificAtlanticVisualization }))
+        import(
+          "@/components/visualizations/algorithms/PacificAtlanticVisualization"
+        ).then((m) => ({ default: m.PacificAtlanticVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><PacificAtlanticVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <PacificAtlanticVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "num-islands") {
       const NumberOfIslandsVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/NumberOfIslandsVisualization").then((m) => ({ default: m.NumberOfIslandsVisualization }))
+        import(
+          "@/components/visualizations/algorithms/NumberOfIslandsVisualization"
+        ).then((m) => ({ default: m.NumberOfIslandsVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><NumberOfIslandsVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <NumberOfIslandsVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "sum-of-two-integers") {
@@ -801,7 +1056,9 @@ const Blind75Detail: React.FC = () => {
       const LongestIncreasingSubsequenceVisualization = React.lazy(() =>
         import(
           "@/components/visualizations/algorithms/LongestIncreasingSubsequenceVisualization"
-        ).then((m) => ({ default: m.LongestIncreasingSubsequenceVisualization }))
+        ).then((m) => ({
+          default: m.LongestIncreasingSubsequenceVisualization,
+        }))
       );
       return (
         <React.Suspense
@@ -1175,7 +1432,9 @@ const Blind75Detail: React.FC = () => {
       const LongestSubstringVisualization = React.lazy(() =>
         import(
           "@/components/visualizations/algorithms/LongestSubstringWithoutRepeatingCharactersVisualization"
-        ).then((m) => ({ default: m.LongestSubstringWithoutRepeatingCharactersVisualization }))
+        ).then((m) => ({
+          default: m.LongestSubstringWithoutRepeatingCharactersVisualization,
+        }))
       );
       return (
         <React.Suspense
@@ -1192,7 +1451,9 @@ const Blind75Detail: React.FC = () => {
       const LongestRepeatingCharacterReplacementVisualization = React.lazy(() =>
         import(
           "@/components/visualizations/algorithms/LongestRepeatingCharacterReplacementVisualization"
-        ).then((m) => ({ default: m.LongestRepeatingCharacterReplacementVisualization }))
+        ).then((m) => ({
+          default: m.LongestRepeatingCharacterReplacementVisualization,
+        }))
       );
       return (
         <React.Suspense
@@ -1276,72 +1537,176 @@ const Blind75Detail: React.FC = () => {
     // Tree visualizations
     if (algoId === "same-tree") {
       const SameTreeVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/SameTreeVisualization").then((m) => ({ default: m.SameTreeVisualization }))
+        import(
+          "@/components/visualizations/algorithms/SameTreeVisualization"
+        ).then((m) => ({ default: m.SameTreeVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><SameTreeVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <SameTreeVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "invert-binary-tree") {
       const InvertBinaryTreeVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/InvertBinaryTreeVisualization").then((m) => ({ default: m.InvertBinaryTreeVisualization }))
+        import(
+          "@/components/visualizations/algorithms/InvertBinaryTreeVisualization"
+        ).then((m) => ({ default: m.InvertBinaryTreeVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><InvertBinaryTreeVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <InvertBinaryTreeVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "binary-tree-maximum-path-sum") {
       const BinaryTreeMaximumPathSumVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/BinaryTreeMaximumPathSumVisualization").then((m) => ({ default: m.BinaryTreeMaximumPathSumVisualization }))
+        import(
+          "@/components/visualizations/algorithms/BinaryTreeMaximumPathSumVisualization"
+        ).then((m) => ({ default: m.BinaryTreeMaximumPathSumVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><BinaryTreeMaximumPathSumVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <BinaryTreeMaximumPathSumVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "binary-tree-level-order-traversal") {
       const BinaryTreeLevelOrderVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/BinaryTreeLevelOrderVisualization").then((m) => ({ default: m.BinaryTreeLevelOrderVisualization }))
+        import(
+          "@/components/visualizations/algorithms/BinaryTreeLevelOrderVisualization"
+        ).then((m) => ({ default: m.BinaryTreeLevelOrderVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><BinaryTreeLevelOrderVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <BinaryTreeLevelOrderVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "serialize-and-deserialize-binary-tree") {
       const SerializeDeserializeBinaryTreeVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/SerializeDeserializeBinaryTreeVisualization").then((m) => ({ default: m.SerializeDeserializeBinaryTreeVisualization }))
+        import(
+          "@/components/visualizations/algorithms/SerializeDeserializeBinaryTreeVisualization"
+        ).then((m) => ({
+          default: m.SerializeDeserializeBinaryTreeVisualization,
+        }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><SerializeDeserializeBinaryTreeVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <SerializeDeserializeBinaryTreeVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "subtree-of-another-tree") {
       const SubtreeOfAnotherTreeVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/SubtreeOfAnotherTreeVisualization").then((m) => ({ default: m.SubtreeOfAnotherTreeVisualization }))
+        import(
+          "@/components/visualizations/algorithms/SubtreeOfAnotherTreeVisualization"
+        ).then((m) => ({ default: m.SubtreeOfAnotherTreeVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><SubtreeOfAnotherTreeVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <SubtreeOfAnotherTreeVisualization />
+        </React.Suspense>
+      );
     }
 
-    if (algoId === "construct-binary-tree-from-preorder-and-inorder-traversal") {
+    if (
+      algoId === "construct-binary-tree-from-preorder-and-inorder-traversal"
+    ) {
       const ConstructBinaryTreeVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/ConstructBinaryTreeVisualization").then((m) => ({ default: m.ConstructBinaryTreeVisualization }))
+        import(
+          "@/components/visualizations/algorithms/ConstructBinaryTreeVisualization"
+        ).then((m) => ({ default: m.ConstructBinaryTreeVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><ConstructBinaryTreeVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <ConstructBinaryTreeVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "validate-binary-search-tree") {
       const ValidateBSTVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/ValidateBSTVisualization").then((m) => ({ default: m.ValidateBSTVisualization }))
+        import(
+          "@/components/visualizations/algorithms/ValidateBSTVisualization"
+        ).then((m) => ({ default: m.ValidateBSTVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><ValidateBSTVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <ValidateBSTVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "kth-smallest-element-in-a-bst") {
       const KthSmallestInBSTVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/KthSmallestInBSTVisualization").then((m) => ({ default: m.KthSmallestInBSTVisualization }))
+        import(
+          "@/components/visualizations/algorithms/KthSmallestInBSTVisualization"
+        ).then((m) => ({ default: m.KthSmallestInBSTVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><KthSmallestInBSTVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <KthSmallestInBSTVisualization />
+        </React.Suspense>
+      );
     }
 
     if (algoId === "lowest-common-ancestor-of-bst") {
       const LowestCommonAncestorBSTVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/LowestCommonAncestorBSTVisualization").then((m) => ({ default: m.LowestCommonAncestorBSTVisualization }))
+        import(
+          "@/components/visualizations/algorithms/LowestCommonAncestorBSTVisualization"
+        ).then((m) => ({ default: m.LowestCommonAncestorBSTVisualization }))
       );
-      return <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}><LowestCommonAncestorBSTVisualization /></React.Suspense>;
+      return (
+        <React.Suspense
+          fallback={
+            <div className="text-center py-12">Loading visualization...</div>
+          }
+        >
+          <LowestCommonAncestorBSTVisualization />
+        </React.Suspense>
+      );
     }
 
     // Add more visualization mappings as needed
@@ -1358,17 +1723,33 @@ const Blind75Detail: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>{problem.title} - Blind 75 | AlgoLib.io | LeetCode Solution</title>
-        <meta 
-          name="description" 
-          content={`${problem.title} - Complete solution with visualizations in Python, Java, C++, TypeScript. Time: ${problem.timeComplexity}, Space: ${problem.spaceComplexity}. ${problem.description.substring(0, 160)}`}
+        <title>
+          {problem.title} - Blind 75 | AlgoLib.io | LeetCode Solution
+        </title>
+        <meta
+          name="description"
+          content={`${
+            problem.title
+          } - Complete solution with visualizations in Python, Java, C++, TypeScript. Time: ${
+            problem.timeComplexity
+          }, Space: ${problem.spaceComplexity}. ${problem.description.substring(
+            0,
+            160
+          )}`}
         />
-        <meta 
-          name="keywords" 
-          content={`${problem.title}, blind 75, leetcode, ${problem.category}, ${problem.difficulty}, ${problem.tags.join(', ')}, coding interview, algorithm, ${problem.companies.join(', ')}`}
+        <meta
+          name="keywords"
+          content={`${problem.title}, blind 75, leetcode, ${
+            problem.category
+          }, ${problem.difficulty}, ${problem.tags.join(
+            ", "
+          )}, coding interview, algorithm, ${problem.companies.join(", ")}`}
         />
         <meta name="author" content="AlgoLib.io" />
-        <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
+        <meta
+          name="robots"
+          content="index, follow, max-snippet:-1, max-image-preview:large"
+        />
         <link
           rel="canonical"
           href={`https://algolib.io/blind75/${problem.slug}`}
@@ -1377,16 +1758,25 @@ const Blind75Detail: React.FC = () => {
         {/* Open Graph */}
         <meta property="og:type" content="article" />
         <meta property="og:site_name" content="AlgoLib.io" />
-        <meta property="og:title" content={`${problem.title} - Blind 75 LeetCode Solution`} />
-        <meta property="og:description" content={`Learn ${problem.title} with interactive visualizations and multi-language code examples. Difficulty: ${problem.difficulty}. ${problem.category}.`} />
-        <meta property="og:url" content={`https://algolib.io/blind75/${problem.slug}`} />
+        <meta
+          property="og:title"
+          content={`${problem.title} - Blind 75 LeetCode Solution`}
+        />
+        <meta
+          property="og:description"
+          content={`Learn ${problem.title} with interactive visualizations and multi-language code examples. Difficulty: ${problem.difficulty}. ${problem.category}.`}
+        />
+        <meta
+          property="og:url"
+          content={`https://algolib.io/blind75/${problem.slug}`}
+        />
         <meta property="og:image" content="https://algolib.io/og-image.png" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:locale" content="en_US" />
         <meta property="article:section" content={problem.category} />
         <meta property="article:tag" content="Blind 75" />
-        {problem.tags.map(tag => (
+        {problem.tags.map((tag) => (
           <meta key={tag} property="article:tag" content={tag} />
         ))}
 
@@ -1394,8 +1784,14 @@ const Blind75Detail: React.FC = () => {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@algolib_io" />
         <meta name="twitter:creator" content="@algolib_io" />
-        <meta name="twitter:title" content={`${problem.title} - Blind 75 Solution`} />
-        <meta name="twitter:description" content={`${problem.difficulty} ${problem.category} problem. Time: ${problem.timeComplexity}, Space: ${problem.spaceComplexity}`} />
+        <meta
+          name="twitter:title"
+          content={`${problem.title} - Blind 75 Solution`}
+        />
+        <meta
+          name="twitter:description"
+          content={`${problem.difficulty} ${problem.category} problem. Time: ${problem.timeComplexity}, Space: ${problem.spaceComplexity}`}
+        />
         <meta name="twitter:image" content="https://algolib.io/og-image.png" />
 
         {/* TechArticle Schema */}
@@ -1403,50 +1799,61 @@ const Blind75Detail: React.FC = () => {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "TechArticle",
-            "headline": problem.title,
-            "description": problem.description,
-            "url": `https://algolib.io/blind75/${problem.slug}`,
-            "image": {
+            headline: problem.title,
+            description: problem.description,
+            url: `https://algolib.io/blind75/${problem.slug}`,
+            image: {
               "@type": "ImageObject",
-              "url": "https://algolib.io/og-image.png",
-              "width": 1200,
-              "height": 630
+              url: "https://algolib.io/og-image.png",
+              width: 1200,
+              height: 630,
             },
-            "datePublished": "2024-01-01",
-            "dateModified": new Date().toISOString().split('T')[0],
-            "author": {
+            datePublished: "2024-01-01",
+            dateModified: new Date().toISOString().split("T")[0],
+            author: {
               "@type": "Organization",
-              "name": "AlgoLib.io",
-              "url": "https://algolib.io",
-              "logo": {
+              name: "AlgoLib.io",
+              url: "https://algolib.io",
+              logo: {
                 "@type": "ImageObject",
-                "url": "https://algolib.io/android-chrome-512x512.png"
-              }
+                url: "https://algolib.io/android-chrome-512x512.png",
+              },
             },
-            "publisher": {
+            publisher: {
               "@type": "Organization",
-              "name": "AlgoLib.io",
-              "url": "https://algolib.io",
-              "logo": {
+              name: "AlgoLib.io",
+              url: "https://algolib.io",
+              logo: {
                 "@type": "ImageObject",
-                "url": "https://algolib.io/android-chrome-512x512.png"
-              }
+                url: "https://algolib.io/android-chrome-512x512.png",
+              },
             },
-            "mainEntityOfPage": {
+            mainEntityOfPage: {
               "@type": "WebPage",
-              "@id": `https://algolib.io/blind75/${problem.slug}`
+              "@id": `https://algolib.io/blind75/${problem.slug}`,
             },
-            "articleSection": problem.category,
-            "articleBody": problem.description,
-            "keywords": [problem.title, "Blind 75", problem.category, problem.difficulty, ...problem.tags].join(", "),
-            "proficiencyLevel": problem.difficulty,
-            "educationalLevel": problem.difficulty === 'easy' ? 'Beginner' : problem.difficulty === 'medium' ? 'Intermediate' : 'Advanced',
-            "timeRequired": "PT10M",
-            "about": {
+            articleSection: problem.category,
+            articleBody: problem.description,
+            keywords: [
+              problem.title,
+              "Blind 75",
+              problem.category,
+              problem.difficulty,
+              ...problem.tags,
+            ].join(", "),
+            proficiencyLevel: problem.difficulty,
+            educationalLevel:
+              problem.difficulty === "easy"
+                ? "Beginner"
+                : problem.difficulty === "medium"
+                ? "Intermediate"
+                : "Advanced",
+            timeRequired: "PT10M",
+            about: {
               "@type": "Thing",
-              "name": problem.category,
-              "description": `${problem.category} algorithms and data structures`
-            }
+              name: problem.category,
+              description: `${problem.category} algorithms and data structures`,
+            },
           })}
         </script>
 
@@ -1455,40 +1862,42 @@ const Blind75Detail: React.FC = () => {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
-            "itemListElement": [
+            itemListElement: [
               {
                 "@type": "ListItem",
-                "position": 1,
-                "item": {
+                position: 1,
+                item: {
                   "@id": "https://algolib.io",
-                  "name": "Home"
-                }
+                  name: "Home",
+                },
               },
               {
                 "@type": "ListItem",
-                "position": 2,
-                "item": {
+                position: 2,
+                item: {
                   "@id": "https://algolib.io/blind75",
-                  "name": "Blind 75"
-                }
+                  name: "Blind 75",
+                },
               },
               {
                 "@type": "ListItem",
-                "position": 3,
-                "item": {
-                  "@id": `https://algolib.io/blind75?category=${encodeURIComponent(problem.category)}`,
-                  "name": problem.category
-                }
+                position: 3,
+                item: {
+                  "@id": `https://algolib.io/blind75?category=${encodeURIComponent(
+                    problem.category
+                  )}`,
+                  name: problem.category,
+                },
               },
               {
                 "@type": "ListItem",
-                "position": 4,
-                "item": {
+                position: 4,
+                item: {
                   "@id": `https://algolib.io/blind75/${problem.slug}`,
-                  "name": problem.title
-                }
-              }
-            ]
+                  name: problem.title,
+                },
+              },
+            ],
           })}
         </script>
 
@@ -1497,32 +1906,32 @@ const Blind75Detail: React.FC = () => {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "HowTo",
-            "name": `How to solve ${problem.title}`,
-            "description": problem.description,
-            "totalTime": "PT10M",
-            "tool": ["Python", "Java", "C++", "TypeScript"],
-            "step": [
+            name: `How to solve ${problem.title}`,
+            description: problem.description,
+            totalTime: "PT10M",
+            tool: ["Python", "Java", "C++", "TypeScript"],
+            step: [
               {
                 "@type": "HowToStep",
-                "name": "Understand the Problem",
-                "text": problem.description
+                name: "Understand the Problem",
+                text: problem.description,
               },
               {
                 "@type": "HowToStep",
-                "name": "Analyze Time Complexity",
-                "text": `Time Complexity: ${problem.timeComplexity}`
+                name: "Analyze Time Complexity",
+                text: `Time Complexity: ${problem.timeComplexity}`,
               },
               {
                 "@type": "HowToStep",
-                "name": "Analyze Space Complexity",
-                "text": `Space Complexity: ${problem.spaceComplexity}`
+                name: "Analyze Space Complexity",
+                text: `Space Complexity: ${problem.spaceComplexity}`,
               },
               {
                 "@type": "HowToStep",
-                "name": "Implement Solution",
-                "text": "Choose your preferred programming language and implement the solution"
-              }
-            ]
+                name: "Implement Solution",
+                text: "Choose your preferred programming language and implement the solution",
+              },
+            ],
           })}
         </script>
       </Helmet>
@@ -1608,15 +2017,7 @@ const Blind75Detail: React.FC = () => {
                       <ExternalLink className="w-4 h-4 mr-2" />
                       Solve on LeetCode
                     </Button>
-                    <Button
-                      onClick={() => navigate('/brainstorm')}
-                      variant="outline"
-                      size="lg"
-                      className="gap-2"
-                    >
-                      <Palette className="w-4 h-4" />
-                      Brainstorm
-                    </Button>
+
                     <ShareButton
                       title={problem.title}
                       description={problem.description}
@@ -1625,7 +2026,6 @@ const Blind75Detail: React.FC = () => {
                 </div>
               </div>
             </Card>
-
 
             {/* Problem Description - Always visible */}
             <Card className="p-4 sm:p-6 glass-card overflow-hidden">
@@ -1690,7 +2090,15 @@ const Blind75Detail: React.FC = () => {
                 )}
               </div>
             </Card>
-
+            {/* Brainstorm Section - Only visible when logged in */}
+            {user && slug && (
+              <div className="container mx-auto px-4 mb-8">
+                <BrainstormSection
+                  algorithmId={`blind75-${slug}`}
+                  algorithmTitle={problem.title}
+                />
+              </div>
+            )}
             {/* Interactive Visualization - Always visible */}
             <Card className="p-4 sm:p-6 glass-card overflow-hidden">
               <div className="space-y-4">

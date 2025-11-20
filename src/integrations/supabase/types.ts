@@ -91,6 +91,7 @@ export type Database = {
       }
       user_notes: {
         Row: {
+          algorithm_id: string | null
           created_at: string
           id: string
           notes_text: string
@@ -99,6 +100,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          algorithm_id?: string | null
           created_at?: string
           id?: string
           notes_text?: string
@@ -107,6 +109,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          algorithm_id?: string | null
           created_at?: string
           id?: string
           notes_text?: string
@@ -151,6 +154,7 @@ export type Database = {
       }
       user_whiteboards: {
         Row: {
+          algorithm_id: string | null
           board_json: Json
           created_at: string
           id: string
@@ -159,6 +163,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          algorithm_id?: string | null
           board_json?: Json
           created_at?: string
           id?: string
@@ -167,6 +172,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          algorithm_id?: string | null
           board_json?: Json
           created_at?: string
           id?: string
