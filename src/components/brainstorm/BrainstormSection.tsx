@@ -65,7 +65,7 @@ export const BrainstormSection = ({ algorithmId, algorithmTitle }: BrainstormSec
                   <span className="hidden sm:inline">Expand</span>
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-full w-full h-[100vh] p-0 gap-0 z-50">
+              <DialogContent className="max-w-full w-full h-[100vh] p-0 gap-0 z-50 bg-background">
                 <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full h-full flex flex-col">
                   <TabsList className="w-full justify-start rounded-none border-b px-4 bg-background">
                     <TabsTrigger value="whiteboard" className="gap-2">
