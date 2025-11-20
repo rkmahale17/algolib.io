@@ -129,63 +129,72 @@ export const NotesComponent = ({ algorithmId, algorithmTitle, restoreData }: Not
   }, [notes, title, latestNote]);
 
   return (
-    <div className="space-y-4">
-      <div className="flex gap-2 items-center">
+    <div className="flex flex-col w-full h-full">
+      {/* Fixed Header Bar */}
+      <div className="flex flex-wrap gap-2 items-center p-3 bg-muted/30 border-b">
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Note title"
-          className="flex-1"
+          className="flex-1 min-w-[200px] bg-background"
         />
-        <Button
-          onClick={() => setIsPreview(!isPreview)}
-          variant="outline"
-          size="sm"
-          className="gap-2"
-        >
-          {isPreview ? (
-            <>
-              <Edit className="w-4 h-4" />
-              Edit
-            </>
-          ) : (
-            <>
-              <Eye className="w-4 h-4" />
-              Preview
-            </>
-          )}
-        </Button>
-        <Button
-          onClick={() => saveMutation.mutate()}
-          disabled={saveMutation.isPending}
-          size="sm"
-          className="gap-2"
-        >
-          {saveMutation.isPending ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <Save className="w-4 h-4" />
-          )}
-          Save Now
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => setIsPreview(!isPreview)}
+            variant="outline"
+            size="sm"
+            className="gap-2"
+          >
+            {isPreview ? (
+              <>
+                <Edit className="w-4 h-4" />
+                <span className="hidden sm:inline">Edit</span>
+              </>
+            ) : (
+              <>
+                <Eye className="w-4 h-4" />
+                <span className="hidden sm:inline">Preview</span>
+              </>
+            )}
+          </Button>
+          <Button
+            onClick={() => saveMutation.mutate()}
+            disabled={saveMutation.isPending}
+            size="sm"
+            className="gap-2"
+          >
+            {saveMutation.isPending ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Save className="w-4 h-4" />
+            )}
+            <span className="hidden sm:inline">Save</span>
+          </Button>
+        </div>
       </div>
 
-      {isPreview ? (
-        <div className="min-h-[400px] p-4 border rounded-lg bg-muted/30 prose prose-sm dark:prose-invert max-w-none">
-          <ReactMarkdown>{notes || '*No content yet*'}</ReactMarkdown>
-        </div>
-      ) : (
-        <Textarea
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          placeholder="Start writing your notes... (Markdown supported)"
-          className="min-h-[400px] font-mono text-sm"
-        />
-      )}
+      {/* Notes Content */}
+      <div className="flex-1 p-4">
+        {isPreview ? (
+          <div className="min-h-[500px] lg:min-h-[700px] p-4 border rounded-lg bg-muted/30 prose prose-sm dark:prose-invert max-w-none">
+            <ReactMarkdown>{notes || '*No content yet*'}</ReactMarkdown>
+          </div>
+        ) : (
+          <Textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Start writing your notes... (Markdown supported)"
+            className="min-h-[500px] lg:min-h-[700px] font-mono text-sm resize-none"
+          />
+        )}
+      </div>
 
-      <p className="text-xs text-muted-foreground">
-        Auto-saves after 5 seconds of inactivity. Supports Markdown formatting.
-      </p>
+      {/* Footer */}
+      <div className="px-4 pb-3">
+        <p className="text-xs text-muted-foreground">
+          Auto-saves after 5 seconds of inactivity. Supports Markdown formatting.
+        </p>
+      </div>
     </div>
   );
 };
