@@ -132,7 +132,7 @@ export const BrainstormSection = ({ algorithmId, algorithmTitle }: BrainstormSec
           </div>
         )}
 
-        <CollapsibleContent>
+        <CollapsibleContent className="data-[state=closed]:hidden">
           <div className="p-6 pt-0">
             <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
               <TabsList className="grid w-full grid-cols-3 bg-muted/50">
