@@ -51,6 +51,9 @@ export const NotesComponent = ({ algorithmId, algorithmTitle, restoreData }: Not
       setNoteId(latestNote.id);
       setTitle(latestNote.title);
       setNotes(latestNote.notes_text);
+    } else {
+      // No existing note, reset states
+      setNoteId(null);
     }
   }, [restoreData, latestNote]);
 
@@ -62,8 +65,17 @@ export const NotesComponent = ({ algorithmId, algorithmTitle, restoreData }: Not
         throw new Error('Please sign in to save notes');
       }
 
-      if (noteId) {
+      // First check if a note already exists for this user and algorithm
+      const { data: existingNote } = await supabase
+        .from('user_notes')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('algorithm_id', algorithmId)
+        .maybeSingle();
+
+      if (existingNote || noteId) {
         // Update existing note
+        const updateId = existingNote?.id || noteId;
         const { error } = await supabase
           .from('user_notes')
           .update({
@@ -71,11 +83,13 @@ export const NotesComponent = ({ algorithmId, algorithmTitle, restoreData }: Not
             notes_text: notes,
             updated_at: new Date().toISOString(),
           })
-          .eq('id', noteId);
+          .eq('id', updateId)
+          .eq('user_id', user.id);
 
         if (error) throw error;
+        if (!noteId) setNoteId(updateId);
       } else {
-        // Create new note
+        // Create new note only if none exists
         const { data, error } = await supabase
           .from('user_notes')
           .insert({
@@ -104,13 +118,15 @@ export const NotesComponent = ({ algorithmId, algorithmTitle, restoreData }: Not
   // Auto-save functionality
   useEffect(() => {
     if (!notes.trim()) return;
+    // Don't auto-save if we're still loading initial data
+    if (latestNote === undefined) return;
 
     const autoSaveTimer = setTimeout(() => {
       saveMutation.mutate();
     }, 5000); // Auto-save after 5 seconds of inactivity
 
     return () => clearTimeout(autoSaveTimer);
-  }, [notes, title]);
+  }, [notes, title, latestNote]);
 
   return (
     <div className="space-y-4">
