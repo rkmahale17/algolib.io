@@ -161,35 +161,33 @@ const SaveButton = ({ algorithmId, algorithmTitle }: WhiteboardComponentProps) =
       toast.error("Failed to export");
     }
   }, [editor, title]);
+
+  return (
+    <div className="absolute top-4 right-4 z-10 flex gap-2 bg-background border border-border p-3 rounded-lg shadow-lg">
+      <Input
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Whiteboard title"
+        className="w-48 bg-background text-foreground border-border"
+      />
+      <Button onClick={handleSave} disabled={isSaving} size="sm" className="gap-2">
+        {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+        Save
+      </Button>
+      <Button onClick={handleExportPNG} variant="outline" size="sm" className="gap-2">
+        <Download className="w-4 h-4" />
+        Export PNG
+      </Button>
+    </div>
+  );
 };
 
 export const WhiteboardComponent = ({ algorithmId, algorithmTitle, restoreData }: WhiteboardComponentProps) => {
   return (
-    <div className="flex flex-col w-full h-full">
-      {/* Fixed Header Bar */}
-      <div className="flex flex-wrap gap-2 items-center p-3 bg-muted/30 border-b border-border">
-        <Input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Whiteboard title"
-          className="flex-1 min-w-[200px] bg-background"
-        />
-        <div className="flex gap-2">
-          <Button onClick={handleSave} disabled={isSaving} size="sm" className="gap-2">
-            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            <span className="hidden sm:inline">Save</span>
-          </Button>
-          <Button onClick={handleExportPNG} variant="outline" size="sm" className="gap-2">
-            <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">Export</span>
-          </Button>
-        </div>
-      </div>
+    <div className="relative w-full h-[600px] border rounded-lg overflow-hidden">
+      <SaveButton algorithmId={algorithmId} algorithmTitle={algorithmTitle} />
 
-      {/* Whiteboard Canvas */}
-      <div className="relative flex-1 min-h-[500px] lg:min-h-[700px]">
-        <Tldraw snapshot={restoreData}></Tldraw>
-      </div>
+      <Tldraw snapshot={restoreData}></Tldraw>
     </div>
   );
 };
