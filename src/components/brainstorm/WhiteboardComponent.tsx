@@ -46,23 +46,31 @@ export const WhiteboardComponent = ({
     },
   });
 
-  // Load the latest whiteboard on mount
-  useEffect(() => {
-    if (latestWhiteboard && editor) {
-      setWhiteboardId(latestWhiteboard.id);
-      setTitle(latestWhiteboard.title);
-      editor.store.loadSnapshot(latestWhiteboard.board_json as any);
-    }
-  }, [latestWhiteboard, editor]);
-
-  // Load restore data if provided
+  // Load restore data if provided (takes priority)
   useEffect(() => {
     if (restoreData && editor) {
       setWhiteboardId(restoreData.id);
       setTitle(restoreData.title);
-      editor.store.loadSnapshot(restoreData.board_json as any);
+      try {
+        editor.store.loadSnapshot(restoreData.board_json as any);
+      } catch (error) {
+        console.error('Error loading restore data:', error);
+      }
     }
   }, [restoreData, editor]);
+
+  // Load the latest whiteboard on mount (only if no restore data)
+  useEffect(() => {
+    if (latestWhiteboard && editor && !restoreData) {
+      setWhiteboardId(latestWhiteboard.id);
+      setTitle(latestWhiteboard.title);
+      try {
+        editor.store.loadSnapshot(latestWhiteboard.board_json as any);
+      } catch (error) {
+        console.error('Error loading latest whiteboard:', error);
+      }
+    }
+  }, [latestWhiteboard, editor, restoreData]);
 
   const handleSave = async () => {
     if (!editor) return;
