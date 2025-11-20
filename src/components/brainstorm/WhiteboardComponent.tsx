@@ -161,13 +161,10 @@ const SaveButton = ({ algorithmId, algorithmTitle }: WhiteboardComponentProps) =
       toast.error("Failed to export");
     }
   }, [editor, title]);
-
-  
 };
 
 export const WhiteboardComponent = ({ algorithmId, algorithmTitle, restoreData }: WhiteboardComponentProps) => {
   return (
-
     <div className="flex flex-col w-full h-full">
       {/* Fixed Header Bar */}
       <div className="flex flex-wrap gap-2 items-center p-3 bg-muted/30 border-b border-border">
@@ -178,35 +175,21 @@ export const WhiteboardComponent = ({ algorithmId, algorithmTitle, restoreData }
           className="flex-1 min-w-[200px] bg-background"
         />
         <div className="flex gap-2">
-          <Button
-            onClick={handleSave}
-            disabled={isSaving}
-            size="sm"
-            className="gap-2"
-          >
-            {isSaving ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Save className="w-4 h-4" />
-            )}
+          <Button onClick={handleSave} disabled={isSaving} size="sm" className="gap-2">
+            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             <span className="hidden sm:inline">Save</span>
           </Button>
-          <Button
-            onClick={handleExportPNG}
-            variant="outline"
-            size="sm"
-            className="gap-2"
-          >
+          <Button onClick={handleExportPNG} variant="outline" size="sm" className="gap-2">
             <Download className="w-4 h-4" />
             <span className="hidden sm:inline">Export</span>
           </Button>
         </div>
-         <div className="relative w-full h-[600px] border rounded-lg overflow-hidden">
-      <Tldraw snapshot={restoreData}>
-        <SaveButton algorithmId={algorithmId} algorithmTitle={algorithmTitle} />
-      </Tldraw>
-    </div>
       </div>
-   
+
+      {/* Whiteboard Canvas */}
+      <div className="relative flex-1 min-h-[500px] lg:min-h-[700px]">
+        <Tldraw snapshot={restoreData}></Tldraw>
+      </div>
+    </div>
   );
 };
