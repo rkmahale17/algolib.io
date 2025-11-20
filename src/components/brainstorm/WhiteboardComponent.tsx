@@ -227,7 +227,7 @@ export const WhiteboardComponent = ({ algorithmId, algorithmTitle, restoreData }
 
       {/* Whiteboard Canvas */}
       <div className="relative flex-1 min-h-[500px] lg:min-h-[700px]">
-        <Tldraw onMount={setEditor} snapshot={restoreData} />
+        <Tldraw snapshot={restoreData} />
       </div>
     </div>
   );
