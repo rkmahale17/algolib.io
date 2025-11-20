@@ -51,10 +51,16 @@ export const WhiteboardComponent = ({
     if (restoreData && editor) {
       setWhiteboardId(restoreData.id);
       setTitle(restoreData.title);
-      try {
-        editor.store.loadSnapshot(restoreData.board_json as any);
-      } catch (error) {
-        console.error('Error loading restore data:', error);
+      const snapshot = restoreData.board_json;
+
+      if (snapshot && typeof snapshot === 'object') {
+        try {
+          editor.store.loadSnapshot(snapshot as any);
+        } catch (error) {
+          console.error('Error loading restore data:', error);
+        }
+      } else {
+        console.warn('Invalid restoreData.board_json, skipping load');
       }
     }
   }, [restoreData, editor]);
@@ -64,10 +70,16 @@ export const WhiteboardComponent = ({
     if (latestWhiteboard && editor && !restoreData) {
       setWhiteboardId(latestWhiteboard.id);
       setTitle(latestWhiteboard.title);
-      try {
-        editor.store.loadSnapshot(latestWhiteboard.board_json as any);
-      } catch (error) {
-        console.error('Error loading latest whiteboard:', error);
+      const snapshot = latestWhiteboard.board_json;
+
+      if (snapshot && typeof snapshot === 'object') {
+        try {
+          editor.store.loadSnapshot(snapshot as any);
+        } catch (error) {
+          console.error('Error loading latest whiteboard:', error);
+        }
+      } else {
+        console.warn('Invalid latestWhiteboard.board_json, skipping load');
       }
     }
   }, [latestWhiteboard, editor, restoreData]);
