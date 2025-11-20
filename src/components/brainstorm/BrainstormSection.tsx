@@ -1,16 +1,5 @@
-import {
-  ChevronDown,
-  ChevronUp,
-  FileText,
-  History,
-  Palette,
-  Maximize2,
-} from "lucide-react";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { ChevronDown, ChevronUp, FileText, History, Palette, Maximize2 } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
@@ -26,10 +15,7 @@ interface BrainstormSectionProps {
   algorithmTitle: string;
 }
 
-export const BrainstormSection = ({
-  algorithmId,
-  algorithmTitle,
-}: BrainstormSectionProps) => {
+export const BrainstormSection = ({ algorithmId, algorithmTitle }: BrainstormSectionProps) => {
   const [isOpen, setIsOpen] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [whiteboardRestore, setWhiteboardRestore] = useState<any>(null);
@@ -67,9 +53,7 @@ export const BrainstormSection = ({
               <h2 className="text-2xl font-bold">Brainstorm Space</h2>
               <p className="text-sm text-muted-foreground">
                 Draw diagrams, take notes, and save your work for{" "}
-                <span className="font-semibold text-foreground">
-                  {algorithmTitle}
-                </span>
+                <span className="font-semibold text-foreground">{algorithmTitle}</span>
               </p>
             </div>
           </div>
@@ -81,12 +65,8 @@ export const BrainstormSection = ({
                   <span className="hidden sm:inline">Expand</span>
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-full w-full h-[75vh] p-0 gap-0">
-                <Tabs
-                  value={activeTab}
-                  onValueChange={handleTabChange}
-                  className="w-full h-full flex flex-col"
-                >
+              <DialogContent className="max-w-full w-full h-[100vh] p-0 gap-0 z-50">
+                <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full h-full flex flex-col">
                   <TabsList className="w-full justify-start rounded-none border-b px-4 bg-background">
                     <TabsTrigger value="whiteboard" className="gap-2">
                       <Palette className="w-4 h-4" />
@@ -145,7 +125,8 @@ export const BrainstormSection = ({
           <div className="px-6 pb-4">
             <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-background border border-primary/20 rounded-xl p-4">
               <p className="text-sm text-muted-foreground text-center">
-                <span className="font-medium text-foreground">Sketch your ideas</span> — draw diagrams, take notes, and save your work for quick reference.
+                <span className="font-medium text-foreground">Sketch your ideas</span> — draw diagrams, take notes, and
+                save your work for quick reference.
               </p>
             </div>
           </div>
@@ -153,11 +134,7 @@ export const BrainstormSection = ({
 
         <CollapsibleContent>
           <div className="p-6 pt-0">
-            <Tabs
-              value={activeTab}
-              onValueChange={handleTabChange}
-              className="space-y-6"
-            >
+            <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
               <TabsList className="grid w-full grid-cols-3 bg-muted/50">
                 <TabsTrigger
                   value="whiteboard"
@@ -191,11 +168,7 @@ export const BrainstormSection = ({
               </TabsContent>
 
               <TabsContent value="notes" className="space-y-4 mt-0">
-                <NotesComponent
-                  algorithmId={algorithmId}
-                  algorithmTitle={algorithmTitle}
-                  restoreData={noteRestore}
-                />
+                <NotesComponent algorithmId={algorithmId} algorithmTitle={algorithmTitle} restoreData={noteRestore} />
               </TabsContent>
 
               <TabsContent value="history" className="space-y-4 mt-0">
