@@ -184,7 +184,7 @@ const SaveButton = ({ algorithmId, algorithmTitle }: WhiteboardComponentProps) =
 
 export const WhiteboardComponent = ({ algorithmId, algorithmTitle, restoreData }: WhiteboardComponentProps) => {
   return (
-    <div className="relative w-full  h-[600px] border rounded-lg overflow-hidden">
+    <div className="relative w-full  h-[700px] border rounded-lg overflow-hidden">
       <Tldraw snapshot={restoreData}>
         <SaveButton algorithmId={algorithmId} algorithmTitle={algorithmTitle} />
       </Tldraw>
