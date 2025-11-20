@@ -210,31 +210,41 @@ const WhiteboardControls = ({ algorithmId, algorithmTitle, restoreData }: Whiteb
   }, [editor, title]);
 
   return (
-    <div className="absolute top-4 right-4 z-10 flex gap-2 bg-background border border-border p-3 rounded-lg shadow-lg">
-      <Input
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="Whiteboard title"
-        className="w-48 bg-background text-foreground border-border"
-      />
-      <Button onClick={handleSave} disabled={isSaving} size="sm" className="gap-2">
-        {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-        Save
-      </Button>
-      <Button onClick={handleExportPNG} variant="outline" size="sm" className="gap-2">
-        <Download className="w-4 h-4" />
-        Export PNG
-      </Button>
-    </div>
+    <>
+      {/* Fixed Header Bar - Outside Tldraw viewport */}
+      <div className="absolute top-0 left-0 right-0 z-[10000] flex flex-wrap gap-2 items-center p-3 bg-muted/30 border-b border-border backdrop-blur-sm">
+        <Input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Whiteboard title"
+          className="flex-1 min-w-[200px] bg-background"
+        />
+        <div className="flex gap-2">
+          <Button onClick={handleSave} disabled={isSaving} size="sm" className="gap-2">
+            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+            <span className="hidden sm:inline">Save</span>
+          </Button>
+          <Button onClick={handleExportPNG} variant="outline" size="sm" className="gap-2">
+            <Download className="w-4 h-4" />
+            <span className="hidden sm:inline">Export</span>
+          </Button>
+        </div>
+      </div>
+    </>
   );
 };
 
 export const WhiteboardComponent = ({ algorithmId, algorithmTitle, restoreData }: WhiteboardComponentProps) => {
   return (
-    <div className="relative w-full h-[600px] lg:h-[700px] border rounded-lg overflow-hidden">
-      <Tldraw snapshot={restoreData?.board_json}>
-        <WhiteboardControls algorithmId={algorithmId} algorithmTitle={algorithmTitle} restoreData={restoreData} />
-      </Tldraw>
+    <div className="flex flex-col w-full h-full relative">
+      {/* Whiteboard Canvas - Full size with padding for header */}
+      <div className="relative flex-1 min-h-[500px] lg:min-h-[700px] pt-[68px]">
+        <div className="absolute inset-0">
+          <Tldraw snapshot={restoreData?.board_json}>
+            <WhiteboardControls algorithmId={algorithmId} algorithmTitle={algorithmTitle} restoreData={restoreData} />
+          </Tldraw>
+        </div>
+      </div>
     </div>
   );
 };
