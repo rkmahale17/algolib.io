@@ -135,9 +135,7 @@ const AlgorithmDetail: React.FC = () => {
         toast.error("Failed to update progress");
         console.error(error);
       } else {
-        toast.success(
-          newCompletedState ? "Marked as completed! 🎉" : "Marked as incomplete"
-        );
+        toast.success(newCompletedState ? "Marked as completed! 🎉" : "Marked as incomplete");
       }
     } else {
       // Insert new record
@@ -247,14 +245,12 @@ const AlgorithmDetail: React.FC = () => {
     // Enhanced visualizations with static imports
     if (algorithm.id === "two-pointers") {
       const TwoPointersVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/TwoPointersVisualization"
-        ).then((m) => ({ default: m.TwoPointersVisualization }))
+        import("@/components/visualizations/algorithms/TwoPointersVisualization").then((m) => ({
+          default: m.TwoPointersVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <TwoPointersVisualization />
         </React.Suspense>
       );
@@ -262,14 +258,12 @@ const AlgorithmDetail: React.FC = () => {
 
     if (algorithm.id === "sliding-window") {
       const SlidingWindowVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/SlidingWindowVisualization"
-        ).then((m) => ({ default: m.SlidingWindowVisualization }))
+        import("@/components/visualizations/algorithms/SlidingWindowVisualization").then((m) => ({
+          default: m.SlidingWindowVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <SlidingWindowVisualization />
         </React.Suspense>
       );
@@ -277,14 +271,12 @@ const AlgorithmDetail: React.FC = () => {
 
     if (algorithm.id === "prefix-sum") {
       const PrefixSumVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/PrefixSumVisualization"
-        ).then((m) => ({ default: m.PrefixSumVisualization }))
+        import("@/components/visualizations/algorithms/PrefixSumVisualization").then((m) => ({
+          default: m.PrefixSumVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <PrefixSumVisualization />
         </React.Suspense>
       );
@@ -292,14 +284,12 @@ const AlgorithmDetail: React.FC = () => {
 
     if (algorithm.id === "binary-search") {
       const BinarySearchVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/BinarySearchVisualization"
-        ).then((m) => ({ default: m.BinarySearchVisualization }))
+        import("@/components/visualizations/algorithms/BinarySearchVisualization").then((m) => ({
+          default: m.BinarySearchVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <BinarySearchVisualization />
         </React.Suspense>
       );
@@ -307,14 +297,12 @@ const AlgorithmDetail: React.FC = () => {
 
     if (algorithm.id === "kadanes-algorithm") {
       const KadanesVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/KadanesVisualization"
-        ).then((m) => ({ default: m.KadanesVisualization }))
+        import("@/components/visualizations/algorithms/KadanesVisualization").then((m) => ({
+          default: m.KadanesVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <KadanesVisualization />
         </React.Suspense>
       );
@@ -322,14 +310,12 @@ const AlgorithmDetail: React.FC = () => {
 
     if (algorithm.id === "dutch-national-flag") {
       const DutchNationalFlagVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/DutchNationalFlagVisualization"
-        ).then((m) => ({ default: m.DutchNationalFlagVisualization }))
+        import("@/components/visualizations/algorithms/DutchNationalFlagVisualization").then((m) => ({
+          default: m.DutchNationalFlagVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <DutchNationalFlagVisualization />
         </React.Suspense>
       );
@@ -337,14 +323,12 @@ const AlgorithmDetail: React.FC = () => {
 
     if (algorithm.id === "merge-intervals") {
       const MergeIntervalsVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/MergeIntervalsVisualization"
-        ).then((m) => ({ default: m.MergeIntervalsVisualization }))
+        import("@/components/visualizations/algorithms/MergeIntervalsVisualization").then((m) => ({
+          default: m.MergeIntervalsVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <MergeIntervalsVisualization />
         </React.Suspense>
       );
@@ -352,14 +336,12 @@ const AlgorithmDetail: React.FC = () => {
 
     if (algorithm.id === "monotonic-stack") {
       const MonotonicStackVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/MonotonicStackVisualization"
-        ).then((m) => ({ default: m.MonotonicStackVisualization }))
+        import("@/components/visualizations/algorithms/MonotonicStackVisualization").then((m) => ({
+          default: m.MonotonicStackVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <MonotonicStackVisualization />
         </React.Suspense>
       );
@@ -367,14 +349,12 @@ const AlgorithmDetail: React.FC = () => {
 
     if (algorithm.id === "quick-select") {
       const QuickSelectVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/QuickSelectVisualization"
-        ).then((m) => ({ default: m.QuickSelectVisualization }))
+        import("@/components/visualizations/algorithms/QuickSelectVisualization").then((m) => ({
+          default: m.QuickSelectVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <QuickSelectVisualization />
         </React.Suspense>
       );
@@ -382,14 +362,12 @@ const AlgorithmDetail: React.FC = () => {
 
     if (algorithm.id === "container-with-most-water") {
       const ContainerWithMostWaterVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/ContainerWithMostWaterVisualization"
-        ).then((m) => ({ default: m.ContainerWithMostWaterVisualization }))
+        import("@/components/visualizations/algorithms/ContainerWithMostWaterVisualization").then((m) => ({
+          default: m.ContainerWithMostWaterVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <ContainerWithMostWaterVisualization />
         </React.Suspense>
       );
@@ -397,14 +375,12 @@ const AlgorithmDetail: React.FC = () => {
 
     if (algorithm.id === "trapping-rain-water") {
       const TrappingRainWaterVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/TrappingRainWaterVisualization"
-        ).then((m) => ({ default: m.TrappingRainWaterVisualization }))
+        import("@/components/visualizations/algorithms/TrappingRainWaterVisualization").then((m) => ({
+          default: m.TrappingRainWaterVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <TrappingRainWaterVisualization />
         </React.Suspense>
       );
@@ -412,14 +388,12 @@ const AlgorithmDetail: React.FC = () => {
 
     if (algorithm.id === "dfs-preorder") {
       const DFSPreorderVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/DFSPreorderVisualization"
-        ).then((m) => ({ default: m.DFSPreorderVisualization }))
+        import("@/components/visualizations/algorithms/DFSPreorderVisualization").then((m) => ({
+          default: m.DFSPreorderVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <DFSPreorderVisualization />
         </React.Suspense>
       );
@@ -427,14 +401,12 @@ const AlgorithmDetail: React.FC = () => {
 
     if (algorithm.id === "rotate-array") {
       const RotateArrayVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/RotateArrayVisualization"
-        ).then((m) => ({ default: m.RotateArrayVisualization }))
+        import("@/components/visualizations/algorithms/RotateArrayVisualization").then((m) => ({
+          default: m.RotateArrayVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <RotateArrayVisualization />
         </React.Suspense>
       );
@@ -442,14 +414,12 @@ const AlgorithmDetail: React.FC = () => {
 
     if (algorithm.id === "cyclic-sort") {
       const CyclicSortVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/CyclicSortVisualization"
-        ).then((m) => ({ default: m.CyclicSortVisualization }))
+        import("@/components/visualizations/algorithms/CyclicSortVisualization").then((m) => ({
+          default: m.CyclicSortVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <CyclicSortVisualization />
         </React.Suspense>
       );
@@ -457,14 +427,12 @@ const AlgorithmDetail: React.FC = () => {
 
     if (algorithm.id === "merge-sorted-lists") {
       const MergeSortedListsVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/MergeSortedListsVisualization"
-        ).then((m) => ({ default: m.MergeSortedListsVisualization }))
+        import("@/components/visualizations/algorithms/MergeSortedListsVisualization").then((m) => ({
+          default: m.MergeSortedListsVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <MergeSortedListsVisualization />
         </React.Suspense>
       );
@@ -472,14 +440,12 @@ const AlgorithmDetail: React.FC = () => {
 
     if (algorithm.id === "dfs-inorder") {
       const DFSInorderVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/DFSInorderVisualization"
-        ).then((m) => ({ default: m.DFSInorderVisualization }))
+        import("@/components/visualizations/algorithms/DFSInorderVisualization").then((m) => ({
+          default: m.DFSInorderVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <DFSInorderVisualization />
         </React.Suspense>
       );
@@ -487,14 +453,12 @@ const AlgorithmDetail: React.FC = () => {
 
     if (algorithm.id === "dfs-postorder") {
       const DFSPostorderVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/DFSPostorderVisualization"
-        ).then((m) => ({ default: m.DFSPostorderVisualization }))
+        import("@/components/visualizations/algorithms/DFSPostorderVisualization").then((m) => ({
+          default: m.DFSPostorderVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <DFSPostorderVisualization />
         </React.Suspense>
       );
@@ -502,14 +466,12 @@ const AlgorithmDetail: React.FC = () => {
 
     if (algorithm.id === "bfs-level-order") {
       const BFSLevelOrderVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/BFSLevelOrderVisualization"
-        ).then((m) => ({ default: m.BFSLevelOrderVisualization }))
+        import("@/components/visualizations/algorithms/BFSLevelOrderVisualization").then((m) => ({
+          default: m.BFSLevelOrderVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <BFSLevelOrderVisualization />
         </React.Suspense>
       );
@@ -517,14 +479,12 @@ const AlgorithmDetail: React.FC = () => {
 
     if (algorithm.id === "bst-insert") {
       const BSTInsertVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/BSTInsertVisualization"
-        ).then((m) => ({ default: m.BSTInsertVisualization }))
+        import("@/components/visualizations/algorithms/BSTInsertVisualization").then((m) => ({
+          default: m.BSTInsertVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <BSTInsertVisualization />
         </React.Suspense>
       );
@@ -532,14 +492,12 @@ const AlgorithmDetail: React.FC = () => {
 
     if (algorithm.id === "lca") {
       const LowestCommonAncestorVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/LowestCommonAncestorVisualization"
-        ).then((m) => ({ default: m.LowestCommonAncestorVisualization }))
+        import("@/components/visualizations/algorithms/LowestCommonAncestorVisualization").then((m) => ({
+          default: m.LowestCommonAncestorVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <LowestCommonAncestorVisualization />
         </React.Suspense>
       );
@@ -547,14 +505,12 @@ const AlgorithmDetail: React.FC = () => {
 
     if (algorithm.id === "serialize-tree") {
       const SerializeTreeVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/SerializeTreeVisualization"
-        ).then((m) => ({ default: m.SerializeTreeVisualization }))
+        import("@/components/visualizations/algorithms/SerializeTreeVisualization").then((m) => ({
+          default: m.SerializeTreeVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <SerializeTreeVisualization />
         </React.Suspense>
       );
@@ -562,14 +518,12 @@ const AlgorithmDetail: React.FC = () => {
 
     if (algorithm.id === "recover-bst") {
       const RecoverBSTVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/RecoverBSTVisualization"
-        ).then((m) => ({ default: m.RecoverBSTVisualization }))
+        import("@/components/visualizations/algorithms/RecoverBSTVisualization").then((m) => ({
+          default: m.RecoverBSTVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <RecoverBSTVisualization />
         </React.Suspense>
       );
@@ -577,14 +531,12 @@ const AlgorithmDetail: React.FC = () => {
 
     if (algorithm.id === "fast-slow-pointers") {
       const FastSlowPointersVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/FastSlowPointersVisualization"
-        ).then((m) => ({ default: m.FastSlowPointersVisualization }))
+        import("@/components/visualizations/algorithms/FastSlowPointersVisualization").then((m) => ({
+          default: m.FastSlowPointersVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <FastSlowPointersVisualization />
         </React.Suspense>
       );
@@ -592,14 +544,12 @@ const AlgorithmDetail: React.FC = () => {
 
     if (algorithm.id === "reverse-linked-list") {
       const ReverseLinkedListVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/ReverseLinkedListVisualization"
-        ).then((m) => ({ default: m.ReverseLinkedListVisualization }))
+        import("@/components/visualizations/algorithms/ReverseLinkedListVisualization").then((m) => ({
+          default: m.ReverseLinkedListVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <ReverseLinkedListVisualization />
         </React.Suspense>
       );
@@ -607,14 +557,12 @@ const AlgorithmDetail: React.FC = () => {
 
     if (algorithm.id === "detect-cycle") {
       const DetectCycleVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/DetectCycleVisualization"
-        ).then((m) => ({ default: m.DetectCycleVisualization }))
+        import("@/components/visualizations/algorithms/DetectCycleVisualization").then((m) => ({
+          default: m.DetectCycleVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <DetectCycleVisualization />
         </React.Suspense>
       );
@@ -622,14 +570,12 @@ const AlgorithmDetail: React.FC = () => {
 
     if (algorithm.id === "middle-node") {
       const MiddleNodeVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/MiddleNodeVisualization"
-        ).then((m) => ({ default: m.MiddleNodeVisualization }))
+        import("@/components/visualizations/algorithms/MiddleNodeVisualization").then((m) => ({
+          default: m.MiddleNodeVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <MiddleNodeVisualization />
         </React.Suspense>
       );
@@ -638,14 +584,12 @@ const AlgorithmDetail: React.FC = () => {
     // Trees & BSTs
     if (algorithm.id === "trie") {
       const TrieVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/TrieVisualization").then(
-          (m) => ({ default: m.TrieVisualization })
-        )
+        import("@/components/visualizations/algorithms/TrieVisualization").then((m) => ({
+          default: m.TrieVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <TrieVisualization />
         </React.Suspense>
       );
@@ -654,56 +598,48 @@ const AlgorithmDetail: React.FC = () => {
     // Graphs
     if (algorithm.id === "graph-dfs") {
       const GraphDFSVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/GraphDFSVisualization"
-        ).then((m) => ({ default: m.GraphDFSVisualization }))
+        import("@/components/visualizations/algorithms/GraphDFSVisualization").then((m) => ({
+          default: m.GraphDFSVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <GraphDFSVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "graph-bfs") {
       const GraphBFSVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/GraphBFSVisualization"
-        ).then((m) => ({ default: m.GraphBFSVisualization }))
+        import("@/components/visualizations/algorithms/GraphBFSVisualization").then((m) => ({
+          default: m.GraphBFSVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <GraphBFSVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "topological-sort") {
       const TopologicalSortVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/TopologicalSortVisualization"
-        ).then((m) => ({ default: m.TopologicalSortVisualization }))
+        import("@/components/visualizations/algorithms/TopologicalSortVisualization").then((m) => ({
+          default: m.TopologicalSortVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <TopologicalSortVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "union-find") {
       const UnionFindVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/UnionFindVisualization"
-        ).then((m) => ({ default: m.UnionFindVisualization }))
+        import("@/components/visualizations/algorithms/UnionFindVisualization").then((m) => ({
+          default: m.UnionFindVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <UnionFindVisualization />
         </React.Suspense>
       );
@@ -712,625 +648,528 @@ const AlgorithmDetail: React.FC = () => {
     // Dynamic Programming
     if (algorithm.id === "knapsack-01") {
       const KnapsackVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/KnapsackVisualization"
-        ).then((m) => ({ default: m.KnapsackVisualization }))
+        import("@/components/visualizations/algorithms/KnapsackVisualization").then((m) => ({
+          default: m.KnapsackVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <KnapsackVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "coin-change") {
       const CoinChangeVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/CoinChangeVisualization"
-        ).then((m) => ({ default: m.CoinChangeVisualization }))
+        import("@/components/visualizations/algorithms/CoinChangeVisualization").then((m) => ({
+          default: m.CoinChangeVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <CoinChangeVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "lcs") {
       const LCSVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/LCSVisualization").then(
-          (m) => ({ default: m.LCSVisualization })
-        )
+        import("@/components/visualizations/algorithms/LCSVisualization").then((m) => ({
+          default: m.LCSVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <LCSVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "lis") {
       const LISVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/LISVisualization").then(
-          (m) => ({ default: m.LISVisualization })
-        )
+        import("@/components/visualizations/algorithms/LISVisualization").then((m) => ({
+          default: m.LISVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <LISVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "edit-distance") {
       const EditDistanceVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/EditDistanceVisualization"
-        ).then((m) => ({ default: m.EditDistanceVisualization }))
+        import("@/components/visualizations/algorithms/EditDistanceVisualization").then((m) => ({
+          default: m.EditDistanceVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <EditDistanceVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "matrix-path-dp") {
       const MatrixPathVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/MatrixPathVisualization"
-        ).then((m) => ({ default: m.MatrixPathVisualization }))
+        import("@/components/visualizations/algorithms/MatrixPathVisualization").then((m) => ({
+          default: m.MatrixPathVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <MatrixPathVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "house-robber") {
       const HouseRobberVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/HouseRobberVisualization"
-        ).then((m) => ({ default: m.HouseRobberVisualization }))
+        import("@/components/visualizations/algorithms/HouseRobberVisualization").then((m) => ({
+          default: m.HouseRobberVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <HouseRobberVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "climbing-stairs") {
       const ClimbingStairsVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/ClimbingStairsVisualization"
-        ).then((m) => ({ default: m.ClimbingStairsVisualization }))
+        import("@/components/visualizations/algorithms/ClimbingStairsVisualization").then((m) => ({
+          default: m.ClimbingStairsVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <ClimbingStairsVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "kruskals") {
       const KruskalsVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/KruskalsVisualization"
-        ).then((m) => ({ default: m.KruskalsVisualization }))
+        import("@/components/visualizations/algorithms/KruskalsVisualization").then((m) => ({
+          default: m.KruskalsVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <KruskalsVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "prims") {
       const PrimsVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/PrimsVisualization"
-        ).then((m) => ({ default: m.PrimsVisualization }))
+        import("@/components/visualizations/algorithms/PrimsVisualization").then((m) => ({
+          default: m.PrimsVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <PrimsVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "dijkstras") {
       const DijkstrasVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/DijkstrasVisualization"
-        ).then((m) => ({ default: m.DijkstrasVisualization }))
+        import("@/components/visualizations/algorithms/DijkstrasVisualization").then((m) => ({
+          default: m.DijkstrasVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <DijkstrasVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "bellman-ford") {
       const BellmanFordVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/BellmanFordVisualization"
-        ).then((m) => ({ default: m.BellmanFordVisualization }))
+        import("@/components/visualizations/algorithms/BellmanFordVisualization").then((m) => ({
+          default: m.BellmanFordVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <BellmanFordVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "floyd-warshall") {
       const FloydWarshallVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/FloydWarshallVisualization"
-        ).then((m) => ({ default: m.FloydWarshallVisualization }))
+        import("@/components/visualizations/algorithms/FloydWarshallVisualization").then((m) => ({
+          default: m.FloydWarshallVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <FloydWarshallVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "a-star") {
       const AStarVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/AStarVisualization"
-        ).then((m) => ({ default: m.AStarVisualization }))
+        import("@/components/visualizations/algorithms/AStarVisualization").then((m) => ({
+          default: m.AStarVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <AStarVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "partition-equal-subset") {
       const PartitionEqualSubsetVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/PartitionEqualSubsetVisualization"
-        ).then((m) => ({ default: m.PartitionEqualSubsetVisualization }))
+        import("@/components/visualizations/algorithms/PartitionEqualSubsetVisualization").then((m) => ({
+          default: m.PartitionEqualSubsetVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <PartitionEqualSubsetVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "word-break") {
       const WordBreakVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/WordBreakVisualization"
-        ).then((m) => ({ default: m.WordBreakVisualization }))
+        import("@/components/visualizations/algorithms/WordBreakVisualization").then((m) => ({
+          default: m.WordBreakVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <WordBreakVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "subsets") {
       const SubsetsVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/SubsetsVisualization"
-        ).then((m) => ({ default: m.SubsetsVisualization }))
+        import("@/components/visualizations/algorithms/SubsetsVisualization").then((m) => ({
+          default: m.SubsetsVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <SubsetsVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "permutations") {
       const PermutationsVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/PermutationsVisualization"
-        ).then((m) => ({ default: m.PermutationsVisualization }))
+        import("@/components/visualizations/algorithms/PermutationsVisualization").then((m) => ({
+          default: m.PermutationsVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <PermutationsVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "combinations") {
       const CombinationsVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/CombinationsVisualization"
-        ).then((m) => ({ default: m.CombinationsVisualization }))
+        import("@/components/visualizations/algorithms/CombinationsVisualization").then((m) => ({
+          default: m.CombinationsVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <CombinationsVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "combination-sum") {
       const CombinationSumVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/CombinationSumVisualization"
-        ).then((m) => ({ default: m.CombinationSumVisualization }))
+        import("@/components/visualizations/algorithms/CombinationSumVisualization").then((m) => ({
+          default: m.CombinationSumVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <CombinationSumVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "word-search" || algorithm.id === "word-search-grid") {
       const WordSearchVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/WordSearchVisualization"
-        ).then((m) => ({ default: m.WordSearchVisualization }))
+        import("@/components/visualizations/algorithms/WordSearchVisualization").then((m) => ({
+          default: m.WordSearchVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <WordSearchVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "n-queens") {
       const NQueensVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/NQueensVisualization"
-        ).then((m) => ({ default: m.NQueensVisualization }))
+        import("@/components/visualizations/algorithms/NQueensVisualization").then((m) => ({
+          default: m.NQueensVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <NQueensVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "sudoku-solver") {
       const SudokuSolverVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/SudokuSolverVisualization"
-        ).then((m) => ({ default: m.SudokuSolverVisualization }))
+        import("@/components/visualizations/algorithms/SudokuSolverVisualization").then((m) => ({
+          default: m.SudokuSolverVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <SudokuSolverVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "segment-tree") {
       const SegmentTreeVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/SegmentTreeVisualization"
-        ).then((m) => ({ default: m.SegmentTreeVisualization }))
+        import("@/components/visualizations/algorithms/SegmentTreeVisualization").then((m) => ({
+          default: m.SegmentTreeVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <SegmentTreeVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "fenwick-tree") {
       const FenwickTreeVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/FenwickTreeVisualization"
-        ).then((m) => ({ default: m.FenwickTreeVisualization }))
+        import("@/components/visualizations/algorithms/FenwickTreeVisualization").then((m) => ({
+          default: m.FenwickTreeVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <FenwickTreeVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "kmp" || algorithm.id === "kmp-string-matching") {
       const KMPVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/KMPVisualization").then(
-          (m) => ({ default: m.KMPVisualization })
-        )
+        import("@/components/visualizations/algorithms/KMPVisualization").then((m) => ({
+          default: m.KMPVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <KMPVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "rabin-karp") {
       const RabinKarpVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/RabinKarpVisualization"
-        ).then((m) => ({ default: m.RabinKarpVisualization }))
+        import("@/components/visualizations/algorithms/RabinKarpVisualization").then((m) => ({
+          default: m.RabinKarpVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <RabinKarpVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "activity-selection") {
       const ActivitySelectionVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/ActivitySelectionVisualization"
-        ).then((m) => ({ default: m.ActivitySelectionVisualization }))
+        import("@/components/visualizations/algorithms/ActivitySelectionVisualization").then((m) => ({
+          default: m.ActivitySelectionVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <ActivitySelectionVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "xor-trick") {
       const XORTrickVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/XORTrickVisualization"
-        ).then((m) => ({ default: m.XORTrickVisualization }))
+        import("@/components/visualizations/algorithms/XORTrickVisualization").then((m) => ({
+          default: m.XORTrickVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <XORTrickVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "count-bits") {
       const CountBitsVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/CountBitsVisualization"
-        ).then((m) => ({ default: m.CountBitsVisualization }))
+        import("@/components/visualizations/algorithms/CountBitsVisualization").then((m) => ({
+          default: m.CountBitsVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <CountBitsVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "subset-generation-bits") {
       const SubsetBitsVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/SubsetBitsVisualization"
-        ).then((m) => ({ default: m.SubsetBitsVisualization }))
+        import("@/components/visualizations/algorithms/SubsetBitsVisualization").then((m) => ({
+          default: m.SubsetBitsVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <SubsetBitsVisualization />
         </React.Suspense>
       );
     }
-    if (
-      algorithm.id === "kth-largest" ||
-      algorithm.id === "kth-largest-element"
-    ) {
+    if (algorithm.id === "kth-largest" || algorithm.id === "kth-largest-element") {
       const KthLargestVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/KthLargestVisualization"
-        ).then((m) => ({ default: m.KthLargestVisualization }))
+        import("@/components/visualizations/algorithms/KthLargestVisualization").then((m) => ({
+          default: m.KthLargestVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <KthLargestVisualization />
         </React.Suspense>
       );
     }
-    if (
-      algorithm.id === "merge-k-lists" ||
-      algorithm.id === "merge-k-sorted-lists"
-    ) {
+    if (algorithm.id === "merge-k-lists" || algorithm.id === "merge-k-sorted-lists") {
       const MergeKSortedListsVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/MergeKSortedListsVisualization"
-        ).then((m) => ({ default: m.MergeKSortedListsVisualization }))
+        import("@/components/visualizations/algorithms/MergeKSortedListsVisualization").then((m) => ({
+          default: m.MergeKSortedListsVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <MergeKSortedListsVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "sliding-window-maximum") {
       const SlidingWindowMaxVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/SlidingWindowMaxVisualization"
-        ).then((m) => ({ default: m.SlidingWindowMaxVisualization }))
+        import("@/components/visualizations/algorithms/SlidingWindowMaxVisualization").then((m) => ({
+          default: m.SlidingWindowMaxVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <SlidingWindowMaxVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "gcd-euclidean" || algorithm.id === "gcd") {
       const GCDVisualization = React.lazy(() =>
-        import("@/components/visualizations/algorithms/GCDVisualization").then(
-          (m) => ({ default: m.GCDVisualization })
-        )
+        import("@/components/visualizations/algorithms/GCDVisualization").then((m) => ({
+          default: m.GCDVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <GCDVisualization />
         </React.Suspense>
       );
     }
-    if (
-      algorithm.id === "sieve-eratosthenes" ||
-      algorithm.id === "sieve-of-eratosthenes"
-    ) {
+    if (algorithm.id === "sieve-eratosthenes" || algorithm.id === "sieve-of-eratosthenes") {
       const SieveVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/SieveVisualization"
-        ).then((m) => ({ default: m.SieveVisualization }))
+        import("@/components/visualizations/algorithms/SieveVisualization").then((m) => ({
+          default: m.SieveVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <SieveVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "modular-exponentiation") {
       const ModularExpVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/ModularExpVisualization"
-        ).then((m) => ({ default: m.ModularExpVisualization }))
+        import("@/components/visualizations/algorithms/ModularExpVisualization").then((m) => ({
+          default: m.ModularExpVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <ModularExpVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "sparse-table") {
       const SparseTableVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/SparseTableVisualization"
-        ).then((m) => ({ default: m.SparseTableVisualization }))
+        import("@/components/visualizations/algorithms/SparseTableVisualization").then((m) => ({
+          default: m.SparseTableVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <SparseTableVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "gas-station") {
       const GasStationVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/GasStationVisualization"
-        ).then((m) => ({ default: m.GasStationVisualization }))
+        import("@/components/visualizations/algorithms/GasStationVisualization").then((m) => ({
+          default: m.GasStationVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <GasStationVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "manachers") {
       const ManachersVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/ManachersVisualization"
-        ).then((m) => ({ default: m.ManachersVisualization }))
+        import("@/components/visualizations/algorithms/ManachersVisualization").then((m) => ({
+          default: m.ManachersVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <ManachersVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "karatsuba") {
       const KaratsubaVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/KaratsubaVisualization"
-        ).then((m) => ({ default: m.KaratsubaVisualization }))
+        import("@/components/visualizations/algorithms/KaratsubaVisualization").then((m) => ({
+          default: m.KaratsubaVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <KaratsubaVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "tarjans") {
       const TarjansVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/TarjansVisualization"
-        ).then((m) => ({ default: m.TarjansVisualization }))
+        import("@/components/visualizations/algorithms/TarjansVisualization").then((m) => ({
+          default: m.TarjansVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <TarjansVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "binary-lifting") {
       const BinaryLiftingVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/BinaryLiftingVisualization"
-        ).then((m) => ({ default: m.BinaryLiftingVisualization }))
+        import("@/components/visualizations/algorithms/BinaryLiftingVisualization").then((m) => ({
+          default: m.BinaryLiftingVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <BinaryLiftingVisualization />
         </React.Suspense>
       );
     }
     if (algorithm.id === "lru-cache") {
       const LRUCacheVisualization = React.lazy(() =>
-        import(
-          "@/components/visualizations/algorithms/LRUCacheVisualization"
-        ).then((m) => ({ default: m.LRUCacheVisualization }))
+        import("@/components/visualizations/algorithms/LRUCacheVisualization").then((m) => ({
+          default: m.LRUCacheVisualization,
+        })),
       );
       return (
-        <React.Suspense
-          fallback={<div className="text-center py-12">Loading...</div>}
-        >
+        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
           <LRUCacheVisualization />
         </React.Suspense>
       );
@@ -1343,9 +1182,7 @@ const AlgorithmDetail: React.FC = () => {
           <Eye className="w-8 h-8 text-primary" />
         </div>
         <div>
-          <p className="text-lg font-semibold text-foreground">
-            Visualization Coming Soon
-          </p>
+          <p className="text-lg font-semibold text-foreground">Visualization Coming Soon</p>
           <p className="text-sm text-muted-foreground mt-1">
             We're working on an interactive visualization for this algorithm
           </p>
@@ -1374,18 +1211,14 @@ const AlgorithmDetail: React.FC = () => {
               <Separator orientation="vertical" className="h-6" />
               <div
                 className={`transition-all duration-100 md:opacity-100 ${
-                  showBreadcrumb
-                    ? "opacity-100 max-h-12"
-                    : "opacity-0 max-h-0 overflow-hidden"
+                  showBreadcrumb ? "opacity-100 max-h-12" : "opacity-0 max-h-0 overflow-hidden"
                 }`}
               >
                 <Breadcrumbs
                   items={[
                     {
                       label: algorithm.category,
-                      href: `/?category=${encodeURIComponent(
-                        algorithm.category
-                      )}`,
+                      href: `/?category=${encodeURIComponent(algorithm.category)}`,
                     },
                     {
                       label: algorithm.name,
@@ -1406,24 +1239,12 @@ const AlgorithmDetail: React.FC = () => {
               <Card className="p-4 glass-card border-primary/20">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div
-                      className={`p-2 rounded-full ${
-                        isCompleted ? "bg-green-500/20" : "bg-muted"
-                      }`}
-                    >
-                      <CheckCircle2
-                        className={`w-5 h-5 ${
-                          isCompleted
-                            ? "text-green-500"
-                            : "text-muted-foreground"
-                        }`}
-                      />
+                    <div className={`p-2 rounded-full ${isCompleted ? "bg-green-500/20" : "bg-muted"}`}>
+                      <CheckCircle2 className={`w-5 h-5 ${isCompleted ? "text-green-500" : "text-muted-foreground"}`} />
                     </div>
                     <div>
                       <p className="font-medium">Track Your Progress</p>
-                      <p className="text-xs text-muted-foreground">
-                        Mark this algorithm as completed
-                      </p>
+                      <p className="text-xs text-muted-foreground">Mark this algorithm as completed</p>
                     </div>
                   </div>
                   <Checkbox
@@ -1438,11 +1259,8 @@ const AlgorithmDetail: React.FC = () => {
             {/* Brainstorm Section - Only visible when logged in */}
 
             {user && id && (
-              <div className="max-w-5xl mx-auto">
-                <BrainstormSection
-                  algorithmId={id}
-                  algorithmTitle={algorithm.name}
-                />
+              <div className="container mx-auto px-4 mb-8">
+                <BrainstormSection algorithmId={id} algorithmTitle={algorithm.name} />
               </div>
             )}
             {/* 1. Animation - Login Required */}
@@ -1454,14 +1272,8 @@ const AlgorithmDetail: React.FC = () => {
                     Interactive Visualization
                   </h2>
                   <div className="flex items-center gap-2">
-                    <ShareButton
-                      title={algorithm.name}
-                      description={algorithm.description}
-                    />
-                    <Badge
-                      variant="outline"
-                      className={difficultyColors[algorithm.difficulty]}
-                    >
+                    <ShareButton title={algorithm.name} description={algorithm.description} />
+                    <Badge variant="outline" className={difficultyColors[algorithm.difficulty]}>
                       {algorithm.difficulty}
                     </Badge>
                   </div>
@@ -1475,12 +1287,9 @@ const AlgorithmDetail: React.FC = () => {
                         <Eye className="w-8 h-8 text-primary" />
                       </div>
                       <div>
-                        <p className="text-lg font-semibold text-foreground">
-                          Sign In to View Visualization
-                        </p>
+                        <p className="text-lg font-semibold text-foreground">Sign In to View Visualization</p>
                         <p className="text-sm text-muted-foreground mt-2">
-                          Interactive visualizations are exclusive to registered
-                          users
+                          Interactive visualizations are exclusive to registered users
                         </p>
                       </div>
                       <Button onClick={() => navigate("/auth")} size="lg">
@@ -1501,9 +1310,7 @@ const AlgorithmDetail: React.FC = () => {
                 </h3>
 
                 <Tabs
-                  defaultValue={
-                    localStorage.getItem("preferredLanguage") || "python"
-                  }
+                  defaultValue={localStorage.getItem("preferredLanguage") || "python"}
                   onValueChange={(v) => {
                     localStorage.setItem("preferredLanguage", v);
                   }}
@@ -1512,10 +1319,7 @@ const AlgorithmDetail: React.FC = () => {
                     <TabsTrigger value="python" className="text-xs sm:text-sm">
                       Python
                     </TabsTrigger>
-                    <TabsTrigger
-                      value="typescript"
-                      className="text-xs sm:text-sm"
-                    >
+                    <TabsTrigger value="typescript" className="text-xs sm:text-sm">
                       TypeScript
                     </TabsTrigger>
                     <TabsTrigger value="cpp" className="text-xs sm:text-sm">
@@ -1530,13 +1334,9 @@ const AlgorithmDetail: React.FC = () => {
                     <>
                       <TabsContent value="typescript" className="mt-4">
                         <div className="relative overflow-hidden rounded-lg">
-                          <CopyCodeButton
-                            code={implementation.code.typescript}
-                          />
+                          <CopyCodeButton code={implementation.code.typescript} />
                           <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
-                            <code className="block">
-                              {implementation.code.typescript}
-                            </code>
+                            <code className="block">{implementation.code.typescript}</code>
                           </pre>
                         </div>
                       </TabsContent>
@@ -1545,9 +1345,7 @@ const AlgorithmDetail: React.FC = () => {
                         <div className="relative overflow-hidden rounded-lg">
                           <CopyCodeButton code={implementation.code.python} />
                           <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
-                            <code className="block">
-                              {implementation.code.python}
-                            </code>
+                            <code className="block">{implementation.code.python}</code>
                           </pre>
                         </div>
                       </TabsContent>
@@ -1556,9 +1354,7 @@ const AlgorithmDetail: React.FC = () => {
                         <div className="relative overflow-hidden rounded-lg">
                           <CopyCodeButton code={implementation.code.cpp} />
                           <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
-                            <code className="block">
-                              {implementation.code.cpp}
-                            </code>
+                            <code className="block">{implementation.code.cpp}</code>
                           </pre>
                         </div>
                       </TabsContent>
@@ -1567,17 +1363,13 @@ const AlgorithmDetail: React.FC = () => {
                         <div className="relative overflow-hidden rounded-lg">
                           <CopyCodeButton code={implementation.code.java} />
                           <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
-                            <code className="block">
-                              {implementation.code.java}
-                            </code>
+                            <code className="block">{implementation.code.java}</code>
                           </pre>
                         </div>
                       </TabsContent>
                     </>
                   ) : (
-                    <p className="text-sm text-muted-foreground mt-4">
-                      Implementation coming soon
-                    </p>
+                    <p className="text-sm text-muted-foreground mt-4">Implementation coming soon</p>
                   )}
                 </Tabs>
               </div>
@@ -1591,8 +1383,7 @@ const AlgorithmDetail: React.FC = () => {
                   Algorithm Overview
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  {implementation?.explanation.overview ||
-                    algorithm.description}
+                  {implementation?.explanation.overview || algorithm.description}
                 </p>
 
                 <Separator />
@@ -1641,9 +1432,7 @@ const AlgorithmDetail: React.FC = () => {
                   </TabsContent>
 
                   <TabsContent value="usecase" className="mt-4">
-                    <p className="text-sm text-muted-foreground">
-                      {implementation.explanation.useCase}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{implementation.explanation.useCase}</p>
                   </TabsContent>
 
                   <TabsContent value="tips" className="mt-4">
@@ -1671,16 +1460,12 @@ const AlgorithmDetail: React.FC = () => {
                     </div>
 
                     {/* Responsive YouTube Player */}
-                    <div
-                      className="relative w-full"
-                      style={{ paddingBottom: "56.25%" }}
-                    >
+                    <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
                       <iframe
                         className="absolute top-0 left-0 w-full h-full rounded-lg"
                         src={`https://www.youtube.com/embed/${
-                          algorithm.youtubeUrl.match(
-                            /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/
-                          )?.[1] || algorithm.youtubeUrl
+                          algorithm.youtubeUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)?.[1] ||
+                          algorithm.youtubeUrl
                         }`}
                         title={`${algorithm.name} Tutorial`}
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -1690,27 +1475,20 @@ const AlgorithmDetail: React.FC = () => {
 
                     {/* What the video teaches */}
                     <div className="space-y-2">
-                      <h4 className="text-lg font-semibold">
-                        What This Video Teaches
-                      </h4>
+                      <h4 className="text-lg font-semibold">What This Video Teaches</h4>
                       <p className="text-sm text-muted-foreground leading-relaxed">
-                        This tutorial provides a comprehensive walkthrough of
-                        the {algorithm.name} algorithm, demonstrating its
-                        practical application through step-by-step code
-                        implementation. The video breaks down complex concepts
-                        into digestible segments, making it easier to understand
-                        how the algorithm works under the hood and when to apply
-                        it in real-world scenarios.
+                        This tutorial provides a comprehensive walkthrough of the {algorithm.name} algorithm,
+                        demonstrating its practical application through step-by-step code implementation. The video
+                        breaks down complex concepts into digestible segments, making it easier to understand how the
+                        algorithm works under the hood and when to apply it in real-world scenarios.
                       </p>
                     </div>
 
                     {/* Credits */}
                     <div className="pt-2 border-t border-border/50">
                       <p className="text-xs text-muted-foreground">
-                        <strong>Credits:</strong> Video tutorial by NeetCode
-                        (used with permission). All written explanations, code
-                        examples, and additional insights provided by
-                        Algolib.io.
+                        <strong>Credits:</strong> Video tutorial by NeetCode (used with permission). All written
+                        explanations, code examples, and additional insights provided by Algolib.io.
                       </p>
                     </div>
                   </div>
@@ -1729,19 +1507,16 @@ const AlgorithmDetail: React.FC = () => {
                           `The implementation of ${algorithm.name} follows a systematic approach that ensures optimal performance. 
                           Each step in the algorithm is carefully designed to handle specific cases while maintaining efficiency.`}
                       </p>
-                      {implementation.explanation.steps &&
-                        implementation.explanation.steps.length > 0 && (
-                          <div className="mt-4">
-                            <h4 className="font-medium mb-2">Key Steps:</h4>
-                            <ol className="space-y-2 list-decimal list-inside text-sm text-muted-foreground">
-                              {implementation.explanation.steps
-                                .slice(0, 4)
-                                .map((step, i) => (
-                                  <li key={i}>{step}</li>
-                                ))}
-                            </ol>
-                          </div>
-                        )}
+                      {implementation.explanation.steps && implementation.explanation.steps.length > 0 && (
+                        <div className="mt-4">
+                          <h4 className="font-medium mb-2">Key Steps:</h4>
+                          <ol className="space-y-2 list-decimal list-inside text-sm text-muted-foreground">
+                            {implementation.explanation.steps.slice(0, 4).map((step, i) => (
+                              <li key={i}>{step}</li>
+                            ))}
+                          </ol>
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -1755,17 +1530,13 @@ const AlgorithmDetail: React.FC = () => {
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
-                        <div className="text-xs font-medium text-muted-foreground mb-1">
-                          Time Complexity
-                        </div>
+                        <div className="text-xs font-medium text-muted-foreground mb-1">Time Complexity</div>
                         <div className="text-lg font-mono font-semibold text-foreground">
                           {algorithm.timeComplexity}
                         </div>
                       </div>
                       <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
-                        <div className="text-xs font-medium text-muted-foreground mb-1">
-                          Space Complexity
-                        </div>
+                        <div className="text-xs font-medium text-muted-foreground mb-1">Space Complexity</div>
                         <div className="text-lg font-mono font-semibold text-foreground">
                           {algorithm.spaceComplexity}
                         </div>
@@ -1774,23 +1545,22 @@ const AlgorithmDetail: React.FC = () => {
                   </div>
 
                   {/* Additional Insights */}
-                  {implementation?.explanation.tips &&
-                    implementation.explanation.tips.length > 0 && (
-                      <>
-                        <Separator />
-                        <div className="space-y-3">
-                          <h3 className="text-xl font-semibold flex items-center gap-2">
-                            <Lightbulb className="w-5 h-5 text-primary" />
-                            Additional Insights & Improvements
-                          </h3>
-                          <ul className="space-y-2 list-disc list-inside text-sm text-muted-foreground">
-                            {implementation.explanation.tips.map((tip, i) => (
-                              <li key={i}>{tip}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      </>
-                    )}
+                  {implementation?.explanation.tips && implementation.explanation.tips.length > 0 && (
+                    <>
+                      <Separator />
+                      <div className="space-y-3">
+                        <h3 className="text-xl font-semibold flex items-center gap-2">
+                          <Lightbulb className="w-5 h-5 text-primary" />
+                          Additional Insights & Improvements
+                        </h3>
+                        <ul className="space-y-2 list-disc list-inside text-sm text-muted-foreground">
+                          {implementation.explanation.tips.map((tip, i) => (
+                            <li key={i}>{tip}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </>
+                  )}
                 </div>
               </Card>
             )}
@@ -1810,9 +1580,7 @@ const AlgorithmDetail: React.FC = () => {
                     >
                       <div className="flex-1">
                         <p className="text-sm font-medium">{problem.title}</p>
-                        <p className="text-xs text-muted-foreground mt-1 capitalize">
-                          {problem.difficulty}
-                        </p>
+                        <p className="text-xs text-muted-foreground mt-1 capitalize">{problem.difficulty}</p>
                       </div>
                       <ExternalLink className="w-4 h-4 text-muted-foreground" />
                     </a>
