@@ -53,12 +53,14 @@ export const WhiteboardComponent = ({ algorithmId, algorithmTitle, restoreData }
 
       if (snapshot && typeof snapshot === "object") {
         try {
-          editor.store.loadSnapshot(snapshot as any);
+          // Small delay to ensure editor is fully ready
+          setTimeout(() => {
+            editor.store.loadSnapshot(snapshot);
+          }, 100);
         } catch (error) {
           console.error("Error loading restore data:", error);
+          toast.error("Failed to load whiteboard data");
         }
-      } else {
-        console.warn("Invalid restoreData.board_json, skipping load");
       }
     }
   }, [restoreData, editor]);
@@ -72,18 +74,23 @@ export const WhiteboardComponent = ({ algorithmId, algorithmTitle, restoreData }
 
       if (snapshot && typeof snapshot === "object") {
         try {
-          editor.store.loadSnapshot(snapshot as any);
+          // Small delay to ensure editor is fully ready
+          setTimeout(() => {
+            editor.store.loadSnapshot(snapshot);
+          }, 100);
         } catch (error) {
           console.error("Error loading latest whiteboard:", error);
+          toast.error("Failed to load whiteboard data");
         }
-      } else {
-        console.warn("Invalid latestWhiteboard.board_json, skipping load");
       }
     }
   }, [latestWhiteboard, editor, restoreData]);
 
   const handleSave = async () => {
-    if (!editor) return;
+    if (!editor) {
+      toast.error("Editor not ready");
+      return;
+    }
 
     setIsSaving(true);
     try {
@@ -112,7 +119,7 @@ export const WhiteboardComponent = ({ algorithmId, algorithmTitle, restoreData }
           .from("user_whiteboards")
           .update({
             title: title || algorithmTitle,
-            board_json: snapshot as any,
+            board_json: snapshot,
             updated_at: new Date().toISOString(),
           })
           .eq("id", updateId)
@@ -128,7 +135,7 @@ export const WhiteboardComponent = ({ algorithmId, algorithmTitle, restoreData }
             user_id: user.id,
             algorithm_id: algorithmId,
             title: title || algorithmTitle,
-            board_json: snapshot as any,
+            board_json: snapshot,
           })
           .select()
           .single();
@@ -139,6 +146,7 @@ export const WhiteboardComponent = ({ algorithmId, algorithmTitle, restoreData }
 
       toast.success("Whiteboard saved successfully!");
       queryClient.invalidateQueries({ queryKey: ["whiteboards", algorithmId] });
+      queryClient.invalidateQueries({ queryKey: ["latest-whiteboard", algorithmId] });
     } catch (error) {
       console.error("Error saving whiteboard:", error);
       toast.error("Failed to save whiteboard");
@@ -148,7 +156,10 @@ export const WhiteboardComponent = ({ algorithmId, algorithmTitle, restoreData }
   };
 
   const handleExportPNG = useCallback(async () => {
-    if (!editor) return;
+    if (!editor) {
+      toast.error("Editor not ready");
+      return;
+    }
 
     try {
       const shapeIds = editor.getCurrentPageShapeIds();
@@ -214,11 +225,11 @@ export const WhiteboardComponent = ({ algorithmId, algorithmTitle, restoreData }
           className="flex-1 min-w-[200px] bg-background"
         />
         <div className="flex gap-2">
-          <Button onClick={handleSave} disabled={isSaving} size="sm" className="gap-2">
+          <Button onClick={handleSave} disabled={isSaving || !editor} size="sm" className="gap-2">
             {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             <span className="hidden sm:inline">Save</span>
           </Button>
-          <Button onClick={handleExportPNG} variant="outline" size="sm" className="gap-2">
+          <Button onClick={handleExportPNG} variant="outline" size="sm" className="gap-2" disabled={!editor}>
             <Download className="w-4 h-4" />
             <span className="hidden sm:inline">Export</span>
           </Button>
@@ -227,7 +238,11 @@ export const WhiteboardComponent = ({ algorithmId, algorithmTitle, restoreData }
 
       {/* Whiteboard Canvas */}
       <div className="relative flex-1 min-h-[500px] lg:min-h-[700px]">
-        <Tldraw snapshot={restoreData} />
+        <Tldraw
+          onMount={(editor) => {
+            setEditor(editor);
+          }}
+        />
       </div>
     </div>
   );
