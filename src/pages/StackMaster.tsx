@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { StackModeSelection } from "@/components/stackMaster/StackModeSelection";
 import { StackGameBoard } from "@/components/stackMaster/StackGameBoard";
 import { StackMode } from "@/hooks/useStackGame";
@@ -15,7 +16,24 @@ const StackMaster = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-8 px-4">
+    <>
+      <Helmet>
+        <title>Stack Master Game - Learn Stack Data Structure | AlgoLib.io</title>
+        <meta name="description" content="Master stack operations through fast-paced symbol matching game. Learn LIFO data structure, push/pop operations, and valid parentheses patterns interactively." />
+        <meta name="keywords" content="stack data structure game, learn stack operations, LIFO game, parentheses matching, data structure learning, interactive stack tutorial" />
+        <link rel="canonical" href="https://algolib.io/games/stack-master" />
+        
+        <meta property="og:title" content="Stack Master - Interactive Stack Learning Game" />
+        <meta property="og:description" content="Master stack operations through fast-paced symbol matching." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://algolib.io/games/stack-master" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Stack Master - Learn Stack Data Structure" />
+        <meta name="twitter:description" content="Master stack operations through fast-paced symbol matching game." />
+      </Helmet>
+      
+      <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-8 px-4">
       <div className="container mx-auto max-w-7xl">
         <div className="text-center mb-8">
           <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">
@@ -37,6 +55,7 @@ const StackMaster = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 
