@@ -1,9 +1,9 @@
 import type { Plugin } from 'vite';
+import React from 'react';
 import { algorithms } from './src/data/algorithms';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import path from 'path';
-import React from 'react';
 import { renderToString } from 'react-dom/server';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -115,13 +115,13 @@ export function prerenderPlugin(): Plugin {
 
                     // Generate route-specific HTML with meta tags and content
                     let routeHtml = indexHtml;
-                    
+
                     // Find algorithm data if this is an algorithm route
                     const algoMatch = route.path.match(/\/algorithm\/(.+)/);
                     if (algoMatch) {
                         const algoId = algoMatch[1];
                         const algo = algorithms.find((a: any) => a.id === algoId);
-                        
+
                         if (algo) {
                             // Generate SEO content for algorithm pages
                             const seoContent = `
@@ -148,37 +148,37 @@ export function prerenderPlugin(): Plugin {
                                     </div>
                                 </div>
                             `;
-                            
+
                             // Replace the empty root div with content
                             routeHtml = routeHtml.replace(
                                 /<div id="root"><!--app-html--><\/div>/,
                                 seoContent
                             );
-                            
+
                             // Update meta tags
                             const title = `${algo.name} - AlgoLib.io`;
                             const description = `${algo.description}. Time: ${algo.timeComplexity}, Space: ${algo.spaceComplexity}. Learn ${algo.name} algorithm with examples and LeetCode problems.`;
-                            
+
                             routeHtml = routeHtml.replace(
                                 /<title>[^<]*<\/title>/,
                                 `<title>${title}</title>`
                             );
-                            
+
                             routeHtml = routeHtml.replace(
                                 /<meta name="description" content="[^"]*"/,
                                 `<meta name="description" content="${description}"`
                             );
-                            
+
                             routeHtml = routeHtml.replace(
                                 /<meta property="og:title" content="[^"]*"/,
                                 `<meta property="og:title" content="${title}"`
                             );
-                            
+
                             routeHtml = routeHtml.replace(
                                 /<meta property="og:description" content="[^"]*"/,
                                 `<meta property="og:description" content="${description}"`
                             );
-                            
+
                             routeHtml = routeHtml.replace(
                                 /<link rel="canonical" href="[^"]*"/,
                                 `<link rel="canonical" href="https://algolib.io${route.path}"`
@@ -284,7 +284,7 @@ export function prerenderPlugin(): Plugin {
                                 `
                             }
                         };
-                        
+
                         const pageInfo = pageContent[route.path];
                         if (pageInfo) {
                             // Inject content
@@ -292,18 +292,18 @@ export function prerenderPlugin(): Plugin {
                                 /<div id="root"><!--app-html--><\/div>/,
                                 `<div id="root">${pageInfo.content}</div>`
                             );
-                            
+
                             // Update meta tags
                             routeHtml = routeHtml.replace(
                                 /<title>[^<]*<\/title>/,
                                 `<title>${pageInfo.title}</title>`
                             );
-                            
+
                             routeHtml = routeHtml.replace(
                                 /<meta name="description" content="[^"]*"/,
                                 `<meta name="description" content="${pageInfo.description}"`
                             );
-                            
+
                             routeHtml = routeHtml.replace(
                                 /<link rel="canonical" href="[^"]*"/,
                                 `<link rel="canonical" href="https://algolib.io${route.path}"`
@@ -329,7 +329,7 @@ export function prerenderPlugin(): Plugin {
             // Generate rich SEO content for the home page
             try {
                 console.log('\n📄 Generating home page SEO content...');
-                
+
                 // Group algorithms by category for better SEO
                 const algorithmsByCategory: Record<string, any[]> = {};
                 algorithms.forEach((algo: any) => {
@@ -338,12 +338,12 @@ export function prerenderPlugin(): Plugin {
                     }
                     algorithmsByCategory[algo.category].push(algo);
                 });
-                
+
                 // Generate rich content for home page
                 const homePageContent = `
                     <div id="root">
                         <div style="padding: 40px 20px; max-width: 1200px; margin: 0 auto;">
-                            <h1>AlgoLib.io - Master 72+ Algorithms with Interactive Visualizations</h1>
+                            <h1>AlgoLib.io - Master 200+ Algorithms with Interactive Visualizations</h1>
                             <p style="font-size: 1.125rem; margin: 20px 0;">
                                 Free and open-source algorithm library for developers, students, and competitive programmers. 
                                 Learn data structures and algorithms with step-by-step visualizations, clean code examples in 
@@ -408,24 +408,24 @@ export function prerenderPlugin(): Plugin {
                         </div>
                     </div>
                 `;
-                
+
                 // Update home page with rich content
                 let homeHtml = indexHtml.replace(
                     /<div id="root"><!--app-html--><\/div>/,
                     homePageContent
                 );
-                
+
                 // Update home page meta tags for better SEO
                 homeHtml = homeHtml.replace(
                     /<title>[^<]*<\/title>/,
-                    '<title>AlgoLib.io - Master 72+ Algorithms with Interactive Visualizations | Free & Open Source</title>'
+                    '<title>AlgoLib.io - Master 200+ Algorithms with Interactive Visualizations | Free & Open Source</title>'
                 );
-                
+
                 homeHtml = homeHtml.replace(
                     /<meta name="description" content="[^"]*"/,
                     '<meta name="description" content="Learn data structures and algorithms with interactive visualizations. 72+ algorithms in Python, Java, C++, TypeScript. Perfect for coding interviews, LeetCode, and competitive programming. 100% free and open source."'
                 );
-                
+
                 fs.writeFileSync(indexPath, homeHtml, 'utf-8');
                 console.log('✓ Home page with rich SEO content');
             } catch (error) {
