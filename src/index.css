@@ -193,3 +193,7 @@
     transform: translateX(0);
   }
 }
+.tldraw-algolib .tlui-layout__bottom {
+  position: relative !important;
+  bottom: 65px !important;
+}
