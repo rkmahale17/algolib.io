@@ -14,13 +14,8 @@ interface WhiteboardComponentProps {
   restoreData?: any;
 }
 
-interface SaveControlsProps {
-  algorithmId: string;
-  algorithmTitle: string;
-  editor: any;
-}
-
-const SaveControls = ({ algorithmId, algorithmTitle, editor }: SaveControlsProps) => {
+const SaveButton = ({ algorithmId, algorithmTitle }: WhiteboardComponentProps) => {
+  const editor = useEditor();
   const [title, setTitle] = useState(algorithmTitle);
   const [whiteboardId, setWhiteboardId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -49,12 +44,14 @@ const SaveControls = ({ algorithmId, algorithmTitle, editor }: SaveControlsProps
     },
   });
 
+  // Load the latest whiteboard on mount
   useEffect(() => {
-    if (latestWhiteboard) {
+    if (latestWhiteboard && editor) {
       setWhiteboardId(latestWhiteboard.id);
       setTitle(latestWhiteboard.title);
+      editor.store.loadSnapshot(latestWhiteboard.board_json as any);
     }
-  }, [latestWhiteboard]);
+  }, [latestWhiteboard, editor]);
 
   const handleSave = async () => {
     if (!editor) return;
@@ -72,6 +69,7 @@ const SaveControls = ({ algorithmId, algorithmTitle, editor }: SaveControlsProps
       }
 
       if (whiteboardId) {
+        // Update existing whiteboard
         const { error } = await supabase
           .from("user_whiteboards")
           .update({
@@ -83,6 +81,7 @@ const SaveControls = ({ algorithmId, algorithmTitle, editor }: SaveControlsProps
 
         if (error) throw error;
       } else {
+        // Create new whiteboard
         const { data, error } = await supabase
           .from("user_whiteboards")
           .insert({
@@ -128,7 +127,10 @@ const SaveControls = ({ algorithmId, algorithmTitle, editor }: SaveControlsProps
         return;
       }
 
+      // Convert SVG element to string
       const svgString = new XMLSerializer().serializeToString(svgElement);
+
+      // Convert SVG to PNG using canvas
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
       const img = new Image();
@@ -161,58 +163,31 @@ const SaveControls = ({ algorithmId, algorithmTitle, editor }: SaveControlsProps
   }, [editor, title]);
 
   return (
-    <div className="absolute top-2 left-2 right-2 z-[10] flex flex-wrap gap-2 items-center p-2 bg-background/95 backdrop-blur-sm border rounded-lg shadow-lg">
+    <div className="absolute top-4 right-4 z-10 flex gap-2 bg-background border border-border p-3 rounded-lg shadow-lg">
       <Input
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Whiteboard title"
-        className="flex-1 min-w-[150px] max-w-[300px] h-8 text-sm"
+        className="w-48 bg-background text-foreground border-border"
       />
-      <div className="flex gap-2">
-        <Button onClick={handleExportPNG} variant="outline" size="sm" className="gap-1 h-8">
-          <Download className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline text-xs">Export</span>
-        </Button>
-        <Button onClick={handleSave} disabled={isSaving} size="sm" className="gap-1 h-8">
-          {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-          <span className="hidden sm:inline text-xs">Save</span>
-        </Button>
-      </div>
+      <Button onClick={handleSave} disabled={isSaving} size="sm" className="gap-2">
+        {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+        Save
+      </Button>
+      <Button onClick={handleExportPNG} variant="outline" size="sm" className="gap-2">
+        <Download className="w-4 h-4" />
+        Export PNG
+      </Button>
     </div>
   );
 };
 
 export const WhiteboardComponent = ({ algorithmId, algorithmTitle, restoreData }: WhiteboardComponentProps) => {
-  const [editor, setEditor] = useState<any>(null);
-
   return (
-    <div className="relative w-full h-full min-h-[500px] lg:min-h-[700px]">
-      {editor && (
-        <SaveControls algorithmId={algorithmId} algorithmTitle={algorithmTitle} editor={editor} />
-      )}
-      <div className="w-full h-full border rounded-lg overflow-hidden">
-        <Tldraw
-          snapshot={restoreData}
-          onMount={(editor) => {
-            setEditor(editor);
-            
-            // Load restore data if provided
-            if (restoreData) {
-              try {
-                const snapshot = restoreData.board_json || restoreData;
-                if (snapshot && typeof snapshot === 'object') {
-                  editor.store.loadSnapshot(snapshot);
-                } else {
-                  console.warn('Invalid restore data format');
-                }
-              } catch (error) {
-                console.error('Error loading restore data:', error);
-                toast.error('Failed to load whiteboard data');
-              }
-            }
-          }}
-        />
-      </div>
+    <div className="relative w-full  h-[700px] border rounded-lg overflow-hidden">
+      <Tldraw snapshot={restoreData}>
+        <SaveButton algorithmId={algorithmId} algorithmTitle={algorithmTitle} />
+      </Tldraw>
     </div>
   );
 };

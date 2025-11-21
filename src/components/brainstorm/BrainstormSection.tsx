@@ -2,7 +2,7 @@ import { ChevronDown, ChevronUp, FileText, History, Palette, Maximize2 } from "l
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import Draggable from "react-draggable";
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { HistoryTab } from "./HistoryTab";
@@ -65,52 +65,50 @@ export const BrainstormSection = ({ algorithmId, algorithmTitle }: BrainstormSec
                   <span className="hidden sm:inline">Expand</span>
                 </Button>
               </DialogTrigger>
-              <Draggable handle=".drag-handle" bounds="parent">
-                <DialogContent className="max-w-[95vw] w-[95vw] h-[75vh] p-0 gap-0 bg-background [&>button]:z-[100] cursor-move">
-                  <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full h-full flex flex-col">
-                    <TabsList className="w-full justify-start rounded-none border-b px-4 bg-background z-[60] relative drag-handle cursor-grab active:cursor-grabbing">
-                      <TabsTrigger value="whiteboard" className="gap-2">
-                        <Palette className="w-4 h-4" />
-                        Whiteboard
-                      </TabsTrigger>
-                      <TabsTrigger value="notes" className="gap-2">
-                        <FileText className="w-4 h-4" />
-                        Notes
-                      </TabsTrigger>
-                      <TabsTrigger value="history" className="gap-2">
-                        <History className="w-4 h-4" />
-                        History
-                      </TabsTrigger>
-                    </TabsList>
+              <DialogContent className="max-w-full w-full h-[100vh] p-0 gap-0 z-50 bg-background">
+                <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full h-full flex flex-col">
+                  <TabsList className="w-full justify-start rounded-none border-b px-4 bg-background">
+                    <TabsTrigger value="whiteboard" className="gap-2">
+                      <Palette className="w-4 h-4" />
+                      Whiteboard
+                    </TabsTrigger>
+                    <TabsTrigger value="notes" className="gap-2">
+                      <FileText className="w-4 h-4" />
+                      Notes
+                    </TabsTrigger>
+                    <TabsTrigger value="history" className="gap-2">
+                      <History className="w-4 h-4" />
+                      History
+                    </TabsTrigger>
+                  </TabsList>
 
-                    <div className="flex-1 overflow-hidden relative z-[50]">
-                      <TabsContent value="whiteboard" className="h-full m-0 [&_.tl-container]:!z-[1]">
-                        <WhiteboardComponent
-                          algorithmId={algorithmId}
-                          algorithmTitle={algorithmTitle}
-                          restoreData={whiteboardRestore}
-                        />
-                      </TabsContent>
+                  <div className="flex-1 overflow-hidden">
+                    <TabsContent value="whiteboard" className="h-full m-0">
+                      <WhiteboardComponent
+                        algorithmId={algorithmId}
+                        algorithmTitle={algorithmTitle}
+                        restoreData={whiteboardRestore}
+                      />
+                    </TabsContent>
 
-                      <TabsContent value="notes" className="h-full m-0">
-                        <NotesComponent
-                          algorithmId={algorithmId}
-                          algorithmTitle={algorithmTitle}
-                          restoreData={noteRestore}
-                        />
-                      </TabsContent>
+                    <TabsContent value="notes" className="h-full m-0">
+                      <NotesComponent
+                        algorithmId={algorithmId}
+                        algorithmTitle={algorithmTitle}
+                        restoreData={noteRestore}
+                      />
+                    </TabsContent>
 
-                      <TabsContent value="history" className="h-full m-0 p-4 overflow-auto">
-                        <HistoryTab
-                          algorithmId={algorithmId}
-                          onRestoreWhiteboard={handleRestoreWhiteboard}
-                          onRestoreNote={handleRestoreNote}
-                        />
-                      </TabsContent>
-                    </div>
-                  </Tabs>
-                </DialogContent>
-              </Draggable>
+                    <TabsContent value="history" className="h-full m-0 p-4 overflow-auto">
+                      <HistoryTab
+                        algorithmId={algorithmId}
+                        onRestoreWhiteboard={handleRestoreWhiteboard}
+                        onRestoreNote={handleRestoreNote}
+                      />
+                    </TabsContent>
+                  </div>
+                </Tabs>
+              </DialogContent>
             </Dialog>
             <CollapsibleTrigger asChild>
               <Button variant="ghost" size="sm">
