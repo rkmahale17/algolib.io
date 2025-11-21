@@ -60,10 +60,10 @@ export const BrainstormSection = ({ algorithmId, algorithmTitle }: BrainstormSec
           <div className="flex items-center gap-2">
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
               <DialogTrigger asChild>
-                {/* <Button variant="outline" size="sm" className="gap-2">
+                <Button variant="outline" size="sm" className="gap-2">
                   <Maximize2 className="w-4 h-4" />
                   <span className="hidden sm:inline">Expand</span>
-                </Button> */}
+                </Button>
               </DialogTrigger>
               <DialogContent className="max-w-full w-full h-[100vh] p-0 gap-0 z-50 bg-background">
                 <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full h-full flex flex-col">
