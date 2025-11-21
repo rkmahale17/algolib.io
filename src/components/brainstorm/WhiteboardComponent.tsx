@@ -171,7 +171,7 @@ const SaveButton = ({
   }, [editor, title]);
 
   return (
-    <div className="relative top-0 left-0 z-10 flex gap-2 bg-background border border-border p-3 ">
+    <div className="relative top-0  z-10 flex gap-2 bg-background border border-border p-3 ">
       <Input
         value={title}
         onChange={(e) => setTitle(e.target.value)}
@@ -207,12 +207,17 @@ export const WhiteboardComponent = ({
 }: WhiteboardComponentProps) => {
   return (
     <div
-      className={`relative w-full  border rounded-lg overflow-hidden z-10 ${
+      className={` relative w-full  border rounded-lg overflow-hidden z-10 ${
         isExpand ? "h-full" : "h-[700px]"
       }`}
     >
-      <Tldraw snapshot={restoreData}>
-        <SaveButton algorithmId={algorithmId} algorithmTitle={algorithmTitle} />
+      <Tldraw snapshot={restoreData} className="tldraw-algolib">
+        <div>
+          <SaveButton
+            algorithmId={algorithmId}
+            algorithmTitle={algorithmTitle}
+          />
+        </div>
       </Tldraw>
     </div>
   );
