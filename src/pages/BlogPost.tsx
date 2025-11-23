@@ -9,6 +9,7 @@ import { BlogContent } from "@/components/blog/BlogContent";
 import { Helmet } from "react-helmet-async";
 import { Separator } from "@/components/ui/separator";
 import { ShareButton } from "@/components/ShareButton";
+import { BlogSidebar } from "@/components/blog/BlogSidebar";
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -96,8 +97,10 @@ const BlogPost = () => {
             Back to Blog
           </Link>
 
-          {/* Content wrapper - Centered */}
-          <div className="max-w-4xl mx-auto">
+          {/* Two Column Layout */}
+          <div className="flex flex-col lg:flex-row gap-8 items-start">
+            {/* Main Content */}
+            <div className="flex-1 max-w-4xl mx-auto lg:mx-0 w-full">
             {/* Main Content */}
             <article>
               {/* Header */}
@@ -135,9 +138,17 @@ const BlogPost = () => {
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4" />
+                   <Clock className="w-4 h-4" />
                     <span>{post.readTime}</span>
                   </div>
+                </div>
+
+                {/* Share Button */}
+                <div className="mt-6 mb-6">
+                  <ShareButton
+                    title={post.title}
+                    description={post.description}
+                  />
                 </div>
 
                 <Separator className="mb-8" />
@@ -156,20 +167,13 @@ const BlogPost = () => {
 
               {/* Blog Content */}
               <BlogContent content={post.content} />
-
-              {/* Share Section */}
-              <div className="mt-16 pt-8 border-t border-border">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold font-roboto">
-                    Share this article
-                  </h3>
-                  <ShareButton
-                    title={post.title}
-                    description={post.description}
-                  />
-                </div>
-              </div>
             </article>
+            </div>
+
+            {/* Sidebar - Desktop Only */}
+            <div className="hidden lg:block lg:w-80 flex-shrink-0">
+              <BlogSidebar category={post.category} />
+            </div>
           </div>
         </div>
       </div>
