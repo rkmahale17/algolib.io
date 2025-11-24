@@ -166,8 +166,15 @@ const BlogPost = () => {
           </article>
         </div>
 
-        {/* Floating Sidebar - Desktop Only */}
-        <div className="hidden xl:block fixed top-24 right-8 w-80 max-h-[calc(100vh-8rem)] overflow-y-auto">
+        {/* Floating Sidebar - Large Desktop Only (1760px+) */}
+        <div className="hidden 3xl:block fixed top-24 right-8 w-80 max-h-[calc(100vh-6rem)]">
+          <div className="overflow-y-auto max-h-full pr-2 scrollbar-thin">
+            <BlogSidebar category={post.category} />
+          </div>
+        </div>
+
+        {/* Mobile/Tablet Sidebar - Below Content */}
+        <div className="3xl:hidden container mx-auto max-w-4xl mt-12 px-4">
           <BlogSidebar category={post.category} />
         </div>
       </div>
