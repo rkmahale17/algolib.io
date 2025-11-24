@@ -13,6 +13,9 @@ export default {
       },
     },
     extend: {
+      screens: {
+        '3xl': '1760px',
+      },
       fontFamily: {
         roboto: ['Roboto', 'sans-serif'],
       },
