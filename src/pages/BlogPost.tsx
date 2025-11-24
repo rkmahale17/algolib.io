@@ -87,93 +87,100 @@ const BlogPost = () => {
       </Helmet>
 
       <div className="min-h-screen bg-background py-12 px-4 blog-post-container">
-        <div className="container mx-auto max-w-4xl">
-          {/* Back Button */}
-          <Link
-            to="/blog"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Blog
-          </Link>
+        <div className="max-w-7xl mx-auto">
+          <div className="flex gap-8">
+            {/* Main Content Column - Always Centered */}
+            <div className="flex-1 max-w-4xl mx-auto xl:mx-0">
+              {/* Back Button */}
+              <Link
+                to="/blog"
+                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to Blog
+              </Link>
 
-          {/* Main Content - Always Centered */}
-          <article>
-            {/* Header */}
-            <header className="mb-8">
-              <div className="flex items-center gap-2 mb-4">
-                <Badge variant="secondary" className="font-roboto">
-                  {post.category}
-                </Badge>
+              {/* Main Content */}
+              <article>
+                {/* Header */}
+                <header className="mb-8">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Badge variant="secondary" className="font-roboto">
+                      {post.category}
+                    </Badge>
+                  </div>
+
+                  <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground font-roboto">
+                    {post.title}
+                  </h1>
+
+                  {post.subtitle && (
+                    <p className="text-xl text-muted-foreground mb-6 font-roboto">
+                      {post.subtitle}
+                    </p>
+                  )}
+
+                  {/* Meta Info */}
+                  <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground mb-6 font-roboto">
+                    <div className="flex items-center gap-2">
+                      <User className="w-4 h-4" />
+                      <span>{post.author}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4" />
+                      <span>
+                        {new Date(post.date).toLocaleDateString("en-US", {
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4" />
+                      <span>{post.readTime}</span>
+                    </div>
+                  </div>
+
+                  {/* Share Button */}
+                  <div className="mt-6 mb-6">
+                    <ShareButton
+                      title={post.title}
+                      description={post.description}
+                    />
+                  </div>
+
+                  <Separator className="mb-8" />
+                </header>
+
+                {/* Hero Image - Inside Content */}
+                {post.image && (
+                  <div className="blog-image-container">
+                    <img
+                      src={post.image}
+                      alt={post.title}
+                      className="blog-hero-image"
+                    />
+                  </div>
+                )}
+
+                {/* Blog Content */}
+                <BlogContent content={post.content} />
+              </article>
+            </div>
+
+            {/* Sidebar Column - Desktop Only (1280px+) */}
+            <aside className="hidden xl:block w-80 flex-shrink-0">
+              <div className="sticky top-24">
+                <BlogSidebar category={post.category} />
               </div>
+            </aside>
+          </div>
 
-              <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground font-roboto">
-                {post.title}
-              </h1>
-
-              {post.subtitle && (
-                <p className="text-xl text-muted-foreground mb-6 font-roboto">
-                  {post.subtitle}
-                </p>
-              )}
-
-              {/* Meta Info */}
-              <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground mb-6 font-roboto">
-                <div className="flex items-center gap-2">
-                  <User className="w-4 h-4" />
-                  <span>{post.author}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
-                  <span>
-                    {new Date(post.date).toLocaleDateString("en-US", {
-                      month: "long",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                 <Clock className="w-4 h-4" />
-                  <span>{post.readTime}</span>
-                </div>
-              </div>
-
-              {/* Share Button */}
-              <div className="mt-6 mb-6">
-                <ShareButton
-                  title={post.title}
-                  description={post.description}
-                />
-              </div>
-
-              <Separator className="mb-8" />
-            </header>
-
-            {/* Hero Image - Inside Content */}
-            {post.image && (
-              <div className="blog-image-container">
-                <img
-                  src={post.image}
-                  alt={post.title}
-                  className="blog-hero-image"
-                />
-              </div>
-            )}
-
-            {/* Blog Content */}
-            <BlogContent content={post.content} />
-          </article>
-        </div>
-
-        {/* Floating Sidebar - Desktop Only (1280px+) */}
-        <div className="hidden xl:block fixed top-24 right-4 w-72 max-h-[calc(100vh-7rem)] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
-          <BlogSidebar category={post.category} />
-        </div>
-
-        {/* Mobile/Tablet Sidebar - Below Content */}
-        <div className="xl:hidden container mx-auto max-w-4xl mt-12 px-4">
-          <BlogSidebar category={post.category} />
+          {/* Mobile Sidebar - Below Content */}
+          <div className="xl:hidden mt-12">
+            <BlogSidebar category={post.category} />
+          </div>
         </div>
       </div>
     </>
