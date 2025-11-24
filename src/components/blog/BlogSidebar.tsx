@@ -74,19 +74,19 @@ export const BlogSidebar = ({ category }: BlogSidebarProps) => {
   const relatedLinks = getRelatedLinks();
 
   return (
-    <aside className="blog-sidebar space-y-6">
+    <aside className="blog-sidebar space-y-4">
       {/* Games Promotion Card */}
       <Card className="blog-sidebar-card border-primary/20">
-        <CardHeader>
-          <CardTitle className="blog-sidebar-title flex items-center gap-2">
-            <Gamepad2 className="w-5 h-5 text-primary" />
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Gamepad2 className="w-4 h-4 text-primary" />
             Play & Learn
           </CardTitle>
-          <CardDescription>
-            Master algorithms through interactive games
+          <CardDescription className="text-xs">
+            Master algorithms through games
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-2">
           {games.map((game) => {
             const Icon = game.icon;
             return (
@@ -95,24 +95,21 @@ export const BlogSidebar = ({ category }: BlogSidebarProps) => {
                 to={game.link}
                 className="block group"
               >
-                <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-accent/50 transition-colors">
-                  <Icon className={`w-5 h-5 ${game.color} flex-shrink-0 mt-0.5`} />
+                <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-accent/50 transition-colors">
+                  <Icon className={`w-4 h-4 ${game.color} flex-shrink-0`} />
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">
+                    <h4 className="font-semibold text-xs text-foreground group-hover:text-primary transition-colors truncate">
                       {game.title}
                     </h4>
-                    <p className="text-xs text-muted-foreground line-clamp-2">
-                      {game.description}
-                    </p>
                   </div>
                 </div>
               </Link>
             );
           })}
           <Link to="/games">
-            <Button variant="outline" size="sm" className="w-full gap-2">
+            <Button variant="outline" size="sm" className="w-full gap-2 h-8 text-xs mt-2">
               View All Games
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-3 h-3" />
             </Button>
           </Link>
         </CardContent>
@@ -120,29 +117,26 @@ export const BlogSidebar = ({ category }: BlogSidebarProps) => {
 
       {/* Related Links Card */}
       <Card className="blog-sidebar-card">
-        <CardHeader>
-          <CardTitle className="blog-sidebar-title">Related Resources</CardTitle>
-          <CardDescription>
-            Continue your learning journey
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Related Resources</CardTitle>
+          <CardDescription className="text-xs">
+            Continue learning
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-2">
+        <CardContent className="space-y-1">
           {relatedLinks.map((link) => (
             <Link
               key={link.link}
               to={link.link}
-              className="block group p-3 rounded-lg hover:bg-accent/50 transition-colors"
+              className="block group p-2 rounded-lg hover:bg-accent/50 transition-colors"
             >
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">
+                  <h4 className="font-semibold text-xs text-foreground group-hover:text-primary transition-colors truncate">
                     {link.title}
                   </h4>
-                  <p className="text-xs text-muted-foreground line-clamp-1">
-                    {link.description}
-                  </p>
                 </div>
-                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0 ml-2" />
+                <ArrowRight className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
               </div>
             </Link>
           ))}
