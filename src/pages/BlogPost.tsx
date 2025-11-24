@@ -166,15 +166,13 @@ const BlogPost = () => {
           </article>
         </div>
 
-        {/* Floating Sidebar - Large Desktop Only (1760px+) */}
-        <div className="hidden 3xl:block fixed top-24 right-8 w-80 max-h-[calc(100vh-6rem)]">
-          <div className="overflow-y-auto max-h-full pr-2 scrollbar-thin">
-            <BlogSidebar category={post.category} />
-          </div>
+        {/* Floating Sidebar - Desktop Only (1280px+) */}
+        <div className="hidden xl:block fixed top-24 right-4 w-72 max-h-[calc(100vh-7rem)] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
+          <BlogSidebar category={post.category} />
         </div>
 
         {/* Mobile/Tablet Sidebar - Below Content */}
-        <div className="3xl:hidden container mx-auto max-w-4xl mt-12 px-4">
+        <div className="xl:hidden container mx-auto max-w-4xl mt-12 px-4">
           <BlogSidebar category={post.category} />
         </div>
       </div>
