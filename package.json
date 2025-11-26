@@ -71,7 +71,11 @@
     "tldraw": "^3.9.0",
     "vaul": "^0.9.9",
     "vite-plugin-compression": "^0.5.1",
-    "zod": "^3.25.76"
+    "zod": "^3.25.76",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "axios": "^1.6.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
