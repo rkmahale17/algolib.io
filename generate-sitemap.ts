@@ -1,4 +1,6 @@
 import { algorithms } from './src/data/algorithms';
+import { blind75Problems } from './src/data/blind75';
+import { blogPosts } from './src/data/blogPosts';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -16,11 +18,27 @@ const staticRoutes = [
     '/content-rights',
     '/feedback',
     '/auth',
+    '/games',
+    '/games/leaderboard',
+    '/blind75',
+    '/blog',
 ];
 
 const algorithmRoutes = algorithms.map((algo) => `/algorithm/${algo.id}`);
+const blind75Routes = blind75Problems.map((problem) => `/blind75/${problem.slug}`);
+const blogRoutes = blogPosts.map((post) => `/blog/${post.slug}`);
 
-const allRoutes = [...staticRoutes, ...algorithmRoutes];
+// Game routes
+const gameRoutes = [
+    '/games/sort-hero',
+    '/games/graph-explorer',
+    '/games/stack-master',
+    '/games/dp-puzzle',
+    '/games/sliding-window',
+    '/games/two-pointer',
+];
+
+const allRoutes = [...staticRoutes, ...algorithmRoutes, ...blind75Routes, ...blogRoutes, ...gameRoutes];
 
 // Generate sitemap XML
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -28,8 +46,20 @@ const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 ${allRoutes.map(route => `  <url>
     <loc>${baseUrl}${route}</loc>
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
-    <changefreq>${route === '/' ? 'daily' : route.startsWith('/algorithm/') ? 'weekly' : 'monthly'}</changefreq>
-    <priority>${route === '/' ? '1.0' : route.startsWith('/algorithm/') ? '0.8' : '0.5'}</priority>
+    <changefreq>${
+      route === '/' ? 'daily' : 
+      route.startsWith('/algorithm/') || route.startsWith('/blind75/') ? 'weekly' : 
+      route.startsWith('/blog/') ? 'weekly' :
+      route.startsWith('/games/') ? 'weekly' :
+      'monthly'
+    }</changefreq>
+    <priority>${
+      route === '/' ? '1.0' : 
+      route.startsWith('/algorithm/') || route.startsWith('/blind75/') ? '0.8' : 
+      route.startsWith('/blog/') ? '0.7' :
+      route.startsWith('/games/') ? '0.6' :
+      '0.5'
+    }</priority>
   </url>`).join('\n')}
 </urlset>`;
 

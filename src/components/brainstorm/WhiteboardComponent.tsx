@@ -1,20 +1,26 @@
-import { useCallback, useState, useEffect } from "react";
-import { Tldraw, useEditor } from "tldraw";
 import "tldraw/tldraw.css";
-import { supabase } from "@/integrations/supabase/client";
+
+import { Download, Loader2, Save } from "lucide-react";
+import { Tldraw, useEditor } from "tldraw";
+import { useCallback, useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Download, Save, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
 
 interface WhiteboardComponentProps {
   algorithmId: string;
   algorithmTitle: string;
   restoreData?: any;
+  isExpand?: boolean;
 }
 
-const SaveButton = ({ algorithmId, algorithmTitle }: WhiteboardComponentProps) => {
+const SaveButton = ({
+  algorithmId,
+  algorithmTitle,
+}: WhiteboardComponentProps) => {
   const editor = useEditor();
   const [title, setTitle] = useState(algorithmTitle);
   const [whiteboardId, setWhiteboardId] = useState<string | null>(null);
@@ -153,7 +159,9 @@ const SaveButton = ({ algorithmId, algorithmTitle }: WhiteboardComponentProps) =
         }, "image/png");
       };
 
-      const svgBlob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+      const svgBlob = new Blob([svgString], {
+        type: "image/svg+xml;charset=utf-8",
+      });
       const url = URL.createObjectURL(svgBlob);
       img.src = url;
     } catch (error) {
@@ -163,18 +171,27 @@ const SaveButton = ({ algorithmId, algorithmTitle }: WhiteboardComponentProps) =
   }, [editor, title]);
 
   return (
-    <div className="absolute top-4 right-4 z-10 flex gap-2 bg-background border border-border p-3 rounded-lg shadow-lg">
+    <div className="relative top-0  z-10 flex gap-2 bg-background border border-border p-3 ">
       <Input
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Whiteboard title"
-        className="w-48 bg-background text-foreground border-border"
+        className="bg-background text-foreground border-border"
       />
-      <Button onClick={handleSave} disabled={isSaving} size="sm" className="gap-2">
-        {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+      <Button
+        onClick={handleSave}
+        disabled={isSaving}
+        size="sm"
+        className="gap-2"
+      >
+        {isSaving ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : (
+          <Save className="w-4 h-4" />
+        )}
         Save
       </Button>
-      <Button onClick={handleExportPNG} variant="outline" size="sm" className="gap-2">
+      <Button onClick={handleExportPNG} size="sm" className="gap-2">
         <Download className="w-4 h-4" />
         Export PNG
       </Button>
@@ -182,11 +199,25 @@ const SaveButton = ({ algorithmId, algorithmTitle }: WhiteboardComponentProps) =
   );
 };
 
-export const WhiteboardComponent = ({ algorithmId, algorithmTitle, restoreData }: WhiteboardComponentProps) => {
+export const WhiteboardComponent = ({
+  algorithmId,
+  algorithmTitle,
+  restoreData,
+  isExpand,
+}: WhiteboardComponentProps) => {
   return (
-    <div className="relative w-full  h-[700px] border rounded-lg overflow-hidden">
-      <Tldraw snapshot={restoreData}>
-        <SaveButton algorithmId={algorithmId} algorithmTitle={algorithmTitle} />
+    <div
+      className={` relative w-full  border rounded-lg overflow-hidden z-10 ${
+        isExpand ? "h-full" : "h-[700px]"
+      }`}
+    >
+      <Tldraw snapshot={restoreData} className="tldraw-algolib">
+        <div>
+          <SaveButton
+            algorithmId={algorithmId}
+            algorithmTitle={algorithmTitle}
+          />
+        </div>
       </Tldraw>
     </div>
   );
