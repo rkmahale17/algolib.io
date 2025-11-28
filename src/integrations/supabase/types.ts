@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      algorithms: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          difficulty: string
+          id: number
+          name: string
+          problems: Json | null
+          slug: string
+          space_complexity: string
+          time_complexity: string
+          updated_at: string
+          youtube_url: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          difficulty: string
+          id?: number
+          name: string
+          problems?: Json | null
+          slug: string
+          space_complexity: string
+          time_complexity: string
+          updated_at?: string
+          youtube_url?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          difficulty?: string
+          id?: number
+          name?: string
+          problems?: Json | null
+          slug?: string
+          space_complexity?: string
+          time_complexity?: string
+          updated_at?: string
+          youtube_url?: string | null
+        }
+        Relationships: []
+      }
       game_sessions: {
         Row: {
           completed_at: string
