@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      algorithm_implementations: {
+        Row: {
+          code_cpp: string
+          code_java: string
+          code_python: string
+          code_typescript: string
+          created_at: string
+          explanation_overview: string
+          explanation_steps: Json | null
+          explanation_tips: Json | null
+          explanation_use_case: string
+          id: string
+          practice_problems: Json | null
+          updated_at: string
+          visualization_type: string
+        }
+        Insert: {
+          code_cpp: string
+          code_java: string
+          code_python: string
+          code_typescript: string
+          created_at?: string
+          explanation_overview: string
+          explanation_steps?: Json | null
+          explanation_tips?: Json | null
+          explanation_use_case: string
+          id: string
+          practice_problems?: Json | null
+          updated_at?: string
+          visualization_type: string
+        }
+        Update: {
+          code_cpp?: string
+          code_java?: string
+          code_python?: string
+          code_typescript?: string
+          created_at?: string
+          explanation_overview?: string
+          explanation_steps?: Json | null
+          explanation_tips?: Json | null
+          explanation_use_case?: string
+          id?: string
+          practice_problems?: Json | null
+          updated_at?: string
+          visualization_type?: string
+        }
+        Relationships: []
+      }
       algorithms: {
         Row: {
           category: string
@@ -55,6 +103,96 @@ export type Database = {
           space_complexity?: string
           time_complexity?: string
           updated_at?: string
+          youtube_url?: string | null
+        }
+        Relationships: []
+      }
+      blind75_implementations: {
+        Row: {
+          code_cpp: string
+          code_java: string
+          code_python: string
+          code_typescript: string
+          created_at: string
+          explanation: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          code_cpp: string
+          code_java: string
+          code_python: string
+          code_typescript: string
+          created_at?: string
+          explanation: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          code_cpp?: string
+          code_java?: string
+          code_python?: string
+          code_typescript?: string
+          created_at?: string
+          explanation?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      blind75_problems: {
+        Row: {
+          algorithm_id: string | null
+          category: string
+          companies: Json | null
+          created_at: string
+          description: string
+          difficulty: string
+          id: number
+          leetcode_search: string
+          slug: string
+          space_complexity: string
+          tags: Json | null
+          time_complexity: string
+          title: string
+          updated_at: string
+          use_cases: Json | null
+          youtube_url: string | null
+        }
+        Insert: {
+          algorithm_id?: string | null
+          category: string
+          companies?: Json | null
+          created_at?: string
+          description: string
+          difficulty: string
+          id: number
+          leetcode_search: string
+          slug: string
+          space_complexity: string
+          tags?: Json | null
+          time_complexity: string
+          title: string
+          updated_at?: string
+          use_cases?: Json | null
+          youtube_url?: string | null
+        }
+        Update: {
+          algorithm_id?: string | null
+          category?: string
+          companies?: Json | null
+          created_at?: string
+          description?: string
+          difficulty?: string
+          id?: number
+          leetcode_search?: string
+          slug?: string
+          space_complexity?: string
+          tags?: Json | null
+          time_complexity?: string
+          title?: string
+          updated_at?: string
+          use_cases?: Json | null
           youtube_url?: string | null
         }
         Relationships: []
