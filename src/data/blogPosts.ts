@@ -37,8 +37,8 @@ export const blogPosts: BlogPost[] = [
     readTime: '18 min read',
     category: 'Interview Prep',
     tags: ['Blind 75', 'LeetCode', 'FAANG', 'Visual Learning', 'Coding Interview', 'Algorithm Patterns'],
-    thumbnail: '/blog/blind75-patterns-diagram.png',
-    image: '/blog/blind75-patterns-diagram.png', // Hero image
+    thumbnail: '/_blog/blind75-patterns-diagram.png',
+    image: '/_blog/blind75-patterns-diagram.png', // Hero image
 
     content: [
       {
@@ -150,7 +150,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: 'image',
-        content: '/blog/patterns/two-pointers.png',
+        content: '/_blog/patterns/two-pointers.png',
       },
       {
         type: "cta",
@@ -175,7 +175,7 @@ export const blogPosts: BlogPost[] = [
 
       {
         type: 'image',
-        content: '/blog/patterns/slow-fast-pointers.png',
+        content: '/_blog/patterns/slow-fast-pointers.png',
       },
       {
         type: "cta",
@@ -197,7 +197,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: 'image',
-        content: '/blog/patterns/bineary-search.png',
+        content: '/_blog/patterns/bineary-search.png',
       },
       {
         type: "cta",
@@ -220,7 +220,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: 'image',
-        content: '/blog/patterns/bfs.png',
+        content: '/_blog/patterns/bfs.png',
       },
       {
         type: "cta",
@@ -262,7 +262,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: 'image',
-        content: '/blog/patterns/coin-change.png',
+        content: '/_blog/patterns/coin-change.png',
       },
       {
         type: "cta",
@@ -283,7 +283,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: 'image',
-        content: '/blog/patterns/backtracking.png',
+        content: '/_blog/patterns/backtracking.png',
       },
       {
         type: "cta",
@@ -306,7 +306,7 @@ export const blogPosts: BlogPost[] = [
 
       {
         type: 'image',
-        content: '/blog/patterns/valid-parentesis.png',
+        content: '/_blog/patterns/valid-parentesis.png',
       },
       {
         type: "cta",
@@ -595,8 +595,8 @@ export const blogPosts: BlogPost[] = [
     readTime: '35 min read',
     category: 'System Design & Data Structures',
     tags: ['LRU Cache', 'System Design', 'Caching', 'HashMap', 'Doubly Linked List', 'Performance', 'Algorithms'],
-    thumbnail: '/blog/lru/hero.png',
-    image: '/blog/lru/hero.png',
+    thumbnail: '/_blog/lru/hero.png',
+    image: '/_blog/lru/hero.png',
 
     content: [
       {
@@ -678,7 +678,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: 'image',
-        content: '/blog/lru/basic.png'
+        content: '/_blog/lru/basic.png'
       },
 
       {
@@ -720,7 +720,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: 'image',
-        content: '/blog/lru/internal-structure.png'
+        content: '/_blog/lru/internal-structure.png'
       },
 
       {
@@ -887,7 +887,7 @@ class LRUCache:
 
       {
         type: 'image',
-        content: '/blog/lru/lru-cache-viz.png'
+        content: '/_blog/lru/lru-cache-viz.png'
       },
 
       {
@@ -1043,8 +1043,8 @@ class LRUCache:
     "readTime": "7 min read",
     "category": "Algorithms",
     "tags": ["Dynamic Programming", "DP", "Visual Learning", "DSA", "Coding Interview", "Algolib", "LeetCode"],
-    "thumbnail": "/blog/3/hero.png",
-    "image": "/blog/3/hero.png",
+    "thumbnail": "/_blog/3/hero.png",
+    "image": "/_blog/3/hero.png",
 
     "content": [
       {
@@ -1116,7 +1116,7 @@ class LRUCache:
       },
       {
         "type": "image",
-        "content": '/blog/patterns/coin-change.png',
+        "content": '/_blog/patterns/coin-change.png',
         "link": "https://algolib.io",
         "large": false
       },
@@ -1201,7 +1201,7 @@ class LRUCache:
       {
         "type": "image",
         "alt": "DP Visualization",
-        "content": '/blog/common/house-robber.png',
+        "content": '/_blog/common/house-robber.png',
         "caption": "House Robber Visualization ",
         "large": true
       },
@@ -1230,7 +1230,7 @@ class LRUCache:
       {
         "type": "image",
         "alt": "Fib Simulation",
-        "content": "/blog/common/fib-stack.png",
+        "content": "/_blog/common/fib-stack.png",
         "large": false
       },
       {
@@ -1330,7 +1330,7 @@ class LRUCache:
         "type": "image",
         "alt": "Knapsack DP algo",
         "caption": "Knapsack AlgoLib.io simulation ",
-        "content": "/blog/common/knaps.png",
+        "content": "/_blog/common/knaps.png",
         "large": false
       },
       {
@@ -1423,8 +1423,8 @@ class LRUCache:
     "readTime": "8 min read",
     "category": "Algorithms",
     "tags": ["Graphs", "BFS", "DFS", "Graph Traversal", "Visual Learning", "Algolib", "DSA", "LeetCode"],
-    "thumbnail": "/blog/4/hero.png",
-    "image": "/blog/4/hero.png",
+    "thumbnail": "/_blog/4/hero.png",
+    "image": "/_blog/4/hero.png",
 
     "content": [
 
@@ -1565,7 +1565,7 @@ class LRUCache:
       {
         "type": "image",
         "alt": "Graph BFS visualization",
-        "content": "/blog/4/bfs.png",
+        "content": "/_blog/4/bfs.png",
         "caption": "BFS spreading level by level",
         "large": true
       },
@@ -1615,7 +1615,7 @@ class LRUCache:
       },
       {
         "type": "image",
-        "content": "/blog/4/dfs.png",
+        "content": "/_blog/4/dfs.png",
         "caption": "DFS recursion tree visualization",
         "large": true
       },
@@ -1690,7 +1690,7 @@ class LRUCache:
 
       {
         "type": "image",
-        "content": "/blog/4/islands.png",
+        "content": "/_blog/4/islands.png",
         "caption": "Island DFS visualization",
         "large": false
       },
