@@ -39,7 +39,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { CopyCodeButton } from "@/components/CopyCodeButton";
 import { Separator } from "@/components/ui/separator";
 import { YouTubePlayer } from "@/components/YouTubePlayer";
-import { algorithmsDB } from "@/data/algorithmsDB";
+// import { algorithmsDB } from "@/data/algorithmsDB";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CodeRunner } from "@/components/CodeRunner/CodeRunner";
@@ -48,7 +48,43 @@ import { ShareButton } from "@/components/ShareButton";
 const AlgorithmDetailNew: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
-  const algorithm = id ? algorithmsDB[id] : undefined;
+  const [algorithm, setAlgorithm] = useState<any>(undefined);
+  const [isLoadingAlgorithm, setIsLoadingAlgorithm] = useState(true);
+
+  useEffect(() => {
+    const fetchAlgorithm = async () => {
+      if (!id) return;
+      setIsLoadingAlgorithm(true);
+      try {
+        const { data, error } = await supabase
+          .from('algorithms')
+          .select('*')
+          .eq('id', id)
+          .single();
+        
+        if (error) throw error;
+        
+        // Transform Supabase data structure to match component expectations
+        // Flatten metadata fields to top level
+        const transformedData = {
+          ...data,
+          // Spread metadata fields to top level
+          ...(data.metadata || {}),
+          // Keep original nested structure for backward compatibility
+          metadata: data.metadata
+        };
+        
+        setAlgorithm(transformedData);
+      } catch (error) {
+        console.error('Error fetching algorithm:', error);
+        toast.error('Failed to load algorithm details');
+      } finally {
+        setIsLoadingAlgorithm(false);
+      }
+    };
+
+    fetchAlgorithm();
+  }, [id]);
   
   const [user, setUser] = useState<any>(null);
   const [isCompleted, setIsCompleted] = useState(false);
@@ -299,6 +335,14 @@ const AlgorithmDetailNew: React.FC = () => {
     );
   };
 
+  if (isLoadingAlgorithm) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   if (!algorithm) {
     return (
       <>
@@ -418,6 +462,59 @@ const AlgorithmDetailNew: React.FC = () => {
                     </div>
                   </div>
 
+                  {/* Examples Section */}
+                  {algorithm.explanation.io && algorithm.explanation.io.length > 0 && (
+                    <div className="space-y-4">
+                      {algorithm.explanation.io.map((example: any, index: number) => (
+                        <div key={index} className="border rounded-lg p-4 bg-muted/20">
+                          <h4 className="font-semibold mb-3">Example {index + 1}:</h4>
+                          <div className="space-y-2 font-mono text-sm">
+                            {example.input && (
+                              <div>
+                                <span className="font-semibold">Input:</span>{' '}
+                                <code className="bg-muted px-2 py-0.5 rounded">{example.input}</code>
+                              </div>
+                            )}
+                            {example.output && (
+                              <div>
+                                <span className="font-semibold">Output:</span>{' '}
+                                <code className="bg-muted px-2 py-0.5 rounded">{example.output}</code>
+                              </div>
+                            )}
+                            {example.explanation && (
+                              <div className="mt-2">
+                                <span className="font-semibold">Explanation:</span>{' '}
+                                <span className="text-muted-foreground">{example.explanation}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Constraints Section */}
+                  {algorithm.explanation.constraints && algorithm.explanation.constraints.length > 0 && (
+                    <div className="border rounded-lg p-4 bg-muted/20">
+                      <h4 className="font-semibold mb-3">Constraints:</h4>
+                      <ul className="space-y-1.5 font-mono text-sm">
+                        {algorithm.explanation.constraints.map((constraint: string, index: number) => (
+                          <li key={index} className="flex items-start gap-2">
+                            <span className="text-muted-foreground mt-0.5">•</span>
+                            <code className="flex-1">{constraint}</code>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Note Section */}
+                  {algorithm.explanation.note && (
+                    <div className="border-l-4 border-primary pl-4 py-2">
+                      <p className="text-sm text-muted-foreground italic">{algorithm.explanation.note}</p>
+                    </div>
+                  )}
+
                   {/* Algorithm Overview Card (Reused from AlgorithmDetail) */}
                   <Card className="p-4 sm:p-6 glass-card overflow-hidden">
                     <div className="space-y-4">
@@ -466,7 +563,7 @@ const AlgorithmDetailNew: React.FC = () => {
 
                         <TabsContent value="steps" className="mt-4">
                           <ol className="space-y-2 list-decimal list-inside">
-                            {algorithm.explanation.steps.map((step, i) => (
+                            {algorithm.explanation.steps?.map((step, i) => (
                               <li key={i} className="text-sm text-muted-foreground">
                                 {step}
                               </li>
@@ -480,7 +577,7 @@ const AlgorithmDetailNew: React.FC = () => {
 
                         <TabsContent value="tips" className="mt-4">
                           <ul className="space-y-2 list-disc list-inside">
-                            {algorithm.explanation.tips.map((tip, i) => (
+                            {algorithm.explanation.tips?.map((tip, i) => (
                               <li key={i} className="text-sm text-muted-foreground">
                                 {tip}
                               </li>
@@ -609,11 +706,11 @@ const AlgorithmDetailNew: React.FC = () => {
                   )}
 
                   {/* Practice Problems Card (Reused from AlgorithmDetail) */}
-                  {algorithm.problemsToSolve.external && algorithm.problemsToSolve.external.length > 0 ? (
+                  {algorithm?.problems_to_solve?.external && algorithm.problems_to_solve.external.length > 0 ? (
                     <Card className="p-4 sm:p-6 glass-card overflow-hidden">
                       <h3 className="font-semibold mb-4">Practice Problems</h3>
                       <div className="space-y-2">
-                        {algorithm.problemsToSolve.external.map((problem, i) => (
+                        {algorithm.problems_to_solve.external.map((problem, i) => (
                           <a
                             key={i}
                             href={problem.url}
@@ -743,9 +840,10 @@ const AlgorithmDetailNew: React.FC = () => {
             </div>
 
             <TabsContent value="code" className="flex-1 m-0 overflow-hidden relative group flex flex-col data-[state=inactive]:hidden">
-              {id && (
+              {id && algorithm && (
                 <CodeRunner 
-                  algorithmId={id} 
+                  algorithmId={id}
+                  algorithmData={algorithm}
                   onToggleFullscreen={() => setIsCodeRunnerMaximized(true)}
                   className="h-full border-0 rounded-none shadow-none"
                 />
@@ -789,9 +887,10 @@ const AlgorithmDetailNew: React.FC = () => {
             </Button>
           </div>
           <div className="flex-1 overflow-hidden">
-            {id && (
+            {id && algorithm && (
               <CodeRunner 
-                algorithmId={id} 
+                algorithmId={id}
+                algorithmData={algorithm}
                 isMaximized={true}
                 onToggleFullscreen={() => setIsCodeRunnerMaximized(false)}
                 className="h-full border-0 rounded-none shadow-none"
@@ -832,7 +931,7 @@ const AlgorithmDetailNew: React.FC = () => {
             </Button>
           </div>
           <div className="flex-1 overflow-auto p-6">
-            {user && id ? (
+            {user && id && algorithm ? (
               <BrainstormSection algorithmId={id} algorithmTitle={algorithm.name} />
             ) : (
               <div className="text-center py-12 text-muted-foreground">
@@ -851,12 +950,12 @@ const AlgorithmDetailNew: React.FC = () => {
             <div className="flex flex-col min-h-full">
               {/* Left Panel Content */}
               <div className="flex-none">
-                {renderLeftPanel()}
+                {algorithm && renderLeftPanel()}
               </div>
               
               {/* Right Panel Content */}
               <div className="flex-none h-[600px] border-t-4 border-muted">
-                {renderRightPanel()}
+                {algorithm && renderRightPanel()}
               </div>
             </div>
             
@@ -889,7 +988,7 @@ const AlgorithmDetailNew: React.FC = () => {
                     collapsedSize={0}
                     className={isLeftCollapsed ? "min-w-0" : ""}
                   >
-                    {renderLeftPanel()}
+                    {algorithm && renderLeftPanel()}
                   </ResizablePanel>
 
                   {/* Collapsed Left Panel Toggle */}
@@ -920,7 +1019,7 @@ const AlgorithmDetailNew: React.FC = () => {
                     collapsedSize={0}
                     className={isRightCollapsed ? "min-w-0" : ""}
                   >
-                    {renderRightPanel()}
+                    {algorithm && renderRightPanel()}
                   </ResizablePanel>
 
                   {/* Collapsed Right Panel Toggle */}

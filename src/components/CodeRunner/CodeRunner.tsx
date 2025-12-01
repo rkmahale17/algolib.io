@@ -11,11 +11,14 @@ import { LanguageSelector, Language } from './LanguageSelector';
 import { CodeEditor } from './CodeEditor';
 import { OutputPanel } from './OutputPanel';
 import { DEFAULT_CODE, LANGUAGE_IDS } from './constants';
-import { algorithmsDB } from '@/data/algorithmsDB';
+// import { algorithmsDB } from '@/data/algorithmsDB';
+import { supabase } from '@/integrations/supabase/client';
 import { generateStub } from '@/utils/stubGenerator';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface CodeRunnerProps {
   algorithmId?: string;
+  algorithmData?: any;
   onToggleFullscreen?: () => void;
   isMaximized?: boolean;
   className?: string;
@@ -23,6 +26,7 @@ interface CodeRunnerProps {
 
 export const CodeRunner: React.FC<CodeRunnerProps> = ({ 
   algorithmId, 
+  algorithmData,
   onToggleFullscreen, 
   isMaximized = false,
   className 
@@ -35,26 +39,57 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   const [internalIsFullscreen, setInternalIsFullscreen] = useState(false);
   const [executionTime, setExecutionTime] = useState<number | null>(null);
   const [customTestCases, setCustomTestCases] = useState<Array<{ input: any[]; expectedOutput: any }>>([]);
+  const [fetchedAlgorithm, setFetchedAlgorithm] = useState<any>(null);
+
+  const activeAlgorithm = algorithmData || fetchedAlgorithm;
+
+  useEffect(() => {
+    if (!algorithmData && algorithmId) {
+      const fetchAlgo = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('algorithms')
+            .select('*')
+            .eq('id', algorithmId)
+            .single();
+          
+          if (error) throw error;
+          
+          // Transform Supabase data structure to match component expectations
+          const transformedData = {
+            ...data,
+            ...(data.metadata || {}),
+            metadata: data.metadata
+          };
+          
+          setFetchedAlgorithm(transformedData);
+        } catch (error) {
+          console.error('Error fetching algorithm for runner:', error);
+        }
+      };
+      fetchAlgo();
+    }
+  }, [algorithmId, algorithmData]);
 
   // Use either internal state or prop
   const isFullscreen = isMaximized || internalIsFullscreen;
 
   // Load algorithm code and schema
   useEffect(() => {
-    if (algorithmId && algorithmsDB[algorithmId]) {
-      const algo = algorithmsDB[algorithmId];
+    if (activeAlgorithm) {
+      const algo = activeAlgorithm;
       
       // Try to get starter code or full implementation
       const impl = algo.implementations.find(i => i.lang.toLowerCase() === language.toLowerCase());
       let algoCode = impl?.code.find(c => c.codeType === 'starter')?.code || impl?.code.find(c => c.codeType === 'optimize')?.code;
       
       // If no code exists for this language, generate a stub
-      if (!algoCode && algo.inputSchema) {
+      if (!algoCode && algo.input_schema) {
         const functionName = algorithmId.replace(/-/g, '_'); // Convert kebab-case to snake_case
         
         // Parse input values for stub generation
         const parsedInputs: Record<string, any> = {};
-        algo.inputSchema.forEach(field => {
+        algo.input_schema.forEach(field => {
           const value = inputValues[field.name];
           if (value) {
             try {
@@ -68,7 +103,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
         algoCode = generateStub(
           language,
           functionName,
-          algo.inputSchema as any,
+          algo.input_schema as any,
           Object.keys(parsedInputs).length > 0 ? parsedInputs : undefined
         );
       }
@@ -80,11 +115,11 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
       }
 
       // Initialize input values from schema or test case
-      if (algo.inputSchema) {
+      if (algo.input_schema) {
         const initialValues: Record<string, string> = {};
-        algo.inputSchema.forEach((field, index) => {
+        algo.input_schema.forEach((field, index) => {
            // Default to first test case value if available, else empty
-           const defaultVal = algo.testCases?.[0]?.input[index];
+           const defaultVal = algo.test_cases?.[0]?.input[index];
            initialValues[field.name] = defaultVal !== undefined ? JSON.stringify(defaultVal) : "";
         });
         setInputValues(initialValues);
@@ -92,7 +127,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
     } else {
       setCode(DEFAULT_CODE[language]);
     }
-  }, [algorithmId, language]);
+  }, [activeAlgorithm, language, algorithmId]);
 
   const handleLanguageChange = (newLang: Language) => {
     setLanguage(newLang);
@@ -100,8 +135,8 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   };
 
   const handleReset = () => {
-    if (algorithmId && algorithmsDB[algorithmId]) {
-      const algo = algorithmsDB[algorithmId];
+    if (activeAlgorithm) {
+      const algo = activeAlgorithm;
       const impl = algo.implementations.find(i => i.lang.toLowerCase() === language.toLowerCase());
       const algoCode = impl?.code.find(c => c.codeType === 'starter')?.code || impl?.code.find(c => c.codeType === 'optimize')?.code;
       setCode(algoCode || DEFAULT_CODE[language]);
@@ -138,7 +173,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   }, [isFullscreen, onToggleFullscreen]);
 
   // Get algorithm metadata for complexity display
-  const algorithmMeta = algorithmId ? algorithmsDB[algorithmId] : null;
+  const algorithmMeta = activeAlgorithm;
 
   const formatValueForLanguage = (value: string, type: string, lang: Language): string => {
     if (type === 'number' || type === 'boolean') {
@@ -183,14 +218,14 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
     try {
       const startTime = performance.now();
       
-      const algo = algorithmId ? algorithmsDB[algorithmId] : null;
+      const algo = activeAlgorithm;
       let fullCode = code;
 
-      if (algo && algo.testCases && algo.testCases.length > 0) {
+      if (algo && algo.test_cases && algo.test_cases.length > 0) {
         // Use the new test runner generator with predefined test cases
         const { generateTestRunner } = await import('@/utils/testRunnerGenerator');
         // Map testCases from AlgorithmDB format to expected format
-        const mappedTestCases = algo.testCases.map((tc: any) => ({
+        const mappedTestCases = algo.test_cases.map((tc: any) => ({
           input: tc.input,
           expectedOutput: tc.expectedOutput || tc.output,
           description: tc.description
@@ -199,7 +234,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
           code,
           language,
           mappedTestCases,
-          algo.inputSchema || []
+          algo.input_schema || []
         );
       } else {
         // No test cases available, just run the code as-is
@@ -317,13 +352,13 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   };
 
   const renderInputForm = () => {
-    if (!algorithmId || !algorithmsDB[algorithmId]?.inputSchema) return null;
+    if (!activeAlgorithm?.input_schema) return null;
 
     return (
       <div className="p-4 grid gap-4 bg-muted/20 border-b">
         <h4 className="text-xs font-medium text-muted-foreground mb-2">Test Inputs</h4>
         <div className="grid grid-cols-2 gap-4">
-          {algorithmsDB[algorithmId].inputSchema!.map((field) => (
+          {activeAlgorithm.input_schema!.map((field: any) => (
             <div key={field.name} className="space-y-1">
               <Label htmlFor={field.name} className="text-[10px] uppercase tracking-wider">{field.label || field.name}</Label>
               <Input 
@@ -413,6 +448,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
         <ResizableHandle withHandle />
         
         <ResizablePanel defaultSize={50} minSize={20}>
+           <ScrollArea className="h-full">
           <div className="h-full flex flex-col">
              {renderInputForm()}
              <div className="flex-1 overflow-hidden">
@@ -421,8 +457,8 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                   loading={isLoading} 
                   stdin="" // Not used anymore
                   onStdinChange={() => {}} // Not used anymore
-                  testCases={algorithmId && algorithmsDB[algorithmId]?.testCases ? 
-                    algorithmsDB[algorithmId].testCases.map((tc: any) => ({
+                  testCases={activeAlgorithm?.test_cases ? 
+                    activeAlgorithm.test_cases.map((tc: any) => ({
                       input: Array.isArray(tc.input) ? tc.input : [tc.input],
                       output: tc.expectedOutput || tc.output
                     })) : undefined
@@ -433,6 +469,8 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                 />
              </div>
           </div>
+
+         </ScrollArea>
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>
