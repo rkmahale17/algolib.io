@@ -46,7 +46,7 @@ Deno.serve(async (req) => {
     // Create Supabase client with service role key
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    
+
     if (!supabaseUrl || !supabaseServiceKey) {
       throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
     }
@@ -59,9 +59,9 @@ Deno.serve(async (req) => {
     if (!algorithms || !Array.isArray(algorithms)) {
       return new Response(
         JSON.stringify({ error: 'Invalid request body. Expected { algorithms: AlgorithmData[] }' }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       );
     }
@@ -94,6 +94,7 @@ Deno.serve(async (req) => {
             test_cases: algo.testCases,
             input_schema: algo.inputSchema,
             tutorials: algo.tutorials,
+            list_type: algo.listType,
             metadata: {
               likes: algo.likes,
               dislikes: algo.dislikes,
@@ -101,7 +102,7 @@ Deno.serve(async (req) => {
               commonNotes: algo.commonNotes,
               commonWhiteBoard: algo.commonWhiteBoard,
               companyTags: algo.companyTags,
-              listType: algo.listType,
+
               overview: algo.overview,
               timeComplexity: algo.timeComplexity,
               spaceComplexity: algo.spaceComplexity,
@@ -135,8 +136,8 @@ Deno.serve(async (req) => {
         message: 'Seed process completed',
         results,
       }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     );
 
@@ -144,9 +145,9 @@ Deno.serve(async (req) => {
     console.error('Error in seed-algorithms function:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     );
   }

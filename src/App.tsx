@@ -25,9 +25,9 @@ import TwoPointer from "./pages/TwoPointer";
 import Leaderboard from "./pages/Leaderboard";
 import Navbar from "./components/Navbar";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import SeedDatabase from "./pages/SeedDatabase";
+import AdminAlgorithms from "./pages/AdminAlgorithms";
 
 const queryClient = new QueryClient();
 
@@ -58,9 +58,9 @@ const App = () => (
           <Route path="/games/sliding-window" element={<ProtectedRoute><SlidingWindow /></ProtectedRoute>} />
           <Route path="/games/two-pointer" element={<ProtectedRoute><TwoPointer /></ProtectedRoute>} />
           <Route path="/games/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
-          <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/admin/seed" element={<SeedDatabase />} />
+          <Route path="/admin/algorithms" element={<AdminAlgorithms />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

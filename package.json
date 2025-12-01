@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "generate-sitemap": "tsx generate-sitemap.ts",
-    "verify-ssg": "tsx verify-ssg.ts"
+    "verify-ssg": "tsx verify-ssg.ts",
+    "seed": "tsx scripts/seedSupabase.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

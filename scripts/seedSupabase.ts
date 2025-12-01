@@ -1,4 +1,3 @@
-
 import { createClient } from '@supabase/supabase-js';
 import { algorithmsDB } from '../src/data/algorithmsDB';
 import * as dotenv from 'dotenv';
@@ -10,6 +9,8 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseServiceKey) {
     console.error('Missing VITE_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY environment variables.');
+    console.error('Please set SUPABASE_SERVICE_ROLE_KEY in your .env file.');
+    console.error('You can find it in your Supabase project settings under API > service_role key');
     process.exit(1);
 }
 
@@ -31,7 +32,7 @@ async function seedAlgorithms() {
                 name: algo.name,
                 category: algo.category,
                 difficulty: algo.difficulty,
-                description: algo.explanation.problemStatement, // Mapping problemStatement to description
+                description: algo.explanation.problemStatement,
                 explanation: algo.explanation,
                 implementations: algo.implementations,
                 problems_to_solve: algo.problemsToSolve,
