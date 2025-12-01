@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import AlgorithmDetail from "./pages/AlgorithmDetail";
+import AlgorithmDetailNew from "./pages/AlgorithmDetailNew";
 import Blind75 from "./pages/Blind75";
 import Blind75Detail from "./pages/Blind75Detail";
 import Auth from "./pages/Auth";
@@ -39,6 +40,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/algorithm/:id" element={<AlgorithmDetail />} />
+          <Route path="/algorithm-new/:id" element={<AlgorithmDetailNew />} />
           <Route path="/blind75" element={<ProtectedRoute><Blind75 /></ProtectedRoute>} />
           <Route path="/blind75/:slug" element={<ProtectedRoute><Blind75Detail /></ProtectedRoute>} />
           <Route path="/auth" element={<Auth />} />

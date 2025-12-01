@@ -8,18 +8,28 @@ WORKDIR /usr
 COPY package*.json ./
 COPY src ./src
 COPY public ./public
-ADD  . .
+COPY index.html ./
+COPY vite.config.ts ./
+COPY tsconfig*.json ./
+COPY generate-sitemap.ts ./
+COPY verify-ssg.ts ./
+COPY tailwind.config.ts ./
+COPY postcss.config.js ./
+COPY eslint.config.js ./
+
 RUN npm install
 RUN npm run build
-RUN cd /usr/dist && find . -type f -exec brotli {} \;
+# RUN cd /usr/dist && find . -type f -exec brotli {} \; # Optional: Compress if serving static directly, but express static handles gzip usually. keeping simple for now.
 
 # Actual runtime container
-FROM alpine
-RUN apk add brotli nginx nginx-mod-http-brotli
+FROM node:18-alpine
+WORKDIR /app
 
-# Minimal config
-COPY nginx/nginx.conf /etc/nginx/http.d/default.conf
-# Actual data
-COPY --from=builder /usr/dist /usr/share/nginx/html
-CMD ["nginx", "-g", "daemon off;"]
-EXPOSE 8080
+COPY package*.json ./
+RUN npm install --production
+
+COPY --from=builder /usr/dist ./dist
+COPY server.js ./
+
+EXPOSE 3000
+CMD ["node", "server.js"]

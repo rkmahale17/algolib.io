@@ -7,6 +7,7 @@ import {
   Code2,
   ExternalLink,
   Eye,
+  EyeOff,
   Lightbulb,
   Palette,
   Youtube,
@@ -32,6 +33,7 @@ import { algorithms } from "@/data/algorithms";
 import { getAlgorithmImplementation } from "@/data/algorithmImplementations";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { CodeRunner } from "@/components/CodeRunner/CodeRunner";
 
 const AlgorithmDetail: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
@@ -43,6 +45,15 @@ const AlgorithmDetail: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const [isCompleted, setIsCompleted] = useState(false);
   const [isLoadingProgress, setIsLoadingProgress] = useState(true);
+  
+  // Hide code state with localStorage persistence
+  const [isCodeHidden, setIsCodeHidden] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('implementationCodeHidden');
+      return saved === 'true';
+    }
+    return false;
+  });
 
   // Check authentication and load progress
   useEffect(() => {
@@ -1304,10 +1315,34 @@ const AlgorithmDetail: React.FC = () => {
             {/* 2. Code Implementation */}
             <Card className="p-4 sm:p-6 glass-card  overflow-hidden  mx-auto">
               <div className="space-y-4 ">
-                <h3 className="font-semibold flex items-center gap-2">
-                  <Code2 className="w-5 h-5 text-primary" />
-                  Implementation
-                </h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold flex items-center gap-2">
+                    <Code2 className="w-5 h-5 text-primary" />
+                    Implementation
+                  </h3>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const newValue = !isCodeHidden;
+                      setIsCodeHidden(newValue);
+                      localStorage.setItem('implementationCodeHidden', String(newValue));
+                    }}
+                    title={isCodeHidden ? "Show code" : "Hide code"}
+                  >
+                    {isCodeHidden ? (
+                      <>
+                        <Eye className="w-4 h-4 mr-2" />
+                        Show Code
+                      </>
+                    ) : (
+                      <>
+                        <EyeOff className="w-4 h-4 mr-2" />
+                        Hide Code
+                      </>
+                    )}
+                  </Button>
+                </div>
 
                 <Tabs
                   defaultValue={localStorage.getItem("preferredLanguage") || "python"}
@@ -1338,6 +1373,14 @@ const AlgorithmDetail: React.FC = () => {
                           <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
                             <code className="block">{implementation.code.typescript}</code>
                           </pre>
+                          {/* Transparency overlay when code is hidden */}
+                          {isCodeHidden && (
+                            <div className="absolute inset-0 bg-background/70 backdrop-blur-sm flex items-center justify-center rounded-lg">
+                              <div className="text-muted-foreground text-sm font-medium">
+                                Code Hidden
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </TabsContent>
 
@@ -1347,6 +1390,14 @@ const AlgorithmDetail: React.FC = () => {
                           <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
                             <code className="block">{implementation.code.python}</code>
                           </pre>
+                          {/* Transparency overlay when code is hidden */}
+                          {isCodeHidden && (
+                            <div className="absolute inset-0 bg-background/70 backdrop-blur-sm flex items-center justify-center rounded-lg">
+                              <div className="text-muted-foreground text-sm font-medium">
+                                Code Hidden
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </TabsContent>
 
@@ -1356,6 +1407,14 @@ const AlgorithmDetail: React.FC = () => {
                           <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
                             <code className="block">{implementation.code.cpp}</code>
                           </pre>
+                          {/* Transparency overlay when code is hidden */}
+                          {isCodeHidden && (
+                            <div className="absolute inset-0 bg-background/70 backdrop-blur-sm flex items-center justify-center rounded-lg">
+                              <div className="text-muted-foreground text-sm font-medium">
+                                Code Hidden
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </TabsContent>
 
@@ -1365,6 +1424,14 @@ const AlgorithmDetail: React.FC = () => {
                           <pre className="code-block overflow-x-auto whitespace-pre text-xs sm:text-sm max-w-full block">
                             <code className="block">{implementation.code.java}</code>
                           </pre>
+                          {/* Transparency overlay when code is hidden */}
+                          {isCodeHidden && (
+                            <div className="absolute inset-0 bg-background/70 backdrop-blur-sm flex items-center justify-center rounded-lg">
+                              <div className="text-muted-foreground text-sm font-medium">
+                                Code Hidden
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </TabsContent>
                     </>
@@ -1447,6 +1514,15 @@ const AlgorithmDetail: React.FC = () => {
                 </Tabs>
               </Card>
             )}
+
+            {/* 4.5 Code Runner */}
+            <div className="max-w-5xl mx-auto">
+               <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                  <Code2 className="w-5 h-5 text-primary" />
+                  Interactive Code Runner
+               </h3>
+               <CodeRunner algorithmId={algorithm.id} />
+            </div>
 
             {/* 5. YouTube Video Player with Explanations (if available) */}
             {algorithm.youtubeUrl && (
