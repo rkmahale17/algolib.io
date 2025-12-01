@@ -43,7 +43,7 @@ export interface AlgorithmDB {
     external: { type: string; url: string; title: string }[];
   };
   imageUrls: { name: string; alt: string; url: string; size: string }[];
-  testCases: { input: any; output: any; complexityExpected: { space: string; time: string }, description: string }[];
+  testCases: { input: any; output?: any; expectedOutput?: any; complexityExpected?: { space: string; time: string }, description?: string }[];
   inputSchema: { name: string; type: string; label?: string }[];
   availableLanguages: string;
   editorialId: string;

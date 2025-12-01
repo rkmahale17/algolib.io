@@ -25,7 +25,7 @@ import {
 import { Link, useNavigate, useParams } from "react-router-dom";
 import React, { useEffect, useState, useRef } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle, ImperativePanelHandle } from "@/components/ui/resizable";
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -63,8 +63,8 @@ const AlgorithmDetailNew: React.FC = () => {
   const [isVisualizationMaximized, setIsVisualizationMaximized] = useState(false);
   const [isBrainstormMaximized, setIsBrainstormMaximized] = useState(false);
   
-  const leftPanelRef = useRef<ImperativePanelHandle>(null);
-  const rightPanelRef = useRef<ImperativePanelHandle>(null);
+  const leftPanelRef = useRef<any>(null);
+  const rightPanelRef = useRef<any>(null);
 
   const [selectedLanguage, setSelectedLanguage] = useState(
     localStorage.getItem('preferredLanguage') || 'typescript'
@@ -623,7 +623,7 @@ const AlgorithmDetailNew: React.FC = () => {
                           >
                             <div className="flex-1">
                               <p className="text-sm font-medium">{problem.title}</p>
-                              <p className="text-xs text-muted-foreground mt-1 capitalize">{problem.difficulty}</p>
+                              <p className="text-xs text-muted-foreground mt-1 capitalize">{problem.type}</p>
                             </div>
                             <ExternalLink className="w-4 h-4 text-muted-foreground" />
                           </a>

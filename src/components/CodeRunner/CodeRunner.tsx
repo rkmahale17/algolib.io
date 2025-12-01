@@ -68,7 +68,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
         algoCode = generateStub(
           language,
           functionName,
-          algo.inputSchema,
+          algo.inputSchema as any,
           Object.keys(parsedInputs).length > 0 ? parsedInputs : undefined
         );
       }
@@ -189,10 +189,16 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
       if (algo && algo.testCases && algo.testCases.length > 0) {
         // Use the new test runner generator with predefined test cases
         const { generateTestRunner } = await import('@/utils/testRunnerGenerator');
+        // Map testCases from AlgorithmDB format to expected format
+        const mappedTestCases = algo.testCases.map((tc: any) => ({
+          input: tc.input,
+          expectedOutput: tc.expectedOutput || tc.output,
+          description: tc.description
+        }));
         fullCode = generateTestRunner(
           code,
           language,
-          algo.testCases,
+          mappedTestCases,
           algo.inputSchema || []
         );
       } else {
@@ -410,14 +416,19 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
           <div className="h-full flex flex-col">
              {renderInputForm()}
              <div className="flex-1 overflow-hidden">
-                <OutputPanel 
+                 <OutputPanel 
                   output={output} 
                   loading={isLoading} 
                   stdin="" // Not used anymore
                   onStdinChange={() => {}} // Not used anymore
-                  testCases={algorithmId ? algorithmsDB[algorithmId]?.testCases : undefined}
+                  testCases={algorithmId && algorithmsDB[algorithmId]?.testCases ? 
+                    algorithmsDB[algorithmId].testCases.map((tc: any) => ({
+                      input: Array.isArray(tc.input) ? tc.input : [tc.input],
+                      output: tc.expectedOutput || tc.output
+                    })) : undefined
+                  }
                   executionTime={executionTime}
-                  algorithmMeta={algorithmMeta}
+                  algorithmMeta={algorithmMeta as any}
                   onAddCustomTestCase={handleAddCustomTestCase}
                 />
              </div>
