@@ -65,45 +65,54 @@ export type Database = {
       algorithms: {
         Row: {
           category: string
-          created_at: string
+          created_at: string | null
           description: string
           difficulty: string
-          id: number
+          explanation: Json
+          id: string
+          implementations: Json
+          input_schema: Json | null
+          metadata: Json | null
           name: string
-          problems: Json | null
-          slug: string
-          space_complexity: string
-          time_complexity: string
-          updated_at: string
-          youtube_url: string | null
+          problems_to_solve: Json | null
+          test_cases: Json | null
+          title: string
+          tutorials: Json | null
+          updated_at: string | null
         }
         Insert: {
           category: string
-          created_at?: string
+          created_at?: string | null
           description: string
           difficulty: string
-          id?: number
+          explanation?: Json
+          id: string
+          implementations?: Json
+          input_schema?: Json | null
+          metadata?: Json | null
           name: string
-          problems?: Json | null
-          slug: string
-          space_complexity: string
-          time_complexity: string
-          updated_at?: string
-          youtube_url?: string | null
+          problems_to_solve?: Json | null
+          test_cases?: Json | null
+          title: string
+          tutorials?: Json | null
+          updated_at?: string | null
         }
         Update: {
           category?: string
-          created_at?: string
+          created_at?: string | null
           description?: string
           difficulty?: string
-          id?: number
+          explanation?: Json
+          id?: string
+          implementations?: Json
+          input_schema?: Json | null
+          metadata?: Json | null
           name?: string
-          problems?: Json | null
-          slug?: string
-          space_complexity?: string
-          time_complexity?: string
-          updated_at?: string
-          youtube_url?: string | null
+          problems_to_solve?: Json | null
+          test_cases?: Json | null
+          title?: string
+          tutorials?: Json | null
+          updated_at?: string | null
         }
         Relationships: []
       }
