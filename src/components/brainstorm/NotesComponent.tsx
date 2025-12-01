@@ -123,7 +123,7 @@ export const NotesComponent = ({ algorithmId, algorithmTitle, restoreData }: Not
 
     const autoSaveTimer = setTimeout(() => {
       saveMutation.mutate();
-    }, 5000); // Auto-save after 5 seconds of inactivity
+    }, 500000); // Auto-save after 5 seconds of inactivity
 
     return () => clearTimeout(autoSaveTimer);
   }, [notes, title, latestNote]);
@@ -192,7 +192,7 @@ export const NotesComponent = ({ algorithmId, algorithmTitle, restoreData }: Not
       {/* Footer */}
       <div className="px-4 pb-3">
         <p className="text-xs text-muted-foreground">
-          Auto-saves after 5 seconds of inactivity. Supports Markdown formatting.
+          Auto-saves after 5 minutes of inactivity. Supports Markdown formatting.
         </p>
       </div>
     </div>

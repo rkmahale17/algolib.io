@@ -44,6 +44,7 @@ import { getAlgorithmImplementation } from "@/data/algorithmImplementations";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CodeRunner } from "@/components/CodeRunner/CodeRunner";
+import { ShareButton } from "@/components/ShareButton";
 
 const AlgorithmDetailNew: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
@@ -353,10 +354,9 @@ const AlgorithmDetailNew: React.FC = () => {
       </div>
 
       {/* Left Content */}
-      <ScrollArea className="flex-1">
-        <div className="p-6 space-y-6">
-          <Tabs defaultValue="description" className="w-full">
-            <TabsList className="w-full grid grid-cols-3 mb-6 p-0 bg-transparent gap-0 border-b rounded-none">
+      <Tabs defaultValue="description" className="flex-1 flex flex-col overflow-hidden w-full pt-0 mt-0">
+        <div className="px-4  shrink-0">
+            <TabsList className="w-full grid grid-cols-3 p-0 bg-transparent gap-0 border-b rounded-none">
               <TabsTrigger 
                 value="description" 
                 className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
@@ -379,319 +379,356 @@ const AlgorithmDetailNew: React.FC = () => {
                 Solutions
               </TabsTrigger>
             </TabsList>
+        </div>
 
-            <TabsContent value="description" className="space-y-6 m-0">
-              {/* Title & Progress */}
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h1 className="text-3xl font-bold mb-2">{algorithm.name}</h1>
-                  {implementation?.explanation.problemStatement && (
-                    <p className="text-muted-foreground text-lg leading-relaxed">
-                      {implementation.explanation.problemStatement}
-                    </p>
-                  )}
-                </div>
-                <div className="shrink-0">
-                  {isCompleted ? (
-                    <Badge 
-                      variant="outline" 
-                      className="bg-green-500/10 text-green-500 border-green-500/20 px-3 py-1.5 cursor-pointer hover:bg-green-500/20 transition-colors"
-                      onClick={toggleCompletion}
-                    >
-                      <CheckCircle2 className="w-4 h-4 mr-2" />
-                      Attempted
-                    </Badge>
-                  ) : (
-                    <div className="flex items-center gap-2 border rounded-full px-3 py-1.5 hover:bg-muted/50 transition-colors cursor-pointer" onClick={toggleCompletion}>
-                      <Checkbox checked={false} className="rounded-full" />
-                      <span className="text-sm font-medium">Mark Complete</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Algorithm Overview Card (Reused from AlgorithmDetail) */}
-              <Card className="p-4 sm:p-6 glass-card overflow-hidden">
-                <div className="space-y-4">
-                  <h3 className="font-semibold flex items-center gap-2">
-                    <BookOpen className="w-5 h-5 text-primary" />
-                    Algorithm Overview
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {implementation?.explanation.overview || algorithm.description}
-                  </p>
-
-                  <Separator />
-
-                  <div className="grid grid-cols-2 gap-4">
+        <div className="flex-1 overflow-hidden relative">
+            <TabsContent value="description" className="h-full m-0 data-[state=inactive]:hidden">
+              <ScrollArea className="h-full">
+                <div className="p-4 space-y-6">
+                  {/* Title & Progress */}
+                  <div className="flex items-start justify-between gap-4">
                     <div>
-                      <p className="text-sm font-medium mb-1">Time Complexity</p>
-                      <Badge variant="outline" className="font-mono">
-                        {algorithm.timeComplexity}
-                      </Badge>
+                      <h1 className="text-2xl font-bold mb-2">{algorithm.name}</h1>
+                      {implementation?.explanation.problemStatement && (
+                        <p className="text-muted-foreground text-base leading-relaxed">
+                          {implementation.explanation.problemStatement}
+                        </p>
+                      )}
                     </div>
-                    <div>
-                      <p className="text-sm font-medium mb-1">Space Complexity</p>
-                      <Badge variant="outline" className="font-mono">
-                        {algorithm.spaceComplexity}
-                      </Badge>
+                    <div className="shrink-0">
+                      {isCompleted ? (
+                        <Badge 
+                          variant="outline" 
+                          className="bg-green-500/10 text-green-500 border-green-500/20 px-3 py-1.5 cursor-pointer hover:bg-green-500/20 transition-colors"
+                          onClick={toggleCompletion}
+                        >
+                          <CheckCircle2 className="w-4 h-4 mr-2" />
+                          Attempted
+                        </Badge>
+                      ) : (
+                        <div className="flex items-center gap-2 border rounded-full px-3 py-1.5 hover:bg-muted/50 transition-colors cursor-pointer" onClick={toggleCompletion}>
+                          <Checkbox checked={false} className="rounded-full" />
+                          <span className="text-sm font-medium">Mark Complete</span>
+                        </div>
+                      )}
                     </div>
                   </div>
-                </div>
-              </Card>
 
-              {/* Steps, Use Cases & Tips Card (Reused from AlgorithmDetail) */}
-              {implementation && (
-                <Card className="p-4 sm:p-6 glass-card overflow-hidden">
-                  <Tabs defaultValue="steps">
-                    <TabsList className="grid w-full grid-cols-3 h-auto">
-                      <TabsTrigger value="steps" className="text-xs sm:text-sm">
-                        Steps
-                      </TabsTrigger>
-                      <TabsTrigger value="usecase" className="text-xs sm:text-sm">
-                        Use Cases
-                      </TabsTrigger>
-                      <TabsTrigger value="tips" className="text-xs sm:text-sm">
-                        Pro Tips
-                      </TabsTrigger>
-                    </TabsList>
+                  {/* Algorithm Overview Card (Reused from AlgorithmDetail) */}
+                  <Card className="p-4 sm:p-6 glass-card overflow-hidden">
+                    <div className="space-y-4">
+                      <h3 className="font-semibold flex items-center gap-2">
+                        <BookOpen className="w-5 h-5 text-primary" />
+                        Algorithm Overview
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        {implementation?.explanation.overview || algorithm.description}
+                      </p>
 
-                    <TabsContent value="steps" className="mt-4">
-                      <ol className="space-y-2 list-decimal list-inside">
-                        {implementation.explanation.steps.map((step, i) => (
-                          <li key={i} className="text-sm text-muted-foreground">
-                            {step}
-                          </li>
-                        ))}
-                      </ol>
-                    </TabsContent>
+                      <Separator />
 
-                    <TabsContent value="usecase" className="mt-4">
-                      <p className="text-sm text-muted-foreground">{implementation.explanation.useCase}</p>
-                    </TabsContent>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-sm font-medium mb-1">Time Complexity</p>
+                          <Badge variant="outline" className="font-mono">
+                            {algorithm.timeComplexity}
+                          </Badge>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium mb-1">Space Complexity</p>
+                          <Badge variant="outline" className="font-mono">
+                            {algorithm.spaceComplexity}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
 
-                    <TabsContent value="tips" className="mt-4">
-                      <ul className="space-y-2 list-disc list-inside">
-                        {implementation.explanation.tips.map((tip, i) => (
-                          <li key={i} className="text-sm text-muted-foreground">
-                            {tip}
-                          </li>
-                        ))}
-                      </ul>
-                    </TabsContent>
-                  </Tabs>
-                </Card>
-              )}
+                  {/* Steps, Use Cases & Tips Card (Reused from AlgorithmDetail) */}
+                  {implementation && (
+                    <Card className="p-4 sm:p-6 glass-card overflow-hidden">
+                      <Tabs defaultValue="steps">
+                        <TabsList className="grid w-full grid-cols-3 h-auto">
+                          <TabsTrigger value="steps" className="text-xs sm:text-sm">
+                            Steps
+                          </TabsTrigger>
+                          <TabsTrigger value="usecase" className="text-xs sm:text-sm">
+                            Use Cases
+                          </TabsTrigger>
+                          <TabsTrigger value="tips" className="text-xs sm:text-sm">
+                            Pro Tips
+                          </TabsTrigger>
+                        </TabsList>
 
-              {/* Video Tutorial Card (Reused from AlgorithmDetail) */}
-              {algorithm.youtubeUrl && (
-               <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-5xl mx-auto">
-                             <div className="space-y-6">
-                               {/* Video Section */}
-                               <div className="space-y-4">
-                                 <div className="flex items-center gap-2">
-                                   <Youtube className="w-5 h-5 text-red-500" />
-                                   <h3 className="font-semibold">Video Tutorial</h3>
-                                 </div>
-             
-                                 {/* Responsive YouTube Player */}
-                                 <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-                                   <iframe
-                                     className="absolute top-0 left-0 w-full h-full rounded-lg"
-                                     src={`https://www.youtube.com/embed/${
-                                       algorithm.youtubeUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)?.[1] ||
-                                       algorithm.youtubeUrl
-                                     }`}
-                                     title={`${algorithm.name} Tutorial`}
-                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                     allowFullScreen
-                                   />
-                                 </div>
-             
-                                 {/* What the video teaches */}
-                                 <div className="space-y-2">
-                                   <h4 className="text-lg font-semibold">What This Video Teaches</h4>
-                                   <p className="text-sm text-muted-foreground leading-relaxed">
-                                     This tutorial provides a comprehensive walkthrough of the {algorithm.name} algorithm,
-                                     demonstrating its practical application through step-by-step code implementation. The video
-                                     breaks down complex concepts into digestible segments, making it easier to understand how the
-                                     algorithm works under the hood and when to apply it in real-world scenarios.
-                                   </p>
-                                 </div>
-             
-                                 {/* Credits */}
-                                 <div className="pt-2 border-t border-border/50">
-                                   <p className="text-xs text-muted-foreground">
-                                     <strong>Credits:</strong> Video tutorial by NeetCode (used with permission). All written
-                                     explanations, code examples, and additional insights provided by Algolib.io.
-                                   </p>
-                                 </div>
-                               </div>
-             
-                               <Separator />
-             
-                               {/* Code example explanation */}
-                               {implementation && (
-                                 <div className="space-y-3">
-                                   <h3 className="text-xl font-semibold flex items-center gap-2">
-                                     <Code2 className="w-5 h-5 text-primary" />
-                                     Code Example & Logic
-                                   </h3>
-                                   <p className="text-sm text-muted-foreground leading-relaxed">
-                                     {implementation.explanation.overview ||
-                                       `The implementation of ${algorithm.name} follows a systematic approach that ensures optimal performance. 
-                                       Each step in the algorithm is carefully designed to handle specific cases while maintaining efficiency.`}
-                                   </p>
-                                   {implementation.explanation.steps && implementation.explanation.steps.length > 0 && (
-                                     <div className="mt-4">
-                                       <h4 className="font-medium mb-2">Key Steps:</h4>
-                                       <ol className="space-y-2 list-decimal list-inside text-sm text-muted-foreground">
-                                         {implementation.explanation.steps.slice(0, 4).map((step, i) => (
-                                           <li key={i}>{step}</li>
-                                         ))}
-                                       </ol>
+                        <TabsContent value="steps" className="mt-4">
+                          <ol className="space-y-2 list-decimal list-inside">
+                            {implementation.explanation.steps.map((step, i) => (
+                              <li key={i} className="text-sm text-muted-foreground">
+                                {step}
+                              </li>
+                            ))}
+                          </ol>
+                        </TabsContent>
+
+                        <TabsContent value="usecase" className="mt-4">
+                          <p className="text-sm text-muted-foreground">{implementation.explanation.useCase}</p>
+                        </TabsContent>
+
+                        <TabsContent value="tips" className="mt-4">
+                          <ul className="space-y-2 list-disc list-inside">
+                            {implementation.explanation.tips.map((tip, i) => (
+                              <li key={i} className="text-sm text-muted-foreground">
+                                {tip}
+                              </li>
+                            ))}
+                          </ul>
+                        </TabsContent>
+                      </Tabs>
+                    </Card>
+                  )}
+
+                  {/* Video Tutorial Card (Reused from AlgorithmDetail) */}
+                  {algorithm.youtubeUrl && (
+                   <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-5xl mx-auto">
+                                 <div className="space-y-6">
+                                   {/* Video Section */}
+                                   <div className="space-y-4">
+                                     <div className="flex items-center gap-2">
+                                       <Youtube className="w-5 h-5 text-red-500" />
+                                       <h3 className="font-semibold">Video Tutorial</h3>
+                                     </div>
+                 
+                                     {/* Responsive YouTube Player */}
+                                     <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+                                       <iframe
+                                         className="absolute top-0 left-0 w-full h-full rounded-lg"
+                                         src={`https://www.youtube.com/embed/${
+                                           algorithm.youtubeUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)?.[1] ||
+                                           algorithm.youtubeUrl
+                                         }`}
+                                         title={`${algorithm.name} Tutorial`}
+                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                         allowFullScreen
+                                       />
+                                     </div>
+                 
+                                     {/* What the video teaches */}
+                                     <div className="space-y-2">
+                                       <h4 className="text-lg font-semibold">What This Video Teaches</h4>
+                                       <p className="text-sm text-muted-foreground leading-relaxed">
+                                         This tutorial provides a comprehensive walkthrough of the {algorithm.name} algorithm,
+                                         demonstrating its practical application through step-by-step code implementation. The video
+                                         breaks down complex concepts into digestible segments, making it easier to understand how the
+                                         algorithm works under the hood and when to apply it in real-world scenarios.
+                                       </p>
+                                     </div>
+                 
+                                     {/* Credits */}
+                                     <div className="pt-2 border-t border-border/50">
+                                       <p className="text-xs text-muted-foreground">
+                                         <strong>Credits:</strong> Video tutorial by NeetCode (used with permission). All written
+                                         explanations, code examples, and additional insights provided by Algolib.io.
+                                       </p>
+                                     </div>
+                                   </div>
+                 
+                                   <Separator />
+                 
+                                   {/* Code example explanation */}
+                                   {implementation && (
+                                     <div className="space-y-3">
+                                       <h3 className="text-xl font-semibold flex items-center gap-2">
+                                         <Code2 className="w-5 h-5 text-primary" />
+                                         Code Example & Logic
+                                       </h3>
+                                       <p className="text-sm text-muted-foreground leading-relaxed">
+                                         {implementation.explanation.overview ||
+                                           `The implementation of ${algorithm.name} follows a systematic approach that ensures optimal performance. 
+                                           Each step in the algorithm is carefully designed to handle specific cases while maintaining efficiency.`}
+                                       </p>
+                                       {implementation.explanation.steps && implementation.explanation.steps.length > 0 && (
+                                         <div className="mt-4">
+                                           <h4 className="font-medium mb-2">Key Steps:</h4>
+                                           <ol className="space-y-2 list-decimal list-inside text-sm text-muted-foreground">
+                                             {implementation.explanation.steps.slice(0, 4).map((step, i) => (
+                                               <li key={i}>{step}</li>
+                                             ))}
+                                           </ol>
+                                         </div>
+                                       )}
                                      </div>
                                    )}
-                                 </div>
-                               )}
-             
-                               <Separator />
-             
-                               {/* Complexity Analysis */}
-                               <div className="space-y-3">
-                                 <h3 className="text-xl font-semibold flex items-center gap-2">
-                                   <Clock className="w-5 h-5 text-primary" />
-                                   Time & Space Complexity
-                                 </h3>
-                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                   <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
-                                     <div className="text-xs font-medium text-muted-foreground mb-1">Time Complexity</div>
-                                     <div className="text-lg font-mono font-semibold text-foreground">
-                                       {algorithm.timeComplexity}
-                                     </div>
-                                   </div>
-                                   <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
-                                     <div className="text-xs font-medium text-muted-foreground mb-1">Space Complexity</div>
-                                     <div className="text-lg font-mono font-semibold text-foreground">
-                                       {algorithm.spaceComplexity}
-                                     </div>
-                                   </div>
-                                 </div>
-                               </div>
-             
-                               {/* Additional Insights */}
-                               {implementation?.explanation.tips && implementation.explanation.tips.length > 0 && (
-                                 <>
+                 
                                    <Separator />
+                 
+                                   {/* Complexity Analysis */}
                                    <div className="space-y-3">
                                      <h3 className="text-xl font-semibold flex items-center gap-2">
-                                       <Lightbulb className="w-5 h-5 text-primary" />
-                                       Additional Insights & Improvements
+                                       <Clock className="w-5 h-5 text-primary" />
+                                       Time & Space Complexity
                                      </h3>
-                                     <ul className="space-y-2 list-disc list-inside text-sm text-muted-foreground">
-                                       {implementation.explanation.tips.map((tip, i) => (
-                                         <li key={i}>{tip}</li>
-                                       ))}
-                                     </ul>
+                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                       <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
+                                         <div className="text-xs font-medium text-muted-foreground mb-1">Time Complexity</div>
+                                         <div className="text-lg font-mono font-semibold text-foreground">
+                                           {algorithm.timeComplexity}
+                                         </div>
+                                       </div>
+                                       <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
+                                         <div className="text-xs font-medium text-muted-foreground mb-1">Space Complexity</div>
+                                         <div className="text-lg font-mono font-semibold text-foreground">
+                                           {algorithm.spaceComplexity}
+                                         </div>
+                                       </div>
+                                     </div>
                                    </div>
-                                 </>
-                               )}
-                             </div>
-                           </Card>
-              )}
+                 
+                                   {/* Additional Insights */}
+                                   {implementation?.explanation.tips && implementation.explanation.tips.length > 0 && (
+                                     <>
+                                       <Separator />
+                                       <div className="space-y-3">
+                                         <h3 className="text-xl font-semibold flex items-center gap-2">
+                                           <Lightbulb className="w-5 h-5 text-primary" />
+                                           Additional Insights & Improvements
+                                         </h3>
+                                         <ul className="space-y-2 list-disc list-inside text-sm text-muted-foreground">
+                                           {implementation.explanation.tips.map((tip, i) => (
+                                             <li key={i}>{tip}</li>
+                                           ))}
+                                         </ul>
+                                       </div>
+                                     </>
+                                   )}
+                                 </div>
+                               </Card>
+                  )}
 
-              {/* Practice Problems Card (Reused from AlgorithmDetail) */}
-              {(implementation?.practiceProblems && implementation.practiceProblems.length > 0) || (algorithm?.problems && algorithm.problems.length > 0) ? (
-                <Card className="p-4 sm:p-6 glass-card overflow-hidden">
-                  <h3 className="font-semibold mb-4">Practice Problems</h3>
-                  <div className="space-y-2">
-                    {implementation?.practiceProblems?.map((problem, i) => (
-                      <a
-                        key={i}
-                        href={problem.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
-                      >
-                        <div className="flex-1">
-                          <p className="text-sm font-medium">{problem.title}</p>
-                          <p className="text-xs text-muted-foreground mt-1 capitalize">{problem.difficulty}</p>
-                        </div>
-                        <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                      </a>
-                    )) || algorithm.problems.map((problem, i) => (
-                      <a
-                        key={i}
-                        href={problem.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
-                      >
-                        <div className="flex-1">
-                          <p className="text-sm font-medium">{problem.title}</p>
-                          <p className="text-xs text-muted-foreground mt-1 capitalize">{problem.difficulty}</p>
-                        </div>
-                        <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                      </a>
-                    ))}
-                  </div>
-                </Card>
-              ) : null}
-            </TabsContent>
-
-            <TabsContent value="visualizations" className="m-0 h-[600px] relative border rounded-lg overflow-hidden bg-muted/10">
-              <div className="absolute top-4 right-4 z-10">
-                <Button variant="secondary" size="sm" onClick={() => setIsVisualizationMaximized(true)}>
-                  <Maximize2 className="w-4 h-4 mr-2" />
-                  Fullscreen
-                </Button>
-              </div>
-              <div className="h-full overflow-auto p-6 no-scrollbar">
-                {renderVisualization()}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="solutions" className="m-0 space-y-4">
-              <div className="flex items-center justify-between mb-4">
-                <Select value={selectedLanguage} onValueChange={handleLanguageChange}>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select Language" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="python">Python</SelectItem>
-                    <SelectItem value="typescript">TypeScript</SelectItem>
-                    <SelectItem value="cpp">C++</SelectItem>
-                    <SelectItem value="java">Java</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {implementation && implementation.code[selectedLanguage as keyof typeof implementation.code] ? (
-                <div className="relative rounded-lg border bg-muted/30 overflow-hidden">
-                  <div className="absolute right-4 top-4 z-10">
-                    <CopyCodeButton code={implementation.code[selectedLanguage as keyof typeof implementation.code]} />
-                  </div>
-                  <ScrollArea className="h-[500px] w-full">
-                    <pre className="p-6 text-sm font-mono leading-relaxed">
-                      <code>{implementation.code[selectedLanguage as keyof typeof implementation.code]}</code>
-                    </pre>
-                  </ScrollArea>
+                  {/* Practice Problems Card (Reused from AlgorithmDetail) */}
+                  {(implementation?.practiceProblems && implementation.practiceProblems.length > 0) || (algorithm?.problems && algorithm.problems.length > 0) ? (
+                    <Card className="p-4 sm:p-6 glass-card overflow-hidden">
+                      <h3 className="font-semibold mb-4">Practice Problems</h3>
+                      <div className="space-y-2">
+                        {implementation?.practiceProblems?.map((problem, i) => (
+                          <a
+                            key={i}
+                            href={problem.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                          >
+                            <div className="flex-1">
+                              <p className="text-sm font-medium">{problem.title}</p>
+                              <p className="text-xs text-muted-foreground mt-1 capitalize">{problem.difficulty}</p>
+                            </div>
+                            <ExternalLink className="w-4 h-4 text-muted-foreground" />
+                          </a>
+                        )) || algorithm.problems.map((problem, i) => (
+                          <a
+                            key={i}
+                            href={problem.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                          >
+                            <div className="flex-1">
+                              <p className="text-sm font-medium">{problem.title}</p>
+                              <p className="text-xs text-muted-foreground mt-1 capitalize">{problem.difficulty}</p>
+                            </div>
+                            <ExternalLink className="w-4 h-4 text-muted-foreground" />
+                          </a>
+                        ))}
+                      </div>
+                    </Card>
+                  ) : null}
                 </div>
-              ) : (
-                <div className="text-center py-12 text-muted-foreground border rounded-lg border-dashed">
-                  No implementation available for {selectedLanguage}.
-                </div>
-              )}
+              </ScrollArea>
             </TabsContent>
-          </Tabs>
+
+            <TabsContent value="visualizations" className="h-full m-0 flex flex-col data-[state=inactive]:hidden">
+               <div className="flex-1 flex flex-col border rounded-lg overflow-hidden bg-muted/10 m-4">
+                  <div className="flex items-center justify-between px-4 py-2 border-b bg-background/50 backdrop-blur-sm shrink-0">
+                    <h3 className="text-sm font-medium flex items-center gap-2">
+                      <Eye className="w-4 h-4 text-primary" />
+                      Visualization
+                    </h3>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8" 
+                      onClick={() => setIsVisualizationMaximized(true)}
+                      title="Maximize Visualization"
+                    >
+                      <Maximize2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <div className="flex-1 overflow-auto p-6 no-scrollbar relative">
+                    {renderVisualization()}
+                  </div>
+               </div>
+            </TabsContent>
+
+            <TabsContent value="solutions" className="h-full m-0 data-[state=inactive]:hidden">
+               <ScrollArea className="h-full">
+                  <div className="p-4 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <Select value={selectedLanguage} onValueChange={handleLanguageChange}>
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Select Language" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="python">Python</SelectItem>
+                          <SelectItem value="typescript">TypeScript</SelectItem>
+                          <SelectItem value="cpp">C++</SelectItem>
+                          <SelectItem value="java">Java</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {implementation && implementation.code[selectedLanguage as keyof typeof implementation.code] ? (
+                      <div className="relative rounded-lg border bg-muted/30 overflow-hidden">
+                        <div className="absolute right-4 top-4 z-10">
+                          <CopyCodeButton code={implementation.code[selectedLanguage as keyof typeof implementation.code]} />
+                        </div>
+                        <ScrollArea className="h-[500px] w-full">
+                          <pre className="p-6 text-sm font-mono leading-relaxed">
+                            <code>{implementation.code[selectedLanguage as keyof typeof implementation.code]}</code>
+                          </pre>
+                        </ScrollArea>
+                      </div>
+                    ) : (
+                      <div className="text-center py-12 text-muted-foreground border rounded-lg border-dashed">
+                        No implementation available for {selectedLanguage}.
+                      </div>
+                    )}
+                  </div>
+               </ScrollArea>
+            </TabsContent>
         </div>
-      </ScrollArea>
+      </Tabs>
     </div>
   );
 
   const renderRightPanel = () => (
     <div className="h-full flex flex-col bg-card/30 backdrop-blur-sm">
       {/* Right Content - No Header, Tabs with Collapse Button */}
+         <div className="h-14 border-b flex items-center px-4 gap-4 shrink-0 justify-between">
+        <div className="flex items-center gap-4 overflow-hidden">
+                              <ShareButton title={algorithm.name} description={algorithm.description} />
+          
+        </div>
+         {!isMobile && (
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={toggleRightPanel} 
+                  title="Collapse Panel"
+                  className="w-[40px] h-auto rounded-none border-l border-border/50 hover:bg-primary/10 hover:text-primary"
+                >
+                  <PanelRightClose className="w-4 h-4" />
+                </Button>
+              )}
+      </div>
       <div className="flex-1 overflow-hidden p-0">
          <Tabs defaultValue="code" className="h-full flex flex-col">
             <div className="flex items-stretch border-b bg-muted/10 shrink-0">
@@ -711,53 +748,32 @@ const AlgorithmDetailNew: React.FC = () => {
                   Brainstorm
                 </TabsTrigger>
               </TabsList>
-              {!isMobile && (
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={toggleRightPanel} 
-                  title="Collapse Panel"
-                  className="w-[40px] h-auto rounded-none border-l border-border/50 hover:bg-primary/10 hover:text-primary"
-                >
-                  <PanelRightClose className="w-4 h-4" />
-                </Button>
-              )}
+           
             </div>
 
-            <TabsContent value="code" className="flex-1 m-0 overflow-hidden relative group">
-              <div className="absolute top-2 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Button 
-                  variant="secondary" 
-                  size="sm" 
-                  className="h-7 text-xs shadow-sm bg-background/80 backdrop-blur-sm hover:bg-background" 
-                  onClick={() => setIsCodeRunnerMaximized(true)}
-                >
-                  <Maximize2 className="w-3 h-3 mr-1" />
-                  Maximize
-                </Button>
-              </div>
-              {id && <CodeRunner algorithmId={id} />}
+            <TabsContent value="code" className="flex-1 m-0 overflow-hidden relative group flex flex-col data-[state=inactive]:hidden">
+              {id && (
+                <CodeRunner 
+                  algorithmId={id} 
+                  onToggleFullscreen={() => setIsCodeRunnerMaximized(true)}
+                  className="h-full border-0 rounded-none shadow-none"
+                />
+              )}
             </TabsContent>
 
-            <TabsContent value="brainstorm" className="flex-1 m-0 overflow-auto p-6 relative group">
-              <div className="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Button 
-                  variant="secondary" 
-                  size="sm" 
-                  className="h-7 text-xs shadow-sm bg-background/80 backdrop-blur-sm hover:bg-background"
-                  onClick={() => setIsBrainstormMaximized(true)}
-                >
-                  <Maximize2 className="w-3 h-3 mr-1" />
-                  Maximize
-                </Button>
-              </div>
-              {user && id ? (
-                <BrainstormSection algorithmId={id} algorithmTitle={algorithm.name} />
-              ) : (
-                <div className="text-center py-12 text-muted-foreground">
-                  Please sign in to use the brainstorm feature
+            <TabsContent value="brainstorm" className="flex-1 m-0 overflow-hidden relative group data-[state=inactive]:hidden">
+              
+              <ScrollArea className="h-full">
+                <div className="p-6">
+                  {user && id ? (
+                    <BrainstormSection algorithmId={id} algorithmTitle={algorithm.name} />
+                  ) : (
+                    <div className="text-center py-12 text-muted-foreground">
+                      Please sign in to use the brainstorm feature
+                    </div>
+                  )}
                 </div>
-              )}
+              </ScrollArea>
             </TabsContent>
           </Tabs>
       </div>
@@ -765,7 +781,7 @@ const AlgorithmDetailNew: React.FC = () => {
   );
 
   return (
-    <div className="h-screen w-full overflow-hidden flex flex-col bg-background items-center">
+    <div className="h-[calc(100vh-4rem)] w-full overflow-hidden flex flex-col bg-background items-center">
       <AlgoMetaHead id={id} />
 
       {/* Full Screen Overlays */}
@@ -782,7 +798,14 @@ const AlgorithmDetailNew: React.FC = () => {
             </Button>
           </div>
           <div className="flex-1 overflow-hidden">
-            {id && <CodeRunner algorithmId={id} />}
+            {id && (
+              <CodeRunner 
+                algorithmId={id} 
+                isMaximized={true}
+                onToggleFullscreen={() => setIsCodeRunnerMaximized(false)}
+                className="h-full border-0 rounded-none shadow-none"
+              />
+            )}
           </div>
         </div>
       )}
