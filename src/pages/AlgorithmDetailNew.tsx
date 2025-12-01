@@ -39,8 +39,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { CopyCodeButton } from "@/components/CopyCodeButton";
 import { Separator } from "@/components/ui/separator";
 import { YouTubePlayer } from "@/components/YouTubePlayer";
-import { algorithms } from "@/data/algorithms";
-import { getAlgorithmImplementation } from "@/data/algorithmImplementations";
+import { algorithmsDB } from "@/data/algorithmsDB";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CodeRunner } from "@/components/CodeRunner/CodeRunner";
@@ -49,8 +48,8 @@ import { ShareButton } from "@/components/ShareButton";
 const AlgorithmDetailNew: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
-  const algorithm = algorithms.find((a) => a.id === id);
-  const implementation = getAlgorithmImplementation(id || "");
+  const algorithm = id ? algorithmsDB[id] : undefined;
+  
   const [user, setUser] = useState<any>(null);
   const [isCompleted, setIsCompleted] = useState(false);
   const [isLoadingProgress, setIsLoadingProgress] = useState(true);
@@ -70,6 +69,11 @@ const AlgorithmDetailNew: React.FC = () => {
   const [selectedLanguage, setSelectedLanguage] = useState(
     localStorage.getItem('preferredLanguage') || 'typescript'
   );
+
+  const currentImplementation = algorithm?.implementations.find(
+    (impl) => impl.lang.toLowerCase() === selectedLanguage.toLowerCase()
+  );
+  const currentCode = currentImplementation?.code.find(c => c.codeType === 'optimize')?.code || '';
 
   // Detect mobile and window width
   useEffect(() => {
@@ -389,9 +393,9 @@ const AlgorithmDetailNew: React.FC = () => {
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <h1 className="text-2xl font-bold mb-2">{algorithm.name}</h1>
-                      {implementation?.explanation.problemStatement && (
+                      {algorithm.explanation.problemStatement && (
                         <p className="text-muted-foreground text-base leading-relaxed">
-                          {implementation.explanation.problemStatement}
+                          {algorithm.explanation.problemStatement}
                         </p>
                       )}
                     </div>
@@ -422,7 +426,7 @@ const AlgorithmDetailNew: React.FC = () => {
                         Algorithm Overview
                       </h3>
                       <p className="text-sm text-muted-foreground">
-                        {implementation?.explanation.overview || algorithm.description}
+                        {algorithm.overview || algorithm.explanation.problemStatement}
                       </p>
 
                       <Separator />
@@ -445,7 +449,7 @@ const AlgorithmDetailNew: React.FC = () => {
                   </Card>
 
                   {/* Steps, Use Cases & Tips Card (Reused from AlgorithmDetail) */}
-                  {implementation && (
+                  {algorithm && (
                     <Card className="p-4 sm:p-6 glass-card overflow-hidden">
                       <Tabs defaultValue="steps">
                         <TabsList className="grid w-full grid-cols-3 h-auto">
@@ -462,7 +466,7 @@ const AlgorithmDetailNew: React.FC = () => {
 
                         <TabsContent value="steps" className="mt-4">
                           <ol className="space-y-2 list-decimal list-inside">
-                            {implementation.explanation.steps.map((step, i) => (
+                            {algorithm.explanation.steps.map((step, i) => (
                               <li key={i} className="text-sm text-muted-foreground">
                                 {step}
                               </li>
@@ -471,12 +475,12 @@ const AlgorithmDetailNew: React.FC = () => {
                         </TabsContent>
 
                         <TabsContent value="usecase" className="mt-4">
-                          <p className="text-sm text-muted-foreground">{implementation.explanation.useCase}</p>
+                          <p className="text-sm text-muted-foreground">{algorithm.explanation.useCase}</p>
                         </TabsContent>
 
                         <TabsContent value="tips" className="mt-4">
                           <ul className="space-y-2 list-disc list-inside">
-                            {implementation.explanation.tips.map((tip, i) => (
+                            {algorithm.explanation.tips.map((tip, i) => (
                               <li key={i} className="text-sm text-muted-foreground">
                                 {tip}
                               </li>
@@ -488,7 +492,7 @@ const AlgorithmDetailNew: React.FC = () => {
                   )}
 
                   {/* Video Tutorial Card (Reused from AlgorithmDetail) */}
-                  {algorithm.youtubeUrl && (
+                  {algorithm.tutorials[0]?.url && (
                    <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-5xl mx-auto">
                                  <div className="space-y-6">
                                    {/* Video Section */}
@@ -502,10 +506,10 @@ const AlgorithmDetailNew: React.FC = () => {
                                      <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
                                        <iframe
                                          className="absolute top-0 left-0 w-full h-full rounded-lg"
-                                         src={`https://www.youtube.com/embed/${
-                                           algorithm.youtubeUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)?.[1] ||
-                                           algorithm.youtubeUrl
-                                         }`}
+                                          src={`https://www.youtube.com/embed/${
+                                            algorithm.tutorials[0].url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)?.[1] ||
+                                            algorithm.tutorials[0].url
+                                          }`}
                                          title={`${algorithm.name} Tutorial`}
                                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                          allowFullScreen
@@ -535,22 +539,22 @@ const AlgorithmDetailNew: React.FC = () => {
                                    <Separator />
                  
                                    {/* Code example explanation */}
-                                   {implementation && (
+                                   {algorithm && (
                                      <div className="space-y-3">
                                        <h3 className="text-xl font-semibold flex items-center gap-2">
                                          <Code2 className="w-5 h-5 text-primary" />
                                          Code Example & Logic
                                        </h3>
                                        <p className="text-sm text-muted-foreground leading-relaxed">
-                                         {implementation.explanation.overview ||
+                                         {algorithm.overview ||
                                            `The implementation of ${algorithm.name} follows a systematic approach that ensures optimal performance. 
                                            Each step in the algorithm is carefully designed to handle specific cases while maintaining efficiency.`}
                                        </p>
-                                       {implementation.explanation.steps && implementation.explanation.steps.length > 0 && (
+                                       {algorithm.explanation.steps && algorithm.explanation.steps.length > 0 && (
                                          <div className="mt-4">
                                            <h4 className="font-medium mb-2">Key Steps:</h4>
                                            <ol className="space-y-2 list-decimal list-inside text-sm text-muted-foreground">
-                                             {implementation.explanation.steps.slice(0, 4).map((step, i) => (
+                                             {algorithm.explanation.steps.slice(0, 4).map((step, i) => (
                                                <li key={i}>{step}</li>
                                              ))}
                                            </ol>
@@ -584,7 +588,7 @@ const AlgorithmDetailNew: React.FC = () => {
                                    </div>
                  
                                    {/* Additional Insights */}
-                                   {implementation?.explanation.tips && implementation.explanation.tips.length > 0 && (
+                                   {algorithm.explanation.tips && algorithm.explanation.tips.length > 0 && (
                                      <>
                                        <Separator />
                                        <div className="space-y-3">
@@ -593,7 +597,7 @@ const AlgorithmDetailNew: React.FC = () => {
                                            Additional Insights & Improvements
                                          </h3>
                                          <ul className="space-y-2 list-disc list-inside text-sm text-muted-foreground">
-                                           {implementation.explanation.tips.map((tip, i) => (
+                                           {algorithm.explanation.tips.map((tip, i) => (
                                              <li key={i}>{tip}</li>
                                            ))}
                                          </ul>
@@ -605,11 +609,11 @@ const AlgorithmDetailNew: React.FC = () => {
                   )}
 
                   {/* Practice Problems Card (Reused from AlgorithmDetail) */}
-                  {(implementation?.practiceProblems && implementation.practiceProblems.length > 0) || (algorithm?.problems && algorithm.problems.length > 0) ? (
+                  {algorithm.problemsToSolve.external && algorithm.problemsToSolve.external.length > 0 ? (
                     <Card className="p-4 sm:p-6 glass-card overflow-hidden">
                       <h3 className="font-semibold mb-4">Practice Problems</h3>
                       <div className="space-y-2">
-                        {implementation?.practiceProblems?.map((problem, i) => (
+                        {algorithm.problemsToSolve.external.map((problem, i) => (
                           <a
                             key={i}
                             href={problem.url}
@@ -623,21 +627,8 @@ const AlgorithmDetailNew: React.FC = () => {
                             </div>
                             <ExternalLink className="w-4 h-4 text-muted-foreground" />
                           </a>
-                        )) || algorithm.problems.map((problem, i) => (
-                          <a
-                            key={i}
-                            href={problem.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
-                          >
-                            <div className="flex-1">
-                              <p className="text-sm font-medium">{problem.title}</p>
-                              <p className="text-xs text-muted-foreground mt-1 capitalize">{problem.difficulty}</p>
-                            </div>
-                            <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                          </a>
                         ))}
+
                       </div>
                     </Card>
                   ) : null}
@@ -685,14 +676,14 @@ const AlgorithmDetailNew: React.FC = () => {
                       </Select>
                     </div>
 
-                    {implementation && implementation.code[selectedLanguage as keyof typeof implementation.code] ? (
+                    {currentCode ? (
                       <div className="relative rounded-lg border bg-muted/30 overflow-hidden">
                         <div className="absolute right-4 top-4 z-10">
-                          <CopyCodeButton code={implementation.code[selectedLanguage as keyof typeof implementation.code]} />
+                          <CopyCodeButton code={currentCode} />
                         </div>
                         <ScrollArea className="h-[500px] w-full">
                           <pre className="p-6 text-sm font-mono leading-relaxed">
-                            <code>{implementation.code[selectedLanguage as keyof typeof implementation.code]}</code>
+                            <code>{currentCode}</code>
                           </pre>
                         </ScrollArea>
                       </div>
@@ -714,7 +705,7 @@ const AlgorithmDetailNew: React.FC = () => {
       {/* Right Content - No Header, Tabs with Collapse Button */}
          <div className="h-14 border-b flex items-center px-4 gap-4 shrink-0 justify-between">
         <div className="flex items-center gap-4 overflow-hidden">
-                              <ShareButton title={algorithm.name} description={algorithm.description} />
+                              <ShareButton title={algorithm.name} description={algorithm.explanation.problemStatement} />
           
         </div>
          {!isMobile && (

@@ -11,10 +11,8 @@ import { LanguageSelector, Language } from './LanguageSelector';
 import { CodeEditor } from './CodeEditor';
 import { OutputPanel } from './OutputPanel';
 import { DEFAULT_CODE, LANGUAGE_IDS } from './constants';
-import { algorithmImplementations } from '@/data/algorithmImplementations';
-import { getTestCases } from '@/data/testCases';
+import { algorithmsDB } from '@/data/algorithmsDB';
 import { generateStub } from '@/utils/stubGenerator';
-import { algorithms } from '@/data/algorithms';
 
 interface CodeRunnerProps {
   algorithmId?: string;
@@ -43,20 +41,20 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
 
   // Load algorithm code and schema
   useEffect(() => {
-    if (algorithmId && algorithmImplementations[algorithmId]) {
-      const algoImpl = algorithmImplementations[algorithmId];
+    if (algorithmId && algorithmsDB[algorithmId]) {
+      const algo = algorithmsDB[algorithmId];
       
       // Try to get starter code or full implementation
-      let algoCode = algoImpl.starterCode?.[language] || algoImpl.code?.[language];
+      const impl = algo.implementations.find(i => i.lang.toLowerCase() === language.toLowerCase());
+      let algoCode = impl?.code.find(c => c.codeType === 'starter')?.code || impl?.code.find(c => c.codeType === 'optimize')?.code;
       
       // If no code exists for this language, generate a stub
-      if (!algoCode && algoImpl.inputSchema) {
-        const algorithm = algorithms.find(a => a.id === algorithmId);
+      if (!algoCode && algo.inputSchema) {
         const functionName = algorithmId.replace(/-/g, '_'); // Convert kebab-case to snake_case
         
         // Parse input values for stub generation
         const parsedInputs: Record<string, any> = {};
-        algoImpl.inputSchema.forEach(field => {
+        algo.inputSchema.forEach(field => {
           const value = inputValues[field.name];
           if (value) {
             try {
@@ -70,7 +68,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
         algoCode = generateStub(
           language,
           functionName,
-          algoImpl.inputSchema,
+          algo.inputSchema,
           Object.keys(parsedInputs).length > 0 ? parsedInputs : undefined
         );
       }
@@ -82,11 +80,11 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
       }
 
       // Initialize input values from schema or test case
-      if (algoImpl.inputSchema) {
+      if (algo.inputSchema) {
         const initialValues: Record<string, string> = {};
-        algoImpl.inputSchema.forEach((field, index) => {
+        algo.inputSchema.forEach((field, index) => {
            // Default to first test case value if available, else empty
-           const defaultVal = algoImpl.testCases?.[0]?.input[index];
+           const defaultVal = algo.testCases?.[0]?.input[index];
            initialValues[field.name] = defaultVal !== undefined ? JSON.stringify(defaultVal) : "";
         });
         setInputValues(initialValues);
@@ -102,9 +100,10 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   };
 
   const handleReset = () => {
-    if (algorithmId && algorithmImplementations[algorithmId]) {
-      const algoImpl = algorithmImplementations[algorithmId];
-      const algoCode = algoImpl.starterCode?.[language] || algoImpl.code[language];
+    if (algorithmId && algorithmsDB[algorithmId]) {
+      const algo = algorithmsDB[algorithmId];
+      const impl = algo.implementations.find(i => i.lang.toLowerCase() === language.toLowerCase());
+      const algoCode = impl?.code.find(c => c.codeType === 'starter')?.code || impl?.code.find(c => c.codeType === 'optimize')?.code;
       setCode(algoCode || DEFAULT_CODE[language]);
     } else {
       setCode(DEFAULT_CODE[language]);
@@ -139,7 +138,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   }, [isFullscreen, onToggleFullscreen]);
 
   // Get algorithm metadata for complexity display
-  const algorithmMeta = algorithmId ? algorithms.find(a => a.id === algorithmId) : null;
+  const algorithmMeta = algorithmId ? algorithmsDB[algorithmId] : null;
 
   const formatValueForLanguage = (value: string, type: string, lang: Language): string => {
     if (type === 'number' || type === 'boolean') {
@@ -184,27 +183,17 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
     try {
       const startTime = performance.now();
       
-      const algoImpl = algorithmId ? algorithmImplementations[algorithmId] : null;
-      const testCaseData = algorithmId ? getTestCases(algorithmId) : null;
+      const algo = algorithmId ? algorithmsDB[algorithmId] : null;
       let fullCode = code;
 
-      if (algoImpl && testCaseData && testCaseData.testCases) {
+      if (algo && algo.testCases && algo.testCases.length > 0) {
         // Use the new test runner generator with predefined test cases
         const { generateTestRunner } = await import('@/utils/testRunnerGenerator');
         fullCode = generateTestRunner(
           code,
           language,
-          testCaseData.testCases,
-          algoImpl.inputSchema || []
-        );
-      } else if (algoImpl && algoImpl.testCases) {
-        // Fallback to old test cases from algorithmImplementations if available
-        const { generateTestRunner } = await import('@/utils/testRunnerGenerator');
-        fullCode = generateTestRunner(
-          code,
-          language,
-          algoImpl.testCases,
-          algoImpl.inputSchema || []
+          algo.testCases,
+          algo.inputSchema || []
         );
       } else {
         // No test cases available, just run the code as-is
@@ -322,13 +311,13 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   };
 
   const renderInputForm = () => {
-    if (!algorithmId || !algorithmImplementations[algorithmId]?.inputSchema) return null;
+    if (!algorithmId || !algorithmsDB[algorithmId]?.inputSchema) return null;
 
     return (
       <div className="p-4 grid gap-4 bg-muted/20 border-b">
         <h4 className="text-xs font-medium text-muted-foreground mb-2">Test Inputs</h4>
         <div className="grid grid-cols-2 gap-4">
-          {algorithmImplementations[algorithmId].inputSchema!.map((field) => (
+          {algorithmsDB[algorithmId].inputSchema!.map((field) => (
             <div key={field.name} className="space-y-1">
               <Label htmlFor={field.name} className="text-[10px] uppercase tracking-wider">{field.label || field.name}</Label>
               <Input 
@@ -426,7 +415,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                   loading={isLoading} 
                   stdin="" // Not used anymore
                   onStdinChange={() => {}} // Not used anymore
-                  testCases={algorithmId ? (getTestCases(algorithmId)?.testCases || algorithmImplementations[algorithmId]?.testCases) : undefined}
+                  testCases={algorithmId ? algorithmsDB[algorithmId]?.testCases : undefined}
                   executionTime={executionTime}
                   algorithmMeta={algorithmMeta}
                   onAddCustomTestCase={handleAddCustomTestCase}

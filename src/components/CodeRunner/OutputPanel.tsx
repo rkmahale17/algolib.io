@@ -11,7 +11,7 @@ interface OutputPanelProps {
   loading: boolean;
   stdin: string;
   onStdinChange: (value: string) => void;
-  testCases?: Array<{ input: any[]; expectedOutput: any }>;
+  testCases?: Array<{ input: any[]; output: any }>;
   executionTime?: number | null;
   algorithmMeta?: Algorithm | null;
   onAddCustomTestCase?: () => void;
@@ -179,7 +179,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({
                                     <div className="p-3 rounded-lg bg-muted/30 border">
                                       <div className="text-xs font-semibold text-muted-foreground mb-2">EXPECTED OUTPUT</div>
                                       <code className="font-mono text-sm break-all block">
-                                        {JSON.stringify(result.expected || testCase.expectedOutput, null, 2)}
+                                        {JSON.stringify(result.expected || testCase.output, null, 2)}
                                       </code>
                                     </div>
 
