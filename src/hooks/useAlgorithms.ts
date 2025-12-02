@@ -15,7 +15,7 @@ export interface Algorithm {
     test_cases: any;
     input_schema: any;
     tutorials: any;
-    list_type?: string;
+    list_type: string;
     metadata: any;
     created_at?: string;
     updated_at?: string;
@@ -26,11 +26,6 @@ export function useAlgorithms(searchQuery?: string, categoryFilter?: string) {
     return useQuery({
         queryKey: ['algorithms', searchQuery, categoryFilter],
         queryFn: async () => {
-            if (!supabase) {
-                console.warn('Supabase not available, returning empty algorithms list');
-                return [];
-            }
-
             let query = supabase
                 .from('algorithms')
                 .select('*')
@@ -61,11 +56,6 @@ export function useAlgorithm(id: string) {
     return useQuery({
         queryKey: ['algorithm', id],
         queryFn: async () => {
-            if (!supabase) {
-                console.warn('Supabase not available, cannot fetch algorithm');
-                return null;
-            }
-
             const { data, error } = await supabase
                 .from('algorithms')
                 .select('*')
@@ -79,7 +69,7 @@ export function useAlgorithm(id: string) {
 
             return data as Algorithm;
         },
-        enabled: !!id && !!supabase,
+        enabled: !!id,
     });
 }
 
@@ -89,10 +79,6 @@ export function useCreateAlgorithm() {
 
     return useMutation({
         mutationFn: async (algorithm: Omit<Algorithm, 'created_at' | 'updated_at'>) => {
-            if (!supabase) {
-                throw new Error('Supabase not available');
-            }
-
             const { data, error } = await supabase
                 .from('algorithms')
                 .insert([algorithm as any])
@@ -118,10 +104,6 @@ export function useUpdateAlgorithm() {
 
     return useMutation({
         mutationFn: async ({ id, updates }: { id: string; updates: Partial<Algorithm> }) => {
-            if (!supabase) {
-                throw new Error('Supabase not available');
-            }
-
             // Remove id from updates to avoid updating the primary key
             const { id: _, ...updateData } = updates as any;
 
@@ -152,10 +134,6 @@ export function useDeleteAlgorithm() {
 
     return useMutation({
         mutationFn: async (id: string) => {
-            if (!supabase) {
-                throw new Error('Supabase not available');
-            }
-
             const { error } = await supabase
                 .from('algorithms')
                 .delete()
@@ -178,11 +156,6 @@ export function useCategories() {
     return useQuery({
         queryKey: ['categories'],
         queryFn: async () => {
-            if (!supabase) {
-                console.warn('Supabase not available, returning empty categories');
-                return [];
-            }
-
             const { data, error } = await supabase
                 .from('algorithms')
                 .select('category')
