@@ -379,7 +379,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_algorithms_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       game_type:

@@ -30,6 +30,8 @@ const Navbar = () => {
   const isAuthPage = location.pathname === "/auth";
 
   useEffect(() => {
+    if (!supabase) return;
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
@@ -54,6 +56,8 @@ const Navbar = () => {
   }, []);
 
   const fetchProgress = async (userId: string) => {
+    if (!supabase) return;
+    
     const { data, error } = await supabase
       .from("user_progress")
       .select("*", { count: "exact" })
@@ -67,7 +71,7 @@ const Navbar = () => {
 
   // Set up realtime subscription for progress updates
   useEffect(() => {
-    if (!user) return;
+    if (!user || !supabase) return;
 
     const channel = supabase
       .channel("user_progress_changes")
@@ -92,6 +96,10 @@ const Navbar = () => {
   }, [user]);
 
   const handleSignOut = async () => {
+    if (!supabase) {
+      toast.error("Authentication not available");
+      return;
+    }
     const { error } = await supabase.auth.signOut();
     if (error) {
       toast.error("Failed to sign out");
