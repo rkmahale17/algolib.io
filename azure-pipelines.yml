@@ -16,7 +16,7 @@ variables:
   qaService: "qaalgo"
   prodService: "prodalgolib"
 
-- group: supababse   # <-- YOUR VARIABLE GROUP
+-group: supababse   # <-- YOUR VARIABLE GROUP
 
 stages:
   # =========================
