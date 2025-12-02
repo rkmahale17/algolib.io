@@ -11,7 +11,7 @@ pool:
 
 # Variables
 variables:
-  - group: AlgoLib-Secrets  # Variable group from Library containing all secrets
+  - group: AlgoLib-Secrets # Variable group from Library containing all secrets
   - name: nodeVersion
     value: "22"
   - name: projectId
@@ -68,7 +68,7 @@ stages:
           # Build with build args for environment variables
           - script: |
               gcloud builds submit \
-                --config=cloudbuild.yaml \
+                --config=cloudbuild.yml \
                 --substitutions=_IMAGE_NAME=$(imageName),_VITE_SUPABASE_URL="$(VITE_SUPABASE_URL)",_VITE_SUPABASE_PUBLISHABLE_KEY="$(VITE_SUPABASE_PUBLISHABLE_KEY)",_VITE_SUPABASE_PROJECT_ID="$(VITE_SUPABASE_PROJECT_ID)",_JUDGE0_API_KEY="$(JUDGE0_API_KEY)",_JUDGE0_API_HOST="$(JUDGE0_API_HOST)",_JUDGE0_API_URL="$(JUDGE0_API_URL)" \
                 --substitutions=BUILD_ID=$(Build.BuildId),PROJECT_ID=$(projectId)
             displayName: "Cloud Build -> GCR with env vars"
