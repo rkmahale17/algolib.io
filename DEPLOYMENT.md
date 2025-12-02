@@ -1,21 +1,26 @@
 # Deployment Instructions for QA/Production
 
-## Problem
-The Dockerfile builds the app without Supabase environment variables, causing the production bundle to have `undefined` values baked in.
+## Overview
 
-## Solution
+Your app is a **client-side React application** served by **nginx**. The Supabase credentials need to be available during the **build step** so Vite can bake them into the JavaScript bundle.
+
+## The Solution
+
+The Dockerfile has been updated to accept Supabase credentials as **build arguments**. These are passed from Azure DevOps during the Docker build process.
 
 ### Step 1: Add Supabase Credentials to Azure DevOps
 
 1. Go to **Azure DevOps** → **Pipelines** → **Library**
-2. Create or edit your Variable Group
-3. Add these secret variables:
+2. Create or edit your Variable Group (or add to pipeline variables)
+3. Add these variables:
    - `VITE_SUPABASE_URL` = `https://your-project.supabase.co`
    - `VITE_SUPABASE_PUBLISHABLE_KEY` = `your-anon-key-here`
 
+> **Note:** These should be the SAME values you have in your local `.env` file
+
 ### Step 2: Update azure-pipelines.yml
 
-Replace the Cloud Build step (line 67-69) with this:
+Find the Cloud Build step (around line 67-69) and update it to pass build arguments:
 
 ```yaml
 # Build once and tag with BuildId for promotion to PROD
@@ -27,9 +32,9 @@ Replace the Cloud Build step (line 67-69) with this:
   displayName: "Cloud Build -> GCR (with Supabase credentials)"
 ```
 
-### Step 3: Verify the Dockerfile
+### Step 3: Verify Dockerfile
 
-The Dockerfile has been updated to accept these build arguments. Make sure it contains:
+The Dockerfile now includes (already updated):
 
 ```dockerfile
 # Accept build arguments for Supabase credentials
@@ -41,41 +46,20 @@ ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
 ENV VITE_SUPABASE_PUBLISHABLE_KEY=$VITE_SUPABASE_PUBLISHABLE_KEY
 ```
 
+These lines ensure that when `npm run build` executes, Vite has access to the Supabase credentials and bakes them into the production bundle.
+
 ### Step 4: Deploy
 
-After making these changes:
-1. Commit and push to your repository
-2. The Azure pipeline will trigger
-3. The Docker build will now have access to Supabase credentials
-4. The production bundle will work correctly
+1. Commit the updated Dockerfile
+2. Push to your repository
+3. Azure pipeline will trigger
+4. Docker build will receive Supabase credentials
+5. Production bundle will have working Supabase connection
 
-## Alternative: Use Google Cloud Build Config
+## How It Works
 
-If `gcloud builds submit` doesn't support `--build-arg`, create a `cloudbuild.yaml`:
-
-```yaml
-steps:
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - 'build'
-      - '--build-arg'
-      - 'VITE_SUPABASE_URL=${_VITE_SUPABASE_URL}'
-      - '--build-arg'
-      - 'VITE_SUPABASE_PUBLISHABLE_KEY=${_VITE_SUPABASE_PUBLISHABLE_KEY}'
-      - '-t'
-      - 'gcr.io/$PROJECT_ID/algo-image:$BUILD_ID'
-      - '.'
-images:
-  - 'gcr.io/$PROJECT_ID/algo-image:$BUILD_ID'
-substitutions:
-  _VITE_SUPABASE_URL: 'your-supabase-url'
-  _VITE_SUPABASE_PUBLISHABLE_KEY: 'your-supabase-key'
-```
-
-Then update the pipeline to use:
-```yaml
-- script: |
-    gcloud builds submit --config=cloudbuild.yaml \
-      --substitutions=_VITE_SUPABASE_URL=$(VITE_SUPABASE_URL),_VITE_SUPABASE_PUBLISHABLE_KEY=$(VITE_SUPABASE_PUBLISHABLE_KEY)
-  displayName: "Cloud Build -> GCR (with config)"
-```
+1. **Build Time**: Azure DevOps passes `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` as build arguments
+2. **Docker Build**: Dockerfile receives these as `ARG` and sets them as `ENV` variables
+3. **Vite Build**: `npm run build` runs with these environment variables available
+4. **Bundle**: Vite replaces `import.meta.env.VITE_SUPABASE_URL` with the actual URL in the JavaScript bundle
+5. **Runtime**: nginx serves the static files with Supabase credentials baked in
