@@ -65,10 +65,7 @@ stages:
 
           # Build once and tag with BuildId for promotion to PROD
           - script: |
-              gcloud builds submit \
-                --tag gcr.io/$(projectId)/$(imageName):$(Build.BuildId) \
-                --build-arg VITE_SUPABASE_URL=$(VITE_SUPABASE_URL) \
-                --build-arg VITE_SUPABASE_PUBLISHABLE_KEY=$(VITE_SUPABASE_PUBLISHABLE_KEY)
+              gcloud builds submit --tag gcr.io/$(projectId)/$(imageName):$(Build.BuildId)
             displayName: "Cloud Build -> GCR (single build)"
 
           # Deploy to QA service
