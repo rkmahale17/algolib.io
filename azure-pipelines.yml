@@ -64,9 +64,13 @@ stages:
             displayName: "Authenticate to Google Cloud"
 
           # Build once and tag with BuildId for promotion to PROD
+          # Build once and tag with BuildId for promotion to PROD
           - script: |
-              gcloud builds submit --tag gcr.io/$(projectId)/$(imageName):$(Build.BuildId)
-            displayName: "Cloud Build -> GCR (single build)"
+              gcloud builds submit \
+                --tag gcr.io/$(projectId)/$(imageName):$(Build.BuildId) \
+                --build-arg VITE_SUPABASE_URL=$(VITE_SUPABASE_URL) \
+                --build-arg VITE_SUPABASE_PUBLISHABLE_KEY=$(VITE_SUPABASE_PUBLISHABLE_KEY)
+            displayName: "Cloud Build -> GCR (with Supabase credentials)"
 
           # Deploy to QA service
           - script: |
