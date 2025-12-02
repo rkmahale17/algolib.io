@@ -79,7 +79,7 @@ stages:
                 --cpu 1 \
                 --min-instances 0 \
                 --max-instances 1 \
-                --set-env-vars "APP_ENV=qa"
+                --set-env-vars "APP_ENV=qa,VITE_SUPABASE_URL=$(VITE_SUPABASE_URL),VITE_SUPABASE_PUBLISHABLE_KEY=$(VITE_SUPABASE_PUBLISHABLE_KEY)"
             displayName: "Deploy to Cloud Run (QA)"
 
   # =========================
@@ -129,5 +129,5 @@ stages:
                       --cpu 1 \
                       --min-instances 0 \
                       --max-instances 1 \
-                      --set-env-vars "APP_ENV=prod"
+                      --set-env-vars "APP_ENV=prod,VITE_SUPABASE_URL=$(VITE_SUPABASE_URL),VITE_SUPABASE_PUBLISHABLE_KEY=$(VITE_SUPABASE_PUBLISHABLE_KEY)"
                   displayName: "Deploy to Cloud Run (PROD)"
