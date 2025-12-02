@@ -31,6 +31,11 @@ const Home = () => {
 
   // Check authentication status
   useEffect(() => {
+    if (!supabase) {
+      console.warn('Supabase not available, skipping authentication');
+      return;
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
     });
@@ -47,7 +52,7 @@ const Home = () => {
   // Fetch user progress and subscribe to real-time updates
   useEffect(() => {
     const fetchUserProgress = async () => {
-      if (!user) {
+      if (!user || !supabase) {
         setUserProgress([]);
         return;
       }
@@ -66,7 +71,7 @@ const Home = () => {
     fetchUserProgress();
 
     // Subscribe to real-time updates
-    if (!user) return;
+    if (!user || !supabase) return;
 
     const channel = supabase
       .channel("user_progress_changes")
