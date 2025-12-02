@@ -54,6 +54,13 @@ const AlgorithmDetailNew: React.FC = () => {
   useEffect(() => {
     const fetchAlgorithm = async () => {
       if (!id) return;
+      
+      if (!supabase) {
+        console.warn('Supabase not available, cannot fetch algorithm from database');
+        setIsLoadingAlgorithm(false);
+        return;
+      }
+
       setIsLoadingAlgorithm(true);
       try {
         const { data, error } = await supabase
@@ -152,6 +159,11 @@ const AlgorithmDetailNew: React.FC = () => {
   };
 
   useEffect(() => {
+    if (!supabase) {
+      console.warn('Supabase not available, skipping authentication');
+      return;
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
     });
@@ -167,7 +179,7 @@ const AlgorithmDetailNew: React.FC = () => {
 
   useEffect(() => {
     const checkProgress = async () => {
-      if (!user || !id) return;
+      if (!user || !id || !supabase) return;
       
       try {
         const { data, error } = await supabase
@@ -190,6 +202,11 @@ const AlgorithmDetailNew: React.FC = () => {
   }, [user, id]);
 
   const toggleCompletion = async () => {
+    if (!supabase) {
+      toast.error("Progress tracking is not available");
+      return;
+    }
+
     if (!user) {
       toast.error("Please sign in to track progress");
       return;

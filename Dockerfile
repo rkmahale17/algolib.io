@@ -1,6 +1,14 @@
 # Build container
 FROM node:18-alpine AS builder
 
+# Accept build arguments for Supabase credentials
+ARG VITE_SUPABASE_URL
+ARG VITE_SUPABASE_PUBLISHABLE_KEY
+
+# Set them as environment variables so Vite can access them during build
+ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
+ENV VITE_SUPABASE_PUBLISHABLE_KEY=$VITE_SUPABASE_PUBLISHABLE_KEY
+
 # Make sure we got brotli compression
 RUN apk update
 RUN apk add --upgrade brotli

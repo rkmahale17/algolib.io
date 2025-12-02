@@ -18,6 +18,11 @@ const Auth = () => {
   const [fullName, setFullName] = useState('');
 
   useEffect(() => {
+    if (!supabase) {
+      console.warn('Supabase not available, authentication disabled');
+      return;
+    }
+
     // Check if already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
@@ -39,6 +44,12 @@ const Auth = () => {
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!supabase) {
+      toast.error('Authentication is not available. Please contact support.');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -74,6 +85,11 @@ const Auth = () => {
   };
 
   const handleGoogleAuth = async () => {
+    if (!supabase) {
+      toast.error('Authentication is not available. Please contact support.');
+      return;
+    }
+
     setIsLoading(true);
     try {
       const { error } = await supabase.auth.signInWithOAuth({
