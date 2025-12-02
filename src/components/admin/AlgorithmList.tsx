@@ -137,7 +137,7 @@ export function AlgorithmList({ onEdit, onCreate }: AlgorithmListProps) {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">{algo.list_type}</Badge>
+                      <Badge variant="outline">{algo.metadata?.listType || algo.list_type || 'N/A'}</Badge>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">

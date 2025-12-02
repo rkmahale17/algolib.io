@@ -67,6 +67,7 @@ export function AlgorithmForm({ algorithm, open, onClose }: AlgorithmFormProps) 
         input_schema: JSON.stringify(algorithm.input_schema, null, 2),
         tutorials: JSON.stringify(algorithm.tutorials, null, 2),
         metadata: JSON.stringify(algorithm.metadata, null, 2),
+        list_type: algorithm.metadata?.listType || algorithm.list_type || 'coreAlgo',
       });
     } else {
       reset({
@@ -126,15 +127,21 @@ export function AlgorithmForm({ algorithm, open, onClose }: AlgorithmFormProps) 
     }
 
     // Parse JSON fields
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { list_type, ...restData } = data;
+    
     const parsedData = {
-      ...data,
+      ...restData,
       explanation: JSON.parse(data.explanation),
       implementations: JSON.parse(data.implementations),
       problems_to_solve: JSON.parse(data.problems_to_solve),
       test_cases: JSON.parse(data.test_cases),
       input_schema: JSON.parse(data.input_schema),
       tutorials: JSON.parse(data.tutorials),
-      metadata: JSON.parse(data.metadata),
+      metadata: {
+        ...JSON.parse(data.metadata),
+        listType: data.list_type, // Sync list_type to metadata
+      },
     };
 
     try {
@@ -259,7 +266,7 @@ export function AlgorithmForm({ algorithm, open, onClose }: AlgorithmFormProps) 
                     <SelectContent>
                       <SelectItem value="coreAlgo">Core Algorithm</SelectItem>
                       <SelectItem value="blind75">Blind 75</SelectItem>
-                      <SelectItem value="core+Blind75">Core + Blind 75</SelectItem>
+                      <SelectItem value="core+Blind75">Core + Blind 75 (Both)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
