@@ -1,41 +1,35 @@
-# ----------------------------
-# BUILD STAGE
-# ----------------------------
+# Build container
 FROM node:18-alpine AS builder
 
-# Accept Supabase values from Cloud Build
-ARG VITE_SUPABASE_URL
-ARG VITE_SUPABASE_PUBLISHABLE_KEY
-
-# Export for Vite build
-ENV VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
-ENV VITE_SUPABASE_PUBLISHABLE_KEY=${VITE_SUPABASE_PUBLISHABLE_KEY}
-
-RUN apk update && apk add --upgrade brotli
-
+# Make sure we got brotli compression
+RUN apk update
+RUN apk add --upgrade brotli
 WORKDIR /usr
-
 COPY package*.json ./
 COPY src ./src
 COPY public ./public
-ADD . .
+COPY index.html ./
+COPY vite.config.ts ./
+COPY tsconfig*.json ./
+COPY generate-sitemap.ts ./
+COPY verify-ssg.ts ./
+COPY tailwind.config.ts ./
+COPY postcss.config.js ./
+COPY eslint.config.js ./
 
 RUN npm install
 RUN npm run build
+# RUN cd /usr/dist && find . -type f -exec brotli {} \; # Optional: Compress if serving static directly, but express static handles gzip usually. keeping simple for now.
 
-# Create brotli compressed assets
-RUN cd /usr/dist && find . -type f -exec brotli --best {} \;
+# Actual runtime container
+FROM node:18-alpine
+WORKDIR /app
 
-# ----------------------------
-# RUNTIME STAGE
-# ----------------------------
-FROM alpine
+COPY package*.json ./
+RUN npm install --production
 
-RUN apk add --no-cache brotli nginx nginx-mod-http-brotli
+COPY --from=builder /usr/dist ./dist
+COPY server.js ./
 
-COPY nginx/nginx.conf /etc/nginx/http.d/default.conf
-
-COPY --from=builder /usr/dist /usr/share/nginx/html
-
-EXPOSE 8080
-CMD ["nginx", "-g", "daemon off;"]
+EXPOSE 3000
+CMD ["node", "server.js"]
