@@ -76,7 +76,7 @@ const AlgorithmDetailNew: React.FC = () => {
         const transformedData = {
           ...data,
           // Spread metadata fields to top level
-          ...(data.metadata || {}),
+          ...(typeof data.metadata === 'object' && data.metadata !== null ? data.metadata : {}),
           // Keep original nested structure for backward compatibility
           metadata: data.metadata
         };

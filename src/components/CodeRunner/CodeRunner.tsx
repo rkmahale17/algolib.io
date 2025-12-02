@@ -58,7 +58,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
           // Transform Supabase data structure to match component expectations
           const transformedData = {
             ...data,
-            ...(data.metadata || {}),
+            ...(typeof data.metadata === 'object' && data.metadata !== null ? data.metadata : {}),
             metadata: data.metadata
           };
           

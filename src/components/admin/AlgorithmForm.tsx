@@ -66,7 +66,6 @@ export function AlgorithmForm({ algorithm, open, onClose }: AlgorithmFormProps) 
         test_cases: JSON.stringify(algorithm.test_cases, null, 2),
         input_schema: JSON.stringify(algorithm.input_schema, null, 2),
         tutorials: JSON.stringify(algorithm.tutorials, null, 2),
-        tutorials: JSON.stringify(algorithm.tutorials, null, 2),
         metadata: JSON.stringify(algorithm.metadata, null, 2),
         list_type: algorithm.metadata?.listType || algorithm.list_type || 'coreAlgo',
       });
@@ -135,7 +134,6 @@ export function AlgorithmForm({ algorithm, open, onClose }: AlgorithmFormProps) 
       problems_to_solve: JSON.parse(data.problems_to_solve),
       test_cases: JSON.parse(data.test_cases),
       input_schema: JSON.parse(data.input_schema),
-      tutorials: JSON.parse(data.tutorials),
       tutorials: JSON.parse(data.tutorials),
       metadata: {
         ...JSON.parse(data.metadata),
@@ -297,8 +295,8 @@ export function AlgorithmForm({ algorithm, open, onClose }: AlgorithmFormProps) 
                 {jsonErrors.explanation && (
                   <p className="text-sm text-destructive">{jsonErrors.explanation}</p>
                 )}
-                {errors.explanation && (
-                  <p className="text-sm text-destructive">{errors.explanation.message}</p>
+                {errors.explanation?.message && (
+                  <p className="text-sm text-destructive">{errors.explanation.message as string}</p>
                 )}
                 <p className="text-sm text-muted-foreground">
                   Should include: problemStatement, steps, useCase, tips, constraints, note, io
@@ -321,8 +319,8 @@ export function AlgorithmForm({ algorithm, open, onClose }: AlgorithmFormProps) 
                 {jsonErrors.implementations && (
                   <p className="text-sm text-destructive">{jsonErrors.implementations}</p>
                 )}
-                {errors.implementations && (
-                  <p className="text-sm text-destructive">{errors.implementations.message}</p>
+                {errors.implementations?.message && (
+                  <p className="text-sm text-destructive">{errors.implementations.message as string}</p>
                 )}
                 <p className="text-sm text-muted-foreground">
                   Array of implementations for each language (typeScript, python, java, cpp)
@@ -345,8 +343,8 @@ export function AlgorithmForm({ algorithm, open, onClose }: AlgorithmFormProps) 
                 {jsonErrors.test_cases && (
                   <p className="text-sm text-destructive">{jsonErrors.test_cases}</p>
                 )}
-                {errors.test_cases && (
-                  <p className="text-sm text-destructive">{errors.test_cases.message}</p>
+                {errors.test_cases?.message && (
+                  <p className="text-sm text-destructive">{errors.test_cases.message as string}</p>
                 )}
               </div>
 
@@ -363,8 +361,8 @@ export function AlgorithmForm({ algorithm, open, onClose }: AlgorithmFormProps) 
                 {jsonErrors.input_schema && (
                   <p className="text-sm text-destructive">{jsonErrors.input_schema}</p>
                 )}
-                {errors.input_schema && (
-                  <p className="text-sm text-destructive">{errors.input_schema.message}</p>
+                {errors.input_schema?.message && (
+                  <p className="text-sm text-destructive">{errors.input_schema.message as string}</p>
                 )}
               </div>
             </TabsContent>
