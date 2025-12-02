@@ -2,6 +2,7 @@
 FROM node:18-alpine AS builder
 
 # Accept build arguments for Supabase credentials
+# These will be passed from Azure DevOps during build
 ARG VITE_SUPABASE_URL
 ARG VITE_SUPABASE_PUBLISHABLE_KEY
 
@@ -13,31 +14,23 @@ ENV VITE_SUPABASE_PUBLISHABLE_KEY=$VITE_SUPABASE_PUBLISHABLE_KEY
 RUN apk update
 RUN apk add --upgrade brotli
 WORKDIR /usr
+
+# Copy package files and install dependencies
 COPY package*.json ./
 COPY src ./src
 COPY public ./public
-COPY index.html ./
-COPY vite.config.ts ./
-COPY tsconfig*.json ./
-COPY generate-sitemap.ts ./
-COPY verify-ssg.ts ./
-COPY tailwind.config.ts ./
-COPY postcss.config.js ./
-COPY eslint.config.js ./
-
+ADD . .
 RUN npm install
 RUN npm run build
-# RUN cd /usr/dist && find . -type f -exec brotli {} \; # Optional: Compress if serving static directly, but express static handles gzip usually. keeping simple for now.
+RUN cd /usr/dist && find . -type f -exec brotli {} \;
 
 # Actual runtime container
-FROM node:18-alpine
-WORKDIR /app
+FROM alpine
+RUN apk add brotli nginx nginx-mod-http-brotli
 
-COPY package*.json ./
-RUN npm install --production
-
-COPY --from=builder /usr/dist ./dist
-COPY server.js ./
-
-EXPOSE 3000
-CMD ["node", "server.js"]
+# Minimal config
+COPY nginx/nginx.conf /etc/nginx/http.d/default.conf
+# Actual data
+COPY --from=builder /usr/dist /usr/share/nginx/html
+CMD ["nginx", "-g", "daemon off;"]
+EXPOSE 8080
