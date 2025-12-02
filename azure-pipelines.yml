@@ -65,7 +65,10 @@ stages:
 
           # Build once and tag with BuildId for promotion to PROD
           - script: |
-              gcloud builds submit --tag gcr.io/$(projectId)/$(imageName):$(Build.BuildId)
+              gcloud builds submit \
+                --tag gcr.io/$(projectId)/$(imageName):$(Build.BuildId) \
+                --build-arg VITE_SUPABASE_URL=$(VITE_SUPABASE_URL) \
+                --build-arg VITE_SUPABASE_PUBLISHABLE_KEY=$(VITE_SUPABASE_PUBLISHABLE_KEY)
             displayName: "Cloud Build -> GCR (single build)"
 
           # Deploy to QA service
@@ -79,7 +82,7 @@ stages:
                 --cpu 1 \
                 --min-instances 0 \
                 --max-instances 1 \
-                --set-env-vars "APP_ENV=qa,VITE_SUPABASE_URL=$(VITE_SUPABASE_URL),VITE_SUPABASE_PUBLISHABLE_KEY=$(VITE_SUPABASE_PUBLISHABLE_KEY)"
+                --set-env-vars "APP_ENV=qa"
             displayName: "Deploy to Cloud Run (QA)"
 
   # =========================
@@ -129,5 +132,5 @@ stages:
                       --cpu 1 \
                       --min-instances 0 \
                       --max-instances 1 \
-                      --set-env-vars "APP_ENV=prod,VITE_SUPABASE_URL=$(VITE_SUPABASE_URL),VITE_SUPABASE_PUBLISHABLE_KEY=$(VITE_SUPABASE_PUBLISHABLE_KEY)"
+                      --set-env-vars "APP_ENV=prod"
                   displayName: "Deploy to Cloud Run (PROD)"
