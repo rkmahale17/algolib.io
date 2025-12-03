@@ -314,30 +314,36 @@ export type Database = {
       user_progress: {
         Row: {
           algorithm_id: string
+          code: string | null
           completed: boolean | null
           completed_at: string | null
           created_at: string | null
           id: string
+          is_favorite: boolean | null
           time_spent: number | null
           updated_at: string | null
           user_id: string
         }
         Insert: {
           algorithm_id: string
+          code?: string | null
           completed?: boolean | null
           completed_at?: string | null
           created_at?: string | null
           id?: string
+          is_favorite?: boolean | null
           time_spent?: number | null
           updated_at?: string | null
           user_id: string
         }
         Update: {
           algorithm_id?: string
+          code?: string | null
           completed?: boolean | null
           completed_at?: string | null
           created_at?: string | null
           id?: string
+          is_favorite?: boolean | null
           time_spent?: number | null
           updated_at?: string | null
           user_id?: string
