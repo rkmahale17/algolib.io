@@ -94,7 +94,6 @@ Deno.serve(async (req) => {
             test_cases: algo.testCases,
             input_schema: algo.inputSchema,
             tutorials: algo.tutorials,
-            list_type: algo.listType,
             metadata: {
               likes: algo.likes,
               dislikes: algo.dislikes,
@@ -102,7 +101,7 @@ Deno.serve(async (req) => {
               commonNotes: algo.commonNotes,
               commonWhiteBoard: algo.commonWhiteBoard,
               companyTags: algo.companyTags,
-
+              list_type: algo.listType,
               overview: algo.overview,
               timeComplexity: algo.timeComplexity,
               spaceComplexity: algo.spaceComplexity,

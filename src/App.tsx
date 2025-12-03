@@ -28,6 +28,8 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import BlogPost from "./pages/BlogPost";
 import SeedDatabase from "./pages/SeedDatabase";
 import AdminAlgorithms from "./pages/AdminAlgorithms";
+import AdminAlgorithmDetail from "./pages/AdminAlgorithmDetail";
+import { ProtectedAdminRoute } from "./components/ProtectedAdminRoute";
 
 const queryClient = new QueryClient();
 
@@ -59,8 +61,26 @@ const App = () => (
           <Route path="/games/two-pointer" element={<ProtectedRoute><TwoPointer /></ProtectedRoute>} />
           <Route path="/games/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
           <Route path="/blog/:slug" element={<BlogPost />} />
-          <Route path="/admin/seed" element={<SeedDatabase />} />
-          <Route path="/admin/algorithms" element={<AdminAlgorithms />} />
+          <Route path="/admin/seed" element={
+            <ProtectedAdminRoute>
+              <SeedDatabase />
+            </ProtectedAdminRoute>
+          } />
+          <Route path="/admin/algorithms" element={
+            <ProtectedAdminRoute>
+              <AdminAlgorithms />
+            </ProtectedAdminRoute>
+          } />
+          <Route path="/admin/algorithms/new" element={
+            <ProtectedAdminRoute>
+              <AdminAlgorithmDetail />
+            </ProtectedAdminRoute>
+          } />
+          <Route path="/admin/algorithms/:id" element={
+            <ProtectedAdminRoute>
+              <AdminAlgorithmDetail />
+            </ProtectedAdminRoute>
+          } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

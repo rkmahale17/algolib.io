@@ -20,7 +20,20 @@ import {
   Database,
   ListChecks,
   Target,
-  ExternalLink
+  ExternalLink,
+  Timer,
+  Flag,
+  Bug,
+  Share2,
+  Shuffle,
+  Plus,
+  Monitor,
+  ThumbsUp,
+  ThumbsDown,
+  Heart,
+  Pause,
+  RotateCcw,
+  Play
 } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import React, { useEffect, useState, useRef } from "react";
@@ -28,6 +41,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 import AlgoMetaHead from "@/services/meta.injectot";
 import { Badge } from "@/components/ui/badge";
@@ -39,18 +65,59 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { CopyCodeButton } from "@/components/CopyCodeButton";
 import { Separator } from "@/components/ui/separator";
 import { YouTubePlayer } from "@/components/YouTubePlayer";
-// import { algorithmsDB } from "@/data/algorithmsDB";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CodeRunner } from "@/components/CodeRunner/CodeRunner";
 import { ShareButton } from "@/components/ShareButton";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { blind75Problems } from "@/data/blind75";
+import { renderBlind75Visualization } from "@/utils/blind75Visualizations";
 
 const AlgorithmDetailNew: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
   const [algorithm, setAlgorithm] = useState<any>(undefined);
   const [isLoadingAlgorithm, setIsLoadingAlgorithm] = useState(true);
+  
+  const [user, setUser] = useState<any>(null);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [isLoadingProgress, setIsLoadingProgress] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  
+  // Layout State
+  const [isLeftCollapsed, setIsLeftCollapsed] = useState(false);
+  const [isRightCollapsed, setIsRightCollapsed] = useState(false);
+  const [isCodeRunnerMaximized, setIsCodeRunnerMaximized] = useState(false);
+  const [isVisualizationMaximized, setIsVisualizationMaximized] = useState(false);
+  const [isBrainstormMaximized, setIsBrainstormMaximized] = useState(false);
+  
+  // New Features State
+  const [isInterviewMode, setIsInterviewMode] = useState(false);
+  const [showInterviewSummary, setShowInterviewSummary] = useState(false);
+  const [interviewTime, setInterviewTime] = useState(0);
+  
+  const [timerSeconds, setTimerSeconds] = useState(0);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [likes, setLikes] = useState(0);
+  const [userVote, setUserVote] = useState<'like' | 'dislike' | null>(null);
+  const [savedCode, setSavedCode] = useState<string>("");
+  
+  const leftPanelRef = useRef<any>(null);
+  const rightPanelRef = useRef<any>(null);
 
+  const [selectedLanguage, setSelectedLanguage] = useState(
+    localStorage.getItem('preferredLanguage') || 'typescript'
+  );
+
+  // Fetch Algorithm
   useEffect(() => {
     const fetchAlgorithm = async () => {
       if (!id) return;
@@ -71,17 +138,15 @@ const AlgorithmDetailNew: React.FC = () => {
         
         if (error) throw error;
         
-        // Transform Supabase data structure to match component expectations
-        // Flatten metadata fields to top level
+        // Transform Supabase data structure
         const transformedData = {
           ...data,
-          // Spread metadata fields to top level
           ...(data.metadata || {}),
-          // Keep original nested structure for backward compatibility
           metadata: data.metadata
         };
         
         setAlgorithm(transformedData);
+        setLikes(transformedData.likes || 0);
       } catch (error) {
         console.error('Error fetching algorithm:', error);
         toast.error('Failed to load algorithm details');
@@ -92,31 +157,82 @@ const AlgorithmDetailNew: React.FC = () => {
 
     fetchAlgorithm();
   }, [id]);
-  
-  const [user, setUser] = useState<any>(null);
-  const [isCompleted, setIsCompleted] = useState(false);
-  const [isLoadingProgress, setIsLoadingProgress] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
-  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
-  
-  // Layout State
-  const [isLeftCollapsed, setIsLeftCollapsed] = useState(false);
-  const [isRightCollapsed, setIsRightCollapsed] = useState(false);
-  const [isCodeRunnerMaximized, setIsCodeRunnerMaximized] = useState(false);
-  const [isVisualizationMaximized, setIsVisualizationMaximized] = useState(false);
-  const [isBrainstormMaximized, setIsBrainstormMaximized] = useState(false);
-  
-  const leftPanelRef = useRef<any>(null);
-  const rightPanelRef = useRef<any>(null);
 
-  const [selectedLanguage, setSelectedLanguage] = useState(
-    localStorage.getItem('preferredLanguage') || 'typescript'
-  );
+  // Auth & Progress
+  useEffect(() => {
+    if (!supabase) return;
 
-  const currentImplementation = algorithm?.implementations.find(
-    (impl) => impl.lang.toLowerCase() === selectedLanguage.toLowerCase()
-  );
-  const currentCode = currentImplementation?.code.find(c => c.codeType === 'optimize')?.code || '';
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const fetchProgress = async () => {
+      if (!user || !id || !supabase) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('user_progress')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('algorithm_id', id)
+          .maybeSingle();
+          
+        if (error) throw error;
+        
+        if (data) {
+          setIsCompleted(data.completed || false);
+          setIsFavorite(data.is_favorite || false);
+          if (data.code) setSavedCode(data.code);
+        }
+      } catch (error) {
+        console.error('Error fetching progress:', error);
+      } finally {
+        setIsLoadingProgress(false);
+      }
+    };
+
+    fetchProgress();
+  }, [user, id]);
+
+  // Timer Logic
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isTimerRunning) {
+      interval = setInterval(() => {
+        setTimerSeconds(s => s + 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isTimerRunning]);
+
+  const toggleInterviewMode = () => {
+    if (isInterviewMode) {
+      // Stopping interview mode
+      setIsInterviewMode(false);
+      setIsTimerRunning(false);
+      setInterviewTime(timerSeconds);
+      setShowInterviewSummary(true);
+    } else {
+      // Starting interview mode
+      setIsInterviewMode(true);
+      setIsTimerRunning(true);
+      setTimerSeconds(0);
+    }
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   // Detect mobile and window width
   useEffect(() => {
@@ -153,54 +269,6 @@ const AlgorithmDetailNew: React.FC = () => {
     }
   };
 
-  const handleLanguageChange = (value: string) => {
-    setSelectedLanguage(value);
-    localStorage.setItem('preferredLanguage', value);
-  };
-
-  useEffect(() => {
-    if (!supabase) {
-      console.warn('Supabase not available, skipping authentication');
-      return;
-    }
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    const checkProgress = async () => {
-      if (!user || !id || !supabase) return;
-      
-      try {
-        const { data, error } = await supabase
-          .from('user_progress')
-          .select('*')
-          .eq('user_id', user.id)
-          .eq('algorithm_id', id)
-          .maybeSingle();
-          
-        if (error) throw error;
-        setIsCompleted(!!data);
-      } catch (error) {
-        console.error('Error checking progress:', error);
-      } finally {
-        setIsLoadingProgress(false);
-      }
-    };
-
-    checkProgress();
-  }, [user, id]);
-
   const toggleCompletion = async () => {
     if (!supabase) {
       toast.error("Progress tracking is not available");
@@ -213,130 +281,167 @@ const AlgorithmDetailNew: React.FC = () => {
     }
 
     try {
-      if (isCompleted) {
-        const { error } = await supabase
-          .from('user_progress')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('algorithm_id', id);
+      const newStatus = !isCompleted;
+      
+      // Upsert to handle both insert and update
+      const { error } = await supabase
+        .from('user_progress')
+        .upsert({
+          user_id: user.id,
+          algorithm_id: id,
+          completed: newStatus,
+          completed_at: newStatus ? new Date().toISOString() : null,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id,algorithm_id' });
 
-        if (error) throw error;
-        setIsCompleted(false);
-        toast.success("Progress removed");
-      } else {
-        const { error } = await supabase
-          .from('user_progress')
-          .insert({
-            user_id: user.id,
-            algorithm_id: id,
-            completed: true,
-            completed_at: new Date().toISOString()
-          });
-
-        if (error) throw error;
-        setIsCompleted(true);
-        toast.success("Algorithm marked as completed!");
-      }
+      if (error) throw error;
+      
+      setIsCompleted(newStatus);
+      toast.success(newStatus ? "Marked as completed!" : "Marked as incomplete");
     } catch (error) {
       console.error('Error toggling completion:', error);
       toast.error("Failed to update progress");
     }
   };
 
-  const renderVisualization = () => {
-    const vizMap: Record<string, any> = {
-      "two-pointers": () => import("@/components/visualizations/algorithms/TwoPointersVisualization").then(m => ({ default: m.TwoPointersVisualization })),
-      "sliding-window": () => import("@/components/visualizations/algorithms/SlidingWindowVisualization").then(m => ({ default: m.SlidingWindowVisualization })),
-      "prefix-sum": () => import("@/components/visualizations/algorithms/PrefixSumVisualization").then(m => ({ default: m.PrefixSumVisualization })),
-      "binary-search": () => import("@/components/visualizations/algorithms/BinarySearchVisualization").then(m => ({ default: m.BinarySearchVisualization })),
-      "kadanes-algorithm": () => import("@/components/visualizations/algorithms/KadanesVisualization").then(m => ({ default: m.KadanesVisualization })),
-      "dutch-national-flag": () => import("@/components/visualizations/algorithms/DutchNationalFlagVisualization").then(m => ({ default: m.DutchNationalFlagVisualization })),
-      "merge-intervals": () => import("@/components/visualizations/algorithms/MergeIntervalsVisualization").then(m => ({ default: m.MergeIntervalsVisualization })),
-      "monotonic-stack": () => import("@/components/visualizations/algorithms/MonotonicStackVisualization").then(m => ({ default: m.MonotonicStackVisualization })),
-      "quick-select": () => import("@/components/visualizations/algorithms/QuickSelectVisualization").then(m => ({ default: m.QuickSelectVisualization })),
-      "container-with-most-water": () => import("@/components/visualizations/algorithms/ContainerWithMostWaterVisualization").then(m => ({ default: m.ContainerWithMostWaterVisualization })),
-      "trapping-rain-water": () => import("@/components/visualizations/algorithms/TrappingRainWaterVisualization").then(m => ({ default: m.TrappingRainWaterVisualization })),
-      "dfs-preorder": () => import("@/components/visualizations/algorithms/DFSPreorderVisualization").then(m => ({ default: m.DFSPreorderVisualization })),
-      "rotate-array": () => import("@/components/visualizations/algorithms/RotateArrayVisualization").then(m => ({ default: m.RotateArrayVisualization })),
-      "cyclic-sort": () => import("@/components/visualizations/algorithms/CyclicSortVisualization").then(m => ({ default: m.CyclicSortVisualization })),
-      "merge-sorted-lists": () => import("@/components/visualizations/algorithms/MergeSortedListsVisualization").then(m => ({ default: m.MergeSortedListsVisualization })),
-      "dfs-inorder": () => import("@/components/visualizations/algorithms/DFSInorderVisualization").then(m => ({ default: m.DFSInorderVisualization })),
-      "dfs-postorder": () => import("@/components/visualizations/algorithms/DFSPostorderVisualization").then(m => ({ default: m.DFSPostorderVisualization })),
-      "bfs-level-order": () => import("@/components/visualizations/algorithms/BFSLevelOrderVisualization").then(m => ({ default: m.BFSLevelOrderVisualization })),
-      "bst-insert": () => import("@/components/visualizations/algorithms/BSTInsertVisualization").then(m => ({ default: m.BSTInsertVisualization })),
-      "lca": () => import("@/components/visualizations/algorithms/LowestCommonAncestorVisualization").then(m => ({ default: m.LowestCommonAncestorVisualization })),
-      "serialize-tree": () => import("@/components/visualizations/algorithms/SerializeTreeVisualization").then(m => ({ default: m.SerializeTreeVisualization })),
-      "recover-bst": () => import("@/components/visualizations/algorithms/RecoverBSTVisualization").then(m => ({ default: m.RecoverBSTVisualization })),
-      "fast-slow-pointers": () => import("@/components/visualizations/algorithms/FastSlowPointersVisualization").then(m => ({ default: m.FastSlowPointersVisualization })),
-      "reverse-linked-list": () => import("@/components/visualizations/algorithms/ReverseLinkedListVisualization").then(m => ({ default: m.ReverseLinkedListVisualization })),
-      "detect-cycle": () => import("@/components/visualizations/algorithms/DetectCycleVisualization").then(m => ({ default: m.DetectCycleVisualization })),
-      "middle-node": () => import("@/components/visualizations/algorithms/MiddleNodeVisualization").then(m => ({ default: m.MiddleNodeVisualization })),
-      "trie": () => import("@/components/visualizations/algorithms/TrieVisualization").then(m => ({ default: m.TrieVisualization })),
-      "graph-dfs": () => import("@/components/visualizations/algorithms/GraphDFSVisualization").then(m => ({ default: m.GraphDFSVisualization })),
-      "graph-bfs": () => import("@/components/visualizations/algorithms/GraphBFSVisualization").then(m => ({ default: m.GraphBFSVisualization })),
-      "topological-sort": () => import("@/components/visualizations/algorithms/TopologicalSortVisualization").then(m => ({ default: m.TopologicalSortVisualization })),
-      "union-find": () => import("@/components/visualizations/algorithms/UnionFindVisualization").then(m => ({ default: m.UnionFindVisualization })),
-      "knapsack-01": () => import("@/components/visualizations/algorithms/KnapsackVisualization").then(m => ({ default: m.KnapsackVisualization })),
-      "coin-change": () => import("@/components/visualizations/algorithms/CoinChangeVisualization").then(m => ({ default: m.CoinChangeVisualization })),
-      "lcs": () => import("@/components/visualizations/algorithms/LCSVisualization").then(m => ({ default: m.LCSVisualization })),
-      "lis": () => import("@/components/visualizations/algorithms/LISVisualization").then(m => ({ default: m.LISVisualization })),
-      "edit-distance": () => import("@/components/visualizations/algorithms/EditDistanceVisualization").then(m => ({ default: m.EditDistanceVisualization })),
-      "matrix-path-dp": () => import("@/components/visualizations/algorithms/MatrixPathVisualization").then(m => ({ default: m.MatrixPathVisualization })),
-      "house-robber": () => import("@/components/visualizations/algorithms/HouseRobberVisualization").then(m => ({ default: m.HouseRobberVisualization })),
-      "climbing-stairs": () => import("@/components/visualizations/algorithms/ClimbingStairsVisualization").then(m => ({ default: m.ClimbingStairsVisualization })),
-      "kruskals": () => import("@/components/visualizations/algorithms/KruskalsVisualization").then(m => ({ default: m.KruskalsVisualization })),
-      "prims": () => import("@/components/visualizations/algorithms/PrimsVisualization").then(m => ({ default: m.PrimsVisualization })),
-      "dijkstras": () => import("@/components/visualizations/algorithms/DijkstrasVisualization").then(m => ({ default: m.DijkstrasVisualization })),
-      "bellman-ford": () => import("@/components/visualizations/algorithms/BellmanFordVisualization").then(m => ({ default: m.BellmanFordVisualization })),
-      "floyd-warshall": () => import("@/components/visualizations/algorithms/FloydWarshallVisualization").then(m => ({ default: m.FloydWarshallVisualization })),
-      "a-star": () => import("@/components/visualizations/algorithms/AStarVisualization").then(m => ({ default: m.AStarVisualization })),
-      "partition-equal-subset": () => import("@/components/visualizations/algorithms/PartitionEqualSubsetVisualization").then(m => ({ default: m.PartitionEqualSubsetVisualization })),
-      "word-break": () => import("@/components/visualizations/algorithms/WordBreakVisualization").then(m => ({ default: m.WordBreakVisualization })),
-      "subsets": () => import("@/components/visualizations/algorithms/SubsetsVisualization").then(m => ({ default: m.SubsetsVisualization })),
-      "permutations": () => import("@/components/visualizations/algorithms/PermutationsVisualization").then(m => ({ default: m.PermutationsVisualization })),
-      "combinations": () => import("@/components/visualizations/algorithms/CombinationsVisualization").then(m => ({ default: m.CombinationsVisualization })),
-      "combination-sum": () => import("@/components/visualizations/algorithms/CombinationSumVisualization").then(m => ({ default: m.CombinationSumVisualization })),
-      "word-search": () => import("@/components/visualizations/algorithms/WordSearchVisualization").then(m => ({ default: m.WordSearchVisualization })),
-      "word-search-grid": () => import("@/components/visualizations/algorithms/WordSearchVisualization").then(m => ({ default: m.WordSearchVisualization })),
-      "n-queens": () => import("@/components/visualizations/algorithms/NQueensVisualization").then(m => ({ default: m.NQueensVisualization })),
-      "sudoku-solver": () => import("@/components/visualizations/algorithms/SudokuSolverVisualization").then(m => ({ default: m.SudokuSolverVisualization })),
-      "segment-tree": () => import("@/components/visualizations/algorithms/SegmentTreeVisualization").then(m => ({ default: m.SegmentTreeVisualization })),
-      "fenwick-tree": () => import("@/components/visualizations/algorithms/FenwickTreeVisualization").then(m => ({ default: m.FenwickTreeVisualization })),
-      "kmp": () => import("@/components/visualizations/algorithms/KMPVisualization").then(m => ({ default: m.KMPVisualization })),
-      "kmp-string-matching": () => import("@/components/visualizations/algorithms/KMPVisualization").then(m => ({ default: m.KMPVisualization })),
-      "rabin-karp": () => import("@/components/visualizations/algorithms/RabinKarpVisualization").then(m => ({ default: m.RabinKarpVisualization })),
-      "activity-selection": () => import("@/components/visualizations/algorithms/ActivitySelectionVisualization").then(m => ({ default: m.ActivitySelectionVisualization })),
-      "xor-trick": () => import("@/components/visualizations/algorithms/XORTrickVisualization").then(m => ({ default: m.XORTrickVisualization })),
-      "count-bits": () => import("@/components/visualizations/algorithms/CountBitsVisualization").then(m => ({ default: m.CountBitsVisualization })),
-      "subset-generation-bits": () => import("@/components/visualizations/algorithms/SubsetBitsVisualization").then(m => ({ default: m.SubsetBitsVisualization })),
-      "kth-largest": () => import("@/components/visualizations/algorithms/KthLargestVisualization").then(m => ({ default: m.KthLargestVisualization })),
-      "kth-largest-element": () => import("@/components/visualizations/algorithms/KthLargestVisualization").then(m => ({ default: m.KthLargestVisualization })),
-      "merge-k-lists": () => import("@/components/visualizations/algorithms/MergeKSortedListsVisualization").then(m => ({ default: m.MergeKSortedListsVisualization })),
-      "merge-k-sorted-lists": () => import("@/components/visualizations/algorithms/MergeKSortedListsVisualization").then(m => ({ default: m.MergeKSortedListsVisualization })),
-      "sliding-window-maximum": () => import("@/components/visualizations/algorithms/SlidingWindowMaxVisualization").then(m => ({ default: m.SlidingWindowMaxVisualization })),
-      "gcd-euclidean": () => import("@/components/visualizations/algorithms/GCDVisualization").then(m => ({ default: m.GCDVisualization })),
-      "gcd": () => import("@/components/visualizations/algorithms/GCDVisualization").then(m => ({ default: m.GCDVisualization })),
-      "sieve-eratosthenes": () => import("@/components/visualizations/algorithms/SieveVisualization").then(m => ({ default: m.SieveVisualization })),
-      "sieve-of-eratosthenes": () => import("@/components/visualizations/algorithms/SieveVisualization").then(m => ({ default: m.SieveVisualization })),
-      "modular-exponentiation": () => import("@/components/visualizations/algorithms/ModularExpVisualization").then(m => ({ default: m.ModularExpVisualization })),
-      "sparse-table": () => import("@/components/visualizations/algorithms/SparseTableVisualization").then(m => ({ default: m.SparseTableVisualization })),
-      "gas-station": () => import("@/components/visualizations/algorithms/GasStationVisualization").then(m => ({ default: m.GasStationVisualization })),
-      "manachers": () => import("@/components/visualizations/algorithms/ManachersVisualization").then(m => ({ default: m.ManachersVisualization })),
-      "karatsuba": () => import("@/components/visualizations/algorithms/KaratsubaVisualization").then(m => ({ default: m.KaratsubaVisualization })),
-      "tarjans": () => import("@/components/visualizations/algorithms/TarjansVisualization").then(m => ({ default: m.TarjansVisualization })),
-      "binary-lifting": () => import("@/components/visualizations/algorithms/BinaryLiftingVisualization").then(m => ({ default: m.BinaryLiftingVisualization })),
-      "lru-cache": () => import("@/components/visualizations/algorithms/LRUCacheVisualization").then(m => ({ default: m.LRUCacheVisualization })),
-    };
+  const toggleFavorite = async () => {
+    if (!user) {
+      toast.error("Please sign in to favorite");
+      return;
+    }
 
-    if (vizMap[algorithm.id]) {
-      const VizComponent = React.lazy(vizMap[algorithm.id]);
+    try {
+      const newStatus = !isFavorite;
+      const { error } = await supabase
+        .from('user_progress')
+        .upsert({
+          user_id: user.id,
+          algorithm_id: id,
+          is_favorite: newStatus,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id,algorithm_id' });
+
+      if (error) throw error;
+      setIsFavorite(newStatus);
+      toast.success(newStatus ? "Added to favorites" : "Removed from favorites");
+    } catch (error) {
+      toast.error("Failed to update favorites");
+    }
+  };
+
+  const handleVote = (vote: 'like' | 'dislike') => {
+    if (!user) {
+      toast.error("Please sign in to vote");
+      return;
+    }
+    // Optimistic update
+    if (userVote === vote) {
+      setUserVote(null);
+      if (vote === 'like') setLikes(l => l - 1);
+    } else {
+      if (userVote === 'like') setLikes(l => l - 1);
+      setUserVote(vote);
+      if (vote === 'like') setLikes(l => l + 1);
+    }
+    // TODO: Implement actual DB update
+  };
+
+  const handleRandomProblem = async () => {
+    const { data } = await supabase.from('algorithms').select('id');
+    if (data && data.length > 0) {
+      const random = data[Math.floor(Math.random() * data.length)];
+      navigate(`/algorithm/${random.id}`);
+    }
+  };
+
+  const handleNextProblem = async () => {
+    if (!algorithm) return;
+
+    // Try to find current problem in Blind 75 list
+    const currentSlug = algorithm.slug || algorithm.id; // Fallback if slug is missing
+    const currentIndex = blind75Problems.findIndex(p => p.slug === currentSlug || p.algorithmId === currentSlug);
+
+    if (currentIndex !== -1 && currentIndex < blind75Problems.length - 1) {
+      const nextProblem = blind75Problems[currentIndex + 1];
+      
+      // We need the UUID for the route, so we must query Supabase
+      const { data } = await supabase
+        .from('algorithms')
+        .select('id')
+        .eq('slug', nextProblem.slug)
+        .maybeSingle();
+
+      if (data) {
+        navigate(`/algorithm/${data.id}`);
+        return;
+      }
+    }
+
+    // Fallback: Random or just stay (could also query next ID from DB if we had an order)
+    toast.info("No next problem found in sequence. Trying random...");
+    handleRandomProblem();
+  };
+
+  const handleCodeChange = async (newCode: string) => {
+    setSavedCode(newCode);
+  };
+
+  // Periodic code save
+  useEffect(() => {
+    const saveTimeout = setTimeout(async () => {
+      if (!user || !id || !savedCode) return;
+      
+      try {
+        const { error } = await supabase
+          .from('user_progress')
+          .upsert({
+            user_id: user.id,
+            algorithm_id: id,
+            code: savedCode,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'user_id,algorithm_id' });
+          
+        if (error) throw error;
+      } catch (err) {
+        console.error("Error saving code:", err);
+      }
+    }, 2000);
+
+    return () => clearTimeout(saveTimeout);
+  }, [savedCode, user, id]);
+
+  const renderVisualization = () => {
+    if (!algorithm) return null;
+
+    // 1. Check DB Visualization URL
+    const dbUrl = algorithm.metadata?.visualizationUrl || algorithm.visualizationUrl;
+    if (dbUrl && dbUrl.startsWith('http')) {
       return (
-        <React.Suspense fallback={<div className="text-center py-12">Loading...</div>}>
-          <VizComponent />
-        </React.Suspense>
+        <iframe 
+          src={dbUrl} 
+          className="w-full h-full border-0" 
+          title="Visualization"
+        />
       );
     }
 
+    // 2. Try Blind 75 Visualization Mapping
+    // First, check if algorithm has a slug that matches Blind 75
+    const blind75Match = blind75Problems.find(p => 
+      p.slug === algorithm.slug || 
+      p.algorithmId === algorithm.id ||
+      p.algorithmId === algorithm.slug
+    );
+    
+    const vizKey = blind75Match?.algorithmId || algorithm.id || algorithm.slug;
+    
+    // Try to render using Blind 75 visualization helper
+    const blind75Viz = renderBlind75Visualization(vizKey);
+    if (blind75Viz) {
+      return blind75Viz;
+    }
+
+    // 3. Fallback: "Coming Soon" message
     return (
       <div className="text-center space-y-3 py-12">
         <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
@@ -379,20 +484,19 @@ const AlgorithmDetailNew: React.FC = () => {
     );
   }
 
-  const difficultyColors: Record<string, string> = {
-    beginner: "bg-green-500/10 text-green-500 border-green-500/20",
-    intermediate: "bg-yellow-500/10 text-yellow-500 border-yellow-500/20",
-    advanced: "bg-red-500/10 text-red-500 border-red-500/20",
-  };
-
   const renderLeftPanel = () => (
     <div className="h-full flex flex-col bg-card/30 backdrop-blur-sm">
-      {/* Left Header */}
+      {/* Left Header with Tools */}
       <div className="h-14 border-b flex items-center px-4 gap-4 shrink-0 justify-between">
-        <div className="flex items-center gap-4 overflow-hidden">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)} title="Back">
+        <div className="flex items-center gap-2 overflow-hidden">
+          {/* <Button variant="ghost" size="icon" onClick={() => navigate(-1)} title="Back">
             <ChevronLeft className="w-5 h-5" />
-          </Button>
+            {/* Back */}
+          {/* </Button> */}
+          
+        
+
+          
           <div className="flex-1 min-w-0">
             <Breadcrumbs
               items={[
@@ -410,6 +514,36 @@ const AlgorithmDetailNew: React.FC = () => {
               ]}
             />
           </div>
+          <div className="h-4 w-px bg-border mx-2" />
+
+            <TooltipProvider>
+            {/* <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" onClick={() => navigate("/admin/algorithms/new")} className="h-8 w-8">
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">New Problem</TooltipContent>
+            </Tooltip> */}
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" onClick={handleRandomProblem} className="h-8 w-8">
+                  <Shuffle className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Random Problem</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" onClick={handleNextProblem} className="h-8 w-8">
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Next Problem</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
         {!isMobile && (
           <Button variant="ghost" size="icon" onClick={toggleLeftPanel} title="Collapse Panel">
@@ -420,7 +554,7 @@ const AlgorithmDetailNew: React.FC = () => {
 
       {/* Left Content */}
       <Tabs defaultValue="description" className="flex-1 flex flex-col overflow-hidden w-full pt-0 mt-0">
-        <div className="px-4  shrink-0">
+        <div className="px-0  shrink-0">
             <TabsList className="w-full grid grid-cols-3 p-0 bg-transparent gap-0 border-b rounded-none">
               <TabsTrigger 
                 value="description" 
@@ -449,19 +583,20 @@ const AlgorithmDetailNew: React.FC = () => {
         <div className="flex-1 overflow-hidden relative">
             <TabsContent value="description" className="h-full m-0 data-[state=inactive]:hidden">
               <ScrollArea className="h-full">
-                <div className="p-4 space-y-6">
+                <div className="p-4 space-y-6 pb-20">
                   {/* Title & Progress */}
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <h1 className="text-2xl font-bold mb-2">{algorithm.name}</h1>
                       {algorithm.explanation.problemStatement && (
-                        <p className="text-muted-foreground text-base leading-relaxed">
-                          {algorithm.explanation.problemStatement}
-                        </p>
+                        <div 
+                          className="text-muted-foreground text-base leading-relaxed whitespace-pre-wrap prose prose-sm max-w-none dark:prose-invert"
+                          dangerouslySetInnerHTML={{ __html: algorithm.explanation.problemStatement }}
+                        />
                       )}
                     </div>
-                    <div className="shrink-0">
-                      {isCompleted ? (
+                    <div className="shrink-0 flex flex-col gap-2">
+                       {isCompleted ? (
                         <Badge 
                           variant="outline" 
                           className="bg-green-500/10 text-green-500 border-green-500/20 px-3 py-1.5 cursor-pointer hover:bg-green-500/20 transition-colors"
@@ -501,7 +636,7 @@ const AlgorithmDetailNew: React.FC = () => {
                             {example.explanation && (
                               <div className="mt-2">
                                 <span className="font-semibold">Explanation:</span>{' '}
-                                <span className="text-muted-foreground">{example.explanation}</span>
+                                <span className="text-muted-foreground whitespace-pre-line">{example.explanation}</span>
                               </div>
                             )}
                           </div>
@@ -532,7 +667,7 @@ const AlgorithmDetailNew: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Algorithm Overview Card (Reused from AlgorithmDetail) */}
+                  {/* Algorithm Overview Card */}
                   <Card className="p-4 sm:p-6 glass-card overflow-hidden">
                     <div className="space-y-4">
                       <h3 className="font-semibold flex items-center gap-2">
@@ -562,7 +697,7 @@ const AlgorithmDetailNew: React.FC = () => {
                     </div>
                   </Card>
 
-                  {/* Steps, Use Cases & Tips Card (Reused from AlgorithmDetail) */}
+                  {/* Steps, Use Cases & Tips Card */}
                   {algorithm && (
                     <Card className="p-4 sm:p-6 glass-card overflow-hidden">
                       <Tabs defaultValue="steps">
@@ -580,7 +715,7 @@ const AlgorithmDetailNew: React.FC = () => {
 
                         <TabsContent value="steps" className="mt-4">
                           <ol className="space-y-2 list-decimal list-inside">
-                            {algorithm.explanation.steps?.map((step, i) => (
+                            {algorithm.explanation.steps?.map((step: string, i: number) => (
                               <li key={i} className="text-sm text-muted-foreground">
                                 {step}
                               </li>
@@ -594,7 +729,7 @@ const AlgorithmDetailNew: React.FC = () => {
 
                         <TabsContent value="tips" className="mt-4">
                           <ul className="space-y-2 list-disc list-inside">
-                            {algorithm.explanation.tips?.map((tip, i) => (
+                            {algorithm.explanation.tips?.map((tip: string, i: number) => (
                               <li key={i} className="text-sm text-muted-foreground">
                                 {tip}
                               </li>
@@ -605,18 +740,16 @@ const AlgorithmDetailNew: React.FC = () => {
                     </Card>
                   )}
 
-                  {/* Video Tutorial Card (Reused from AlgorithmDetail) */}
-                  {algorithm.tutorials[0]?.url && (
+                  {/* Video Tutorial Card */}
+                  {algorithm.tutorials?.[0]?.url && (
                    <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-5xl mx-auto">
                                  <div className="space-y-6">
-                                   {/* Video Section */}
                                    <div className="space-y-4">
                                      <div className="flex items-center gap-2">
                                        <Youtube className="w-5 h-5 text-red-500" />
                                        <h3 className="font-semibold">Video Tutorial</h3>
                                      </div>
                  
-                                     {/* Responsive YouTube Player */}
                                      <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
                                        <iframe
                                          className="absolute top-0 left-0 w-full h-full rounded-lg"
@@ -629,105 +762,17 @@ const AlgorithmDetailNew: React.FC = () => {
                                          allowFullScreen
                                        />
                                      </div>
-                 
-                                     {/* What the video teaches */}
-                                     <div className="space-y-2">
-                                       <h4 className="text-lg font-semibold">What This Video Teaches</h4>
-                                       <p className="text-sm text-muted-foreground leading-relaxed">
-                                         This tutorial provides a comprehensive walkthrough of the {algorithm.name} algorithm,
-                                         demonstrating its practical application through step-by-step code implementation. The video
-                                         breaks down complex concepts into digestible segments, making it easier to understand how the
-                                         algorithm works under the hood and when to apply it in real-world scenarios.
-                                       </p>
-                                     </div>
-                 
-                                     {/* Credits */}
-                                     <div className="pt-2 border-t border-border/50">
-                                       <p className="text-xs text-muted-foreground">
-                                         <strong>Credits:</strong> Video tutorial by NeetCode (used with permission). All written
-                                         explanations, code examples, and additional insights provided by Algolib.io.
-                                       </p>
-                                     </div>
                                    </div>
-                 
-                                   <Separator />
-                 
-                                   {/* Code example explanation */}
-                                   {algorithm && (
-                                     <div className="space-y-3">
-                                       <h3 className="text-xl font-semibold flex items-center gap-2">
-                                         <Code2 className="w-5 h-5 text-primary" />
-                                         Code Example & Logic
-                                       </h3>
-                                       <p className="text-sm text-muted-foreground leading-relaxed">
-                                         {algorithm.overview ||
-                                           `The implementation of ${algorithm.name} follows a systematic approach that ensures optimal performance. 
-                                           Each step in the algorithm is carefully designed to handle specific cases while maintaining efficiency.`}
-                                       </p>
-                                       {algorithm.explanation.steps && algorithm.explanation.steps.length > 0 && (
-                                         <div className="mt-4">
-                                           <h4 className="font-medium mb-2">Key Steps:</h4>
-                                           <ol className="space-y-2 list-decimal list-inside text-sm text-muted-foreground">
-                                             {algorithm.explanation.steps.slice(0, 4).map((step, i) => (
-                                               <li key={i}>{step}</li>
-                                             ))}
-                                           </ol>
-                                         </div>
-                                       )}
-                                     </div>
-                                   )}
-                 
-                                   <Separator />
-                 
-                                   {/* Complexity Analysis */}
-                                   <div className="space-y-3">
-                                     <h3 className="text-xl font-semibold flex items-center gap-2">
-                                       <Clock className="w-5 h-5 text-primary" />
-                                       Time & Space Complexity
-                                     </h3>
-                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                       <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
-                                         <div className="text-xs font-medium text-muted-foreground mb-1">Time Complexity</div>
-                                         <div className="text-lg font-mono font-semibold text-foreground">
-                                           {algorithm.timeComplexity}
-                                         </div>
-                                       </div>
-                                       <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
-                                         <div className="text-xs font-medium text-muted-foreground mb-1">Space Complexity</div>
-                                         <div className="text-lg font-mono font-semibold text-foreground">
-                                           {algorithm.spaceComplexity}
-                                         </div>
-                                       </div>
-                                     </div>
-                                   </div>
-                 
-                                   {/* Additional Insights */}
-                                   {algorithm.explanation.tips && algorithm.explanation.tips.length > 0 && (
-                                     <>
-                                       <Separator />
-                                       <div className="space-y-3">
-                                         <h3 className="text-xl font-semibold flex items-center gap-2">
-                                           <Lightbulb className="w-5 h-5 text-primary" />
-                                           Additional Insights & Improvements
-                                         </h3>
-                                         <ul className="space-y-2 list-disc list-inside text-sm text-muted-foreground">
-                                           {algorithm.explanation.tips.map((tip, i) => (
-                                             <li key={i}>{tip}</li>
-                                           ))}
-                                         </ul>
-                                       </div>
-                                     </>
-                                   )}
                                  </div>
                                </Card>
                   )}
 
-                  {/* Practice Problems Card (Reused from AlgorithmDetail) */}
+                  {/* Practice Problems Card */}
                   {algorithm?.problems_to_solve?.external && algorithm.problems_to_solve.external.length > 0 ? (
                     <Card className="p-4 sm:p-6 glass-card overflow-hidden">
                       <h3 className="font-semibold mb-4">Practice Problems</h3>
                       <div className="space-y-2">
-                        {algorithm.problems_to_solve.external.map((problem, i) => (
+                        {algorithm.problems_to_solve.external.map((problem: any, i: number) => (
                           <a
                             key={i}
                             href={problem.url}
@@ -746,6 +791,60 @@ const AlgorithmDetailNew: React.FC = () => {
                       </div>
                     </Card>
                   ) : null}
+                  
+                  {/* Bottom Action Bar - Minimized */}
+                  <div className="p-2 border-t bg-background/40 backdrop-blur-md sticky bottom-0 z-10 flex items-center justify-between rounded-lg h-10">
+                    <div className="flex items-center gap-2">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button 
+                              variant={userVote === 'like' ? "default" : "ghost"} 
+                              size="sm" 
+                              onClick={() => handleVote('like')}
+                              className="gap-2 h-8 px-2"
+                            >
+                              <ThumbsUp className="h-3 w-3" />
+                              <span className="text-xs">{likes}</span>
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent side="top">Like</TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button 
+                              variant={userVote === 'dislike' ? "secondary" : "ghost"} 
+                              size="icon" 
+                              onClick={() => handleVote('dislike')}
+                              className="h-8 w-8"
+                            >
+                              <ThumbsDown className="h-3 w-3" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent side="top">Dislike</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button 
+                              variant={isFavorite ? "default" : "ghost"} 
+                              size="icon" 
+                              onClick={toggleFavorite}
+                              className={`h-8 w-8 ${isFavorite ? "text-red-500 hover:text-red-600" : ""}`}
+                            >
+                              <Heart className={`h-3 w-3 ${isFavorite ? "fill-current" : ""}`} />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent side="top">Favorite</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                  </div>
                 </div>
               </ScrollArea>
             </TabsContent>
@@ -777,7 +876,10 @@ const AlgorithmDetailNew: React.FC = () => {
                <ScrollArea className="h-full">
                   <div className="p-4 space-y-4">
                     <div className="flex items-center justify-between">
-                      <Select value={selectedLanguage} onValueChange={handleLanguageChange}>
+                      <Select value={selectedLanguage} onValueChange={(val) => {
+                        setSelectedLanguage(val);
+                        localStorage.setItem('preferredLanguage', val);
+                      }}>
                         <SelectTrigger className="w-[180px]">
                           <SelectValue placeholder="Select Language" />
                         </SelectTrigger>
@@ -790,14 +892,14 @@ const AlgorithmDetailNew: React.FC = () => {
                       </Select>
                     </div>
 
-                    {currentCode ? (
+                    {algorithm?.implementations?.find((i: any) => i.lang.toLowerCase() === selectedLanguage.toLowerCase())?.code?.find((c: any) => c.codeType === 'optimize')?.code ? (
                       <div className="relative rounded-lg border bg-muted/30 overflow-hidden">
                         <div className="absolute right-4 top-4 z-10">
-                          <CopyCodeButton code={currentCode} />
+                          <CopyCodeButton code={algorithm.implementations.find((i: any) => i.lang.toLowerCase() === selectedLanguage.toLowerCase()).code.find((c: any) => c.codeType === 'optimize').code} />
                         </div>
                         <ScrollArea className="h-[500px] w-full">
                           <pre className="p-6 text-sm font-mono leading-relaxed">
-                            <code>{currentCode}</code>
+                            <code>{algorithm.implementations.find((i: any) => i.lang.toLowerCase() === selectedLanguage.toLowerCase()).code.find((c: any) => c.codeType === 'optimize').code}</code>
                           </pre>
                         </ScrollArea>
                       </div>
@@ -816,11 +918,74 @@ const AlgorithmDetailNew: React.FC = () => {
 
   const renderRightPanel = () => (
     <div className="h-full flex flex-col bg-card/30 backdrop-blur-sm">
-      {/* Right Content - No Header, Tabs with Collapse Button */}
+      {/* Right Header with Tools */}
          <div className="h-14 border-b flex items-center px-4 gap-4 shrink-0 justify-between">
-        <div className="flex items-center gap-4 overflow-hidden">
-                              <ShareButton title={algorithm.name} description={algorithm.explanation.problemStatement} />
-          
+        <div className="flex items-center gap-2 overflow-hidden">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <Share2 className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Share</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+        </div>
+        <div className="flex items-center gap-1">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate('/feedback')}>
+                  <Bug className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Report Bug</TooltipContent>
+            </Tooltip>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button 
+                  variant={isTimerRunning ? "secondary" : "ghost"} 
+                  size="sm" 
+                  className="gap-2 font-mono h-8"
+                >
+                  <Timer className="h-4 w-4" />
+                  {formatTime(timerSeconds)}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-48">
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-lg">{formatTime(timerSeconds)}</span>
+                    <Button variant="ghost" size="icon" onClick={() => setTimerSeconds(0)}>
+                      <RotateCcw className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button className="flex-1" onClick={() => setIsTimerRunning(!isTimerRunning)}>
+                      {isTimerRunning ? <Pause className="h-4 w-4 mr-2" /> : <Play className="h-4 w-4 mr-2" />}
+                      {isTimerRunning ? "Pause" : "Start"}
+                    </Button>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant={isInterviewMode ? "default" : "ghost"} 
+                  size="icon" 
+                  onClick={toggleInterviewMode}
+                  className="h-8 w-8"
+                >
+                  <Monitor className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Interview Mode</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
          {!isMobile && (
                 <Button 
@@ -863,6 +1028,8 @@ const AlgorithmDetailNew: React.FC = () => {
                   algorithmData={algorithm}
                   onToggleFullscreen={() => setIsCodeRunnerMaximized(true)}
                   className="h-full border-0 rounded-none shadow-none"
+                  initialCode={savedCode}
+                  onCodeChange={handleCodeChange}
                 />
               )}
             </TabsContent>
@@ -887,7 +1054,7 @@ const AlgorithmDetailNew: React.FC = () => {
   );
 
   return (
-    <div className="h-[calc(100vh-4rem)] w-full overflow-hidden flex flex-col bg-background items-center">
+    <div className={`h-[calc(100vh-4rem)] w-full overflow-hidden flex flex-col bg-background items-center ${isInterviewMode ? 'border-4 border-green-500/30' : ''}`}>
       <AlgoMetaHead id={id} />
 
       {/* Full Screen Overlays */}
@@ -911,6 +1078,8 @@ const AlgorithmDetailNew: React.FC = () => {
                 isMaximized={true}
                 onToggleFullscreen={() => setIsCodeRunnerMaximized(false)}
                 className="h-full border-0 rounded-none shadow-none"
+                initialCode={savedCode}
+                onCodeChange={handleCodeChange}
               />
             )}
           </div>
@@ -958,6 +1127,33 @@ const AlgorithmDetailNew: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Interview Summary Modal */}
+      <Dialog open={showInterviewSummary} onOpenChange={setShowInterviewSummary}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Interview Finished</DialogTitle>
+            <DialogDescription>
+              Great job! Here's a summary of your session.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+              <span className="font-medium">Time Spent</span>
+              <span className="font-mono text-xl">{formatTime(interviewTime)}</span>
+            </div>
+            <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+              <span className="font-medium">Status</span>
+              <Badge variant={isCompleted ? "default" : "secondary"}>
+                {isCompleted ? "Completed" : "In Progress"}
+              </Badge>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setShowInterviewSummary(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Main Layout */}
       <div className="w-full max-w-[1900px] flex-1 overflow-hidden relative flex flex-col">

@@ -22,6 +22,8 @@ interface CodeRunnerProps {
   onToggleFullscreen?: () => void;
   isMaximized?: boolean;
   className?: string;
+  initialCode?: string;
+  onCodeChange?: (code: string) => void;
 }
 
 export const CodeRunner: React.FC<CodeRunnerProps> = ({ 
@@ -29,10 +31,12 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   algorithmData,
   onToggleFullscreen, 
   isMaximized = false,
-  className 
+  className,
+  initialCode,
+  onCodeChange
 }) => {
   const [language, setLanguage] = useState<Language>('typescript'); // Default to TypeScript
-  const [code, setCode] = useState<string>(DEFAULT_CODE['typescript']);
+  const [code, setCode] = useState<string>(initialCode || DEFAULT_CODE['typescript']);
   const [output, setOutput] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
@@ -79,39 +83,47 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
     if (activeAlgorithm) {
       const algo = activeAlgorithm;
       
-      // Try to get starter code or full implementation
-      const impl = algo.implementations.find(i => i.lang.toLowerCase() === language.toLowerCase());
-      let algoCode = impl?.code.find(c => c.codeType === 'starter')?.code || impl?.code.find(c => c.codeType === 'optimize')?.code;
-      
-      // If no code exists for this language, generate a stub
-      if (!algoCode && algo.input_schema) {
-        const functionName = algorithmId.replace(/-/g, '_'); // Convert kebab-case to snake_case
-        
-        // Parse input values for stub generation
-        const parsedInputs: Record<string, any> = {};
-        algo.input_schema.forEach(field => {
-          const value = inputValues[field.name];
-          if (value) {
-            try {
-              parsedInputs[field.name] = JSON.parse(value);
-            } catch {
-              parsedInputs[field.name] = value;
-            }
-          }
-        });
-        
-        algoCode = generateStub(
-          language,
-          functionName,
-          algo.input_schema as any,
-          Object.keys(parsedInputs).length > 0 ? parsedInputs : undefined
-        );
-      }
-      
-      if (algoCode) {
-        setCode(algoCode);
+      // If initialCode is provided and we haven't switched languages manually, use it
+      // Note: This is a simple heuristic. For more robust handling, we might need a 'savedLanguage' prop.
+      if (initialCode && code === initialCode) {
+         // Do nothing, keep initial code
       } else {
-        setCode(DEFAULT_CODE[language]);
+          // Try to get starter code or full implementation
+          const impl = algo.implementations.find(i => i.lang.toLowerCase() === language.toLowerCase());
+          let algoCode = impl?.code.find(c => c.codeType === 'starter')?.code || impl?.code.find(c => c.codeType === 'optimize')?.code;
+          
+          // If no code exists for this language, generate a stub
+          if (!algoCode && algo.input_schema) {
+            const functionName = algorithmId?.replace(/-/g, '_') || 'solution'; // Convert kebab-case to snake_case
+            
+            // Parse input values for stub generation
+            const parsedInputs: Record<string, any> = {};
+            algo.input_schema.forEach(field => {
+              const value = inputValues[field.name];
+              if (value) {
+                try {
+                  parsedInputs[field.name] = JSON.parse(value);
+                } catch {
+                  parsedInputs[field.name] = value;
+                }
+              }
+            });
+            
+            algoCode = generateStub(
+              language,
+              functionName,
+              algo.input_schema as any,
+              Object.keys(parsedInputs).length > 0 ? parsedInputs : undefined
+            );
+          }
+          
+          if (algoCode) {
+            setCode(algoCode);
+            onCodeChange?.(algoCode);
+          } else {
+            setCode(DEFAULT_CODE[language]);
+            onCodeChange?.(DEFAULT_CODE[language]);
+          }
       }
 
       // Initialize input values from schema or test case
@@ -125,9 +137,12 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
         setInputValues(initialValues);
       }
     } else {
-      setCode(DEFAULT_CODE[language]);
+      if (!initialCode) {
+        setCode(DEFAULT_CODE[language]);
+        onCodeChange?.(DEFAULT_CODE[language]);
+      }
     }
-  }, [activeAlgorithm, language, algorithmId]);
+  }, [activeAlgorithm, language, algorithmId]); // Removed initialCode from deps to prevent reset on every save
 
   const handleLanguageChange = (newLang: Language) => {
     setLanguage(newLang);
@@ -439,7 +454,11 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
               <CodeEditor
                 code={code}
                 language={language}
-                onChange={(value) => setCode(value || '')}
+                onChange={(value) => {
+                  const newCode = value || '';
+                  setCode(newCode);
+                  onCodeChange?.(newCode);
+                }}
               />
             </div>
           </div>

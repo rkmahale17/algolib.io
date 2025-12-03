@@ -15,7 +15,6 @@ export interface Algorithm {
     test_cases: any;
     input_schema: any;
     tutorials: any;
-    list_type: string;
     metadata: any;
     created_at?: string;
     updated_at?: string;
@@ -112,9 +111,10 @@ export function useUpdateAlgorithm() {
                 .update(updateData)
                 .eq('id', id)
                 .select()
-                .single();
+                .maybeSingle();
 
             if (error) throw error;
+            if (!data) throw new Error('Algorithm not found or permission denied');
             return data;
         },
         onSuccess: (_, variables) => {
