@@ -33,6 +33,8 @@ import { blind75Problems } from "@/data/blind75";
 import { getAlgorithmImplementation } from "@/data/algorithmImplementations";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useUserAlgorithmData } from "@/hooks/useUserAlgorithmData";
+import { updateProgress } from "@/utils/userAlgorithmDataHelpers";
 
 const Blind75Detail: React.FC = () => {
   const { slug } = useParams<{ slug?: string }>();
@@ -82,24 +84,20 @@ const Blind75Detail: React.FC = () => {
   }, [navigate, slug]);
 
   // Fetch user's progress for this problem
-  const fetchProgress = async (userId: string) => {
-    if (!slug) return;
+  const { data: userAlgoData, loading: loadingUserData, refetch: refetchUserData } = useUserAlgorithmData({
+    userId: user?.id,
+    algorithmId: slug ? `blind75-${slug}` : '',
+    enabled: !!user && !!slug,
+  });
 
-    setIsLoadingProgress(true);
-    const { data, error } = await supabase
-      .from("user_progress")
-      .select("completed")
-      .eq("user_id", userId)
-      .eq("algorithm_id", `blind75-${slug}`)
-      .maybeSingle();
-
-    if (!error && data) {
-      setIsCompleted(data.completed);
+  useEffect(() => {
+    if (userAlgoData) {
+      setIsCompleted(userAlgoData.completed);
     } else {
       setIsCompleted(false);
     }
-    setIsLoadingProgress(false);
-  };
+    setIsLoadingProgress(loadingUserData);
+  }, [userAlgoData, loadingUserData]);
 
   // Toggle completion status
   const toggleCompletion = async () => {
@@ -111,55 +109,22 @@ const Blind75Detail: React.FC = () => {
 
     const newCompletedState = !isCompleted;
 
-    // Optimistic update
-    setIsCompleted(newCompletedState);
-
-    // Check if record exists
-    const { data: existing } = await supabase
-      .from("user_progress")
-      .select("id")
-      .eq("user_id", user.id)
-      .eq("algorithm_id", `blind75-${slug}`)
-      .maybeSingle();
-
-    if (existing) {
-      // Update existing record
-      const { error } = await supabase
-        .from("user_progress")
-        .update({
-          completed: newCompletedState,
-          completed_at: newCompletedState ? new Date().toISOString() : null,
-        })
-        .eq("user_id", user.id)
-        .eq("algorithm_id", `blind75-${slug}`);
-
-      if (error) {
-        // Revert on error
-        setIsCompleted(!newCompletedState);
-        toast.error("Failed to update progress");
-        console.error(error);
-      } else {
-        toast.success(
-          newCompletedState ? "Marked as completed! 🎉" : "Marked as incomplete"
-        );
-      }
-    } else {
-      // Insert new record
-      const { error } = await supabase.from("user_progress").insert({
-        user_id: user.id,
-        algorithm_id: `blind75-${slug}`,
+    try {
+      const success = await updateProgress(user.id, `blind75-${slug}`, {
         completed: newCompletedState,
         completed_at: newCompletedState ? new Date().toISOString() : null,
       });
 
-      if (error) {
-        // Revert on error
-        setIsCompleted(!newCompletedState);
-        toast.error("Failed to save progress");
-        console.error(error);
-      } else {
-        toast.success("Marked as completed! 🎉");
-      }
+      if (!success) throw new Error("Failed to update");
+
+      setIsCompleted(newCompletedState);
+      toast.success(
+        newCompletedState ? "Marked as completed! 🎉" : "Marked as incomplete"
+      );
+      refetchUserData();
+    } catch (error) {
+      toast.error("Failed to update progress");
+      console.error(error);
     }
   };
 

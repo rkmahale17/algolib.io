@@ -103,18 +103,7 @@ const Home = () => {
     }
   }, [searchParams]);
 
-  // Calculate progress based on real completion data
-  const algorithmProgress = useMemo(() => {
-    const completed = userProgress.filter((p) =>
-      algorithms.some((algo) => algo.id === p.algorithm_id)
-    ).length;
-    const total = algorithms.length;
-    return {
-      completed,
-      total,
-      percentage: Math.round((completed / total) * 100),
-    };
-  }, [userProgress]);
+
 
   const filteredAlgorithms = algorithms.filter((algo) => {
     const matchesSearch =

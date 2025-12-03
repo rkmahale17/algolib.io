@@ -24,6 +24,8 @@ interface CodeRunnerProps {
   className?: string;
   initialCode?: string;
   onCodeChange?: (code: string) => void;
+  language?: Language;
+  onLanguageChange?: (language: Language) => void;
 }
 
 export const CodeRunner: React.FC<CodeRunnerProps> = ({ 
@@ -33,9 +35,13 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   isMaximized = false,
   className,
   initialCode,
-  onCodeChange
+  onCodeChange,
+  language: controlledLanguage,
+  onLanguageChange
 }) => {
-  const [language, setLanguage] = useState<Language>('typescript'); // Default to TypeScript
+  const [internalLanguage, setInternalLanguage] = useState<Language>('typescript');
+  const language = controlledLanguage || internalLanguage;
+  
   const [code, setCode] = useState<string>(initialCode || DEFAULT_CODE['typescript']);
   const [output, setOutput] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -145,7 +151,11 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   }, [activeAlgorithm, language, algorithmId]); // Removed initialCode from deps to prevent reset on every save
 
   const handleLanguageChange = (newLang: Language) => {
-    setLanguage(newLang);
+    if (onLanguageChange) {
+      onLanguageChange(newLang);
+    } else {
+      setInternalLanguage(newLang);
+    }
     setOutput(null);
   };
 

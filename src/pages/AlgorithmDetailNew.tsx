@@ -79,9 +79,11 @@ import { blind75Problems } from "@/data/blind75";
 import { renderBlind75Visualization } from "@/utils/blind75Visualizations";
 import { useUserAlgorithmData } from "@/hooks/useUserAlgorithmData";
 import { updateProgress, updateCode, updateNotes, updateWhiteboard, updateSocial } from "@/utils/userAlgorithmDataHelpers";
+import { renderVisualization as renderVizFromMapping, hasVisualization } from "@/utils/visualizationMapping";
 
 const AlgorithmDetailNew: React.FC = () => {
-  const { id } = useParams<{ id?: string }>();
+  const { id, slug } = useParams<{ id?: string; slug?: string }>();
+  const algorithmIdOrSlug = id || slug; // Support both /algorithm/:id and /blind75/:slug
   const navigate = useNavigate();
   const [algorithm, setAlgorithm] = useState<any>(undefined);
   const [isLoadingAlgorithm, setIsLoadingAlgorithm] = useState(true);
@@ -119,10 +121,16 @@ const AlgorithmDetailNew: React.FC = () => {
     localStorage.getItem('preferredLanguage') || 'typescript'
   );
 
+  // Local code cache per language to prevent race conditions
+  const [codeCache, setCodeCache] = useState<Record<string, string>>({});
+  
+  // Track if user has modified code (to prevent saving on initial load)
+  const [isUserModified, setIsUserModified] = useState(false);
+
   // Fetch Algorithm
   useEffect(() => {
     const fetchAlgorithm = async () => {
-      if (!id) return;
+      if (!algorithmIdOrSlug) return;
       
       if (!supabase) {
         console.warn('Supabase not available, cannot fetch algorithm from database');
@@ -132,11 +140,21 @@ const AlgorithmDetailNew: React.FC = () => {
 
       setIsLoadingAlgorithm(true);
       try {
-        const { data, error } = await supabase
+        // Try to fetch by id first, then by slug
+        let query = supabase
           .from('algorithms')
-          .select('*')
-          .eq('id', id)
-          .single();
+          .select('*');
+        
+        // If it looks like a slug (contains hyphens and no UUID pattern), search by slug
+        const isSlug = algorithmIdOrSlug.includes('-') && !algorithmIdOrSlug.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+        
+        if (isSlug) {
+          query = query.eq('id', algorithmIdOrSlug);
+        } else {
+          query = query.eq('id', algorithmIdOrSlug);
+        }
+        
+        const { data, error } = await query.single();
         
         if (error) throw error;
         
@@ -158,7 +176,7 @@ const AlgorithmDetailNew: React.FC = () => {
     };
 
     fetchAlgorithm();
-  }, [id]);
+  }, [algorithmIdOrSlug]);
 
   // Auth & Progress
   useEffect(() => {
@@ -182,17 +200,30 @@ const AlgorithmDetailNew: React.FC = () => {
     enabled: !!user && !!id,
   });
 
-  // Update state when user data changes
+  // Update state when user data changes (INITIAL LOAD ONLY)
   useEffect(() => {
     if (userAlgoData) {
       setIsCompleted(userAlgoData.completed || false);
       setIsFavorite(userAlgoData.is_favorite || false);
-      // Get code for current language or default
-      const codeForLanguage = userAlgoData.code?.[selectedLanguage] || userAlgoData.code?.default || '';
-      if (codeForLanguage) setSavedCode(codeForLanguage);
+      
+      // Load all code from DB into cache
+      if (userAlgoData.code && typeof userAlgoData.code === 'object') {
+        setCodeCache(userAlgoData.code as Record<string, string>);
+        
+        // Set current language code
+        const codeForLanguage = userAlgoData.code[selectedLanguage] || '';
+        setSavedCode(codeForLanguage);
+      }
     }
     setIsLoadingProgress(loadingUserData);
-  }, [userAlgoData, loadingUserData, selectedLanguage]);
+  }, [userAlgoData, loadingUserData]); // Removed selectedLanguage from deps!
+
+  // Handle language switching - load from cache, not DB
+  useEffect(() => {
+    const codeForLanguage = codeCache[selectedLanguage] || '';
+    setSavedCode(codeForLanguage);
+    setIsUserModified(false); // Reset flag when switching languages
+  }, [selectedLanguage]);
 
   // Timer Logic
   useEffect(() => {
@@ -361,10 +392,20 @@ const AlgorithmDetailNew: React.FC = () => {
 
   const handleCodeChange = async (newCode: string) => {
     setSavedCode(newCode);
+    setIsUserModified(true); // Mark as modified by user
+    // Update local cache immediately
+    setCodeCache(prev => ({
+      ...prev,
+      [selectedLanguage]: newCode
+    }));
   };
 
-  // Periodic code save with multi-language support
+  // Periodic code save with multi-language support (6 second debounce)
+  // ONLY saves if user has actually modified the code
   useEffect(() => {
+    // Don't save if user hasn't modified code
+    if (!isUserModified) return;
+    
     const saveTimeout = setTimeout(async () => {
       if (!user || !id || !savedCode) return;
       
@@ -375,13 +416,16 @@ const AlgorithmDetailNew: React.FC = () => {
         });
           
         if (!success) throw new Error('Failed to save code');
+        
+        // Reset modified flag after successful save
+        setIsUserModified(false);
       } catch (err) {
         console.error("Error saving code:", err);
       }
-    }, 2000);
+    }, 6000); // 6 second debounce
 
     return () => clearTimeout(saveTimeout);
-  }, [savedCode, user, id, selectedLanguage]);
+  }, [savedCode, user, id, selectedLanguage, isUserModified]);
 
   const renderVisualization = () => {
     if (!algorithm) return null;
@@ -398,8 +442,13 @@ const AlgorithmDetailNew: React.FC = () => {
       );
     }
 
-    // 2. Try Blind 75 Visualization Mapping
-    // First, check if algorithm has a slug that matches Blind 75
+    // 2. Try centralized visualization mapping (internal components)
+    const algorithmKey = algorithm.id || algorithm.slug;
+    if (hasVisualization(algorithmKey)) {
+      return renderVizFromMapping(algorithmKey);
+    }
+
+    // 3. Try Blind 75 Visualization Mapping (legacy fallback)
     const blind75Match = blind75Problems.find(p => 
       p.slug === algorithm.slug || 
       p.algorithmId === algorithm.id ||
@@ -414,7 +463,7 @@ const AlgorithmDetailNew: React.FC = () => {
       return blind75Viz;
     }
 
-    // 3. Fallback: "Coming Soon" message
+    // 4. Fallback: "Coming Soon" message
     return (
       <div className="text-center space-y-3 py-12">
         <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
@@ -735,6 +784,12 @@ const AlgorithmDetailNew: React.FC = () => {
                                          allowFullScreen
                                        />
                                      </div>
+                                     <div className="pt-2 border-t border-border/50">
+                      <p className="text-xs text-muted-foreground">
+                        <strong>Credits:</strong> Video tutorial by NeetCode (used with permission). All written
+                        explanations, code examples, and additional insights provided by Algolib.io.
+                      </p>
+                    </div>
                                    </div>
                                  </div>
                                </Card>
@@ -1003,6 +1058,11 @@ const AlgorithmDetailNew: React.FC = () => {
                   className="h-full border-0 rounded-none shadow-none"
                   initialCode={savedCode}
                   onCodeChange={handleCodeChange}
+                  language={selectedLanguage as any}
+                  onLanguageChange={(lang) => {
+                    setSelectedLanguage(lang);
+                    localStorage.setItem('preferredLanguage', lang);
+                  }}
                 />
               )}
             </TabsContent>

@@ -30,22 +30,23 @@ import SeedDatabase from "./pages/SeedDatabase";
 import AdminAlgorithms from "./pages/AdminAlgorithms";
 import AdminAlgorithmDetail from "./pages/AdminAlgorithmDetail";
 import { ProtectedAdminRoute } from "./components/ProtectedAdminRoute";
+import { AppProvider } from "./contexts/AppContext";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter basename="/">
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/algorithm/:id" element={<AlgorithmDetail />} />
-          <Route path="/algorithm-new/:id" element={<AlgorithmDetailNew />} />
-          <Route path="/blind75" element={<ProtectedRoute><Blind75 /></ProtectedRoute>} />
-          <Route path="/blind75/:slug" element={<ProtectedRoute><Blind75Detail /></ProtectedRoute>} />
+    <AppProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter basename="/">
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/algorithm/:id" element={<AlgorithmDetailNew />} />
+            <Route path="/blind75" element={<ProtectedRoute><Blind75 /></ProtectedRoute>} />
+            <Route path="/blind75/:slug" element={<ProtectedRoute><AlgorithmDetailNew /></ProtectedRoute>} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/about" element={<About />} />
@@ -86,6 +87,7 @@ const App = () => (
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
+    </AppProvider>
   </QueryClientProvider>
 );
 
