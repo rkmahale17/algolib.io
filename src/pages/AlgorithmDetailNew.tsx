@@ -77,6 +77,8 @@ import {
 } from "@/components/ui/tooltip";
 import { blind75Problems } from "@/data/blind75";
 import { renderBlind75Visualization } from "@/utils/blind75Visualizations";
+import { useUserAlgorithmData } from "@/hooks/useUserAlgorithmData";
+import { updateProgress, updateCode, updateNotes, updateWhiteboard, updateSocial } from "@/utils/userAlgorithmDataHelpers";
 
 const AlgorithmDetailNew: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
@@ -173,34 +175,24 @@ const AlgorithmDetailNew: React.FC = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  useEffect(() => {
-    const fetchProgress = async () => {
-      if (!user || !id || !supabase) return;
-      
-      try {
-        const { data, error } = await supabase
-          .from('user_progress')
-          .select('*')
-          .eq('user_id', user.id)
-          .eq('algorithm_id', id)
-          .maybeSingle();
-          
-        if (error) throw error;
-        
-        if (data) {
-          setIsCompleted(data.completed || false);
-          setIsFavorite(data.is_favorite || false);
-          if (data.code) setSavedCode(data.code);
-        }
-      } catch (error) {
-        console.error('Error fetching progress:', error);
-      } finally {
-        setIsLoadingProgress(false);
-      }
-    };
+  // Use the custom hook to fetch user algorithm data
+  const { data: userAlgoData, loading: loadingUserData, refetch: refetchUserData } = useUserAlgorithmData({
+    userId: user?.id,
+    algorithmId: id || '',
+    enabled: !!user && !!id,
+  });
 
-    fetchProgress();
-  }, [user, id]);
+  // Update state when user data changes
+  useEffect(() => {
+    if (userAlgoData) {
+      setIsCompleted(userAlgoData.completed || false);
+      setIsFavorite(userAlgoData.is_favorite || false);
+      // Get code for current language or default
+      const codeForLanguage = userAlgoData.code?.[selectedLanguage] || userAlgoData.code?.default || '';
+      if (codeForLanguage) setSavedCode(codeForLanguage);
+    }
+    setIsLoadingProgress(loadingUserData);
+  }, [userAlgoData, loadingUserData, selectedLanguage]);
 
   // Timer Logic
   useEffect(() => {
@@ -270,34 +262,23 @@ const AlgorithmDetailNew: React.FC = () => {
   };
 
   const toggleCompletion = async () => {
-    if (!supabase) {
-      toast.error("Progress tracking is not available");
-      return;
-    }
-
-    if (!user) {
+    if (!user || !id) {
       toast.error("Please sign in to track progress");
       return;
     }
 
     try {
       const newStatus = !isCompleted;
-      
-      // Upsert to handle both insert and update
-      const { error } = await supabase
-        .from('user_progress')
-        .upsert({
-          user_id: user.id,
-          algorithm_id: id,
-          completed: newStatus,
-          completed_at: newStatus ? new Date().toISOString() : null,
-          updated_at: new Date().toISOString()
-        }, { onConflict: 'user_id,algorithm_id' });
+      const success = await updateProgress(user.id, id, {
+        completed: newStatus,
+        completed_at: newStatus ? new Date().toISOString() : null,
+      });
 
-      if (error) throw error;
+      if (!success) throw new Error('Failed to update');
       
       setIsCompleted(newStatus);
       toast.success(newStatus ? "Marked as completed!" : "Marked as incomplete");
+      refetchUserData();
     } catch (error) {
       console.error('Error toggling completion:', error);
       toast.error("Failed to update progress");
@@ -305,25 +286,21 @@ const AlgorithmDetailNew: React.FC = () => {
   };
 
   const toggleFavorite = async () => {
-    if (!user) {
+    if (!user || !id) {
       toast.error("Please sign in to favorite");
       return;
     }
 
     try {
       const newStatus = !isFavorite;
-      const { error } = await supabase
-        .from('user_progress')
-        .upsert({
-          user_id: user.id,
-          algorithm_id: id,
-          is_favorite: newStatus,
-          updated_at: new Date().toISOString()
-        }, { onConflict: 'user_id,algorithm_id' });
+      const success = await updateSocial(user.id, id, {
+        is_favorite: newStatus,
+      });
 
-      if (error) throw error;
+      if (!success) throw new Error('Failed to update');
       setIsFavorite(newStatus);
       toast.success(newStatus ? "Added to favorites" : "Removed from favorites");
+      refetchUserData();
     } catch (error) {
       toast.error("Failed to update favorites");
     }
@@ -386,29 +363,25 @@ const AlgorithmDetailNew: React.FC = () => {
     setSavedCode(newCode);
   };
 
-  // Periodic code save
+  // Periodic code save with multi-language support
   useEffect(() => {
     const saveTimeout = setTimeout(async () => {
       if (!user || !id || !savedCode) return;
       
       try {
-        const { error } = await supabase
-          .from('user_progress')
-          .upsert({
-            user_id: user.id,
-            algorithm_id: id,
-            code: savedCode,
-            updated_at: new Date().toISOString()
-          }, { onConflict: 'user_id,algorithm_id' });
+        const success = await updateCode(user.id, id, {
+          language: selectedLanguage,
+          code: savedCode,
+        });
           
-        if (error) throw error;
+        if (!success) throw new Error('Failed to save code');
       } catch (err) {
         console.error("Error saving code:", err);
       }
     }, 2000);
 
     return () => clearTimeout(saveTimeout);
-  }, [savedCode, user, id]);
+  }, [savedCode, user, id, selectedLanguage]);
 
   const renderVisualization = () => {
     if (!algorithm) return null;

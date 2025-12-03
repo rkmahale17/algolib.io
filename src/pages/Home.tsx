@@ -58,7 +58,7 @@ const Home = () => {
       }
 
       const { data, error } = await supabase
-        .from("user_progress")
+        .from("user_algorithm_data")
         .select("*")
         .eq("user_id", user.id)
         .eq("completed", true);
@@ -74,13 +74,13 @@ const Home = () => {
     if (!user || !supabase) return;
 
     const channel = supabase
-      .channel("user_progress_changes")
+      .channel("user_algorithm_data_changes")
       .on(
         "postgres_changes",
         {
           event: "*",
           schema: "public",
-          table: "user_progress",
+          table: "user_algorithm_data",
           filter: `user_id=eq.${user.id}`,
         },
         () => {
