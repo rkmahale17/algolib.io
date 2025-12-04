@@ -77,7 +77,7 @@ const App = () => (
               <AdminAlgorithmDetail />
             </ProtectedAdminRoute>
           } />
-          <Route path="/admin/algorithms/:id" element={
+          <Route path="/admin/algorithm/:id" element={
             <ProtectedAdminRoute>
               <AdminAlgorithmDetail />
             </ProtectedAdminRoute>

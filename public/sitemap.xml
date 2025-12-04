@@ -2,1021 +2,1021 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://algolib.io/</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://algolib.io/about</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://algolib.io/privacy</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://algolib.io/terms</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://algolib.io/content-rights</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://algolib.io/feedback</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://algolib.io/auth</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://algolib.io/games</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://algolib.io/games/leaderboard</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://algolib.io/blog</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/two-pointers</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/sliding-window</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/prefix-sum</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/binary-search</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/kadanes-algorithm</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/dutch-national-flag</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/merge-intervals</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/monotonic-stack</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/rotate-array</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/cyclic-sort</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/fast-slow-pointers</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/reverse-linked-list</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/merge-sorted-lists</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/detect-cycle</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/middle-node</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/dfs-preorder</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/dfs-inorder</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/dfs-postorder</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/bfs-level-order</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/bst-insert</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/lca</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/recover-bst</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/serialize-tree</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/trie</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/graph-dfs</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/graph-bfs</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/topological-sort</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/union-find</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/kruskals</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/prims</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/dijkstras</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/bellman-ford</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/floyd-warshall</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/a-star</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/knapsack-01</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/coin-change</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/lcs</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/lis</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/edit-distance</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/matrix-path-dp</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/partition-equal-subset</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/house-robber</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/climbing-stairs</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/word-break</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/activity-selection</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/interval-scheduling</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/huffman-encoding</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/gas-station</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/subsets</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/permutations</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/combinations</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/combination-sum</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/word-search-grid</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/n-queens</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/sudoku-solver</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/xor-trick</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/count-bits</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/subset-generation-bits</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/kth-largest</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/merge-k-lists</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/sliding-window-maximum</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/gcd-euclidean</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/sieve-eratosthenes</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/modular-exponentiation</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/karatsuba</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/segment-tree</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/fenwick-tree</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/sparse-table</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/kmp</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/rabin-karp</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/manachers</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/union-by-rank</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/tarjans</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/binary-lifting</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/algorithm/lru-cache</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/two-sum</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/best-time-to-buy-and-sell-stock</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/contains-duplicate</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/product-of-array-except-self</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/maximum-subarray</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/maximum-product-subarray</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/find-minimum-in-rotated-sorted-array</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/search-in-rotated-sorted-array</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/3sum</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/container-with-most-water</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/sum-of-two-integers</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/number-of-1-bits</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/counting-bits</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/missing-number</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/reverse-bits</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/climbing-stairs</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/coin-change</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/longest-increasing-subsequence</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/longest-common-subsequence</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/word-break-problem</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/combination-sum</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/house-robber</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/house-robber-ii</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/decode-ways</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/unique-paths</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/jump-game</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/clone-graph</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/course-schedule</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/pacific-atlantic-water-flow</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/number-of-islands</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/longest-consecutive-sequence</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/alien-dictionary</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/graph-valid-tree</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/number-of-connected-components-in-an-undirected-graph</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/insert-interval</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/merge-intervals</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/non-overlapping-intervals</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/meeting-rooms</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/meeting-rooms-ii</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/reverse-linked-list</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/detect-cycle-in-a-linked-list</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/merge-two-sorted-lists</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/merge-k-sorted-lists</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/remove-nth-node-from-end-of-list</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/reorder-list</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/set-matrix-zeroes</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/spiral-matrix</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/rotate-image</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/word-search</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/longest-substring-without-repeating-characters</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/longest-repeating-character-replacement</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/minimum-window-substring</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/valid-anagram</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/group-anagrams</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/valid-parentheses</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/valid-palindrome</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/longest-palindromic-substring</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/palindromic-substrings</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/encode-and-decode-strings</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/maximum-depth-of-binary-tree</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/same-tree</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/invert-binary-tree</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/binary-tree-maximum-path-sum</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/binary-tree-level-order-traversal</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/serialize-and-deserialize-binary-tree</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/subtree-of-another-tree</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/construct-binary-tree-from-preorder-and-inorder-traversal</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/validate-binary-search-tree</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/kth-smallest-element-in-a-bst</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/lowest-common-ancestor-of-bst</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/implement-trie</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/add-and-search-word</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/word-search-ii</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/top-k-frequent-elements</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blind75/find-median-from-data-stream</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://algolib.io/blog/master-blind-75-visual-algorithms</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://algolib.io/blog/lru-cache-complete-guide</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://algolib.io/blog/dynamic-programming-for-people-who-hate-dynamic-programming</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://algolib.io/games/sort-hero</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://algolib.io/games/graph-explorer</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://algolib.io/games/stack-master</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://algolib.io/games/dp-puzzle</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://algolib.io/games/sliding-window</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://algolib.io/games/two-pointer</loc>
-    <lastmod>2025-12-02</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
