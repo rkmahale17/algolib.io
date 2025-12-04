@@ -28,6 +28,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import BlogPost from "./pages/BlogPost";
 import SeedDatabase from "./pages/SeedDatabase";
 import AdminAlgorithms from "./pages/AdminAlgorithms";
+import FeedbackAdmin from "./pages/FeedbackAdmin";
 
 const queryClient = new QueryClient();
 
@@ -61,6 +62,7 @@ const App = () => (
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/admin/seed" element={<SeedDatabase />} />
           <Route path="/admin/algorithms" element={<AdminAlgorithms />} />
+          <Route path="/admin/feedback" element={<FeedbackAdmin />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
