@@ -9,7 +9,7 @@ const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 const hasSupabaseCredentials = SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY;
 
 if (!hasSupabaseCredentials) {
-  console.warn('⚠️ Supabase credentials not found. User progress tracking will be disabled.');
+  console.warn('⚠️ Supabase credentials not found. Some features will be disabled.');
 }
 
 // Import the supabase client like this:
