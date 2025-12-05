@@ -257,6 +257,37 @@ export function AlgorithmFormBuilder({
                 </div>
 
                 <div className="space-y-2">
+                  <Label>YouTube Video URL</Label>
+                  <Input
+                    value={
+                      formData.tutorials?.find((t: any) => t.type === "youtube")
+                        ?.url || ""
+                    }
+                    onChange={(e) => {
+                      const url = e.target.value;
+                      const newTutorials = [
+                        ...(formData.tutorials?.filter(
+                          (t: any) => t.type !== "youtube"
+                        ) || []),
+                      ];
+                      
+                      if (url) {
+                        newTutorials.push({
+                          type: "youtube",
+                          url: url,
+                          credits: "",
+                          moreInfo: "",
+                        });
+                      }
+                      
+                      setFormData({ ...formData, tutorials: newTutorials });
+                    }}
+                    placeholder="e.g., https://www.youtube.com/watch?v=..."
+                    type="url"
+                  />
+                </div>
+
+                <div className="space-y-2">
                   <Label>Difficulty *</Label>
                   <Select
                     value={formData.difficulty}

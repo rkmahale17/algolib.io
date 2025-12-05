@@ -43,7 +43,7 @@ export function ExplanationEditor({ data, onChange }: ExplanationEditorProps) {
             value={data.problemStatement}
             onChange={(e) => updateField("problemStatement", e.target.value)}
             placeholder="Describe the problem this algorithm solves..."
-            rows={3}
+            className="min-h-[350px]"
           />
         </CardContent>
       </Card>
