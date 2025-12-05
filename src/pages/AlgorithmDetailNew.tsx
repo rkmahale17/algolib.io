@@ -94,6 +94,8 @@ import { renderBlind75Visualization } from "@/utils/blind75Visualizations";
 import { useUserAlgorithmData } from "@/hooks/useUserAlgorithmData";
 import { updateProgress, updateCode, updateNotes, updateWhiteboard, updateSocial } from "@/utils/userAlgorithmDataHelpers";
 import { renderVisualization as renderVizFromMapping, hasVisualization } from "@/utils/visualizationMapping";
+import { SolutionViewer } from "@/components/SolutionViewer";
+import { RichText } from "@/components/RichText";
 
 const AlgorithmDetailNew: React.FC = () => {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
@@ -116,6 +118,7 @@ const AlgorithmDetailNew: React.FC = () => {
   const [isBrainstormMaximized, setIsBrainstormMaximized] = useState(false);
   
   // New Features State
+  const [activeTab, setActiveTab] = useState("description");
   const [isInterviewMode, setIsInterviewMode] = useState(false);
   const [showInterviewSummary, setShowInterviewSummary] = useState(false);
   const [interviewTime, setInterviewTime] = useState(0);
@@ -125,6 +128,7 @@ const AlgorithmDetailNew: React.FC = () => {
   
   const [isFavorite, setIsFavorite] = useState(false);
   const [likes, setLikes] = useState(0);
+  const [dislikes, setDislikes] = useState(0);
   const [userVote, setUserVote] = useState<'like' | 'dislike' | null>(null);
   const [savedCode, setSavedCode] = useState<string>("");
   
@@ -201,6 +205,7 @@ const AlgorithmDetailNew: React.FC = () => {
         
         setAlgorithm(transformedData);
         setLikes(transformedData.likes || 0);
+        setDislikes(transformedData.dislikes || 0);
       } catch (error) {
         console.error('Error fetching algorithm:', error);
         toast.error('Failed to load algorithm details');
@@ -225,13 +230,32 @@ const AlgorithmDetailNew: React.FC = () => {
     });
 
     return () => subscription.unsubscribe();
+    return () => subscription.unsubscribe();
   }, []);
+
+  const handleRichTextClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    const anchor = target.closest('a');
+    
+    if (anchor) {
+      const href = anchor.getAttribute('href');
+      if (href === '#visualization') {
+        e.preventDefault();
+        setActiveTab('visualizations');
+        // Scroll to top of tab content if needed
+        const tabsContent = document.querySelector('[role="tabpanel"][data-state="active"]');
+        if (tabsContent) {
+          tabsContent.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    }
+  };
 
   // Use the custom hook to fetch user algorithm data
   const { data: userAlgoData, loading: loadingUserData, refetch: refetchUserData } = useUserAlgorithmData({
     userId: user?.id,
-    algorithmId: id || '',
-    enabled: !!user && !!id,
+    algorithmId: algorithmIdOrSlug || '',
+    enabled: !!user && !!algorithmIdOrSlug,
   });
 
   // Update state when user data changes (INITIAL LOAD ONLY)
@@ -371,21 +395,88 @@ const AlgorithmDetailNew: React.FC = () => {
     }
   };
 
-  const handleVote = (vote: 'like' | 'dislike') => {
+  const handleVote = async (vote: 'like' | 'dislike') => {
     if (!user) {
       toast.error("Please sign in to vote");
       return;
     }
+
+    const previousVote = userVote;
+    const previousLikes = likes;
+    const previousDislikes = dislikes;
+
     // Optimistic update
     if (userVote === vote) {
+      // Toggle off
       setUserVote(null);
-      if (vote === 'like') setLikes(l => l - 1);
+      if (vote === 'like') setLikes(l => Math.max(0, l - 1));
+      else setDislikes(d => Math.max(0, d - 1));
     } else {
-      if (userVote === 'like') setLikes(l => l - 1);
+      // Change vote or new vote
       setUserVote(vote);
-      if (vote === 'like') setLikes(l => l + 1);
+      if (vote === 'like') {
+        setLikes(l => l + 1);
+        if (previousVote === 'dislike') setDislikes(d => Math.max(0, d - 1));
+      } else {
+        setDislikes(d => d + 1);
+        if (previousVote === 'like') setLikes(l => Math.max(0, l - 1));
+      }
     }
-    // TODO: Implement actual DB update
+
+    try {
+      // DB Update Logic
+      let likeIncrement = 0;
+      let dislikeIncrement = 0;
+
+      if (previousVote === vote) {
+        // Removing vote
+        if (vote === 'like') likeIncrement = -1;
+        else dislikeIncrement = -1;
+      } else {
+        // Adding or changing vote
+        if (vote === 'like') {
+          likeIncrement = 1;
+          if (previousVote === 'dislike') dislikeIncrement = -1;
+        } else {
+          dislikeIncrement = 1;
+          if (previousVote === 'like') likeIncrement = -1;
+        }
+      }
+
+      // Update algorithm counts
+      if (likeIncrement !== 0 || dislikeIncrement !== 0) {
+        // We need to fetch current counts first to be safe, or use an RPC if available.
+        // For now, we'll just increment/decrement based on our optimistic assumption, 
+        // but a real production app might use a stored procedure to avoid race conditions.
+        // Since we don't have a custom RPC, we'll just update the row.
+        
+        const { error } = await supabase.rpc('update_algorithm_votes', {
+            algo_id: algorithm.id,
+            like_delta: likeIncrement,
+            dislike_delta: dislikeIncrement
+        }).catch(async () => {
+             // Fallback if RPC doesn't exist: standard update (less safe for concurrency)
+             const { data: current } = await supabase.from('algorithms').select('likes, dislikes').eq('id', algorithm.id).single();
+             if (current) {
+                 return await supabase.from('algorithms').update({
+                     likes: (current.likes || 0) + likeIncrement,
+                     dislikes: (current.dislikes || 0) + dislikeIncrement
+                 }).eq('id', algorithm.id);
+             }
+             return { error: 'Failed to fetch current' };
+        });
+
+        if (error) throw error;
+      }
+
+    } catch (error) {
+      console.error("Error updating vote:", error);
+      toast.error("Failed to update vote");
+      // Revert optimistic update
+      setUserVote(previousVote);
+      setLikes(previousLikes);
+      setDislikes(previousDislikes);
+    }
   };
 
   const handleRandomProblem = async () => {
@@ -546,7 +637,7 @@ const AlgorithmDetailNew: React.FC = () => {
      
 
       {/* Left Content */}
-      <Tabs defaultValue="description" className="flex-1 flex flex-col overflow-hidden w-full pt-0 mt-0">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden w-full pt-0 mt-0">
         <div className="px-0 shrink-0 flex items-stretch border-b">
           {/* Collapse Button - Left Panel */}
          
@@ -594,13 +685,56 @@ const AlgorithmDetailNew: React.FC = () => {
                   {/* Title & Progress */}
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <h1 className="text-2xl font-bold mb-2">{algorithm.name}</h1>
-                      {algorithm.explanation.problemStatement && (
-                        <div 
-                          className="text-base leading-relaxed whitespace-pre-wrap prose prose-sm max-w-none dark:prose-invert"
-                          dangerouslySetInnerHTML={{ __html: algorithm.explanation.problemStatement }}
-                        />
-                      )}
+                      <h1 className="text-2xl font-bold mb-3">{algorithm.name}</h1>
+                      
+                      {/* Difficulty and Company Tags */}
+                      <div className="flex flex-wrap items-center gap-2 mb-4">
+                        {/* Difficulty Badge */}
+                        {algorithm.difficulty && (
+                          <Badge 
+                            variant="outline"
+                            className={`
+                              ${algorithm.difficulty.toLowerCase() === 'easy' ? 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/30' : ''}
+                              ${algorithm.difficulty.toLowerCase() === 'medium' ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/30' : ''}
+                              ${algorithm.difficulty.toLowerCase() === 'hard' ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30' : ''}
+                              ${algorithm.difficulty.toLowerCase() === 'advanced' ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30' : ''}
+                              ${algorithm.difficulty.toLowerCase() === 'advance' ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30' : ''}
+                              ${algorithm.difficulty.toLowerCase() === 'intermediate' ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/30' : ''}
+                              font-semibold px-3 py-1
+                            `}
+                          >
+                            {algorithm.difficulty}
+                          </Badge>
+                        )}
+                        
+                        {/* Company Tags */}
+                        {algorithm.metadata?.companies && algorithm.metadata.companies.length > 0 && (
+                          <>
+                            <span className="text-muted-foreground text-sm">•</span>
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              {algorithm.metadata.companies.slice(0, 5).map((company: string, index: number) => (
+                                <Badge 
+                                  key={index}
+                                  variant="secondary"
+                                  className="bg-primary/5 text-primary border-primary/20 text-xs px-2 py-0.5"
+                                >
+                                  {company}
+                                </Badge>
+                              ))}
+                              {algorithm.metadata.companies.length > 5 && (
+                                <Badge 
+                                  variant="secondary"
+                                  className="bg-muted text-muted-foreground text-xs px-2 py-0.5"
+                                >
+                                  +{algorithm.metadata.companies.length - 5} more
+                                </Badge>
+                              )}
+                            </div>
+                          </>
+                        )}
+                      </div>
+
+                      
                     </div>
                     <div className="shrink-0 flex flex-col gap-2">
                        {isCompleted ? (
@@ -620,7 +754,13 @@ const AlgorithmDetailNew: React.FC = () => {
                       )}
                     </div>
                   </div>
-
+{algorithm.explanation.problemStatement && (
+                        <RichText
+                        content={algorithm.explanation.problemStatement}
+                        className="text-base leading-relaxed max-w-[800px] pr-4"
+                        onClick={handleRichTextClick}
+                        ></RichText>
+                      )}
                   {/* Examples Section */}
                   {algorithm.explanation.io && algorithm.explanation.io.length > 0 && (
                     <div className="space-y-4">
@@ -805,55 +945,58 @@ const AlgorithmDetailNew: React.FC = () => {
                     </Card>
                   ) : null}
                   
-                  {/* Bottom Action Bar - Minimized */}
-                  <div className="p-2 border-t bg-background/40 backdrop-blur-md sticky bottom-0 z-10 flex items-center justify-between rounded-lg h-10">
-                    <div className="flex items-center gap-2">
+                  {/* Bottom Action Bar - Floating & Centered */}
+                  <div className="sticky bottom-6 z-10 flex justify-center pointer-events-none">
+                    <div className="pointer-events-auto flex items-center gap-1 p-1.5 bg-background/60 backdrop-blur-xl border shadow-lg rounded-full">
+                      
+                      {/* Like Button */}
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button 
-                              variant={userVote === 'like' ? "default" : "ghost"} 
+                              variant={userVote === 'like' ? "secondary" : "ghost"} 
                               size="sm" 
                               onClick={() => handleVote('like')}
-                              className="gap-2 h-8 px-2"
+                              className={`gap-1.5 h-8 px-3 rounded-full transition-all ${userVote === 'like' ? 'bg-primary/10 text-primary hover:bg-primary/20' : 'hover:bg-muted'}`}
                             >
-                              <ThumbsUp className="h-3 w-3" />
-                              <span className="text-xs">{likes}</span>
+                              <ThumbsUp className={`h-3.5 w-3.5 ${userVote === 'like' ? 'fill-current' : ''}`} />
+                              <span className="text-xs font-medium">{likes}</span>
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent side="top">Like</TooltipContent>
                         </Tooltip>
 
+                        {/* Dislike Button */}
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button 
                               variant={userVote === 'dislike' ? "secondary" : "ghost"} 
-                              size="icon" 
+                              size="sm" 
                               onClick={() => handleVote('dislike')}
-                              className="h-8 w-8"
+                              className={`gap-1.5 h-8 px-3 rounded-full transition-all ${userVote === 'dislike' ? 'bg-destructive/10 text-destructive hover:bg-destructive/20' : 'hover:bg-muted'}`}
                             >
-                              <ThumbsDown className="h-3 w-3" />
+                              <ThumbsDown className={`h-3.5 w-3.5 ${userVote === 'dislike' ? 'fill-current' : ''}`} />
+                              {dislikes > 0 && <span className="text-xs font-medium">{dislikes}</span>}
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent side="top">Dislike</TooltipContent>
                         </Tooltip>
-                      </TooltipProvider>
-                    </div>
 
-                    <div className="flex items-center gap-2">
-                      <TooltipProvider>
+                        <div className="w-px h-4 bg-border mx-1" />
+
+                        {/* Favorite Button */}
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button 
                               variant="ghost" 
                               size="icon" 
                               onClick={toggleFavorite}
-                              className="h-8 w-8"
+                              className={`h-8 w-8 rounded-full transition-all ${isFavorite ? 'text-yellow-500 hover:text-yellow-600 hover:bg-yellow-500/10' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}
                             >
-                              <Star className={`h-4 w-4 ${isFavorite ? "fill-yellow-400 text-yellow-400" : ""}`} />
+                              <Star className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
                             </Button>
                           </TooltipTrigger>
-                          <TooltipContent side="top">Favorite</TooltipContent>
+                          <TooltipContent side="top">{isFavorite ? "Unfavorite" : "Favorite"}</TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                     </div>
@@ -893,41 +1036,18 @@ const AlgorithmDetailNew: React.FC = () => {
             <TabsContent value="solutions" className="h-full m-0 data-[state=inactive]:hidden">
                <ScrollArea className="h-full">
                   <div className="p-4 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <Select value={selectedLanguage} onValueChange={(val) => {
-                        setSelectedLanguage(val);
-                        localStorage.setItem('preferredLanguage', val);
-                      }}>
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder="Select Language" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="python">Python</SelectItem>
-                          <SelectItem value="typescript">TypeScript</SelectItem>
-                          <SelectItem value="cpp">C++</SelectItem>
-                          <SelectItem value="java">Java</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {algorithm?.implementations?.find((i: any) => i.lang.toLowerCase() === selectedLanguage.toLowerCase())?.code?.find((c: any) => c.codeType === 'optimize')?.code ? (
-                      <div className="relative rounded-lg border bg-muted/30 overflow-hidden">
-                        <div className="absolute right-4 top-4 z-10">
-                          <CopyCodeButton code={algorithm.implementations.find((i: any) => i.lang.toLowerCase() === selectedLanguage.toLowerCase()).code.find((c: any) => c.codeType === 'optimize').code} />
-                        </div>
-                        <ScrollArea className="h-[500px] w-full">
-                          <pre className="p-6 text-sm font-mono leading-relaxed">
-                            <code>{algorithm.implementations.find((i: any) => i.lang.toLowerCase() === selectedLanguage.toLowerCase()).code.find((c: any) => c.codeType === 'optimize').code}</code>
-                          </pre>
-                        </ScrollArea>
-                      </div>
+                    {algorithm?.implementations ? (
+                      <SolutionViewer
+                        implementations={algorithm.implementations}
+                        approachName="Optimal Solution"
+                      />
                     ) : (
                       <div className="text-center py-12 text-muted-foreground border rounded-lg border-dashed">
-                        No implementation available for {selectedLanguage}.
+                        No solutions available.
                       </div>
                     )}
                   </div>
-               </ScrollArea>
+                </ScrollArea>
             </TabsContent>
         </div>
       </Tabs>
@@ -980,9 +1100,9 @@ const AlgorithmDetailNew: React.FC = () => {
                 fallbackTitle="Sign in to use Code Runner"
                 fallbackDescription="Create an account or sign in to run and test your code solutions."
               >
-                {id && algorithm && (
+                {algorithmIdOrSlug && algorithm && (
                   <CodeRunner 
-                    algorithmId={id}
+                    algorithmId={algorithmIdOrSlug}
                     algorithmData={algorithm}
                     onToggleFullscreen={() => setIsCodeRunnerMaximized(true)}
                     className="h-full border-0 rounded-none shadow-none"
@@ -1005,8 +1125,8 @@ const AlgorithmDetailNew: React.FC = () => {
               >
                 <ScrollArea className="h-full">
                   <div className="p-0">
-                    {id && (
-                      <BrainstormSection algorithmId={id} algorithmTitle={algorithm.name} />
+                    {algorithmIdOrSlug && (
+                      <BrainstormSection algorithmId={algorithmIdOrSlug} algorithmTitle={algorithm.name} />
                     )}
                   </div>
                 </ScrollArea>
@@ -1019,7 +1139,7 @@ const AlgorithmDetailNew: React.FC = () => {
 
   return (
     <div className={`h-screen w-full overflow-hidden flex flex-col bg-background ${isInterviewMode ? 'border-4 border-green-500/30' : ''}`}>
-      <AlgoMetaHead id={id} />
+      <AlgoMetaHead id={algorithmIdOrSlug} />
 
       {/* Custom 48px Header Bar */}
       <div className="h-12 border-b flex items-center px-4 gap-4 shrink-0 bg-background/95">
@@ -1194,9 +1314,9 @@ const AlgorithmDetailNew: React.FC = () => {
             </Button>
           </div>
           <div className="flex-1 overflow-hidden">
-            {id && algorithm && (
+            {algorithmIdOrSlug && algorithm && (
               <CodeRunner 
-                algorithmId={id}
+                algorithmId={algorithmIdOrSlug}
                 algorithmData={algorithm}
                 isMaximized={true}
                 onToggleFullscreen={() => setIsCodeRunnerMaximized(false)}
@@ -1240,8 +1360,8 @@ const AlgorithmDetailNew: React.FC = () => {
             </Button>
           </div>
           <div className="flex-1 overflow-auto p-6">
-            {user && id && algorithm ? (
-              <BrainstormSection algorithmId={id} algorithmTitle={algorithm.name} />
+            {user && algorithmIdOrSlug && algorithm ? (
+              <BrainstormSection algorithmId={algorithmIdOrSlug} algorithmTitle={algorithm.name} />
             ) : (
               <div className="text-center py-12 text-muted-foreground">
                 Please sign in to use the brainstorm feature

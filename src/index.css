@@ -9,49 +9,49 @@
     /* Modern color palette - deep purple & cyan theme */
     --background: 0 0% 100%;
     --foreground: 222 47% 11%;
-    
+
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
-    
+
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    
+
     --primary: 262 83% 58%;
     --primary-foreground: 210 40% 98%;
     --primary-glow: 262 83% 68%;
-    
+
     --secondary: 217 91% 60%;
     --secondary-foreground: 210 40% 98%;
-    
+
     --muted: 210 40% 96%;
     --muted-foreground: 215 16% 47%;
-    
+
     --accent: 210 40% 96%;
     --accent-foreground: 222 47% 11%;
-    
+
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
-    
+
     --border: 214 32% 91%;
     --input: 214 32% 91%;
     --ring: 262 83% 58%;
-    
+
     --radius: 0.75rem;
-    
+
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(262 83% 58%), hsl(217 91% 60%));
     --gradient-card: linear-gradient(135deg, hsl(0 0% 100%), hsl(210 40% 98%));
     --gradient-hero: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 40% 98%) 100%);
-    
+
     /* Shadows */
     --shadow-glow: 0 0 40px hsl(262 83% 58% / 0.2);
     --shadow-card: 0 4px 16px hsl(222 47% 11% / 0.1);
     --shadow-elegant: 0 10px 30px -10px hsl(262 83% 58% / 0.3);
-    
+
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-spring: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-    
+
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 222 47% 11%;
     --sidebar-primary: 262 83% 58%;
@@ -65,41 +65,41 @@
   .dark {
     --background: 222 47% 11%;
     --foreground: 210 40% 98%;
-    
+
     --card: 222 47% 14%;
     --card-foreground: 210 40% 98%;
-    
+
     --popover: 222 47% 14%;
     --popover-foreground: 210 40% 98%;
-    
+
     --primary: 262 83% 58%;
     --primary-foreground: 210 40% 98%;
     --primary-glow: 262 83% 68%;
-    
+
     --secondary: 217 91% 60%;
     --secondary-foreground: 210 40% 98%;
-    
+
     --muted: 217 33% 17%;
     --muted-foreground: 215 20% 65%;
-    
+
     --accent: 262 83% 58%;
     --accent-foreground: 210 40% 98%;
-    
+
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
-    
+
     --border: 217 33% 17%;
     --input: 217 33% 17%;
     --ring: 262 83% 58%;
-    
+
     --gradient-primary: linear-gradient(135deg, hsl(262 83% 58%), hsl(217 91% 60%));
     --gradient-card: linear-gradient(135deg, hsl(222 47% 14%), hsl(217 33% 17%));
     --gradient-hero: linear-gradient(180deg, hsl(222 47% 11%) 0%, hsl(217 33% 17%) 100%);
-    
+
     --shadow-glow: 0 0 40px hsl(262 83% 58% / 0.3);
     --shadow-card: 0 8px 32px hsl(222 47% 5% / 0.5);
     --shadow-elegant: 0 10px 30px -10px hsl(262 83% 58% / 0.4);
-    
+
     --sidebar-background: 222 47% 14%;
     --sidebar-foreground: 210 40% 98%;
     --sidebar-primary: 262 83% 58%;
@@ -115,15 +115,16 @@
   * {
     @apply border-border;
   }
-  
+
   body {
     @apply bg-background text-foreground;
     font-family: 'Inter', sans-serif;
     font-feature-settings: 'cv11', 'ss01';
     font-variation-settings: 'opsz' 32;
   }
-  
-  code, pre {
+
+  code,
+  pre {
     font-family: 'JetBrains Mono', monospace;
   }
 }
@@ -132,32 +133,35 @@
   .gradient-text {
     @apply bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent;
   }
-  
+
   .gradient-border {
-    @apply relative before:absolute before:inset-0 before:-z-10 before:rounded-[inherit] before:bg-gradient-to-r before:from-primary before:to-secondary before:p-[2px] before:content-[''] before:[mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] before:[mask-composite:exclude];
+    @apply relative before:absolute before:inset-0 before:-z-10 before:rounded-[inherit] before:bg-gradient-to-r before:from-primary before:to-secondary before:p-[2px] before:content-[''] before:[mask:linear-gradient(#fff_0_0)_content-box, linear-gradient(#fff_0_0)] before:[mask-composite:exclude];
   }
-  
+
   .glass-card {
     @apply bg-card/50 backdrop-blur-xl border border-border/50;
   }
-  
+
   .hover-lift {
     @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl;
   }
-  
+
   .animate-glow {
     animation: glow 2s ease-in-out infinite;
   }
-  
+
   .code-block {
     @apply rounded-lg bg-muted/30 p-4 border border-border/50 overflow-x-auto overflow-y-auto max-h-[60vh] min-h-[200px] md:min-h-[280px];
   }
 }
 
 @keyframes glow {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 0 20px hsl(var(--primary) / 0.2);
   }
+
   50% {
     box-shadow: 0 0 40px hsl(var(--primary) / 0.4);
   }
@@ -168,6 +172,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -179,6 +184,7 @@
     opacity: 0;
     transform: scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -189,6 +195,7 @@
   from {
     transform: translateX(100%);
   }
+
   to {
     transform: translateX(0);
   }
@@ -216,4 +223,247 @@
 .tldraw-algolib .tlui-layout__bottom {
   position: relative !important;
   bottom: 65px !important;
+}
+
+/* Rich Text / Prose Styling */
+/* Headings */
+.prose h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.prose h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-top: 1.75rem;
+  margin-bottom: 0.875rem;
+  line-height: 1.3;
+}
+
+.prose h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+}
+
+.prose h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.625rem;
+  line-height: 1.4;
+}
+
+.prose h5 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.prose h6 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+/* Paragraphs */
+.prose p {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  line-height: 1.75;
+}
+
+/* Paragraph after heading - reduce top margin */
+.prose h1+p,
+.prose h2+p,
+.prose h3+p,
+.prose h4+p,
+.prose h5+p,
+.prose h6+p {
+  margin-top: 0.5rem;
+}
+
+/* Images */
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  display: block;
+}
+
+/* Image after heading */
+.prose h1+img,
+.prose h2+img,
+.prose h3+img,
+.prose h4+img,
+.prose h5+img,
+.prose h6+img {
+  margin-top: 1rem;
+}
+
+/* Lists */
+.prose ul,
+.prose ol {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+
+.prose ul {
+  list-style-type: disc;
+}
+
+.prose ol {
+  list-style-type: decimal;
+}
+
+.prose li {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.75;
+}
+
+.prose li>p {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Nested lists */
+.prose ul ul,
+.prose ul ol,
+.prose ol ul,
+.prose ol ol {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Tables */
+.prose table {
+  width: 100%;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.prose thead {
+  border-bottom: 2px solid hsl(var(--border));
+}
+
+.prose thead th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  background-color: hsl(var(--muted) / 0.5);
+}
+
+.prose tbody tr {
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.prose tbody tr:last-child {
+  border-bottom: none;
+}
+
+.prose tbody td {
+  padding: 0.75rem 1rem;
+}
+
+.prose tbody tr:hover {
+  background-color: hsl(var(--muted) / 0.3);
+}
+
+/* Code */
+.prose code {
+  background-color: hsl(var(--muted) / 0.5);
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+  font-weight: 500;
+  color: hsl(var(--primary));
+}
+
+.prose pre {
+  background-color: hsl(var(--muted) / 0.3);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid hsl(var(--border));
+}
+
+.prose pre code {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  font-size: 0.875rem;
+  color: inherit;
+}
+
+/* Blockquotes */
+.prose blockquote {
+  border-left: 4px solid hsl(var(--primary));
+  padding-left: 1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  font-style: italic;
+  color: hsl(var(--muted-foreground));
+}
+
+.prose blockquote p {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Horizontal Rule */
+.prose hr {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  border: none;
+  border-top: 1px solid hsl(var(--border));
+}
+
+/* Links */
+.prose a {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.2s;
+}
+
+.prose a:hover {
+  color: hsl(var(--primary) / 0.8);
+}
+
+/* Strong and Em */
+.prose strong {
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+
+.prose em {
+  font-style: italic;
+}
+
+/* First element - remove top margin */
+.prose> :first-child {
+  margin-top: 0;
+}
+
+/* Last element - remove bottom margin */
+.prose> :last-child {
+  margin-bottom: 0;
 }
