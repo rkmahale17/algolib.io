@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import AlgorithmDetail from "./pages/AlgorithmDetail";
 import AlgorithmDetailNew from "./pages/AlgorithmDetailNew";
@@ -34,6 +34,17 @@ import { AppProvider } from "./contexts/AppContext";
 
 const queryClient = new QueryClient();
 
+// Component to conditionally render navbar
+const ConditionalNavbar = () => {
+  const location = useLocation();
+  // Hide navbar on algorithm detail pages and blind75 detail pages
+  const hideNavbar = location.pathname.startsWith('/algorithm/') || 
+                     (location.pathname.startsWith('/blind75/') && location.pathname !== '/blind75');
+  
+  if (hideNavbar) return null;
+  return <Navbar />;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AppProvider>
@@ -41,7 +52,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter basename="/">
-          <Navbar />
+          <ConditionalNavbar />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/algorithm/:id" element={<AlgorithmDetailNew />} />

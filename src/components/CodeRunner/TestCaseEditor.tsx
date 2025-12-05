@@ -93,7 +93,7 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
     <div className="space-y-3 p-4 border rounded-lg bg-muted/20">
       <div className="flex items-center justify-between mb-2">
         <h4 className="text-sm font-semibold">
-          {isEditing ? 'Edit Test Case' : 'Add Test Case'}
+          {isEditing ? 'Edit Test Case' : ''}
         </h4>
       </div>
 

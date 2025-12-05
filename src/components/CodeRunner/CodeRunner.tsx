@@ -272,7 +272,8 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
     setTestCases([...testCases, newTestCase]);
     setEditingTestCaseId(newTestCase.id); // Auto-start editing
     setPendingTestCaseId(newTestCase.id); // Mark as pending
-    toast.success("New test case added");
+    // Switch to testcase tab and select the new test case
+    setActiveTab("testcase");
   };
 
   const handleUpdateTestCase = (id: number, updatedCase: any) => {
@@ -362,15 +363,24 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
       setActiveTab("result"); // Switch to result tab on completion
       
       // Check if ALL test cases passed
-      const allPassed = result.testResults && Array.isArray(result.testResults) && 
-                        result.testResults.every((r: any) => r.status === 'pass');
+      const testResults = result.testResults;
+      const allPassed = testResults && Array.isArray(testResults) && testResults.length > 0 &&
+                        testResults.every((r: any) => r.status === 'pass');
+      const hasFailed = testResults && Array.isArray(testResults) && 
+                        testResults.some((r: any) => r.status !== 'pass');
 
-      if (result.status?.id === 3 && allPassed) { // Accepted AND all tests passed
+      console.log('[CodeRunner] Test Results:', testResults);
+      console.log('[CodeRunner] All Passed:', allPassed, 'Has Failed:', hasFailed);
+
+      if (result.status?.id === 3 && allPassed) {
         toast.success("All test cases passed!");
-      } else if (result.status?.id === 3 && !allPassed) {
-         toast.warning("Code ran, but some test cases failed.");
-      } else {
+      } else if (result.status?.id === 3 && hasFailed) {
+        toast.warning("Code ran, but some test cases failed.");
+      } else if (result.status?.id !== 3) {
         toast.error("Execution failed");
+      } else {
+        // status is 3 but no test results
+        toast.success("Code executed successfully!");
       }
       
       // Always try to extract user output from stdout, regardless of errors
@@ -548,10 +558,9 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
         </ResizablePanel>
         
         <ResizableHandle withHandle />
-                <ResizablePanel defaultSize={50} minSize={20}>
-           <ScrollArea className="h-full">
-          <div className="h-full flex-col">
-             <div className="flex-1 overflow-hidden">
+                <ResizablePanel defaultSize={10} minSize={5}>
+          <div className="h-full flex flex-col">
+             <div className="flex-1 min-h-0 overflow-hidden">
                  <OutputPanel 
                   output={output} 
                   loading={isLoading} 
@@ -583,8 +592,6 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                 />
              </div>
           </div>
-
-         </ScrollArea>
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>
