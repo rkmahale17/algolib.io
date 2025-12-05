@@ -206,6 +206,39 @@ export type Database = {
         }
         Relationships: []
       }
+      feedback: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          image_url: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_email: string | null
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          image_url?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_email?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_email?: string | null
+        }
+        Relationships: []
+      }
       game_sessions: {
         Row: {
           completed_at: string
@@ -281,6 +314,63 @@ export type Database = {
         }
         Relationships: []
       }
+      user_algorithm_data: {
+        Row: {
+          algorithm_id: string
+          code: Json | null
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          is_favorite: boolean | null
+          last_viewed_at: string | null
+          notes: string | null
+          share_count: number | null
+          submissions: Json | null
+          time_spent_seconds: number | null
+          updated_at: string | null
+          user_id: string
+          user_vote: string | null
+          whiteboard_data: Json | null
+        }
+        Insert: {
+          algorithm_id: string
+          code?: Json | null
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          is_favorite?: boolean | null
+          last_viewed_at?: string | null
+          notes?: string | null
+          share_count?: number | null
+          submissions?: Json | null
+          time_spent_seconds?: number | null
+          updated_at?: string | null
+          user_id: string
+          user_vote?: string | null
+          whiteboard_data?: Json | null
+        }
+        Update: {
+          algorithm_id?: string
+          code?: Json | null
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          is_favorite?: boolean | null
+          last_viewed_at?: string | null
+          notes?: string | null
+          share_count?: number | null
+          submissions?: Json | null
+          time_spent_seconds?: number | null
+          updated_at?: string | null
+          user_id?: string
+          user_vote?: string | null
+          whiteboard_data?: Json | null
+        }
+        Relationships: []
+      }
       user_notes: {
         Row: {
           algorithm_id: string | null
@@ -314,30 +404,36 @@ export type Database = {
       user_progress: {
         Row: {
           algorithm_id: string
+          code: string | null
           completed: boolean | null
           completed_at: string | null
           created_at: string | null
           id: string
+          is_favorite: boolean | null
           time_spent: number | null
           updated_at: string | null
           user_id: string
         }
         Insert: {
           algorithm_id: string
+          code?: string | null
           completed?: boolean | null
           completed_at?: string | null
           created_at?: string | null
           id?: string
+          is_favorite?: boolean | null
           time_spent?: number | null
           updated_at?: string | null
           user_id: string
         }
         Update: {
           algorithm_id?: string
+          code?: string | null
           completed?: boolean | null
           completed_at?: string | null
           created_at?: string | null
           id?: string
+          is_favorite?: boolean | null
           time_spent?: number | null
           updated_at?: string | null
           user_id?: string
@@ -379,7 +475,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_algorithms_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       game_type:

@@ -31,6 +31,7 @@ import AdminAlgorithms from "./pages/AdminAlgorithms";
 import AdminAlgorithmDetail from "./pages/AdminAlgorithmDetail";
 import { ProtectedAdminRoute } from "./components/ProtectedAdminRoute";
 import { AppProvider } from "./contexts/AppContext";
+import FeedbackAdmin from "./pages/FeedbackAdmin";
 
 const queryClient = new QueryClient();
 
@@ -91,6 +92,11 @@ const App = () => (
           <Route path="/admin/algorithm/:id" element={
             <ProtectedAdminRoute>
               <AdminAlgorithmDetail />
+            </ProtectedAdminRoute>
+          } />
+          <Route path="/admin/feedback" element={
+            <ProtectedAdminRoute>
+              <FeedbackAdmin />
             </ProtectedAdminRoute>
           } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
