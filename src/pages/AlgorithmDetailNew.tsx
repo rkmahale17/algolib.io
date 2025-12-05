@@ -896,7 +896,15 @@ const AlgorithmDetailNew: React.FC = () => {
                                        <Youtube className="w-5 h-5 text-red-500" />
                                        <h3 className="font-semibold">Video Tutorial</h3>
                                      </div>
-                 
+                        {algorithm.tutorials?.[0]?.moreInfo && (
+                         
+                              <RichText 
+                                        content={algorithm.tutorials?.[0]?.moreInfo}
+                                        
+                                    />
+                        
+                                  
+                                )}
                                      <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
                                        <iframe
                                          className="absolute top-0 left-0 w-full h-full rounded-lg"

@@ -28,6 +28,7 @@ import { InputSchemaEditor } from "./InputSchemaEditor";
 import { MetadataEditor } from "./MetadataEditor";
 import { ProblemsEditor } from "./ProblemsEditor";
 import { AlgorithmPreview } from "./AlgorithmPreview";
+import { TutorialsEditor } from "./TutorialsEditor";
 
 interface AlgorithmFormBuilderProps {
   algorithm?: Algorithm | null;
@@ -200,6 +201,9 @@ export function AlgorithmFormBuilder({
             <TabsTrigger value="problems" className="text-xs">
               Problems
             </TabsTrigger>
+            <TabsTrigger value="tutorials" className="text-xs">
+              Tutorials
+            </TabsTrigger>
           </TabsList>
 
           {/* Basic Info Tab */}
@@ -253,37 +257,6 @@ export function AlgorithmFormBuilder({
                       setFormData({ ...formData, category: e.target.value })
                     }
                     placeholder="e.g., Arrays & Strings"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>YouTube Video URL</Label>
-                  <Input
-                    value={
-                      formData.tutorials?.find((t: any) => t.type === "youtube")
-                        ?.url || ""
-                    }
-                    onChange={(e) => {
-                      const url = e.target.value;
-                      const newTutorials = [
-                        ...(formData.tutorials?.filter(
-                          (t: any) => t.type !== "youtube"
-                        ) || []),
-                      ];
-                      
-                      if (url) {
-                        newTutorials.push({
-                          type: "youtube",
-                          url: url,
-                          credits: "",
-                          moreInfo: "",
-                        });
-                      }
-                      
-                      setFormData({ ...formData, tutorials: newTutorials });
-                    }}
-                    placeholder="e.g., https://www.youtube.com/watch?v=..."
-                    type="url"
                   />
                 </div>
 
@@ -375,6 +348,14 @@ export function AlgorithmFormBuilder({
               onChange={(problems_to_solve) =>
                 setFormData({ ...formData, problems_to_solve })
               }
+            />
+          </TabsContent>
+
+          {/* Tutorials Tab */}
+          <TabsContent value="tutorials" className="mt-4">
+            <TutorialsEditor
+              tutorials={formData.tutorials}
+              onChange={(tutorials) => setFormData({ ...formData, tutorials })}
             />
           </TabsContent>
         </Tabs>
