@@ -174,34 +174,9 @@ export function AlgorithmFormBuilder({
             Fill in the details below
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onCancel}
-            disabled={isLoading}
-            className="gap-2"
-          >
-            <X className="h-4 w-4" />
-            Cancel
-          </Button>
-          <Button onClick={handleSave} disabled={isLoading} className="gap-2">
-            {isLoading ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="h-4 w-4" />
-                {algorithm ? "Update" : "Create"} Algorithm
-              </>
-            )}
-          </Button>
-        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-24">
         {/* Left Side - Form */}
         <div className="space-y-6">
 
@@ -379,6 +354,38 @@ export function AlgorithmFormBuilder({
         <AlgorithmPreview algorithm={formData} />
       </div>
     </div>
+
+      {/* Floating Action Bar */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 px-6 py-3 rounded-full border bg-background/80 backdrop-blur-md shadow-lg">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          disabled={isLoading}
+          className="gap-2 rounded-full"
+        >
+          <X className="h-4 w-4" />
+          Cancel
+        </Button>
+        <div className="h-6 w-px bg-border" />
+        <Button 
+          onClick={handleSave} 
+          disabled={isLoading} 
+          className="gap-2 rounded-full"
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Save className="h-4 w-4" />
+              {algorithm ? "Update" : "Create"}
+            </>
+          )}
+        </Button>
+      </div>
     </div>
   );
 }

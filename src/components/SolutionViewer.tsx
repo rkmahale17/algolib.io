@@ -180,6 +180,7 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
                     {/* Monaco Editor - Read Only */}
                     <Editor
                       height="500px"
+                      path={`/solution/${codeType}/${langImpl.lang}/solution.${langImpl.lang === 'python' ? 'py' : langImpl.lang === 'java' ? 'java' : langImpl.lang === 'cpp' ? 'cpp' : 'ts'}`}
                       language={getLanguageForMonaco(langImpl.lang)}
                       value={langImpl.code}
                       theme={isDark ? 'vs-dark' : 'light'}

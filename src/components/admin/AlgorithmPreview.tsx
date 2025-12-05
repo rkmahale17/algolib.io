@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { BookOpen, Code2, ExternalLink, Lightbulb, Youtube } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { RichText } from "../RichText";
 
 interface AlgorithmPreviewProps {
   algorithm: any;
@@ -48,9 +49,7 @@ export function AlgorithmPreview({ algorithm }: AlgorithmPreviewProps) {
                 <div>
                   <h1 className="text-2xl font-bold mb-2">{algorithm.name}</h1>
                   {algorithm.explanation?.problemStatement && (
-                    <p className="text-muted-foreground text-base leading-relaxed">
-                      {algorithm.explanation.problemStatement}
-                    </p>
+                   <RichText content={algorithm.explanation?.problemStatement}></RichText>
                   )}
                 </div>
                 <div className="shrink-0">
