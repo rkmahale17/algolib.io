@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import AlgorithmDetail from "./pages/AlgorithmDetail";
 import AlgorithmDetailNew from "./pages/AlgorithmDetailNew";
@@ -28,23 +28,37 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import BlogPost from "./pages/BlogPost";
 import SeedDatabase from "./pages/SeedDatabase";
 import AdminAlgorithms from "./pages/AdminAlgorithms";
+import AdminAlgorithmDetail from "./pages/AdminAlgorithmDetail";
+import { ProtectedAdminRoute } from "./components/ProtectedAdminRoute";
+import { AppProvider } from "./contexts/AppContext";
 import FeedbackAdmin from "./pages/FeedbackAdmin";
 
 const queryClient = new QueryClient();
 
+// Component to conditionally render navbar
+const ConditionalNavbar = () => {
+  const location = useLocation();
+  // Hide navbar on algorithm detail pages and blind75 detail pages
+  const hideNavbar = location.pathname.startsWith('/algorithm/') || 
+                     (location.pathname.startsWith('/blind75/') && location.pathname !== '/blind75');
+  
+  if (hideNavbar) return null;
+  return <Navbar />;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter basename="/">
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/algorithm/:id" element={<AlgorithmDetail />} />
-          <Route path="/algorithm-new/:id" element={<AlgorithmDetailNew />} />
-          <Route path="/blind75" element={<ProtectedRoute><Blind75 /></ProtectedRoute>} />
-          <Route path="/blind75/:slug" element={<ProtectedRoute><Blind75Detail /></ProtectedRoute>} />
+    <AppProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter basename="/">
+          <ConditionalNavbar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/algorithm/:id" element={<AlgorithmDetailNew />} />
+            <Route path="/blind75" element={<ProtectedRoute><Blind75 /></ProtectedRoute>} />
+            <Route path="/blind75/:slug" element={<ProtectedRoute><AlgorithmDetailNew /></ProtectedRoute>} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/about" element={<About />} />
@@ -60,14 +74,37 @@ const App = () => (
           <Route path="/games/two-pointer" element={<ProtectedRoute><TwoPointer /></ProtectedRoute>} />
           <Route path="/games/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
           <Route path="/blog/:slug" element={<BlogPost />} />
-          <Route path="/admin/seed" element={<SeedDatabase />} />
-          <Route path="/admin/algorithms" element={<AdminAlgorithms />} />
-          <Route path="/admin/feedback" element={<FeedbackAdmin />} />
+          <Route path="/admin/seed" element={
+            <ProtectedAdminRoute>
+              <SeedDatabase />
+            </ProtectedAdminRoute>
+          } />
+          <Route path="/admin/algorithms" element={
+            <ProtectedAdminRoute>
+              <AdminAlgorithms />
+            </ProtectedAdminRoute>
+          } />
+          <Route path="/admin/algorithms/new" element={
+            <ProtectedAdminRoute>
+              <AdminAlgorithmDetail />
+            </ProtectedAdminRoute>
+          } />
+          <Route path="/admin/algorithm/:id" element={
+            <ProtectedAdminRoute>
+              <AdminAlgorithmDetail />
+            </ProtectedAdminRoute>
+          } />
+          <Route path="/admin/feedback" element={
+            <ProtectedAdminRoute>
+              <FeedbackAdmin />
+            </ProtectedAdminRoute>
+          } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
+    </AppProvider>
   </QueryClientProvider>
 );
 

@@ -58,7 +58,7 @@ const Home = () => {
       }
 
       const { data, error } = await supabase
-        .from("user_progress")
+        .from("user_algorithm_data")
         .select("*")
         .eq("user_id", user.id)
         .eq("completed", true);
@@ -74,13 +74,13 @@ const Home = () => {
     if (!user || !supabase) return;
 
     const channel = supabase
-      .channel("user_progress_changes")
+      .channel("user_algorithm_data_changes")
       .on(
         "postgres_changes",
         {
           event: "*",
           schema: "public",
-          table: "user_progress",
+          table: "user_algorithm_data",
           filter: `user_id=eq.${user.id}`,
         },
         () => {
@@ -103,18 +103,7 @@ const Home = () => {
     }
   }, [searchParams]);
 
-  // Calculate progress based on real completion data
-  const algorithmProgress = useMemo(() => {
-    const completed = userProgress.filter((p) =>
-      algorithms.some((algo) => algo.id === p.algorithm_id)
-    ).length;
-    const total = algorithms.length;
-    return {
-      completed,
-      total,
-      percentage: Math.round((completed / total) * 100),
-    };
-  }, [userProgress]);
+
 
   const filteredAlgorithms = algorithms.filter((algo) => {
     const matchesSearch =

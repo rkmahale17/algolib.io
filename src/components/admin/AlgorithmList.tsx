@@ -29,16 +29,13 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Pencil, Trash2, Plus, Search } from 'lucide-react';
-import { Algorithm } from '@/hooks/useAlgorithms';
+import { useNavigate } from 'react-router-dom';
 
-interface AlgorithmListProps {
-  onEdit: (algorithm: Algorithm) => void;
-  onCreate: () => void;
-}
-
-export function AlgorithmList({ onEdit, onCreate }: AlgorithmListProps) {
+export function AlgorithmList() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [listTypeFilter, setListTypeFilter] = useState<string>('all');
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const { data: algorithms, isLoading } = useAlgorithms(searchQuery, categoryFilter === 'all' ? '' : categoryFilter);
@@ -65,20 +62,34 @@ export function AlgorithmList({ onEdit, onCreate }: AlgorithmListProps) {
     }
   };
 
+  const filteredAlgorithms = algorithms?.filter(algo => {
+    if (listTypeFilter === 'all') return true;
+    // Check metadata.listType
+    const type = algo.metadata?.listType || 'coreAlgo';
+    return type === listTypeFilter;
+  });
+
   return (
     <div className="space-y-4">
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Algorithm Management</h1>
-        <Button onClick={onCreate} className="gap-2">
+        <div className="flex items-baseline gap-4">
+          <h1 className="text-3xl font-bold">Algorithm Management</h1>
+          {!isLoading && (
+            <span className="text-muted-foreground">
+              Total: {filteredAlgorithms?.length || 0}
+            </span>
+          )}
+        </div>
+        <Button onClick={() => navigate('/admin/algorithms/new')} className="gap-2">
           <Plus className="h-4 w-4" />
           Add Algorithm
         </Button>
       </div>
 
       {/* Filters */}
-      <div className="flex gap-4">
-        <div className="relative flex-1">
+      <div className="flex gap-4 flex-wrap">
+        <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search by name, title, or ID..."
@@ -100,6 +111,17 @@ export function AlgorithmList({ onEdit, onCreate }: AlgorithmListProps) {
             ))}
           </SelectContent>
         </Select>
+        <Select value={listTypeFilter} onValueChange={setListTypeFilter}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="All List Types" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All List Types</SelectItem>
+            <SelectItem value="coreAlgo">Core Algorithm</SelectItem>
+            <SelectItem value="blind75">Blind 75</SelectItem>
+            <SelectItem value="core+Blind75">Core + Blind 75</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Table */}
@@ -119,14 +141,14 @@ export function AlgorithmList({ onEdit, onCreate }: AlgorithmListProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {algorithms?.length === 0 ? (
+              {filteredAlgorithms?.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                     No algorithms found
                   </TableCell>
                 </TableRow>
               ) : (
-                algorithms?.map((algo) => (
+                filteredAlgorithms?.map((algo) => (
                   <TableRow key={algo.id}>
                     <TableCell className="font-mono text-sm">{algo.id}</TableCell>
                     <TableCell className="font-medium">{algo.name}</TableCell>
@@ -137,14 +159,14 @@ export function AlgorithmList({ onEdit, onCreate }: AlgorithmListProps) {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">{algo.list_type}</Badge>
+                      <Badge variant="outline">{algo.metadata?.listType || 'coreAlgo'}</Badge>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => onEdit(algo)}
+                          onClick={() => navigate(`/admin/algorithms/${algo.id}`)}
                           className="gap-2"
                         >
                           <Pencil className="h-4 w-4" />

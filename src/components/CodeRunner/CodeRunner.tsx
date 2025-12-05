@@ -3,13 +3,14 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Play, RotateCcw, Loader2, Maximize2, Minimize2 } from "lucide-react";
+import { Play, RotateCcw, Loader2, Maximize2, Minimize2, Plus, Trash2, Edit2 } from "lucide-react";
 import { toast } from "sonner";
 import axios from 'axios';
 
 import { LanguageSelector, Language } from './LanguageSelector';
 import { CodeEditor } from './CodeEditor';
 import { OutputPanel } from './OutputPanel';
+import { TestCaseEditor } from './TestCaseEditor';
 import { DEFAULT_CODE, LANGUAGE_IDS } from './constants';
 // import { algorithmsDB } from '@/data/algorithmsDB';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,6 +23,10 @@ interface CodeRunnerProps {
   onToggleFullscreen?: () => void;
   isMaximized?: boolean;
   className?: string;
+  initialCode?: string;
+  onCodeChange?: (code: string) => void;
+  language?: Language;
+  onLanguageChange?: (language: Language) => void;
 }
 
 export const CodeRunner: React.FC<CodeRunnerProps> = ({ 
@@ -29,17 +34,29 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   algorithmData,
   onToggleFullscreen, 
   isMaximized = false,
-  className 
+  className,
+  initialCode,
+  onCodeChange,
+  language: controlledLanguage,
+  onLanguageChange
 }) => {
-  const [language, setLanguage] = useState<Language>('typescript'); // Default to TypeScript
-  const [code, setCode] = useState<string>(DEFAULT_CODE['typescript']);
+  const [internalLanguage, setInternalLanguage] = useState<Language>('typescript');
+  const language = controlledLanguage || internalLanguage;
+  
+  const [code, setCode] = useState<string>(initialCode || DEFAULT_CODE['typescript']);
   const [output, setOutput] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
   const [internalIsFullscreen, setInternalIsFullscreen] = useState(false);
   const [executionTime, setExecutionTime] = useState<number | null>(null);
-  const [customTestCases, setCustomTestCases] = useState<Array<{ input: any[]; expectedOutput: any }>>([]);
+  // Unified test cases state
+  const [testCases, setTestCases] = useState<Array<{ id: number; input: any[]; expectedOutput: any; isCustom: boolean }>>([]);
+  const [activeTab, setActiveTab] = useState<"testcase" | "result">("testcase");
+  
   const [fetchedAlgorithm, setFetchedAlgorithm] = useState<any>(null);
+  const [editingTestCaseId, setEditingTestCaseId] = useState<number | null>(null);
+  const [pendingTestCaseId, setPendingTestCaseId] = useState<number | null>(null);
+  const [isAddingTestCase, setIsAddingTestCase] = useState(false);
 
   const activeAlgorithm = algorithmData || fetchedAlgorithm;
 
@@ -79,39 +96,47 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
     if (activeAlgorithm) {
       const algo = activeAlgorithm;
       
-      // Try to get starter code or full implementation
-      const impl = algo.implementations.find(i => i.lang.toLowerCase() === language.toLowerCase());
-      let algoCode = impl?.code.find(c => c.codeType === 'starter')?.code || impl?.code.find(c => c.codeType === 'optimize')?.code;
-      
-      // If no code exists for this language, generate a stub
-      if (!algoCode && algo.input_schema) {
-        const functionName = algorithmId.replace(/-/g, '_'); // Convert kebab-case to snake_case
-        
-        // Parse input values for stub generation
-        const parsedInputs: Record<string, any> = {};
-        algo.input_schema.forEach(field => {
-          const value = inputValues[field.name];
-          if (value) {
-            try {
-              parsedInputs[field.name] = JSON.parse(value);
-            } catch {
-              parsedInputs[field.name] = value;
-            }
-          }
-        });
-        
-        algoCode = generateStub(
-          language,
-          functionName,
-          algo.input_schema as any,
-          Object.keys(parsedInputs).length > 0 ? parsedInputs : undefined
-        );
-      }
-      
-      if (algoCode) {
-        setCode(algoCode);
+      // If initialCode is provided and we haven't switched languages manually, use it
+      // Note: This is a simple heuristic. For more robust handling, we might need a 'savedLanguage' prop.
+      if (initialCode && code === initialCode) {
+         // Do nothing, keep initial code
       } else {
-        setCode(DEFAULT_CODE[language]);
+          // Try to get starter code or full implementation
+          const impl = algo.implementations.find(i => i.lang.toLowerCase() === language.toLowerCase());
+          let algoCode = impl?.code.find(c => c.codeType === 'starter')?.code || impl?.code.find(c => c.codeType === 'optimize')?.code;
+          
+          // If no code exists for this language, generate a stub
+          if (!algoCode && algo.input_schema) {
+            const functionName = algorithmId?.replace(/-/g, '_') || 'solution'; // Convert kebab-case to snake_case
+            
+            // Parse input values for stub generation
+            const parsedInputs: Record<string, any> = {};
+            algo.input_schema.forEach(field => {
+              const value = inputValues[field.name];
+              if (value) {
+                try {
+                  parsedInputs[field.name] = JSON.parse(value);
+                } catch {
+                  parsedInputs[field.name] = value;
+                }
+              }
+            });
+            
+            algoCode = generateStub(
+              language,
+              functionName,
+              algo.input_schema as any,
+              Object.keys(parsedInputs).length > 0 ? parsedInputs : undefined
+            );
+          }
+          
+          if (algoCode) {
+            setCode(algoCode);
+            onCodeChange?.(algoCode);
+          } else {
+            setCode(DEFAULT_CODE[language]);
+            onCodeChange?.(DEFAULT_CODE[language]);
+          }
       }
 
       // Initialize input values from schema or test case
@@ -124,13 +149,31 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
         });
         setInputValues(initialValues);
       }
+
+      // Initialize test cases from algorithm data
+      if (algo.test_cases) {
+        const initialTestCases = algo.test_cases.map((tc: any, idx: number) => ({
+          id: idx, // Use index as ID for sample cases
+          input: tc.input,
+          expectedOutput: tc.expectedOutput || tc.output,
+          isCustom: false
+        }));
+        setTestCases(initialTestCases);
+      }
     } else {
-      setCode(DEFAULT_CODE[language]);
+      if (!initialCode) {
+        setCode(DEFAULT_CODE[language]);
+        onCodeChange?.(DEFAULT_CODE[language]);
+      }
     }
-  }, [activeAlgorithm, language, algorithmId]);
+  }, [activeAlgorithm, language, algorithmId]); // Removed initialCode from deps to prevent reset on every save
 
   const handleLanguageChange = (newLang: Language) => {
-    setLanguage(newLang);
+    if (onLanguageChange) {
+      onLanguageChange(newLang);
+    } else {
+      setInternalLanguage(newLang);
+    }
     setOutput(null);
   };
 
@@ -204,10 +247,73 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
     return value;
   };
 
-  const handleAddCustomTestCase = () => {
-    // TODO: Show modal/dialog to add custom test case
-    // For now, just log
-    toast.info("Custom test case feature coming soon!");
+  const handleAddTestCase = () => {
+    // Create default values based on schema types
+    const defaultInput = activeAlgorithm?.input_schema?.map((field: any) => {
+      switch (field.type) {
+        case 'integer': return 0;
+        case 'float': return 0.0;
+        case 'string': return "";
+        case 'boolean': return false;
+        case 'array': return [];
+        case 'integer[]': return [];
+        case 'string[]': return [];
+        case 'object': return {};
+        default: return null;
+      }
+    }) || [];
+
+    const newTestCase = {
+      id: Date.now(),
+      input: defaultInput,
+      expectedOutput: null,
+      isCustom: true
+    };
+    setTestCases([...testCases, newTestCase]);
+    setEditingTestCaseId(newTestCase.id); // Auto-start editing
+    setPendingTestCaseId(newTestCase.id); // Mark as pending
+    // Switch to testcase tab and select the new test case
+    setActiveTab("testcase");
+  };
+
+  const handleUpdateTestCase = (id: number, updatedCase: any) => {
+    setTestCases(testCases.map(tc => 
+      tc.id === id ? { ...tc, input: updatedCase.input, expectedOutput: updatedCase.expectedOutput } : tc
+    ));
+    setEditingTestCaseId(null);
+    toast.success("Test case updated");
+  };
+
+  const handleDeleteTestCase = (id: number) => {
+    setTestCases(testCases.filter(tc => tc.id !== id));
+    toast.success("Test case deleted");
+  };
+
+  const handleCancelEdit = () => {
+    // If we are cancelling a newly added test case that hasn't been saved/modified yet, remove it
+    // We can check if it's the last one and matches default values, or track "newlyAdded" state.
+    // Simpler approach: If the user cancels the edit of a custom test case immediately after adding it,
+    // we should probably keep it if they want to edit it later?
+    // User request: "cancel means delete the test case if not added"
+    // We'll implement a check: if it's a custom case and we just added it.
+    // For now, let's just stop editing. The user can delete it explicitly if they want.
+    // Wait, user explicitly asked: "cancel means delete the test case if not added"
+    // We need to know if it was just added.
+    // Let's rely on the fact that we setEditingTestCaseId immediately after adding.
+    // But we don't have a separate "isNew" flag.
+    // Let's assume if the user cancels, they just want to stop editing.
+    // If they want to delete, they can use the delete button.
+    // BUT, for a better UX on "Add", we could check if it's identical to default?
+    // Let's stick to simple cancel for now to avoid accidental deletion of work.
+    // Re-reading user request: "cancel means delete the test case if not added"
+    // Okay, I will implement a "pendingTestCaseId" state.
+    
+    if (editingTestCaseId === pendingTestCaseId) {
+       setTestCases(testCases.filter(tc => tc.id !== pendingTestCaseId));
+       setPendingTestCaseId(null);
+       toast.info("New test case discarded");
+    }
+    setEditingTestCaseId(null);
   };
 
   const handleRun = async () => {
@@ -221,19 +327,20 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
       const algo = activeAlgorithm;
       let fullCode = code;
 
-      if (algo && algo.test_cases && algo.test_cases.length > 0) {
-        // Use the new test runner generator with predefined test cases
+      // Use the unified test cases
+      const allTestCases = testCases.map(tc => ({
+        input: tc.input,
+        expectedOutput: tc.expectedOutput,
+        description: tc.isCustom ? 'Custom Case' : `Case ${tc.id + 1}`
+      }));
+
+      if (algo && allTestCases.length > 0) {
+        // Use the new test runner generator with all test cases
         const { generateTestRunner } = await import('@/utils/testRunnerGenerator');
-        // Map testCases from AlgorithmDB format to expected format
-        const mappedTestCases = algo.test_cases.map((tc: any) => ({
-          input: tc.input,
-          expectedOutput: tc.expectedOutput || tc.output,
-          description: tc.description
-        }));
         fullCode = generateTestRunner(
           code,
           language,
-          mappedTestCases,
+          allTestCases,
           algo.input_schema || []
         );
       } else {
@@ -252,6 +359,29 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
       setExecutionTime(execTime);
 
       const result = response.data;
+      setOutput(result);
+      setActiveTab("result"); // Switch to result tab on completion
+      
+      // Check if ALL test cases passed
+      const testResults = result.testResults;
+      const allPassed = testResults && Array.isArray(testResults) && testResults.length > 0 &&
+                        testResults.every((r: any) => r.status === 'pass');
+      const hasFailed = testResults && Array.isArray(testResults) && 
+                        testResults.some((r: any) => r.status !== 'pass');
+
+      console.log('[CodeRunner] Test Results:', testResults);
+      console.log('[CodeRunner] All Passed:', allPassed, 'Has Failed:', hasFailed);
+
+      if (result.status?.id === 3 && allPassed) {
+        toast.success("All test cases passed!");
+      } else if (result.status?.id === 3 && hasFailed) {
+        toast.warning("Code ran, but some test cases failed.");
+      } else if (result.status?.id !== 3) {
+        toast.error("Execution failed");
+      } else {
+        // status is 3 but no test results
+        toast.success("Code executed successfully!");
+      }
       
       // Always try to extract user output from stdout, regardless of errors
       if (result.stdout) {
@@ -351,29 +481,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
     }
   };
 
-  const renderInputForm = () => {
-    if (!activeAlgorithm?.input_schema) return null;
 
-    return (
-      <div className="p-4 grid gap-4 bg-muted/20 border-b">
-        <h4 className="text-xs font-medium text-muted-foreground mb-2">Test Inputs</h4>
-        <div className="grid grid-cols-2 gap-4">
-          {activeAlgorithm.input_schema!.map((field: any) => (
-            <div key={field.name} className="space-y-1">
-              <Label htmlFor={field.name} className="text-[10px] uppercase tracking-wider">{field.label || field.name}</Label>
-              <Input 
-                id={field.name}
-                value={inputValues[field.name] || ''}
-                onChange={(e) => setInputValues(prev => ({ ...prev, [field.name]: e.target.value }))}
-                className="font-mono text-xs h-7"
-                placeholder={`Enter ${field.type}`}
-              />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className={`w-full border rounded-lg overflow-hidden bg-background shadow-sm flex flex-col transition-all duration-300 ${
@@ -439,38 +547,51 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
               <CodeEditor
                 code={code}
                 language={language}
-                onChange={(value) => setCode(value || '')}
+                onChange={(value) => {
+                  const newCode = value || '';
+                  setCode(newCode);
+                  onCodeChange?.(newCode);
+                }}
               />
             </div>
           </div>
         </ResizablePanel>
         
         <ResizableHandle withHandle />
-        
-        <ResizablePanel defaultSize={50} minSize={20}>
-           <ScrollArea className="h-full">
+                <ResizablePanel defaultSize={10} minSize={5}>
           <div className="h-full flex flex-col">
-             {renderInputForm()}
-             <div className="flex-1 overflow-hidden">
+             <div className="flex-1 min-h-0 overflow-hidden">
                  <OutputPanel 
                   output={output} 
                   loading={isLoading} 
-                  stdin="" // Not used anymore
-                  onStdinChange={() => {}} // Not used anymore
-                  testCases={activeAlgorithm?.test_cases ? 
-                    activeAlgorithm.test_cases.map((tc: any) => ({
-                      input: Array.isArray(tc.input) ? tc.input : [tc.input],
-                      output: tc.expectedOutput || tc.output
-                    })) : undefined
-                  }
+                  stdin="" 
+                  onStdinChange={() => {}} 
+                  testCases={testCases.map(tc => ({
+                    input: tc.input,
+                    output: tc.expectedOutput
+                  }))}
                   executionTime={executionTime}
                   algorithmMeta={algorithmMeta as any}
-                  onAddCustomTestCase={handleAddCustomTestCase}
+                  
+                  // New Props for LeetCode Style UI
+                  activeTab={activeTab}
+                  onTabChange={setActiveTab}
+                  
+                  // Unified Test Case Management
+                  allTestCases={testCases}
+                  onAddTestCase={handleAddTestCase}
+                  onUpdateTestCase={handleUpdateTestCase}
+                  onDeleteTestCase={handleDeleteTestCase}
+                  
+                  // Editing State
+                  editingTestCaseId={editingTestCaseId}
+                  onEditTestCase={setEditingTestCaseId}
+                  onCancelEdit={handleCancelEdit}
+                  
+                  inputSchema={activeAlgorithm?.input_schema}
                 />
              </div>
           </div>
-
-         </ScrollArea>
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>

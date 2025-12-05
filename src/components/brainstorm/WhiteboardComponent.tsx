@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useUserAlgorithmData } from "@/hooks/useUserAlgorithmData";
+import { updateWhiteboard } from "@/utils/userAlgorithmDataHelpers";
 
 interface WhiteboardComponentProps {
   algorithmId: string;
@@ -27,37 +29,41 @@ const SaveButton = ({
   const [isSaving, setIsSaving] = useState(false);
   const queryClient = useQueryClient();
 
-  // Fetch the latest whiteboard for this algorithm
-  const { data: latestWhiteboard } = useQuery({
-    queryKey: ["latest-whiteboard", algorithmId],
-    queryFn: async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return null;
+  // Get current user
+  const [userId, setUserId] = useState<string | null>(null);
+  
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUserId(user?.id || null);
+    });
+  }, []);
 
-      const { data, error } = await supabase
-        .from("user_whiteboards")
-        .select("*")
-        .eq("user_id", user.id)
-        .eq("algorithm_id", algorithmId)
-        .order("updated_at", { ascending: false })
-        .limit(1)
-        .single();
-
-      if (error && error.code !== "PGRST116") throw error;
-      return data;
-    },
+  // Fetch user algorithm data
+  const { data: userAlgoData } = useUserAlgorithmData({
+    userId: userId || undefined,
+    algorithmId,
+    enabled: !!userId,
   });
 
   // Load the latest whiteboard on mount
   useEffect(() => {
-    if (latestWhiteboard && editor) {
-      setWhiteboardId(latestWhiteboard.id);
-      setTitle(latestWhiteboard.title);
-      editor.store.loadSnapshot(latestWhiteboard.board_json as any);
+    if (userAlgoData?.whiteboard_data && editor) {
+      try {
+        // Validate whiteboard data has required structure
+        if (userAlgoData.whiteboard_data && typeof userAlgoData.whiteboard_data === 'object') {
+          editor.store.loadSnapshot(userAlgoData.whiteboard_data as any);
+          
+          // Center the canvas on the content after loading
+          setTimeout(() => {
+            editor.zoomToFit({ duration: 0 });
+          }, 100);
+        }
+      } catch (error) {
+        console.error('Error loading whiteboard data:', error);
+        // Silently fail - whiteboard will start empty
+      }
     }
-  }, [latestWhiteboard, editor]);
+  }, [userAlgoData, editor]);
 
   const handleSave = async () => {
     if (!editor) return;
@@ -65,46 +71,20 @@ const SaveButton = ({
     setIsSaving(true);
     try {
       const snapshot = editor.store.getSnapshot();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
 
-      if (!user) {
+      if (!userId) {
         toast.error("Please sign in to save");
         return;
       }
 
-      if (whiteboardId) {
-        // Update existing whiteboard
-        const { error } = await supabase
-          .from("user_whiteboards")
-          .update({
-            title: title || algorithmTitle,
-            board_json: snapshot as any,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", whiteboardId);
+      const success = await updateWhiteboard(userId, algorithmId, {
+        whiteboard_data: snapshot as any,
+      });
 
-        if (error) throw error;
-      } else {
-        // Create new whiteboard
-        const { data, error } = await supabase
-          .from("user_whiteboards")
-          .insert({
-            user_id: user.id,
-            algorithm_id: algorithmId,
-            title: title || algorithmTitle,
-            board_json: snapshot as any,
-          })
-          .select()
-          .single();
-
-        if (error) throw error;
-        if (data) setWhiteboardId(data.id);
-      }
+      if (!success) throw new Error('Failed to save whiteboard');
 
       toast.success("Whiteboard saved successfully!");
-      queryClient.invalidateQueries({ queryKey: ["whiteboards", algorithmId] });
+      queryClient.invalidateQueries({ queryKey: ["user-algorithm-data", algorithmId] });
     } catch (error) {
       console.error("Error saving whiteboard:", error);
       toast.error("Failed to save whiteboard");
