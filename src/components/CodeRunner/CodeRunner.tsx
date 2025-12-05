@@ -1,21 +1,32 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Play, RotateCcw, Loader2, Maximize2, Minimize2, Plus, Trash2, Edit2 } from "lucide-react";
+import { Play, RotateCcw, Loader2, Maximize2, Minimize2, Settings, AlignLeft, Info } from "lucide-react";
 import { toast } from "sonner";
 import axios from 'axios';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 
 import { LanguageSelector, Language } from './LanguageSelector';
-import { CodeEditor } from './CodeEditor';
+import { CodeEditor, CodeEditorRef } from './CodeEditor';
 import { OutputPanel } from './OutputPanel';
-import { TestCaseEditor } from './TestCaseEditor';
 import { DEFAULT_CODE, LANGUAGE_IDS } from './constants';
-// import { algorithmsDB } from '@/data/algorithmsDB';
 import { supabase } from '@/integrations/supabase/client';
 import { generateStub } from '@/utils/stubGenerator';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface CodeRunnerProps {
   algorithmId?: string;
@@ -28,6 +39,24 @@ interface CodeRunnerProps {
   language?: Language;
   onLanguageChange?: (language: Language) => void;
 }
+
+interface EditorSettings {
+  fontSize: number;
+  theme: 'dark' | 'light' | 'system';
+  tabSize: number;
+  wordWrap: 'on' | 'off';
+  minimap: boolean;
+  lineNumbers: 'on' | 'off' | 'relative' | 'interval';
+}
+
+const DEFAULT_SETTINGS: EditorSettings = {
+  fontSize: 14,
+  theme: 'system',
+  tabSize: 2,
+  wordWrap: 'off',
+  minimap: false,
+  lineNumbers: 'on'
+};
 
 export const CodeRunner: React.FC<CodeRunnerProps> = ({ 
   algorithmId, 
@@ -56,9 +85,30 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   const [fetchedAlgorithm, setFetchedAlgorithm] = useState<any>(null);
   const [editingTestCaseId, setEditingTestCaseId] = useState<number | null>(null);
   const [pendingTestCaseId, setPendingTestCaseId] = useState<number | null>(null);
-  const [isAddingTestCase, setIsAddingTestCase] = useState(false);
+
+  // Settings state
+  const [settings, setSettings] = useState<EditorSettings>(DEFAULT_SETTINGS);
+  const editorRef = useRef<CodeEditorRef>(null);
 
   const activeAlgorithm = algorithmData || fetchedAlgorithm;
+
+  // Load settings from localStorage
+  useEffect(() => {
+    const savedSettings = localStorage.getItem('monaco-editor-settings');
+    if (savedSettings) {
+      try {
+        setSettings({ ...DEFAULT_SETTINGS, ...JSON.parse(savedSettings) });
+      } catch (e) {
+        console.error("Failed to parse saved settings", e);
+      }
+    }
+  }, []);
+
+  const updateSetting = <K extends keyof EditorSettings>(key: K, value: EditorSettings[K]) => {
+    const newSettings = { ...settings, [key]: value };
+    setSettings(newSettings);
+    localStorage.setItem('monaco-editor-settings', JSON.stringify(newSettings));
+  };
 
   useEffect(() => {
     if (!algorithmData && algorithmId) {
@@ -72,7 +122,6 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
           
           if (error) throw error;
           
-          // Transform Supabase data structure to match component expectations
           const transformedData = {
             ...data,
             ...(typeof data.metadata === 'object' && data.metadata !== null ? data.metadata : {}),
@@ -96,22 +145,17 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
     if (activeAlgorithm) {
       const algo = activeAlgorithm;
       
-      // If initialCode is provided and we haven't switched languages manually, use it
-      // Note: This is a simple heuristic. For more robust handling, we might need a 'savedLanguage' prop.
       if (initialCode && code === initialCode) {
          // Do nothing, keep initial code
       } else {
-          // Try to get starter code or full implementation
-          const impl = algo.implementations.find(i => i.lang.toLowerCase() === language.toLowerCase());
-          let algoCode = impl?.code.find(c => c.codeType === 'starter')?.code || impl?.code.find(c => c.codeType === 'optimize')?.code;
+          const impl = algo.implementations.find((i: any) => i.lang.toLowerCase() === language.toLowerCase());
+          let algoCode = impl?.code.find((c: any) => c.codeType === 'starter')?.code || impl?.code.find((c: any) => c.codeType === 'optimize')?.code;
           
-          // If no code exists for this language, generate a stub
           if (!algoCode && algo.input_schema) {
-            const functionName = algorithmId?.replace(/-/g, '_') || 'solution'; // Convert kebab-case to snake_case
+            const functionName = algorithmId?.replace(/-/g, '_') || 'solution'; 
             
-            // Parse input values for stub generation
             const parsedInputs: Record<string, any> = {};
-            algo.input_schema.forEach(field => {
+            algo.input_schema.forEach((field: any) => {
               const value = inputValues[field.name];
               if (value) {
                 try {
@@ -139,21 +183,18 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
           }
       }
 
-      // Initialize input values from schema or test case
       if (algo.input_schema) {
         const initialValues: Record<string, string> = {};
-        algo.input_schema.forEach((field, index) => {
-           // Default to first test case value if available, else empty
+        algo.input_schema.forEach((field: any, index: number) => {
            const defaultVal = algo.test_cases?.[0]?.input[index];
            initialValues[field.name] = defaultVal !== undefined ? JSON.stringify(defaultVal) : "";
         });
         setInputValues(initialValues);
       }
 
-      // Initialize test cases from algorithm data
       if (algo.test_cases) {
         const initialTestCases = algo.test_cases.map((tc: any, idx: number) => ({
-          id: idx, // Use index as ID for sample cases
+          id: idx,
           input: tc.input,
           expectedOutput: tc.expectedOutput || tc.output,
           isCustom: false
@@ -166,7 +207,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
         onCodeChange?.(DEFAULT_CODE[language]);
       }
     }
-  }, [activeAlgorithm, language, algorithmId]); // Removed initialCode from deps to prevent reset on every save
+  }, [activeAlgorithm, language, algorithmId]); 
 
   const handleLanguageChange = (newLang: Language) => {
     if (onLanguageChange) {
@@ -180,8 +221,8 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   const handleReset = () => {
     if (activeAlgorithm) {
       const algo = activeAlgorithm;
-      const impl = algo.implementations.find(i => i.lang.toLowerCase() === language.toLowerCase());
-      const algoCode = impl?.code.find(c => c.codeType === 'starter')?.code || impl?.code.find(c => c.codeType === 'optimize')?.code;
+      const impl = algo.implementations.find((i: any) => i.lang.toLowerCase() === language.toLowerCase());
+      const algoCode = impl?.code.find((c: any) => c.codeType === 'starter')?.code || impl?.code.find((c: any) => c.codeType === 'optimize')?.code;
       setCode(algoCode || DEFAULT_CODE[language]);
     } else {
       setCode(DEFAULT_CODE[language]);
@@ -190,7 +231,6 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
     toast.success("Code reset to default");
   };
 
-  // Fullscreen mode handlers
   const toggleFullscreen = useCallback(() => {
     if (onToggleFullscreen) {
       onToggleFullscreen();
@@ -199,12 +239,11 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
     }
   }, [onToggleFullscreen]);
 
-  // ESC key handler for fullscreen
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && isFullscreen) {
         if (onToggleFullscreen) {
-           // Optional: call onToggleFullscreen() if we want ESC to exit external fullscreen
+           // do nothing
         } else {
           setInternalIsFullscreen(false);
         }
@@ -215,40 +254,9 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
     return () => window.removeEventListener('keydown', handleEsc);
   }, [isFullscreen, onToggleFullscreen]);
 
-  // Get algorithm metadata for complexity display
   const algorithmMeta = activeAlgorithm;
 
-  const formatValueForLanguage = (value: string, type: string, lang: Language): string => {
-    if (type === 'number' || type === 'boolean') {
-      return value;
-    }
-    
-    if (type === 'string') {
-      return `"${value}"`;
-    }
-    
-    if (type === 'number[]') {
-      try {
-        const arr = JSON.parse(value);
-        if (lang === 'java') {
-          // Return only the initializer list, caller will add 'new int[]'
-          return `{${arr.join(', ')}}`;
-        } else if (lang === 'cpp') {
-          return `{${arr.join(', ')}}`; // For vector initializer
-        } else if (lang === 'python') {
-           return value; // "[1, 2, 3]" is valid python list
-        } else {
-           return value; // "[1, 2, 3]" is valid JS array
-        }
-      } catch (e) {
-        return value; // Fallback
-      }
-    }
-    return value;
-  };
-
   const handleAddTestCase = () => {
-    // Create default values based on schema types
     const defaultInput = activeAlgorithm?.input_schema?.map((field: any) => {
       switch (field.type) {
         case 'integer': return 0;
@@ -270,9 +278,8 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
       isCustom: true
     };
     setTestCases([...testCases, newTestCase]);
-    setEditingTestCaseId(newTestCase.id); // Auto-start editing
-    setPendingTestCaseId(newTestCase.id); // Mark as pending
-    // Switch to testcase tab and select the new test case
+    setEditingTestCaseId(newTestCase.id);
+    setPendingTestCaseId(newTestCase.id);
     setActiveTab("testcase");
   };
 
@@ -290,30 +297,17 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   };
 
   const handleCancelEdit = () => {
-    // If we are cancelling a newly added test case that hasn't been saved/modified yet, remove it
-    // We can check if it's the last one and matches default values, or track "newlyAdded" state.
-    // Simpler approach: If the user cancels the edit of a custom test case immediately after adding it,
-    // we should probably keep it if they want to edit it later?
-    // User request: "cancel means delete the test case if not added"
-    // We'll implement a check: if it's a custom case and we just added it.
-    // For now, let's just stop editing. The user can delete it explicitly if they want.
-    // Wait, user explicitly asked: "cancel means delete the test case if not added"
-    // We need to know if it was just added.
-    // Let's rely on the fact that we setEditingTestCaseId immediately after adding.
-    // But we don't have a separate "isNew" flag.
-    // Let's assume if the user cancels, they just want to stop editing.
-    // If they want to delete, they can use the delete button.
-    // BUT, for a better UX on "Add", we could check if it's identical to default?
-    // Let's stick to simple cancel for now to avoid accidental deletion of work.
-    // Re-reading user request: "cancel means delete the test case if not added"
-    // Okay, I will implement a "pendingTestCaseId" state.
-    
     if (editingTestCaseId === pendingTestCaseId) {
        setTestCases(testCases.filter(tc => tc.id !== pendingTestCaseId));
        setPendingTestCaseId(null);
        toast.info("New test case discarded");
     }
     setEditingTestCaseId(null);
+  };
+
+  const handleFormatCode = () => {
+    editorRef.current?.formatCode();
+    toast.success("Code formatted");
   };
 
   const handleRun = async () => {
@@ -327,7 +321,6 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
       const algo = activeAlgorithm;
       let fullCode = code;
 
-      // Use the unified test cases
       const allTestCases = testCases.map(tc => ({
         input: tc.input,
         expectedOutput: tc.expectedOutput,
@@ -335,7 +328,6 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
       }));
 
       if (algo && allTestCases.length > 0) {
-        // Use the new test runner generator with all test cases
         const { generateTestRunner } = await import('@/utils/testRunnerGenerator');
         fullCode = generateTestRunner(
           code,
@@ -343,9 +335,6 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
           allTestCases,
           algo.input_schema || []
         );
-      } else {
-        // No test cases available, just run the code as-is
-        // This might need custom input handling in the future
       }
 
       const response = await axios.post('/api/execute', {
@@ -360,17 +349,13 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
 
       const result = response.data;
       setOutput(result);
-      setActiveTab("result"); // Switch to result tab on completion
+      setActiveTab("result");
       
-      // Check if ALL test cases passed
       const testResults = result.testResults;
       const allPassed = testResults && Array.isArray(testResults) && testResults.length > 0 &&
                         testResults.every((r: any) => r.status === 'pass');
       const hasFailed = testResults && Array.isArray(testResults) && 
                         testResults.some((r: any) => r.status !== 'pass');
-
-      console.log('[CodeRunner] Test Results:', testResults);
-      console.log('[CodeRunner] All Passed:', allPassed, 'Has Failed:', hasFailed);
 
       if (result.status?.id === 3 && allPassed) {
         toast.success("All test cases passed!");
@@ -379,17 +364,14 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
       } else if (result.status?.id !== 3) {
         toast.error("Execution failed");
       } else {
-        // status is 3 but no test results
         toast.success("Code executed successfully!");
       }
       
-      // Always try to extract user output from stdout, regardless of errors
       if (result.stdout) {
         const startMarker = '___TEST_RESULTS_START___';
         const startIdx = result.stdout.indexOf(startMarker);
         
         if (startIdx !== -1) {
-          // We found the marker, so everything before it is user output
           const userOutput = result.stdout.substring(0, startIdx).trim();
           if (userOutput) {
             result.userOutput = userOutput;
@@ -397,10 +379,8 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
         }
       }
 
-      // Parse the output if it's our structured JSON and no runtime errors
       if (result.stdout && !result.stderr && !result.compile_output) {
         try {
-          // Look for test results between markers
           const startMarker = '___TEST_RESULTS_START___';
           const endMarker = '___TEST_RESULTS_END___';
           
@@ -408,26 +388,21 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
           const endIdx = result.stdout.indexOf(endMarker);
           
           if (startIdx !== -1 && endIdx !== -1) {
-            // Extract only the JSON between markers
             const jsonStr = result.stdout.substring(
               startIdx + startMarker.length,
               endIdx
             ).trim();
             
             const parsedResults = JSON.parse(jsonStr);
-            // Remove the dummy last element if it exists (from C++ runner)
             if (Array.isArray(parsedResults) && parsedResults.length > 0 && 
                 Object.keys(parsedResults[parsedResults.length - 1]).length === 0) {
               parsedResults.pop();
             }
             result.testResults = parsedResults;
           } else {
-            // Fallback to old bracket-counting method for languages without markers
-            // ... (keep existing fallback logic if needed, or simplify if we trust markers)
              const lines = result.stdout.split('\n');
             let jsonStr = '';
             
-            // Find the line that starts with '[' and collect until we find the matching ']'
             let inJson = false;
             let bracketCount = 0;
             
@@ -440,13 +415,11 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
               
               if (inJson) {
                 jsonStr += line;
-                // Count brackets
                 for (const char of line) {
                   if (char === '[') bracketCount++;
                   if (char === ']') bracketCount--;
                 }
                 
-                // If we've closed all brackets, we're done
                 if (bracketCount === 0) {
                   break;
                 }
@@ -455,7 +428,6 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
             
             if (jsonStr) {
               const parsedResults = JSON.parse(jsonStr);
-              // Remove the dummy last element if it exists (from C++ runner)
               if (Array.isArray(parsedResults) && parsedResults.length > 0 && 
                   Object.keys(parsedResults[parsedResults.length - 1]).length === 0) {
                 parsedResults.pop();
@@ -465,7 +437,6 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
           }
         } catch (e) {
           console.warn("Failed to parse test results JSON", e);
-          console.log("Raw stdout:", result.stdout);
         }
       }
 
@@ -480,8 +451,6 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
       setIsLoading(false);
     }
   };
-
-
 
   return (
     <div className={`w-full border rounded-lg overflow-hidden bg-background shadow-sm flex flex-col transition-all duration-300 ${
@@ -529,6 +498,123 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
               </Button>
              
               </div>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={handleFormatCode}
+                  title="Format Code"
+                >
+                  <AlignLeft className="w-4 h-4" />
+                </Button>
+
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      title="Editor Settings"
+                    >
+                      <Settings className="w-4 h-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80" align="end">
+                    <div className="grid gap-4">
+                      <div className="space-y-2">
+                        <h4 className="font-medium leading-none">Editor Settings</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Customize your coding experience.
+                        </p>
+                      </div>
+                      <div className="grid gap-4">
+                        <div className="grid grid-cols-3 items-center gap-4">
+                          <Label htmlFor="theme">Theme</Label>
+                          <Select 
+                            value={settings.theme === 'system' ? 'light' : settings.theme} 
+                            onValueChange={(val: any) => updateSetting('theme', val)}
+                          >
+                            <SelectTrigger className="w-full col-span-2 h-8">
+                              <SelectValue placeholder="Theme" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="light">Light</SelectItem>
+                              <SelectItem value="dark">Dark</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div className="grid grid-cols-3 items-center gap-4">
+                          <Label htmlFor="fontSize">Font Size</Label>
+                          <div className="col-span-2 flex items-center gap-2">
+                            <Slider
+                              id="fontSize"
+                              value={[settings.fontSize]}
+                              min={10}
+                              max={24}
+                              step={1}
+                              onValueChange={([val]) => updateSetting('fontSize', val)}
+                              className="w-full"
+                            />
+                            <span className="w-8 text-xs text-right">{settings.fontSize}px</span>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-3 items-center gap-4">
+                          <Label htmlFor="tabSize">Tab Size</Label>
+                          <Select 
+                            value={settings.tabSize.toString()} 
+                            onValueChange={(val) => updateSetting('tabSize', parseInt(val))}
+                          >
+                            <SelectTrigger className="w-full col-span-2 h-8">
+                              <SelectValue placeholder="Tab Size" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="2">2 Spaces</SelectItem>
+                              <SelectItem value="4">4 Spaces</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="wordWrap">Word Wrap</Label>
+                          <Switch
+                            id="wordWrap"
+                            checked={settings.wordWrap === 'on'}
+                            onCheckedChange={(checked) => updateSetting('wordWrap', checked ? 'on' : 'off')}
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="minimap">Minimap</Label>
+                          <Switch
+                            id="minimap"
+                            checked={settings.minimap}
+                            onCheckedChange={(checked) => updateSetting('minimap', checked)}
+                          />
+                        </div>
+                        
+                         <div className="flex items-center justify-between">
+                          <Label htmlFor="lineNumbers">Line Numbers</Label>
+                          <Select 
+                            value={settings.lineNumbers} 
+                            onValueChange={(val: any) => updateSetting('lineNumbers', val)}
+                          >
+                            <SelectTrigger className="w-[120px] h-8">
+                              <SelectValue placeholder="Line Numbers" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="on">On</SelectItem>
+                              <SelectItem value="off">Off</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+
                 <Button
                   variant="ghost"
                   size="icon"
@@ -542,16 +628,27 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                     <Maximize2 className="w-3 h-3" />
                   )}
                 </Button>
+              </div>
             </div>
             <div className="flex-1 relative">
               <CodeEditor
+                ref={editorRef}
                 code={code}
                 language={language}
+                path={`/runner/${algorithmId || 'playground'}/${language}/code.${language === 'python' ? 'py' : language === 'java' ? 'java' : language === 'cpp' ? 'cpp' : 'ts'}`}
                 onChange={(value) => {
                   const newCode = value || '';
                   setCode(newCode);
                   onCodeChange?.(newCode);
                 }}
+                options={{
+                  fontSize: settings.fontSize,
+                  wordWrap: settings.wordWrap,
+                  tabSize: settings.tabSize,
+                  minimap: settings.minimap,
+                  lineNumbers: settings.lineNumbers
+                }}
+                theme={settings.theme}
               />
             </div>
           </div>

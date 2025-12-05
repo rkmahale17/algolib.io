@@ -166,7 +166,7 @@ export function AlgorithmList() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => navigate(`/admin/algorithms/${algo.id}`)}
+                          onClick={() => navigate(`/admin/algorithm/${algo.id}`)}
                           className="gap-2"
                         >
                           <Pencil className="h-4 w-4" />

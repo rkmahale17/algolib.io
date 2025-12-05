@@ -21,6 +21,80 @@ interface TestCaseEditorProps {
   onChange: (testCases: TestCase[]) => void;
 }
 
+// Helper component to manage input state locally
+function TestCaseInput({ 
+  label, 
+  type, 
+  value, 
+  onChange 
+}: { 
+  label: string; 
+  type: string; 
+  value: any; 
+  onChange: (val: any) => void;
+}) {
+  const [localValue, setLocalValue] = useState<string>("");
+  const [isEditing, setIsEditing] = useState(false);
+
+  const handleFocus = () => {
+    setIsEditing(true);
+    if (type.includes("[]") || type === "object") {
+      setLocalValue(JSON.stringify(value, null, 2));
+    } else {
+      setLocalValue(String(value ?? ""));
+    }
+  };
+
+  const handleBlur = () => {
+    setIsEditing(false);
+    if (type.includes("[]") || type === "object") {
+      try {
+        const parsed = JSON.parse(localValue);
+        onChange(parsed);
+      } catch {
+        // If parsing fails, pass raw string to parent (or handle error)
+        // For now, let's specific fallback or user re-entry
+        onChange(localValue);
+      }
+    } else {
+      const numVal = Number(localValue);
+      onChange(isNaN(numVal) ? localValue : numVal);
+    }
+  };
+
+  const displayValue = isEditing 
+    ? localValue 
+    : (type.includes("[]") || type === "object" 
+        ? JSON.stringify(value || "", null, 2) 
+        : (value ?? ""));
+
+  return (
+    <div className="space-y-2">
+      <Label>{label}</Label>
+      {type.includes("[]") || type === "object" ? (
+         <Textarea
+            value={displayValue}
+            onChange={(e) => setLocalValue(e.target.value)}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            placeholder={`Enter ${type} as JSON`}
+            rows={3}
+            className="font-mono text-sm"
+         />
+      ) : (
+         <Input
+            value={displayValue}
+            onChange={(e) => setLocalValue(e.target.value)}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            placeholder={`Enter ${type}`}
+            type={type === "number" ? "number" : "text"}
+         />
+      )}
+    </div>
+  );
+}
+
 export function TestCaseEditor({
   testCases,
   inputSchema,
@@ -48,26 +122,6 @@ export function TestCaseEditor({
   const handleUpdate = (index: number, updates: Partial<TestCase>) => {
     const updated = [...testCases];
     updated[index] = { ...updated[index], ...updates };
-    onChange(updated);
-  };
-
-  const handleInputChange = (
-    testIndex: number,
-    inputIndex: number,
-    value: string
-  ) => {
-    const updated = [...testCases];
-    const inputs = [...updated[testIndex].input];
-
-    // Try to parse as JSON for arrays/objects
-    try {
-      inputs[inputIndex] = JSON.parse(value);
-    } catch {
-      // If not valid JSON, store as string or number
-      inputs[inputIndex] = isNaN(Number(value)) ? value : Number(value);
-    }
-
-    updated[testIndex].input = inputs;
     onChange(updated);
   };
 
@@ -153,44 +207,19 @@ export function TestCaseEditor({
                   ) : (
                     <div className="grid gap-3">
                       {inputSchema.map((field, inputIndex) => (
-                        <div key={inputIndex} className="space-y-2">
-                          <Label>
-                            {field.label} ({field.type})
-                          </Label>
-                          {field.type.includes("[]") ||
-                          field.type === "object" ? (
-                            <Textarea
-                              value={JSON.stringify(
-                                testCase.input[inputIndex] || "",
-                                null,
-                                2
-                              )}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  index,
-                                  inputIndex,
-                                  e.target.value
-                                )
-                              }
-                              placeholder={`Enter ${field.type} as JSON`}
-                              rows={3}
-                              className="font-mono text-sm"
-                            />
-                          ) : (
-                            <Input
-                              value={testCase.input[inputIndex] ?? ""}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  index,
-                                  inputIndex,
-                                  e.target.value
-                                )
-                              }
-                              placeholder={`Enter ${field.type}`}
-                              type={field.type === "number" ? "number" : "text"}
-                            />
-                          )}
-                        </div>
+                        <TestCaseInput
+                          key={inputIndex}
+                          label={`${field.label} (${field.type})`}
+                          type={field.type}
+                          value={testCase.input[inputIndex]}
+                          onChange={(newValue) => {
+                            const updated = [...testCases];
+                            const inputs = [...updated[index].input];
+                            inputs[inputIndex] = newValue;
+                            updated[index].input = inputs;
+                            onChange(updated);
+                          }}
+                        />
                       ))}
                     </div>
                   )}
