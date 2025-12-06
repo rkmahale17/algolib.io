@@ -103,35 +103,35 @@ const AlgorithmDetailNew: React.FC = () => {
   const navigate = useNavigate();
   const [algorithm, setAlgorithm] = useState<any>(undefined);
   const [isLoadingAlgorithm, setIsLoadingAlgorithm] = useState(true);
-  
+
   const [user, setUser] = useState<any>(null);
   const [isCompleted, setIsCompleted] = useState(false);
   const [isLoadingProgress, setIsLoadingProgress] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
-  
+
   // Layout State
   const [isLeftCollapsed, setIsLeftCollapsed] = useState(false);
   const [isRightCollapsed, setIsRightCollapsed] = useState(false);
   const [isCodeRunnerMaximized, setIsCodeRunnerMaximized] = useState(false);
   const [isVisualizationMaximized, setIsVisualizationMaximized] = useState(false);
   const [isBrainstormMaximized, setIsBrainstormMaximized] = useState(false);
-  
+
   // New Features State
   const [activeTab, setActiveTab] = useState("description");
   const [isInterviewMode, setIsInterviewMode] = useState(false);
   const [showInterviewSummary, setShowInterviewSummary] = useState(false);
   const [interviewTime, setInterviewTime] = useState(0);
-  
+
   const [timerSeconds, setTimerSeconds] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
-  
+
   const [isFavorite, setIsFavorite] = useState(false);
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
   const [userVote, setUserVote] = useState<'like' | 'dislike' | null>(null);
   const [savedCode, setSavedCode] = useState<string>("");
-  
+
   const leftPanelRef = useRef<any>(null);
   const rightPanelRef = useRef<any>(null);
 
@@ -141,7 +141,7 @@ const AlgorithmDetailNew: React.FC = () => {
 
   // Local code cache per language to prevent race conditions
   const [codeCache, setCodeCache] = useState<Record<string, string>>({});
-  
+
   // Track if user has modified code (to prevent saving on initial load)
   const [isUserModified, setIsUserModified] = useState(false);
 
@@ -169,7 +169,7 @@ const AlgorithmDetailNew: React.FC = () => {
   useEffect(() => {
     const fetchAlgorithm = async () => {
       if (!algorithmIdOrSlug) return;
-      
+
       if (!supabase) {
         console.warn('Supabase not available, cannot fetch algorithm from database');
         setIsLoadingAlgorithm(false);
@@ -182,27 +182,27 @@ const AlgorithmDetailNew: React.FC = () => {
         let query = supabase
           .from('algorithms')
           .select('*');
-        
+
         // If it looks like a slug (contains hyphens and no UUID pattern), search by slug
         const isSlug = algorithmIdOrSlug.includes('-') && !algorithmIdOrSlug.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
-        
+
         if (isSlug) {
           query = query.eq('id', algorithmIdOrSlug);
         } else {
           query = query.eq('id', algorithmIdOrSlug);
         }
-        
+
         const { data, error } = await query.single();
-        
+
         if (error) throw error;
-        
+
         // Transform Supabase data structure
         const transformedData = {
           ...data,
           ...(data.metadata || {}),
           metadata: data.metadata
         };
-        
+
         setAlgorithm(transformedData);
         setLikes(transformedData.likes || 0);
         setDislikes(transformedData.dislikes || 0);
@@ -236,7 +236,7 @@ const AlgorithmDetailNew: React.FC = () => {
   const handleRichTextClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
     const anchor = target.closest('a');
-    
+
     if (anchor) {
       const href = anchor.getAttribute('href');
       if (href === '#visualization') {
@@ -263,11 +263,11 @@ const AlgorithmDetailNew: React.FC = () => {
     if (userAlgoData) {
       setIsCompleted(userAlgoData.completed || false);
       setIsFavorite(userAlgoData.is_favorite || false);
-      
+
       // Load all code from DB into cache
       if (userAlgoData.code && typeof userAlgoData.code === 'object') {
         setCodeCache(userAlgoData.code as Record<string, string>);
-        
+
         // Set current language code
         const codeForLanguage = userAlgoData.code[selectedLanguage] || '';
         setSavedCode(codeForLanguage);
@@ -322,7 +322,7 @@ const AlgorithmDetailNew: React.FC = () => {
       setWindowWidth(width);
       setIsMobile(width < 480);
     };
-    
+
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -364,7 +364,7 @@ const AlgorithmDetailNew: React.FC = () => {
       });
 
       if (!success) throw new Error('Failed to update');
-      
+
       setIsCompleted(newStatus);
       toast.success(newStatus ? "Marked as completed!" : "Marked as incomplete");
       refetchUserData();
@@ -449,21 +449,21 @@ const AlgorithmDetailNew: React.FC = () => {
         // For now, we'll just increment/decrement based on our optimistic assumption, 
         // but a real production app might use a stored procedure to avoid race conditions.
         // Since we don't have a custom RPC, we'll just update the row.
-        
+
         const { error } = await supabase.rpc('update_algorithm_votes', {
-            algo_id: algorithm.id,
-            like_delta: likeIncrement,
-            dislike_delta: dislikeIncrement
+          algo_id: algorithm.id,
+          like_delta: likeIncrement,
+          dislike_delta: dislikeIncrement
         }).catch(async () => {
-             // Fallback if RPC doesn't exist: standard update (less safe for concurrency)
-             const { data: current } = await supabase.from('algorithms').select('likes, dislikes').eq('id', algorithm.id).single();
-             if (current) {
-                 return await supabase.from('algorithms').update({
-                     likes: (current.likes || 0) + likeIncrement,
-                     dislikes: (current.dislikes || 0) + dislikeIncrement
-                 }).eq('id', algorithm.id);
-             }
-             return { error: 'Failed to fetch current' };
+          // Fallback if RPC doesn't exist: standard update (less safe for concurrency)
+          const { data: current } = await supabase.from('algorithms').select('likes, dislikes').eq('id', algorithm.id).single();
+          if (current) {
+            return await supabase.from('algorithms').update({
+              likes: (current.likes || 0) + likeIncrement,
+              dislikes: (current.dislikes || 0) + dislikeIncrement
+            }).eq('id', algorithm.id);
+          }
+          return { error: 'Failed to fetch current' };
         });
 
         if (error) throw error;
@@ -496,7 +496,7 @@ const AlgorithmDetailNew: React.FC = () => {
 
     if (currentIndex !== -1 && currentIndex < blind75Problems.length - 1) {
       const nextProblem = blind75Problems[currentIndex + 1];
-      
+
       // We need the UUID for the route, so we must query Supabase
       const { data } = await supabase
         .from('algorithms')
@@ -530,18 +530,18 @@ const AlgorithmDetailNew: React.FC = () => {
   useEffect(() => {
     // Don't save if user hasn't modified code
     if (!isUserModified) return;
-    
+
     const saveTimeout = setTimeout(async () => {
       if (!user || !id || !savedCode) return;
-      
+
       try {
         const success = await updateCode(user.id, id, {
           language: selectedLanguage,
           code: savedCode,
         });
-          
+
         if (!success) throw new Error('Failed to save code');
-        
+
         // Reset modified flag after successful save
         setIsUserModified(false);
       } catch (err) {
@@ -559,9 +559,9 @@ const AlgorithmDetailNew: React.FC = () => {
     const dbUrl = algorithm.metadata?.visualizationUrl || algorithm.visualizationUrl;
     if (dbUrl && dbUrl.startsWith('http')) {
       return (
-        <iframe 
-          src={dbUrl} 
-          className="w-full h-full border-0" 
+        <iframe
+          src={dbUrl}
+          className="w-full h-full border-0"
           title="Visualization"
         />
       );
@@ -574,14 +574,14 @@ const AlgorithmDetailNew: React.FC = () => {
     }
 
     // 3. Try Blind 75 Visualization Mapping (legacy fallback)
-    const blind75Match = blind75Problems.find(p => 
-      p.slug === algorithm.slug || 
+    const blind75Match = blind75Problems.find(p =>
+      p.slug === algorithm.slug ||
       p.algorithmId === algorithm.id ||
       p.algorithmId === algorithm.slug
     );
-    
+
     const vizKey = blind75Match?.algorithmId || algorithm.id || algorithm.slug;
-    
+
     // Try to render using Blind 75 visualization helper
     const blind75Viz = renderBlind75Visualization(vizKey);
     if (blind75Viz) {
@@ -634,30 +634,30 @@ const AlgorithmDetailNew: React.FC = () => {
   const renderLeftPanel = () => (
     <div className="h-full flex flex-col bg-card/30 backdrop-blur-sm">
       {/* Left Header with Tools */}
-     
+
 
       {/* Left Content */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden w-full pt-0 mt-0">
         <div className="px-0 shrink-0 flex items-stretch border-b">
           {/* Collapse Button - Left Panel */}
-         
-          
+
+
           <TabsList className="flex-1 grid grid-cols-3 p-0 bg-transparent gap-0 rounded-none">
-            <TabsTrigger 
-              value="description" 
+            <TabsTrigger
+              value="description"
               className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
             >
               <Book className="w-4 h-4 mr-2" />
               Description
             </TabsTrigger>
-            <TabsTrigger 
+            <TabsTrigger
               value="visualizations"
               className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
             >
               <Eye className="w-4 h-4 mr-2" />
               Visualizations
             </TabsTrigger>
-            <TabsTrigger 
+            <TabsTrigger
               value="solutions"
               className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
             >
@@ -665,11 +665,11 @@ const AlgorithmDetailNew: React.FC = () => {
               Solutions
             </TabsTrigger>
           </TabsList>
-           {!isMobile && (
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={toggleLeftPanel} 
+          {!isMobile && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleLeftPanel}
               title="Collapse Panel"
               className="h-10 w-10 rounded-none border-r border-border/50 hover:bg-primary/10 hover:text-primary shrink-0"
             >
@@ -679,21 +679,21 @@ const AlgorithmDetailNew: React.FC = () => {
         </div>
 
         <div className="flex-1 overflow-hidden relative">
-            <TabsContent value="description" className="h-full m-0 data-[state=inactive]:hidden">
-              <ScrollArea className="h-full">
-                <div className="p-4 space-y-6 pb-20">
-                  {/* Title & Progress */}
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h1 className="text-2xl font-bold mb-3">{algorithm.name}</h1>
-                      
-                      {/* Difficulty and Company Tags */}
-                      <div className="flex flex-wrap items-center gap-2 mb-4">
-                        {/* Difficulty Badge */}
-                        {algorithm.difficulty && (
-                          <Badge 
-                            variant="outline"
-                            className={`
+          <TabsContent value="description" className="h-full m-0 max-w-[800px] data-[state=inactive]:hidden">
+            <ScrollArea className="h-full">
+              <div className="p-4 space-y-6 pb-20">
+                {/* Title & Progress */}
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h1 className="text-2xl font-bold mb-3">{algorithm.name}</h1>
+
+                    {/* Difficulty and Company Tags */}
+                    <div className="flex flex-wrap items-center gap-2 mb-4">
+                      {/* Difficulty Badge */}
+                      {algorithm.difficulty && (
+                        <Badge
+                          variant="outline"
+                          className={`
                               ${algorithm.difficulty.toLowerCase() === 'easy' ? 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/30' : ''}
                               ${algorithm.difficulty.toLowerCase() === 'medium' ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/30' : ''}
                               ${algorithm.difficulty.toLowerCase() === 'hard' ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30' : ''}
@@ -702,361 +702,364 @@ const AlgorithmDetailNew: React.FC = () => {
                               ${algorithm.difficulty.toLowerCase() === 'intermediate' ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/30' : ''}
                               font-semibold px-3 py-1
                             `}
-                          >
-                            {algorithm.difficulty}
-                          </Badge>
-                        )}
-                        
-                        {/* Company Tags */}
-                        {algorithm.metadata?.companies && algorithm.metadata.companies.length > 0 && (
-                          <>
-                            <span className="text-muted-foreground text-sm">•</span>
-                            <div className="flex flex-wrap items-center gap-1.5">
-                              {algorithm.metadata.companies.slice(0, 5).map((company: string, index: number) => (
-                                <Badge 
-                                  key={index}
-                                  variant="secondary"
-                                  className="bg-primary/5 text-primary border-primary/20 text-xs px-2 py-0.5"
-                                >
-                                  {company}
-                                </Badge>
-                              ))}
-                              {algorithm.metadata.companies.length > 5 && (
-                                <Badge 
-                                  variant="secondary"
-                                  className="bg-muted text-muted-foreground text-xs px-2 py-0.5"
-                                >
-                                  +{algorithm.metadata.companies.length - 5} more
-                                </Badge>
-                              )}
-                            </div>
-                          </>
-                        )}
-                      </div>
-
-                      
-                    </div>
-                    <div className="shrink-0 flex flex-col gap-2">
-                       {isCompleted ? (
-                        <Badge 
-                          variant="outline" 
-                          className="bg-green-500/10 text-green-500 border-green-500/20 px-3 py-1.5 cursor-pointer hover:bg-green-500/20 transition-colors"
-                          onClick={toggleCompletion}
                         >
-                          <CheckCircle2 className="w-4 h-4 mr-2" />
-                          Attempted
+                          {algorithm.difficulty}
                         </Badge>
-                      ) : (
-                        <div className="flex items-center gap-2 border rounded-full px-3 py-1.5 hover:bg-muted/50 transition-colors cursor-pointer" onClick={toggleCompletion}>
-                          <Checkbox checked={false} className="rounded-full" />
-                          <span className="text-sm font-medium">Mark Complete</span>
-                        </div>
                       )}
-                    </div>
-                  </div>
-{algorithm.explanation.problemStatement && (
-                        <RichText
-                        content={algorithm.explanation.problemStatement}
-                        className="text-base leading-relaxed max-w-[800px] pr-4"
-                        onClick={handleRichTextClick}
-                        ></RichText>
-                      )}
-                  {/* Examples Section */}
-                  {algorithm.explanation.io && algorithm.explanation.io.length > 0 && (
-                    <div className="space-y-4">
-                      {algorithm.explanation.io.map((example: any, index: number) => (
-                        <div key={index} className="border rounded-lg p-4 bg-muted/20">
-                          <h4 className="font-semibold mb-3">Example {index + 1}:</h4>
-                          <div className="space-y-2 font-mono text-sm">
-                            {example.input && (
-                              <div>
-                                <span className="font-semibold">Input:</span>{' '}
-                                <code className="bg-muted px-2 py-0.5 rounded">{example.input}</code>
-                              </div>
-                            )}
-                            {example.output && (
-                              <div>
-                                <span className="font-semibold">Output:</span>{' '}
-                                <code className="bg-muted px-2 py-0.5 rounded">{example.output}</code>
-                              </div>
-                            )}
-                            {example.explanation && (
-                              <div className="mt-2">
-                                <span className="font-semibold">Explanation:</span>{' '}
-                                <span className="text-muted-foreground whitespace-pre-line">{example.explanation}</span>
-                              </div>
+
+                      {/* Company Tags */}
+                      {algorithm.metadata?.companies && algorithm.metadata.companies.length > 0 && (
+                        <>
+                          <span className="text-muted-foreground text-sm">•</span>
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            {algorithm.metadata.companies.slice(0, 5).map((company: string, index: number) => (
+                              <Badge
+                                key={index}
+                                variant="secondary"
+                                className="bg-primary/5 text-primary border-primary/20 text-xs px-2 py-0.5"
+                              >
+                                {company}
+                              </Badge>
+                            ))}
+                            {algorithm.metadata.companies.length > 5 && (
+                              <Badge
+                                variant="secondary"
+                                className="bg-muted text-muted-foreground text-xs px-2 py-0.5"
+                              >
+                                +{algorithm.metadata.companies.length - 5} more
+                              </Badge>
                             )}
                           </div>
+                        </>
+                      )}
+                    </div>
+
+
+                  </div>
+                  <div className="shrink-0 flex flex-col gap-2">
+                    {isCompleted ? (
+                      <Badge
+                        variant="outline"
+                        className="bg-green-500/10 text-green-500 border-green-500/20 px-3 py-1.5 cursor-pointer hover:bg-green-500/20 transition-colors"
+                        onClick={toggleCompletion}
+                      >
+                        <CheckCircle2 className="w-4 h-4 mr-2" />
+                        Attempted
+                      </Badge>
+                    ) : (
+                      <div className="flex items-center gap-2 border rounded-full px-3 py-1.5 hover:bg-muted/50 transition-colors cursor-pointer" onClick={toggleCompletion}>
+                        <Checkbox checked={false} className="rounded-full" />
+                        <span className="text-sm font-medium">Mark Complete</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                {algorithm.explanation.problemStatement && (
+                  <RichText
+                    content={algorithm.explanation.problemStatement}
+                    className="text-base leading-relaxed max-w-[800px] pr-4"
+                    onClick={handleRichTextClick}
+                  ></RichText>
+                )}
+                {/* Examples Section */}
+                {algorithm.explanation.io && algorithm.explanation.io.length > 0 && (
+                  <div className="space-y-4">
+                    {algorithm.explanation.io.map((example: any, index: number) => (
+                      <div key={index} className="border rounded-lg p-4 bg-muted/20">
+                        <h4 className="font-semibold mb-3">Example {index + 1}:</h4>
+                        <div className="space-y-2 font-mono text-sm">
+                          {example.input && (
+                            <div>
+                              <span className="font-semibold">Input:</span>{' '}
+                              <code className="bg-muted px-2 py-0.5 rounded">{example.input}</code>
+                            </div>
+                          )}
+                          {example.output && (
+                            <div>
+                              <span className="font-semibold">Output:</span>{' '}
+                              <code className="bg-muted px-2 py-0.5 rounded">{example.output}</code>
+                            </div>
+                          )}
+                          {example.explanation && (
+                            <div className="mt-2">
+                              <span className="font-semibold">Explanation:</span>{' '}
+                              <span className="text-muted-foreground whitespace-pre-line">{example.explanation}</span>
+                            </div>
+                          )}
                         </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Constraints Section */}
+                {algorithm.explanation.constraints && algorithm.explanation.constraints.length > 0 && (
+                  <div className="border rounded-lg max-w-[500px] p-4 bg-muted/20">
+                    <h4 className="font-semibold mb-3">Constraints:</h4>
+                    <ul className="space-y-1.5 font-mono text-sm">
+                      {algorithm.explanation.constraints.map((constraint: string, index: number) => (
+                        <li key={index} className="flex items-start gap-2">
+                          <span className="text-muted-foreground mt-0.5">•</span>
+                          <RichText
+                            content={constraint}
+                            className="text-base leading-relaxed pr-4"
+                            onClick={handleRichTextClick}
+                          ></RichText>
+                        </li>
                       ))}
-                    </div>
-                  )}
+                    </ul>
+                  </div>
+                )}
 
-                  {/* Constraints Section */}
-                  {algorithm.explanation.constraints && algorithm.explanation.constraints.length > 0 && (
-                    <div className="border rounded-lg p-4 bg-muted/20">
-                      <h4 className="font-semibold mb-3">Constraints:</h4>
-                      <ul className="space-y-1.5 font-mono text-sm">
-                        {algorithm.explanation.constraints.map((constraint: string, index: number) => (
-                          <li key={index} className="flex items-start gap-2">
-                            <span className="text-muted-foreground mt-0.5">•</span>
-                            <code className="flex-1">{constraint}</code>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+                {/* Note Section */}
+                {algorithm.explanation.note && (
+                  <div className="border-l-4 border-primary pl-4 py-2">
+                    <p className="text-sm text-muted-foreground italic">{algorithm.explanation.note}</p>
+                  </div>
+                )}
 
-                  {/* Note Section */}
-                  {algorithm.explanation.note && (
-                    <div className="border-l-4 border-primary pl-4 py-2">
-                      <p className="text-sm text-muted-foreground italic">{algorithm.explanation.note}</p>
-                    </div>
-                  )}
+                {/* Algorithm Overview Card */}
+                <Card className="p-4 sm:p-6 glass-card overflow-hidden">
+                  <div className="space-y-4">
+                    <h3 className="font-semibold flex items-center gap-2">
+                      <BookOpen className="w-5 h-5 text-primary" />
+                      Algorithm Overview
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      {algorithm.overview || algorithm.explanation.problemStatement}
+                    </p>
 
-                  {/* Algorithm Overview Card */}
+                    <Separator />
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm font-medium mb-1">Time Complexity</p>
+                        <Badge variant="outline" className="font-mono">
+                          {algorithm.timeComplexity}
+                        </Badge>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium mb-1">Space Complexity</p>
+                        <Badge variant="outline" className="font-mono">
+                          {algorithm.spaceComplexity}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+
+                {/* Steps, Use Cases & Tips Card */}
+                {algorithm && (
                   <Card className="p-4 sm:p-6 glass-card overflow-hidden">
-                    <div className="space-y-4">
-                      <h3 className="font-semibold flex items-center gap-2">
-                        <BookOpen className="w-5 h-5 text-primary" />
-                        Algorithm Overview
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        {algorithm.overview || algorithm.explanation.problemStatement}
-                      </p>
+                    <Tabs defaultValue="steps">
+                      <TabsList className="grid w-full grid-cols-3 h-auto">
+                        <TabsTrigger value="steps" className="text-xs sm:text-sm">
+                          Steps
+                        </TabsTrigger>
+                        <TabsTrigger value="usecase" className="text-xs sm:text-sm">
+                          Use Cases
+                        </TabsTrigger>
+                        <TabsTrigger value="tips" className="text-xs sm:text-sm">
+                          Pro Tips
+                        </TabsTrigger>
+                      </TabsList>
 
-                      <Separator />
+                      <TabsContent value="steps" className="mt-4">
+                        <ol className="space-y-2 list-decimal list-inside">
+                          {algorithm.explanation.steps?.map((step: string, i: number) => (
+                            <li key={i} className="text-sm text-muted-foreground">
+                              {step}
+                            </li>
+                          ))}
+                        </ol>
+                      </TabsContent>
 
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm font-medium mb-1">Time Complexity</p>
-                          <Badge variant="outline" className="font-mono">
-                            {algorithm.timeComplexity}
-                          </Badge>
+                      <TabsContent value="usecase" className="mt-4">
+                        <p className="text-sm text-muted-foreground">{algorithm.explanation.useCase}</p>
+                      </TabsContent>
+
+                      <TabsContent value="tips" className="mt-4">
+                        <ul className="space-y-2 list-disc list-inside">
+                          {algorithm.explanation.tips?.map((tip: string, i: number) => (
+                            <li key={i} className="text-sm text-muted-foreground">
+                              {tip}
+                            </li>
+                          ))}
+                        </ul>
+                      </TabsContent>
+                    </Tabs>
+                  </Card>
+                )}
+
+                {/* Video Tutorial Card */}
+                {algorithm.tutorials?.[0]?.url && (
+                  <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-5xl mx-auto">
+                    <div className="space-y-6">
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2">
+                          <Youtube className="w-5 h-5 text-red-500" />
+                          <h3 className="font-semibold">Video Tutorial</h3>
                         </div>
-                        <div>
-                          <p className="text-sm font-medium mb-1">Space Complexity</p>
-                          <Badge variant="outline" className="font-mono">
-                            {algorithm.spaceComplexity}
-                          </Badge>
+                        {algorithm.tutorials?.[0]?.moreInfo && (
+
+                          <RichText
+                            content={algorithm.tutorials?.[0]?.moreInfo}
+
+                          />
+
+
+                        )}
+                        <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+                          <iframe
+                            className="absolute top-0 left-0 w-full h-full rounded-lg"
+                            src={`https://www.youtube.com/embed/${algorithm.tutorials[0].url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)?.[1] ||
+                              algorithm.tutorials[0].url
+                              }`}
+                            title={`${algorithm.name} Tutorial`}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          />
+                        </div>
+                        <div className="pt-2 border-t border-border/50">
+                          <p className="text-xs text-muted-foreground">
+                            <strong>Credits:</strong> Video tutorial by NeetCode (used with permission). All written
+                            explanations, code examples, and additional insights provided by Algolib.io.
+                          </p>
                         </div>
                       </div>
                     </div>
                   </Card>
+                )}
 
-                  {/* Steps, Use Cases & Tips Card */}
-                  {algorithm && (
-                    <Card className="p-4 sm:p-6 glass-card overflow-hidden">
-                      <Tabs defaultValue="steps">
-                        <TabsList className="grid w-full grid-cols-3 h-auto">
-                          <TabsTrigger value="steps" className="text-xs sm:text-sm">
-                            Steps
-                          </TabsTrigger>
-                          <TabsTrigger value="usecase" className="text-xs sm:text-sm">
-                            Use Cases
-                          </TabsTrigger>
-                          <TabsTrigger value="tips" className="text-xs sm:text-sm">
-                            Pro Tips
-                          </TabsTrigger>
-                        </TabsList>
+                {/* Practice Problems Card */}
+                {algorithm?.problems_to_solve?.external && algorithm.problems_to_solve.external.length > 0 ? (
+                  <Card className="p-4 sm:p-6 glass-card overflow-hidden">
+                    <h3 className="font-semibold mb-4">Practice Problems</h3>
+                    <div className="space-y-2">
+                      {algorithm.problems_to_solve.external.map((problem: any, i: number) => (
+                        <a
+                          key={i}
+                          href={problem.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                        >
+                          <div className="flex-1">
+                            <p className="text-sm font-medium">{problem.title}</p>
+                            <p className="text-xs text-muted-foreground mt-1 capitalize">{problem.type}</p>
+                          </div>
+                          <ExternalLink className="w-4 h-4 text-muted-foreground" />
+                        </a>
+                      ))}
 
-                        <TabsContent value="steps" className="mt-4">
-                          <ol className="space-y-2 list-decimal list-inside">
-                            {algorithm.explanation.steps?.map((step: string, i: number) => (
-                              <li key={i} className="text-sm text-muted-foreground">
-                                {step}
-                              </li>
-                            ))}
-                          </ol>
-                        </TabsContent>
-
-                        <TabsContent value="usecase" className="mt-4">
-                          <p className="text-sm text-muted-foreground">{algorithm.explanation.useCase}</p>
-                        </TabsContent>
-
-                        <TabsContent value="tips" className="mt-4">
-                          <ul className="space-y-2 list-disc list-inside">
-                            {algorithm.explanation.tips?.map((tip: string, i: number) => (
-                              <li key={i} className="text-sm text-muted-foreground">
-                                {tip}
-                              </li>
-                            ))}
-                          </ul>
-                        </TabsContent>
-                      </Tabs>
-                    </Card>
-                  )}
-
-                  {/* Video Tutorial Card */}
-                  {algorithm.tutorials?.[0]?.url && (
-                   <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-5xl mx-auto">
-                                 <div className="space-y-6">
-                                   <div className="space-y-4">
-                                     <div className="flex items-center gap-2">
-                                       <Youtube className="w-5 h-5 text-red-500" />
-                                       <h3 className="font-semibold">Video Tutorial</h3>
-                                     </div>
-                        {algorithm.tutorials?.[0]?.moreInfo && (
-                         
-                              <RichText 
-                                        content={algorithm.tutorials?.[0]?.moreInfo}
-                                        
-                                    />
-                        
-                                  
-                                )}
-                                     <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-                                       <iframe
-                                         className="absolute top-0 left-0 w-full h-full rounded-lg"
-                                          src={`https://www.youtube.com/embed/${
-                                            algorithm.tutorials[0].url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)?.[1] ||
-                                            algorithm.tutorials[0].url
-                                          }`}
-                                         title={`${algorithm.name} Tutorial`}
-                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                         allowFullScreen
-                                       />
-                                     </div>
-                                     <div className="pt-2 border-t border-border/50">
-                      <p className="text-xs text-muted-foreground">
-                        <strong>Credits:</strong> Video tutorial by NeetCode (used with permission). All written
-                        explanations, code examples, and additional insights provided by Algolib.io.
-                      </p>
                     </div>
-                                   </div>
-                                 </div>
-                               </Card>
-                  )}
+                  </Card>
+                ) : null}
 
-                  {/* Practice Problems Card */}
-                  {algorithm?.problems_to_solve?.external && algorithm.problems_to_solve.external.length > 0 ? (
-                    <Card className="p-4 sm:p-6 glass-card overflow-hidden">
-                      <h3 className="font-semibold mb-4">Practice Problems</h3>
-                      <div className="space-y-2">
-                        {algorithm.problems_to_solve.external.map((problem: any, i: number) => (
-                          <a
-                            key={i}
-                            href={problem.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                {/* Bottom Action Bar - Floating & Centered */}
+                <div className="sticky bottom-6 z-10 flex justify-center pointer-events-none">
+                  <div className="pointer-events-auto flex items-center gap-1 p-1.5 bg-background/60 backdrop-blur-xl border shadow-lg rounded-full">
+
+                    {/* Like Button */}
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant={userVote === 'like' ? "secondary" : "ghost"}
+                            size="sm"
+                            onClick={() => handleVote('like')}
+                            className={`gap-1.5 h-8 px-3 rounded-full transition-all ${userVote === 'like' ? 'bg-primary/10 text-primary hover:bg-primary/20' : 'hover:bg-muted'}`}
                           >
-                            <div className="flex-1">
-                              <p className="text-sm font-medium">{problem.title}</p>
-                              <p className="text-xs text-muted-foreground mt-1 capitalize">{problem.type}</p>
-                            </div>
-                            <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                          </a>
-                        ))}
+                            <ThumbsUp className={`h-3.5 w-3.5 ${userVote === 'like' ? 'fill-current' : ''}`} />
+                            <span className="text-xs font-medium">{likes}</span>
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">Like</TooltipContent>
+                      </Tooltip>
 
-                      </div>
-                    </Card>
-                  ) : null}
-                  
-                  {/* Bottom Action Bar - Floating & Centered */}
-                  <div className="sticky bottom-6 z-10 flex justify-center pointer-events-none">
-                    <div className="pointer-events-auto flex items-center gap-1 p-1.5 bg-background/60 backdrop-blur-xl border shadow-lg rounded-full">
-                      
-                      {/* Like Button */}
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button 
-                              variant={userVote === 'like' ? "secondary" : "ghost"} 
-                              size="sm" 
-                              onClick={() => handleVote('like')}
-                              className={`gap-1.5 h-8 px-3 rounded-full transition-all ${userVote === 'like' ? 'bg-primary/10 text-primary hover:bg-primary/20' : 'hover:bg-muted'}`}
-                            >
-                              <ThumbsUp className={`h-3.5 w-3.5 ${userVote === 'like' ? 'fill-current' : ''}`} />
-                              <span className="text-xs font-medium">{likes}</span>
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent side="top">Like</TooltipContent>
-                        </Tooltip>
+                      {/* Dislike Button */}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant={userVote === 'dislike' ? "secondary" : "ghost"}
+                            size="sm"
+                            onClick={() => handleVote('dislike')}
+                            className={`gap-1.5 h-8 px-3 rounded-full transition-all ${userVote === 'dislike' ? 'bg-destructive/10 text-destructive hover:bg-destructive/20' : 'hover:bg-muted'}`}
+                          >
+                            <ThumbsDown className={`h-3.5 w-3.5 ${userVote === 'dislike' ? 'fill-current' : ''}`} />
+                            {dislikes > 0 && <span className="text-xs font-medium">{dislikes}</span>}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">Dislike</TooltipContent>
+                      </Tooltip>
 
-                        {/* Dislike Button */}
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button 
-                              variant={userVote === 'dislike' ? "secondary" : "ghost"} 
-                              size="sm" 
-                              onClick={() => handleVote('dislike')}
-                              className={`gap-1.5 h-8 px-3 rounded-full transition-all ${userVote === 'dislike' ? 'bg-destructive/10 text-destructive hover:bg-destructive/20' : 'hover:bg-muted'}`}
-                            >
-                              <ThumbsDown className={`h-3.5 w-3.5 ${userVote === 'dislike' ? 'fill-current' : ''}`} />
-                              {dislikes > 0 && <span className="text-xs font-medium">{dislikes}</span>}
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent side="top">Dislike</TooltipContent>
-                        </Tooltip>
+                      <div className="w-px h-4 bg-border mx-1" />
 
-                        <div className="w-px h-4 bg-border mx-1" />
-
-                        {/* Favorite Button */}
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              onClick={toggleFavorite}
-                              className={`h-8 w-8 rounded-full transition-all ${isFavorite ? 'text-yellow-500 hover:text-yellow-600 hover:bg-yellow-500/10' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}
-                            >
-                              <Star className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent side="top">{isFavorite ? "Unfavorite" : "Favorite"}</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
+                      {/* Favorite Button */}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={toggleFavorite}
+                            className={`h-8 w-8 rounded-full transition-all ${isFavorite ? 'text-yellow-500 hover:text-yellow-600 hover:bg-yellow-500/10' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}
+                          >
+                            <Star className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">{isFavorite ? "Unfavorite" : "Favorite"}</TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
                 </div>
-              </ScrollArea>
-            </TabsContent>
+              </div>
+            </ScrollArea>
+          </TabsContent>
 
-            <TabsContent value="visualizations" className="h-full m-0 flex flex-col data-[state=inactive]:hidden">
-              <AuthGuard
-                fallbackTitle="Sign in to view Visualizations"
-                fallbackDescription="Create an account or sign in to access interactive algorithm visualizations."
-              >
-                <div className="flex-1 flex flex-col border rounded-lg overflow-hidden bg-muted/10 m-4">
-                  <div className="flex items-center justify-between px-4 py-2 border-b bg-background/50 backdrop-blur-sm shrink-0">
-                    <h3 className="text-sm font-medium flex items-center gap-2">
-                      <Eye className="w-4 h-4 text-primary" />
-                      Visualization
-                    </h3>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8" 
-                      onClick={() => setIsVisualizationMaximized(true)}
-                      title="Maximize Visualization"
-                    >
-                      <Maximize2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                  <div className="flex-1 overflow-auto p-6 no-scrollbar relative">
-                    {renderVisualization()}
-                  </div>
+          <TabsContent value="visualizations" className="h-full m-0 flex flex-col data-[state=inactive]:hidden">
+            <AuthGuard
+              fallbackTitle="Sign in to view Visualizations"
+              fallbackDescription="Create an account or sign in to access interactive algorithm visualizations."
+            >
+              <div className="flex-1 flex flex-col border rounded-lg overflow-hidden bg-muted/10 m-4">
+                <div className="flex items-center justify-between px-4 py-2 border-b bg-background/50 backdrop-blur-sm shrink-0">
+                  <h3 className="text-sm font-medium flex items-center gap-2">
+                    <Eye className="w-4 h-4 text-primary" />
+                    Visualization
+                  </h3>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => setIsVisualizationMaximized(true)}
+                    title="Maximize Visualization"
+                  >
+                    <Maximize2 className="w-4 h-4" />
+                  </Button>
                 </div>
-              </AuthGuard>
-            </TabsContent>
+                <div className="flex-1 overflow-auto p-6 no-scrollbar relative">
+                  {renderVisualization()}
+                </div>
+              </div>
+            </AuthGuard>
+          </TabsContent>
 
-            <TabsContent value="solutions" className="h-full m-0 data-[state=inactive]:hidden">
-               <ScrollArea className="h-full">
-                  <div className="p-4 space-y-4">
-                    {algorithm?.implementations ? (
-                      <SolutionViewer
-                        implementations={algorithm.implementations}
-                        approachName="Optimal Solution"
-                      />
-                    ) : (
-                      <div className="text-center py-12 text-muted-foreground border rounded-lg border-dashed">
-                        No solutions available.
-                      </div>
-                    )}
+          <TabsContent value="solutions" className="h-full m-0 data-[state=inactive]:hidden">
+            <ScrollArea className="h-full">
+              <div className="p-4 space-y-4">
+                {algorithm?.implementations ? (
+                  <SolutionViewer
+                    implementations={algorithm.implementations}
+                    approachName="Optimal Solution"
+                  />
+                ) : (
+                  <div className="text-center py-12 text-muted-foreground border rounded-lg border-dashed">
+                    No solutions available.
                   </div>
-                </ScrollArea>
-            </TabsContent>
+                )}
+              </div>
+            </ScrollArea>
+          </TabsContent>
         </div>
       </Tabs>
     </div>
@@ -1065,82 +1068,82 @@ const AlgorithmDetailNew: React.FC = () => {
   const renderRightPanel = () => (
     <div className="h-full flex flex-col bg-card/30 backdrop-blur-sm">
       {/* Right Header with Tools */}
-        
+
       <div className="flex-1 overflow-hidden p-0">
-            {/* Collapse Button - Right Panel */}
-           
-         <Tabs defaultValue="code" className="h-full flex flex-col">
-            <div className="flex items-stretch border-b bg-muted/10 shrink-0">
-               {!isMobile && (
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={toggleRightPanel} 
-                  title="Collapse Panel"
-                  className="h-10 w-10 rounded-none border-l border-border/50 hover:bg-primary/10 hover:text-primary shrink-0"
-                >
-                  <PanelRightClose className="w-4 h-4" />
-                </Button>
-              )}
-              
-              <TabsList className="flex-1 flex p-0 bg-transparent gap-0 rounded-none">
-                <TabsTrigger 
-                  value="code" 
-                  className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
-                >
-                  <Code2 className="w-4 h-4 mr-2" />
-                  Code
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="brainstorm"
-                  className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
-                >
-                  <Lightbulb className="w-4 h-4 mr-2" />
-                  Brainstorm
-                </TabsTrigger>
-              </TabsList>
-              
+        {/* Collapse Button - Right Panel */}
+
+        <Tabs defaultValue="code" className="h-full flex flex-col">
+          <div className="flex items-stretch border-b bg-muted/10 shrink-0">
+            {!isMobile && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleRightPanel}
+                title="Collapse Panel"
+                className="h-10 w-10 rounded-none border-l border-border/50 hover:bg-primary/10 hover:text-primary shrink-0"
+              >
+                <PanelRightClose className="w-4 h-4" />
+              </Button>
+            )}
+
+            <TabsList className="flex-1 flex p-0 bg-transparent gap-0 rounded-none">
+              <TabsTrigger
+                value="code"
+                className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
+              >
+                <Code2 className="w-4 h-4 mr-2" />
+                Code
+              </TabsTrigger>
+              <TabsTrigger
+                value="brainstorm"
+                className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
+              >
+                <Lightbulb className="w-4 h-4 mr-2" />
+                Brainstorm
+              </TabsTrigger>
+            </TabsList>
+
           </div>
-            
 
-            <TabsContent value="code" className="flex-1 m-0 overflow-hidden relative group flex flex-col data-[state=inactive]:hidden">
-              <AuthGuard
-                fallbackTitle="Sign in to use Code Runner"
-                fallbackDescription="Create an account or sign in to run and test your code solutions."
-              >
-                {algorithmIdOrSlug && algorithm && (
-                  <CodeRunner 
-                    algorithmId={algorithmIdOrSlug}
-                    algorithmData={algorithm}
-                    onToggleFullscreen={() => setIsCodeRunnerMaximized(true)}
-                    className="h-full border-0 rounded-none shadow-none"
-                    initialCode={savedCode}
-                    onCodeChange={handleCodeChange}
-                    language={selectedLanguage as any}
-                    onLanguageChange={(lang) => {
-                      setSelectedLanguage(lang);
-                      localStorage.setItem('preferredLanguage', lang);
-                    }}
-                  />
-                )}
-              </AuthGuard>
-            </TabsContent>
 
-            <TabsContent value="brainstorm" className="flex-1 m-0 overflow-hidden relative group data-[state=inactive]:hidden">
-              <AuthGuard
-                fallbackTitle="Sign in to use Brainstorm"
-                fallbackDescription="Create an account or sign in to save notes and whiteboards."
-              >
-                <ScrollArea className="h-full">
-                  <div className="p-0">
-                    {algorithmIdOrSlug && (
-                      <BrainstormSection algorithmId={algorithmIdOrSlug} algorithmTitle={algorithm.name} />
-                    )}
-                  </div>
-                </ScrollArea>
-              </AuthGuard>
-            </TabsContent>
-          </Tabs>
+          <TabsContent value="code" className="flex-1 m-0 overflow-hidden relative group flex flex-col data-[state=inactive]:hidden">
+            <AuthGuard
+              fallbackTitle="Sign in to use Code Runner"
+              fallbackDescription="Create an account or sign in to run and test your code solutions."
+            >
+              {algorithmIdOrSlug && algorithm && (
+                <CodeRunner
+                  algorithmId={algorithmIdOrSlug}
+                  algorithmData={algorithm}
+                  onToggleFullscreen={() => setIsCodeRunnerMaximized(true)}
+                  className="h-full border-0 rounded-none shadow-none"
+                  initialCode={savedCode}
+                  onCodeChange={handleCodeChange}
+                  language={selectedLanguage as any}
+                  onLanguageChange={(lang) => {
+                    setSelectedLanguage(lang);
+                    localStorage.setItem('preferredLanguage', lang);
+                  }}
+                />
+              )}
+            </AuthGuard>
+          </TabsContent>
+
+          <TabsContent value="brainstorm" className="flex-1 m-0 overflow-hidden relative group data-[state=inactive]:hidden">
+            <AuthGuard
+              fallbackTitle="Sign in to use Brainstorm"
+              fallbackDescription="Create an account or sign in to save notes and whiteboards."
+            >
+              <ScrollArea className="h-full">
+                <div className="p-0">
+                  {algorithmIdOrSlug && (
+                    <BrainstormSection algorithmId={algorithmIdOrSlug} algorithmTitle={algorithm.name} />
+                  )}
+                </div>
+              </ScrollArea>
+            </AuthGuard>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
@@ -1153,16 +1156,16 @@ const AlgorithmDetailNew: React.FC = () => {
       <div className="h-12 border-b flex items-center px-4 gap-4 shrink-0 bg-background/95">
         {/* Left Side: Logo + Navigation */}
         <div className="flex items-center gap-3">
-         <Link
-                       to="/"
-                       className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-                     >
-                       <img src={logo} alt="Algo Lib Logo" className="w-8 h-8" />
-                       <span className=" text-xl">Algo Lib</span>
-                     </Link>
-          
+          <Link
+            to="/"
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          >
+            <img src={logo} alt="Algo Lib Logo" className="w-8 h-8" />
+            <span className=" text-xl">Algo Lib</span>
+          </Link>
+
           <div className="h-4 w-px bg-border" />
-          
+
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -1186,34 +1189,34 @@ const AlgorithmDetailNew: React.FC = () => {
 
         {/* Right Side: Share, Bug, Timer, Interview, Theme, Profile */}
         <div className="ml-auto flex items-center gap-2">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleShare}>
-                    <Share2 className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="bottom">Share</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleShare}>
+                  <Share2 className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Share</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
 
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => window.open("/feedback", "_blank")}>
-                    <Bug className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Report Issue</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => window.open("/feedback", "_blank")}>
+                  <Bug className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Report Issue</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
 
           <TooltipProvider>
             <Popover>
               <PopoverTrigger asChild>
-                <Button 
-                  variant={isTimerRunning ? "secondary" : "ghost"} 
-                  size="sm" 
+                <Button
+                  variant={isTimerRunning ? "secondary" : "ghost"}
+                  size="sm"
                   className="gap-2 font-mono h-8 text-xs"
                 >
                   <Timer className="h-4 w-4" />
@@ -1240,9 +1243,9 @@ const AlgorithmDetailNew: React.FC = () => {
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button 
-                  variant={isInterviewMode ? "default" : "ghost"} 
-                  size="icon" 
+                <Button
+                  variant={isInterviewMode ? "default" : "ghost"}
+                  size="icon"
                   onClick={toggleInterviewMode}
                   className="h-8 w-8"
                 >
@@ -1323,7 +1326,7 @@ const AlgorithmDetailNew: React.FC = () => {
           </div>
           <div className="flex-1 overflow-hidden">
             {algorithmIdOrSlug && algorithm && (
-              <CodeRunner 
+              <CodeRunner
                 algorithmId={algorithmIdOrSlug}
                 algorithmData={algorithm}
                 isMaximized={true}
@@ -1416,17 +1419,17 @@ const AlgorithmDetailNew: React.FC = () => {
               <div className="flex-none">
                 {algorithm && renderLeftPanel()}
               </div>
-              
+
               {/* Right Panel Content */}
               <div className="flex-none h-[600px] border-t-4 border-muted">
                 {algorithm && renderRightPanel()}
               </div>
             </div>
-            
+
             {/* Floating Code Button for Mobile */}
             <div className="fixed bottom-6 right-6 z-40">
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="rounded-full shadow-lg h-14 w-14 p-0"
                 onClick={() => {
                   // Scroll to code section
@@ -1441,69 +1444,69 @@ const AlgorithmDetailNew: React.FC = () => {
         ) : (
           // Desktop/Tablet Split Layout
           <div className="flex-1 overflow-x-auto overflow-y-hidden">
-             <div className="h-full min-w-[900px]">
-                <ResizablePanelGroup direction="horizontal" className="h-full">
-                  {/* Left Panel */}
-                  <ResizablePanel 
-                    ref={leftPanelRef}
-                    defaultSize={50} 
-                    minSize={30} 
-                    collapsible={true}
-                    collapsedSize={0}
-                    className={isLeftCollapsed ? "min-w-0" : ""}
-                  >
-                    {algorithm && renderLeftPanel()}
-                  </ResizablePanel>
+            <div className="h-full min-w-[900px]">
+              <ResizablePanelGroup direction="horizontal" className="h-full">
+                {/* Left Panel */}
+                <ResizablePanel
+                  ref={leftPanelRef}
+                  defaultSize={50}
+                  minSize={30}
+                  collapsible={true}
+                  collapsedSize={0}
+                  className={isLeftCollapsed ? "min-w-0" : ""}
+                >
+                  {algorithm && renderLeftPanel()}
+                </ResizablePanel>
 
-                  {/* Collapsed Left Panel Toggle */}
-                  {isLeftCollapsed && (
-                    <div className="w-12 border-r flex flex-col items-center py-4 gap-4 bg-muted/10">
-                       <Button variant="ghost" size="icon" onClick={toggleLeftPanel} title="Expand Panel">
-                        <PanelLeftOpen className="w-4 h-4" />
-                      </Button>
-                      <div className="h-px w-6 bg-border" />
-                      <div className="writing-mode-vertical text-xs font-medium tracking-wider text-muted-foreground whitespace-nowrap py-4">
-                        ALGORITHM SOLUTION
-                      </div>
-                      <div className="h-px w-6 bg-border" />
-                      <Button variant="ghost" size="icon" onClick={() => navigate(-1)} title="Back">
-                        <ArrowLeft className="w-4 h-4" />
-                      </Button>
+                {/* Collapsed Left Panel Toggle */}
+                {isLeftCollapsed && (
+                  <div className="w-12 border-r flex flex-col items-center py-4 gap-4 bg-muted/10">
+                    <Button variant="ghost" size="icon" onClick={toggleLeftPanel} title="Expand Panel">
+                      <PanelLeftOpen className="w-4 h-4" />
+                    </Button>
+                    <div className="h-px w-6 bg-border" />
+                    <div className="writing-mode-vertical text-xs font-medium tracking-wider text-muted-foreground whitespace-nowrap py-4">
+                      ALGORITHM SOLUTION
                     </div>
-                  )}
+                    <div className="h-px w-6 bg-border" />
+                    <Button variant="ghost" size="icon" onClick={() => navigate(-1)} title="Back">
+                      <ArrowLeft className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
 
-                  <ResizableHandle withHandle />
+                <ResizableHandle withHandle />
 
-                  {/* Right Panel */}
-                  <ResizablePanel 
-                    ref={rightPanelRef}
-                    defaultSize={50} 
-                    minSize={30}
-                    collapsible={true}
-                    collapsedSize={0}
-                    className={isRightCollapsed ? "min-w-0" : ""}
-                  >
-                    {algorithm && renderRightPanel()}
-                  </ResizablePanel>
+                {/* Right Panel */}
+                <ResizablePanel
+                  ref={rightPanelRef}
+                  defaultSize={50}
+                  minSize={30}
+                  collapsible={true}
+                  collapsedSize={0}
+                  className={isRightCollapsed ? "min-w-0" : ""}
+                >
+                  {algorithm && renderRightPanel()}
+                </ResizablePanel>
 
-                  {/* Collapsed Right Panel Toggle */}
-                  {isRightCollapsed && (
-                    <div className="w-12 border-l flex flex-col items-center py-4 gap-4 bg-muted/10">
-                       <Button variant="ghost" size="icon" onClick={toggleRightPanel} title="Expand Panel">
-                        <PanelRightOpen className="w-4 h-4" />
-                      </Button>
-                      <div className="h-px w-6 bg-border" />
-                      <div className="writing-mode-vertical text-xs font-medium tracking-wider text-muted-foreground whitespace-nowrap py-4">
-                        CODE AND NOTES
-                      </div>
+                {/* Collapsed Right Panel Toggle */}
+                {isRightCollapsed && (
+                  <div className="w-12 border-l flex flex-col items-center py-4 gap-4 bg-muted/10">
+                    <Button variant="ghost" size="icon" onClick={toggleRightPanel} title="Expand Panel">
+                      <PanelRightOpen className="w-4 h-4" />
+                    </Button>
+                    <div className="h-px w-6 bg-border" />
+                    <div className="writing-mode-vertical text-xs font-medium tracking-wider text-muted-foreground whitespace-nowrap py-4">
+                      CODE AND NOTES
                     </div>
-                  )}
-                </ResizablePanelGroup>
-             </div>
+                  </div>
+                )}
+              </ResizablePanelGroup>
+            </div>
           </div>
         )}
       </div>
-      
+
       <style>{`
         .writing-mode-vertical {
           writing-mode: vertical-rl;
