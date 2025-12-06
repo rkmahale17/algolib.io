@@ -1,7 +1,8 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAlgorithm } from '@/hooks/useAlgorithms';
 import { AlgorithmFormBuilder } from '@/components/admin/AlgorithmFormBuilder';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function AdminAlgorithmDetail() {
   const { id } = useParams();
@@ -41,6 +42,16 @@ export default function AdminAlgorithmDetail() {
 
   return (
     <div className="container mx-auto py-8">
+      <div className="mb-6">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/admin/algorithms')}
+            className="gap-2 pl-0 hover:pl-2 transition-all"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Algorithms
+          </Button>
+      </div>
       <AlgorithmFormBuilder
         algorithm={algorithm}
         onCancel={handleCancel}

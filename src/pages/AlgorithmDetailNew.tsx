@@ -685,7 +685,7 @@ const AlgorithmDetailNew: React.FC = () => {
         </div>
 
         <div className="flex-1 overflow-hidden relative">
-            <TabsContent value="description" className="h-full m-0 data-[state=inactive]:hidden">
+            <TabsContent value="description" className="h-full m-0 max-w-[800px] data-[state=inactive]:hidden">
               <ScrollArea className="h-full">
                 <div className="p-4 space-y-6 pb-20">
                   {/* Title & Progress */}
@@ -800,13 +800,17 @@ const AlgorithmDetailNew: React.FC = () => {
 
                   {/* Constraints Section */}
                   {algorithm.explanation.constraints && algorithm.explanation.constraints.length > 0 && (
-                    <div className="border rounded-lg p-4 bg-muted/20">
+                    <div className="border rounded-lg max-w-[500px] p-4 bg-muted/20">
                       <h4 className="font-semibold mb-3">Constraints:</h4>
                       <ul className="space-y-1.5 font-mono text-sm">
                         {algorithm.explanation.constraints.map((constraint: string, index: number) => (
                           <li key={index} className="flex items-start gap-2">
                             <span className="text-muted-foreground mt-0.5">•</span>
-                            <code className="flex-1">{constraint}</code>
+                            <RichText
+                              content={constraint}
+                              className="text-base leading-relaxed pr-4"
+                              onClick={handleRichTextClick}
+                            ></RichText>
                           </li>
                         ))}
                       </ul>
