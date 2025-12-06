@@ -32,6 +32,7 @@ import AdminAlgorithmDetail from "./pages/AdminAlgorithmDetail";
 import { ProtectedAdminRoute } from "./components/ProtectedAdminRoute";
 import { AppProvider } from "./contexts/AppContext";
 import FeedbackAdmin from "./pages/FeedbackAdmin";
+import Blog from "./pages/Blog";
 
 const queryClient = new QueryClient();
 
@@ -74,6 +75,8 @@ const App = () => (
           <Route path="/games/two-pointer" element={<ProtectedRoute><TwoPointer /></ProtectedRoute>} />
           <Route path="/games/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
           <Route path="/blog/:slug" element={<BlogPost />} />
+          <Route path="/blog" element={<Blog />} />
+
           <Route path="/admin/seed" element={
             <ProtectedAdminRoute>
               <SeedDatabase />
