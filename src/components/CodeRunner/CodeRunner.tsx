@@ -141,48 +141,83 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   const isFullscreen = isMaximized || internalIsFullscreen;
 
   // Load algorithm code and schema
+  // Load algorithm code and schema
   useEffect(() => {
     if (activeAlgorithm) {
       const algo = activeAlgorithm;
       
-      if (initialCode && code === initialCode) {
-         // Do nothing, keep initial code
-      } else {
-          const impl = algo.implementations.find((i: any) => i.lang.toLowerCase() === language.toLowerCase());
-          let algoCode = impl?.code.find((c: any) => c.codeType === 'starter')?.code || impl?.code.find((c: any) => c.codeType === 'optimize')?.code;
-          
-          if (!algoCode && algo.input_schema) {
-            const functionName = algorithmId?.replace(/-/g, '_') || 'solution'; 
-            
-            const parsedInputs: Record<string, any> = {};
-            algo.input_schema.forEach((field: any) => {
-              const value = inputValues[field.name];
-              if (value) {
-                try {
-                  parsedInputs[field.name] = JSON.parse(value);
-                } catch {
-                  parsedInputs[field.name] = value;
-                }
-              }
-            });
-            
-            algoCode = generateStub(
-              language,
-              functionName,
-              algo.input_schema as any,
-              Object.keys(parsedInputs).length > 0 ? parsedInputs : undefined
-            );
+      // Determine if language changed (simple way: check if current code matches expected language style? No, unreliable)
+      // Better: We know 'language' prop changed because this effect is running.
+      // If we are switching languages, we should ALWAYS load the new language code, 
+      // unless we are just mounting and have a specific initialCode.
+      
+      const impl = algo.implementations.find((i: any) => i.lang.toLowerCase() === language.toLowerCase());
+      let algoCode = impl?.code.find((c: any) => c.codeType === 'starter')?.code || impl?.code.find((c: any) => c.codeType === 'optimize')?.code;
+      
+      if (!algoCode && algo.input_schema) {
+        const functionName = algorithmId?.replace(/-/g, '_') || 'solution'; 
+        
+        const parsedInputs: Record<string, any> = {};
+        algo.input_schema.forEach((field: any) => {
+          const value = inputValues[field.name];
+          if (value) {
+            try {
+              parsedInputs[field.name] = JSON.parse(value);
+            } catch {
+              parsedInputs[field.name] = value;
+            }
           }
-          
-          if (algoCode) {
-            setCode(algoCode);
-            onCodeChange?.(algoCode);
-          } else {
-            setCode(DEFAULT_CODE[language]);
-            onCodeChange?.(DEFAULT_CODE[language]);
-          }
+        });
+        
+        algoCode = generateStub(
+          language,
+          functionName,
+          algo.input_schema as any,
+          Object.keys(parsedInputs).length > 0 ? parsedInputs : undefined
+        );
       }
 
+      // Logic:
+      // 1. If initialCode is provided AND it seems to match the TARGET language (heuristics or metadata), we use it.
+      // 2. But the 'initialCode' prop might be stale (from previous language) during the first render of a language switch.
+      // 3. So relying on 'initialCode' during a language switch is dangerous if the parent hasn't updated it yet.
+      // 4. Ideally, we should ignore 'initialCode' if we detect a language switch inside this component, 
+      //    UNLESS we are sure 'initialCode' is meant for the NEW language.
+      
+      // FIX: Since we can't easily know if initialCode is stale without deep comparison, 
+      // we will rely on the fact that when switching languages, we usually want the STARTER code 
+      // for the new language, OR the cached code for the new language (which the parent should provide).
+      
+      // If the parent updates `initialCode` in a later render (after localStorage fetch), 
+      // we might want to respect that.
+      
+      // Current approach: Just set the code to the calculated algoCode (starter).
+      // If the parent passes a specialized 'initialCode' (e.g. from saved state), 
+      // we need to know if that 'initialCode' is actually for THIS language.
+      // We can't know for sure.
+      
+      // The safest fix for the reported bug ("Java code in C++ runner") is:
+      // When 'language' changes, ALWAYS reset to the starter code (algoCode) derived from 'activeAlgorithm'.
+      // If the parent wants to restore a saved session, it should ensure 'initialCode' is correct 
+      // AND maybe we need a separate effect for 'initialCode' updates?
+      
+      // Actually, let's simplify.
+      
+      if (algoCode) {
+        // We always switch to the correct language starter/stub first. 
+        // If the parent has "savedCode", it will eventually trigger a re-render with the correct 'initialCode' 
+        // (because AlgorithmDetailNew has a useEffect for that).
+        // However, we need to respect that 'initialCode' when it arrives.
+        
+        // Problem: This effect runs on 'language' change.
+        setCode(algoCode);
+        onCodeChange?.(algoCode);
+      } else {
+        setCode(DEFAULT_CODE[language]);
+        onCodeChange?.(DEFAULT_CODE[language]);
+      }
+
+      // Setting input values
       if (algo.input_schema) {
         const initialValues: Record<string, string> = {};
         algo.input_schema.forEach((field: any, index: number) => {
@@ -208,6 +243,18 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
       }
     }
   }, [activeAlgorithm, language, algorithmId]); 
+
+  // Separate effect to handle external updates to initialCode (e.g. loading from cache/db)
+  // This allows the parent to override the "starter code" set by the previous effect 
+  // once the async fetch/cache lookup is done.
+  useEffect(() => {
+    if (initialCode && initialCode !== code) {
+        // Only update if it looks different, to avoid cursor jumps or overwrites while typing 
+        // (though this effect only runs when initialCode prop changes).
+        // We simply trust the parent's initialCode if it changes.
+        setCode(initialCode);
+    }
+  }, [initialCode]); 
 
   const handleLanguageChange = (newLang: Language) => {
     if (onLanguageChange) {

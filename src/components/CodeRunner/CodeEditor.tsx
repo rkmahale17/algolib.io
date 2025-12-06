@@ -4,7 +4,7 @@ import { useTheme } from "next-themes";
 import * as monaco from 'monaco-editor';
 import { format } from "prettier/standalone";
 import * as parserBabel from "prettier/plugins/babel";
-import * as parserEstree from "prettier/plugins/estree";
+import parserEstree from "prettier/plugins/estree";
 
 export interface CodeEditorRef {
   formatCode: () => Promise<void>;
