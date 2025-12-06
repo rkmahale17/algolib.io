@@ -122,7 +122,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({
         </Button>
       </div>
       {/* TABS content */}
-      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+      <div className="flex-1 flex flex-col min-h-0 overflow-hidden relative">
         {/* TESTCASE TAB */}
         {activeTab === "testcase" && (
           <div className="h-full flex flex-col min-h-0">
@@ -310,7 +310,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({
         )}
         
         {loading && (
-          <div className=" inset-0 bg-background/50 backdrop-blur-sm flex flex-col items-center justify-center z-10">
+          <div className="absolute inset-0 bg-background/50 backdrop-blur-sm flex flex-col items-center justify-center z-10">
             <div className="relative">
               <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
               <div className="absolute inset-0 flex items-center justify-center">

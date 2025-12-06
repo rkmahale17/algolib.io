@@ -263,6 +263,7 @@ const AlgorithmDetailNew: React.FC = () => {
     if (userAlgoData) {
       setIsCompleted(userAlgoData.completed || false);
       setIsFavorite(userAlgoData.is_favorite || false);
+      setUserVote(userAlgoData.user_vote || null);
       
       // Load all code from DB into cache
       if (userAlgoData.code && typeof userAlgoData.code === 'object') {
@@ -443,31 +444,36 @@ const AlgorithmDetailNew: React.FC = () => {
         }
       }
 
-      // Update algorithm counts
+      // Update algorithm counts in DB
+      // Update algorithm counts in DB
       if (likeIncrement !== 0 || dislikeIncrement !== 0) {
-        // We need to fetch current counts first to be safe, or use an RPC if available.
-        // For now, we'll just increment/decrement based on our optimistic assumption, 
-        // but a real production app might use a stored procedure to avoid race conditions.
-        // Since we don't have a custom RPC, we'll just update the row.
+        // Fallback: manual update of metadata since 'likes' column doesn't exist on 'algorithms' table
+        const { data: current, error: fetchError } = await supabase
+            .from('algorithms')
+            .select('metadata')
+            .eq('id', algorithm.id)
+            .single();
         
-        const { error } = await supabase.rpc('update_algorithm_votes', {
-            algo_id: algorithm.id,
-            like_delta: likeIncrement,
-            dislike_delta: dislikeIncrement
-        }).catch(async () => {
-             // Fallback if RPC doesn't exist: standard update (less safe for concurrency)
-             const { data: current } = await supabase.from('algorithms').select('likes, dislikes').eq('id', algorithm.id).single();
-             if (current) {
-                 return await supabase.from('algorithms').update({
-                     likes: (current.likes || 0) + likeIncrement,
-                     dislikes: (current.dislikes || 0) + dislikeIncrement
-                 }).eq('id', algorithm.id);
-             }
-             return { error: 'Failed to fetch current' };
-        });
-
-        if (error) throw error;
+        if (current && !fetchError) {
+             const currentMeta = (current.metadata as any) || {};
+             const newLikes = Math.max(0, (currentMeta.likes || 0) + likeIncrement);
+             const newDislikes = Math.max(0, (currentMeta.dislikes || 0) + dislikeIncrement);
+             
+             await supabase.from('algorithms').update({
+                 metadata: {
+                     ...currentMeta,
+                     likes: newLikes,
+                     dislikes: newDislikes
+                 }
+             }).eq('id', algorithm.id);
+        }
       }
+      
+      // Also persist the user's vote to their personal data so it sticks on reload
+      const newVote = (previousVote === vote) ? null : vote; // If same vote, we toggled off (null), else we switched/added
+      await updateSocial(user.id, algorithmIdOrSlug || '', {
+         user_vote: newVote
+      });
 
     } catch (error) {
       console.error("Error updating vote:", error);
@@ -953,62 +959,7 @@ const AlgorithmDetailNew: React.FC = () => {
                     </Card>
                   ) : null}
                   
-                  {/* Bottom Action Bar - Floating & Centered */}
-                  <div className="sticky bottom-6 z-10 flex justify-center pointer-events-none">
-                    <div className="pointer-events-auto flex items-center gap-1 p-1.5 bg-background/60 backdrop-blur-xl border shadow-lg rounded-full">
-                      
-                      {/* Like Button */}
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button 
-                              variant={userVote === 'like' ? "secondary" : "ghost"} 
-                              size="sm" 
-                              onClick={() => handleVote('like')}
-                              className={`gap-1.5 h-8 px-3 rounded-full transition-all ${userVote === 'like' ? 'bg-primary/10 text-primary hover:bg-primary/20' : 'hover:bg-muted'}`}
-                            >
-                              <ThumbsUp className={`h-3.5 w-3.5 ${userVote === 'like' ? 'fill-current' : ''}`} />
-                              <span className="text-xs font-medium">{likes}</span>
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent side="top">Like</TooltipContent>
-                        </Tooltip>
-
-                        {/* Dislike Button */}
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button 
-                              variant={userVote === 'dislike' ? "secondary" : "ghost"} 
-                              size="sm" 
-                              onClick={() => handleVote('dislike')}
-                              className={`gap-1.5 h-8 px-3 rounded-full transition-all ${userVote === 'dislike' ? 'bg-destructive/10 text-destructive hover:bg-destructive/20' : 'hover:bg-muted'}`}
-                            >
-                              <ThumbsDown className={`h-3.5 w-3.5 ${userVote === 'dislike' ? 'fill-current' : ''}`} />
-                              {dislikes > 0 && <span className="text-xs font-medium">{dislikes}</span>}
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent side="top">Dislike</TooltipContent>
-                        </Tooltip>
-
-                        <div className="w-px h-4 bg-border mx-1" />
-
-                        {/* Favorite Button */}
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              onClick={toggleFavorite}
-                              className={`h-8 w-8 rounded-full transition-all ${isFavorite ? 'text-yellow-500 hover:text-yellow-600 hover:bg-yellow-500/10' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}
-                            >
-                              <Star className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent side="top">{isFavorite ? "Unfavorite" : "Favorite"}</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
-                  </div>
+                  {/* Bottom Action Bar moved to parent container */}
                 </div>
               </ScrollArea>
             </TabsContent>
@@ -1043,7 +994,7 @@ const AlgorithmDetailNew: React.FC = () => {
 
             <TabsContent value="solutions" className="h-full m-0 data-[state=inactive]:hidden">
                <ScrollArea className="h-full">
-                  <div className="p-4 space-y-4">
+                  <div className="p-4 space-y-4 pb-20">
                     {algorithm?.implementations ? (
                       <SolutionViewer
                         implementations={algorithm.implementations}
@@ -1057,6 +1008,63 @@ const AlgorithmDetailNew: React.FC = () => {
                   </div>
                 </ScrollArea>
             </TabsContent>
+
+            {/* Bottom Action Bar - Floating & Centered (Visible across all tabs) */}
+            <div className="absolute bottom-6 left-0 right-0 z-10 flex justify-center pointer-events-none">
+              <div className="pointer-events-auto flex items-center gap-1 p-1.5 bg-background/60 backdrop-blur-xl border shadow-lg rounded-full animate-in fade-in slide-in-from-bottom-4 duration-300">
+                
+                {/* Like Button */}
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        variant={userVote === 'like' ? "secondary" : "ghost"} 
+                        size="sm" 
+                        onClick={() => handleVote('like')}
+                        className={`gap-1.5 h-8 px-3 rounded-full transition-all ${userVote === 'like' ? 'bg-primary/10 text-primary hover:bg-primary/20' : 'hover:bg-muted'}`}
+                      >
+                        <ThumbsUp className={`h-3.5 w-3.5 ${userVote === 'like' ? 'fill-current' : ''}`} />
+                        <span className="text-xs font-medium">{likes}</span>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">Like</TooltipContent>
+                  </Tooltip>
+
+                  {/* Dislike Button */}
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        variant={userVote === 'dislike' ? "secondary" : "ghost"} 
+                        size="sm" 
+                        onClick={() => handleVote('dislike')}
+                        className={`gap-1.5 h-8 px-3 rounded-full transition-all ${userVote === 'dislike' ? 'bg-destructive/10 text-destructive hover:bg-destructive/20' : 'hover:bg-muted'}`}
+                      >
+                        <ThumbsDown className={`h-3.5 w-3.5 ${userVote === 'dislike' ? 'fill-current' : ''}`} />
+                        {dislikes > 0 && <span className="text-xs font-medium">{dislikes}</span>}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">Dislike</TooltipContent>
+                  </Tooltip>
+
+                  <div className="w-px h-4 bg-border mx-1" />
+
+                  {/* Favorite Button */}
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={toggleFavorite}
+                        className={`h-8 w-8 rounded-full transition-all ${isFavorite ? 'text-yellow-500 hover:text-yellow-600 hover:bg-yellow-500/10' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}
+                      >
+                        <Star className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">{isFavorite ? "Unfavorite" : "Favorite"}</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+            </div>
         </div>
       </Tabs>
     </div>
@@ -1197,61 +1205,65 @@ const AlgorithmDetailNew: React.FC = () => {
               </Tooltip>
             </TooltipProvider>
 
+            {!isMobile && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => window.open("/feedback", "_blank")}>
+                      <Bug className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Report Issue</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+
+          {!isMobile && (
             <TooltipProvider>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button 
+                    variant={isTimerRunning ? "secondary" : "ghost"} 
+                    size="sm" 
+                    className="gap-2 font-mono h-8 text-xs"
+                  >
+                    <Timer className="h-4 w-4" />
+                    {formatTime(timerSeconds)}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-48">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-lg">{formatTime(timerSeconds)}</span>
+                      <Button variant="ghost" size="icon" onClick={() => setTimerSeconds(0)}>
+                        <RotateCcw className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button className="flex-1" onClick={() => setIsTimerRunning(!isTimerRunning)}>
+                        {isTimerRunning ? <Pause className="h-4 w-4 mr-2" /> : <Play className="h-4 w-4 mr-2" />}
+                        {isTimerRunning ? "Pause" : "Start"}
+                      </Button>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => window.open("/feedback", "_blank")}>
-                    <Bug className="h-4 w-4" />
+                  <Button 
+                    variant={isInterviewMode ? "default" : "ghost"} 
+                    size="icon" 
+                    onClick={toggleInterviewMode}
+                    className="h-8 w-8"
+                  >
+                    <Monitor className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Report Issue</TooltipContent>
+                <TooltipContent>Interview Mode</TooltipContent>
               </Tooltip>
             </TooltipProvider>
-
-          <TooltipProvider>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button 
-                  variant={isTimerRunning ? "secondary" : "ghost"} 
-                  size="sm" 
-                  className="gap-2 font-mono h-8 text-xs"
-                >
-                  <Timer className="h-4 w-4" />
-                  {formatTime(timerSeconds)}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-48">
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-lg">{formatTime(timerSeconds)}</span>
-                    <Button variant="ghost" size="icon" onClick={() => setTimerSeconds(0)}>
-                      <RotateCcw className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button className="flex-1" onClick={() => setIsTimerRunning(!isTimerRunning)}>
-                      {isTimerRunning ? <Pause className="h-4 w-4 mr-2" /> : <Play className="h-4 w-4 mr-2" />}
-                      {isTimerRunning ? "Pause" : "Start"}
-                    </Button>
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button 
-                  variant={isInterviewMode ? "default" : "ghost"} 
-                  size="icon" 
-                  onClick={toggleInterviewMode}
-                  className="h-8 w-8"
-                >
-                  <Monitor className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Interview Mode</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          )}
 
           <div className="h-4 w-px bg-border mx-1" />
 
@@ -1424,19 +1436,32 @@ const AlgorithmDetailNew: React.FC = () => {
             </div>
             
             {/* Floating Code Button for Mobile */}
-            <div className="fixed bottom-6 right-6 z-40">
-              <Button 
-                size="lg" 
-                className="rounded-full shadow-lg h-14 w-14 p-0"
-                onClick={() => {
-                  // Scroll to code section
-                  const codeSection = document.querySelector('[value="code"]');
-                  codeSection?.scrollIntoView({ behavior: 'smooth' });
-                }}
-              >
-                <Code2 className="w-6 h-6" />
-              </Button>
-            </div>
+            {isMobile && (
+              <div className="fixed bottom-6 right-6 z-40">
+                <Button 
+                  size="lg" 
+                  className="rounded-full shadow-lg h-14 w-14 p-0 pointer-events-auto"
+                  onClick={(e) => {
+                    e.preventDefault(); // Prevent default
+                    e.stopPropagation();
+                    // Scroll to code section
+                    const codeSection = document.querySelector('[value="code"]');
+                    if (codeSection) {
+                        codeSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        // Also trigger tab change if needed
+                        const trigger = document.querySelector('[value="code"][role="tab"]');
+                        if (trigger instanceof HTMLElement) trigger.click();
+                    } else {
+                         // Fallback: try to find the tabs content container
+                         const tabs = document.querySelector('[data-state="active"]');
+                         tabs?.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
+                >
+                  <Code2 className="w-6 h-6" />
+                </Button>
+              </div>
+            )}
           </div>
         ) : (
           // Desktop/Tablet Split Layout
