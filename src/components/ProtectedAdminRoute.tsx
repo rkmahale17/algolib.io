@@ -9,11 +9,6 @@ export const ProtectedAdminRoute = ({ children }: { children: React.ReactNode })
   const adminId = import.meta.env.VITE_ADMIN_USER_ID;
 
   useEffect(() => {
-    if (!supabase) {
-      setLoading(false);
-      return;
-    }
-    
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setLoading(false);

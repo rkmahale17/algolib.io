@@ -72,11 +72,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       }
 
       // Fetch from database
-      if (!supabase) {
-        setIsAlgorithmsLoading(false);
-        return;
-      }
-      
       setIsAlgorithmsLoading(true);
       const { data, error } = await supabase
         .from('algorithms')
@@ -86,15 +81,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (error) throw error;
 
       const transformedData = (data || []).map(algo => {
-        const metadata = (algo.metadata && typeof algo.metadata === 'object' && !Array.isArray(algo.metadata)) 
-          ? algo.metadata as Record<string, unknown>
-          : {};
+        const metadata = algo.metadata || {};
         return {
           ...algo,
           ...metadata,
-          slug: algo.id, // Use id as slug if not present
           metadata: algo.metadata,
-        } as Algorithm;
+        };
       });
 
       setAlgorithms(transformedData);
@@ -132,11 +124,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   // Initialize auth
   useEffect(() => {
-    if (!supabase) {
-      setIsAuthLoading(false);
-      return;
-    }
-    
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setIsAuthLoading(false);
@@ -161,7 +148,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   // Subscribe to user_algorithm_data changes
   useEffect(() => {
-    if (!user || !supabase) return;
+    if (!user) return;
 
     const channel = supabase
       .channel('user_algorithm_data_changes')
