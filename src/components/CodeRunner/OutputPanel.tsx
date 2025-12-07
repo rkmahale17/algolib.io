@@ -20,7 +20,7 @@ interface OutputPanelProps {
   activeTab: "testcase" | "result";
   onTabChange: (tab: "testcase" | "result") => void;
   
-  allTestCases: Array<{ id: number; input: any[]; expectedOutput: any; isCustom: boolean }>;
+  allTestCases: Array<{ id: number; input: any[]; expectedOutput: any; isCustom: boolean; description?: string }>;
   onAddTestCase: () => void;
   onUpdateTestCase: (id: number, data: any) => void;
   onDeleteTestCase: (id: number) => void;
@@ -175,7 +175,9 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({
                             inputSchema={inputSchema}
                             onSave={(updated) => onUpdateTestCase(tc.id, updated)}
                             onCancel={() => onCancelEdit()} 
-                            isEditing={tc.isCustom} // Only custom cases are editable
+                            isEditing={editingTestCaseId === tc.id}
+                            onEdit={() => onEditTestCase(tc.id)}
+                            canEdit={tc.isCustom}
                           />
                         </div>
                       </div>
@@ -239,6 +241,12 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({
                           >
                             {result.status === 'pass' ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
                             Case {index + 1}
+                            {/* Show tooltip or small indicator if description exists */}
+                            {allTestCases[index]?.description && (
+                                <span className="ml-2 text-[10px] text-muted-foreground/70 hidden sm:inline-block truncate max-w-[100px]">
+                                    - {allTestCases[index].description}
+                                </span>
+                            )}
                           </TabsTrigger>
                         ))}
                       </TabsList>
@@ -251,7 +259,19 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({
                           <div className="space-y-2">
                             <div className="text-xs font-medium text-muted-foreground">Input</div>
                             <div className="p-3 rounded-md bg-muted/30 border font-mono text-sm">
-                              {JSON.stringify(result.input, null, 2)}
+                              {inputSchema.length > 0 && Array.isArray(result.input) ? (
+                                // Map input array to schema labels/names
+                                <div className="space-y-1">
+                                    {inputSchema.map((field, i) => (
+                                        <div key={i} className="flex gap-2">
+                                            <span className="text-muted-foreground select-none">{field.name}:</span>
+                                            <span>{JSON.stringify(result.input[i])}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                              ) : (
+                                JSON.stringify(result.input, null, 2)
+                              )}
                             </div>
                           </div>
 

@@ -79,7 +79,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   const [internalIsFullscreen, setInternalIsFullscreen] = useState(false);
   const [executionTime, setExecutionTime] = useState<number | null>(null);
   // Unified test cases state
-  const [testCases, setTestCases] = useState<Array<{ id: number; input: any[]; expectedOutput: any; isCustom: boolean }>>([]);
+  const [testCases, setTestCases] = useState<Array<{ id: number; input: any[]; expectedOutput: any; isCustom: boolean; description?: string }>>([]);
   const [activeTab, setActiveTab] = useState<"testcase" | "result">("testcase");
   
   const [fetchedAlgorithm, setFetchedAlgorithm] = useState<any>(null);
@@ -232,7 +232,8 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
           id: idx,
           input: tc.input,
           expectedOutput: tc.expectedOutput || tc.output,
-          isCustom: false
+          isCustom: false,
+          description: tc.description
         }));
         setTestCases(initialTestCases);
       }
@@ -508,7 +509,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
       <ResizablePanelGroup direction="vertical">
         <ResizablePanel defaultSize={50} minSize={30}>
           <div className="h-full flex flex-col">
-            <div className="flex items-center justify-between p-2 border-b bg-muted/30">
+            <div className="flex items-center justify-between p-2 border-b bg-muted/30 overflow-x-auto no-scrollbar min-h-[50px]">
               <div className="flex items-center gap-2">
                 <LanguageSelector
                   language={language}
@@ -677,7 +678,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                 </Button>
               </div>
             </div>
-            <div className="flex-1 relative">
+            <div className="flex-1 relative min-h-0">
               <CodeEditor
                 ref={editorRef}
                 code={code}
