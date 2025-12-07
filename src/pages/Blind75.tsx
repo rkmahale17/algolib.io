@@ -320,7 +320,7 @@ const Blind75 = () => {
         <div className="container mx-auto px-4 pb-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredProblems.map((problem, index) => (
-              <Link key={problem.id} to={`/blind75/${problem.slug}`} target="_blank" rel="noopener noreferrer">
+              <Link key={problem.id} to={`/blind75/${problem.slug}`}  rel="noopener noreferrer">
                 <Card 
                   className="p-6 hover-lift cursor-pointer glass-card group h-full"
                   style={{ animationDelay: `${index * 50}ms` }}

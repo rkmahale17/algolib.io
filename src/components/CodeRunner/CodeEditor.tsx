@@ -98,7 +98,7 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(({
 
 
   return (
-    <div className="h-full w-full overflow-hidden rounded-md border border-input bg-background">
+    <div className="h-full w-full overflow-hidden bg-background">
       <Editor
         height="100%"
         path={path}

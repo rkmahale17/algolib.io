@@ -685,7 +685,7 @@ const AlgorithmDetailNew: React.FC = () => {
         </div>
 
         <div className="flex-1 overflow-hidden relative">
-            <TabsContent value="description" className="h-full m-0 max-w-[800px] data-[state=inactive]:hidden">
+            <TabsContent value="description" className="h-full m-0 data-[state=inactive]:hidden">
               <ScrollArea className="h-full">
                 <div className="p-4 space-y-6 pb-20">
                   {/* Title & Progress */}
@@ -760,16 +760,19 @@ const AlgorithmDetailNew: React.FC = () => {
                       )}
                     </div>
                   </div>
+                  <section className="max-w-[800px] ">
 {algorithm.explanation.problemStatement && (
                         <RichText
                         content={algorithm.explanation.problemStatement}
-                        className="text-base leading-relaxed max-w-[800px] pr-4"
+                        className="text-base leading-relaxed pr-4"
                         onClick={handleRichTextClick}
                         ></RichText>
                       )}
+                  </section>
+
                   {/* Examples Section */}
                   {algorithm.explanation.io && algorithm.explanation.io.length > 0 && (
-                    <div className="space-y-4">
+                    <div className="space-y-4 max-w-[600px] ">
                       {algorithm.explanation.io.map((example: any, index: number) => (
                         <div key={index} className="border rounded-lg p-4 bg-muted/20">
                           <h4 className="font-semibold mb-3">Example {index + 1}:</h4>

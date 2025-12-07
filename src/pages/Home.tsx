@@ -377,7 +377,6 @@ const Home = () => {
               <Link
                 key={algo.id}
                 to={`/algorithm/${algo.id}`}
-                target="_blank"
                 rel="noopener noreferrer"
               >
                 <Card
