@@ -42,10 +42,10 @@ export default function AdminDashboard() {
       gradient: "from-purple-500/20 to-pink-500/20"
     },
     {
-      title: "Database Seeding",
-      description: "Initialize or reset database content with default algorithms and problem sets.",
-      icon: Database,
-      path: "/admin/seed",
+      title: "Feature Management",
+      description: "Toggle features on/off in real-time using feature flags.",
+      icon: Activity,
+      path: "/admin/features",
       color: "text-emerald-500",
       bgColor: "bg-emerald-500/10",
       gradient: "from-emerald-500/20 to-teal-500/20"

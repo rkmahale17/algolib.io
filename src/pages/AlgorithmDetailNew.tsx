@@ -37,6 +37,9 @@ import {
   Heart,
   Menu
 } from "lucide-react";
+import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
+import { FeatureGuard } from "@/components/FeatureGuard";
+import confetti from 'canvas-confetti';
 import { Link, useNavigate, useParams } from "react-router-dom";
 import React, { useEffect, useState, useRef } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -97,7 +100,8 @@ import { updateProgress, updateCode, updateNotes, updateWhiteboard, updateSocial
 import { renderVisualization as renderVizFromMapping, hasVisualization } from "@/utils/visualizationMapping";
 import { SolutionViewer } from "@/components/SolutionViewer";
 import { RichText } from "@/components/RichText";
-import { AlgorithmLoader } from "@/components/AlgorithmLoader";
+import { PremiumLoader } from "@/components/PremiumLoader";
+import { FeatureGuard } from "@/components/FeatureGuard";
 
 const AlgorithmDetailNew: React.FC = () => {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
@@ -540,6 +544,8 @@ const AlgorithmDetailNew: React.FC = () => {
 
   // Periodic code save with multi-language support (6 second debounce)
   // ONLY saves if user has actually modified the code
+  const isNaughtyCloud = useFeatureFlag("naugty_cloud");
+
   useEffect(() => {
     // Don't save if user hasn't modified code
     if (!isUserModified) return;
@@ -555,6 +561,12 @@ const AlgorithmDetailNew: React.FC = () => {
           
         if (!success) throw new Error('Failed to save code');
         
+        if (isNaughtyCloud) {
+             toast("Cloud is feeling naughty today, but saved anyway 😈", {
+                 description: "Your code is safe, don't worry!",
+             });
+        }
+
         // Reset modified flag after successful save
         setIsUserModified(false);
       } catch (err) {
@@ -563,7 +575,7 @@ const AlgorithmDetailNew: React.FC = () => {
     }, 6000); // 6 second debounce
 
     return () => clearTimeout(saveTimeout);
-  }, [savedCode, user, id, selectedLanguage, isUserModified]);
+  }, [savedCode, user, id, selectedLanguage, isUserModified, isNaughtyCloud]);
 
   const renderVisualization = () => {
     if (!algorithm) return null;
@@ -618,11 +630,7 @@ const AlgorithmDetailNew: React.FC = () => {
   };
 
   if (isLoadingAlgorithm) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <PremiumLoader text="Fetching Algorithm Details" />;
   }
 
   if (!algorithm) {
@@ -750,20 +758,14 @@ const AlgorithmDetailNew: React.FC = () => {
                       
                     </div>
                     <div className="shrink-0 flex flex-col gap-2">
-                       {isCompleted ? (
+                       {isCompleted && (
                         <Badge 
                           variant="outline" 
-                          className="bg-green-500/10 text-green-500 border-green-500/20 px-3 py-1.5 cursor-pointer hover:bg-green-500/20 transition-colors"
-                          onClick={toggleCompletion}
+                          className="bg-green-500/10 text-green-500 border-green-500/20 px-3 py-1.5 hover:bg-green-500/20 transition-colors cursor-default"
                         >
                           <CheckCircle2 className="w-4 h-4 mr-2" />
                           Attempted
                         </Badge>
-                      ) : (
-                        <div className="flex items-center gap-2 border rounded-full px-3 py-1.5 hover:bg-muted/50 transition-colors cursor-pointer" onClick={toggleCompletion}>
-                          <Checkbox checked={false} className="rounded-full" />
-                          <span className="text-sm font-medium">Mark Complete</span>
-                        </div>
                       )}
                     </div>
                   </div>
@@ -913,16 +915,17 @@ const AlgorithmDetailNew: React.FC = () => {
                   )}
 
                   {/* Video Tutorial Card */}
-                  {algorithm.tutorials?.[0]?.url && (
-                   <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-5xl mx-auto">
-                                 <div className="space-y-6">
-                                   <div className="space-y-4">
-                                     <div className="flex items-center gap-2">
-                                       <Youtube className="w-5 h-5 text-red-500" />
-                                       <h3 className="font-semibold">Video Tutorial</h3>
-                                     </div>
+                  <FeatureGuard flag="youtube_video">
+                    {algorithm.tutorials?.[0]?.url && (
+                    <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-5xl mx-auto">
+                                  <div className="space-y-6">
+                                    <div className="space-y-4">
+                                      <div className="flex items-center gap-2">
+                                        <Youtube className="w-5 h-5 text-red-500" />
+                                        <h3 className="font-semibold">Video Tutorial</h3>
+                                      </div>
                         {algorithm.tutorials?.[0]?.moreInfo && (
-                         
+                          
                               <RichText 
                                         content={algorithm.tutorials?.[0]?.moreInfo}
                                         
@@ -930,53 +933,56 @@ const AlgorithmDetailNew: React.FC = () => {
                         
                                   
                                 )}
-                                     <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-                                       <iframe
-                                         className="absolute top-0 left-0 w-full h-full rounded-lg"
-                                          src={`https://www.youtube.com/embed/${
-                                            algorithm.tutorials[0].url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)?.[1] ||
-                                            algorithm.tutorials[0].url
-                                          }`}
-                                         title={`${algorithm.name} Tutorial`}
-                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                         allowFullScreen
-                                       />
-                                     </div>
-                                     <div className="pt-2 border-t border-border/50">
+                                      <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+                                        <iframe
+                                          className="absolute top-0 left-0 w-full h-full rounded-lg"
+                                           src={`https://www.youtube.com/embed/${
+                                             algorithm.tutorials[0].url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)?.[1] ||
+                                             algorithm.tutorials[0].url
+                                           }`}
+                                          title={`${algorithm.name} Tutorial`}
+                                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                          allowFullScreen
+                                        />
+                                      </div>
+                                      <div className="pt-2 border-t border-border/50">
                       <p className="text-xs text-muted-foreground">
                         <strong>Credits:</strong> Video tutorial by NeetCode (used with permission). All written
                         explanations, code examples, and additional insights provided by Algolib.io.
                       </p>
                     </div>
-                                   </div>
-                                 </div>
-                               </Card>
-                  )}
+                                    </div>
+                                  </div>
+                                </Card>
+                    )}
+                  </FeatureGuard>
 
                   {/* Practice Problems Card */}
-                  {algorithm?.problems_to_solve?.external && algorithm.problems_to_solve.external.length > 0 ? (
-                    <Card className="p-4 sm:p-6 glass-card overflow-hidden">
-                      <h3 className="font-semibold mb-4">Practice Problems</h3>
-                      <div className="space-y-2">
-                        {algorithm.problems_to_solve.external.map((problem: any, i: number) => (
-                          <a
-                            key={i}
-                            href={problem.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
-                          >
-                            <div className="flex-1">
-                              <p className="text-sm font-medium">{problem.title}</p>
-                              <p className="text-xs text-muted-foreground mt-1 capitalize">{problem.type}</p>
-                            </div>
-                            <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                          </a>
-                        ))}
+                  <FeatureGuard flag="external_links">
+                    {algorithm?.problems_to_solve?.external && algorithm.problems_to_solve.external.length > 0 ? (
+                      <Card className="p-4 sm:p-6 glass-card overflow-hidden">
+                        <h3 className="font-semibold mb-4">Practice Problems</h3>
+                        <div className="space-y-2">
+                          {algorithm.problems_to_solve.external.map((problem: any, i: number) => (
+                            <a
+                              key={i}
+                              href={problem.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                            >
+                              <div className="flex-1">
+                                <p className="text-sm font-medium">{problem.title}</p>
+                                <p className="text-xs text-muted-foreground mt-1 capitalize">{problem.type}</p>
+                              </div>
+                              <ExternalLink className="w-4 h-4 text-muted-foreground" />
+                            </a>
+                          ))}
 
-                      </div>
-                    </Card>
-                  ) : null}
+                        </div>
+                      </Card>
+                    ) : null}
+                  </FeatureGuard>
                   
                   {/* Bottom Action Bar moved to parent container */}
                 </div>
@@ -1111,62 +1117,71 @@ const AlgorithmDetailNew: React.FC = () => {
               )}
               
               <TabsList className="flex-1 flex p-0 bg-transparent gap-0 rounded-none">
-                <TabsTrigger 
-                  value="code" 
-                  className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
-                >
-                  <Code2 className="w-4 h-4 mr-2" />
-                  Code
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="brainstorm"
-                  className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
-                >
-                  <Lightbulb className="w-4 h-4 mr-2" />
-                  Brainstorm
-                </TabsTrigger>
+                <FeatureGuard flag="code_runner_tab">
+                  <TabsTrigger 
+                    value="code" 
+                    className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
+                  >
+                    <Code2 className="w-4 h-4 mr-2" />
+                    Code
+                  </TabsTrigger>
+                </FeatureGuard>
+                <FeatureGuard flag="brainstrom_tab">
+                  <TabsTrigger 
+                    value="brainstorm"
+                    className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
+                  >
+                    <Lightbulb className="w-4 h-4 mr-2" />
+                    Brainstorm
+                  </TabsTrigger>
+                </FeatureGuard>
               </TabsList>
               
           </div>
             
 
-            <TabsContent value="code" className="flex-1 m-0 overflow-hidden relative group flex flex-col data-[state=inactive]:hidden">
-              <AuthGuard
-                fallbackTitle="Sign in to use Code Runner"
-                fallbackDescription="Create an account or sign in to run and test your code solutions."
-              >
-                {algorithmIdOrSlug && algorithm && (
-                  <CodeRunner 
-                    algorithmId={algorithmIdOrSlug}
-                    algorithmData={algorithm}
-                    onToggleFullscreen={() => setIsCodeRunnerMaximized(true)}
-                    className="h-full border-0 rounded-none shadow-none"
-                    initialCode={savedCode}
-                    onCodeChange={handleCodeChange}
-                    language={selectedLanguage as any}
-                    onLanguageChange={(lang) => {
-                      setSelectedLanguage(lang);
-                      localStorage.setItem('preferredLanguage', lang);
-                    }}
-                  />
-                )}
-              </AuthGuard>
-            </TabsContent>
+            <FeatureGuard flag="code_runner_tab">
+              <TabsContent value="code" className="flex-1 m-0 overflow-hidden relative group flex flex-col data-[state=inactive]:hidden">
+                <AuthGuard
+                  fallbackTitle="Sign in to use Code Runner"
+                  fallbackDescription="Create an account or sign in to run and test your code solutions."
+                >
+                  {algorithmIdOrSlug && algorithm && (
+                    <CodeRunner 
+                      algorithmId={algorithmIdOrSlug}
+                      algorithmData={algorithm}
+                      onToggleFullscreen={() => setIsCodeRunnerMaximized(true)}
+                      className="h-full border-0 rounded-none shadow-none"
+                      initialCode={savedCode}
+                      onCodeChange={handleCodeChange}
+                      language={selectedLanguage as any}
+                      onLanguageChange={(lang) => {
+                        setSelectedLanguage(lang);
+                        localStorage.setItem('preferredLanguage', lang);
+                      }}
+                      onSuccess={handleCodeSuccess}
+                    />
+                  )}
+                </AuthGuard>
+              </TabsContent>
+            </FeatureGuard>
 
-            <TabsContent value="brainstorm" className="flex-1 m-0 overflow-hidden relative group data-[state=inactive]:hidden">
-              <AuthGuard
-                fallbackTitle="Sign in to use Brainstorm"
-                fallbackDescription="Create an account or sign in to save notes and whiteboards."
-              >
-                <ScrollArea className="h-full">
-                  <div className="p-0">
-                    {algorithmIdOrSlug && (
-                      <BrainstormSection algorithmId={algorithmIdOrSlug} algorithmTitle={algorithm.name} />
-                    )}
-                  </div>
-                </ScrollArea>
-              </AuthGuard>
-            </TabsContent>
+            <FeatureGuard flag="brainstrom_tab">
+              <TabsContent value="brainstorm" className="flex-1 m-0 overflow-hidden relative group data-[state=inactive]:hidden">
+                <AuthGuard
+                  fallbackTitle="Sign in to use Brainstorm"
+                  fallbackDescription="Create an account or sign in to save notes and whiteboards."
+                >
+                  <ScrollArea className="h-full">
+                    <div className="p-0">
+                      {algorithmIdOrSlug && (
+                        <BrainstormSection algorithmId={algorithmIdOrSlug} algorithmTitle={algorithm.name} />
+                      )}
+                    </div>
+                  </ScrollArea>
+                </AuthGuard>
+              </TabsContent>
+            </FeatureGuard>
           </Tabs>
       </div>
     </div>
@@ -1175,6 +1190,36 @@ const AlgorithmDetailNew: React.FC = () => {
   if (isLoadingAlgorithm) {
     return <AlgorithmLoader />;
   }
+
+  const handleCodeSuccess = async () => {
+    // Trigger Confetti
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+
+    if (user && id && !isCompleted) {
+       try {
+        const success = await updateProgress(user.id, id, {
+          completed: true,
+          completed_at: new Date().toISOString(),
+        });
+        
+        if (success) {
+          setIsCompleted(true);
+          toast.success("Algorithm completed! Keep it up!", {
+             description: "Marked as completed automatically."
+          });
+          refetchUserData();
+        }
+      } catch (error) {
+        console.error("Failed to auto-complete:", error);
+      }
+    } else if (!user) {
+       toast.success("Great job! Sign in to track your progress.");
+    }
+  };
 
   return (
     <div className={`h-screen w-full overflow-hidden flex flex-col bg-background ${isInterviewMode ? 'border-4 border-green-500/30' : ''}`}>
@@ -1250,10 +1295,12 @@ const AlgorithmDetailNew: React.FC = () => {
                     <span>Report Issue</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={toggleInterviewMode}>
-                    <Monitor className="mr-2 h-4 w-4" />
-                    <span>{isInterviewMode ? "Exit Interview Mode" : "Interview Mode"}</span>
-                  </DropdownMenuItem>
+                  <FeatureGuard flag="interview_mode">
+                    <DropdownMenuItem onClick={toggleInterviewMode}>
+                      <Monitor className="mr-2 h-4 w-4" />
+                      <span>{isInterviewMode ? "Exit Interview Mode" : "Interview Mode"}</span>
+                    </DropdownMenuItem>
+                  </FeatureGuard>
                   {/* Simple Timer Toggle for Mobile */}
                   <div className="p-2 flex items-center justify-between">
                      <div className="flex items-center gap-2 text-sm">
@@ -1330,19 +1377,21 @@ const AlgorithmDetailNew: React.FC = () => {
                 </PopoverContent>
               </Popover>
 
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant={isInterviewMode ? "default" : "ghost"} 
-                    size="icon" 
-                    onClick={toggleInterviewMode}
-                    className="h-8 w-8"
-                  >
-                    <Monitor className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Interview Mode</TooltipContent>
-              </Tooltip>
+              <FeatureGuard flag="interview_mode">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant={isInterviewMode ? "default" : "ghost"} 
+                      size="icon" 
+                      onClick={toggleInterviewMode}
+                      className="h-8 w-8"
+                    >
+                      <Monitor className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Interview Mode</TooltipContent>
+                </Tooltip>
+              </FeatureGuard>
             </TooltipProvider>
           )}
 
@@ -1424,6 +1473,7 @@ const AlgorithmDetailNew: React.FC = () => {
                 className="h-full border-0 rounded-none shadow-none"
                 initialCode={savedCode}
                 onCodeChange={handleCodeChange}
+                onSuccess={handleCodeSuccess}
               />
             )}
           </div>
@@ -1518,30 +1568,32 @@ const AlgorithmDetailNew: React.FC = () => {
             
             {/* Floating Code Button for Mobile */}
             {isMobile && (
-              <div className="fixed bottom-6 right-6 z-40">
-                <Button 
-                  size="lg" 
-                  className="rounded-full shadow-lg h-14 w-14 p-0 pointer-events-auto"
-                  onClick={(e) => {
-                    e.preventDefault(); // Prevent default
-                    e.stopPropagation();
-                    // Scroll to code section
-                    const codeSection = document.querySelector('[value="code"]');
-                    if (codeSection) {
-                        codeSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        // Also trigger tab change if needed
-                        const trigger = document.querySelector('[value="code"][role="tab"]');
-                        if (trigger instanceof HTMLElement) trigger.click();
-                    } else {
-                         // Fallback: try to find the tabs content container
-                         const tabs = document.querySelector('[data-state="active"]');
-                         tabs?.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }}
-                >
-                  <Code2 className="w-6 h-6" />
-                </Button>
-              </div>
+              <FeatureGuard flag="code_runner">
+                <div className="fixed bottom-6 right-6 z-40">
+                  <Button 
+                    size="lg" 
+                    className="rounded-full shadow-lg h-14 w-14 p-0 pointer-events-auto"
+                    onClick={(e) => {
+                      e.preventDefault(); // Prevent default
+                      e.stopPropagation();
+                      // Scroll to code section
+                      const codeSection = document.querySelector('[value="code"]');
+                      if (codeSection) {
+                          codeSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          // Also trigger tab change if needed
+                          const trigger = document.querySelector('[value="code"][role="tab"]');
+                          if (trigger instanceof HTMLElement) trigger.click();
+                      } else {
+                           // Fallback: try to find the tabs content container
+                           const tabs = document.querySelector('[data-state="active"]');
+                           tabs?.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    }}
+                  >
+                    <Code2 className="w-6 h-6" />
+                  </Button>
+                </div>
+              </FeatureGuard>
             )}
           </div>
         ) : (

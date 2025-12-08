@@ -1,9 +1,11 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import React from 'react';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
+import ProfilePage from "./pages/Profile";
 import AlgorithmDetail from "./pages/AlgorithmDetail";
 import AlgorithmDetailNew from "./pages/AlgorithmDetailNew";
 import Blind75 from "./pages/Blind75";
@@ -36,6 +38,7 @@ import FeedbackAdmin from "./pages/FeedbackAdmin";
 import Blog from "./pages/Blog";
 import ComplexityCard from "./components/complexity/ComplexityCard";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminFeatureFlags from "./pages/AdminFeatureFlags";
 
 const queryClient = new QueryClient();
 
@@ -50,12 +53,27 @@ const ConditionalNavbar = () => {
   return <Navbar />;
 };
 
-const App = () => (
+import { appStatus } from "@/utils/appStatus";
+
+import { FeatureFlagProvider } from "@/contexts/FeatureFlagContext";
+
+const App = () => {
+    // Set initialized flag after first mount (so subsequent internal navigations know app is loaded)
+  React.useEffect(() => {
+    // Small timeout to allow the initial route (like Home) to render with "isInitialized: false" first
+    const timer = setTimeout(() => {
+      appStatus.isInitialized = true;
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
   <QueryClientProvider client={queryClient}>
     <AppProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
+      <FeatureFlagProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
         <BrowserRouter basename="/">
           <ConditionalNavbar />
           <Routes>
@@ -108,19 +126,30 @@ const App = () => (
             </ProtectedAdminRoute>
           } />
           
+
+          <Route path="/admin/features" element={
+            <ProtectedAdminRoute>
+              <AdminFeatureFlags />
+            </ProtectedAdminRoute>
+          } />
+
           <Route path="/admin" element={
             <ProtectedAdminRoute>
               <AdminDashboard />
             </ProtectedAdminRoute>
           } />
 
+            <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-    </AppProvider>
-  </QueryClientProvider>
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </FeatureFlagProvider>
+  </AppProvider>
+</QueryClientProvider>
 );
+};
 
 export default App;

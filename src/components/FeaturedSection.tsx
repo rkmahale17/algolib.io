@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Link } from "react-router-dom";
+import { FeatureGuard } from "./FeatureGuard";
 
 const features = [
   {
@@ -19,6 +20,7 @@ const features = [
     icon: Code2,
     link: "#algorithms",
     action: "Browse Algorithms",
+    flag: "core_algo",
   },
   {
     id: "blind-75",
@@ -29,6 +31,7 @@ const features = [
     badge: "75",
     link: "/blind75",
     action: "Start Learning",
+    flag: "blind_75",
   },
   {
     id: "blog",
@@ -47,6 +50,7 @@ const features = [
     icon: Gamepad2,
     link: "/games",
     action: "Play Now",
+    flag: "algo_games",
   },
 ];
 
@@ -70,47 +74,99 @@ export const FeaturedSection = () => {
             const isFirstCard = index === 0;
 
             return (
-              <Link
-                key={feature.id}
-                to={feature.link}
-                onClick={isFirstCard ? handleCoreAlgorithmsClick : undefined}
-                className="group block"
-              >
-                <Card className="overflow-hidden  border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg bg-card max-w-72">
-                  <div className="relative h-32 bg-gradient-to-br from-primary/40 to-primary/5 flex items-center justify-center overflow-hidden">
-                    {feature.badge ? (
-                      <div className="text-6xl font-bold text-primary/80 group-hover:text-primary/60 transition-all duration-500 group-hover:scale-110 ">
-                        {feature.badge}
-                      </div>
-                    ) : (
-                      Icon && (
-                        <Icon className="w-16 h-16 text-primary/80 group-hover:text-primary/60 transition-colors duration-300 group-hover:scale-110 transform" />
-                      )
-                    )}
-                  </div>
-
-                  <div className="p-5">
-                    <h4 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">
-                      {feature.title}
-                    </h4>
-
-                    <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-                      {feature.description}
-                    </p>
-
-                    <div className="flex justify-end">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-primary hover:text-primary hover:bg-primary/10 gap-1"
+              <FeatureGuard key={feature.id} flag={feature.flag || "always_true"} fallback={!feature.flag ? undefined : null}>
+                 {/* Hack: if no flag, we use a non-existent flag but fallback is implicitly handled or we modify FeatureGuard? 
+                     Better: Condition logic.
+                     Actually FeatureGuard requires a flag. If no flag, just render.
+                 */}
+                  {(!feature.flag) ? (
+                      <Link
+                        key={feature.id}
+                        to={feature.link}
+                        onClick={isFirstCard ? handleCoreAlgorithmsClick : undefined}
+                        className="group block"
                       >
-                        {feature.action}
-                        <ArrowRight className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              </Link>
+                         <Card className="overflow-hidden  border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg bg-card max-w-72">
+                          <div className="relative h-32 bg-gradient-to-br from-primary/40 to-primary/5 flex items-center justify-center overflow-hidden">
+                            {feature.badge ? (
+                              <div className="text-6xl font-bold text-primary/80 group-hover:text-primary/60 transition-all duration-500 group-hover:scale-110 ">
+                                {feature.badge}
+                              </div>
+                            ) : (
+                              Icon && (
+                                <Icon className="w-16 h-16 text-primary/80 group-hover:text-primary/60 transition-colors duration-300 group-hover:scale-110 transform" />
+                              )
+                            )}
+                          </div>
+
+                          <div className="p-5">
+                            <h4 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">
+                              {feature.title}
+                            </h4>
+
+                            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                              {feature.description}
+                            </p>
+
+                            <div className="flex justify-end">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-primary hover:text-primary hover:bg-primary/10 gap-1"
+                              >
+                                {feature.action}
+                                <ArrowRight className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </Card>
+                      </Link>
+                  ) : (
+                      <FeatureGuard flag={feature.flag}>
+                         <Link
+                            key={feature.id}
+                            to={feature.link}
+                            onClick={isFirstCard ? handleCoreAlgorithmsClick : undefined}
+                            className="group block"
+                          >
+                            <Card className="overflow-hidden  border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg bg-card max-w-72">
+                              <div className="relative h-32 bg-gradient-to-br from-primary/40 to-primary/5 flex items-center justify-center overflow-hidden">
+                                {feature.badge ? (
+                                  <div className="text-6xl font-bold text-primary/80 group-hover:text-primary/60 transition-all duration-500 group-hover:scale-110 ">
+                                    {feature.badge}
+                                  </div>
+                                ) : (
+                                  Icon && (
+                                    <Icon className="w-16 h-16 text-primary/80 group-hover:text-primary/60 transition-colors duration-300 group-hover:scale-110 transform" />
+                                  )
+                                )}
+                              </div>
+
+                              <div className="p-5">
+                                <h4 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">
+                                  {feature.title}
+                                </h4>
+
+                                <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                                  {feature.description}
+                                </p>
+
+                                <div className="flex justify-end">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-primary hover:text-primary hover:bg-primary/10 gap-1"
+                                  >
+                                    {feature.action}
+                                    <ArrowRight className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </Card>
+                          </Link>
+                      </FeatureGuard>
+                  )}
+            </FeatureGuard>
             );
           })}
         </div>

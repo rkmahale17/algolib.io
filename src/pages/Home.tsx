@@ -21,7 +21,9 @@ import { Link } from "react-router-dom";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useSearchParams } from "react-router-dom";
-import { AlgorithmLoader } from "@/components/AlgorithmLoader";
+import { PremiumLoader } from "@/components/PremiumLoader";
+import { appStatus } from "@/utils/appStatus";
+import { FeatureGuard } from "@/components/FeatureGuard";
 
 const Home = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -125,8 +127,11 @@ const Home = () => {
     advanced: "bg-red-500/10 text-red-500 border-red-500/20",
   };
 
+
+
   if (loading) {
-    return <AlgorithmLoader />;
+      // Only show text if this is the initial app load (not navigating from another page)
+    return <PremiumLoader text={!appStatus.isInitialized ? "Initializing Algorithms for you" : undefined} />;
   }
 
   return (
@@ -331,119 +336,121 @@ const Home = () => {
         {/* Featured Section */}
         <FeaturedSection />
 
-        {/* Search and Filter */}
-        <div className="container mx-auto px-4 py-8" id="algorithms">
-          <div className="max-w-4xl mx-auto space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl md:text-4xl font-bold gradient-text mb-2">
-                Core Algorithms
-              </h2>
-            </div>
+        <FeatureGuard flag="core_algo">
+          {/* Search and Filter */}
+          <div className="container mx-auto px-4 py-8" id="algorithms">
+            <div className="max-w-4xl mx-auto space-y-6">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl md:text-4xl font-bold gradient-text mb-2">
+                  Core Algorithms
+                </h2>
+              </div>
 
-            {/* Search Bar */}
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search algorithms..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 h-14 text-lg bg-card border-border/50"
-              />
-            </div>
+              {/* Search Bar */}
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Search algorithms..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-12 h-14 text-lg bg-card border-border/50"
+                />
+              </div>
 
-            {/* Category Filter */}
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant={selectedCategory === null ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedCategory(null)}
-                className="rounded-full"
-              >
-                All
-              </Button>
-              {categories.map((category) => (
+              {/* Category Filter */}
+              <div className="flex flex-wrap gap-2">
                 <Button
-                  key={category}
-                  variant={
-                    selectedCategory === category ? "default" : "outline"
-                  }
+                  variant={selectedCategory === null ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setSelectedCategory(category)}
+                  onClick={() => setSelectedCategory(null)}
                   className="rounded-full"
                 >
-                  {category}
+                  All
                 </Button>
+                {categories.map((category) => (
+                  <Button
+                    key={category}
+                    variant={
+                      selectedCategory === category ? "default" : "outline"
+                    }
+                    size="sm"
+                    onClick={() => setSelectedCategory(category)}
+                    className="rounded-full"
+                  >
+                    {category}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Algorithm Cards Section */}
+          <div className="container mx-auto px-4 pb-16">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredAlgorithms.map((algo, index) => (
+                <Link
+                  key={algo.id}
+                  to={`/algorithm/${algo.id}`}
+                  rel="noopener noreferrer"
+                >
+                  <Card
+                    className="p-6 hover-lift cursor-pointer glass-card group"
+                    style={{ animationDelay: `${index * 50}ms` }}
+                  >
+                    <div className="space-y-4">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-lg group-hover:text-primary transition-colors truncate">
+                            {algo.name}
+                          </h3>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {algo.category}
+                          </p>
+                        </div>
+                        <Badge
+                          variant="outline"
+                          className={`${
+                            difficultyColors[algo.difficulty]
+                          } shrink-0`}
+                        >
+                          {algo.difficulty}
+                        </Badge>
+                      </div>
+
+                      <p className="text-sm text-muted-foreground line-clamp-2">
+                        {algo.description}
+                      </p>
+
+                      <div className="flex items-center gap-4 text-xs">
+                        <div className="flex items-center gap-1">
+                          <TrendingUp className="w-3 h-3" />
+                          <span className="text-muted-foreground">
+                            Time: {algo.timeComplexity}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <BookOpen className="w-3 h-3" />
+                          <span className="text-muted-foreground">
+                            Space: {algo.spaceComplexity}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
               ))}
             </div>
+
+            {filteredAlgorithms.length === 0 && (
+              <div className="text-center py-16">
+                <p className="text-muted-foreground">
+                  No algorithms found matching your search.
+                </p>
+              </div>
+            )}
           </div>
-        </div>
-
-        {/* Algorithm Cards Section */}
-        <div className="container mx-auto px-4 pb-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredAlgorithms.map((algo, index) => (
-              <Link
-                key={algo.id}
-                to={`/algorithm/${algo.id}`}
-                rel="noopener noreferrer"
-              >
-                <Card
-                  className="p-6 hover-lift cursor-pointer glass-card group"
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
-                  <div className="space-y-4">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-lg group-hover:text-primary transition-colors truncate">
-                          {algo.name}
-                        </h3>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {algo.category}
-                        </p>
-                      </div>
-                      <Badge
-                        variant="outline"
-                        className={`${
-                          difficultyColors[algo.difficulty]
-                        } shrink-0`}
-                      >
-                        {algo.difficulty}
-                      </Badge>
-                    </div>
-
-                    <p className="text-sm text-muted-foreground line-clamp-2">
-                      {algo.description}
-                    </p>
-
-                    <div className="flex items-center gap-4 text-xs">
-                      <div className="flex items-center gap-1">
-                        <TrendingUp className="w-3 h-3" />
-                        <span className="text-muted-foreground">
-                          Time: {algo.timeComplexity}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <BookOpen className="w-3 h-3" />
-                        <span className="text-muted-foreground">
-                          Space: {algo.spaceComplexity}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              </Link>
-            ))}
-          </div>
-
-          {filteredAlgorithms.length === 0 && (
-            <div className="text-center py-16">
-              <p className="text-muted-foreground">
-                No algorithms found matching your search.
-              </p>
-            </div>
-          )}
-        </div>
+        </FeatureGuard>
 
         {/* FAQ Section */}
         <FAQ />

@@ -14,6 +14,7 @@ import {
   MessageSquare,
   Trophy,
   ShieldCheck,
+  User,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -23,6 +24,8 @@ import { ThemeToggle } from "./ThemeToggle";
 import logo from "@/assets/logo.svg";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { FeatureGuard } from "./FeatureGuard";
+import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
 
 const Navbar = () => {
   const [user, setUser] = useState<any>(null);
@@ -274,6 +277,14 @@ const Navbar = () => {
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
+                    <FeatureGuard flag="profiles">
+                      <DropdownMenuItem asChild>
+                        <Link to="/profile">
+                          <User className="mr-2 h-4 w-4" />
+                          <span>Profile</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    </FeatureGuard>
                     <DropdownMenuItem asChild>
                       <Link to="/feedback">
                         <MessageSquare className="mr-2 h-4 w-4" />

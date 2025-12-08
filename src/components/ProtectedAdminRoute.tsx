@@ -1,5 +1,5 @@
 import { Navigate } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import { PremiumLoader } from "@/components/PremiumLoader";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -24,11 +24,7 @@ export const ProtectedAdminRoute = ({ children }: { children: React.ReactNode })
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
+    return <PremiumLoader />;
   }
 
   if (!session) {

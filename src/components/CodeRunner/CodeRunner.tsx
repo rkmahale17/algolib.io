@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Play, RotateCcw, Loader2, Maximize2, Minimize2, Settings, AlignLeft, Info } from "lucide-react";
+import { FeatureGuard } from "@/components/FeatureGuard";
 import { toast } from "sonner";
 import axios from 'axios';
 import {
@@ -28,6 +30,8 @@ import { DEFAULT_CODE, LANGUAGE_IDS } from './constants';
 import { supabase } from '@/integrations/supabase/client';
 import { generateStub } from '@/utils/stubGenerator';
 
+
+
 interface CodeRunnerProps {
   algorithmId?: string;
   algorithmData?: any;
@@ -38,6 +42,7 @@ interface CodeRunnerProps {
   onCodeChange?: (code: string) => void;
   language?: Language;
   onLanguageChange?: (language: Language) => void;
+  onSuccess?: () => void;
 }
 
 interface EditorSettings {
@@ -67,8 +72,10 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   initialCode,
   onCodeChange,
   language: controlledLanguage,
-  onLanguageChange
+  onLanguageChange,
+  onSuccess
 }) => {
+  const isLimitExceeded = useFeatureFlag("todays_limit_exceed");
   const [internalLanguage, setInternalLanguage] = useState<Language>('typescript');
   const language = controlledLanguage || internalLanguage;
   
@@ -244,7 +251,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
       }
     }
   }, [activeAlgorithm, language, algorithmId]); 
-
+  
   // Separate effect to handle external updates to initialCode (e.g. loading from cache/db)
   // This allows the parent to override the "starter code" set by the previous effect 
   // once the async fetch/cache lookup is done.
@@ -359,6 +366,13 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   };
 
   const handleRun = async () => {
+    // Check for daily limit flag
+    if (isLimitExceeded) {
+      // Flag check enforcement
+      toast.error("Daily execution limit exceeded! Please try again tomorrow.");
+      return;
+    }
+
     setIsLoading(true);
     setOutput(null);
     setExecutionTime(null);
@@ -407,6 +421,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
 
       if (result.status?.id === 3 && allPassed) {
         toast.success("All test cases passed!");
+        onSuccess?.(); // Trigger success callback
       } else if (result.status?.id === 3 && hasFailed) {
         toast.warning("Code ran, but some test cases failed.");
       } else if (result.status?.id !== 3) {
@@ -526,6 +541,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                 >
                   <RotateCcw className="w-3 h-3" />
                 </Button>
+                <FeatureGuard flag="code_runner">
                  <Button 
                 onClick={handleRun} 
                 disabled={isLoading}
@@ -544,6 +560,19 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                   </>
                 )}
               </Button>
+                </FeatureGuard>
+              
+              <FeatureGuard flag="submit_button">
+                <Button 
+                  onClick={() => toast.success("Solution submitted! (Mock)")} 
+                  disabled={isLoading}
+                  size="sm"
+                  variant="default"
+                  className="h-8 px-4 text-xs bg-green-600 hover:bg-green-700 text-white ml-2"
+                >
+                  Submit
+                </Button>
+              </FeatureGuard>
              
               </div>
               <div className="flex items-center gap-1">
