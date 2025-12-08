@@ -8,7 +8,7 @@ import { getAllUserAlgorithmData } from '@/utils/userAlgorithmDataHelpers';
 
 interface Algorithm {
   id: string;
-  slug: string;
+  slug?: string;
   name: string;
   category: string;
   difficulty: string;
@@ -55,6 +55,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   // Fetch algorithms from cache or database
   const fetchAlgorithms = async (forceRefresh = false) => {
+    if (!supabase) {
+      console.warn('Supabase not available, skipping algorithms fetch');
+      setIsAlgorithmsLoading(false);
+      return;
+    }
+
     try {
       // Check cache first
       if (!forceRefresh) {
@@ -82,11 +88,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
       const transformedData = (data || []).map(algo => {
         const metadata = algo.metadata || {};
+        const metadataObj = typeof metadata === 'object' && metadata !== null ? metadata : {};
         return {
           ...algo,
-          ...metadata,
+          ...metadataObj,
           metadata: algo.metadata,
-        };
+        } as Algorithm;
       });
 
       setAlgorithms(transformedData);
@@ -124,6 +131,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   // Initialize auth
   useEffect(() => {
+    if (!supabase) {
+      console.warn('Supabase not available, skipping authentication');
+      setIsAuthLoading(false);
+      return;
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setIsAuthLoading(false);
@@ -148,7 +161,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   // Subscribe to user_algorithm_data changes
   useEffect(() => {
-    if (!user) return;
+    if (!user || !supabase) return;
 
     const channel = supabase
       .channel('user_algorithm_data_changes')

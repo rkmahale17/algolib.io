@@ -21,6 +21,11 @@ export async function getUserAlgorithmData(
     userId: string,
     algorithmId: string
 ): Promise<UserAlgorithmData | null> {
+    if (!supabase) {
+        console.warn('Supabase not available');
+        return null;
+    }
+
     const { data, error } = await supabase
         .from('user_algorithm_data')
         .select('*')
@@ -37,18 +42,23 @@ export async function getUserAlgorithmData(
         return null;
     }
 
-    return data as UserAlgorithmData;
+    return data as unknown as UserAlgorithmData;
 }
 
 /**
  * Upsert (insert or update) user algorithm data
  */
 export async function upsertUserAlgorithmData(
-    data: InsertUserAlgorithmData
+    insertData: InsertUserAlgorithmData
 ): Promise<UserAlgorithmData | null> {
+    if (!supabase) {
+        console.warn('Supabase not available');
+        return null;
+    }
+
     const { data: result, error } = await supabase
         .from('user_algorithm_data')
-        .upsert(data, {
+        .upsert(insertData as any, {
             onConflict: 'user_id,algorithm_id',
         })
         .select()
@@ -59,7 +69,7 @@ export async function upsertUserAlgorithmData(
         return null;
     }
 
-    return result as UserAlgorithmData;
+    return result as unknown as UserAlgorithmData;
 }
 
 /**
@@ -70,6 +80,11 @@ export async function updateProgress(
     algorithmId: string,
     progressData: UpdateProgressData
 ): Promise<boolean> {
+    if (!supabase) {
+        console.warn('Supabase not available');
+        return false;
+    }
+
     const { error } = await supabase
         .from('user_algorithm_data')
         .upsert(
@@ -77,7 +92,7 @@ export async function updateProgress(
                 user_id: userId,
                 algorithm_id: algorithmId,
                 ...progressData,
-            },
+            } as any,
             {
                 onConflict: 'user_id,algorithm_id',
             }
@@ -99,6 +114,11 @@ export async function updateCode(
     algorithmId: string,
     codeData: UpdateCodeData
 ): Promise<boolean> {
+    if (!supabase) {
+        console.warn('Supabase not available');
+        return false;
+    }
+
     // First, get existing data
     const existing = await getUserAlgorithmData(userId, algorithmId);
 
@@ -115,7 +135,7 @@ export async function updateCode(
                 user_id: userId,
                 algorithm_id: algorithmId,
                 code: updatedCode,
-            },
+            } as any,
             {
                 onConflict: 'user_id,algorithm_id',
             }
@@ -137,6 +157,11 @@ export async function addSubmission(
     algorithmId: string,
     submission: Submission
 ): Promise<boolean> {
+    if (!supabase) {
+        console.warn('Supabase not available');
+        return false;
+    }
+
     // First, get existing data
     const existing = await getUserAlgorithmData(userId, algorithmId);
 
@@ -150,7 +175,7 @@ export async function addSubmission(
                 user_id: userId,
                 algorithm_id: algorithmId,
                 submissions: updatedSubmissions,
-            },
+            } as any,
             {
                 onConflict: 'user_id,algorithm_id',
             }
@@ -172,6 +197,11 @@ export async function updateNotes(
     algorithmId: string,
     notesData: UpdateNotesData
 ): Promise<boolean> {
+    if (!supabase) {
+        console.warn('Supabase not available');
+        return false;
+    }
+
     const { error } = await supabase
         .from('user_algorithm_data')
         .upsert(
@@ -179,7 +209,7 @@ export async function updateNotes(
                 user_id: userId,
                 algorithm_id: algorithmId,
                 ...notesData,
-            },
+            } as any,
             {
                 onConflict: 'user_id,algorithm_id',
             }
@@ -201,6 +231,11 @@ export async function updateWhiteboard(
     algorithmId: string,
     whiteboardData: UpdateWhiteboardData
 ): Promise<boolean> {
+    if (!supabase) {
+        console.warn('Supabase not available');
+        return false;
+    }
+
     const { error } = await supabase
         .from('user_algorithm_data')
         .upsert(
@@ -208,7 +243,7 @@ export async function updateWhiteboard(
                 user_id: userId,
                 algorithm_id: algorithmId,
                 ...whiteboardData,
-            },
+            } as any,
             {
                 onConflict: 'user_id,algorithm_id',
             }
@@ -230,6 +265,11 @@ export async function updateSocial(
     algorithmId: string,
     socialData: UpdateSocialData
 ): Promise<boolean> {
+    if (!supabase) {
+        console.warn('Supabase not available');
+        return false;
+    }
+
     const { error } = await supabase
         .from('user_algorithm_data')
         .upsert(
@@ -237,7 +277,7 @@ export async function updateSocial(
                 user_id: userId,
                 algorithm_id: algorithmId,
                 ...socialData,
-            },
+            } as any,
             {
                 onConflict: 'user_id,algorithm_id',
             }
@@ -259,6 +299,11 @@ export async function updateTimeTracking(
     algorithmId: string,
     timeData: UpdateTimeData
 ): Promise<boolean> {
+    if (!supabase) {
+        console.warn('Supabase not available');
+        return false;
+    }
+
     const { error } = await supabase
         .from('user_algorithm_data')
         .upsert(
@@ -266,7 +311,7 @@ export async function updateTimeTracking(
                 user_id: userId,
                 algorithm_id: algorithmId,
                 ...timeData,
-            },
+            } as any,
             {
                 onConflict: 'user_id,algorithm_id',
             }
@@ -286,6 +331,11 @@ export async function updateTimeTracking(
 export async function getAllUserAlgorithmData(
     userId: string
 ): Promise<UserAlgorithmData[]> {
+    if (!supabase) {
+        console.warn('Supabase not available');
+        return [];
+    }
+
     const { data, error } = await supabase
         .from('user_algorithm_data')
         .select('*')
@@ -296,13 +346,18 @@ export async function getAllUserAlgorithmData(
         return [];
     }
 
-    return (data as UserAlgorithmData[]) || [];
+    return (data as unknown as UserAlgorithmData[]) || [];
 }
 
 /**
  * Get completed algorithms count
  */
 export async function getCompletedCount(userId: string): Promise<number> {
+    if (!supabase) {
+        console.warn('Supabase not available');
+        return 0;
+    }
+
     const { count, error } = await supabase
         .from('user_algorithm_data')
         .select('*', { count: 'exact', head: true })
