@@ -171,7 +171,6 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
                         ) : (
                           <>
                             <Copy className="w-4 h-4" />
-                            Copy Code
                           </>
                         )}
                       </Button>
