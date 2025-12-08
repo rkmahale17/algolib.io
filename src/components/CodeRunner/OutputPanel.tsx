@@ -4,6 +4,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, Terminal, FlaskConical, Clock, Zap, Plus, CheckCircle2, XCircle, AlertCircle, Edit2, Trash2 } from "lucide-react";
 import { Algorithm } from '@/data/algorithms';
 import { Button } from "@/components/ui/button";
+import { FeatureGuard } from "@/components/FeatureGuard";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { TestCaseEditor } from './TestCaseEditor';
 
@@ -154,14 +155,16 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({
                   ))}
                 </TabsList>
                 
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 text-xs gap-1 ml-1 shrink-0 text-muted-foreground hover:text-foreground"
-                  onClick={onAddTestCase}
-                >
-                  <Plus className="w-3 h-3" />
-                </Button>
+                <FeatureGuard flag="custom_test_case_addtion">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 text-xs gap-1 ml-1 shrink-0 text-muted-foreground hover:text-foreground"
+                    onClick={onAddTestCase}
+                  >
+                    <Plus className="w-3 h-3" />
+                  </Button>
+                </FeatureGuard>
               </div>
 
               <div className="flex-1 min-h-0">

@@ -12,6 +12,7 @@ import { HistoryTab } from "./HistoryTab";
 import { NotesComponent } from "./NotesComponent";
 import { WhiteboardComponent } from "./WhiteboardComponent";
 import { useState } from "react";
+import { FeatureGuard } from "@/components/FeatureGuard";
 
 interface BrainstormSectionProps {
   algorithmId: string;
@@ -55,20 +56,24 @@ export const BrainstormSection = ({
       >
         <div className="flex items-center justify-between border-b bg-muted/10 shrink-0">
           <TabsList className="flex-1 flex p-0 bg-transparent gap-0 rounded-none h-12">
-            <TabsTrigger
-              value="whiteboard"
-              className="flex-1 gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none"
-            >
-              <Palette className="w-4 h-4" />
-              Whiteboard
-            </TabsTrigger>
-            <TabsTrigger
-              value="notes"
-              className="flex-1 gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none"
-            >
-              <FileText className="w-4 h-4" />
-              Notes
-            </TabsTrigger>
+            <FeatureGuard flag="drawing">
+              <TabsTrigger
+                value="whiteboard"
+                className="flex-1 gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none"
+              >
+                <Palette className="w-4 h-4" />
+                Whiteboard
+              </TabsTrigger>
+            </FeatureGuard>
+            <FeatureGuard flag="notes">
+              <TabsTrigger
+                value="notes"
+                className="flex-1 gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none"
+              >
+                <FileText className="w-4 h-4" />
+                Notes
+              </TabsTrigger>
+            </FeatureGuard>
             <TabsTrigger
               value="history"
               className="flex-1 gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none"
@@ -91,14 +96,18 @@ export const BrainstormSection = ({
                 className="w-full h-full flex flex-col"
               >
                 <TabsList className="w-full justify-start rounded-none border-b px-4 bg-background">
-                  <TabsTrigger value="whiteboard" className="gap-2">
-                    <Palette className="w-4 h-4" />
-                    Whiteboard
-                  </TabsTrigger>
-                  <TabsTrigger value="notes" className="gap-2">
-                    <FileText className="w-4 h-4" />
-                    Notes
-                  </TabsTrigger>
+                  <FeatureGuard flag="drawing">
+                    <TabsTrigger value="whiteboard" className="gap-2">
+                      <Palette className="w-4 h-4" />
+                      Whiteboard
+                    </TabsTrigger>
+                  </FeatureGuard>
+                  <FeatureGuard flag="notes">
+                    <TabsTrigger value="notes" className="gap-2">
+                      <FileText className="w-4 h-4" />
+                      Notes
+                    </TabsTrigger>
+                  </FeatureGuard>
                   <TabsTrigger value="history" className="gap-2">
                     <History className="w-4 h-4" />
                     History
@@ -106,22 +115,26 @@ export const BrainstormSection = ({
                 </TabsList>
 
                 <div className="flex-1 overflow-hidden">
-                  <TabsContent value="whiteboard" className="h-full m-0">
-                    <WhiteboardComponent
-                      algorithmId={algorithmId}
-                      algorithmTitle={algorithmTitle}
-                      restoreData={whiteboardRestore}
-                      isExpand={isModalOpen}
-                    />
-                  </TabsContent>
+                  <FeatureGuard flag="drawing">
+                    <TabsContent value="whiteboard" className="h-full m-0">
+                      <WhiteboardComponent
+                        algorithmId={algorithmId}
+                        algorithmTitle={algorithmTitle}
+                        restoreData={whiteboardRestore}
+                        isExpand={isModalOpen}
+                      />
+                    </TabsContent>
+                  </FeatureGuard>
 
-                  <TabsContent value="notes" className="h-full m-0">
-                    <NotesComponent
-                      algorithmId={algorithmId}
-                      algorithmTitle={algorithmTitle}
-                      restoreData={noteRestore}
-                    />
-                  </TabsContent>
+                  <FeatureGuard flag="notes">
+                    <TabsContent value="notes" className="h-full m-0">
+                      <NotesComponent
+                        algorithmId={algorithmId}
+                        algorithmTitle={algorithmTitle}
+                        restoreData={noteRestore}
+                      />
+                    </TabsContent>
+                  </FeatureGuard>
 
                   <TabsContent
                     value="history"
@@ -140,21 +153,25 @@ export const BrainstormSection = ({
         </div>
 
         <div className="flex-1 overflow-hidden">
-          <TabsContent value="whiteboard" className="h-full m-0">
-            <WhiteboardComponent
-              algorithmId={algorithmId}
-              algorithmTitle={algorithmTitle}
-              restoreData={whiteboardRestore}
-            />
-          </TabsContent>
+          <FeatureGuard flag="drawing">
+            <TabsContent value="whiteboard" className="h-full m-0">
+              <WhiteboardComponent
+                algorithmId={algorithmId}
+                algorithmTitle={algorithmTitle}
+                restoreData={whiteboardRestore}
+              />
+            </TabsContent>
+          </FeatureGuard>
 
-          <TabsContent value="notes" className="h-full m-0">
-            <NotesComponent
-              algorithmId={algorithmId}
-              algorithmTitle={algorithmTitle}
-              restoreData={noteRestore}
-            />
-          </TabsContent>
+          <FeatureGuard flag="notes">
+            <TabsContent value="notes" className="h-full m-0">
+              <NotesComponent
+                algorithmId={algorithmId}
+                algorithmTitle={algorithmTitle}
+                restoreData={noteRestore}
+              />
+            </TabsContent>
+          </FeatureGuard>
 
           <TabsContent value="history" className="h-full m-0 p-4 overflow-auto">
             <HistoryTab
