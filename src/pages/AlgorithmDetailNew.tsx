@@ -201,15 +201,17 @@ const AlgorithmDetailNew: React.FC = () => {
         if (error) throw error;
         
         // Transform Supabase data structure
+        const metadata = data.metadata || {};
+        const metadataObj = (typeof metadata === 'object' && metadata !== null ? metadata : {}) as Record<string, any>;
         const transformedData = {
           ...data,
-          ...(data.metadata || {}),
+          ...metadataObj,
           metadata: data.metadata
         };
         
         setAlgorithm(transformedData);
-        setLikes(transformedData.likes || 0);
-        setDislikes(transformedData.dislikes || 0);
+        setLikes((metadataObj.likes as number) || 0);
+        setDislikes((metadataObj.dislikes as number) || 0);
       } catch (error) {
         console.error('Error fetching algorithm:', error);
         toast.error('Failed to load algorithm details');
@@ -236,7 +238,6 @@ const AlgorithmDetailNew: React.FC = () => {
       setUser(session?.user ?? null);
     });
 
-    return () => subscription.unsubscribe();
     return () => subscription.unsubscribe();
   }, []);
 
@@ -511,10 +512,11 @@ const AlgorithmDetailNew: React.FC = () => {
       const nextProblem = blind75Problems[currentIndex + 1];
       
       // We need the UUID for the route, so we must query Supabase
+      if (!supabase) return;
       const { data } = await supabase
         .from('algorithms')
         .select('id')
-        .eq('slug', nextProblem.slug)
+        .eq('id', nextProblem.slug)
         .maybeSingle();
 
       if (data) {

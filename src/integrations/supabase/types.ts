@@ -206,6 +206,33 @@ export type Database = {
         }
         Relationships: []
       }
+      feature_flags: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_enabled: boolean | null
+          key: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          key: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          key?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       feedback: {
         Row: {
           created_at: string
@@ -287,30 +314,54 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          bio: string | null
+          company: string | null
           created_at: string | null
           display_name: string | null
           email: string | null
           full_name: string | null
+          github_url: string | null
           id: string
+          linkedin_url: string | null
+          location: string | null
+          twitter_url: string | null
           updated_at: string | null
+          username: string | null
+          website_url: string | null
         }
         Insert: {
           avatar_url?: string | null
+          bio?: string | null
+          company?: string | null
           created_at?: string | null
           display_name?: string | null
           email?: string | null
           full_name?: string | null
+          github_url?: string | null
           id: string
+          linkedin_url?: string | null
+          location?: string | null
+          twitter_url?: string | null
           updated_at?: string | null
+          username?: string | null
+          website_url?: string | null
         }
         Update: {
           avatar_url?: string | null
+          bio?: string | null
+          company?: string | null
           created_at?: string | null
           display_name?: string | null
           email?: string | null
           full_name?: string | null
+          github_url?: string | null
           id?: string
+          linkedin_url?: string | null
+          location?: string | null
+          twitter_url?: string | null
           updated_at?: string | null
+          username?: string | null
+          website_url?: string | null
         }
         Relationships: []
       }

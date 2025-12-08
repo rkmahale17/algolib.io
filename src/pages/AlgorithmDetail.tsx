@@ -59,17 +59,19 @@ const AlgorithmDetail: React.FC = () => {
 
   // Check authentication and load progress
   useEffect(() => {
+    if (!supabase) {
+      console.warn('Supabase not available, skipping authentication');
+      setIsCheckingAuth(false);
+      setIsLoadingProgress(false);
+      return;
+    }
+
     const checkAuth = async () => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
-
-      if (session?.user && id) {
-        await fetchProgress(session.user.id);
-      } else {
-        setIsLoadingProgress(false);
-      }
+      setIsLoadingProgress(false);
       setIsCheckingAuth(true);
     };
 
@@ -79,9 +81,7 @@ const AlgorithmDetail: React.FC = () => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
-      if (session?.user && id) {
-        fetchProgress(session.user.id);
-      } else {
+      if (!session?.user) {
         setIsCompleted(false);
         setIsLoadingProgress(false);
       }
