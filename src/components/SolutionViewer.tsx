@@ -4,10 +4,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Copy, Check } from 'lucide-react';
 import { toast } from 'sonner';
+import { RichText } from '@/components/RichText';
+
+interface CodeBlock {
+  codeType: string;
+  code: string;
+  explanationBefore?: string;
+  explanationAfter?: string;
+}
 
 interface CodeImplementation {
   codeType: string;
   code: string;
+  explanationBefore?: string;
+  explanationAfter?: string;
 }
 
 interface SolutionData {
@@ -84,6 +94,18 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
     return displayNames[lang.toLowerCase()] || lang;
   };
 
+  const getFileExtension = (lang: string) => {
+    switch (lang.toLowerCase()) {
+      case 'python': return 'py';
+      case 'java': return 'java';
+      case 'cpp': return 'cpp';
+      case 'c': return 'c';
+      case 'javascript': return 'js';
+      case 'typescript': return 'mts';
+      default: return 'mts';
+    }
+  };
+
   if (implementations.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground border rounded-lg border-dashed">
@@ -103,7 +125,7 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
 
       {(() => {
         // Group implementations by code type (approach)
-        const approachesByType: Record<string, { lang: string; code: string }[]> = {};
+        const approachesByType: Record<string, { lang: string; code: string; explanationBefore?: string; explanationAfter?: string }[]> = {};
         
         implementations.forEach((impl) => {
           impl.code.forEach((codeImpl) => {
@@ -114,6 +136,8 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
               approachesByType[codeImpl.codeType].push({
                 lang: impl.lang,
                 code: codeImpl.code,
+                explanationBefore: codeImpl.explanationBefore,
+                explanationAfter: codeImpl.explanationAfter,
               });
             }
           });
@@ -129,82 +153,104 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
           );
         }
 
-        return approaches.map(([codeType, langImplementations], approachIndex) => (
-          <div key={codeType} className="space-y-3">
-            {/* Approach Header */}
-            <h3 className="text-base font-semibold">
-              Approach {approachIndex + 1}: {codeType === 'optimize' ? 'Optimized' : codeType.charAt(0).toUpperCase() + codeType.slice(1)}
-            </h3>
+        return approaches.map(([codeType, langImplementations], approachIndex) => {
+          // Get explanations from the first language implementation (assuming they are synced)
+          const explanationBefore = langImplementations[0]?.explanationBefore;
+          const explanationAfter = langImplementations[0]?.explanationAfter;
 
-            {/* Language Tabs for this approach */}
-            <Tabs defaultValue={langImplementations[0]?.lang || 'typescript'} className="w-full">
-              {langImplementations.map((langImpl) => (
-                <TabsContent key={langImpl.lang} value={langImpl.lang} className="mt-0">
-                  <div className="relative rounded-lg border overflow-hidden">
-                    {/* Header with Language Tabs and Copy Button - Theme aware */}
-                    <div className="flex items-stretch border-b bg-muted/10 shrink-0">
-                      {/* Language Tabs - Compact style like AlgorithmDetailNew */}
-                      <TabsList className="flex-1 flex p-0 bg-transparent gap-0 rounded-none">
-                        {langImplementations.map((impl) => (
-                          <TabsTrigger
-                            key={impl.lang}
-                            value={impl.lang}
-                            className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10 text-sm"
-                          >
-                            {getLanguageDisplayName(impl.lang)}
-                          </TabsTrigger>
-                        ))}
-                      </TabsList>
+          return (
+            <div key={codeType} className="space-y-4">
+              {/* Approach Header */}
+              <h3 className="text-base font-semibold">
+                Approach {approachIndex + 1}: {codeType === 'optimize' ? 'Optimized' : codeType.charAt(0).toUpperCase() + codeType.slice(1)}
+              </h3>
 
-                      {/* Copy Button - Right side */}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleCopy(langImpl.code, `${codeType}-${langImpl.lang}`)}
-                        className="gap-2 h-10 rounded-none border-l shrink-0 hover:bg-primary/10 hover:text-primary"
-                      >
-                        {copiedTab === `${codeType}-${langImpl.lang}` ? (
-                          <>
-                            <Check className="w-4 h-4" />
-                            Copied
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-4 h-4" />
-                          </>
-                        )}
-                      </Button>
+              {/* Explanation Before */}
+              {explanationBefore && (
+                <RichText 
+                  content={explanationBefore} 
+                  className="text-sm text-muted-foreground mb-4"
+                />
+              )}
+
+              {/* Language Tabs for this approach */}
+              <Tabs defaultValue={langImplementations[0]?.lang || 'typescript'} className="w-full">
+                {langImplementations.map((langImpl) => (
+                  <TabsContent key={langImpl.lang} value={langImpl.lang} className="mt-0">
+                    <div className="relative rounded-lg border overflow-hidden">
+                      {/* Header with Language Tabs and Copy Button - Theme aware */}
+                      <div className="flex items-stretch border-b bg-muted/10 shrink-0">
+                        {/* Language Tabs - Compact style like AlgorithmDetailNew */}
+                        <TabsList className="flex-1 flex p-0 bg-transparent gap-0 rounded-none">
+                          {langImplementations.map((impl) => (
+                            <TabsTrigger
+                              key={impl.lang}
+                              value={impl.lang}
+                              className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10 text-sm"
+                            >
+                              {getLanguageDisplayName(impl.lang)}
+                            </TabsTrigger>
+                          ))}
+                        </TabsList>
+
+                        {/* Copy Button - Right side */}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleCopy(langImpl.code, `${codeType}-${langImpl.lang}`)}
+                          className="gap-2 h-10 rounded-none border-l shrink-0 hover:bg-primary/10 hover:text-primary"
+                        >
+                          {copiedTab === `${codeType}-${langImpl.lang}` ? (
+                            <>
+                              <Check className="w-4 h-4" />
+                              Copied
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-4 h-4" />
+                            </>
+                          )}
+                        </Button>
+                      </div>
+
+                      {/* Monaco Editor - Read Only */}
+                      <Editor
+                        height="500px"
+                        path={`solution://${codeType}/${langImpl.lang}/solution.${getFileExtension(langImpl.lang)}`}
+                        language={getLanguageForMonaco(langImpl.lang)}
+                        value={langImpl.code}
+                        theme={isDark ? 'vs-dark' : 'light'}
+                        options={{
+                          readOnly: true,
+                          minimap: { enabled: false },
+                          scrollBeyondLastLine: false,
+                          fontSize: 14,
+                          lineNumbers: 'on',
+                          renderLineHighlight: 'none',
+                          scrollbar: {
+                            vertical: 'visible',
+                            horizontal: 'visible',
+                          },
+                          overviewRulerLanes: 0,
+                          hideCursorInOverviewRuler: true,
+                          overviewRulerBorder: false,
+                        }}
+                      />
                     </div>
+                  </TabsContent>
+                ))}
+              </Tabs>
 
-                    {/* Monaco Editor - Read Only */}
-                    <Editor
-                      height="500px"
-                      path={`/solution/${codeType}/${langImpl.lang}/solution.${langImpl.lang === 'python' ? 'py' : langImpl.lang === 'java' ? 'java' : langImpl.lang === 'cpp' ? 'cpp' : 'ts'}`}
-                      language={getLanguageForMonaco(langImpl.lang)}
-                      value={langImpl.code}
-                      theme={isDark ? 'vs-dark' : 'light'}
-                      options={{
-                        readOnly: true,
-                        minimap: { enabled: false },
-                        scrollBeyondLastLine: false,
-                        fontSize: 14,
-                        lineNumbers: 'on',
-                        renderLineHighlight: 'none',
-                        scrollbar: {
-                          vertical: 'visible',
-                          horizontal: 'visible',
-                        },
-                        overviewRulerLanes: 0,
-                        hideCursorInOverviewRuler: true,
-                        overviewRulerBorder: false,
-                      }}
-                    />
-                  </div>
-                </TabsContent>
-              ))}
-            </Tabs>
-          </div>
-        ));
+              {/* Explanation After */}
+              {explanationAfter && (
+                <RichText 
+                  content={explanationAfter} 
+                  className="text-sm text-muted-foreground mt-4"
+                />
+              )}
+            </div>
+          );
+        });
       })()}
 
       {/* Complexity Explanation - Future field */}
@@ -217,3 +263,4 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
     </div>
   );
 };
+

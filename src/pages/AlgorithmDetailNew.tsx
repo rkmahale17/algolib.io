@@ -891,7 +891,12 @@ const AlgorithmDetailNew: React.FC = () => {
                         </TabsContent>
 
                         <TabsContent value="usecase" className="mt-4">
-                          <p className="text-sm text-muted-foreground">{algorithm.explanation.useCase}</p>
+                          <RichText
+                          className="text-sm text-muted-foreground"
+                            content={algorithm.explanation.useCase}
+                           
+                          />
+                        
                         </TabsContent>
 
                         <TabsContent value="tips" className="mt-4">
