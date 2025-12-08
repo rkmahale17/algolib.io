@@ -55,7 +55,7 @@ const SaveButton = ({
           
           // Center the canvas on the content after loading
           setTimeout(() => {
-            editor.zoomToFit({ duration: 0 });
+            editor.zoomToFit();
           }, 100);
         }
       } catch (error) {
