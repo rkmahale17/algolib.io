@@ -34,7 +34,8 @@ import {
   Pause,
   RotateCcw,
   Play,
-  Heart
+  Heart,
+  Menu
 } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import React, { useEffect, useState, useRef } from "react";
@@ -96,6 +97,7 @@ import { updateProgress, updateCode, updateNotes, updateWhiteboard, updateSocial
 import { renderVisualization as renderVizFromMapping, hasVisualization } from "@/utils/visualizationMapping";
 import { SolutionViewer } from "@/components/SolutionViewer";
 import { RichText } from "@/components/RichText";
+import { AlgorithmLoader } from "@/components/AlgorithmLoader";
 
 const AlgorithmDetailNew: React.FC = () => {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
@@ -210,7 +212,10 @@ const AlgorithmDetailNew: React.FC = () => {
         console.error('Error fetching algorithm:', error);
         toast.error('Failed to load algorithm details');
       } finally {
-        setIsLoadingAlgorithm(false);
+        // Enforce a minimum load time of 1.5 seconds to show off the animation
+        setTimeout(() => {
+          setIsLoadingAlgorithm(false);
+        }, 1500);
       }
     };
 
@@ -1160,6 +1165,10 @@ const AlgorithmDetailNew: React.FC = () => {
     </div>
   );
 
+  if (isLoadingAlgorithm) {
+    return <AlgorithmLoader />;
+  }
+
   return (
     <div className={`h-screen w-full overflow-hidden flex flex-col bg-background ${isInterviewMode ? 'border-4 border-green-500/30' : ''}`}>
       <AlgoMetaHead id={algorithmIdOrSlug} />
@@ -1178,39 +1187,97 @@ const AlgorithmDetailNew: React.FC = () => {
           
           <div className="h-4 w-px bg-border" />
           
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" onClick={handleRandomProblem} className="h-8 w-8">
-                  <Shuffle className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Random Problem</TooltipContent>
-            </Tooltip>
+          {/* Desktop Navigation */}
+          {!isMobile && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" onClick={handleRandomProblem} className="h-8 w-8">
+                    <Shuffle className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Random Problem</TooltipContent>
+              </Tooltip>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" onClick={handleNextProblem} className="h-8 w-8">
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Next Problem</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" onClick={handleNextProblem} className="h-8 w-8">
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Next Problem</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
 
         {/* Right Side: Share, Bug, Timer, Interview, Theme, Profile */}
         <div className="ml-auto flex items-center gap-2">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleShare}>
-                    <Share2 className="h-4 w-4" />
+            
+            {/* Mobile Hamburger Menu */}
+            {isMobile && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <Menu className="h-4 w-4" />
                   </Button>
-                </TooltipTrigger>
-                <TooltipContent side="bottom">Share</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>Menu</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleNextProblem}>
+                    <ChevronRight className="mr-2 h-4 w-4" />
+                    <span>Next Problem</span>
+                  </DropdownMenuItem>
+                   <DropdownMenuItem onClick={handleRandomProblem}>
+                    <Shuffle className="mr-2 h-4 w-4" />
+                    <span>Random Problem</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleShare}>
+                    <Share2 className="mr-2 h-4 w-4" />
+                    <span>Share</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => window.open("/feedback", "_blank")}>
+                    <Bug className="mr-2 h-4 w-4" />
+                    <span>Report Issue</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={toggleInterviewMode}>
+                    <Monitor className="mr-2 h-4 w-4" />
+                    <span>{isInterviewMode ? "Exit Interview Mode" : "Interview Mode"}</span>
+                  </DropdownMenuItem>
+                  {/* Simple Timer Toggle for Mobile */}
+                  <div className="p-2 flex items-center justify-between">
+                     <div className="flex items-center gap-2 text-sm">
+                        <Timer className="h-4 w-4" />
+                        <span className="font-mono">{formatTime(timerSeconds)}</span>
+                     </div>
+                     <div className="flex gap-1">
+                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={(e) => { e.stopPropagation(); setIsTimerRunning(!isTimerRunning); }}>
+                          {isTimerRunning ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={(e) => { e.stopPropagation(); setTimerSeconds(0); setIsTimerRunning(false); }}>
+                          <RotateCcw className="h-3 w-3" />
+                        </Button>
+                     </div>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            {!isMobile && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleShare}>
+                      <Share2 className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Share</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
 
             {!isMobile && (
               <TooltipProvider>

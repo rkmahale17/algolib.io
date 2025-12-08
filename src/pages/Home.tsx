@@ -21,6 +21,7 @@ import { Link } from "react-router-dom";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useSearchParams } from "react-router-dom";
+import { AlgorithmLoader } from "@/components/AlgorithmLoader";
 
 const Home = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -28,6 +29,7 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [userProgress, setUserProgress] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // Check authentication status
   useEffect(() => {
@@ -45,6 +47,9 @@ const Home = () => {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
+
+    // Simulate initial load or wait for auth
+    setTimeout(() => setLoading(false), 1000);
 
     return () => subscription.unsubscribe();
   }, []);
@@ -119,6 +124,10 @@ const Home = () => {
     intermediate: "bg-yellow-500/10 text-yellow-500 border-yellow-500/20",
     advanced: "bg-red-500/10 text-red-500 border-red-500/20",
   };
+
+  if (loading) {
+    return <AlgorithmLoader />;
+  }
 
   return (
     <>
