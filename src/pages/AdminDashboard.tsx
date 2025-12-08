@@ -41,15 +41,15 @@ export default function AdminDashboard() {
       bgColor: "bg-purple-500/10",
       gradient: "from-purple-500/20 to-pink-500/20"
     },
-    {
-      title: "Database Seeding",
-      description: "Initialize or reset database content with default algorithms and problem sets.",
-      icon: Database,
-      path: "/admin/seed",
-      color: "text-emerald-500",
-      bgColor: "bg-emerald-500/10",
-      gradient: "from-emerald-500/20 to-teal-500/20"
-    }
+    // {
+    //   title: "Database Seeding",
+    //   description: "Initialize or reset database content with default algorithms and problem sets.",
+    //   icon: Database,
+    //   path: "/admin/seed",
+    //   color: "text-emerald-500",
+    //   bgColor: "bg-emerald-500/10",
+    //   gradient: "from-emerald-500/20 to-teal-500/20"
+    // }
   ];
 
   return (

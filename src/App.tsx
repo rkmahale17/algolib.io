@@ -1,6 +1,7 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import React from 'react';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
@@ -50,7 +51,19 @@ const ConditionalNavbar = () => {
   return <Navbar />;
 };
 
-const App = () => (
+import { appStatus } from "@/utils/appStatus";
+
+const App = () => {
+    // Set initialized flag after first mount (so subsequent internal navigations know app is loaded)
+  React.useEffect(() => {
+    // Small timeout to allow the initial route (like Home) to render with "isInitialized: false" first
+    const timer = setTimeout(() => {
+      appStatus.isInitialized = true;
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
   <QueryClientProvider client={queryClient}>
     <AppProvider>
       <TooltipProvider>
@@ -122,5 +135,6 @@ const App = () => (
     </AppProvider>
   </QueryClientProvider>
 );
+};
 
 export default App;

@@ -28,6 +28,8 @@ import { DEFAULT_CODE, LANGUAGE_IDS } from './constants';
 import { supabase } from '@/integrations/supabase/client';
 import { generateStub } from '@/utils/stubGenerator';
 
+
+
 interface CodeRunnerProps {
   algorithmId?: string;
   algorithmData?: any;
@@ -38,6 +40,7 @@ interface CodeRunnerProps {
   onCodeChange?: (code: string) => void;
   language?: Language;
   onLanguageChange?: (language: Language) => void;
+  onSuccess?: () => void;
 }
 
 interface EditorSettings {
@@ -67,7 +70,8 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   initialCode,
   onCodeChange,
   language: controlledLanguage,
-  onLanguageChange
+  onLanguageChange,
+  onSuccess
 }) => {
   const [internalLanguage, setInternalLanguage] = useState<Language>('typescript');
   const language = controlledLanguage || internalLanguage;
@@ -244,7 +248,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
       }
     }
   }, [activeAlgorithm, language, algorithmId]); 
-
+  
   // Separate effect to handle external updates to initialCode (e.g. loading from cache/db)
   // This allows the parent to override the "starter code" set by the previous effect 
   // once the async fetch/cache lookup is done.
@@ -407,6 +411,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
 
       if (result.status?.id === 3 && allPassed) {
         toast.success("All test cases passed!");
+        onSuccess?.(); // Trigger success callback
       } else if (result.status?.id === 3 && hasFailed) {
         toast.warning("Code ran, but some test cases failed.");
       } else if (result.status?.id !== 3) {

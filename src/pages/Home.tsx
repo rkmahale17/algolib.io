@@ -21,7 +21,8 @@ import { Link } from "react-router-dom";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useSearchParams } from "react-router-dom";
-import { AlgorithmLoader } from "@/components/AlgorithmLoader";
+import { PremiumLoader } from "@/components/PremiumLoader";
+import { appStatus } from "@/utils/appStatus";
 
 const Home = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -125,8 +126,11 @@ const Home = () => {
     advanced: "bg-red-500/10 text-red-500 border-red-500/20",
   };
 
+
+
   if (loading) {
-    return <AlgorithmLoader />;
+      // Only show text if this is the initial app load (not navigating from another page)
+    return <PremiumLoader text={!appStatus.isInitialized ? "Initializing Algorithms for you" : undefined} />;
   }
 
   return (

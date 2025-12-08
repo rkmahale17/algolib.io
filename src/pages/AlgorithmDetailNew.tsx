@@ -37,6 +37,7 @@ import {
   Heart,
   Menu
 } from "lucide-react";
+import confetti from 'canvas-confetti';
 import { Link, useNavigate, useParams } from "react-router-dom";
 import React, { useEffect, useState, useRef } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -97,7 +98,7 @@ import { updateProgress, updateCode, updateNotes, updateWhiteboard, updateSocial
 import { renderVisualization as renderVizFromMapping, hasVisualization } from "@/utils/visualizationMapping";
 import { SolutionViewer } from "@/components/SolutionViewer";
 import { RichText } from "@/components/RichText";
-import { AlgorithmLoader } from "@/components/AlgorithmLoader";
+import { PremiumLoader } from "@/components/PremiumLoader";
 
 const AlgorithmDetailNew: React.FC = () => {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
@@ -616,11 +617,7 @@ const AlgorithmDetailNew: React.FC = () => {
   };
 
   if (isLoadingAlgorithm) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <PremiumLoader text="Fetching Algorithm Details" />;
   }
 
   if (!algorithm) {
@@ -748,20 +745,14 @@ const AlgorithmDetailNew: React.FC = () => {
                       
                     </div>
                     <div className="shrink-0 flex flex-col gap-2">
-                       {isCompleted ? (
+                       {isCompleted && (
                         <Badge 
                           variant="outline" 
-                          className="bg-green-500/10 text-green-500 border-green-500/20 px-3 py-1.5 cursor-pointer hover:bg-green-500/20 transition-colors"
-                          onClick={toggleCompletion}
+                          className="bg-green-500/10 text-green-500 border-green-500/20 px-3 py-1.5 hover:bg-green-500/20 transition-colors cursor-default"
                         >
                           <CheckCircle2 className="w-4 h-4 mr-2" />
                           Attempted
                         </Badge>
-                      ) : (
-                        <div className="flex items-center gap-2 border rounded-full px-3 py-1.5 hover:bg-muted/50 transition-colors cursor-pointer" onClick={toggleCompletion}>
-                          <Checkbox checked={false} className="rounded-full" />
-                          <span className="text-sm font-medium">Mark Complete</span>
-                        </div>
                       )}
                     </div>
                   </div>
@@ -1146,6 +1137,7 @@ const AlgorithmDetailNew: React.FC = () => {
                       setSelectedLanguage(lang);
                       localStorage.setItem('preferredLanguage', lang);
                     }}
+                    onSuccess={handleCodeSuccess}
                   />
                 )}
               </AuthGuard>
@@ -1173,6 +1165,36 @@ const AlgorithmDetailNew: React.FC = () => {
   if (isLoadingAlgorithm) {
     return <AlgorithmLoader />;
   }
+
+  const handleCodeSuccess = async () => {
+    // Trigger Confetti
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+
+    if (user && id && !isCompleted) {
+       try {
+        const success = await updateProgress(user.id, id, {
+          completed: true,
+          completed_at: new Date().toISOString(),
+        });
+        
+        if (success) {
+          setIsCompleted(true);
+          toast.success("Algorithm completed! Keep it up!", {
+             description: "Marked as completed automatically."
+          });
+          refetchUserData();
+        }
+      } catch (error) {
+        console.error("Failed to auto-complete:", error);
+      }
+    } else if (!user) {
+       toast.success("Great job! Sign in to track your progress.");
+    }
+  };
 
   return (
     <div className={`h-screen w-full overflow-hidden flex flex-col bg-background ${isInterviewMode ? 'border-4 border-green-500/30' : ''}`}>
@@ -1422,6 +1444,7 @@ const AlgorithmDetailNew: React.FC = () => {
                 className="h-full border-0 rounded-none shadow-none"
                 initialCode={savedCode}
                 onCodeChange={handleCodeChange}
+                onSuccess={handleCodeSuccess}
               />
             )}
           </div>
