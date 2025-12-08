@@ -99,6 +99,7 @@ import { renderVisualization as renderVizFromMapping, hasVisualization } from "@
 import { SolutionViewer } from "@/components/SolutionViewer";
 import { RichText } from "@/components/RichText";
 import { PremiumLoader } from "@/components/PremiumLoader";
+import { FeatureGuard } from "@/components/FeatureGuard";
 
 const AlgorithmDetailNew: React.FC = () => {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
@@ -902,16 +903,17 @@ const AlgorithmDetailNew: React.FC = () => {
                   )}
 
                   {/* Video Tutorial Card */}
-                  {algorithm.tutorials?.[0]?.url && (
-                   <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-5xl mx-auto">
-                                 <div className="space-y-6">
-                                   <div className="space-y-4">
-                                     <div className="flex items-center gap-2">
-                                       <Youtube className="w-5 h-5 text-red-500" />
-                                       <h3 className="font-semibold">Video Tutorial</h3>
-                                     </div>
+                  <FeatureGuard flag="youtube_video">
+                    {algorithm.tutorials?.[0]?.url && (
+                    <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-5xl mx-auto">
+                                  <div className="space-y-6">
+                                    <div className="space-y-4">
+                                      <div className="flex items-center gap-2">
+                                        <Youtube className="w-5 h-5 text-red-500" />
+                                        <h3 className="font-semibold">Video Tutorial</h3>
+                                      </div>
                         {algorithm.tutorials?.[0]?.moreInfo && (
-                         
+                          
                               <RichText 
                                         content={algorithm.tutorials?.[0]?.moreInfo}
                                         
@@ -919,28 +921,29 @@ const AlgorithmDetailNew: React.FC = () => {
                         
                                   
                                 )}
-                                     <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-                                       <iframe
-                                         className="absolute top-0 left-0 w-full h-full rounded-lg"
-                                          src={`https://www.youtube.com/embed/${
-                                            algorithm.tutorials[0].url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)?.[1] ||
-                                            algorithm.tutorials[0].url
-                                          }`}
-                                         title={`${algorithm.name} Tutorial`}
-                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                         allowFullScreen
-                                       />
-                                     </div>
-                                     <div className="pt-2 border-t border-border/50">
+                                      <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+                                        <iframe
+                                          className="absolute top-0 left-0 w-full h-full rounded-lg"
+                                           src={`https://www.youtube.com/embed/${
+                                             algorithm.tutorials[0].url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)?.[1] ||
+                                             algorithm.tutorials[0].url
+                                           }`}
+                                          title={`${algorithm.name} Tutorial`}
+                                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                          allowFullScreen
+                                        />
+                                      </div>
+                                      <div className="pt-2 border-t border-border/50">
                       <p className="text-xs text-muted-foreground">
                         <strong>Credits:</strong> Video tutorial by NeetCode (used with permission). All written
                         explanations, code examples, and additional insights provided by Algolib.io.
                       </p>
                     </div>
-                                   </div>
-                                 </div>
-                               </Card>
-                  )}
+                                    </div>
+                                  </div>
+                                </Card>
+                    )}
+                  </FeatureGuard>
 
                   {/* Practice Problems Card */}
                   {algorithm?.problems_to_solve?.external && algorithm.problems_to_solve.external.length > 0 ? (

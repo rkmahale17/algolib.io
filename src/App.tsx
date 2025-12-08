@@ -38,6 +38,7 @@ import FeedbackAdmin from "./pages/FeedbackAdmin";
 import Blog from "./pages/Blog";
 import ComplexityCard from "./components/complexity/ComplexityCard";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminFeatureFlags from "./pages/AdminFeatureFlags";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +55,8 @@ const ConditionalNavbar = () => {
 
 import { appStatus } from "@/utils/appStatus";
 
+import { FeatureFlagProvider } from "@/contexts/FeatureFlagContext";
+
 const App = () => {
     // Set initialized flag after first mount (so subsequent internal navigations know app is loaded)
   React.useEffect(() => {
@@ -67,9 +70,10 @@ const App = () => {
   return (
   <QueryClientProvider client={queryClient}>
     <AppProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
+      <FeatureFlagProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
         <BrowserRouter basename="/">
           <ConditionalNavbar />
           <Routes>
@@ -122,6 +126,13 @@ const App = () => {
             </ProtectedAdminRoute>
           } />
           
+
+          <Route path="/admin/features" element={
+            <ProtectedAdminRoute>
+              <AdminFeatureFlags />
+            </ProtectedAdminRoute>
+          } />
+
           <Route path="/admin" element={
             <ProtectedAdminRoute>
               <AdminDashboard />
@@ -135,8 +146,9 @@ const App = () => {
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
-    </AppProvider>
-  </QueryClientProvider>
+    </FeatureFlagProvider>
+  </AppProvider>
+</QueryClientProvider>
 );
 };
 
