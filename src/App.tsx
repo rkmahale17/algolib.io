@@ -5,6 +5,7 @@ import React from 'react';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
+import ProfilePage from "./pages/Profile";
 import AlgorithmDetail from "./pages/AlgorithmDetail";
 import AlgorithmDetailNew from "./pages/AlgorithmDetailNew";
 import Blind75 from "./pages/Blind75";
@@ -127,11 +128,13 @@ const App = () => {
             </ProtectedAdminRoute>
           } />
 
+            <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
     </AppProvider>
   </QueryClientProvider>
 );
