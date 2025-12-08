@@ -13,6 +13,7 @@ import {
   Menu as MenuIcon,
   MessageSquare,
   Trophy,
+  ShieldCheck,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -28,6 +29,7 @@ const Navbar = () => {
   const [completedCount, setCompletedCount] = useState(0);
   const location = useLocation();
   const isAuthPage = location.pathname === "/auth";
+  const adminId = import.meta.env.VITE_ADMIN_USER_ID;
 
   useEffect(() => {
     if (!supabase) return;
@@ -108,6 +110,8 @@ const Navbar = () => {
     }
   };
 
+  const isAdmin = user && adminId && user.id === adminId;
+
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-md">
       <div className="container mx-auto px-4">
@@ -152,6 +156,17 @@ const Navbar = () => {
               <MessageSquare className="w-4 h-4" />
               Feedback
             </Link>
+            
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className="text-sm font-medium text-emerald-500 hover:text-emerald-400 transition-colors flex items-center gap-1.5"
+              >
+                <ShieldCheck className="w-4 h-4" />
+                Admin
+              </Link>
+            )}
+
             <a
               href="https://github.com/rkmahale17/algolib.io"
               target="_blank"
@@ -194,6 +209,19 @@ const Navbar = () => {
                     Feedback
                   </Link>
                 </DropdownMenuItem>
+                
+                {isAdmin && (
+                  <DropdownMenuItem asChild>
+                    <Link
+                      to="/admin"
+                      className="flex items-center gap-2 cursor-pointer text-emerald-500 font-medium"
+                    >
+                      <ShieldCheck className="w-4 h-4" />
+                      Admin Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+
                 <DropdownMenuItem asChild>
                   <a
                     href="https://github.com/chandeldivyam/AlgoLib"
@@ -252,6 +280,16 @@ const Navbar = () => {
                         <span>Feedback</span>
                       </Link>
                     </DropdownMenuItem>
+                    
+                    {isAdmin && (
+                       <DropdownMenuItem asChild>
+                          <Link to="/admin">
+                            <ShieldCheck className="mr-2 h-4 w-4 text-emerald-500" />
+                            <span className="text-emerald-500 font-medium">Admin Dashboard</span>
+                          </Link>
+                       </DropdownMenuItem>
+                    )}
+
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={handleSignOut}

@@ -35,6 +35,7 @@ import { AppProvider } from "./contexts/AppContext";
 import FeedbackAdmin from "./pages/FeedbackAdmin";
 import Blog from "./pages/Blog";
 import ComplexityCard from "./components/complexity/ComplexityCard";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -106,6 +107,13 @@ const App = () => (
               <FeedbackAdmin />
             </ProtectedAdminRoute>
           } />
+          
+          <Route path="/admin" element={
+            <ProtectedAdminRoute>
+              <AdminDashboard />
+            </ProtectedAdminRoute>
+          } />
+
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
