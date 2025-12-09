@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -314,6 +315,8 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
     return () => window.removeEventListener('keydown', handleEsc);
   }, [isFullscreen, onToggleFullscreen]);
 
+
+
   const algorithmMeta = activeAlgorithm;
 
   const handleAddTestCase = () => {
@@ -604,6 +607,34 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
      }
   };
 
+  // Keyboard Shortcuts for Run (Ctrl + ') and Submit (Ctrl + Enter)
+  useEffect(() => {
+    const handleShortcuts = (e: KeyboardEvent) => {
+      // Check for Ctrl or Meta (Cmd) key
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === "'") {
+          e.preventDefault();
+          if (!isLoading && !isSubmitting && controls?.run_code !== false) {
+             handleRun();
+          }
+        }
+        if (e.key === "Enter") {
+          // Only trigger submit if not loading, not submitting, and if last run was successful
+          if (!isLoading && !isSubmitting && lastRunSuccess && controls?.submit !== false) {
+             e.preventDefault();
+             handleSubmit();
+          } else if (!lastRunSuccess && controls?.submit !== false) {
+             // If trying to submit but last run wasn't success, maybe show toast?
+             // Optional: toast.warning("Please run code successfully before submitting.");
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleShortcuts);
+    return () => window.removeEventListener('keydown', handleShortcuts);
+  }, [isLoading, isSubmitting, lastRunSuccess, controls, handleRun, handleSubmit]);
+
   return (
     <div className={`w-full border rounded-lg overflow-hidden bg-background shadow-sm flex flex-col transition-all duration-300 ${
       isFullscreen 
@@ -683,52 +714,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                 >
                   <RotateCcw className="w-3 h-3" />
                 </Button>
-                <FeatureGuard flag="code_runner">
-                 {controls?.run_code !== false && (
-                   <Button 
-                    onClick={handleRun} 
-                    disabled={isLoading || isSubmitting}
-                    size="sm"
-                    className="h-8 px-4 text-xs"
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="w-3 h-3 mr-2 animate-spin" />
-                        Running
-                      </>
-                    ) : (
-                      <>
-                        <Play className="w-3 h-3 mr-2" />
-                        Run Code
-                      </>
-                    )}
-                  </Button>
-                 )}
-                </FeatureGuard>
-              
-              <FeatureGuard flag="submit_button">
-                {controls?.submit !== false && (
-                  <Button 
-                    onClick={handleSubmit} 
-                    disabled={isLoading || isSubmitting || !lastRunSuccess}
-                    size="sm"
-                    variant="default"
-                    className="h-8 px-4 text-xs bg-green-600 hover:bg-green-700 text-white ml-2 disabled:bg-gray-400 disabled:opacity-50"
-                  >
-                     {isSubmitting ? (
-                      <>
-                        <Loader2 className="w-3 h-3 mr-2 animate-spin" />
-                        Submitting
-                      </>
-                    ) : (
-                      <>
-                        <Send className="w-3 h-3 mr-2" />
-                        Submit
-                      </>
-                    )}
-                  </Button>
-                )}
-              </FeatureGuard>
+
              
               </div>
               <div className="flex items-center gap-1">
@@ -880,6 +866,85 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                   readOnly: false // Explicitly writable
                 }}
               />
+              <div className="absolute bottom-5 right-5 z-10">
+                <div className="flex items-center gap-0.5 p-0.5 bg-background/60 backdrop-blur-xl border shadow-lg rounded-full">
+                <TooltipProvider>
+                  <FeatureGuard flag="code_runner">
+                  {controls?.run_code !== false && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button 
+                          onClick={handleRun} 
+                          disabled={isLoading || isSubmitting}
+                          size="sm"
+                          variant="ghost"
+                          className="h-8 px-3 text-xs rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-all border-0"
+                        >
+                          {isLoading ? (
+                            <>
+                              <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />
+                              Running
+                            </>
+                          ) : (
+                            <>
+                              <Play className="w-3 h-3 mr-1 text-primary fill-primary/20" />
+                              Run
+                            </>
+                          )}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">Run Code <kbd className="ml-2 pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100"><span className="text-xs">Ctrl</span> + '</kbd></TooltipContent>
+                    </Tooltip>
+                  )}
+                  </FeatureGuard>
+
+                  {controls?.run_code !== false && controls?.submit !== false && (
+                    <div className="w-px h-4 bg-border/50 mx-0" />
+                  )}
+
+                  <FeatureGuard flag="submit_button">
+                  {controls?.submit !== false && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span tabIndex={0} className="cursor-default">
+                          <Button 
+                            onClick={handleSubmit} 
+                            disabled={isLoading || isSubmitting || !lastRunSuccess}
+                            size="sm"
+                            variant="ghost"
+                            className={`h-8 px-3 text-xs rounded-full transition-all border-0 ${
+                              lastRunSuccess 
+                                ? 'bg-green-500/10 text-green-600 hover:bg-green-500/20 hover:text-green-700' 
+                                : 'hover:bg-muted'
+                            } ${(!lastRunSuccess && !isLoading && !isSubmitting) ? 'pointer-events-none opacity-50' : ''}`}
+                          >
+                            {isSubmitting ? (
+                              <>
+                                <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />
+                                Submitting
+                              </>
+                            ) : (
+                              <>
+                                <Send className="w-3 h-3 mr-1" />
+                                Submit
+                              </>
+                            )}
+                          </Button>
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">
+                        {!lastRunSuccess && !isLoading && !isSubmitting ? (
+                           <span className="text-orange-500 font-medium">Run all test cases successfully to enable submission</span>
+                        ) : (
+                           <>Submit Solution <kbd className="ml-2 pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100"><span className="text-xs">Ctrl</span> + Enter</kbd></>
+                        )}
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                  </FeatureGuard>
+                </TooltipProvider>
+                </div>
+              </div>
             </div>
             </div>
            </TabsContent>
