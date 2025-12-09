@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Book,
   Eye,
@@ -66,6 +66,21 @@ export const ProblemDescriptionPanel: React.FC<ProblemDescriptionPanelProps> = (
   setIsVisualizationMaximized,
   handleRichTextClick,
 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isCompact, setIsCompact] = useState(false);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setIsCompact(entry.contentRect.width < 400);
+      }
+    });
+
+    resizeObserver.observe(containerRef.current);
+    return () => resizeObserver.disconnect();
+  }, []);
   
   const renderVisualization = () => {
     if (!algorithm) return null;
@@ -120,33 +135,68 @@ export const ProblemDescriptionPanel: React.FC<ProblemDescriptionPanelProps> = (
   };
 
   return (
-    <div className="h-full flex flex-col bg-card/30 backdrop-blur-sm">
+    <div ref={containerRef} className="h-full flex flex-col bg-card/30 backdrop-blur-sm">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden w-full pt-0 mt-0">
         <div className="px-0 shrink-0 flex items-stretch border-b">
           <TabsList className="flex-1 grid grid-cols-3 p-0 bg-transparent gap-0 rounded-none">
-            <TabsTrigger 
-              value="description" 
-              className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10 px-4"
-            >
-              <Book className="w-4 h-4 mr-2" />
-              Description
-            </TabsTrigger>
+            <TooltipProvider>
+              <TabsTrigger 
+                value="description" 
+                className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10 px-4"
+              >
+                {isCompact ? (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Book className="w-4 h-4" />
+                    </TooltipTrigger>
+                    <TooltipContent>Description</TooltipContent>
+                  </Tooltip>
+                ) : (
+                  <>
+                    <Book className="w-4 h-4 mr-2" />
+                    Description
+                  </>
+                )}
+              </TabsTrigger>
 
-            <TabsTrigger 
-              value="visualizations"
-              className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10 px-4"
-            >
-              <Eye className="w-4 h-4 mr-2" />
-              Visualizations
-            </TabsTrigger>
+              <TabsTrigger 
+                value="visualizations"
+                className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10 px-4"
+              >
+                {isCompact ? (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Eye className="w-4 h-4" />
+                    </TooltipTrigger>
+                    <TooltipContent>Visualizations</TooltipContent>
+                  </Tooltip>
+                ) : (
+                  <>
+                    <Eye className="w-4 h-4 mr-2" />
+                    Visualizations
+                  </>
+                )}
+              </TabsTrigger>
 
-            <TabsTrigger 
-              value="solutions"
-              className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10 px-4"
-            >
-              <Code2 className="w-4 h-4 mr-2" />
-              Solutions
-            </TabsTrigger>
+              <TabsTrigger 
+                value="solutions"
+                className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10 px-4"
+              >
+                {isCompact ? (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Code2 className="w-4 h-4" />
+                    </TooltipTrigger>
+                    <TooltipContent>Solutions</TooltipContent>
+                  </Tooltip>
+                ) : (
+                  <>
+                    <Code2 className="w-4 h-4 mr-2" />
+                    Solutions
+                  </>
+                )}
+              </TabsTrigger>
+            </TooltipProvider>
           </TabsList>
            {!isMobile && (
             <Button 

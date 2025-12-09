@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Code2,
   Lightbulb,
@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AuthGuard } from "@/components/AuthGuard";
 import { TabWarning } from "@/components/TabWarning";
 import { CodeRunner } from "@/components/CodeRunner/CodeRunner";
@@ -38,8 +39,24 @@ export const CodeWorkspacePanel: React.FC<CodeWorkspacePanelProps> = ({
   isCodeRunnerMaximized,
   setIsCodeRunnerMaximized,
 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isCompact, setIsCompact] = useState(false);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setIsCompact(entry.contentRect.width < 400);
+      }
+    });
+
+    resizeObserver.observe(containerRef.current);
+    return () => resizeObserver.disconnect();
+  }, []);
+
   return (
-    <div className="h-full flex flex-col bg-card/30 backdrop-blur-sm">
+    <div ref={containerRef} className="h-full flex flex-col bg-card/30 backdrop-blur-sm">
       <div className="flex-1 overflow-hidden p-0">
          <Tabs defaultValue="code" className="h-full flex flex-col">
             <div className="flex items-stretch border-b bg-muted/10 shrink-0">
@@ -56,21 +73,49 @@ export const CodeWorkspacePanel: React.FC<CodeWorkspacePanelProps> = ({
               )}
               
               <TabsList className="flex-1 flex p-0 bg-transparent gap-0 rounded-none">
-                <TabsTrigger 
-                  value="code" 
-                  className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
-                >
-                  <Code2 className="w-4 h-4 mr-2" />
-                  Code
-                </TabsTrigger>
-                
-                <TabsTrigger 
-                  value="brainstorm"
-                  className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
-                >
-                  <Lightbulb className="w-4 h-4 mr-2" />
-                  Brainstorm
-                </TabsTrigger>
+                <TooltipProvider>
+                  <TabsTrigger 
+                    value="code" 
+                    className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
+                  >
+                    {isCompact ? (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                           <div className="flex items-center justify-center w-full h-full">
+                             <Code2 className="w-4 h-4" />
+                           </div>
+                        </TooltipTrigger>
+                        <TooltipContent>Code</TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      <>
+                        <Code2 className="w-4 h-4 mr-2" />
+                        Code
+                      </>
+                    )}
+                  </TabsTrigger>
+                  
+                  <TabsTrigger 
+                    value="brainstorm"
+                    className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
+                  >
+                    {isCompact ? (
+                       <Tooltip>
+                        <TooltipTrigger asChild>
+                           <div className="flex items-center justify-center w-full h-full">
+                            <Lightbulb className="w-4 h-4" />
+                           </div>
+                        </TooltipTrigger>
+                        <TooltipContent>Brainstorm</TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      <>
+                        <Lightbulb className="w-4 h-4 mr-2" />
+                        Brainstorm
+                      </>
+                    )}
+                  </TabsTrigger>
+                </TooltipProvider>
               </TabsList>
             </div>
             
