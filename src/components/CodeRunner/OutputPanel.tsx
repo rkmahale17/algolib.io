@@ -67,7 +67,7 @@ export const OutputPanel = ({
 }: OutputPanelProps) => {
   const [activeTestCaseTab, setActiveTestCaseTab] = useState<string>("");
   const containerRef = React.useRef<HTMLDivElement>(null);
-  const [panelWidth, setPanelWidth] = useState(320);
+  const [panelWidth, setPanelWidth] = useState(300);
 
   // Measure panel width for responsive tab labels
   React.useEffect(() => {
@@ -130,58 +130,37 @@ export const OutputPanel = ({
   return (
     <div className="h-full flex flex-col bg-muted/10 border-t overflow-hidden">
       {/* Top Bar / Tabs */}
-      <div ref={containerRef} className="flex items-center gap-1 p-1 border-b bg-background/50 shrink-0 overflow-x-auto no-scrollbar">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onTabChange("testcase")}
-                className={`h-8 text-xs gap-2 ${activeTab === "testcase" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}
-              >
-                <FlaskConical className="w-3.5 h-3.5" />
-                {panelWidth >= 320 && "Testcase"}
-              </Button>
-            </TooltipTrigger>
-            {panelWidth < 320 && <TooltipContent side="bottom">Testcase</TooltipContent>}
-          </Tooltip>
-        </TooltipProvider>
+      <div className="flex items-center gap-1 p-1 border-b bg-background/50 shrink-0 overflow-x-auto no-scrollbar">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onTabChange("testcase")}
+          className={`h-8 text-xs gap-2 ${activeTab === "testcase" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}
+        >
+          <FlaskConical className="w-3.5 h-3.5" />
+          Testcase
+        </Button>
 
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onTabChange("result")}
-                className={`h-8 text-xs gap-2 ${activeTab === "result" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}
-                disabled={!output}
-              >
-                <Terminal className="w-3.5 h-3.5" />
-                {panelWidth >= 320 && "Test Result"}
-              </Button>
-            </TooltipTrigger>
-            {panelWidth < 320 && <TooltipContent side="bottom">Test Result</TooltipContent>}
-          </Tooltip>
-        </TooltipProvider>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onTabChange("result")}
+          className={`h-8 text-xs gap-2 ${activeTab === "result" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}
+          disabled={!output}
+        >
+          <Terminal className="w-3.5 h-3.5" />
+          Test Result
+        </Button>
 
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onTabChange("submissions")}
-                className={`h-8 text-xs gap-2 ${activeTab === "submissions" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}
-              >
-                <History className="w-3.5 h-3.5" />
-                {panelWidth >= 320 && "Submissions"}
-              </Button>
-            </TooltipTrigger>
-            {panelWidth < 320 && <TooltipContent side="bottom">Submissions</TooltipContent>}
-          </Tooltip>
-        </TooltipProvider>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onTabChange("submissions")}
+          className={`h-8 text-xs gap-2 ${activeTab === "submissions" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}
+        >
+          <History className="w-3.5 h-3.5" />
+          Submissions
+        </Button>
       </div>
       {/* TABS content */}
       <div className="flex-1 flex flex-col min-h-0 overflow-hidden relative">
