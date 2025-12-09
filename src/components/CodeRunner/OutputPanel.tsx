@@ -206,7 +206,7 @@ export const OutputPanel = ({
                       disabled={loading}
                       >
                       <Plus className="w-3 h-3" />
-                      Add Test Case
+                      
                       </Button>
                   )}
                  </FeatureGuard>

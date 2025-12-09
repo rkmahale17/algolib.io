@@ -313,7 +313,7 @@ const AlgorithmDetailNew: React.FC = () => {
                />
             </ResizablePanel>
 
-            <ResizableHandle withHandle />
+            <ResizableHandle withHandle className="bg-border hover:bg-primary/20 data-[resize-handle-active]:bg-primary/40 transition-colors" />
 
             {/* Right Panel */}
             <ResizablePanel
@@ -336,6 +336,7 @@ const AlgorithmDetailNew: React.FC = () => {
                   setSelectedLanguage={interactions.setSelectedLanguage}
                   isCodeRunnerMaximized={layout.isCodeRunnerMaximized}
                   setIsCodeRunnerMaximized={layout.setIsCodeRunnerMaximized}
+                  submissions={userAlgoData?.submissions || []}
                />
             </ResizablePanel>
          </ResizablePanelGroup>

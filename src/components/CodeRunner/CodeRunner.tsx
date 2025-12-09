@@ -57,6 +57,7 @@ interface CodeRunnerProps {
       cpp: boolean;
     };
   };
+  submissions?: Submission[];
 }
 
 interface EditorSettings {
@@ -88,7 +89,8 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   language: controlledLanguage,
   onLanguageChange,
   onSuccess,
-  controls
+  controls,
+  submissions: initialSubmissions = []
 }) => {
   const isLimitExceeded = useFeatureFlag("todays_limit_exceed");
   const [internalLanguage, setInternalLanguage] = useState<Language>('typescript');
@@ -114,7 +116,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   const [editingTestCaseId, setEditingTestCaseId] = useState<number | null>(null);
   const [pendingTestCaseId, setPendingTestCaseId] = useState<number | null>(null);
   
-  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [submissions, setSubmissions] = useState<Submission[]>(initialSubmissions);
   const [lastRunSuccess, setLastRunSuccess] = useState(false);
   
   const [viewingSubmission, setViewingSubmission] = useState<Submission | null>(null);
@@ -125,6 +127,13 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   const editorRef = useRef<CodeEditorRef>(null);
 
   const activeAlgorithm = algorithmData || fetchedAlgorithm;
+
+  // Sync submissions from props if they change
+  useEffect(() => {
+    if (initialSubmissions.length > 0) {
+      setSubmissions(initialSubmissions);
+    }
+  }, [initialSubmissions]);
 
   // Load settings from localStorage
   useEffect(() => {
@@ -144,25 +153,12 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
     localStorage.setItem('monaco-editor-settings', JSON.stringify(newSettings));
   };
 
+  // Deprecated internal fetching - removed to prevent redundant calls
+  /*
   const fetchUserData = useCallback(async () => {
-    if (!algorithmId) return;
-    
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const data = await getUserAlgorithmData(user.id, algorithmId);
-        if (data?.submissions) {
-          setSubmissions(data.submissions);
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
+     ...
   }, [algorithmId]);
-
-  useEffect(() => {
-    fetchUserData();
-  }, [fetchUserData]);
+  */
 
   useEffect(() => {
     if (!algorithmData && algorithmId) {
@@ -197,6 +193,24 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   // Load algorithm code and schema
   useEffect(() => {
     if (activeAlgorithm) {
+      // If we have valid initialCode (user saved code), prioritize it!
+      if (initialCode && initialCode.trim().length > 0) {
+        setCode(initialCode);
+        onCodeChange?.(initialCode); // Ensure parent is synced if needed, though usually parent passed it
+        
+        // We still need to populate default input values for test cases
+        if (activeAlgorithm.input_schema) {
+            const initialValues: Record<string, string> = {};
+            activeAlgorithm.input_schema.forEach((field: any, index: number) => {
+               const defaultVal = activeAlgorithm.test_cases?.[0]?.input[index];
+               initialValues[field.name] = defaultVal !== undefined ? JSON.stringify(defaultVal) : "";
+            });
+            setInputValues(initialValues);
+        }
+        return; 
+      }
+
+      // FALLBACK: Generate starter code if no user code exists
       const algo = activeAlgorithm;
       
       const impl = algo.implementations.find((i: any) => i.lang.toLowerCase() === language.toLowerCase());
@@ -242,6 +256,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
         });
         setInputValues(initialValues);
       }
+
 
       if (algo.test_cases) {
         const initialTestCases = algo.test_cases.map((tc: any, idx: number) => ({
@@ -990,7 +1005,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
          </Tabs>
         </ResizablePanel>
         
-        <ResizableHandle withHandle />
+        <ResizableHandle withHandle className="bg-muted/50 hover:bg-primary/20 data-[resize-handle-active]:bg-primary/40 transition-colors" />
                 <ResizablePanel defaultSize={10} minSize={5}>
           <div className="h-full flex flex-col">
              <div className="flex-1 min-h-0 overflow-hidden">

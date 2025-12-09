@@ -12,6 +12,8 @@ import { TabWarning } from "@/components/TabWarning";
 import { CodeRunner } from "@/components/CodeRunner/CodeRunner";
 import { BrainstormSection } from "@/components/brainstorm/BrainstormSection";
 
+import { Submission } from '@/types/userAlgorithmData';
+
 interface CodeWorkspacePanelProps {
   algorithm: any;
   algorithmId: string;
@@ -24,6 +26,7 @@ interface CodeWorkspacePanelProps {
   setSelectedLanguage: (lang: string) => void;
   isCodeRunnerMaximized: boolean;
   setIsCodeRunnerMaximized: (val: boolean) => void;
+  submissions: Submission[];
 }
 
 export const CodeWorkspacePanel: React.FC<CodeWorkspacePanelProps> = ({
@@ -38,6 +41,7 @@ export const CodeWorkspacePanel: React.FC<CodeWorkspacePanelProps> = ({
   setSelectedLanguage,
   isCodeRunnerMaximized,
   setIsCodeRunnerMaximized,
+  submissions,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isCompact, setIsCompact] = useState(false);
@@ -100,7 +104,7 @@ export const CodeWorkspacePanel: React.FC<CodeWorkspacePanelProps> = ({
                     className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
                   >
                     {isCompact ? (
-                       <Tooltip>
+                      <Tooltip>
                         <TooltipTrigger asChild>
                            <div className="flex items-center justify-center w-full h-full">
                             <Lightbulb className="w-4 h-4" />
@@ -143,6 +147,7 @@ export const CodeWorkspacePanel: React.FC<CodeWorkspacePanelProps> = ({
                        }}
                        onSuccess={handleCodeSuccess}
                        controls={algorithm.controls?.code_runner} 
+                       submissions={submissions}
                      />
                    )}
                  </AuthGuard>

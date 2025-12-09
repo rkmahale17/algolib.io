@@ -184,7 +184,7 @@ export function AlgorithmPreview({ algorithm }: AlgorithmPreviewProps) {
                         />
                     </ResizablePanel>
 
-                    <ResizableHandle withHandle />
+                    <ResizableHandle withHandle className="bg-border hover:bg-primary/20 data-[resize-handle-active]:bg-primary/40 transition-colors" />
 
                     {/* Right Panel */}
                     <ResizablePanel
@@ -207,6 +207,7 @@ export function AlgorithmPreview({ algorithm }: AlgorithmPreviewProps) {
                             setSelectedLanguage={setSelectedLanguage}
                             isCodeRunnerMaximized={isCodeRunnerMaximized}
                             setIsCodeRunnerMaximized={setIsCodeRunnerMaximized}
+                            submissions={[]}
                         />
                     </ResizablePanel>
                 </ResizablePanelGroup>
@@ -288,7 +289,7 @@ export function AlgorithmPreview({ algorithm }: AlgorithmPreviewProps) {
                         />
                     </ResizablePanel>
 
-                    <ResizableHandle withHandle />
+                    <ResizableHandle withHandle className="bg-border hover:bg-primary/20 data-[resize-handle-active]:bg-primary/40 transition-colors" />
 
                     {/* Right Panel */}
                     <ResizablePanel
@@ -311,6 +312,7 @@ export function AlgorithmPreview({ algorithm }: AlgorithmPreviewProps) {
                             setSelectedLanguage={setSelectedLanguage}
                             isCodeRunnerMaximized={isCodeRunnerMaximized}
                             setIsCodeRunnerMaximized={setIsCodeRunnerMaximized}
+                            submissions={[]}
                         />
                     </ResizablePanel>
                 </ResizablePanelGroup>
