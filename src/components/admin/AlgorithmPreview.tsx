@@ -1,16 +1,35 @@
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { BookOpen, Code2, ExternalLink, Lightbulb, Youtube } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
-import { RichText } from "../RichText";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
+import { ProblemDescriptionPanel } from "@/components/algorithm/ProblemDescriptionPanel";
+import { CodeWorkspacePanel } from "@/components/algorithm/CodeWorkspacePanel";
+import { AlgorithmHeader } from "@/components/algorithm/AlgorithmHeader";
+import { Code2, Minimize2, Eye, Lightbulb, Maximize2 } from "lucide-react";
+import { CodeRunner } from "@/components/CodeRunner/CodeRunner";
+import { BrainstormSection } from "@/components/brainstorm/BrainstormSection";
 
 interface AlgorithmPreviewProps {
   algorithm: any;
 }
 
 export function AlgorithmPreview({ algorithm }: AlgorithmPreviewProps) {
+  // Mock State for Preview
+  const [activeTab, setActiveTab] = useState("description");
+  const [isLeftCollapsed, setIsLeftCollapsed] = useState(false);
+  const [isRightCollapsed, setIsRightCollapsed] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState<string>("typescript");
+  const [isCodeRunnerMaximized, setIsCodeRunnerMaximized] = useState(false);
+  const [isVisualizationMaximized, setIsVisualizationMaximized] = useState(false);
+  const [isBrainstormMaximized, setIsBrainstormMaximized] = useState(false);
+  const [isPreviewExpanded, setIsPreviewExpanded] = useState(false);
+
+  // Mock Handlers
+  const toggleLeftPanel = () => setIsLeftCollapsed(!isLeftCollapsed);
+  const toggleRightPanel = () => setIsRightCollapsed(!isRightCollapsed);
+
   if (!algorithm || !algorithm.name) {
     return (
       <Card>
@@ -21,257 +40,287 @@ export function AlgorithmPreview({ algorithm }: AlgorithmPreviewProps) {
     );
   }
 
-  const getDifficultyColor = (difficulty: string) => {
-    const colors: Record<string, string> = {
-      easy: "bg-green-500/10 text-green-500 border-green-500/20",
-      intermediate: "bg-yellow-500/10 text-yellow-500 border-yellow-500/20",
-      advance: "bg-red-500/10 text-red-500 border-red-500/20",
-    };
-    return colors[difficulty?.toLowerCase()] || "bg-gray-500/10 text-gray-500";
+  // Ensure implementations exist for CodeWorkspacePanel
+  const previewAlgorithm = {
+    ...algorithm,
+    implementations: algorithm.implementations || []
   };
 
+  // Render Maximize Overlays
+  const renderMaximizedOverlays = () => (
+    <>
+      {isCodeRunnerMaximized && (
+        <div className="fixed inset-0 z-50 bg-background flex flex-col">
+          <div className="flex items-center justify-between p-4 border-b">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <Code2 className="w-5 h-5 text-primary" />
+              Code Runner
+            </h2>
+            <Button variant="ghost" size="sm" onClick={() => setIsCodeRunnerMaximized(false)}>
+              <Minimize2 className="w-4 h-4 mr-2" />
+              Exit Fullscreen
+            </Button>
+          </div>
+          <div className="flex-1 overflow-hidden">
+             <CodeRunner 
+                algorithmId="preview-mode"
+                algorithmData={previewAlgorithm}
+                isMaximized={true}
+                onToggleFullscreen={() => setIsCodeRunnerMaximized(false)}
+                className="h-full border-0 rounded-none shadow-none"
+                initialCode=""
+                onCodeChange={() => {}}
+                onSuccess={() => {}}
+              />
+          </div>
+        </div>
+      )}
+
+      {isVisualizationMaximized && (
+        <div className="fixed inset-0 z-50 bg-background flex flex-col">
+           <div className="flex items-center justify-between p-4 border-b">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <Eye className="w-5 h-5 text-primary" />
+              Visualization
+            </h2>
+            <Button variant="ghost" size="sm" onClick={() => setIsVisualizationMaximized(false)}>
+              <Minimize2 className="w-4 h-4 mr-2" />
+              Exit Fullscreen
+            </Button>
+          </div>
+          <div className="flex-1 overflow-auto p-6 pb-20">
+             {previewAlgorithm.metadata?.visualizationUrl ? (
+                <iframe src={previewAlgorithm.metadata.visualizationUrl} className="w-full h-full border-0" title="Viz" />
+             ) : (
+                <div className="text-center p-10">Maximize mode not fully supported for this visualization type yet.</div>
+             )}
+          </div>
+        </div>
+      )}
+
+      {isBrainstormMaximized && (
+        <div className="fixed inset-0 z-50 bg-background flex flex-col">
+           <div className="flex items-center justify-between p-4 border-b">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <Lightbulb className="w-5 h-5 text-primary" />
+              Brainstorm
+            </h2>
+            <Button variant="ghost" size="sm" onClick={() => setIsBrainstormMaximized(false)}>
+              <Minimize2 className="w-4 h-4 mr-2" />
+              Exit Fullscreen
+            </Button>
+          </div>
+          <div className="flex-1 overflow-auto p-6">
+             <BrainstormSection algorithmId="preview-mode" algorithmTitle={previewAlgorithm.name} />
+          </div>
+        </div>
+      )}
+
+      {/* Global Preview Expand Overlay */}
+      {/* Global Preview Expand Overlay */}
+      <Dialog open={isPreviewExpanded} onOpenChange={setIsPreviewExpanded}>
+        <DialogContent className="max-w-[100vw] w-screen h-screen p-0 border-0 rounded-none bg-background flex flex-col focus:outline-none">
+           <DialogTitle className="sr-only">Live Preview Fullscreen</DialogTitle>
+           <div className="flex items-center justify-between p-3 border-b bg-background shadow-sm shrink-0">
+             <div className="flex items-center gap-3">
+                <h2 className="text-sm font-semibold flex items-center gap-2">
+                    Live Preview 
+                </h2>
+                <Badge variant="secondary" className="font-normal">Fullscreen Mode</Badge>
+             </div>
+             <Button variant="ghost" size="sm" onClick={() => setIsPreviewExpanded(false)} className="gap-2 hover:bg-destructive/10 hover:text-destructive">
+               <Minimize2 className="w-4 h-4" />
+               Exit Preview
+             </Button>
+           </div>
+           
+           <div className="flex-1 flex flex-col overflow-hidden relative">
+              {/* Header Mock */}
+            <div className="pointer-events-none opacity-80 border-b">
+                 <AlgorithmHeader 
+                    user={{ email: 'preview@example.com' } as any}
+                    algorithm={previewAlgorithm}
+                    isMobile={false}
+                    isInterviewMode={false}
+                    toggleInterviewMode={() => {}}
+                    timerSeconds={0}
+                    isTimerRunning={false}
+                    setIsTimerRunning={() => {}}
+                    setTimerSeconds={() => {}}
+                    formatTime={() => "00:00"}
+                    handleRandomProblem={() => {}}
+                    handleNextProblem={() => {}}
+                    handleShare={() => {}}
+                    handleSignOut={() => {}}
+                 />
+            </div>
+               <div className="flex-1 overflow-hidden relative">
+                <ResizablePanelGroup direction="horizontal" className="h-full">
+                    {/* Left Panel */}
+                    <ResizablePanel
+                        defaultSize={40}
+                        minSize={20}
+                        collapsible={true}
+                        onCollapse={() => setIsLeftCollapsed(true)}
+                        onExpand={() => setIsLeftCollapsed(false)}
+                        className={isLeftCollapsed ? 'min-w-[0px]' : ''}
+                    >
+                        <ProblemDescriptionPanel
+                            algorithm={previewAlgorithm}
+                            activeTab={activeTab}
+                            setActiveTab={setActiveTab}
+                            isMobile={false}
+                            toggleLeftPanel={toggleLeftPanel}
+                            // Mock interactions
+                            isCompleted={false}
+                            likes={previewAlgorithm.metadata?.likes || 0}
+                            dislikes={previewAlgorithm.metadata?.dislikes || 0}
+                            userVote={null}
+                            isFavorite={false}
+                            handleVote={() => {}}
+                            toggleFavorite={() => {}}
+                            setIsVisualizationMaximized={setIsVisualizationMaximized}
+                            handleRichTextClick={() => {}}
+                        />
+                    </ResizablePanel>
+
+                    <ResizableHandle withHandle className="bg-border hover:bg-primary/20 data-[resize-handle-active]:bg-primary/40 transition-colors" />
+
+                    {/* Right Panel */}
+                    <ResizablePanel
+                        defaultSize={60}
+                        minSize={20}
+                        collapsible={true}
+                        onCollapse={() => setIsRightCollapsed(true)}
+                        onExpand={() => setIsRightCollapsed(false)}
+                        className={isRightCollapsed ? 'min-w-[0px]' : ''}
+                    >
+                        <CodeWorkspacePanel
+                            algorithm={previewAlgorithm}
+                            algorithmId="preview-mode"
+                            isMobile={false}
+                            toggleRightPanel={toggleRightPanel}
+                            savedCode=""
+                            handleCodeChange={() => {}}
+                            handleCodeSuccess={() => {}}
+                            selectedLanguage={selectedLanguage}
+                            setSelectedLanguage={setSelectedLanguage}
+                            isCodeRunnerMaximized={isCodeRunnerMaximized}
+                            setIsCodeRunnerMaximized={setIsCodeRunnerMaximized}
+                            submissions={[]}
+                        />
+                    </ResizablePanel>
+                </ResizablePanelGroup>
+            </div>
+           </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+
   return (
-    <div className="sticky top-4">
-      <Card className="border-2">
-        <CardHeader className="border-b bg-muted/30">
+    <div className="sticky top-4 space-y-4">
+      <Card className="border-2 overflow-hidden flex flex-col h-[calc(100vh-100px)]">
+        <CardHeader className="border-b bg-muted/30 py-3 shrink-0">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-sm font-semibold">Live Preview</CardTitle>
-            <Badge variant="outline" className="text-xs">
-              Production View
-            </Badge>
+            <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                Live Preview
+                <span className="font-normal text-muted-foreground">(Interactive)</span>
+            </CardTitle>
+            <div className="flex items-center gap-2">
+                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setIsPreviewExpanded(true)} title="Expand Preview">
+                    <Maximize2 className="h-4 w-4" />
+                </Button>
+                <Badge variant="outline" className="text-xs">
+                Production View
+                </Badge>
+            </div>
           </div>
         </CardHeader>
-        <CardContent className="p-0">
-          <ScrollArea className="h-[calc(100vh-200px)]">
-            <div className="p-4 space-y-6">
-              {/* Title & Difficulty - Exact match to AlgorithmDetailNew */}
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h1 className="text-2xl font-bold mb-2">{algorithm.name}</h1>
-                  {algorithm.explanation?.problemStatement && (
-                   <RichText content={algorithm.explanation?.problemStatement}></RichText>
-                  )}
-                </div>
-                <div className="shrink-0">
-                  {algorithm.difficulty && (
-                    <Badge variant="outline" className={getDifficultyColor(algorithm.difficulty)}>
-                      {algorithm.difficulty}
-                    </Badge>
-                  )}
-                </div>
-              </div>
-
-              {/* Examples Section - Exact match */}
-              {algorithm.explanation?.io?.length > 0 && (
-                <div className="space-y-4">
-                  {algorithm.explanation.io.map((example: any, index: number) => (
-                    <div key={index} className="border rounded-lg p-4 bg-muted/20">
-                      <h4 className="font-semibold mb-3">Example {index + 1}:</h4>
-                      <div className="space-y-2 font-mono text-sm">
-                        {example.input && (
-                          <div>
-                            <span className="font-semibold">Input:</span>{' '}
-                            <code className="bg-muted px-2 py-0.5 rounded">{example.input}</code>
-                          </div>
-                        )}
-                        {example.output && (
-                          <div>
-                            <span className="font-semibold">Output:</span>{' '}
-                            <code className="bg-muted px-2 py-0.5 rounded">{example.output}</code>
-                          </div>
-                        )}
-                        {example.explanation && (
-                          <div className="mt-2">
-                            <span className="font-semibold">Explanation:</span>{' '}
-                            <span className="text-muted-foreground whitespace-pre-line">
-                              {example.explanation}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Constraints Section - Exact match */}
-              {algorithm.explanation?.constraints?.length > 0 && (
-                <div className="border rounded-lg p-4 bg-muted/20">
-                  <h4 className="font-semibold mb-3">Constraints:</h4>
-                  <ul className="space-y-1.5 font-mono text-sm">
-                    {algorithm.explanation.constraints.map((constraint: string, index: number) => (
-                      <li key={index} className="flex items-start gap-2">
-                        <span className="text-muted-foreground mt-0.5">•</span>
-                        <code className="flex-1">{constraint}</code>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Note Section - Exact match */}
-              {algorithm.explanation?.note && (
-                <div className="border-l-4 border-primary pl-4 py-2">
-                  <p className="text-sm text-muted-foreground italic">{algorithm.explanation.note}</p>
-                </div>
-              )}
-
-              {/* Algorithm Overview Card - Exact match */}
-              <Card className="p-4 sm:p-6 glass-card overflow-hidden">
-                <div className="space-y-4">
-                  <h3 className="font-semibold flex items-center gap-2">
-                    <BookOpen className="w-5 h-5 text-primary" />
-                    Algorithm Overview
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {algorithm.metadata?.overview || algorithm.explanation?.problemStatement}
-                  </p>
-
-                  <Separator />
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm font-medium mb-1">Time Complexity</p>
-                      <Badge variant="outline" className="font-mono">
-                        {algorithm.metadata?.timeComplexity || 'N/A'}
-                      </Badge>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium mb-1">Space Complexity</p>
-                      <Badge variant="outline" className="font-mono">
-                        {algorithm.metadata?.spaceComplexity || 'N/A'}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-
-              {/* Steps, Use Cases & Tips Card - Exact match */}
-              <Card className="p-4 sm:p-6 glass-card overflow-hidden">
-                <Tabs defaultValue="steps">
-                  <TabsList className="grid w-full grid-cols-3 h-auto">
-                    <TabsTrigger value="steps" className="text-xs sm:text-sm">
-                      Steps
-                    </TabsTrigger>
-                    <TabsTrigger value="usecase" className="text-xs sm:text-sm">
-                      Use Cases
-                    </TabsTrigger>
-                    <TabsTrigger value="tips" className="text-xs sm:text-sm">
-                      Pro Tips
-                    </TabsTrigger>
-                  </TabsList>
-
-                  <TabsContent value="steps" className="mt-4">
-                    <ol className="space-y-2 list-decimal list-inside">
-                      {algorithm.explanation?.steps?.map((step: string, i: number) => (
-                        <li key={i} className="text-sm text-muted-foreground">
-                          {step}
-                        </li>
-                      ))}
-                    </ol>
-                  </TabsContent>
-
-                  <TabsContent value="usecase" className="mt-4">
-                    <p className="text-sm text-muted-foreground">{algorithm.explanation?.useCase}</p>
-                  </TabsContent>
-
-                  <TabsContent value="tips" className="mt-4">
-                    <ul className="space-y-2 list-disc list-inside">
-                      {algorithm.explanation?.tips?.map((tip: string, i: number) => (
-                        <li key={i} className="text-sm text-muted-foreground">
-                          {tip}
-                        </li>
-                      ))}
-                    </ul>
-                  </TabsContent>
-                </Tabs>
-              </Card>
-
-              {/* Video Tutorial Card - Exact match */}
-              {algorithm.tutorials?.[0]?.url && (
-                <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-5xl mx-auto">
-                  <div className="space-y-6">
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-2">
-                        <Youtube className="w-5 h-5 text-red-500" />
-                        <h3 className="font-semibold">Video Tutorial</h3>
-                      </div>
-
-                      <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-                        <iframe
-                          className="absolute top-0 left-0 w-full h-full rounded-lg"
-                          src={`https://www.youtube.com/embed/${
-                            algorithm.tutorials[0].url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)?.[1] ||
-                            algorithm.tutorials[0].url
-                          }`}
-                          title={`${algorithm.name} Tutorial`}
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        />
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    <div className="space-y-3">
-                      <h3 className="text-xl font-semibold flex items-center gap-2">
-                        <Code2 className="w-5 h-5 text-primary" />
-                        Code Example & Logic
-                      </h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        {algorithm.metadata?.overview ||
-                          `The implementation of ${algorithm.name} follows a systematic approach that ensures optimal performance.`}
-                      </p>
-                    </div>
-
-                    <Separator />
-
-                    {algorithm.explanation?.tips?.length > 0 && (
-                      <>
-                        <div className="space-y-3">
-                          <h3 className="text-xl font-semibold flex items-center gap-2">
-                            <Lightbulb className="w-5 h-5 text-primary" />
-                            Additional Insights & Improvements
-                          </h3>
-                          <ul className="space-y-2 list-disc list-inside text-sm text-muted-foreground">
-                            {algorithm.explanation.tips.map((tip: string, i: number) => (
-                              <li key={i}>{tip}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </Card>
-              )}
-
-              {/* Practice Problems Card - Exact match */}
-              {algorithm.problems_to_solve?.external?.length > 0 && (
-                <Card className="p-4 sm:p-6 glass-card overflow-hidden">
-                  <h3 className="font-semibold mb-4">Practice Problems</h3>
-                  <div className="space-y-2">
-                    {algorithm.problems_to_solve.external.map((problem: any, i: number) => (
-                      <a
-                        key={i}
-                        href={problem.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
-                      >
-                        <div className="flex-1">
-                          <p className="text-sm font-medium">{problem.title}</p>
-                          <p className="text-xs text-muted-foreground mt-1 capitalize">{problem.type}</p>
-                        </div>
-                        <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                      </a>
-                    ))}
-                  </div>
-                </Card>
-              )}
+        
+        <div className="flex-1 flex flex-col overflow-hidden relative bg-background">
+            {/* Header Mock */}
+            <div className="pointer-events-none opacity-80 border-b">
+                 <AlgorithmHeader 
+                    user={{ email: 'preview@example.com' } as any}
+                    algorithm={previewAlgorithm}
+                    isMobile={false}
+                    isInterviewMode={false}
+                    toggleInterviewMode={() => {}}
+                    timerSeconds={0}
+                    isTimerRunning={false}
+                    setIsTimerRunning={() => {}}
+                    setTimerSeconds={() => {}}
+                    formatTime={() => "00:00"}
+                    handleRandomProblem={() => {}}
+                    handleNextProblem={() => {}}
+                    handleShare={() => {}}
+                    handleSignOut={() => {}}
+                 />
             </div>
-          </ScrollArea>
-        </CardContent>
+
+            <div className="flex-1 overflow-hidden relative">
+                <ResizablePanelGroup direction="horizontal" className="h-full">
+                    {/* Left Panel */}
+                    <ResizablePanel
+                        defaultSize={40}
+                        minSize={20}
+                        collapsible={true}
+                        onCollapse={() => setIsLeftCollapsed(true)}
+                        onExpand={() => setIsLeftCollapsed(false)}
+                        className={isLeftCollapsed ? 'min-w-[0px]' : ''}
+                    >
+                        <ProblemDescriptionPanel
+                            algorithm={previewAlgorithm}
+                            activeTab={activeTab}
+                            setActiveTab={setActiveTab}
+                            isMobile={false}
+                            toggleLeftPanel={toggleLeftPanel}
+                            // Mock interactions
+                            isCompleted={false}
+                            likes={previewAlgorithm.metadata?.likes || 0}
+                            dislikes={previewAlgorithm.metadata?.dislikes || 0}
+                            userVote={null}
+                            isFavorite={false}
+                            handleVote={() => {}}
+                            toggleFavorite={() => {}}
+                            setIsVisualizationMaximized={setIsVisualizationMaximized}
+                            handleRichTextClick={() => {}}
+                        />
+                    </ResizablePanel>
+
+                    <ResizableHandle withHandle className="bg-border hover:bg-primary/20 data-[resize-handle-active]:bg-primary/40 transition-colors" />
+
+                    {/* Right Panel */}
+                    <ResizablePanel
+                        defaultSize={60}
+                        minSize={20}
+                        collapsible={true}
+                        onCollapse={() => setIsRightCollapsed(true)}
+                        onExpand={() => setIsRightCollapsed(false)}
+                        className={isRightCollapsed ? 'min-w-[0px]' : ''}
+                    >
+                        <CodeWorkspacePanel
+                            algorithm={previewAlgorithm}
+                            algorithmId="preview-mode"
+                            isMobile={false}
+                            toggleRightPanel={toggleRightPanel}
+                            savedCode=""
+                            handleCodeChange={() => {}}
+                            handleCodeSuccess={() => {}}
+                            selectedLanguage={selectedLanguage}
+                            setSelectedLanguage={setSelectedLanguage}
+                            isCodeRunnerMaximized={isCodeRunnerMaximized}
+                            setIsCodeRunnerMaximized={setIsCodeRunnerMaximized}
+                            submissions={[]}
+                        />
+                    </ResizablePanel>
+                </ResizablePanelGroup>
+            </div>
+        </div>
       </Card>
+
+      {renderMaximizedOverlays()}
     </div>
   );
 }

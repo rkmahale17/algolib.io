@@ -162,11 +162,7 @@ export function TestCaseEditor({
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base">
                   Test Case {index + 1}
-                  {testCase.description && (
-                    <span className="text-sm font-normal text-muted-foreground ml-2">
-                      - {testCase.description}
-                    </span>
-                  )}
+                  
                   {testCase.isSubmission && (
                     <span className="ml-2 px-2 py-0.5 text-xs bg-yellow-100 text-yellow-800 rounded-full border border-yellow-200">
                       Hidden
@@ -193,6 +189,11 @@ export function TestCaseEditor({
             {expandedIndex === index && (
               <CardContent className="space-y-4">
                 {/* Description */}
+                {testCase.description && (
+                    <span className="text-sm font-normal text-muted-foreground ml-2">
+                       {testCase.description}
+                    </span>
+                  )}
                 <div className="space-y-2">
                   <Label>Description</Label>
                   <Input

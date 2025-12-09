@@ -32,6 +32,7 @@ interface CodeBlock {
   code: string;
   explanationBefore?: string;
   explanationAfter?: string;
+  isVisible?: boolean;
 }
 
 interface CodeImplementation {

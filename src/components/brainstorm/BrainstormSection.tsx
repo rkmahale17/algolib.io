@@ -6,12 +6,13 @@ import {
 } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 import { Button } from "@/components/ui/button";
 import { HistoryTab } from "./HistoryTab";
 import { NotesComponent } from "./NotesComponent";
 import { WhiteboardComponent } from "./WhiteboardComponent";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { FeatureGuard } from "@/components/FeatureGuard";
 
 interface BrainstormSectionProps {
@@ -37,6 +38,22 @@ export const BrainstormSection = ({
     );
   });
 
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isCompact, setIsCompact] = useState(false);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setIsCompact(entry.contentRect.width < 400);
+      }
+    });
+
+    resizeObserver.observe(containerRef.current);
+    return () => resizeObserver.disconnect();
+  }, []);
+
   const handleTabChange = (value: string) => {
     setActiveTab(value);
     localStorage.setItem(`brainstorm-tab-${algorithmId}`, value);
@@ -53,7 +70,7 @@ export const BrainstormSection = ({
   };
 
   return (
-    <div className="h-full flex flex-col">
+    <div ref={containerRef} className="h-full flex flex-col">
       <Tabs
         value={activeTab}
         onValueChange={handleTabChange}
@@ -61,35 +78,76 @@ export const BrainstormSection = ({
       >
         <div className="flex items-center justify-between border-b bg-muted/10 shrink-0">
           <TabsList className="flex-1 flex p-0 bg-transparent gap-0 rounded-none h-12">
-            <FeatureGuard flag="drawing">
-              {controls?.whiteboard !== false && (
-                <TabsTrigger
-                  value="whiteboard"
-                  className="flex-1 gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none"
-                >
-                  <Palette className="w-4 h-4" />
-                  Whiteboard
-                </TabsTrigger>
-              )}
-            </FeatureGuard>
-            <FeatureGuard flag="notes">
-              {controls?.notes !== false && (
-                <TabsTrigger
-                    value="notes"
+            <TooltipProvider>
+              <FeatureGuard flag="drawing">
+                {controls?.whiteboard !== false && (
+                  <TabsTrigger
+                    value="whiteboard"
                     className="flex-1 gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none"
-                >
-                    <FileText className="w-4 h-4" />
-                    Notes
-                </TabsTrigger>
-              )}
-            </FeatureGuard>
-            <TabsTrigger
-              value="history"
-              className="flex-1 gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none"
-            >
-              <History className="w-4 h-4" />
-              History
-            </TabsTrigger>
+                  >
+                    {isCompact ? (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                           <div className="flex items-center justify-center w-full h-full">
+                              <Palette className="w-4 h-4" />
+                           </div>
+                        </TooltipTrigger>
+                        <TooltipContent>Whiteboard</TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      <>
+                        <Palette className="w-4 h-4" />
+                        Whiteboard
+                      </>
+                    )}
+                  </TabsTrigger>
+                )}
+              </FeatureGuard>
+              <FeatureGuard flag="notes">
+                {controls?.notes !== false && (
+                  <TabsTrigger
+                      value="notes"
+                      className="flex-1 gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none"
+                  >
+                    {isCompact ? (
+                       <Tooltip>
+                        <TooltipTrigger asChild>
+                           <div className="flex items-center justify-center w-full h-full">
+                             <FileText className="w-4 h-4" />
+                           </div>
+                        </TooltipTrigger>
+                        <TooltipContent>Notes</TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      <>
+                        <FileText className="w-4 h-4" />
+                        Notes
+                      </>
+                    )}
+                  </TabsTrigger>
+                )}
+              </FeatureGuard>
+              <TabsTrigger
+                value="history"
+                className="flex-1 gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none"
+              >
+                  {isCompact ? (
+                     <Tooltip>
+                        <TooltipTrigger asChild>
+                           <div className="flex items-center justify-center w-full h-full">
+                             <History className="w-4 h-4" />
+                           </div>
+                        </TooltipTrigger>
+                        <TooltipContent>History</TooltipContent>
+                      </Tooltip>
+                  ) : (
+                    <>
+                      <History className="w-4 h-4" />
+                      History
+                    </>
+                  )}
+              </TabsTrigger>
+            </TooltipProvider>
           </TabsList>
           
           <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>

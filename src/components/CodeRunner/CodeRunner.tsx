@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -56,6 +59,7 @@ interface CodeRunnerProps {
       cpp: boolean;
     };
   };
+  submissions?: Submission[];
 }
 
 interface EditorSettings {
@@ -87,7 +91,8 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   language: controlledLanguage,
   onLanguageChange,
   onSuccess,
-  controls
+  controls,
+  submissions: initialSubmissions = []
 }) => {
   const isLimitExceeded = useFeatureFlag("todays_limit_exceed");
   const [internalLanguage, setInternalLanguage] = useState<Language>('typescript');
@@ -113,7 +118,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   const [editingTestCaseId, setEditingTestCaseId] = useState<number | null>(null);
   const [pendingTestCaseId, setPendingTestCaseId] = useState<number | null>(null);
   
-  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [submissions, setSubmissions] = useState<Submission[]>(initialSubmissions);
   const [lastRunSuccess, setLastRunSuccess] = useState(false);
   
   const [viewingSubmission, setViewingSubmission] = useState<Submission | null>(null);
@@ -121,9 +126,20 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
 
   // Settings state
   const [settings, setSettings] = useState<EditorSettings>(DEFAULT_SETTINGS);
+
   const editorRef = useRef<CodeEditorRef>(null);
+  const [isOutputExpanded, setIsOutputExpanded] = useState(false);
+  const [activeTestCaseTab, setActiveTestCaseTab] = useState<string>("");
+
 
   const activeAlgorithm = algorithmData || fetchedAlgorithm;
+
+  // Sync submissions from props if they change
+  useEffect(() => {
+    if (initialSubmissions.length > 0) {
+      setSubmissions(initialSubmissions);
+    }
+  }, [initialSubmissions]);
 
   // Load settings from localStorage
   useEffect(() => {
@@ -143,25 +159,12 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
     localStorage.setItem('monaco-editor-settings', JSON.stringify(newSettings));
   };
 
+  // Deprecated internal fetching - removed to prevent redundant calls
+  /*
   const fetchUserData = useCallback(async () => {
-    if (!algorithmId) return;
-    
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const data = await getUserAlgorithmData(user.id, algorithmId);
-        if (data?.submissions) {
-          setSubmissions(data.submissions);
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
+     ...
   }, [algorithmId]);
-
-  useEffect(() => {
-    fetchUserData();
-  }, [fetchUserData]);
+  */
 
   useEffect(() => {
     if (!algorithmData && algorithmId) {
@@ -196,6 +199,38 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   // Load algorithm code and schema
   useEffect(() => {
     if (activeAlgorithm) {
+      // 1. Initialize Test Cases (Always)
+      if (activeAlgorithm.test_cases) {
+        const initialTestCases = activeAlgorithm.test_cases.map((tc: any, idx: number) => ({
+          id: idx,
+          input: tc.input,
+          expectedOutput: tc.expectedOutput || tc.output,
+          isCustom: false,
+          description: tc.description,
+          isSubmission: tc.isSubmission
+        }));
+        setTestCases(initialTestCases);
+      }
+
+      // 2. Initialize Input Values (Always, based on first test case or defaults)
+      if (activeAlgorithm.input_schema) {
+            const initialValues: Record<string, string> = {};
+            activeAlgorithm.input_schema.forEach((field: any, index: number) => {
+               const defaultVal = activeAlgorithm.test_cases?.[0]?.input[index];
+               initialValues[field.name] = defaultVal !== undefined ? JSON.stringify(defaultVal) : "";
+            });
+            setInputValues(initialValues);
+      }
+
+      // 3. Initialize Code
+      // If we have valid initialCode (user saved code), prioritize it!
+      if (initialCode && initialCode.trim().length > 0) {
+        setCode(initialCode);
+        onCodeChange?.(initialCode); 
+        return; 
+      }
+
+      // FALLBACK: Generate starter code if no user code exists
       const algo = activeAlgorithm;
       
       const impl = algo.implementations.find((i: any) => i.lang.toLowerCase() === language.toLowerCase());
@@ -232,27 +267,6 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
         onCodeChange?.(DEFAULT_CODE[language]);
       }
 
-      // Setting input values
-      if (algo.input_schema) {
-        const initialValues: Record<string, string> = {};
-        algo.input_schema.forEach((field: any, index: number) => {
-           const defaultVal = algo.test_cases?.[0]?.input[index];
-           initialValues[field.name] = defaultVal !== undefined ? JSON.stringify(defaultVal) : "";
-        });
-        setInputValues(initialValues);
-      }
-
-      if (algo.test_cases) {
-        const initialTestCases = algo.test_cases.map((tc: any, idx: number) => ({
-          id: idx,
-          input: tc.input,
-          expectedOutput: tc.expectedOutput || tc.output,
-          isCustom: false,
-          description: tc.description,
-          isSubmission: tc.isSubmission
-        }));
-        setTestCases(initialTestCases);
-      }
     } else {
       if (!initialCode) {
         setCode(DEFAULT_CODE[language]);
@@ -291,6 +305,12 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
     toast.success("Code reset to default");
   };
 
+  const handleToggleOutputExpand = () => {
+    setIsOutputExpanded(!isOutputExpanded);
+  };
+
+
+
   const toggleFullscreen = useCallback(() => {
     if (onToggleFullscreen) {
       onToggleFullscreen();
@@ -313,6 +333,8 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
     window.addEventListener('keydown', handleEsc);
     return () => window.removeEventListener('keydown', handleEsc);
   }, [isFullscreen, onToggleFullscreen]);
+
+
 
   const algorithmMeta = activeAlgorithm;
 
@@ -604,6 +626,34 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
      }
   };
 
+  // Keyboard Shortcuts for Run (Ctrl + ') and Submit (Ctrl + Enter)
+  useEffect(() => {
+    const handleShortcuts = (e: KeyboardEvent) => {
+      // Check for Ctrl or Meta (Cmd) key
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === "'") {
+          e.preventDefault();
+          if (!isLoading && !isSubmitting && controls?.run_code !== false) {
+             handleRun();
+          }
+        }
+        if (e.key === "Enter") {
+          // Only trigger submit if not loading, not submitting, and if last run was successful
+          if (!isLoading && !isSubmitting && lastRunSuccess && controls?.submit !== false) {
+             e.preventDefault();
+             handleSubmit();
+          } else if (!lastRunSuccess && controls?.submit !== false) {
+             // If trying to submit but last run wasn't success, maybe show toast?
+             // Optional: toast.warning("Please run code successfully before submitting.");
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleShortcuts);
+    return () => window.removeEventListener('keydown', handleShortcuts);
+  }, [isLoading, isSubmitting, lastRunSuccess, controls, handleRun, handleSubmit]);
+
   return (
     <div className={`w-full border rounded-lg overflow-hidden bg-background shadow-sm flex flex-col transition-all duration-300 ${
       isFullscreen 
@@ -683,52 +733,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                 >
                   <RotateCcw className="w-3 h-3" />
                 </Button>
-                <FeatureGuard flag="code_runner">
-                 {controls?.run_code !== false && (
-                   <Button 
-                    onClick={handleRun} 
-                    disabled={isLoading || isSubmitting}
-                    size="sm"
-                    className="h-8 px-4 text-xs"
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="w-3 h-3 mr-2 animate-spin" />
-                        Running
-                      </>
-                    ) : (
-                      <>
-                        <Play className="w-3 h-3 mr-2" />
-                        Run Code
-                      </>
-                    )}
-                  </Button>
-                 )}
-                </FeatureGuard>
-              
-              <FeatureGuard flag="submit_button">
-                {controls?.submit !== false && (
-                  <Button 
-                    onClick={handleSubmit} 
-                    disabled={isLoading || isSubmitting || !lastRunSuccess}
-                    size="sm"
-                    variant="default"
-                    className="h-8 px-4 text-xs bg-green-600 hover:bg-green-700 text-white ml-2 disabled:bg-gray-400 disabled:opacity-50"
-                  >
-                     {isSubmitting ? (
-                      <>
-                        <Loader2 className="w-3 h-3 mr-2 animate-spin" />
-                        Submitting
-                      </>
-                    ) : (
-                      <>
-                        <Send className="w-3 h-3 mr-2" />
-                        Submit
-                      </>
-                    )}
-                  </Button>
-                )}
-              </FeatureGuard>
+
              
               </div>
               <div className="flex items-center gap-1">
@@ -880,6 +885,85 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                   readOnly: false // Explicitly writable
                 }}
               />
+              <div className="absolute bottom-5 right-5 z-10">
+                <div className="flex items-center gap-0.5 p-0.5 bg-background/60 backdrop-blur-xl border shadow-lg rounded-full">
+                <TooltipProvider>
+                  <FeatureGuard flag="code_runner">
+                  {controls?.run_code !== false && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button 
+                          onClick={handleRun} 
+                          disabled={isLoading || isSubmitting}
+                          size="sm"
+                          variant="ghost"
+                          className="h-8 px-3 text-xs rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-all border-0"
+                        >
+                          {isLoading ? (
+                            <>
+                              <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />
+                              Running
+                            </>
+                          ) : (
+                            <>
+                              <Play className="w-3 h-3 mr-1 text-primary fill-primary/20" />
+                              Run
+                            </>
+                          )}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">Run Code <kbd className="ml-2 pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100"><span className="text-xs">Ctrl</span> + '</kbd></TooltipContent>
+                    </Tooltip>
+                  )}
+                  </FeatureGuard>
+
+                  {controls?.run_code !== false && controls?.submit !== false && (
+                    <div className="w-px h-4 bg-border/50 mx-0" />
+                  )}
+
+                  <FeatureGuard flag="submit_button">
+                  {controls?.submit !== false && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span tabIndex={0} className="cursor-default">
+                          <Button 
+                            onClick={handleSubmit} 
+                            disabled={isLoading || isSubmitting || !lastRunSuccess}
+                            size="sm"
+                            variant="ghost"
+                            className={`h-8 px-3 text-xs rounded-full transition-all border-0 ${
+                              lastRunSuccess 
+                                ? 'bg-green-500/10 text-green-600 hover:bg-green-500/20 hover:text-green-700' 
+                                : 'hover:bg-muted'
+                            } ${(!lastRunSuccess && !isLoading && !isSubmitting) ? 'pointer-events-none opacity-50' : ''}`}
+                          >
+                            {isSubmitting ? (
+                              <>
+                                <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />
+                                Submitting
+                              </>
+                            ) : (
+                              <>
+                                <Send className="w-3 h-3 mr-1" />
+                                Submit
+                              </>
+                            )}
+                          </Button>
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">
+                        {!lastRunSuccess && !isLoading && !isSubmitting ? (
+                           <span className="text-orange-500 font-medium">Run all test cases successfully to enable submission</span>
+                        ) : (
+                           <>Submit Solution <kbd className="ml-2 pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100"><span className="text-xs">Ctrl</span> + Enter</kbd></>
+                        )}
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                  </FeatureGuard>
+                </TooltipProvider>
+                </div>
+              </div>
             </div>
             </div>
            </TabsContent>
@@ -915,8 +999,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                     onChange={() => {}} // Read only
                     options={{
                        ...settings,
-                        readOnly: true,
-                        domReadOnly: true
+                        readOnly: true
                     }}
                   />
                </div>
@@ -925,11 +1008,13 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
          </Tabs>
         </ResizablePanel>
         
-        <ResizableHandle withHandle />
+        <ResizableHandle withHandle className="bg-muted/50 hover:bg-primary/20 data-[resize-handle-active]:bg-primary/40 transition-colors" />
                 <ResizablePanel defaultSize={10} minSize={5}>
           <div className="h-full flex flex-col">
              <div className="flex-1 min-h-0 overflow-hidden">
                  <OutputPanel 
+                  onToggleExpand={handleToggleOutputExpand}
+                  isExpanded={isOutputExpanded}
                   output={output} 
                   loading={isLoading} 
                   stdin="" 
@@ -967,11 +1052,59 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                   controls={controls}
                   
                   // Submissions
+                  activeTestCaseTab={activeTestCaseTab}
+                  onTestCaseTabChange={setActiveTestCaseTab}
                 />
              </div>
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>
+
+      {/* Expanded Modal View */}
+      <Dialog open={isOutputExpanded} onOpenChange={setIsOutputExpanded}>
+        <DialogContent className="max-w-[90vw] h-[90vh] flex flex-col p-0 gap-0 border-none bg-background/95 backdrop-blur-xl">
+           <div className="h-full flex flex-col overflow-hidden rounded-lg border">
+              <OutputPanel 
+                onToggleExpand={handleToggleOutputExpand}
+                isExpanded={true}
+                activeTestCaseTab={activeTestCaseTab}
+                onTestCaseTabChange={setActiveTestCaseTab}
+                output={output} 
+                loading={isLoading} 
+                stdin="" 
+                onStdinChange={() => {}} 
+                testCases={testCases.map(tc => ({
+                  input: tc.input,
+                  output: tc.expectedOutput
+                }))}
+                executionTime={executionTime}
+                algorithmMeta={algorithmMeta as any}
+                
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+                
+                allTestCases={testCases}
+                executedTestCases={executedTestCases}
+                onAddTestCase={handleAddTestCase}
+                onUpdateTestCase={handleUpdateTestCase}
+                onDeleteTestCase={handleDeleteTestCase}
+                
+                submissions={submissions}
+                onSelectSubmission={handleSelectSubmission}
+                
+                editingTestCaseId={editingTestCaseId}
+                onEditTestCase={setEditingTestCaseId}
+                onCancelEdit={() => {
+                  setEditingTestCaseId(null);
+                  setPendingTestCaseId(null);
+                }}
+                
+                inputSchema={algorithmData?.input_schema}
+                controls={controls}
+              />
+           </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
