@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
@@ -124,7 +126,11 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
 
   // Settings state
   const [settings, setSettings] = useState<EditorSettings>(DEFAULT_SETTINGS);
+
   const editorRef = useRef<CodeEditorRef>(null);
+  const [isOutputExpanded, setIsOutputExpanded] = useState(false);
+  const [activeTestCaseTab, setActiveTestCaseTab] = useState<string>("");
+
 
   const activeAlgorithm = algorithmData || fetchedAlgorithm;
 
@@ -193,20 +199,34 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   // Load algorithm code and schema
   useEffect(() => {
     if (activeAlgorithm) {
-      // If we have valid initialCode (user saved code), prioritize it!
-      if (initialCode && initialCode.trim().length > 0) {
-        setCode(initialCode);
-        onCodeChange?.(initialCode); // Ensure parent is synced if needed, though usually parent passed it
-        
-        // We still need to populate default input values for test cases
-        if (activeAlgorithm.input_schema) {
+      // 1. Initialize Test Cases (Always)
+      if (activeAlgorithm.test_cases) {
+        const initialTestCases = activeAlgorithm.test_cases.map((tc: any, idx: number) => ({
+          id: idx,
+          input: tc.input,
+          expectedOutput: tc.expectedOutput || tc.output,
+          isCustom: false,
+          description: tc.description,
+          isSubmission: tc.isSubmission
+        }));
+        setTestCases(initialTestCases);
+      }
+
+      // 2. Initialize Input Values (Always, based on first test case or defaults)
+      if (activeAlgorithm.input_schema) {
             const initialValues: Record<string, string> = {};
             activeAlgorithm.input_schema.forEach((field: any, index: number) => {
                const defaultVal = activeAlgorithm.test_cases?.[0]?.input[index];
                initialValues[field.name] = defaultVal !== undefined ? JSON.stringify(defaultVal) : "";
             });
             setInputValues(initialValues);
-        }
+      }
+
+      // 3. Initialize Code
+      // If we have valid initialCode (user saved code), prioritize it!
+      if (initialCode && initialCode.trim().length > 0) {
+        setCode(initialCode);
+        onCodeChange?.(initialCode); 
         return; 
       }
 
@@ -247,28 +267,6 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
         onCodeChange?.(DEFAULT_CODE[language]);
       }
 
-      // Setting input values
-      if (algo.input_schema) {
-        const initialValues: Record<string, string> = {};
-        algo.input_schema.forEach((field: any, index: number) => {
-           const defaultVal = algo.test_cases?.[0]?.input[index];
-           initialValues[field.name] = defaultVal !== undefined ? JSON.stringify(defaultVal) : "";
-        });
-        setInputValues(initialValues);
-      }
-
-
-      if (algo.test_cases) {
-        const initialTestCases = algo.test_cases.map((tc: any, idx: number) => ({
-          id: idx,
-          input: tc.input,
-          expectedOutput: tc.expectedOutput || tc.output,
-          isCustom: false,
-          description: tc.description,
-          isSubmission: tc.isSubmission
-        }));
-        setTestCases(initialTestCases);
-      }
     } else {
       if (!initialCode) {
         setCode(DEFAULT_CODE[language]);
@@ -306,6 +304,12 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
     setLastRunSuccess(false);
     toast.success("Code reset to default");
   };
+
+  const handleToggleOutputExpand = () => {
+    setIsOutputExpanded(!isOutputExpanded);
+  };
+
+
 
   const toggleFullscreen = useCallback(() => {
     if (onToggleFullscreen) {
@@ -995,8 +999,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                     onChange={() => {}} // Read only
                     options={{
                        ...settings,
-                        readOnly: true,
-                        domReadOnly: true
+                        readOnly: true
                     }}
                   />
                </div>
@@ -1010,6 +1013,8 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
           <div className="h-full flex flex-col">
              <div className="flex-1 min-h-0 overflow-hidden">
                  <OutputPanel 
+                  onToggleExpand={handleToggleOutputExpand}
+                  isExpanded={isOutputExpanded}
                   output={output} 
                   loading={isLoading} 
                   stdin="" 
@@ -1047,11 +1052,59 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                   controls={controls}
                   
                   // Submissions
+                  activeTestCaseTab={activeTestCaseTab}
+                  onTestCaseTabChange={setActiveTestCaseTab}
                 />
              </div>
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>
+
+      {/* Expanded Modal View */}
+      <Dialog open={isOutputExpanded} onOpenChange={setIsOutputExpanded}>
+        <DialogContent className="max-w-[90vw] h-[90vh] flex flex-col p-0 gap-0 border-none bg-background/95 backdrop-blur-xl">
+           <div className="h-full flex flex-col overflow-hidden rounded-lg border">
+              <OutputPanel 
+                onToggleExpand={handleToggleOutputExpand}
+                isExpanded={true}
+                activeTestCaseTab={activeTestCaseTab}
+                onTestCaseTabChange={setActiveTestCaseTab}
+                output={output} 
+                loading={isLoading} 
+                stdin="" 
+                onStdinChange={() => {}} 
+                testCases={testCases.map(tc => ({
+                  input: tc.input,
+                  output: tc.expectedOutput
+                }))}
+                executionTime={executionTime}
+                algorithmMeta={algorithmMeta as any}
+                
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+                
+                allTestCases={testCases}
+                executedTestCases={executedTestCases}
+                onAddTestCase={handleAddTestCase}
+                onUpdateTestCase={handleUpdateTestCase}
+                onDeleteTestCase={handleDeleteTestCase}
+                
+                submissions={submissions}
+                onSelectSubmission={handleSelectSubmission}
+                
+                editingTestCaseId={editingTestCaseId}
+                onEditTestCase={setEditingTestCaseId}
+                onCancelEdit={() => {
+                  setEditingTestCaseId(null);
+                  setPendingTestCaseId(null);
+                }}
+                
+                inputSchema={algorithmData?.input_schema}
+                controls={controls}
+              />
+           </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

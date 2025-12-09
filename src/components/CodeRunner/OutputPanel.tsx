@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, Terminal, FlaskConical, Clock, Zap, Plus, CheckCircle2, XCircle, AlertCircle, AlertTriangle, Edit2, Trash2, History, Code } from "lucide-react";
+import { Loader2, Terminal, FlaskConical, Clock, Zap, Plus, CheckCircle2, XCircle, AlertCircle, AlertTriangle, Edit2, Trash2, History, Code, ChevronUp, ChevronDown } from "lucide-react";
 import { Algorithm } from '@/data/algorithms';
 import { Button } from "@/components/ui/button";
 import { FeatureGuard } from "@/components/FeatureGuard";
@@ -40,6 +40,11 @@ interface OutputPanelProps {
   submissions?: Submission[];
   executedTestCases?: Array<{ id: number; input: any[]; expectedOutput: any; isCustom: boolean; description?: string; isSubmission?: boolean }>;
   onSelectSubmission?: (submission: Submission) => void;
+  // State Lifting
+  activeTestCaseTab?: string;
+  onTestCaseTabChange?: (val: string) => void;
+  onToggleExpand?: () => void;
+  isExpanded?: boolean;
 }
 
 export const OutputPanel = ({
@@ -63,50 +68,24 @@ export const OutputPanel = ({
   inputSchema,
   submissions = [],
   executedTestCases,
-  onSelectSubmission
+  onSelectSubmission,
+  activeTestCaseTab: controlledActiveTestCaseTab, 
+  onTestCaseTabChange,
+  onToggleExpand,
+  isExpanded
 }: OutputPanelProps) => {
-  const [activeTestCaseTab, setActiveTestCaseTab] = useState<string>("");
+  const [internalActiveTestCaseTab, setInternalActiveTestCaseTab] = useState<string>("");
+  const activeTestCaseTab = controlledActiveTestCaseTab ?? internalActiveTestCaseTab;
+  const setActiveTestCaseTab = onTestCaseTabChange ?? setInternalActiveTestCaseTab;
+  
   const containerRef = React.useRef<HTMLDivElement>(null);
   const [panelWidth, setPanelWidth] = useState(300);
 
-  // Measure panel width for responsive tab labels
-  React.useEffect(() => {
-    if (!containerRef.current) return;
-    
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setPanelWidth(entry.contentRect.width);
-      }
-    });
-    
-    observer.observe(containerRef.current);
-    return () => observer.disconnect();
-  }, []);
-
-  React.useEffect(() => {
-    if (allTestCases.length > 0) {
-      // If no active tab, select the first one
-      if (!activeTestCaseTab) {
-        setActiveTestCaseTab(`case-${allTestCases[0].id}`);
-      } else {
-        // Check if current active tab still exists
-        const currentExists = allTestCases.some(tc => `case-${tc.id}` === activeTestCaseTab);
-        if (!currentExists) {
-          // If current tab was deleted, select the last one
-          setActiveTestCaseTab(`case-${allTestCases[allTestCases.length - 1].id}`);
-        }
-      }
-      
-      // Auto-select the newest test case (last in array) when a new one is added
-      const lastTestCase = allTestCases[allTestCases.length - 1];
-      if (lastTestCase && lastTestCase.isCustom && editingTestCaseId === lastTestCase.id) {
-        setActiveTestCaseTab(`case-${lastTestCase.id}`);
-      }
-    }
-  }, [allTestCases, editingTestCaseId]);
+  // ... (keep useEffects)
 
   // Determine status color
   const getStatusColor = (statusId?: number, testResults?: any[]) => {
+    // ...
     if (statusId === 3) {
       const allPassed = testResults?.every((r: any) => r.status === 'pass');
       return allPassed ? "text-green-500" : "text-destructive";
@@ -116,6 +95,7 @@ export const OutputPanel = ({
   };
 
   const getStatusText = (statusId?: number, description?: string, testResults?: any[]) => {
+    // ... 
     if (statusId === 3) {
       const allPassed = testResults?.every((r: any) => r.status === 'pass');
       return allPassed ? "Accepted" : "Wrong Answer";
@@ -161,6 +141,20 @@ export const OutputPanel = ({
           <History className="w-3.5 h-3.5" />
           Submissions
         </Button>
+
+        <div className="ml-auto flex items-center pr-2">
+            {onToggleExpand && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onToggleExpand}
+                className="h-6 w-6 text-muted-foreground hover:text-foreground"
+                title={isExpanded ? "Collapse" : "Expand output"}
+              >
+                {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+              </Button>
+            )}
+        </div>
       </div>
       {/* TABS content */}
       <div className="flex-1 flex flex-col min-h-0 overflow-hidden relative">
@@ -173,7 +167,7 @@ export const OutputPanel = ({
               className="flex-1 flex flex-col min-h-0"
             >
               <div className="border-b px-4 bg-background/50 shrink-0 flex items-center gap-2">
-                <TabsList className="h-9 bg-transparent p-0 gap-1 flex-nowrap overflow-x-auto w-0 flex-1 justify-start overflow-y-hidden">
+                <TabsList className="h-9 bg-transparent p-0 gap-1 flex-nowrap overflow-x-auto w-full justify-start overflow-y-hidden no-scrollbar">
                   {allTestCases.filter(tc => !tc.isSubmission).map((tc, index) => (
                     <TabsTrigger
                       key={tc.id}
@@ -193,24 +187,32 @@ export const OutputPanel = ({
                       </div>
                     </TabsTrigger>
                   ))}
+                  
+                   <FeatureGuard flag="custom_test_case_addtion">
+                    {controls?.add_test_case !== false && (
+                        <div className="pl-1 shrink-0 flex items-center">
+                          <TooltipProvider delayDuration={0}>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  onClick={onAddTestCase}
+                                  className="h-6 w-6 rounded-full bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20"
+                                  disabled={loading}
+                                >
+                                  <Plus className="w-4 h-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Add Custom Test Case</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
+                    )}
+                   </FeatureGuard>
                 </TabsList>
-                
-                <div className="flex items-center gap-2">
-                 <FeatureGuard flag="custom_test_case_addtion">
-                  {controls?.add_test_case !== false && (
-                      <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={onAddTestCase}
-                      className="h-8 text-xs gap-1 ml-1"
-                      disabled={loading}
-                      >
-                      <Plus className="w-3 h-3" />
-                      
-                      </Button>
-                  )}
-                 </FeatureGuard>
-                </div>
               </div>
 
               <div className="flex-1 min-h-0">
@@ -277,7 +279,7 @@ export const OutputPanel = ({
                 {output.testResults && (
                   <Tabs defaultValue="result-0" className="flex flex-col">
                     <div className="flex border-b px-4 bg-background/50 shrink-0 sticky top-0 z-10 overflow-hidden">
-                      <TabsList className="h-9 bg-transparent p-0 gap-2 flex-nowrap overflow-x-auto w-full justify-start overflow-y-hidden">
+                      <TabsList className="h-9 bg-transparent p-0 gap-2 flex-nowrap overflow-x-auto w-full justify-start overflow-y-hidden no-scrollbar">
                         {output.testResults.map((result: any, index: number) => (
                           <TabsTrigger
                             key={index}
