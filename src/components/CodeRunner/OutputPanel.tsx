@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, Terminal, FlaskConical, Clock, Zap, Plus, CheckCircle2, XCircle, AlertCircle, Edit2, Trash2 } from "lucide-react";
+import { Loader2, Terminal, FlaskConical, Clock, Zap, Plus, CheckCircle2, XCircle, AlertCircle, Edit2, Trash2, History, Code } from "lucide-react";
 import { Algorithm } from '@/data/algorithms';
 import { Button } from "@/components/ui/button";
 import { FeatureGuard } from "@/components/FeatureGuard";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { TestCaseEditor } from './TestCaseEditor';
+import { Submission } from '@/types/userAlgorithmData';
 
 interface OutputPanelProps {
   output: any | null;
@@ -18,10 +19,10 @@ interface OutputPanelProps {
   algorithmMeta?: Algorithm | null;
   
   // LeetCode Style Props
-  activeTab: "testcase" | "result";
-  onTabChange: (tab: "testcase" | "result") => void;
+  activeTab: "testcase" | "result" | "submissions";
+  onTabChange: (tab: "testcase" | "result" | "submissions") => void;
   
-  allTestCases: Array<{ id: number; input: any[]; expectedOutput: any; isCustom: boolean; description?: string }>;
+  allTestCases: Array<{ id: number; input: any[]; expectedOutput: any; isCustom: boolean; description?: string; isSubmission?: boolean }>;
   onAddTestCase: () => void;
   onUpdateTestCase: (id: number, data: any) => void;
   onDeleteTestCase: (id: number) => void;
@@ -33,6 +34,10 @@ interface OutputPanelProps {
   
   inputSchema?: any[];
   controls?: any;
+  
+  // New Prop
+  submissions?: Submission[];
+  executedTestCases?: Array<{ id: number; input: any[]; expectedOutput: any; isCustom: boolean; description?: string; isSubmission?: boolean }>;
 }
 
 export const OutputPanel = ({
@@ -53,7 +58,9 @@ export const OutputPanel = ({
   onEditTestCase,
   onCancelEdit,
   controls,
-  inputSchema
+  inputSchema,
+  submissions = [],
+  executedTestCases
 }: OutputPanelProps) => {
   const [activeTestCaseTab, setActiveTestCaseTab] = useState<string>("");
 
@@ -96,6 +103,10 @@ export const OutputPanel = ({
     }
     return description || "Error";
   };
+  
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString();
+  };
 
   return (
     <div className="h-full flex flex-col bg-muted/10 border-t overflow-hidden">
@@ -120,6 +131,15 @@ export const OutputPanel = ({
           <Terminal className="w-3.5 h-3.5" />
           Test Result
         </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onTabChange("submissions")}
+          className={`h-8 text-xs gap-2 ${activeTab === "submissions" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}
+        >
+          <History className="w-3.5 h-3.5" />
+          Submissions
+        </Button>
       </div>
       {/* TABS content */}
       <div className="flex-1 flex flex-col min-h-0 overflow-hidden relative">
@@ -132,8 +152,8 @@ export const OutputPanel = ({
               className="flex-1 flex flex-col min-h-0"
             >
               <div className="border-b px-4 bg-background/50 shrink-0 flex items-center gap-2">
-                <TabsList className="h-9 bg-transparent p-0 gap-1 flex-nowrap overflow-x-auto w-0 flex-1 justify-start">
-                  {allTestCases.map((tc, index) => (
+                <TabsList className="h-9 bg-transparent p-0 gap-1 flex-nowrap overflow-x-auto w-0 flex-1 justify-start overflow-y-hidden">
+                  {allTestCases.filter(tc => !tc.isSubmission).map((tc, index) => (
                     <TabsTrigger
                       key={tc.id}
                       value={`case-${tc.id}`}
@@ -174,7 +194,7 @@ export const OutputPanel = ({
 
               <div className="flex-1 min-h-0">
                 <ScrollArea className="h-full" type="always">
-                  {allTestCases.map((tc) => (
+                  {allTestCases.filter(tc => !tc.isSubmission).map((tc) => (
                     <TabsContent key={tc.id} value={`case-${tc.id}`} className="h-full m-0 p-4">
                         <div className="relative">
                           <TestCaseEditor
@@ -236,7 +256,7 @@ export const OutputPanel = ({
                 {output.testResults && (
                   <Tabs defaultValue="result-0" className="flex flex-col">
                     <div className="border-b px-4 bg-background/50 shrink-0 sticky top-0 z-10">
-                      <TabsList className="h-9 bg-transparent p-0 gap-2 flex-nowrap overflow-x-auto no-scrollbar">
+                      <TabsList className="h-9 bg-transparent p-0 gap-2 flex-nowrap overflow-x-auto w-0 flex-1 justify-start overflow-y-hidden">
                         {output.testResults.map((result: any, index: number) => (
                           <TabsTrigger
                             key={index}
@@ -248,11 +268,22 @@ export const OutputPanel = ({
                             {result.status === 'pass' ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
                             Case {index + 1}
                             {/* Show tooltip or small indicator if description exists */}
-                            {allTestCases[index]?.description && (
-                                <span className="ml-2 text-[10px] text-muted-foreground/70 hidden sm:inline-block truncate max-w-[100px]">
-                                    - {allTestCases[index].description}
-                                </span>
-                            )}
+                            {(() => {
+                                // Resolve test case from executed list if available, else allTestCases (fallback/legacy)
+                                // Note: result index matches executedTestCases index
+                                const tc = executedTestCases ? executedTestCases[index] : allTestCases[index];
+                                return tc?.description && (
+                                    <span className="ml-2 text-[10px] text-muted-foreground/70 hidden sm:inline-block truncate max-w-[100px]">
+                                        - {tc.description}
+                                    </span>
+                                );
+                            })()}
+
+                            {/* Hide details for submission cases in tabs? Or show them but mask content? 
+                                User Requirement: "test cases which mark as a submission also visiable here" -> imply they see them but shouldn't?
+                                Or "should at test visible" -> "should NOT be visible"?
+                                Let's show them in RESULTS but mark as hidden.
+                            */}
                           </TabsTrigger>
                         ))}
                       </TabsList>
@@ -265,19 +296,30 @@ export const OutputPanel = ({
                           <div className="space-y-2">
                             <div className="text-xs font-medium text-muted-foreground">Input</div>
                             <div className="p-3 rounded-md bg-muted/30 border font-mono text-sm">
-                              {inputSchema.length > 0 && Array.isArray(result.input) ? (
-                                // Map input array to schema labels/names
-                                <div className="space-y-1">
-                                    {inputSchema.map((field, i) => (
-                                        <div key={i} className="flex gap-2">
-                                            <span className="text-muted-foreground select-none">{field.name}:</span>
-                                            <span>{JSON.stringify(result.input[i])}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                              ) : (
-                                JSON.stringify(result.input, null, 2)
-                              )}
+                              {(() => {
+                                const tc = executedTestCases ? executedTestCases[index] : allTestCases[index];
+
+                                // Check if this is a hidden submission case
+                                const isHidden = tc?.isSubmission;
+                                if (isHidden) return "Hidden Test Case";
+
+                                // Fallback to original test case input if result input is missing
+                                const inputData = result.input !== undefined ? result.input : tc?.input;
+                                
+                                if (inputSchema && inputSchema.length > 0 && Array.isArray(inputData)) {
+                                   return (
+                                    <div className="space-y-1">
+                                        {inputSchema.map((field, i) => (
+                                            <div key={i} className="flex gap-2">
+                                                <span className="text-muted-foreground select-none">{field.name}:</span>
+                                                <span>{JSON.stringify(inputData[i])}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                   );
+                                }
+                                return JSON.stringify(inputData, null, 2);
+                              })()}
                             </div>
                           </div>
 
@@ -295,7 +337,10 @@ export const OutputPanel = ({
                           <div className="space-y-2">
                             <div className="text-xs font-medium text-muted-foreground">Output</div>
                             <div className="p-3 rounded-md bg-muted/30 border font-mono text-sm">
-                              {JSON.stringify(result.actual, null, 2)}
+                              {(() => {
+                                const tc = executedTestCases ? executedTestCases[index] : allTestCases[index];
+                                return tc?.isSubmission ? "Hidden Output" : JSON.stringify(result.actual, null, 2);
+                              })()}
                             </div>
                           </div>
 
@@ -304,7 +349,10 @@ export const OutputPanel = ({
                             <div className="space-y-2">
                               <div className="text-xs font-medium text-muted-foreground">Expected</div>
                               <div className="p-3 rounded-md bg-muted/30 border font-mono text-sm">
-                                {JSON.stringify(result.expected, null, 2)}
+                                {(() => {
+                                  const tc = executedTestCases ? executedTestCases[index] : allTestCases[index];
+                                  return tc?.isSubmission ? "Hidden Expected Output" : JSON.stringify(result.expected, null, 2);
+                                })()}
                               </div>
                             </div>
                           )}
@@ -328,7 +376,66 @@ export const OutputPanel = ({
           </div>
         )}
         
-        {/* Empty State / Loading */}
+        {/* SUBMISSIONS TAB */}
+        {activeTab === "submissions" && (
+          <div className="h-full flex flex-col min-h-0 bg-background/50">
+             {submissions.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-muted-foreground p-8 text-center">
+                    <History className="w-12 h-12 mb-4 opacity-20" />
+                    <p>No submissions yet</p>
+                    <p className="text-xs mt-1">Submit your code to see history here</p>
+                </div>
+             ) : (
+                <ScrollArea className="h-full">
+                    <div className="p-4 space-y-3">
+                        {/* Header */}
+                        <div className="grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground px-3 mb-2">
+                            <div className="col-span-4">Status</div>
+                            <div className="col-span-2">Lang</div>
+                            <div className="col-span-3">Time</div>
+                            <div className="col-span-3 text-right">Date</div>
+                        </div>
+                        
+                        {/* List - Reversed order to show newest first if not already sorted */}
+                        {[...submissions].reverse().map((sub) => (
+                            <div key={sub.id} className="grid grid-cols-12 gap-2 p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors items-center text-sm shadow-sm">
+                                <div className="col-span-4 flex items-center gap-2">
+                                     {sub.status === 'passed' ? (
+                                         <CheckCircle2 className="w-4 h-4 text-green-500" />
+                                     ) : sub.status === 'error' ? (
+                                         <AlertCircle className="w-4 h-4 text-destructive" />
+                                     ) : (
+                                         <XCircle className="w-4 h-4 text-destructive" />
+                                     )}
+                                     <div className="flex flex-col">
+                                         <span className={`font-medium ${sub.status === 'passed' ? 'text-green-600' : 'text-destructive'}`}>
+                                            {sub.status === 'passed' ? 'Accepted' : (sub.status === 'error' ? 'Runtime Error' : 'Wrong Answer')}
+                                         </span>
+                                         {sub.test_results && (
+                                            <span className="text-[10px] text-muted-foreground">
+                                                {sub.test_results.passed} / {sub.test_results.total} passed
+                                            </span>
+                                         )}
+                                     </div>
+                                </div>
+                                <div className="col-span-2 text-xs capitalize text-muted-foreground">
+                                    {sub.language}
+                                </div>
+                                <div className="col-span-3 text-xs text-muted-foreground font-mono">
+                                    {sub.test_results?.execution_time_ms ? `${sub.test_results.execution_time_ms} ms` : '-'}
+                                </div>
+                                <div className="col-span-3 text-right text-xs text-muted-foreground">
+                                    {formatDate(sub.timestamp)}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </ScrollArea>
+             )}
+          </div>
+        )}
+        
+        {/* Empty State / Loading for Result Tab */}
         {activeTab === "result" && !output && !loading && (
           <div className="h-full flex flex-col items-center justify-center text-muted-foreground">
             <div className="text-sm">Run the code to see results</div>

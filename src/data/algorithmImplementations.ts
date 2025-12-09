@@ -33,6 +33,8 @@ export interface AlgorithmImplementation {
   testCases?: Array<{
     input: any[];
     expectedOutput: any;
+    isSubmission?: boolean;
+    description?: string;
   }>;
 }
 
