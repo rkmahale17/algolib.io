@@ -21,6 +21,8 @@ interface CodeEditorProps {
     tabSize?: number;
     minimap?: boolean;
     lineNumbers?: "on" | "off" | "relative" | "interval";
+    readOnly?: boolean;
+    domReadOnly?: boolean;
   };
   theme?: string; // Explicit theme override
   path?: string; // Unique path for the model to prevent duplicates
@@ -113,7 +115,8 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(({
           lineNumbers: customOptions?.lineNumbers || 'on',
           roundedSelection: false,
           scrollBeyondLastLine: false,
-          readOnly: false,
+          readOnly: customOptions?.readOnly ?? false,
+          domReadOnly: customOptions?.domReadOnly ?? false,
           automaticLayout: true,
           padding: { top: 16, bottom: 16 },
           fontFamily: "'JetBrains Mono', 'Fira Code', Consolas, monospace",
