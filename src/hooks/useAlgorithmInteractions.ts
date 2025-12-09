@@ -49,10 +49,14 @@ export const useAlgorithmInteractions = ({
             if (userAlgoData.code && typeof userAlgoData.code === 'object') {
                 const cache = userAlgoData.code as Record<string, string>;
                 setCodeCache(cache);
-                setSavedCode(cache[selectedLanguage] || '');
+                // Only update saved code if user hasn't modified it locally
+                if (!isUserModified) {
+                    setSavedCode(cache[selectedLanguage] || '');
+                }
             }
         }
-    }, [userAlgoData]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [userAlgoData, selectedLanguage]); // added selectedLanguage to deps as it's used in body
 
     // Handle language switch
     useEffect(() => {
@@ -83,12 +87,14 @@ export const useAlgorithmInteractions = ({
                 }
 
                 setIsUserModified(false);
+                refetchUserData(); // Sync latest state to prevent stale overwrites
             } catch (err) {
                 console.error("Error saving code:", err);
             }
-        }, 6000);
+        }, 4000);
 
         return () => clearTimeout(saveTimeout);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [savedCode, user, algorithmId, selectedLanguage, isUserModified, isNaughtyCloud]);
 
     // Actions
