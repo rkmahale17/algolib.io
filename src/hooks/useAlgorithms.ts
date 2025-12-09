@@ -16,6 +16,7 @@ export interface Algorithm {
     input_schema: any;
     tutorials: any;
     metadata: any;
+    controls?: any;
     created_at?: string;
     updated_at?: string;
 }

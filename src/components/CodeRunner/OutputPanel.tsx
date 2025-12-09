@@ -26,38 +26,37 @@ interface OutputPanelProps {
   onUpdateTestCase: (id: number, data: any) => void;
   onDeleteTestCase: (id: number) => void;
   
+  // Editing State
   editingTestCaseId: number | null;
   onEditTestCase: (id: number | null) => void;
   onCancelEdit: () => void;
   
   inputSchema?: any[];
+  controls?: any;
 }
 
-export const OutputPanel: React.FC<OutputPanelProps> = ({
+export const OutputPanel = ({
   output,
   loading,
+  stdin,
+  onStdinChange,
   testCases,
   executionTime,
   algorithmMeta,
-  
   activeTab,
   onTabChange,
-  
   allTestCases,
   onAddTestCase,
   onUpdateTestCase,
   onDeleteTestCase,
-  
   editingTestCaseId,
   onEditTestCase,
   onCancelEdit,
-  
-  inputSchema = []
-}) => {
-  // State for active test case tab
-  const [activeTestCaseTab, setActiveTestCaseTab] = React.useState<string | undefined>(undefined);
+  controls,
+  inputSchema
+}: OutputPanelProps) => {
+  const [activeTestCaseTab, setActiveTestCaseTab] = useState<string>("");
 
-  // Set default active tab when test cases load or change
   React.useEffect(() => {
     if (allTestCases.length > 0) {
       // If no active tab, select the first one
@@ -79,7 +78,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({
       }
     }
   }, [allTestCases, editingTestCaseId]);
-  // Determine status color
+
   // Determine status color
   const getStatusColor = (statusId?: number, testResults?: any[]) => {
     if (statusId === 3) {
@@ -155,23 +154,28 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({
                   ))}
                 </TabsList>
                 
-                <FeatureGuard flag="custom_test_case_addtion">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 text-xs gap-1 ml-1 shrink-0 text-muted-foreground hover:text-foreground"
-                    onClick={onAddTestCase}
-                  >
-                    <Plus className="w-3 h-3" />
-                  </Button>
-                </FeatureGuard>
+                <div className="flex items-center gap-2">
+                 <FeatureGuard flag="custom_test_case_addtion">
+                  {controls?.add_test_case !== false && (
+                      <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={onAddTestCase}
+                      className="h-8 text-xs gap-1 ml-1"
+                      disabled={loading}
+                      >
+                      <Plus className="w-3 h-3" />
+                      Add Test Case
+                      </Button>
+                  )}
+                 </FeatureGuard>
+                </div>
               </div>
 
               <div className="flex-1 min-h-0">
                 <ScrollArea className="h-full" type="always">
                   {allTestCases.map((tc) => (
                     <TabsContent key={tc.id} value={`case-${tc.id}`} className="h-full m-0 p-4">
-                      <div className="space-y-4 max-w-3xl">
                         <div className="relative">
                           <TestCaseEditor
                             testCase={tc}
@@ -183,7 +187,6 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({
                             canEdit={tc.isCustom}
                           />
                         </div>
-                      </div>
                     </TabsContent>
                   ))}
                 </ScrollArea>

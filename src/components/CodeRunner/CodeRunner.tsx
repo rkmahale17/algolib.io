@@ -43,6 +43,17 @@ interface CodeRunnerProps {
   language?: Language;
   onLanguageChange?: (language: Language) => void;
   onSuccess?: () => void;
+  controls?: {
+    run_code: boolean;
+    submit: boolean;
+    add_test_case: boolean;
+    languages: {
+      typescript: boolean;
+      python: boolean;
+      java: boolean;
+      cpp: boolean;
+    };
+  };
 }
 
 interface EditorSettings {
@@ -73,7 +84,8 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   onCodeChange,
   language: controlledLanguage,
   onLanguageChange,
-  onSuccess
+  onSuccess,
+  controls
 }) => {
   const isLimitExceeded = useFeatureFlag("todays_limit_exceed");
   const [internalLanguage, setInternalLanguage] = useState<Language>('typescript');
@@ -197,11 +209,6 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
       
       // If the parent updates `initialCode` in a later render (after localStorage fetch), 
       // we might want to respect that.
-      
-      // Current approach: Just set the code to the calculated algoCode (starter).
-      // If the parent passes a specialized 'initialCode' (e.g. from saved state), 
-      // we need to know if that 'initialCode' is actually for THIS language.
-      // We can't know for sure.
       
       // The safest fix for the reported bug ("Java code in C++ runner") is:
       // When 'language' changes, ALWAYS reset to the starter code (algoCode) derived from 'activeAlgorithm'.
@@ -542,36 +549,40 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                   <RotateCcw className="w-3 h-3" />
                 </Button>
                 <FeatureGuard flag="code_runner">
-                 <Button 
-                onClick={handleRun} 
-                disabled={isLoading}
-                size="sm"
-                className="h-8 px-4 text-xs"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-3 h-3 mr-2 animate-spin" />
-                    Running
-                  </>
-                ) : (
-                  <>
-                    <Play className="w-3 h-3 mr-2" />
-                    Run Code
-                  </>
-                )}
-              </Button>
+                 {controls?.run_code !== false && (
+                   <Button 
+                    onClick={handleRun} 
+                    disabled={isLoading}
+                    size="sm"
+                    className="h-8 px-4 text-xs"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-3 h-3 mr-2 animate-spin" />
+                        Running
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-3 h-3 mr-2" />
+                        Run Code
+                      </>
+                    )}
+                  </Button>
+                 )}
                 </FeatureGuard>
               
               <FeatureGuard flag="submit_button">
-                <Button 
-                  onClick={() => toast.success("Solution submitted! (Mock)")} 
-                  disabled={isLoading}
-                  size="sm"
-                  variant="default"
-                  className="h-8 px-4 text-xs bg-green-600 hover:bg-green-700 text-white ml-2"
-                >
-                  Submit
-                </Button>
+                {controls?.submit !== false && (
+                  <Button 
+                    onClick={() => toast.success("Solution submitted! (Mock)")} 
+                    disabled={isLoading}
+                    size="sm"
+                    variant="default"
+                    className="h-8 px-4 text-xs bg-green-600 hover:bg-green-700 text-white ml-2"
+                  >
+                    Submit
+                  </Button>
+                )}
               </FeatureGuard>
              
               </div>
@@ -760,9 +771,13 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                   // Editing State
                   editingTestCaseId={editingTestCaseId}
                   onEditTestCase={setEditingTestCaseId}
-                  onCancelEdit={handleCancelEdit}
+                  onCancelEdit={() => {
+                    setEditingTestCaseId(null);
+                    setPendingTestCaseId(null);
+                  }}
                   
-                  inputSchema={activeAlgorithm?.input_schema}
+                  inputSchema={algorithmData?.input_schema}
+                  controls={controls}
                 />
              </div>
           </div>

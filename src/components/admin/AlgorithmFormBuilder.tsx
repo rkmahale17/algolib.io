@@ -29,6 +29,7 @@ import { MetadataEditor } from "./MetadataEditor";
 import { ProblemsEditor } from "./ProblemsEditor";
 import { AlgorithmPreview } from "./AlgorithmPreview";
 import { TutorialsEditor } from "./TutorialsEditor";
+import { ControlsEditor, DEFAULT_CONTROLS } from "./ControlsEditor";
 
 interface AlgorithmFormBuilderProps {
   algorithm?: Algorithm | null;
@@ -81,6 +82,7 @@ export function AlgorithmFormBuilder({
       external: [],
     },
     tutorials: [],
+    controls: DEFAULT_CONTROLS,
   });
 
   // Load algorithm data when editing
@@ -124,6 +126,7 @@ export function AlgorithmFormBuilder({
           typeof algorithm.tutorials === "string"
             ? JSON.parse(algorithm.tutorials)
             : algorithm.tutorials,
+        controls: algorithm.controls || DEFAULT_CONTROLS,
       });
     }
   }, [algorithm]);
@@ -182,7 +185,7 @@ export function AlgorithmFormBuilder({
         <div className="space-y-6">
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-6 h-auto">
+          <TabsList className="grid w-full grid-cols-7 h-auto">
             <TabsTrigger value="basic" className="text-xs">
               Basic
             </TabsTrigger>
@@ -203,6 +206,9 @@ export function AlgorithmFormBuilder({
             </TabsTrigger>
             <TabsTrigger value="tutorials" className="text-xs">
               Tutorials
+            </TabsTrigger>
+            <TabsTrigger value="controls" className="text-xs">
+              Controls
             </TabsTrigger>
           </TabsList>
 
@@ -356,6 +362,14 @@ export function AlgorithmFormBuilder({
             <TutorialsEditor
               tutorials={formData.tutorials}
               onChange={(tutorials) => setFormData({ ...formData, tutorials })}
+            />
+          </TabsContent>
+
+          {/* Controls Tab */}
+          <TabsContent value="controls" className="mt-4">
+             <ControlsEditor
+              controls={formData.controls}
+              onChange={(controls) => setFormData({ ...formData, controls })}
             />
           </TabsContent>
         </Tabs>
