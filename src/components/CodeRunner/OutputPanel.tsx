@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, Terminal, FlaskConical, Clock, Zap, Plus, CheckCircle2, XCircle, AlertCircle, Edit2, Trash2, History, Code } from "lucide-react";
+import { Loader2, Terminal, FlaskConical, Clock, Zap, Plus, CheckCircle2, XCircle, AlertCircle, AlertTriangle, Edit2, Trash2, History, Code } from "lucide-react";
 import { Algorithm } from '@/data/algorithms';
 import { Button } from "@/components/ui/button";
 import { FeatureGuard } from "@/components/FeatureGuard";
@@ -38,6 +38,7 @@ interface OutputPanelProps {
   // New Prop
   submissions?: Submission[];
   executedTestCases?: Array<{ id: number; input: any[]; expectedOutput: any; isCustom: boolean; description?: string; isSubmission?: boolean }>;
+  onSelectSubmission?: (submission: Submission) => void;
 }
 
 export const OutputPanel = ({
@@ -60,7 +61,8 @@ export const OutputPanel = ({
   controls,
   inputSchema,
   submissions = [],
-  executedTestCases
+  executedTestCases,
+  onSelectSubmission
 }: OutputPanelProps) => {
   const [activeTestCaseTab, setActiveTestCaseTab] = useState<string>("");
 
@@ -392,46 +394,48 @@ export const OutputPanel = ({
                         <div className="grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground px-3 mb-2">
                             <div className="col-span-4">Status</div>
                             <div className="col-span-2">Lang</div>
-                            <div className="col-span-3">Time</div>
-                            <div className="col-span-3 text-right">Date</div>
                         </div>
                         
-                        {/* List - Reversed order to show newest first if not already sorted */}
+                        {/* List */}
+                        <div className="space-y-2">
                         {[...submissions].reverse().map((sub) => (
-                            <div key={sub.id} className="grid grid-cols-12 gap-2 p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors items-center text-sm shadow-sm">
-                                <div className="col-span-4 flex items-center gap-2">
-                                     {sub.status === 'passed' ? (
-                                         <CheckCircle2 className="w-4 h-4 text-green-500" />
-                                     ) : sub.status === 'error' ? (
-                                         <AlertCircle className="w-4 h-4 text-destructive" />
-                                     ) : (
-                                         <XCircle className="w-4 h-4 text-destructive" />
-                                     )}
-                                     <div className="flex flex-col">
-                                         <span className={`font-medium ${sub.status === 'passed' ? 'text-green-600' : 'text-destructive'}`}>
-                                            {sub.status === 'passed' ? 'Accepted' : (sub.status === 'error' ? 'Runtime Error' : 'Wrong Answer')}
-                                         </span>
-                                         {sub.test_results && (
-                                            <span className="text-[10px] text-muted-foreground">
-                                                {sub.test_results.passed} / {sub.test_results.total} passed
-                                            </span>
-                                         )}
-                                     </div>
+                          <div 
+                             key={sub.id} 
+                             className="grid grid-cols-12 gap-2 p-3 rounded-lg border bg-card hover:bg-muted/50 cursor-pointer transition-colors items-center text-sm shadow-sm"
+                             onClick={() => onSelectSubmission?.(sub)}
+                          >
+                             <div className="col-span-4 flex items-center gap-2">
+                                {sub.status === 'passed' ? (
+                                   <CheckCircle2 className="w-4 h-4 text-green-500" />
+                                ) : sub.status === 'error' ? (
+                                   <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                                ) : (
+                                   <XCircle className="w-4 h-4 text-destructive" />
+                                )}
+                                <div className="flex flex-col">
+                                   <span className={`font-medium ${sub.status === 'passed' ? 'text-green-600' : 'text-destructive'}`}>
+                                      {sub.status === 'passed' ? 'Accepted' : (sub.status === 'error' ? 'Runtime Error' : 'Wrong Answer')}
+                                   </span>
+                                   <span className="text-[10px] text-muted-foreground mt-0.5">
+                                      {sub.test_results?.passed ?? 0} / {sub.test_results?.total ?? 0} passed
+                                   </span>
                                 </div>
-                                <div className="col-span-2 text-xs capitalize text-muted-foreground">
-                                    {sub.language}
-                                </div>
-                                <div className="col-span-3 text-xs text-muted-foreground font-mono">
-                                    {sub.test_results?.execution_time_ms ? `${sub.test_results.execution_time_ms} ms` : '-'}
-                                </div>
-                                <div className="col-span-3 text-right text-xs text-muted-foreground">
-                                    {formatDate(sub.timestamp)}
-                                </div>
-                            </div>
+                             </div>
+                             <div className="col-span-2 text-xs capitalize text-muted-foreground">
+                                {sub.language}
+                             </div>
+                              <div className="col-span-3 text-xs text-muted-foreground font-mono">
+                                  {sub.test_results?.execution_time_ms ? `${sub.test_results.execution_time_ms} ms` : '-'}
+                              </div>
+                              <div className="col-span-3 text-right text-xs text-muted-foreground">
+                                  {new Date(sub.timestamp).toLocaleString()}
+                              </div>
+                          </div>
                         ))}
+                      </div>
                     </div>
                 </ScrollArea>
-             )}
+              )}
           </div>
         )}
         

@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Play, RotateCcw, Loader2, Maximize2, Minimize2, Settings, AlignLeft, Info, Send } from "lucide-react";
+import { Play, RotateCcw, Loader2, Maximize2, Minimize2, Settings, AlignLeft, Info, Send, Copy, X } from "lucide-react";
 import { FeatureGuard } from "@/components/FeatureGuard";
 import { toast } from "sonner";
 import axios from 'axios';
@@ -114,6 +115,9 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [lastRunSuccess, setLastRunSuccess] = useState(false);
+  
+  const [viewingSubmission, setViewingSubmission] = useState<Submission | null>(null);
+  const [activeEditorTab, setActiveEditorTab] = useState<"current" | "submission">("current");
 
   // Settings state
   const [settings, setSettings] = useState<EditorSettings>(DEFAULT_SETTINGS);
@@ -582,6 +586,24 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
     }
   };
 
+  const handleSelectSubmission = (submission: Submission) => {
+    setViewingSubmission(submission);
+    setActiveEditorTab("submission");
+  };
+
+  const handleCloseSubmission = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setViewingSubmission(null);
+    setActiveEditorTab("current");
+  };
+
+  const handleCopySubmission = () => {
+     if (viewingSubmission?.code) {
+        navigator.clipboard.writeText(viewingSubmission.code);
+        toast.success("Submission code copied to clipboard");
+     }
+  };
+
   return (
     <div className={`w-full border rounded-lg overflow-hidden bg-background shadow-sm flex flex-col transition-all duration-300 ${
       isFullscreen 
@@ -590,7 +612,40 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
     }`}>
       <ResizablePanelGroup direction="vertical">
         <ResizablePanel defaultSize={50} minSize={30}>
-          <div className="h-full flex flex-col">
+           <Tabs 
+             value={activeEditorTab} 
+             onValueChange={(v) => setActiveEditorTab(v as any)} 
+             className="h-full flex flex-col"
+           >
+             {/* Only show tab list if we have a submission to view */}
+             {viewingSubmission && (
+               <div className="flex items-center px-1 bg-muted/20 border-b">
+                 <TabsList className="bg-transparent h-9 p-0 gap-1 w-full justify-start">
+                   <TabsTrigger 
+                     value="current"
+                     className="data-[state=active]:bg-background data-[state=active]:shadow-none rounded-t-md rounded-b-none border-b-2 border-transparent data-[state=active]:border-primary h-9 px-4 rounded-none"
+                   >
+                     Current Code
+                   </TabsTrigger>
+                   <TabsTrigger 
+                     value="submission"
+                     className="data-[state=active]:bg-background data-[state=active]:shadow-none rounded-t-md rounded-b-none border-b-2 border-transparent data-[state=active]:border-primary h-9 px-4 gap-2 rounded-none group"
+                   >
+                     <span>Submission {new Date(viewingSubmission.timestamp).toLocaleDateString()}</span>
+                     <div 
+                        role="button"
+                        className="opacity-60 group-hover:opacity-100 hover:bg-muted rounded-full p-0.5"
+                        onClick={handleCloseSubmission}
+                     >
+                        <X className="w-3 h-3" />
+                     </div>
+                   </TabsTrigger>
+                 </TabsList>
+               </div>
+             )}
+
+           <TabsContent value="current" className="flex-1 flex flex-col min-h-0 m-0 data-[state=inactive]:hidden h-full">
+            <div className={`h-full flex flex-col ${viewingSubmission ? '' : 'border-t-0'}`}>
             <div className="flex items-center justify-between p-2 border-b bg-muted/30 overflow-x-auto no-scrollbar min-h-[50px]">
               <div className="flex items-center gap-2">
                 <LanguageSelector
@@ -802,16 +857,53 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                   setLastRunSuccess(false); // Reset success on code change
                 }}
                 options={{
-                  fontSize: settings.fontSize,
-                  wordWrap: settings.wordWrap,
-                  tabSize: settings.tabSize,
-                  minimap: settings.minimap,
-                  lineNumbers: settings.lineNumbers
+                  ...settings,
+                  readOnly: false // Explicitly writable
                 }}
-                theme={settings.theme}
               />
             </div>
-          </div>
+            </div>
+           </TabsContent>
+          
+          <TabsContent value="submission" className="flex-1 flex flex-col min-h-0 m-0 data-[state=inactive]:hidden h-full">
+            <div className="h-full flex flex-col bg-background">
+               {/* Read Only Toolbar */}
+               <div className="flex items-center justify-between p-2 border-b bg-muted/30 min-h-[50px]">
+                  <div className="flex items-center gap-2">
+                     <span className="text-sm font-medium px-2">
+                        {viewingSubmission?.language} Submission
+                     </span>
+                     <span className="text-xs text-muted-foreground">
+                        {viewingSubmission && new Date(viewingSubmission.timestamp).toLocaleString()}
+                     </span>
+                  </div>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="h-8 gap-2"
+                    onClick={handleCopySubmission}
+                  >
+                    <Copy className="w-3 h-3" />
+                    Copy Code
+                  </Button>
+               </div>
+               
+               <div className="flex-1 relative min-h-0">
+                  <CodeEditor
+                    code={viewingSubmission?.code || ''}
+                    language={viewingSubmission?.language as Language || 'typescript'}
+                    path={`/runner/submission/${viewingSubmission?.id}`}
+                    onChange={() => {}} // Read only
+                    options={{
+                       ...settings,
+                        readOnly: true,
+                        domReadOnly: true
+                    }}
+                  />
+               </div>
+            </div>
+          </TabsContent>
+         </Tabs>
         </ResizablePanel>
         
         <ResizableHandle withHandle />
@@ -840,6 +932,9 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                   onAddTestCase={handleAddTestCase}
                   onUpdateTestCase={handleUpdateTestCase}
                   onDeleteTestCase={handleDeleteTestCase}
+                  
+                  submissions={submissions}
+                  onSelectSubmission={handleSelectSubmission}
                   
                   // Editing State
                   editingTestCaseId={editingTestCaseId}
