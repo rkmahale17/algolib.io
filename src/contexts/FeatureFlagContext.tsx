@@ -40,6 +40,12 @@ export const FeatureFlagProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     fetchFlags();
 
+    // Guard against null supabase client (e.g., missing env vars)
+    if (!supabase) {
+      console.warn('Supabase client is not initialized. Realtime subscriptions disabled.');
+      return;
+    }
+
     // specific subscription to table changes
     const channel = supabase
       .channel('public:feature_flags')
