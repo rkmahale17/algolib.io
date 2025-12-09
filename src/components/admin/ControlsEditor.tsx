@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -158,8 +159,51 @@ export function ControlsEditor({ controls, onChange }: ControlsEditorProps) {
     onChange(newControls);
   };
 
+  const handleQuickAction = (action: 'enable_all' | 'disable_all') => {
+      const val = action === 'enable_all';
+      // Deep clone check
+      const newControls = JSON.parse(JSON.stringify(DEFAULT_CONTROLS));
+      
+      // Helper to traverse and set
+      const setAll = (obj: any) => {
+          for (const key in obj) {
+              if (key === 'maintenance_mode') {
+                  obj[key] = false; // Always disable maintenance mode on reset
+                  continue;
+              }
+              if (typeof obj[key] === 'object' && obj[key] !== null) {
+                  setAll(obj[key]);
+              } else if (typeof obj[key] === 'boolean') {
+                  obj[key] = val;
+              }
+          }
+      };
+      setAll(newControls);
+      onChange(newControls);
+  };
+
   return (
     <div className="space-y-6">
+       {/* GLOBAL MAINTENANCE & QUICK ACTIONS */}
+       <Card className="border-destructive/20 bg-destructive/5">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-medium text-destructive flex items-center gap-2">
+                Alert Zone
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <ConfirmSwitch 
+              id="maint-mode"
+              itemLabel="Maintenance Mode (Coming Soon Page)"
+              checked={localControls.maintenance_mode === true}
+              onCheckedChange={(c) => updateNested(['maintenance_mode'], c)}
+            />
+            <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={() => handleQuickAction('disable_all')}>Disable All Features</Button>
+                <Button variant="outline" size="sm" onClick={() => handleQuickAction('enable_all')}>Enable All Features</Button>
+            </div>
+          </CardContent>
+        </Card>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* TAB VISIBILITY */}
         <Card>
@@ -179,6 +223,13 @@ export function ControlsEditor({ controls, onChange }: ControlsEditorProps) {
               itemLabel="Description"
               checked={localControls.tabs?.description !== false}
               onCheckedChange={(c) => updateNested(['tabs', 'description'], c)}
+            />
+            <Separator />
+             <ConfirmSwitch 
+              id="tab-sol"
+              itemLabel="Solutions"
+              checked={localControls.tabs?.solutions !== false}
+              onCheckedChange={(c) => updateNested(['tabs', 'solutions'], c)}
             />
             <Separator />
              <ConfirmSwitch 
@@ -203,13 +254,27 @@ export function ControlsEditor({ controls, onChange }: ControlsEditorProps) {
             <CardTitle className="text-base font-medium">Description Controls</CardTitle>
           </CardHeader>
            <CardContent className="space-y-3">
-             <ConfirmSwitch 
+            <ConfirmSwitch 
               id="desc-prob"
-              itemLabel="Problem Statement"
+              itemLabel="Problem Statement (Text Only)"
               checked={localControls.description?.problem_statement !== false}
               onCheckedChange={(c) => updateNested(['description', 'problem_statement'], c)}
             />
             <Separator />
+            <ConfirmSwitch 
+              id="desc-const"
+              itemLabel="Constraints"
+              checked={localControls.description?.constraints !== false}
+              onCheckedChange={(c) => updateNested(['description', 'constraints'], c)}
+            />
+            <Separator />
+            <ConfirmSwitch 
+              id="desc-ex"
+              itemLabel="Examples (IO)"
+              checked={localControls.description?.examples !== false}
+              onCheckedChange={(c) => updateNested(['description', 'examples'], c)}
+            />
+             <Separator />
              <ConfirmSwitch 
               id="desc-over"
               itemLabel="Algorithm Overview"
@@ -363,6 +428,48 @@ export function ControlsEditor({ controls, onChange }: ControlsEditorProps) {
           </CardContent>
         </Card>
 
+        {/* CODE RUNNER CONFIG */}
+        <Card>
+          <CardHeader className="pb-3">
+             <CardTitle className="text-base font-medium">Code Runner Config</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+             <ConfirmSwitch 
+               id="cr-run"
+               itemLabel="Run Code Button"
+               checked={localControls.code_runner?.run_code !== false}
+               onCheckedChange={(c) => updateNested(['code_runner', 'run_code'], c)}
+             />
+              <Separator />
+             <ConfirmSwitch 
+               id="cr-sub"
+               itemLabel="Submit Button"
+               checked={localControls.code_runner?.submit !== false}
+               onCheckedChange={(c) => updateNested(['code_runner', 'submit'], c)}
+             />
+              <Separator />
+             <ConfirmSwitch 
+               id="cr-add"
+               itemLabel="Add Test Case"
+               checked={localControls.code_runner?.add_test_case !== false}
+               onCheckedChange={(c) => updateNested(['code_runner', 'add_test_case'], c)}
+             />
+             <Separator className="my-2" />
+             <h4 className="text-sm font-semibold mb-2">Languages (Run Ability)</h4>
+             <div className="grid grid-cols-2 gap-2">
+                 {['typescript', 'python', 'java', 'cpp'].map(lang => (
+                     <ConfirmSwitch 
+                       key={lang}
+                       id={`cr-lang-${lang}`}
+                       itemLabel={lang.charAt(0).toUpperCase() + lang.slice(1)}
+                       checked={localControls.code_runner?.languages?.[lang] !== false}
+                       onCheckedChange={(c) => updateNested(['code_runner', 'languages', lang], c)}
+                     />
+                 ))}
+             </div>
+          </CardContent>
+        </Card>
+
         {/* SOLUTIONS CONFIG */}
         <Card>
           <CardHeader className="pb-3">
@@ -371,17 +478,36 @@ export function ControlsEditor({ controls, onChange }: ControlsEditorProps) {
           <CardContent className="space-y-3">
              <ConfirmSwitch 
               id="sol-app"
-              itemLabel="Approaches (Tabs)"
+              itemLabel="Approaches (Show All vs Optimal Only)"
               checked={localControls.solutions?.approaches !== false}
               onCheckedChange={(c) => updateNested(['solutions', 'approaches'], c)}
             />
             <Separator />
-            <ConfirmSwitch 
-              id="sol-lang"
-              itemLabel="Language Selector"
-              checked={localControls.solutions?.languages !== false}
-              onCheckedChange={(c) => updateNested(['solutions', 'languages'], c)}
+             <ConfirmSwitch 
+              id="sol-exp-bef"
+              itemLabel="Explanation Before Code"
+              checked={localControls.solutions?.explanation_before !== false}
+              onCheckedChange={(c) => updateNested(['solutions', 'explanation_before'], c)}
             />
+             <ConfirmSwitch 
+              id="sol-exp-aft"
+              itemLabel="Explanation After Code"
+              checked={localControls.solutions?.explanation_after !== false}
+              onCheckedChange={(c) => updateNested(['solutions', 'explanation_after'], c)}
+            />
+            <Separator className="my-2" />
+            <h4 className="text-sm font-semibold mb-2">Languages (Visibility)</h4>
+             <div className="grid grid-cols-2 gap-2">
+                 {['typescript', 'python', 'java', 'cpp'].map(lang => (
+                     <ConfirmSwitch 
+                       key={lang}
+                       id={`sol-lang-${lang}`}
+                       itemLabel={lang.charAt(0).toUpperCase() + lang.slice(1)}
+                       checked={localControls.solutions?.languages?.[lang] !== false}
+                       onCheckedChange={(c) => updateNested(['solutions', 'languages', lang], c)}
+                     />
+                 ))}
+             </div>
           </CardContent>
         </Card>
       </div>

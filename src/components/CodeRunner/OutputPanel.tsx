@@ -132,12 +132,12 @@ export const OutputPanel = ({
               className="flex-1 flex flex-col min-h-0"
             >
               <div className="border-b px-4 bg-background/50 shrink-0 flex items-center gap-2">
-                <TabsList className="h-9 bg-transparent p-0 gap-1 flex-nowrap overflow-x-auto no-scrollbar">
+                <TabsList className="h-9 bg-transparent p-0 gap-1 flex-nowrap overflow-x-auto w-0 flex-1 justify-start">
                   {allTestCases.map((tc, index) => (
                     <TabsTrigger
                       key={tc.id}
                       value={`case-${tc.id}`}
-                      className="text-xs px-3 h-7 whitespace-nowrap data-[state=active]:bg-primary/10 relative group"
+                      className="text-xs px-3 h-7 whitespace-nowrap data-[state=active]:bg-primary/10 relative group shrink-0"
                     >
                       {tc.isCustom ? `Case ${index + 1}` : `Case ${index + 1}`}
                       {/* Delete button for all cases */}

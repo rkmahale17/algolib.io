@@ -14,6 +14,7 @@ interface LanguageSelectorProps {
   language: Language;
   onLanguageChange: (lang: Language) => void;
   disabled?: boolean;
+  availableLanguages?: Language[];
 }
 
 const languages: { id: Language; name: string; icon: React.ElementType }[] = [
@@ -26,8 +27,13 @@ const languages: { id: Language; name: string; icon: React.ElementType }[] = [
 export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   language,
   onLanguageChange,
-  disabled
+  disabled,
+  availableLanguages
 }) => {
+  const displayLanguages = availableLanguages 
+    ? languages.filter(l => availableLanguages.includes(l.id))
+    : languages;
+
   return (
     <Select
       value={language}
@@ -38,7 +44,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
         <SelectValue placeholder="Select Language" />
       </SelectTrigger>
       <SelectContent>
-        {languages.map((lang) => (
+        {displayLanguages.map((lang) => (
           <SelectItem key={lang.id} value={lang.id}>
             <div className="flex items-center gap-2">
               <lang.icon className="w-4 h-4" />

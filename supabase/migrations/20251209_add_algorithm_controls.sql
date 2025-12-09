@@ -12,6 +12,7 @@ END $$;
 -- This ensures all existing algorithms have the full set of controls enabled by default
 UPDATE algorithms
 SET controls = '{
+  "maintenance_mode": false,
   "tabs": {
     "visualization": true,
     "description": true,
@@ -23,7 +24,9 @@ SET controls = '{
   "description": {
     "problem_statement": true,
     "overview": true,
-    "guides": true
+    "guides": true,
+    "constraints": true,
+    "examples": true
   },
   "header": {
     "random_problem": true,
@@ -63,7 +66,14 @@ SET controls = '{
   },
   "solutions": {
       "approaches": true,
-      "languages": true
+      "explanation_before": true,
+      "explanation_after": true,
+      "languages": {
+        "typescript": true,
+        "python": true,
+        "java": true,
+        "cpp": true
+      }
   }
 }'::jsonb
 WHERE controls IS NULL OR controls = '{}'::jsonb;
@@ -71,6 +81,7 @@ WHERE controls IS NULL OR controls = '{}'::jsonb;
 -- 3. Set the default value for future inserts
 ALTER TABLE algorithms 
 ALTER COLUMN controls SET DEFAULT '{
+  "maintenance_mode": false,
   "tabs": {
     "visualization": true,
     "description": true,
@@ -82,7 +93,9 @@ ALTER COLUMN controls SET DEFAULT '{
   "description": {
     "problem_statement": true,
     "overview": true,
-    "guides": true
+    "guides": true,
+    "constraints": true,
+    "examples": true
   },
   "header": {
     "random_problem": true,
@@ -122,6 +135,13 @@ ALTER COLUMN controls SET DEFAULT '{
   },
   "solutions": {
       "approaches": true,
-      "languages": true
+      "explanation_before": true,
+      "explanation_after": true,
+      "languages": {
+        "typescript": true,
+        "python": true,
+        "java": true,
+        "cpp": true
+      }
   }
 }'::jsonb;

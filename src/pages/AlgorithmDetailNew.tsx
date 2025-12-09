@@ -633,6 +633,33 @@ const AlgorithmDetailNew: React.FC = () => {
     return <PremiumLoader text="Fetching Algorithm Details" />;
   }
 
+  // Maintenance Mode Check
+  if (algorithm?.controls?.maintenance_mode) {
+      return (
+          <>
+            <AlgoMetaHead id={id} />
+             <div className="h-screen w-full flex flex-col items-center justify-center bg-background p-4 text-center space-y-6">
+                <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center animate-pulse">
+                    <Code2 className="w-12 h-12 text-primary" />
+                </div>
+                <div className="space-y-2 max-w-md">
+                    <h1 className="text-3xl font-bold tracking-tight">Under Maintenance</h1>
+                    <p className="text-muted-foreground">
+                        This algorithm is currently being updated with new content and test cases. 
+                        Please check back shortly!
+                    </p>
+                </div>
+                 <Link to="/">
+                  <Button variant="outline" className="gap-2">
+                      <ArrowLeft className="w-4 h-4" />
+                      Back to Problems
+                  </Button>
+                </Link>
+             </div>
+          </>
+      );
+  }
+
   if (!algorithm) {
     return (
       <>
@@ -780,7 +807,7 @@ const AlgorithmDetailNew: React.FC = () => {
                   </section>
 
                   {/* Examples Section */}
-                  {algorithm.explanation.io && algorithm.explanation.io.length > 0 && (!algorithm?.controls || algorithm.controls?.description?.problem_statement !== false) && (
+                  {algorithm.explanation.io && algorithm.explanation.io.length > 0 && (!algorithm?.controls || algorithm.controls?.description?.examples !== false) && (
                     <div className="space-y-4 max-w-[600px] ">
                       {algorithm.explanation.io.map((example: any, index: number) => (
                         <div key={index} className="border rounded-lg p-4 bg-muted/20">
@@ -811,7 +838,7 @@ const AlgorithmDetailNew: React.FC = () => {
                   )}
 
                   {/* Constraints Section */}
-                  {algorithm.explanation.constraints && algorithm.explanation.constraints.length > 0 && (!algorithm?.controls || algorithm.controls?.description?.problem_statement !== false) && (
+                  {algorithm.explanation.constraints && algorithm.explanation.constraints.length > 0 && (!algorithm?.controls || algorithm.controls?.description?.constraints !== false) && (
                     <div className="border rounded-lg max-w-[500px] p-4 bg-muted/20">
                       <h4 className="font-semibold mb-3">Constraints:</h4>
                       <ul className="space-y-1.5 font-mono text-sm">

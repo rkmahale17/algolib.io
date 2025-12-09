@@ -91,6 +91,10 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   const [internalLanguage, setInternalLanguage] = useState<Language>('typescript');
   const language = controlledLanguage || internalLanguage;
   
+  const availableLanguages = controls?.languages 
+    ? (Object.keys(controls.languages) as Language[]).filter(lang => controls.languages[lang])
+    : undefined;
+  
   const [code, setCode] = useState<string>(initialCode || DEFAULT_CODE['typescript']);
   const [output, setOutput] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -537,6 +541,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                   language={language}
                   onLanguageChange={handleLanguageChange}
                   disabled={isLoading}
+                  availableLanguages={availableLanguages}
                 />
                 <Button
                   variant="ghost"

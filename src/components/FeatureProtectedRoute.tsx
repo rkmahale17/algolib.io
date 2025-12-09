@@ -1,6 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
-import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
+import { useFeatureFlags } from "@/contexts/FeatureFlagContext";
 import { FeatureFlag } from "@/types/featureFlags";
+import { PremiumLoader } from "@/components/PremiumLoader";
 
 interface FeatureProtectedRouteProps {
   children: React.ReactNode;
@@ -13,8 +14,13 @@ export const FeatureProtectedRoute = ({
   flag, 
   redirectTo = "/" 
 }: FeatureProtectedRouteProps) => {
-  const isEnabled = useFeatureFlag(flag);
+  const { flags, isLoading } = useFeatureFlags();
   const location = useLocation();
+  const isEnabled = flags[flag] ?? false;
+
+  if (isLoading) {
+    return <PremiumLoader text="Initializing features..." />;
+  }
 
   if (!isEnabled) {
     // Optionally we could show a "Feature Disabled" page instead of redirecting
