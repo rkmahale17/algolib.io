@@ -30,6 +30,10 @@ interface SolutionViewerProps {
   approachName?: string;
   explanation?: string;
   complexityExplanation?: string;
+  controls?: {
+    approaches?: boolean;
+    languages?: boolean;
+  };
 }
 
 export const SolutionViewer: React.FC<SolutionViewerProps> = ({
@@ -37,6 +41,7 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
   approachName = "Optimal Solution",
   explanation,
   complexityExplanation,
+  controls,
 }) => {
   const [copiedTab, setCopiedTab] = useState<string | null>(null);
   const [isDark, setIsDark] = useState(false);
@@ -144,8 +149,13 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
         });
 
         const approaches = Object.entries(approachesByType);
+        
+        // Filter approaches based on controls
+        const filteredApproaches = (controls?.approaches === false) 
+          ? approaches.slice(0, 1) 
+          : approaches;
 
-        if (approaches.length === 0) {
+        if (filteredApproaches.length === 0) {
           return (
             <div className="text-center py-12 text-muted-foreground border rounded-lg border-dashed">
               No solutions available.
@@ -153,7 +163,7 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
           );
         }
 
-        return approaches.map(([codeType, langImplementations], approachIndex) => {
+        return filteredApproaches.map(([codeType, langImplementations], approachIndex) => {
           // Get explanations from the first language implementation (assuming they are synced)
           const explanationBefore = langImplementations[0]?.explanationBefore;
           const explanationAfter = langImplementations[0]?.explanationAfter;
@@ -166,7 +176,7 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
               </h3>
 
               {/* Explanation Before */}
-              {explanationBefore && (
+              {explanationBefore && controls?.explanation_before !== false && (
                 <RichText 
                   content={explanationBefore} 
                   className="text-sm text-muted-foreground mb-4"
@@ -181,17 +191,24 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
                       {/* Header with Language Tabs and Copy Button - Theme aware */}
                       <div className="flex items-stretch border-b bg-muted/10 shrink-0">
                         {/* Language Tabs - Compact style like AlgorithmDetailNew */}
-                        <TabsList className="flex-1 flex p-0 bg-transparent gap-0 rounded-none">
-                          {langImplementations.map((impl) => (
-                            <TabsTrigger
-                              key={impl.lang}
-                              value={impl.lang}
-                              className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10 text-sm"
-                            >
-                              {getLanguageDisplayName(impl.lang)}
-                            </TabsTrigger>
-                          ))}
-                        </TabsList>
+                        {(controls?.languages !== false) && (
+                          <TabsList className="flex-1 flex p-0 bg-transparent gap-0 rounded-none">
+                            {langImplementations.map((impl) => (
+                              <TabsTrigger
+                                key={impl.lang}
+                                value={impl.lang}
+                                className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10 text-sm"
+                              >
+                                {getLanguageDisplayName(impl.lang)}
+                              </TabsTrigger>
+                            ))}
+                          </TabsList>
+                        )}
+                        {(controls?.languages === false) && (
+                           <div className="flex-1 px-4 flex items-center text-sm font-medium text-muted-foreground bg-muted/5">
+                              {getLanguageDisplayName(langImplementations.find(i => i.lang === (langImplementations[0]?.lang || 'typescript'))?.lang || 'Code')}
+                           </div>
+                        )}
 
                         {/* Copy Button - Right side */}
                         <Button
@@ -242,7 +259,7 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
               </Tabs>
 
               {/* Explanation After */}
-              {explanationAfter && (
+              {explanationAfter && controls?.explanation_after !== false && (
                 <RichText 
                   content={explanationAfter} 
                   className="text-sm text-muted-foreground mt-4"

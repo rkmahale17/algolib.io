@@ -13,6 +13,7 @@ interface TestCase {
   expectedOutput: any;
   output?: any;
   description: string;
+  isSubmission?: boolean;
 }
 
 interface TestCaseEditorProps {
@@ -107,6 +108,7 @@ export function TestCaseEditor({
       input: inputSchema.map(() => null),
       expectedOutput: null,
       description: "",
+      isSubmission: false,
     };
     onChange([...testCases, newTestCase]);
     setExpandedIndex(testCases.length);
@@ -165,6 +167,11 @@ export function TestCaseEditor({
                       - {testCase.description}
                     </span>
                   )}
+                  {testCase.isSubmission && (
+                    <span className="ml-2 px-2 py-0.5 text-xs bg-yellow-100 text-yellow-800 rounded-full border border-yellow-200">
+                      Hidden
+                    </span>
+                  )}
                 </CardTitle>
                 <div className="flex gap-2">
                   <Button
@@ -195,6 +202,20 @@ export function TestCaseEditor({
                     }
                     placeholder="Brief description of this test case"
                   />
+                  <div className="flex items-center space-x-2 pt-2">
+                    <input
+                      type="checkbox"
+                      id={`submission-${index}`}
+                      checked={testCase.isSubmission || false}
+                      onChange={(e) =>
+                        handleUpdate(index, { isSubmission: e.target.checked })
+                      }
+                      className="h-4 w-4 rounded border-gray-300"
+                    />
+                    <Label htmlFor={`submission-${index}`}>
+                      Submission Only (Hidden from user)
+                    </Label>
+                  </div>
                 </div>
 
                 {/* Inputs */}

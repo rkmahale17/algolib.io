@@ -33,6 +33,7 @@ import SeedDatabase from "./pages/SeedDatabase";
 import AdminAlgorithms from "./pages/AdminAlgorithms";
 import AdminAlgorithmDetail from "./pages/AdminAlgorithmDetail";
 import { ProtectedAdminRoute } from "./components/ProtectedAdminRoute";
+import { FeatureProtectedRoute } from "./components/FeatureProtectedRoute";
 import { AppProvider } from "./contexts/AppContext";
 import FeedbackAdmin from "./pages/FeedbackAdmin";
 import Blog from "./pages/Blog";
@@ -80,8 +81,16 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/algorithm/:id" element={<AlgorithmDetailNew />} />
 
-            <Route path="/blind75" element={<ProtectedRoute><Blind75 /></ProtectedRoute>} />
-            <Route path="/blind75/:slug" element={<ProtectedRoute><AlgorithmDetailNew /></ProtectedRoute>} />
+            <Route path="/blind75" element={
+              <FeatureProtectedRoute flag="blind_75">
+                <ProtectedRoute><Blind75 /></ProtectedRoute>
+              </FeatureProtectedRoute>
+            } />
+            <Route path="/blind75/:slug" element={
+              <FeatureProtectedRoute flag="blind_75">
+                <ProtectedRoute><AlgorithmDetailNew /></ProtectedRoute>
+              </FeatureProtectedRoute>
+            } />
           <Route path="/auth" element={<Auth />} />
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/about" element={<About />} />
@@ -89,14 +98,46 @@ const App = () => {
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/content-rights" element={<ContentRights />} />
           <Route path="/complexity" element={<TimeComplexity />} />
-          <Route path="/games" element={<ProtectedRoute><Games /></ProtectedRoute>} />
-          <Route path="/games/sort-hero" element={<ProtectedRoute><SortHero /></ProtectedRoute>} />
-          <Route path="/games/graph-explorer" element={<ProtectedRoute><GraphExplorer /></ProtectedRoute>} />
-          <Route path="/games/stack-master" element={<ProtectedRoute><StackMaster /></ProtectedRoute>} />
-          <Route path="/games/dp-puzzle" element={<ProtectedRoute><DPPuzzle /></ProtectedRoute>} />
-          <Route path="/games/sliding-window" element={<ProtectedRoute><SlidingWindow /></ProtectedRoute>} />
-          <Route path="/games/two-pointer" element={<ProtectedRoute><TwoPointer /></ProtectedRoute>} />
-          <Route path="/games/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
+          <Route path="/games" element={
+            <FeatureProtectedRoute flag="algo_games">
+              <ProtectedRoute><Games /></ProtectedRoute>
+            </FeatureProtectedRoute>
+          } />
+          <Route path="/games/sort-hero" element={
+            <FeatureProtectedRoute flag="algo_games">
+              <ProtectedRoute><SortHero /></ProtectedRoute>
+            </FeatureProtectedRoute>
+          } />
+          <Route path="/games/graph-explorer" element={
+            <FeatureProtectedRoute flag="algo_games">
+              <ProtectedRoute><GraphExplorer /></ProtectedRoute>
+            </FeatureProtectedRoute>
+          } />
+          <Route path="/games/stack-master" element={
+            <FeatureProtectedRoute flag="algo_games">
+              <ProtectedRoute><StackMaster /></ProtectedRoute>
+            </FeatureProtectedRoute>
+          } />
+          <Route path="/games/dp-puzzle" element={
+            <FeatureProtectedRoute flag="algo_games">
+              <ProtectedRoute><DPPuzzle /></ProtectedRoute>
+            </FeatureProtectedRoute>
+          } />
+          <Route path="/games/sliding-window" element={
+            <FeatureProtectedRoute flag="algo_games">
+              <ProtectedRoute><SlidingWindow /></ProtectedRoute>
+            </FeatureProtectedRoute>
+          } />
+          <Route path="/games/two-pointer" element={
+            <FeatureProtectedRoute flag="algo_games">
+              <ProtectedRoute><TwoPointer /></ProtectedRoute>
+            </FeatureProtectedRoute>
+          } />
+          <Route path="/games/leaderboard" element={
+            <FeatureProtectedRoute flag="algo_games">
+              <ProtectedRoute><Leaderboard /></ProtectedRoute>
+            </FeatureProtectedRoute>
+          } />
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/blog" element={<Blog />} />
 
@@ -139,7 +180,11 @@ const App = () => {
             </ProtectedAdminRoute>
           } />
 
-            <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+            <Route path="/profile" element={
+              <FeatureProtectedRoute flag="profiles">
+                <ProtectedRoute><ProfilePage /></ProtectedRoute>
+              </FeatureProtectedRoute>
+            } />
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

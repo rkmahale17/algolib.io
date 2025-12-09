@@ -28,7 +28,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
-import { Pencil, Trash2, Plus, Search } from 'lucide-react';
+import { Pencil, Trash2, Plus, Search, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export function AlgorithmList() {
@@ -74,6 +74,14 @@ export function AlgorithmList() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div className="flex items-baseline gap-4">
+          <Button 
+             variant="ghost" 
+             size="icon" 
+             onClick={() => navigate('/admin')}
+             className="mr-2"
+          >
+             <ArrowLeft className="h-4 w-4" />
+          </Button>
           <h1 className="text-3xl font-bold">Algorithm Management</h1>
           {!isLoading && (
             <span className="text-muted-foreground">
@@ -132,6 +140,7 @@ export function AlgorithmList() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-[50px]">Edit</TableHead>
                 <TableHead>ID</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Category</TableHead>
@@ -143,13 +152,24 @@ export function AlgorithmList() {
             <TableBody>
               {filteredAlgorithms?.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                     No algorithms found
                   </TableCell>
                 </TableRow>
               ) : (
                 filteredAlgorithms?.map((algo) => (
                   <TableRow key={algo.id}>
+                    <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => navigate(`/admin/algorithm/${algo.id}`)}
+                          className="h-8 w-8 hover:bg-muted"
+                          title="Edit Algorithm"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                    </TableCell>
                     <TableCell className="font-mono text-sm">{algo.id}</TableCell>
                     <TableCell className="font-medium">{algo.name}</TableCell>
                     <TableCell>{algo.category}</TableCell>
@@ -169,7 +189,6 @@ export function AlgorithmList() {
                           onClick={() => navigate(`/admin/algorithm/${algo.id}`)}
                           className="gap-2"
                         >
-                          <Pencil className="h-4 w-4" />
                           Edit
                         </Button>
                         <Button

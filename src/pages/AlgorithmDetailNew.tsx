@@ -37,6 +37,7 @@ import {
   Heart,
   Menu
 } from "lucide-react";
+import { TabWarning } from "@/components/TabWarning";
 import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
 import { FeatureGuard } from "@/components/FeatureGuard";
 import { AlgorithmLoader } from "@/components/AlgorithmLoader";
@@ -140,6 +141,8 @@ const AlgorithmDetailNew: React.FC = () => {
   
   const leftPanelRef = useRef<any>(null);
   const rightPanelRef = useRef<any>(null);
+  const leftPanelContentRef = useRef<HTMLDivElement>(null);
+  const [leftPanelWidth, setLeftPanelWidth] = useState(400);
 
   const [selectedLanguage, setSelectedLanguage] = useState(
     localStorage.getItem('preferredLanguage') || 'typescript'
@@ -336,7 +339,22 @@ const AlgorithmDetailNew: React.FC = () => {
     
     handleResize();
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    
+    // Resize Observer for Left Panel
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setLeftPanelWidth(entry.contentRect.width);
+      }
+    });
+
+    if (leftPanelContentRef.current) {
+      observer.observe(leftPanelContentRef.current);
+    }
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      observer.disconnect();
+    };
   }, []);
 
   const toggleLeftPanel = () => {
@@ -633,6 +651,33 @@ const AlgorithmDetailNew: React.FC = () => {
     return <PremiumLoader text="Fetching Algorithm Details" />;
   }
 
+  // Maintenance Mode Check
+  if (algorithm?.controls?.maintenance_mode) {
+      return (
+          <>
+            <AlgoMetaHead id={id} />
+             <div className="h-screen w-full flex flex-col items-center justify-center bg-background p-4 text-center space-y-6">
+                <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center animate-pulse">
+                    <Code2 className="w-12 h-12 text-primary" />
+                </div>
+                <div className="space-y-2 max-w-md">
+                    <h1 className="text-3xl font-bold tracking-tight">Under Maintenance</h1>
+                    <p className="text-muted-foreground">
+                        This algorithm is currently being updated with new content and test cases. 
+                        Please check back shortly!
+                    </p>
+                </div>
+                 <Link to="/">
+                  <Button variant="outline" className="gap-2">
+                      <ArrowLeft className="w-4 h-4" />
+                      Back to Problems
+                  </Button>
+                </Link>
+             </div>
+          </>
+      );
+  }
+
   if (!algorithm) {
     return (
       <>
@@ -653,7 +698,7 @@ const AlgorithmDetailNew: React.FC = () => {
   }
 
   const renderLeftPanel = () => (
-    <div className="h-full flex flex-col bg-card/30 backdrop-blur-sm">
+    <div ref={leftPanelContentRef} className="h-full flex flex-col bg-card/30 backdrop-blur-sm">
       {/* Left Header with Tools */}
      
 
@@ -666,21 +711,23 @@ const AlgorithmDetailNew: React.FC = () => {
           <TabsList className="flex-1 grid grid-cols-3 p-0 bg-transparent gap-0 rounded-none">
             <TabsTrigger 
               value="description" 
-              className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
+              className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10 px-4"
             >
               <Book className="w-4 h-4 mr-2" />
               Description
             </TabsTrigger>
+
             <TabsTrigger 
               value="visualizations"
-              className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
+              className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10 px-4"
             >
               <Eye className="w-4 h-4 mr-2" />
               Visualizations
             </TabsTrigger>
+
             <TabsTrigger 
               value="solutions"
-              className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
+              className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10 px-4"
             >
               <Code2 className="w-4 h-4 mr-2" />
               Solutions
@@ -711,7 +758,7 @@ const AlgorithmDetailNew: React.FC = () => {
                       {/* Difficulty and Company Tags */}
                       <div className="flex flex-wrap items-center gap-2 mb-4">
                         {/* Difficulty Badge */}
-                        {algorithm.difficulty && (
+                        {(!algorithm?.controls || algorithm.controls?.metadata?.difficulty !== false) && algorithm.difficulty && (
                           <Badge 
                             variant="outline"
                             className={`
@@ -729,7 +776,7 @@ const AlgorithmDetailNew: React.FC = () => {
                         )}
                         
                         {/* Company Tags */}
-                        {algorithm.metadata?.companies && algorithm.metadata.companies.length > 0 && (
+                        {(!algorithm?.controls || algorithm.controls?.metadata?.companies !== false) && algorithm.metadata?.companies && algorithm.metadata.companies.length > 0 && (
                           <>
                             <span className="text-muted-foreground text-sm">•</span>
                             <div className="flex flex-wrap items-center gap-1.5">
@@ -758,7 +805,7 @@ const AlgorithmDetailNew: React.FC = () => {
                       
                     </div>
                     <div className="shrink-0 flex flex-col gap-2">
-                       {isCompleted && (
+                       {(!algorithm?.controls || algorithm.controls?.metadata?.attempted_badge !== false) && isCompleted && (
                         <Badge 
                           variant="outline" 
                           className="bg-green-500/10 text-green-500 border-green-500/20 px-3 py-1.5 hover:bg-green-500/20 transition-colors cursor-default"
@@ -770,7 +817,7 @@ const AlgorithmDetailNew: React.FC = () => {
                     </div>
                   </div>
                   <section className="max-w-[800px] ">
-{algorithm.explanation.problemStatement && (
+{algorithm.explanation.problemStatement && (!algorithm?.controls || algorithm.controls?.description?.problem_statement !== false) && (
                         <RichText
                         content={algorithm.explanation.problemStatement}
                         className="text-base leading-relaxed pr-4"
@@ -780,7 +827,7 @@ const AlgorithmDetailNew: React.FC = () => {
                   </section>
 
                   {/* Examples Section */}
-                  {algorithm.explanation.io && algorithm.explanation.io.length > 0 && (
+                  {algorithm.explanation.io && algorithm.explanation.io.length > 0 && (!algorithm?.controls || algorithm.controls?.description?.examples !== false) && (
                     <div className="space-y-4 max-w-[600px] ">
                       {algorithm.explanation.io.map((example: any, index: number) => (
                         <div key={index} className="border rounded-lg p-4 bg-muted/20">
@@ -811,7 +858,7 @@ const AlgorithmDetailNew: React.FC = () => {
                   )}
 
                   {/* Constraints Section */}
-                  {algorithm.explanation.constraints && algorithm.explanation.constraints.length > 0 && (
+                  {algorithm.explanation.constraints && algorithm.explanation.constraints.length > 0 && (!algorithm?.controls || algorithm.controls?.description?.constraints !== false) && (
                     <div className="border rounded-lg max-w-[500px] p-4 bg-muted/20">
                       <h4 className="font-semibold mb-3">Constraints:</h4>
                       <ul className="space-y-1.5 font-mono text-sm">
@@ -830,44 +877,46 @@ const AlgorithmDetailNew: React.FC = () => {
                   )}
 
                   {/* Note Section */}
-                  {algorithm.explanation.note && (
+                  {algorithm.explanation.note && (!algorithm?.controls || algorithm.controls?.description?.problem_statement !== false) && (
                     <div className="border-l-4 border-primary pl-4 py-2">
                       <p className="text-sm text-muted-foreground italic">{algorithm.explanation.note}</p>
                     </div>
                   )}
 
                   {/* Algorithm Overview Card */}
-                  <Card className="p-4 sm:p-6 glass-card overflow-hidden">
-                    <div className="space-y-4">
-                      <h3 className="font-semibold flex items-center gap-2">
-                        <BookOpen className="w-5 h-5 text-primary" />
-                        Algorithm Overview
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        {algorithm.overview || algorithm.explanation.problemStatement}
-                      </p>
+                  {(!algorithm?.controls || algorithm.controls?.description?.overview !== false) && (
+                    <Card className="p-4 sm:p-6 glass-card overflow-hidden">
+                      <div className="space-y-4">
+                        <h3 className="font-semibold flex items-center gap-2">
+                          <BookOpen className="w-5 h-5 text-primary" />
+                          Algorithm Overview
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          {algorithm.overview || algorithm.explanation.problemStatement}
+                        </p>
 
-                      <Separator />
+                        <Separator />
 
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm font-medium mb-1">Time Complexity</p>
-                          <Badge variant="outline" className="font-mono">
-                            {algorithm.timeComplexity}
-                          </Badge>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium mb-1">Space Complexity</p>
-                          <Badge variant="outline" className="font-mono">
-                            {algorithm.spaceComplexity}
-                          </Badge>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-sm font-medium mb-1">Time Complexity</p>
+                            <Badge variant="outline" className="font-mono">
+                              {algorithm.timeComplexity}
+                            </Badge>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium mb-1">Space Complexity</p>
+                            <Badge variant="outline" className="font-mono">
+                              {algorithm.spaceComplexity}
+                            </Badge>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Card>
+                    </Card>
+                  )}
 
                   {/* Steps, Use Cases & Tips Card */}
-                  {algorithm && (
+                  {algorithm && (!algorithm?.controls || algorithm.controls?.description?.guides !== false) && (
                     <Card className="p-4 sm:p-6 glass-card overflow-hidden">
                       <Tabs defaultValue="steps">
                         <TabsList className="grid w-full grid-cols-3 h-auto">
@@ -916,7 +965,7 @@ const AlgorithmDetailNew: React.FC = () => {
 
                   {/* Video Tutorial Card */}
                   <FeatureGuard flag="youtube_video">
-                    {algorithm.tutorials?.[0]?.url && (
+                    {algorithm.tutorials?.[0]?.url && (!algorithm?.controls || algorithm.controls?.content?.youtube_tutorial !== false) && (
                     <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-5xl mx-auto">
                                   <div className="space-y-6">
                                     <div className="space-y-4">
@@ -959,7 +1008,7 @@ const AlgorithmDetailNew: React.FC = () => {
 
                   {/* Practice Problems Card */}
                   <FeatureGuard flag="external_links">
-                    {algorithm?.problems_to_solve?.external && algorithm.problems_to_solve.external.length > 0 ? (
+                    {algorithm?.problems_to_solve?.external && algorithm.problems_to_solve.external.length > 0 && (!algorithm?.controls || algorithm.controls?.content?.practice_problems !== false) ? (
                       <Card className="p-4 sm:p-6 glass-card overflow-hidden">
                         <h3 className="font-semibold mb-4">Practice Problems</h3>
                         <div className="space-y-2">
@@ -990,48 +1039,57 @@ const AlgorithmDetailNew: React.FC = () => {
             </TabsContent>
 
             <TabsContent value="visualizations" className="h-full m-0 flex flex-col data-[state=inactive]:hidden">
-              <AuthGuard
-                fallbackTitle="Sign in to view Visualizations"
-                fallbackDescription="Create an account or sign in to access interactive algorithm visualizations."
-              >
-                <div className="flex-1 flex flex-col border rounded-lg overflow-hidden bg-muted/10 m-4">
-                  <div className="flex items-center justify-between px-4 py-2 border-b bg-background/50 backdrop-blur-sm shrink-0">
-                    <h3 className="text-sm font-medium flex items-center gap-2">
-                      <Eye className="w-4 h-4 text-primary" />
-                      Visualization
-                    </h3>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8" 
-                      onClick={() => setIsVisualizationMaximized(true)}
-                      title="Maximize Visualization"
-                    >
-                      <Maximize2 className="w-4 h-4" />
-                    </Button>
+              {algorithm?.controls?.tabs?.visualization === false ? (
+                 <TabWarning message="Visualization is not available for this problem at the moment." />
+              ) : (
+                <AuthGuard
+                  fallbackTitle="Sign in to view Visualizations"
+                  fallbackDescription="Create an account or sign in to access interactive algorithm visualizations."
+                >
+                  <div className="flex-1 flex flex-col border rounded-lg overflow-hidden bg-muted/10 m-4">
+                    <div className="flex items-center justify-between px-4 py-2 border-b bg-background/50 backdrop-blur-sm shrink-0">
+                      <h3 className="text-sm font-medium flex items-center gap-2">
+                        <Eye className="w-4 h-4 text-primary" />
+                        Visualization
+                      </h3>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8" 
+                        onClick={() => setIsVisualizationMaximized(true)}
+                        title="Maximize Visualization"
+                      >
+                        <Maximize2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    <div className="flex-1 overflow-auto p-6 no-scrollbar relative">
+                      {renderVisualization()}
+                    </div>
                   </div>
-                  <div className="flex-1 overflow-auto p-6 no-scrollbar relative">
-                    {renderVisualization()}
-                  </div>
-                </div>
-              </AuthGuard>
+                </AuthGuard>
+              )}
             </TabsContent>
 
             <TabsContent value="solutions" className="h-full m-0 data-[state=inactive]:hidden">
-               <ScrollArea className="h-full">
-                  <div className="p-4 space-y-4 pb-20">
-                    {algorithm?.implementations ? (
-                      <SolutionViewer
-                        implementations={algorithm.implementations}
-                        approachName="Optimal Solution"
-                      />
-                    ) : (
-                      <div className="text-center py-12 text-muted-foreground border rounded-lg border-dashed">
-                        No solutions available.
-                      </div>
-                    )}
-                  </div>
-                </ScrollArea>
+               {algorithm?.controls?.tabs?.solutions === false ? (
+                 <TabWarning message="Detailed solutions are not available for this problem yet." />
+               ) : (
+                 <ScrollArea className="h-full">
+                    <div className="p-4 space-y-4 pb-20">
+                      {algorithm?.implementations ? (
+                        <SolutionViewer
+                          implementations={algorithm.implementations}
+                          approachName="Optimal Solution"
+                          controls={algorithm?.controls?.solutions}
+                        />
+                      ) : (
+                        <div className="text-center py-12 text-muted-foreground border rounded-lg border-dashed">
+                          No solutions available.
+                        </div>
+                      )}
+                    </div>
+                  </ScrollArea>
+               )}
             </TabsContent>
 
             {/* Bottom Action Bar - Floating & Centered (Visible across all tabs) */}
@@ -1039,41 +1097,50 @@ const AlgorithmDetailNew: React.FC = () => {
               <div className="pointer-events-auto flex items-center gap-1 p-1.5 bg-background/60 backdrop-blur-xl border shadow-lg rounded-full animate-in fade-in slide-in-from-bottom-4 duration-300">
                 
                 {/* Like Button */}
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button 
-                        variant={userVote === 'like' ? "secondary" : "ghost"} 
-                        size="sm" 
-                        onClick={() => handleVote('like')}
-                        className={`gap-1.5 h-8 px-3 rounded-full transition-all ${userVote === 'like' ? 'bg-primary/10 text-primary hover:bg-primary/20' : 'hover:bg-muted'}`}
-                      >
-                        <ThumbsUp className={`h-3.5 w-3.5 ${userVote === 'like' ? 'fill-current' : ''}`} />
-                        <span className="text-xs font-medium">{likes}</span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="top">Like</TooltipContent>
-                  </Tooltip>
+                {(!algorithm?.controls || algorithm.controls?.social?.voting !== false) && (
+                  <>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button 
+                          variant={userVote === 'like' ? "secondary" : "ghost"} 
+                          size="sm" 
+                          onClick={() => handleVote('like')}
+                          className={`gap-1.5 h-8 px-3 rounded-full transition-all ${userVote === 'like' ? 'bg-primary/10 text-primary hover:bg-primary/20' : 'hover:bg-muted'}`}
+                        >
+                          <ThumbsUp className={`h-3.5 w-3.5 ${userVote === 'like' ? 'fill-current' : ''}`} />
+                          <span className="text-xs font-medium">{likes}</span>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top">Like</TooltipContent>
+                    </Tooltip>
 
-                  {/* Dislike Button */}
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button 
-                        variant={userVote === 'dislike' ? "secondary" : "ghost"} 
-                        size="sm" 
-                        onClick={() => handleVote('dislike')}
-                        className={`gap-1.5 h-8 px-3 rounded-full transition-all ${userVote === 'dislike' ? 'bg-destructive/10 text-destructive hover:bg-destructive/20' : 'hover:bg-muted'}`}
-                      >
-                        <ThumbsDown className={`h-3.5 w-3.5 ${userVote === 'dislike' ? 'fill-current' : ''}`} />
-                        {dislikes > 0 && <span className="text-xs font-medium">{dislikes}</span>}
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="top">Dislike</TooltipContent>
-                  </Tooltip>
+                    {/* Dislike Button */}
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button 
+                          variant={userVote === 'dislike' ? "secondary" : "ghost"} 
+                          size="sm" 
+                          onClick={() => handleVote('dislike')}
+                          className={`gap-1.5 h-8 px-3 rounded-full transition-all ${userVote === 'dislike' ? 'bg-destructive/10 text-destructive hover:bg-destructive/20' : 'hover:bg-muted'}`}
+                        >
+                          <ThumbsDown className={`h-3.5 w-3.5 ${userVote === 'dislike' ? 'fill-current' : ''}`} />
+                          {dislikes > 0 && <span className="text-xs font-medium">{dislikes}</span>}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top">Dislike</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  </>
+                )}
 
-                  <div className="w-px h-4 bg-border mx-1" />
+                {(!algorithm?.controls || (algorithm.controls?.social?.voting !== false && algorithm.controls?.social?.favorite !== false)) && (
+                   <div className="w-px h-4 bg-border mx-1" />
+                )}
 
-                  {/* Favorite Button */}
+                {/* Favorite Button */}
+                {(!algorithm?.controls || algorithm.controls?.social?.favorite !== false) && (
+                  <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button 
@@ -1087,7 +1154,8 @@ const AlgorithmDetailNew: React.FC = () => {
                     </TooltipTrigger>
                     <TooltipContent side="top">{isFavorite ? "Unfavorite" : "Favorite"}</TooltipContent>
                   </Tooltip>
-                </TooltipProvider>
+                  </TooltipProvider>
+                )}
               </div>
             </div>
         </div>
@@ -1117,71 +1185,74 @@ const AlgorithmDetailNew: React.FC = () => {
               )}
               
               <TabsList className="flex-1 flex p-0 bg-transparent gap-0 rounded-none">
-                <FeatureGuard flag="code_runner_tab">
-                  <TabsTrigger 
-                    value="code" 
-                    className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
-                  >
-                    <Code2 className="w-4 h-4 mr-2" />
-                    Code
-                  </TabsTrigger>
-                </FeatureGuard>
-                <FeatureGuard flag="brainstrom_tab">
-                  <TabsTrigger 
-                    value="brainstorm"
-                    className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
-                  >
-                    <Lightbulb className="w-4 h-4 mr-2" />
-                    Brainstorm
-                  </TabsTrigger>
-                </FeatureGuard>
+                <TabsTrigger 
+                  value="code" 
+                  className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
+                >
+                  <Code2 className="w-4 h-4 mr-2" />
+                  Code
+                </TabsTrigger>
+                
+                <TabsTrigger 
+                  value="brainstorm"
+                  className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
+                >
+                  <Lightbulb className="w-4 h-4 mr-2" />
+                  Brainstorm
+                </TabsTrigger>
               </TabsList>
               
           </div>
             
 
-            <FeatureGuard flag="code_runner_tab">
-              <TabsContent value="code" className="flex-1 m-0 overflow-hidden relative group flex flex-col data-[state=inactive]:hidden">
-                <AuthGuard
-                  fallbackTitle="Sign in to use Code Runner"
-                  fallbackDescription="Create an account or sign in to run and test your code solutions."
-                >
-                  {algorithmIdOrSlug && algorithm && (
-                    <CodeRunner 
-                      algorithmId={algorithmIdOrSlug}
-                      algorithmData={algorithm}
-                      onToggleFullscreen={() => setIsCodeRunnerMaximized(true)}
-                      className="h-full border-0 rounded-none shadow-none"
-                      initialCode={savedCode}
-                      onCodeChange={handleCodeChange}
-                      language={selectedLanguage as any}
-                      onLanguageChange={(lang) => {
-                        setSelectedLanguage(lang);
-                        localStorage.setItem('preferredLanguage', lang);
-                      }}
-                      onSuccess={handleCodeSuccess}
-                    />
-                  )}
-                </AuthGuard>
-              </TabsContent>
-            </FeatureGuard>
+            <TabsContent value="code" className="flex-1 m-0 overflow-hidden relative group flex flex-col data-[state=inactive]:hidden">
+               {algorithm?.controls?.tabs?.code === false ? (
+                  <TabWarning message="Code Runner is not available for this problem." />
+               ) : (
+                 <AuthGuard
+                   fallbackTitle="Sign in to use Code Runner"
+                   fallbackDescription="Create an account or sign in to run and test your code solutions."
+                 >
+                   {algorithmIdOrSlug && algorithm && (
+                     <CodeRunner 
+                       algorithmId={algorithmIdOrSlug}
+                       algorithmData={algorithm}
+                       onToggleFullscreen={() => setIsCodeRunnerMaximized(!isCodeRunnerMaximized)}
+                       isMaximized={isCodeRunnerMaximized}
+                       className={isCodeRunnerMaximized ? "fixed inset-0 z-50 h-screen w-screen bg-background" : "h-full flex-1 border-0 rounded-none"}
+                       initialCode={savedCode}
+                       onCodeChange={handleCodeChange}
+                       language={selectedLanguage as any}
+                       onLanguageChange={(lang) => {
+                         setSelectedLanguage(lang);
+                         localStorage.setItem('preferredLanguage', lang);
+                       }}
+                       onSuccess={handleCodeSuccess}
+                       controls={algorithm.controls?.code_runner} 
+                     />
+                   )}
+                 </AuthGuard>
+               )}
+            </TabsContent>
 
-            <FeatureGuard flag="brainstrom_tab">
-              <TabsContent value="brainstorm" className="flex-1 m-0 overflow-hidden relative group data-[state=inactive]:hidden">
-                <AuthGuard
-                  fallbackTitle="Sign in to use Brainstorm"
-                  fallbackDescription="Create an account or sign in to save notes and whiteboards."
-                >
-                  <ScrollArea className="h-full">
-                    <div className="p-0">
-                      {algorithmIdOrSlug && (
-                        <BrainstormSection algorithmId={algorithmIdOrSlug} algorithmTitle={algorithm.name} />
-                      )}
-                    </div>
-                  </ScrollArea>
-                </AuthGuard>
-              </TabsContent>
-            </FeatureGuard>
+            <TabsContent value="brainstorm" className="flex-1 m-0 overflow-hidden data-[state=inactive]:hidden">
+               {algorithm?.controls?.tabs?.brainstorm === false ? (
+                  <TabWarning message="Brainstorming tools are disabled for this session." />
+               ) : (
+                  <div className="h-full flex flex-col">
+                    <AuthGuard
+                      fallbackTitle="Sign in to Brainstorm"
+                      fallbackDescription="Create an account or sign in to access whiteboard and notes."
+                    >
+                      <BrainstormSection 
+                        algorithmId={algorithmIdOrSlug || ""}
+                        algorithmTitle={algorithm?.title || ""}
+                        controls={algorithm?.controls?.brainstorm}
+                      />
+                    </AuthGuard>
+                  </div>
+               )}
+            </TabsContent>
           </Tabs>
       </div>
     </div>
@@ -1242,23 +1313,27 @@ const AlgorithmDetailNew: React.FC = () => {
           {/* Desktop Navigation */}
           {!isMobile && (
             <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={handleRandomProblem} className="h-8 w-8">
-                    <Shuffle className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Random Problem</TooltipContent>
-              </Tooltip>
+              {(!algorithm?.controls || algorithm.controls?.header?.random_problem !== false) && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" onClick={handleRandomProblem} className="h-8 w-8">
+                      <Shuffle className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Random Problem</TooltipContent>
+                </Tooltip>
+              )}
 
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={handleNextProblem} className="h-8 w-8">
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Next Problem</TooltipContent>
-              </Tooltip>
+              {(!algorithm?.controls || algorithm.controls?.header?.next_problem !== false) && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" onClick={handleNextProblem} className="h-8 w-8">
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Next Problem</TooltipContent>
+                </Tooltip>
+              )}
             </TooltipProvider>
           )}
         </div>
@@ -1320,7 +1395,7 @@ const AlgorithmDetailNew: React.FC = () => {
               </DropdownMenu>
             )}
 
-            {!isMobile && (
+            {!isMobile && (!algorithm?.controls || algorithm.controls?.social?.share !== false) && (
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -1333,7 +1408,7 @@ const AlgorithmDetailNew: React.FC = () => {
               </TooltipProvider>
             )}
 
-            {!isMobile && (
+            {!isMobile && (!algorithm?.controls || algorithm.controls?.header?.bug_report !== false) && (
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -1346,7 +1421,7 @@ const AlgorithmDetailNew: React.FC = () => {
               </TooltipProvider>
             )}
 
-          {!isMobile && (
+          {!isMobile && (!algorithm?.controls || algorithm.controls?.header?.timer !== false) && (
             <TooltipProvider>
               <Popover>
                 <PopoverTrigger asChild>
@@ -1376,7 +1451,11 @@ const AlgorithmDetailNew: React.FC = () => {
                   </div>
                 </PopoverContent>
               </Popover>
+            </TooltipProvider>
+          )}
 
+          {(!algorithm?.controls || algorithm.controls?.header?.interview_mode !== false) && (
+              <TooltipProvider>
               <FeatureGuard flag="interview_mode">
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -1392,7 +1471,7 @@ const AlgorithmDetailNew: React.FC = () => {
                   <TooltipContent>Interview Mode</TooltipContent>
                 </Tooltip>
               </FeatureGuard>
-            </TooltipProvider>
+              </TooltipProvider>
           )}
 
           <div className="h-4 w-px bg-border mx-1" />
