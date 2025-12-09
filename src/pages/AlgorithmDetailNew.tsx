@@ -140,6 +140,8 @@ const AlgorithmDetailNew: React.FC = () => {
   
   const leftPanelRef = useRef<any>(null);
   const rightPanelRef = useRef<any>(null);
+  const leftPanelContentRef = useRef<HTMLDivElement>(null);
+  const [leftPanelWidth, setLeftPanelWidth] = useState(400);
 
   const [selectedLanguage, setSelectedLanguage] = useState(
     localStorage.getItem('preferredLanguage') || 'typescript'
@@ -336,7 +338,22 @@ const AlgorithmDetailNew: React.FC = () => {
     
     handleResize();
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    
+    // Resize Observer for Left Panel
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setLeftPanelWidth(entry.contentRect.width);
+      }
+    });
+
+    if (leftPanelContentRef.current) {
+      observer.observe(leftPanelContentRef.current);
+    }
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      observer.disconnect();
+    };
   }, []);
 
   const toggleLeftPanel = () => {
@@ -680,7 +697,7 @@ const AlgorithmDetailNew: React.FC = () => {
   }
 
   const renderLeftPanel = () => (
-    <div className="h-full flex flex-col bg-card/30 backdrop-blur-sm">
+    <div ref={leftPanelContentRef} className="h-full flex flex-col bg-card/30 backdrop-blur-sm">
       {/* Left Header with Tools */}
      
 
@@ -691,27 +708,50 @@ const AlgorithmDetailNew: React.FC = () => {
          
           
           <TabsList className="flex-1 grid grid-cols-3 p-0 bg-transparent gap-0 rounded-none">
-            <TabsTrigger 
-              value="description" 
-              className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
-            >
-              <Book className="w-4 h-4 mr-2" />
-              Description
-            </TabsTrigger>
-            <TabsTrigger 
-              value="visualizations"
-              className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
-            >
-              <Eye className="w-4 h-4 mr-2" />
-              Visualizations
-            </TabsTrigger>
-            <TabsTrigger 
-              value="solutions"
-              className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
-            >
-              <Code2 className="w-4 h-4 mr-2" />
-              Solutions
-            </TabsTrigger>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger 
+                    value="description" 
+                    className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
+                  >
+                    <Book className="w-4 h-4 mr-2" />
+                    {leftPanelWidth >= 400 && "Description"}
+                  </TabsTrigger>
+                </TooltipTrigger>
+                {leftPanelWidth < 400 && <TooltipContent side="bottom">Description</TooltipContent>}
+              </Tooltip>
+            </TooltipProvider>
+
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger 
+                    value="visualizations"
+                    className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
+                  >
+                    <Eye className="w-4 h-4 mr-2" />
+                     {leftPanelWidth >= 400 && "Visualizations"}
+                  </TabsTrigger>
+                </TooltipTrigger>
+                 {leftPanelWidth < 400 && <TooltipContent side="bottom">Visualizations</TooltipContent>}
+              </Tooltip>
+            </TooltipProvider>
+
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                   <TabsTrigger 
+                    value="solutions"
+                    className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
+                  >
+                    <Code2 className="w-4 h-4 mr-2" />
+                     {leftPanelWidth >= 400 && "Solutions"}
+                  </TabsTrigger>
+                </TooltipTrigger>
+                 {leftPanelWidth < 400 && <TooltipContent side="bottom">Solutions</TooltipContent>}
+              </Tooltip>
+            </TooltipProvider>
           </TabsList>
            {!isMobile && (
             <Button 

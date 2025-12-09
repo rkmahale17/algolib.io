@@ -172,7 +172,7 @@ export function AlgorithmFormBuilder({
       <div className="flex items-center justify-between sticky top-0 z-10 bg-background pb-4 border-b">
         <div>
           <h2 className="text-2xl font-bold">
-            {algorithm ? "Edit Algorithm" : "Create New Algorithm"}
+            {algorithm ? "Edit Algorithm" : "Create New Algorithm"} - {algorithm?.name}
           </h2>
           <p className="text-sm text-muted-foreground">
             Fill in the details below

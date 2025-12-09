@@ -5,7 +5,7 @@ import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Play, RotateCcw, Loader2, Maximize2, Minimize2, Settings, AlignLeft, Info, Send, Copy, X } from "lucide-react";
+import { Play, RotateCcw, Loader2, Maximize2, Minimize2, Settings, AlignLeft, Info, Send, Copy, X, Clock } from "lucide-react";
 import { FeatureGuard } from "@/components/FeatureGuard";
 import { toast } from "sonner";
 import axios from 'axios';
@@ -629,12 +629,31 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                    </TabsTrigger>
                    <TabsTrigger 
                      value="submission"
-                     className="data-[state=active]:bg-background data-[state=active]:shadow-none rounded-t-md rounded-b-none border-b-2 border-transparent data-[state=active]:border-primary h-9 px-4 gap-2 rounded-none group"
+                     className="data-[state=active]:bg-background data-[state=active]:shadow-none rounded-t-md rounded-b-none border-b-2 border-transparent data-[state=active]:border-primary h-9 px-4 gap-3 rounded-none group items-center"
                    >
-                     <span>Submission {new Date(viewingSubmission.timestamp).toLocaleDateString()}</span>
+                     <div className="flex items-center gap-2 text-xs">
+                        <span className={`font-semibold ${viewingSubmission?.status === 'passed' ? 'text-green-600' : 'text-destructive'}`}>
+                          {viewingSubmission?.status === 'passed' ? 'Accepted' : (viewingSubmission?.status === 'error' ? 'Runtime Error' : 'Wrong Answer')}
+                        </span>
+                        <span className="text-muted-foreground">|</span>
+                        <span className="uppercase font-medium text-foreground">{viewingSubmission?.language}</span>
+                         {/* Time & Memory if available */}
+                        {viewingSubmission?.test_results?.execution_time_ms && (
+                           <>
+                             <span className="text-muted-foreground">|</span>
+                             <div className="flex items-center gap-1 text-muted-foreground">
+                                <Clock className="w-3 h-3" />
+                                {viewingSubmission.test_results.execution_time_ms}ms
+                             </div>
+                           </>
+                        )}
+                        {/* Memory usage typically not stored but if it were: */}
+                        {/* <div className="flex items-center gap-1 text-muted-foreground">| 12MB</div> */}
+                     </div>
+                     
                      <div 
                         role="button"
-                        className="opacity-60 group-hover:opacity-100 hover:bg-muted rounded-full p-0.5"
+                        className="opacity-60 group-hover:opacity-100 hover:bg-muted rounded-full p-0.5 ml-2"
                         onClick={handleCloseSubmission}
                      >
                         <X className="w-3 h-3" />
@@ -948,7 +967,6 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                   controls={controls}
                   
                   // Submissions
-                  submissions={submissions}
                 />
              </div>
           </div>

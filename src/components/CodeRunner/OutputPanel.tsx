@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, Terminal, FlaskConical, Clock, Zap, Plus, CheckCircle2, XCircle, AlertCircle, AlertTriangle, Edit2, Trash2, History, Code } from "lucide-react";
 import { Algorithm } from '@/data/algorithms';
@@ -65,6 +66,22 @@ export const OutputPanel = ({
   onSelectSubmission
 }: OutputPanelProps) => {
   const [activeTestCaseTab, setActiveTestCaseTab] = useState<string>("");
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const [panelWidth, setPanelWidth] = useState(320);
+
+  // Measure panel width for responsive tab labels
+  React.useEffect(() => {
+    if (!containerRef.current) return;
+    
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setPanelWidth(entry.contentRect.width);
+      }
+    });
+    
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   React.useEffect(() => {
     if (allTestCases.length > 0) {
@@ -112,36 +129,59 @@ export const OutputPanel = ({
 
   return (
     <div className="h-full flex flex-col bg-muted/10 border-t overflow-hidden">
-      {/* Top Level Tabs Control - Fixed */}
-      <div className="flex items-center gap-1 p-1 bg-muted/30 border-b shrink-0">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onTabChange("testcase")}
-          className={`h-8 text-xs gap-2 ${activeTab === "testcase" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}
-        >
-          <FlaskConical className="w-3.5 h-3.5" />
-          Testcase
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onTabChange("result")}
-          className={`h-8 text-xs gap-2 ${activeTab === "result" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}
-          disabled={!output}
-        >
-          <Terminal className="w-3.5 h-3.5" />
-          Test Result
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onTabChange("submissions")}
-          className={`h-8 text-xs gap-2 ${activeTab === "submissions" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}
-        >
-          <History className="w-3.5 h-3.5" />
-          Submissions
-        </Button>
+      {/* Top Bar / Tabs */}
+      <div ref={containerRef} className="flex items-center gap-1 p-1 border-b bg-background/50 shrink-0 overflow-x-auto no-scrollbar">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onTabChange("testcase")}
+                className={`h-8 text-xs gap-2 ${activeTab === "testcase" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}
+              >
+                <FlaskConical className="w-3.5 h-3.5" />
+                {panelWidth >= 320 && "Testcase"}
+              </Button>
+            </TooltipTrigger>
+            {panelWidth < 320 && <TooltipContent side="bottom">Testcase</TooltipContent>}
+          </Tooltip>
+        </TooltipProvider>
+
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onTabChange("result")}
+                className={`h-8 text-xs gap-2 ${activeTab === "result" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}
+                disabled={!output}
+              >
+                <Terminal className="w-3.5 h-3.5" />
+                {panelWidth >= 320 && "Test Result"}
+              </Button>
+            </TooltipTrigger>
+            {panelWidth < 320 && <TooltipContent side="bottom">Test Result</TooltipContent>}
+          </Tooltip>
+        </TooltipProvider>
+
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onTabChange("submissions")}
+                className={`h-8 text-xs gap-2 ${activeTab === "submissions" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}
+              >
+                <History className="w-3.5 h-3.5" />
+                {panelWidth >= 320 && "Submissions"}
+              </Button>
+            </TooltipTrigger>
+            {panelWidth < 320 && <TooltipContent side="bottom">Submissions</TooltipContent>}
+          </Tooltip>
+        </TooltipProvider>
       </div>
       {/* TABS content */}
       <div className="flex-1 flex flex-col min-h-0 overflow-hidden relative">
@@ -257,8 +297,8 @@ export const OutputPanel = ({
                 {/* Test Results */}
                 {output.testResults && (
                   <Tabs defaultValue="result-0" className="flex flex-col">
-                    <div className="border-b px-4 bg-background/50 shrink-0 sticky top-0 z-10">
-                      <TabsList className="h-9 bg-transparent p-0 gap-2 flex-nowrap overflow-x-auto w-0 flex-1 justify-start overflow-y-hidden">
+                    <div className="flex border-b px-4 bg-background/50 shrink-0 sticky top-0 z-10 overflow-hidden">
+                      <TabsList className="h-9 bg-transparent p-0 gap-2 flex-nowrap overflow-x-auto w-full justify-start overflow-y-hidden">
                         {output.testResults.map((result: any, index: number) => (
                           <TabsTrigger
                             key={index}
