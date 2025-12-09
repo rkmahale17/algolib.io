@@ -65,6 +65,7 @@ export type Database = {
       algorithms: {
         Row: {
           category: string
+          controls: Json | null
           created_at: string | null
           description: string
           difficulty: string
@@ -82,6 +83,7 @@ export type Database = {
         }
         Insert: {
           category: string
+          controls?: Json | null
           created_at?: string | null
           description: string
           difficulty: string
@@ -99,6 +101,7 @@ export type Database = {
         }
         Update: {
           category?: string
+          controls?: Json | null
           created_at?: string | null
           description?: string
           difficulty?: string
