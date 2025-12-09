@@ -23,6 +23,12 @@ export const DEFAULT_CONTROLS = {
     solutions: true,
     brainstorm: true,
     history: true,
+    code: true,
+  },
+  description: {
+      problem_statement: true,
+      overview: true,
+      guides: true,
   },
   header: {
     random_problem: true,
@@ -176,17 +182,46 @@ export function ControlsEditor({ controls, onChange }: ControlsEditorProps) {
             />
             <Separator />
              <ConfirmSwitch 
-              id="tab-sol"
-              itemLabel="Solutions"
-              checked={localControls.tabs?.solutions !== false}
-              onCheckedChange={(c) => updateNested(['tabs', 'solutions'], c)}
-            />
-            <Separator />
-             <ConfirmSwitch 
               id="tab-brain"
               itemLabel="Brainstorm"
               checked={localControls.tabs?.brainstorm !== false}
               onCheckedChange={(c) => updateNested(['tabs', 'brainstorm'], c)}
+            />
+            <Separator />
+             <ConfirmSwitch 
+              id="tab-code"
+              itemLabel="Code"
+              checked={localControls.tabs?.code !== false}
+              onCheckedChange={(c) => updateNested(['tabs', 'code'], c)}
+            />
+          </CardContent>
+        </Card>
+
+        {/* DESCRIPTION GRANULAR */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-medium">Description Controls</CardTitle>
+          </CardHeader>
+           <CardContent className="space-y-3">
+             <ConfirmSwitch 
+              id="desc-prob"
+              itemLabel="Problem Statement"
+              checked={localControls.description?.problem_statement !== false}
+              onCheckedChange={(c) => updateNested(['description', 'problem_statement'], c)}
+            />
+            <Separator />
+             <ConfirmSwitch 
+              id="desc-over"
+              itemLabel="Algorithm Overview"
+              checked={localControls.description?.overview !== false}
+              onCheckedChange={(c) => updateNested(['description', 'overview'], c)}
+            />
+             <Separator />
+             <ConfirmSwitch 
+              id="desc-guides"
+              itemLabel="Steps, Use Cases, Tips"
+              checked={localControls.description?.guides !== false}
+              onCheckedChange={(c) => updateNested(['description', 'guides'], c)}
             />
           </CardContent>
         </Card>

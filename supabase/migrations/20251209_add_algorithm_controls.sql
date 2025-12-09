@@ -17,7 +17,13 @@ SET controls = '{
     "description": true,
     "solutions": true,
     "brainstorm": true,
-    "history": true
+    "history": true,
+    "code": true
+  },
+  "description": {
+    "problem_statement": true,
+    "overview": true,
+    "guides": true
   },
   "header": {
     "random_problem": true,
@@ -70,7 +76,13 @@ ALTER COLUMN controls SET DEFAULT '{
     "description": true,
     "solutions": true,
     "brainstorm": true,
-    "history": true
+    "history": true,
+    "code": true
+  },
+  "description": {
+    "problem_statement": true,
+    "overview": true,
+    "guides": true
   },
   "header": {
     "random_problem": true,

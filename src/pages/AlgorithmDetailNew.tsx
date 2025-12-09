@@ -37,6 +37,7 @@ import {
   Heart,
   Menu
 } from "lucide-react";
+import { TabWarning } from "@/components/TabWarning";
 import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
 import confetti from 'canvas-confetti';
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -769,7 +770,7 @@ const AlgorithmDetailNew: React.FC = () => {
                     </div>
                   </div>
                   <section className="max-w-[800px] ">
-{algorithm.explanation.problemStatement && (
+{algorithm.explanation.problemStatement && (!algorithm?.controls || algorithm.controls?.description?.problem_statement !== false) && (
                         <RichText
                         content={algorithm.explanation.problemStatement}
                         className="text-base leading-relaxed pr-4"
@@ -779,7 +780,7 @@ const AlgorithmDetailNew: React.FC = () => {
                   </section>
 
                   {/* Examples Section */}
-                  {algorithm.explanation.io && algorithm.explanation.io.length > 0 && (
+                  {algorithm.explanation.io && algorithm.explanation.io.length > 0 && (!algorithm?.controls || algorithm.controls?.description?.problem_statement !== false) && (
                     <div className="space-y-4 max-w-[600px] ">
                       {algorithm.explanation.io.map((example: any, index: number) => (
                         <div key={index} className="border rounded-lg p-4 bg-muted/20">
@@ -810,7 +811,7 @@ const AlgorithmDetailNew: React.FC = () => {
                   )}
 
                   {/* Constraints Section */}
-                  {algorithm.explanation.constraints && algorithm.explanation.constraints.length > 0 && (
+                  {algorithm.explanation.constraints && algorithm.explanation.constraints.length > 0 && (!algorithm?.controls || algorithm.controls?.description?.problem_statement !== false) && (
                     <div className="border rounded-lg max-w-[500px] p-4 bg-muted/20">
                       <h4 className="font-semibold mb-3">Constraints:</h4>
                       <ul className="space-y-1.5 font-mono text-sm">
@@ -829,44 +830,46 @@ const AlgorithmDetailNew: React.FC = () => {
                   )}
 
                   {/* Note Section */}
-                  {algorithm.explanation.note && (
+                  {algorithm.explanation.note && (!algorithm?.controls || algorithm.controls?.description?.problem_statement !== false) && (
                     <div className="border-l-4 border-primary pl-4 py-2">
                       <p className="text-sm text-muted-foreground italic">{algorithm.explanation.note}</p>
                     </div>
                   )}
 
                   {/* Algorithm Overview Card */}
-                  <Card className="p-4 sm:p-6 glass-card overflow-hidden">
-                    <div className="space-y-4">
-                      <h3 className="font-semibold flex items-center gap-2">
-                        <BookOpen className="w-5 h-5 text-primary" />
-                        Algorithm Overview
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        {algorithm.overview || algorithm.explanation.problemStatement}
-                      </p>
+                  {(!algorithm?.controls || algorithm.controls?.description?.overview !== false) && (
+                    <Card className="p-4 sm:p-6 glass-card overflow-hidden">
+                      <div className="space-y-4">
+                        <h3 className="font-semibold flex items-center gap-2">
+                          <BookOpen className="w-5 h-5 text-primary" />
+                          Algorithm Overview
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          {algorithm.overview || algorithm.explanation.problemStatement}
+                        </p>
 
-                      <Separator />
+                        <Separator />
 
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm font-medium mb-1">Time Complexity</p>
-                          <Badge variant="outline" className="font-mono">
-                            {algorithm.timeComplexity}
-                          </Badge>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium mb-1">Space Complexity</p>
-                          <Badge variant="outline" className="font-mono">
-                            {algorithm.spaceComplexity}
-                          </Badge>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-sm font-medium mb-1">Time Complexity</p>
+                            <Badge variant="outline" className="font-mono">
+                              {algorithm.timeComplexity}
+                            </Badge>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium mb-1">Space Complexity</p>
+                            <Badge variant="outline" className="font-mono">
+                              {algorithm.spaceComplexity}
+                            </Badge>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Card>
+                    </Card>
+                  )}
 
                   {/* Steps, Use Cases & Tips Card */}
-                  {algorithm && (!algorithm?.controls || algorithm.controls?.tabs?.description !== false) && (
+                  {algorithm && (!algorithm?.controls || algorithm.controls?.description?.guides !== false) && (
                     <Card className="p-4 sm:p-6 glass-card overflow-hidden">
                       <Tabs defaultValue="steps">
                         <TabsList className="grid w-full grid-cols-3 h-auto">
@@ -988,8 +991,10 @@ const AlgorithmDetailNew: React.FC = () => {
               </ScrollArea>
             </TabsContent>
 
-            {(!algorithm?.controls || algorithm.controls?.tabs?.visualization !== false) && (
-              <TabsContent value="visualizations" className="h-full m-0 flex flex-col data-[state=inactive]:hidden">
+            <TabsContent value="visualizations" className="h-full m-0 flex flex-col data-[state=inactive]:hidden">
+              {algorithm?.controls?.tabs?.visualization === false ? (
+                 <TabWarning message="Visualization is not available for this problem at the moment." />
+              ) : (
                 <AuthGuard
                   fallbackTitle="Sign in to view Visualizations"
                   fallbackDescription="Create an account or sign in to access interactive algorithm visualizations."
@@ -1015,11 +1020,13 @@ const AlgorithmDetailNew: React.FC = () => {
                     </div>
                   </div>
                 </AuthGuard>
-              </TabsContent>
-            )}
+              )}
+            </TabsContent>
 
-            {(!algorithm?.controls || algorithm.controls?.tabs?.solutions !== false) && (
-              <TabsContent value="solutions" className="h-full m-0 data-[state=inactive]:hidden">
+            <TabsContent value="solutions" className="h-full m-0 data-[state=inactive]:hidden">
+               {algorithm?.controls?.tabs?.solutions === false ? (
+                 <TabWarning message="Detailed solutions are not available for this problem yet." />
+               ) : (
                  <ScrollArea className="h-full">
                     <div className="p-4 space-y-4 pb-20">
                       {algorithm?.implementations ? (
@@ -1035,8 +1042,8 @@ const AlgorithmDetailNew: React.FC = () => {
                       )}
                     </div>
                   </ScrollArea>
-              </TabsContent>
-            )}
+               )}
+            </TabsContent>
 
             {/* Bottom Action Bar - Floating & Centered (Visible across all tabs) */}
             <div className="absolute bottom-6 left-0 right-0 z-10 flex justify-center pointer-events-none">
@@ -1131,63 +1138,60 @@ const AlgorithmDetailNew: React.FC = () => {
               )}
               
               <TabsList className="flex-1 flex p-0 bg-transparent gap-0 rounded-none">
-                <FeatureGuard flag="code_runner_tab">
-                  <TabsTrigger 
-                    value="code" 
-                    className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
-                  >
-                    <Code2 className="w-4 h-4 mr-2" />
-                    Code
-                  </TabsTrigger>
-                </FeatureGuard>
+                <TabsTrigger 
+                  value="code" 
+                  className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
+                >
+                  <Code2 className="w-4 h-4 mr-2" />
+                  Code
+                </TabsTrigger>
                 
-                {(!algorithm?.controls || algorithm.controls?.tabs?.brainstorm !== false) && (
-                  <FeatureGuard flag="brainstrom_tab">
-                    <TabsTrigger 
-                      value="brainstorm"
-                      className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
-                    >
-                      <Lightbulb className="w-4 h-4 mr-2" />
-                      Brainstorm
-                    </TabsTrigger>
-                  </FeatureGuard>
-                )}
+                <TabsTrigger 
+                  value="brainstorm"
+                  className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10"
+                >
+                  <Lightbulb className="w-4 h-4 mr-2" />
+                  Brainstorm
+                </TabsTrigger>
               </TabsList>
               
           </div>
             
 
-            <FeatureGuard flag="code_runner_tab">
-              <TabsContent value="code" className="flex-1 m-0 overflow-hidden relative group flex flex-col data-[state=inactive]:hidden">
-                <AuthGuard
-                  fallbackTitle="Sign in to use Code Runner"
-                  fallbackDescription="Create an account or sign in to run and test your code solutions."
-                >
-                  {algorithmIdOrSlug && algorithm && (
-                    <CodeRunner 
-                      algorithmId={algorithmIdOrSlug}
-                      algorithmData={algorithm}
-                      onToggleFullscreen={() => setIsCodeRunnerMaximized(!isCodeRunnerMaximized)}
-                      isMaximized={isCodeRunnerMaximized}
-                      className={isCodeRunnerMaximized ? "fixed inset-0 z-50 h-screen w-screen bg-background" : "h-full flex-1 border-0 rounded-none"}
-                      initialCode={savedCode}
-                      onCodeChange={handleCodeChange}
-                      language={selectedLanguage as any}
-                      onLanguageChange={(lang) => {
-                        setSelectedLanguage(lang);
-                        localStorage.setItem('preferredLanguage', lang);
-                      }}
-                      onSuccess={handleCodeSuccess}
-                      controls={algorithm.controls?.code_runner} 
-                    />
-                  )}
-                </AuthGuard>
-              </TabsContent>
-            </FeatureGuard>
+            <TabsContent value="code" className="flex-1 m-0 overflow-hidden relative group flex flex-col data-[state=inactive]:hidden">
+               {algorithm?.controls?.tabs?.code === false ? (
+                  <TabWarning message="Code Runner is not available for this problem." />
+               ) : (
+                 <AuthGuard
+                   fallbackTitle="Sign in to use Code Runner"
+                   fallbackDescription="Create an account or sign in to run and test your code solutions."
+                 >
+                   {algorithmIdOrSlug && algorithm && (
+                     <CodeRunner 
+                       algorithmId={algorithmIdOrSlug}
+                       algorithmData={algorithm}
+                       onToggleFullscreen={() => setIsCodeRunnerMaximized(!isCodeRunnerMaximized)}
+                       isMaximized={isCodeRunnerMaximized}
+                       className={isCodeRunnerMaximized ? "fixed inset-0 z-50 h-screen w-screen bg-background" : "h-full flex-1 border-0 rounded-none"}
+                       initialCode={savedCode}
+                       onCodeChange={handleCodeChange}
+                       language={selectedLanguage as any}
+                       onLanguageChange={(lang) => {
+                         setSelectedLanguage(lang);
+                         localStorage.setItem('preferredLanguage', lang);
+                       }}
+                       onSuccess={handleCodeSuccess}
+                       controls={algorithm.controls?.code_runner} 
+                     />
+                   )}
+                 </AuthGuard>
+               )}
+            </TabsContent>
 
-            {(!algorithm?.controls || algorithm.controls?.tabs?.brainstorm !== false) && (
-              <FeatureGuard flag="brainstrom_tab">
-               <TabsContent value="brainstorm" className="flex-1 m-0 overflow-hidden data-[state=inactive]:hidden">
+            <TabsContent value="brainstorm" className="flex-1 m-0 overflow-hidden data-[state=inactive]:hidden">
+               {algorithm?.controls?.tabs?.brainstorm === false ? (
+                  <TabWarning message="Brainstorming tools are disabled for this session." />
+               ) : (
                   <div className="h-full flex flex-col">
                     <AuthGuard
                       fallbackTitle="Sign in to Brainstorm"
@@ -1200,9 +1204,8 @@ const AlgorithmDetailNew: React.FC = () => {
                       />
                     </AuthGuard>
                   </div>
-               </TabsContent>
-              </FeatureGuard>
-            )}
+               )}
+            </TabsContent>
           </Tabs>
       </div>
     </div>
