@@ -33,8 +33,6 @@ interface SolutionViewerProps {
   controls?: {
     approaches?: boolean;
     languages?: boolean;
-    explanation_before?: boolean;
-    explanation_after?: boolean;
   };
 }
 

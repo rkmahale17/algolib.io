@@ -2,6 +2,3 @@ project_id = "mitejukmgshjyusgnpps"
 
 [functions.seed-algorithms]
 verify_jwt = true
-
-[functions.get-config]
-verify_jwt = false

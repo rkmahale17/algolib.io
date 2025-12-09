@@ -1,7 +1,7 @@
-import { createContext, useContext, useEffect, useState, ReactNode, useRef } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { getDynamicSupabaseClient } from "@/lib/supabaseConfig";
-import type { SupabaseClient } from "@supabase/supabase-js";
+import { FeatureFlag } from "@/types/featureFlags";
+import { toast } from "sonner";
 
 interface FeatureFlagContextType {
   flags: Record<string, boolean>;
@@ -14,42 +14,18 @@ const FeatureFlagContext = createContext<FeatureFlagContextType | undefined>(und
 export const FeatureFlagProvider = ({ children }: { children: ReactNode }) => {
   const [flags, setFlags] = useState<Record<string, boolean>>({});
   const [isLoading, setIsLoading] = useState(true);
-  const clientRef = useRef<SupabaseClient | null>(null);
-
-  const getClient = async (): Promise<SupabaseClient | null> => {
-    // Try to use the main supabase client first
-    if (supabase) {
-      return supabase;
-    }
-    
-    // Fallback to dynamic client
-    try {
-      const dynamicClient = await getDynamicSupabaseClient();
-      return dynamicClient;
-    } catch (error) {
-      console.error('Failed to get Supabase client:', error);
-      return null;
-    }
-  };
 
   const fetchFlags = async () => {
     try {
-      const client = await getClient();
-      
-      if (!client) {
-        console.warn('No Supabase client available. Using default feature flags.');
-        setIsLoading(false);
-        return;
-      }
-
-      const { data, error } = await client
+      // @ts-ignore - feature_flags table is new and types are not regenerated yet
+      const { data, error } = await supabase
         .from('feature_flags')
         .select('*');
       
       if (error) throw error;
 
       const flagMap: Record<string, boolean> = {};
-      data?.forEach((flag: { key: string; is_enabled: boolean }) => {
+      data?.forEach(flag => {
         flagMap[flag.key] = flag.is_enabled;
       });
       
@@ -62,40 +38,23 @@ export const FeatureFlagProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    let channel: ReturnType<SupabaseClient['channel']> | null = null;
+    fetchFlags();
 
-    const initializeRealtime = async () => {
-      await fetchFlags();
-
-      const client = await getClient();
-      
-      if (!client) {
-        console.warn('Supabase client is not initialized. Realtime subscriptions disabled.');
-        return;
-      }
-
-      clientRef.current = client;
-
-      // specific subscription to table changes
-      channel = client
-        .channel('public:feature_flags')
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'feature_flags' },
-          (payload) => {
-            console.log('Feature Flag update received:', payload);
-            fetchFlags(); // Simple re-fetch strategy on any change
-          }
-        )
-        .subscribe();
-    };
-
-    initializeRealtime();
+    // specific subscription to table changes
+    const channel = supabase
+      .channel('public:feature_flags')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'feature_flags' },
+        (payload) => {
+          console.log('Feature Flag update received:', payload);
+          fetchFlags(); // Simple re-fetch strategy on any change
+        }
+      )
+      .subscribe();
 
     return () => {
-      if (channel && clientRef.current) {
-        clientRef.current.removeChannel(channel);
-      }
+      supabase.removeChannel(channel);
     };
   }, []);
 
