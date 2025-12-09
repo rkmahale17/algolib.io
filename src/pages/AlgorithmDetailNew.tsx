@@ -39,6 +39,7 @@ import {
 } from "lucide-react";
 import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
 import { FeatureGuard } from "@/components/FeatureGuard";
+import { AlgorithmLoader } from "@/components/AlgorithmLoader";
 import confetti from 'canvas-confetti';
 import { Link, useNavigate, useParams } from "react-router-dom";
 import React, { useEffect, useState, useRef } from "react";
@@ -101,7 +102,6 @@ import { renderVisualization as renderVizFromMapping, hasVisualization } from "@
 import { SolutionViewer } from "@/components/SolutionViewer";
 import { RichText } from "@/components/RichText";
 import { PremiumLoader } from "@/components/PremiumLoader";
-import { FeatureGuard } from "@/components/FeatureGuard";
 
 const AlgorithmDetailNew: React.FC = () => {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
