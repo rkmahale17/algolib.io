@@ -69,13 +69,35 @@ export const DEFAULT_CONTROLS = {
   },
   solutions: {
       approaches: true,
-      languages: true
+      languages: {
+        typescript: true,
+        python: true,
+        java: true,
+        cpp: true,
+      }
   }
 };
+
+
+
+interface CodeBlock {
+  codeType: string;
+  code: string;
+  explanationBefore?: string;
+  explanationAfter?: string;
+  isVisible?: boolean;
+}
+
+interface CodeImplementation {
+  lang: string;
+  code: CodeBlock[];
+}
 
 interface ControlsEditorProps {
   controls: any;
   onChange: (controls: any) => void;
+  implementations?: CodeImplementation[];
+  onImplementationsChange?: (implementations: CodeImplementation[]) => void;
 }
 
 const ConfirmSwitch = ({ 
@@ -144,7 +166,93 @@ const ConfirmSwitch = ({
   );
 };
 
-export function ControlsEditor({ controls, onChange }: ControlsEditorProps) {
+const VisibilityMatrix = ({ 
+  implementations, 
+  onUpdate 
+}: { 
+  implementations: CodeImplementation[];
+  onUpdate: (impls: CodeImplementation[]) => void;
+}) => {
+  if (!implementations || implementations.length === 0) return null;
+
+  // 1. Gather all unique approaches (code types)
+  const codeTypes = new Set<string>();
+  implementations.forEach(impl => {
+      impl.code?.forEach(c => codeTypes.add(c.codeType));
+  });
+  const approaches = Array.from(codeTypes);
+
+  // 2. toggle visibility
+  const toggleVisibility = (lang: string, codeType: string, currentVal: boolean) => {
+      const newImpls = implementations.map(impl => {
+          if (impl.lang !== lang) return impl;
+          return {
+              ...impl,
+              code: impl.code.map(c => {
+                  if (c.codeType !== codeType) return c;
+                  return { ...c, isVisible: !currentVal };
+              })
+          };
+      });
+      onUpdate(newImpls);
+  };
+
+  // Derive languages dynamically from implementations
+  const uniqueLangs = new Set<string>();
+  implementations.forEach(impl => uniqueLangs.add(impl.lang));
+  // Sort to keep consistent order, prioritizing common ones if desired, or just alphabetical
+  const LANGUAGES = Array.from(uniqueLangs).sort();
+
+  return (
+    <div className="mt-4 border rounded-md p-3 bg-muted/20">
+      <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
+         Granular Visibility 
+         <span className="text-xs font-normal text-muted-foreground">(Hide specific approaches per language)</span>
+      </h4>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+           <thead>
+              <tr className="border-b">
+                 <th className="text-left font-medium p-2">Approach</th>
+                 {LANGUAGES.map(lang => (
+                     <th key={lang} className="text-center font-medium p-2 capitalize">{lang}</th>
+                 ))}
+              </tr>
+           </thead>
+           <tbody>
+              {approaches.map(approach => (
+                  <tr key={approach} className="border-b last:border-0 hover:bg-muted/30">
+                      <td className="p-2 font-medium capitalize">{approach.replace(/-/g, ' ')}</td>
+                      {LANGUAGES.map(lang => {
+                          const impl = implementations.find(i => i.lang === lang);
+                          const block = impl?.code.find(c => c.codeType === approach);
+                          
+                          if (!impl || !block) {
+                              return <td key={lang} className="p-2 text-center text-muted-foreground/30">-</td>;
+                          }
+
+                          const isVisible = block.isVisible !== false; // Default to true
+
+                          return (
+                              <td key={lang} className="p-2 text-center">
+                                  <Switch 
+                                      checked={isVisible}
+                                      onCheckedChange={() => toggleVisibility(lang, approach, isVisible)}
+                                      className="scale-75 data-[state=checked]:bg-green-600"
+                                  />
+                              </td>
+                          );
+                      })}
+                  </tr>
+              ))}
+           </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+export function ControlsEditor({ controls, onChange, implementations, onImplementationsChange }: ControlsEditorProps) {
   // Ensure we have all default keys if some are missing (backward compatibility)
   const localControls = { ...DEFAULT_CONTROLS, ...controls };
 
@@ -152,7 +260,7 @@ export function ControlsEditor({ controls, onChange }: ControlsEditorProps) {
     const newControls = JSON.parse(JSON.stringify(localControls));
     let current = newControls;
     for (let i = 0; i < path.length - 1; i++) {
-        if (!current[path[i]]) current[path[i]] = {};
+        if (!current[path[i]] || typeof current[path[i]] !== 'object') current[path[i]] = {};
         current = current[path[i]];
     }
     current[path[path.length - 1]] = value;
@@ -508,58 +616,23 @@ export function ControlsEditor({ controls, onChange }: ControlsEditorProps) {
                      />
                  ))}
              </div>
+             
+             {/* Granular Visibility Matrix */}
+             {implementations && onImplementationsChange && (
+                <>
+                    <Separator className="my-2" />
+                    <VisibilityMatrix 
+                        implementations={implementations}
+                        onUpdate={onImplementationsChange}
+                    />
+                </>
+             )}
           </CardContent>
         </Card>
       </div>
 
       {/* CODE RUNNER CONFIG */}
-      <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base font-medium">Code Runner Config</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                 {/* Main Controls - Using ConfirmSwitch */}
-                 <ConfirmSwitch 
-                    id="cr-run" 
-                    itemLabel="Run Button"
-                    checked={localControls.code_runner?.run_code !== false}
-                    onCheckedChange={(c) => updateNested(['code_runner', 'run_code'], c)}
-                  />
-                  
-                 <ConfirmSwitch 
-                    id="cr-sub" 
-                    itemLabel="Submit Button"
-                    checked={localControls.code_runner?.submit !== false}
-                    onCheckedChange={(c) => updateNested(['code_runner', 'submit'], c)}
-                  />
 
-                 <ConfirmSwitch 
-                    id="cr-add" 
-                    itemLabel="Add Test Case"
-                    checked={localControls.code_runner?.add_test_case !== false}
-                    onCheckedChange={(c) => updateNested(['code_runner', 'add_test_case'], c)}
-                  />
-             </div>
-             
-             <Separator className="my-4" />
-             
-             <div className="space-y-3">
-                <Label className="text-base font-medium block">Enabled Languages</Label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {['typescript', 'python', 'java', 'cpp'].map((lang) => (
-                        <ConfirmSwitch 
-                            key={lang}
-                            id={`lang-${lang}`}
-                            itemLabel={lang.charAt(0).toUpperCase() + lang.slice(1)}
-                            checked={localControls.code_runner?.languages?.[lang] !== false}
-                            onCheckedChange={(c) => updateNested(['code_runner', 'languages', lang], c)}
-                        />
-                    ))}
-                </div>
-             </div>
-          </CardContent>
-        </Card>
     </div>
   );
 }

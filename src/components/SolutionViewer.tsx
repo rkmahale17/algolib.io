@@ -11,6 +11,7 @@ interface CodeBlock {
   code: string;
   explanationBefore?: string;
   explanationAfter?: string;
+  isVisible?: boolean;
 }
 
 interface CodeImplementation {
@@ -32,7 +33,9 @@ interface SolutionViewerProps {
   complexityExplanation?: string;
   controls?: {
     approaches?: boolean;
-    languages?: boolean;
+    languages?: boolean | Record<string, boolean>; // Supported granular control
+    explanation_before?: boolean;
+    explanation_after?: boolean;
   };
 }
 
@@ -133,7 +136,19 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
         const approachesByType: Record<string, { lang: string; code: string; explanationBefore?: string; explanationAfter?: string }[]> = {};
         
         implementations.forEach((impl) => {
+          // Check if language is enabled
+          const normalizedLang = impl.lang.toLowerCase();
+          const isLangEnabled = !controls?.languages || 
+                               (typeof controls.languages === 'boolean' ? controls.languages : controls.languages[normalizedLang] !== false);
+
+          if (!isLangEnabled) return;
+
           impl.code.forEach((codeImpl) => {
+            // Check for granular visibility (default to true if undefined)
+            // We use 'as any' casting if the type definition isn't updated in this file yet, 
+            // but we should verify the interface above first.
+            if ((codeImpl as any).isVisible === false) return;
+
             if (codeImpl.codeType !== 'starter') {
               if (!approachesByType[codeImpl.codeType]) {
                 approachesByType[codeImpl.codeType] = [];
@@ -159,6 +174,11 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
           return (
             <div className="text-center py-12 text-muted-foreground border rounded-lg border-dashed">
               No solutions available.
+              {implementations.length > 0 && (
+                 <p className="text-xs mt-2 text-muted-foreground/80">
+                   Some solutions might be hidden by your display settings.
+                 </p>
+              )}
             </div>
           );
         }
@@ -191,7 +211,8 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
                       {/* Header with Language Tabs and Copy Button - Theme aware */}
                       <div className="flex items-stretch border-b bg-muted/10 shrink-0">
                         {/* Language Tabs - Compact style like AlgorithmDetailNew */}
-                        {(controls?.languages !== false) && (
+                        {/* Language Tabs - Show if multiple languages are available */}
+                        {(controls?.languages !== false && langImplementations.length > 1) && (
                           <TabsList className="flex-1 flex p-0 bg-transparent gap-0 rounded-none">
                             {langImplementations.map((impl) => (
                               <TabsTrigger
@@ -204,7 +225,8 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
                             ))}
                           </TabsList>
                         )}
-                        {(controls?.languages === false) && (
+                        {/* Single Language Header - Show if only 1 language or tabs disabled */}
+                        {(controls?.languages === false || langImplementations.length === 1) && (
                            <div className="flex-1 px-4 flex items-center text-sm font-medium text-muted-foreground bg-muted/5">
                               {getLanguageDisplayName(langImplementations.find(i => i.lang === (langImplementations[0]?.lang || 'typescript'))?.lang || 'Code')}
                            </div>

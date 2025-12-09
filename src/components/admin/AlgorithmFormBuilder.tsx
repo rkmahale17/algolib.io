@@ -370,6 +370,8 @@ export function AlgorithmFormBuilder({
              <ControlsEditor
               controls={formData.controls}
               onChange={(controls) => setFormData({ ...formData, controls })}
+              implementations={formData.implementations}
+              onImplementationsChange={(implementations) => setFormData({ ...formData, implementations })}
             />
           </TabsContent>
         </Tabs>
