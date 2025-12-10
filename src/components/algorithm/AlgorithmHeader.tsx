@@ -13,6 +13,7 @@ import {
   RotateCcw,
   MessageSquare,
   LogOut,
+  MoreHorizontal,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -43,6 +44,7 @@ interface AlgorithmHeaderProps {
   user: any;
   algorithm: any;
   isMobile: boolean;
+  windowWidth: number;
   
   // Timer / Interview
   isInterviewMode: boolean;
@@ -64,6 +66,7 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
   user,
   algorithm,
   isMobile,
+  windowWidth,
   isInterviewMode,
   toggleInterviewMode,
   timerSeconds,
@@ -76,6 +79,8 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
   handleShare,
   handleSignOut,
 }) => {
+  const showCondensedMenu = windowWidth < 778;
+
   return (
     <div className="h-12 border-b flex items-center px-4 gap-4 shrink-0 bg-background/95">
       {/* Left Side: Logo + Navigation */}
@@ -90,8 +95,8 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
         
         <div className="h-4 w-px bg-border" />
         
-        {/* Desktop Navigation */}
-        {!isMobile && (
+        {/* Desktop Navigation - Show only if NOT condensed menu */}
+        {!showCondensedMenu && (
           <TooltipProvider>
             {(!algorithm?.controls || algorithm.controls?.header?.random_problem !== false) && (
               <Tooltip>
@@ -121,8 +126,8 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
       {/* Right Side: Share, Bug, Timer, Interview, Theme, Profile */}
       <div className="ml-auto flex items-center gap-2">
           
-          {/* Mobile Hamburger Menu */}
-          {isMobile && (
+          {/* Condensed Menu (Tablet/Mobile < 778px) */}
+          {showCondensedMenu && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -156,7 +161,8 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
                     <span>{isInterviewMode ? "Exit Interview Mode" : "Interview Mode"}</span>
                   </DropdownMenuItem>
                 </FeatureGuard>
-                {/* Simple Timer Toggle for Mobile */}
+                
+                {/* Timer in Dropdown */}
                 <div className="p-2 flex items-center justify-between">
                    <div className="flex items-center gap-2 text-sm">
                       <Timer className="h-4 w-4" />
@@ -175,7 +181,8 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
             </DropdownMenu>
           )}
 
-          {!isMobile && (!algorithm?.controls || algorithm.controls?.social?.share !== false) && (
+          {/* Desktop Actions - Show only if NOT condensed menu */}
+          {!showCondensedMenu && (!algorithm?.controls || algorithm.controls?.social?.share !== false) && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -188,7 +195,7 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
             </TooltipProvider>
           )}
 
-          {!isMobile && (!algorithm?.controls || algorithm.controls?.header?.bug_report !== false) && (
+          {!showCondensedMenu && (!algorithm?.controls || algorithm.controls?.header?.bug_report !== false) && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -201,7 +208,7 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
             </TooltipProvider>
           )}
 
-        {!isMobile && (!algorithm?.controls || algorithm.controls?.header?.timer !== false) && (
+        {!showCondensedMenu && (!algorithm?.controls || algorithm.controls?.header?.timer !== false) && (
           <TooltipProvider>
             <Popover>
               <PopoverTrigger asChild>
@@ -234,7 +241,8 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
           </TooltipProvider>
         )}
 
-        {(!algorithm?.controls || algorithm.controls?.header?.interview_mode !== false) && (
+        {/* Interview Mode - Show only if NOT condensed menu */}
+        {!showCondensedMenu && (!algorithm?.controls || algorithm.controls?.header?.interview_mode !== false) && (
             <TooltipProvider>
             <FeatureGuard flag="interview_mode">
               <Tooltip>

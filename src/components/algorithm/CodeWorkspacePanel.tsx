@@ -27,6 +27,8 @@ interface CodeWorkspacePanelProps {
   isCodeRunnerMaximized: boolean;
   setIsCodeRunnerMaximized: (val: boolean) => void;
   submissions: Submission[];
+  className?: string;
+  isInterviewMode?: boolean;
 }
 
 export const CodeWorkspacePanel: React.FC<CodeWorkspacePanelProps> = ({
@@ -42,6 +44,8 @@ export const CodeWorkspacePanel: React.FC<CodeWorkspacePanelProps> = ({
   isCodeRunnerMaximized,
   setIsCodeRunnerMaximized,
   submissions,
+  className,
+  isInterviewMode,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isCompact, setIsCompact] = useState(false);
@@ -60,7 +64,7 @@ export const CodeWorkspacePanel: React.FC<CodeWorkspacePanelProps> = ({
   }, []);
 
   return (
-    <div ref={containerRef} className="h-full flex flex-col bg-card/30 backdrop-blur-sm">
+    <div ref={containerRef} className={`h-full flex flex-col bg-card/30 backdrop-blur-sm ${className || ''}`}>
       <div className="flex-1 overflow-hidden p-0">
          <Tabs defaultValue="code" className="h-full flex flex-col">
             <div className="flex items-stretch border-b bg-muted/10 shrink-0">
@@ -148,6 +152,7 @@ export const CodeWorkspacePanel: React.FC<CodeWorkspacePanelProps> = ({
                        onSuccess={handleCodeSuccess}
                        controls={algorithm.controls?.code_runner} 
                        submissions={submissions}
+                       isInterviewMode={isInterviewMode}
                      />
                    )}
                  </AuthGuard>

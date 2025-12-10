@@ -60,6 +60,7 @@ interface CodeRunnerProps {
     };
   };
   submissions?: Submission[];
+  isInterviewMode?: boolean;
 }
 
 interface EditorSettings {
@@ -69,6 +70,7 @@ interface EditorSettings {
   wordWrap: 'on' | 'off';
   minimap: boolean;
   lineNumbers: 'on' | 'off' | 'relative' | 'interval';
+  autocomplete: boolean;
 }
 
 const DEFAULT_SETTINGS: EditorSettings = {
@@ -77,7 +79,38 @@ const DEFAULT_SETTINGS: EditorSettings = {
   tabSize: 2,
   wordWrap: 'off',
   minimap: false,
-  lineNumbers: 'on'
+  lineNumbers: 'on',
+  autocomplete: true
+};
+
+const parseErrorLines = (output: string, lang: string): Array<{ line: number; column?: number; message: string }> => {
+  if (!output) return [];
+  const errors: Array<{ line: number; column?: number; message: string }> = [];
+  const lines = output.split('\n');
+
+  for (const line of lines) {
+    let match;
+    // Python: File "script.py", line 10, in <module>
+    if (lang === 'python') {
+       match = line.match(/File ".*", line (\d+)/);
+       if (match) {
+         errors.push({ line: parseInt(match[1]), message: line });
+       }
+    } 
+    // Java: Solution.java:10: error: ...
+    // C++: solution.cpp:12:5: error: ...
+    else if (lang === 'java' || lang === 'cpp') {
+       match = line.match(/:(\d+):(?:(\d+):)?\s*(error|warning):/);
+       if (match) {
+          errors.push({ 
+            line: parseInt(match[1]), 
+            column: match[2] ? parseInt(match[2]) : undefined,
+            message: line 
+          });
+       }
+    }
+  }
+  return errors;
 };
 
 export const CodeRunner: React.FC<CodeRunnerProps> = ({ 
@@ -92,7 +125,8 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   onLanguageChange,
   onSuccess,
   controls,
-  submissions: initialSubmissions = []
+  submissions: initialSubmissions = [],
+  isInterviewMode
 }) => {
   const isLimitExceeded = useFeatureFlag("todays_limit_exceed");
   const [internalLanguage, setInternalLanguage] = useState<Language>('typescript');
@@ -157,6 +191,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
     const newSettings = { ...settings, [key]: value };
     setSettings(newSettings);
     localStorage.setItem('monaco-editor-settings', JSON.stringify(newSettings));
+    window.dispatchEvent(new Event('monaco-settings-changed'));
   };
 
   // Deprecated internal fetching - removed to prevent redundant calls
@@ -394,7 +429,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
 
   const executeCode = async (isSubmission: boolean = false) => {
     if (isLimitExceeded) {
-      toast.error("Daily execution limit exceeded! Please try again tomorrow.");
+      toast.error("Daily execution limit exceeded! Please try again in sometime.");
       return;
     }
 
@@ -403,6 +438,9 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
 
     setOutput(null);
     setExecutionTime(null);
+    
+    // Clear previous error markers
+    editorRef.current?.setErrors([]);
 
     // If running (not submitting), filter out submission-only cases
     // If submitting, run ALL cases
@@ -500,6 +538,15 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
 
       setOutput(result);
       
+      // Parse and show errors in editor
+      if (result.stderr || result.compile_output) {
+         const errorText = result.compile_output || result.stderr || "";
+         const parsedErrors = parseErrorLines(errorText, language);
+         if (parsedErrors.length > 0) {
+            editorRef.current?.setErrors(parsedErrors);
+         }
+      }
+
       // Don't switch tab if submitting
       if (!isSubmission) {
         setActiveTab("result");
@@ -611,6 +658,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   const handleSelectSubmission = (submission: Submission) => {
     setViewingSubmission(submission);
     setActiveEditorTab("submission");
+    setIsOutputExpanded(false);
   };
 
   const handleCloseSubmission = (e?: React.MouseEvent) => {
@@ -815,23 +863,24 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                           </Select>
                         </div>
 
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="wordWrap">Word Wrap</Label>
-                          <Switch
-                            id="wordWrap"
-                            checked={settings.wordWrap === 'on'}
-                            onCheckedChange={(checked) => updateSetting('wordWrap', checked ? 'on' : 'off')}
-                          />
-                        </div>
 
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="minimap">Minimap</Label>
-                          <Switch
-                            id="minimap"
-                            checked={settings.minimap}
-                            onCheckedChange={(checked) => updateSetting('minimap', checked)}
-                          />
-                        </div>
+
+
+
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                    <Label htmlFor="autocomplete" className="text-xs">Autocomplete</Label>
+                    {isInterviewMode && (
+                        <p className="text-[10px] text-muted-foreground text-orange-500">Disabled in Interview Mode</p>
+                    )}
+                </div>
+                <Switch 
+                  id="autocomplete" 
+                  checked={settings.autocomplete}
+                  onCheckedChange={(checked) => updateSetting('autocomplete', checked)}
+                  disabled={isInterviewMode}
+                />
+              </div>
                         
                          <div className="flex items-center justify-between">
                           <Label htmlFor="lineNumbers">Line Numbers</Label>
@@ -880,13 +929,14 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                   onCodeChange?.(newCode);
                   setLastRunSuccess(false); // Reset success on code change
                 }}
+                theme={settings.theme}
                 options={{
                   ...settings,
                   readOnly: false // Explicitly writable
                 }}
               />
               <div className="absolute bottom-5 right-5 z-10">
-                <div className="flex items-center gap-0.5 p-0.5 bg-background/60 backdrop-blur-xl border shadow-lg rounded-full">
+                <div className="flex items-center gap-0.5 p-0.5 bg-white backdrop-blur-xl border border-gray-200 shadow-lg rounded-full">
                 <TooltipProvider>
                   <FeatureGuard flag="code_runner">
                   {controls?.run_code !== false && (
@@ -897,7 +947,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                           disabled={isLoading || isSubmitting}
                           size="sm"
                           variant="ghost"
-                          className="h-8 px-3 text-xs rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-all border-0"
+                          className="h-8 px-3 text-xs rounded-full bg-violet-100 text-violet-700 hover:bg-violet-200 transition-all border-0"
                         >
                           {isLoading ? (
                             <>
@@ -933,9 +983,9 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                             variant="ghost"
                             className={`h-8 px-3 text-xs rounded-full transition-all border-0 ${
                               lastRunSuccess 
-                                ? 'bg-green-500/10 text-green-600 hover:bg-green-500/20 hover:text-green-700' 
-                                : 'hover:bg-muted'
-                            } ${(!lastRunSuccess && !isLoading && !isSubmitting) ? 'pointer-events-none opacity-50' : ''}`}
+                                ? 'bg-green-100 text-green-700 hover:bg-green-200 hover:text-green-800' 
+                                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                            } ${(!lastRunSuccess && !isLoading && !isSubmitting) ? 'opacity-50' : ''}`}
                           >
                             {isSubmitting ? (
                               <>
@@ -997,6 +1047,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                     language={viewingSubmission?.language as Language || 'typescript'}
                     path={`/runner/submission/${viewingSubmission?.id}`}
                     onChange={() => {}} // Read only
+                    theme={settings.theme}
                     options={{
                        ...settings,
                         readOnly: true
@@ -1062,8 +1113,8 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
 
       {/* Expanded Modal View */}
       <Dialog open={isOutputExpanded} onOpenChange={setIsOutputExpanded}>
-        <DialogContent className="max-w-[90vw] h-[90vh] flex flex-col p-0 gap-0 border-none bg-background/95 backdrop-blur-xl">
-           <div className="h-full flex flex-col overflow-hidden rounded-lg border">
+        <DialogContent className="max-w-screen w-screen h-screen flex flex-col p-0 gap-0 border-none bg-background/95 backdrop-blur-xl rounded-none">
+           <div className="h-full flex flex-col overflow-hidden">
               <OutputPanel 
                 onToggleExpand={handleToggleOutputExpand}
                 isExpanded={true}

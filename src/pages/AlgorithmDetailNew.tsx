@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { Code2, ArrowLeft, Eye, Lightbulb, Minimize2 } from "lucide-react";
+import { Code2, ArrowLeft, Eye, Lightbulb, Minimize2, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -22,6 +22,14 @@ import { useAlgorithmLayout } from "@/hooks/useAlgorithmLayout";
 import { useInterviewSession } from "@/hooks/useInterviewSession";
 import { useAlgorithmInteractions } from "@/hooks/useAlgorithmInteractions";
 import { useUserAlgorithmData } from "@/hooks/useUserAlgorithmData";
+
+// Helper for scrolling to code section on mobile
+const scrollToCode = () => {
+  const codeSection = document.getElementById('mobile-code-section');
+  if (codeSection) {
+    codeSection.scrollIntoView({ behavior: 'smooth' });
+  }
+};
 
 const AlgorithmDetailNew: React.FC = () => {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
@@ -184,7 +192,6 @@ const AlgorithmDetailNew: React.FC = () => {
   }
 
   // -- Visualizations / Full Screen Overlays --
-  // These render unconditionally on top if active
   const renderMaximizedOverlays = () => (
     <>
       {layout.isCodeRunnerMaximized && (
@@ -209,6 +216,7 @@ const AlgorithmDetailNew: React.FC = () => {
                 initialCode={interactions.savedCode}
                 onCodeChange={interactions.handleCodeChange}
                 onSuccess={interactions.handleCodeSuccess}
+                isInterviewMode={session.isInterviewMode}
               />
           </div>
         </div>
@@ -227,11 +235,6 @@ const AlgorithmDetailNew: React.FC = () => {
             </Button>
           </div>
           <div className="flex-1 overflow-auto p-6 pb-20">
-             {/* Note: We duplicate logic slightly here as the panel has the renderer internal. 
-                 Ideally extract renderVisualization to a util or component if complex.
-                 For now, we can render the iframe directly if simple, or use the Panel logic.
-                 Given the complexity of `renderVisualization` in original file, it might be best to pass a helper */}
-             {/* For simplicity in this refactor, I will just replicate the Iframe check which is 90% of cases */}
              {algorithm.metadata?.visualizationUrl ? (
                 <iframe src={algorithm.metadata.visualizationUrl} className="w-full h-full border-0" title="Viz" />
              ) : (
@@ -261,6 +264,11 @@ const AlgorithmDetailNew: React.FC = () => {
     </>
   );
 
+  // Determine layout mode
+  const isTablet = layout.windowWidth >= 480 && layout.windowWidth < 778;
+  const showHorizontalScroll = isTablet; 
+  const isMobileView = layout.windowWidth < 480;
+
   return (
     <div className={`h-screen w-full overflow-hidden flex flex-col bg-background ${session.isInterviewMode ? 'border-4 border-green-500/30' : ''}`}>
       <AlgoMetaHead id={algorithmIdOrSlug} />
@@ -269,6 +277,7 @@ const AlgorithmDetailNew: React.FC = () => {
         user={user}
         algorithm={algorithm}
         isMobile={layout.isMobile}
+        windowWidth={layout.windowWidth}
         isInterviewMode={session.isInterviewMode}
         toggleInterviewMode={session.toggleInterviewMode}
         timerSeconds={session.timerSeconds}
@@ -282,64 +291,126 @@ const AlgorithmDetailNew: React.FC = () => {
         handleSignOut={handleSignOut}
       />
 
-      <div className="flex-1 overflow-hidden relative">
-         <ResizablePanelGroup direction={layout.isMobile ? "vertical" : "horizontal"} className="h-full">
-            {/* Left Panel */}
-            <ResizablePanel
-               ref={layout.leftPanelRef}
-               defaultSize={40}
-               minSize={15}
-               collapsible={true}
-               onCollapse={() => {
-                  // If utilizing local storage sync, update it here
-               }}
-               className={layout.isLeftCollapsed ? 'min-w-[0px]' : ''}
-            >
-               <ProblemDescriptionPanel
-                  algorithm={algorithm}
-                  activeTab={layout.activeTab}
-                  setActiveTab={layout.setActiveTab}
-                  isMobile={layout.isMobile}
-                  toggleLeftPanel={layout.toggleLeftPanel}
-                  isCompleted={interactions.isCompleted}
-                  likes={interactions.likes}
-                  dislikes={interactions.dislikes}
-                  userVote={interactions.userVote}
-                  isFavorite={interactions.isFavorite}
-                  handleVote={interactions.handleVote}
-                  toggleFavorite={interactions.toggleFavorite}
-                  setIsVisualizationMaximized={layout.setIsVisualizationMaximized}
-                  handleRichTextClick={handleRichTextClick}
-               />
-            </ResizablePanel>
+      <div className={`flex-1 relative ${showHorizontalScroll ? 'overflow-x-auto overflow-y-hidden' : 'overflow-hidden'}`}>
+         
+         {/* Mobile View (< 480px): Stacked Layout */}
+         {isMobileView ? (
+           <div className="h-full overflow-y-auto no-scrollbar pb-20 scroll-smooth">
+              {/* Top: Description */}
+              <div className="min-h-screen">
+                <ProblemDescriptionPanel
+                   algorithm={algorithm}
+                   activeTab={layout.activeTab}
+                   setActiveTab={layout.setActiveTab}
+                   isMobile={true}
+                   toggleLeftPanel={layout.toggleLeftPanel}
+                   isCompleted={interactions.isCompleted}
+                   likes={interactions.likes}
+                   dislikes={interactions.dislikes}
+                   userVote={interactions.userVote}
+                   isFavorite={interactions.isFavorite}
+                   handleVote={interactions.handleVote}
+                   toggleFavorite={interactions.toggleFavorite}
+                   setIsVisualizationMaximized={layout.setIsVisualizationMaximized}
+                   handleRichTextClick={handleRichTextClick}
+                />
+              </div>
 
-            <ResizableHandle withHandle className="bg-border hover:bg-primary/20 data-[resize-handle-active]:bg-primary/40 transition-colors" />
+              {/* Bottom: Code Workspace */}
+              <div id="mobile-code-section" className="min-h-screen border-t-4 border-muted">
+                 <CodeWorkspacePanel
+                    algorithm={algorithm}
+                    algorithmId={algorithmIdOrSlug || ""}
+                    isMobile={true}
+                    toggleRightPanel={layout.toggleRightPanel}
+                    savedCode={interactions.savedCode}
+                    handleCodeChange={interactions.handleCodeChange}
+                    handleCodeSuccess={interactions.handleCodeSuccess}
+                    selectedLanguage={interactions.selectedLanguage}
+                    setSelectedLanguage={interactions.setSelectedLanguage}
+                    isCodeRunnerMaximized={layout.isCodeRunnerMaximized}
+                    setIsCodeRunnerMaximized={layout.setIsCodeRunnerMaximized}
+                    submissions={userAlgoData?.submissions || []}
+                    className="h-[85vh]"
+                    isInterviewMode={session.isInterviewMode}
+                 />
+              </div>
+              
+              {/* Floating Action Button for Mobile Scroll */}
+              <div className="fixed bottom-6 right-6 z-50">
+                <Button 
+                  size="icon" 
+                  className="rounded-full h-12 w-12 shadow-lg hover:shadow-xl transition-shadow bg-primary text-primary-foreground"
+                  onClick={scrollToCode}
+                >
+                  <ArrowDown className="h-6 w-6" />
+                </Button>
+              </div>
+           </div>
+         ) : (
+           /* Tablet/Desktop View (>= 480px): Resizable Panels */
+           <div className={`h-full ${showHorizontalScroll ? 'min-w-[778px]' : 'w-full'}`}>
+             <ResizablePanelGroup direction="horizontal" className="h-full">
+                {/* Left Panel */}
+                <ResizablePanel
+                   ref={layout.leftPanelRef}
+                   defaultSize={40}
+                   minSize={20}
+                   maxSize={80}
+                   collapsible={true}
+                   onCollapse={() => {
+                      // If utilizing local storage sync, update it here
+                   }}
+                   className={layout.isLeftCollapsed ? 'min-w-[0px]' : ''}
+                >
+                   <ProblemDescriptionPanel
+                      algorithm={algorithm}
+                      activeTab={layout.activeTab}
+                      setActiveTab={layout.setActiveTab}
+                      isMobile={layout.isMobile}
+                      toggleLeftPanel={layout.toggleLeftPanel}
+                      isCompleted={interactions.isCompleted}
+                      likes={interactions.likes}
+                      dislikes={interactions.dislikes}
+                      userVote={interactions.userVote}
+                      isFavorite={interactions.isFavorite}
+                      handleVote={interactions.handleVote}
+                      toggleFavorite={interactions.toggleFavorite}
+                      setIsVisualizationMaximized={layout.setIsVisualizationMaximized}
+                      handleRichTextClick={handleRichTextClick}
+                   />
+                </ResizablePanel>
 
-            {/* Right Panel */}
-            <ResizablePanel
-               ref={layout.rightPanelRef}
-               defaultSize={60}
-               minSize={15}
-               collapsible={true}
-               onCollapse={() => {}}
-               className={layout.isRightCollapsed ? 'min-w-[0px]' : ''}
-            >
-               <CodeWorkspacePanel
-                  algorithm={algorithm}
-                  algorithmId={algorithmIdOrSlug || ""}
-                  isMobile={layout.isMobile}
-                  toggleRightPanel={layout.toggleRightPanel}
-                  savedCode={interactions.savedCode}
-                  handleCodeChange={interactions.handleCodeChange}
-                  handleCodeSuccess={interactions.handleCodeSuccess}
-                  selectedLanguage={interactions.selectedLanguage}
-                  setSelectedLanguage={interactions.setSelectedLanguage}
-                  isCodeRunnerMaximized={layout.isCodeRunnerMaximized}
-                  setIsCodeRunnerMaximized={layout.setIsCodeRunnerMaximized}
-                  submissions={userAlgoData?.submissions || []}
-               />
-            </ResizablePanel>
-         </ResizablePanelGroup>
+                <ResizableHandle withHandle className="bg-border hover:bg-primary/20 data-[resize-handle-active]:bg-primary/40 transition-colors" />
+
+                {/* Right Panel */}
+                <ResizablePanel
+                   ref={layout.rightPanelRef}
+                   defaultSize={60}
+                   minSize={20}
+                   maxSize={80}
+                   collapsible={true}
+                   onCollapse={() => {}}
+                   className={layout.isRightCollapsed ? 'min-w-[0px]' : ''}
+                >
+                   <CodeWorkspacePanel
+                      algorithm={algorithm}
+                      algorithmId={algorithmIdOrSlug || ""}
+                      isMobile={layout.isMobile}
+                      toggleRightPanel={layout.toggleRightPanel}
+                      savedCode={interactions.savedCode}
+                      handleCodeChange={interactions.handleCodeChange}
+                      handleCodeSuccess={interactions.handleCodeSuccess}
+                      selectedLanguage={interactions.selectedLanguage}
+                      setSelectedLanguage={interactions.setSelectedLanguage}
+                      isCodeRunnerMaximized={layout.isCodeRunnerMaximized}
+                      setIsCodeRunnerMaximized={layout.setIsCodeRunnerMaximized}
+                      submissions={userAlgoData?.submissions || []}
+                   />
+                </ResizablePanel>
+             </ResizablePanelGroup>
+           </div>
+         )}
       </div>
       
       {renderMaximizedOverlays()}
