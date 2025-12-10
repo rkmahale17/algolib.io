@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import {
   Book,
   Eye,
   Code2,
   PanelLeftClose,
   Maximize2,
+  Minimize2,
   BookOpen,
   Youtube,
   ExternalLink,
@@ -28,6 +30,7 @@ import { RichText } from "@/components/RichText";
 import { blind75Problems } from "@/data/blind75";
 import { renderBlind75Visualization } from "@/utils/blind75Visualizations";
 import { renderVisualization as renderVizFromMapping, hasVisualization } from "@/utils/visualizationMapping";
+import { AlgoLink } from "../AlgoLink";
 
 interface ProblemDescriptionPanelProps {
   algorithm: any;
@@ -46,6 +49,7 @@ interface ProblemDescriptionPanelProps {
   toggleFavorite: () => void;
   
   // Visualization props
+  isVisualizationMaximized: boolean;
   setIsVisualizationMaximized: (val: boolean) => void;
   handleRichTextClick: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
@@ -63,6 +67,7 @@ export const ProblemDescriptionPanel = React.memo(({
   isFavorite,
   handleVote,
   toggleFavorite,
+  isVisualizationMaximized,
   setIsVisualizationMaximized,
   handleRichTextClick,
 }: ProblemDescriptionPanelProps) => {
@@ -275,6 +280,7 @@ export const ProblemDescriptionPanel = React.memo(({
                           variant="outline" 
                           className="bg-green-500/10 text-green-500 border-green-500/20 px-3 py-1.5 hover:bg-green-500/20 transition-colors cursor-default"
                         >
+                          
                           <CheckCircle2 className="w-4 h-4 mr-2" />
                           Attempted
                         </Badge>
@@ -625,6 +631,31 @@ export const ProblemDescriptionPanel = React.memo(({
             </div>
         </div>
       </Tabs>
+      
+      {/* Maximized Visualization Portal */}
+      {isVisualizationMaximized && createPortal(
+        <div className="fixed inset-0 z-[100] bg-background flex flex-col w-screen h-screen">
+            <div className="flex items-center justify-between px-4 py-2 border-b bg-background shrink-0 h-14">
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                <Eye className="w-5 h-5 text-primary" />
+                Visualization
+              </h2>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setIsVisualizationMaximized(false)}
+                className="gap-2"
+              >
+                <Minimize2 className="w-4 h-4" />
+                Exit Fullscreen
+              </Button>
+            </div>
+            <div className="flex-1 overflow-hidden p-4 relative">
+               {renderVisualization()}
+            </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 });

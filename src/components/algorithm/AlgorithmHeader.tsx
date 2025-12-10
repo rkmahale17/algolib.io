@@ -14,6 +14,7 @@ import {
   MessageSquare,
   LogOut,
   MoreHorizontal,
+  User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -150,11 +151,18 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
                   <Share2 className="mr-2 h-4 w-4" />
                   <span>Share</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => window.open("/feedback", "_blank")}>
+                <DropdownMenuItem asChild>
+                  <Link to="/profile">
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </Link>
+                </DropdownMenuItem>
+                {/* <DropdownMenuItem onClick={() => window.open("/feedback", "_blank")}>
                   <Bug className="mr-2 h-4 w-4" />
                   <span>Report Issue</span>
-                </DropdownMenuItem>
+                </DropdownMenuItem> */}
                 <DropdownMenuSeparator />
+                {/* Interview Mode - Hidden for now */}
                 <FeatureGuard flag="interview_mode">
                   <DropdownMenuItem onClick={toggleInterviewMode}>
                     <Monitor className="mr-2 h-4 w-4" />
@@ -242,7 +250,7 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
         )}
 
         {/* Interview Mode - Show only if NOT condensed menu */}
-        {!showCondensedMenu && (!algorithm?.controls || algorithm.controls?.header?.interview_mode !== false) && (
+        {!showCondensedMenu && false && (!algorithm?.controls || algorithm.controls?.header?.interview_mode !== false) && (
             <TooltipProvider>
             <FeatureGuard flag="interview_mode">
               <Tooltip>
@@ -294,9 +302,13 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link to="/feedback">
+                {/* <Link to="/feedback">
                   <MessageSquare className="mr-2 h-4 w-4" />
                   <span>Feedback</span>
+                </Link> */}
+                  <Link to="/profile">
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />

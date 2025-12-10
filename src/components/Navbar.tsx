@@ -12,7 +12,6 @@ import {
   LogOut,
   Menu as MenuIcon,
   MessageSquare,
-  Trophy,
   ShieldCheck,
   User,
 } from "lucide-react";
@@ -29,7 +28,6 @@ import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
 
 const Navbar = () => {
   const [user, setUser] = useState<any>(null);
-  const [completedCount, setCompletedCount] = useState(0);
   const location = useLocation();
   const isAuthPage = location.pathname === "/auth";
   const adminId = import.meta.env.VITE_ADMIN_USER_ID;
@@ -40,9 +38,6 @@ const Navbar = () => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProgress(session.user.id);
-      }
     });
 
     // Listen for auth changes
@@ -50,55 +45,10 @@ const Navbar = () => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProgress(session.user.id);
-      } else {
-        setCompletedCount(0);
-      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
-
-  const fetchProgress = async (userId: string) => {
-    if (!supabase) return;
-    
-    const { data, error } = await supabase
-      .from("user_algorithm_data")
-      .select("*", { count: "exact" })
-      .eq("user_id", userId)
-      .eq("completed", true);
-
-    if (!error && data) {
-      setCompletedCount(data.length);
-    }
-  };
-
-  // Set up realtime subscription for progress updates
-  useEffect(() => {
-    if (!user || !supabase) return;
-
-    const channel = supabase
-      .channel("user_algorithm_data_changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "user_algorithm_data",
-          filter: `user_id=eq.${user.id}`,
-        },
-        () => {
-          // Refetch progress when any change occurs
-          fetchProgress(user.id);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user]);
 
   const handleSignOut = async () => {
     if (!supabase) {
@@ -242,14 +192,6 @@ const Navbar = () => {
             <ThemeToggle />
             {user && !isAuthPage ? (
               <>
-                {/* Progress indicator */}
-                <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/50 border border-border/50">
-                  <Trophy className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-medium">
-                    {completedCount} / 80 completed
-                  </span>
-                </div>
-
                 {/* User menu */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

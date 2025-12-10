@@ -223,50 +223,7 @@ const AlgorithmDetailNew: React.FC = () => {
     );
   }
 
-  // -- Visualizations / Full Screen Overlays --
-  const renderMaximizedOverlays = () => (
-    <>
-      {layout.isVisualizationMaximized && (
-        <div className="fixed inset-0 z-50 bg-background flex flex-col">
-           <div className="flex items-center justify-between p-4 border-b">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              <Eye className="w-5 h-5 text-primary" />
-              Visualization
-            </h2>
-            <Button variant="ghost" size="sm" onClick={() => layout.setIsVisualizationMaximized(false)}>
-              <Minimize2 className="w-4 h-4 mr-2" />
-              Exit Fullscreen
-            </Button>
-          </div>
-          <div className="flex-1 overflow-auto p-6 pb-20">
-             {algorithm.metadata?.visualizationUrl ? (
-                <iframe src={algorithm.metadata.visualizationUrl} className="w-full h-full border-0" title="Viz" />
-             ) : (
-                <div className="text-center p-10">Maximize mode not fully supported for this visualization type yet.</div>
-             )}
-          </div>
-        </div>
-      )}
 
-      {layout.isBrainstormMaximized && (
-        <div className="fixed inset-0 z-50 bg-background flex flex-col">
-           <div className="flex items-center justify-between p-4 border-b">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              <Lightbulb className="w-5 h-5 text-primary" />
-              Brainstorm
-            </h2>
-            <Button variant="ghost" size="sm" onClick={() => layout.setIsBrainstormMaximized(false)}>
-              <Minimize2 className="w-4 h-4 mr-2" />
-              Exit Fullscreen
-            </Button>
-          </div>
-          <div className="flex-1 overflow-auto p-6">
-             <BrainstormSection algorithmId={algorithmIdOrSlug || ""} algorithmTitle={algorithm.name} />
-          </div>
-        </div>
-      )}
-    </>
-  );
 
   // Determine layout mode
   const isTablet = layout.windowWidth >= 480 && layout.windowWidth < 778;
@@ -317,6 +274,7 @@ const AlgorithmDetailNew: React.FC = () => {
                    isFavorite={interactions.isFavorite}
                    handleVote={interactions.handleVote}
                    toggleFavorite={interactions.toggleFavorite}
+                   isVisualizationMaximized={layout.isVisualizationMaximized}
                    setIsVisualizationMaximized={layout.setIsVisualizationMaximized}
                    handleRichTextClick={handleRichTextClick}
                 />
@@ -382,6 +340,7 @@ const AlgorithmDetailNew: React.FC = () => {
                       isFavorite={interactions.isFavorite}
                       handleVote={interactions.handleVote}
                       toggleFavorite={interactions.toggleFavorite}
+                      isVisualizationMaximized={layout.isVisualizationMaximized}
                       setIsVisualizationMaximized={layout.setIsVisualizationMaximized}
                       handleRichTextClick={handleRichTextClick}
                    />
@@ -405,8 +364,6 @@ const AlgorithmDetailNew: React.FC = () => {
            </div>
          )}
       </div>
-      
-      {renderMaximizedOverlays()}
     </div>
   );
 };
