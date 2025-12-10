@@ -40,14 +40,14 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
       onValueChange={(value) => onLanguageChange(value as Language)}
       disabled={disabled}
     >
-      <SelectTrigger className="w-[180px] bg-background border-input">
+      <SelectTrigger className="w-[140px] h-8 bg-background border-input text-xs">
         <SelectValue placeholder="Select Language" />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className="p-2 z-[100]">
         {displayLanguages.map((lang) => (
-          <SelectItem key={lang.id} value={lang.id}>
+          <SelectItem key={lang.id} value={lang.id} className="text-xs cursor-pointer">
             <div className="flex items-center gap-2">
-              <lang.icon className="w-4 h-4" />
+              <lang.icon className="w-3.5 h-3.5" />
               <span>{lang.name}</span>
             </div>
           </SelectItem>

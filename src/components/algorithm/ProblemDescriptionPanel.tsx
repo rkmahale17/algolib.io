@@ -50,7 +50,7 @@ interface ProblemDescriptionPanelProps {
   handleRichTextClick: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
 
-export const ProblemDescriptionPanel: React.FC<ProblemDescriptionPanelProps> = ({
+export const ProblemDescriptionPanel = React.memo(({
   algorithm,
   activeTab,
   setActiveTab,
@@ -65,7 +65,7 @@ export const ProblemDescriptionPanel: React.FC<ProblemDescriptionPanelProps> = (
   toggleFavorite,
   setIsVisualizationMaximized,
   handleRichTextClick,
-}) => {
+}: ProblemDescriptionPanelProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isCompact, setIsCompact] = useState(false);
 
@@ -627,4 +627,4 @@ export const ProblemDescriptionPanel: React.FC<ProblemDescriptionPanelProps> = (
       </Tabs>
     </div>
   );
-};
+});

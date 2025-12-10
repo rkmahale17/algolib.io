@@ -1,6 +1,6 @@
 // Custom React hook for user_algorithm_data
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { UserAlgorithmData } from '@/types/userAlgorithmData';
 import { getUserAlgorithmData } from '@/utils/userAlgorithmDataHelpers';
@@ -88,7 +88,7 @@ export function useUserAlgorithmData({
     }, [userId, algorithmId, enabled]);
 
     // Refetch function
-    const refetch = async () => {
+    const refetch = useCallback(async () => {
         if (!userId) return;
 
         try {
@@ -101,7 +101,7 @@ export function useUserAlgorithmData({
         } finally {
             setLoading(false);
         }
-    };
+    }, [userId, algorithmId]);
 
     return {
         data,

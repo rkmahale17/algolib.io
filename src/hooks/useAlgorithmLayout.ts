@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 interface UseAlgorithmLayoutReturn {
     // Device State
@@ -58,27 +58,31 @@ export const useAlgorithmLayout = (): UseAlgorithmLayoutReturn => {
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    const toggleLeftPanel = () => {
-        const newCollapsed = !isLeftCollapsed;
-        setIsLeftCollapsed(newCollapsed);
-        localStorage.setItem('leftPanelCollapsed', String(newCollapsed));
-        if (newCollapsed) {
-            leftPanelRef.current?.collapse();
-        } else {
-            leftPanelRef.current?.expand();
-        }
-    };
+    const toggleLeftPanel = useCallback(() => {
+        setIsLeftCollapsed(prev => {
+            const newCollapsed = !prev;
+            localStorage.setItem('leftPanelCollapsed', String(newCollapsed));
+            if (newCollapsed) {
+                leftPanelRef.current?.collapse();
+            } else {
+                leftPanelRef.current?.expand();
+            }
+            return newCollapsed;
+        });
+    }, []);
 
-    const toggleRightPanel = () => {
-        const newCollapsed = !isRightCollapsed;
-        setIsRightCollapsed(newCollapsed);
-        localStorage.setItem('rightPanelCollapsed', String(newCollapsed));
-        if (newCollapsed) {
-            rightPanelRef.current?.collapse();
-        } else {
-            rightPanelRef.current?.expand();
-        }
-    };
+    const toggleRightPanel = useCallback(() => {
+        setIsRightCollapsed(prev => {
+            const newCollapsed = !prev;
+            localStorage.setItem('rightPanelCollapsed', String(newCollapsed));
+            if (newCollapsed) {
+                rightPanelRef.current?.collapse();
+            } else {
+                rightPanelRef.current?.expand();
+            }
+            return newCollapsed;
+        });
+    }, []);
 
     return {
         isMobile,

@@ -31,6 +31,14 @@ export const NIGHT_OWL_THEME = {
     }
 };
 
+let isThemeDefined = false;
+
 export const defineThemes = (monaco: Monaco) => {
+    if (isThemeDefined) {
+        console.log('[monacoThemes] Theme already defined, skipping.');
+        return;
+    }
+    console.log('[monacoThemes] Defining night-owl theme.');
     monaco.editor.defineTheme('night-owl', NIGHT_OWL_THEME);
+    isThemeDefined = true;
 };

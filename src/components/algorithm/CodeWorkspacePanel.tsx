@@ -31,7 +31,7 @@ interface CodeWorkspacePanelProps {
   isInterviewMode?: boolean;
 }
 
-export const CodeWorkspacePanel: React.FC<CodeWorkspacePanelProps> = ({
+export const CodeWorkspacePanel = React.memo(({
   algorithm,
   algorithmId,
   isMobile,
@@ -46,7 +46,7 @@ export const CodeWorkspacePanel: React.FC<CodeWorkspacePanelProps> = ({
   submissions,
   className,
   isInterviewMode,
-}) => {
+}: CodeWorkspacePanelProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isCompact, setIsCompact] = useState(false);
 
@@ -181,4 +181,4 @@ export const CodeWorkspacePanel: React.FC<CodeWorkspacePanelProps> = ({
       </div>
     </div>
   );
-};
+});

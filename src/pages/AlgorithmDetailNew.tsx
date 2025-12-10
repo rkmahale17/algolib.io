@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useMemo } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Code2, ArrowLeft, Eye, Lightbulb, Minimize2, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
@@ -60,6 +60,8 @@ const AlgorithmDetailNew: React.FC = () => {
     userAlgoData,
     refetchUserData,
   });
+
+  const submissions = useMemo(() => userAlgoData?.submissions || [], [userAlgoData?.submissions]);
 
   // -- Effects --
   
@@ -130,7 +132,7 @@ const AlgorithmDetailNew: React.FC = () => {
     }
   };
 
-  const handleRichTextClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleRichTextClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
     const anchor = target.closest('a');
     if (anchor) {
@@ -140,7 +142,37 @@ const AlgorithmDetailNew: React.FC = () => {
         layout.setActiveTab('visualizations');
       }
     }
-  };
+  }, [layout.setActiveTab]);
+
+  const codeWorkspacePanel = useMemo(() => (
+    <CodeWorkspacePanel
+      algorithm={algorithm}
+      algorithmId={algorithmIdOrSlug || ""}
+      isMobile={layout.isMobile}
+      toggleRightPanel={layout.toggleRightPanel}
+      savedCode={interactions.savedCode}
+      handleCodeChange={interactions.handleCodeChange}
+      handleCodeSuccess={interactions.handleCodeSuccess}
+      selectedLanguage={interactions.selectedLanguage}
+      setSelectedLanguage={interactions.setSelectedLanguage}
+      isCodeRunnerMaximized={layout.isCodeRunnerMaximized}
+      setIsCodeRunnerMaximized={layout.setIsCodeRunnerMaximized}
+      submissions={submissions}
+    />
+  ), [
+    algorithm, 
+    algorithmIdOrSlug, 
+    layout.isMobile, 
+    layout.toggleRightPanel, 
+    interactions.savedCode, 
+    interactions.handleCodeChange, 
+    interactions.handleCodeSuccess, 
+    interactions.selectedLanguage, 
+    interactions.setSelectedLanguage, 
+    layout.isCodeRunnerMaximized, 
+    layout.setIsCodeRunnerMaximized, 
+    submissions
+  ]);
 
   // -- Render Guards --
 
@@ -194,34 +226,6 @@ const AlgorithmDetailNew: React.FC = () => {
   // -- Visualizations / Full Screen Overlays --
   const renderMaximizedOverlays = () => (
     <>
-      {layout.isCodeRunnerMaximized && (
-        <div className="fixed inset-0 z-50 bg-background flex flex-col">
-          <div className="flex items-center justify-between p-4 border-b">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              <Code2 className="w-5 h-5 text-primary" />
-              Code Runner
-            </h2>
-            <Button variant="ghost" size="sm" onClick={() => layout.setIsCodeRunnerMaximized(false)}>
-              <Minimize2 className="w-4 h-4 mr-2" />
-              Exit Fullscreen
-            </Button>
-          </div>
-          <div className="flex-1 overflow-hidden">
-             <CodeRunner 
-                algorithmId={algorithmIdOrSlug || ""}
-                algorithmData={algorithm}
-                isMaximized={true}
-                onToggleFullscreen={() => layout.setIsCodeRunnerMaximized(false)}
-                className="h-full border-0 rounded-none shadow-none"
-                initialCode={interactions.savedCode}
-                onCodeChange={interactions.handleCodeChange}
-                onSuccess={interactions.handleCodeSuccess}
-                isInterviewMode={session.isInterviewMode}
-              />
-          </div>
-        </div>
-      )}
-
       {layout.isVisualizationMaximized && (
         <div className="fixed inset-0 z-50 bg-background flex flex-col">
            <div className="flex items-center justify-between p-4 border-b">
@@ -268,6 +272,8 @@ const AlgorithmDetailNew: React.FC = () => {
   const isTablet = layout.windowWidth >= 480 && layout.windowWidth < 778;
   const showHorizontalScroll = isTablet; 
   const isMobileView = layout.windowWidth < 480;
+
+
 
   return (
     <div className={`h-screen w-full overflow-hidden flex flex-col bg-background ${session.isInterviewMode ? 'border-4 border-green-500/30' : ''}`}>
@@ -330,7 +336,7 @@ const AlgorithmDetailNew: React.FC = () => {
                     setSelectedLanguage={interactions.setSelectedLanguage}
                     isCodeRunnerMaximized={layout.isCodeRunnerMaximized}
                     setIsCodeRunnerMaximized={layout.setIsCodeRunnerMaximized}
-                    submissions={userAlgoData?.submissions || []}
+                    submissions={submissions}
                     className="h-[85vh]"
                     isInterviewMode={session.isInterviewMode}
                  />
@@ -393,20 +399,7 @@ const AlgorithmDetailNew: React.FC = () => {
                    onCollapse={() => {}}
                    className={layout.isRightCollapsed ? 'min-w-[0px]' : ''}
                 >
-                   <CodeWorkspacePanel
-                      algorithm={algorithm}
-                      algorithmId={algorithmIdOrSlug || ""}
-                      isMobile={layout.isMobile}
-                      toggleRightPanel={layout.toggleRightPanel}
-                      savedCode={interactions.savedCode}
-                      handleCodeChange={interactions.handleCodeChange}
-                      handleCodeSuccess={interactions.handleCodeSuccess}
-                      selectedLanguage={interactions.selectedLanguage}
-                      setSelectedLanguage={interactions.setSelectedLanguage}
-                      isCodeRunnerMaximized={layout.isCodeRunnerMaximized}
-                      setIsCodeRunnerMaximized={layout.setIsCodeRunnerMaximized}
-                      submissions={userAlgoData?.submissions || []}
-                   />
+                   {codeWorkspacePanel}
                 </ResizablePanel>
              </ResizablePanelGroup>
            </div>

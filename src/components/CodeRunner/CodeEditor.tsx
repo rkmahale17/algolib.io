@@ -10,6 +10,7 @@ import { defineThemes } from "@/utils/monacoThemes";
 export interface CodeEditorRef {
   formatCode: () => Promise<void>;
   setErrors: (errors: Array<{ line: number; column?: number; message: string }>) => void;
+  layout: () => void;
 }
 
 // Basic formatter helper
@@ -120,7 +121,11 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(({
         }));
 
         monaco.editor.setModelMarkers(model, "owner", markers);
+    },
+    layout: () => {
+        editorRef.current?.layout();
     }
+
   }));
 
   const handleEditorDidMount: OnMount = (editor, monacoInstance) => {
@@ -153,24 +158,20 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(({
       ? (customTheme === 'dark' ? 'night-owl' : (customTheme === 'light' ? 'light' : (systemTheme === 'dark' ? 'night-owl' : 'light')))
       : (systemTheme === 'dark' ? 'night-owl' : 'light');
 
-  const handleBeforeMount: BeforeMount = (monaco) => {
-      defineThemes(monaco);
-  };
-
   return (
     <div className="h-full w-full overflow-hidden bg-background">
       <Editor
         height="100%"
         path={path}
         language={getMonacoLanguage(language)}
-        value={code}
+        value={code ?? ''}
         theme={monacoTheme}
         onChange={onChange}
         onMount={handleEditorDidMount}
-        beforeMount={handleBeforeMount}
+        beforeMount={defineThemes}
         options={{
-          minimap: { enabled: customOptions?.minimap ?? false },
-          fontSize: customOptions?.fontSize || 14,
+          minimap: { enabled: false},
+          fontSize: customOptions?.fontSize || 15,
           lineNumbers: customOptions?.lineNumbers || 'on',
           roundedSelection: false,
           scrollBeyondLastLine: false,

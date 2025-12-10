@@ -2,11 +2,10 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, Terminal, FlaskConical, Clock, Zap, Plus, CheckCircle2, XCircle, AlertCircle, AlertTriangle, Edit2, Trash2, History, Code, ChevronUp, ChevronDown } from "lucide-react";
+import { Loader2, Terminal, FlaskConical, Clock, Zap, Plus, CheckCircle2, XCircle, AlertTriangle, History, Code, ChevronUp, ChevronDown, Minimize2, Minimize, Maximize2 } from "lucide-react";
 import { Algorithm } from '@/data/algorithms';
 import { Button } from "@/components/ui/button";
 import { FeatureGuard } from "@/components/FeatureGuard";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { TestCaseEditor } from './TestCaseEditor';
 import { Submission } from '@/types/userAlgorithmData';
 
@@ -155,7 +154,8 @@ export const OutputPanel = ({
                 className="h-6 w-6 text-muted-foreground hover:text-foreground"
                 title={isExpanded ? "Collapse" : "Expand output"}
               >
-                {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+                     
+                {isExpanded ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
               </Button>
             )}
         </div>

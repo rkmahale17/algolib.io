@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
@@ -369,6 +370,15 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
     return () => window.removeEventListener('keydown', handleEsc);
   }, [isFullscreen, onToggleFullscreen]);
 
+  // Force layout update when fullscreen changes to prevent blank editor
+  useEffect(() => {
+    // Small timeout to allow transition/DOM update to complete
+    const timer = setTimeout(() => {
+      editorRef.current?.layout();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [isFullscreen]);
+
 
 
   const algorithmMeta = activeAlgorithm;
@@ -702,14 +712,14 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
     return () => window.removeEventListener('keydown', handleShortcuts);
   }, [isLoading, isSubmitting, lastRunSuccess, controls, handleRun, handleSubmit]);
 
-  return (
-    <div className={`w-full border rounded-lg overflow-hidden bg-background shadow-sm flex flex-col transition-all duration-300 ${
+  const content = (
+    <div className={`w-full bg-background shadow-sm flex flex-col ${
       isFullscreen 
-        ? 'fixed inset-0 z-50 h-screen' 
-        : className || 'h-[calc(100vh-100px)] min-h-[600px]'
+        ? 'fixed inset-0 z-50 h-screen w-screen rounded-none border-0' 
+        : `border rounded-lg overflow-hidden ${className || 'h-[calc(100vh-100px)] min-h-[600px]'}`
     }`}>
       <ResizablePanelGroup direction="vertical">
-        <ResizablePanel defaultSize={50} minSize={30}>
+        <ResizablePanel defaultSize={90} minSize={30}>
            <Tabs 
              value={activeEditorTab} 
              onValueChange={(v) => setActiveEditorTab(v as any)} 
@@ -763,49 +773,67 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
 
            <TabsContent value="current" className="flex-1 flex flex-col min-h-0 m-0 data-[state=inactive]:hidden h-full">
             <div className={`h-full flex flex-col ${viewingSubmission ? '' : 'border-t-0'}`}>
-            <div className="flex items-center justify-between p-2 border-b bg-muted/30 overflow-x-auto no-scrollbar min-h-[50px]">
-              <div className="flex items-center gap-2">
+            <div className={`h-full flex flex-col ${viewingSubmission ? '' : 'border-t-0'}`}>
+            <div className="flex items-center justify-between px-3 pl-9  border-b bg-muted/30 h-10 shrink-0 gap-2">
+              {/* Left Group: Language Selector */}
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar mask-linear-fade shrink-0">
                 <LanguageSelector
                   language={language}
                   onLanguageChange={handleLanguageChange}
                   disabled={isLoading || isSubmitting}
                   availableLanguages={availableLanguages}
                 />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={handleReset}
-                  disabled={isLoading || isSubmitting}
-                  title="Reset to default code"
-                >
-                  <RotateCcw className="w-3 h-3" />
-                </Button>
-
-             
               </div>
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={handleFormatCode}
-                  title="Format Code"
-                >
-                  <AlignLeft className="w-4 h-4" />
-                </Button>
 
-                <Popover>
-                  <PopoverTrigger asChild>
+              {/* Middle Spacer */}
+              <div className="flex-1" />
+
+              {/* Right Group: Actions (Reset, Format, Settings) */}
+              <div className="flex items-center gap-1 shrink-0">
+                <Tooltip>
+                  <TooltipTrigger asChild>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8"
-                      title="Editor Settings"
+                      className="h-7 w-7"
+                      onClick={handleReset}
+                      disabled={isLoading || isSubmitting}
                     >
-                      <Settings className="w-4 h-4" />
+                      <RotateCcw className="w-3.5 h-3.5" />
                     </Button>
-                  </PopoverTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">Reset to starter code</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={handleFormatCode}
+                    >
+                      <AlignLeft className="w-3.5 h-3.5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">Format code</TooltipContent>
+                </Tooltip>
+
+                <Popover>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7"
+                        >
+                          <Settings className="w-3.5 h-3.5" />
+                        </Button>
+                      </PopoverTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">Settings</TooltipContent>
+                  </Tooltip>
                   <PopoverContent className="w-80" align="end">
                     <div className="grid gap-4">
                       <div className="space-y-2">
@@ -857,62 +885,67 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                               <SelectValue placeholder="Tab Size" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="2">2 Spaces</SelectItem>
-                              <SelectItem value="4">4 Spaces</SelectItem>
+                              <SelectItem value="2">2 spaces</SelectItem>
+                              <SelectItem value="4">4 spaces</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
+        
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="wordWrap">Word Wrap</Label>
+                          <Switch
+                            id="wordWrap"
+                            checked={settings.wordWrap === 'on'}
+                            onCheckedChange={(checked) => updateSetting('wordWrap', checked ? 'on' : 'off')}
+                          />
+                        </div>
 
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="minimap">Minimap</Label>
+                          <Switch
+                            id="minimap"
+                            checked={settings.minimap}
+                            onCheckedChange={(checked) => updateSetting('minimap', checked)}
+                          />
+                        </div>
 
-
-
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                    <Label htmlFor="autocomplete" className="text-xs">Autocomplete</Label>
-                    {isInterviewMode && (
-                        <p className="text-[10px] text-muted-foreground text-orange-500">Disabled in Interview Mode</p>
-                    )}
-                </div>
-                <Switch 
-                  id="autocomplete" 
-                  checked={settings.autocomplete}
-                  onCheckedChange={(checked) => updateSetting('autocomplete', checked)}
-                  disabled={isInterviewMode}
-                />
-              </div>
-                        
-                         <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between">
                           <Label htmlFor="lineNumbers">Line Numbers</Label>
-                          <Select 
-                            value={settings.lineNumbers} 
-                            onValueChange={(val: any) => updateSetting('lineNumbers', val)}
-                          >
-                            <SelectTrigger className="w-[120px] h-8">
-                              <SelectValue placeholder="Line Numbers" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="on">On</SelectItem>
-                              <SelectItem value="off">Off</SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <Switch
+                            id="lineNumbers"
+                            checked={settings.lineNumbers === 'on'}
+                            onCheckedChange={(checked) => updateSetting('lineNumbers', checked ? 'on' : 'off')}
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="autocomplete">Autocomplete</Label>
+                          <Switch
+                            id="autocomplete"
+                            checked={settings.autocomplete}
+                            onCheckedChange={(checked) => updateSetting('autocomplete', checked)}
+                          />
                         </div>
                       </div>
                     </div>
                   </PopoverContent>
                 </Popover>
+              </div>
+
+              {/* Separator and Expand Actions */}
+              <div className="flex items-center gap-1 shrink-0 pl-2 border-l shadow-sm">
 
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8"
+                  className="h-7 w-7"
                   onClick={toggleFullscreen}
                   title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
                 >
                   {isFullscreen ? (
-                    <Minimize2 className="w-3 h-3" />
+                    <Minimize2 className="w-3.5 h-3.5" />
                   ) : (
-                    <Maximize2 className="w-3 h-3" />
+                    <Maximize2 className="w-3.5 h-3.5" />
                   )}
                 </Button>
               </div>
@@ -1016,6 +1049,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
               </div>
             </div>
             </div>
+            </div>
            </TabsContent>
           
           <TabsContent value="submission" className="flex-1 flex flex-col min-h-0 m-0 data-[state=inactive]:hidden h-full">
@@ -1060,7 +1094,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
         </ResizablePanel>
         
         <ResizableHandle withHandle className="bg-muted/50 hover:bg-primary/20 data-[resize-handle-active]:bg-primary/40 transition-colors" />
-                <ResizablePanel defaultSize={10} minSize={5}>
+        <ResizablePanel defaultSize={10} minSize={5}>
           <div className="h-full flex flex-col">
              <div className="flex-1 min-h-0 overflow-hidden">
                  <OutputPanel 
@@ -1158,4 +1192,12 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
       </Dialog>
     </div>
   );
+
+  if (isFullscreen) {
+    return createPortal(content, document.body);
+  }
+
+  return content;
+  
+  
 };
