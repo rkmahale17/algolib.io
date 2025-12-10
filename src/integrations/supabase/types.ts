@@ -77,6 +77,7 @@ export type Database = {
           metadata: Json | null
           name: string
           problems_to_solve: Json | null
+          serial_no: number | null
           test_cases: Json | null
           title: string
           tutorials: Json | null
@@ -96,6 +97,7 @@ export type Database = {
           metadata?: Json | null
           name: string
           problems_to_solve?: Json | null
+          serial_no?: number | null
           test_cases?: Json | null
           title: string
           tutorials?: Json | null
@@ -115,6 +117,7 @@ export type Database = {
           metadata?: Json | null
           name?: string
           problems_to_solve?: Json | null
+          serial_no?: number | null
           test_cases?: Json | null
           title?: string
           tutorials?: Json | null
