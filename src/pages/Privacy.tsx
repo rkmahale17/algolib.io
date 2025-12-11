@@ -67,7 +67,20 @@ export default function Privacy() {
 
           <Card>
             <CardHeader>
-              <CardTitle>3. Data Storage and Security</CardTitle>
+              <CardTitle>3. Analytics and Heatmaps</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">
+                We use Hotjar in order to better understand our users' needs and to optimize this service and experience.
+                Hotjar is a technology service that helps us better understand our users' experience (e.g. how much time they spend on which pages, which links they choose to click, what users do and don't like, etc.) and this enables us to build and maintain our service with user feedback.
+              </p>
+             
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>4. Data Storage and Security</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
@@ -84,7 +97,7 @@ export default function Privacy() {
 
           <Card>
             <CardHeader>
-              <CardTitle>4. Cookies and Tracking</CardTitle>
+              <CardTitle>5. Cookies and Tracking</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
@@ -103,7 +116,7 @@ export default function Privacy() {
 
           <Card>
             <CardHeader>
-              <CardTitle>5. Third-Party Services</CardTitle>
+              <CardTitle>6. Third-Party Services</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
@@ -120,7 +133,7 @@ export default function Privacy() {
 
           <Card>
             <CardHeader>
-              <CardTitle>6. Open Source Transparency</CardTitle>
+              <CardTitle>7. Open Source Transparency</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
@@ -139,7 +152,7 @@ export default function Privacy() {
 
           <Card>
             <CardHeader>
-              <CardTitle>7. Children's Privacy</CardTitle>
+              <CardTitle>8. Children's Privacy</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
@@ -152,7 +165,7 @@ export default function Privacy() {
 
           <Card>
             <CardHeader>
-              <CardTitle>8. Your Rights</CardTitle>
+              <CardTitle>9. Your Rights</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
@@ -169,7 +182,7 @@ export default function Privacy() {
 
           <Card>
             <CardHeader>
-              <CardTitle>9. Changes to This Policy</CardTitle>
+              <CardTitle>10. Changes to This Policy</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
@@ -181,7 +194,7 @@ export default function Privacy() {
 
           <Card>
             <CardHeader>
-              <CardTitle>10. Contact Us</CardTitle>
+              <CardTitle>11. Contact Us</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">

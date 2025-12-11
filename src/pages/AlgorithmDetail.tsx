@@ -112,9 +112,7 @@ const AlgorithmDetail: React.FC = () => {
         console.error('Error fetching algorithm:', error);
         toast.error('Failed to load algorithm details');
       } finally {
-        setTimeout(() => {
-          setIsLoadingAlgorithm(false);
-        }, 1500);
+        setIsLoadingAlgorithm(false);
       }
     };
 
