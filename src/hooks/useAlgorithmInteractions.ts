@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { blind75Problems } from '@/data/blind75';
 import { updateProgress, updateSocial, updateCode } from '@/utils/userAlgorithmDataHelpers';
 import { useFeatureFlag } from '@/contexts/FeatureFlagContext';
 import confetti from 'canvas-confetti';
@@ -56,7 +55,7 @@ export const useAlgorithmInteractions = ({
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [userAlgoData, selectedLanguage]); // added selectedLanguage to deps as it's used in body
+    }, [userAlgoData, selectedLanguage]);
 
     // Handle language switch
     useEffect(() => {
@@ -271,28 +270,36 @@ export const useAlgorithmInteractions = ({
     }, [navigate]);
 
     const handleNextProblem = useCallback(async () => {
-        if (!algorithm) return;
+        if (!algorithm || !supabase) return;
 
-        const currentSlug = algorithm.slug || algorithm.id;
-        const currentIndex = blind75Problems.findIndex(p => p.slug === currentSlug || p.algorithmId === currentSlug);
-
-        if (currentIndex !== -1 && currentIndex < blind75Problems.length - 1) {
-            const nextProblem = blind75Problems[currentIndex + 1];
-            if (!supabase) return;
-            const { data } = await supabase
+        try {
+            // Fetch Blind 75 sequence from DB
+            const { data: blind75Data } = await supabase
                 .from('algorithms')
                 .select('id')
-                .eq('id', nextProblem.slug)
-                .maybeSingle();
+                .or('list_type.eq.blind75,list_type.eq.core+Blind75')
+                .order('id', { ascending: true });
 
-            if (data) {
-                navigate(`/algorithm/${data.id}`);
-                return;
+            if (blind75Data && blind75Data.length > 0) {
+                const currentId = algorithm.id;
+                const currentIndex = blind75Data.findIndex((p: any) => p.id === currentId);
+
+                if (currentIndex !== -1 && currentIndex < blind75Data.length - 1) {
+                    const nextProblem = blind75Data[currentIndex + 1];
+                    navigate(`/algorithm/${nextProblem.id}`);
+                    return;
+                }
             }
+
+            // Fallback to random if not in Blind 75 list or end of list
+            toast.info("No next problem found in sequence. Trying random...");
+            handleRandomProblem();
+
+        } catch (error) {
+            console.error("Error navigating next:", error);
+            handleRandomProblem();
         }
 
-        toast.info("No next problem found in sequence. Trying random...");
-        handleRandomProblem();
     }, [algorithm, handleRandomProblem, navigate]);
 
     const handleShare = useCallback(async () => {

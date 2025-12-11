@@ -111,7 +111,7 @@ export const OutputPanel = ({
       {/* Top Bar / Tabs */}
       <div className="flex items-center justify-between border-b bg-background/50 shrink-0">
         {/* Scrollable Tabs Area */}
-        <div className="flex-1 flex items-center gap-1 p-1 overflow-x-auto no-scrollbar mask-image-linear-gradient-to-r">
+        <div className="flex-1 flex items-center gap-1 p-1 overflow-x-auto scrollbar-thin mask-image-linear-gradient-to-r pb-2">
             <Button
               variant="ghost"
               size="sm"
@@ -172,8 +172,8 @@ export const OutputPanel = ({
             >
               <div className="flex items-center justify-between border-b bg-background/50 shrink-0">
                 {/* Scrollable Tabs List */}
-                <div className="flex-1 overflow-x-auto no-scrollbar mask-image-linear-gradient-to-r">
-                   <TabsList className="h-9 bg-transparent p-0 gap-1 flex-nowrap w-max justify-start">
+                <div className="flex-1 overflow-x-auto scrollbar-thin mask-image-linear-gradient-to-r pb-1">
+                   <TabsList className="h-9 bg-transparent p-0 gap-1 flex-nowrap w-max justify-start mb-1">
                     {allTestCases.filter(tc => !tc.isSubmission).map((tc, index) => (
                       <TabsTrigger
                         key={tc.id}
@@ -272,7 +272,6 @@ export const OutputPanel = ({
 
             {/* Scrollable content area */}
             <div className="flex-1 min-h-0">
-              <ScrollArea className="h-full" type="always">
                 {/* Compilation/Runtime Error */}
                 {(output.status?.id === 6 || (output.stderr && !output.testResults)) && (
                   <div className="p-4">
@@ -284,14 +283,16 @@ export const OutputPanel = ({
 
                 {/* Test Results */}
                 {output.testResults && (
-                  <Tabs defaultValue="result-0" className="flex flex-col">
-                    <div className="flex border-b px-4 bg-background/50 shrink-0 sticky top-0 z-10 overflow-hidden">
-                      <TabsList className="h-9 bg-transparent p-0 gap-2 flex-nowrap overflow-x-auto w-full justify-start overflow-y-hidden no-scrollbar mask-image-linear-gradient-to-r">
+                       <div className="h-full flex flex-col min-h-0">
+                  <Tabs defaultValue="result-0" className="flex-1 flex flex-col min-h-0">
+                    <div className="flex border-b bg-background/50 shrink-0 sticky top-0 z-10 overflow-x-auto overflow-y-hidden">
+                      <div className="flex-1 overflow-x-auto scrollbar-thin mask-image-linear-gradient-to-r px-4 pb-1">
+                        <TabsList className="h-9 bg-transparent p-0 gap-2 flex-nowrap w-max justify-start mb-1">
                         {output.testResults.map((result: any, index: number) => (
                           <TabsTrigger
                             key={index}
                             value={`result-${index}`}
-                            className={`text-xs px-3 h-7 whitespace-nowrap gap-2 data-[state=active]:bg-muted ${
+                            className={`text-xs px-3 h-7 whitespace-nowrap gap-2 bg-transparent data-[state=active]:bg-muted data-[state=active]:shadow-none ${
                               result.status === 'pass' ? 'text-green-500 data-[state=active]:text-green-500' : 'text-destructive data-[state=active]:text-destructive'
                             }`}
                           >
@@ -304,7 +305,7 @@ export const OutputPanel = ({
                                 const tc = executedTestCases ? executedTestCases[index] : allTestCases[index];
                                 return tc?.description && (
                                     <span className="ml-2 text-[10px] text-muted-foreground/70 hidden sm:inline-block truncate max-w-[100px]">
-                                        - {tc.description}
+                                        {/* - {tc.description} */}
                                     </span>
                                 );
                             })()}
@@ -318,7 +319,8 @@ export const OutputPanel = ({
                         ))}
                       </TabsList>
                     </div>
-
+                  </div>
+                    <ScrollArea className="h-full" type="always">
                     <div className="p-4">
                       {output.testResults.map((result: any, index: number) => (
                         <TabsContent key={index} value={`result-${index}`} className="m-0 space-y-6">
@@ -329,9 +331,9 @@ export const OutputPanel = ({
                               {(() => {
                                 const tc = executedTestCases ? executedTestCases[index] : allTestCases[index];
 
-                                // Check if this is a hidden submission case
-                                const isHidden = tc?.isSubmission;
-                                if (isHidden) return "Hidden Test Case";
+                                // Don't hide submission cases as per user request
+                                // const isHidden = tc?.isSubmission; 
+                                // if (isHidden) return "Hidden Test Case";
 
                                 // Fallback to original test case input if result input is missing
                                 const inputData = result.input !== undefined ? result.input : tc?.input;
@@ -369,7 +371,7 @@ export const OutputPanel = ({
                             <div className="p-3 rounded-md bg-muted/30 border font-mono text-sm">
                               {(() => {
                                 const tc = executedTestCases ? executedTestCases[index] : allTestCases[index];
-                                return tc?.isSubmission ? "Hidden Output" : JSON.stringify(result.actual, null, 2);
+                                return JSON.stringify(result.actual, null, 2);
                               })()}
                             </div>
                           </div>
@@ -381,7 +383,7 @@ export const OutputPanel = ({
                               <div className="p-3 rounded-md bg-muted/30 border font-mono text-sm">
                                 {(() => {
                                   const tc = executedTestCases ? executedTestCases[index] : allTestCases[index];
-                                  return tc?.isSubmission ? "Hidden Expected Output" : JSON.stringify(result.expected, null, 2);
+                                  return JSON.stringify(result.expected, null, 2);
                                 })()}
                               </div>
                             </div>
@@ -399,9 +401,10 @@ export const OutputPanel = ({
                         </TabsContent>
                       ))}
                     </div>
+                    </ScrollArea>
                   </Tabs>
+                  </div>
                 )}
-              </ScrollArea>
             </div>
           </div>
         )}

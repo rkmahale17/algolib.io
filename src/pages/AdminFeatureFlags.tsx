@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { FeatureFlag } from "@/types/featureFlags";
 import { toast } from "sonner";
-import { Loader2, Plus, RefreshCw, Trash2 } from "lucide-react";
+import { Link } from "react-router-dom"; // Added Link
+import { Loader2, Plus, RefreshCw, Trash2, ArrowLeft } from "lucide-react"; // Added ArrowLeft
 
 export default function AdminFeatureFlags() {
   const [flags, setFlags] = useState<FeatureFlag[]>([]);
@@ -110,9 +111,17 @@ export default function AdminFeatureFlags() {
   return (
     <div className="container mx-auto p-8 space-y-8">
       <div className="flex justify-between items-center">
-        <div>
-            <h1 className="text-3xl font-bold">Feature Flags</h1>
-            <p className="text-muted-foreground">Manage real-time feature toggles for the application.</p>
+        <div className="space-y-4">
+            <Link to="/admin">
+                <Button variant="ghost" className="gap-2 -ml-2 text-muted-foreground">
+                    <ArrowLeft className="w-4 h-4" />
+                    Back to Dashboard
+                </Button>
+            </Link>
+            <div>
+                <h1 className="text-3xl font-bold">Feature Flags</h1>
+                <p className="text-muted-foreground">Manage real-time feature toggles for the application.</p>
+            </div>
         </div>
         <Button variant="outline" size="icon" onClick={fetchFlags} disabled={loading}>
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />

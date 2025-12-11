@@ -21,6 +21,7 @@ interface BrainstormSectionProps {
   controls?: {
     notes: boolean;
     whiteboard: boolean;
+    history: boolean;
   };
 }
 
@@ -127,6 +128,7 @@ export const BrainstormSection = ({
                   </TabsTrigger>
                 )}
               </FeatureGuard>
+                  <FeatureGuard flag="history">
               <TabsTrigger
                 value="history"
                 className="flex-1 gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none"
@@ -147,6 +149,7 @@ export const BrainstormSection = ({
                     </>
                   )}
               </TabsTrigger>
+              </FeatureGuard>
             </TooltipProvider>
           </TabsList>
           

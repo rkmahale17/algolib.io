@@ -1,37 +1,24 @@
 import {
-  BookOpen,
-  Coffee,
-  Search,
   Sparkles,
-  TrendingUp,
-  Trophy,
+  Coffee,
 } from "lucide-react";
-import { algorithms, categories } from "@/data/algorithms";
-import { useEffect, useMemo, useState } from "react";
-
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { useEffect, useState } from "react";
 import { FAQ } from "@/components/FAQ";
 import { FeaturedSection } from "@/components/FeaturedSection";
 import { Footer } from "@/components/Footer";
 import { Helmet } from "react-helmet-async";
-import { Input } from "@/components/ui/input";
-import { Link } from "react-router-dom";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { useSearchParams } from "react-router-dom";
 import { PremiumLoader } from "@/components/PremiumLoader";
 import { appStatus } from "@/utils/appStatus";
 import { FeatureGuard } from "@/components/FeatureGuard";
+import { AlgorithmList, AlgorithmListItem } from "@/components/AlgorithmList";
+import { ListType } from "@/types/algorithm";
 
 const Home = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [userProgress, setUserProgress] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [algorithms, setAlgorithms] = useState<AlgorithmListItem[]>([]);
 
   // Check authentication status
   useEffect(() => {
@@ -50,89 +37,58 @@ const Home = () => {
       setUser(session?.user ?? null);
     });
 
-    // Simulate initial load or wait for auth
-    setTimeout(() => setLoading(false), 1000);
-
     return () => subscription.unsubscribe();
   }, []);
 
-  // Fetch user progress and subscribe to real-time updates
+  // Fetch algorithms from Supabase
   useEffect(() => {
-    const fetchUserProgress = async () => {
-      if (!user || !supabase) {
-        setUserProgress([]);
-        return;
-      }
+    const fetchAlgorithms = async () => {
+      if (!supabase) return;
 
-      const { data, error } = await supabase
-        .from("user_algorithm_data")
-        .select("*")
-        .eq("user_id", user.id)
-        .eq("completed", true);
+      try {
+        const { data, error } = await supabase
+          .from('algorithms')
+          .select('*');
 
-      if (!error && data) {
-        setUserProgress(data);
-      }
-    };
-
-    fetchUserProgress();
-
-    // Subscribe to real-time updates
-    if (!user || !supabase) return;
-
-    const channel = supabase
-      .channel("user_algorithm_data_changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "user_algorithm_data",
-          filter: `user_id=eq.${user.id}`,
-        },
-        () => {
-          // Refetch progress when changes occur
-          fetchUserProgress();
+        if (error) {
+          console.error('Error fetching algorithms:', error);
+          return;
         }
-      )
-      .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
+        if (data) {
+          const mappedAlgorithms: AlgorithmListItem[] = data.map((algo: any) => ({
+             id: algo.id,
+             title: algo.title || algo.name, // Fallback if title is missing
+             name: algo.name,
+             category: algo.category,
+             difficulty: algo.difficulty,
+             description: algo.description || algo.explanation?.problemStatement || '', // Try description col, then nested
+             timeComplexity: algo.timeComplexity || algo.time_complexity || algo.metadata?.timeComplexity,
+             spaceComplexity: algo.spaceComplexity || algo.space_complexity || algo.metadata?.spaceComplexity,
+             slug: algo.slug || algo.id,
+             companies: algo.companyTags || algo.company_tags,
+             listType: algo.list_type,
+             serial_no: algo.serial_no
+          }));
+          setAlgorithms(mappedAlgorithms);
+        }
+      } catch (error) {
+        console.error('Error fetching algorithms:', error);
+      } finally {
+        setLoading(false);
+      }
     };
-  }, [user]);
 
-  // Read category from URL params on mount
-  useEffect(() => {
-    const categoryParam = searchParams.get("category");
-    if (categoryParam) {
-      setSelectedCategory(categoryParam);
-    }
-  }, [searchParams]);
-
-
-
-  const filteredAlgorithms = algorithms.filter((algo) => {
-    const matchesSearch =
-      algo.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      algo.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory =
-      !selectedCategory || algo.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
-
-  const difficultyColors = {
-    beginner: "bg-green-500/10 text-green-500 border-green-500/20",
-    intermediate: "bg-yellow-500/10 text-yellow-500 border-yellow-500/20",
-    advanced: "bg-red-500/10 text-red-500 border-red-500/20",
-  };
-
-
+    fetchAlgorithms();
+  }, []);
 
   if (loading) {
       // Only show text if this is the initial app load (not navigating from another page)
     return <PremiumLoader text={!appStatus.isInitialized ? "Initializing Algorithms for you" : undefined} />;
   }
+
+  // Extract categories for SEO from fetched data or use defaults if empty
+  const categories = Array.from(new Set(algorithms.map(a => a.category).filter(Boolean))).sort();
 
   return (
     <>
@@ -214,56 +170,6 @@ const Home = () => {
               "AlgoLib.io is a free and open-source algorithm library that helps developers learn and visualize algorithms with interactive animations and clean code snippets in multiple programming languages.",
           })}
         </script>
-
-        {/* Structured Data - ItemList for Categories */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "ItemList",
-            name: "Algorithm Categories",
-            description: "Browse algorithms by category",
-            itemListElement: categories.map((category, index) => ({
-              "@type": "ListItem",
-              position: index + 1,
-              item: {
-                "@type": "Thing",
-                "@id": `https://algolib.io/?category=${encodeURIComponent(
-                  category
-                )}`,
-                name: `${category} Algorithms`,
-                description: `Learn ${category.toLowerCase()} algorithms with interactive visualizations`,
-              },
-            })),
-          })}
-        </script>
-
-        {/* Structured Data - CollectionPage */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "CollectionPage",
-            name: "AlgoLib.io - Algorithm Library",
-            description:
-              "Browse 200+ algorithms with step-by-step visualizations across 20 categories",
-            url: "https://algolib.io",
-            mainEntity: {
-              "@type": "ItemList",
-              numberOfItems: algorithms.length,
-              itemListElement: algorithms.slice(0, 20).map((algo, index) => ({
-                "@type": "ListItem",
-                position: index + 1,
-                item: {
-                  "@type": "TechArticle",
-                  name: algo.name,
-                  description: algo.description,
-                  url: `https://algolib.io/algorithm/${algo.id}`,
-                  articleSection: algo.category,
-                  proficiencyLevel: algo.difficulty,
-                },
-              })),
-            },
-          })}
-        </script>
       </Helmet>
 
       <div className="min-h-screen bg-background">
@@ -316,7 +222,7 @@ const Home = () => {
                 </div>
                 <div className="h-12 w-px bg-border" />
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-secondary">20</div>
+                  <div className="text-3xl font-bold text-secondary">{categories.length}</div>
                   <div className="text-sm text-muted-foreground">
                     Categories
                   </div>
@@ -337,118 +243,20 @@ const Home = () => {
         <FeaturedSection />
 
         <FeatureGuard flag="core_algo">
-          {/* Search and Filter */}
+          {/* Main Algorithm List */}
           <div className="container mx-auto px-4 py-8" id="algorithms">
-            <div className="max-w-4xl mx-auto space-y-6">
-              <div className="text-center mb-8">
+             <div className="max-w-4xl mx-auto space-y-6 mb-8 text-center">
                 <h2 className="text-3xl md:text-4xl font-bold gradient-text mb-2">
-                  Core Algorithms
+                  Core algorithms
                 </h2>
-              </div>
-
-              {/* Search Bar */}
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <Input
-                  type="text"
-                  placeholder="Search algorithms..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 h-14 text-lg bg-card border-border/50"
-                />
-              </div>
-
-              {/* Category Filter */}
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  variant={selectedCategory === null ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedCategory(null)}
-                  className="rounded-full"
-                >
-                  All
-                </Button>
-                {categories.map((category) => (
-                  <Button
-                    key={category}
-                    variant={
-                      selectedCategory === category ? "default" : "outline"
-                    }
-                    size="sm"
-                    onClick={() => setSelectedCategory(category)}
-                    className="rounded-full"
-                  >
-                    {category}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Algorithm Cards Section */}
-          <div className="container mx-auto px-4 pb-16">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredAlgorithms.map((algo, index) => (
-                <Link
-                  key={algo.id}
-                  to={`/algorithm/${algo.id}`}
-                  rel="noopener noreferrer"
-                >
-                  <Card
-                    className="p-6 hover-lift cursor-pointer glass-card group"
-                    style={{ animationDelay: `${index * 50}ms` }}
-                  >
-                    <div className="space-y-4">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-lg group-hover:text-primary transition-colors truncate">
-                            {algo.name}
-                          </h3>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {algo.category}
-                          </p>
-                        </div>
-                        <Badge
-                          variant="outline"
-                          className={`${
-                            difficultyColors[algo.difficulty]
-                          } shrink-0`}
-                        >
-                          {algo.difficulty}
-                        </Badge>
-                      </div>
-
-                      <p className="text-sm text-muted-foreground line-clamp-2">
-                        {algo.description}
-                      </p>
-
-                      <div className="flex items-center gap-4 text-xs">
-                        <div className="flex items-center gap-1">
-                          <TrendingUp className="w-3 h-3" />
-                          <span className="text-muted-foreground">
-                            Time: {algo.timeComplexity}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <BookOpen className="w-3 h-3" />
-                          <span className="text-muted-foreground">
-                            Space: {algo.spaceComplexity}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-
-            {filteredAlgorithms.length === 0 && (
-              <div className="text-center py-16">
-                <p className="text-muted-foreground">
-                  No algorithms found matching your search.
-                </p>
-              </div>
-            )}
+             </div>
+             <AlgorithmList 
+               algorithms={algorithms} 
+               emptyMessage="No algorithms found matching your search." 
+               defaultListType={ListType.Core}
+               availableListTypes={[ListType.Core, ListType.CoreAndBlind75]}
+               hideListSelection={true}
+             />
           </div>
         </FeatureGuard>
 

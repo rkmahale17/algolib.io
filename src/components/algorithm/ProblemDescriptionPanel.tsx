@@ -20,6 +20,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AuthGuard } from "@/components/AuthGuard";
@@ -27,9 +33,9 @@ import { TabWarning } from "@/components/TabWarning";
 import { FeatureGuard } from "@/components/FeatureGuard";
 import { SolutionViewer } from "@/components/SolutionViewer";
 import { RichText } from "@/components/RichText";
-import { blind75Problems } from "@/data/blind75";
 import { renderBlind75Visualization } from "@/utils/blind75Visualizations";
 import { renderVisualization as renderVizFromMapping, hasVisualization } from "@/utils/visualizationMapping";
+import { DIFFICULTY_MAP } from "@/types/algorithm";
 import { AlgoLink } from "../AlgoLink";
 
 interface ProblemDescriptionPanelProps {
@@ -109,13 +115,7 @@ export const ProblemDescriptionPanel = React.memo(({
     }
 
     // 3. Try Blind 75 Visualization Mapping (legacy fallback)
-    const blind75Match = blind75Problems.find(p => 
-      p.slug === algorithm.slug || 
-      p.algorithmId === algorithm.id ||
-      p.algorithmId === algorithm.slug
-    );
-    
-    const vizKey = blind75Match?.algorithmId || algorithm.id || algorithm.slug;
+    const vizKey = algorithm.id || algorithm.slug;
     
     // Try to render using Blind 75 visualization helper
     const blind75Viz = renderBlind75Visualization(vizKey);
@@ -232,16 +232,13 @@ export const ProblemDescriptionPanel = React.memo(({
                           <Badge 
                             variant="outline"
                             className={`
-                              ${algorithm.difficulty.toLowerCase() === 'easy' ? 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/30' : ''}
-                              ${algorithm.difficulty.toLowerCase() === 'medium' ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/30' : ''}
-                              ${algorithm.difficulty.toLowerCase() === 'hard' ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30' : ''}
-                              ${algorithm.difficulty.toLowerCase() === 'advanced' ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30' : ''}
-                              ${algorithm.difficulty.toLowerCase() === 'advance' ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30' : ''}
-                              ${algorithm.difficulty.toLowerCase() === 'intermediate' ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/30' : ''}
+                              ${DIFFICULTY_MAP[algorithm.difficulty?.toLowerCase()] === 'Easy' ? 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/30' : ''}
+                              ${DIFFICULTY_MAP[algorithm.difficulty?.toLowerCase()] === 'Medium' ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/30' : ''}
+                              ${DIFFICULTY_MAP[algorithm.difficulty?.toLowerCase()] === 'Hard' ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30' : ''}
                               font-semibold px-3 py-1
                             `}
                           >
-                            {algorithm.difficulty}
+                            {DIFFICULTY_MAP[algorithm.difficulty?.toLowerCase()] || algorithm.difficulty}
                           </Badge>
                         )}
                         
@@ -354,85 +351,113 @@ export const ProblemDescriptionPanel = React.memo(({
                     </div>
                   )}
 
-                  {/* Algorithm Overview Card */}
-                  {(!algorithm?.controls || algorithm.controls?.description?.overview !== false) && (
-                    <Card className="p-4 sm:p-6 glass-card overflow-hidden">
-                      <div className="space-y-4">
-                        <h3 className="font-semibold flex items-center gap-2">
-                          <BookOpen className="w-5 h-5 text-primary" />
-                          Algorithm Overview
-                        </h3>
-                        <p className="text-sm text-muted-foreground">
-                          {algorithm.overview || algorithm.explanation.problemStatement}
-                        </p>
+                  {/* Collapsible Section for Overview and Guides */}
+                  {(() => {
+                    const showOverview = !algorithm?.controls || algorithm.controls?.description?.overview !== false;
+                    const showGuides = algorithm && (!algorithm?.controls || algorithm.controls?.description?.guides !== false);
 
-                        <Separator />
+                    if (!showOverview && !showGuides) return null;
 
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <p className="text-sm font-medium mb-1">Time Complexity</p>
-                            <Badge variant="outline" className="font-mono">
-                              {algorithm.timeComplexity}
-                            </Badge>
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium mb-1">Space Complexity</p>
-                            <Badge variant="outline" className="font-mono">
-                              {algorithm.spaceComplexity}
-                            </Badge>
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  )}
+                    return (
+                      <Card className="glass-card overflow-hidden">
+                        <Accordion type="single" collapsible defaultValue="details" className="w-full">
+                          <AccordionItem value="details" className="border-none">
+                            <AccordionTrigger className="px-4 sm:px-6 py-4 hover:no-underline">
+                               <div className="flex items-center gap-2 text-lg font-semibold">
+                                  <BookOpen className="w-5 h-5 text-primary" />
+                                  Algorithm Overview
+                               </div>
+                            </AccordionTrigger>
+                            <AccordionContent className="px-1 sm:px-1 pb-4">
+                               <div className="space-y-6 pt-0">
+                                    <div className="px-3 sm:px-5 space-y-4">
+                                      {showOverview && (
+                                        <>
+                                          <div className="text-sm text-muted-foreground">
+                                            {/* Using RichText if available, otherwise fallback */}
+                                            {algorithm.overview ? (
+                                                <RichText content={algorithm.overview} />
+                                            ) : (
+                                                algorithm.explanation.problemStatement
+                                            )}
+                                          </div>
 
-                  {/* Steps, Use Cases & Tips Card */}
-                  {algorithm && (!algorithm?.controls || algorithm.controls?.description?.guides !== false) && (
-                    <Card className="p-4 sm:p-6 glass-card overflow-hidden">
-                      <Tabs defaultValue="steps">
-                        <TabsList className="grid w-full grid-cols-3 h-auto">
-                          <TabsTrigger value="steps" className="text-xs sm:text-sm">
-                            Steps
-                          </TabsTrigger>
-                          <TabsTrigger value="usecase" className="text-xs sm:text-sm">
-                            Use Cases
-                          </TabsTrigger>
-                          <TabsTrigger value="tips" className="text-xs sm:text-sm">
-                            Pro Tips
-                          </TabsTrigger>
-                        </TabsList>
+                                          <Separator />
 
-                        <TabsContent value="steps" className="mt-4">
-                          <ol className="space-y-2 list-decimal list-inside">
-                            {algorithm.explanation.steps?.map((step: string, i: number) => (
-                              <li key={i} className="text-sm text-muted-foreground">
-                                {step}
-                              </li>
-                            ))}
-                          </ol>
-                        </TabsContent>
+                                          <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                              <p className="text-sm font-medium mb-1">Time Complexity</p>
+                                              <Badge variant="outline" className="font-mono">
+                                                {algorithm.timeComplexity}
+                                              </Badge>
+                                            </div>
+                                            <div>
+                                              <p className="text-sm font-medium mb-1">Space Complexity</p>
+                                              <Badge variant="outline" className="font-mono">
+                                                {algorithm.spaceComplexity}
+                                              </Badge>
+                                            </div>
+                                          </div>
+                                          <Separator />
 
-                        <TabsContent value="usecase" className="mt-4">
-                          <RichText
-                          className="text-sm text-muted-foreground"
-                            content={algorithm.explanation.useCase}
-                           
-                          />
-                        
-                        </TabsContent>
+                                        </>
+                                      )}
 
-                        <TabsContent value="tips" className="mt-4">
-                          <ul className="space-y-2 list-disc list-inside">
-                            {algorithm.explanation.tips?.map((tip: string, i: number) => (
-                              <li key={i} className="text-sm text-muted-foreground">
-                                {tip}
-                              </li>
-                            ))}
-                          </ul>
-                        </TabsContent>
-                      </Tabs>
-                    </Card>
-                  )}
+                                      {/* Steps, Use Cases & Tips */}
+                                      {showGuides && (
+                                        <div className="pt-2">
+                                          <Tabs defaultValue="steps">
+                                            <TabsList className="grid w-full grid-cols-3 h-auto">
+                                              <TabsTrigger value="usecase" className="text-xs sm:text-sm">
+                                                Use Cases
+                                              </TabsTrigger>
+                                              <TabsTrigger value="tips" className="text-xs sm:text-sm">
+                                                Pro Tips
+                                              </TabsTrigger>
+                                              <TabsTrigger value="steps" className="text-xs sm:text-sm">
+                                                Steps to solve
+                                              </TabsTrigger>
+                                            </TabsList>
+
+                                            <div className="p-1">
+                                                <TabsContent value="steps" className="mt-4">
+                                                  <ol className="space-y-2 list-decimal list-inside">
+                                                    {algorithm.explanation.steps?.map((step: string, i: number) => (
+                                                      <li key={i} className="text-sm text-muted-foreground">
+                                                        {step}
+                                                      </li>
+                                                    ))}
+                                                  </ol>
+                                                </TabsContent>
+
+                                                <TabsContent value="usecase" className="mt-4">
+                                                  <RichText
+                                                    className="text-sm text-muted-foreground"
+                                                    content={algorithm.explanation.useCase}
+                                                  />
+                                                </TabsContent>
+
+                                                <TabsContent value="tips" className="mt-4">
+                                                  <ul className="space-y-2 list-disc list-inside">
+                                                    {algorithm.explanation.tips?.map((tip: string, i: number) => (
+                                                      <li key={i} className="text-sm text-muted-foreground">
+                                                        {tip}
+                                                      </li>
+                                                    ))}
+                                                  </ul>
+                                                </TabsContent>
+                                            </div>
+                                          </Tabs>
+                                        </div>
+                                      )}
+                                    </div>
+                               </div>
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
+                      </Card>
+                    );
+                  })()}
 
                   {/* Video Tutorial Card */}
                   <FeatureGuard flag="youtube_video">

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
 import {
   Code2,
   Lightbulb,
@@ -49,6 +50,9 @@ export const CodeWorkspacePanel = React.memo(({
 }: CodeWorkspacePanelProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isCompact, setIsCompact] = useState(false);
+
+  const isCodeRunnerGlobalEnabled = useFeatureFlag('code_runner_tab');
+  const isBrainstormGlobalEnabled = useFeatureFlag('brainstrom_tab');
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -128,8 +132,8 @@ export const CodeWorkspacePanel = React.memo(({
             </div>
             
             <TabsContent value="code" className="flex-1 m-0 overflow-hidden relative group flex flex-col data-[state=inactive]:hidden">
-               {algorithm?.controls?.tabs?.code === false ? (
-                  <TabWarning message="Code Runner is not available for this problem." />
+               {(algorithm?.controls?.tabs?.code === false || algorithm?.controls?.code_runner === false || !isCodeRunnerGlobalEnabled) ? (
+                  <TabWarning message={!isCodeRunnerGlobalEnabled ? "Code Runner is currently disabled globally." : "Code Runner is not available for this problem."} />
                ) : (
                  <AuthGuard
                    fallbackTitle="Sign in to use Code Runner"
@@ -160,8 +164,8 @@ export const CodeWorkspacePanel = React.memo(({
             </TabsContent>
 
             <TabsContent value="brainstorm" className="flex-1 m-0 overflow-hidden data-[state=inactive]:hidden">
-               {algorithm?.controls?.tabs?.brainstorm === false ? (
-                  <TabWarning message="Brainstorming tools are disabled for this session." />
+               {(algorithm?.controls?.tabs?.brainstorm === false || algorithm?.controls?.brainstorm === false || !isBrainstormGlobalEnabled) ? (
+                  <TabWarning message={!isBrainstormGlobalEnabled ? "Brainstorming is currently disabled globally." : "Brainstorming tools are disabled for this session."} />
                ) : (
                   <div className="h-full flex flex-col">
                     <AuthGuard
