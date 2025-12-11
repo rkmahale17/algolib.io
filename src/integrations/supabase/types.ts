@@ -78,9 +78,7 @@ export type Database = {
           name: string
           problems_to_solve: Json | null
           serial_no: number | null
-          space_complexity: string | null
           test_cases: Json | null
-          time_complexity: string | null
           title: string
           tutorials: Json | null
           updated_at: string | null
@@ -100,9 +98,7 @@ export type Database = {
           name: string
           problems_to_solve?: Json | null
           serial_no?: number | null
-          space_complexity?: string | null
           test_cases?: Json | null
-          time_complexity?: string | null
           title: string
           tutorials?: Json | null
           updated_at?: string | null
@@ -122,9 +118,7 @@ export type Database = {
           name?: string
           problems_to_solve?: Json | null
           serial_no?: number | null
-          space_complexity?: string | null
           test_cases?: Json | null
-          time_complexity?: string | null
           title?: string
           tutorials?: Json | null
           updated_at?: string | null

@@ -181,7 +181,6 @@ export function AlgorithmPreview({ algorithm }: AlgorithmPreviewProps) {
                             handleVote={() => {}}
                             toggleFavorite={() => {}}
                             setIsVisualizationMaximized={setIsVisualizationMaximized}
-                            isVisualizationMaximized={isVisualizationMaximized}
                             handleRichTextClick={() => {}}
                         />
                     </ResizablePanel>
@@ -288,7 +287,6 @@ export function AlgorithmPreview({ algorithm }: AlgorithmPreviewProps) {
                             handleVote={() => {}}
                             toggleFavorite={() => {}}
                             setIsVisualizationMaximized={setIsVisualizationMaximized}
-                            isVisualizationMaximized={isVisualizationMaximized}
                             handleRichTextClick={() => {}}
                         />
                     </ResizablePanel>
