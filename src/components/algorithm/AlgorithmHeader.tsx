@@ -13,6 +13,8 @@ import {
   RotateCcw,
   MessageSquare,
   LogOut,
+  MoreHorizontal,
+  User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -43,6 +45,7 @@ interface AlgorithmHeaderProps {
   user: any;
   algorithm: any;
   isMobile: boolean;
+  windowWidth: number;
   
   // Timer / Interview
   isInterviewMode: boolean;
@@ -64,6 +67,7 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
   user,
   algorithm,
   isMobile,
+  windowWidth,
   isInterviewMode,
   toggleInterviewMode,
   timerSeconds,
@@ -76,6 +80,8 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
   handleShare,
   handleSignOut,
 }) => {
+  const showCondensedMenu = windowWidth < 778;
+
   return (
     <div className="h-12 border-b flex items-center px-4 gap-4 shrink-0 bg-background/95">
       {/* Left Side: Logo + Navigation */}
@@ -90,8 +96,8 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
         
         <div className="h-4 w-px bg-border" />
         
-        {/* Desktop Navigation */}
-        {!isMobile && (
+        {/* Desktop Navigation - Show only if NOT condensed menu */}
+        {!showCondensedMenu && (
           <TooltipProvider>
             {(!algorithm?.controls || algorithm.controls?.header?.random_problem !== false) && (
               <Tooltip>
@@ -121,8 +127,8 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
       {/* Right Side: Share, Bug, Timer, Interview, Theme, Profile */}
       <div className="ml-auto flex items-center gap-2">
           
-          {/* Mobile Hamburger Menu */}
-          {isMobile && (
+          {/* Condensed Menu (Tablet/Mobile < 778px) */}
+          {showCondensedMenu && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -145,18 +151,26 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
                   <Share2 className="mr-2 h-4 w-4" />
                   <span>Share</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => window.open("/feedback", "_blank")}>
+                <DropdownMenuItem asChild>
+                  <Link to="/profile">
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </Link>
+                </DropdownMenuItem>
+                {/* <DropdownMenuItem onClick={() => window.open("/feedback", "_blank")}>
                   <Bug className="mr-2 h-4 w-4" />
                   <span>Report Issue</span>
-                </DropdownMenuItem>
+                </DropdownMenuItem> */}
                 <DropdownMenuSeparator />
+                {/* Interview Mode - Hidden for now */}
                 <FeatureGuard flag="interview_mode">
                   <DropdownMenuItem onClick={toggleInterviewMode}>
                     <Monitor className="mr-2 h-4 w-4" />
                     <span>{isInterviewMode ? "Exit Interview Mode" : "Interview Mode"}</span>
                   </DropdownMenuItem>
                 </FeatureGuard>
-                {/* Simple Timer Toggle for Mobile */}
+                
+                {/* Timer in Dropdown */}
                 <div className="p-2 flex items-center justify-between">
                    <div className="flex items-center gap-2 text-sm">
                       <Timer className="h-4 w-4" />
@@ -175,7 +189,8 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
             </DropdownMenu>
           )}
 
-          {!isMobile && (!algorithm?.controls || algorithm.controls?.social?.share !== false) && (
+          {/* Desktop Actions - Show only if NOT condensed menu */}
+          {!showCondensedMenu && (!algorithm?.controls || algorithm.controls?.social?.share !== false) && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -188,7 +203,7 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
             </TooltipProvider>
           )}
 
-          {!isMobile && (!algorithm?.controls || algorithm.controls?.header?.bug_report !== false) && (
+          {!showCondensedMenu && (!algorithm?.controls || algorithm.controls?.header?.bug_report !== false) && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -201,7 +216,7 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
             </TooltipProvider>
           )}
 
-        {!isMobile && (!algorithm?.controls || algorithm.controls?.header?.timer !== false) && (
+        {!showCondensedMenu && (!algorithm?.controls || algorithm.controls?.header?.timer !== false) && (
           <TooltipProvider>
             <Popover>
               <PopoverTrigger asChild>
@@ -234,7 +249,8 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
           </TooltipProvider>
         )}
 
-        {(!algorithm?.controls || algorithm.controls?.header?.interview_mode !== false) && (
+        {/* Interview Mode - Show only if NOT condensed menu */}
+        {!showCondensedMenu && false && (!algorithm?.controls || algorithm.controls?.header?.interview_mode !== false) && (
             <TooltipProvider>
             <FeatureGuard flag="interview_mode">
               <Tooltip>
@@ -286,9 +302,13 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link to="/feedback">
+                {/* <Link to="/feedback">
                   <MessageSquare className="mr-2 h-4 w-4" />
                   <span>Feedback</span>
+                </Link> */}
+                  <Link to="/profile">
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />

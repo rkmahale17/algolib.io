@@ -17,6 +17,8 @@ export interface Algorithm {
     tutorials: any;
     metadata: any;
     controls?: any;
+    list_type?: string;
+    serial_no?: number;
     created_at?: string;
     updated_at?: string;
 }

@@ -97,6 +97,10 @@ export const visualizationMap: Record<string, React.LazyExoticComponent<React.Co
   'kth-largest-element': React.lazy(() => import('@/components/visualizations/algorithms/KthLargestVisualization').then(m => ({ default: m.KthLargestVisualization }))),
   'sliding-window-maximum': React.lazy(() => import('@/components/visualizations/algorithms/SlidingWindowMaxVisualization').then(m => ({ default: m.SlidingWindowMaxVisualization }))),
   
+  // Cache Algorithms
+  'lru-cache': React.lazy(() => import('@/components/visualizations/algorithms/LRUCacheVisualization').then(m => ({ default: m.LRUCacheVisualization }))),
+  'lru': React.lazy(() => import('@/components/visualizations/algorithms/LRUCacheVisualization').then(m => ({ default: m.LRUCacheVisualization }))),
+  
   // Math Algorithms
   'gcd-euclidean': React.lazy(() => import('@/components/visualizations/algorithms/GCDVisualization').then(m => ({ default: m.GCDVisualization }))),
   'gcd': React.lazy(() => import('@/components/visualizations/algorithms/GCDVisualization').then(m => ({ default: m.GCDVisualization }))),

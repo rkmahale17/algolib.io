@@ -141,6 +141,7 @@ export function AlgorithmPreview({ algorithm }: AlgorithmPreviewProps) {
                     user={{ email: 'preview@example.com' } as any}
                     algorithm={previewAlgorithm}
                     isMobile={false}
+                    windowWidth={1200}
                     isInterviewMode={false}
                     toggleInterviewMode={() => {}}
                     timerSeconds={0}
@@ -245,6 +246,7 @@ export function AlgorithmPreview({ algorithm }: AlgorithmPreviewProps) {
                     user={{ email: 'preview@example.com' } as any}
                     algorithm={previewAlgorithm}
                     isMobile={false}
+                    windowWidth={1200}
                     isInterviewMode={false}
                     toggleInterviewMode={() => {}}
                     timerSeconds={0}

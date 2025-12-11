@@ -1,14 +1,7 @@
-import { Search, Trophy, Target, TrendingUp, BookOpen } from 'lucide-react';
-import { blind75Problems, blind75Categories } from '@/data/blind75';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Trophy } from 'lucide-react';
 import { Footer } from '@/components/Footer';
 import { Helmet } from 'react-helmet-async';
-import { Input } from '@/components/ui/input';
-import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import {
   Accordion,
@@ -16,40 +9,20 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { AlgorithmList, AlgorithmListItem } from '@/components/AlgorithmList';
+import { PremiumLoader } from '@/components/PremiumLoader';
+import { ListType, DIFFICULTY_MAP } from "@/types/algorithm";
 
 const Blind75 = () => {
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
+  const [algorithms, setAlgorithms] = useState<AlgorithmListItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const categoryParam = searchParams.get('category');
-    if (categoryParam) {
-      setSelectedCategory(categoryParam);
-    }
-  }, [searchParams]);
-
-  const filteredProblems = blind75Problems.filter((problem) => {
-    const matchesSearch = problem.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         problem.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = !selectedCategory || problem.category === selectedCategory;
-    const matchesDifficulty = !selectedDifficulty || problem.difficulty === selectedDifficulty;
-    return matchesSearch && matchesCategory && matchesDifficulty;
-  });
-
-  const difficultyColors = {
-    easy: 'bg-green-500/10 text-green-500 border-green-500/20',
-    medium: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
-    hard: 'bg-red-500/10 text-red-500 border-red-500/20',
-  };
-
+  // Stats derived from fetched algorithms
   const stats = {
-    total: blind75Problems.length,
-    easy: blind75Problems.filter(p => p.difficulty === 'easy').length,
-    medium: blind75Problems.filter(p => p.difficulty === 'medium').length,
-    hard: blind75Problems.filter(p => p.difficulty === 'hard').length,
+    total: algorithms.length,
+    easy: algorithms.filter(p => DIFFICULTY_MAP[p.difficulty?.toLowerCase()] === 'Easy').length,
+    medium: algorithms.filter(p => DIFFICULTY_MAP[p.difficulty?.toLowerCase()] === 'Medium').length,
+    hard: algorithms.filter(p => DIFFICULTY_MAP[p.difficulty?.toLowerCase()] === 'Hard').length,
   };
 
   const faqItems = [
@@ -74,6 +47,53 @@ const Blind75 = () => {
       answer: "You can filter problems by difficulty and category to organize your practice. We recommend keeping a personal log of completed problems and revisiting challenging ones periodically to reinforce your understanding."
     }
   ];
+
+  useEffect(() => {
+    const fetchBlind75Algorithms = async () => {
+      if (!supabase) return;
+      
+      try {
+        // Using correct column name 'list_type' (snake_case standard in Supabase)
+        const { data, error } = await supabase
+          .from('algorithms')
+          .select('*')
+          .or('list_type.eq.blind75,list_type.eq.core+blind75');
+
+        if (error) {
+          console.error('Error fetching Blind 75 algorithms:', error);
+          return;
+        }
+
+        if (data) {
+           const mappedAlgorithms: AlgorithmListItem[] = data.map((algo: any) => ({
+             id: algo.id,
+             title: algo.title || algo.name,
+             name: algo.name,
+             category: algo.category,
+             difficulty: algo.difficulty,
+             description: algo.description || algo.explanation?.problemStatement || '',
+             timeComplexity: algo.timeComplexity || algo.time_complexity || algo.metadata?.timeComplexity,
+             spaceComplexity: algo.spaceComplexity || algo.space_complexity || algo.metadata?.spaceComplexity,
+             slug: algo.slug || algo.id,
+             companies: algo.companyTags || algo.company_tags,
+             listType: algo.list_type,
+             serial_no: algo.serial_no
+          }));
+          setAlgorithms(mappedAlgorithms);
+        }
+      } catch (error) {
+        console.error('Error in fetch:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlind75Algorithms();
+  }, []);
+
+  if (loading) {
+    return <PremiumLoader text="Loading Blind 75 List..." />;
+  }
 
   return (
     <>
@@ -109,81 +129,6 @@ const Blind75 = () => {
         <meta name="twitter:title" content="Blind 75 LeetCode Problems - Complete Interview Guide" />
         <meta name="twitter:description" content="Master the 75 most important LeetCode problems for coding interviews with detailed solutions and visualizations" />
         <meta name="twitter:image" content="https://algolib.io/og-image.png" />
-        
-        {/* CollectionPage Schema */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "CollectionPage",
-            "name": "Blind 75 LeetCode Problems",
-            "description": "Curated list of 75 essential LeetCode problems for interview preparation",
-            "url": "https://algolib.io/blind75",
-            "inLanguage": "en-US",
-            "isPartOf": {
-              "@type": "WebSite",
-              "name": "AlgoLib.io",
-              "url": "https://algolib.io"
-            },
-            "mainEntity": {
-              "@type": "ItemList",
-              "numberOfItems": blind75Problems.length,
-              "itemListElement": blind75Problems.map((problem, index) => ({
-                "@type": "ListItem",
-                "position": index + 1,
-                "item": {
-                  "@type": "TechArticle",
-                  "name": problem.title,
-                  "description": problem.description,
-                  "url": `https://algolib.io/blind75/${problem.slug}`,
-                  "articleSection": problem.category,
-                  "proficiencyLevel": problem.difficulty
-                }
-              }))
-            }
-          })}
-        </script>
-        
-        {/* BreadcrumbList Schema */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-              {
-                "@type": "ListItem",
-                "position": 1,
-                "item": {
-                  "@id": "https://algolib.io",
-                  "name": "Home"
-                }
-              },
-              {
-                "@type": "ListItem",
-                "position": 2,
-                "item": {
-                  "@id": "https://algolib.io/blind75",
-                  "name": "Blind 75"
-                }
-              }
-            ]
-          })}
-        </script>
-        
-        {/* FAQPage Schema */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": faqItems.map(item => ({
-              "@type": "Question",
-              "name": item.question,
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": item.answer
-              }
-            }))
-          })}
-        </script>
       </Helmet>
       
       <div className="min-h-screen bg-background">
@@ -234,153 +179,15 @@ const Blind75 = () => {
           </div>
         </div>
 
-        {/* Search and Filter */}
+        {/* Algorithm List with Filters */}
         <div className="container mx-auto px-4 py-8">
-          <div className="max-w-4xl mx-auto space-y-6">
-            {/* Search Bar */}
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search problems..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 h-14 text-lg bg-card border-border/50"
-              />
-            </div>
-
-            {/* Category Filter */}
-            <div className="space-y-2">
-              <div className="text-sm font-medium text-muted-foreground">Categories</div>
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  variant={selectedCategory === null ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedCategory(null)}
-                  className="rounded-full"
-                >
-                  All
-                </Button>
-                {blind75Categories.map((category) => (
-                  <Button
-                    key={category}
-                    variant={selectedCategory === category ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setSelectedCategory(category)}
-                    className="rounded-full"
-                  >
-                    {category}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            {/* Difficulty Filter */}
-            <div className="space-y-2">
-              <div className="text-sm font-medium text-muted-foreground">Difficulty</div>
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  variant={selectedDifficulty === null ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedDifficulty(null)}
-                  className="rounded-full"
-                >
-                  All
-                </Button>
-                <Button
-                  variant={selectedDifficulty === 'easy' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedDifficulty('easy')}
-                  className="rounded-full"
-                >
-                  Easy
-                </Button>
-                <Button
-                  variant={selectedDifficulty === 'medium' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedDifficulty('medium')}
-                  className="rounded-full"
-                >
-                  Medium
-                </Button>
-                <Button
-                  variant={selectedDifficulty === 'hard' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedDifficulty('hard')}
-                  className="rounded-full"
-                >
-                  Hard
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Problems Grid */}
-        <div className="container mx-auto px-4 pb-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredProblems.map((problem, index) => (
-              <Link key={problem.id} to={`/blind75/${problem.slug}`}  rel="noopener noreferrer">
-                <Card 
-                  className="p-6 hover-lift cursor-pointer glass-card group h-full"
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
-                  <div className="space-y-4">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs font-mono text-muted-foreground">#{problem.id}</span>
-                          <Badge 
-                            variant="outline" 
-                            className={`${difficultyColors[problem.difficulty]} shrink-0 text-xs`}
-                          >
-                            {problem.difficulty}
-                          </Badge>
-                        </div>
-                        <h3 className="font-semibold text-lg group-hover:text-primary transition-colors">
-                          {problem.title}
-                        </h3>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {problem.category}
-                        </p>
-                      </div>
-                    </div>
-
-                    <p className="text-sm text-muted-foreground line-clamp-2">
-                      {problem.description}
-                    </p>
-
-                    <div className="flex items-center gap-4 text-xs">
-                      <div className="flex items-center gap-1">
-                        <TrendingUp className="w-3 h-3" />
-                        <span className="text-muted-foreground">Time: {problem.timeComplexity}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <BookOpen className="w-3 h-3" />
-                        <span className="text-muted-foreground">Space: {problem.spaceComplexity}</span>
-                      </div>
-                    </div>
-
-                    {problem.companies && problem.companies.length > 0 && (
-                      <div className="flex flex-wrap gap-1 pt-2">
-                        {problem.companies.slice(0, 3).map((company) => (
-                          <Badge key={company} variant="secondary" className="text-xs">
-                            {company}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </Card>
-              </Link>
-            ))}
-          </div>
-
-          {filteredProblems.length === 0 && (
-            <div className="text-center py-16">
-              <p className="text-muted-foreground">No problems found matching your filters.</p>
-            </div>
-          )}
+           <AlgorithmList 
+              algorithms={algorithms} 
+              emptyMessage="No Blind 75 problems found."
+              defaultListType={ListType.Blind75}
+              availableListTypes={[ListType.Blind75, ListType.CoreAndBlind75]} 
+              hideListSelection={true}
+           />
         </div>
 
         {/* FAQ Section */}
@@ -405,8 +212,8 @@ const Blind75 = () => {
           </div>
         </div>
       
-      <Footer />
-    </div>
+        <Footer />
+      </div>
     </>
   );
 };

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAlgorithms, useCategories, useDeleteAlgorithm } from '@/hooks/useAlgorithms';
+import { ListType, LIST_TYPE_LABELS, LIST_TYPE_OPTIONS } from '@/types/algorithm';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -37,6 +38,7 @@ export function AlgorithmList() {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [listTypeFilter, setListTypeFilter] = useState<string>('all');
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' }>({ key: 'serial_no', direction: 'asc' });
 
   const { data: algorithms, isLoading } = useAlgorithms(searchQuery, categoryFilter === 'all' ? '' : categoryFilter);
   const { data: categories } = useCategories();
@@ -64,10 +66,45 @@ export function AlgorithmList() {
 
   const filteredAlgorithms = algorithms?.filter(algo => {
     if (listTypeFilter === 'all') return true;
-    // Check metadata.listType
-    const type = algo.metadata?.listType || 'coreAlgo';
+    // Check list_type
+    const type = algo.list_type || 'core';
     return type === listTypeFilter;
+  })?.sort((a: any, b: any) => {
+    let aValue = a[sortConfig.key];
+    let bValue = b[sortConfig.key];
+
+    if (sortConfig.key === 'serial_no') {
+        const aNum = aValue === null || aValue === undefined || aValue === '' ? -1 : Number(aValue);
+        const bNum = bValue === null || bValue === undefined || bValue === '' ? -1 : Number(bValue);
+        
+        // If sorting strictly by what exists, we might want nulls at bottom.
+        // Let's stick to the previous pattern: nulls last.
+        const aIsNull = aValue === null || aValue === undefined || aValue === '';
+        const bIsNull = bValue === null || bValue === undefined || bValue === '';
+
+        if (aIsNull && bIsNull) return 0;
+        if (aIsNull) return 1;
+        if (bIsNull) return -1;
+
+        return sortConfig.direction === 'asc' ? aNum - bNum : bNum - aNum;
+    }
+
+    if (aValue === bValue) return 0;
+    
+    // Handle null/undefined values - push to end
+    if (aValue === null || aValue === undefined) return 1;
+    if (bValue === null || bValue === undefined) return -1;
+
+    const result = aValue < bValue ? -1 : 1;
+    return sortConfig.direction === 'asc' ? result : -result;
   });
+
+  const handleSort = (key: string) => {
+    setSortConfig(current => ({
+      key,
+      direction: current.key === key && current.direction === 'asc' ? 'desc' : 'asc'
+    }));
+  };
 
   return (
     <div className="space-y-4">
@@ -125,10 +162,10 @@ export function AlgorithmList() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All List Types</SelectItem>
-            <SelectItem value="coreAlgo">Core Algorithm</SelectItem>
-            <SelectItem value="blind75">Blind 75</SelectItem>
-            <SelectItem value="core+Blind75">Core + Blind 75</SelectItem>
-          </SelectContent>
+            {LIST_TYPE_OPTIONS.map(opt => (
+                <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+            ))}
+          </SelectContent>  
         </Select>
       </div>
 
@@ -141,11 +178,12 @@ export function AlgorithmList() {
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[50px]">Edit</TableHead>
-                <TableHead>ID</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Difficulty</TableHead>
-                <TableHead>List Type</TableHead>
+                <TableHead onClick={() => handleSort('id')} className="cursor-pointer hover:bg-muted/50">ID</TableHead>
+                <TableHead onClick={() => handleSort('name')} className="cursor-pointer hover:bg-muted/50">Name</TableHead>
+                <TableHead onClick={() => handleSort('category')} className="cursor-pointer hover:bg-muted/50">Category</TableHead>
+                <TableHead onClick={() => handleSort('difficulty')} className="cursor-pointer hover:bg-muted/50">Difficulty</TableHead>
+                <TableHead onClick={() => handleSort('serial_no')} className="cursor-pointer hover:bg-muted/50 font-bold text-primary">Serial No</TableHead>
+                <TableHead onClick={() => handleSort('list_type')} className="cursor-pointer hover:bg-muted/50">List Type</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -178,8 +216,9 @@ export function AlgorithmList() {
                         {algo.difficulty}
                       </Badge>
                     </TableCell>
+                    <TableCell className="font-mono text-sm">{algo.serial_no || '-'}</TableCell>
                     <TableCell>
-                      <Badge variant="outline">{algo.metadata?.listType || 'coreAlgo'}</Badge>
+                      <Badge variant="outline">{algo.list_type || 'core'}</Badge>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">

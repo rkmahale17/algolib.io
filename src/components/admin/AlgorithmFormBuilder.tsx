@@ -5,6 +5,7 @@ import {
   useCreateAlgorithm,
   useUpdateAlgorithm,
 } from "@/hooks/useAlgorithms";
+import { ListType, LIST_TYPE_OPTIONS } from "@/types/algorithm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -56,7 +57,9 @@ export function AlgorithmFormBuilder({
     title: "",
     category: "",
     difficulty: "easy",
+
     description: "",
+    serial_no: "",
     explanation: {
       problemStatement: "",
       useCase: "",
@@ -93,7 +96,7 @@ export function AlgorithmFormBuilder({
         typeof algorithm.metadata === "string"
           ? JSON.parse(algorithm.metadata)
           : algorithm.metadata;
-      setListType(metadataObj?.listType || "coreAlgo");
+      setListType(algorithm.list_type || metadataObj?.listType || "coreAlgo");
 
       setFormData({
         id: algorithm.id,
@@ -102,6 +105,7 @@ export function AlgorithmFormBuilder({
         category: algorithm.category,
         difficulty: algorithm.difficulty,
         description: algorithm.description || "",
+        serial_no: algorithm.serial_no || "",
         explanation:
           typeof algorithm.explanation === "string"
             ? JSON.parse(algorithm.explanation)
@@ -141,9 +145,15 @@ export function AlgorithmFormBuilder({
 
     const payload = {
       ...formData,
+      list_type: listType,
+      serial_no: formData.serial_no ? parseInt(formData.serial_no) : null,
       metadata: {
         ...formData.metadata,
-        listType: listType,
+        // We can keep listType in metadata for backward compatibility if needed, 
+        // but user requested "direct column instead of meta data".
+        // Let's remove it from metadata if we want to be strict, or just ignore it.
+        // For now, I'll update it to match just in case.
+        listType: listType, 
       },
     };
 
@@ -258,6 +268,18 @@ export function AlgorithmFormBuilder({
                         </div>
 
                         <div className="space-y-2">
+                          <Label>Serial No</Label>
+                          <Input
+                            type="number"
+                            value={formData.serial_no}
+                            onChange={(e) =>
+                              setFormData({ ...formData, serial_no: e.target.value })
+                            }
+                            placeholder="e.g., 1"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
                           <Label>Category *</Label>
                           <Input
                             value={formData.category}
@@ -288,15 +310,17 @@ export function AlgorithmFormBuilder({
                         </div>
 
                         <div className="space-y-2">
-                          <Label>List Type *</Label>
+                          <Label>List Type</Label>
                           <Select value={listType} onValueChange={setListType}>
                             <SelectTrigger>
-                              <SelectValue />
+                              <SelectValue placeholder="Select list type" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="coreAlgo">Core Algorithm</SelectItem>
-                              <SelectItem value="blind75">Blind 75</SelectItem>
-                              <SelectItem value="core+Blind75">Core + Blind 75</SelectItem>
+                              {LIST_TYPE_OPTIONS.map((opt) => (
+                                <SelectItem key={opt.value} value={opt.value}>
+                                  {opt.label}
+                                </SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                         </div>

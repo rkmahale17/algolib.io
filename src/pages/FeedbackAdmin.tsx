@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { format } from 'date-fns';
-import { ExternalLink, Loader2, MessageSquare, Trash2, CheckCircle, Clock, XCircle } from 'lucide-react';
+import { Link } from 'react-router-dom'; // Added Link
+import { ExternalLink, Loader2, MessageSquare, Trash2, CheckCircle, Clock, XCircle, ArrowLeft } from 'lucide-react'; // Added ArrowLeft
+
 import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -121,14 +123,22 @@ const FeedbackAdmin = () => {
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-3xl font-bold flex items-center gap-2">
-                <MessageSquare className="w-8 h-8 text-primary" />
-                Feedback Management
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                {feedback.length} feedback submission{feedback.length !== 1 ? 's' : ''}
-              </p>
+            <div className="space-y-4">
+               <Link to="/admin">
+                    <Button variant="ghost" className="gap-2 -ml-2 text-muted-foreground">
+                        <ArrowLeft className="w-4 h-4" />
+                        Back to Dashboard
+                    </Button>
+               </Link>
+               <div>
+                  <h1 className="text-3xl font-bold flex items-center gap-2">
+                    <MessageSquare className="w-8 h-8 text-primary" />
+                    Feedback Management
+                  </h1>
+                  <p className="text-muted-foreground mt-1">
+                    {feedback.length} feedback submission{feedback.length !== 1 ? 's' : ''}
+                  </p>
+               </div>
             </div>
           </div>
 

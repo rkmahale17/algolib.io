@@ -6,10 +6,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import ProfilePage from "./pages/Profile";
-import AlgorithmDetail from "./pages/AlgorithmDetail";
-import AlgorithmDetailNew from "./pages/AlgorithmDetailNew";
+import AlgorithmDetail from '@/pages/AlgorithmDetail';
 import Blind75 from "./pages/Blind75";
-import Blind75Detail from "./pages/Blind75Detail";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import Feedback from "./pages/Feedback";
@@ -29,7 +27,6 @@ import Leaderboard from "./pages/Leaderboard";
 import Navbar from "./components/Navbar";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import BlogPost from "./pages/BlogPost";
-import SeedDatabase from "./pages/SeedDatabase";
 import AdminAlgorithms from "./pages/AdminAlgorithms";
 import AdminAlgorithmDetail from "./pages/AdminAlgorithmDetail";
 import { ProtectedAdminRoute } from "./components/ProtectedAdminRoute";
@@ -56,7 +53,137 @@ const ConditionalNavbar = () => {
 
 import { appStatus } from "@/utils/appStatus";
 
-import { FeatureFlagProvider } from "@/contexts/FeatureFlagContext";
+import { FeatureFlagProvider, useFeatureFlag } from "@/contexts/FeatureFlagContext"; // Added useFeatureFlag
+import MaintenancePage from "./pages/MaintenancePage"; // Added MaintenancePage
+
+const AppContent = () => {
+  const isMaintenanceMode = useFeatureFlag('maintenance_mode');
+  const location = useLocation();
+
+  const isMaintenanceActive = isMaintenanceMode && !location.pathname.startsWith('/admin');
+
+  return (
+        <>
+          {isMaintenanceActive ? (
+            <>
+              <Navbar />
+              <MaintenancePage />
+            </>
+          ) : (
+            <>
+              <ConditionalNavbar />
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/algorithm/:id" element={<AlgorithmDetail />} />
+
+                <Route path="/blind75" element={
+                  <FeatureProtectedRoute flag="blind_75">
+                    <ProtectedRoute><Blind75 /></ProtectedRoute>
+                  </FeatureProtectedRoute>
+                } />
+                <Route path="/blind75/:slug" element={
+                  <FeatureProtectedRoute flag="blind_75">
+                    <ProtectedRoute><AlgorithmDetail /></ProtectedRoute>
+                  </FeatureProtectedRoute>
+                } />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/feedback" element={<Feedback />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<TermsOfService />} />
+              <Route path="/content-rights" element={<ContentRights />} />
+              <Route path="/complexity" element={<TimeComplexity />} />
+              <Route path="/games" element={
+                <FeatureProtectedRoute flag="algo_games">
+                  <ProtectedRoute><Games /></ProtectedRoute>
+                </FeatureProtectedRoute>
+              } />
+              <Route path="/games/sort-hero" element={
+                <FeatureProtectedRoute flag="algo_games">
+                  <ProtectedRoute><SortHero /></ProtectedRoute>
+                </FeatureProtectedRoute>
+              } />
+              <Route path="/games/graph-explorer" element={
+                <FeatureProtectedRoute flag="algo_games">
+                  <ProtectedRoute><GraphExplorer /></ProtectedRoute>
+                </FeatureProtectedRoute>
+              } />
+              <Route path="/games/stack-master" element={
+                <FeatureProtectedRoute flag="algo_games">
+                  <ProtectedRoute><StackMaster /></ProtectedRoute>
+                </FeatureProtectedRoute>
+              } />
+              <Route path="/games/dp-puzzle" element={
+                <FeatureProtectedRoute flag="algo_games">
+                  <ProtectedRoute><DPPuzzle /></ProtectedRoute>
+                </FeatureProtectedRoute>
+              } />
+              <Route path="/games/sliding-window" element={
+                <FeatureProtectedRoute flag="algo_games">
+                  <ProtectedRoute><SlidingWindow /></ProtectedRoute>
+                </FeatureProtectedRoute>
+              } />
+              <Route path="/games/two-pointer" element={
+                <FeatureProtectedRoute flag="algo_games">
+                  <ProtectedRoute><TwoPointer /></ProtectedRoute>
+                </FeatureProtectedRoute>
+              } />
+              <Route path="/games/leaderboard" element={
+                <FeatureProtectedRoute flag="algo_games">
+                  <ProtectedRoute><Leaderboard /></ProtectedRoute>
+                </FeatureProtectedRoute>
+              } />
+              <Route path="/blog/:slug" element={<BlogPost />} />
+              <Route path="/blog" element={<Blog />} />
+
+              <Route path="/admin/algorithms" element={
+                <ProtectedAdminRoute>
+                  <AdminAlgorithms />
+                </ProtectedAdminRoute>
+              } />
+              <Route path="/admin/algorithms/new" element={
+                <ProtectedAdminRoute>
+                  <AdminAlgorithmDetail />
+                </ProtectedAdminRoute>
+              } />
+              <Route path="/admin/algorithm/:id" element={
+                <ProtectedAdminRoute>
+                  <AdminAlgorithmDetail />
+                </ProtectedAdminRoute>
+              } />
+              <Route path="/admin/feedback" element={
+                <ProtectedAdminRoute>
+                  <FeedbackAdmin />
+                </ProtectedAdminRoute>
+              } />
+              
+
+              <Route path="/admin/features" element={
+                <ProtectedAdminRoute>
+                  <AdminFeatureFlags />
+                </ProtectedAdminRoute>
+              } />
+
+              <Route path="/admin" element={
+                <ProtectedAdminRoute>
+                  <AdminDashboard />
+                </ProtectedAdminRoute>
+              } />
+
+                <Route path="/profile" element={
+                  <FeatureProtectedRoute flag="profiles">
+                    <ProtectedRoute><ProfilePage /></ProtectedRoute>
+                  </FeatureProtectedRoute>
+                } />
+
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+              </Routes>
+            </>
+          )}
+        </>
+  );
+};
 
 const App = () => {
     // Set initialized flag after first mount (so subsequent internal navigations know app is loaded)
@@ -75,121 +202,9 @@ const App = () => {
         <TooltipProvider>
           <Toaster />
           <Sonner />
-        <BrowserRouter basename="/">
-          <ConditionalNavbar />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/algorithm/:id" element={<AlgorithmDetailNew />} />
-
-            <Route path="/blind75" element={
-              <FeatureProtectedRoute flag="blind_75">
-                <ProtectedRoute><Blind75 /></ProtectedRoute>
-              </FeatureProtectedRoute>
-            } />
-            <Route path="/blind75/:slug" element={
-              <FeatureProtectedRoute flag="blind_75">
-                <ProtectedRoute><AlgorithmDetailNew /></ProtectedRoute>
-              </FeatureProtectedRoute>
-            } />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/feedback" element={<Feedback />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/terms" element={<TermsOfService />} />
-          <Route path="/content-rights" element={<ContentRights />} />
-          <Route path="/complexity" element={<TimeComplexity />} />
-          <Route path="/games" element={
-            <FeatureProtectedRoute flag="algo_games">
-              <ProtectedRoute><Games /></ProtectedRoute>
-            </FeatureProtectedRoute>
-          } />
-          <Route path="/games/sort-hero" element={
-            <FeatureProtectedRoute flag="algo_games">
-              <ProtectedRoute><SortHero /></ProtectedRoute>
-            </FeatureProtectedRoute>
-          } />
-          <Route path="/games/graph-explorer" element={
-            <FeatureProtectedRoute flag="algo_games">
-              <ProtectedRoute><GraphExplorer /></ProtectedRoute>
-            </FeatureProtectedRoute>
-          } />
-          <Route path="/games/stack-master" element={
-            <FeatureProtectedRoute flag="algo_games">
-              <ProtectedRoute><StackMaster /></ProtectedRoute>
-            </FeatureProtectedRoute>
-          } />
-          <Route path="/games/dp-puzzle" element={
-            <FeatureProtectedRoute flag="algo_games">
-              <ProtectedRoute><DPPuzzle /></ProtectedRoute>
-            </FeatureProtectedRoute>
-          } />
-          <Route path="/games/sliding-window" element={
-            <FeatureProtectedRoute flag="algo_games">
-              <ProtectedRoute><SlidingWindow /></ProtectedRoute>
-            </FeatureProtectedRoute>
-          } />
-          <Route path="/games/two-pointer" element={
-            <FeatureProtectedRoute flag="algo_games">
-              <ProtectedRoute><TwoPointer /></ProtectedRoute>
-            </FeatureProtectedRoute>
-          } />
-          <Route path="/games/leaderboard" element={
-            <FeatureProtectedRoute flag="algo_games">
-              <ProtectedRoute><Leaderboard /></ProtectedRoute>
-            </FeatureProtectedRoute>
-          } />
-          <Route path="/blog/:slug" element={<BlogPost />} />
-          <Route path="/blog" element={<Blog />} />
-
-          <Route path="/admin/seed" element={
-            <ProtectedAdminRoute>
-              <SeedDatabase />
-            </ProtectedAdminRoute>
-          } />
-          <Route path="/admin/algorithms" element={
-            <ProtectedAdminRoute>
-              <AdminAlgorithms />
-            </ProtectedAdminRoute>
-          } />
-          <Route path="/admin/algorithms/new" element={
-            <ProtectedAdminRoute>
-              <AdminAlgorithmDetail />
-            </ProtectedAdminRoute>
-          } />
-          <Route path="/admin/algorithm/:id" element={
-            <ProtectedAdminRoute>
-              <AdminAlgorithmDetail />
-            </ProtectedAdminRoute>
-          } />
-          <Route path="/admin/feedback" element={
-            <ProtectedAdminRoute>
-              <FeedbackAdmin />
-            </ProtectedAdminRoute>
-          } />
-          
-
-          <Route path="/admin/features" element={
-            <ProtectedAdminRoute>
-              <AdminFeatureFlags />
-            </ProtectedAdminRoute>
-          } />
-
-          <Route path="/admin" element={
-            <ProtectedAdminRoute>
-              <AdminDashboard />
-            </ProtectedAdminRoute>
-          } />
-
-            <Route path="/profile" element={
-              <FeatureProtectedRoute flag="profiles">
-                <ProtectedRoute><ProfilePage /></ProtectedRoute>
-              </FeatureProtectedRoute>
-            } />
-
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+          <BrowserRouter basename="/">
+             <AppContent />
+          </BrowserRouter>
       </TooltipProvider>
     </FeatureFlagProvider>
   </AppProvider>

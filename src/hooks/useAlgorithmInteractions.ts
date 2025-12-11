@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { blind75Problems } from '@/data/blind75';
 import { updateProgress, updateSocial, updateCode } from '@/utils/userAlgorithmDataHelpers';
 import { useFeatureFlag } from '@/contexts/FeatureFlagContext';
 import confetti from 'canvas-confetti';
@@ -56,7 +55,7 @@ export const useAlgorithmInteractions = ({
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [userAlgoData, selectedLanguage]); // added selectedLanguage to deps as it's used in body
+    }, [userAlgoData, selectedLanguage]);
 
     // Handle language switch
     useEffect(() => {
@@ -97,17 +96,16 @@ export const useAlgorithmInteractions = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [savedCode, user, algorithmId, selectedLanguage, isUserModified, isNaughtyCloud]);
 
-    // Actions
-    const handleCodeChange = (newCode: string) => {
+    const handleCodeChange = useCallback((newCode: string) => {
         setSavedCode(newCode);
         setIsUserModified(true);
         setCodeCache(prev => ({
             ...prev,
             [selectedLanguage]: newCode
         }));
-    };
+    }, [selectedLanguage]);
 
-    const toggleCompletion = async () => {
+    const toggleCompletion = useCallback(async () => {
         if (!user || !algorithmId) {
             toast.error("Please sign in to track progress");
             return;
@@ -129,9 +127,9 @@ export const useAlgorithmInteractions = ({
             console.error('Error toggling completion:', error);
             toast.error("Failed to update progress");
         }
-    };
+    }, [user, algorithmId, isCompleted, refetchUserData]);
 
-    const handleCodeSuccess = async () => {
+    const handleCodeSuccess = useCallback(async () => {
         // Trigger Confetti
         confetti({
             particleCount: 100,
@@ -159,9 +157,9 @@ export const useAlgorithmInteractions = ({
         } else if (!user) {
             toast.success("Great job! Sign in to track your progress.");
         }
-    };
+    }, [user, algorithmId, isCompleted, refetchUserData]);
 
-    const toggleFavorite = async () => {
+    const toggleFavorite = useCallback(async () => {
         if (!user || !algorithmId) {
             toast.error("Please sign in to favorite");
             return;
@@ -180,9 +178,9 @@ export const useAlgorithmInteractions = ({
         } catch (error) {
             toast.error("Failed to update favorites");
         }
-    };
+    }, [user, algorithmId, isFavorite, refetchUserData]);
 
-    const handleVote = async (vote: 'like' | 'dislike') => {
+    const handleVote = useCallback(async (vote: 'like' | 'dislike') => {
         if (!user) {
             toast.error("Please sign in to vote");
             return;
@@ -261,42 +259,50 @@ export const useAlgorithmInteractions = ({
             setLikes(previousLikes);
             setDislikes(previousDislikes);
         }
-    };
+    }, [user, algorithmId, userVote, likes, dislikes, algorithm]);
 
-    const handleRandomProblem = async () => {
+    const handleRandomProblem = useCallback(async () => {
         const { data } = await supabase.from('algorithms').select('id');
         if (data && data.length > 0) {
             const random = data[Math.floor(Math.random() * data.length)];
             navigate(`/algorithm/${random.id}`);
         }
-    };
+    }, [navigate]);
 
-    const handleNextProblem = async () => {
-        if (!algorithm) return;
+    const handleNextProblem = useCallback(async () => {
+        if (!algorithm || !supabase) return;
 
-        const currentSlug = algorithm.slug || algorithm.id;
-        const currentIndex = blind75Problems.findIndex(p => p.slug === currentSlug || p.algorithmId === currentSlug);
-
-        if (currentIndex !== -1 && currentIndex < blind75Problems.length - 1) {
-            const nextProblem = blind75Problems[currentIndex + 1];
-            if (!supabase) return;
-            const { data } = await supabase
+        try {
+            // Fetch Blind 75 sequence from DB
+            const { data: blind75Data } = await supabase
                 .from('algorithms')
                 .select('id')
-                .eq('id', nextProblem.slug)
-                .maybeSingle();
+                .or('list_type.eq.blind75,list_type.eq.core+Blind75')
+                .order('id', { ascending: true });
 
-            if (data) {
-                navigate(`/algorithm/${data.id}`);
-                return;
+            if (blind75Data && blind75Data.length > 0) {
+                const currentId = algorithm.id;
+                const currentIndex = blind75Data.findIndex((p: any) => p.id === currentId);
+
+                if (currentIndex !== -1 && currentIndex < blind75Data.length - 1) {
+                    const nextProblem = blind75Data[currentIndex + 1];
+                    navigate(`/algorithm/${nextProblem.id}`);
+                    return;
+                }
             }
+
+            // Fallback to random if not in Blind 75 list or end of list
+            toast.info("No next problem found in sequence. Trying random...");
+            handleRandomProblem();
+
+        } catch (error) {
+            console.error("Error navigating next:", error);
+            handleRandomProblem();
         }
 
-        toast.info("No next problem found in sequence. Trying random...");
-        handleRandomProblem();
-    };
+    }, [algorithm, handleRandomProblem, navigate]);
 
-    const handleShare = async () => {
+    const handleShare = useCallback(async () => {
         try {
             const url = window.location.href;
             await navigator.clipboard.writeText(url);
@@ -304,7 +310,7 @@ export const useAlgorithmInteractions = ({
         } catch (error) {
             toast.error("Failed to copy link");
         }
-    };
+    }, []);
 
     return {
         isCompleted,

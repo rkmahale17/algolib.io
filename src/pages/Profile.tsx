@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { EditProfileDialog } from "@/components/profile/EditProfileDialog";
+import { DIFFICULTY_MAP } from "@/types/algorithm"; // Added import
 
 const ProfilePage = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -80,7 +81,10 @@ const ProfilePage = () => {
             if (entry.completed) {
                 // Find algo difficulty from DB metadata
                 const algo = algoMap.get(entry.algorithm_id);
-                const diff = algo?.difficulty?.toLowerCase();
+                // Normalize difficulty
+                const rawDiff = algo?.difficulty?.toLowerCase() || '';
+                const diff = (DIFFICULTY_MAP[rawDiff] || rawDiff).toLowerCase();
+
                 if (diff === 'easy') easy++;
                 else if (diff === 'medium') med++;
                 else if (diff === 'hard') hard++;
@@ -103,10 +107,15 @@ const ProfilePage = () => {
             });
         });
 
-        // Calculate Totals from DB metadata
-        const totalEasy = allAlgorithms?.filter(a => a.difficulty.toLowerCase() === 'easy').length || 0;
-        const totalMed = allAlgorithms?.filter(a => a.difficulty.toLowerCase() === 'medium').length || 0;
-        const totalHard = allAlgorithms?.filter(a => a.difficulty.toLowerCase() === 'hard').length || 0;
+        // Calculate Totals from DB metadata using normalization
+        let totalEasy = 0, totalMed = 0, totalHard = 0;
+        allAlgorithms?.forEach(a => {
+            const rawDiff = a.difficulty?.toLowerCase() || '';
+            const diff = (DIFFICULTY_MAP[rawDiff] || rawDiff).toLowerCase();
+            if (diff === 'easy') totalEasy++;
+            else if (diff === 'medium') totalMed++;
+            else if (diff === 'hard') totalHard++;
+        });
 
         setStats({
             totalSolved: easy + med + hard,
@@ -118,7 +127,7 @@ const ProfilePage = () => {
             hardSolved: hard,
             hardTotal: totalHard,
             heatmapData: Object.entries(heatmapRaw).map(([date, count]) => ({ date, count })),
-            recentSubmissions: recents.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 5)
+            recentSubmissions: recents.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 20)
         });
 
     } catch (error) {

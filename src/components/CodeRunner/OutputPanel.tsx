@@ -2,11 +2,10 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, Terminal, FlaskConical, Clock, Zap, Plus, CheckCircle2, XCircle, AlertCircle, AlertTriangle, Edit2, Trash2, History, Code, ChevronUp, ChevronDown } from "lucide-react";
+import { Loader2, Terminal, FlaskConical, Clock, Zap, Plus, CheckCircle2, XCircle, AlertTriangle, History, Code, ChevronUp, ChevronDown, Minimize2, Minimize, Maximize2 } from "lucide-react";
 import { Algorithm } from '@/data/algorithms';
 import { Button } from "@/components/ui/button";
 import { FeatureGuard } from "@/components/FeatureGuard";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { TestCaseEditor } from './TestCaseEditor';
 import { Submission } from '@/types/userAlgorithmData';
 
@@ -110,39 +109,43 @@ export const OutputPanel = ({
   return (
     <div className="h-full flex flex-col bg-muted/10 border-t overflow-hidden">
       {/* Top Bar / Tabs */}
-      <div className="flex items-center gap-1 p-1 border-b bg-background/50 shrink-0 overflow-x-auto no-scrollbar">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onTabChange("testcase")}
-          className={`h-8 text-xs gap-2 ${activeTab === "testcase" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}
-        >
-          <FlaskConical className="w-3.5 h-3.5" />
-          Testcase
-        </Button>
+      <div className="flex items-center justify-between border-b bg-background/50 shrink-0">
+        {/* Scrollable Tabs Area */}
+        <div className="flex-1 flex items-center gap-1 p-1 overflow-x-auto scrollbar-thin mask-image-linear-gradient-to-r pb-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onTabChange("testcase")}
+              className={`h-8 text-xs gap-2 shrink-0 ${activeTab === "testcase" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}
+            >
+              <FlaskConical className="w-3.5 h-3.5" />
+              Testcase
+            </Button>
 
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onTabChange("result")}
-          className={`h-8 text-xs gap-2 ${activeTab === "result" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}
-          disabled={!output}
-        >
-          <Terminal className="w-3.5 h-3.5" />
-          Test Result
-        </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onTabChange("result")}
+              className={`h-8 text-xs gap-2 shrink-0 ${activeTab === "result" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}
+              disabled={!output}
+            >
+              <Terminal className="w-3.5 h-3.5" />
+              Test Result
+            </Button>
 
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onTabChange("submissions")}
-          className={`h-8 text-xs gap-2 ${activeTab === "submissions" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}
-        >
-          <History className="w-3.5 h-3.5" />
-          Submissions
-        </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onTabChange("submissions")}
+              className={`h-8 text-xs gap-2 shrink-0 ${activeTab === "submissions" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}
+            >
+              <History className="w-3.5 h-3.5" />
+              Submissions
+            </Button>
+        </div>
 
-        <div className="ml-auto flex items-center pr-2">
+        {/* Fixed Right Actions */}
+        <div className="flex items-center px-2 shrink-0 bg-background/50 h-full shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)] z-10">
             {onToggleExpand && (
               <Button
                 variant="ghost"
@@ -151,7 +154,8 @@ export const OutputPanel = ({
                 className="h-6 w-6 text-muted-foreground hover:text-foreground"
                 title={isExpanded ? "Collapse" : "Expand output"}
               >
-                {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+                     
+                {isExpanded ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
               </Button>
             )}
         </div>
@@ -166,53 +170,56 @@ export const OutputPanel = ({
               onValueChange={setActiveTestCaseTab}
               className="flex-1 flex flex-col min-h-0"
             >
-              <div className="border-b px-4 bg-background/50 shrink-0 flex items-center gap-2">
-                <TabsList className="h-9 bg-transparent p-0 gap-1 flex-nowrap overflow-x-auto w-full justify-start overflow-y-hidden no-scrollbar">
-                  {allTestCases.filter(tc => !tc.isSubmission).map((tc, index) => (
-                    <TabsTrigger
-                      key={tc.id}
-                      value={`case-${tc.id}`}
-                      className="text-xs px-3 h-7 whitespace-nowrap data-[state=active]:bg-primary/10 relative group shrink-0"
-                    >
-                      {tc.isCustom ? `Case ${index + 1}` : `Case ${index + 1}`}
-                      {/* Delete button for all cases */}
-                      <div 
-                        className="ml-2 hover:bg-destructive/20 rounded-full p-0.5 cursor-pointer opacity-70 hover:opacity-100 transition-opacity"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDeleteTestCase(tc.id);
-                        }}
+              <div className="flex items-center justify-between border-b bg-background/50 shrink-0">
+                {/* Scrollable Tabs List */}
+                <div className="flex-1 overflow-x-auto scrollbar-thin mask-image-linear-gradient-to-r pb-1">
+                   <TabsList className="h-9 bg-transparent p-0 gap-1 flex-nowrap w-max justify-start mb-1">
+                    {allTestCases.filter(tc => !tc.isSubmission).map((tc, index) => (
+                      <TabsTrigger
+                        key={tc.id}
+                        value={`case-${tc.id}`}
+                        className="text-xs px-3 h-7 whitespace-nowrap data-[state=active]:bg-primary/10 relative group shrink-0"
                       >
-                        <XCircle className="w-3.5 h-3.5 text-muted-foreground hover:text-destructive" />
-                      </div>
-                    </TabsTrigger>
-                  ))}
-                  
-                   <FeatureGuard flag="custom_test_case_addtion">
-                    {controls?.add_test_case !== false && (
-                        <div className="pl-1 shrink-0 flex items-center">
-                          <TooltipProvider delayDuration={0}>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button 
-                                  variant="ghost" 
-                                  size="icon" 
-                                  onClick={onAddTestCase}
-                                  className="h-6 w-6 rounded-full bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20"
-                                  disabled={loading}
-                                >
-                                  <Plus className="w-4 h-4" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Add Custom Test Case</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
+                        {tc.isCustom ? `Case ${index + 1}` : `Case ${index + 1}`}
+                        {/* Delete button for all cases */}
+                        <div 
+                          className="ml-2 hover:bg-destructive/20 rounded-full p-0.5 cursor-pointer opacity-70 hover:opacity-100 transition-opacity"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDeleteTestCase(tc.id);
+                          }}
+                        >
+                          <XCircle className="w-3.5 h-3.5 text-muted-foreground hover:text-destructive" />
                         </div>
-                    )}
-                   </FeatureGuard>
-                </TabsList>
+                      </TabsTrigger>
+                    ))}
+                    
+                    <FeatureGuard flag="custom_test_case_addtion">
+                      {controls?.add_test_case !== false && (
+                          <div className="sticky right-0 top-0 z-10 flex items-center pl-1 bg-background/80 backdrop-blur-sm h-full shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)]">
+                            <TooltipProvider delayDuration={0}>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    onClick={onAddTestCase}
+                                    className="h-6 w-6 rounded-full bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 shadow-sm"
+                                    disabled={loading}
+                                  >
+                                    <Plus className="w-4 h-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Add Custom Test Case</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
+                      )}
+                     </FeatureGuard>
+                   </TabsList>
+                </div>
               </div>
 
               <div className="flex-1 min-h-0">
@@ -265,7 +272,6 @@ export const OutputPanel = ({
 
             {/* Scrollable content area */}
             <div className="flex-1 min-h-0">
-              <ScrollArea className="h-full" type="always">
                 {/* Compilation/Runtime Error */}
                 {(output.status?.id === 6 || (output.stderr && !output.testResults)) && (
                   <div className="p-4">
@@ -277,14 +283,16 @@ export const OutputPanel = ({
 
                 {/* Test Results */}
                 {output.testResults && (
-                  <Tabs defaultValue="result-0" className="flex flex-col">
-                    <div className="flex border-b px-4 bg-background/50 shrink-0 sticky top-0 z-10 overflow-hidden">
-                      <TabsList className="h-9 bg-transparent p-0 gap-2 flex-nowrap overflow-x-auto w-full justify-start overflow-y-hidden no-scrollbar">
+                       <div className="h-full flex flex-col min-h-0">
+                  <Tabs defaultValue="result-0" className="flex-1 flex flex-col min-h-0">
+                    <div className="flex border-b bg-background/50 shrink-0 sticky top-0 z-10 overflow-x-auto overflow-y-hidden">
+                      <div className="flex-1 overflow-x-auto scrollbar-thin mask-image-linear-gradient-to-r px-4 pb-1">
+                        <TabsList className="h-9 bg-transparent p-0 gap-2 flex-nowrap w-max justify-start mb-1">
                         {output.testResults.map((result: any, index: number) => (
                           <TabsTrigger
                             key={index}
                             value={`result-${index}`}
-                            className={`text-xs px-3 h-7 whitespace-nowrap gap-2 data-[state=active]:bg-muted ${
+                            className={`text-xs px-3 h-7 whitespace-nowrap gap-2 bg-transparent data-[state=active]:bg-muted data-[state=active]:shadow-none ${
                               result.status === 'pass' ? 'text-green-500 data-[state=active]:text-green-500' : 'text-destructive data-[state=active]:text-destructive'
                             }`}
                           >
@@ -297,7 +305,7 @@ export const OutputPanel = ({
                                 const tc = executedTestCases ? executedTestCases[index] : allTestCases[index];
                                 return tc?.description && (
                                     <span className="ml-2 text-[10px] text-muted-foreground/70 hidden sm:inline-block truncate max-w-[100px]">
-                                        - {tc.description}
+                                        {/* - {tc.description} */}
                                     </span>
                                 );
                             })()}
@@ -311,7 +319,8 @@ export const OutputPanel = ({
                         ))}
                       </TabsList>
                     </div>
-
+                  </div>
+                    <ScrollArea className="h-full" type="always">
                     <div className="p-4">
                       {output.testResults.map((result: any, index: number) => (
                         <TabsContent key={index} value={`result-${index}`} className="m-0 space-y-6">
@@ -322,9 +331,9 @@ export const OutputPanel = ({
                               {(() => {
                                 const tc = executedTestCases ? executedTestCases[index] : allTestCases[index];
 
-                                // Check if this is a hidden submission case
-                                const isHidden = tc?.isSubmission;
-                                if (isHidden) return "Hidden Test Case";
+                                // Don't hide submission cases as per user request
+                                // const isHidden = tc?.isSubmission; 
+                                // if (isHidden) return "Hidden Test Case";
 
                                 // Fallback to original test case input if result input is missing
                                 const inputData = result.input !== undefined ? result.input : tc?.input;
@@ -362,7 +371,7 @@ export const OutputPanel = ({
                             <div className="p-3 rounded-md bg-muted/30 border font-mono text-sm">
                               {(() => {
                                 const tc = executedTestCases ? executedTestCases[index] : allTestCases[index];
-                                return tc?.isSubmission ? "Hidden Output" : JSON.stringify(result.actual, null, 2);
+                                return JSON.stringify(result.actual, null, 2);
                               })()}
                             </div>
                           </div>
@@ -374,7 +383,7 @@ export const OutputPanel = ({
                               <div className="p-3 rounded-md bg-muted/30 border font-mono text-sm">
                                 {(() => {
                                   const tc = executedTestCases ? executedTestCases[index] : allTestCases[index];
-                                  return tc?.isSubmission ? "Hidden Expected Output" : JSON.stringify(result.expected, null, 2);
+                                  return JSON.stringify(result.expected, null, 2);
                                 })()}
                               </div>
                             </div>
@@ -392,9 +401,10 @@ export const OutputPanel = ({
                         </TabsContent>
                       ))}
                     </div>
+                    </ScrollArea>
                   </Tabs>
+                  </div>
                 )}
-              </ScrollArea>
             </div>
           </div>
         )}

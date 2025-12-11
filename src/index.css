@@ -204,6 +204,7 @@
 /* Thin scrollbar styling */
 .scrollbar-thin::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 
 .scrollbar-thin::-webkit-scrollbar-track {
@@ -280,6 +281,7 @@
   margin-top: 1rem;
   margin-bottom: 1rem;
   line-height: 1.75;
+  font-size: 0.9rem;
 }
 
 /* Paragraph after heading - reduce top margin */
@@ -472,6 +474,7 @@
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;

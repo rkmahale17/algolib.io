@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
 import {
   Code2,
   Lightbulb,
@@ -27,9 +28,11 @@ interface CodeWorkspacePanelProps {
   isCodeRunnerMaximized: boolean;
   setIsCodeRunnerMaximized: (val: boolean) => void;
   submissions: Submission[];
+  className?: string;
+  isInterviewMode?: boolean;
 }
 
-export const CodeWorkspacePanel: React.FC<CodeWorkspacePanelProps> = ({
+export const CodeWorkspacePanel = React.memo(({
   algorithm,
   algorithmId,
   isMobile,
@@ -42,9 +45,14 @@ export const CodeWorkspacePanel: React.FC<CodeWorkspacePanelProps> = ({
   isCodeRunnerMaximized,
   setIsCodeRunnerMaximized,
   submissions,
-}) => {
+  className,
+  isInterviewMode,
+}: CodeWorkspacePanelProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isCompact, setIsCompact] = useState(false);
+
+  const isCodeRunnerGlobalEnabled = useFeatureFlag('code_runner_tab');
+  const isBrainstormGlobalEnabled = useFeatureFlag('brainstrom_tab');
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -60,7 +68,7 @@ export const CodeWorkspacePanel: React.FC<CodeWorkspacePanelProps> = ({
   }, []);
 
   return (
-    <div ref={containerRef} className="h-full flex flex-col bg-card/30 backdrop-blur-sm">
+    <div ref={containerRef} className={`h-full flex flex-col bg-card/30 backdrop-blur-sm ${className || ''}`}>
       <div className="flex-1 overflow-hidden p-0">
          <Tabs defaultValue="code" className="h-full flex flex-col">
             <div className="flex items-stretch border-b bg-muted/10 shrink-0">
@@ -124,8 +132,8 @@ export const CodeWorkspacePanel: React.FC<CodeWorkspacePanelProps> = ({
             </div>
             
             <TabsContent value="code" className="flex-1 m-0 overflow-hidden relative group flex flex-col data-[state=inactive]:hidden">
-               {algorithm?.controls?.tabs?.code === false ? (
-                  <TabWarning message="Code Runner is not available for this problem." />
+               {(algorithm?.controls?.tabs?.code === false || algorithm?.controls?.code_runner === false || !isCodeRunnerGlobalEnabled) ? (
+                  <TabWarning message={!isCodeRunnerGlobalEnabled ? "Code Runner is currently disabled globally." : "Code Runner is not available for this problem."} />
                ) : (
                  <AuthGuard
                    fallbackTitle="Sign in to use Code Runner"
@@ -148,6 +156,7 @@ export const CodeWorkspacePanel: React.FC<CodeWorkspacePanelProps> = ({
                        onSuccess={handleCodeSuccess}
                        controls={algorithm.controls?.code_runner} 
                        submissions={submissions}
+                       isInterviewMode={isInterviewMode}
                      />
                    )}
                  </AuthGuard>
@@ -155,8 +164,8 @@ export const CodeWorkspacePanel: React.FC<CodeWorkspacePanelProps> = ({
             </TabsContent>
 
             <TabsContent value="brainstorm" className="flex-1 m-0 overflow-hidden data-[state=inactive]:hidden">
-               {algorithm?.controls?.tabs?.brainstorm === false ? (
-                  <TabWarning message="Brainstorming tools are disabled for this session." />
+               {(algorithm?.controls?.tabs?.brainstorm === false || algorithm?.controls?.brainstorm === false || !isBrainstormGlobalEnabled) ? (
+                  <TabWarning message={!isBrainstormGlobalEnabled ? "Brainstorming is currently disabled globally." : "Brainstorming tools are disabled for this session."} />
                ) : (
                   <div className="h-full flex flex-col">
                     <AuthGuard
@@ -176,4 +185,4 @@ export const CodeWorkspacePanel: React.FC<CodeWorkspacePanelProps> = ({
       </div>
     </div>
   );
-};
+});
