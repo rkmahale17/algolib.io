@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, Terminal, FlaskConical, Clock, Zap, Plus, CheckCircle2, XCircle, AlertTriangle, History, Code, ChevronUp, ChevronDown, Minimize2, Minimize, Maximize2 } from "lucide-react";
-import { Algorithm } from '@/data/algorithms';
+import { Algorithm } from '@/hooks/useAlgorithms';
 import { Button } from "@/components/ui/button";
 import { FeatureGuard } from "@/components/FeatureGuard";
 import { TestCaseEditor } from './TestCaseEditor';
