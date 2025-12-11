@@ -73,9 +73,11 @@ export type Database = {
           id: string
           implementations: Json
           input_schema: Json | null
+          list_type: string | null
           metadata: Json | null
           name: string
           problems_to_solve: Json | null
+          serial_no: number | null
           test_cases: Json | null
           title: string
           tutorials: Json | null
@@ -91,9 +93,11 @@ export type Database = {
           id: string
           implementations?: Json
           input_schema?: Json | null
+          list_type?: string | null
           metadata?: Json | null
           name: string
           problems_to_solve?: Json | null
+          serial_no?: number | null
           test_cases?: Json | null
           title: string
           tutorials?: Json | null
@@ -109,9 +113,11 @@ export type Database = {
           id?: string
           implementations?: Json
           input_schema?: Json | null
+          list_type?: string | null
           metadata?: Json | null
           name?: string
           problems_to_solve?: Json | null
+          serial_no?: number | null
           test_cases?: Json | null
           title?: string
           tutorials?: Json | null
