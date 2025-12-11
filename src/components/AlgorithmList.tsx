@@ -6,22 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ListType, LIST_TYPE_LABELS, DIFFICULTY_MAP } from '@/types/algorithm';
-
-export interface AlgorithmListItem {
-  id: string;
-  title: string; // or name
-  slug?: string;
-  category: string;
-  difficulty: string;
-  description: string;
-  timeComplexity?: string;
-  spaceComplexity?: string;
-  companies?: string[];
-  listType?: string;
-  serial_no?: number;
-  [key: string]: any;
-}
+import { ListType, LIST_TYPE_LABELS, DIFFICULTY_MAP, AlgorithmListItem } from '@/types/algorithm';
 
 interface AlgorithmListProps {
   algorithms: AlgorithmListItem[];
@@ -29,7 +14,16 @@ interface AlgorithmListProps {
   defaultListType?: string;
   availableListTypes?: string[];
   hideListSelection?: boolean;
+  isLoading?: boolean;
 }
+
+const AlgorithmListSkeleton = () => (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    {[...Array(6)].map((_, i) => (
+      <div key={i} className="h-[200px] rounded-xl bg-muted/20 animate-pulse" />
+    ))}
+  </div>
+);
 
 const difficultyRank: Record<string, number> = {
   'Easy': 1,
@@ -48,7 +42,8 @@ export const AlgorithmList = ({
     emptyMessage = "No algorithms found.",
     defaultListType = "all",
     availableListTypes = ["all", ListType.Core, ListType.Blind75, ListType.CoreAndBlind75],
-    hideListSelection = false
+    hideListSelection = false,
+    isLoading = false
 }: AlgorithmListProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -200,7 +195,11 @@ export const AlgorithmList = ({
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {isLoading ? (
+        <AlgorithmListSkeleton />
+      ) : (
+        <>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredAndSortedAlgorithms.map((algo, index) => (
           <Link 
             key={algo.id} 
@@ -267,6 +266,8 @@ export const AlgorithmList = ({
         <div className="text-center py-16">
           <p className="text-muted-foreground">{emptyMessage}</p>
         </div>
+      )}
+      </>
       )}
     </div>
   );

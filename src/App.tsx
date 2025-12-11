@@ -1,42 +1,48 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { PremiumLoader } from "@/components/PremiumLoader";
+
+// Eager load Home for best LCP
 import Home from "./pages/Home";
-import ProfilePage from "./pages/Profile";
-import AlgorithmDetail from '@/pages/AlgorithmDetail';
-import Blind75 from "./pages/Blind75";
-import Auth from "./pages/Auth";
-import NotFound from "./pages/NotFound";
-import Feedback from "./pages/Feedback";
-import About from "./pages/About";
-import Privacy from "./pages/Privacy";
-import TermsOfService from "./pages/TermsOfService";
-import TimeComplexity from "./pages/TimeComplexity";
-import ContentRights from "./pages/ContentRights";
-import Games from "./pages/Games";
-import SortHero from "./pages/SortHero";
-import GraphExplorer from "./pages/GraphExplorer";
-import StackMaster from "./pages/StackMaster";
-import DPPuzzle from "./pages/DPPuzzle";
-import SlidingWindow from "./pages/SlidingWindow";
-import TwoPointer from "./pages/TwoPointer";
-import Leaderboard from "./pages/Leaderboard";
 import Navbar from "./components/Navbar";
+
+// Lazy load everything else to reduce initial bundle size
+const ProfilePage = lazy(() => import("./pages/Profile"));
+const AlgorithmDetail = lazy(() => import('@/pages/AlgorithmDetail'));
+const Blind75 = lazy(() => import("./pages/Blind75"));
+const Auth = lazy(() => import("./pages/Auth"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const Feedback = lazy(() => import("./pages/Feedback"));
+const About = lazy(() => import("./pages/About"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const TermsOfService = lazy(() => import("./pages/TermsOfService"));
+const TimeComplexity = lazy(() => import("./pages/TimeComplexity"));
+const ContentRights = lazy(() => import("./pages/ContentRights"));
+const Games = lazy(() => import("./pages/Games"));
+const SortHero = lazy(() => import("./pages/SortHero"));
+const GraphExplorer = lazy(() => import("./pages/GraphExplorer"));
+const StackMaster = lazy(() => import("./pages/StackMaster"));
+const DPPuzzle = lazy(() => import("./pages/DPPuzzle"));
+const SlidingWindow = lazy(() => import("./pages/SlidingWindow"));
+const TwoPointer = lazy(() => import("./pages/TwoPointer"));
+const Leaderboard = lazy(() => import("./pages/Leaderboard"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
+const AdminAlgorithms = lazy(() => import("./pages/AdminAlgorithms"));
+const AdminAlgorithmDetail = lazy(() => import("./pages/AdminAlgorithmDetail"));
+const FeedbackAdmin = lazy(() => import("./pages/FeedbackAdmin"));
+const Blog = lazy(() => import("./pages/Blog"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const AdminFeatureFlags = lazy(() => import("./pages/AdminFeatureFlags"));
+
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import BlogPost from "./pages/BlogPost";
-import AdminAlgorithms from "./pages/AdminAlgorithms";
-import AdminAlgorithmDetail from "./pages/AdminAlgorithmDetail";
 import { ProtectedAdminRoute } from "./components/ProtectedAdminRoute";
 import { FeatureProtectedRoute } from "./components/FeatureProtectedRoute";
 import { AppProvider } from "./contexts/AppContext";
-import FeedbackAdmin from "./pages/FeedbackAdmin";
-import Blog from "./pages/Blog";
-import ComplexityCard from "./components/complexity/ComplexityCard";
-import AdminDashboard from "./pages/AdminDashboard";
-import AdminFeatureFlags from "./pages/AdminFeatureFlags";
+// import ComplexityCard from "./components/complexity/ComplexityCard"; // Unused in routes currently, checking usage
 
 const queryClient = new QueryClient();
 
@@ -72,113 +78,115 @@ const AppContent = () => {
           ) : (
             <>
               <ConditionalNavbar />
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/algorithm/:id" element={<AlgorithmDetail />} />
+              <Suspense fallback={<PremiumLoader text="Loading..." />}>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/algorithm/:id" element={<AlgorithmDetail />} />
 
-                <Route path="/blind75" element={
-                  <FeatureProtectedRoute flag="blind_75">
-                    <ProtectedRoute><Blind75 /></ProtectedRoute>
+                  <Route path="/blind75" element={
+                    <FeatureProtectedRoute flag="blind_75">
+                      <ProtectedRoute><Blind75 /></ProtectedRoute>
+                    </FeatureProtectedRoute>
+                  } />
+                  <Route path="/blind75/:slug" element={
+                    <FeatureProtectedRoute flag="blind_75">
+                      <ProtectedRoute><AlgorithmDetail /></ProtectedRoute>
+                    </FeatureProtectedRoute>
+                  } />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/feedback" element={<Feedback />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/terms" element={<TermsOfService />} />
+                <Route path="/content-rights" element={<ContentRights />} />
+                <Route path="/complexity" element={<TimeComplexity />} />
+                <Route path="/games" element={
+                  <FeatureProtectedRoute flag="algo_games">
+                    <ProtectedRoute><Games /></ProtectedRoute>
                   </FeatureProtectedRoute>
                 } />
-                <Route path="/blind75/:slug" element={
-                  <FeatureProtectedRoute flag="blind_75">
-                    <ProtectedRoute><AlgorithmDetail /></ProtectedRoute>
+                <Route path="/games/sort-hero" element={
+                  <FeatureProtectedRoute flag="algo_games">
+                    <ProtectedRoute><SortHero /></ProtectedRoute>
                   </FeatureProtectedRoute>
                 } />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/feedback" element={<Feedback />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/terms" element={<TermsOfService />} />
-              <Route path="/content-rights" element={<ContentRights />} />
-              <Route path="/complexity" element={<TimeComplexity />} />
-              <Route path="/games" element={
-                <FeatureProtectedRoute flag="algo_games">
-                  <ProtectedRoute><Games /></ProtectedRoute>
-                </FeatureProtectedRoute>
-              } />
-              <Route path="/games/sort-hero" element={
-                <FeatureProtectedRoute flag="algo_games">
-                  <ProtectedRoute><SortHero /></ProtectedRoute>
-                </FeatureProtectedRoute>
-              } />
-              <Route path="/games/graph-explorer" element={
-                <FeatureProtectedRoute flag="algo_games">
-                  <ProtectedRoute><GraphExplorer /></ProtectedRoute>
-                </FeatureProtectedRoute>
-              } />
-              <Route path="/games/stack-master" element={
-                <FeatureProtectedRoute flag="algo_games">
-                  <ProtectedRoute><StackMaster /></ProtectedRoute>
-                </FeatureProtectedRoute>
-              } />
-              <Route path="/games/dp-puzzle" element={
-                <FeatureProtectedRoute flag="algo_games">
-                  <ProtectedRoute><DPPuzzle /></ProtectedRoute>
-                </FeatureProtectedRoute>
-              } />
-              <Route path="/games/sliding-window" element={
-                <FeatureProtectedRoute flag="algo_games">
-                  <ProtectedRoute><SlidingWindow /></ProtectedRoute>
-                </FeatureProtectedRoute>
-              } />
-              <Route path="/games/two-pointer" element={
-                <FeatureProtectedRoute flag="algo_games">
-                  <ProtectedRoute><TwoPointer /></ProtectedRoute>
-                </FeatureProtectedRoute>
-              } />
-              <Route path="/games/leaderboard" element={
-                <FeatureProtectedRoute flag="algo_games">
-                  <ProtectedRoute><Leaderboard /></ProtectedRoute>
-                </FeatureProtectedRoute>
-              } />
-              <Route path="/blog/:slug" element={<BlogPost />} />
-              <Route path="/blog" element={<Blog />} />
-
-              <Route path="/admin/algorithms" element={
-                <ProtectedAdminRoute>
-                  <AdminAlgorithms />
-                </ProtectedAdminRoute>
-              } />
-              <Route path="/admin/algorithms/new" element={
-                <ProtectedAdminRoute>
-                  <AdminAlgorithmDetail />
-                </ProtectedAdminRoute>
-              } />
-              <Route path="/admin/algorithm/:id" element={
-                <ProtectedAdminRoute>
-                  <AdminAlgorithmDetail />
-                </ProtectedAdminRoute>
-              } />
-              <Route path="/admin/feedback" element={
-                <ProtectedAdminRoute>
-                  <FeedbackAdmin />
-                </ProtectedAdminRoute>
-              } />
-              
-
-              <Route path="/admin/features" element={
-                <ProtectedAdminRoute>
-                  <AdminFeatureFlags />
-                </ProtectedAdminRoute>
-              } />
-
-              <Route path="/admin" element={
-                <ProtectedAdminRoute>
-                  <AdminDashboard />
-                </ProtectedAdminRoute>
-              } />
-
-                <Route path="/profile" element={
-                  <FeatureProtectedRoute flag="profiles">
-                    <ProtectedRoute><ProfilePage /></ProtectedRoute>
+                <Route path="/games/graph-explorer" element={
+                  <FeatureProtectedRoute flag="algo_games">
+                    <ProtectedRoute><GraphExplorer /></ProtectedRoute>
                   </FeatureProtectedRoute>
                 } />
+                <Route path="/games/stack-master" element={
+                  <FeatureProtectedRoute flag="algo_games">
+                    <ProtectedRoute><StackMaster /></ProtectedRoute>
+                  </FeatureProtectedRoute>
+                } />
+                <Route path="/games/dp-puzzle" element={
+                  <FeatureProtectedRoute flag="algo_games">
+                    <ProtectedRoute><DPPuzzle /></ProtectedRoute>
+                  </FeatureProtectedRoute>
+                } />
+                <Route path="/games/sliding-window" element={
+                  <FeatureProtectedRoute flag="algo_games">
+                    <ProtectedRoute><SlidingWindow /></ProtectedRoute>
+                  </FeatureProtectedRoute>
+                } />
+                <Route path="/games/two-pointer" element={
+                  <FeatureProtectedRoute flag="algo_games">
+                    <ProtectedRoute><TwoPointer /></ProtectedRoute>
+                  </FeatureProtectedRoute>
+                } />
+                <Route path="/games/leaderboard" element={
+                  <FeatureProtectedRoute flag="algo_games">
+                    <ProtectedRoute><Leaderboard /></ProtectedRoute>
+                  </FeatureProtectedRoute>
+                } />
+                <Route path="/blog/:slug" element={<BlogPost />} />
+                <Route path="/blog" element={<Blog />} />
 
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-              </Routes>
+                <Route path="/admin/algorithms" element={
+                  <ProtectedAdminRoute>
+                    <AdminAlgorithms />
+                  </ProtectedAdminRoute>
+                } />
+                <Route path="/admin/algorithms/new" element={
+                  <ProtectedAdminRoute>
+                    <AdminAlgorithmDetail />
+                  </ProtectedAdminRoute>
+                } />
+                <Route path="/admin/algorithm/:id" element={
+                  <ProtectedAdminRoute>
+                    <AdminAlgorithmDetail />
+                  </ProtectedAdminRoute>
+                } />
+                <Route path="/admin/feedback" element={
+                  <ProtectedAdminRoute>
+                    <FeedbackAdmin />
+                  </ProtectedAdminRoute>
+                } />
+                
+
+                <Route path="/admin/features" element={
+                  <ProtectedAdminRoute>
+                    <AdminFeatureFlags />
+                  </ProtectedAdminRoute>
+                } />
+
+                <Route path="/admin" element={
+                  <ProtectedAdminRoute>
+                    <AdminDashboard />
+                  </ProtectedAdminRoute>
+                } />
+
+                  <Route path="/profile" element={
+                    <FeatureProtectedRoute flag="profiles">
+                      <ProtectedRoute><ProfilePage /></ProtectedRoute>
+                    </FeatureProtectedRoute>
+                  } />
+
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
             </>
           )}
         </>

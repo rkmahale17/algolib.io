@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { EditProfileDialog } from "@/components/profile/EditProfileDialog";
-import { DIFFICULTY_MAP } from "@/types/algorithm"; // Added import
+import { DIFFICULTY_MAP } from "@/types/algorithm";
+import { format } from "date-fns";
 
 const ProfilePage = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -93,8 +94,9 @@ const ProfilePage = () => {
             // Process submissions for heatmap and recents
             const subs = (entry.submissions as any[]) || [];
             subs.forEach(s => {
-                const date = s.timestamp.split('T')[0];
-                heatmapRaw[date] = (heatmapRaw[date] || 0) + 1;
+                // Use local date for heatmap to match user's perspective
+                const dateKey = format(new Date(s.timestamp), 'yyyy-MM-dd');
+                heatmapRaw[dateKey] = (heatmapRaw[dateKey] || 0) + 1;
                 
                 recents.push({
                     id: s.id,

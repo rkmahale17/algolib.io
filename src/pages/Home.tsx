@@ -12,13 +12,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { PremiumLoader } from "@/components/PremiumLoader";
 import { appStatus } from "@/utils/appStatus";
 import { FeatureGuard } from "@/components/FeatureGuard";
-import { AlgorithmList, AlgorithmListItem } from "@/components/AlgorithmList";
-import { ListType } from "@/types/algorithm";
+import { AlgorithmList } from "@/components/AlgorithmList";
+import { ListType, AlgorithmListItem } from "@/types/algorithm";
+import { useAlgorithms } from "@/hooks/useAlgorithms";
 
 const Home = () => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [algorithms, setAlgorithms] = useState<AlgorithmListItem[]>([]);
+  // Fetch algorithms using React Query
+  const { data: algorithms = [], isLoading: loading } = useAlgorithms();
 
   // Check authentication status
   useEffect(() => {
@@ -38,48 +39,6 @@ const Home = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
-
-  // Fetch algorithms from Supabase
-  useEffect(() => {
-    const fetchAlgorithms = async () => {
-      if (!supabase) return;
-
-      try {
-        const { data, error } = await supabase
-          .from('algorithms')
-          .select('*');
-
-        if (error) {
-          console.error('Error fetching algorithms:', error);
-          return;
-        }
-
-        if (data) {
-          const mappedAlgorithms: AlgorithmListItem[] = data.map((algo: any) => ({
-             id: algo.id,
-             title: algo.title || algo.name, // Fallback if title is missing
-             name: algo.name,
-             category: algo.category,
-             difficulty: algo.difficulty,
-             description: algo.description || algo.explanation?.problemStatement || '', // Try description col, then nested
-             timeComplexity: algo.timeComplexity || algo.time_complexity || algo.metadata?.timeComplexity,
-             spaceComplexity: algo.spaceComplexity || algo.space_complexity || algo.metadata?.spaceComplexity,
-             slug: algo.slug || algo.id,
-             companies: algo.companyTags || algo.company_tags,
-             listType: algo.list_type,
-             serial_no: algo.serial_no
-          }));
-          setAlgorithms(mappedAlgorithms);
-        }
-      } catch (error) {
-        console.error('Error fetching algorithms:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAlgorithms();
   }, []);
 
   if (loading) {

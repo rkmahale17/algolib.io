@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import {
-  Algorithm,
   useCreateAlgorithm,
   useUpdateAlgorithm,
 } from "@/hooks/useAlgorithms";
+import { Algorithm } from "@/types/algorithm";
 import { ListType, LIST_TYPE_OPTIONS } from "@/types/algorithm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

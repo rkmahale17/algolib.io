@@ -155,9 +155,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // Fetch user data when user changes
-  useEffect(() => {
-    fetchUserData();
-  }, [user]);
+  // useEffect(() => {
+  //   fetchUserData();
+  // }, [user]);
 
   // Subscribe to user_algorithm_data changes
   useEffect(() => {
