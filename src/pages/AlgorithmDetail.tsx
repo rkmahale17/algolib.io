@@ -186,7 +186,7 @@ const AlgorithmDetail: React.FC = () => {
   if (!algorithm) {
     return (
       <>
-        <AlgoMetaHead id={id} />
+        <AlgoMetaHead />
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center space-y-4">
              <h2 className="text-2xl font-bold">Algorithm not found</h2>
@@ -210,7 +210,7 @@ const AlgorithmDetail: React.FC = () => {
 
   return (
     <div className={`h-screen w-full overflow-hidden flex flex-col bg-background ${session.isInterviewMode ? 'border-4 border-green-500/30' : ''}`}>
-      <AlgoMetaHead id={algorithmIdOrSlug} />
+      <AlgoMetaHead algorithm={algorithm} />
 
       <AlgorithmHeader
         user={user}

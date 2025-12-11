@@ -1,5 +1,4 @@
 import { Helmet } from "react-helmet-async";
-import { algorithms } from "@/data/algorithms";
 import { useParams } from "react-router-dom";
 
 // Helper utilities
@@ -25,11 +24,8 @@ function capitalize(s: string) {
 }
 
 // === React component to inject meta tags dynamically ===
-export function AlgoMetaHead({ id }: { id?: string }) {
-  // If id not passed, try to read from route params
-  const params = useParams();
-  const routeId = id || (params as any).id || "";
-  const algo = algorithms.find((a) => a.id === routeId);
+export function AlgoMetaHead({ algorithm }: { algorithm?: any }) {
+  const algo = algorithm;
 
   // Build page-level defaults
   const title = algo
