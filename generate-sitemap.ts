@@ -44,8 +44,17 @@ async function generateSitemap() {
   const supabaseUrl = process.env.VITE_SUPABASE_URL;
   const supabaseKey = process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
+  console.log('Environment Debug:', {
+    hasUrl: !!supabaseUrl,
+    hasKey: !!supabaseKey,
+    allKeys: Object.keys(process.env).filter(k => k.startsWith('VITE_'))
+  });
+
   if (!supabaseUrl || !supabaseKey) {
     console.error('Missing Supabase credentials in environment variables.');
+    // Don't fail the build, just skip dynamic routes if strictly necessary, 
+    // OR fail if it's critical. User request implies failure.
+    // Let's keep failure but with better info.
     process.exit(1);
   }
 

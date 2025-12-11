@@ -41,12 +41,11 @@ stages:
             displayName: "Install Node.js"
 
           - script: |
+              export VITE_SUPABASE_URL=$(VITE_SUPABASE_URL)
+              export VITE_SUPABASE_PUBLISHABLE_KEY=$(VITE_SUPABASE_PUBLISHABLE_KEY)
               npm ci
               npm run build
             displayName: "Build app"
-            env:
-              VITE_SUPABASE_URL: $(VITE_SUPABASE_URL)
-              VITE_SUPABASE_PUBLISHABLE_KEY: $(VITE_SUPABASE_PUBLISHABLE_KEY)
 
           - task: DownloadSecureFile@1
             name: gcpKey
