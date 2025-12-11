@@ -1,8 +1,13 @@
 import type { Plugin } from 'vite';
-import { algorithms } from './data/algorithms';
+// import { algorithms } from './data/algorithms'; // Removed
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import path from 'path';
+import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
+
+// Load env vars
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,6 +20,39 @@ export function prerenderPlugin(): Plugin {
 
         async closeBundle() {
             console.log('\n🚀 Starting prerender process...\n');
+
+            // --- Fetch Algorithms from Supabase ---
+            console.log('Fetching algorithms from Supabase for prerender...');
+            const supabaseUrl = process.env.VITE_SUPABASE_URL;
+            const supabaseKey = process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+            let algorithms: any[] = [];
+
+            if (supabaseUrl && supabaseKey) {
+                const supabase = createClient(supabaseUrl, supabaseKey);
+                const { data, error } = await supabase
+                    .from('algorithms')
+                    .select('*');
+
+                if (!error && data) {
+                    algorithms = data.map(a => ({
+                        ...a,
+                        ...a.metadata, // Flatten metadata into top level for compatibility
+                        id: a.id,
+                        name: a.name, // Ensure these exist
+                        description: a.description || a.metadata?.description || '',
+                        category: a.category || a.metadata?.category || 'Uncategorized',
+                        difficulty: a.difficulty || 'Medium',
+                        timeComplexity: a.timeComplexity || a.metadata?.timeComplexity || '',
+                        spaceComplexity: a.spaceComplexity || a.metadata?.spaceComplexity || '',
+                        problems: a.problems || a.metadata?.problems || []
+                    }));
+                } else {
+                    console.error('Error fetching algorithms:', error);
+                }
+            } else {
+                console.warn('Missing Supabase credentials for prerender. SEO content may be incomplete.');
+            }
+            // --------------------------------------
 
             // Adjust dist path since we are now in src/
             const distPath = path.resolve(__dirname, '../dist');

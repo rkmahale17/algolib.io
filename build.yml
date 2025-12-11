@@ -9,6 +9,9 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
+variables:
+  - group: AlgoLib-Secrets
+
 steps:
 - task: NodeTool@0
   inputs:
@@ -19,3 +22,6 @@ steps:
     npm install
     npm run build
   displayName: 'npm install and build'
+  env:
+    VITE_SUPABASE_URL: $(VITE_SUPABASE_URL)
+    VITE_SUPABASE_PUBLISHABLE_KEY: $(VITE_SUPABASE_PUBLISHABLE_KEY)
