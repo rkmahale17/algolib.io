@@ -32,3 +32,44 @@ export const DIFFICULTY_MAP: Record<string, string> = {
     'expert': 'Hard',
     'hard': 'Hard'
 };
+
+export interface AlgorithmListItem {
+    id: string;
+    title: string; // or name
+    slug?: string;
+    category: string;
+    difficulty: string;
+    description: string;
+    timeComplexity?: string;
+    spaceComplexity?: string;
+    companies?: string[];
+    listType?: string;
+    serial_no?: number;
+    [key: string]: any;
+}
+
+export interface Algorithm {
+    id: string;
+    name: string;
+    title: string;
+    slug?: string;
+    category: string;
+    difficulty: string;
+    description: string;
+    explanation: any; // JSON or string
+    implementations: any; // JSON or string,
+    test_cases: any;
+    input_schema: any;
+    problems_to_solve: any;
+    tutorials: any;
+    metadata: any;
+    controls: any;
+    list_type?: string;
+    serial_no?: number;
+    timeComplexity?: string;
+    spaceComplexity?: string;
+    company_tags?: string[];
+    created_at?: string;
+    updated_at?: string;
+    [key: string]: any;
+}

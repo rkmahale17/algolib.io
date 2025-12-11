@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAlgorithm } from '@/hooks/useAlgorithms';
+import { useAlgorithm } from '@/hooks/useAlgorithm';
 import { AlgorithmFormBuilder } from '@/components/admin/AlgorithmFormBuilder';
 import { Loader2, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';

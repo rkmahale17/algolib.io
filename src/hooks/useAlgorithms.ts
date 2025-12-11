@@ -1,173 +1,123 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { AlgorithmListItem } from "@/types/algorithm";
 
-export interface Algorithm {
-    id: string;
-    title: string;
-    name: string;
-    category: string;
-    difficulty: string;
-    description: string;
-    explanation: any;
-    implementations: any;
-    problems_to_solve: any;
-    test_cases: any;
-    input_schema: any;
-    tutorials: any;
-    metadata: any;
-    controls?: any;
-    list_type?: string;
-    serial_no?: number;
-    created_at?: string;
-    updated_at?: string;
-}
-
-// Fetch all algorithms
-export function useAlgorithms(searchQuery?: string, categoryFilter?: string) {
+export const useAlgorithms = (search?: string, category?: string) => {
     return useQuery({
-        queryKey: ['algorithms', searchQuery, categoryFilter],
+        queryKey: ["algorithms", search, category],
         queryFn: async () => {
+            // Select ONLY the fields needed for the list view
             let query = supabase
-                .from('algorithms')
-                .select('*')
-                .order('name', { ascending: true });
+                .from("algorithms")
+                .select(`
+          id,
+          name,
+          title,
+          difficulty,
+          category,
+          list_type,
+          description,
+          time_complexity,
+          space_complexity, 
+          serial_no,
+          metadata
+        `);
 
-            if (searchQuery) {
-                query = query.or(`name.ilike.%${searchQuery}%,title.ilike.%${searchQuery}%,id.ilike.%${searchQuery}%`);
+            if (search) {
+                query = query.or(`title.ilike.%${search}%,name.ilike.%${search}%`);
             }
-
-            if (categoryFilter) {
-                query = query.eq('category', categoryFilter);
+            if (category && category !== 'all') {
+                query = query.eq('category', category);
             }
 
             const { data, error } = await query;
 
-            if (error) {
-                toast.error('Failed to fetch algorithms');
-                throw error;
-            }
+            if (error) throw error;
 
-            return data as Algorithm[];
+            // Map the raw data to AlgorithmListItem
+            const mappedAlgorithms: AlgorithmListItem[] = data.map((algo: any) => ({
+                id: algo.id,
+                title: algo.title || algo.name,
+                name: algo.name,
+                category: algo.category,
+                difficulty: algo.difficulty,
+                description: algo.description,
+                timeComplexity: algo.time_complexity,
+                spaceComplexity: algo.space_complexity,
+                slug: algo.id,
+                listType: algo.list_type,
+                serial_no: algo.serial_no,
+            }));
+
+            return mappedAlgorithms;
         },
+        staleTime: 1000 * 60 * 5, // Data is fresh for 5 minutes
+        gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
+        refetchOnWindowFocus: false, // Don't refetch on window focus for static content
     });
-}
+};
 
-// Fetch single algorithm
-export function useAlgorithm(id: string) {
+export const useCategories = () => {
     return useQuery({
-        queryKey: ['algorithm', id],
+        queryKey: ["categories"],
         queryFn: async () => {
             const { data, error } = await supabase
-                .from('algorithms')
-                .select('*')
-                .eq('id', id)
-                .single();
-
-            if (error) {
-                toast.error('Failed to fetch algorithm');
-                throw error;
-            }
-
-            return data as Algorithm;
-        },
-        enabled: !!id,
-    });
-}
-
-// Create algorithm
-export function useCreateAlgorithm() {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: async (algorithm: Omit<Algorithm, 'created_at' | 'updated_at'>) => {
-            const { data, error } = await supabase
-                .from('algorithms')
-                .insert([algorithm as any])
-                .select()
-                .single();
+                .from("algorithms")
+                .select("category")
+                .not("category", "is", null);
 
             if (error) throw error;
-            return data;
+            // Unique categories
+            const uniqueCats = Array.from(new Set(data.map((d: any) => d.category))).sort();
+            return uniqueCats;
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['algorithms'] });
-            toast.success('Algorithm created successfully');
-        },
-        onError: (error: any) => {
-            toast.error(`Failed to create algorithm: ${error.message}`);
-        },
+        staleTime: 1000 * 60 * 60, // 1 hour
     });
-}
+};
 
-// Update algorithm (only updates provided fields)
-export function useUpdateAlgorithm() {
+
+
+export const useDeleteAlgorithm = () => {
     const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: async ({ id, updates }: { id: string; updates: Partial<Algorithm> }) => {
-            // Remove id from updates to avoid updating the primary key
-            const { id: _, ...updateData } = updates as any;
-
-            const { data, error } = await supabase
-                .from('algorithms')
-                .update(updateData)
-                .eq('id', id)
-                .select()
-                .maybeSingle();
-
-            if (error) throw error;
-            if (!data) throw new Error('Algorithm not found or permission denied');
-            return data;
-        },
-        onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: ['algorithms'] });
-            queryClient.invalidateQueries({ queryKey: ['algorithm', variables.id] });
-            toast.success('Algorithm updated successfully');
-        },
-        onError: (error: any) => {
-            toast.error(`Failed to update algorithm: ${error.message}`);
-        },
-    });
-}
-
-// Delete algorithm
-export function useDeleteAlgorithm() {
-    const queryClient = useQueryClient();
-
     return useMutation({
         mutationFn: async (id: string) => {
-            const { error } = await supabase
-                .from('algorithms')
-                .delete()
-                .eq('id', id);
-
+            const { error } = await supabase.from("algorithms").delete().eq("id", id);
             if (error) throw error;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['algorithms'] });
-            toast.success('Algorithm deleted successfully');
-        },
-        onError: (error: any) => {
-            toast.error(`Failed to delete algorithm: ${error.message}`);
+            queryClient.invalidateQueries({ queryKey: ["algorithms"] });
         },
     });
-}
+};
 
-// Get unique categories
-export function useCategories() {
-    return useQuery({
-        queryKey: ['categories'],
-        queryFn: async () => {
-            const { data, error } = await supabase
-                .from('algorithms')
-                .select('category')
-                .order('category');
-
+export const useCreateAlgorithm = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (newAlgorithm: any) => {
+            const { error } = await supabase.from("algorithms").insert(newAlgorithm);
             if (error) throw error;
-
-            const uniqueCategories = [...new Set(data.map(d => d.category))];
-            return uniqueCategories;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["algorithms"] });
+            queryClient.invalidateQueries({ queryKey: ["categories"] });
         },
     });
-}
+};
+
+export const useUpdateAlgorithm = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
+            const { error } = await supabase
+                .from("algorithms")
+                .update(updates)
+                .eq("id", id);
+            if (error) throw error;
+        },
+        onSuccess: (data, variables) => {
+            queryClient.invalidateQueries({ queryKey: ["algorithms"] });
+            queryClient.invalidateQueries({ queryKey: ["algorithm", variables.id] });
+            queryClient.invalidateQueries({ queryKey: ["categories"] });
+        },
+    });
+};

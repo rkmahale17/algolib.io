@@ -22,6 +22,7 @@ import { useAlgorithmLayout } from "@/hooks/useAlgorithmLayout";
 import { useInterviewSession } from "@/hooks/useInterviewSession";
 import { useAlgorithmInteractions } from "@/hooks/useAlgorithmInteractions";
 import { useUserAlgorithmData } from "@/hooks/useUserAlgorithmData";
+import { useAlgorithm } from "@/hooks/useAlgorithm";
 
 // Helper for scrolling to code section on mobile
 const scrollToCode = () => {
@@ -38,8 +39,7 @@ const AlgorithmDetail: React.FC = () => {
   const navigate = useNavigate();
   
   // -- Data Fetching State --
-  const [algorithm, setAlgorithm] = useState<any>(undefined);
-  const [isLoadingAlgorithm, setIsLoadingAlgorithm] = useState(true);
+  const { data: algorithm, isLoading: isLoadingAlgorithm } = useAlgorithm(algorithmIdOrSlug);
   const [user, setUser] = useState<any>(null);
 
   // -- Hooks --
@@ -77,49 +77,14 @@ const AlgorithmDetail: React.FC = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // 2. Fetch Algorithm Data
+  // 2. Set Likes/Dislikes Initial State from Algorithm Data
   useEffect(() => {
-    const fetchAlgorithm = async () => {
-      if (!algorithmIdOrSlug) return;
-      if (!supabase) {
-        setIsLoadingAlgorithm(false);
-        return;
-      }
-
-      setIsLoadingAlgorithm(true);
-      try {
-        let query = supabase.from('algorithms').select('*');
-        const isSlug = algorithmIdOrSlug.includes('-') && !algorithmIdOrSlug.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
-        
-        query = query.eq('id', algorithmIdOrSlug);
-        
-        const { data, error } = await query.single();
-        if (error) throw error;
-        
-        const metadata = data.metadata || {};
-        const metadataObj = (typeof metadata === 'object' && metadata !== null ? metadata : {}) as Record<string, any>;
-        const transformedData = {
-          ...data,
-          ...metadataObj,
-          metadata: data.metadata
-        };
-        
-        setAlgorithm(transformedData);
-        // Initial like/dislike counts
-        interactions.setLikes((metadataObj.likes as number) || 0);
-        interactions.setDislikes((metadataObj.dislikes as number) || 0);
-      } catch (error) {
-        console.error('Error fetching algorithm:', error);
-        toast.error('Failed to load algorithm details');
-      } finally {
-        setTimeout(() => {
-          setIsLoadingAlgorithm(false);
-        }, 1500);
-      }
-    };
-
-    fetchAlgorithm();
-  }, [algorithmIdOrSlug]);
+    if (algorithm?.metadata) {
+      const meta = algorithm.metadata as any;
+      interactions.setLikes((meta.likes as number) || 0);
+      interactions.setDislikes((meta.dislikes as number) || 0);
+    }
+  }, [algorithm]);
 
   // -- Handlers --
   const handleSignOut = async () => {
@@ -232,7 +197,7 @@ const AlgorithmDetail: React.FC = () => {
 
       <div className={`flex-1 relative ${showHorizontalScroll ? 'overflow-x-auto overflow-y-hidden' : 'overflow-hidden'}`}>
          
-         {algorithm?.controls?.maintenance_mode ? (
+         {(algorithm?.controls as any)?.maintenance_mode ? (
             <div className="h-full w-full flex flex-col items-center justify-center bg-card/30 backdrop-blur-sm p-4 text-center space-y-6 animate-in fade-in zoom-in duration-500">
               <div className="relative">
                  <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping opacity-20" />

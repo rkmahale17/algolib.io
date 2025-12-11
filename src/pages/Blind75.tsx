@@ -1,23 +1,47 @@
 import { Trophy } from 'lucide-react';
 import { Footer } from '@/components/Footer';
 import { Helmet } from 'react-helmet-async';
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { AlgorithmList, AlgorithmListItem } from '@/components/AlgorithmList';
+import { AlgorithmList } from '@/components/AlgorithmList';
 import { PremiumLoader } from '@/components/PremiumLoader';
 import { ListType, DIFFICULTY_MAP } from "@/types/algorithm";
+import { useAlgorithms } from "@/hooks/useAlgorithms";
+
+
+const faqItems = [
+  {
+    question: "What is Blind 75?",
+    answer: "Blind 75 is a curated list of the 75 most essential LeetCode questions. These problems cover all major patterns and data structures you need to know for technical interviews at FAANG and top tech companies."
+  },
+  {
+    question: "Is this enough for interviews?",
+    answer: "For most roles, yes. Mastering these 75 problems gives you the pattern recognition skills needed to solve similar unseen problems. Many candidates have cracked FAANG interviews doing just these.",
+  },
+  {
+    question: "How should I practice them?",
+    answer: "Don't just memorize solutions. Focus on understanding the underlying patterns (Sliding Window, DFS, etc.). Try to solve them in order of difficulty, or by category.",
+  },
+  {
+    question: "Are these solutions available in multiple languages?",
+    answer: "Yes! All problems on AlgoLib include solutions and explanations in Python, Java, C++, and TypeScript.",
+  }
+];
 
 const Blind75 = () => {
-  const [algorithms, setAlgorithms] = useState<AlgorithmListItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Fetch algorithms using the shared hook to utilize cache
+  const { data: allAlgorithms = [], isLoading } = useAlgorithms();
 
-  // Stats derived from fetched algorithms
+  // Filter for Blind 75 algorithms
+  const algorithms = allAlgorithms.filter(algo => 
+    algo.listType === ListType.Blind75 || algo.listType === ListType.CoreAndBlind75
+  );
+
+  // Stats derived from filtered algorithms
   const stats = {
     total: algorithms.length,
     easy: algorithms.filter(p => DIFFICULTY_MAP[p.difficulty?.toLowerCase()] === 'Easy').length,
@@ -25,74 +49,8 @@ const Blind75 = () => {
     hard: algorithms.filter(p => DIFFICULTY_MAP[p.difficulty?.toLowerCase()] === 'Hard').length,
   };
 
-  const faqItems = [
-    {
-      question: "What is the Blind 75 list?",
-      answer: "The Blind 75 is a curated collection of 75 essential LeetCode problems selected by a former Facebook engineer. These problems cover fundamental data structures and algorithms commonly asked in technical interviews at top tech companies like Google, Amazon, Facebook, Apple, and Microsoft (FAANG)."
-    },
-    {
-      question: "How long does it take to complete all 75 problems?",
-      answer: "On average, it takes 4-8 weeks to complete all 75 problems if you practice 2-3 problems per day. The time varies based on your current skill level and the complexity of each problem. Focus on understanding the concepts rather than rushing through the list."
-    },
-    {
-      question: "Are solutions provided in multiple programming languages?",
-      answer: "Yes! Each problem includes complete solutions in Python, Java, C++, and TypeScript. All solutions include detailed explanations, time/space complexity analysis, and interactive visualizations to help you understand the algorithm."
-    },
-    {
-      question: "Do I need to solve problems in order?",
-      answer: "No, you don't have to solve them in order. However, we recommend starting with easier problems and progressing to harder ones. You can also filter by category (Arrays, Strings, Trees, etc.) to focus on specific data structures first."
-    },
-    {
-      question: "How do I track my progress?",
-      answer: "You can filter problems by difficulty and category to organize your practice. We recommend keeping a personal log of completed problems and revisiting challenging ones periodically to reinforce your understanding."
-    }
-  ];
-
-  useEffect(() => {
-    const fetchBlind75Algorithms = async () => {
-      if (!supabase) return;
-      
-      try {
-        // Using correct column name 'list_type' (snake_case standard in Supabase)
-        const { data, error } = await supabase
-          .from('algorithms')
-          .select('*')
-          .or('list_type.eq.blind75,list_type.eq.core+blind75');
-
-        if (error) {
-          console.error('Error fetching Blind 75 algorithms:', error);
-          return;
-        }
-
-        if (data) {
-           const mappedAlgorithms: AlgorithmListItem[] = data.map((algo: any) => ({
-             id: algo.id,
-             title: algo.title || algo.name,
-             name: algo.name,
-             category: algo.category,
-             difficulty: algo.difficulty,
-             description: algo.description || algo.explanation?.problemStatement || '',
-             timeComplexity: algo.timeComplexity || algo.time_complexity || algo.metadata?.timeComplexity,
-             spaceComplexity: algo.spaceComplexity || algo.space_complexity || algo.metadata?.spaceComplexity,
-             slug: algo.slug || algo.id,
-             companies: algo.companyTags || algo.company_tags,
-             listType: algo.list_type,
-             serial_no: algo.serial_no
-          }));
-          setAlgorithms(mappedAlgorithms);
-        }
-      } catch (error) {
-        console.error('Error in fetch:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBlind75Algorithms();
-  }, []);
-
-  if (loading) {
-    return <PremiumLoader text="Loading Blind 75 List..." />;
+  if (isLoading) {
+    // Return with isLoading prop tailored for AlgorithmList instead of blocking
   }
 
   return (
@@ -183,6 +141,7 @@ const Blind75 = () => {
         <div className="container mx-auto px-4 py-8">
            <AlgorithmList 
               algorithms={algorithms} 
+              isLoading={isLoading}
               emptyMessage="No Blind 75 problems found."
               defaultListType={ListType.Blind75}
               availableListTypes={[ListType.Blind75, ListType.CoreAndBlind75]} 
