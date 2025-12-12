@@ -217,8 +217,9 @@ const Feedback = () => {
                       variant="outline"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isSubmitting}
+                      className="h-8 text-xs"
                     >
-                      <ImagePlus className="w-4 h-4 mr-2" />
+                      <ImagePlus className="w-3.5 h-3.5 mr-2" />
                       Add Screenshot
                     </Button>
                   )}
