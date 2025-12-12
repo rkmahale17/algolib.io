@@ -17,26 +17,23 @@ export const useAlgorithms = (
     pageSize: number = 20
 ) => {
     return useQuery({
-        queryKey: ["algorithms", search, category, page, pageSize],
+        queryKey: ["algorithms", search, category],
         queryFn: async (): Promise<PaginatedAlgorithmsResult> => {
-            const offset = (page - 1) * pageSize;
-            
-            // Select ONLY the fields needed for the list view
+            // Select ONLY the fields needed for the list view - no metadata
             let query = supabase
                 .from("algorithms")
                 .select(`
-          id,
-          name,
-          title,
-          difficulty,
-          category,
-          list_type,
-          description,
-          time_complexity,
-          space_complexity, 
-          serial_no,
-          metadata
-        `, { count: 'exact' });
+                    id,
+                    name,
+                    title,
+                    difficulty,
+                    category,
+                    list_type,
+                    description,
+                    time_complexity,
+                    space_complexity, 
+                    serial_no
+                `);
 
             if (search) {
                 query = query.or(`title.ilike.%${search}%,name.ilike.%${search}%`);
@@ -45,16 +42,12 @@ export const useAlgorithms = (
                 query = query.eq('category', category);
             }
 
-            // Add pagination and ordering
-            query = query
-                .order('serial_no', { ascending: true, nullsFirst: false })
-                .range(offset, offset + pageSize - 1);
+            // Order only - fetch all records
+            query = query.order('serial_no', { ascending: true, nullsFirst: false });
 
-            const { data, error, count } = await query;
+            const { data, error } = await query;
 
             if (error) throw error;
-
-            const totalCount = count || 0;
             
             // Map the raw data to AlgorithmListItem
             const mappedAlgorithms: AlgorithmListItem[] = (data || []).map((algo: any) => ({
@@ -73,10 +66,10 @@ export const useAlgorithms = (
 
             return {
                 algorithms: mappedAlgorithms,
-                totalCount,
-                hasMore: offset + pageSize < totalCount,
-                currentPage: page,
-                totalPages: Math.ceil(totalCount / pageSize)
+                totalCount: mappedAlgorithms.length,
+                hasMore: false,
+                currentPage: 1,
+                totalPages: 1
             };
         },
         staleTime: 1000 * 60 * 5, // Data is fresh for 5 minutes
