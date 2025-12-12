@@ -1,8 +1,8 @@
 import {
-  Algorithm,
   useCreateAlgorithm,
   useUpdateAlgorithm,
 } from "@/hooks/useAlgorithms";
+import { Algorithm } from "@/types/algorithm";
 import {
   Select,
   SelectContent,
