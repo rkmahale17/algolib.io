@@ -16,6 +16,11 @@ export const FeatureFlagProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchFlags = async () => {
+    if (!supabase) {
+      setIsLoading(false);
+      return;
+    }
+    
     try {
       // @ts-ignore - feature_flags table is new and types are not regenerated yet
       const { data, error } = await supabase
@@ -39,6 +44,8 @@ export const FeatureFlagProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     fetchFlags();
+
+    if (!supabase) return;
 
     // specific subscription to table changes
     const channel = supabase
