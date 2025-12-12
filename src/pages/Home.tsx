@@ -19,7 +19,8 @@ import { useAlgorithms } from "@/hooks/useAlgorithms";
 const Home = () => {
   const [user, setUser] = useState<User | null>(null);
   // Fetch algorithms using React Query
-  const { data: algorithms = [], isLoading: loading } = useAlgorithms();
+  const { data, isLoading: loading } = useAlgorithms();
+  const algorithms = data?.algorithms ?? [];
 
   // Check authentication status
   useEffect(() => {

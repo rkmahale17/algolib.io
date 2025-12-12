@@ -11,7 +11,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Button } from "@/components/ui/button";
 import { HistoryTab } from "./HistoryTab";
 import { NotesComponent } from "./NotesComponent";
-import { WhiteboardComponent } from "./WhiteboardComponent";
+import { LazyWhiteboardComponent } from "./LazyWhiteboardComponent";
 import { useState, useRef, useEffect } from "react";
 import { FeatureGuard } from "@/components/FeatureGuard";
 
@@ -192,7 +192,7 @@ export const BrainstormSection = ({
                   <FeatureGuard flag="drawing">
                    {controls?.whiteboard !== false && (
                     <TabsContent value="whiteboard" className="h-full m-0">
-                      <WhiteboardComponent
+                      <LazyWhiteboardComponent
                         algorithmId={algorithmId}
                         algorithmTitle={algorithmTitle}
                         restoreData={whiteboardRestore}
@@ -234,7 +234,7 @@ export const BrainstormSection = ({
           <FeatureGuard flag="drawing">
            {controls?.whiteboard !== false && (
             <TabsContent value="whiteboard" className="h-full m-0">
-              <WhiteboardComponent
+              <LazyWhiteboardComponent
                 algorithmId={algorithmId}
                 algorithmTitle={algorithmTitle}
                 restoreData={whiteboardRestore}
