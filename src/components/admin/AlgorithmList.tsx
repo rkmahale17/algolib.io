@@ -40,7 +40,8 @@ export function AlgorithmList() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' }>({ key: 'serial_no', direction: 'asc' });
 
-  const { data: algorithms, isLoading } = useAlgorithms(searchQuery, categoryFilter === 'all' ? '' : categoryFilter);
+  const { data, isLoading } = useAlgorithms(searchQuery, categoryFilter === 'all' ? '' : categoryFilter);
+  const algorithms = data?.algorithms ?? [];
   const { data: categories } = useCategories();
   const deleteMutation = useDeleteAlgorithm();
 
@@ -64,7 +65,7 @@ export function AlgorithmList() {
     }
   };
 
-  const filteredAlgorithms = algorithms?.filter(algo => {
+  const filteredAlgorithms = algorithms.filter(algo => {
     if (listTypeFilter === 'all') return true;
     // Check list_type
     const type = algo.list_type || 'core';

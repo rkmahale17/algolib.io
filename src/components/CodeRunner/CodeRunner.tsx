@@ -30,7 +30,8 @@ import { Switch } from "@/components/ui/switch";
 import confetti from 'canvas-confetti';
 
 import { LanguageSelector, Language } from './LanguageSelector';
-import { CodeEditor, CodeEditorRef } from './CodeEditor';
+import { LazyCodeEditor } from './LazyCodeEditor';
+import type { CodeEditorRef } from './CodeEditor';
 import { OutputPanel } from './OutputPanel';
 import { DEFAULT_CODE, LANGUAGE_IDS } from './constants';
 import { supabase } from '@/integrations/supabase/client';
@@ -951,7 +952,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
               </div>
             </div>
             <div className="flex-1 relative min-h-0">
-              <CodeEditor
+              <LazyCodeEditor
                 ref={editorRef}
                 code={code}
                 language={language}
@@ -1076,7 +1077,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                </div>
                
                <div className="flex-1 relative min-h-0">
-                  <CodeEditor
+                  <LazyCodeEditor
                     code={viewingSubmission?.code || ''}
                     language={viewingSubmission?.language as Language || 'typescript'}
                     path={`/runner/submission/${viewingSubmission?.id}`}

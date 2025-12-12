@@ -2,10 +2,25 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AlgorithmListItem } from "@/types/algorithm";
 
-export const useAlgorithms = (search?: string, category?: string) => {
+export interface PaginatedAlgorithmsResult {
+    algorithms: AlgorithmListItem[];
+    totalCount: number;
+    hasMore: boolean;
+    currentPage: number;
+    totalPages: number;
+}
+
+export const useAlgorithms = (
+    search?: string, 
+    category?: string,
+    page: number = 1,
+    pageSize: number = 20
+) => {
     return useQuery({
-        queryKey: ["algorithms", search, category],
-        queryFn: async () => {
+        queryKey: ["algorithms", search, category, page, pageSize],
+        queryFn: async (): Promise<PaginatedAlgorithmsResult> => {
+            const offset = (page - 1) * pageSize;
+            
             // Select ONLY the fields needed for the list view
             let query = supabase
                 .from("algorithms")
@@ -21,7 +36,7 @@ export const useAlgorithms = (search?: string, category?: string) => {
           space_complexity, 
           serial_no,
           metadata
-        `);
+        `, { count: 'exact' });
 
             if (search) {
                 query = query.or(`title.ilike.%${search}%,name.ilike.%${search}%`);
@@ -30,12 +45,19 @@ export const useAlgorithms = (search?: string, category?: string) => {
                 query = query.eq('category', category);
             }
 
-            const { data, error } = await query;
+            // Add pagination and ordering
+            query = query
+                .order('serial_no', { ascending: true, nullsFirst: false })
+                .range(offset, offset + pageSize - 1);
+
+            const { data, error, count } = await query;
 
             if (error) throw error;
 
+            const totalCount = count || 0;
+            
             // Map the raw data to AlgorithmListItem
-            const mappedAlgorithms: AlgorithmListItem[] = data.map((algo: any) => ({
+            const mappedAlgorithms: AlgorithmListItem[] = (data || []).map((algo: any) => ({
                 id: algo.id,
                 title: algo.title || algo.name,
                 name: algo.name,
@@ -49,11 +71,18 @@ export const useAlgorithms = (search?: string, category?: string) => {
                 serial_no: algo.serial_no,
             }));
 
-            return mappedAlgorithms;
+            return {
+                algorithms: mappedAlgorithms,
+                totalCount,
+                hasMore: offset + pageSize < totalCount,
+                currentPage: page,
+                totalPages: Math.ceil(totalCount / pageSize)
+            };
         },
         staleTime: 1000 * 60 * 5, // Data is fresh for 5 minutes
         gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
         refetchOnWindowFocus: false, // Don't refetch on window focus for static content
+        placeholderData: (previousData) => previousData, // Keep previous data while fetching new page
     });
 };
 

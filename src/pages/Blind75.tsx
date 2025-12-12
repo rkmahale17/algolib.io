@@ -34,7 +34,8 @@ const faqItems = [
 
 const Blind75 = () => {
   // Fetch algorithms using the shared hook to utilize cache
-  const { data: allAlgorithms = [], isLoading } = useAlgorithms();
+  const { data, isLoading } = useAlgorithms();
+  const allAlgorithms = data?.algorithms ?? [];
 
   // Filter for Blind 75 algorithms
   const algorithms = allAlgorithms.filter(algo => 
