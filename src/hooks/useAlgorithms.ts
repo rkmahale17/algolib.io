@@ -19,63 +19,41 @@ export const useAlgorithms = (
     return useQuery({
         queryKey: ["algorithms", search, category],
         queryFn: async (): Promise<PaginatedAlgorithmsResult> => {
-            // Select ONLY the fields needed for the list view - no metadata
-            let query = supabase
-                .from("algorithms")
-                .select(`
-                    id,
-                    name,
-                    title,
-                    difficulty,
-                    category,
-                    list_type,
-                    description,
-                    time_complexity,
-                    space_complexity, 
-                    serial_no
-                `);
+            // Build query params for edge function
+            const params = new URLSearchParams();
+            if (search) params.append('search', search);
+            if (category && category !== 'all') params.append('category', category);
 
-            if (search) {
-                query = query.or(`title.ilike.%${search}%,name.ilike.%${search}%`);
-            }
-            if (category && category !== 'all') {
-                query = query.eq('category', category);
+            // Call edge function via fetch (GET with query params)
+            const response = await fetch(
+                `https://mitejukmgshjyusgnpps.supabase.co/functions/v1/fetch-algorithms?${params.toString()}`,
+                {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to fetch algorithms');
             }
 
-            // Order only - fetch all records
-            query = query.order('serial_no', { ascending: true, nullsFirst: false });
-
-            const { data, error } = await query;
-
-            if (error) throw error;
-            
-            // Map the raw data to AlgorithmListItem
-            const mappedAlgorithms: AlgorithmListItem[] = (data || []).map((algo: any) => ({
-                id: algo.id,
-                title: algo.title || algo.name,
-                name: algo.name,
-                category: algo.category,
-                difficulty: algo.difficulty,
-                description: algo.description,
-                timeComplexity: algo.time_complexity,
-                spaceComplexity: algo.space_complexity,
-                slug: algo.id,
-                listType: algo.list_type,
-                serial_no: algo.serial_no,
-            }));
+            const result = await response.json();
 
             return {
-                algorithms: mappedAlgorithms,
-                totalCount: mappedAlgorithms.length,
+                algorithms: result.algorithms || [],
+                totalCount: result.totalCount || 0,
                 hasMore: false,
                 currentPage: 1,
                 totalPages: 1
             };
         },
-        staleTime: 1000 * 60 * 5, // Data is fresh for 5 minutes
-        gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
-        refetchOnWindowFocus: false, // Don't refetch on window focus for static content
-        placeholderData: (previousData) => previousData, // Keep previous data while fetching new page
+        staleTime: 1000 * 60 * 5,
+        gcTime: 1000 * 60 * 30,
+        refetchOnWindowFocus: false,
+        placeholderData: (previousData) => previousData,
     });
 };
 
