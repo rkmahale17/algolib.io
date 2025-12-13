@@ -5,6 +5,7 @@ import React, { Suspense, lazy } from 'react';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { PremiumLoader } from "@/components/PremiumLoader";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 // Eager load Home for best LCP
 import Home from "./pages/Home";
@@ -210,9 +211,11 @@ const App = () => {
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter basename="/">
-             <AppContent />
-          </BrowserRouter>
+          <ErrorBoundary>
+            <BrowserRouter basename="/">
+               <AppContent />
+            </BrowserRouter>
+          </ErrorBoundary>
       </TooltipProvider>
     </FeatureFlagProvider>
   </AppProvider>

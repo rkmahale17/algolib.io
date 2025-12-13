@@ -20,8 +20,8 @@ interface Problem {
 }
 
 interface ProblemsData {
-  internal: string[];
-  external: Problem[];
+  internal: Problem[];
+  external: Problem[]; // Keeping for legacy/compatibility, though user focuses on internal
 }
 
 interface ProblemsEditorProps {
@@ -30,7 +30,11 @@ interface ProblemsEditorProps {
 }
 
 export function ProblemsEditor({ data, onChange }: ProblemsEditorProps) {
-  const [newInternal, setNewInternal] = useState("");
+  const [newInternal, setNewInternal] = useState<Problem>({
+    type: "easy",
+    url: "",
+    title: "",
+  });
   const [newExternal, setNewExternal] = useState<Problem>({
     type: "easy",
     url: "",
@@ -38,12 +42,12 @@ export function ProblemsEditor({ data, onChange }: ProblemsEditorProps) {
   });
 
   const addInternal = () => {
-    if (newInternal.trim()) {
+    if (newInternal.url && newInternal.title) {
       onChange({
         ...data,
-        internal: [...data.internal, newInternal.trim()],
+        internal: [...data.internal, newInternal],
       });
-      setNewInternal("");
+      setNewInternal({ type: "easy", url: "", title: "" });
     }
   };
 
@@ -230,14 +234,61 @@ export function ProblemsEditor({ data, onChange }: ProblemsEditorProps) {
             {data.internal.map((problem, index) => (
               <Card key={index}>
                 <CardContent className="pt-6">
-                  <div className="flex items-center gap-3">
-                    <Input value={problem} disabled className="flex-1" />
+                  <div className="flex items-start gap-3">
+                    <div className="flex-1 space-y-3">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-2">
+                          <Label>Title</Label>
+                          <Input
+                            value={problem.title}
+                            onChange={(e) => {
+                                const updated = [...data.internal];
+                                updated[index] = { ...updated[index], title: e.target.value };
+                                onChange({ ...data, internal: updated });
+                            }}
+                            placeholder="Problem title"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Difficulty</Label>
+                          <Select
+                            value={problem.type}
+                            onValueChange={(value: any) => {
+                                const updated = [...data.internal];
+                                updated[index] = { ...updated[index], type: value };
+                                onChange({ ...data, internal: updated });
+                            }}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="easy">Easy</SelectItem>
+                              <SelectItem value="medium">Medium</SelectItem>
+                              <SelectItem value="hard">Hard</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Problem ID</Label>
+                        <Input
+                          value={problem.url}
+                          onChange={(e) => {
+                                const updated = [...data.internal];
+                                updated[index] = { ...updated[index], url: e.target.value };
+                                onChange({ ...data, internal: updated });
+                          }}
+                          placeholder="two-sum"
+                        />
+                      </div>
+                    </div>
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
                       onClick={() => removeInternal(index)}
-                      className="text-destructive hover:text-destructive"
+                      className="text-destructive hover:text-destructive mt-7"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -247,28 +298,63 @@ export function ProblemsEditor({ data, onChange }: ProblemsEditorProps) {
             ))}
           </div>
 
-          <div className="flex gap-2">
-            <Input
-              value={newInternal}
-              onChange={(e) => setNewInternal(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  addInternal();
-                }
-              }}
-              placeholder="Internal problem ID"
-            />
-            <Button
-              type="button"
-              onClick={addInternal}
-              disabled={!newInternal.trim()}
-              className="gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Add
-            </Button>
-          </div>
+          {/* Add New Internal Problem */}
+          <Card className="border-dashed">
+            <CardHeader>
+              <CardTitle className="text-base">Add Internal Problem</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>Title *</Label>
+                  <Input
+                    value={newInternal.title}
+                    onChange={(e) =>
+                      setNewInternal({ ...newInternal, title: e.target.value })
+                    }
+                    placeholder="Problem Title"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Difficulty *</Label>
+                  <Select
+                    value={newInternal.type}
+                    onValueChange={(value: any) =>
+                      setNewInternal({ ...newInternal, type: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="easy">Easy</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="hard">Hard</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Problem ID *</Label>
+                <Input
+                  value={newInternal.url}
+                  onChange={(e) =>
+                    setNewInternal({ ...newInternal, url: e.target.value })
+                  }
+                  placeholder="two-sum"
+                />
+              </div>
+              <Button
+                type="button"
+                onClick={addInternal}
+                disabled={!newInternal.url || !newInternal.title}
+                className="w-full gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Add Problem
+              </Button>
+            </CardContent>
+          </Card>
 
           {data.internal.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">

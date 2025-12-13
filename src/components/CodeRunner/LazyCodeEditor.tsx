@@ -30,6 +30,7 @@ interface LazyCodeEditorProps {
   options?: Record<string, any>;
   theme?: string;
   path?: string;
+  isMobile?: boolean;
 }
 
 export const LazyCodeEditor = forwardRef<CodeEditorRef, LazyCodeEditorProps>(

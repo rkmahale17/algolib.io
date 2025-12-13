@@ -14,6 +14,8 @@ interface CodeBlock {
   explanationBefore?: string;
   explanationAfter?: string;
   isVisible?: boolean;
+  showExplanationBefore?: boolean;
+  showExplanationAfter?: boolean;
 }
 
 interface CodeImplementation {
@@ -160,7 +162,7 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
 
       {(() => {
         // Group implementations by code type (approach)
-        const approachesByType: Record<string, { lang: string; code: string; explanationBefore?: string; explanationAfter?: string }[]> = {};
+        const approachesByType: Record<string, { lang: string; code: string; explanationBefore?: string; explanationAfter?: string; showExplanationBefore?: boolean; showExplanationAfter?: boolean }[]> = {};
         
         implementations.forEach((impl) => {
           // Check if language is enabled
@@ -183,6 +185,8 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
                 code: codeImpl.code,
                 explanationBefore: codeImpl.explanationBefore,
                 explanationAfter: codeImpl.explanationAfter,
+                showExplanationBefore: (codeImpl as any).showExplanationBefore,
+                showExplanationAfter: (codeImpl as any).showExplanationAfter,
               });
             }
           });
@@ -239,7 +243,7 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
 // Extracted Component for Per-Approach State and Layout
 const SolutionApproach: React.FC<{
   codeType: string;
-  langImplementations: { lang: string; code: string; explanationBefore?: string; explanationAfter?: string }[];
+  langImplementations: { lang: string; code: string; explanationBefore?: string; explanationAfter?: string; showExplanationBefore?: boolean; showExplanationAfter?: boolean }[];
   approachIndex: number;
   controls: SolutionViewerProps['controls'];
   handleCopy: (code: string, id: string) => void;
@@ -286,6 +290,9 @@ const SolutionApproach: React.FC<{
   const explanationBefore = langImplementations[0]?.explanationBefore;
   const explanationAfter = langImplementations[0]?.explanationAfter;
 
+  const showPre = activeImpl.showExplanationBefore !== false;
+  const showPost = activeImpl.showExplanationAfter !== false;
+
   return (
     <div className="space-y-4" ref={containerRef}>
       {/* Approach Header */}
@@ -294,7 +301,7 @@ const SolutionApproach: React.FC<{
       </h3>
 
       {/* Explanation Before */}
-      {explanationBefore && controls?.explanation_before !== false && (
+      {explanationBefore && controls?.explanation_before !== false && showPre && (
         <RichText 
           content={explanationBefore} 
           className="text-sm text-muted-foreground mb-4"
@@ -420,7 +427,7 @@ const SolutionApproach: React.FC<{
       </Tabs>
 
       {/* Explanation After */}
-      {explanationAfter && controls?.explanation_after !== false && (
+      {explanationAfter && controls?.explanation_after !== false && showPost && (
         <RichText 
           content={explanationAfter} 
           className="text-sm text-muted-foreground mt-4"

@@ -9,8 +9,7 @@ import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/componen
 import { Button } from "@/components/ui/button";
 import { PremiumLoader } from "@/components/PremiumLoader";
 import AlgoMetaHead from "@/services/meta.injectot";
-import { CodeRunner } from "@/components/CodeRunner/CodeRunner";
-import { BrainstormSection } from "@/components/brainstorm/BrainstormSection";
+import { CodeRunnerRef } from "@/components/CodeRunner/CodeRunner";
 
 // New Refactored Components
 import { AlgorithmHeader } from "@/components/algorithm/AlgorithmHeader";
@@ -62,6 +61,26 @@ const AlgorithmDetail: React.FC = () => {
   });
 
   const submissions = useMemo(() => userAlgoData?.submissions || [], [userAlgoData?.submissions]);
+
+  // -- Code Runner Control --
+  const runnerRef = React.useRef<CodeRunnerRef>(null);
+  const [runnerState, setRunnerState] = useState({
+    isLoading: false,
+    isSubmitting: false, 
+    lastRunSuccess: false
+  });
+
+  const handleRunnerStateChange = useCallback((state: any) => {
+    setRunnerState(state);
+  }, []);
+
+  const handleRun = useCallback(() => {
+    runnerRef.current?.run();
+  }, []);
+
+  const handleSubmit = useCallback(() => {
+    runnerRef.current?.submit();
+  }, []);
 
   // -- Effects --
   
@@ -123,6 +142,8 @@ const AlgorithmDetail: React.FC = () => {
       isCodeRunnerMaximized={layout.isCodeRunnerMaximized}
       setIsCodeRunnerMaximized={layout.setIsCodeRunnerMaximized}
       submissions={submissions}
+      codeRunnerRef={runnerRef}
+      onRunnerStateChange={handleRunnerStateChange}
     />
   ), [
     algorithm, 
@@ -191,8 +212,15 @@ const AlgorithmDetail: React.FC = () => {
         formatTime={session.formatTime}
         handleRandomProblem={interactions.handleRandomProblem}
         handleNextProblem={interactions.handleNextProblem}
+        handlePreviousProblem={interactions.handlePreviousProblem}
         handleShare={interactions.handleShare}
         handleSignOut={handleSignOut}
+        // Runner Controls
+        onRun={handleRun}
+        onSubmit={handleSubmit}
+        isRunnerLoading={runnerState.isLoading}
+        isRunnerSubmitting={runnerState.isSubmitting}
+        lastRunSuccess={runnerState.lastRunSuccess}
       />
 
       <div className={`flex-1 relative ${showHorizontalScroll ? 'overflow-x-auto overflow-y-hidden' : 'overflow-hidden'}`}>

@@ -60,6 +60,7 @@ interface CodeEditorProps {
   };
   theme?: string; // Explicit theme override
   path?: string; // Unique path for the model to prevent duplicates
+  isMobile?: boolean; // Mobile flag for responsive sizing
 }
 
 export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(({
@@ -69,7 +70,8 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(({
   onMount,
   options: customOptions,
   theme: customTheme,
-  path
+  path,
+  isMobile
 }, ref) => {
   const { theme: systemTheme } = useTheme();
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
@@ -159,10 +161,11 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(({
       : (systemTheme === 'dark' ? 'night-owl' : 'light');
 
   return (
-    <div className="h-full w-full overflow-hidden bg-background">
+    <div className={`h-full w-full overflow-hidden bg-background min-h-[300px] `}>
       <Editor
         height="100%"
         path={path}
+        className={isMobile ? "min-h-[300px]" : ""}
         language={getMonacoLanguage(language)}
         value={code ?? ''}
         theme={monacoTheme}

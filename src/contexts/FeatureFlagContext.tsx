@@ -43,6 +43,8 @@ export const FeatureFlagProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
+    if (!supabase) return;
+
     fetchFlags();
 
     if (!supabase) return;

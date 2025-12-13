@@ -33,6 +33,8 @@ interface CodeBlock {
   explanationBefore?: string;
   explanationAfter?: string;
   isVisible?: boolean;
+  showExplanationBefore?: boolean;
+  showExplanationAfter?: boolean;
 }
 
 interface CodeImplementation {
@@ -209,6 +211,7 @@ export function CodeImplementationEditor({
     setIsDialogOpen(false);
   };
 
+  // Updates a field for the specific language implementation (e.g. code)
   const updateCodeField = (field: keyof CodeBlock, value: string) => {
     onChange(
       implementations.map((impl) => {
@@ -222,6 +225,18 @@ export function CodeImplementationEditor({
         }
         return impl;
       })
+    );
+  };
+
+  // Updates a field for ALL languages for this codeType (e.g. explanations)
+  const updateGlobalCodeField = (field: keyof CodeBlock, value: string) => {
+    onChange(
+      implementations.map((impl) => ({
+        ...impl,
+        code: impl.code.map((c) =>
+          c.codeType === activeCodeType ? { ...c, [field]: value } : c
+        ),
+      }))
     );
   };
 
@@ -379,13 +394,13 @@ export function CodeImplementationEditor({
             {/* Explanation Before */}
             <div className="space-y-2">
                 <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-                    <Text className="w-3 h-3" /> Explanation Before Code
+                    <Text className="w-3 h-3" /> Explanation Before Code (Shared across languages)
                 </Label>
                 <Textarea 
                     placeholder="Context or theory to show before the code block..."
                     className="min-h-[80px] font-sans"
                     value={currentCode?.explanationBefore || ""}
-                    onChange={(e) => updateCodeField('explanationBefore', e.target.value)}
+                    onChange={(e) => updateGlobalCodeField('explanationBefore', e.target.value)}
                 />
             </div>
 
@@ -416,13 +431,13 @@ export function CodeImplementationEditor({
             {/* Explanation After */}
             <div className="space-y-2">
                 <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-                    <Text className="w-3 h-3" /> Explanation After Code
+                    <Text className="w-3 h-3" /> Explanation After Code (Shared across languages)
                 </Label>
                 <Textarea 
                     placeholder="Complexity analysis or notes to show after the code block..."
                     className="min-h-[80px] font-sans"
                     value={currentCode?.explanationAfter || ""}
-                    onChange={(e) => updateCodeField('explanationAfter', e.target.value)}
+                    onChange={(e) => updateGlobalCodeField('explanationAfter', e.target.value)}
                 />
             </div>
 

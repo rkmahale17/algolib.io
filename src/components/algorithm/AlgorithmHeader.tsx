@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import {
   ChevronRight,
+  ChevronLeft,
   Shuffle,
   Menu,
   Share2,
@@ -15,6 +16,8 @@ import {
   LogOut,
   MoreHorizontal,
   User,
+  Send,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -59,8 +62,16 @@ interface AlgorithmHeaderProps {
   // Actions
   handleRandomProblem: () => void;
   handleNextProblem: () => void;
+  handlePreviousProblem: () => void;
   handleShare: () => void;
   handleSignOut: () => void;
+
+  // Runner Control
+  onRun?: () => void;
+  onSubmit?: () => void;
+  isRunnerLoading?: boolean;
+  isRunnerSubmitting?: boolean;
+  lastRunSuccess?: boolean;
 }
 
 export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
@@ -77,13 +88,19 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
   formatTime,
   handleRandomProblem,
   handleNextProblem,
+  handlePreviousProblem,
   handleShare,
   handleSignOut,
+  onRun,
+  onSubmit,
+  isRunnerLoading,
+  isRunnerSubmitting,
+  lastRunSuccess,
 }) => {
   const showCondensedMenu = windowWidth < 778;
 
   return (
-    <div className="h-12 border-b flex items-center px-4 gap-4 shrink-0 bg-background/95">
+    <div className="h-12 border-b flex items-center px-4 gap-4 shrink-0 bg-background/95 relative">
       {/* Left Side: Logo + Navigation */}
       <div className="flex items-center gap-3">
         <Link
@@ -109,7 +126,19 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
                 <TooltipContent>Random Problem</TooltipContent>
               </Tooltip>
             )}
-
+             <Tooltip>
+                <TooltipTrigger asChild>
+               <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handlePreviousProblem}
+                    className="h-9 w-9 text-muted-foreground hover:text-foreground"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Previous Problem</TooltipContent>
+                </Tooltip>
             {(!algorithm?.controls || algorithm.controls?.header?.next_problem !== false) && (
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -123,6 +152,74 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
           </TooltipProvider>
         )}
       </div>
+
+      {/* Middle: Run / Submit Buttons */}
+      {/* Show on md+ screens, assuming md ~768px matches the user intent roughly, or use custom class if needed. 
+          The user wanted "always visible" which implies desktop. "Mobile buttons with coderrunner" implies hidden on mobile.
+          The `!showCondensedMenu` checks window width < 778. Let's start by using that for consistent logic, 
+          but change the styling to be more contrasted.
+       */}
+      {!showCondensedMenu && onRun && onSubmit && (
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
+            <TooltipProvider>
+              <div className="flex items-center shadow-sm rounded-md">
+                 <FeatureGuard flag="code_runner">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        onClick={onRun} 
+                        disabled={isRunnerLoading || isRunnerSubmitting}
+                        size="sm"
+                        variant="ghost"
+                        className="h-8 px-4 text-xs rounded-r-none border border-r-0 bg-violet-100 text-violet-700 hover:bg-violet-500 hover:text-white border-violet-200 font-medium transition-colors"
+                      >
+                         {isRunnerLoading ? (
+                            <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
+                          ) : (
+                            <Play className="w-3.5 h-3.5 mr-2 fill-current" />
+                          )}
+                         Run
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">Run Code <kbd className="ml-2 pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100"><span className="text-xs">Ctrl</span> + '</kbd></TooltipContent>
+                  </Tooltip>
+                 </FeatureGuard>
+
+                 <FeatureGuard flag="submit_button">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        onClick={onSubmit} 
+                        disabled={isRunnerLoading || isRunnerSubmitting || !lastRunSuccess}
+                        size="sm"
+                        variant="ghost"
+                        className={`h-8 px-4 text-xs rounded-l-none border ${
+                           lastRunSuccess 
+                           ? 'bg-green-100 text-green-700 hover:bg-green-500 hover:text-white border-green-200' 
+                           : 'bg-gray-100 text-gray-500 hover:bg-gray-200 border-gray-200'
+                        } transition-colors`}
+                      >
+                         {isRunnerSubmitting ? (
+                            <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
+                          ) : (
+                            <Send className="w-3.5 h-3.5 mr-2" />
+                          )}
+                         Submit
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">
+                       {!lastRunSuccess && !isRunnerLoading && !isRunnerSubmitting ? (
+                           <span className="text-orange-500 font-medium">Run all test cases successfully to enable submission</span>
+                        ) : (
+                           <>Submit Solution <kbd className="ml-2 pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100"><span className="text-xs">Ctrl</span> + Enter</kbd></>
+                        )}
+                    </TooltipContent>
+                  </Tooltip>
+                 </FeatureGuard>
+              </div>
+            </TooltipProvider>
+        </div>
+      )}
 
       {/* Right Side: Share, Bug, Timer, Interview, Theme, Profile */}
       <div className="ml-auto flex items-center gap-2">
@@ -138,6 +235,8 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>Menu</DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                
+              
                 <DropdownMenuItem onClick={handleNextProblem}>
                   <ChevronRight className="mr-2 h-4 w-4" />
                   <span>Next Problem</span>
@@ -255,16 +354,30 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
             <FeatureGuard flag="interview_mode">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button 
-                    variant={isInterviewMode ? "default" : "ghost"} 
-                    size="icon" 
-                    onClick={toggleInterviewMode}
-                    className="h-8 w-8"
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handlePreviousProblem}
+                    className="h-9 w-9 text-muted-foreground hover:text-foreground"
                   >
-                    <Monitor className="h-4 w-4" />
+                    <ChevronLeft className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Interview Mode</TooltipContent>
+                <TooltipContent>Previous Problem</TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleNextProblem}
+                    className="h-9 w-9 text-muted-foreground hover:text-foreground"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Next Problem</TooltipContent>
               </Tooltip>
             </FeatureGuard>
             </TooltipProvider>

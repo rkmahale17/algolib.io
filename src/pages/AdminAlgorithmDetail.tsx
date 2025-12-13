@@ -41,7 +41,7 @@ export default function AdminAlgorithmDetail() {
   }
 
   return (
-    <div className="container mx-auto py-8">
+    <div className=" mx-auto py-8 m-4">
       <div className="mb-6">
           <Button
             variant="ghost"

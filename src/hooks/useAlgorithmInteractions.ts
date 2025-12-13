@@ -269,29 +269,53 @@ export const useAlgorithmInteractions = ({
         }
     }, [navigate]);
 
-    const handleNextProblem = useCallback(async () => {
+    const handlePreviousProblem = useCallback(async () => {
         if (!algorithm || !supabase) return;
 
         try {
-            // Fetch Blind 75 sequence from DB
-            const { data: blind75Data } = await supabase
-                .from('algorithms')
-                .select('id')
-                .or('list_type.eq.blind75,list_type.eq.core+Blind75')
-                .order('id', { ascending: true });
+            if (typeof algorithm.serial_no === 'number') {
+                const { data: prevAlgo } = await supabase
+                    .from('algorithms')
+                    .select('id, serial_no')
+                    .lt('serial_no', algorithm.serial_no)
+                    .order('serial_no', { ascending: false })
+                    .limit(1)
+                    .single();
 
-            if (blind75Data && blind75Data.length > 0) {
-                const currentId = algorithm.id;
-                const currentIndex = blind75Data.findIndex((p: any) => p.id === currentId);
-
-                if (currentIndex !== -1 && currentIndex < blind75Data.length - 1) {
-                    const nextProblem = blind75Data[currentIndex + 1];
-                    navigate(`/algorithm/${nextProblem.id}`);
+                if (prevAlgo) {
+                    navigate(`/algorithm/${prevAlgo.id}`);
                     return;
                 }
             }
 
-            // Fallback to random if not in Blind 75 list or end of list
+            toast.info("No previous problem found. You are at the start!");
+        } catch (error) {
+            console.error("Error navigating previous:", error);
+        }
+    }, [algorithm, navigate]);
+
+    const handleNextProblem = useCallback(async () => {
+        if (!algorithm || !supabase) return;
+
+        try {
+            // New Logic: Find next by serial_no
+            if (typeof algorithm.serial_no === 'number') {
+                const { data: nextAlgo } = await supabase
+                    .from('algorithms')
+                    .select('id, serial_no')
+                    .gt('serial_no', algorithm.serial_no)
+                    .order('serial_no', { ascending: true })
+                    .limit(1)
+                    .single(); // Use single() as we expect at most one, or null if none
+
+                if (nextAlgo) {
+                    navigate(`/algorithm/${nextAlgo.id}`);
+                    return;
+                }
+            }
+
+            // Fallback: If no serial number or no next problem found (last one?), try random
+            console.log("No next problem found by serial_no, trying random...");
             toast.info("No next problem found in sequence. Trying random...");
             handleRandomProblem();
 
@@ -329,6 +353,7 @@ export const useAlgorithmInteractions = ({
         toggleFavorite,
         handleVote,
         handleRandomProblem,
+        handlePreviousProblem,
         handleNextProblem,
         handleShare,
         handleCodeChange,

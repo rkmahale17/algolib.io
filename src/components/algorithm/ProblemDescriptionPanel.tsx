@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import { Link } from "react-router-dom";
 import {
   Book,
   Eye,
@@ -14,6 +15,9 @@ import {
   ThumbsUp,
   ThumbsDown,
   Star,
+  Flashlight,
+  FileText,
+  ArrowRight,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -152,13 +156,13 @@ export const ProblemDescriptionPanel = React.memo(({
                 {isCompact ? (
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Book className="w-4 h-4" />
+                      <FileText className="w-4 h-4" />
                     </TooltipTrigger>
                     <TooltipContent>Description</TooltipContent>
                   </Tooltip>
                 ) : (
                   <>
-                    <Book className="w-4 h-4 mr-2" />
+                    <FileText className="w-4 h-4 mr-2 shrink-0" />
                     Description
                   </>
                 )}
@@ -177,7 +181,7 @@ export const ProblemDescriptionPanel = React.memo(({
                   </Tooltip>
                 ) : (
                   <>
-                    <Eye className="w-4 h-4 mr-2" />
+                    <Eye className="w-4 h-4 mr-2 shrink-0" />
                     Visualizations
                   </>
                 )}
@@ -190,13 +194,13 @@ export const ProblemDescriptionPanel = React.memo(({
                 {isCompact ? (
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Code2 className="w-4 h-4" />
+                      <Flashlight className="w-4 h-4" />
                     </TooltipTrigger>
                     <TooltipContent>Solutions</TooltipContent>
                   </Tooltip>
                 ) : (
                   <>
-                    <Code2 className="w-4 h-4 mr-2" />
+                    <Flashlight className="w-4 h-4 mr-2 shrink-0" />
                     Solutions
                   </>
                 )}
@@ -279,7 +283,7 @@ export const ProblemDescriptionPanel = React.memo(({
                         >
                           
                           <CheckCircle2 className="w-4 h-4 mr-2" />
-                          Attempted
+                          Solved
                         </Badge>
                       )}
                     </div>
@@ -406,7 +410,7 @@ export const ProblemDescriptionPanel = React.memo(({
                                       {/* Steps, Use Cases & Tips */}
                                       {showGuides && (
                                         <div className="pt-2">
-                                          <Tabs defaultValue="steps">
+                                          <Tabs defaultValue="usecase">
                                             <TabsList className="grid w-full grid-cols-3 h-auto">
                                               <TabsTrigger value="usecase" className="text-xs sm:text-sm">
                                                 Use Cases
@@ -421,13 +425,9 @@ export const ProblemDescriptionPanel = React.memo(({
 
                                             <div className="p-1">
                                                 <TabsContent value="steps" className="mt-4">
-                                                  <ol className="space-y-2 list-decimal list-inside">
-                                                    {algorithm.explanation.steps?.map((step: string, i: number) => (
-                                                      <li key={i} className="text-sm text-muted-foreground">
-                                                        {step}
-                                                      </li>
-                                                    ))}
-                                                  </ol>
+                                                  <div className="text-sm text-muted-foreground">
+                                                    <RichText content={algorithm.explanation.steps} />
+                                                  </div>
                                                 </TabsContent>
 
                                                 <TabsContent value="usecase" className="mt-4">
@@ -438,13 +438,9 @@ export const ProblemDescriptionPanel = React.memo(({
                                                 </TabsContent>
 
                                                 <TabsContent value="tips" className="mt-4">
-                                                  <ul className="space-y-2 list-disc list-inside">
-                                                    {algorithm.explanation.tips?.map((tip: string, i: number) => (
-                                                      <li key={i} className="text-sm text-muted-foreground">
-                                                        {tip}
-                                                      </li>
-                                                    ))}
-                                                  </ul>
+                                                  <div className="text-sm text-muted-foreground">
+                                                    <RichText content={algorithm.explanation.tips} />
+                                                  </div>
                                                 </TabsContent>
                                             </div>
                                           </Tabs>
@@ -504,26 +500,38 @@ export const ProblemDescriptionPanel = React.memo(({
 
                   {/* Practice Problems Card */}
                   <FeatureGuard flag="external_links">
-                    {algorithm?.problems_to_solve?.external && algorithm.problems_to_solve.external.length > 0 && (!algorithm?.controls || algorithm.controls?.content?.practice_problems !== false) ? (
+                    {algorithm?.problems_to_solve?.internal && algorithm.problems_to_solve.internal.length > 0 && 
+                      (!algorithm?.controls || algorithm.controls?.content?.practice_problems !== false) ? (
                       <Card className="p-4 sm:p-6 glass-card overflow-hidden">
                         <h3 className="font-semibold mb-4">Practice Problems</h3>
                         <div className="space-y-2">
-                          {algorithm.problems_to_solve.external.map((problem: any, i: number) => (
-                            <a
-                              key={i}
-                              href={problem.url}
+                          {algorithm.problems_to_solve.internal.map((problem: any, i: number) => (
+                            <Link
+                              key={`internal-${i}`}
+                              to={`/algorithm/${problem.url}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
                             >
                               <div className="flex-1">
                                 <p className="text-sm font-medium">{problem.title}</p>
-                                <p className="text-xs text-muted-foreground mt-1 capitalize">{problem.type}</p>
+                                <div className="mt-1.5 flex">
+                                  <Badge 
+                                    variant="secondary" 
+                                    className={`
+                                      text-[10px] h-5 px-2 capitalize font-medium border
+                                      ${problem.type.toLowerCase() === 'easy' ? 'bg-green-100 text-green-700 border-green-200 hover:bg-green-200  ' : ''}
+                                      ${problem.type.toLowerCase() === 'medium' ? 'bg-orange-100 text-orange-700 border-orange-200 hover:bg-orange-200' : ''}
+                                      ${problem.type.toLowerCase() === 'hard' ? 'bg-red-100 text-red-700 border-red-200 hover:bg-red-200' : ''}
+                                    `}
+                                  >
+                                    {problem.type}
+                                  </Badge>
+                                </div>
                               </div>
                               <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                            </a>
+                            </Link>
                           ))}
-
                         </div>
                       </Card>
                     ) : null}

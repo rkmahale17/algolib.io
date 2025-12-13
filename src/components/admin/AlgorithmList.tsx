@@ -163,6 +163,8 @@ export function AlgorithmList() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All List Types</SelectItem>
+
+            
             {LIST_TYPE_OPTIONS.map(opt => (
                 <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
             ))}
