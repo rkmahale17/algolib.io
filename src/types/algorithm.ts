@@ -1,6 +1,6 @@
 export enum ListType {
     Core = 'core',
-    Blind75 = 'blind75',
+    Blind75 = 'blind-75',
     CoreAndBlind75 = 'core+blind75',
 }
 
@@ -12,6 +12,11 @@ export const LIST_TYPE_LABELS: Record<ListType, string> = {
 
 export const LIST_TYPE_OPTIONS = [
     { value: ListType.Core, label: LIST_TYPE_LABELS[ListType.Core] },
+    { value: ListType.CoreAndBlind75, label: LIST_TYPE_LABELS[ListType.CoreAndBlind75] },
+]; ``
+export const LIST_TYPE_OPTIONS_ADMIN = [
+    { value: ListType.Core, label: LIST_TYPE_LABELS[ListType.Core] },
+    { value: ListType.Blind75, label: LIST_TYPE_LABELS[ListType.Blind75] },
     { value: ListType.CoreAndBlind75, label: LIST_TYPE_LABELS[ListType.CoreAndBlind75] },
 ];
 

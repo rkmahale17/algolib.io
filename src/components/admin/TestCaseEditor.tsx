@@ -37,12 +37,20 @@ function TestCaseInput({
   const [localValue, setLocalValue] = useState<string>("");
   const [isEditing, setIsEditing] = useState(false);
 
+  const displayValue = isEditing 
+    ? localValue 
+    : (type.includes("[]") || type === "object" 
+        ? (typeof value === 'string' ? value : JSON.stringify(value)) 
+        : (value ?? ""));
+
   const handleFocus = () => {
     setIsEditing(true);
+    // Initialize with the current display value (raw string or compact JSON)
+    // blocking the "auto-format to 2 spaces" behavior
     if (type.includes("[]") || type === "object") {
-      setLocalValue(JSON.stringify(value, null, 2));
+        setLocalValue(typeof value === 'string' ? value : JSON.stringify(value));
     } else {
-      setLocalValue(String(value ?? ""));
+        setLocalValue(String(value ?? ""));
     }
   };
 
@@ -50,7 +58,9 @@ function TestCaseInput({
     setIsEditing(false);
     if (type.includes("[]") || type === "object") {
       try {
-        const parsed = JSON.parse(localValue);
+        // Normalize unicode minus to standard hyphen
+        const normalized = localValue.replace(/−/g, '-');
+        const parsed = JSON.parse(normalized);
         onChange(parsed);
       } catch {
         // If parsing fails, pass raw string to parent (or handle error)
@@ -62,12 +72,6 @@ function TestCaseInput({
       onChange(isNaN(numVal) ? localValue : numVal);
     }
   };
-
-  const displayValue = isEditing 
-    ? localValue 
-    : (type.includes("[]") || type === "object" 
-        ? JSON.stringify(value || "", null, 2) 
-        : (value ?? ""));
 
   return (
     <div className="space-y-2">
