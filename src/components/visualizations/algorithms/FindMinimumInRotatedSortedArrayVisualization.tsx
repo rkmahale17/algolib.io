@@ -225,7 +225,10 @@ export const FindMinimumInRotatedSortedArrayVisualization = () => {
 
   const code = `function findMin(nums: number[]): number {
   let left = 0, right = nums.length - 1;
-  
+
+  if(nums.length == 0)
+      return 0;  
+
   while (left < right) {
     const mid = Math.floor((left + right) / 2);
     
