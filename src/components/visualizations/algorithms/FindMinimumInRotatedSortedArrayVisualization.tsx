@@ -225,7 +225,10 @@ export const FindMinimumInRotatedSortedArrayVisualization = () => {
 
   const code = `function findMin(nums: number[]): number {
   let left = 0, right = nums.length - 1;
-  
+
+  if(nums.length == 0)
+      return 0;  
+
   while (left < right) {
     const mid = Math.floor((left + right) / 2);
     
@@ -254,7 +257,7 @@ export const FindMinimumInRotatedSortedArrayVisualization = () => {
             <Card className="p-6">
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-center">Find Minimum in Rotated Sorted Array</h3>
-                <div className="flex items-center justify-center gap-2 min-h-[200px]">
+                <div className="flex items-center justify-center gap-2 min-h-[200px] flex-wrap">
                   {step.array.map((value, index) => (
                     <motion.div
                       key={index}
