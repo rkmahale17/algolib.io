@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Save, X } from "lucide-react";
+import { ArrowLeft, Loader2, Save, X } from "lucide-react";
 import { toast } from "sonner";
 
 // Import all editor components
@@ -32,6 +32,7 @@ import { ProblemsEditor } from "./ProblemsEditor";
 import { AlgorithmPreview } from "./AlgorithmPreview";
 import { TutorialsEditor } from "./TutorialsEditor";
 import { ControlsEditor, DEFAULT_CONTROLS } from "./ControlsEditor";
+import { useNavigate } from "react-router-dom";
 
 interface AlgorithmFormBuilderProps {
   algorithm?: Algorithm | null;
@@ -46,6 +47,7 @@ export function AlgorithmFormBuilder({
 }: AlgorithmFormBuilderProps) {
   const [activeTab, setActiveTab] = useState("basic");
   const [listType, setListType] = useState("coreAlgo");
+  const navigate = useNavigate();
 
   const createMutation = useCreateAlgorithm();
   const updateMutation = useUpdateAlgorithm();
@@ -178,16 +180,24 @@ export function AlgorithmFormBuilder({
   const isLoading = createMutation.isPending || updateMutation.isPending;
 
   return (
-    <div className="space-y-6 w-[calc(100 - 100px)]">
+    <div className="space-y-2 w-[calc(100 - 100px)]">
       {/* Header with Action Buttons */}
-      <div className="flex items-center justify-between sticky top-0 z-10 bg-background pb-4 border-b">
+      <div className="flex items-center justify-between sticky top-0 z-10 bg-background pb-0 border-b">
         <div>
           <h2 className="text-2xl font-bold">
-            {algorithm ? "Edit Algorithm" : "Create New Algorithm"} - {algorithm?.name}
+              <div className="mb-1">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/admin/algorithms')}
+            className="gap-2 pl-0 hover:pl-2 transition-all"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Algorithms
+          </Button>
+          {algorithm ? "Edit Algorithm" : "Create New Algorithm"} - {algorithm?.name}
+      </div> 
           </h2>
-          <p className="text-sm text-muted-foreground">
-            Fill in the details below
-          </p>
+        
         </div>
       </div>
 

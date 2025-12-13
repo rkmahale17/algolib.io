@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, X, Text, AlertTriangle } from "lucide-react";
+import { Plus, Trash2, X, Text, AlertTriangle, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -240,6 +240,40 @@ export function CodeImplementationEditor({
     );
   };
 
+  const moveApproach = (index: number, direction: 'left' | 'right') => {
+    if (!currentImpl) return;
+    
+    const newIndex = direction === 'left' ? index - 1 : index + 1;
+    
+    // Boundary checks
+    if (newIndex < 0 || newIndex >= currentImpl.code.length) return;
+
+    // Get the codeType we are moving
+    const movingCodeType = currentImpl.code[index].codeType;
+    const swapTargetCodeType = currentImpl.code[newIndex].codeType;
+
+    // We need to reorder this key in ALL implementations to keep them in sync
+    const updatedImpls = implementations.map(impl => {
+        const newCode = [...impl.code];
+        
+        // Find indices in this specific implementation (should match, but safe to find)
+        const idx1 = newCode.findIndex(c => c.codeType === movingCodeType);
+        const idx2 = newCode.findIndex(c => c.codeType === swapTargetCodeType);
+        
+        if (idx1 !== -1 && idx2 !== -1) {
+            // Swap
+            [newCode[idx1], newCode[idx2]] = [newCode[idx2], newCode[idx1]];
+        }
+        
+        return {
+            ...impl,
+            code: newCode
+        };
+    });
+
+    onChange(updatedImpls);
+  };
+
   const availableLanguages = LANGUAGES.filter(
     (lang) => !implementations.find((impl) => impl.lang === lang.id)
   );
@@ -270,89 +304,74 @@ export function CodeImplementationEditor({
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Language Management */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>Languages</span>
-            {availableLanguages.length > 0 && (
-              <div className="flex gap-2">
-                {availableLanguages.map((lang) => (
-                  <Button
-                    key={lang.id}
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => addLanguage(lang.id)}
-                    className="gap-2"
-                  >
-                    <Plus className="h-3 w-3" />
-                    {lang.label}
-                  </Button>
-                ))}
-              </div>
-            )}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-2 flex-wrap">
-            {implementations.map((impl) => {
-              const lang = LANGUAGES.find((l) => l.id === impl.lang);
-              return (
-                <Badge
-                  key={impl.lang}
-                  variant={activeLanguage === impl.lang ? "default" : "outline"}
-                  className="cursor-pointer px-3 py-1.5 gap-2"
-                  onClick={() => setActiveLanguage(impl.lang)}
-                >
-                  {lang?.label || impl.lang}
-                  {implementations.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        confirmRemoveLanguage(impl.lang);
-                      }}
-                      className="ml-1 hover:text-destructive"
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </button>
-                  )}
-                </Badge>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Code Editor */}
-      {currentImpl && (
-        <Card>
-          <CardHeader className="pb-3">
-             <div className="flex items-center justify-between mb-4">
+      {/* Combined Editor Card */}
+      <Card className="border-2">
+        <CardHeader className="pb-3 space-y-4">
+            {/* Approach Selection Row (Top) */}
+            {currentImpl && (
+             <div className="flex items-center justify-between border-b pb-4">
                 <div className="flex items-center gap-2 overflow-x-auto max-w-[80%] pb-2">
-                    {currentImpl.code.map((block) => (
+                    {currentImpl.code.map((block, index) => (
                         <div 
                            key={block.codeType}
                            onClick={() => setActiveCodeType(block.codeType)}
                            className={`
-                             px-4 py-2 rounded-lg text-sm font-medium cursor-pointer flex items-center gap-2 transition-colors whitespace-nowrap
+                             pl-3 pr-2 py-1.5 rounded-lg text-sm font-medium cursor-pointer flex items-center gap-1 transition-colors whitespace-nowrap border
                              ${activeCodeType === block.codeType 
-                                ? 'bg-primary text-primary-foreground' 
-                                : 'bg-muted hover:bg-muted/80 text-muted-foreground'}
+                                ? 'bg-primary text-primary-foreground border-primary' 
+                                : 'bg-background hover:bg-muted text-foreground border-border'}
                            `}
                         >
-                            <span className="capitalize">{block.codeType.replace(/-/g, ' ')}</span>
-                            {/* Only show delete if there's more than one approach OR if user wants to delete the last one (but usually we keep at least one, though request implies arbitrary) */}
-                            {currentImpl.code.length > 0 && (
-                                <X 
-                                    className={`w-3 h-3 hover:text-destructive ${activeCodeType === block.codeType ? 'text-primary-foreground/70' : ''}`}
+                            {/* Reorder Buttons */}
+                            <div className="flex flex-col -ml-1 mr-1">
+                                <button
+                                    type="button"
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        confirmRemoveApproach(block.codeType);
+                                        moveApproach(index, 'left');
                                     }}
-                                />
-                            )}
+                                    disabled={index === 0}
+                                    className={`
+                                        p-0.5 hover:bg-white/20 rounded 
+                                        ${index === 0 ? 'opacity-30 cursor-not-allowed' : 'opacity-70 hover:opacity-100'}
+                                    `}
+                                >
+                                    <ChevronLeft className="w-3 h-3" />
+                                </button>
+                            </div>
+
+                            <span className="capitalize select-none">{block.codeType.replace(/-/g, ' ')}</span>
+                            
+                            <div className="flex items-center gap-1 ml-1">
+                                 {/* Only show delete if there's more than one approach OR if user wants to delete the last one */}
+                                {currentImpl.code.length > 0 && (
+                                    <button
+                                        type="button"
+                                        className={`p-1 hover:bg-white/20 rounded transition-colors ${activeCodeType === block.codeType ? 'text-primary-foreground/80 hover:text-primary-foreground' : 'text-muted-foreground hover:text-destructive'}`}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            confirmRemoveApproach(block.codeType);
+                                        }}
+                                    >
+                                        <X className="w-3 h-3" />
+                                    </button>
+                                )}
+                                
+                                <button
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        moveApproach(index, 'right');
+                                    }}
+                                    disabled={index === currentImpl.code.length - 1}
+                                    className={`
+                                        p-0.5 hover:bg-white/20 rounded 
+                                        ${index === currentImpl.code.length - 1 ? 'opacity-30 cursor-not-allowed' : 'opacity-70 hover:opacity-100'}
+                                    `}
+                                >
+                                    <ChevronRight className="w-3 h-3" />
+                                </button>
+                            </div>
                         </div>
                     ))}
                     
@@ -388,22 +407,65 @@ export function CodeImplementationEditor({
                     </Dialog>
                 </div>
              </div>
-          </CardHeader>
+             )}
+
+            {/* Language Selection Row (Below) */}
+            <div className="flex items-center justify-between pt-2">
+                <div className="flex items-center gap-4">
+                    <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Languages</span>
+                    <div className="flex gap-2 flex-wrap">
+                        {implementations.map((impl) => {
+                        const lang = LANGUAGES.find((l) => l.id === impl.lang);
+                        return (
+                            <Badge
+                            key={impl.lang}
+                            variant={activeLanguage === impl.lang ? "default" : "outline"}
+                            className="cursor-pointer px-3 py-1.5 gap-2 text-sm"
+                            onClick={() => setActiveLanguage(impl.lang)}
+                            >
+                            {lang?.label || impl.lang}
+                            {implementations.length > 1 && (
+                                <button
+                                type="button"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    confirmRemoveLanguage(impl.lang);
+                                }}
+                                className="ml-1 hover:text-destructive"
+                                >
+                                <Trash2 className="h-3 w-3" />
+                                </button>
+                            )}
+                            </Badge>
+                        );
+                        })}
+                        
+                        {/* Add Language Dropdown/Buttons */}
+                        {availableLanguages.length > 0 && (
+                             <div className="flex gap-2 ml-2 border-l pl-4">
+                                {availableLanguages.map((lang) => (
+                                    <Button
+                                        key={lang.id}
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => addLanguage(lang.id)}
+                                        className="gap-1 h-7 text-xs"
+                                    >
+                                        <Plus className="h-3 w-3" />
+                                        {lang.label}
+                                    </Button>
+                                ))}
+                             </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </CardHeader>
+
+        {currentImpl && (
           <CardContent className="space-y-6">
             
-            {/* Explanation Before */}
-            <div className="space-y-2">
-                <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-                    <Text className="w-3 h-3" /> Explanation Before Code (Shared across languages)
-                </Label>
-                <Textarea 
-                    placeholder="Context or theory to show before the code block..."
-                    className="min-h-[80px] font-sans"
-                    value={currentCode?.explanationBefore || ""}
-                    onChange={(e) => updateGlobalCodeField('explanationBefore', e.target.value)}
-                />
-            </div>
-
             {/* Code Editor */}
             <div className="space-y-2">
                 <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
@@ -428,6 +490,19 @@ export function CodeImplementationEditor({
                 </div>
             </div>
 
+            {/* Explanation Before */}
+            <div className="space-y-2">
+                <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                    <Text className="w-3 h-3" /> Explanation Before Code (Shared across languages)
+                </Label>
+                <Textarea 
+                    placeholder="Context or theory to show before the code block..."
+                    className="min-h-[80px] font-sans"
+                    value={currentCode?.explanationBefore || ""}
+                    onChange={(e) => updateGlobalCodeField('explanationBefore', e.target.value)}
+                />
+            </div>
+
             {/* Explanation After */}
             <div className="space-y-2">
                 <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
@@ -442,11 +517,9 @@ export function CodeImplementationEditor({
             </div>
 
           </CardContent>
-        </Card>
-      )}
+        )}
 
       {implementations.length === 0 && (
-        <Card>
           <CardContent className="py-12 text-center">
             <p className="text-muted-foreground mb-4">No languages added yet</p>
             <div className="flex gap-2 justify-center flex-wrap">
@@ -464,8 +537,8 @@ export function CodeImplementationEditor({
               ))}
             </div>
           </CardContent>
-        </Card>
       )}
+      </Card>
     </div>
   );
 }
