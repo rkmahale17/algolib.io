@@ -57,12 +57,29 @@ export const useAlgorithmInteractions = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [userAlgoData, selectedLanguage]);
 
-    // Handle language switch
+    // Handle language switch or algorithm change
     useEffect(() => {
+        // When algorithmId changes, we want to reset state first
+        // But codeCache might be from previous algo if userAlgoData hasn't updated yet?
+        // Actually, userAlgoData updates when algorithmId changes (via key in parent or refetch)
+        // Check effect above (line 42) - it depends on userAlgoData.
+
+        // This effect ensures that if we switch language, we load from cache.
+        // It also needs to handle the case where we just switched algorithm.
         const codeForLanguage = codeCache[selectedLanguage] || '';
         setSavedCode(codeForLanguage);
+
+        // IMPORTANT: We must NOT reset isUserModified to false blindly if we just typed,
+        // BUT if we switched algorithm, we start fresh.
+        // The safest way is to rely on userAlgoData effect to setInitial state.
+    }, [selectedLanguage]); // Keeping this simple for language switch
+
+    // Reset local state when algorithmId changes
+    useEffect(() => {
+        setSavedCode("");
+        setCodeCache({});
         setIsUserModified(false);
-    }, [selectedLanguage]);
+    }, [algorithmId]);
 
     // Auto-save Effect
     useEffect(() => {
