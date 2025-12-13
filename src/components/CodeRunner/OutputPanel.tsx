@@ -44,6 +44,7 @@ interface OutputPanelProps {
   onTestCaseTabChange?: (val: string) => void;
   onToggleExpand?: () => void;
   isExpanded?: boolean;
+  submitting?: boolean;
 }
 
 export const OutputPanel = ({
@@ -71,7 +72,8 @@ export const OutputPanel = ({
   activeTestCaseTab: controlledActiveTestCaseTab, 
   onTestCaseTabChange,
   onToggleExpand,
-  isExpanded
+  isExpanded,
+  submitting = false
 }: OutputPanelProps) => {
   const [internalActiveTestCaseTab, setInternalActiveTestCaseTab] = useState<string>("");
   const activeTestCaseTab = controlledActiveTestCaseTab ?? internalActiveTestCaseTab;
@@ -80,7 +82,23 @@ export const OutputPanel = ({
   const containerRef = React.useRef<HTMLDivElement>(null);
   const [panelWidth, setPanelWidth] = useState(300);
 
-  // ... (keep useEffects)
+  // Ensure first test case is active by default
+  React.useEffect(() => {
+    if (!activeTestCaseTab && allTestCases.length > 0) {
+      const firstCase = allTestCases.find(tc => !tc.isSubmission);
+      if (firstCase) {
+        setActiveTestCaseTab(`case-${firstCase.id}`);
+      }
+    }
+  }, [allTestCases, activeTestCaseTab, setActiveTestCaseTab]);
+
+  // Ensure first result is active when output changes
+  const [activeResultTab, setActiveResultTab] = useState("result-0");
+  React.useEffect(() => {
+    if (output && output.testResults && output.testResults.length > 0) {
+       setActiveResultTab("result-0");
+    }
+  }, [output]);
 
   // Determine status color
   const getStatusColor = (statusId?: number, testResults?: any[]) => {
@@ -283,8 +301,8 @@ export const OutputPanel = ({
 
                 {/* Test Results */}
                 {output.testResults && (
-                       <div className="h-full flex flex-col min-h-0">
-                  <Tabs defaultValue="result-0" className="flex-1 flex flex-col min-h-0">
+                   <div className="h-full flex flex-col min-h-0">
+                  <Tabs value={activeResultTab} onValueChange={setActiveResultTab} className="flex-1 flex flex-col min-h-0">
                     <div className="flex border-b bg-background/50 shrink-0 sticky top-0 z-10 overflow-x-auto overflow-y-hidden">
                       <div className="flex-1 overflow-x-auto scrollbar-thin mask-image-linear-gradient-to-r px-4 pb-1">
                         <TabsList className="h-9 bg-transparent p-0 gap-2 flex-nowrap w-max justify-start mb-1">
@@ -471,13 +489,13 @@ export const OutputPanel = ({
         )}
         
         {/* Empty State / Loading for Result Tab */}
-        {activeTab === "result" && !output && !loading && (
+        {activeTab === "result" && !output && !loading && !submitting && (
           <div className="h-full flex flex-col items-center justify-center text-muted-foreground">
             <div className="text-sm">Run the code to see results</div>
           </div>
         )}
         
-        {loading && (
+        {(loading || submitting) && (
           <div className="absolute inset-0 bg-background/50 backdrop-blur-sm flex flex-col items-center justify-center z-10">
             <div className="relative">
               <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
@@ -486,7 +504,7 @@ export const OutputPanel = ({
               </div>
             </div>
             <div className="mt-4 text-sm font-medium text-muted-foreground animate-pulse">
-              Running Code...
+              {submitting ? "Submitting Solution..." : "Running Code..."}
             </div>
           </div>
         )}

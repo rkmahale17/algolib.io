@@ -204,7 +204,7 @@ export function AlgorithmForm({
   const isLoading = createMutation.isPending || updateMutation.isPending;
 
   return (
-    <div className="bg-background border rounded-lg p-6 shadow-sm">
+    <div className="bg-background border rounded-lg shadow-sm w-[100vw]">
       <div className="mb-6">
         <h2 className="text-2xl font-bold tracking-tight">
           {algorithm ? "Edit Algorithm" : "Create New Algorithm"}

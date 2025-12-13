@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
 import {
+  Book,
+  Code,
   Code2,
   Lightbulb,
   PanelRightClose,
+  TestTube2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -30,6 +33,8 @@ interface CodeWorkspacePanelProps {
   submissions: Submission[];
   className?: string;
   isInterviewMode?: boolean;
+  codeRunnerRef?: React.RefObject<any>;
+  onRunnerStateChange?: (state: any) => void;
 }
 
 export const CodeWorkspacePanel = React.memo(({
@@ -47,6 +52,8 @@ export const CodeWorkspacePanel = React.memo(({
   submissions,
   className,
   isInterviewMode,
+  codeRunnerRef,
+  onRunnerStateChange
 }: CodeWorkspacePanelProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isCompact, setIsCompact] = useState(false);
@@ -94,14 +101,14 @@ export const CodeWorkspacePanel = React.memo(({
                       <Tooltip>
                         <TooltipTrigger asChild>
                            <div className="flex items-center justify-center w-full h-full">
-                             <Code2 className="w-4 h-4" />
+                             <Code className="w-4 h-4" />
                            </div>
                         </TooltipTrigger>
                         <TooltipContent>Code</TooltipContent>
                       </Tooltip>
                     ) : (
                       <>
-                        <Code2 className="w-4 h-4 mr-2" />
+                        <Code className="w-4 h-4 mr-2 shrink-0" />
                         Code
                       </>
                     )}
@@ -115,15 +122,15 @@ export const CodeWorkspacePanel = React.memo(({
                       <Tooltip>
                         <TooltipTrigger asChild>
                            <div className="flex items-center justify-center w-full h-full">
-                            <Lightbulb className="w-4 h-4" />
+                            <Book className="w-4 h-4" />
                            </div>
                         </TooltipTrigger>
-                        <TooltipContent>Brainstorm</TooltipContent>
+                        <TooltipContent>Scratchpad</TooltipContent>
                       </Tooltip>
                     ) : (
                       <>
-                        <Lightbulb className="w-4 h-4 mr-2" />
-                        Brainstorm
+                        <Book className="w-4 h-4 mr-2 shrink-0" />
+                        Scratchpad
                       </>
                     )}
                   </TabsTrigger>
@@ -157,6 +164,9 @@ export const CodeWorkspacePanel = React.memo(({
                        controls={algorithm.controls?.code_runner} 
                        submissions={submissions}
                        isInterviewMode={isInterviewMode}
+                       ref={codeRunnerRef}
+                       onStateChange={onRunnerStateChange}
+                       isMobile={isMobile}
                      />
                    )}
                  </AuthGuard>

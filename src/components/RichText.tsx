@@ -3,7 +3,7 @@ import parse, { DOMNode, Element, domToReact, HTMLReactParserOptions } from 'htm
 import { AlgoLink } from './AlgoLink';
 
 interface RichTextProps {
-  content: string;
+  content: string | string[];
   className?: string;
   onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
@@ -13,7 +13,14 @@ interface RichTextProps {
  * Supports images, formatting, and custom components like <AlgoLink>
  */
 export const RichText: React.FC<RichTextProps> = ({ content, className = '', onClick }) => {
-  
+  // Handle case where content might be an array (legacy data support)
+  const safeContent = useMemo(() => {
+    if (Array.isArray(content)) {
+      return content.join(''); // Join array elements if content is array
+    }
+    return content || ''; // Fallback to empty string if undefined/null
+  }, [content]);
+
   const options: HTMLReactParserOptions = useMemo(() => ({
     replace: (domNode) => {
       // Check if it's an element
@@ -36,7 +43,7 @@ export const RichText: React.FC<RichTextProps> = ({ content, className = '', onC
   }), []);
 
   // Parse only when content changes
-  const parsedContent = useMemo(() => parse(content, options), [content, options]);
+  const parsedContent = useMemo(() => parse(safeContent, options), [safeContent, options]);
 
   return (
     <div

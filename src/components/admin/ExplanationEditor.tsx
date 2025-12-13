@@ -8,8 +8,8 @@ interface ExplanationData {
   problemStatement: string;
   useCase: string;
   note: string;
-  steps: string[];
-  tips: string[];
+  steps: string | string[];
+  tips: string | string[];
   constraints: string[];
   io: Array<{
     input: string;
@@ -82,12 +82,11 @@ export function ExplanationEditor({ data, onChange }: ExplanationEditorProps) {
           <CardTitle>Algorithm Steps</CardTitle>
         </CardHeader>
         <CardContent>
-          <ArrayEditor
-            label="Steps"
-            items={data.steps}
-            onChange={(steps) => updateField("steps", steps)}
-            placeholder="Enter a step..."
-            description="Break down the algorithm into clear, sequential steps"
+          <Textarea
+             value={Array.isArray(data.steps) ? data.steps.join('\n') : data.steps}
+             onChange={(e) => updateField("steps", e.target.value)}
+             placeholder="Enter steps (HTML supported)..."
+             rows={5}
           />
         </CardContent>
       </Card>
@@ -98,12 +97,11 @@ export function ExplanationEditor({ data, onChange }: ExplanationEditorProps) {
           <CardTitle>Tips & Insights</CardTitle>
         </CardHeader>
         <CardContent>
-          <ArrayEditor
-            label="Tips"
-            items={data.tips}
-            onChange={(tips) => updateField("tips", tips)}
-            placeholder="Add a tip..."
-            description="Helpful tips, complexity notes, or key insights"
+          <Textarea
+            value={Array.isArray(data.tips) ? data.tips.join('\n') : data.tips}
+            onChange={(e) => updateField("tips", e.target.value)}
+            placeholder="Add tips (HTML supported)..."
+            rows={5}
           />
         </CardContent>
       </Card>

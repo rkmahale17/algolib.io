@@ -86,6 +86,8 @@ interface CodeBlock {
   explanationBefore?: string;
   explanationAfter?: string;
   isVisible?: boolean;
+  showExplanationBefore?: boolean;
+  showExplanationAfter?: boolean;
 }
 
 interface CodeImplementation {
@@ -182,8 +184,19 @@ const VisibilityMatrix = ({
   });
   const approaches = Array.from(codeTypes);
 
-  // 2. toggle visibility
-  const toggleVisibility = (lang: string, codeType: string, currentVal: boolean) => {
+  // Toggle field globally for an approach (for all languages)
+  const toggleGlobalField = (codeType: string, field: 'showExplanationBefore' | 'showExplanationAfter', currentVal: boolean) => {
+    const newImpls = implementations.map(impl => ({
+      ...impl,
+      code: impl.code.map(c => 
+        c.codeType === codeType ? { ...c, [field]: !currentVal } : c
+      )
+    }));
+    onUpdate(newImpls);
+  };
+
+  // Toggle field for specific language (for code visibility)
+  const toggleLocalField = (lang: string, codeType: string, currentVal: boolean) => {
       const newImpls = implementations.map(impl => {
           if (impl.lang !== lang) return impl;
           return {
@@ -200,51 +213,86 @@ const VisibilityMatrix = ({
   // Derive languages dynamically from implementations
   const uniqueLangs = new Set<string>();
   implementations.forEach(impl => uniqueLangs.add(impl.lang));
-  // Sort to keep consistent order, prioritizing common ones if desired, or just alphabetical
   const LANGUAGES = Array.from(uniqueLangs).sort();
 
   return (
     <div className="mt-4 border rounded-md p-3 bg-muted/20">
       <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
-         Granular Visibility 
-         <span className="text-xs font-normal text-muted-foreground">(Hide specific approaches per language)</span>
+         Approach Visibility Control
+         <span className="text-xs font-normal text-muted-foreground">(Explanations are shared, Code is per-language)</span>
       </h4>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-sm border-collapse">
            <thead>
-              <tr className="border-b">
-                 <th className="text-left font-medium p-2">Approach</th>
+              <tr className="border-b bg-muted/30">
+                 <th className="text-left font-medium p-2 min-w-[150px] border-r">Approach</th>
+                 <th className="text-center font-medium p-2 min-w-[80px] w-[80px]">Pre-Exp</th>
+                 <th className="text-center font-medium p-2 min-w-[80px] w-[80px] border-r">Post-Exp</th>
                  {LANGUAGES.map(lang => (
-                     <th key={lang} className="text-center font-medium p-2 capitalize">{lang}</th>
+                     <th key={lang} className="text-center font-medium p-2 capitalize min-w-[80px]">{lang}</th>
                  ))}
               </tr>
            </thead>
            <tbody>
-              {approaches.map(approach => (
-                  <tr key={approach} className="border-b last:border-0 hover:bg-muted/30">
-                      <td className="p-2 font-medium capitalize">{approach.replace(/-/g, ' ')}</td>
-                      {LANGUAGES.map(lang => {
-                          const impl = implementations.find(i => i.lang === lang);
-                          const block = impl?.code.find(c => c.codeType === approach);
-                          
-                          if (!impl || !block) {
-                              return <td key={lang} className="p-2 text-center text-muted-foreground/30">-</td>;
-                          }
+              {approaches.map(approach => {
+                  // Get first instance to check global status (since we sync them)
+                  const firstImpl = implementations.find(i => i.code.some(c => c.codeType === approach));
+                  const firstBlock = firstImpl?.code.find(c => c.codeType === approach);
+                  
+                  const isPreVisible = firstBlock?.showExplanationBefore !== false;
+                  const isPostVisible = firstBlock?.showExplanationAfter !== false;
 
-                          const isVisible = block.isVisible !== false; // Default to true
+                  return (
+                    <tr key={approach} className="border-b last:border-0 hover:bg-muted/30">
+                        <td className="p-2 font-medium capitalize border-r">
+                            {approach.replace(/-/g, ' ')}
+                        </td>
+                        
+                        {/* GLOBAL: Pre-Explanation */}
+                        <td className="p-2 text-center">
+                             <Switch 
+                                checked={isPreVisible}
+                                onCheckedChange={() => toggleGlobalField(approach, 'showExplanationBefore', isPreVisible)}
+                                className="scale-75 data-[state=checked]:bg-blue-600"
+                                title="Toggle All Pre-Explanations"
+                            />
+                        </td>
 
-                          return (
-                              <td key={lang} className="p-2 text-center">
-                                  <Switch 
-                                      checked={isVisible}
-                                      onCheckedChange={() => toggleVisibility(lang, approach, isVisible)}
-                                      className="scale-75 data-[state=checked]:bg-green-600"
-                                  />
-                              </td>
-                          );
-                      })}
-                  </tr>
-              ))}
+                        {/* GLOBAL: Post-Explanation */}
+                        <td className="p-2 text-center border-r">
+                             <Switch 
+                                checked={isPostVisible}
+                                onCheckedChange={() => toggleGlobalField(approach, 'showExplanationAfter', isPostVisible)}
+                                className="scale-75 data-[state=checked]:bg-purple-600"
+                                title="Toggle All Post-Explanations"
+                            />
+                        </td>
+
+                        {/* LOCAL: Code Visibility per Language */}
+                        {LANGUAGES.map(lang => {
+                            const impl = implementations.find(i => i.lang === lang);
+                            const block = impl?.code.find(c => c.codeType === approach);
+                            
+                            if (!impl || !block) {
+                                return <td key={lang} className="p-2 text-center text-muted-foreground/30">-</td>;
+                            }
+
+                            const isCodeVisible = block.isVisible !== false;
+
+                            return (
+                                <td key={lang} className="p-2 text-center">
+                                    <Switch 
+                                        checked={isCodeVisible}
+                                        onCheckedChange={() => toggleLocalField(lang, approach, isCodeVisible)}
+                                        className="scale-75 data-[state=checked]:bg-green-600"
+                                        title={`Toggle ${lang} Code`}
+                                    />
+                                </td>
+                            );
+                        })}
+                    </tr>
+                  );
+              })}
            </tbody>
         </table>
       </div>

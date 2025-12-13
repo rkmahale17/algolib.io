@@ -9,10 +9,11 @@ import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Play, RotateCcw, Loader2, Maximize2, Minimize2, Settings, AlignLeft, Info, Send, Copy, X, Clock } from "lucide-react";
+import { Play, RotateCcw, Loader2, Maximize2, Minimize2, Settings, AlignLeft, Info, Send, Copy, X, Clock, Terminal } from "lucide-react";
 import { FeatureGuard } from "@/components/FeatureGuard";
 import { toast } from "sonner";
 import axios from 'axios';
+import { ImperativePanelGroupHandle } from "react-resizable-panels";
 import {
   Popover,
   PopoverContent,
@@ -63,6 +64,14 @@ interface CodeRunnerProps {
   };
   submissions?: Submission[];
   isInterviewMode?: boolean;
+  // New props for remote control
+  onStateChange?: (state: { isLoading: boolean; isSubmitting: boolean; lastRunSuccess: boolean }) => void;
+  isMobile?: boolean;
+}
+
+export interface CodeRunnerRef {
+  run: () => void;
+  submit: () => void;
 }
 
 interface EditorSettings {
@@ -115,7 +124,7 @@ const parseErrorLines = (output: string, lang: string): Array<{ line: number; co
   return errors;
 };
 
-export const CodeRunner: React.FC<CodeRunnerProps> = ({ 
+export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({ 
   algorithmId, 
   algorithmData,
   onToggleFullscreen, 
@@ -128,8 +137,10 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   onSuccess,
   controls,
   submissions: initialSubmissions = [],
-  isInterviewMode
-}) => {
+  isInterviewMode,
+  onStateChange,
+  isMobile
+}, ref) => {
   const isLimitExceeded = useFeatureFlag("todays_limit_exceed");
   const [internalLanguage, setInternalLanguage] = useState<Language>('typescript');
   const language = controlledLanguage || internalLanguage;
@@ -164,6 +175,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   const [settings, setSettings] = useState<EditorSettings>(DEFAULT_SETTINGS);
 
   const editorRef = useRef<CodeEditorRef>(null);
+  const panelGroupRef = useRef<ImperativePanelGroupHandle>(null);
   const [isOutputExpanded, setIsOutputExpanded] = useState(false);
   const [activeTestCaseTab, setActiveTestCaseTab] = useState<string>("");
 
@@ -384,6 +396,21 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
 
   const algorithmMeta = activeAlgorithm;
 
+  // Expose Run and Submit methods
+  React.useImperativeHandle(ref, () => ({
+    run: () => handleRun(),
+    submit: () => handleSubmit()
+  }));
+
+  // Report state changes to parent
+  useEffect(() => {
+    onStateChange?.({
+      isLoading,
+      isSubmitting,
+      lastRunSuccess
+    });
+  }, [isLoading, isSubmitting, lastRunSuccess, onStateChange]);
+
   const handleAddTestCase = () => {
     const defaultInput = activeAlgorithm?.input_schema?.map((field: any) => {
       switch (field.type) {
@@ -603,11 +630,21 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   };
 
   const handleRun = () => {
+    if (isMobile) {
+      setIsOutputExpanded(true);
+    } else {
+      panelGroupRef.current?.setLayout([50, 50]);
+    }
     executeCode(false);
   };
 
   const handleSubmit = async () => {
     if (!algorithmId) return;
+    
+    // Auto-resize panel on desktop
+    if (!isMobile) {
+      panelGroupRef.current?.setLayout([50, 50]);
+    }
 
     const { result, allPassed, execTime } = await executeCode(true);
 
@@ -713,438 +750,461 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
     return () => window.removeEventListener('keydown', handleShortcuts);
   }, [isLoading, isSubmitting, lastRunSuccess, controls, handleRun, handleSubmit]);
 
+  /* Refactored Layout Components to support Mobile/Desktop switch */
+  const editorTabs = (
+    <Tabs 
+      value={activeEditorTab} 
+      onValueChange={(v) => setActiveEditorTab(v as any)} 
+      className="h-full flex flex-col"
+    >
+      {/* Only show tab list if we have a submission to view */}
+      {viewingSubmission && (
+        <div className="flex items-center px-1 bg-muted/20 border-b">
+          <TabsList className="bg-transparent h-9 p-0 gap-1 w-full justify-start">
+            <TabsTrigger 
+              value="current"
+              className="data-[state=active]:bg-background data-[state=active]:shadow-none rounded-t-md rounded-b-none border-b-2 border-transparent data-[state=active]:border-primary h-9 px-4 rounded-none"
+            >
+              Current Code
+            </TabsTrigger>
+            <TabsTrigger 
+              value="submission"
+              className="data-[state=active]:bg-background data-[state=active]:shadow-none rounded-t-md rounded-b-none border-b-2 border-transparent data-[state=active]:border-primary h-9 px-4 gap-3 rounded-none group items-center"
+            >
+              <div className="flex items-center gap-2 text-xs">
+                 <span className={`font-semibold ${viewingSubmission?.status === 'passed' ? 'text-green-600' : 'text-destructive'}`}>
+                   {viewingSubmission?.status === 'passed' ? 'Accepted' : (viewingSubmission?.status === 'error' ? 'Runtime Error' : 'Wrong Answer')}
+                 </span>
+                 <span className="text-muted-foreground">|</span>
+                 <span className="uppercase font-medium text-foreground">{viewingSubmission?.language}</span>
+                  {/* Time & Memory if available */}
+                 {viewingSubmission?.test_results?.execution_time_ms && (
+                    <>
+                      <span className="text-muted-foreground">|</span>
+                      <div className="flex items-center gap-1 text-muted-foreground">
+                         <Clock className="w-3 h-3" />
+                         {viewingSubmission.test_results.execution_time_ms}ms
+                      </div>
+                    </>
+                 )}
+              </div>
+              
+              <div 
+                 role="button"
+                 className="opacity-60 group-hover:opacity-100 hover:bg-muted rounded-full p-0.5 ml-2"
+                 onClick={handleCloseSubmission}
+              >
+                 <X className="w-3 h-3" />
+              </div>
+            </TabsTrigger>
+          </TabsList>
+        </div>
+      )}
+
+      <TabsContent value="current" className="flex-1 flex flex-col min-h-0 m-0 data-[state=inactive]:hidden h-full">
+       <div className={`h-full flex flex-col ${viewingSubmission ? '' : 'border-t-0'}`}>
+       <div className="flex items-center justify-between px-3 pl-9  border-b bg-muted/30 h-10 shrink-0 gap-2">
+         {/* Left Group: Language Selector */}
+         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar mask-linear-fade shrink-0">
+           <LanguageSelector
+             language={language}
+             onLanguageChange={handleLanguageChange}
+             disabled={isLoading || isSubmitting}
+             availableLanguages={availableLanguages}
+           />
+         </div>
+
+         {/* Middle Spacer */}
+         <div className="flex-1" />
+
+         {/* Right Group: Actions (Reset, Format, Settings) */}
+         <div className="flex items-center gap-1 shrink-0">
+           <Tooltip>
+             <TooltipTrigger asChild>
+              <Button
+                 variant="ghost"
+                 size="icon"
+                 className="h-7 w-7"
+                 onClick={handleReset}
+                 disabled={isLoading || isSubmitting}
+               >
+                 <RotateCcw className="w-3.5 h-3.5" />
+               </Button>
+             </TooltipTrigger>
+             <TooltipContent side="top">Reset to starter code</TooltipContent>
+           </Tooltip>
+
+           <Tooltip>
+             <TooltipTrigger asChild>
+               <Button
+                 variant="ghost"
+                 size="icon"
+                 className="h-7 w-7"
+                 onClick={handleFormatCode}
+               >
+                 <AlignLeft className="w-3.5 h-3.5" />
+               </Button>
+             </TooltipTrigger>
+             <TooltipContent side="top">Format code</TooltipContent>
+           </Tooltip>
+
+           <Popover>
+             <Tooltip>
+               <TooltipTrigger asChild>
+                 <PopoverTrigger asChild>
+                   <Button
+                     variant="ghost"
+                     size="icon"
+                     className="h-7 w-7"
+                   >
+                     <Settings className="w-3.5 h-3.5" />
+                   </Button>
+                 </PopoverTrigger>
+               </TooltipTrigger>
+               <TooltipContent side="top">Settings</TooltipContent>
+             </Tooltip>
+             <PopoverContent className="w-80" align="end">
+               <div className="grid gap-4">
+                 <div className="space-y-2">
+                   <h4 className="font-medium leading-none">Editor Settings</h4>
+                   <p className="text-sm text-muted-foreground">
+                     Customize your coding experience.
+                   </p>
+                 </div>
+                 <div className="grid gap-4">
+                   <div className="grid grid-cols-3 items-center gap-4">
+                     <Label htmlFor="theme">Theme</Label>
+                     <Select 
+                       value={settings.theme === 'system' ? 'light' : settings.theme} 
+                       onValueChange={(val: any) => updateSetting('theme', val)}
+                     >
+                       <SelectTrigger className="w-full col-span-2 h-8">
+                         <SelectValue placeholder="Theme" />
+                       </SelectTrigger>
+                       <SelectContent>
+                         <SelectItem value="light">Light</SelectItem>
+                         <SelectItem value="dark">Dark</SelectItem>
+                       </SelectContent>
+                     </Select>
+                   </div>
+                   
+                   <div className="grid grid-cols-3 items-center gap-4">
+                     <Label htmlFor="fontSize">Font Size</Label>
+                     <div className="col-span-2 flex items-center gap-2">
+                       <Slider
+                         id="fontSize"
+                         value={[settings.fontSize]}
+                         min={10}
+                         max={24}
+                         step={1}
+                         onValueChange={([val]) => updateSetting('fontSize', val)}
+                         className="w-full"
+                       />
+                       <span className="w-8 text-xs text-right">{settings.fontSize}px</span>
+                     </div>
+                   </div>
+
+                   <div className="grid grid-cols-3 items-center gap-4">
+                     <Label htmlFor="tabSize">Tab Size</Label>
+                     <Select 
+                       value={settings.tabSize.toString()} 
+                       onValueChange={(val) => updateSetting('tabSize', parseInt(val))}
+                     >
+                       <SelectTrigger className="w-full col-span-2 h-8">
+                         <SelectValue placeholder="Tab Size" />
+                       </SelectTrigger>
+                       <SelectContent>
+                         <SelectItem value="2">2 spaces</SelectItem>
+                         <SelectItem value="4">4 spaces</SelectItem>
+                       </SelectContent>
+                     </Select>
+                   </div>
+   
+                   <div className="flex items-center justify-between">
+                     <Label htmlFor="wordWrap">Word Wrap</Label>
+                     <Switch
+                       id="wordWrap"
+                       checked={settings.wordWrap === 'on'}
+                       onCheckedChange={(checked) => updateSetting('wordWrap', checked ? 'on' : 'off')}
+                     />
+                   </div>
+
+                   <div className="flex items-center justify-between">
+                     <Label htmlFor="minimap">Minimap</Label>
+                     <Switch
+                       id="minimap"
+                       checked={settings.minimap}
+                       onCheckedChange={(checked) => updateSetting('minimap', checked)}
+                     />
+                   </div>
+
+                   <div className="flex items-center justify-between">
+                     <Label htmlFor="lineNumbers">Line Numbers</Label>
+                     <Switch
+                       id="lineNumbers"
+                       checked={settings.lineNumbers === 'on'}
+                       onCheckedChange={(checked) => updateSetting('lineNumbers', checked ? 'on' : 'off')}
+                     />
+                   </div>
+
+                   <div className="flex items-center justify-between">
+                     <Label htmlFor="autocomplete">Autocomplete</Label>
+                     <Switch
+                       id="autocomplete"
+                       checked={settings.autocomplete}
+                       onCheckedChange={(checked) => updateSetting('autocomplete', checked)}
+                     />
+                   </div>
+                 </div>
+               </div>
+             </PopoverContent>
+           </Popover>
+         </div>
+
+         {/* Separator and Expand Actions */}
+         <div className="flex items-center gap-1 shrink-0 pl-2 border-l shadow-sm">
+
+           <Button
+             variant="ghost"
+             size="icon"
+             className="h-7 w-7"
+             onClick={toggleFullscreen}
+             title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+           >
+             {isFullscreen ? (
+               <Minimize2 className="w-3.5 h-3.5" />
+             ) : (
+               <Maximize2 className="w-3.5 h-3.5" />
+             )}
+           </Button>
+         </div>
+       </div>
+       <div className="flex-1 relative min-h-[300px]">
+         <LazyCodeEditor
+           ref={editorRef}
+           code={code}
+           isMobile={isMobile}
+           language={language}
+           path={`/runner/${algorithmId || 'playground'}/${language}/code.${language === 'python' ? 'py' : language === 'java' ? 'java' : language === 'cpp' ? 'cpp' : 'ts'}`}
+           onChange={(value) => {
+             const newCode = value || '';
+             setCode(newCode);
+             onCodeChange?.(newCode);
+             setLastRunSuccess(false); // Reset success on code change
+           }}
+           theme={settings.theme}
+           options={{
+             ...settings,
+             readOnly: false // Explicitly writable
+           }}
+         />
+         
+         {/* Mobile-only Floating Buttons */}
+         <div className="absolute bottom-5 right-5 z-10 md:hidden">
+           <div className="flex items-center gap-0.5 p-0.5 bg-white backdrop-blur-xl border border-gray-200 shadow-lg rounded-full">
+           <TooltipProvider>
+             <FeatureGuard flag="code_runner">
+             {controls?.run_code !== false && (
+               <Tooltip>
+                 <TooltipTrigger asChild>
+                   <Button 
+                     onClick={handleRun} 
+                     disabled={isLoading || isSubmitting}
+                     size="sm"
+                     variant="ghost"
+                     className="h-8 px-3 text-xs rounded-full bg-violet-100 text-primary hover:bg-primary hover:text-white transition-all border-0 group"
+                   >
+                     {isLoading ? (
+                       <>
+                         <Loader2 className="w-3 h-3 mr-1.5 animate-spin group-hover:text-white" />
+                         Running
+                       </>
+                     ) : (
+                       <>
+                         <Play className="w-3 h-3 mr-1 text-primary fill-primary group-hover:text-primary group-hover:fill-white" />
+                         Run
+                       </>
+                     )}
+                   </Button>
+                 </TooltipTrigger>
+                 <TooltipContent side="bottom">Run Code</TooltipContent>
+               </Tooltip>
+             )}
+             </FeatureGuard>
+
+
+
+             <FeatureGuard flag="submit_button">
+             {controls?.submit !== false && (
+               <Tooltip>
+                 <TooltipTrigger asChild>
+                   <span tabIndex={0} className="cursor-default">
+                     <Button 
+                       onClick={handleSubmit} 
+                       disabled={isLoading || isSubmitting || !lastRunSuccess}
+                       size="sm"
+                       variant="ghost"
+                       className={`h-8 px-3 text-xs rounded-full transition-all border-0 group ${
+                         lastRunSuccess 
+                           ? 'bg-green-100 text-green-700 hover:bg-green-600 hover:text-white' 
+                           : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                       } ${(!lastRunSuccess && !isLoading && !isSubmitting) ? 'opacity-50' : ''}`}
+                     >
+                       {isSubmitting ? (
+                         <>
+                         <Loader2 className="w-3 h-3 mr-1.5 animate-spin group-hover:text-white" />
+                           Submitting
+                         </>
+                       ) : (
+                         <>
+                           <Send className="w-3 h-3 mr-1 group-hover:text-primary" />
+                           Submit
+                         </>
+                       )}
+                     </Button>
+                   </span>
+                 </TooltipTrigger>
+                 <TooltipContent side="bottom">
+                   {!lastRunSuccess && !isLoading && !isSubmitting ? (
+                      <span className="text-orange-500 font-medium">Run all test cases successfully to enable submission</span>
+                   ) : (
+                      "Submit Solution"
+                   )}
+                 </TooltipContent>
+               </Tooltip>
+             )}
+              </FeatureGuard>
+            
+           </TooltipProvider>
+           </div>
+         </div>
+
+       </div>
+       </div>
+      </TabsContent>
+     
+      <TabsContent value="submission" className="flex-1 flex flex-col min-h-0 m-0 data-[state=inactive]:hidden h-full">
+        <div className="h-full flex flex-col bg-background">
+           {/* Read Only Toolbar */}
+           <div className="flex items-center justify-between p-2 border-b bg-muted/30">
+              <div className="flex items-center gap-2">
+                 <span className="text-sm font-medium px-2">
+                    {viewingSubmission?.language} Submission
+                 </span>
+                 <span className="text-xs text-muted-foreground">
+                    {viewingSubmission && new Date(viewingSubmission.timestamp).toLocaleString()}
+                 </span>
+              </div>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="h-8 gap-2"
+                onClick={handleCopySubmission}
+              >
+                <Copy className="w-3 h-3" />
+                Copy Code
+              </Button>
+           </div>
+           
+           <div className="flex-1 relative min-h-0">
+              <LazyCodeEditor
+                code={viewingSubmission?.code || ''}
+                language={viewingSubmission?.language as Language || 'typescript'}
+                path={`/runner/submission/${viewingSubmission?.id}`}
+                onChange={() => {}} // Read only
+                theme={settings.theme}
+                options={{
+                   ...settings,
+                    readOnly: true
+                }}
+                isMobile={isMobile}
+              />
+           </div>
+        </div>
+      </TabsContent>
+    </Tabs>
+  );
+
+  const outputPanelContent = (
+    <div className="h-full flex flex-col">
+       <div className="flex-1 min-h-0 overflow-hidden">
+           <OutputPanel 
+            onToggleExpand={handleToggleOutputExpand}
+            isExpanded={isOutputExpanded}
+            output={output} 
+            loading={isLoading} 
+            submitting={isSubmitting as boolean} 
+            stdin="" 
+            onStdinChange={() => {}} 
+            testCases={testCases.map(tc => ({
+              input: tc.input,
+              output: tc.expectedOutput
+            }))}
+            executionTime={executionTime}
+            algorithmMeta={algorithmMeta as any}
+            
+            // New Props for LeetCode Style UI
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            
+            // Unified Test Case Management
+            allTestCases={testCases}
+            executedTestCases={executedTestCases}
+            onAddTestCase={handleAddTestCase}
+            onUpdateTestCase={handleUpdateTestCase}
+            onDeleteTestCase={handleDeleteTestCase}
+            
+            submissions={submissions}
+            onSelectSubmission={handleSelectSubmission}
+            
+            // Editing State
+            editingTestCaseId={editingTestCaseId}
+            onEditTestCase={setEditingTestCaseId}
+            onCancelEdit={() => {
+              setEditingTestCaseId(null);
+              setPendingTestCaseId(null);
+            }}
+            
+            inputSchema={algorithmData?.input_schema}
+            controls={controls}
+            
+            // Submissions
+            activeTestCaseTab={activeTestCaseTab}
+            onTestCaseTabChange={setActiveTestCaseTab}
+          />
+       </div>
+    </div>
+  );
+
   const content = (
     <div className={`w-full bg-background shadow-sm flex flex-col ${
       isFullscreen 
         ? 'fixed inset-0 z-50 h-screen w-screen rounded-none border-0' 
-        : `border rounded-lg overflow-hidden ${className || 'h-[calc(100vh-100px)] min-h-[600px]'}`
+        : `border rounded-lg overflow-hidden ${className || 'h-[calc(100vh-100px)]'}`
     }`}>
-      <ResizablePanelGroup direction="vertical">
-        <ResizablePanel defaultSize={90} minSize={30}>
-           <Tabs 
-             value={activeEditorTab} 
-             onValueChange={(v) => setActiveEditorTab(v as any)} 
-             className="h-full flex flex-col"
-           >
-             {/* Only show tab list if we have a submission to view */}
-             {viewingSubmission && (
-               <div className="flex items-center px-1 bg-muted/20 border-b">
-                 <TabsList className="bg-transparent h-9 p-0 gap-1 w-full justify-start">
-                   <TabsTrigger 
-                     value="current"
-                     className="data-[state=active]:bg-background data-[state=active]:shadow-none rounded-t-md rounded-b-none border-b-2 border-transparent data-[state=active]:border-primary h-9 px-4 rounded-none"
-                   >
-                     Current Code
-                   </TabsTrigger>
-                   <TabsTrigger 
-                     value="submission"
-                     className="data-[state=active]:bg-background data-[state=active]:shadow-none rounded-t-md rounded-b-none border-b-2 border-transparent data-[state=active]:border-primary h-9 px-4 gap-3 rounded-none group items-center"
-                   >
-                     <div className="flex items-center gap-2 text-xs">
-                        <span className={`font-semibold ${viewingSubmission?.status === 'passed' ? 'text-green-600' : 'text-destructive'}`}>
-                          {viewingSubmission?.status === 'passed' ? 'Accepted' : (viewingSubmission?.status === 'error' ? 'Runtime Error' : 'Wrong Answer')}
-                        </span>
-                        <span className="text-muted-foreground">|</span>
-                        <span className="uppercase font-medium text-foreground">{viewingSubmission?.language}</span>
-                         {/* Time & Memory if available */}
-                        {viewingSubmission?.test_results?.execution_time_ms && (
-                           <>
-                             <span className="text-muted-foreground">|</span>
-                             <div className="flex items-center gap-1 text-muted-foreground">
-                                <Clock className="w-3 h-3" />
-                                {viewingSubmission.test_results.execution_time_ms}ms
-                             </div>
-                           </>
-                        )}
-                        {/* Memory usage typically not stored but if it were: */}
-                        {/* <div className="flex items-center gap-1 text-muted-foreground">| 12MB</div> */}
-                     </div>
-                     
-                     <div 
-                        role="button"
-                        className="opacity-60 group-hover:opacity-100 hover:bg-muted rounded-full p-0.5 ml-2"
-                        onClick={handleCloseSubmission}
-                     >
-                        <X className="w-3 h-3" />
-                     </div>
-                   </TabsTrigger>
-                 </TabsList>
-               </div>
-             )}
-
-           <TabsContent value="current" className="flex-1 flex flex-col min-h-0 m-0 data-[state=inactive]:hidden h-full">
-            <div className={`h-full flex flex-col ${viewingSubmission ? '' : 'border-t-0'}`}>
-            <div className={`h-full flex flex-col ${viewingSubmission ? '' : 'border-t-0'}`}>
-            <div className="flex items-center justify-between px-3 pl-9  border-b bg-muted/30 h-10 shrink-0 gap-2">
-              {/* Left Group: Language Selector */}
-              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar mask-linear-fade shrink-0">
-                <LanguageSelector
-                  language={language}
-                  onLanguageChange={handleLanguageChange}
-                  disabled={isLoading || isSubmitting}
-                  availableLanguages={availableLanguages}
-                />
-              </div>
-
-              {/* Middle Spacer */}
-              <div className="flex-1" />
-
-              {/* Right Group: Actions (Reset, Format, Settings) */}
-              <div className="flex items-center gap-1 shrink-0">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7"
-                      onClick={handleReset}
-                      disabled={isLoading || isSubmitting}
-                    >
-                      <RotateCcw className="w-3.5 h-3.5" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">Reset to starter code</TooltipContent>
-                </Tooltip>
-
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7"
-                      onClick={handleFormatCode}
-                    >
-                      <AlignLeft className="w-3.5 h-3.5" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">Format code</TooltipContent>
-                </Tooltip>
-
-                <Popover>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7"
-                        >
-                          <Settings className="w-3.5 h-3.5" />
-                        </Button>
-                      </PopoverTrigger>
-                    </TooltipTrigger>
-                    <TooltipContent side="top">Settings</TooltipContent>
-                  </Tooltip>
-                  <PopoverContent className="w-80" align="end">
-                    <div className="grid gap-4">
-                      <div className="space-y-2">
-                        <h4 className="font-medium leading-none">Editor Settings</h4>
-                        <p className="text-sm text-muted-foreground">
-                          Customize your coding experience.
-                        </p>
-                      </div>
-                      <div className="grid gap-4">
-                        <div className="grid grid-cols-3 items-center gap-4">
-                          <Label htmlFor="theme">Theme</Label>
-                          <Select 
-                            value={settings.theme === 'system' ? 'light' : settings.theme} 
-                            onValueChange={(val: any) => updateSetting('theme', val)}
-                          >
-                            <SelectTrigger className="w-full col-span-2 h-8">
-                              <SelectValue placeholder="Theme" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="light">Light</SelectItem>
-                              <SelectItem value="dark">Dark</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        
-                        <div className="grid grid-cols-3 items-center gap-4">
-                          <Label htmlFor="fontSize">Font Size</Label>
-                          <div className="col-span-2 flex items-center gap-2">
-                            <Slider
-                              id="fontSize"
-                              value={[settings.fontSize]}
-                              min={10}
-                              max={24}
-                              step={1}
-                              onValueChange={([val]) => updateSetting('fontSize', val)}
-                              className="w-full"
-                            />
-                            <span className="w-8 text-xs text-right">{settings.fontSize}px</span>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-3 items-center gap-4">
-                          <Label htmlFor="tabSize">Tab Size</Label>
-                          <Select 
-                            value={settings.tabSize.toString()} 
-                            onValueChange={(val) => updateSetting('tabSize', parseInt(val))}
-                          >
-                            <SelectTrigger className="w-full col-span-2 h-8">
-                              <SelectValue placeholder="Tab Size" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="2">2 spaces</SelectItem>
-                              <SelectItem value="4">4 spaces</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-        
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="wordWrap">Word Wrap</Label>
-                          <Switch
-                            id="wordWrap"
-                            checked={settings.wordWrap === 'on'}
-                            onCheckedChange={(checked) => updateSetting('wordWrap', checked ? 'on' : 'off')}
-                          />
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="minimap">Minimap</Label>
-                          <Switch
-                            id="minimap"
-                            checked={settings.minimap}
-                            onCheckedChange={(checked) => updateSetting('minimap', checked)}
-                          />
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="lineNumbers">Line Numbers</Label>
-                          <Switch
-                            id="lineNumbers"
-                            checked={settings.lineNumbers === 'on'}
-                            onCheckedChange={(checked) => updateSetting('lineNumbers', checked ? 'on' : 'off')}
-                          />
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="autocomplete">Autocomplete</Label>
-                          <Switch
-                            id="autocomplete"
-                            checked={settings.autocomplete}
-                            onCheckedChange={(checked) => updateSetting('autocomplete', checked)}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              {/* Separator and Expand Actions */}
-              <div className="flex items-center gap-1 shrink-0 pl-2 border-l shadow-sm">
-
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7"
-                  onClick={toggleFullscreen}
-                  title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
-                >
-                  {isFullscreen ? (
-                    <Minimize2 className="w-3.5 h-3.5" />
-                  ) : (
-                    <Maximize2 className="w-3.5 h-3.5" />
-                  )}
-                </Button>
-              </div>
-            </div>
-            <div className="flex-1 relative min-h-0">
-              <LazyCodeEditor
-                ref={editorRef}
-                code={code}
-                language={language}
-                path={`/runner/${algorithmId || 'playground'}/${language}/code.${language === 'python' ? 'py' : language === 'java' ? 'java' : language === 'cpp' ? 'cpp' : 'ts'}`}
-                onChange={(value) => {
-                  const newCode = value || '';
-                  setCode(newCode);
-                  onCodeChange?.(newCode);
-                  setLastRunSuccess(false); // Reset success on code change
-                }}
-                theme={settings.theme}
-                options={{
-                  ...settings,
-                  readOnly: false // Explicitly writable
-                }}
-              />
-              <div className="absolute bottom-5 right-5 z-10">
-                <div className="flex items-center gap-0.5 p-0.5 bg-white backdrop-blur-xl border border-gray-200 shadow-lg rounded-full">
-                <TooltipProvider>
-                  <FeatureGuard flag="code_runner">
-                  {controls?.run_code !== false && (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button 
-                          onClick={handleRun} 
-                          disabled={isLoading || isSubmitting}
-                          size="sm"
-                          variant="ghost"
-                          className="h-8 px-3 text-xs rounded-full bg-violet-100 text-violet-700 hover:bg-violet-200 transition-all border-0"
-                        >
-                          {isLoading ? (
-                            <>
-                              <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />
-                              Running
-                            </>
-                          ) : (
-                            <>
-                              <Play className="w-3 h-3 mr-1 text-primary fill-primary/20" />
-                              Run
-                            </>
-                          )}
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom">Run Code <kbd className="ml-2 pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100"><span className="text-xs">Ctrl</span> + '</kbd></TooltipContent>
-                    </Tooltip>
-                  )}
-                  </FeatureGuard>
-
-                  {controls?.run_code !== false && controls?.submit !== false && (
-                    <div className="w-px h-4 bg-border/50 mx-0" />
-                  )}
-
-                  <FeatureGuard flag="submit_button">
-                  {controls?.submit !== false && (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span tabIndex={0} className="cursor-default">
-                          <Button 
-                            onClick={handleSubmit} 
-                            disabled={isLoading || isSubmitting || !lastRunSuccess}
-                            size="sm"
-                            variant="ghost"
-                            className={`h-8 px-3 text-xs rounded-full transition-all border-0 ${
-                              lastRunSuccess 
-                                ? 'bg-green-100 text-green-700 hover:bg-green-200 hover:text-green-800' 
-                                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                            } ${(!lastRunSuccess && !isLoading && !isSubmitting) ? 'opacity-50' : ''}`}
-                          >
-                            {isSubmitting ? (
-                              <>
-                                <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />
-                                Submitting
-                              </>
-                            ) : (
-                              <>
-                                <Send className="w-3 h-3 mr-1" />
-                                Submit
-                              </>
-                            )}
-                          </Button>
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom">
-                        {!lastRunSuccess && !isLoading && !isSubmitting ? (
-                           <span className="text-orange-500 font-medium">Run all test cases successfully to enable submission</span>
-                        ) : (
-                           <>Submit Solution <kbd className="ml-2 pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100"><span className="text-xs">Ctrl</span> + Enter</kbd></>
-                        )}
-                      </TooltipContent>
-                    </Tooltip>
-                  )}
-                  </FeatureGuard>
-                </TooltipProvider>
-                </div>
-              </div>
-            </div>
-            </div>
-            </div>
-           </TabsContent>
+      {isMobile ? (
+        <div className="h-full flex flex-col">
+           <div className="flex-1 min-h-0 overflow-hidden">
+               {editorTabs}
+           </div>
+           {/* Mobile Output: Fixed height at bottom, non-resizable for stability */}
+           <div className="h-px bg-border shadow-sm" />
+           <div className="h-[40vh] min-h-[300px] flex flex-col">
+              {outputPanelContent}
+           </div>
+        </div>
+      ) : (
+        <ResizablePanelGroup ref={panelGroupRef} direction="vertical" className="h-full">
+          <ResizablePanel defaultSize={75} minSize={30}>
+             {editorTabs}
+          </ResizablePanel>
           
-          <TabsContent value="submission" className="flex-1 flex flex-col min-h-0 m-0 data-[state=inactive]:hidden h-full">
-            <div className="h-full flex flex-col bg-background">
-               {/* Read Only Toolbar */}
-               <div className="flex items-center justify-between p-2 border-b bg-muted/30 min-h-[50px]">
-                  <div className="flex items-center gap-2">
-                     <span className="text-sm font-medium px-2">
-                        {viewingSubmission?.language} Submission
-                     </span>
-                     <span className="text-xs text-muted-foreground">
-                        {viewingSubmission && new Date(viewingSubmission.timestamp).toLocaleString()}
-                     </span>
-                  </div>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="h-8 gap-2"
-                    onClick={handleCopySubmission}
-                  >
-                    <Copy className="w-3 h-3" />
-                    Copy Code
-                  </Button>
-               </div>
-               
-               <div className="flex-1 relative min-h-0">
-                  <LazyCodeEditor
-                    code={viewingSubmission?.code || ''}
-                    language={viewingSubmission?.language as Language || 'typescript'}
-                    path={`/runner/submission/${viewingSubmission?.id}`}
-                    onChange={() => {}} // Read only
-                    theme={settings.theme}
-                    options={{
-                       ...settings,
-                        readOnly: true
-                    }}
-                  />
-               </div>
-            </div>
-          </TabsContent>
-         </Tabs>
-        </ResizablePanel>
-        
-        <ResizableHandle withHandle className="bg-muted/50 hover:bg-primary/20 data-[resize-handle-active]:bg-primary/40 transition-colors" />
-        <ResizablePanel defaultSize={10} minSize={5}>
-          <div className="h-full flex flex-col">
-             <div className="flex-1 min-h-0 overflow-hidden">
-                 <OutputPanel 
-                  onToggleExpand={handleToggleOutputExpand}
-                  isExpanded={isOutputExpanded}
-                  output={output} 
-                  loading={isLoading} 
-                  stdin="" 
-                  onStdinChange={() => {}} 
-                  testCases={testCases.map(tc => ({
-                    input: tc.input,
-                    output: tc.expectedOutput
-                  }))}
-                  executionTime={executionTime}
-                  algorithmMeta={algorithmMeta as any}
-                  
-                  // New Props for LeetCode Style UI
-                  activeTab={activeTab}
-                  onTabChange={setActiveTab}
-                  
-                  // Unified Test Case Management
-                  allTestCases={testCases}
-                  executedTestCases={executedTestCases}
-                  onAddTestCase={handleAddTestCase}
-                  onUpdateTestCase={handleUpdateTestCase}
-                  onDeleteTestCase={handleDeleteTestCase}
-                  
-                  submissions={submissions}
-                  onSelectSubmission={handleSelectSubmission}
-                  
-                  // Editing State
-                  editingTestCaseId={editingTestCaseId}
-                  onEditTestCase={setEditingTestCaseId}
-                  onCancelEdit={() => {
-                    setEditingTestCaseId(null);
-                    setPendingTestCaseId(null);
-                  }}
-                  
-                  inputSchema={algorithmData?.input_schema}
-                  controls={controls}
-                  
-                  // Submissions
-                  activeTestCaseTab={activeTestCaseTab}
-                  onTestCaseTabChange={setActiveTestCaseTab}
-                />
-             </div>
-          </div>
-        </ResizablePanel>
-      </ResizablePanelGroup>
+          <ResizableHandle withHandle className="bg-muted/50 hover:bg-primary/20 data-[resize-handle-active]:bg-primary/40 transition-colors" />
+          <ResizablePanel defaultSize={25} minSize={10}>
+             {outputPanelContent}
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      )}
 
       {/* Expanded Modal View */}
       <Dialog open={isOutputExpanded} onOpenChange={setIsOutputExpanded}>
@@ -1157,6 +1217,7 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
                 onTestCaseTabChange={setActiveTestCaseTab}
                 output={output} 
                 loading={isLoading} 
+                submitting={isSubmitting as boolean}
                 stdin="" 
                 onStdinChange={() => {}} 
                 testCases={testCases.map(tc => ({
@@ -1201,4 +1262,5 @@ export const CodeRunner: React.FC<CodeRunnerProps> = ({
   return content;
   
   
-};
+});
+
