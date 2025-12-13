@@ -212,21 +212,25 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
           );
         }
 
-        return filteredApproaches.map(([codeType, langImplementations], approachIndex) => (
-          <SolutionApproach 
-            key={codeType}
-            codeType={codeType}
-            langImplementations={langImplementations}
-            approachIndex={approachIndex}
-            controls={controls}
-            handleCopy={handleCopy}
-            copiedTab={copiedTab}
-            editorTheme={effectiveTheme}
-            getLanguageDisplayName={getLanguageDisplayName}
-            getLanguageForMonaco={getLanguageForMonaco}
-            getFileExtension={getFileExtension}
-          />
-        ));
+        return (
+          <div className="space-y-12">
+            {filteredApproaches.map(([codeType, langImplementations], approachIndex) => (
+              <SolutionApproach 
+                key={codeType}
+                codeType={codeType}
+                langImplementations={langImplementations}
+                approachIndex={approachIndex}
+                controls={controls}
+                handleCopy={handleCopy}
+                copiedTab={copiedTab}
+                editorTheme={effectiveTheme}
+                getLanguageDisplayName={getLanguageDisplayName}
+                getLanguageForMonaco={getLanguageForMonaco}
+                getFileExtension={getFileExtension}
+              />
+            ))}
+          </div>
+        );
       })()}
 
       {/* Complexity Explanation - Future field */}
