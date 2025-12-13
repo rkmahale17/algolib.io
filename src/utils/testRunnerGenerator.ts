@@ -27,6 +27,9 @@ export const generateTestRunner = (
 };
 
 const formatValue = (value: any, type: string, lang: Language): string => {
+    if (lang === 'python') {
+        return jsonToPython(value);
+    }
     if (type === 'number' || type === 'boolean') return String(value);
     if (type === 'string') return `"${value}"`;
     if (type === 'number[]') {
@@ -35,6 +38,22 @@ const formatValue = (value: any, type: string, lang: Language): string => {
         return `[${value.join(', ')}]`;
     }
     return String(value);
+};
+
+const jsonToPython = (val: any): string => {
+    if (val === null) return 'None';
+    if (val === true) return 'True';
+    if (val === false) return 'False';
+    if (Array.isArray(val)) {
+        return `[${val.map(jsonToPython).join(', ')}]`;
+    }
+    if (typeof val === 'object') {
+        return `{${Object.entries(val).map(([k, v]) => `"${k}": ${jsonToPython(v)}`).join(', ')}}`;
+    }
+    if (typeof val === 'string') {
+        return JSON.stringify(val); // Handles escaping quotes safely
+    }
+    return String(val);
 };
 
 const generateTypeScriptRunner = (
@@ -111,8 +130,8 @@ const generatePythonRunner = (
     const userFuncName = userCode.match(/def\s+(\w+)/)?.[1] || 'solution';
 
     const testCasesStr = testCases.map(tc => {
-        const inputs = tc.input.map((val, i) => formatValue(val, inputSchema[i].type, 'python')).join(', ');
-        const expectedOutput = JSON.stringify(tc.expectedOutput);
+        const inputs = tc.input.map(val => jsonToPython(val)).join(', ');
+        const expectedOutput = jsonToPython(tc.expectedOutput);
         return `{"input": [${inputs}], "expected": ${expectedOutput}}`;
     }).join(',\n    ');
 
@@ -121,7 +140,8 @@ import json
 import time
 import sys
 import io
-from typing import List
+import math
+from typing import List, Optional
 
 ${userCode}
 
@@ -129,6 +149,21 @@ ${userCode}
 test_cases = [
     ${testCasesStr}
 ]
+
+def to_json_serializable(val):
+    if val is None:
+        return None
+    if val is True:
+        return True
+    if val is False:
+        return False
+    if isinstance(val, (int, float, str)):
+        return val
+    if isinstance(val, list):
+        return [to_json_serializable(x) for x in val]
+    if isinstance(val, dict):
+        return {str(k): to_json_serializable(v) for k, v in val.items()}
+    return str(val)
 
 results = []
 for tc in test_cases:
@@ -149,9 +184,9 @@ for tc in test_cases:
         
         results.append({
             "status": "pass" if passed else "fail",
-            "input": tc['input'],
-            "expected": tc['expected'],
-            "actual": actual,
+            "input": to_json_serializable(tc['input']),
+            "expected": to_json_serializable(tc['expected']),
+            "actual": to_json_serializable(actual),
             "time": (end - start) * 1000,
             "logs": logs.split('\\n') if logs else []
         })
@@ -160,7 +195,7 @@ for tc in test_cases:
         logs = captured_output.getvalue()
         results.append({
             "status": "error",
-            "input": tc['input'],
+            "input": to_json_serializable(tc['input']),
             "error": str(e),
             "logs": logs.split('\\n') if logs else []
         })
@@ -330,7 +365,7 @@ const generateCppRunner = (
 #include <string>
 #include <algorithm>
 #include <map>
-
+#include <unordered_set> 
 using namespace std;
 
 // Helper to print vectors

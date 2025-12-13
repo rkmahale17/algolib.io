@@ -148,6 +148,7 @@ export const CodeWorkspacePanel = React.memo(({
                  >
                    {algorithmId && algorithm && (
                      <CodeRunner 
+                       key={algorithmId}
                        algorithmId={algorithmId}
                        algorithmData={algorithm}
                        onToggleFullscreen={() => setIsCodeRunnerMaximized(!isCodeRunnerMaximized)}
