@@ -66,7 +66,7 @@ export function useUserAlgorithmData({
 
     // Set up real-time subscription
     useEffect(() => {
-        if (!enabled || !userId) {
+        if (!enabled || !userId || !supabase) {
             return;
         }
 
