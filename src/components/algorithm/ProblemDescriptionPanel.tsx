@@ -361,6 +361,11 @@ export const ProblemDescriptionPanel = React.memo(({
                     const showGuides = algorithm && (!algorithm?.controls || algorithm.controls?.description?.guides !== false);
 
                     if (!showOverview && !showGuides) return null;
+                    
+                    // Prioritize metadata (Preview Mode) then root properties (Production Mode)
+                    const overview = algorithm.metadata?.overview || algorithm.overview;
+                    const timeComplexity = algorithm.metadata?.timeComplexity || algorithm.timeComplexity;
+                    const spaceComplexity = algorithm.metadata?.spaceComplexity || algorithm.spaceComplexity;
 
                     return (
                       <Card className="glass-card overflow-hidden">
@@ -379,10 +384,10 @@ export const ProblemDescriptionPanel = React.memo(({
                                         <>
                                           <div className="text-sm text-muted-foreground">
                                             {/* Using RichText if available, otherwise fallback */}
-                                            {algorithm.overview ? (
-                                                <RichText content={algorithm.overview} />
+                                            {overview ? (
+                                                <RichText content={overview} />
                                             ) : (
-                                                algorithm.explanation.problemStatement
+                                                <RichText content={algorithm.explanation.problemStatement} />
                                             )}
                                           </div>
 
@@ -392,13 +397,13 @@ export const ProblemDescriptionPanel = React.memo(({
                                             <div>
                                               <p className="text-sm font-medium mb-1">Time Complexity</p>
                                               <Badge variant="outline" className="font-mono">
-                                                {algorithm.timeComplexity}
+                                                {timeComplexity || "N/A"}
                                               </Badge>
                                             </div>
                                             <div>
                                               <p className="text-sm font-medium mb-1">Space Complexity</p>
                                               <Badge variant="outline" className="font-mono">
-                                                {algorithm.spaceComplexity}
+                                                {spaceComplexity || "N/A"}
                                               </Badge>
                                             </div>
                                           </div>
