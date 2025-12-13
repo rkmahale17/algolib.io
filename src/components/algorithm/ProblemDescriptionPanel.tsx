@@ -106,7 +106,7 @@ export const ProblemDescriptionPanel = React.memo(({
       return (
         <iframe 
           src={dbUrl} 
-          className="w-full h-full border-0" 
+          className="w-full h-full border-0 " 
           title="Visualization"
         />
       );
@@ -688,7 +688,7 @@ export const ProblemDescriptionPanel = React.memo(({
                 Exit Fullscreen
               </Button>
             </div>
-            <div className="flex-1 overflow-hidden p-4 relative">
+            <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 relative">
                {renderVisualization()}
             </div>
         </div>,

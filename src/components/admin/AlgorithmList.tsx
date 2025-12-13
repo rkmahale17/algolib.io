@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAlgorithms, useCategories, useDeleteAlgorithm } from '@/hooks/useAlgorithms';
-import { ListType, LIST_TYPE_LABELS, LIST_TYPE_OPTIONS } from '@/types/algorithm';
+import { ListType, LIST_TYPE_LABELS, LIST_TYPE_OPTIONS, LIST_TYPE_OPTIONS_ADMIN } from '@/types/algorithm';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -165,7 +165,7 @@ export function AlgorithmList() {
             <SelectItem value="all">All List Types</SelectItem>
 
             
-            {LIST_TYPE_OPTIONS.map(opt => (
+            {LIST_TYPE_OPTIONS_ADMIN.map(opt => (
                 <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
             ))}
           </SelectContent>  

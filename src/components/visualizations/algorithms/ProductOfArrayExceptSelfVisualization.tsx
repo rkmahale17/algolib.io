@@ -157,7 +157,7 @@ export const ProductOfArrayExceptSelfVisualization = () => {
               
               <div className="space-y-2">
                 <div className="text-xs font-semibold text-center">Original Array</div>
-                <div className="flex items-center justify-center gap-2">
+                <div className="flex items-center justify-center gap-2 flex-wrap">
                   {step.array.map((value, index) => (
                     <div key={index} className="flex flex-col items-center gap-1">
                       <div className={`w-12 h-12 rounded flex items-center justify-center font-bold text-sm ${
@@ -173,7 +173,7 @@ export const ProductOfArrayExceptSelfVisualization = () => {
 
               <div className="space-y-2">
                 <div className="text-xs font-semibold text-center">Result Array</div>
-                <div className="flex items-center justify-center gap-2">
+                <div className="flex items-center justify-center gap-2 flex-wrap">
                   {step.result.map((value, index) => (
                     <div key={index} className="flex flex-col items-center gap-1">
                       <div className={`w-12 h-12 rounded flex items-center justify-center font-bold text-sm ${

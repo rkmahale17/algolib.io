@@ -78,31 +78,31 @@ export function AlgorithmForm({
         explanation:
           typeof algorithm.explanation === "string"
             ? algorithm.explanation
-            : JSON.stringify(algorithm.explanation, null, 2),
+            : JSON.stringify(algorithm.explanation),
         implementations:
           typeof algorithm.implementations === "string"
             ? algorithm.implementations
-            : JSON.stringify(algorithm.implementations, null, 2),
+            : JSON.stringify(algorithm.implementations),
         problems_to_solve:
           typeof algorithm.problems_to_solve === "string"
             ? algorithm.problems_to_solve
-            : JSON.stringify(algorithm.problems_to_solve, null, 2),
+            : JSON.stringify(algorithm.problems_to_solve),
         test_cases:
           typeof algorithm.test_cases === "string"
             ? algorithm.test_cases
-            : JSON.stringify(algorithm.test_cases, null, 2),
+            : JSON.stringify(algorithm.test_cases),
         input_schema:
           typeof algorithm.input_schema === "string"
             ? algorithm.input_schema
-            : JSON.stringify(algorithm.input_schema, null, 2),
+            : JSON.stringify(algorithm.input_schema),
         tutorials:
           typeof algorithm.tutorials === "string"
             ? algorithm.tutorials
-            : JSON.stringify(algorithm.tutorials, null, 2),
+            : JSON.stringify(algorithm.tutorials),
         metadata:
           typeof algorithm.metadata === "string"
             ? algorithm.metadata
-            : JSON.stringify(algorithm.metadata, null, 2),
+            : JSON.stringify(algorithm.metadata),
       });
     } else {
       setListType("coreAlgo");
