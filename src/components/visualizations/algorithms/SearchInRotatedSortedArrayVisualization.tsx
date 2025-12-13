@@ -135,7 +135,7 @@ export const SearchInRotatedSortedArrayVisualization = () => {
               <div className="text-sm text-center text-muted-foreground">
                 Target: {target}
               </div>
-              <div className="flex items-center justify-center gap-2 min-h-[200px]">
+              <div className="flex items-center justify-center gap-2 min-h-[200px] flex-wrap">
                 {step.array.map((value, index) => (
                   <div key={index} className="flex flex-col items-center gap-2">
                     <div
