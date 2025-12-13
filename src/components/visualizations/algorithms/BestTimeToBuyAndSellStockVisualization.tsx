@@ -20,73 +20,89 @@ export const BestTimeToBuyAndSellStockVisualization = () => {
   const [speed, setSpeed] = useState(1);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const code = `function maxProfit(prices: number[]): number {
-  let minPrice = Infinity;
+  const code = `function maxProfit(prices: number[]): number  {
+  let l = 0;
+  let r = 1;
   let maxProfit = 0;
   
-  for (let i = 0; i < prices.length; i++) {
-    if (prices[i] < minPrice) {
-      minPrice = prices[i];
+  while(r < prices.length){
+    if(prices[l] < prices[r]){
+      maxProfit = Math.max(maxProfit, prices[r] - prices[l]);
     } else {
-      maxProfit = Math.max(maxProfit, prices[i] - minPrice);
+      l = r;
     }
+    r = r + 1; 
   }
-  
   return maxProfit;
 }`;
 
   const generateSteps = () => {
     const prices = [7, 1, 5, 3, 6, 4];
     const newSteps: Step[] = [];
-    let minPrice = Infinity;
+    
+    let l = 0;
+    let r = 1;
     let maxProfit = 0;
-    let minIndex = -1;
 
+    // Initialization step
     newSteps.push({
       array: [...prices],
-      highlights: [],
-      minIndex: -1,
-      currentIndex: -1,
-      variables: { minPrice: '∞', maxProfit: 0, i: '-' },
-      explanation: 'Initialize: minPrice = ∞, maxProfit = 0',
-      lineNumber: 1
+      highlights: [l, r],
+      minIndex: l, // reusing minIndex for l for rendering convenience if needed, but we'll use specific l/r checks
+      currentIndex: r,
+      variables: { l, r, maxProfit },
+      explanation: 'Initialize pointers: l = 0, r = 1, maxProfit = 0',
+      lineNumber: 2
     });
 
-    for (let i = 0; i < prices.length; i++) {
+    while (r < prices.length) {
       newSteps.push({
         array: [...prices],
-        highlights: [i],
-        minIndex,
-        currentIndex: i,
-        variables: { i, 'prices[i]': prices[i], minPrice: minPrice === Infinity ? '∞' : minPrice, maxProfit },
-        explanation: `i=${i}: Check prices[${i}]=${prices[i]}`,
-        lineNumber: 5
+        highlights: [l, r],
+        minIndex: l,
+        currentIndex: r,
+        variables: { l, r, maxProfit, 'prices[l]': prices[l], 'prices[r]': prices[r] },
+        explanation: `Check if prices[l] (${prices[l]}) < prices[r] (${prices[r]})`,
+        lineNumber: 6
       });
 
-      if (prices[i] < minPrice) {
-        minPrice = prices[i];
-        minIndex = i;
-        newSteps.push({
-          array: [...prices],
-          highlights: [i],
-          minIndex: i,
-          currentIndex: i,
-          variables: { i, 'prices[i]': prices[i], minPrice, maxProfit, action: 'Update minPrice' },
-          explanation: `prices[${i}]=${prices[i]} < minPrice. Update minPrice = ${minPrice}`,
-          lineNumber: 6
-        });
-      } else {
-        const profit = prices[i] - minPrice;
+      if (prices[l] < prices[r]) {
+        const profit = prices[r] - prices[l];
         const oldMaxProfit = maxProfit;
         maxProfit = Math.max(maxProfit, profit);
+        
         newSteps.push({
           array: [...prices],
-          highlights: [minIndex, i],
-          minIndex,
-          currentIndex: i,
-          variables: { i, profit, oldMaxProfit, newMaxProfit: maxProfit },
-          explanation: `Profit = prices[${i}] - minPrice = ${prices[i]} - ${minPrice} = ${profit}. MaxProfit = max(${oldMaxProfit}, ${profit}) = ${maxProfit}`,
+          highlights: [l, r],
+          minIndex: l,
+          currentIndex: r,
+          variables: { l, r, maxProfit, profit },
+          explanation: `prices[l] < prices[r], so calculate profit: ${prices[r]} - ${prices[l]} = ${profit}. Update maxProfit = max(${oldMaxProfit}, ${profit}) = ${maxProfit}`,
           lineNumber: 8
+        });
+      } else {
+        l = r;
+        newSteps.push({
+          array: [...prices],
+          highlights: [l, r],
+          minIndex: l,
+          currentIndex: r,
+          variables: { l, r, maxProfit },
+          explanation: `prices[l] >= prices[r], so move left pointer l to r (${r})`,
+          lineNumber: 11
+        });
+      }
+
+      r = r + 1;
+      if (r < prices.length) {
+         newSteps.push({
+          array: [...prices],
+          highlights: [l, r],
+          minIndex: l,
+          currentIndex: r,
+          variables: { l, r, maxProfit },
+          explanation: `Increment r to ${r}`,
+          lineNumber: 14
         });
       }
     }
@@ -94,11 +110,11 @@ export const BestTimeToBuyAndSellStockVisualization = () => {
     newSteps.push({
       array: [...prices],
       highlights: [],
-      minIndex,
+      minIndex: -1,
       currentIndex: -1,
-      variables: { result: maxProfit },
-      explanation: `Complete! Maximum profit = ${maxProfit}`,
-      lineNumber: 12
+      variables: { maxProfit },
+      explanation: `Loop finished. Return maxProfit = ${maxProfit}`,
+      lineNumber: 17
     });
 
     setSteps(newSteps);
@@ -163,24 +179,29 @@ export const BestTimeToBuyAndSellStockVisualization = () => {
           <div className="bg-muted/30 rounded-lg border border-border/50 p-6">
             <div className="flex items-end justify-center gap-2 h-48">
               {currentStep.array.map((value, idx) => {
-                const isMin = idx === currentStep.minIndex;
-                const isCurrent = idx === currentStep.currentIndex;
-                const isHighlighted = currentStep.highlights.includes(idx);
+                // In our generated steps variables: 
+                // l is stored in variables.l
+                // r is stored in variables.r
+                const l = currentStep.variables.l;
+                const r = currentStep.variables.r;
+                
+                const isL = idx === l;
+                const isR = idx === r;
                 
                 return (
                   <div key={idx} className="flex flex-col items-center gap-2 flex-1 max-w-[50px] relative">
-                    {isMin && <div className="absolute -top-6 text-xs font-bold text-green-500">BUY</div>}
-                    {isCurrent && idx !== currentStep.minIndex && <div className="absolute -top-6 text-xs font-bold text-blue-500">SELL</div>}
+                    {isL && <div className="absolute -top-6 text-xs font-bold text-green-500">L</div>}
+                    {isR && <div className="absolute -top-6 text-xs font-bold text-blue-500">R</div>}
                     <div
                       className={`w-full rounded-t transition-all duration-300 ${
-                        isHighlighted
+                         isL || isR
                           ? 'bg-primary shadow-lg shadow-primary/50'
                           : 'bg-muted/60'
                       }`}
                       style={{ height: `${(value / maxPrice) * 100}%`, minHeight: '20px' }}
                     />
                     <span className="text-xs font-mono">${value}</span>
-                    <span className="text-xs text-muted-foreground">D{idx + 1}</span>
+                    <span className="text-xs text-muted-foreground">{idx}</span>
                   </div>
                 );
               })}
@@ -192,12 +213,13 @@ export const BestTimeToBuyAndSellStockVisualization = () => {
           </div>
 
           <div className="bg-muted/50 rounded-lg border p-4">
-            <h3 className="font-semibold mb-2 text-sm">Strategy:</h3>
+            <h3 className="font-semibold mb-2 text-sm">Strategy: Sliding Window / Two Pointers</h3>
             <div className="text-xs space-y-1 text-muted-foreground">
-              <p>• Track minimum price seen so far</p>
-              <p>• At each day, calculate profit if we sell today</p>
-              <p>• Keep track of maximum profit</p>
-              <p>• Time: O(n), Space: O(1)</p>
+              <p>• Initialize Left (buy) at 0 and Right (sell) at 1</p>
+              <p>• Determine if strictly profitable (prices[l] &lt; prices[r])</p>
+              <p>• If profitable, update maxProfit (prices[r] - prices[l])</p>
+              <p>• If not profitable, move Left pointer to Right</p>
+              <p>• Always increment Right pointer</p>
             </div>
           </div>
 

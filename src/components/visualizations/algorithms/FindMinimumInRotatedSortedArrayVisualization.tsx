@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
@@ -17,218 +17,11 @@ interface Step {
 
 export const FindMinimumInRotatedSortedArrayVisualization = () => {
   const [currentStep, setCurrentStep] = useState(0);
-
-  const array = [4, 5, 6, 7, 0, 1, 2];
-
-  const steps: Step[] = [
-    {
-      array,
-      highlights: [],
-      variables: { left: '?', right: '?', mid: '?' },
-      explanation: "Starting with rotated sorted array [4,5,6,7,0,1,2]. Goal: Find minimum in O(log n) time.",
-      highlightedLines: [1],
-      lineExecution: "function findMin(nums: number[]): number {"
-    },
-    {
-      array,
-      highlights: [],
-      variables: { left: '?', right: '?', mid: '?' },
-      explanation: "Declaring left pointer to track search start boundary.",
-      highlightedLines: [2],
-      lineExecution: "let left = 0, right = nums.length - 1;"
-    },
-    {
-      array,
-      highlights: [0],
-      variables: { left: 0, right: '?', mid: '?' },
-      explanation: "left initialized to 0 (first index).",
-      highlightedLines: [2],
-      lineExecution: "let left = 0"
-    },
-    {
-      array,
-      highlights: [0, 6],
-      variables: { left: 0, right: 6, mid: '?' },
-      explanation: "right initialized to 6 (last index). Search space: [0...6].",
-      highlightedLines: [2],
-      lineExecution: "right = nums.length - 1 = 6"
-    },
-    {
-      array,
-      highlights: [0, 6],
-      variables: { left: 0, right: 6, mid: '?' },
-      explanation: "Check loop condition: left (0) < right (6)? Yes, continue.",
-      highlightedLines: [4],
-      lineExecution: "while (left < right)"
-    },
-    {
-      array,
-      highlights: [0, 6],
-      variables: { left: 0, right: 6, mid: '?' },
-      explanation: "Calculate mid index: (0 + 6) / 2 = 3.",
-      highlightedLines: [5],
-      lineExecution: "const mid = Math.floor((left + right) / 2)"
-    },
-    {
-      array,
-      highlights: [0, 3, 6],
-      variables: { left: 0, right: 6, mid: 3 },
-      explanation: "mid = 3. Now compare nums[mid]=7 with nums[right]=2.",
-      highlightedLines: [5],
-      lineExecution: "mid = 3"
-    },
-    {
-      array,
-      highlights: [3, 6],
-      variables: { left: 0, right: 6, mid: 3 },
-      explanation: "Check: nums[mid] (7) > nums[right] (2)? Yes!",
-      highlightedLines: [7],
-      lineExecution: "if (nums[mid] > nums[right])"
-    },
-    {
-      array,
-      highlights: [3, 6],
-      variables: { left: 0, right: 6, mid: 3 },
-      explanation: "Since 7 > 2, minimum must be in RIGHT half. Move left pointer.",
-      highlightedLines: [8],
-      lineExecution: "left = mid + 1"
-    },
-    {
-      array,
-      highlights: [4, 6],
-      variables: { left: 4, right: 6, mid: 3 },
-      explanation: "left updated to 4. Search space narrowed: [4...6].",
-      highlightedLines: [8],
-      lineExecution: "left = 4"
-    },
-    {
-      array,
-      highlights: [4, 6],
-      variables: { left: 4, right: 6, mid: 3 },
-      explanation: "Check loop condition: left (4) < right (6)? Yes, continue.",
-      highlightedLines: [4],
-      lineExecution: "while (left < right)"
-    },
-    {
-      array,
-      highlights: [4, 6],
-      variables: { left: 4, right: 6, mid: 3 },
-      explanation: "Calculate new mid: (4 + 6) / 2 = 5.",
-      highlightedLines: [5],
-      lineExecution: "const mid = Math.floor((left + right) / 2)"
-    },
-    {
-      array,
-      highlights: [4, 5, 6],
-      variables: { left: 4, right: 6, mid: 5 },
-      explanation: "mid = 5. Compare nums[mid]=1 with nums[right]=2.",
-      highlightedLines: [5],
-      lineExecution: "mid = 5"
-    },
-    {
-      array,
-      highlights: [5, 6],
-      variables: { left: 4, right: 6, mid: 5 },
-      explanation: "Check: nums[mid] (1) > nums[right] (2)? No, 1 < 2.",
-      highlightedLines: [7],
-      lineExecution: "if (nums[mid] > nums[right]) -> false"
-    },
-    {
-      array,
-      highlights: [5, 6],
-      variables: { left: 4, right: 6, mid: 5 },
-      explanation: "Minimum is in LEFT half (including mid). Move right pointer.",
-      highlightedLines: [10],
-      lineExecution: "right = mid"
-    },
-    {
-      array,
-      highlights: [4, 5],
-      variables: { left: 4, right: 5, mid: 5 },
-      explanation: "right updated to 5. Search space: [4...5].",
-      highlightedLines: [10],
-      lineExecution: "right = 5"
-    },
-    {
-      array,
-      highlights: [4, 5],
-      variables: { left: 4, right: 5, mid: 5 },
-      explanation: "Check loop condition: left (4) < right (5)? Yes, continue.",
-      highlightedLines: [4],
-      lineExecution: "while (left < right)"
-    },
-    {
-      array,
-      highlights: [4, 5],
-      variables: { left: 4, right: 5, mid: 5 },
-      explanation: "Calculate new mid: (4 + 5) / 2 = 4.",
-      highlightedLines: [5],
-      lineExecution: "const mid = Math.floor((left + right) / 2)"
-    },
-    {
-      array,
-      highlights: [4, 5],
-      variables: { left: 4, right: 5, mid: 4 },
-      explanation: "mid = 4. Compare nums[mid]=0 with nums[right]=1.",
-      highlightedLines: [5],
-      lineExecution: "mid = 4"
-    },
-    {
-      array,
-      highlights: [4, 5],
-      variables: { left: 4, right: 5, mid: 4 },
-      explanation: "Check: nums[mid] (0) > nums[right] (1)? No, 0 < 1.",
-      highlightedLines: [7],
-      lineExecution: "if (nums[mid] > nums[right]) -> false"
-    },
-    {
-      array,
-      highlights: [4, 5],
-      variables: { left: 4, right: 5, mid: 4 },
-      explanation: "Minimum is at mid or left. Move right to mid.",
-      highlightedLines: [10],
-      lineExecution: "right = mid"
-    },
-    {
-      array,
-      highlights: [4],
-      variables: { left: 4, right: 4, mid: 4 },
-      explanation: "right updated to 4. Search space: [4...4]. Converged!",
-      highlightedLines: [10],
-      lineExecution: "right = 4"
-    },
-    {
-      array,
-      highlights: [4],
-      variables: { left: 4, right: 4, mid: 4 },
-      explanation: "Check loop condition: left (4) < right (4)? No, exit loop.",
-      highlightedLines: [4],
-      lineExecution: "while (left < right) -> false"
-    },
-    {
-      array,
-      highlights: [4],
-      variables: { left: 4, right: 4, mid: 4 },
-      explanation: "Return nums[left] = nums[4] = 0. Minimum found!",
-      highlightedLines: [13],
-      lineExecution: "return nums[left] = 0"
-    },
-    {
-      array,
-      highlights: [4],
-      variables: { left: 4, right: 4, mid: 4, result: 0 },
-      explanation: "Algorithm complete! Found minimum: 0. Time: O(log n), Space: O(1).",
-      highlightedLines: [13],
-      lineExecution: "Result: 0"
-    }
-  ];
+  const [steps, setSteps] = useState<Step[]>([]);
 
   const code = `function findMin(nums: number[]): number {
   let left = 0, right = nums.length - 1;
-
-  if(nums.length == 0)
-      return 0;  
-
+  
   while (left < right) {
     const mid = Math.floor((left + right) / 2);
     
@@ -242,6 +35,118 @@ export const FindMinimumInRotatedSortedArrayVisualization = () => {
   return nums[left];
 }`;
 
+  useEffect(() => {
+    const generateSteps = () => {
+      const nums = [4, 5, 6, 7, 0, 1, 2];
+      const newSteps: Step[] = [];
+      let left = 0;
+      let right = nums.length - 1;
+      let mid = 0;
+
+      // Step 1: Initialization(Start)
+      newSteps.push({
+        array: [...nums],
+        highlights: [],
+        variables: { left: '?', right: '?', mid: '?' },
+        explanation: "Starting with rotated sorted array [4,5,6,7,0,1,2]. Goal: Find minimum in O(log n) time.",
+        highlightedLines: [1],
+        lineExecution: "function findMin(nums: number[]): number {"
+      });
+
+      // Step 2: Declare pointers
+      newSteps.push({
+        array: [...nums],
+        highlights: [left, right],
+        variables: { left, right, mid: '?' },
+        explanation: `Initialize pointers: left = ${left}, right = ${right} (last index). Search space: [${left}...${right}].`,
+        highlightedLines: [2],
+        lineExecution: `let left = 0, right = nums.length - 1;`
+      });
+
+      while (left < right) {
+        // Loop check
+        newSteps.push({
+          array: [...nums],
+          highlights: [left, right],
+          variables: { left, right, mid: mid || '?' },
+          explanation: `Check loop condition: left (${left}) < right (${right})? Yes.`,
+          highlightedLines: [4],
+          lineExecution: "while (left < right)"
+        });
+
+        mid = Math.floor((left + right) / 2);
+
+        // Calc mid
+        newSteps.push({
+            array: [...nums],
+            highlights: [left, mid, right],
+            variables: { left, right, mid },
+            explanation: `Calculate mid index: Math.floor((${left} + ${right}) / 2) = ${mid}.`,
+            highlightedLines: [5],
+            lineExecution: "const mid = Math.floor((left + right) / 2);"
+        });
+
+        // Check condition
+        newSteps.push({
+            array: [...nums],
+            highlights: [mid, right],
+            variables: { left, right, mid },
+            explanation: `Compare nums[mid] (${nums[mid]}) > nums[right] (${nums[right]})? ${nums[mid] > nums[right] ? 'Yes' : 'No'}.`,
+            highlightedLines: [7],
+            lineExecution: `if (nums[mid] > nums[right])`
+        });
+
+        if (nums[mid] > nums[right]) {
+          left = mid + 1;
+          newSteps.push({
+            array: [...nums],
+            highlights: [left, right],
+            variables: { left, right, mid },
+            explanation: `Since ${nums[mid]} > ${nums[right]}, minimum is to the right. New left = mid + 1 = ${left}.`,
+            highlightedLines: [8],
+            lineExecution: "left = mid + 1;"
+          });
+        } else {
+          right = mid;
+          newSteps.push({
+            array: [...nums],
+            highlights: [left, right],
+            variables: { left, right, mid },
+            explanation: `Since ${nums[mid]} <= ${nums[right]}, minimum is to the left (or is mid). New right = mid = ${right}.`,
+            highlightedLines: [10],
+            lineExecution: "right = mid;"
+          });
+        }
+      }
+
+      // Loop exit
+      newSteps.push({
+        array: [...nums],
+        highlights: [left, right],
+        variables: { left, right, mid },
+        explanation: `Check loop condition: left (${left}) < right (${right})? No. Loop terminates.`,
+        highlightedLines: [4],
+        lineExecution: "while (left < right)"
+      });
+
+      // Return
+      newSteps.push({
+        array: [...nums],
+        highlights: [left],
+        variables: { left, right, mid, result: nums[left] },
+        explanation: `Return nums[left] = nums[${left}] = ${nums[left]}. Found minimum!`,
+        highlightedLines: [13],
+        lineExecution: "return nums[left];"
+      });
+
+      setSteps(newSteps);
+    };
+
+    generateSteps();
+  }, []);
+
+  if (steps.length === 0) return null;
+
   const step = steps[currentStep];
 
   return (
@@ -250,8 +155,6 @@ export const FindMinimumInRotatedSortedArrayVisualization = () => {
         <>
           <motion.div
             key={`array-${currentStep}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
             <Card className="p-6">
@@ -261,8 +164,6 @@ export const FindMinimumInRotatedSortedArrayVisualization = () => {
                   {step.array.map((value, index) => (
                     <motion.div
                       key={index}
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
                       transition={{ delay: index * 0.05 }}
                       className="flex flex-col items-center gap-2"
                     >
@@ -285,8 +186,6 @@ export const FindMinimumInRotatedSortedArrayVisualization = () => {
 
           <motion.div
             key={`explanation-${currentStep}`}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.4, delay: 0.2 }}
           >
             <Card className="p-4 bg-muted/50">
@@ -304,8 +203,6 @@ export const FindMinimumInRotatedSortedArrayVisualization = () => {
 
           <motion.div
             key={`variables-${currentStep}`}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3, delay: 0.3 }}
           >
             <VariablePanel variables={step.variables} />
