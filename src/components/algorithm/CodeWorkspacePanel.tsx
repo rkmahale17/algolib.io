@@ -16,7 +16,7 @@ import { TabWarning } from "@/components/TabWarning";
 import { CodeRunner } from "@/components/CodeRunner/CodeRunner";
 import { BrainstormSection } from "@/components/brainstorm/BrainstormSection";
 
-import { Submission } from '@/types/userAlgorithmData';
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface CodeWorkspacePanelProps {
   algorithm: any;
@@ -35,6 +35,7 @@ interface CodeWorkspacePanelProps {
   isInterviewMode?: boolean;
   codeRunnerRef?: React.RefObject<any>;
   onRunnerStateChange?: (state: any) => void;
+  isLoading?: boolean;
 }
 
 export const CodeWorkspacePanel = React.memo(({
@@ -53,7 +54,8 @@ export const CodeWorkspacePanel = React.memo(({
   className,
   isInterviewMode,
   codeRunnerRef,
-  onRunnerStateChange
+  onRunnerStateChange,
+  isLoading = false
 }: CodeWorkspacePanelProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isCompact, setIsCompact] = useState(false);
@@ -168,6 +170,7 @@ export const CodeWorkspacePanel = React.memo(({
                        ref={codeRunnerRef}
                        onStateChange={onRunnerStateChange}
                        isMobile={isMobile}
+                       isLoading={isLoading}
                      />
                    )}
                  </AuthGuard>

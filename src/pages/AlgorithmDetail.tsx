@@ -144,6 +144,7 @@ const AlgorithmDetail: React.FC = () => {
       submissions={submissions}
       codeRunnerRef={runnerRef}
       onRunnerStateChange={handleRunnerStateChange}
+      isLoading={loadingUserData}
     />
   ), [
     algorithm, 
@@ -157,7 +158,8 @@ const AlgorithmDetail: React.FC = () => {
     interactions.setSelectedLanguage, 
     layout.isCodeRunnerMaximized, 
     layout.setIsCodeRunnerMaximized, 
-    submissions
+    submissions,
+    loadingUserData
   ]);
 
   // -- Render Guards --

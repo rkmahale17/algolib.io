@@ -6,7 +6,7 @@ const CodeEditor = React.lazy(() =>
   import('./CodeEditor').then((mod) => ({ default: mod.CodeEditor }))
 );
 
-const CodeEditorSkeleton = () => (
+export const CodeEditorSkeleton = () => (
   <div className="h-full w-full bg-background p-4 space-y-3">
     <div className="flex items-center gap-2 mb-4">
       <Skeleton className="h-3 w-3 rounded-full" />
