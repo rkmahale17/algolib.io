@@ -313,18 +313,14 @@ export const MaximumSubarrayVisualization = () => {
       
       <motion.div 
         key={`explanation-${currentStep}`}
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.4, delay: 0.1 }}
+     
         className="p-4 bg-primary/20 rounded-lg border border-primary/30"
       >
         <p className="text-sm font-medium">{steps[currentStep].explanation}</p>
       </motion.div>
 
       <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3, delay: 0.2 }}
+
         className="p-3 bg-muted/50 rounded-lg border"
       >
         <div className="text-xs font-mono text-muted-foreground">
@@ -334,9 +330,7 @@ export const MaximumSubarrayVisualization = () => {
       </motion.div>
 
       <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3, delay: 0.25 }}
+ 
         className="p-3 bg-accent/50 rounded-lg border border-accent"
       >
         <p className="text-xs text-muted-foreground">
@@ -346,8 +340,7 @@ export const MaximumSubarrayVisualization = () => {
 
       <motion.div
         key={`variables-${currentStep}`}
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
+       
         transition={{ duration: 0.3, delay: 0.3 }}
       >
         <VariablePanel variables={steps[currentStep].variables} />
