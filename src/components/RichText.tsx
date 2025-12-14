@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import parse, { DOMNode, Element, domToReact, HTMLReactParserOptions } from 'html-react-parser';
 import { AlgoLink } from './AlgoLink';
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 interface RichTextProps {
   content: string | string[];
@@ -15,10 +16,15 @@ interface RichTextProps {
 export const RichText: React.FC<RichTextProps> = ({ content, className = '', onClick }) => {
   // Handle case where content might be an array (legacy data support)
   const safeContent = useMemo(() => {
+    let text = "";
     if (Array.isArray(content)) {
-      return content.join(''); // Join array elements if content is array
+      text = content.join('');
+    } else {
+      text = content || '';
     }
-    return content || ''; // Fallback to empty string if undefined/null
+    
+    // Auto-fix: Convert JSX 'className' to HTML 'class' to support copy-pasting from React
+    return text.replace(/\bclassName=(["'])/g, 'class=$1');
   }, [content]);
 
   const options: HTMLReactParserOptions = useMemo(() => ({
@@ -26,17 +32,37 @@ export const RichText: React.FC<RichTextProps> = ({ content, className = '', onC
       // Check if it's an element
       if (domNode instanceof Element && domNode.attribs) {
         // Handle <AlgoLink> or <algolink> tags
-        // Note: html-react-parser lowercases tag names
         if (domNode.name === 'algolink') {
           const { url, label } = domNode.attribs;
-          // Render children if present, otherwise use label attrib
           const children = domToReact(domNode.children as DOMNode[], options);
-          
           return (
             <AlgoLink url={url} label={label}>
               {children}
             </AlgoLink>
           );
+        }
+
+        // Handle <ScrollArea> tags
+        if (domNode.name === 'scrollarea') {
+           const { class: className, ...rest } = domNode.attribs;
+           const children = domToReact(domNode.children as DOMNode[], options);
+           return (
+             <ScrollArea className={className} {...rest}>
+               {children}
+             </ScrollArea>
+           );
+        }
+        
+        // Handle <ScrollBar> tags
+        if (domNode.name === 'scrollbar') {
+           const { class: className, orientation, ...rest } = domNode.attribs;
+           return (
+             <ScrollBar 
+                className={className} 
+                orientation={orientation as "horizontal" | "vertical"} 
+                {...rest} 
+             />
+           );
         }
       }
     }
@@ -50,19 +76,21 @@ export const RichText: React.FC<RichTextProps> = ({ content, className = '', onC
   const whitespaceClass = isHtml ? '' : 'whitespace-pre-wrap';
 
   return (
-    <div
-      className={`prose prose-sm max-w-none dark:prose-invert ${whitespaceClass} ${className}`}
-      onClick={onClick}
-      style={{
-        // Ensure images are responsive
-        '--tw-prose-body': 'inherit',
-      } as React.CSSProperties}
-    >
-      {parsedContent}
-    </div>
+    <ScrollArea className="w-full max-w-full">
+      <div
+        className={`prose prose-sm max-w-none dark:prose-invert ${whitespaceClass} ${className}`}
+        onClick={onClick}
+        style={{
+          // Ensure images are responsive
+          '--tw-prose-body': 'inherit',
+        } as React.CSSProperties}
+      >
+        {parsedContent}
+      </div>
+      <ScrollBar orientation="horizontal" />
+    </ScrollArea>
   );
 };
-
 
 /**
  * CSS for prose styling (add to your global CSS if needed):

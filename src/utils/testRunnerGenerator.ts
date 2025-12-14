@@ -306,41 +306,71 @@ const generateCppRunner = (
 ): string => {
     const userFuncName = userCode.match(/(\w+)\s*\(/)?.[1] || 'solution';
 
-    // Helper to map schema type to C++ type
-    const getCppType = (schemaType: string): string => {
-        if (schemaType === 'number[]') return 'vector<int>';
-        if (schemaType === 'string[]') return 'vector<string>';
-        if (schemaType === 'number') return 'int';
-        if (schemaType === 'boolean') return 'bool';
-        if (schemaType === 'string') return 'string';
-        return 'auto';
+    // Helper to deduce C++ type from value
+    const deduceCppType = (val: any): string => {
+        if (Array.isArray(val)) {
+            if (val.length === 0) return 'vector<int>'; // Default for empty array
+            const first = val[0];
+            if (Array.isArray(first)) {
+                // Nested vector
+                const innerType = deduceCppType(first);
+                return `vector<${innerType}>`;
+            }
+            if (typeof first === 'string') return 'vector<string>';
+            if (typeof first === 'boolean') return 'vector<bool>';
+            return 'vector<int>';
+        }
+        if (typeof val === 'string') return 'string';
+        if (typeof val === 'boolean') return 'bool';
+        return 'int';
+    };
+
+    // Helper to format C++ literal
+    const formatCppLiteral = (val: any): string => {
+        if (Array.isArray(val)) {
+            const inner = val.map(v => formatCppLiteral(v)).join(', ');
+            return `{${inner}}`;
+        }
+        if (typeof val === 'string') return `"${val}"`;
+        if (typeof val === 'boolean') return val ? 'true' : 'false';
+        return String(val);
     };
 
     const testCalls = testCases.map((tc, index) => {
         // Declare variables for inputs to avoid rvalue binding issues
         const inputDecls = tc.input.map((val, i) => {
-            const cppType = getCppType(inputSchema[i].type);
-            const valStr = formatValue(val, inputSchema[i].type, 'cpp');
-            return `${cppType} arg${i} = ${valStr};`;
+            const cppType = deduceCppType(val);
+            // Use specific formatting based on schema type if needed, 
+            // but for inputs formatValue is usually ok. 
+            // However, let's use our new formatter for consistency if it's an array 
+            // to ensure nested arrays work for inputs too if schema says so.
+            // Actually inputSchema[i].type might be "number[][]" which getCppType doesn't handle well yet?
+            // getCppType handles "number[]", "string[]".
+            // Let's improve getCppType locally or just use `auto` and let C++ deduce from initializer?
+            // `auto` works well if initializer is `{...}` -> deduces std::initializer_list, not vector.
+            // We need explicit type for vectors usually.
+
+            // Fix: if schema type implies 2D, we need proper C++ type string.
+            // For now, let's rely on deduceCppType from the VALUE for the declaration
+            // to be safe against schema mismatches, OR extend getCppType.
+
+            // Let's stick to schema-based for inputs if possible, but allow deduction fallback.
+            let typeToUse = cppType;
+            if (Array.isArray(val) && Array.isArray(val[0])) {
+                // It is 2D, override simple detection
+                typeToUse = deduceCppType(val);
+            }
+
+            const valStr = formatCppLiteral(val);
+            return `${typeToUse} arg${i} = ${valStr};`;
         }).join('\n            ');
 
         const args = tc.input.map((_, i) => `arg${i}`).join(', ');
 
         // Handle expected output type mapping
-        let expectedDecl = '';
-        if (Array.isArray(tc.expectedOutput)) {
-            // Heuristic: check first element type or default to int
-            const isStringArray = tc.expectedOutput.length > 0 && typeof tc.expectedOutput[0] === 'string';
-            const type = isStringArray ? 'vector<string>' : 'vector<int>';
-            const valStr = `{${tc.expectedOutput.map((v: any) => formatValue(v, isStringArray ? 'string' : 'number', 'cpp')).join(', ')}}`;
-            expectedDecl = `${type} expected = ${valStr};`;
-        } else {
-            const type = getCppType(typeof tc.expectedOutput);
-            // Note: typeof gives 'number', 'string', 'boolean' which matches simplistic schema types roughly
-            // Better to use actual value
-            const valStr = formatValue(tc.expectedOutput, typeof tc.expectedOutput as any, 'cpp');
-            expectedDecl = `auto expected = ${valStr};`;
-        }
+        const expectedType = deduceCppType(tc.expectedOutput);
+        const expectedValStr = formatCppLiteral(tc.expectedOutput);
+        const expectedDecl = `${expectedType} expected = ${expectedValStr};`;
 
         return `
         {
