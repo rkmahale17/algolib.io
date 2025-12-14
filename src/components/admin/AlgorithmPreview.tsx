@@ -151,7 +151,6 @@ export function AlgorithmPreview({ algorithm }: AlgorithmPreviewProps) {
                     formatTime={() => "00:00"}
                     handleRandomProblem={() => {}}
                     handleNextProblem={() => {}}
-                    handlePreviousProblem={() => {}}
                     handleShare={() => {}}
                     handleSignOut={() => {}}
                  />
@@ -258,7 +257,6 @@ export function AlgorithmPreview({ algorithm }: AlgorithmPreviewProps) {
                     formatTime={() => "00:00"}
                     handleRandomProblem={() => {}}
                     handleNextProblem={() => {}}
-                    handlePreviousProblem={() => {}}
                     handleShare={() => {}}
                     handleSignOut={() => {}}
                  />
