@@ -292,7 +292,7 @@ export const ProblemDescriptionPanel = React.memo(({
                     {algorithm.explanation.problemStatement && (!algorithm?.controls || algorithm.controls?.description?.problem_statement !== false) && (
                         <RichText
                         content={algorithm.explanation.problemStatement}
-                        className="text-base leading-relaxed pr-4"
+                        className="text-base leading-relaxed pr-4 dark:text-muted-foreground"
                         onClick={handleRichTextClick}
                         ></RichText>
                       )}

@@ -45,9 +45,13 @@ export const RichText: React.FC<RichTextProps> = ({ content, className = '', onC
   // Parse only when content changes
   const parsedContent = useMemo(() => parse(safeContent, options), [safeContent, options]);
 
+  // Heuristic: If content doesn't look like HTML (no tags), preserve whitespace/newlines
+  const isHtml = /<[a-z][\s\S]*>/i.test(safeContent);
+  const whitespaceClass = isHtml ? '' : 'whitespace-pre-wrap';
+
   return (
     <div
-      className={`prose prose-sm max-w-none dark:prose-invert ${className}`}
+      className={`prose prose-sm max-w-none dark:prose-invert ${whitespaceClass} ${className}`}
       onClick={onClick}
       style={{
         // Ensure images are responsive
