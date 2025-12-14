@@ -360,6 +360,11 @@
   line-height: 1.5;
 }
 
+.comparison-table {
+  min-width: 600px;
+  /* Force scroll on small screens */
+}
+
 .prose thead {
   border-bottom: 2px solid hsl(var(--border));
 }
