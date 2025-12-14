@@ -1,6 +1,6 @@
 export enum ListType {
     Core = 'core',
-    Blind75 = 'blind-75',
+    Blind75 = 'blind75',
     CoreAndBlind75 = 'core+blind75',
 }
 

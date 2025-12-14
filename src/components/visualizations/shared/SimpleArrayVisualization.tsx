@@ -16,7 +16,7 @@ export const SimpleArrayVisualization = ({ array, highlights, label }: SimpleArr
           const height = typeof value === 'number' ? (value / maxValue) * 100 : 50;
           
           return (
-            <div key={index} className="flex flex-col items-center gap-2 flex-1 max-w-[80px]">
+            <div key={index} className="flex flex-col items-center gap-2 flex-1 max-w-[80px] flex-wrap">
               <div
                 className={`w-full rounded-t transition-all duration-300 flex items-end justify-center pb-2 ${
                   isHighlighted ? 'bg-primary' : 'bg-muted'
