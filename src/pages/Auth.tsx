@@ -7,7 +7,12 @@ import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Loader2, Mail, Lock, User, Sparkles } from 'lucide-react';
+import { Loader2, Mail, Lock, User, Sparkles, ArrowLeft } from 'lucide-react';
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from '@/components/ui/input-otp';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -16,6 +21,11 @@ const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  
+  // OTP states
+  const [showOtpInput, setShowOtpInput] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   useEffect(() => {
     if (!supabase) {
@@ -42,7 +52,107 @@ const Auth = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  const handleEmailAuth = async (e: React.FormEvent) => {
+  // Resend cooldown timer
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendCooldown]);
+
+  const handleSendOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!supabase) {
+      toast.error('Authentication is not available. Please contact support.');
+      return;
+    }
+
+    if (!email.trim()) {
+      toast.error('Please enter your email address');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          shouldCreateUser: false, // Only existing users can sign in with OTP
+        },
+      });
+
+      if (error) throw error;
+      
+      toast.success('Check your email for the verification code!');
+      setShowOtpInput(true);
+      setResendCooldown(60);
+    } catch (error: any) {
+      if (error.message?.includes('Signups not allowed')) {
+        toast.error('No account found with this email. Please sign up first.');
+      } else {
+        toast.error(error.message || 'Failed to send verification code');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!supabase) {
+      toast.error('Authentication is not available. Please contact support.');
+      return;
+    }
+
+    if (otpCode.length !== 6) {
+      toast.error('Please enter the complete 6-digit code');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email,
+        token: otpCode,
+        type: 'email',
+      });
+
+      if (error) throw error;
+      toast.success('Welcome back!');
+    } catch (error: any) {
+      toast.error(error.message || 'Invalid verification code');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (resendCooldown > 0 || !supabase) return;
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          shouldCreateUser: false,
+        },
+      });
+
+      if (error) throw error;
+      toast.success('New verification code sent!');
+      setResendCooldown(60);
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to resend code');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!supabase) {
@@ -53,32 +163,23 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
-      if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/`,
-            data: {
-              full_name: fullName,
-            },
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            full_name: fullName,
           },
-        });
+        },
+      });
 
-        if (error) throw error;
-        toast.success('Account created! You can now sign in.');
-        setIsSignUp(false);
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (error) throw error;
-        toast.success('Welcome back!');
-      }
+      if (error) throw error;
+      toast.success('Account created! You can now sign in with OTP.');
+      setIsSignUp(false);
+      setShowOtpInput(false);
     } catch (error: any) {
-      toast.error(error.message || 'Authentication failed');
+      toast.error(error.message || 'Sign up failed');
     } finally {
       setIsLoading(false);
     }
@@ -106,26 +207,28 @@ const Auth = () => {
     }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background via-muted/20 to-background p-4">
-      <Card className="w-full max-w-md p-8 glass-card">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
-            <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-primary">Algorithm Learning Platform</span>
-          </div>
-          <h1 className="text-3xl font-bold mb-2">
-            {isSignUp ? 'Create Account' : 'Welcome Back'}
-          </h1>
-          <p className="text-muted-foreground">
-            {isSignUp
-              ? 'Start your journey to master algorithms'
-              : 'Continue learning algorithms visually'}
-          </p>
-        </div>
+  const handleBackToEmail = () => {
+    setShowOtpInput(false);
+    setOtpCode('');
+  };
 
-        <form onSubmit={handleEmailAuth} className="space-y-4">
-          {isSignUp && (
+  // Sign Up Form
+  if (isSignUp) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background via-muted/20 to-background p-4">
+        <Card className="w-full max-w-md p-8 glass-card">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
+              <Sparkles className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium text-primary">Algorithm Learning Platform</span>
+            </div>
+            <h1 className="text-3xl font-bold mb-2">Create Account</h1>
+            <p className="text-muted-foreground">
+              Start your journey to master algorithms
+            </p>
+          </div>
+
+          <form onSubmit={handleSignUp} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="fullName" className="flex items-center gap-2">
                 <User className="w-4 h-4" />
@@ -137,12 +240,165 @@ const Auth = () => {
                 placeholder="John Doe"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                required={isSignUp}
+                required
                 disabled={isLoading}
               />
             </div>
-          )}
 
+            <div className="space-y-2">
+              <Label htmlFor="email" className="flex items-center gap-2">
+                <Mail className="w-4 h-4" />
+                Email
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={isLoading}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password" className="flex items-center gap-2">
+                <Lock className="w-4 h-4" />
+                Password
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={isLoading}
+                minLength={6}
+              />
+            </div>
+
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Creating account...
+                </>
+              ) : (
+                'Sign Up'
+              )}
+            </Button>
+          </form>
+
+          <div className="mt-6 text-center text-sm">
+            <button
+              type="button"
+              onClick={() => setIsSignUp(false)}
+              className="text-primary hover:underline"
+              disabled={isLoading}
+            >
+              Already have an account? Sign in
+            </button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  // OTP Verification Form
+  if (showOtpInput) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background via-muted/20 to-background p-4">
+        <Card className="w-full max-w-md p-8 glass-card">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
+              <Mail className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium text-primary">Check Your Email</span>
+            </div>
+            <h1 className="text-3xl font-bold mb-2">Enter Verification Code</h1>
+            <p className="text-muted-foreground">
+              We sent a 6-digit code to <br />
+              <span className="font-medium text-foreground">{email}</span>
+            </p>
+          </div>
+
+          <form onSubmit={handleVerifyOtp} className="space-y-6">
+            <div className="flex justify-center">
+              <InputOTP
+                maxLength={6}
+                value={otpCode}
+                onChange={(value) => setOtpCode(value)}
+                disabled={isLoading}
+              >
+                <InputOTPGroup>
+                  <InputOTPSlot index={0} />
+                  <InputOTPSlot index={1} />
+                  <InputOTPSlot index={2} />
+                </InputOTPGroup>
+                <span className="mx-2 text-muted-foreground">-</span>
+                <InputOTPGroup>
+                  <InputOTPSlot index={3} />
+                  <InputOTPSlot index={4} />
+                  <InputOTPSlot index={5} />
+                </InputOTPGroup>
+              </InputOTP>
+            </div>
+
+            <Button type="submit" className="w-full" disabled={isLoading || otpCode.length !== 6}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Verifying...
+                </>
+              ) : (
+                'Verify Code'
+              )}
+            </Button>
+          </form>
+
+          <div className="mt-6 text-center space-y-3">
+            <button
+              type="button"
+              onClick={handleResendOtp}
+              className={`text-sm ${resendCooldown > 0 ? 'text-muted-foreground' : 'text-primary hover:underline'}`}
+              disabled={resendCooldown > 0 || isLoading}
+            >
+              {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : 'Resend code'}
+            </button>
+            
+            <div>
+              <button
+                type="button"
+                onClick={handleBackToEmail}
+                className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 mx-auto"
+                disabled={isLoading}
+              >
+                <ArrowLeft className="w-3 h-3" />
+                Back to email
+              </button>
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  // Email Entry Form (Sign In with OTP)
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background via-muted/20 to-background p-4">
+      <Card className="w-full max-w-md p-8 glass-card">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
+            <Sparkles className="w-4 h-4 text-primary" />
+            <span className="text-sm font-medium text-primary">Algorithm Learning Platform</span>
+          </div>
+          <h1 className="text-3xl font-bold mb-2">Welcome Back</h1>
+          <p className="text-muted-foreground">
+            Sign in with a verification code sent to your email
+          </p>
+        </div>
+
+        <form onSubmit={handleSendOtp} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email" className="flex items-center gap-2">
               <Mail className="w-4 h-4" />
@@ -159,33 +415,14 @@ const Auth = () => {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="password" className="flex items-center gap-2">
-              <Lock className="w-4 h-4" />
-              Password
-            </Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              disabled={isLoading}
-              minLength={6}
-            />
-          </div>
-
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Please wait...
+                Sending code...
               </>
-            ) : isSignUp ? (
-              'Sign Up'
             ) : (
-              'Sign In'
+              'Send Verification Code'
             )}
           </Button>
         </form>
@@ -228,11 +465,11 @@ const Auth = () => {
         <div className="mt-6 text-center text-sm">
           <button
             type="button"
-            onClick={() => setIsSignUp(!isSignUp)}
+            onClick={() => setIsSignUp(true)}
             className="text-primary hover:underline"
             disabled={isLoading}
           >
-            {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+            Don't have an account? Sign up
           </button>
         </div>
       </Card>
