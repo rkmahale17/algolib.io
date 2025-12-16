@@ -165,7 +165,7 @@ export const ThreeSumVisualization = () => {
           <Card className="p-6">
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-center">3Sum - Two Pointer Approach</h3>
-              <div className="flex items-center justify-center gap-2 min-h-[200px]">
+              <div className="flex items-center justify-center gap-2 min-h-[200px] flex-wrap">
                 {step.array.map((value, index) => (
                   <div key={index} className="flex flex-col items-center gap-2">
                     <div

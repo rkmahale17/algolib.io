@@ -397,6 +397,7 @@ const generateCppRunner = (
 #include <map>
 #include <unordered_set>
 #include <climits>
+#include <set>
 using namespace std;
 
 // Helper to print vectors
