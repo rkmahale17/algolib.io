@@ -52,7 +52,8 @@ const ConditionalNavbar = () => {
   const location = useLocation();
   // Hide navbar on algorithm detail pages and blind75 detail pages
   const hideNavbar = location.pathname.startsWith('/algorithm/') || 
-                     (location.pathname.startsWith('/blind75/') && location.pathname !== '/blind75');
+                     (location.pathname.startsWith('/blind75/') && location.pathname !== '/blind75') ||
+                     location.pathname.startsWith('/admin');
   
   if (hideNavbar) return null;
   return <Navbar />;

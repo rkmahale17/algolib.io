@@ -41,7 +41,7 @@ export default function AdminAlgorithmDetail() {
   }
 
   return (
-    <div className=" mx-auto pb-2 mx-2">
+    <div className=" mx-auto  mx-2">
    
       <AlgorithmFormBuilder
         algorithm={algorithm}
