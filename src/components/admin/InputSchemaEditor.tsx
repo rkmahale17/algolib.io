@@ -111,7 +111,7 @@ export function InputSchemaEditor({ schema, onChange }: InputSchemaEditorProps) 
                       </SelectTrigger>
                       <SelectContent>
                         {FIELD_TYPES.map((type) => (
-                          <SelectItem key={type.value} value={type.value}>
+                          <SelectItem key={`${type.value}-option`} value={type.value}>
                             {type.label}
                           </SelectItem>
                         ))}

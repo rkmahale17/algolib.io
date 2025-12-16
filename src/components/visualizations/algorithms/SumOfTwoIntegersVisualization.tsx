@@ -154,12 +154,12 @@ export const SumOfTwoIntegersVisualization = () => {
   const leftContent = (
     <>
       <div className="space-y-4">
-        <div className="flex gap-2 justify-center items-center">
+        <div className="flex gap-2 justify-center items-center flex-wrap">
           <div className="p-4 bg-primary/10 rounded-lg border border-primary/20 flex-1">
             <h3 className="font-semibold mb-2 text-sm">a (binary)</h3>
-            <div className="flex gap-1 justify-center">
+            <div className="flex gap-1 justify-center flex-wrap">
               {step.bitsA.map((bit, idx) => (
-                <div key={idx} className={`w-10 h-10 flex items-center justify-center font-mono text-lg border-2 rounded ${bit === '1' ? 'bg-primary/30 border-primary' : 'bg-muted border-border'}`}>
+                <div key={idx} className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center font-mono text-lg border-2 rounded ${bit === '1' ? 'bg-primary/30 border-primary' : 'bg-muted border-border'}`}>
                   {bit}
                 </div>
               ))}
@@ -169,9 +169,9 @@ export const SumOfTwoIntegersVisualization = () => {
           
           <div className="p-4 bg-secondary/10 rounded-lg border border-secondary/20 flex-1">
             <h3 className="font-semibold mb-2 text-sm">b (carry)</h3>
-            <div className="flex gap-1 justify-center">
+            <div className="flex gap-1 justify-center flex-wrap">
               {step.bitsB.map((bit, idx) => (
-                <div key={idx} className={`w-10 h-10 flex items-center justify-center font-mono text-lg border-2 rounded ${bit === '1' ? 'bg-secondary/30 border-secondary' : 'bg-muted border-border'}`}>
+                <div key={idx} className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center font-mono text-lg border-2 rounded ${bit === '1' ? 'bg-secondary/30 border-secondary' : 'bg-muted border-border'}`}>
                   {bit}
                 </div>
               ))}
@@ -183,9 +183,9 @@ export const SumOfTwoIntegersVisualization = () => {
         {step.bitsCarry && (
           <div className="p-4 bg-accent/10 rounded-lg border border-accent/20">
             <h3 className="font-semibold mb-2 text-sm text-center">Carry Calculation</h3>
-            <div className="flex gap-1 justify-center">
+            <div className="flex gap-1 justify-center flex-wrap">
               {step.bitsCarry.map((bit, idx) => (
-                <div key={idx} className={`w-10 h-10 flex items-center justify-center font-mono text-lg border-2 rounded ${bit === '1' ? 'bg-accent/30 border-accent' : 'bg-muted border-border'}`}>
+                <div key={idx} className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center font-mono text-lg border-2 rounded ${bit === '1' ? 'bg-accent/30 border-accent' : 'bg-muted border-border'}`}>
                   {bit}
                 </div>
               ))}

@@ -20,12 +20,18 @@ export const AlgoLink: React.FC<AlgoLinkProps> = ({
   iconClassName,
   hideIcon = false
 }) => {
-  const content = children || label || url;
+  const content = children || label || url || 'Link';
 
+  // Guard against missing URL
+  if (!url) {
+    return <span className={className}>{content}</span>;
+  }
+
+  const safeUrl = url.trim();
   // Determine link type
-  const isMail = url.startsWith('mailto:');
-  const isHash = url.startsWith('#');
-  const isExternal = url.startsWith('http') || url.startsWith('https') || url.startsWith('//');
+  const isMail = safeUrl.startsWith('mailto:');
+  const isHash = safeUrl.startsWith('#');
+  const isExternal = safeUrl.startsWith('http') || safeUrl.startsWith('https') || safeUrl.startsWith('//');
   
   // Icon Size and Style
   const iconBaseClass = cn("inline-block ml-1.5 w-4 h-4", iconClassName);

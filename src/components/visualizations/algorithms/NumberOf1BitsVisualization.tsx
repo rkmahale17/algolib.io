@@ -243,14 +243,14 @@ export const NumberOf1BitsVisualization = () => {
           >
             <div className="p-6 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg border">
               <h3 className="font-semibold mb-4 text-center">Binary Representation</h3>
-              <div className="flex gap-1 justify-center mb-4">
+              <div className="flex gap-1 justify-center mb-4 flex-wrap">
                 {step.bits.map((bit, idx) => (
                   <motion.div
                     key={idx}
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: idx * 0.05 }}
-                    className={`w-10 h-10 flex items-center justify-center font-mono text-lg border-2 rounded transition-all ${
+                    className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center font-mono text-lg border-2 rounded transition-all ${
                       bit === '1' 
                         ? 'bg-primary/30 border-primary font-bold' 
                         : 'bg-muted border-border'

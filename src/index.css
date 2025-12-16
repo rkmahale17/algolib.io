@@ -361,8 +361,60 @@
 }
 
 .comparison-table {
-  min-width: 600px;
-  /* Force scroll on small screens */
+  min-width: 100%;
+  /* Allow full width */
+  border-collapse: collapse;
+  /* Ensure borders look right */
+}
+
+/* Enforce min-width on cells to ensure scrolling on small screens */
+.comparison-table th,
+.comparison-table td {
+  min-width: 200px;
+  /* Reduced to ensure scrolling on <400px but fit better on tablets */
+  word-wrap: break-word;
+}
+
+/* Define a container for the table to query against */
+.responsive-table-container {
+  container-type: inline-size;
+  width: 100%;
+  /* Ensure it has width */
+}
+
+/* Sticky First Column - Only when CONTAINER is wide enough */
+@container (min-width: 500px) {
+
+  .comparison-table th:first-child,
+  .comparison-table td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 50;
+    /* Drop shadow to right + separator line inside + LEFT border inside */
+    box-shadow:
+      inset 1px 0 0 0 hsl(var(--border)),
+      inset -1px 0 0 0 hsl(var(--border)),
+      5px 0 10px -2px rgba(0, 0, 0, 0.1);
+    border-right: none;
+    border-left: none;
+  }
+
+  /* Ensure background opacity for sticky column to cover scrolled content */
+  .comparison-table th:first-child {
+    background-color: hsl(var(--muted));
+    /* Match header bg - OPAQUE */
+  }
+
+  .comparison-table td:first-child {
+    background-color: hsl(var(--card));
+    /* Default background - OPAQUE */
+  }
+
+  /* Fix for zebra striping if rows have hover/alt backgrounds */
+  .prose tbody tr:hover td:first-child {
+    background-color: hsl(var(--muted));
+    /* OPAQUE hover state, no transparency */
+  }
 }
 
 .prose thead {
