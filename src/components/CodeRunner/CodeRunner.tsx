@@ -31,7 +31,7 @@ import { Switch } from "@/components/ui/switch";
 import confetti from 'canvas-confetti';
 
 import { LanguageSelector, Language } from './LanguageSelector';
-import { LazyCodeEditor } from './LazyCodeEditor';
+import { LazyCodeEditor, CodeEditorSkeleton } from './LazyCodeEditor';
 import type { CodeEditorRef } from './CodeEditor';
 import { OutputPanel } from './OutputPanel';
 import { DEFAULT_CODE, LANGUAGE_IDS } from './constants';
@@ -67,6 +67,7 @@ interface CodeRunnerProps {
   // New props for remote control
   onStateChange?: (state: { isLoading: boolean; isSubmitting: boolean; lastRunSuccess: boolean }) => void;
   isMobile?: boolean;
+  isLoading?: boolean;
 }
 
 export interface CodeRunnerRef {
@@ -139,7 +140,8 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
   submissions: initialSubmissions = [],
   isInterviewMode,
   onStateChange,
-  isMobile
+  isMobile,
+  isLoading: isLoadingProp
 }, ref) => {
   const isLimitExceeded = useFeatureFlag("todays_limit_exceed");
   const [internalLanguage, setInternalLanguage] = useState<Language>('typescript');
@@ -980,24 +982,28 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
          </div>
        </div>
        <div className="flex-1 relative min-h-[300px]">
-         <LazyCodeEditor
-           ref={editorRef}
-           code={code}
-           isMobile={isMobile}
-           language={language}
-           path={`/runner/${algorithmId || 'playground'}/${language}/code.${language === 'python' ? 'py' : language === 'java' ? 'java' : language === 'cpp' ? 'cpp' : 'ts'}`}
-           onChange={(value) => {
-             const newCode = value || '';
-             setCode(newCode);
-             onCodeChange?.(newCode);
-             setLastRunSuccess(false); // Reset success on code change
-           }}
-           theme={settings.theme}
-           options={{
-             ...settings,
-             readOnly: false // Explicitly writable
-           }}
-         />
+         {isLoadingProp ? (
+           <CodeEditorSkeleton />
+         ) : (
+           <LazyCodeEditor
+             ref={editorRef}
+             code={code}
+             isMobile={isMobile}
+             language={language}
+             path={`/runner/${algorithmId || 'playground'}/${language}/code.${language === 'python' ? 'py' : language === 'java' ? 'java' : language === 'cpp' ? 'cpp' : 'ts'}`}
+             onChange={(value) => {
+               const newCode = value || '';
+               setCode(newCode);
+               onCodeChange?.(newCode);
+               setLastRunSuccess(false); // Reset success on code change
+             }}
+             theme={settings.theme}
+             options={{
+               ...settings,
+               readOnly: false // Explicitly writable
+             }}
+           />
+         )}
          
          {/* Mobile-only Floating Buttons */}
          <div className="absolute bottom-5 right-5 z-10 md:hidden">

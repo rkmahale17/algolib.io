@@ -336,28 +336,51 @@ const generateCppRunner = (
         return String(val);
     };
 
+    // Helper to find the common type across all test cases (to handle empty arrays correctly)
+    const determineCommonCppType = (testCases: TestCase[]): string => {
+        let maxDepth = 0;
+        let innerType = 'int'; // Default to int
+
+        const getDepthAndType = (val: any, currentDepth: number): void => {
+            if (Array.isArray(val)) {
+                if (val.length === 0) {
+                    // Empty array, just record depth if it's deeper than what we've seen
+                    if (currentDepth + 1 > maxDepth) maxDepth = currentDepth + 1;
+                    return;
+                }
+                // Non-empty, recurse
+                if (currentDepth + 1 > maxDepth) maxDepth = currentDepth + 1;
+                val.forEach(v => getDepthAndType(v, currentDepth + 1));
+            } else {
+                // Leaf value
+                if (typeof val === 'string') innerType = 'string';
+                else if (typeof val === 'boolean') innerType = 'bool';
+            }
+        };
+
+        testCases.forEach(tc => {
+            getDepthAndType(tc.expectedOutput, 0);
+        });
+
+        // Reconstruct vector type based on depth
+        let typeStr = innerType;
+        for (let i = 0; i < maxDepth; i++) {
+            typeStr = `vector<${typeStr}>`;
+        }
+        return typeStr;
+    };
+
+    const commonExpectedType = determineCommonCppType(testCases);
+
     const testCalls = testCases.map((tc, index) => {
         // Declare variables for inputs to avoid rvalue binding issues
         const inputDecls = tc.input.map((val, i) => {
             const cppType = deduceCppType(val);
-            // Use specific formatting based on schema type if needed, 
-            // but for inputs formatValue is usually ok. 
-            // However, let's use our new formatter for consistency if it's an array 
-            // to ensure nested arrays work for inputs too if schema says so.
-            // Actually inputSchema[i].type might be "number[][]" which getCppType doesn't handle well yet?
-            // getCppType handles "number[]", "string[]".
-            // Let's improve getCppType locally or just use `auto` and let C++ deduce from initializer?
-            // `auto` works well if initializer is `{...}` -> deduces std::initializer_list, not vector.
-            // We need explicit type for vectors usually.
+            // ... (rest of logic same) ...
 
             // Fix: if schema type implies 2D, we need proper C++ type string.
-            // For now, let's rely on deduceCppType from the VALUE for the declaration
-            // to be safe against schema mismatches, OR extend getCppType.
-
-            // Let's stick to schema-based for inputs if possible, but allow deduction fallback.
             let typeToUse = cppType;
             if (Array.isArray(val) && Array.isArray(val[0])) {
-                // It is 2D, override simple detection
                 typeToUse = deduceCppType(val);
             }
 
@@ -367,10 +390,9 @@ const generateCppRunner = (
 
         const args = tc.input.map((_, i) => `arg${i}`).join(', ');
 
-        // Handle expected output type mapping
-        const expectedType = deduceCppType(tc.expectedOutput);
+        // Use the common type for expected output
         const expectedValStr = formatCppLiteral(tc.expectedOutput);
-        const expectedDecl = `${expectedType} expected = ${expectedValStr};`;
+        const expectedDecl = `${commonExpectedType} expected = ${expectedValStr};`;
 
         return `
         {
@@ -395,7 +417,7 @@ const generateCppRunner = (
 #include <string>
 #include <algorithm>
 #include <map>
-#include <unordered_set>
+#include <unordered_set> 
 #include <climits>
 #include <set>
 using namespace std;

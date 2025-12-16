@@ -214,6 +214,9 @@ export const AlgorithmList = ({
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-lg group-hover:text-primary transition-colors truncate">
+                      <span className="mr-2 text-muted-foreground font-mono text-base text-x opacity-70">
+                        {index + 1}.
+                      </span>
                       {algo.displayTitle}
                     </h3>
                     <p className="text-sm text-muted-foreground mt-1">

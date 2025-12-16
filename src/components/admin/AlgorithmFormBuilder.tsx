@@ -180,7 +180,7 @@ export function AlgorithmFormBuilder({
   const isLoading = createMutation.isPending || updateMutation.isPending;
 
   return (
-    <div className="space-y-2 w-[calc(100 - 100px)]">
+    <div className="space-y-0 w-full">
       {/* Header with Action Buttons */}
       <div className="flex items-center justify-between sticky top-0 z-10 bg-background pb-0 border-b">
         <div>
@@ -201,7 +201,7 @@ export function AlgorithmFormBuilder({
         </div>
       </div>
 
-      <div className="h-[calc(100vh-140px)] pb-12 ">
+      <div className="h-[calc(100vh-40px)]  ">
         <ResizablePanelGroup direction="horizontal" className="h-full border rounded-lg overflow-hidden">
           {/* Left Side - Form */}
           <ResizablePanel defaultSize={50} minSize={20} collapsible={true} className="min-w-0">

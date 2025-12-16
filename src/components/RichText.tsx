@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import parse, { DOMNode, Element, domToReact, HTMLReactParserOptions } from 'html-react-parser';
 import { AlgoLink } from './AlgoLink';
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { ResponsiveTableContainer } from './ResponsiveTableContainer';
 
 interface RichTextProps {
   content: string | string[];
@@ -64,6 +65,22 @@ export const RichText: React.FC<RichTextProps> = ({ content, className = '', onC
              />
            );
         }
+
+        // Handle <table> tags to automatically wrap them in responsive container
+        if (domNode.name === 'table') {
+          const { class: className, style, ...rest } = domNode.attribs;
+          const children = domToReact(domNode.children as DOMNode[], options);
+          
+          const combinedClass = (`${className || ''} comparison-table`).trim();
+
+          return (
+            <ResponsiveTableContainer>
+               <table className={combinedClass} style={style} {...rest}>
+                 {children}
+               </table>
+            </ResponsiveTableContainer>
+          );
+        }
       }
     }
   }), []);
@@ -73,6 +90,7 @@ export const RichText: React.FC<RichTextProps> = ({ content, className = '', onC
 
   // Heuristic: If content doesn't look like HTML (no tags), preserve whitespace/newlines
   const isHtml = /<[a-z][\s\S]*>/i.test(safeContent);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const whitespaceClass = isHtml ? '' : 'whitespace-pre-wrap';
 
   return (

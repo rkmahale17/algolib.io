@@ -230,7 +230,7 @@ export function TestCaseEditor({
                     <div className="grid gap-3">
                       {inputSchema.map((field, inputIndex) => (
                         <TestCaseInput
-                          key={inputIndex}
+                          key={`${field.name}-${inputIndex}`}
                           label={`${field.label} (${field.type})`}
                           type={field.type}
                           value={testCase.input[inputIndex]}
