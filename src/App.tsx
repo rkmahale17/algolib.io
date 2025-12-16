@@ -38,6 +38,7 @@ const FeedbackAdmin = lazy(() => import("./pages/FeedbackAdmin"));
 const Blog = lazy(() => import("./pages/Blog"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const AdminFeatureFlags = lazy(() => import("./pages/AdminFeatureFlags"));
+const AdminSimulator = lazy(() => import("./pages/AdminSimulator"));
 
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { ProtectedAdminRoute } from "./components/ProtectedAdminRoute";
@@ -165,6 +166,12 @@ const AppContent = () => {
                     <FeedbackAdmin />
                   </ProtectedAdminRoute>
                 } />
+
+                  <Route path="/admin/simulator" element={
+                    <ProtectedAdminRoute>
+                      <AdminSimulator />
+                    </ProtectedAdminRoute>
+                  } />
                 
 
                 <Route path="/admin/features" element={

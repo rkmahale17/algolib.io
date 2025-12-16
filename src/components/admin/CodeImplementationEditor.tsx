@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, X, Text, AlertTriangle, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Trash2, X, Text, AlertTriangle, ChevronLeft, ChevronRight, Pencil } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -67,6 +67,11 @@ export function CodeImplementationEditor({
   const [activeCodeType, setActiveCodeType] = useState<string>("optimize");
   const [newApproachName, setNewApproachName] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  
+  // Rename state
+  const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
+  const [renamingApproachOldName, setRenamingApproachOldName] = useState("");
+  const [renamingApproachNewName, setRenamingApproachNewName] = useState("");
   
   // Deletion confirmation state
   const [deleteConfirm, setDeleteConfirm] = useState<{
@@ -176,6 +181,54 @@ export function CodeImplementationEditor({
     }
     
     setDeleteConfirm({ isOpen: false, type: 'language', id: '' });
+  };
+
+  // Open rename dialog
+  const openRenameDialog = (codeType: string) => {
+    setRenamingApproachOldName(codeType);
+    setRenamingApproachNewName(codeType.replace(/-/g, ' ')); // Pre-fill with readable name
+    setIsRenameDialogOpen(true);
+  };
+
+  // Handle renaming
+  const handleRenameApproach = () => {
+    if (!renamingApproachNewName.trim()) return;
+
+    const oldKey = renamingApproachOldName;
+    const newKey = renamingApproachNewName.trim().toLowerCase().replace(/\s+/g, '-');
+
+    if (oldKey === newKey) {
+        setIsRenameDialogOpen(false);
+        return;
+    }
+
+    // Check if new key already exists (and it's not the one we are renaming)
+    if (currentImpl && currentImpl.code.find(c => c.codeType === newKey && c.codeType !== oldKey)) {
+        // Maybe show error toast here? For now just return
+        return;
+    }
+
+    // Update ALL implementations
+    const updatedImpls = implementations.map(impl => ({
+        ...impl,
+        code: impl.code.map(c => {
+            if (c.codeType === oldKey) {
+                return { ...c, codeType: newKey };
+            }
+            return c;
+        })
+    }));
+
+    onChange(updatedImpls);
+
+    // Update active type if we renamed the active one
+    if (activeCodeType === oldKey) {
+        setActiveCodeType(newKey);
+    }
+
+    setIsRenameDialogOpen(false);
+    setRenamingApproachOldName("");
+    setRenamingApproachNewName("");
   };
 
   const handleCreateApproach = () => {
@@ -304,6 +357,33 @@ export function CodeImplementationEditor({
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Dialog for Renaming Approach */}
+      <Dialog open={isRenameDialogOpen} onOpenChange={setIsRenameDialogOpen}>
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Rename Approach</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="rename-name" className="text-right">
+                        New Name
+                    </Label>
+                    <Input
+                        id="rename-name"
+                        value={renamingApproachNewName}
+                        onChange={(e) => setRenamingApproachNewName(e.target.value)}
+                        placeholder="e.g. Optimized Approach"
+                        className="col-span-3"
+                    />
+                </div>
+            </div>
+            <DialogFooter>
+                <Button variant="outline" onClick={() => setIsRenameDialogOpen(false)}>Cancel</Button>
+                <Button onClick={handleRenameApproach}>Rename</Button>
+            </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Combined Editor Card */}
       <Card className="border-2">
         <CardHeader className="pb-3 space-y-4">
@@ -343,6 +423,19 @@ export function CodeImplementationEditor({
                             <span className="capitalize select-none">{block.codeType.replace(/-/g, ' ')}</span>
                             
                             <div className="flex items-center gap-1 ml-1">
+                                 {/* Edit Button */}
+                                 <button
+                                     type="button"
+                                     className={`p-1 hover:bg-white/20 rounded transition-colors ${activeCodeType === block.codeType ? 'text-primary-foreground/80 hover:text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                                     onClick={(e) => {
+                                         e.stopPropagation();
+                                         openRenameDialog(block.codeType);
+                                     }}
+                                     title="Rename Approach"
+                                 >
+                                     <Pencil className="w-3 h-3" />
+                                 </button>
+
                                  {/* Only show delete if there's more than one approach OR if user wants to delete the last one */}
                                 {currentImpl.code.length > 0 && (
                                     <button
@@ -352,6 +445,7 @@ export function CodeImplementationEditor({
                                             e.stopPropagation();
                                             confirmRemoveApproach(block.codeType);
                                         }}
+                                        title="Delete Approach"
                                     >
                                         <X className="w-3 h-3" />
                                     </button>

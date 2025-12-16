@@ -10,99 +10,120 @@ export const MissingNumberVisualization = () => {
 
   const nums = [3, 0, 1];
   
+  // Code line mapping (1-based):
+  // 1: function...
+  // 2:   // Start...
+  // 3:   let res = nums.length;
+  // 4: 
+  // 5:   // Loop...
+  // 6:   for (let i = 0; i < nums.length; i++) {
+  // 7:       // Add...
+  // 8:       res += i - nums[i];
+  // 9:   }
+  // 10:
+  // 11:  // Remaining...
+  // 12:  return res;
+  // 13: }
+
   const steps = [
     {
       array: nums,
       highlighting: [],
-      variables: { result: 3, resultBinary: '11', operation: 'Initialize' },
-      explanation: "XOR approach: result = n (array length) = 3. Array: [3, 0, 1], range should be [0,1,2,3]",
-      highlightedLine: 1
+      variables: { res: 3, n: 3 },
+      explanation: "Initialize res = n = 3. This accounts for the missing index n in the 0..n range.",
+      highlightedLine: 3 // Fixed: Points to 'let res...'
     },
     {
       array: nums,
       highlighting: [],
-      variables: { result: 3, i: 0, 'nums[0]': 3 },
-      explanation: "Start loop: i = 0. Will XOR with index 0 and value nums[0] = 3",
-      highlightedLine: 2
+      variables: { res: 3, i: 0, 'nums[0]': 3 },
+      explanation: "Start loop at i = 0. We will compute diff = i - nums[i].",
+      highlightedLine: 6 // Fixed: Points to 'for loop'
     },
     {
       array: nums,
       highlighting: [0],
-      variables: { result: 3, i: 0, operation: 'result ^= 0' },
-      explanation: "Step 1: result ^= i → 3 ^ 0 = 3 (XOR with index)",
-      highlightedLine: 3,
-      calc: '11 ^ 00 = 11'
+      variables: { res: 3, i: 0, 'nums[0]': 3, diff: -3 },
+      explanation: "Calculate difference: i - nums[i] = 0 - 3 = -3.",
+      highlightedLine: 8, // Fixed: Points to 'res += ...'
+      calc: '0 - 3 = -3'
     },
     {
       array: nums,
       highlighting: [0],
-      variables: { result: 0, i: 0, operation: 'result ^= nums[0]', resultBinary: '00' },
-      explanation: "Step 2: result ^= nums[0] → 3 ^ 3 = 0 (XOR with value). 3 cancels out!",
-      highlightedLine: 3,
-      calc: '11 ^ 11 = 00'
+      variables: { res: 0, i: 0, 'nums[i]': 3, prevRes: 3 },
+      explanation: "Update res: res += -3 → 3 + (-3) = 0.",
+      highlightedLine: 8,
+      calc: '3 + (-3) = 0'
     },
     {
       array: nums,
       highlighting: [],
-      variables: { result: 0, i: 1, 'nums[1]': 0 },
-      explanation: "Loop: i = 1. Will XOR with index 1 and value nums[1] = 0",
-      highlightedLine: 2
+      variables: { res: 0, i: 1, 'nums[1]': 0 },
+      explanation: "Loop: i = 1. We will compute diff = i - nums[i].",
+      highlightedLine: 6
     },
     {
       array: nums,
       highlighting: [1],
-      variables: { result: 1, i: 1, operation: 'result ^= 1', resultBinary: '01' },
-      explanation: "Step 1: result ^= i → 0 ^ 1 = 1 (XOR with index)",
-      highlightedLine: 3,
-      calc: '00 ^ 01 = 01'
+      variables: { res: 0, i: 1, 'nums[1]': 0, diff: 1 },
+      explanation: "Calculate difference: i - nums[i] = 1 - 0 = 1.",
+      highlightedLine: 8,
+      calc: '1 - 0 = 1'
     },
     {
       array: nums,
       highlighting: [1],
-      variables: { result: 1, i: 1, operation: 'result ^= nums[1]', resultBinary: '01' },
-      explanation: "Step 2: result ^= nums[1] → 1 ^ 0 = 1 (XOR with value). 0 cancels out!",
-      highlightedLine: 3,
-      calc: '01 ^ 00 = 01'
+      variables: { res: 1, i: 1, 'nums[i]': 0, prevRes: 0 },
+      explanation: "Update res: res += 1 → 0 + 1 = 1.",
+      highlightedLine: 8,
+      calc: '0 + 1 = 1'
     },
     {
       array: nums,
       highlighting: [],
-      variables: { result: 1, i: 2, 'nums[2]': 1 },
-      explanation: "Loop: i = 2. Will XOR with index 2 and value nums[2] = 1",
-      highlightedLine: 2
+      variables: { res: 1, i: 2, 'nums[2]': 1 },
+      explanation: "Loop: i = 2. We will compute diff = i - nums[i].",
+      highlightedLine: 6
     },
     {
       array: nums,
       highlighting: [2],
-      variables: { result: 3, i: 2, operation: 'result ^= 2', resultBinary: '11' },
-      explanation: "Step 1: result ^= i → 1 ^ 2 = 3 (XOR with index)",
-      highlightedLine: 3,
-      calc: '01 ^ 10 = 11'
+      variables: { res: 1, i: 2, 'nums[2]': 1, diff: 1 },
+      explanation: "Calculate difference: i - nums[i] = 2 - 1 = 1.",
+      highlightedLine: 8,
+      calc: '2 - 1 = 1'
     },
     {
       array: nums,
       highlighting: [2],
-      variables: { result: 2, i: 2, operation: 'result ^= nums[2]', resultBinary: '10' },
-      explanation: "Step 2: result ^= nums[2] → 3 ^ 1 = 2 (XOR with value). 1 cancels out!",
-      highlightedLine: 3,
-      calc: '11 ^ 01 = 10'
+      variables: { res: 2, i: 2, 'nums[i]': 1, prevRes: 1 },
+      explanation: "Update res: res += 1 → 1 + 1 = 2.",
+      highlightedLine: 8,
+      calc: '1 + 1 = 2'
     },
     {
       array: nums,
       highlighting: [],
-      variables: { result: 2, answer: 2 },
-      explanation: "Exit loop. Return result = 2. The missing number is 2! All others cancelled via XOR.",
-      highlightedLine: 4,
-      calc: 'Result: 10 (binary) = 2 (decimal)'
+      variables: { res: 2 },
+      explanation: "Loop finished. The accumulated result is the missing number: 2.",
+      highlightedLine: 12, // Fixed: Points to 'return res'
+      calc: 'Result: 2'
     }
   ];
 
   const code = `function missingNumber(nums: number[]): number {
-  let result = nums.length;
-  for (let i = 0; i < nums.length; i++) {
-    result ^= i ^ nums[i];
-  }
-  return result;
+    // Start with n (array length)
+    let res = nums.length;
+
+    // Loop through all indices
+    for (let i = 0; i < nums.length; i++) {
+        // Add difference between index and value
+        res += i - nums[i];
+    }
+
+    // Remaining value is the missing number
+    return res;
 }`;
 
   const step = steps[currentStep];
@@ -157,8 +178,9 @@ export const MissingNumberVisualization = () => {
         {/* Left: Visualization */}
         <div className="space-y-4">
           <Card className="p-6">
-            <h3 className="text-sm font-semibold mb-3">Input Array</h3>
-            <div className="flex items-center justify-center gap-2">
+            <h3 className="text-sm font-semibold mb-3">Input Array (nums)</h3>
+            {/* Added flex-wrap for responsiveness */}
+            <div className="flex flex-wrap items-center justify-center gap-2">
               {step.array.map((value, index) => (
                 <div key={index} className="flex flex-col items-center gap-2">
                   <div
@@ -170,15 +192,21 @@ export const MissingNumberVisualization = () => {
                   >
                     {value}
                   </div>
-                  <span className="text-xs text-muted-foreground">{index}</span>
+                  <span className="text-xs text-muted-foreground">i = {index}</span>
                 </div>
               ))}
+              {/* Virtual Nth element explanation visual */}
+              <div className="flex flex-col items-center gap-2 opacity-50 border border-dashed rounded p-1">
+                 <div className="w-12 h-12 flex items-center justify-center text-xs text-center text-muted-foreground">
+                    n = {nums.length}
+                 </div>
+              </div>
             </div>
           </Card>
 
           {step.calc && (
             <Card className="p-4">
-              <h3 className="font-semibold mb-2 text-sm">Binary Calculation</h3>
+              <h3 className="font-semibold mb-2 text-sm">Calculation</h3>
               <p className="font-mono text-center text-lg">{step.calc}</p>
             </Card>
           )}
@@ -188,27 +216,26 @@ export const MissingNumberVisualization = () => {
           </Card>
 
           <Card className="p-4">
-            <h3 className="font-semibold mb-2 text-sm">XOR Properties:</h3>
-            <div className="text-xs space-y-1 text-muted-foreground">
-              <p>• a ^ a = 0 (any number XOR itself = 0)</p>
-              <p>• a ^ 0 = a (any number XOR 0 = itself)</p>
-              <p>• XOR is commutative: order doesn't matter</p>
-              <p>• We XOR all indices [0,1,2,3] with all values [3,0,1]</p>
-              <p>• Duplicates cancel out, leaving only the missing number!</p>
-            </div>
-          </Card>
-
-          <Card className="p-4">
             <h3 className="text-sm font-semibold mb-3">Variables</h3>
-            <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-4">
               {Object.entries(step.variables).map(([key, value]) => (
-                <div key={key} className="flex items-center justify-between text-sm">
+                <div key={key} className="flex items-center justify-between text-sm border-b pb-1">
                   <span className="font-mono text-muted-foreground">{key}</span>
                   <span className="font-mono font-bold text-primary">
                     {Array.isArray(value) ? `[${value.join(', ')}]` : String(value)}
                   </span>
                 </div>
               ))}
+            </div>
+          </Card>
+          
+           <Card className="p-4 bg-muted/20">
+            <h3 className="font-semibold mb-2 text-sm">Why this works?</h3>
+            <div className="text-xs space-y-1 text-muted-foreground">
+              <p>Consider the sum of indices [0...n] and sum of values in array.</p>
+              <p>Missing Number = Sum(0...n) - Sum(nums)</p>
+              <p>This approach computes this difference incrementally to avoid separate loops or potential overflow (though less of an issue here than complex multiplication).</p>
+              <p>res ends up being accumulating `n + (0-nums[0]) + (1-nums[1]) ...` which effectively re-arranges to `(n + 0 + 1 + ... ) - (nums[0] + nums[1] + ...)`.</p>
             </div>
           </Card>
         </div>
@@ -224,7 +251,7 @@ export const MissingNumberVisualization = () => {
                 <div
                   key={index}
                   className={`flex ${
-                    index === step.highlightedLine
+                    index + 1 === step.highlightedLine // Adjust for 1-based index vs 0-based loop
                       ? 'bg-primary/20 border-l-2 border-primary'
                       : ''
                   } transition-colors duration-300`}
@@ -232,7 +259,7 @@ export const MissingNumberVisualization = () => {
                   <span className="inline-block w-8 text-right pr-3 text-muted-foreground select-none">
                     {index + 1}
                   </span>
-                  <code className={index === step.highlightedLine ? 'font-bold' : ''}>
+                  <code className={index + 1 === step.highlightedLine ? 'font-bold' : ''}>
                     {line || ' '}
                   </code>
                 </div>
