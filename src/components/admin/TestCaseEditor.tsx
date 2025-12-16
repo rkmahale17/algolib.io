@@ -140,10 +140,6 @@ export function TestCaseEditor({
             Define test cases to validate the algorithm
           </p>
         </div>
-        <Button type="button" onClick={handleAdd} className="gap-2">
-          <Plus className="h-4 w-4" />
-          Add Test Case
-        </Button>
       </div>
 
       {testCases.length === 0 && (
@@ -282,6 +278,14 @@ export function TestCaseEditor({
             )}
           </Card>
         ))}
+
+        {/* Add Button at the bottom */}
+        <div className="flex justify-start">
+             <Button type="button" onClick={handleAdd} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Add Test Case
+            </Button>
+        </div>
       </div>
     </div>
   );
