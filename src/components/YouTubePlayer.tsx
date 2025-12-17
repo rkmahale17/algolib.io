@@ -120,7 +120,7 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ youtubeUrl, algori
         <div className="pt-4 border-t border-border/50">
           <p className="text-xs text-muted-foreground">
             <strong>Credits:</strong> Video tutorial by NeetCode (used with permission). 
-            All written explanations, code examples, and additional insights provided by Algolib.io.
+            All written explanations, code examples, and additional insights provided by Rulcode.com
           </p>
         </div>
       </div>

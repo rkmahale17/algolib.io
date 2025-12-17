@@ -494,7 +494,7 @@ export const ProblemDescriptionPanel = React.memo(({
                                       <div className="pt-2 border-t border-border/50">
                       <p className="text-xs text-muted-foreground">
                         <strong>Credits:</strong> Video tutorial by NeetCode (used with permission). All written
-                        explanations, code examples, and additional insights provided by Algolib.io.
+                        explanations, code examples, and additional insights provided by Rulcode.com.
                       </p>
                     </div>
                                     </div>

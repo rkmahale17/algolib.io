@@ -21,6 +21,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./ThemeToggle";
 import logo from "@/assets/logo.svg";
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { FeatureGuard } from "./FeatureGuard";
@@ -75,17 +76,12 @@ const Navbar = () => {
               to="/"
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
             >
-              <img src={logo} alt="Algo Lib Logo" className="w-8 h-8" />
-              <span className="font-bold text-xl">Algo Lib</span>
+              <img src={logo} alt="RulCode Logo" className="w-8 h-8" />
+              <span className=" text-xl font-mono" >RulCode</span>
+              {/* <span className="font-bold text-xl font-mono text-[1.2rem] underline-offset-2   " >Code</span> */}
+           
             </Link>
-            <a
-              href="https://neetcode.io"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden md:block text-xs text-muted-foreground hover:text-foreground transition-colors"
-            >
-              With Neetcode videos
-            </a>
+         
           </div>
 
           {/* Navigation Links */}
@@ -177,7 +173,7 @@ const Navbar = () => {
 
                 <DropdownMenuItem asChild>
                   <a
-                    href="https://github.com/chandeldivyam/AlgoLib"
+                    href="https://github.com/rkmahale17/algolib.io"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 cursor-pointer"

@@ -345,7 +345,7 @@ const SolutionApproach: React.FC<{
               {(controls?.languages !== false && langImplementations.length > 1) && isNarrow && (
                 <div className="px-2 py-1">
                    <Select value={activeLang} onValueChange={setActiveLang}>
-                    <SelectTrigger className="h-8 w-[140px] border-none shadow-none bg-transparent focus:ring-0 text-sm font-medium">
+                    <SelectTrigger className="h-8 w-[140px] border-none shadow-none bg-transparent focus:ring-0 focus:ring-offset-0 text-sm font-medium">
                       <SelectValue placeholder="Language" />
                     </SelectTrigger>
                     <SelectContent>

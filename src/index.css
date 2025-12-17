@@ -221,7 +221,7 @@
   background: hsl(var(--muted-foreground) / 0.5);
 }
 
-.tldraw-algolib .tlui-layout__bottom {
+.tldraw-rulcode .tlui-layout__bottom {
   position: relative !important;
   bottom: 65px !important;
 }

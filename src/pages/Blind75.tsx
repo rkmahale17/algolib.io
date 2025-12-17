@@ -28,7 +28,7 @@ const faqItems = [
   },
   {
     question: "Are these solutions available in multiple languages?",
-    answer: "Yes! All problems on AlgoLib include solutions and explanations in Python, Java, C++, and TypeScript.",
+    answer: "Yes! All problems on Rulcode include solutions and explanations in Python, Java, C++, and TypeScript.",
   }
 ];
 
@@ -57,7 +57,7 @@ const Blind75 = () => {
   return (
     <>
       <Helmet>
-        <title>Blind 75 LeetCode Problems - AlgoLib.io | FAANG Interview Preparation Guide</title>
+        <title>Blind 75 LeetCode Problems - Rulcode.com | FAANG Interview Preparation Guide</title>
         <meta 
           name="description"
           content="Master the Blind 75 - curated list of 75 essential LeetCode problems for coding interviews. Complete solutions in Python, Java, C++, TypeScript with detailed explanations and visualizations." 
@@ -66,28 +66,28 @@ const Blind75 = () => {
           name="keywords" 
           content="blind 75, leetcode, coding interview, interview preparation, leetcode problems, algorithm interview, FAANG interview, technical interview, coding practice" 
         />
-        <meta name="author" content="AlgoLib.io" />
+        <meta name="author" content="Rulcode.com" />
         <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
-        <link rel="canonical" href="https://algolib.io/blind75" />
+        <link rel="canonical" href="https://rulcode.com/blind75" />
         
         {/* Open Graph */}
         <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="AlgoLib.io" />
+        <meta property="og:site_name" content="Rulcode.com" />
         <meta property="og:title" content="Blind 75 LeetCode Problems - Complete Interview Guide" />
         <meta property="og:description" content="Master the 75 most important LeetCode problems for coding interviews with detailed solutions and visualizations" />
-        <meta property="og:url" content="https://algolib.io/blind75" />
-        <meta property="og:image" content="https://algolib.io/og-image.png" />
+        <meta property="og:url" content="https://rulcode.com/blind75" />
+        <meta property="og:image" content="https://rulcode.com/og-image.png" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:locale" content="en_US" />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@algolib_io" />
-        <meta name="twitter:creator" content="@algolib_io" />
+        <meta name="twitter:site" content="@rulcode_io" />
+        <meta name="twitter:creator" content="@rulcode_io" />
         <meta name="twitter:title" content="Blind 75 LeetCode Problems - Complete Interview Guide" />
         <meta name="twitter:description" content="Master the 75 most important LeetCode problems for coding interviews with detailed solutions and visualizations" />
-        <meta name="twitter:image" content="https://algolib.io/og-image.png" />
+        <meta name="twitter:image" content="https://rulcode.com/og-image.png" />
       </Helmet>
       
       <div className="min-h-screen bg-background">

@@ -9,7 +9,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* About Section */}
           <div className="space-y-3">
-            <h3 className="font-semibold text-foreground">AlgoLib.io</h3>
+            <h3 className="font-semibold text-foreground">RulCode</h3>
             <p className="text-sm text-muted-foreground">
               Open-source platform to learn, visualize, and master algorithms.
             </p>
@@ -35,7 +35,7 @@ export function Footer() {
               </li>
               <li>
                 <a 
-                  href="https://github.com/rkmahale17/algolib.io#-algorithm-index" 
+                  href="https://github.com/rkmahale17/rulcode.com#-algorithm-index" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -52,7 +52,7 @@ export function Footer() {
             <ul className="space-y-2">
               <li>
                 <a 
-                  href="https://github.com/rkmahale17/algolib.io" 
+                  href="https://github.com/rkmahale17/rulcode.com" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1"
@@ -63,7 +63,7 @@ export function Footer() {
               </li>
               <li>
                 <a 
-                  href="https://github.com/rkmahale17/algolib.io/issues/new" 
+                  href="https://github.com/rkmahale17/rulcode.com/issues/new" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -73,7 +73,7 @@ export function Footer() {
               </li>
               <li>
                 <a 
-                  href="https://github.com/rkmahale17/algolib.io#-contribute" 
+                  href="https://github.com/rkmahale17/rulcode.com#-contribute" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -112,7 +112,7 @@ export function Footer() {
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="flex flex-col items-center sm:items-start gap-2">
               <p className="text-sm text-muted-foreground text-center sm:text-left">
-                © {new Date().getFullYear()} AlgoLib.io. Open source and free forever.
+                © {new Date().getFullYear()} RulCode. Open source and free forever.
               </p>
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-3 text-xs text-muted-foreground">
                 <a 
@@ -139,7 +139,7 @@ export function Footer() {
             <div className="flex items-center gap-3">
               <Button variant="outline" size="sm" asChild>
                 <a 
-                  href="https://github.com/rkmahale17/algolib.io" 
+                  href="https://github.com/rkmahale17/rulcode.com" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="flex items-center gap-2"

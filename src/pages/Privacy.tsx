@@ -6,20 +6,20 @@ export default function Privacy() {
   return (
     <>
       <Helmet>
-        <title>Privacy Policy - AlgoLib.io | Data Protection & User Privacy</title>
+        <title>Privacy Policy - Rulcode.com | Data Protection & User Privacy</title>
         <meta 
           name="description" 
-          content="AlgoLib.io Privacy Policy - Learn how we protect your data and privacy. Minimal data collection, no ads tracking, open-source transparency. Read our privacy practices for algorithm learning platform." 
+          content="Rulcode.com Privacy Policy - Learn how we protect your data and privacy. Minimal data collection, no ads tracking, open-source transparency. Read our privacy practices for algorithm learning platform." 
         />
         <meta 
           name="keywords" 
-          content="algolib privacy policy, data protection, user privacy, open source privacy, algorithm learning privacy" 
+          content="rulcode privacy policy, data protection, user privacy, open source privacy, algorithm learning privacy" 
         />
-        <link rel="canonical" href="https://algolib.io/privacy" />
+        <link rel="canonical" href="https://rulcode.com/privacy" />
         
-        <meta property="og:title" content="Privacy Policy - AlgoLib.io" />
-        <meta property="og:description" content="How AlgoLib.io protects your data and respects your privacy" />
-        <meta property="og:url" content="https://algolib.io/privacy" />
+        <meta property="og:title" content="Privacy Policy - Rulcode.com" />
+        <meta property="og:description" content="How Rulcode.com protects your data and respects your privacy" />
+        <meta property="og:url" content="https://rulcode.com/privacy" />
         <meta name="robots" content="index, follow" />
       </Helmet>
       
@@ -37,7 +37,7 @@ export default function Privacy() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
-                AlgoLib.io is committed to protecting your privacy. We collect minimal information to 
+                Rulcode.com is committed to protecting your privacy. We collect minimal information to 
                 provide our services:
               </p>
               <ul className="list-disc list-inside space-y-2 text-muted-foreground ml-4">
@@ -57,7 +57,7 @@ export default function Privacy() {
                 We use the collected information for:
               </p>
               <ul className="list-disc list-inside space-y-2 text-muted-foreground ml-4">
-                <li>Providing and maintaining the AlgoLib.io platform</li>
+                <li>Providing and maintaining the Rulcode.com platform</li>
                 <li>Improving user experience and platform features</li>
                 <li>Understanding how users interact with our content</li>
                 <li>Communicating important updates (if you have an account)</li>
@@ -101,7 +101,7 @@ export default function Privacy() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
-                AlgoLib.io uses minimal cookies and local storage to:
+                Rulcode.com uses minimal cookies and local storage to:
               </p>
               <ul className="list-disc list-inside space-y-2 text-muted-foreground ml-4">
                 <li>Remember your authentication session</li>
@@ -120,7 +120,7 @@ export default function Privacy() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
-                AlgoLib.io may link to external practice problem websites (LeetCode, Codeforces, etc.). 
+                Rulcode.com may link to external practice problem websites (LeetCode, Codeforces, etc.). 
                 These third-party sites have their own privacy policies, and we are not responsible for 
                 their practices.
               </p>
@@ -137,9 +137,9 @@ export default function Privacy() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
-                AlgoLib.io is an open-source project. Our entire codebase is publicly available on{" "}
+                Rulcode.com is an open-source project. Our entire codebase is publicly available on{" "}
                 <a 
-                  href="https://github.com/rkmahale17/algolib.io" 
+                  href="https://github.com/rkmahale17/rulcode.com" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-primary hover:underline"
@@ -156,7 +156,7 @@ export default function Privacy() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
-                AlgoLib.io is suitable for all ages and does not knowingly collect personal information 
+                Rulcode.com is suitable for all ages and does not knowingly collect personal information 
                 from children under 13. If you are a parent and believe your child has provided us with 
                 personal information, please contact us.
               </p>
@@ -200,7 +200,7 @@ export default function Privacy() {
               <p className="text-muted-foreground">
                 If you have questions or concerns about this privacy policy, please open an issue on our{" "}
                 <a 
-                  href="https://github.com/rkmahale17/algolib.io/issues" 
+                  href="https://github.com/rkmahale17/rulcode.com/issues" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-primary hover:underline"

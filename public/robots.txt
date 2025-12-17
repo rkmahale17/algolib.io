@@ -12,4 +12,4 @@ Allow: /
 
 User-agent: *
 Allow: /
-Sitemap: https://algolib.io/sitemap.xml
+Sitemap: https://rulcode.com/sitemap.xml
