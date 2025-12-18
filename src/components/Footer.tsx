@@ -35,7 +35,7 @@ export function Footer() {
               </li>
               <li>
                 <a 
-                  href="https://github.com/rkmahale17/rulcode.com#-algorithm-index" 
+                  href="https://github.com/rkmahale17/algolib.io#-algorithm-index" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -52,7 +52,7 @@ export function Footer() {
             <ul className="space-y-2">
               <li>
                 <a 
-                  href="https://github.com/rkmahale17/rulcode.com" 
+                  href="https://github.com/rkmahale17/algolib.io" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1"
@@ -63,7 +63,7 @@ export function Footer() {
               </li>
               <li>
                 <a 
-                  href="https://github.com/rkmahale17/rulcode.com/issues/new" 
+                  href="https://github.com/rkmahale17/algolib.io/issues/new" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -73,7 +73,7 @@ export function Footer() {
               </li>
               <li>
                 <a 
-                  href="https://github.com/rkmahale17/rulcode.com#-contribute" 
+                  href="https://github.com/rkmahale17/algolib.io#-contribute" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -139,7 +139,7 @@ export function Footer() {
             <div className="flex items-center gap-3">
               <Button variant="outline" size="sm" asChild>
                 <a 
-                  href="https://github.com/rkmahale17/rulcode.com" 
+                  href="https://github.com/rkmahale17/algolib.io" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="flex items-center gap-2"

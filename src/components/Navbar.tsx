@@ -21,6 +21,8 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./ThemeToggle";
 import logo from "@/assets/logo.svg";
+import logo_text from "@/assets/logo_test_2.svg";
+
 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -77,8 +79,8 @@ const Navbar = () => {
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
             >
               <img src={logo} alt="RulCode Logo" className="w-8 h-8" />
-              <span className=" text-xl font-mono" >RulCode</span>
-              {/* <span className="font-bold text-xl font-mono text-[1.2rem] underline-offset-2   " >Code</span> */}
+              <span className="hidden sm:block sm:hidden font-bold text-xl font-mono whitespace-nowrap">RulCode</span>
+              <img src={logo_text} alt="RulCode Logo Text" className="hidden xs:block h-6" />
            
             </Link>
          

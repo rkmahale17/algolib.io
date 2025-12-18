@@ -124,7 +124,7 @@ const Home = () => {
             },
             sameAs: [
               "https://x.com/rulcode_io",
-              "https://github.com/rkmahale17/rulcode.com",
+              "https://github.com/rkmahale17/algolib.io",
             ],
             description:
               "Rulcode.com is a free and open-source algorithm library that helps developers learn and visualize algorithms with interactive animations and clean code snippets in multiple programming languages.",

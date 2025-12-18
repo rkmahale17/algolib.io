@@ -139,7 +139,7 @@ export default function Privacy() {
               <p className="text-muted-foreground">
                 Rulcode.com is an open-source project. Our entire codebase is publicly available on{" "}
                 <a 
-                  href="https://github.com/rkmahale17/rulcode.com" 
+                  href="https://github.com/rkmahale17/algolib.io" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-primary hover:underline"
@@ -200,7 +200,7 @@ export default function Privacy() {
               <p className="text-muted-foreground">
                 If you have questions or concerns about this privacy policy, please open an issue on our{" "}
                 <a 
-                  href="https://github.com/rkmahale17/rulcode.com/issues" 
+                  href="https://github.com/rkmahale17/algolib.io/issues" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-primary hover:underline"
