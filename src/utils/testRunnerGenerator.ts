@@ -10,17 +10,18 @@ export const generateTestRunner = (
     userCode: string,
     language: Language,
     testCases: TestCase[],
-    inputSchema: any[]
+    inputSchema: any[],
+    entryFunctionName?: string
 ): string => {
     switch (language) {
         case 'typescript':
-            return generateTypeScriptRunner(userCode, testCases, inputSchema);
+            return generateTypeScriptRunner(userCode, testCases, inputSchema, entryFunctionName);
         case 'python':
-            return generatePythonRunner(userCode, testCases, inputSchema);
+            return generatePythonRunner(userCode, testCases, inputSchema, entryFunctionName);
         case 'java':
-            return generateJavaRunner(userCode, testCases, inputSchema);
+            return generateJavaRunner(userCode, testCases, inputSchema, entryFunctionName);
         case 'cpp':
-            return generateCppRunner(userCode, testCases, inputSchema);
+            return generateCppRunner(userCode, testCases, inputSchema, entryFunctionName);
         default:
             return userCode;
     }
@@ -59,9 +60,10 @@ const jsonToPython = (val: any): string => {
 const generateTypeScriptRunner = (
     userCode: string,
     testCases: TestCase[],
-    inputSchema: any[]
+    inputSchema: any[],
+    entryFunctionName?: string
 ): string => {
-    const userFuncName = userCode.match(/(?:function\s+|const\s+|let\s+|var\s+)(\w+)/)?.[1] || 'solution';
+    const userFuncName = entryFunctionName || userCode.match(/(?:function\s+|const\s+|let\s+|var\s+)(\w+)/)?.[1] || 'solution';
 
     const testCasesStr = testCases.map(tc => {
         const inputs = tc.input.map((val, i) => formatValue(val, inputSchema[i].type, 'typescript')).join(', ');
@@ -125,9 +127,10 @@ console.log('___TEST_RESULTS_END___');
 const generatePythonRunner = (
     userCode: string,
     testCases: TestCase[],
-    inputSchema: any[]
+    inputSchema: any[],
+    entryFunctionName?: string
 ): string => {
-    const userFuncName = userCode.match(/def\s+(\w+)/)?.[1] || 'solution';
+    const userFuncName = entryFunctionName || userCode.match(/def\s+(\w+)/)?.[1] || 'solution';
 
     const testCasesStr = testCases.map(tc => {
         const inputs = tc.input.map(val => jsonToPython(val)).join(', ');
@@ -209,10 +212,11 @@ print('___TEST_RESULTS_END___')
 const generateJavaRunner = (
     userCode: string,
     testCases: TestCase[],
-    inputSchema: any[]
+    inputSchema: any[],
+    entryFunctionName?: string
 ): string => {
     // Extract user function signature
-    const userFuncName = userCode.match(/(\w+)\s*\(/)?.[1] || 'solution';
+    const userFuncName = entryFunctionName || userCode.match(/(\w+)\s*\(/)?.[1] || 'solution';
 
     // Prepare user code: needs to be static
     let userCodeClean = userCode;
@@ -302,9 +306,10 @@ public class Main {
 const generateCppRunner = (
     userCode: string,
     testCases: TestCase[],
-    inputSchema: any[]
+    inputSchema: any[],
+    entryFunctionName?: string
 ): string => {
-    const userFuncName = userCode.match(/(\w+)\s*\(/)?.[1] || 'solution';
+    const userFuncName = entryFunctionName || userCode.match(/(\w+)\s*\(/)?.[1] || 'solution';
 
     // Helper to deduce C++ type from value
     const deduceCppType = (val: any): string => {
@@ -420,6 +425,7 @@ const generateCppRunner = (
 #include <unordered_set> 
 #include <climits>
 #include <set>
+#include <bitset>
 using namespace std;
 
 // Helper to print vectors

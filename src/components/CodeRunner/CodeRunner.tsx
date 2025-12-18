@@ -509,11 +509,16 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
 
       if (algo && preparedTestCases.length > 0) {
         const { generateTestRunner } = await import('@/utils/testRunnerGenerator');
+        
+        // Use specified function name or derive from ID
+        const entryFunctionName = algo.function_name || algo.metadata?.function_name;
+        
         fullCode = generateTestRunner(
           code,
           language,
           preparedTestCases,
-          algo.input_schema || []
+          algo.input_schema || [],
+          entryFunctionName
         );
       }
 

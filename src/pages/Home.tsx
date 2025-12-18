@@ -42,11 +42,6 @@ const Home = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  if (loading) {
-      // Only show text if this is the initial app load (not navigating from another page)
-    return <PremiumLoader text={!appStatus.isInitialized ? "Initializing Algorithms for you" : undefined} />;
-  }
-
   // Extract categories for SEO from fetched data or use defaults if empty
   const categories = Array.from(new Set(algorithms.map(a => a.category).filter(Boolean))).sort();
 
@@ -175,14 +170,18 @@ const Home = () => {
               {/* Stats */}
               <div className="flex items-center justify-center gap-8 pt-8">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-primary">200+</div>
+                
+                    <div className="text-3xl font-bold text-primary">200+</div>
+                  
                   <div className="text-sm text-muted-foreground">
                     Algorithms
                   </div>
                 </div>
                 <div className="h-12 w-px bg-border" />
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-secondary">{categories.length}</div>
+            
+                    <div className="text-3xl font-bold text-secondary">{categories.length || 19}</div>
+                  
                   <div className="text-sm text-muted-foreground">
                     Categories
                   </div>
@@ -191,7 +190,7 @@ const Home = () => {
                 <div className="text-center">
                   <div className="text-3xl font-bold text-primary">100%</div>
                   <div className="text-sm text-muted-foreground">
-                    Free Forever
+                    Developer Centric
                   </div>
                 </div>
               </div>
@@ -216,6 +215,7 @@ const Home = () => {
                defaultListType={ListType.Core}
                availableListTypes={[ListType.Core, ListType.CoreAndBlind75]}
                hideListSelection={true}
+               isLoading={loading}
              />
           </div>
         </FeatureGuard>

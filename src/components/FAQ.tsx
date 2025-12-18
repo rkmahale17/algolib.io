@@ -13,7 +13,7 @@ const faqs = [
   },
   {
     question: "Is Rulcode.com really free?",
-    answer: "Yes! Rulcode.com is 100% free and will remain free forever. We believe education should be accessible to everyone. Our entire codebase is open source and available on GitHub."
+    answer: "Yes! Rulcode.com is 100% free which are basic feature needed and will have some kind of premium if website needs to recover maintance. We believe education should be accessible to everyone. Our entire codebase is open source and available on GitHub."
   },
   {
     question: "What programming languages are supported?",

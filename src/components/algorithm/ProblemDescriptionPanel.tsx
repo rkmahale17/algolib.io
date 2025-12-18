@@ -18,6 +18,9 @@ import {
   Flashlight,
   FileText,
   ArrowRight,
+  Lightbulb,
+  Zap,
+  ListChecks,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -83,6 +86,7 @@ export const ProblemDescriptionPanel = React.memo(({
 }: ProblemDescriptionPanelProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isCompact, setIsCompact] = useState(false);
+  const [isUltraCompact, setIsUltraCompact] = useState(false);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -90,6 +94,7 @@ export const ProblemDescriptionPanel = React.memo(({
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
         setIsCompact(entry.contentRect.width < 400);
+        setIsUltraCompact(entry.contentRect.width < 300);
       }
     });
 
@@ -417,17 +422,55 @@ export const ProblemDescriptionPanel = React.memo(({
                                         <div className="pt-2">
                                           <Tabs defaultValue="usecase">
                                             <TabsList className="grid w-full grid-cols-3 h-auto">
-                                              <TabsTrigger value="usecase" className="text-xs sm:text-sm">
-                                                Use Cases
-                                              </TabsTrigger>
-                                              <TabsTrigger value="tips" className="text-xs sm:text-sm">
-                                                Pro Tips
-                                              </TabsTrigger>
-                                              <TabsTrigger value="steps" className="text-xs sm:text-sm">
-                                                Steps to solve
-                                              </TabsTrigger>
+                                              <TooltipProvider>
+                                                <TabsTrigger value="usecase" className="text-xs sm:text-sm">
+                                                  {isUltraCompact ? (
+                                                    <Tooltip>
+                                                      <TooltipTrigger asChild>
+                                                        <Lightbulb className="w-4 h-4" />
+                                                      </TooltipTrigger>
+                                                      <TooltipContent>Use Cases</TooltipContent>
+                                                    </Tooltip>
+                                                  ) : (
+                                                    <>
+                                                      <Lightbulb className="w-3.5 h-3.5 mr-1.5 shrink-0" />
+                                                      Use Cases
+                                                    </>
+                                                  )}
+                                                </TabsTrigger>
+                                                <TabsTrigger value="tips" className="text-xs sm:text-sm">
+                                                  {isUltraCompact ? (
+                                                    <Tooltip>
+                                                      <TooltipTrigger asChild>
+                                                        <Zap className="w-4 h-4" />
+                                                      </TooltipTrigger>
+                                                      <TooltipContent>Pro Tips</TooltipContent>
+                                                    </Tooltip>
+                                                  ) : (
+                                                    <>
+                                                      <Zap className="w-3.5 h-3.5 mr-1.5 shrink-0" />
+                                                      Pro Tips
+                                                    </>
+                                                  )}
+                                                </TabsTrigger>
+                                                <TabsTrigger value="steps" className="text-xs sm:text-sm">
+                                                  {isUltraCompact ? (
+                                                    <Tooltip>
+                                                      <TooltipTrigger asChild>
+                                                        <ListChecks className="w-4 h-4" />
+                                                      </TooltipTrigger>
+                                                      <TooltipContent>Steps to solve</TooltipContent>
+                                                    </Tooltip>
+                                                  ) : (
+                                                    <>
+                                                      <ListChecks className="w-3.5 h-3.5 mr-1.5 shrink-0" />
+                                                      Steps to solve
+                                                    </>
+                                                  )}
+                                                </TabsTrigger>
+                                              </TooltipProvider>
                                             </TabsList>
-
+                                            
                                             <div className="p-1">
                                                 <TabsContent value="steps" className="mt-4">
                                                   <div className="text-sm text-muted-foreground">
