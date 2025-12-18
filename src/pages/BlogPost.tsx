@@ -32,17 +32,17 @@ const BlogPost = () => {
   return (
     <>
       <Helmet>
-        <title>{post.title} | AlgoLib Blog</title>
+        <title>{post.title} | Rulcode Blog</title>
         <meta name="description" content={post.description} />
         <meta name="keywords" content={`${post.category}, algorithms, ${post.title}, coding tutorial, DSA, competitive programming`} />
-        <link rel="canonical" href={`https://algolib.io/blog/${post.slug}`} />
+        <link rel="canonical" href={`https://rulcode.com/blog/${post.slug}`} />
         
         {/* Open Graph */}
-        <meta property="og:title" content={`${post.title} | AlgoLib Blog`} />
+        <meta property="og:title" content={`${post.title} | Rulcode Blog`} />
         <meta property="og:description" content={post.description} />
         <meta property="og:type" content="article" />
-        <meta property="og:url" content={`https://algolib.io/blog/${post.slug}`} />
-        <meta property="og:image" content={post.image || 'https://algolib.io/og-image.png'} />
+        <meta property="og:url" content={`https://rulcode.com/blog/${post.slug}`} />
+        <meta property="og:image" content={post.image || 'https://rulcode.com/og-image.png'} />
         <meta property="article:published_time" content={post.date} />
         <meta property="article:author" content={post.author} />
         <meta property="article:section" content={post.category} />
@@ -51,7 +51,7 @@ const BlogPost = () => {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={post.title} />
         <meta name="twitter:description" content={post.description} />
-        <meta name="twitter:image" content={post.image || 'https://algolib.io/og-image.png'} />
+        <meta name="twitter:image" content={post.image || 'https://rulcode.com/og-image.png'} />
         
         {/* JSON-LD Structured Data */}
         <script type="application/ld+json">
@@ -60,24 +60,24 @@ const BlogPost = () => {
             "@type": "BlogPosting",
             "headline": post.title,
             "description": post.description,
-            "image": post.image || 'https://algolib.io/og-image.png',
+            "image": post.image || 'https://rulcode.com/og-image.png',
             "author": {
               "@type": "Person",
               "name": post.author
             },
             "publisher": {
               "@type": "Organization",
-              "name": "AlgoLib.io",
+              "name": "Rulcode.com",
               "logo": {
                 "@type": "ImageObject",
-                "url": "https://algolib.io/android-chrome-512x512.png"
+                "url": "https://rulcode.com/android-chrome-512x512.png"
               }
             },
             "datePublished": post.date,
             "dateModified": post.date,
             "mainEntityOfPage": {
               "@type": "WebPage",
-              "@id": `https://algolib.io/blog/${post.slug}`
+              "@id": `https://rulcode.com/blog/${post.slug}`
             },
             "articleSection": post.category,
             "keywords": `${post.category}, algorithms, coding tutorial`,

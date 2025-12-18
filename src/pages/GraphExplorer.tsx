@@ -24,15 +24,15 @@ const GraphExplorer = () => {
   return (
     <>
       <Helmet>
-        <title>Graph Explorer Game - Learn BFS and DFS Algorithms | AlgoLib.io</title>
+        <title>Graph Explorer Game - Learn BFS and DFS Algorithms | Rulcode.com</title>
         <meta name="description" content="Master graph traversal algorithms through maze navigation. Learn BFS, DFS, and pathfinding by solving visual graph puzzles interactively." />
         <meta name="keywords" content="graph algorithms game, BFS game, DFS game, maze solver, graph traversal learning, pathfinding game, coding interview graphs" />
-        <link rel="canonical" href="https://algolib.io/games/graph-explorer" />
+        <link rel="canonical" href="https://rulcode.com/games/graph-explorer" />
         
         <meta property="og:title" content="Graph Explorer - Learn Graph Algorithms" />
         <meta property="og:description" content="Master BFS and DFS through maze navigation." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://algolib.io/games/graph-explorer" />
+        <meta property="og:url" content="https://rulcode.com/games/graph-explorer" />
         
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Graph Explorer - Graph Algorithm Game" />

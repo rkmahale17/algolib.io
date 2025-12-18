@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { SimpleArrayVisualization } from '../shared/SimpleArrayVisualization';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
@@ -8,7 +7,7 @@ import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 
 interface Step {
-  array: (number | typeof Infinity)[];
+  array: (number | string)[];
   highlighting: number[];
   variables: Record<string, any>;
   explanation: string;
@@ -20,181 +19,276 @@ export const CoinChangeVisualization = () => {
   const [currentStep, setCurrentStep] = useState(0);
 
   const coins = [1, 2, 5];
-  const amount = 11;
+  const amount = 6;
+  
+  // Helper to init array with logic value
+  const INF = 7; // amount + 1
   
   const steps: Step[] = [
     {
       array: [],
       highlighting: [],
-      variables: { coins: '[1,2,5]', amount: 11 },
-      explanation: "Starting with coins [1,2,5] and amount 11. Find minimum coins needed.",
+      variables: { coins: '[1,2,5]', amount: 6 },
+      explanation: "Starting with coins [1,2,5] and amount 6. Goal: minimum coins.",
       highlightedLines: [1],
       lineExecution: "function coinChange(coins: number[], amount: number): number {"
     },
     {
-      array: [],
+      array: [7, 7, 7, 7, 7, 7, 7], // 0 to 6
       highlighting: [],
-      variables: { coins: '[1,2,5]', amount: 11, size: 12 },
-      explanation: "Create dp array of size amount + 1 = 12. Fill with Infinity.",
-      highlightedLines: [2],
-      lineExecution: "const dp = new Array(amount + 1).fill(Infinity);"
+      variables: { coins: '[1,2,5]', amount: 6, 'amount + 1': 7 },
+      explanation: "Initialize dp array of size 7 (amount + 1). Fill with 7 (amount + 1) as 'Infinity'.",
+      highlightedLines: [4],
+      lineExecution: "const dp: number[] = new Array(amount + 1).fill(amount + 1);"
     },
     {
-      array: [0, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity],
+      array: [0, 7, 7, 7, 7, 7, 7],
       highlighting: [0],
-      variables: { coins: '[1,2,5]', amount: 11 },
-      explanation: "Base case: dp[0] = 0. Zero coins needed for amount 0.",
-      highlightedLines: [3],
+      variables: { amount: 6 },
+      explanation: "Base case: 0 coins needed to make amount 0.",
+      highlightedLines: [8],
       lineExecution: "dp[0] = 0;"
     },
+    // a = 1
     {
-      array: [0, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity],
+      array: [0, 7, 7, 7, 7, 7, 7],
       highlighting: [],
-      variables: { i: 1, amount: 11 },
-      explanation: "Start outer loop: i = 1. Check: 1 <= 11? Yes, enter loop.",
-      highlightedLines: [5],
-      lineExecution: "for (let i = 1; i <= amount; i++)"
+      variables: { a: 1, amount: 6 },
+      explanation: "Outer loop: a = 1. Trying to make amount 1.",
+      highlightedLines: [11],
+      lineExecution: "for (let a = 1; a <= amount; a++)"
     },
     {
-      array: [0, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity],
-      highlighting: [1],
-      variables: { i: 1, coin: 1 },
-      explanation: "Inner loop: Try coin = 1. Check if coin (1) <= i (1)? Yes.",
-      highlightedLines: [6, 7],
+      array: [0, 7, 7, 7, 7, 7, 7],
+      highlighting: [],
+      variables: { a: 1, coin: 1 },
+      explanation: "Inner loop: Try coin = 1.",
+      highlightedLines: [13],
       lineExecution: "for (const coin of coins)"
     },
     {
-      array: [0, 1, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity],
-      highlighting: [1],
-      variables: { i: 1, coin: 1, 'dp[1]': 1 },
-      explanation: "dp[1] = min(Infinity, dp[0] + 1) = min(Infinity, 1) = 1.",
-      highlightedLines: [8],
-      lineExecution: "dp[1] = 1"
+      array: [0, 7, 7, 7, 7, 7, 7],
+      highlighting: [],
+      variables: { a: 1, coin: 1 },
+      explanation: "Check: 1 - 1 >= 0? Yes.",
+      highlightedLines: [15],
+      lineExecution: "if (a - coin >= 0)"
     },
     {
-      array: [0, 1, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity],
+      array: [0, 1, 7, 7, 7, 7, 7],
+      highlighting: [1],
+      variables: { a: 1, coin: 1, 'dp[1]': 1 },
+      explanation: "Update dp[1] = Math.min(7, 1 + dp[0]) = 1.",
+      highlightedLines: [19],
+      lineExecution: "dp[a] = Math.min(...) -> 1"
+    },
+    // a = 2
+    {
+      array: [0, 1, 7, 7, 7, 7, 7],
+      highlighting: [],
+      variables: { a: 2 },
+      explanation: "Outer loop: a = 2.",
+      highlightedLines: [11],
+      lineExecution: "for (let a = 1; a <= amount; a++)"
+    },
+    {
+      array: [0, 1, 7, 7, 7, 7, 7],
+      highlighting: [],
+      variables: { a: 2, coin: 1 },
+      explanation: "Try coin = 1. Check 2 - 1 >= 0? Yes.",
+      highlightedLines: [13, 15],
+      lineExecution: "if (a - coin >= 0)"
+    },
+    {
+      array: [0, 1, 2, 7, 7, 7, 7],
       highlighting: [2],
-      variables: { i: 2, coin: 1 },
-      explanation: "i = 2: Try coin = 1. dp[2] = min(Infinity, dp[1] + 1) = 2.",
-      highlightedLines: [8],
+      variables: { a: 2, coin: 1, 'dp[2]': 2 },
+      explanation: "dp[2] = Math.min(7, 1 + dp[1]) = 2.",
+      highlightedLines: [19],
       lineExecution: "dp[2] = 2"
     },
     {
-      array: [0, 1, 1, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity],
-      highlighting: [2],
-      variables: { i: 2, coin: 2, 'dp[2]': 1 },
-      explanation: "i = 2: Try coin = 2. dp[2] = min(2, dp[0] + 1) = min(2, 1) = 1.",
-      highlightedLines: [8],
-      lineExecution: "dp[2] = 1"
+      array: [0, 1, 2, 7, 7, 7, 7],
+      highlighting: [],
+      variables: { a: 2, coin: 2 },
+      explanation: "Try coin = 2. Check 2 - 2 >= 0? Yes.",
+      highlightedLines: [13, 15],
+      lineExecution: "if (a - coin >= 0)"
     },
     {
-      array: [0, 1, 1, 2, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity],
+      array: [0, 1, 1, 7, 7, 7, 7],
+      highlighting: [2],
+      variables: { a: 2, coin: 2, 'dp[2]': 1 },
+      explanation: "dp[2] = Math.min(2, 1 + dp[0]) = 1. Better solution found!",
+      highlightedLines: [19],
+      lineExecution: "dp[2] = 1"
+    },
+    // a = 3
+    {
+      array: [0, 1, 1, 7, 7, 7, 7],
+      highlighting: [],
+      variables: { a: 3 },
+      explanation: "Outer loop: a = 3.",
+      highlightedLines: [11],
+      lineExecution: "for (let a = 1; a <= amount; a++)"
+    },
+    {
+      array: [0, 1, 1, 2, 7, 7, 7],
       highlighting: [3],
-      variables: { i: 3 },
-      explanation: "i = 3: Process with all coins. dp[3] = 2 (can use coins 1+2 or 1+1+1).",
-      highlightedLines: [8],
+      variables: { a: 3, coin: 1, 'dp[3]': 2 },
+      explanation: "Try coin = 1: dp[3] = Math.min(7, 1 + dp[2]) = 2.",
+      highlightedLines: [19],
       lineExecution: "dp[3] = 2"
     },
     {
-      array: [0, 1, 1, 2, 2, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity],
+      array: [0, 1, 1, 2, 7, 7, 7],
+      highlighting: [3],
+      variables: { a: 3, coin: 2, 'dp[3]': 2 },
+      explanation: "Try coin = 2: dp[3] = Math.min(2, 1 + dp[1]) = Math.min(2, 2) = 2. No change.",
+      highlightedLines: [19],
+      lineExecution: "dp[3] = 2"
+    },
+     // a = 4
+    {
+      array: [0, 1, 1, 2, 7, 7, 7],
+      highlighting: [],
+      variables: { a: 4 },
+      explanation: "Outer loop: a = 4.",
+      highlightedLines: [11],
+      lineExecution: "for (let a = 1; a <= amount; a++)"
+    },
+    {
+      array: [0, 1, 1, 2, 3, 7, 7],
       highlighting: [4],
-      variables: { i: 4 },
-      explanation: "i = 4: Process with all coins. dp[4] = 2 (can use 2+2).",
-      highlightedLines: [8],
+      variables: { a: 4, coin: 1, 'dp[4]': 3 },
+      explanation: "Try coin = 1: dp[4] = 1 + dp[3] = 3.",
+      highlightedLines: [19],
+      lineExecution: "dp[4] = 3"
+    },
+    {
+      array: [0, 1, 1, 2, 2, 7, 7],
+      highlighting: [4],
+      variables: { a: 4, coin: 2, 'dp[4]': 2 },
+      explanation: "Try coin = 2: dp[4] = 1 + dp[2] = 2. Improved.",
+      highlightedLines: [19],
       lineExecution: "dp[4] = 2"
     },
+    // a = 5
     {
-      array: [0, 1, 1, 2, 2, 1, Infinity, Infinity, Infinity, Infinity, Infinity, Infinity],
+      array: [0, 1, 1, 2, 2, 7, 7],
+      highlighting: [],
+      variables: { a: 5 },
+      explanation: "Outer loop: a = 5.",
+      highlightedLines: [11],
+      lineExecution: "for (let a = 1; a <= amount; a++)"
+    },
+    {
+      array: [0, 1, 1, 2, 2, 3, 7],
       highlighting: [5],
-      variables: { i: 5, coin: 5, 'dp[5]': 1 },
-      explanation: "i = 5: Try coin = 5. dp[5] = min(3, dp[0] + 1) = 1. One coin of 5!",
-      highlightedLines: [8],
+      variables: { a: 5, coin: 1, 'dp[5]': 3 },
+      explanation: "Try coin = 1: dp[5] = 1 + dp[4] = 3.",
+      highlightedLines: [19],
+      lineExecution: "dp[5] = 3"
+    },
+    {
+      array: [0, 1, 1, 2, 2, 3, 7],
+      highlighting: [5],
+      variables: { a: 5, coin: 2, 'dp[5]': 3 },
+      explanation: "Try coin = 2: dp[5] = 1 + dp[3] = 3. Same.",
+      highlightedLines: [19],
+      lineExecution: "dp[5] = 3"
+    },
+    {
+      array: [0, 1, 1, 2, 2, 1, 7],
+      highlighting: [5],
+      variables: { a: 5, coin: 5, 'dp[5]': 1 },
+      explanation: "Try coin = 5: dp[5] = 1 + dp[0] = 1. Much better!",
+      highlightedLines: [19],
       lineExecution: "dp[5] = 1"
     },
+    // a = 6
     {
-      array: [0, 1, 1, 2, 2, 1, 2, 2, 3, 3, 2, Infinity],
-      highlighting: [6, 7, 8, 9, 10],
-      variables: { i: '6-10' },
-      explanation: "Continue for i = 6 to 10. Calculate minimum coins for each amount.",
-      highlightedLines: [8],
-      lineExecution: "dp[6..10] calculated"
+      array: [0, 1, 1, 2, 2, 1, 7],
+      highlighting: [],
+      variables: { a: 6 },
+      explanation: "Outer loop: a = 6 (Last iteration).",
+      highlightedLines: [11],
+      lineExecution: "for (let a = 1; a <= amount; a++)"
     },
     {
-      array: [0, 1, 1, 2, 2, 1, 2, 2, 3, 3, 2, Infinity],
-      highlighting: [11],
-      variables: { i: 11, amount: 11 },
-      explanation: "i = 11: Start calculating dp[11]. Try all coins.",
-      highlightedLines: [6],
-      lineExecution: "for (const coin of coins)"
+      array: [0, 1, 1, 2, 2, 1, 2],
+      highlighting: [6],
+      variables: { a: 6, coin: 1, 'dp[6]': 2 },
+      explanation: "Try coin = 1: dp[6] = 1 + dp[5] = 2.",
+      highlightedLines: [19],
+      lineExecution: "dp[6] = 2"
     },
     {
-      array: [0, 1, 1, 2, 2, 1, 2, 2, 3, 3, 2, Infinity],
-      highlighting: [11, 10],
-      variables: { i: 11, coin: 1, 'dp[10]': 2 },
-      explanation: "Try coin = 1: dp[11] = min(Infinity, dp[10] + 1) = 3.",
-      highlightedLines: [8],
-      lineExecution: "dp[11] = min(Infinity, 2 + 1)"
+      array: [0, 1, 1, 2, 2, 1, 2],
+      highlighting: [6],
+      variables: { a: 6, coin: 2, 'dp[6]': 2 },
+      explanation: "Try coin = 2: dp[6] = 1 + dp[4] = 3 (vs 2). Keep 2.",
+      highlightedLines: [19],
+      lineExecution: "dp[6] = 1 + dp[4] (3) >= 2"
     },
     {
-      array: [0, 1, 1, 2, 2, 1, 2, 2, 3, 3, 2, Infinity],
-      highlighting: [11, 9],
-      variables: { i: 11, coin: 2, 'dp[9]': 3 },
-      explanation: "Try coin = 2: dp[11] = min(3, dp[9] + 1) = min(3, 4) = 3.",
-      highlightedLines: [8],
-      lineExecution: "dp[11] = min(3, 3 + 1)"
+      array: [0, 1, 1, 2, 2, 1, 2],
+      highlighting: [6],
+      variables: { a: 6, coin: 5, 'dp[6]': 2 },
+      explanation: "Try coin = 5: dp[6] = 1 + dp[1] = 2. Same.",
+      highlightedLines: [19],
+      lineExecution: "dp[6] = 1 + dp[1] (2) >= 2"
+    },
+    // End
+    {
+      array: [0, 1, 1, 2, 2, 1, 2],
+      highlighting: [],
+      variables: { amount: 6 },
+      explanation: "Loop finished. Check return condition.",
+      highlightedLines: [26],
+      lineExecution: "return dp[amount] !== amount + 1 ..."
     },
     {
-      array: [0, 1, 1, 2, 2, 1, 2, 2, 3, 3, 2, 3],
-      highlighting: [11, 6],
-      variables: { i: 11, coin: 5, 'dp[6]': 2 },
-      explanation: "Try coin = 5: dp[11] = min(3, dp[6] + 1) = min(3, 3) = 3.",
-      highlightedLines: [8],
-      lineExecution: "dp[11] = min(3, 2 + 1)"
-    },
-    {
-      array: [0, 1, 1, 2, 2, 1, 2, 2, 3, 3, 2, 3],
-      highlighting: [11],
-      variables: { i: 12, amount: 11 },
-      explanation: "Check loop condition: i (12) <= amount (11)? No, exit loop.",
-      highlightedLines: [5],
-      lineExecution: "for (let i = 12; i <= amount; i++) -> false"
-    },
-    {
-      array: [0, 1, 1, 2, 2, 1, 2, 2, 3, 3, 2, 3],
-      highlighting: [11],
-      variables: { amount: 11, result: 3 },
-      explanation: "Return dp[11] = 3. Minimum 3 coins needed: 5+5+1.",
-      highlightedLines: [13],
-      lineExecution: "return dp[amount] = 3"
-    },
-    {
-      array: [0, 1, 1, 2, 2, 1, 2, 2, 3, 3, 2, 3],
-      highlighting: [11],
-      variables: { amount: 11, result: 3, solution: '5+5+1' },
-      explanation: "Algorithm complete! Time: O(amount × coins), Space: O(amount).",
-      highlightedLines: [13],
-      lineExecution: "Result: 3 coins (5+5+1)"
+      array: [0, 1, 1, 2, 2, 1, 2],
+      highlighting: [6],
+      variables: { result: 2 },
+      explanation: "Result is 2 (e.g. 5 + 1).",
+      highlightedLines: [26],
+      lineExecution: "return 2"
     }
   ];
 
   const code = `function coinChange(coins: number[], amount: number): number {
-  const dp = new Array(amount + 1).fill(Infinity);
-  dp[0] = 0;
-  
-  for (let i = 1; i <= amount; i++) {
-    for (const coin of coins) {
-      if (coin <= i) {
-        dp[i] = Math.min(dp[i], dp[i - coin] + 1);
-      }
+    // dp[i] will store the minimum number of coins
+    // needed to make amount i
+    const dp: number[] = new Array(amount + 1).fill(amount + 1);
+
+    // Base case:
+    // 0 coins are needed to make amount 0
+    dp[0] = 0;
+
+    // Build the DP table from amount 1 to amount
+    for (let a = 1; a <= amount; a++) {
+        // Try using each coin
+        for (const coin of coins) {
+            // Check if the coin can be used for this amount
+            if (a - coin >= 0) {
+                // Choose the minimum between:
+                // 1) current value of dp[a]
+                // 2) using this coin (1 + dp[a - coin])
+                dp[a] = Math.min(dp[a], 1 + dp[a - coin]);
+            }
+        }
     }
-  }
-  
-  return dp[amount] === Infinity ? -1 : dp[amount];
+
+    // If dp[amount] is still greater than amount,
+    // it means the amount cannot be formed
+    return dp[amount] !== amount + 1 ? dp[amount] : -1;
 }`;
 
   const step = steps[currentStep];
 
-  const displayArray = step.array.map(v => v === Infinity ? '∞' : v);
+  const displayArray = step.array.map(v => v === 7 ? '∞' : v);
 
   return (
     <VisualizationLayout
@@ -202,23 +296,17 @@ export const CoinChangeVisualization = () => {
         <>
           <motion.div
             key={`array-${currentStep}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
           >
             <Card className="p-6">
-              <h3 className="text-sm font-semibold mb-3">DP Array - Minimum Coins for Each Amount</h3>
-              <div className="flex items-center gap-1 overflow-x-auto">
+              <h3 className="text-sm font-semibold mb-3">DP Array - Min Coins (Target: {amount})</h3>
+              <div className="flex items-center gap-1 overflow-x-auto pb-2">
                 {displayArray.map((value, index) => (
                   <motion.div
                     key={index}
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: index * 0.03 }}
                     className="flex flex-col items-center gap-1 flex-shrink-0"
                   >
                     <div
-                      className={`w-12 h-12 rounded flex items-center justify-center font-bold text-xs transition-all duration-300 ${
+                      className={`w-10 h-10 rounded flex items-center justify-center font-bold text-sm transition-all duration-300 ${
                         step.highlighting.includes(index)
                           ? 'bg-primary text-primary-foreground scale-110'
                           : 'bg-muted text-foreground'
@@ -226,7 +314,7 @@ export const CoinChangeVisualization = () => {
                     >
                       {value}
                     </div>
-                    <span className="text-xs text-muted-foreground">{index}</span>
+                    <span className="text-[10px] text-muted-foreground">{index}</span>
                   </motion.div>
                 ))}
               </div>
@@ -235,9 +323,6 @@ export const CoinChangeVisualization = () => {
           
           <motion.div
             key={`execution-${currentStep}`}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
           >
             <Card className="p-4 bg-muted/50">
               <div className="space-y-2">
@@ -262,16 +347,14 @@ export const CoinChangeVisualization = () => {
               <div className="text-xs space-y-1 text-muted-foreground">
                 <p><strong>Coins:</strong> {JSON.stringify(coins)}</p>
                 <p><strong>Target:</strong> {amount}</p>
-                <p><strong>DP Formula:</strong> dp[i] = min(dp[i], dp[i-coin] + 1)</p>
+                <p><strong>Logic:</strong> {`dp[a] = min(dp[a], 1 + dp[a - coin])`}</p>
               </div>
             </Card>
           </motion.div>
 
           <motion.div
             key={`variables-${currentStep}`}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3, delay: 0.4 }}
+       
           >
             <VariablePanel variables={step.variables} />
           </motion.div>

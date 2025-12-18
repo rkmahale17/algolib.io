@@ -54,7 +54,7 @@ const Home = () => {
     <>
       <Helmet>
         <title>
-          AlgoLib.io - Master 200+ Algorithms with Interactive Visualizations |
+          Rulcode.com - Master 200+ Algorithms with Interactive Visualizations |
           Free & Open Source
         </title>
         <meta
@@ -65,45 +65,45 @@ const Home = () => {
           name="keywords"
           content="algorithms, data structures, leetcode, coding interviews, blind 75, competitive programming, algorithm visualization, learn algorithms, DSA, python algorithms, java algorithms, c++ algorithms, typescript algorithms, free algorithm library, interactive games"
         />
-        <link rel="canonical" href="https://algolib.io/" />
+        <link rel="canonical" href="https://rulcode.com/" />
 
         {/* Open Graph */}
         <meta
           property="og:title"
-          content="AlgoLib.io - Master 200+ Algorithms with Interactive Visualizations"
+          content="Rulcode.com - Master 200+ Algorithms with Interactive Visualizations"
         />
         <meta
           property="og:description"
           content="Free open-source algorithm library with 200+ interactive visualizations across 20 categories. Learn DSA for coding interviews with Blind 75, games, and tutorials."
         />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://algolib.io/" />
-        <meta property="og:image" content="https://algolib.io/og-image.png" />
+        <meta property="og:url" content="https://rulcode.com/" />
+        <meta property="og:image" content="https://rulcode.com/og-image.png" />
 
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta
           name="twitter:title"
-          content="AlgoLib.io - Master 200+ Algorithms Visually"
+          content="Rulcode.com - Master 200+ Algorithms Visually"
         />
         <meta
           name="twitter:description"
           content="Free interactive algorithm visualizations with 20 categories, Blind 75, and games for coding interviews"
         />
-        <meta name="twitter:image" content="https://algolib.io/og-image.png" />
+        <meta name="twitter:image" content="https://rulcode.com/og-image.png" />
 
         {/* Structured Data - WebSite */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebSite",
-            name: "AlgoLib.io",
-            url: "https://algolib.io",
+            name: "Rulcode.com",
+            url: "https://rulcode.com",
             description:
               "Free and open-source algorithm library with interactive visualizations for learning data structures and algorithms",
             potentialAction: {
               "@type": "SearchAction",
-              target: "https://algolib.io/?search={search_term_string}",
+              target: "https://rulcode.com/?search={search_term_string}",
               "query-input": "required name=search_term_string",
             },
           })}
@@ -114,20 +114,20 @@ const Home = () => {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "EducationalOrganization",
-            name: "AlgoLib.io",
-            url: "https://algolib.io",
+            name: "Rulcode.com",
+            url: "https://rulcode.com",
             logo: {
               "@type": "ImageObject",
-              url: "https://algolib.io/android-chrome-512x512.png",
+              url: "https://rulcode.com/android-chrome-512x512.png",
               width: 512,
               height: 512,
             },
             sameAs: [
-              "https://x.com/algolib_io",
+              "https://x.com/rulcode_io",
               "https://github.com/rkmahale17/algolib.io",
             ],
             description:
-              "AlgoLib.io is a free and open-source algorithm library that helps developers learn and visualize algorithms with interactive animations and clean code snippets in multiple programming languages.",
+              "Rulcode.com is a free and open-source algorithm library that helps developers learn and visualize algorithms with interactive animations and clean code snippets in multiple programming languages.",
           })}
         </script>
       </Helmet>

@@ -339,7 +339,7 @@ const AdminSimulator: React.FC = () => {
           
           const result = await executeCode(
               codeBlock.code, 
-              lang as Language, 
+              (lang as string).toLowerCase() as Language, 
               testCases, 
               (algo.input_schema as any[])
           );
@@ -426,7 +426,7 @@ const AdminSimulator: React.FC = () => {
 
         for (const impl of (algo.implementations as any[])) {
           if (stopRequested.current) break;
-          const lang = impl.lang as Language;
+          const lang = (impl.lang as string).toLowerCase() as Language;
           if (!LANGUAGE_IDS[lang]) continue;
 
           // FILTER LOGIC

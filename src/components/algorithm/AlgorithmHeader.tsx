@@ -107,8 +107,8 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
           to="/"
           className="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
-          <img src={logo} alt="Algo Lib Logo" className="w-8 h-8" />
-          <span className="text-xl">Algo Lib</span>
+          <img src={logo} alt="RulCode Logo" className="w-8 h-8" />
+          {/* <span className="text-xl font-mono">RulCode</span> */}
         </Link>
         
         <div className="h-4 w-px bg-border" />

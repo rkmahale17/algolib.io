@@ -32,7 +32,7 @@ export const blogPosts: BlogPost[] = [
     title: 'Master the Blind 75: The Only LeetCode List You Need for FAANG Interviews',
     subtitle: 'Learn how 75 strategic problems and visual learning can land you your dream tech job faster than grinding 500+ random questions',
     description: 'Discover why the Blind 75 is the most efficient path to mastering coding interviews at Google, Meta, Amazon, and other top tech companies. Learn proven patterns through interactive visualizations that make complex algorithms click instantly.',
-    author: 'AlgoLib Team',
+    author: 'Rulcode Team',
     date: '2025-01-15',
     readTime: '18 min read',
     category: 'Interview Prep',
@@ -52,7 +52,7 @@ export const blogPosts: BlogPost[] = [
 
       {
         type: 'paragraph',
-        content: 'In this comprehensive guide, we\'ll show you exactly how to master these 75 problems using AlgoLib.io\'s interactive visualizations, transforming your preparation from overwhelming to systematic, and from frustrating to genuinely enjoyable.'
+        content: 'In this comprehensive guide, we\'ll show you exactly how to master these 75 problems using Rulcode.com\'s interactive visualizations, transforming your preparation from overwhelming to systematic, and from frustrating to genuinely enjoyable.'
       },
 
       {
@@ -102,7 +102,7 @@ export const blogPosts: BlogPost[] = [
 
       {
         type: 'paragraph',
-        content: '<strong>Your brain processes visual information 60,000 times faster than text.</strong> When you see pointers move through an array, nodes connect in a graph, or a stack build and collapse in real-time on AlgoLib.io, you\'re creating multiple neural pathways for that information. This is called dual coding theory—your brain stores both the visual representation AND the verbal explanation, creating redundant memory that you can recall under pressure.'
+        content: '<strong>Your brain processes visual information 60,000 times faster than text.</strong> When you see pointers move through an array, nodes connect in a graph, or a stack build and collapse in real-time on Rulcode.com, you\'re creating multiple neural pathways for that information. This is called dual coding theory—your brain stores both the visual representation AND the verbal explanation, creating redundant memory that you can recall under pressure.'
       },
 
       {
@@ -123,7 +123,7 @@ export const blogPosts: BlogPost[] = [
 
       {
         type: 'paragraph',
-        content: 'This is exactly why AlgoLib.io exists. We\'ve built step-by-step interactive visualizations for 72+ algorithms, complete with code examples in Python, Java, C++, and TypeScript. You can watch each algorithm execute line by line, pause at any moment, and truly understand what\'s happening—not just memorize the code.'
+        content: 'This is exactly why Rulcode.com exists. We\'ve built step-by-step interactive visualizations for 72+ algorithms, complete with code examples in Python, Java, C++, and TypeScript. You can watch each algorithm execute line by line, pause at any moment, and truly understand what\'s happening—not just memorize the code.'
       },
 
       {
@@ -146,7 +146,7 @@ export const blogPosts: BlogPost[] = [
         items: [`<strong>The Pattern:</strong> Use two pointers moving toward each other or a window that slides across data to solve problems in O(n) time instead of O(n²).`,
           '<strong>Key Problems:</strong> Two Sum II, Container With Most Water, Longest Substring Without Repeating Characters, Minimum Window Substring',
           '<strong>Why It Matters:</strong> This pattern appears in 20% of all FAANG interviews. Companies love it because it tests your ability to optimize brute force solutions.',
-          '<strong>Visual Advantage:</strong> Watching pointers move and windows expand/contract on AlgoLib.io makes the "aha moment" instant. You\'ll see exactly when to move which pointer and why.']
+          '<strong>Visual Advantage:</strong> Watching pointers move and windows expand/contract on Rulcode.com makes the "aha moment" instant. You\'ll see exactly when to move which pointer and why.']
       },
       {
         type: 'image',
@@ -155,7 +155,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "cta",
         link: '/algorithm/two-pointers/',
-        content: 'Visualize two pointer problems on AlgoLib.io'
+        content: 'Visualize two pointer problems on Rulcode.com'
       },
 
 
@@ -180,7 +180,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "cta",
         link: '/algorithm/fast-slow-pointers/',
-        content: 'Visualize slow fast problems on AlgoLib.io'
+        content: 'Visualize slow fast problems on Rulcode.com'
       },
 
       {
@@ -202,7 +202,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "cta",
         link: '/algorithm/binary-search',
-        content: 'Visualize binary search on AlgoLib.io'
+        content: 'Visualize binary search on Rulcode.com'
       },
 
       {
@@ -215,7 +215,7 @@ export const blogPosts: BlogPost[] = [
           '<strong>The Pattern:</strong> Navigate hierarchical or networked data using Breadth-First Search (level by level) or Depth-First Search (dive deep first).',
           '<strong>Key Problems:</strong> Binary Tree Level Order Traversal, Number of Islands, Clone Graph, Course Schedule.',
           '<strong>Why It Matters:</strong> Tree and graph problems make up 25–30% of all interviews. They test recursion skills, queue/stack usage, and your ability to think spatially.',
-          '<strong>Visual Advantage:</strong> AlgoLib.io’s tree and graph visualizations make BFS vs DFS differences crystal clear.'
+          '<strong>Visual Advantage:</strong> Rulcode.com’s tree and graph visualizations make BFS vs DFS differences crystal clear.'
         ]
       },
       {
@@ -225,24 +225,24 @@ export const blogPosts: BlogPost[] = [
       {
         type: "cta",
         link: '/algorithm/bfs-level-order/',
-        content: 'Visualize BFS on AlgoLib.io'
+        content: 'Visualize BFS on Rulcode.com'
       },
       {
         type: "cta",
         link: '/algorithm/dfs-preorder/',
-        content: 'Visualize DFS preorder on AlgoLib.io'
+        content: 'Visualize DFS preorder on Rulcode.com'
       },
 
       {
         type: "cta",
         link: '/algorithm/dfs-inorder/',
-        content: 'Visualize DFS inorder on AlgoLib.io'
+        content: 'Visualize DFS inorder on Rulcode.com'
       },
 
       {
         type: "cta",
         link: '/algorithm/dfs-postorder/',
-        content: 'Visualize DFS postorder on AlgoLib.io'
+        content: 'Visualize DFS postorder on Rulcode.com'
       },
 
 
@@ -257,7 +257,7 @@ export const blogPosts: BlogPost[] = [
           '<strong>The Pattern:</strong> Break problems into overlapping subproblems and build solutions from smaller pieces. Use memoization (top-down) or tabulation (bottom-up).',
           '<strong>Key Problems:</strong> Climbing Stairs, Coin Change, Longest Increasing Subsequence, Word Break.',
           '<strong>Why It Matters:</strong> DP is the final boss of coding interviews. It separates strong candidates from average ones.',
-          '<strong>Visual Advantage:</strong> AlgoLib.io shows how subproblems overlap and how the DP table fills up, transforming confusion into clarity.'
+          '<strong>Visual Advantage:</strong> Rulcode.com shows how subproblems overlap and how the DP table fills up, transforming confusion into clarity.'
         ]
       },
       {
@@ -267,7 +267,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "cta",
         link: '/algorithm/coin-change/',
-        content: 'Visualize Dyanamic Programming on AlgoLib.io'
+        content: 'Visualize Dyanamic Programming on Rulcode.com'
       },
       {
         type: 'h4',
@@ -288,7 +288,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "cta",
         link: '/algorithm/subsets/',
-        content: 'Visualize Backtracking on AlgoLib.io'
+        content: 'Visualize Backtracking on Rulcode.com'
       },
 
       {
@@ -311,7 +311,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "cta",
         link: '/blind75/valid-parentheses',
-        content: 'Visualize Stack, Queues on AlgoLib.io'
+        content: 'Visualize Stack, Queues on Rulcode.com'
       },
 
       {
@@ -333,7 +333,7 @@ export const blogPosts: BlogPost[] = [
         items: [
           '<strong>Focus:</strong> Two Pointers, Sliding Window, Hashing.',
           '<strong>Why Start Here:</strong> These are the easiest patterns and build confidence. Arrays and strings appear in 40% of interviews.',
-          '<strong>AlgoLib.io Resources:</strong> Watch Two Sum, Container With Most Water, and Longest Substring visualizations first.'
+          '<strong>Rulcode.com Resources:</strong> Watch Two Sum, Container With Most Water, and Longest Substring visualizations first.'
         ]
       },
 
@@ -345,7 +345,7 @@ export const blogPosts: BlogPost[] = [
         type: 'list',
         items: [
           '<strong>Focus:</strong> Fast & Slow Pointers, Binary Search variations.',
-          '<strong>Practice Tip:</strong> Draw linked lists on paper while watching AlgoLib.io animations. This dual-channel learning accelerates retention.'
+          '<strong>Practice Tip:</strong> Draw linked lists on paper while watching Rulcode.com animations. This dual-channel learning accelerates retention.'
         ]
       },
 
@@ -357,7 +357,7 @@ export const blogPosts: BlogPost[] = [
         type: 'list',
         items: [
           '<strong>Focus:</strong> BFS, DFS, Recursion, Tree properties.',
-          '<strong>Why It Gets Hard:</strong> Spatial reasoning is challenging. Use AlgoLib.io’s graph visualizations religiously—they’re specifically designed to make these concepts intuitive.'
+          '<strong>Why It Gets Hard:</strong> Spatial reasoning is challenging. Use Rulcode.com’s graph visualizations religiously—they’re specifically designed to make these concepts intuitive.'
         ]
       },
 
@@ -381,7 +381,7 @@ export const blogPosts: BlogPost[] = [
         type: 'list',
         items: [
           '<strong>Step 1 (20 min):</strong> Read the problem on LeetCode. Attempt it yourself for 15 minutes.',
-          '<strong>Step 2 (30 min):</strong> Watch the algorithm visualization on AlgoLib.io. Pause at each step and understand WHY, not just WHAT.',
+          '<strong>Step 2 (30 min):</strong> Watch the algorithm visualization on Rulcode.com. Pause at each step and understand WHY, not just WHAT.',
           '<strong>Step 3 (40 min):</strong> Code the solution from scratch WITHOUT looking. Get stuck? Go back to the visualization.',
           '<strong>Step 4 (20 min):</strong> Review time/space complexity. Can you explain it out loud?',
           '<strong>Step 5 (10 min):</strong> Note down the pattern and any edge cases you missed.'
@@ -435,17 +435,17 @@ export const blogPosts: BlogPost[] = [
 
       {
         type: 'heading',
-        content: 'How AlgoLib.io Supercharges Your Preparation'
+        content: 'How Rulcode.com Supercharges Your Preparation'
       },
 
       {
         type: 'paragraph',
-        content: 'We built AlgoLib.io because we were frustrated with traditional learning methods. Reading algorithm explanations felt like trying to understand a movie by reading the script. We needed to SEE it happen.'
+        content: 'We built Rulcode.com because we were frustrated with traditional learning methods. Reading algorithm explanations felt like trying to understand a movie by reading the script. We needed to SEE it happen.'
       },
 
       {
         type: 'subheading',
-        content: 'What Makes AlgoLib.io Different:'
+        content: 'What Makes Rulcode.com Different:'
       },
 
       {
@@ -462,7 +462,7 @@ export const blogPosts: BlogPost[] = [
 
       {
         type: 'paragraph',
-        content: 'Whether you\'re a CS student prepping for your first interview, a self-taught developer breaking into tech, or an experienced engineer targeting FAANG, AlgoLib.io meets you where you are.'
+        content: 'Whether you\'re a CS student prepping for your first interview, a self-taught developer breaking into tech, or an experienced engineer targeting FAANG, Rulcode.com meets you where you are.'
       },
 
       {
@@ -478,7 +478,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: 'list',
         items: [
-          '<strong>Today:</strong> Pick one easy problem from the Two Pointers category. Watch it on AlgoLib.io, then solve it on LeetCode.',
+          '<strong>Today:</strong> Pick one easy problem from the Two Pointers category. Watch it on Rulcode.com, then solve it on LeetCode.',
           '<strong>This Week:</strong> Solve 3-5 problems using the same pattern. Notice how they\'re all variations of the same technique.',
           '<strong>This Month:</strong> Complete Weeks 1-2 of the study plan. You\'ll have Two Pointers and Sliding Window down cold.',
           '<strong>In 8 Weeks:</strong> You\'ll have mastered all 75 problems and the 7 core patterns. You\'ll be ready to interview anywhere.'
@@ -492,7 +492,7 @@ export const blogPosts: BlogPost[] = [
 
       {
         type: 'cta',
-        content: '🚀 Start Mastering the Blind 75 on AlgoLib.io',
+        content: '🚀 Start Mastering the Blind 75 on Rulcode.com',
         link: '/algorithms'
       },
 
@@ -518,7 +518,7 @@ export const blogPosts: BlogPost[] = [
 
       {
         type: 'paragraph',
-        content: 'You should know the basics: arrays, strings, linked lists, stacks, queues, trees, and graphs. If you\'re rusty, AlgoLib.io has foundational visualizations to refresh your memory.'
+        content: 'You should know the basics: arrays, strings, linked lists, stacks, queues, trees, and graphs. If you\'re rusty, Rulcode.com has foundational visualizations to refresh your memory.'
       },
 
       {
@@ -528,7 +528,7 @@ export const blogPosts: BlogPost[] = [
 
       {
         type: 'paragraph',
-        content: 'This is normal, especially early on. Watch the AlgoLib.io visualization to understand the approach, then close it and implement from scratch. The struggle is part of learning.'
+        content: 'This is normal, especially early on. Watch the Rulcode.com visualization to understand the approach, then close it and implement from scratch. The struggle is part of learning.'
       },
 
       {
@@ -543,12 +543,12 @@ export const blogPosts: BlogPost[] = [
 
       {
         type: 'h4',
-        content: 'Can I use AlgoLib.io during actual interviews?'
+        content: 'Can I use Rulcode.com during actual interviews?'
       },
 
       {
         type: 'paragraph',
-        content: 'No, but that\'s the point! AlgoLib.io trains your brain to visualize algorithms mentally. After watching enough visualizations, you\'ll be able to "run" algorithms in your head during real interviews.'
+        content: 'No, but that\'s the point! Rulcode.com trains your brain to visualize algorithms mentally. After watching enough visualizations, you\'ll be able to "run" algorithms in your head during real interviews.'
       },
 
       {
@@ -558,7 +558,7 @@ export const blogPosts: BlogPost[] = [
 
       {
         type: 'paragraph',
-        content: 'The Blind 75 isn\'t magic. It\'s a systematic approach to learning the patterns that power 90% of coding interviews. Combined with AlgoLib.io\'s visual learning platform, you have everything you need to transform from interview anxiety to interview confidence.'
+        content: 'The Blind 75 isn\'t magic. It\'s a systematic approach to learning the patterns that power 90% of coding interviews. Combined with Rulcode.com\'s visual learning platform, you have everything you need to transform from interview anxiety to interview confidence.'
       },
 
       {
@@ -573,12 +573,12 @@ export const blogPosts: BlogPost[] = [
 
       {
         type: 'paragraph',
-        content: 'Your dream job is waiting. The Blind 75 is your roadmap. AlgoLib.io is your guide. All you need to do is start.'
+        content: 'Your dream job is waiting. The Blind 75 is your roadmap. Rulcode.com is your guide. All you need to do is start.'
       },
 
       {
         type: 'cta',
-        content: 'Explore Blind 75  AlgoLib.io',
+        content: 'Explore Blind 75  Rulcode.com',
         link: '/blind75'
       }
     ]
@@ -590,7 +590,7 @@ export const blogPosts: BlogPost[] = [
     title: 'LRU Cache — The Complete Guide to the Most Popular Cache Algorithm',
     subtitle: 'Everything you need to know about the Least Recently Used cache — from intuition, implementation, and code to real-world systems and interview mastery.',
     description: 'A 4,000-word deep dive into LRU Cache: understand how caching works, why LRU is the backbone of performance optimization, and how to implement it efficiently using HashMaps and Doubly Linked Lists in multiple languages.',
-    author: 'AlgoLib Team',
+    author: 'Rulcode Team',
     date: '2025-02-14',
     readTime: '35 min read',
     category: 'System Design & Data Structures',
@@ -867,12 +867,12 @@ class LRUCache:
 
       {
         type: 'heading',
-        content: '4. Visualization with AlgoLib.io'
+        content: '4. Visualization with Rulcode.com'
       },
       {
         type: 'paragraph',
         content:
-          'Visualizing the LRU cache makes its mechanism intuitive. In AlgoLib.io’s animation:'
+          'Visualizing the LRU cache makes its mechanism intuitive. In Rulcode.com’s animation:'
       },
 
       {
@@ -892,7 +892,7 @@ class LRUCache:
 
       {
         type: 'cta',
-        content: 'Explore the LRU Cache Visualization on AlgoLib.io',
+        content: 'Explore the LRU Cache Visualization on Rulcode.com',
         link: '/algorithm/lru-cache'
       },
 
@@ -1015,7 +1015,7 @@ class LRUCache:
       {
         type: 'paragraph',
         content:
-          'Understanding LRU conceptually is good, but seeing it in action cements the knowledge. Visual tools like AlgoLib.io allow you to interact with algorithms — pausing, rewinding, and exploring step-by-step execution. Watching nodes move as operations occur gives you the spatial intuition you can recall instantly in interviews.'
+          'Understanding LRU conceptually is good, but seeing it in action cements the knowledge. Visual tools like Rulcode.com allow you to interact with algorithms — pausing, rewinding, and exploring step-by-step execution. Watching nodes move as operations occur gives you the spatial intuition you can recall instantly in interviews.'
       },
 
       {
@@ -1036,12 +1036,12 @@ class LRUCache:
     "slug": "dynamic-programming-for-people-who-hate-dynamic-programming",
     "title": "Dynamic Programming for People Who Hate Dynamic Programming",
     "subtitle": "Understand DP using visuals, animations, and real intuitive examples — not confusing formulas.",
-    "description": "A beginner-friendly, visually driven guide to Dynamic Programming (DP). Learn why DP feels hard, how to identify DP problems instantly, and how animations on AlgoLib.io make them simple to understand.",
-    "author": "AlgoLib Team",
+    "description": "A beginner-friendly, visually driven guide to Dynamic Programming (DP). Learn why DP feels hard, how to identify DP problems instantly, and how animations on Rulcode.com make them simple to understand.",
+    "author": "Rulcode Team",
     "date": "2025-01-18",
     "readTime": "7 min read",
     "category": "Algorithms",
-    "tags": ["Dynamic Programming", "DP", "Visual Learning", "DSA", "Coding Interview", "Algolib", "LeetCode"],
+    "tags": ["Dynamic Programming", "DP", "Visual Learning", "DSA", "Coding Interview", "Rulcode", "LeetCode"],
     "thumbnail": "/_blog/3/hero.png",
     "image": "/_blog/3/hero.png",
 
@@ -1116,13 +1116,13 @@ class LRUCache:
       {
         "type": "image",
         "content": '/_blog/patterns/coin-change.png',
-        "link": "https://algolib.io",
+        "link": "https://rulcode.com",
         "large": false
       },
       {
         "type": "cta",
         link: '/algorithm/coin-change',
-        content: 'Visualize Coin Change on AlgoLib.io'
+        content: 'Visualize Coin Change on Rulcode.com'
 
       },
 
@@ -1195,7 +1195,7 @@ class LRUCache:
       },
       {
         "type": "paragraph",
-        "content": "AlgoLib.io makes DP simple by visually showing: recursion expansion, duplicate calls, memoization blocking repeated work, and DP tables filling cell-by-cell. This converts abstract theory into something you can SEE happening."
+        "content": "Rulcode.com makes DP simple by visually showing: recursion expansion, duplicate calls, memoization blocking repeated work, and DP tables filling cell-by-cell. This converts abstract theory into something you can SEE happening."
       },
       {
         "type": "image",
@@ -1206,7 +1206,7 @@ class LRUCache:
       },
       {
         "type": 'cta',
-        "content": 'House robber visualization on AlgoLib.io',
+        "content": 'House robber visualization on Rulcode.com',
         "link": '/algorithm/house-robber'
       },
 
@@ -1328,13 +1328,13 @@ class LRUCache:
       {
         "type": "image",
         "alt": "Knapsack DP algo",
-        "caption": "Knapsack AlgoLib.io simulation ",
+        "caption": "Knapsack Rulcode.com simulation ",
         "content": "/_blog/common/knaps.png",
         "large": false
       },
       {
         type: 'cta',
-        content: 'Learn Knapsack Algo by visualizing on AlgoLib.io',
+        content: 'Learn Knapsack Algo by visualizing on Rulcode.com',
         link: '/algorithm/knapsack-01'
       },
 
@@ -1360,36 +1360,36 @@ class LRUCache:
       },
       {
         "type": "cta",
-        "content": "Max subarray visualization on AlgoLib.io",
+        "content": "Max subarray visualization on Rulcode.com",
         "link": '/blind75/maximum-subarray'
       },
 
       {
         "type": "cta",
-        "content": "Knapsack Algo visualization on AlgoLib.io",
+        "content": "Knapsack Algo visualization on Rulcode.com",
         "link": '/algorithm/knapsack-01'
       },
 
       {
         "type": "cta",
-        "content": "Longest common subsequence visualization on AlgoLib.io",
+        "content": "Longest common subsequence visualization on Rulcode.com",
         "link": '/blind75/longest-common-subsequence'
       },
 
 
       {
         "type": "cta",
-        "content": "Check all dynamic problems on AlgoLib.io",
+        "content": "Check all dynamic problems on Rulcode.com",
         "link": '/blind75/longest-common-subsequence'
       },
 
       {
         "type": "heading",
-        "content": "How AlgoLib.io Helps You Master DP"
+        "content": "How Rulcode.com Helps You Master DP"
       },
       {
         "type": "paragraph",
-        "content": "Algolib.io takes DP to another level with interactive visualizations:"
+        "content": "Rulcode.com takes DP to another level with interactive visualizations:"
       },
       {
         "type": "list",
@@ -1405,8 +1405,8 @@ class LRUCache:
 
       {
         "type": "cta",
-        "content": "Try any Dynamic Programming problem now on AlgoLib.io and see the code come alive.",
-        "link": "https://algolib.io"
+        "content": "Try any Dynamic Programming problem now on Rulcode.com and see the code come alive.",
+        "link": "https://rulcode.com"
       }
     ]
   }

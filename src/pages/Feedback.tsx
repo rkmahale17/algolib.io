@@ -112,20 +112,20 @@ const Feedback = () => {
   return (
     <>
       <Helmet>
-        <title>Feedback & Suggestions - AlgoLib.io | Report Bugs & Request Features</title>
+        <title>Feedback & Suggestions - Rulcode.com | Report Bugs & Request Features</title>
         <meta 
           name="description" 
-          content="Share your feedback, report bugs, or request new features for AlgoLib.io. Help us improve our free algorithm learning platform." 
+          content="Share your feedback, report bugs, or request new features for Rulcode.com. Help us improve our free algorithm learning platform." 
         />
         <meta 
           name="keywords" 
-          content="algolib feedback, report bug, feature request, algorithm platform feedback, contribute feedback" 
+          content="rulcode feedback, report bug, feature request, algorithm platform feedback, contribute feedback" 
         />
-        <link rel="canonical" href="https://algolib.io/feedback" />
+        <link rel="canonical" href="https://rulcode.com/feedback" />
         
-        <meta property="og:title" content="Feedback & Suggestions - AlgoLib.io" />
-        <meta property="og:description" content="Help us improve AlgoLib.io by sharing your feedback and suggestions" />
-        <meta property="og:url" content="https://algolib.io/feedback" />
+        <meta property="og:title" content="Feedback & Suggestions - Rulcode.com" />
+        <meta property="og:description" content="Help us improve Rulcode.com by sharing your feedback and suggestions" />
+        <meta property="og:url" content="https://rulcode.com/feedback" />
         <meta name="robots" content="index, follow" />
       </Helmet>
       
@@ -139,7 +139,7 @@ const Feedback = () => {
               </div>
               <h1 className="text-4xl font-bold mb-4">Feedback & Suggestions</h1>
               <p className="text-muted-foreground">
-                Help us improve AlgoLib by sharing your feedback, bug reports, or feature requests.
+                Help us improve Rulcode by sharing your feedback, bug reports, or feature requests.
               </p>
             </div>
 

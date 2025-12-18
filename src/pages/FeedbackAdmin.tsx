@@ -116,7 +116,7 @@ const FeedbackAdmin = () => {
   return (
     <>
       <Helmet>
-        <title>Feedback Management - AlgoLib.io</title>
+        <title>Feedback Management - Rulcode.com</title>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 

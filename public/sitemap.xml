@@ -1,1405 +1,1405 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://algolib.io/</loc>
+    <loc>https://rulcode.com/</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://algolib.io/about</loc>
+    <loc>https://rulcode.com/about</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://algolib.io/privacy</loc>
+    <loc>https://rulcode.com/privacy</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://algolib.io/terms</loc>
+    <loc>https://rulcode.com/terms</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://algolib.io/content-rights</loc>
+    <loc>https://rulcode.com/content-rights</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://algolib.io/feedback</loc>
+    <loc>https://rulcode.com/feedback</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://algolib.io/games</loc>
+    <loc>https://rulcode.com/games</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://algolib.io/games/leaderboard</loc>
+    <loc>https://rulcode.com/games/leaderboard</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75</loc>
+    <loc>https://rulcode.com/blind75</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blog</loc>
+    <loc>https://rulcode.com/blog</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/binary-search</loc>
+    <loc>https://rulcode.com/algorithm/binary-search</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/encode-and-decode-strings</loc>
+    <loc>https://rulcode.com/algorithm/encode-and-decode-strings</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/sliding-window</loc>
+    <loc>https://rulcode.com/algorithm/sliding-window</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/valid-anagram</loc>
+    <loc>https://rulcode.com/algorithm/valid-anagram</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/invert-binary-tree</loc>
+    <loc>https://rulcode.com/algorithm/invert-binary-tree</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/detect-cycle</loc>
+    <loc>https://rulcode.com/algorithm/detect-cycle</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/longest-palindromic-substring</loc>
+    <loc>https://rulcode.com/algorithm/longest-palindromic-substring</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/top-k-frequent-elements</loc>
+    <loc>https://rulcode.com/algorithm/top-k-frequent-elements</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/kadanes-algorithm</loc>
+    <loc>https://rulcode.com/algorithm/kadanes-algorithm</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/monotonic-stack</loc>
+    <loc>https://rulcode.com/algorithm/monotonic-stack</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/merge-k-sorted-lists</loc>
+    <loc>https://rulcode.com/algorithm/merge-k-sorted-lists</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/lowest-common-ancestor-of-bst</loc>
+    <loc>https://rulcode.com/algorithm/lowest-common-ancestor-of-bst</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/subset-generation-bits</loc>
+    <loc>https://rulcode.com/algorithm/subset-generation-bits</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/gcd-euclidean</loc>
+    <loc>https://rulcode.com/algorithm/gcd-euclidean</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/container-with-most-water</loc>
+    <loc>https://rulcode.com/algorithm/container-with-most-water</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/kth-smallest-element-in-a-bst</loc>
+    <loc>https://rulcode.com/algorithm/kth-smallest-element-in-a-bst</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/dfs-postorder</loc>
+    <loc>https://rulcode.com/algorithm/dfs-postorder</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/word-search-ii</loc>
+    <loc>https://rulcode.com/algorithm/word-search-ii</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/find-median-from-data-stream</loc>
+    <loc>https://rulcode.com/algorithm/find-median-from-data-stream</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/fast-slow-pointers</loc>
+    <loc>https://rulcode.com/algorithm/fast-slow-pointers</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/reverse-linked-list</loc>
+    <loc>https://rulcode.com/algorithm/reverse-linked-list</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/dfs-preorder</loc>
+    <loc>https://rulcode.com/algorithm/dfs-preorder</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/bst-insert</loc>
+    <loc>https://rulcode.com/algorithm/bst-insert</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/merge-sorted-lists</loc>
+    <loc>https://rulcode.com/algorithm/merge-sorted-lists</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/bfs-level-order</loc>
+    <loc>https://rulcode.com/algorithm/bfs-level-order</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/dfs-inorder</loc>
+    <loc>https://rulcode.com/algorithm/dfs-inorder</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/middle-node</loc>
+    <loc>https://rulcode.com/algorithm/middle-node</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/lca</loc>
+    <loc>https://rulcode.com/algorithm/lca</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/merge-k-lists</loc>
+    <loc>https://rulcode.com/algorithm/merge-k-lists</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/recover-bst</loc>
+    <loc>https://rulcode.com/algorithm/recover-bst</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/serialize-tree</loc>
+    <loc>https://rulcode.com/algorithm/serialize-tree</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/graph-bfs</loc>
+    <loc>https://rulcode.com/algorithm/graph-bfs</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/prims</loc>
+    <loc>https://rulcode.com/algorithm/prims</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/a-star</loc>
+    <loc>https://rulcode.com/algorithm/a-star</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/edit-distance</loc>
+    <loc>https://rulcode.com/algorithm/edit-distance</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/trie</loc>
+    <loc>https://rulcode.com/algorithm/trie</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/floyd-warshall</loc>
+    <loc>https://rulcode.com/algorithm/floyd-warshall</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/n-queens</loc>
+    <loc>https://rulcode.com/algorithm/n-queens</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/topological-sort</loc>
+    <loc>https://rulcode.com/algorithm/topological-sort</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/coin-change</loc>
+    <loc>https://rulcode.com/algorithm/coin-change</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/union-find</loc>
+    <loc>https://rulcode.com/algorithm/union-find</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/partition-equal-subset</loc>
+    <loc>https://rulcode.com/algorithm/partition-equal-subset</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/sieve-eratosthenes</loc>
+    <loc>https://rulcode.com/algorithm/sieve-eratosthenes</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/dijkstras</loc>
+    <loc>https://rulcode.com/algorithm/dijkstras</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/gas-station</loc>
+    <loc>https://rulcode.com/algorithm/gas-station</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/xor-trick</loc>
+    <loc>https://rulcode.com/algorithm/xor-trick</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/sparse-table</loc>
+    <loc>https://rulcode.com/algorithm/sparse-table</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/binary-tree-maximum-path-sum</loc>
+    <loc>https://rulcode.com/algorithm/binary-tree-maximum-path-sum</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/bellman-ford</loc>
+    <loc>https://rulcode.com/algorithm/bellman-ford</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/count-bits</loc>
+    <loc>https://rulcode.com/algorithm/count-bits</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/subtree-of-another-tree</loc>
+    <loc>https://rulcode.com/algorithm/subtree-of-another-tree</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/permutations</loc>
+    <loc>https://rulcode.com/algorithm/permutations</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/counting-bits</loc>
+    <loc>https://rulcode.com/algorithm/counting-bits</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/kth-largest</loc>
+    <loc>https://rulcode.com/algorithm/kth-largest</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/tarjans</loc>
+    <loc>https://rulcode.com/algorithm/tarjans</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/manachers</loc>
+    <loc>https://rulcode.com/algorithm/manachers</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/union-by-rank</loc>
+    <loc>https://rulcode.com/algorithm/union-by-rank</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/lru-cache</loc>
+    <loc>https://rulcode.com/algorithm/lru-cache</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/maximum-subarray</loc>
+    <loc>https://rulcode.com/algorithm/maximum-subarray</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/sum-of-two-integers</loc>
+    <loc>https://rulcode.com/algorithm/sum-of-two-integers</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/reverse-bits</loc>
+    <loc>https://rulcode.com/algorithm/reverse-bits</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/longest-common-subsequence</loc>
+    <loc>https://rulcode.com/algorithm/longest-common-subsequence</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/combination-sum</loc>
+    <loc>https://rulcode.com/algorithm/combination-sum</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/unique-paths</loc>
+    <loc>https://rulcode.com/algorithm/unique-paths</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/alien-dictionary</loc>
+    <loc>https://rulcode.com/algorithm/alien-dictionary</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/course-schedule</loc>
+    <loc>https://rulcode.com/algorithm/course-schedule</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/non-overlapping-intervals</loc>
+    <loc>https://rulcode.com/algorithm/non-overlapping-intervals</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/number-of-1-bits</loc>
+    <loc>https://rulcode.com/algorithm/number-of-1-bits</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/lcs</loc>
+    <loc>https://rulcode.com/algorithm/lcs</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/matrix-path-dp</loc>
+    <loc>https://rulcode.com/algorithm/matrix-path-dp</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/number-of-islands</loc>
+    <loc>https://rulcode.com/algorithm/number-of-islands</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/merge-intervals</loc>
+    <loc>https://rulcode.com/algorithm/merge-intervals</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/lis</loc>
+    <loc>https://rulcode.com/algorithm/lis</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/meeting-rooms</loc>
+    <loc>https://rulcode.com/algorithm/meeting-rooms</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/spiral-matrix</loc>
+    <loc>https://rulcode.com/algorithm/spiral-matrix</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/insert-interval</loc>
+    <loc>https://rulcode.com/algorithm/insert-interval</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/longest-substring-without-repeating-characters</loc>
+    <loc>https://rulcode.com/algorithm/longest-substring-without-repeating-characters</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/merge-two-sorted-lists</loc>
+    <loc>https://rulcode.com/algorithm/merge-two-sorted-lists</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/reorder-list</loc>
+    <loc>https://rulcode.com/algorithm/reorder-list</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/longest-repeating-character-replacement</loc>
+    <loc>https://rulcode.com/algorithm/longest-repeating-character-replacement</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/word-break</loc>
+    <loc>https://rulcode.com/algorithm/word-break</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/house-robber</loc>
+    <loc>https://rulcode.com/algorithm/house-robber</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/binary-tree-level-order-traversal</loc>
+    <loc>https://rulcode.com/algorithm/binary-tree-level-order-traversal</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/valid-parentheses</loc>
+    <loc>https://rulcode.com/algorithm/valid-parentheses</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/same-tree</loc>
+    <loc>https://rulcode.com/algorithm/same-tree</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/activity-selection</loc>
+    <loc>https://rulcode.com/algorithm/activity-selection</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/palindromic-substrings</loc>
+    <loc>https://rulcode.com/algorithm/palindromic-substrings</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/interval-scheduling</loc>
+    <loc>https://rulcode.com/algorithm/interval-scheduling</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/serialize-and-deserialize-binary-tree</loc>
+    <loc>https://rulcode.com/algorithm/serialize-and-deserialize-binary-tree</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/construct-binary-tree-from-preorder-and-inorder-traversal</loc>
+    <loc>https://rulcode.com/algorithm/construct-binary-tree-from-preorder-and-inorder-traversal</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/validate-binary-search-tree</loc>
+    <loc>https://rulcode.com/algorithm/validate-binary-search-tree</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/two-sum</loc>
+    <loc>https://rulcode.com/algorithm/two-sum</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/implement-trie</loc>
+    <loc>https://rulcode.com/algorithm/implement-trie</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/huffman-encoding</loc>
+    <loc>https://rulcode.com/algorithm/huffman-encoding</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/prefix-sum</loc>
+    <loc>https://rulcode.com/algorithm/prefix-sum</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/add-and-search-word</loc>
+    <loc>https://rulcode.com/algorithm/add-and-search-word</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/knapsack-01</loc>
+    <loc>https://rulcode.com/algorithm/knapsack-01</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/subsets</loc>
+    <loc>https://rulcode.com/algorithm/subsets</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/product-of-array-except-self</loc>
+    <loc>https://rulcode.com/algorithm/product-of-array-except-self</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/dutch-national-flag</loc>
+    <loc>https://rulcode.com/algorithm/dutch-national-flag</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/word-search-grid</loc>
+    <loc>https://rulcode.com/algorithm/word-search-grid</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/sudoku-solver</loc>
+    <loc>https://rulcode.com/algorithm/sudoku-solver</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/climbing-stairs</loc>
+    <loc>https://rulcode.com/algorithm/climbing-stairs</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/sliding-window-maximum</loc>
+    <loc>https://rulcode.com/algorithm/sliding-window-maximum</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/modular-exponentiation</loc>
+    <loc>https://rulcode.com/algorithm/modular-exponentiation</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/karatsuba</loc>
+    <loc>https://rulcode.com/algorithm/karatsuba</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/fenwick-tree</loc>
+    <loc>https://rulcode.com/algorithm/fenwick-tree</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/valid-palindrome</loc>
+    <loc>https://rulcode.com/algorithm/valid-palindrome</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/segment-tree</loc>
+    <loc>https://rulcode.com/algorithm/segment-tree</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/rabin-karp</loc>
+    <loc>https://rulcode.com/algorithm/rabin-karp</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/kruskals</loc>
+    <loc>https://rulcode.com/algorithm/kruskals</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/maximum-product-subarray</loc>
+    <loc>https://rulcode.com/algorithm/maximum-product-subarray</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/best-time-to-buy-and-sell-stock</loc>
+    <loc>https://rulcode.com/algorithm/best-time-to-buy-and-sell-stock</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/graph-dfs</loc>
+    <loc>https://rulcode.com/algorithm/graph-dfs</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/find-minimum-in-rotated-sorted-array</loc>
+    <loc>https://rulcode.com/algorithm/find-minimum-in-rotated-sorted-array</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/search-in-rotated-sorted-array</loc>
+    <loc>https://rulcode.com/algorithm/search-in-rotated-sorted-array</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/decode-ways</loc>
+    <loc>https://rulcode.com/algorithm/decode-ways</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/kmp</loc>
+    <loc>https://rulcode.com/algorithm/kmp</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/binary-lifting</loc>
+    <loc>https://rulcode.com/algorithm/binary-lifting</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/missing-number</loc>
+    <loc>https://rulcode.com/algorithm/missing-number</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/longest-increasing-subsequence</loc>
+    <loc>https://rulcode.com/algorithm/longest-increasing-subsequence</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/house-robber-ii</loc>
+    <loc>https://rulcode.com/algorithm/house-robber-ii</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/word-break-problem</loc>
+    <loc>https://rulcode.com/algorithm/word-break-problem</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/cyclic-sort</loc>
+    <loc>https://rulcode.com/algorithm/cyclic-sort</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/jump-game</loc>
+    <loc>https://rulcode.com/algorithm/jump-game</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/clone-graph</loc>
+    <loc>https://rulcode.com/algorithm/clone-graph</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/rotate-array</loc>
+    <loc>https://rulcode.com/algorithm/rotate-array</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/pacific-atlantic-water-flow</loc>
+    <loc>https://rulcode.com/algorithm/pacific-atlantic-water-flow</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/graph-valid-tree</loc>
+    <loc>https://rulcode.com/algorithm/graph-valid-tree</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/number-of-connected-components-in-an-undirected-graph</loc>
+    <loc>https://rulcode.com/algorithm/number-of-connected-components-in-an-undirected-graph</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/meeting-rooms-ii</loc>
+    <loc>https://rulcode.com/algorithm/meeting-rooms-ii</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/detect-cycle-in-a-linked-list</loc>
+    <loc>https://rulcode.com/algorithm/detect-cycle-in-a-linked-list</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/remove-nth-node-from-end-of-list</loc>
+    <loc>https://rulcode.com/algorithm/remove-nth-node-from-end-of-list</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/rotate-image</loc>
+    <loc>https://rulcode.com/algorithm/rotate-image</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/combinations</loc>
+    <loc>https://rulcode.com/algorithm/combinations</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/word-search</loc>
+    <loc>https://rulcode.com/algorithm/word-search</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/group-anagrams</loc>
+    <loc>https://rulcode.com/algorithm/group-anagrams</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/longest-consecutive-sequence</loc>
+    <loc>https://rulcode.com/algorithm/longest-consecutive-sequence</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/set-matrix-zeroes</loc>
+    <loc>https://rulcode.com/algorithm/set-matrix-zeroes</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/minimum-window-substring</loc>
+    <loc>https://rulcode.com/algorithm/minimum-window-substring</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/contains-duplicate</loc>
+    <loc>https://rulcode.com/algorithm/contains-duplicate</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/two-pointers</loc>
+    <loc>https://rulcode.com/algorithm/two-pointers</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/algorithm/3sum</loc>
+    <loc>https://rulcode.com/algorithm/3sum</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/encode-and-decode-strings</loc>
+    <loc>https://rulcode.com/blind75/encode-and-decode-strings</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/valid-anagram</loc>
+    <loc>https://rulcode.com/blind75/valid-anagram</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/invert-binary-tree</loc>
+    <loc>https://rulcode.com/blind75/invert-binary-tree</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/longest-palindromic-substring</loc>
+    <loc>https://rulcode.com/blind75/longest-palindromic-substring</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/top-k-frequent-elements</loc>
+    <loc>https://rulcode.com/blind75/top-k-frequent-elements</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/merge-k-sorted-lists</loc>
+    <loc>https://rulcode.com/blind75/merge-k-sorted-lists</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/lowest-common-ancestor-of-bst</loc>
+    <loc>https://rulcode.com/blind75/lowest-common-ancestor-of-bst</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/container-with-most-water</loc>
+    <loc>https://rulcode.com/blind75/container-with-most-water</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/kth-smallest-element-in-a-bst</loc>
+    <loc>https://rulcode.com/blind75/kth-smallest-element-in-a-bst</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/word-search-ii</loc>
+    <loc>https://rulcode.com/blind75/word-search-ii</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/find-median-from-data-stream</loc>
+    <loc>https://rulcode.com/blind75/find-median-from-data-stream</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/reverse-linked-list</loc>
+    <loc>https://rulcode.com/blind75/reverse-linked-list</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/coin-change</loc>
+    <loc>https://rulcode.com/blind75/coin-change</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/binary-tree-maximum-path-sum</loc>
+    <loc>https://rulcode.com/blind75/binary-tree-maximum-path-sum</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/subtree-of-another-tree</loc>
+    <loc>https://rulcode.com/blind75/subtree-of-another-tree</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/counting-bits</loc>
+    <loc>https://rulcode.com/blind75/counting-bits</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/maximum-subarray</loc>
+    <loc>https://rulcode.com/blind75/maximum-subarray</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/sum-of-two-integers</loc>
+    <loc>https://rulcode.com/blind75/sum-of-two-integers</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/reverse-bits</loc>
+    <loc>https://rulcode.com/blind75/reverse-bits</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/longest-common-subsequence</loc>
+    <loc>https://rulcode.com/blind75/longest-common-subsequence</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/unique-paths</loc>
+    <loc>https://rulcode.com/blind75/unique-paths</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/alien-dictionary</loc>
+    <loc>https://rulcode.com/blind75/alien-dictionary</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/course-schedule</loc>
+    <loc>https://rulcode.com/blind75/course-schedule</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/non-overlapping-intervals</loc>
+    <loc>https://rulcode.com/blind75/non-overlapping-intervals</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/number-of-1-bits</loc>
+    <loc>https://rulcode.com/blind75/number-of-1-bits</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/number-of-islands</loc>
+    <loc>https://rulcode.com/blind75/number-of-islands</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/meeting-rooms</loc>
+    <loc>https://rulcode.com/blind75/meeting-rooms</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/spiral-matrix</loc>
+    <loc>https://rulcode.com/blind75/spiral-matrix</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/insert-interval</loc>
+    <loc>https://rulcode.com/blind75/insert-interval</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/longest-substring-without-repeating-characters</loc>
+    <loc>https://rulcode.com/blind75/longest-substring-without-repeating-characters</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/merge-two-sorted-lists</loc>
+    <loc>https://rulcode.com/blind75/merge-two-sorted-lists</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/reorder-list</loc>
+    <loc>https://rulcode.com/blind75/reorder-list</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/longest-repeating-character-replacement</loc>
+    <loc>https://rulcode.com/blind75/longest-repeating-character-replacement</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/house-robber</loc>
+    <loc>https://rulcode.com/blind75/house-robber</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/binary-tree-level-order-traversal</loc>
+    <loc>https://rulcode.com/blind75/binary-tree-level-order-traversal</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/valid-parentheses</loc>
+    <loc>https://rulcode.com/blind75/valid-parentheses</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/same-tree</loc>
+    <loc>https://rulcode.com/blind75/same-tree</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/palindromic-substrings</loc>
+    <loc>https://rulcode.com/blind75/palindromic-substrings</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/serialize-and-deserialize-binary-tree</loc>
+    <loc>https://rulcode.com/blind75/serialize-and-deserialize-binary-tree</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/construct-binary-tree-from-preorder-and-inorder-traversal</loc>
+    <loc>https://rulcode.com/blind75/construct-binary-tree-from-preorder-and-inorder-traversal</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/validate-binary-search-tree</loc>
+    <loc>https://rulcode.com/blind75/validate-binary-search-tree</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/two-sum</loc>
+    <loc>https://rulcode.com/blind75/two-sum</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/implement-trie</loc>
+    <loc>https://rulcode.com/blind75/implement-trie</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/add-and-search-word</loc>
+    <loc>https://rulcode.com/blind75/add-and-search-word</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/product-of-array-except-self</loc>
+    <loc>https://rulcode.com/blind75/product-of-array-except-self</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/climbing-stairs</loc>
+    <loc>https://rulcode.com/blind75/climbing-stairs</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/valid-palindrome</loc>
+    <loc>https://rulcode.com/blind75/valid-palindrome</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/maximum-product-subarray</loc>
+    <loc>https://rulcode.com/blind75/maximum-product-subarray</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/best-time-to-buy-and-sell-stock</loc>
+    <loc>https://rulcode.com/blind75/best-time-to-buy-and-sell-stock</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/find-minimum-in-rotated-sorted-array</loc>
+    <loc>https://rulcode.com/blind75/find-minimum-in-rotated-sorted-array</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/search-in-rotated-sorted-array</loc>
+    <loc>https://rulcode.com/blind75/search-in-rotated-sorted-array</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/decode-ways</loc>
+    <loc>https://rulcode.com/blind75/decode-ways</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/missing-number</loc>
+    <loc>https://rulcode.com/blind75/missing-number</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/longest-increasing-subsequence</loc>
+    <loc>https://rulcode.com/blind75/longest-increasing-subsequence</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/house-robber-ii</loc>
+    <loc>https://rulcode.com/blind75/house-robber-ii</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/word-break-problem</loc>
+    <loc>https://rulcode.com/blind75/word-break-problem</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/jump-game</loc>
+    <loc>https://rulcode.com/blind75/jump-game</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/clone-graph</loc>
+    <loc>https://rulcode.com/blind75/clone-graph</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/pacific-atlantic-water-flow</loc>
+    <loc>https://rulcode.com/blind75/pacific-atlantic-water-flow</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/graph-valid-tree</loc>
+    <loc>https://rulcode.com/blind75/graph-valid-tree</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/number-of-connected-components-in-an-undirected-graph</loc>
+    <loc>https://rulcode.com/blind75/number-of-connected-components-in-an-undirected-graph</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/meeting-rooms-ii</loc>
+    <loc>https://rulcode.com/blind75/meeting-rooms-ii</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/detect-cycle-in-a-linked-list</loc>
+    <loc>https://rulcode.com/blind75/detect-cycle-in-a-linked-list</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/remove-nth-node-from-end-of-list</loc>
+    <loc>https://rulcode.com/blind75/remove-nth-node-from-end-of-list</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/rotate-image</loc>
+    <loc>https://rulcode.com/blind75/rotate-image</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/word-search</loc>
+    <loc>https://rulcode.com/blind75/word-search</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/group-anagrams</loc>
+    <loc>https://rulcode.com/blind75/group-anagrams</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/longest-consecutive-sequence</loc>
+    <loc>https://rulcode.com/blind75/longest-consecutive-sequence</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/set-matrix-zeroes</loc>
+    <loc>https://rulcode.com/blind75/set-matrix-zeroes</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/minimum-window-substring</loc>
+    <loc>https://rulcode.com/blind75/minimum-window-substring</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/contains-duplicate</loc>
+    <loc>https://rulcode.com/blind75/contains-duplicate</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blind75/3sum</loc>
+    <loc>https://rulcode.com/blind75/3sum</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blog/master-blind-75-visual-algorithms</loc>
+    <loc>https://rulcode.com/blog/master-blind-75-visual-algorithms</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blog/lru-cache-complete-guide</loc>
+    <loc>https://rulcode.com/blog/lru-cache-complete-guide</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://algolib.io/blog/dynamic-programming-for-people-who-hate-dynamic-programming</loc>
+    <loc>https://rulcode.com/blog/dynamic-programming-for-people-who-hate-dynamic-programming</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://algolib.io/games/sort-hero</loc>
+    <loc>https://rulcode.com/games/sort-hero</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://algolib.io/games/graph-explorer</loc>
+    <loc>https://rulcode.com/games/graph-explorer</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://algolib.io/games/stack-master</loc>
+    <loc>https://rulcode.com/games/stack-master</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://algolib.io/games/dp-puzzle</loc>
+    <loc>https://rulcode.com/games/dp-puzzle</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://algolib.io/games/sliding-window</loc>
+    <loc>https://rulcode.com/games/sliding-window</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://algolib.io/games/two-pointer</loc>
+    <loc>https://rulcode.com/games/two-pointer</loc>
     <lastmod>2025-12-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>

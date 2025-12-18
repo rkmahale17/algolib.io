@@ -35,7 +35,7 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-const CACHE_KEY = 'algolib_algorithms_cache';
+const CACHE_KEY = 'rulcode_algorithms_cache';
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 
 interface CacheData {

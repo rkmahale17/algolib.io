@@ -61,7 +61,7 @@ const generateTypeScriptRunner = (
     testCases: TestCase[],
     inputSchema: any[]
 ): string => {
-    const userFuncName = userCode.match(/function\s+(\w+)/)?.[1] || 'solution';
+    const userFuncName = userCode.match(/(?:function\s+|const\s+|let\s+|var\s+)(\w+)/)?.[1] || 'solution';
 
     const testCasesStr = testCases.map(tc => {
         const inputs = tc.input.map((val, i) => formatValue(val, inputSchema[i].type, 'typescript')).join(', ');
