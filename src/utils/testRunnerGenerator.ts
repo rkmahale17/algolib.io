@@ -1,4 +1,5 @@
 import { Language } from '@/components/CodeRunner/LanguageSelector';
+import { findEntryFunction, ensureStaticMethods } from './codeManipulation';
 
 
 interface TestCase {
@@ -27,14 +28,45 @@ export const generateTestRunner = (
     }
 };
 
-const formatValue = (value: any, type: string, lang: Language): string => {
+const formatValue = (value: any, type: string, lang: Language, targetJavaType?: string): string => {
     if (lang === 'python') {
         return jsonToPython(value);
     }
+    if (lang === 'typescript') {
+        return JSON.stringify(value);
+    }
+
+    // Legacy/Specific handling for Java/C++
     if (type === 'number' || type === 'boolean') return String(value);
-    if (type === 'string') return `"${value}"`;
+    if (type === 'string') return JSON.stringify(value);
+    if (Array.isArray(value)) { // Generic array handling for Java/C++ fallback
+        if (lang === 'java') {
+            // Check if target expects a List
+            if (targetJavaType && targetJavaType.includes('List')) {
+                if (value.length > 0 && typeof value[0] === 'string') {
+                    return `Arrays.asList(${value.map(v => JSON.stringify(v)).join(', ')})`;
+                }
+                // List<Integer> etc - Autoboxing handles int -> Integer? Arrays.asList expects objects.
+                return `Arrays.asList(${value.join(', ')})`;
+            }
+
+            if (value.length > 0 && typeof value[0] === 'string') {
+                return `new String[]{${value.map(v => JSON.stringify(v)).join(', ')}}`;
+            }
+            return `new int[]{${value.join(', ')}}`;
+        }
+        if (lang === 'cpp') {
+            // Basic vector syntax
+            return `{${value.join(', ')}}`;
+        }
+    }
     if (type === 'number[]') {
-        if (lang === 'java') return `new int[]{${value.join(', ')}}`;
+        if (lang === 'java') {
+            if (targetJavaType && targetJavaType.includes('List')) {
+                return `Arrays.asList(${value.join(', ')})`;
+            }
+            return `new int[]{${value.join(', ')}}`;
+        }
         if (lang === 'cpp') return `{${value.join(', ')}}`;
         return `[${value.join(', ')}]`;
     }
@@ -63,7 +95,8 @@ const generateTypeScriptRunner = (
     inputSchema: any[],
     entryFunctionName?: string
 ): string => {
-    const userFuncName = entryFunctionName || userCode.match(/(?:function\s+|const\s+|let\s+|var\s+)(\w+)/)?.[1] || 'solution';
+    const entryInfo = findEntryFunction(userCode, 'typescript', inputSchema, entryFunctionName);
+    const userFuncName = entryInfo.name;
 
     const testCasesStr = testCases.map(tc => {
         const inputs = tc.input.map((val, i) => formatValue(val, inputSchema[i].type, 'typescript')).join(', ');
@@ -130,7 +163,8 @@ const generatePythonRunner = (
     inputSchema: any[],
     entryFunctionName?: string
 ): string => {
-    const userFuncName = entryFunctionName || userCode.match(/def\s+(\w+)/)?.[1] || 'solution';
+    const entryInfo = findEntryFunction(userCode, 'python', inputSchema, entryFunctionName);
+    const userFuncName = entryInfo.name;
 
     const testCasesStr = testCases.map(tc => {
         const inputs = tc.input.map(val => jsonToPython(val)).join(', ');
@@ -209,38 +243,78 @@ print('___TEST_RESULTS_END___')
 `;
 };
 
+/**
+ * Splits a Java argument string into individual argument types.
+ * e.g. "String s, List<String> wordDict" -> ["String s", "List<String> wordDict"]
+ */
+const splitJavaArgs = (argsStr: string): string[] => {
+    if (!argsStr || argsStr.trim() === '') return [];
+
+    const args: string[] = [];
+    let current = '';
+    let depth = 0;
+
+    for (const char of argsStr) {
+        if (char === '<' || char === '(' || char === '[') depth++;
+        else if (char === '>' || char === ')' || char === ']') depth--;
+
+        if (char === ',' && depth === 0) {
+            args.push(current.trim());
+            current = '';
+        } else {
+            current += char;
+        }
+    }
+    if (current.trim()) args.push(current.trim());
+    return args;
+};
+
 const generateJavaRunner = (
     userCode: string,
     testCases: TestCase[],
     inputSchema: any[],
     entryFunctionName?: string
 ): string => {
-    // Extract user function signature
-    const userFuncName = entryFunctionName || userCode.match(/(\w+)\s*\(/)?.[1] || 'solution';
+    // 1. Find the correct entry function using signature matching
+    const entryInfo = findEntryFunction(userCode, 'java', inputSchema, entryFunctionName);
+    const userFuncName = entryInfo.name;
 
-    // Prepare user code: needs to be static
-    let userCodeClean = userCode;
-    if (!userCodeClean.includes('static')) {
-        userCodeClean = userCodeClean.replace('public ', 'public static ');
-    }
+    // 2. Ensure all helper methods are static
+    const userCodeClean = ensureStaticMethods(userCode);
+
+    // 3. Parse Argument Types from User Code to handle List<T> vs T[]
+    const rawArgs = splitJavaArgs(entryInfo.argsStr); // ["String s", "List<String> wordDict"]
+
+    // Extract types from raw args (everything before the last space is roughly the type)
+    const userArgTypes = rawArgs.map(arg => {
+        const parts = arg.trim().split(/\s+/);
+        if (parts.length < 2) return arg; // Fallback
+        return parts.slice(0, parts.length - 1).join(' '); // "List<String>"
+    });
+
 
     // Helper to infer Java literal from value
     const toJavaLiteral = (val: any): string => {
         if (Array.isArray(val)) {
             // Heuristic for array type
             if (val.length > 0 && typeof val[0] === 'string') {
-                return `new String[]{${val.map(v => `"${v}"`).join(', ')}}`;
+                return `new String[]{${val.map(v => JSON.stringify(v)).join(', ')}}`;
             }
             // default to int array
             return `new int[]{${val.join(', ')}}`;
         }
-        if (typeof val === 'string') return `"${val}"`;
+        if (typeof val === 'string') return JSON.stringify(val);
         return String(val);
     };
 
     // Generate test case calls
     const testCalls = testCases.map(tc => {
-        const args = tc.input.map((val, i) => formatValue(val, inputSchema[i].type, 'java')).join(', ');
+        const args = tc.input.map((val, i) => {
+            // Pass the inferred user argument type to formatValue
+            const targetType = userArgTypes[i] || ''; // e.g. "List<String>"
+            return formatValue(val, inputSchema[i].type, 'java', targetType);
+        }).join(', ');
+
         const expectedJavaLiteral = toJavaLiteral(tc.expectedOutput);
 
         return `
@@ -309,7 +383,8 @@ const generateCppRunner = (
     inputSchema: any[],
     entryFunctionName?: string
 ): string => {
-    const userFuncName = entryFunctionName || userCode.match(/(\w+)\s*\(/)?.[1] || 'solution';
+    const entryInfo = findEntryFunction(userCode, 'cpp', inputSchema, entryFunctionName);
+    const userFuncName = entryInfo.name;
 
     // Helper to deduce C++ type from value
     const deduceCppType = (val: any): string => {
@@ -336,7 +411,7 @@ const generateCppRunner = (
             const inner = val.map(v => formatCppLiteral(v)).join(', ');
             return `{${inner}}`;
         }
-        if (typeof val === 'string') return `"${val}"`;
+        if (typeof val === 'string') return JSON.stringify(val); // FIX: use JSON.stringify
         if (typeof val === 'boolean') return val ? 'true' : 'false';
         return String(val);
     };
