@@ -105,7 +105,7 @@ export const HouseRobberVisualization = () => {
             currentMoney: money,
             temp,
             i,
-            variables: { money, rob1, rob2, 'money+rob1': robCurrent, 'rob2': skipCurrent, temp },
+            variables: { money, rob1, rob2, 'money+rob1': robCurrent, 'skipCurrent': skipCurrent, temp },
             explanation: `Calculate temp = max(money + rob1, rob2) = max(${money} + ${rob1}, ${rob2}) = max(${robCurrent}, ${skipCurrent}) = ${temp}.`,
             highlightedLines: [14]
         });

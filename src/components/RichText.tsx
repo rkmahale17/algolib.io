@@ -68,14 +68,14 @@ export const RichText: React.FC<RichTextProps> = ({ content, className = '', onC
 
         // Handle <table> tags to automatically wrap them in responsive container
         if (domNode.name === 'table') {
-          const { class: className, style, ...rest } = domNode.attribs;
+          const { class: className, style: _style, ...rest } = domNode.attribs;
           const children = domToReact(domNode.children as DOMNode[], options);
           
           const combinedClass = (`${className || ''} comparison-table`).trim();
 
           return (
             <ResponsiveTableContainer>
-               <table className={combinedClass} style={style} {...rest}>
+               <table className={combinedClass} {...rest}>
                  {children}
                </table>
             </ResponsiveTableContainer>
