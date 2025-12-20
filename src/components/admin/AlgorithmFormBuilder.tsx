@@ -33,6 +33,7 @@ import { AlgorithmPreview } from "./AlgorithmPreview";
 import { TutorialsEditor } from "./TutorialsEditor";
 import { ControlsEditor, DEFAULT_CONTROLS } from "./ControlsEditor";
 import { useNavigate } from "react-router-dom";
+import { SmartFillDialog } from "./SmartFillDialog";
 
 interface AlgorithmFormBuilderProps {
   algorithm?: Algorithm | null;
@@ -177,9 +178,22 @@ export function AlgorithmFormBuilder({
     }
   };
 
+  const handleSmartFill = (data: any) => {
+    setFormData((prev: any) => ({
+      ...prev,
+      ...data,
+      // Ensure nested objects are merged correctly if partial data is provided
+      explanation: typeof data.explanation === 'object' ? { ...prev.explanation, ...data.explanation } : (data.explanation || prev.explanation),
+      metadata: typeof data.metadata === 'object' ? { ...prev.metadata, ...data.metadata } : (data.metadata || prev.metadata),
+      problems_to_solve: typeof data.problems_to_solve === 'object' ? { ...prev.problems_to_solve, ...data.problems_to_solve } : (data.problems_to_solve || prev.problems_to_solve),
+    }));
+    toast.success("Form updated with smart fill data");
+  };
+
   const isLoading = createMutation.isPending || updateMutation.isPending;
 
   return (
+
     <div className="space-y-0 w-full">
       {/* Header with Action Buttons */}
       <div className="flex items-center justify-between sticky top-0 z-10 bg-background pb-0 border-b">
@@ -199,6 +213,10 @@ export function AlgorithmFormBuilder({
           </h2>
         
         </div>
+        <div className="flex items-center gap-2 pr-4">
+             <SmartFillDialog onFill={handleSmartFill} />
+        </div>
+
       </div>
 
       <div className="h-[calc(100vh-40px)]  ">
