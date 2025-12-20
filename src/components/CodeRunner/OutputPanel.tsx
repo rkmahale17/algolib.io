@@ -292,9 +292,11 @@ export const OutputPanel = ({
             <div className="flex-1 min-h-0">
                 {/* Compilation/Runtime Error */}
                 {(output.status?.id === 6 || (output.stderr && !output.testResults)) && (
-                  <div className="p-4">
-                    <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive font-mono text-sm whitespace-pre-wrap">
-                      {output.compile_output || output.stderr || output.message}
+                  <div className="p-4 h-full min-h-0">
+                    <div className="w-full h-full rounded-lg bg-destructive/10 border border-destructive/20 text-destructive font-mono text-sm overflow-hidden flex flex-col">
+                        <div className="flex-1 overflow-y-auto p-4 whitespace-pre-wrap">
+                            {output.compile_output || output.stderr || output.message}
+                        </div>
                     </div>
                   </div>
                 )}

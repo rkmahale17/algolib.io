@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
@@ -8,12 +8,14 @@ import { motion } from 'framer-motion';
 
 interface Step {
   nums: number[];
-  dp: number[];
+  rob1: number;
+  rob2: number;
+  currentMoney: number | null;
+  temp: number | null;
   i: number;
   variables: Record<string, any>;
   explanation: string;
   highlightedLines: number[];
-  lineExecution: string;
 }
 
 export const HouseRobberVisualization = () => {
@@ -21,158 +23,137 @@ export const HouseRobberVisualization = () => {
 
   const nums = [2, 7, 9, 3, 1];
 
-  const steps: Step[] = [
-    {
-      nums,
-      dp: [],
-      i: -1,
-      variables: { nums: '[2,7,9,3,1]' },
-      explanation: "Given houses with money [2,7,9,3,1]. Cannot rob adjacent houses. Find maximum money.",
-      highlightedLines: [1],
-      lineExecution: "function rob(nums: number[]): number"
-    },
-    {
-      nums,
-      dp: [],
-      i: -1,
-      variables: { length: 5 },
-      explanation: "Check edge case: nums.length > 0, continue.",
-      highlightedLines: [2],
-      lineExecution: "if (nums.length === 0) return 0; // false, continue"
-    },
-    {
-      nums,
-      dp: [],
-      i: -1,
-      variables: { length: 5 },
-      explanation: "Check edge case: nums.length > 1, continue with full algorithm.",
-      highlightedLines: [3],
-      lineExecution: "if (nums.length === 1) return nums[0]; // false, continue"
-    },
-    {
-      nums,
-      dp: [0, 0, 0, 0, 0],
-      i: -1,
-      variables: { dpLength: 5 },
-      explanation: "Create DP array of length 5. dp[i] = max money robbing houses 0..i.",
-      highlightedLines: [5],
-      lineExecution: "const dp = new Array(nums.length); // length = 5"
-    },
-    {
-      nums,
-      dp: [2, 0, 0, 0, 0],
-      i: 0,
-      variables: { 'dp[0]': 2, 'nums[0]': 2 },
-      explanation: "Base case: dp[0] = nums[0] = 2. Rob first house.",
-      highlightedLines: [6],
-      lineExecution: "dp[0] = nums[0]; // dp[0] = 2"
-    },
-    {
-      nums,
-      dp: [2, 7, 0, 0, 0],
-      i: 1,
-      variables: { 'dp[1]': 7, max: 'max(2,7)=7' },
-      explanation: "Base case: dp[1] = max(nums[0], nums[1]) = max(2, 7) = 7. Rob house 1.",
-      highlightedLines: [7],
-      lineExecution: "dp[1] = Math.max(nums[0], nums[1]); // max(2,7) = 7"
-    },
-    {
-      nums,
-      dp: [2, 7, 0, 0, 0],
-      i: 2,
-      variables: { i: 2, n: 5 },
-      explanation: "Start loop: i = 2. Check: 2 < 5? Yes, continue.",
-      highlightedLines: [9],
-      lineExecution: "for (let i = 2; i < nums.length; i++) // i=2"
-    },
-    {
-      nums,
-      dp: [2, 7, 11, 0, 0],
-      i: 2,
-      variables: { 'dp[2]': 11, calc: 'max(7, 9+2)=11' },
-      explanation: "dp[2] = max(dp[1], nums[2] + dp[0]) = max(7, 9+2) = 11. Rob houses 0 and 2.",
-      highlightedLines: [10],
-      lineExecution: "dp[i] = Math.max(dp[i-1], nums[i] + dp[i-2]); // max(7, 11) = 11"
-    },
-    {
-      nums,
-      dp: [2, 7, 11, 0, 0],
-      i: 3,
-      variables: { i: 3 },
-      explanation: "Increment loop: i = 3. Check: 3 < 5? Yes, continue.",
-      highlightedLines: [9],
-      lineExecution: "for (let i = 3; i < nums.length; i++) // i=3"
-    },
-    {
-      nums,
-      dp: [2, 7, 11, 11, 0],
-      i: 3,
-      variables: { 'dp[3]': 11, calc: 'max(11, 3+7)=11' },
-      explanation: "dp[3] = max(dp[2], nums[3] + dp[1]) = max(11, 3+7) = 11. Skip house 3.",
-      highlightedLines: [10],
-      lineExecution: "dp[i] = Math.max(dp[i-1], nums[i] + dp[i-2]); // max(11, 10) = 11"
-    },
-    {
-      nums,
-      dp: [2, 7, 11, 11, 0],
-      i: 4,
-      variables: { i: 4 },
-      explanation: "Increment loop: i = 4. Check: 4 < 5? Yes, continue.",
-      highlightedLines: [9],
-      lineExecution: "for (let i = 4; i < nums.length; i++) // i=4"
-    },
-    {
-      nums,
-      dp: [2, 7, 11, 11, 12],
-      i: 4,
-      variables: { 'dp[4]': 12, calc: 'max(11, 1+11)=12' },
-      explanation: "dp[4] = max(dp[3], nums[4] + dp[2]) = max(11, 1+11) = 12. Rob houses 0, 2, and 4.",
-      highlightedLines: [10],
-      lineExecution: "dp[i] = Math.max(dp[i-1], nums[i] + dp[i-2]); // max(11, 12) = 12"
-    },
-    {
-      nums,
-      dp: [2, 7, 11, 11, 12],
-      i: 5,
-      variables: { i: 5, n: 5 },
-      explanation: "Increment loop: i = 5. Check: 5 < 5? No, exit loop.",
-      highlightedLines: [9],
-      lineExecution: "for (let i = 5; i < nums.length; i++) // 5 < 5 -> false"
-    },
-    {
-      nums,
-      dp: [2, 7, 11, 11, 12],
-      i: 4,
-      variables: { result: 12 },
-      explanation: "Return dp[n-1] = dp[4] = 12. Maximum money is $12.",
-      highlightedLines: [13],
-      lineExecution: "return dp[nums.length - 1]; // dp[4] = 12"
-    },
-    {
-      nums,
-      dp: [2, 7, 11, 11, 12],
-      i: 4,
-      variables: { maxMoney: 12, houses: '[0,2,4]', complexity: 'O(n)' },
-      explanation: "Algorithm complete! Rob houses [0,2,4] for maximum $12. Time: O(n), Space: O(n).",
-      highlightedLines: [13],
-      lineExecution: "Result: 12 (rob houses 0, 2, 4)"
-    }
-  ];
-
   const code = `function rob(nums: number[]): number {
-  if (nums.length === 0) return 0;
-  if (nums.length === 1) return nums[0];
-  
-  const dp = new Array(nums.length);
-  dp[0] = nums[0];
-  dp[1] = Math.max(nums[0], nums[1]);
-  
-  for (let i = 2; i < nums.length; i++) {
-    dp[i] = Math.max(dp[i-1], nums[i] + dp[i-2]);
-  }
-  
-  return dp[nums.length - 1];
+    // rob1 → maximum money robbed up to two houses before
+    // rob2 → maximum money robbed up to the previous house
+    let rob1 = 0;
+    let rob2 = 0;
+
+    // Iterate through each house
+    for (const money of nums) {
+        // If we rob this house:
+        //   we add current money to rob1 (two houses back)
+        // If we skip this house:
+        //   we keep rob2 (previous best)
+        const temp = Math.max(money + rob1, rob2);
+
+        // Shift the window forward
+        rob1 = rob2;
+        rob2 = temp;
+    }
+
+    // rob2 always holds the best possible result
+    return rob2;
 }`;
+
+  const steps = useMemo(() => {
+    const steps: Step[] = [];
+    let rob1 = 0;
+    let rob2 = 0;
+    
+    // Initial state
+    steps.push({
+      nums,
+      rob1: 0,
+      rob2: 0,
+      currentMoney: null,
+      temp: null,
+      i: -1,
+      variables: { nums: `[${nums.join(', ')}]` },
+      explanation: "Function started. Input houses array received.",
+      highlightedLines: [1]
+    });
+
+    // Initialize variables
+    steps.push({
+      nums,
+      rob1: 0,
+      rob2: 0,
+      currentMoney: null,
+      temp: null,
+      i: -1,
+      variables: { rob1: 0, rob2: 0 },
+      explanation: "Initialize rob1 = 0 (max money 2 houses back) and rob2 = 0 (max money 1 house back).",
+      highlightedLines: [5, 6]
+    });
+
+    for (let i = 0; i < nums.length; i++) {
+        const money = nums[i];
+
+        // Loop start
+        steps.push({
+            nums,
+            rob1,
+            rob2,
+            currentMoney: money,
+            temp: null,
+            i,
+            variables: { money, rob1, rob2 },
+            explanation: `Process house ${i} with money ${money}.`,
+            highlightedLines: [9]
+        });
+
+        const robCurrent = money + rob1;
+        const skipCurrent = rob2;
+        const temp = Math.max(robCurrent, skipCurrent);
+
+        // Calculate temp
+        steps.push({
+            nums,
+            rob1,
+            rob2,
+            currentMoney: money,
+            temp,
+            i,
+            variables: { money, rob1, rob2, 'money+rob1': robCurrent, 'rob2': skipCurrent, temp },
+            explanation: `Calculate temp = max(money + rob1, rob2) = max(${money} + ${rob1}, ${rob2}) = max(${robCurrent}, ${skipCurrent}) = ${temp}.`,
+            highlightedLines: [14]
+        });
+
+        // Update pointers
+        const prevRob1 = rob1;
+        rob1 = rob2;
+        steps.push({
+            nums,
+            rob1,
+            rob2, // rob2 not updated yet
+            currentMoney: money,
+            temp,
+            i,
+            variables: { rob1 },
+            explanation: `Shift rob1: rob1 becomes old rob2 (${rob1}).`,
+            highlightedLines: [17]
+        });
+
+        rob2 = temp;
+        steps.push({
+            nums,
+            rob1,
+            rob2,
+            currentMoney: money,
+            temp,
+            i,
+            variables: { rob2 },
+            explanation: `Shift rob2: rob2 becomes temp (${temp}).`,
+            highlightedLines: [18]
+        });
+    }
+
+    // Return result
+    steps.push({
+        nums,
+        rob1,
+        rob2,
+        currentMoney: null,
+        temp: null,
+        i: nums.length,
+        variables: { result: rob2 },
+        explanation: `Loop finished. Return rob2 = ${rob2}.`,
+        highlightedLines: [22]
+    });
+
+    return steps;
+  }, [nums]);
 
   const step = steps[currentStep];
 
@@ -187,55 +168,73 @@ export const HouseRobberVisualization = () => {
             transition={{ duration: 0.5 }}
           >
             <Card className="p-4">
-              <h3 className="text-sm font-semibold mb-3">Houses (money in each)</h3>
+              <h3 className="text-sm font-semibold mb-3">Houses</h3>
               <div className="flex gap-2 flex-wrap">
-                {step.nums.map((num, idx) => (
-                  <div
-                    key={idx}
-                    className={`px-4 py-3 rounded font-mono text-center ${
-                      idx === step.i
-                        ? 'bg-primary text-primary-foreground ring-2 ring-primary'
-                        : idx < step.i
-                        ? 'bg-secondary'
-                        : 'bg-muted'
-                    }`}
-                  >
-                    <div className="text-xs">House {idx}</div>
-                    <div className="font-bold">${num}</div>
-                  </div>
-                ))}
+                {step.nums.map((num, idx) => {
+                    const isCurrent = idx === step.i;
+                    // Visualize "rob1" relative position (2 houses back from current step i)
+                    // At start of loop i, rob1 is accumulated from i-2. 
+                    // But effectively it represents max up to that point. 
+                    // Let's just highlight the current house being processed.
+                    
+                    return (
+                        <div
+                            key={idx}
+                            className={`px-4 py-3 rounded font-mono text-center relative border-2 transition-all duration-300 ${
+                            isCurrent
+                                ? 'bg-primary text-primary-foreground border-primary scale-110 shadow-lg'
+                                : idx < step.i
+                                ? 'bg-muted/50 border-muted text-muted-foreground'
+                                : 'bg-card border-border'
+                            }`}
+                        >
+                            <div className="text-[10px] uppercase tracking-wider mb-1 opacity-70">House {idx}</div>
+                            <div className="font-bold text-lg">${num}</div>
+                            {isCurrent && (
+                                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-yellow-500 text-white text-[10px] px-1 rounded shadow">
+                                    Current
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
               </div>
             </Card>
           </motion.div>
 
-          {step.dp.length > 0 && (
-            <motion.div
-              key={`dp-${currentStep}`}
+          <motion.div
+              key={`vars-${currentStep}`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-            >
-              <Card className="p-4">
-                <h3 className="text-sm font-semibold mb-3">DP Array (max money up to house i)</h3>
-                <div className="flex gap-2 flex-wrap">
-                  {step.dp.map((val, idx) => (
-                    <div
-                      key={idx}
-                      className={`px-4 py-3 rounded font-mono text-center ${
-                        idx === step.i
-                          ? 'bg-green-500/20 ring-2 ring-green-500'
-                          : idx < step.i
-                          ? 'bg-green-500/10'
-                          : 'bg-muted'
-                      }`}
-                    >
-                      <div className="text-xs">dp[{idx}]</div>
-                      <div className="font-bold">${val}</div>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            </motion.div>
+          >
+              <div className="grid grid-cols-2 gap-4">
+                  <Card className="p-4 bg-blue-500/10 border-blue-200">
+                      <div className="text-xs text-blue-600 font-semibold mb-1">rob1 (2 houses back)</div>
+                      <div className="text-2xl font-bold text-blue-700">{step.rob1}</div>
+                  </Card>
+                  <Card className="p-4 bg-green-500/10 border-green-200">
+                      <div className="text-xs text-green-600 font-semibold mb-1">rob2 (Previous Best)</div>
+                      <div className="text-2xl font-bold text-green-700">{step.rob2}</div>
+                  </Card>
+              </div>
+          </motion.div>
+
+          {step.temp !== null && (
+               <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="mt-2"
+               >
+                   <Card className="p-4 border-dashed border-2 border-yellow-400 bg-yellow-50">
+                       <div className="text-center">
+                           <div className="text-xs text-muted-foreground mb-1">Decision: max(money + rob1, rob2)</div>
+                           <div className="font-mono text-lg font-bold">
+                               max({step.currentMoney} + {step.rob1}, {step.rob2}) = <span className="text-primary text-xl">{step.temp}</span>
+                           </div>
+                       </div>
+                   </Card>
+               </motion.div>
           )}
 
           <motion.div
@@ -244,27 +243,24 @@ export const HouseRobberVisualization = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.4, delay: 0.2 }}
           >
-            <Card className="p-4 bg-muted/50">
+            <Card className="p-4 bg-muted/50 mt-4">
               <div className="space-y-2">
-                <div className="text-sm font-semibold text-primary">Current Execution:</div>
-                <div className="text-sm font-mono bg-background/50 p-2 rounded">
-                  {step.lineExecution}
-                </div>
-                <div className="text-sm text-muted-foreground pt-2">
+                <div className="text-sm font-semibold text-primary">Explanation:</div>
+                <div className="text-sm bg-background/50 p-3 rounded">
                   {step.explanation}
                 </div>
               </div>
             </Card>
           </motion.div>
 
-          <motion.div
+          {/* <motion.div
             key={`variables-${currentStep}`}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3, delay: 0.3 }}
           >
             <VariablePanel variables={step.variables} />
-          </motion.div>
+          </motion.div> */}
         </>
       }
       rightContent={

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
@@ -9,11 +9,6 @@ import { motion } from 'framer-motion';
 interface Step {
   nums: number[];
   range: string;
-  prev: number;
-  curr: number;
-  i: number;
-  start: number;
-  end: number;
   variables: Record<string, any>;
   explanation: string;
   highlightedLines: number[];
@@ -22,238 +17,165 @@ interface Step {
 
 export const HouseRobberIIVisualization = () => {
   const [currentStep, setCurrentStep] = useState(0);
-
   const nums = [2, 3, 2];
 
-  const steps: Step[] = [
-    {
+  const code = `function rob(nums: number[]): number {
+    // Edge case: only one house
+    if (nums.length === 1) return nums[0];
+
+    // Helper function that follows rob1 / rob2 logic
+    const robLinear = (start: number, end: number): number => {
+        let rob1 = 0;
+        let rob2 = 0;
+
+        for (let i = start; i <= end; i++) {
+            // Same logic as screenshot
+            const temp = Math.max(rob1 + nums[i], rob2);
+            rob1 = rob2;
+            rob2 = temp;
+        }
+
+        return rob2;
+    };
+
+    // Two valid cases due to circular houses
+    const case1 = robLinear(0, nums.length - 2);
+    const case2 = robLinear(1, nums.length - 1);
+
+    return Math.max(case1, case2);
+}`;
+
+  const steps = useMemo(() => {
+    const steps: Step[] = [];
+    
+    // Initial Step
+    steps.push({
       nums,
       range: "",
-      prev: 0,
-      curr: 0,
-      i: -1,
-      start: 0,
-      end: 0,
-      variables: { nums: '[2,3,2]' },
-      explanation: "Houses arranged in a circle. Cannot rob first AND last house. Need special handling.",
+      variables: { nums: `[${nums.join(', ')}]`, length: nums.length },
+      explanation: "Start execution. We have circular houses.",
       highlightedLines: [1],
       lineExecution: "function rob(nums: number[]): number"
-    },
-    {
-      nums,
-      range: "",
-      prev: 0,
-      curr: 0,
-      i: -1,
-      start: 0,
-      end: 0,
-      variables: { length: 3 },
-      explanation: "Check edge case: nums.length > 1, continue with circular logic.",
-      highlightedLines: [2],
-      lineExecution: "if (nums.length === 1) return nums[0]; // false, continue"
-    },
-    {
-      nums,
-      range: "",
-      prev: 0,
-      curr: 0,
-      i: -1,
-      start: 0,
-      end: 0,
-      variables: {},
-      explanation: "Define robLinear helper function to rob houses in a range [start, end].",
-      highlightedLines: [4],
-      lineExecution: "function robLinear(start: number, end: number): number"
-    },
-    {
-      nums,
-      range: "[0..1]",
-      prev: 0,
-      curr: 0,
-      i: 0,
-      start: 0,
-      end: 1,
-      variables: { start: 0, end: 1, range: '[0..1]' },
-      explanation: "Case 1: Rob houses [0..n-2] = [0..1], excluding last house.",
-      highlightedLines: [5],
-      lineExecution: "let prev = 0, curr = 0;"
-    },
-    {
-      nums,
-      range: "[0..1]",
-      prev: 0,
-      curr: 0,
-      i: 0,
-      start: 0,
-      end: 1,
-      variables: { i: 0 },
-      explanation: "Start loop: i = 0 (start). Check: 0 <= 1? Yes.",
-      highlightedLines: [6],
-      lineExecution: "for (let i = start; i <= end; i++) // i=0"
-    },
-    {
-      nums,
-      range: "[0..1]",
-      prev: 0,
-      curr: 2,
-      i: 0,
-      start: 0,
-      end: 1,
-      variables: { temp: 2, 'nums[0]': 2 },
-      explanation: "i=0: temp = max(curr, nums[0] + prev) = max(0, 2+0) = 2.",
-      highlightedLines: [7],
-      lineExecution: "const temp = Math.max(curr, nums[i] + prev); // max(0, 2) = 2"
-    },
-    {
-      nums,
-      range: "[0..1]",
-      prev: 0,
-      curr: 2,
-      i: 0,
-      start: 0,
-      end: 1,
-      variables: { prev: 0, curr: 2 },
-      explanation: "Update: prev = 0, curr = 2.",
-      highlightedLines: [8, 9],
-      lineExecution: "prev = curr; curr = temp; // prev=0, curr=2"
-    },
-    {
-      nums,
-      range: "[0..1]",
-      prev: 2,
-      curr: 3,
-      i: 1,
-      start: 0,
-      end: 1,
-      variables: { i: 1, temp: 3 },
-      explanation: "i=1: temp = max(2, nums[1] + 0) = max(2, 3) = 3. Update prev=2, curr=3.",
-      highlightedLines: [7, 8, 9],
-      lineExecution: "temp = max(2, 3+0) = 3; prev=2, curr=3"
-    },
-    {
-      nums,
-      range: "[0..1]",
-      prev: 2,
-      curr: 3,
-      i: 2,
-      start: 0,
-      end: 1,
-      variables: { i: 2, end: 1 },
-      explanation: "i=2: Check 2 <= 1? No, exit loop. Return curr = 3.",
-      highlightedLines: [6],
-      lineExecution: "for (let i = 2; i <= end; i++) // 2 <= 1 -> false"
-    },
-    {
-      nums,
-      range: "[0..1]",
-      prev: 2,
-      curr: 3,
-      i: -1,
-      start: 0,
-      end: 1,
-      variables: { 'robLinear(0,1)': 3 },
-      explanation: "robLinear(0, 1) returns 3. Max money robbing houses [0..1].",
-      highlightedLines: [11],
-      lineExecution: "return curr; // 3"
-    },
-    {
-      nums,
-      range: "[1..2]",
-      prev: 0,
-      curr: 0,
-      i: 1,
-      start: 1,
-      end: 2,
-      variables: { start: 1, end: 2, range: '[1..2]' },
-      explanation: "Case 2: Rob houses [1..n-1] = [1..2], excluding first house.",
-      highlightedLines: [5, 6],
-      lineExecution: "let prev = 0, curr = 0; for i=1"
-    },
-    {
-      nums,
-      range: "[1..2]",
-      prev: 0,
-      curr: 3,
-      i: 1,
-      start: 1,
-      end: 2,
-      variables: { temp: 3, 'nums[1]': 3 },
-      explanation: "i=1: temp = max(0, 3+0) = 3. Update curr=3.",
-      highlightedLines: [7, 8, 9],
-      lineExecution: "temp = max(0, 3) = 3; prev=0, curr=3"
-    },
-    {
-      nums,
-      range: "[1..2]",
-      prev: 3,
-      curr: 3,
-      i: 2,
-      start: 1,
-      end: 2,
-      variables: { i: 2, 'nums[2]': 2 },
-      explanation: "i=2: temp = max(3, 2+0) = max(3, 2) = 3. No change.",
-      highlightedLines: [7, 8, 9],
-      lineExecution: "temp = max(3, 2) = 3; prev=3, curr=3"
-    },
-    {
-      nums,
-      range: "[1..2]",
-      prev: 3,
-      curr: 3,
-      i: -1,
-      start: 1,
-      end: 2,
-      variables: { 'robLinear(1,2)': 3 },
-      explanation: "robLinear(1, 2) returns 3. Max money robbing houses [1..2].",
-      highlightedLines: [11],
-      lineExecution: "return curr; // 3"
-    },
-    {
-      nums,
-      range: "both",
-      prev: 0,
-      curr: 0,
-      i: -1,
-      start: 0,
-      end: 0,
-      variables: { case1: 3, case2: 3, result: 3 },
-      explanation: "Return max(case1, case2) = max(3, 3) = 3. Maximum money is $3.",
-      highlightedLines: [14, 15, 16, 17],
-      lineExecution: "return Math.max(robLinear(0,1), robLinear(1,2)); // max(3,3) = 3"
-    },
-    {
-      nums,
-      range: "both",
-      prev: 0,
-      curr: 0,
-      i: -1,
-      start: 0,
-      end: 0,
-      variables: { maxMoney: 3, complexity: 'O(n)' },
-      explanation: "Algorithm complete! Can't rob both first and last. Rob middle house for $3. Time: O(n), Space: O(1).",
-      highlightedLines: [14, 15, 16, 17],
-      lineExecution: "Result: 3"
-    }
-  ];
+    });
 
-  const code = `function rob(nums: number[]): number {
-  if (nums.length === 1) return nums[0];
-  
-  function robLinear(start: number, end: number): number {
-    let prev = 0, curr = 0;
-    for (let i = start; i <= end; i++) {
-      const temp = Math.max(curr, nums[i] + prev);
-      prev = curr;
-      curr = temp;
-    }
-    return curr;
-  }
-  
-  return Math.max(
-    robLinear(0, nums.length - 2),
-    robLinear(1, nums.length - 1)
-  );
-}`;
+    // Edge case check
+    steps.push({
+      nums,
+      range: "",
+      variables: { length: nums.length },
+      explanation: `Check if there is only one house. ${nums.length} === 1 is false.`,
+      highlightedLines: [3],
+      lineExecution: "if (nums.length === 1) return nums[0];"
+    });
+
+    // Helper definition (conceptual)
+    steps.push({
+      nums,
+      range: "",
+      variables: {},
+      explanation: "Define the helper function 'robLinear' which solves the linear House Robber problem.",
+      highlightedLines: [6],
+      lineExecution: "const robLinear = (start: number, end: number): number => {"
+    });
+
+    // robLinear Simulation Logic
+    const simulateRobLinear = (start: number, end: number, caseName: string) => {
+      let rob1 = 0;
+      let rob2 = 0;
+      const rangeStr = `[${start}..${end}]`;
+
+      // Call Step
+      steps.push({
+        nums,
+        range: rangeStr,
+        variables: { start, end, [caseName]: 'pending' },
+        explanation: `Start ${caseName}: robLinear(${start}, ${end}). This covers houses from index ${start} to ${end}.`,
+        highlightedLines: caseName === 'case1' ? [21] : [22],
+        lineExecution: `const ${caseName} = robLinear(${start}, nums.length - ${caseName === 'case1' ? 2 : 1});`
+      });
+
+      // Init variables
+      steps.push({
+        nums,
+        range: rangeStr,
+        variables: { rob1, rob2, start, end },
+        explanation: "Initialize rob1 = 0, rob2 = 0.",
+        highlightedLines: [7, 8],
+        lineExecution: "let rob1 = 0; let rob2 = 0;"
+      });
+
+      for (let i = start; i <= end; i++) {
+        // Loop Start
+        steps.push({
+            nums,
+            range: rangeStr,
+            variables: { i, start, end, rob1, rob2 },
+            explanation: `Loop iteration i=${i}. Current house value is ${nums[i]}.`,
+            highlightedLines: [10],
+            lineExecution: `for (let i = ${start}; i <= ${end}; i++)` // conceptually
+        });
+
+        const currentVal = nums[i];
+        const valWithRob1 = rob1 + currentVal;
+        const temp = Math.max(valWithRob1, rob2);
+
+        // Temp calc
+        steps.push({
+            nums,
+            range: rangeStr,
+            variables: { i, rob1, rob2, 'nums[i]': currentVal, temp },
+            explanation: `Calculate temp = max(rob1 + nums[i], rob2) = max(${rob1} + ${currentVal}, ${rob2}) = ${temp}.`,
+            highlightedLines: [12],
+            lineExecution: "const temp = Math.max(rob1 + nums[i], rob2);"
+        });
+
+        const oldRob2 = rob2;
+        rob1 = oldRob2;
+        rob2 = temp;
+
+        // Update vars
+        steps.push({
+            nums,
+            range: rangeStr,
+            variables: { i, rob1, rob2, temp },
+            explanation: `Update rob1 = rob2 (${oldRob2}), rob2 = temp (${temp}).`,
+            highlightedLines: [13, 14],
+            lineExecution: "rob1 = rob2; rob2 = temp;"
+        });
+      }
+
+      // Return
+      steps.push({
+        nums,
+        range: rangeStr,
+        variables: { rob2 },
+        explanation: `Finished loop. Return rob2 (${rob2}) as the result for ${caseName}.`,
+        highlightedLines: [17],
+        lineExecution: "return rob2;"
+      });
+
+      return rob2;
+    };
+
+    // Case 1
+    const res1 = simulateRobLinear(0, nums.length - 2, 'case1');
+
+    // Case 2
+    const res2 = simulateRobLinear(1, nums.length - 1, 'case2');
+
+    // Final Comparison
+    const finalMax = Math.max(res1, res2);
+    steps.push({
+      nums,
+      range: "both",
+      variables: { case1: res1, case2: res2, result: finalMax },
+      explanation: `Compare case1 (${res1}) and case2 (${res2}). The maximum is ${finalMax}.`,
+      highlightedLines: [24],
+      lineExecution: "return Math.max(case1, case2);"
+    });
+
+    return steps;
+  }, [nums]);
 
   const step = steps[currentStep];
 
@@ -270,21 +192,30 @@ export const HouseRobberIIVisualization = () => {
             <Card className="p-4">
               <h3 className="text-sm font-semibold mb-3">Houses in Circle</h3>
               <div className="flex gap-2 flex-wrap items-center">
-                {step.nums.map((num, idx) => (
-                  <div
-                    key={idx}
-                    className={`px-4 py-3 rounded font-mono text-center ${
-                      step.range === '[0..1]' && idx <= 1
-                        ? 'bg-primary text-primary-foreground'
-                        : step.range === '[1..2]' && idx >= 1
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted'
-                    }`}
-                  >
-                    <div className="text-xs">House {idx}</div>
-                    <div className="font-bold">${num}</div>
-                  </div>
-                ))}
+                {step.nums.map((num, idx) => {
+                    // Determine if active based on range string [start..end]
+                    let isActive = false;
+                    if (step.range.startsWith('[')) {
+                        const parts = step.range.slice(1, -1).split('..');
+                        const s = parseInt(parts[0]);
+                        const e = parseInt(parts[1]);
+                        if (idx >= s && idx <= e) isActive = true;
+                    }
+                    
+                    return (
+                      <div
+                        key={idx}
+                        className={`px-4 py-3 rounded font-mono text-center ${
+                          isActive
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-muted'
+                        }`}
+                      >
+                        <div className="text-xs">House {idx}</div>
+                        <div className="font-bold">${num}</div>
+                      </div>
+                    );
+                })}
                 <div className="text-xl">🔄</div>
               </div>
               {step.range && step.range !== 'both' && (
@@ -310,21 +241,6 @@ export const HouseRobberIIVisualization = () => {
                 <div className="text-sm text-muted-foreground pt-2">
                   {step.explanation}
                 </div>
-              </div>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            key={`algo-${currentStep}`}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3, delay: 0.3 }}
-          >
-            <Card className="p-4 bg-blue-500/10">
-              <h3 className="font-semibold mb-2 text-sm">Key Insight:</h3>
-              <div className="text-xs text-muted-foreground">
-                Houses form a circle, so we can't rob both house 0 and house n-1. Solution: Run
-                linear rob twice - once excluding last house, once excluding first house.
               </div>
             </Card>
           </motion.div>

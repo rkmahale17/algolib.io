@@ -501,6 +501,8 @@ const generateCppRunner = (
 #include <climits>
 #include <set>
 #include <bitset>
+#include <queue>
+#include <unordered_map>
 using namespace std;
 
 // Helper to print vectors
