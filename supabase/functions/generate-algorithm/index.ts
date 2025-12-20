@@ -185,8 +185,8 @@ Deno.serve(async (req) => {
                 "code": [
                      {
                         "codeType": "optimize",
-                        "code": "function threeSum(nums: number[]): number[][] {\n    nums.sort((a, b) => a - b);\n    const res: number[][] = [];\n    for (let i = 0; i < nums.length - 2; i++) {\n        if (i > 0 && nums[i] === nums[i - 1]) continue;\n        let l = i + 1, r = nums.length - 1;\n        while (l < r) {\n            const sum = nums[i] + nums[l] + nums[r];\n            if (sum > 0) r--;\n            else if (sum < 0) l++;\n            else {\n                res.push([nums[i], nums[l], nums[r]]);\n                l++;\n                while (nums[l] === nums[l - 1] && l < r) l++;\n            }\n        }\n    }\n    return res;\n}",
-                        "explanationBefore": "<p>The key idea is to <strong>sort</strong> the input array first.</p><ul><li>Fix one element `i`.</li><li>Use two pointers `l` and `r` to find pairs that sum to ` - nums[i]`.</li></ul>",
+                        "code": "function threeSum(nums: number[]): number[][] {\\n    nums.sort((a, b) => a - b);\\n    const res: number[][] = [];\\n    for (let i = 0; i < nums.length - 2; i++) {\\n        if (i > 0 && nums[i] === nums[i - 1]) continue;\\n        let l = i + 1, r = nums.length - 1;\\n        while (l < r) {\\n            const sum = nums[i] + nums[l] + nums[r];\\n            if (sum > 0) r--;\\n            else if (sum < 0) l++;\\n            else {\\n                res.push([nums[i], nums[l], nums[r]]);\\n                l++;\\n                while (nums[l] === nums[l - 1] && l < r) l++;\\n            }\\n        }\\n    }\\n    return res;\\n}",
+                        "explanationBefore": "<p>The key idea is to <strong>sort</strong> the input array first.</p><ul><li>Fix one element i.</li><li>Use two pointers l and r to find pairs that sum to -nums[i].</li></ul>",
                         "explanationAfter": "<p>Sorting takes O(N log N). The nested loop takes O(N^2).</p>"
                     }
                 ]
