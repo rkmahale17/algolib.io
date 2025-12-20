@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.generate-algorithm-diagram]
 verify_jwt = false
+
+[functions.generate-algorithm]
+verify_jwt = false
