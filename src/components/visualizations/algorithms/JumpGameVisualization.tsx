@@ -25,123 +25,195 @@ export const JumpGameVisualization = () => {
     {
       nums,
       i: -1,
-      maxReach: 0,
+      maxReach: 4, // reusing maxReach field as 'goal' for visualization convenience
       variables: { nums: '[2,3,1,1,4]' },
-      explanation: "Given jump array [2,3,1,1,4]. Each value = max jump distance from that position. Can we reach last index (4)?",
+      explanation: "Given jump array [2,3,1,1,4]. We want to see if we can reach the last index (4). We'll use a Greedy approach starting from the back.",
       highlightedLines: [1],
       lineExecution: "function canJump(nums: number[]): boolean"
     },
     {
       nums,
       i: -1,
-      maxReach: 0,
-      variables: { maxReach: 0 },
-      explanation: "Initialize maxReach = 0. Tracks the furthest index we can reach.",
-      highlightedLines: [2],
-      lineExecution: "let maxReach = 0;"
-    },
-    {
-      nums,
-      i: 0,
-      maxReach: 0,
-      variables: { i: 0, n: 5 },
-      explanation: "Start loop: i = 0. Check: 0 < 5? Yes, continue.",
+      maxReach: 4,
+      variables: { goal: 4, 'nums.length': 5 },
+      explanation: "Initialize 'goal' to the last index (4). This is the target we need to reach.",
       highlightedLines: [4],
-      lineExecution: "for (let i = 0; i < nums.length; i++) // i=0"
+      lineExecution: "let goal = nums.length - 1;"
+    },
+    {
+      nums,
+      i: 4,
+      maxReach: 4,
+      variables: { i: 4, goal: 4 },
+      explanation: "Start loop from the last index (4) down to 0.",
+      highlightedLines: [7],
+      lineExecution: "for (let i = nums.length - 1; i >= 0; i--) // i=4"
+    },
+    {
+      nums,
+      i: 4,
+      maxReach: 4,
+      variables: { i: 4, goal: 4, jump: 4, calc: '4+4 >= 4' },
+      explanation: "Check: Can index 4 reach the goal (4)? 4 + nums[4] = 8 >= 4. Yes. It's already the goal.",
+      highlightedLines: [12],
+      lineExecution: "if (i + nums[i] >= goal) // 4 + 4 >= 4"
+    },
+    {
+      nums,
+      i: 4,
+      maxReach: 4,
+      variables: { goal: 4 },
+      explanation: "Update goal found. New goal is index 4.",
+      highlightedLines: [13],
+      lineExecution: "goal = i; // goal = 4"
+    },
+    {
+      nums,
+      i: 3,
+      maxReach: 4,
+      variables: { i: 3, goal: 4 },
+      explanation: "Move to index 3. Goal is still 4.",
+      highlightedLines: [7],
+      lineExecution: "for (let i = nums.length - 1; i >= 0; i--) // i=3"
+    },
+    {
+      nums,
+      i: 3,
+      maxReach: 4,
+      variables: { i: 3, goal: 4, jump: 1, calc: '3+1 >= 4' },
+      explanation: "Check: Can index 3 reach goal (4)? 3 + nums[3] (1) = 4. 4 >= 4. Yes!",
+      highlightedLines: [12],
+      lineExecution: "if (i + nums[i] >= goal) // 3 + 1 >= 4"
+    },
+    {
+      nums,
+      i: 3,
+      maxReach: 3,
+      variables: { goal: 3 },
+      explanation: "Since index 3 can reach the goal, index 3 becomes the new goal.",
+      highlightedLines: [13],
+      lineExecution: "goal = i; // goal = 3"
+    },
+    {
+      nums,
+      i: 2,
+      maxReach: 3,
+      variables: { i: 2, goal: 3 },
+      explanation: "Move to index 2. Goal is now 3.",
+      highlightedLines: [7],
+      lineExecution: "for ... i=2"
+    },
+    {
+      nums,
+      i: 2,
+      maxReach: 3,
+      variables: { i: 2, goal: 3, jump: 1, calc: '2+1 >= 3' },
+      explanation: "Check: Can index 2 reach goal (3)? 2 + 1 = 3. 3 >= 3. Yes!",
+      highlightedLines: [12],
+      lineExecution: "if (i + nums[i] >= goal) // 2 + 1 >= 3"
+    },
+    {
+      nums,
+      i: 2,
+      maxReach: 2,
+      variables: { goal: 2 },
+      explanation: "Index 2 becomes the new goal.",
+      highlightedLines: [13],
+      lineExecution: "goal = i; // goal = 2"
+    },
+    {
+      nums,
+      i: 1,
+      maxReach: 2,
+      variables: { i: 1, goal: 2 },
+      explanation: "Move to index 1. Goal is 2.",
+      highlightedLines: [7],
+      lineExecution: "for ... i=1"
+    },
+    {
+      nums,
+      i: 1,
+      maxReach: 2,
+      variables: { i: 1, goal: 2, jump: 3, calc: '1+3 >= 2' },
+      explanation: "Check: Can index 1 reach goal (2)? 1 + 3 = 4. 4 >= 2. Yes!",
+      highlightedLines: [12],
+      lineExecution: "if (i + nums[i] >= goal) // 1 + 3 >= 2"
+    },
+    {
+      nums,
+      i: 1,
+      maxReach: 1,
+      variables: { goal: 1 },
+      explanation: "Index 1 becomes the new goal.",
+      highlightedLines: [13],
+      lineExecution: "goal = i; // goal = 1"
+    },
+    {
+      nums,
+      i: 0,
+      maxReach: 1,
+      variables: { i: 0, goal: 1 },
+      explanation: "Move to index 0. Goal is 1.",
+      highlightedLines: [7],
+      lineExecution: "for ... i=0"
+    },
+    {
+      nums,
+      i: 0,
+      maxReach: 1,
+      variables: { i: 0, goal: 1, jump: 2, calc: '0+2 >= 1' },
+      explanation: "Check: Can index 0 reach goal (1)? 0 + 2 = 2. 2 >= 1. Yes!",
+      highlightedLines: [12],
+      lineExecution: "if (i + nums[i] >= goal) // 0 + 2 >= 1"
     },
     {
       nums,
       i: 0,
       maxReach: 0,
-      variables: { i: 0, maxReach: 0 },
-      explanation: "Check if current position is reachable: i (0) > maxReach (0)? No, continue.",
-      highlightedLines: [5],
-      lineExecution: "if (i > maxReach) return false; // 0 > 0 -> false"
+      variables: { goal: 0 },
+      explanation: "Index 0 becomes the new goal.",
+      highlightedLines: [13],
+      lineExecution: "goal = i; // goal = 0"
     },
     {
       nums,
-      i: 0,
-      maxReach: 2,
-      variables: { maxReach: 2, calc: 'max(0, 0+2)' },
-      explanation: "Update maxReach: max(0, 0+2) = 2. From index 0, we can reach up to index 2.",
-      highlightedLines: [6],
-      lineExecution: "maxReach = Math.max(maxReach, i + nums[i]); // max(0, 2) = 2"
-    },
-    {
-      nums,
-      i: 0,
-      maxReach: 2,
-      variables: { maxReach: 2, target: 4 },
-      explanation: "Check if we've reached the end: maxReach (2) >= 4? No, continue.",
+      i: -1,
+      maxReach: 0,
+      variables: { i: -1, goal: 0 },
+      explanation: "Loop finished.",
       highlightedLines: [7],
-      lineExecution: "if (maxReach >= nums.length - 1) return true; // 2 >= 4 -> false"
+      lineExecution: "i < 0 -> exit loop"
     },
     {
       nums,
-      i: 1,
-      maxReach: 2,
-      variables: { i: 1 },
-      explanation: "Increment loop: i = 1. Check: 1 < 5? Yes, continue.",
-      highlightedLines: [4],
-      lineExecution: "for (let i = 1; i < nums.length; i++) // i=1"
-    },
-    {
-      nums,
-      i: 1,
-      maxReach: 2,
-      variables: { i: 1, maxReach: 2 },
-      explanation: "Check reachability: i (1) > maxReach (2)? No, position 1 is reachable.",
-      highlightedLines: [5],
-      lineExecution: "if (i > maxReach) return false; // 1 > 2 -> false"
-    },
-    {
-      nums,
-      i: 1,
-      maxReach: 4,
-      variables: { maxReach: 4, calc: 'max(2, 1+3)' },
-      explanation: "Update maxReach: max(2, 1+3) = 4. From index 1, we can reach up to index 4!",
-      highlightedLines: [6],
-      lineExecution: "maxReach = Math.max(maxReach, i + nums[i]); // max(2, 4) = 4"
-    },
-    {
-      nums,
-      i: 1,
-      maxReach: 4,
-      variables: { maxReach: 4, target: 4 },
-      explanation: "Check if we've reached the end: maxReach (4) >= 4? Yes! Return true.",
-      highlightedLines: [7],
-      lineExecution: "if (maxReach >= nums.length - 1) return true; // 4 >= 4 -> true"
-    },
-    {
-      nums,
-      i: 1,
-      maxReach: 4,
-      variables: { result: true, maxReach: 4 },
-      explanation: "Success! Can reach the last index. Greedy approach: always track furthest reachable position.",
-      highlightedLines: [7],
-      lineExecution: "return true;"
-    },
-    {
-      nums,
-      i: 1,
-      maxReach: 4,
-      variables: { canReach: true, complexity: 'O(n)' },
-      explanation: "Algorithm complete! Time: O(n), Space: O(1). Greedy: if any position is unreachable, we can't continue.",
-      highlightedLines: [7],
-      lineExecution: "Result: true (can reach last index)"
+      i: -1,
+      maxReach: 0,
+      variables: { result: true, goal: 0 },
+      explanation: "Final check: Is goal == 0? Yes. We found a path from 0 to the end!",
+      highlightedLines: [19],
+      lineExecution: "return goal === 0; // true"
     }
   ];
 
   const code = `function canJump(nums: number[]): boolean {
-  let maxReach = 0;
-  
-  for (let i = 0; i < nums.length; i++) {
-    if (i > maxReach) return false;
-    maxReach = Math.max(maxReach, i + nums[i]);
-    if (maxReach >= nums.length - 1) return true;
-  }
-  
-  return false;
+    // 'goal' stores the leftmost index
+    // that must be reachable to eventually reach the end
+    let goal = nums.length - 1;
+
+    // Iterate from the last index to the first index
+    for (let i = nums.length - 1; i >= 0; i--) {
+
+        // nums[i] tells us the maximum jump length from index i
+        // If index i can jump to the current goal or beyond,
+        // then index i becomes the new goal.
+        if (i + nums[i] >= goal) {
+            goal = i;
+        }
+    }
+
+    // If the goal has moved back to index 0,
+    // then it is possible to reach the last index.
+    return goal === 0;
 }`;
 
   const step = steps[currentStep];
@@ -157,27 +229,35 @@ export const JumpGameVisualization = () => {
             transition={{ duration: 0.5 }}
           >
             <Card className="p-4">
-              <h3 className="text-sm font-semibold mb-3">Array (max jump from each index)</h3>
-              <div className="flex gap-2 flex-wrap">
+              <h3 className="text-sm font-semibold mb-3">Jump Game Array (Goal Strategy)</h3>
+              <div className="flex gap-2 flex-wrap justify-center">
                 {step.nums.map((num, idx) => (
                   <div
                     key={idx}
-                    className={`px-4 py-3 rounded font-mono text-center relative ${
+                    className={`px-4 py-3 rounded font-mono text-center relative transition-all duration-300 ${
+                      // Current index i
                       idx === step.i
-                        ? 'bg-primary text-primary-foreground ring-2 ring-primary'
-                        : idx < step.i
-                        ? 'bg-secondary'
-                        : idx <= step.maxReach && step.i >= 0
-                        ? 'bg-green-500/20'
+                        ? 'ring-2 ring-primary scale-110 z-10'
+                        : ''
+                    } ${
+                      // Goal index coloration
+                      idx === step.maxReach 
+                        ? 'bg-green-500 text-white shadow-lg' 
+                        : idx > step.maxReach 
+                        ? 'bg-green-100 opacity-50' // Already solved part (right of goal)
                         : 'bg-muted'
                     }`}
                   >
-                    <div className="text-xs">Index {idx}</div>
+                    <div className="text-[10px] uppercase font-bold mb-1 opacity-70">
+                        {idx === step.maxReach ? 'GOAL' : `IDX ${idx}`}
+                    </div>
                     <div className="font-bold text-xl">{num}</div>
-                    {idx === step.nums.length - 1 && (
-                      <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
-                        🎯
-                      </div>
+                    
+                    {/* Visualizing Jump Range */}
+                    {idx === step.i && step.i >= 0 && (
+                        <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] text-primary whitespace-nowrap font-semibold">
+                            Reaches {idx + num}
+                        </div>
                     )}
                   </div>
                 ))}
@@ -186,17 +266,28 @@ export const JumpGameVisualization = () => {
           </motion.div>
 
           <motion.div
-            key={`reach-${currentStep}`}
+            key={`goal-tracker-${currentStep}`}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
+            className="mt-4"
           >
-            <Card className="p-4">
-              <h3 className="text-sm font-semibold mb-2">Max Reachable Index</h3>
-              <div className="p-4 bg-green-500/20 rounded text-center">
-                <div className="text-3xl font-bold text-green-600">{step.maxReach}</div>
-              </div>
-            </Card>
+             {/* Simple visualization of the goal moving */}
+             <Card className="p-4 bg-orange-50/50 border-orange-200">
+                <div className="flex items-center justify-between text-sm">
+                    <span className="font-medium text-muted-foreground">Current Goal Post:</span>
+                    <span className="font-bold text-xl text-orange-600">Index {step.maxReach}</span>
+                </div>
+                <div className="w-full bg-gray-200 h-2 rounded-full mt-2 overflow-hidden">
+                    <div 
+                        className="bg-orange-500 h-full transition-all duration-500"
+                        style={{ width: `${100 - (step.maxReach / (step.nums.length - 1)) * 100}%` }}
+                    />
+                </div>
+                <div className="text-xs text-right mt-1 text-muted-foreground">
+                    dist to start: {step.maxReach} steps
+                </div>
+             </Card>
           </motion.div>
 
           <motion.div
@@ -204,6 +295,7 @@ export const JumpGameVisualization = () => {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.4, delay: 0.2 }}
+            className="mt-4"
           >
             <Card className="p-4 bg-muted/50">
               <div className="space-y-2">
@@ -219,25 +311,11 @@ export const JumpGameVisualization = () => {
           </motion.div>
 
           <motion.div
-            key={`algo-${currentStep}`}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3, delay: 0.3 }}
-          >
-            <Card className="p-4 bg-blue-500/10">
-              <h3 className="font-semibold mb-2 text-sm">Greedy Approach:</h3>
-              <div className="text-xs text-muted-foreground">
-                Track the furthest index we can reach. If current index &gt; maxReach, we're stuck!
-                Early return true when maxReach ≥ last index.
-              </div>
-            </Card>
-          </motion.div>
-
-          <motion.div
             key={`variables-${currentStep}`}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3, delay: 0.4 }}
+            className="mt-4"
           >
             <VariablePanel variables={step.variables} />
           </motion.div>
