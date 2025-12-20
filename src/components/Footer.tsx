@@ -15,7 +15,7 @@ export function Footer() {
             </p>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Heart className="w-4 h-4 text-red-500" />
-              <span>100% Free Forever</span>
+              <span>100% Developer Centric</span>
             </div>
           </div>
 

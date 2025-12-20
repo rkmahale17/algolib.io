@@ -100,14 +100,12 @@ export function useUserAlgorithmData({
         if (!userId) return;
 
         try {
-            setLoading(true);
+            // Don't set loading to true for background refetches to avoid UI flicker
             const result = await getUserAlgorithmData(userId, algorithmId);
             setData(result);
             setError(null);
         } catch (err) {
             setError(err as Error);
-        } finally {
-            setLoading(false);
         }
     }, [userId, algorithmId]);
 

@@ -31,9 +31,11 @@ export const renderBlind75Visualization = (algoId: string): React.ReactNode | nu
     "reverse-bits": () => import("@/components/visualizations/algorithms/ReverseBitsVisualization").then(m => ({ default: m.ReverseBitsVisualization })),
     "climbing-stairs": () => import("@/components/visualizations/algorithms/ClimbingStairsVisualization").then(m => ({ default: m.ClimbingStairsVisualization })),
     "coin-change": () => import("@/components/visualizations/algorithms/CoinChangeVisualization").then(m => ({ default: m.CoinChangeVisualization })),
-    "longest-increasing-subsequence": () => import("@/components/visualizations/algorithms/LongestIncreasingSubsequenceVisualization").then(m => ({ default: m.LongestIncreasingSubsequenceVisualization })),
-    "longest-common-subsequence": () => import("@/components/visualizations/algorithms/LongestCommonSubsequenceVisualization").then(m => ({ default: m.LongestCommonSubsequenceVisualization })),
+    "longest-increasing-subsequence": () => import("@/components/visualizations/algorithms/LISVisualization").then(m => ({ default: m.LISVisualization })),
+    "longest-common-subsequence": () => import("@/components/visualizations/algorithms/LCSVisualization").then(m => ({ default: m.LCSVisualization })),
     "word-break": () => import("@/components/visualizations/algorithms/WordBreakVisualization").then(m => ({ default: m.WordBreakVisualization })),
+    "word-break-problem": () => import("@/components/visualizations/algorithms/WordBreakVisualization").then(m => ({ default: m.WordBreakVisualization })),
+    
     "valid-parentheses": () => import("@/components/visualizations/algorithms/ValidParenthesesVisualization").then(m => ({ default: m.ValidParenthesesVisualization })),
     "longest-palindromic-substring": () => import("@/components/visualizations/algorithms/LongestPalindromicSubstringVisualization").then(m => ({ default: m.LongestPalindromicSubstringVisualization })),
     "palindromic-substrings": () => import("@/components/visualizations/algorithms/PalindromicSubstringsVisualization").then(m => ({ default: m.PalindromicSubstringsVisualization })),
