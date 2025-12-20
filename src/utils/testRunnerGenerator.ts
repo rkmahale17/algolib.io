@@ -279,8 +279,8 @@ const generateJavaRunner = (
     const entryInfo = findEntryFunction(userCode, 'java', inputSchema, entryFunctionName);
     const userFuncName = entryInfo.name;
 
-    // 2. Ensure all helper methods are static
-    const userCodeClean = ensureStaticMethods(userCode);
+    // 2. Ensure all helper methods are static (ONLY if not using class Solution)
+    const userCodeClean = entryInfo.hasSolutionClass ? userCode : ensureStaticMethods(userCode);
 
     // 3. Parse Argument Types from User Code to handle List<T> vs T[]
     const rawArgs = splitJavaArgs(entryInfo.argsStr); // ["String s", "List<String> wordDict"]
@@ -321,7 +321,8 @@ const generateJavaRunner = (
         {
             try {
                 long start = System.nanoTime();
-                Object actual = ${userFuncName}(${args});
+                ${entryInfo.hasSolutionClass ? `Solution sol = new Solution();` : ''}
+                Object actual = ${entryInfo.hasSolutionClass ? 'sol.' : ''}${userFuncName}(${args});
                 long end = System.nanoTime();
                 
                 Object expected = ${expectedJavaLiteral};
@@ -361,7 +362,7 @@ const generateJavaRunner = (
     return `
 import java.util.*;
 import java.util.stream.*;
-
+import java.util.HashSet;
 public class Main {
     ${userCodeClean}
 
@@ -478,7 +479,8 @@ const generateCppRunner = (
         {
             ${inputDecls}
             ${expectedDecl}
-            auto actual = ${userFuncName}(${args});
+            ${entryInfo.hasSolutionClass ? 'Solution sol;' : ''}
+            auto actual = ${entryInfo.hasSolutionClass ? 'sol.' : ''}${userFuncName}(${args});
             
             bool passed = (expected == actual);
             

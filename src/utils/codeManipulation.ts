@@ -34,8 +34,18 @@ function countArguments(argsStr: string): number {
 }
 
 /**
- * Finds the best entry point function in the user code based on signature matching.
+ * Strips comments from code string based on language.
  */
+function stripComments(code: string, language: Language): string {
+    if (language === 'python') {
+        // Python: Strip # comments and '''/""" docstrings
+        // Naive stripping of docstrings (non-greedy) and hash comments
+        return code.replace(/'''[\s\S]*?'''|"""[\s\S]*?"""|#.*/g, "");
+    }
+    // Default (C/C++/Java/TS): Strip // and / * ... * /
+    return code.replace(/\/\/.*|\/\*[\s\S]*?\*\//g, "");
+}
+
 /**
  * Finds the best entry point function in the user code based on signature matching.
  */
@@ -44,7 +54,14 @@ export function findEntryFunction(
     language: Language,
     inputSchema: any[],
     metadataFunctionName?: string
-): EntryFunctionInfo {
+): { name: string, argsStr: string, hasSolutionClass: boolean } {
+
+    // Detect if "class Solution" is present (naive check but effective for LeetCode style)
+    const hasSolutionClass = /class\s+Solution/.test(userCode);
+
+    // Work on code without comments to avoid false positive function matches
+    const codeToScan = stripComments(userCode, language);
+
     const expectedArgCount = inputSchema.length;
     const candidates: CandidateFunction[] = [];
 
@@ -55,7 +72,7 @@ export function findEntryFunction(
             // Group 1: Name, Group 2: Args
             const tsRegex = /(?:function\s+(\w+)\s*\(([^)]*)\))|(?:(?:const|let|var)\s+(\w+)\s*=\s*(?:function\s*\(([^)]*)\)|\(([^)]*)\)\s*=>))/g;
             let tsMatch;
-            while ((tsMatch = tsRegex.exec(userCode)) !== null) {
+            while ((tsMatch = tsRegex.exec(codeToScan)) !== null) {
                 const name = tsMatch[1] || tsMatch[3];
                 const args = tsMatch[2] || tsMatch[4] || tsMatch[5] || "";
                 if (name) {
@@ -75,7 +92,7 @@ export function findEntryFunction(
             // def name(...):
             const pyRegex = /def\s+(\w+)\s*\(([^)]*)\)/g;
             let pyMatch;
-            while ((pyMatch = pyRegex.exec(userCode)) !== null) {
+            while ((pyMatch = pyRegex.exec(codeToScan)) !== null) {
                 candidates.push({
                     name: pyMatch[1],
                     argCount: countArguments(pyMatch[2]),
@@ -95,21 +112,21 @@ export function findEntryFunction(
 
             // Regex explanation:
             // ((?:public|private|protected|static)\s+)* : Optional modifiers
-            // (?:[\w<>[\]]+\s+) : Return type (simplified)
+            // (.+?) : Return type (Lazy capture allows spaces, commas, refs, pointers without greediness)
             // (\w+) : Method Name
             // \s*\( : Start of args
             // ([^)]*) : Args content
             // \) : End of args
-            const cStyleRegex = /(?:((?:public|private|protected|static)\s+)*)(?:[\w<>[\]]+\s+)(\w+)\s*\(([^)]*)\)/g;
+            const cStyleRegex = /(?:((?:public|private|protected|static)\s+)*)(.+?)\s+(\w+)\s*\(([^)]*)\)/g;
 
             let cMatch;
-            while ((cMatch = cStyleRegex.exec(userCode)) !== null) {
+            while ((cMatch = cStyleRegex.exec(codeToScan)) !== null) {
                 const modifiers = cMatch[1] || "";
-                const name = cMatch[2];
-                const args = cMatch[3] || "";
+                const name = cMatch[3]; // Adjusted index due to lazy group
+                const args = cMatch[4] || "";
 
                 // Exclude keywords
-                if (/^(if|for|while|switch|catch)$/.test(name)) continue;
+                if (/^(if|for|while|switch|catch|return)$/.test(name)) continue;
 
                 candidates.push({
                     name: name,
@@ -127,14 +144,20 @@ export function findEntryFunction(
     const validCandidates = candidates.filter(c => c.argCount === expectedArgCount);
 
     if (validCandidates.length === 0) {
-        // Fallback: If no valid signature match, try to use the first found function 
-        // that matches naive regex from before (legacy behavior)
-        // Or if metadata name is present but signature didn't match (maybe parsing error?), return it anyway.
-        if (metadataFunctionName) return { name: metadataFunctionName, argsStr: '' };
+        // Fallback Strategy:
+        // 1. If we found ANY candidates, try to find one that matches the metadata name (ignoring arg count).
+        if (candidates.length > 0) {
+            const nameMatch = candidates.find(c => c.name === metadataFunctionName);
+            if (nameMatch) return { name: nameMatch.name, argsStr: nameMatch.argsStr, hasSolutionClass };
 
-        // Ultimate fallback to existing naive logic if our parser fails completely
-        // Return 'solution' as a safe default if absolutely nothing is found
-        return candidates.length > 0 ? { name: candidates[0].name, argsStr: candidates[0].argsStr } : { name: 'solution', argsStr: '' };
+            // 2. If no name match, just return the first candidate (likely the main function)
+            // This is better than returning a ghost name "valid" that causes compilation errors.
+            return { name: candidates[0].name, argsStr: candidates[0].argsStr, hasSolutionClass };
+        }
+
+        // 3. If NO candidates found at all (parsing failed completely), return metadata name or default.
+        if (metadataFunctionName) return { name: metadataFunctionName, argsStr: '', hasSolutionClass };
+        return { name: 'solution', argsStr: '', hasSolutionClass };
     }
 
     // Ranking Logic
@@ -163,7 +186,7 @@ export function findEntryFunction(
         return a.index - b.index;
     });
 
-    return { name: validCandidates[0].name, argsStr: validCandidates[0].argsStr };
+    return { name: validCandidates[0].name, argsStr: validCandidates[0].argsStr, hasSolutionClass };
 }
 
 /**
