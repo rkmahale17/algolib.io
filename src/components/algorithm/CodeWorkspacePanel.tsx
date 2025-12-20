@@ -15,8 +15,8 @@ import { AuthGuard } from "@/components/AuthGuard";
 import { TabWarning } from "@/components/TabWarning";
 import { CodeRunner } from "@/components/CodeRunner/CodeRunner";
 import { BrainstormSection } from "@/components/brainstorm/BrainstormSection";
-
 import { Skeleton } from "@/components/ui/skeleton";
+import { Submission } from "@/types/userAlgorithmData";
 
 interface CodeWorkspacePanelProps {
   algorithm: any;
