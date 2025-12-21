@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Sparkles, Wand2, Loader2, FileJson, Copy, CheckSquare, Square } from "lucide-react";
+import { Sparkles, Wand2, Loader2, FileJson, Copy, CheckSquare, Square, FileCode, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -44,6 +44,7 @@ export function SmartFillDialog({ onFill }: SmartFillDialogProps) {
   // Generate Tab State
   const [topic, setTopic] = useState("");
   const [referenceCode, setReferenceCode] = useState("");
+  const [generatorMode, setGeneratorMode] = useState<"problem" | "core">("problem");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedData, setGeneratedData] = useState<any>(null);
   
@@ -117,7 +118,7 @@ export function SmartFillDialog({ onFill }: SmartFillDialogProps) {
 
     try {
       const { data, error } = await supabase.functions.invoke("generate-algorithm", {
-        body: { topic, referenceCode },
+        body: { topic, referenceCode, mode: generatorMode },
       });
 
       if (error) throw error;
@@ -143,7 +144,7 @@ export function SmartFillDialog({ onFill }: SmartFillDialogProps) {
           Smart Fill
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[800px] h-[85vh] flex flex-col">
+      <DialogContent className="sm:max-w-[1200px] h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-purple-500" />
@@ -189,6 +190,30 @@ export function SmartFillDialog({ onFill }: SmartFillDialogProps) {
                         onChange={(e) => setTopic(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleGenerate()}
                     />
+                  </div>
+
+                  <div className="flex-1 space-y-2">
+                    <Label>Generation Mode</Label>
+                    <div className="flex items-center gap-2 border rounded-md p-1 h-10 bg-muted/30">
+                        <Button 
+                            variant={generatorMode === "problem" ? "secondary" : "ghost"}
+                            size="sm"
+                            className="flex-1 h-8"
+                            onClick={() => setGeneratorMode("problem")}
+                        >
+                            <FileCode className="w-4 h-4 mr-2" />
+                            LeetCode
+                        </Button>
+                        <Button 
+                            variant={generatorMode === "core" ? "secondary" : "ghost"} 
+                            size="sm"
+                            className="flex-1 h-8"
+                            onClick={() => setGeneratorMode("core")}
+                        >
+                            <BookOpen className="w-4 h-4 mr-2" />
+                            Core Algo
+                        </Button>
+                    </div>
                   </div>
                   <div className="flex-1 space-y-2">
                      <Label htmlFor="referenceCode">Reference Code (Optional)</Label>
