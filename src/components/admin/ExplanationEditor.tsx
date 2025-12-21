@@ -4,12 +4,14 @@ import { ArrayEditor } from "./ArrayEditor";
 import { IOExamplesEditor } from "./IOExamplesEditor";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+
 interface ExplanationData {
   problemStatement: string;
   useCase: string;
   note: string;
   steps: string | string[];
   tips: string | string[];
+  comparisonTable?: string; // HTML string
   constraints: string[];
   io: Array<{
     input: string;
@@ -105,6 +107,22 @@ export function ExplanationEditor({ data, onChange }: ExplanationEditorProps) {
           />
         </CardContent>
       </Card>
+      
+      {/* Comparison Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Comparison Table (HTML)</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Textarea
+            value={data.comparisonTable || ''}
+            onChange={(e) => updateField("comparisonTable", e.target.value)}
+            placeholder="Enter comparison table HTML..."
+            rows={5}
+            className="font-mono text-xs"
+          />
+        </CardContent>
+      </Card>
 
       {/* Constraints */}
       <Card>
@@ -139,3 +157,4 @@ export function ExplanationEditor({ data, onChange }: ExplanationEditorProps) {
     </div>
   );
 }
+
