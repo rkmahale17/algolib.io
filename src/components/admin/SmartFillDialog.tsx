@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Sparkles, Wand2, Loader2, FileJson, Copy, CheckSquare, Square, FileCode, BookOpen } from "lucide-react";
+import { Sparkles, Wand2, Loader2, FileJson, Copy, CheckSquare, Square, FileCode, BookOpen, Layers, ListStart, ListPlus } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -45,6 +45,7 @@ export function SmartFillDialog({ onFill }: SmartFillDialogProps) {
   const [topic, setTopic] = useState("");
   const [referenceCode, setReferenceCode] = useState("");
   const [generatorMode, setGeneratorMode] = useState<"problem" | "core">("problem");
+  const [target, setTarget] = useState<"all" | "initial" | "enrichment">("all");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedData, setGeneratedData] = useState<any>(null);
   
@@ -118,7 +119,7 @@ export function SmartFillDialog({ onFill }: SmartFillDialogProps) {
 
     try {
       const { data, error } = await supabase.functions.invoke("generate-algorithm", {
-        body: { topic, referenceCode, mode: generatorMode },
+        body: { topic, referenceCode, mode: generatorMode, target },
       });
 
       if (error) throw error;
@@ -214,6 +215,41 @@ export function SmartFillDialog({ onFill }: SmartFillDialogProps) {
                             Core Algo
                         </Button>
                     </div>
+                  </div>
+                  <div className="flex-1 space-y-2">
+                     <Label>Generation Strategy</Label>
+                     <div className="flex items-center gap-1 border rounded-md p-1 h-10 bg-muted/30">
+                        <Button
+                             variant={target === "all" ? "secondary" : "ghost"}
+                             size="sm"
+                             className="flex-1 h-8 px-2 text-[10px] sm:text-xs"
+                             onClick={() => setTarget("all")}
+                             title="Generate Everything (Default)"
+                        >
+                             <Layers className="w-3 h-3 mr-1.5" />
+                             Full
+                        </Button>
+                        <Button
+                             variant={target === "initial" ? "secondary" : "ghost"}
+                             size="sm"
+                             className="flex-1 h-8 px-2 text-[10px] sm:text-xs"
+                             onClick={() => setTarget("initial")}
+                             title="Metadata + Optimized Solution Only"
+                        >
+                             <ListStart className="w-3 h-3 mr-1.5" />
+                             Base
+                        </Button>
+                        <Button
+                             variant={target === "enrichment" ? "secondary" : "ghost"}
+                             size="sm"
+                             className="flex-1 h-8 px-2 text-[10px] sm:text-xs"
+                             onClick={() => setTarget("enrichment")}
+                             title="Add Brute/Better + Table Only"
+                        >
+                             <ListPlus className="w-3 h-3 mr-1.5" />
+                             Enrich
+                        </Button>
+                     </div>
                   </div>
                   <div className="flex-1 space-y-2">
                      <Label htmlFor="referenceCode">Reference Code (Optional)</Label>
