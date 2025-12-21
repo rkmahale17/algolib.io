@@ -562,7 +562,7 @@ export const ProblemDescriptionPanel = React.memo(({
                               className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
                             >
                               <div className="flex-1">
-                                <p className="text-sm font-medium">{problem.title}</p>
+                                <p className="text-sm font-medium">{problem.serial_no}.{problem.title}</p>
                                 <div className="mt-1.5 flex">
                                   <Badge 
                                     variant="secondary" 

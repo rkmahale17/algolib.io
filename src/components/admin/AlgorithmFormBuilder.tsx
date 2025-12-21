@@ -179,15 +179,138 @@ export function AlgorithmFormBuilder({
   };
 
   const handleSmartFill = (data: any) => {
-    setFormData((prev: any) => ({
-      ...prev,
-      ...data,
-      // Ensure nested objects are merged correctly if partial data is provided
-      explanation: typeof data.explanation === 'object' ? { ...prev.explanation, ...data.explanation } : (data.explanation || prev.explanation),
-      metadata: typeof data.metadata === 'object' ? { ...prev.metadata, ...data.metadata } : (data.metadata || prev.metadata),
-      problems_to_solve: typeof data.problems_to_solve === 'object' ? { ...prev.problems_to_solve, ...data.problems_to_solve } : (data.problems_to_solve || prev.problems_to_solve),
-    }));
-    toast.success("Form updated with smart fill data");
+    setFormData((prev: any) => {
+      // 1. Identify Protected Top-Level Fields
+      // If previous value exists, keep it. Otherwise use new data.
+      const protectedFields = [
+        "id", "name", "title", "category", "difficulty", "serial_no", "description"
+      ];
+      
+      const mergedTopLevel: any = {};
+      protectedFields.forEach(field => {
+        // If prev has value, keep it. Else take data.
+        mergedTopLevel[field] = prev[field] ? prev[field] : (data[field] || "");
+      });
+
+      // 2. Metadata Protection
+      // Protect: companyTags, likes, dislikes, timeComplexity, spaceComplexity
+      const prevMeta = prev.metadata || {};
+      const newMeta = data.metadata || {};
+      
+      const mergedMetadata = {
+        ...newMeta, // Default to new
+        // Restore protected if they exist in prev
+        companyTags: (prevMeta.companyTags && prevMeta.companyTags.length > 0) ? prevMeta.companyTags : (newMeta.companyTags || []),
+        likes: prevMeta.likes !== undefined ? prevMeta.likes : (newMeta.likes || 0),
+        dislikes: prevMeta.dislikes !== undefined ? prevMeta.dislikes : (newMeta.dislikes || 0),
+        timeComplexity: prevMeta.timeComplexity || newMeta.timeComplexity || "",
+        spaceComplexity: prevMeta.spaceComplexity || newMeta.spaceComplexity || "",
+        // Preserve other keys from prev that might not be in new?
+        // Usually we want new overview.
+        overview: newMeta.overview || prevMeta.overview || "",
+      };
+
+      // 3. Explanation Protection
+      // User requested protecting "Complexity Analysis" (often in explanation or metadata)
+      // Logic: Merge explanation fields.
+      const prevExpl = prev.explanation || {};
+      const newExpl = data.explanation || {};
+      const mergedExplanation = {
+        ...prevExpl,
+        ...newExpl,
+        // If we want to protect specific sub-fields (none explicitly requested besides complexity which is in metadata/explanation)
+        // Ensure strictly structured fields are taken from NEW data properly
+        comparisonTable: newExpl.comparisonTable || prevExpl.comparisonTable,
+      };
+
+      // 4. Implementations (Merge by codeType)
+      const prevImpls = Array.isArray(prev.implementations) ? prev.implementations : [];
+      const newImpls = Array.isArray(data.implementations) ? data.implementations : [];
+      
+      // Strategy:
+      // 1. Create a map of existing implementations by Language.
+      // 2. For each language, map code types.
+      // 3. Merge new implementations into this structure (overwriting same codeType, adding new).
+      
+      const implMap = new Map<string, any[]>();
+      
+      // Load previous
+      prevImpls.forEach((impl: any) => {
+          if (impl.lang && Array.isArray(impl.code)) {
+              implMap.set(impl.lang.toLowerCase(), [...impl.code]);
+          }
+      });
+      
+      // Merge new
+      newImpls.forEach((newImpl: any) => {
+          if (newImpl.lang && Array.isArray(newImpl.code)) {
+              const langKey = newImpl.lang.toLowerCase();
+              const existingCodes = implMap.get(langKey) || [];
+              
+              const mergedCodes = [...existingCodes];
+              
+              newImpl.code.forEach((newCode: any) => {
+                  const existingIndex = mergedCodes.findIndex(c => c.codeType === newCode.codeType);
+                  if (existingIndex >= 0) {
+                      // Overwrite existing (unless it's starter? No, if generator sends starter it's usually valid stub)
+                      // If prev was user-edited starter, maybe protect?
+                      // But for now, Smart Fill usually implies "Update".
+                      // Exception: If codeType is 'starter', we might want to preserve invalid user changes?
+                      // User said "more generated approch will merge".
+                      // So if it's a NEW approach, it appends. If it's existing, it updates.
+                      mergedCodes[existingIndex] = newCode; 
+                  } else {
+                      mergedCodes.push(newCode);
+                  }
+              });
+              
+              implMap.set(langKey, mergedCodes);
+          }
+      });
+      
+      // Reconstruct array
+      const mergedImpls = Array.from(implMap.entries()).map(([lang, code]) => ({
+          lang, // Should be normalized? We used lowercase key.
+          code
+      }));
+      
+      // If we had no impls before, just take new (handled by logic above).
+      // If we only have new impls (no prev), logic works.
+      
+      // 5. Protected Arrays/Lists
+      // 'tutorials', 'problems_to_solve'
+      const mergedTutorials = (prev.tutorials && prev.tutorials.length > 0) 
+          ? prev.tutorials 
+          : (data.tutorials || []);
+
+      const mergedProblems = (prev.problems_to_solve && (prev.problems_to_solve.internal?.length > 0 || prev.problems_to_solve.external?.length > 0))
+          ? prev.problems_to_solve
+          : (data.problems_to_solve || { internal: [], external: [] });
+
+      // 6. List Type
+      // If prev has list_type, keep it.
+      // Currently handled by `listType` state outside formData, but formData has it too?
+      // formData doesn't have list_type in initial state, but might be added.
+      // We'll respect `listType` state variable update logic in `useEffect`.
+
+      return {
+        ...prev,
+        ...data, // This blindly overwrites everything, so we must override back with preserved
+        ...mergedTopLevel,
+        metadata: mergedMetadata,
+        explanation: mergedExplanation,
+        implementations: newImpls.length > 0 ? mergedImpls : prevImpls, // Only update if we have new impls
+        tutorials: mergedTutorials,
+        problems_to_solve: mergedProblems,
+        // Explicitly handle list type if it was in data
+        // note: setListType is separate state, we might need to update it too if we wanted to overwrite (but we don't)
+      };
+    });
+    
+    // Also update separate state if needed (but we are protecting it, so probably not)
+    // if (data.list_type) setListType(data.list_type); 
+    
+    toast.success("Form updated (Protected fields preserved)");
   };
 
   const isLoading = createMutation.isPending || updateMutation.isPending;
@@ -214,7 +337,15 @@ export function AlgorithmFormBuilder({
         
         </div>
         <div className="flex items-center gap-2 pr-4">
-             <SmartFillDialog onFill={handleSmartFill} />
+             <SmartFillDialog 
+                onFill={handleSmartFill} 
+                initialTopic={formData.id || formData.title}
+                existingApproaches={Array.from(new Set(
+                  (formData.implementations || []).flatMap((impl: any) => 
+                    (impl.code || []).map((c: any) => c.codeType)
+                  )
+                ))}
+             />
         </div>
 
       </div>
