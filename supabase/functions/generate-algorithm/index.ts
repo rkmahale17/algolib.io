@@ -23,9 +23,9 @@ Deno.serve(async (req) => {
 
     // --- SHARED RULES ---
     const HTML_TEMPLATE = `
-        <p>[Overview content - NO HEADING]</p>
+        <p>[Deep dive introduction - ~600 words]</p>
         <hr />
-        <p><strong>Intuition:</strong><br /> [Content]</p>
+        <p><strong>Intuition:</strong><br /> [Analogy & Theory - ~600 words]</p>
         <hr />
         <p><strong>Step-by-step thinking:</strong></p>
         <ol><li>...</li></ol>
@@ -133,7 +133,7 @@ Deno.serve(async (req) => {
           "test_cases": [{"input": [1, 2], "output": 3, "description": "...", "isSubmission": false}],
           "input_schema": [{"name": "nums", "type": "number[]", "label": "Numbers"}],
           "metadata": {
-            "overview": "EXTREMELY DETAILED GUIDE. Approx 600 words. Deep dive into theory.",
+            "overview": "Detailed Guide. Max 600 words. Split into 2 paragraphs (break after ~300 words).",
             "companyTags": [], "likes": 0, "dislikes": 0
           }
         }
@@ -144,9 +144,10 @@ Deno.serve(async (req) => {
             - **Input Format**: 'input' MUST be an **ARRAY of values** matching input_schema order. Example: \`[2, [[1,0]]]\`. 
             - **Do NOT** use an object like \`{"num": 2}\`. IT MUST BE AN ARRAY: \`[2]\`.
             - Provide 12 total. Mark the LAST 8 as 'isSubmission: true'.
-        3. **Metadata**: Overview must be a **Comprehensive Deep Dive** (approx 600 words). 
+        3. **Metadata**: Overview must be **Max 600 words**. 
+           - **Structure**: Split into **two distinct paragraphs**. The first paragraph should end around 300 words.
            - **Style Guide**: Start with a clear classification (e.g. "Classic graph problem..."). Explain the Core Idea (e.g. "Revolves around Topological Sort").
-           - **Content**: Then expand on history, real-world applications, and variations to reach the word count.
+           - **Content**: Explain history, real-world applications, and variations.
            - **Tone**: Educational, clear, professional.
         `;
 
@@ -160,7 +161,7 @@ Deno.serve(async (req) => {
         ? 'You MUST generate ONLY the **Optimize** approach.'
         : target === 'enrichment'
           ? 'You MUST generate the **Brute Force** and **Better** approaches (if applicable). DO NOT generate Optimize again.'
-          : 'You MUST generate AT LEAST 3 APPROACHES: Brute Force, Better, Optimize.'
+          : 'You MUST generate ALL VIABLE APPROACHES (at least 3, MAX 5). E.g. Brute Force, Better, Optimize. If there are other distinct approaches (e.g. Iterative vs Recursive), INCLUDE THEM up to 5.'
       }
 
         JSON Structure:
@@ -172,7 +173,7 @@ Deno.serve(async (req) => {
                 {
                   "codeType": "${target === 'initial' ? 'optimize' : 'brute-force'}",
                   "code": "FUNCTION CODE ONLY",
-                  "explanationBefore": "EXTREMELY DETAILED HTML (300+ words)",
+                  "explanationBefore": "EXTREMELY DETAILED HTML (1000+ words)",
                   "explanationAfter": "HTML content"
                 }
                 // ... other approaches
@@ -195,13 +196,14 @@ Deno.serve(async (req) => {
         4. **Reference Code**: If provided, use it for 'optimize' logic.
         
         HTML RULES (explanationBefore):
-        Use this template exactly (NO 'Overview' heading):
+        Use this template exactly:
         ${HTML_TEMPLATE}
 
         **DETAIL LEVEL**:
-        - "Intuition": MUST use a **Human Analogy** or Metaphor. Explain it like the user is 5 years old. (e.g. "Think of this as organizing a deck of cards...").
-        - "Step-by-step": **EXTREMELY WORDY and EDUCATIONAL**. Explain *why* taking a step is necessary.
-        - Avoid brief summaries. Go deep. Use real-world logic.
+        1. **Approach Overview**: MUST be **~600 words**. Explain HOW this approach works in detail.
+        2. **Intuition**: MUST be **~600 words**. Use a **Human Analogy** or Metaphor. Explain it like the user is 5 years old. (e.g. "Think of this as organizing a deck of cards...").
+        3. **Step-by-step**: **EXTREMELY WORDY and EDUCATIONAL**. Explain *why* taking a step is necessary.
+        4. **General**: Avoid brief summaries. Go deep. Use real-world logic.
 
         ${target !== 'initial' ? "For the LAST approach (optimize), put the Comparison Table HTML in 'explanationAfter'." : ''}
         `;
