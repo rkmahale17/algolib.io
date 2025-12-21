@@ -23,16 +23,16 @@ Deno.serve(async (req) => {
     // --- SHARED RULES ---
     const HTML_TEMPLATE = `
         <p><strong>Approach Overview:</strong></p>
-        <p>[Deep dive introduction part 1 (max 200 words)]</p>
+        <p>[Deep dive introduction part 1 (max 60 words)]</p>
         <p>[Deep dive introduction part 2...]</p>
         <hr />
         <p><strong>Intuition:</strong></p>
-        <p>[Analogy & Theory part 1 (max 200 words)]</p>
+        <p>[Analogy & Theory part 1 (max 60 words)]</p>
         <p>[Analogy & Theory part 2...]</p>
         <hr />
         <p><strong>Step-by-step thinking:</strong></p>
         <ol>
-           <li><p>[Detailed step explanation (max 200 words)]</p></li>
+           <li><p>[Detailed step explanation (max 60 words)]</p></li>
            <li>...</li>
         </ol>
         <hr />
@@ -139,7 +139,7 @@ Deno.serve(async (req) => {
           "test_cases": [{"input": [1, 2], "output": 3, "description": "...", "isSubmission": false}],
           "input_schema": [{"name": "nums", "type": "number[]", "label": "Numbers"}],
           "metadata": {
-            "overview": "Detailed Guide. Max 600 words. Split into many  paragraphs (break after ~200 words).",
+            "overview": "Detailed Guide. Max 400 words. Split into many  paragraphs (break after ~60 words).",
             "companyTags": [], "likes": 0, "dislikes": 0
           }
         }
@@ -152,7 +152,7 @@ Deno.serve(async (req) => {
             - Provide 12 total. Mark the LAST 8 as 'isSubmission: true'.
         3. **Metadata**: Overview must be **Detailed**. 
            - **Structure**: Use multiple \`<p>\` tags. 
-           - **Paragraph Rule**: **MAX 200 WORDS per paragraph**. Split content logically.
+           - **Paragraph Rule**: **MAX 60 WORDS per paragraph**. Split content logically.
            - **Content**: Start with classification, then history/applications. Total length ~600 words.
            - **Tone**: Educational, clear, professional.
         `;
@@ -163,19 +163,30 @@ Deno.serve(async (req) => {
 
         TASK: Generate Code Implementations for: ${langs.join(", ")}.
         
-        You MUST generate ALL VIABLE APPROACHES (at least 3, MAX 5). E.g. Brute Force, Better, Optimize. If there are other distinct approaches (e.g. Iterative vs Recursive), INCLUDE THEM up to 5.
+        You MUST generate ALL VIABLE APPROACHES (at least 3, MAX 5).
+        **ORDER IS CRITICAL**:
+        1. **Optimize / Best Approach** (MUST BE FIRST).
+        2. **Better / Intermediate Approach**.
+        3. **Brute Force / Naive Approach**.
+        4. Others (Iterative/Recursive variants).
 
         JSON Structure:
         {
           "implementations": [
             {
-              "lang": "${langs[0]}",
+              "lang": "${langs[0]}", // MUST be strict lowercase: e.g. "typescript", "java", "python", "cpp"
               "code": [
                 {
-                  "codeType": "descriptive-name-e.g-brute-force-dfs",
+                  "codeType": "optimize", // For the first approach (Best/Optimal)
                   "code": "FUNCTION CODE ONLY",
                   "explanationBefore": "EXTREMELY DETAILED HTML (1000+ words)",
                   "explanationAfter": "HTML content"
+                },
+                {
+                  "codeType": "descriptive-name-e.g-brute-force", // For subsequent approaches
+                  "code": "...",
+                  "explanationBefore": "...",
+                  "explanationAfter": "..."
                 }
                 // ... other approaches
               ]
@@ -198,19 +209,20 @@ Deno.serve(async (req) => {
            - **Style**: Use inline comments
         3. **Starter Code**: Signature ONLY. No logic.
         4. **Reference Code**: If provided, use it for 'optimize' logic.
-        5. **Provide for all languages**: provide java, python, cpp, ts code strictly with detailed comments.
         
         HTML RULES (explanationBefore):
         Use this template exactly:
         ${HTML_TEMPLATE}
 
         **DETAIL LEVEL**:
-        1. **Approach Overview**: ~600-1000 words. **MUST split into multiple \`<p>\` tags**. Max 200 words per paragraph.
-        2. **Intuition**: ~600-1000 words. **MUST split into multiple \`<p>\` tags**. Max 200 words per paragraph. Use Analogies ("Explain like I'm 5").
+        1. **Approach Overview**: ~400-700 words. **MUST split into multiple \`<p>\` tags**. Max 60 words per paragraph.
+        2. **Intuition**: ~400-700 words. **MUST split into multiple \`<p>\` tags**. Max 60 words per paragraph. Use Analogies ("Explain like I'm 5").
         3. **Step-by-step**: Educational. If a step is long, split it.
-        4. **General**: **STRICT RULE**: NO single paragraph should exceed 200 words. Divide and conquer the text.
+        4. **General**: **STRICT RULE**: NO single paragraph should exceed 60 words. Divide and conquer the text.
+        
+        **COMPARISON TABLE UPDATE**:
+        For the **Optimize** approach (which is FIRST), put the Comparison Table HTML in 'explanationAfter'.
 
-        ${target !== "initial" ? "For the LAST approach (optimize), put the Comparison Table HTML in 'explanationAfter'." : ""}
         `;
 
     // --- EXECUTE ---
