@@ -128,7 +128,7 @@ Deno.serve(async (req) => {
             "constraints": ["String array"],
             "io": [{"input": "...", "output": "...", "explanation": "..."}]
           },
-          "test_cases": [{"input": [], "output": null, "description": "...", "isSubmission": false}],
+          "test_cases": [{"input": [1, 2], "output": 3, "description": "...", "isSubmission": false}],
           "input_schema": [{"name": "nums", "type": "number[]", "label": "Numbers"}],
           "metadata": {
             "overview": "2 paragraphs, \\n\\n separated, 220 words each.",
@@ -139,7 +139,10 @@ Deno.serve(async (req) => {
         REQUIREMENTS:
         1. **Comparison Table**: MUST use this EXACT HTML structure:
            ${TABLE_STRUCTURE}
-        2. **Test Cases**: Provide 12 total. Mark the LAST 8 as 'isSubmission: true'.
+        2. **Test Cases**: 
+            - **Input Format**: 'input' MUST be an **ARRAY of values** matching input_schema order. Example: \`[2, [[1,0]]]\`. 
+            - **Do NOT** use an object like \`{"num": 2}\`. IT MUST BE AN ARRAY: \`[2]\`.
+            - Provide 12 total. Mark the LAST 8 as 'isSubmission: true'.
         3. **Metadata**: Overview must be very descriptive.
         `;
 
@@ -168,10 +171,13 @@ Deno.serve(async (req) => {
         }
 
         CRITICAL CODE RULES:
-        1. **FUNCTION ONLY**: Return ONLY the function definition. 
+        1. **FUNCTION ONLY (STRICT)**: 
            - **NO 'class Solution'**. 
+           - **NO 'public class Solution'**.
            - **NO imports**. 
-           - **NO 'public static void'** unless absolutely necessary for a standalone function (prefer minimal signature).
+           - **Return ONLY the standalone function**.
+           - Example Java: \`public boolean canFinish(...) { ... }\` (NOT wrapped in class).
+           - Example C++: \`bool canFinish(...) { ... }\` (NOT wrapped in class).
         2. **Detailed Comments**: Inline comments for complex logic.
         3. **Starter Code**: Signature ONLY. No logic.
         4. **Reference Code**: If provided, use it for 'optimize' logic.
