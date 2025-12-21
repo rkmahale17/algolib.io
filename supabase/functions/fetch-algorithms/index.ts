@@ -178,7 +178,7 @@ Deno.serve(async (req) => {
               "lang": "${langs[0]}",
               "code": [
                 {
-                  "codeType": "${target === "initial" ? "optimize" : "descriptive-name-e.g-brute-force-dfs"}",
+                  "codeType": "${target === "initial" ? "optimize" : "brute-force"}",
                   "code": "FUNCTION CODE ONLY",
                   "explanationBefore": "EXTREMELY DETAILED HTML (1000+ words)",
                   "explanationAfter": "HTML content"
@@ -198,22 +198,20 @@ Deno.serve(async (req) => {
            - **Return ONLY the standalone function**.
            - Example Java: \`public boolean canFinish(...) { ... }\` (NOT wrapped in class).
            - Example C++: \`bool canFinish(...) { ... }\` (NOT wrapped in class).
-        2. **Detailed Comments**: **EXTREME COMMENTING REQUIRED**. 
-           - **Rule**: Explain every 1-2 lines of code. 
-           - **Content**: Explain *WHY* we are doing this, not just what syntax it is. 
-           - **Style**: Use inline comments \`//\` or block comments above the lines.
-        3. **Starter Code**: Signature ONLY.No logic.
-        4. ** Reference Code **: If provided, use it for 'optimize' logic.
+        2. **Detailed Comments**: Inline comments for complex logic.
+        3. **Starter Code**: Signature ONLY. No logic.
+        4. **Reference Code**: If provided, use it for 'optimize' logic.
         
-        HTML RULES(explanationBefore):
+        HTML RULES (explanationBefore):
         Use this template exactly:
         ${HTML_TEMPLATE}
 
-        ** DETAIL LEVEL **:
-    1. ** Approach Overview **: ~600 - 1000 words. ** MUST split into multiple \`<p>\` tags**. Max 250 words per paragraph.
-        2. **Intuition**: ~600-1000 words. **MUST split into multiple \`<p>\` tags**. Max 250 words per paragraph. Use Analogies ("Explain like I'm 5").
-        3. **Step-by-step**: Educational. If a step is long, split it.
-        4. **General**: **STRICT RULE**: NO single paragraph should exceed 250 words. Divide and conquer the text.
+        202
+        203         **DETAIL LEVEL**:
+        204         1. **Approach Overview**: ~600-1000 words. **MUST split into multiple \`<p>\` tags**. Max 250 words per paragraph.
+        205         2. **Intuition**: ~600-1000 words. **MUST split into multiple \`<p>\` tags**. Max 250 words per paragraph. Use Analogies ("Explain like I'm 5").
+        206         3. **Step-by-step**: Educational. If a step is long, split it.
+        207         4. **General**: **STRICT RULE**: NO single paragraph should exceed 250 words. Divide and conquer the text.
 
         ${target !== "initial" ? "For the LAST approach (optimize), put the Comparison Table HTML in 'explanationAfter'." : ""}
         `;
