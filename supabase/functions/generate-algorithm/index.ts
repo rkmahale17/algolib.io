@@ -1,3 +1,4 @@
+
 const corsHeaders = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -15,172 +16,198 @@ Deno.serve(async (req) => {
         if (!apiKey) {
             throw new Error("GEMINI_API_KEY is not set");
         }
-
         if (!topic) {
             throw new Error("Topic is required");
         }
 
-        const BASE_RULES = `
-      You must return strictly valid JSON. Do not include markdown code blocks.
-      
-      Output JSON format:
-      interface Algorithm {
-        id: string; // url-friendly-id
-        title: string;
-        name: string;
-        category: string;
-        difficulty: "easy" | "medium" | "hard";
-        description: string;
-        serial_no: number; // 0 for core algo
-        list_type: "blind75" | "other" | "coreAlgo"; 
-        explanation: {
-          problemStatement: string; // HTML
-          steps: string; // HTML <ol><li>...</li></ol> (GLOBAL steps)
-          useCase: string; // HTML <ul><li>...</li></ul> (5+ items)
-          tips: string; // HTML <ul><li>...</li></ul> (5+ items)
-          comparisonTable: string; // HTML (Table)
-          timeComplexity: string;
-          spaceComplexity: string;
-          constraints: string[];
-          io: Array<{ input: string; output: string; explanation: string; }>;
-        };
-        implementations: Array<{
-          lang: "typescript" | "python" | "java" | "cpp";
-          code: Array<{
-            codeType: "starter" | "brute-force" | "better" | "optimize";
-            code: string;
-            explanationBefore: string; // STRICT HTML TEMPLATE
-            explanationAfter: string;
-          }>;
-        }>;
-        test_cases: Array<{
-          input: any[]; 
-          output: any;
-          description: string;
-          isSubmission?: boolean; // Last 8 tests must be true
-        }>;
-        input_schema: Array<{ name: string; type: string; label: string; }>;
-        metadata: {
-          overview: string; // 2+ paragraphs, approx 220 words each
-          companyTags: string[];
-          likes: number; 
-          dislikes: number; 
-        }
-      }
-
-      CONTENT RULES (Strict):
-      1. **Structure**: 
-         - **Problem Statement**: Use strict HTML.
-         - **Metadata Overview**: MUST be descriptive. Use \\n\\n to separate paragraphs. Approx 220 words per paragraph.
-         - **Use Cases**: AT LEAST 5 items. Format: <ul><li><strong>Domain</strong> - Description.</li></ul>
-         - **Pro Tips**: AT LEAST 5 items. Format: <ul><li>Tip content.</li></ul>
-         - **IO Examples**: 3 clear examples.
-
-      2. **HTML Layout (explanationBefore)**:
-         MUST follow this EXACT structure with <hr/> tags:
-         \`\`\`html
-         <p><strong>Overview:</strong><br /> [Content]</p>
-         <hr />
-         <p><strong>Intuition:</strong><br /> [Content]</p>
-         <hr />
-         <p><strong>Steps to Solve:</strong></p>
-         <ol><li>...</li></ol>
-         <hr />
-         <p>
-           <strong>Time Complexity:</strong> [Complexity]<br>
-           <strong>Space Complexity:</strong> [Complexity]<br>
-           <br>
-           <AlgoLink url="/complexity" className="m-4">Learn Complexity</AlgoLink>
-           <br><br>
-         </p>
-         \`\`\`
-
-      3. **Code Rules (CRITICAL)**:
-         - **ALL 4 Languages**: Generate TypeScript, Python, Java, C++ for EVERY approach.
-         - **NO CLASSES / NO IMPORTS**: Return ONLY the function definition. Do NOT wrap in \`class Solution\`. Do NOT add imports. Just the function.
-         - **Detailed Comments**: Inline comments explaining complex logic.
-         - **Starter Code**: Signature ONLY. No logic.
-         - **Reference Code**: If provided, STRICTLY translate logic to all 4 languages.
-      
-      4. **Requirements**:
-         - **Test Cases**: Provide 12 total. Mark the LAST 8 as \`isSubmission: true\` (Hidden).
-         - **Approaches**: At least 4 for TS. Same count for others.
-         - **Explanation After**: Last approach must contain the \`comparisonTable\` HTML.
-
-      5. **TRUTHFULNESS PROTOCOL**:
-         - NO Hallucinations. Verify complexity. Identical logic across languages.
+        // --- SHARED RULES ---
+        const HTML_TEMPLATE = `
+        <p>[Overview content - NO HEADING]</p>
+        <hr />
+        <p><strong>Intuition:</strong><br /> [Content]</p>
+        <hr />
+        <p><strong>Steps to Solve:</strong></p>
+        <ol><li>...</li></ol>
+        <hr />
+        <p>
+          <strong>Time Complexity:</strong> [Complexity]<br>
+          <strong>Space Complexity:</strong> [Complexity]<br>
+          <br>
+          <AlgoLink url="/complexity" className="m-4">Learn Complexity</AlgoLink>
+          <br><br>
+        </p>
         `;
 
-        const CORE_ALGO_PROMPT = `
-      You are an expert algorithm tutor. Generate a detailed tutorial for the CORE ALGORITHM: "${topic}".
-      
-      Since this is a core algorithm (e.g. Merge Sort, BFS), it may not match a specific LeetCode problem.
-      YOUR TASK:
-      1. **Define the Problem Yourself**: Create a standard "problem statement" for this algorithm. (e.g. "Given an unsorted array, return it sorted.").
-      2. **Define Inputs/Outputs**: Create a logical input schema and test cases.
-      3. **Educational Focus**: Explain HOW it works deeply in the Metadata Overview.
-      
-      ${BASE_RULES}
+        const TABLE_STRUCTURE = `
+        <div className="relative overflow-x-auto w-full">
+          <table className="w-full border-collapse border border-border">
+            <thead>
+              <tr>
+                <th className="border px-4 py-2">Approach</th>
+                <th className="border px-4 py-2">Core Idea</th>
+                <th className="border px-4 py-2">Time Complexity</th>
+                <th className="border px-4 py-2">Space Complexity</th>
+                <th className="border px-4 py-2">When to Use</th>
+                <th className="border px-4 py-2">Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Rows here -->
+            </tbody>
+          </table>
+        </div>
         `;
 
-        const PROBLEM_PROMPT = `
-      You are an expert algorithm tutor. Generate a detailed tutorial for the ALGORITHM TOPIC: "${topic}".
-      
-      IMPORTANT: This is a known LeetCode/Standard problem.
-      YOUR TASK:
-      1. **Match Exact Definition**: The 'problemStatement', 'input_schema', 'constraints', and 'test_cases' MUST EXACTLY MATCH the standard known definition (e.g. from LeetCode).
-      2. **Do NOT Invent**: Do not create your own variation. Use the standard one.
-      
-      ${BASE_RULES}
+        const BASE_SYSTEM_PROMPT = `
+        You are an expert algorithm tutor.
+        TOPIC: "${topic}"
+        MODE: ${mode === 'core' ? 'Core Algorithm (Define problem yourself)' : 'LeetCode Problem (Match standard definition)'}
+        ${referenceCode ? `REFERENCE CODE PROVIDED (Use for Logic): \n${referenceCode}` : ''}
+
+        GENERAL RULES:
+        1. **Truthfulness**: Verify complexity. No hallucinations.
+        2. **HTML**: Use strict HTML for formatted fields.
+        3. **Detailed**: Explanations must be deep and educational.
         `;
 
-        const prompt = mode === "core" ? CORE_ALGO_PROMPT : PROBLEM_PROMPT;
-
-        const finalPrompt = `
-      ${prompt}
-      
-      ${referenceCode ? `
-      CRITICAL - REFERENCE CODE PROVIDED:
-      Use this logic for the 'optimize' approach and global steps:
-      \`\`\`
-      ${referenceCode}
-      \`\`\`
-      ` : ''}
-
-      Output JUST the JSON.
-        `;
-
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: finalPrompt }] }],
-                }),
+        // --- HELPER TO CALL GEMINI ---
+        async function generateChunk(promptText: string) {
+            const response = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: promptText }] }],
+                    }),
+                }
+            );
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`Gemini Error: ${response.status} ${errText}`);
             }
-        );
+            const data = await response.json();
+            let rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (!rawText) return null;
 
-        if (!response.ok) {
-            const errConf = await response.text();
-            throw new Error(`Gemini API Error: ${response.status} ${errConf}`);
+            // cleanup json
+            rawText = rawText.trim();
+            if (rawText.startsWith("```json")) {
+                rawText = rawText.replace(/^```json\s*/, "").replace(/\s*```$/, "");
+            } else if (rawText.startsWith("```")) {
+                rawText = rawText.replace(/^```\s*/, "").replace(/\s*```$/, "");
+            }
+            return JSON.parse(rawText);
         }
 
-        const data = await response.json();
-        const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        // --- CHUNK 1: CORE DATA ---
+        const corePrompt = `
+        ${BASE_SYSTEM_PROMPT}
 
-        if (!rawText) throw new Error("No content generated");
+        TASK: Generate the CORE METADATA and EXPLANATION for this algorithm.
+        Do NOT generate code implementations yet.
 
-        let jsonString = rawText.trim();
-        if (jsonString.startsWith("```json")) {
-            jsonString = jsonString.replace(/^```json\s*/, "").replace(/\s*```$/, "");
-        } else if (jsonString.startsWith("```")) {
-            jsonString = jsonString.replace(/^```\s*/, "").replace(/\s*```$/, "");
+        JSON Structure:
+        {
+          "id": "url-friendly-id",
+          "title": "Title",
+          "name": "Name",
+          "category": "Category",
+          "difficulty": "easy" | "medium" | "hard",
+          "description": "One line description",
+          "serial_no": 0,
+          "list_type": "coreAlgo",
+          "explanation": {
+            "problemStatement": "STRICT HTML",
+            "steps": "HTML <ol><li>Global high level steps</li></ol>",
+            "useCase": "HTML <ul><li><strong>Domain</strong> - Desc</li></ul> (5+ items)",
+            "tips": "HTML <ul><li>Tip</li></ul> (5+ items)",
+            "comparisonTable": "STRICT HTML Table with 6 columns: Approach, Core Idea, Time, Space, When to Use, Notes",
+            "timeComplexity": "O(..)",
+            "spaceComplexity": "O(..)",
+            "constraints": ["String array"],
+            "io": [{"input": "...", "output": "...", "explanation": "..."}]
+          },
+          "test_cases": [{"input": [], "output": null, "description": "...", "isSubmission": false}],
+          "input_schema": [{"name": "nums", "type": "number[]", "label": "Numbers"}],
+          "metadata": {
+            "overview": "2 paragraphs, \\n\\n separated, 220 words each.",
+            "companyTags": [], "likes": 0, "dislikes": 0
+          }
         }
 
-        return new Response(jsonString, {
+        REQUIREMENTS:
+        1. **Comparison Table**: MUST use this EXACT HTML structure:
+           ${TABLE_STRUCTURE}
+        2. **Test Cases**: Provide 12 total. Mark the LAST 8 as 'isSubmission: true'.
+        3. **Metadata**: Overview must be very descriptive.
+        `;
+
+        // --- CHUNK 2 & 3: IMPLEMENTATIONS ---
+        const implsPrompt = (langs: string[]) => `
+        ${BASE_SYSTEM_PROMPT}
+
+        TASK: Generate Code Implementations for: ${langs.join(", ")}.
+        
+        JSON Structure:
+        {
+          "implementations": [
+            {
+              "lang": "${langs[0]}",
+              "code": [
+                {
+                  "codeType": "starter" | "brute-force" | "better" | "optimize",
+                  "code": "FUNCTION CODE ONLY",
+                  "explanationBefore": "HTML content",
+                  "explanationAfter": "HTML content"
+                }
+              ]
+            }
+            // ... repeat for other languages
+          ]
+        }
+
+        CRITICAL CODE RULES:
+        1. **FUNCTION ONLY**: Return ONLY the function definition. 
+           - **NO 'class Solution'**. 
+           - **NO imports**. 
+           - **NO 'public static void'** unless absolutely necessary for a standalone function (prefer minimal signature).
+        2. **Detailed Comments**: Inline comments for complex logic.
+        3. **Starter Code**: Signature ONLY. No logic.
+        4. **Reference Code**: If provided, use it for 'optimize' logic.
+        
+        HTML RULES (explanationBefore):
+        Use this template exactly (NO 'Overview' heading):
+        ${HTML_TEMPLATE}
+
+        For the LAST approach (optimize), put the Comparison Table HTML in 'explanationAfter'.
+        `;
+
+        // --- EXECUTE PARALLEL ---
+        console.log("Starting Chunked Generation...");
+        const [coreData, implsPart1, implsPart2] = await Promise.all([
+            generateChunk(corePrompt),
+            generateChunk(implsPrompt(["typescript", "python"])),
+            generateChunk(implsPrompt(["java", "cpp"]))
+        ]);
+
+        if (!coreData || !implsPart1 || !implsPart2) {
+            throw new Error("Failed to generate one or more chunks.");
+        }
+
+        // --- MERGE ---
+        const finalJson = {
+            ...coreData,
+            implementations: [
+                ...(implsPart1.implementations || []),
+                ...(implsPart2.implementations || [])
+            ]
+        };
+
+        return new Response(JSON.stringify(finalJson), {
             headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
+
     } catch (error) {
         console.error("Error in generate-algorithm:", error);
         return new Response(JSON.stringify({ error: (error as Error).message }), {
