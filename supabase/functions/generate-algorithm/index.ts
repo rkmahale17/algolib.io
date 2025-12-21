@@ -1,6 +1,3 @@
-
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
 const corsHeaders = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -176,16 +173,16 @@ Deno.serve(async (req) => {
 
         let jsonString = rawText.trim();
         if (jsonString.startsWith("```json")) {
-            jsonString = jsonString.replace(/^```json/, "").replace(/```$/, "");
+            jsonString = jsonString.replace(/^```json\s*/, "").replace(/\s*```$/, "");
         } else if (jsonString.startsWith("```")) {
-            jsonString = jsonString.replace(/^```/, "").replace(/```$/, "");
+            jsonString = jsonString.replace(/^```\s*/, "").replace(/\s*```$/, "");
         }
 
         return new Response(jsonString, {
             headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
     } catch (error) {
-        console.error(error);
+        console.error("Error in generate-algorithm:", error);
         return new Response(JSON.stringify({ error: (error as Error).message }), {
             headers: { ...corsHeaders, "Content-Type": "application/json" },
             status: 500,
