@@ -23,12 +23,19 @@ Deno.serve(async (req) => {
 
     // --- SHARED RULES ---
     const HTML_TEMPLATE = `
-        <p>[Deep dive introduction - ~600 words]</p>
+        <p><strong>Approach Overview:</strong></p>
+        <p>[Deep dive introduction part 1 (max 250 words)]</p>
+        <p>[Deep dive introduction part 2...]</p>
         <hr />
-        <p><strong>Intuition:</strong><br /> [Analogy & Theory - ~600 words]</p>
+        <p><strong>Intuition:</strong></p>
+        <p>[Analogy & Theory part 1 (max 250 words)]</p>
+        <p>[Analogy & Theory part 2...]</p>
         <hr />
         <p><strong>Step-by-step thinking:</strong></p>
-        <ol><li>...</li></ol>
+        <ol>
+           <li><p>[Detailed step explanation (max 250 words)]</p></li>
+           <li>...</li>
+        </ol>
         <hr />
         <p>
           <strong>Time Complexity:</strong> [Complexity]<br>
@@ -144,10 +151,10 @@ Deno.serve(async (req) => {
             - **Input Format**: 'input' MUST be an **ARRAY of values** matching input_schema order. Example: \`[2, [[1,0]]]\`. 
             - **Do NOT** use an object like \`{"num": 2}\`. IT MUST BE AN ARRAY: \`[2]\`.
             - Provide 12 total. Mark the LAST 8 as 'isSubmission: true'.
-        3. **Metadata**: Overview must be **Max 600 words**. 
-           - **Structure**: Split into **two distinct paragraphs**. The first paragraph should end around 300 words.
-           - **Style Guide**: Start with a clear classification (e.g. "Classic graph problem..."). Explain the Core Idea (e.g. "Revolves around Topological Sort").
-           - **Content**: Explain history, real-world applications, and variations.
+        3. **Metadata**: Overview must be **Detailed**. 
+           - **Structure**: Use multiple \`<p>\` tags. 
+           - **Paragraph Rule**: **MAX 250 WORDS per paragraph**. Split content logically.
+           - **Content**: Start with classification, then history/applications. Total length ~600 words.
            - **Tone**: Educational, clear, professional.
         `;
 
@@ -171,7 +178,7 @@ Deno.serve(async (req) => {
               "lang": "${langs[0]}",
               "code": [
                 {
-                  "codeType": "${target === 'initial' ? 'optimize' : 'brute-force'}",
+                  "codeType": "${target === 'initial' ? 'optimize' : 'descriptive-name-e.g-brute-force-dfs'}",
                   "code": "FUNCTION CODE ONLY",
                   "explanationBefore": "EXTREMELY DETAILED HTML (1000+ words)",
                   "explanationAfter": "HTML content"
@@ -191,19 +198,22 @@ Deno.serve(async (req) => {
            - **Return ONLY the standalone function**.
            - Example Java: \`public boolean canFinish(...) { ... }\` (NOT wrapped in class).
            - Example C++: \`bool canFinish(...) { ... }\` (NOT wrapped in class).
-        2. **Detailed Comments**: Inline comments for complex logic.
-        3. **Starter Code**: Signature ONLY. No logic.
-        4. **Reference Code**: If provided, use it for 'optimize' logic.
+        2. **Detailed Comments**: **EXTREME COMMENTING REQUIRED**. 
+           - **Rule**: Explain every 1-2 lines of code. 
+           - **Content**: Explain *WHY* we are doing this, not just what syntax it is. 
+           - **Style**: Use inline comments (`//`) or block comments above the lines.
+    3. ** Starter Code **: Signature ONLY.No logic.
+        4. ** Reference Code **: If provided, use it for 'optimize' logic.
         
-        HTML RULES (explanationBefore):
+        HTML RULES(explanationBefore):
         Use this template exactly:
-        ${HTML_TEMPLATE}
+        ${ HTML_TEMPLATE }
 
-        **DETAIL LEVEL**:
-        1. **Approach Overview**: MUST be **~600 words**. Explain HOW this approach works in detail.
-        2. **Intuition**: MUST be **~600 words**. Use a **Human Analogy** or Metaphor. Explain it like the user is 5 years old. (e.g. "Think of this as organizing a deck of cards...").
-        3. **Step-by-step**: **EXTREMELY WORDY and EDUCATIONAL**. Explain *why* taking a step is necessary.
-        4. **General**: Avoid brief summaries. Go deep. Use real-world logic.
+        ** DETAIL LEVEL **:
+    1. ** Approach Overview **: ~600 - 1000 words. ** MUST split into multiple \`<p>\` tags**. Max 250 words per paragraph.
+        2. **Intuition**: ~600-1000 words. **MUST split into multiple \`<p>\` tags**. Max 250 words per paragraph. Use Analogies ("Explain like I'm 5").
+        3. **Step-by-step**: Educational. If a step is long, split it.
+        4. **General**: **STRICT RULE**: NO single paragraph should exceed 250 words. Divide and conquer the text.
 
         ${target !== 'initial' ? "For the LAST approach (optimize), put the Comparison Table HTML in 'explanationAfter'." : ''}
         `;
