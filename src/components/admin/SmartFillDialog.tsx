@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,16 +11,27 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Sparkles, Wand2, Loader2, FileJson, Copy } from "lucide-react";
+import { Sparkles, Wand2, Loader2, FileJson, Copy, CheckSquare, Square } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Card, CardContent } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface SmartFillDialogProps {
   onFill: (data: any) => void;
 }
+
+const FIELD_GROUPS = [
+  { id: "basic", label: "Basic Info (Title, Category, Difficulty, etc.)", keys: ["title", "name", "category", "difficulty", "description", "serial_no", "list_type", "id"] },
+  { id: "problem", label: "Problem Details (Statement, Steps, Use Cases, Tips, Table)", keys: ["explanation"] },
+  { id: "code", label: "Code Implementations", keys: ["implementations"] },
+  { id: "tests", label: "Test Cases & Schema", keys: ["test_cases", "input_schema"] },
+  { id: "meta", label: "Metadata (Tags, Likes)", keys: ["metadata"] },
+];
 
 export function SmartFillDialog({ onFill }: SmartFillDialogProps) {
   const [open, setOpen] = useState(false);
@@ -32,9 +44,20 @@ export function SmartFillDialog({ onFill }: SmartFillDialogProps) {
   const [topic, setTopic] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedData, setGeneratedData] = useState<any>(null);
+  
+  // Selection State
+  const [selectedGroups, setSelectedGroups] = useState<string[]>(FIELD_GROUPS.map(g => g.id));
+
+  const toggleGroup = (groupId: string) => {
+    setSelectedGroups(prev => 
+      prev.includes(groupId) 
+        ? prev.filter(id => id !== groupId)
+        : [...prev, groupId]
+    );
+  };
 
   const handleFill = (dataToFill: any = null) => {
-    const data = dataToFill || (activeTab === "paste" ? parseAlgorithmData(input) : generatedData);
+    let data = dataToFill || (activeTab === "paste" ? parseAlgorithmData(input) : generatedData);
     
     if (!data) {
         toast.error("No data to fill");
@@ -43,15 +66,36 @@ export function SmartFillDialog({ onFill }: SmartFillDialogProps) {
 
     try {
       // If we are parsing raw input (Paste tab), parse it first
-      const finalData = (activeTab === "paste" && typeof data === 'string') 
+      const rawData = (activeTab === "paste" && typeof data === 'string') 
         ? parseAlgorithmData(input) 
         : data;
+
+      // Filter data based on selection if in Generate mode (or even paste mode if we want to apply it there too, 
+      // but usually paste is "take all". Let's apply selection logic only if we showed the selection UI, which describes "generatedData").
+      // For now, let's apply strict filtering if we have generatedData.
+      
+      let finalData = { ...rawData };
+      
+      if (generatedData) {
+         finalData = {}; // Start empty and push selected
+         FIELD_GROUPS.forEach(group => {
+            if (selectedGroups.includes(group.id)) {
+               group.keys.forEach(key => {
+                  if (rawData[key] !== undefined) {
+                     finalData[key] = rawData[key];
+                  }
+               });
+            }
+         });
+      }
 
       onFill(finalData);
       setOpen(false);
       setInput("");
       setGeneratedData(null);
       setTopic("");
+      // Reset selection
+      setSelectedGroups(FIELD_GROUPS.map(g => g.id)); 
       toast.success("Form filled successfully!");
     } catch (error) {
        // Error handled in parseAlgorithmData or here
@@ -77,7 +121,9 @@ export function SmartFillDialog({ onFill }: SmartFillDialogProps) {
 
       console.log("Generated Data:", data);
       setGeneratedData(data);
-      toast.success("Algorithm generated successfully! Review below.");
+      // Ensure all selected by default on new generation
+      setSelectedGroups(FIELD_GROUPS.map(g => g.id)); 
+      toast.success("Algorithm generated! Please review and select fields.");
     } catch (error) {
       console.error("Generation Error:", error);
       toast.error("Failed to generate algorithm. Check console for details.");
@@ -94,7 +140,7 @@ export function SmartFillDialog({ onFill }: SmartFillDialogProps) {
           Smart Fill
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[700px] h-[80vh] flex flex-col">
+      <DialogContent className="sm:max-w-[800px] h-[85vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-purple-500" />
@@ -128,12 +174,13 @@ export function SmartFillDialog({ onFill }: SmartFillDialogProps) {
             </TabsContent>
 
             <TabsContent value="generate" className="h-full mt-0 flex flex-col gap-4">
-               <div className="flex gap-2 items-end">
+               {/* Search Bar */}
+               <div className="flex gap-2 items-end shrink-0">
                   <div className="flex-1 space-y-2">
-                    <Label htmlFor="topic">Algorithm Name / Topic</Label>
+                    <Label htmlFor="topic">Algorithm Name / LeetCode ID</Label>
                     <Input 
                         id="topic"
-                        placeholder="e.g. Merge Sort, Dijkstra's Algorithm, 3Sum" 
+                        placeholder="e.g. Merge Sort, two-sum, 3Sum" 
                         value={topic}
                         onChange={(e) => setTopic(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleGenerate()}
@@ -154,46 +201,88 @@ export function SmartFillDialog({ onFill }: SmartFillDialogProps) {
                   </Button>
                </div>
 
-               {generatedData && (
-                 <div className="flex-1 border rounded-md p-4 bg-muted/30 overflow-auto space-y-2">
-                    <div className="flex items-center justify-between">
-                         <h4 className="font-semibold text-sm flex items-center gap-2">
-                            <FileJson className="h-4 w-4 text-green-500" />
-                            Generated Result
-                         </h4>
-                         <span className="text-xs text-muted-foreground">{generatedData.implementations?.[0]?.code?.length || 0} approaches found</span>
+               {/* Results Area */}
+               {generatedData ? (
+                 <div className="flex-1 flex flex-col min-h-0 gap-4">
+                    <div className="bg-muted/30 border rounded-md p-3">
+                        <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
+                            <CheckSquare className="h-4 w-4" />
+                            Select Fields to Apply
+                        </h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {FIELD_GROUPS.map(group => (
+                                <div key={group.id} className="flex items-start space-x-2">
+                                    <Checkbox 
+                                        id={group.id} 
+                                        checked={selectedGroups.includes(group.id)}
+                                        onCheckedChange={() => toggleGroup(group.id)}
+                                    />
+                                    <div className="grid gap-1.5 leading-none">
+                                        <label
+                                            htmlFor={group.id}
+                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                                        >
+                                            {group.label}
+                                        </label>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                    <pre className="text-xs font-mono whitespace-pre-wrap text-muted-foreground">
-                        {JSON.stringify(generatedData, null, 2)}
-                    </pre>
-                 </div>
-               )}
 
-                {!generatedData && !isGenerating && (
+                    <div className="flex-1 border rounded-md bg-muted/10 flex flex-col min-h-0">
+                        <div className="p-2 border-b bg-muted/20 text-xs font-semibold text-muted-foreground flex justify-between items-center">
+                             <span>Preview Generated JSON</span>
+                             <span className="text-[10px] bg-background border px-1.5 py-0.5 rounded-full">
+                                {generatedData.implementations?.[0]?.code?.length || 0} approaches
+                             </span>
+                        </div>
+                        <ScrollArea className="flex-1">
+                            <pre className="p-4 text-xs font-mono whitespace-pre-wrap text-muted-foreground">
+                                {JSON.stringify(generatedData, null, 2)}
+                            </pre>
+                        </ScrollArea>
+                    </div>
+                 </div>
+               ) : (
+                 !isGenerating && (
                     <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground bg-muted/10 rounded-md border-dashed border">
                         <Wand2 className="h-8 w-8 mb-2 opacity-20" />
-                        <p className="text-sm">Enter a topic and click Generate</p>
+                        <p className="text-sm">Enter a topic (e.g. "Two Sum") and click Generate</p>
+                        <p className="text-xs text-muted-foreground/60 mt-1 max-w-xs text-center">
+                            AI will search for the exact LeetCode problem details and formatting.
+                        </p>
                     </div>
-                )}
+                 )
+               )}
             </TabsContent>
           </div>
         </Tabs>
 
-        <DialogFooter className="mt-auto pt-4 border-t">
+        <DialogFooter className="pt-4 border-t mt-auto">
           <Button variant="outline" onClick={() => setOpen(false)}>
             Cancel
           </Button>
           <Button 
             onClick={() => handleFill(activeTab === 'generate' ? generatedData : null)} 
             disabled={activeTab === 'generate' ? !generatedData : !input.trim()}
+            className="gap-2"
           >
-            Fill Form
+            {activeTab === 'generate' ? (
+                <>
+                    <Sparkles className="h-4 w-4" />
+                    Apply Selected ({selectedGroups.length})
+                </>
+            ) : (
+                "Fill Form"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 }
+
 
 // TODO: Refine this parser based on user's specific text format
 function parseAlgorithmData(input: string): any {
