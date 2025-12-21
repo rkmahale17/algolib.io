@@ -40,8 +40,10 @@ export function SmartFillDialog({ onFill }: SmartFillDialogProps) {
   // Paste Tab State
   const [input, setInput] = useState("");
   
+
   // Generate Tab State
   const [topic, setTopic] = useState("");
+  const [referenceCode, setReferenceCode] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedData, setGeneratedData] = useState<any>(null);
   
@@ -94,6 +96,7 @@ export function SmartFillDialog({ onFill }: SmartFillDialogProps) {
       setInput("");
       setGeneratedData(null);
       setTopic("");
+      setReferenceCode("");
       // Reset selection
       setSelectedGroups(FIELD_GROUPS.map(g => g.id)); 
       toast.success("Form filled successfully!");
@@ -114,7 +117,7 @@ export function SmartFillDialog({ onFill }: SmartFillDialogProps) {
 
     try {
       const { data, error } = await supabase.functions.invoke("generate-algorithm", {
-        body: { topic },
+        body: { topic, referenceCode },
       });
 
       if (error) throw error;
@@ -176,6 +179,7 @@ export function SmartFillDialog({ onFill }: SmartFillDialogProps) {
             <TabsContent value="generate" className="h-full mt-0 flex flex-col gap-4">
                {/* Search Bar */}
                <div className="flex gap-2 items-end shrink-0">
+
                   <div className="flex-1 space-y-2">
                     <Label htmlFor="topic">Algorithm Name / LeetCode ID</Label>
                     <Input 
@@ -185,6 +189,16 @@ export function SmartFillDialog({ onFill }: SmartFillDialogProps) {
                         onChange={(e) => setTopic(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleGenerate()}
                     />
+                  </div>
+                  <div className="flex-1 space-y-2">
+                     <Label htmlFor="referenceCode">Reference Code (Optional)</Label>
+                     <Textarea
+                        id="referenceCode"
+                        placeholder="Paste optimized code (Python/JS/etc) here. AI will use this logic for the 'optimize' approach."
+                        value={referenceCode}
+                        onChange={(e) => setReferenceCode(e.target.value)}
+                        className="font-mono text-xs h-24 resize-y"
+                     />
                   </div>
                   <Button onClick={handleGenerate} disabled={isGenerating} className="gap-2 min-w-[120px]">
                     {isGenerating ? (
