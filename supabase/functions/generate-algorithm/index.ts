@@ -1,32 +1,33 @@
 
 const corsHeaders = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 Deno.serve(async (req) => {
-    if (req.method === "OPTIONS") {
-        return new Response("ok", { headers: corsHeaders });
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+
+  try {
+    // target: "all" (default) | "initial" | "enrichment"
+    const { topic, referenceCode, mode = "problem", target = "all" } = await req.json();
+    const apiKey = Deno.env.get("GEMINI_API_KEY");
+
+    if (!apiKey) {
+      throw new Error("GEMINI_API_KEY is not set");
+    }
+    if (!topic) {
+      throw new Error("Topic is required");
     }
 
-    try {
-        const { topic, referenceCode, mode = "problem" } = await req.json(); // mode: "problem" | "core"
-        const apiKey = Deno.env.get("GEMINI_API_KEY");
-
-        if (!apiKey) {
-            throw new Error("GEMINI_API_KEY is not set");
-        }
-        if (!topic) {
-            throw new Error("Topic is required");
-        }
-
-        // --- SHARED RULES ---
-        const HTML_TEMPLATE = `
+    // --- SHARED RULES ---
+    const HTML_TEMPLATE = `
         <p>[Overview content - NO HEADING]</p>
         <hr />
         <p><strong>Intuition:</strong><br /> [Content]</p>
         <hr />
-        <p><strong>Steps to Solve:</strong></p>
+        <p><strong>Step-by-step thinking:</strong></p>
         <ol><li>...</li></ol>
         <hr />
         <p>
@@ -38,7 +39,7 @@ Deno.serve(async (req) => {
         </p>
         `;
 
-        const TABLE_STRUCTURE = `
+    const TABLE_STRUCTURE = `
         <div className="relative overflow-x-auto w-full">
           <table className="w-full border-collapse border border-border">
             <thead>
@@ -58,7 +59,7 @@ Deno.serve(async (req) => {
         </div>
         `;
 
-        const BASE_SYSTEM_PROMPT = `
+    const BASE_SYSTEM_PROMPT = `
         You are an expert algorithm tutor.
         TOPIC: "${topic}"
         MODE: ${mode === 'core' ? 'Core Algorithm (Define problem yourself)' : 'LeetCode Problem (Match standard definition)'}
@@ -70,41 +71,42 @@ Deno.serve(async (req) => {
         3. **Detailed**: Explanations must be deep and educational.
         `;
 
-        // --- HELPER TO CALL GEMINI ---
-        async function generateChunk(promptText: string) {
-            const response = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: promptText }] }],
-                    }),
-                }
-            );
-            if (!response.ok) {
-                const errText = await response.text();
-                throw new Error(`Gemini Error: ${response.status} ${errText}`);
-            }
-            const data = await response.json();
-            let rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (!rawText) return null;
-
-            // cleanup json
-            rawText = rawText.trim();
-            if (rawText.startsWith("```json")) {
-                rawText = rawText.replace(/^```json\s*/, "").replace(/\s*```$/, "");
-            } else if (rawText.startsWith("```")) {
-                rawText = rawText.replace(/^```\s*/, "").replace(/\s*```$/, "");
-            }
-            return JSON.parse(rawText);
+    // --- HELPER TO CALL GEMINI ---
+    async function generateChunk(promptText: string) {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: promptText }] }],
+          }),
         }
+      );
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`Gemini Error: ${response.status} ${errText}`);
+      }
+      const data = await response.json();
+      let rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!rawText) return null;
 
-        // --- CHUNK 1: CORE DATA ---
-        const corePrompt = `
+      // cleanup json
+      rawText = rawText.trim();
+      if (rawText.startsWith("```json")) {
+        rawText = rawText.replace(/^```json\s*/, "").replace(/\s*```$/, "");
+      } else if (rawText.startsWith("```")) {
+        rawText = rawText.replace(/^```\s*/, "").replace(/\s*```$/, "");
+      }
+      return JSON.parse(rawText);
+    }
+
+    // --- CHUNK 1: CORE DATA PROMPT ---
+    const corePrompt = `
         ${BASE_SYSTEM_PROMPT}
 
         TASK: Generate the CORE METADATA and EXPLANATION for this algorithm.
+        ${target === 'enrichment' ? 'Generate ONLY the Comparison Table. Other keys optional/null.' : 'Generate COMPLETE metadata.'}
         Do NOT generate code implementations yet.
 
         JSON Structure:
@@ -122,7 +124,7 @@ Deno.serve(async (req) => {
             "steps": "HTML <ol><li>Global high level steps</li></ol>",
             "useCase": "HTML <ul><li><strong>Domain</strong> - Desc</li></ul> (5+ items)",
             "tips": "HTML <ul><li>Tip</li></ul> (5+ items)",
-            "comparisonTable": "STRICT HTML Table with 6 columns: Approach, Core Idea, Time, Space, When to Use, Notes",
+            "comparisonTable": ${target === 'initial' ? 'null' : `"STRICT HTML Table with 6 columns: Approach, Core Idea, Time, Space, When to Use, Notes"`},
             "timeComplexity": "O(..)",
             "spaceComplexity": "O(..)",
             "constraints": ["String array"],
@@ -131,27 +133,36 @@ Deno.serve(async (req) => {
           "test_cases": [{"input": [1, 2], "output": 3, "description": "...", "isSubmission": false}],
           "input_schema": [{"name": "nums", "type": "number[]", "label": "Numbers"}],
           "metadata": {
-            "overview": "2 paragraphs, \\n\\n separated, 220 words each.",
+            "overview": "EXTREMELY DETAILED GUIDE. Approx 600 words. Deep dive into theory.",
             "companyTags": [], "likes": 0, "dislikes": 0
           }
         }
 
         REQUIREMENTS:
-        1. **Comparison Table**: MUST use this EXACT HTML structure:
-           ${TABLE_STRUCTURE}
+        ${target !== 'initial' ? `1. **Comparison Table**: MUST use this EXACT HTML structure: \n ${TABLE_STRUCTURE}` : ''}
         2. **Test Cases**: 
             - **Input Format**: 'input' MUST be an **ARRAY of values** matching input_schema order. Example: \`[2, [[1,0]]]\`. 
             - **Do NOT** use an object like \`{"num": 2}\`. IT MUST BE AN ARRAY: \`[2]\`.
             - Provide 12 total. Mark the LAST 8 as 'isSubmission: true'.
-        3. **Metadata**: Overview must be very descriptive.
+        3. **Metadata**: Overview must be a **Comprehensive Deep Dive** (approx 600 words). 
+           - **Style Guide**: Start with a clear classification (e.g. "Classic graph problem..."). Explain the Core Idea (e.g. "Revolves around Topological Sort").
+           - **Content**: Then expand on history, real-world applications, and variations to reach the word count.
+           - **Tone**: Educational, clear, professional.
         `;
 
-        // --- CHUNK 2 & 3: IMPLEMENTATIONS ---
-        const implsPrompt = (langs: string[]) => `
+    // --- CHUNK 2 & 3: IMPLEMENTATIONS PROMPT ---
+    const implsPrompt = (langs: string[]) => `
         ${BASE_SYSTEM_PROMPT}
 
         TASK: Generate Code Implementations for: ${langs.join(", ")}.
         
+        ${target === 'initial'
+        ? 'You MUST generate ONLY the **Optimize** approach.'
+        : target === 'enrichment'
+          ? 'You MUST generate the **Brute Force** and **Better** approaches (if applicable). DO NOT generate Optimize again.'
+          : 'You MUST generate AT LEAST 3 APPROACHES: Brute Force, Better, Optimize.'
+      }
+
         JSON Structure:
         {
           "implementations": [
@@ -159,11 +170,12 @@ Deno.serve(async (req) => {
               "lang": "${langs[0]}",
               "code": [
                 {
-                  "codeType": "starter" | "brute-force" | "better" | "optimize",
+                  "codeType": "${target === 'initial' ? 'optimize' : 'brute-force'}",
                   "code": "FUNCTION CODE ONLY",
-                  "explanationBefore": "HTML content",
+                  "explanationBefore": "EXTREMELY DETAILED HTML (300+ words)",
                   "explanationAfter": "HTML content"
                 }
+                // ... other approaches
               ]
             }
             // ... repeat for other languages
@@ -186,39 +198,82 @@ Deno.serve(async (req) => {
         Use this template exactly (NO 'Overview' heading):
         ${HTML_TEMPLATE}
 
-        For the LAST approach (optimize), put the Comparison Table HTML in 'explanationAfter'.
+        **DETAIL LEVEL**:
+        - "Intuition": MUST use a **Human Analogy** or Metaphor. Explain it like the user is 5 years old. (e.g. "Think of this as organizing a deck of cards...").
+        - "Step-by-step": **EXTREMELY WORDY and EDUCATIONAL**. Explain *why* taking a step is necessary.
+        - Avoid brief summaries. Go deep. Use real-world logic.
+
+        ${target !== 'initial' ? "For the LAST approach (optimize), put the Comparison Table HTML in 'explanationAfter'." : ''}
         `;
 
-        // --- EXECUTE PARALLEL ---
-        console.log("Starting Chunked Generation...");
-        const [coreData, implsPart1, implsPart2] = await Promise.all([
-            generateChunk(corePrompt),
-            generateChunk(implsPrompt(["typescript", "python"])),
-            generateChunk(implsPrompt(["java", "cpp"]))
-        ]);
+    // --- EXECUTE BASED ON TARGET ---
+    console.log(`Starting Chunked Generation (${target})...`);
 
-        if (!coreData || !implsPart1 || !implsPart2) {
-            throw new Error("Failed to generate one or more chunks.");
-        }
+    let coreData = null;
+    let implsPart1 = null;
+    let implsPart2 = null;
 
-        // --- MERGE ---
-        const finalJson = {
-            ...coreData,
-            implementations: [
-                ...(implsPart1.implementations || []),
-                ...(implsPart2.implementations || [])
-            ]
-        };
-
-        return new Response(JSON.stringify(finalJson), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-
-    } catch (error) {
-        console.error("Error in generate-algorithm:", error);
-        return new Response(JSON.stringify({ error: (error as Error).message }), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-            status: 500,
-        });
+    if (target === "all") {
+      [coreData, implsPart1, implsPart2] = await Promise.all([
+        generateChunk(corePrompt),
+        generateChunk(implsPrompt(["typescript", "python"])),
+        generateChunk(implsPrompt(["java", "cpp"]))
+      ]);
+    } else if (target === "initial") {
+      // Initial: Core Data (No Table) + Optimized Impls
+      [coreData, implsPart1, implsPart2] = await Promise.all([
+        generateChunk(corePrompt),
+        generateChunk(implsPrompt(["typescript", "python"])),
+        generateChunk(implsPrompt(["java", "cpp"]))
+      ]);
+    } else if (target === "enrichment") {
+      // Enrichment: Table Only + Brute/Better Impls
+      // We still request 'corePrompt' but it only returns the Explanation block with Table
+      // NOTE: We merge coreData 'explanation.comparisonTable' later
+      [coreData, implsPart1, implsPart2] = await Promise.all([
+        generateChunk(corePrompt),
+        generateChunk(implsPrompt(["typescript", "python"])),
+        generateChunk(implsPrompt(["java", "cpp"]))
+      ]);
     }
+
+    if ((target !== 'enrichment' && !coreData)) throw new Error("Failed to generate Core Data.");
+    if ((!implsPart1 || !implsPart2)) throw new Error("Failed to generate Implementations.");
+
+    // --- MERGE ---
+    let finalJson: any = {};
+
+    if (target === "all" || target === "initial") {
+      finalJson = {
+        ...coreData,
+        implementations: [
+          ...(implsPart1.implementations || []),
+          ...(implsPart2.implementations || [])
+        ]
+      };
+    } else if (target === "enrichment") {
+      // For enrichment, we return a merged structure that frontend can merge
+      finalJson = {
+        // If coreData returns comparisonTable, include it
+        explanation: {
+          comparisonTable: coreData?.explanation?.comparisonTable || ""
+        },
+        implementations: [
+          ...(implsPart1.implementations || []),
+          ...(implsPart2.implementations || [])
+        ]
+      };
+    }
+
+    return new Response(JSON.stringify(finalJson), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+
+  } catch (error) {
+    console.error("Error in generate-algorithm:", error);
+    return new Response(JSON.stringify({ error: (error as Error).message }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500,
+    });
+  }
 });
