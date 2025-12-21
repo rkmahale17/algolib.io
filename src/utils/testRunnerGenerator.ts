@@ -50,10 +50,8 @@ const formatValue = (value: any, type: string, lang: Language, targetJavaType?: 
                 return `Arrays.asList(${value.join(', ')})`;
             }
 
-            if (value.length > 0 && typeof value[0] === 'string') {
-                return `new String[]{${value.map(v => JSON.stringify(v)).join(', ')}}`;
-            }
-            return `new int[]{${value.join(', ')}}`;
+            // Detect dimensions and type for Java Array
+            return formatJavaArrayLiteral(value);
         }
         if (lang === 'cpp') {
             // Basic vector syntax
@@ -65,13 +63,56 @@ const formatValue = (value: any, type: string, lang: Language, targetJavaType?: 
             if (targetJavaType && targetJavaType.includes('List')) {
                 return `Arrays.asList(${value.join(', ')})`;
             }
-            return `new int[]{${value.join(', ')}}`;
+            return formatJavaArrayLiteral(value);
         }
         if (lang === 'cpp') return `{${value.join(', ')}}`;
         return `[${value.join(', ')}]`;
     }
     return String(value);
 };
+
+// Helper: Recursively formats Java array literals
+// Handles int[], int[][], String[], String[][], char[][] etc.
+const formatJavaArrayLiteral = (arr: any[]): string => {
+    if (!Array.isArray(arr)) return String(arr); // Should not happen given usage, but safe guard
+
+    // 1. Determine base type and dimensions
+    let dimensions = 0;
+    let current = arr;
+    while (Array.isArray(current) && current.length > 0) {
+        dimensions++;
+        current = current[0];
+    }
+    // If empty array, default to int[] (or we need context, but int[] is safe for empty usually)
+    if (dimensions === 0 && Array.isArray(arr)) {
+        return 'new int[]{}';
+    }
+
+    let type = 'int';
+    if (typeof current === 'string') type = 'String';
+    if (typeof current === 'boolean') type = 'boolean';
+    // Add other types if needed (char, double etc)
+
+    // Construct the "new Type[][]..." prefix
+    const brackets = '[]'.repeat(dimensions);
+
+    // Recursive content generation
+    const generateContent = (a: any[]): string => {
+        if (a.length === 0) return '{}';
+        if (!Array.isArray(a[0])) {
+            // Leaf array
+            if (type === 'String') {
+                return `{${a.map(v => JSON.stringify(v)).join(', ')}}`;
+            }
+            return `{${a.join(', ')}}`;
+        }
+        // Nested array
+        return `{${a.map((sub: any) => generateContent(sub)).join(', ')}}`;
+    };
+
+    return `new ${type}${brackets}${generateContent(arr)}`;
+};
+
 
 const jsonToPython = (val: any): string => {
     if (val === null) return 'None';
@@ -294,14 +335,10 @@ const generateJavaRunner = (
 
 
     // Helper to infer Java literal from value
+    // Replaced by global formatJavaArrayLiteral for recursion support
     const toJavaLiteral = (val: any): string => {
         if (Array.isArray(val)) {
-            // Heuristic for array type
-            if (val.length > 0 && typeof val[0] === 'string') {
-                return `new String[]{${val.map(v => JSON.stringify(v)).join(', ')}}`;
-            }
-            // default to int array
-            return `new int[]{${val.join(', ')}}`;
+            return formatJavaArrayLiteral(val);
         }
         if (typeof val === 'string') return JSON.stringify(val);
         return String(val);
@@ -332,6 +369,10 @@ const generateJavaRunner = (
                     passed = Arrays.equals((int[])expected, (int[])actual);
                 } else if (expected instanceof String[] && actual instanceof String[]) {
                     passed = Arrays.equals((String[])expected, (String[])actual);
+                } else if (expected instanceof int[][] && actual instanceof int[][]) {
+                    passed = Arrays.deepEquals((int[][])expected, (int[][])actual);
+                } else if (expected instanceof String[][] && actual instanceof String[][]) {
+                    passed = Arrays.deepEquals((String[][])expected, (String[][])actual);
                 } else {
                     passed = Objects.equals(expected, actual);
                 }
@@ -339,10 +380,14 @@ const generateJavaRunner = (
                 String formattedExpected = String.valueOf(expected);
                 if (expected instanceof int[]) formattedExpected = Arrays.toString((int[])expected);
                 if (expected instanceof String[]) formattedExpected = Arrays.toString((String[])expected);
+                if (expected instanceof int[][]) formattedExpected = Arrays.deepToString((int[][])expected);
+                if (expected instanceof String[][]) formattedExpected = Arrays.deepToString((String[][])expected);
                 
                 String formattedActual = String.valueOf(actual);
                 if (actual instanceof int[]) formattedActual = Arrays.toString((int[])actual);
                 if (actual instanceof String[]) formattedActual = Arrays.toString((String[])actual);
+                if (actual instanceof int[][]) formattedActual = Arrays.deepToString((int[][])actual);
+                if (actual instanceof String[][]) formattedActual = Arrays.deepToString((String[][])actual);
                 
                 System.out.print("{");
                 System.out.print("\\"status\\":\\"" + (passed ? "pass" : "fail") + "\\",");

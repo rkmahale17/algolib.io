@@ -1,3 +1,4 @@
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -9,8 +10,8 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // target: "all" (default) | "initial" | "enrichment"
-    const { topic, referenceCode, mode = "problem", target = "all" } = await req.json();
+    // target: "all" (default) | "add_approaches"
+    const { topic, referenceCode, userPrompt, existingApproaches = [], approachCount = 2, mode = "problem", target = "all" } = await req.json();
     const apiKey = Deno.env.get("GEMINI_API_KEY");
 
     if (!apiKey) {
@@ -22,7 +23,6 @@ Deno.serve(async (req) => {
 
     // --- SHARED RULES ---
     const HTML_TEMPLATE = `
-        <p><strong>Approach Overview:</strong></p>
         <p>[Deep dive introduction part 1 (max 60 words)]</p>
         <p>[Deep dive introduction part 2...]</p>
         <hr />
@@ -68,8 +68,9 @@ Deno.serve(async (req) => {
     const BASE_SYSTEM_PROMPT = `
         You are an expert algorithm tutor.
         TOPIC: "${topic}"
-        MODE: ${mode === "core" ? "Core Algorithm (Define problem yourself)" : "LeetCode Problem (Match standard definition)"}
-        ${referenceCode ? `REFERENCE CODE PROVIDED (Use for Logic): \n${referenceCode}` : ""}
+        MODE: ${mode === 'core' ? 'Core Algorithm (Define problem yourself)' : 'LeetCode Problem (Match standard definition)'}
+        ${referenceCode ? `REFERENCE CODE PROVIDED (Use for Logic): \n${referenceCode}` : ''}
+        ${userPrompt ? `USER CONTEXT / INSTRUCTIONS: \n"${userPrompt}"\n(Follow these instructions specifically)` : ''}
 
         GENERAL RULES:
         1. **Truthfulness**: Verify complexity. No hallucinations.
@@ -87,7 +88,7 @@ Deno.serve(async (req) => {
           body: JSON.stringify({
             contents: [{ parts: [{ text: promptText }] }],
           }),
-        },
+        }
       );
       if (!response.ok) {
         const errText = await response.text();
@@ -139,7 +140,7 @@ Deno.serve(async (req) => {
           "test_cases": [{"input": [1, 2], "output": 3, "description": "...", "isSubmission": false}],
           "input_schema": [{"name": "nums", "type": "number[]", "label": "Numbers"}],
           "metadata": {
-            "overview": "Detailed Guide. Max 400 words. Split into many  paragraphs (break after ~60 words).",
+            "overview": "Detailed Guide. Max 300 words. Split into many  paragraphs (break after ~60 words).",
             "companyTags": [], "likes": 0, "dislikes": 0
           }
         }
@@ -158,37 +159,39 @@ Deno.serve(async (req) => {
         `;
 
     // --- CHUNK 2 & 3: IMPLEMENTATIONS PROMPT ---
+    // If target === 'add_approaches', focus only on NEW approaches
     const implsPrompt = (langs: string[]) => `
         ${BASE_SYSTEM_PROMPT}
 
         TASK: Generate Code Implementations for: ${langs.join(", ")}.
         
-        You MUST generate ALL VIABLE APPROACHES (at least 3, MAX 5).
-        **ORDER IS CRITICAL**:
-        1. **Optimize / Best Approach** (MUST BE FIRST).
-        2. **Better / Intermediate Approach**.
-        3. **Brute Force / Naive Approach**.
-        4. Others (Iterative/Recursive variants).
+        ${target === 'add_approaches'
+        ? `GENERATE **${approachCount} NEW** distinct approaches. 
+              EXCLUDE these existing approaches: ${existingApproaches.join(", ")}.
+              Example: If 'Brute Force' exists, generate 'Optimized Two-Pass' or 'Sort-based'.
+              Context from User: "${userPrompt || 'Provide additional unique methods'}"`
+        : `You MUST generate ALL VIABLE APPROACHES (at least 3, MAX 5).
+              **ORDER IS CRITICAL**:
+              1. **Optimize / Best Approach** (MUST BE FIRST).
+              2. **Better / Intermediate Approach**.
+              3. **Brute Force / Naive Approach**.
+              4. Others (Iterative/Recursive variants).
+             `
+      }
 
         JSON Structure:
         {
           "implementations": [
             {
-              "lang": "${langs[0]}", // MUST be strict lowercase: e.g. "typescript", "java", "python", "cpp"
+              "lang": "${langs[0] === 'typescript' ? 'typeScript' : langs[0]}", // MUST be strict: "typeScript" (camelCase for TS), "java", "python", "cpp"
               "code": [
                 {
-                  "codeType": "optimize", // For the first approach (Best/Optimal)
+                  "codeType": "${target === 'add_approaches' ? 'descriptive-method-name' : 'optimize'}", 
                   "code": "FUNCTION CODE ONLY",
                   "explanationBefore": "EXTREMELY DETAILED HTML (1000+ words)",
                   "explanationAfter": "HTML content"
-                },
-                {
-                  "codeType": "descriptive-name-e.g-brute-force", // For subsequent approaches
-                  "code": "...",
-                  "explanationBefore": "...",
-                  "explanationAfter": "..."
                 }
-                // ... other approaches
+                // ... generate ${target === 'add_approaches' ? approachCount : '3-5'} approaches
               ]
             }
             // ... repeat for other languages
@@ -208,7 +211,7 @@ Deno.serve(async (req) => {
            - **Content**: Explain *WHY* we are doing this, not just what syntax it is. 
            - **Style**: Use inline comments
         3. **Starter Code**: Signature ONLY. No logic.
-        4. **Reference Code**: If provided, use it for 'optimize' logic.
+        4. **Reference Code**: ${target === 'add_approaches' ? 'Use only if relevant to new approaches.' : "If provided, use it for 'optimize' logic."}
         
         HTML RULES (explanationBefore):
         Use this template exactly:
@@ -220,32 +223,48 @@ Deno.serve(async (req) => {
         3. **Step-by-step**: Educational. If a step is long, split it.
         4. **General**: **STRICT RULE**: NO single paragraph should exceed 60 words. Divide and conquer the text.
         
-        **COMPARISON TABLE UPDATE**:
-        For the **Optimize** approach (which is FIRST), put the Comparison Table HTML in 'explanationAfter'.
+        ${target === 'all' ? `**COMPARISON TABLE UPDATE**: For the **Optimize** approach (which is FIRST), put the Comparison Table HTML in 'explanationAfter'.` : ''}
 
         `;
 
     // --- EXECUTE ---
-    console.log(`Starting Generation...`);
+    console.log(`Starting Generation... Mode: ${target}, Topic: ${topic}`);
 
-    const [coreData, implsPart1, implsPart2] = await Promise.all([
-      generateChunk(corePrompt),
-      generateChunk(implsPrompt(["typescript", "python"])),
-      generateChunk(implsPrompt(["java", "cpp"])),
-    ]);
+    let coreData = null;
+    let implsPart1 = null;
+    let implsPart2 = null;
 
-    if (!coreData) throw new Error("Failed to generate Core Data.");
+    if (target === 'all') {
+      [coreData, implsPart1, implsPart2] = await Promise.all([
+        generateChunk(corePrompt),
+        generateChunk(implsPrompt(["typescript", "python"])),
+        generateChunk(implsPrompt(["java", "cpp"]))
+      ]);
+
+      if (!coreData) throw new Error("Failed to generate Core Data.");
+    } else {
+      // Add Approaches Mode: Only run impls chunks
+      [implsPart1, implsPart2] = await Promise.all([
+        generateChunk(implsPrompt(["typescript", "python"])),
+        generateChunk(implsPrompt(["java", "cpp"]))
+      ]);
+    }
+
     if (!implsPart1 || !implsPart2) throw new Error("Failed to generate Implementations.");
 
     // --- MERGE ---
     const finalJson = {
-      ...coreData,
-      implementations: [...(implsPart1.implementations || []), ...(implsPart2.implementations || [])],
+      ...(coreData || {}), // If null (add_approaches), we return empty core. Client handles merge.
+      implementations: [
+        ...(implsPart1.implementations || []),
+        ...(implsPart2.implementations || [])
+      ]
     };
 
     return new Response(JSON.stringify(finalJson), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
+
   } catch (error) {
     console.error("Error in generate-algorithm:", error);
     return new Response(JSON.stringify({ error: (error as Error).message }), {

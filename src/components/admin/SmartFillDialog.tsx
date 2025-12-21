@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,6 +11,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Sparkles, Wand2, Loader2, FileJson, Copy, CheckSquare, Square, FileCode, BookOpen, Layers, ListStart, ListPlus } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,6 +30,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface SmartFillDialogProps {
   onFill: (data: any) => void;
+  initialTopic?: string;
+  existingApproaches?: string[];
 }
 
 const FIELD_GROUPS = [
@@ -33,7 +42,7 @@ const FIELD_GROUPS = [
   { id: "meta", label: "Metadata (Tags, Likes)", keys: ["metadata"] },
 ];
 
-export function SmartFillDialog({ onFill }: SmartFillDialogProps) {
+export function SmartFillDialog({ onFill, initialTopic = "", existingApproaches = [] }: SmartFillDialogProps) {
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("paste");
   
@@ -42,10 +51,20 @@ export function SmartFillDialog({ onFill }: SmartFillDialogProps) {
   
 
   // Generate Tab State
-  const [topic, setTopic] = useState("");
+  const [topic, setTopic] = useState(initialTopic);
+  
+  // Sync initialTopic to topic when it changes or dialog opens
+  useEffect(() => {
+    if (initialTopic) setTopic(initialTopic);
+  }, [initialTopic, open]);
+
   const [referenceCode, setReferenceCode] = useState("");
+  const [userPrompt, setUserPrompt] = useState("");
   const [generatorMode, setGeneratorMode] = useState<"problem" | "core">("problem");
-  const [target, setTarget] = useState<"all" | "initial" | "enrichment">("all");
+  // Target: all=Full, add_approaches=New Only
+  const [target, setTarget] = useState<"all" | "add_approaches">("all");
+  const [approachCount, setApproachCount] = useState(1);
+
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedData, setGeneratedData] = useState<any>(null);
   
@@ -99,6 +118,7 @@ export function SmartFillDialog({ onFill }: SmartFillDialogProps) {
       setGeneratedData(null);
       setTopic("");
       setReferenceCode("");
+      setUserPrompt("");
       // Reset selection
       setSelectedGroups(FIELD_GROUPS.map(g => g.id)); 
       toast.success("Form filled successfully!");
@@ -119,7 +139,15 @@ export function SmartFillDialog({ onFill }: SmartFillDialogProps) {
 
     try {
       const { data, error } = await supabase.functions.invoke("generate-algorithm", {
-        body: { topic, referenceCode, mode: generatorMode, target },
+        body: { 
+            topic, 
+            referenceCode, 
+            userPrompt,
+            mode: generatorMode, 
+            target,
+            approachCount: target === 'add_approaches' ? approachCount : undefined,
+            existingApproaches: target === 'add_approaches' ? existingApproaches : []
+        },
       });
 
       if (error) throw error;
@@ -216,41 +244,49 @@ export function SmartFillDialog({ onFill }: SmartFillDialogProps) {
                         </Button>
                     </div>
                   </div>
+
                   <div className="flex-1 space-y-2">
-                     <Label>Generation Strategy</Label>
-                     <div className="flex items-center gap-1 border rounded-md p-1 h-10 bg-muted/30">
-                        <Button
-                             variant={target === "all" ? "secondary" : "ghost"}
-                             size="sm"
-                             className="flex-1 h-8 px-2 text-[10px] sm:text-xs"
-                             onClick={() => setTarget("all")}
-                             title="Generate Everything (Default)"
-                        >
-                             <Layers className="w-3 h-3 mr-1.5" />
-                             Full
-                        </Button>
-                        <Button
-                             variant={target === "initial" ? "secondary" : "ghost"}
-                             size="sm"
-                             className="flex-1 h-8 px-2 text-[10px] sm:text-xs"
-                             onClick={() => setTarget("initial")}
-                             title="Metadata + Optimized Solution Only"
-                        >
-                             <ListStart className="w-3 h-3 mr-1.5" />
-                             Base
-                        </Button>
-                        <Button
-                             variant={target === "enrichment" ? "secondary" : "ghost"}
-                             size="sm"
-                             className="flex-1 h-8 px-2 text-[10px] sm:text-xs"
-                             onClick={() => setTarget("enrichment")}
-                             title="Add Brute/Better + Table Only"
-                        >
-                             <ListPlus className="w-3 h-3 mr-1.5" />
-                             Enrich
-                        </Button>
+                     <div className="flex gap-2">
+                         <div className="flex-1 space-y-1.5">
+                            <Label>Generation Strategy</Label>
+                            <Select value={target} onValueChange={(val: any) => setTarget(val)}>
+                                <SelectTrigger className="h-8 text-xs">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">Full Generate (New)</SelectItem>
+                                    <SelectItem value="add_approaches">Add More Approaches</SelectItem>
+                                </SelectContent>
+                            </Select>
+                         </div>
+                         
+                         {target === 'add_approaches' && (
+                             <div className="w-24 space-y-1.5">
+                                <Label>Count</Label>
+                                <Input 
+                                    type="number" 
+                                    min={1} 
+                                    max={3} 
+                                    value={approachCount}
+                                    onChange={(e) => setApproachCount(parseInt(e.target.value) || 1)}
+                                    className="h-8 text-xs"
+                                />
+                             </div>
+                         )}
                      </div>
                   </div>
+
+                  <div className="flex-1 space-y-2">
+                     <Label htmlFor="userPrompt">Additional Instructions (Optional)</Label>
+                     <Textarea
+                        id="userPrompt"
+                        placeholder="e.g. 'Use BFS approach', 'Mention time complexity trade-offs', 'Focus on recursive solution'..."
+                        value={userPrompt}
+                        onChange={(e) => setUserPrompt(e.target.value)}
+                        className="font-mono text-xs h-16 resize-y"
+                     />
+                  </div>
+
                   <div className="flex-1 space-y-2">
                      <Label htmlFor="referenceCode">Reference Code (Optional)</Label>
                      <Textarea
@@ -258,7 +294,7 @@ export function SmartFillDialog({ onFill }: SmartFillDialogProps) {
                         placeholder="Paste optimized code (Python/JS/etc) here. AI will use this logic for the 'optimize' approach."
                         value={referenceCode}
                         onChange={(e) => setReferenceCode(e.target.value)}
-                        className="font-mono text-xs h-24 resize-y"
+                        className="font-mono text-xs h-16 resize-y"
                      />
                   </div>
                   <Button onClick={handleGenerate} disabled={isGenerating} className="gap-2 min-w-[120px]">
