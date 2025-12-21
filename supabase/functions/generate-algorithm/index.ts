@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -55,10 +56,10 @@ Deno.serve(async (req) => {
         list_type: "blind75" | "other" | "coreAlgo"; 
         explanation: {
           problemStatement: string; // Full detailed problem statement in HTML
-          steps: string; // HTML <ol>...</ol> - GLOBAL steps matching the reference/optimized approach
-          useCase: string; // HTML <ul>...</ul> - At least 5 items
-          tips: string; // HTML <ul>...</ul> - At least 5 items
-          comparisonTable: string; // HTML <table>...</table>
+          steps: string; // HTML <ol><li>...</li></ol> - GLOBAL steps matching the reference/optimized approach
+          useCase: string; // HTML <ul><li>...</li></ul> - At least 5 items
+          tips: string; // HTML <ul><li>...</li></ul> - At least 5 items
+          comparisonTable: string; // HTML <div className="relative overflow-x-auto w-full"><table className="w-full border-collapse border border-border">...</table></div>
           timeComplexity: string;
           spaceComplexity: string;
           constraints: string[];
@@ -95,16 +96,16 @@ Deno.serve(async (req) => {
       1. **Structure & Descriptiveness**: 
          - **Problem Statement**: Use strict HTML.
          - **Metadata Overview**: MUST be descriptive, each paragraph approx 150-220 words. Explain the core concept deeply.
-         - **Use Cases**: Provide AT LEAST 5 items. Format: <li><strong>Domain Name</strong> - Detailed description.</li>
-         - **Pro Tips**: Provide AT LEAST 5 items. Format: <li>Detailed tip.</li>
+         - **Use Cases**: Provide AT LEAST 5 items. Format: <ul><li><strong>Domain Name</strong> - Detailed description.</li></ul>
+         - **Pro Tips**: Provide AT LEAST 5 items. Format: <ul><li>Detailed tip.</li></ul>
          - **IO Examples**: Provide 3 clear examples with input, output, and visual explanation.
          - **Comparison Table**: Full HTML table comparing all approaches.
 
       2. **HTML Rules**:
          - Use pure HTML, no Markdown when HTML is requested.
-         - Use variable formatting like: <code class="font-mono">variable</code>
-         - Lists: Steps -> <ol>, Use cases/Pro tips -> <ul>
-         - Comparison table wrapper: <div class="overflow-x-auto"><table>...</table></div>
+         - Use variable formatting like: <code className="font-mono">variable</code>
+         - Lists: Steps -> <ol><li>, Use cases/Pro tips -> <ul><li>
+         - Comparison table wrapper: <div className="relative overflow-x-auto w-full"><table className="w-full border-collapse border border-border">
          - Classes: Use 'font-mono' for code snippets.
       
       3. **Code Rules**:
@@ -112,6 +113,7 @@ Deno.serve(async (req) => {
          - **Detailed Comments**: Every line of code must be clear. Complex logic MUST have inline comments explaining *why* it is done.
          - Reference Code Translation: If reference code is provided, translate it logic-for-logic into all 4 languages.
          - Java: Handle static vs non-static (use local helper class if function-inside-function needed).
+         - **STARTER CODE**: For `codeType: 'starter'`, provide ONLY the function signature as seen on LeetCode. The body should be empty or contain a single `return ` statement to avoid compilation errors. DO NOT IMPLEMENT LOGIC IN STARTER CODE.
       
       4. **Requirements**:
          - Provide at least 12 test cases.
@@ -130,31 +132,36 @@ Deno.serve(async (req) => {
          For every approach, 'explanationBefore' MUST follow this EXACT HTML structure:
 
          \`\`\`html
-         <div class="space-y-4">
-           <h4 class="font-semibold">Overview:</h4>
-           <p>[Detailed overview of this specific approach. Explain what it does.]</p>
-         </div>
-         <div class="space-y-4">
-           <h4 class="font-semibold">Intuition:</h4>
-           <p>[Explain the intuition/logic behind it. Use <code class="font-mono">variable</code> for code terms.]</p>
-         </div>
-         <div class="space-y-4">
-           <h4 class="font-semibold">Steps to Solve:</h4>
-         </div>
-         <ol class="list-decimal list-inside space-y-2">
+         <p>
+           <strong>Overview:</strong><br />
+           [Detailed overview of this specific approach. Explain what it does.]
+         </p>
+
+         <p>
+           <strong>Intuition:</strong><br />
+           [Explain the intuition/logic behind it. Use <code className="font-mono">variable</code> for code terms.]
+         </p>
+
+         <p>
+           <strong>Steps to Solve:</strong>
+         </p>
+         <ol>
            <li>[Step 1]</li>
            <li>[Step 2]</li>
            ...
          </ol>
-         <div class="mt-4 p-3 bg-muted rounded-lg">
-           <p><strong>Time Complexity:</strong> [Complexity, e.g. O(n)]</p>
-         </div>
-         <div class="mt-2 p-3 bg-muted rounded-lg">
-           <p><strong>Space Complexity:</strong> [Complexity, e.g. O(1)]</p>
-         </div>
-         <div class="mt-2">
-           <a href="/complexity" class="text-primary hover:underline">Learn more about time & space complexity</a>
-         </div>
+
+         <p>
+           <strong>Time Complexity:</strong> [Complexity, e.g. O(n)]
+         </p>
+
+         <p>
+           <strong>Space Complexity:</strong> [Complexity, e.g. O(1)]
+         </p>
+
+         <p className="p-2">
+           <AlgoLink url="/complexity">Learn more about time & space complexity</AlgoLink>
+         </p>
          \`\`\`
 
       TRAINING DATA (Follow these examples STRICTLY):
@@ -170,11 +177,11 @@ Deno.serve(async (req) => {
         "serial_no": 1,
         "list_type": "blind75",
         "explanation": {
-          "problemStatement": "<p>Given an array of integers <code class='font-mono'>nums</code> and an integer <code class='font-mono'>target</code>, return indices of the two numbers such that they add up to target.</p><p>You may assume that each input would have exactly one solution, and you may not use the same element twice.</p>",
-          "steps": "<ol class='list-decimal list-inside space-y-2'><li>Initialize a hash map to store value-to-index mappings.</li><li>Iterate through the array.</li><li>For each element, calculate the complement (target - current).</li><li>If complement exists in map, return [map.get(complement), current_index].</li><li>Otherwise, store the current element and its index.</li></ol>",
-          "useCase": "<ul class='list-disc list-inside space-y-2'><li><strong>Financial Systems</strong> - Detecting fraud by finding transactions that sum to a suspicious round number.</li><li><strong>E-commerce</strong> - Finding two products that exactly use up a gift card balance.</li><li><strong>Payment Gateways</strong> - Verifying if any two pending charges sum up to a specific refund amount.</li><li><strong>Gaming</strong> - Matching two players whose skill ratings sum to a specific team balance requirement.</li><li><strong>Data Analysis</strong> - Finding pairs of data points that satisfy a specific summation constraint in large datasets.</li></ul>",
-          "tips": "<ul class='list-disc list-inside space-y-2'><li>Use a Hash Map to achieve O(1) lookups instead of scanning the array repeatedly.</li><li>Be careful not to use the same element twice; check the index or ensure strict inequality.</li><li>Handle potential integer overflow if working with very large numbers in typed languages like C++.</li><li>Consider the case where multiple pairs might exist, though the problem guarantees one unique solution here.</li><li>If the array is sorted, a Two Pointer approach could be used instead of a Hash Map to save space.</li></ul>",
-          "comparisonTable": "<div class='overflow-x-auto'><table class='min-w-full divide-y divide-border'><thead><tr><th class='px-4 py-2 text-left'>Approach</th><th class='px-4 py-2 text-left'>Time</th><th class='px-4 py-2 text-left'>Space</th></tr></thead><tbody><tr><td class='px-4 py-2'>Brute Force</td><td class='px-4 py-2'>O(n^2)</td><td class='px-4 py-2'>O(1)</td></tr><tr><td class='px-4 py-2'>One-pass Hash Table</td><td class='px-4 py-2'>O(n)</td><td class='px-4 py-2'>O(n)</td></tr></tbody></table></div>",
+          "problemStatement": "<p>Given an array of integers <code class=\"font-mono\">nums</code> and an integer <code class=\"font-mono\">target</code>, return indices of the two numbers such that they add up to <code class=\"font-mono\">target</code>.</p><p>You may assume that each input would have exactly one solution, and you may not use the same element twice.</p>",
+          "steps": "<ol><li>Initialize a hash map to store value-to-index mappings.</li><li>Iterate through the array.</li><li>For each element, calculate the complement (target - current).</li><li>If complement exists in map, return [map.get(complement), current_index].</li><li>Otherwise, store the current element and its index.</li></ol>",
+          "useCase": "<ul><li><strong>Financial Systems</strong> - Detecting fraud by finding transactions that sum to a suspicious round number.</li><li><strong>E-commerce</strong> - Finding two products that exactly use up a gift card balance.</li><li><strong>Payment Gateways</strong> - Verifying if any two pending charges sum up to a specific refund amount.</li><li><strong>Gaming</strong> - Matching two players whose skill ratings sum to a specific team balance requirement.</li><li><strong>Data Analysis</strong> - Finding pairs of data points that satisfy a specific summation constraint in large datasets.</li></ul>",
+          "tips": "<ul><li>Use a Hash Map to achieve O(1) lookups instead of scanning the array repeatedly.</li><li>Be careful not to use the same element twice; check the index or ensure strict inequality.</li><li>Handle potential integer overflow if working with very large numbers in typed languages like C++.</li><li>Consider the case where multiple pairs might exist, though the problem guarantees one unique solution here.</li><li>If the array is sorted, a Two Pointer approach could be used instead of a Hash Map to save space.</li></ul>",
+          "comparisonTable": "<div className=\"relative overflow-x-auto w-full\"><table className=\"w-full border-collapse border border-border\"><thead><tr><th className=\"border border-border p-2\">Approach</th><th className=\"border border-border p-2\">Time</th><th className=\"border border-border p-2\">Space</th></tr></thead><tbody><tr><td className=\"border border-border p-2\">Brute Force</td><td className=\"border border-border p-2\">O(n^2)</td><td className=\"border border-border p-2\">O(1)</td></tr><tr><td className=\"border border-border p-2\">One-pass Hash Table</td><td className=\"border border-border p-2\">O(n)</td><td className=\"border border-border p-2\">O(n)</td></tr></tbody></table></div>",
           "timeComplexity": "O(n)",
           "spaceComplexity": "O(n)",
           "constraints": ["2 <= nums.length <= 10^4"],
@@ -190,14 +197,14 @@ Deno.serve(async (req) => {
               {
                 "codeType": "starter",
                 "code": "function twoSum(nums: number[], target: number): number[] {\n    \n}",
-                "explanationBefore": "<div class='space-y-4'><h4 class='font-semibold'>Overview:</h4><p>This is the starting point for the algorithm.</p></div><div class='space-y-4'><h4 class='font-semibold'>Intuition:</h4><p>Implement the solution inside this function.</p></div><div class='space-y-4'><h4 class='font-semibold'>Steps to Solve:</h4></div><ol class='list-decimal list-inside space-y-2'><li>Write code.</li></ol><div class='mt-4 p-3 bg-muted rounded-lg'><p><strong>Time Complexity:</strong> N/A</p></div><div class='mt-2 p-3 bg-muted rounded-lg'><p><strong>Space Complexity:</strong> N/A</p></div><div class='mt-2'><a href='/complexity' class='text-primary hover:underline'>Learn more about time & space complexity</a></div>",
+                "explanationBefore": "<p><strong>Overview:</strong><br />This is the starting point for the algorithm.</p><p><strong>Intuition:</strong><br />Implement the solution inside this function.</p><p><strong>Steps to Solve:</strong></p><ol><li>Write code.</li></ol><p><strong>Time Complexity:</strong> N/A</p><p><strong>Space Complexity:</strong> N/A</p><p className=\"p-2\"><AlgoLink url=\"/complexity\">Learn more about time & space complexity</AlgoLink></p>",
                 "explanationAfter": ""
               },
                {
                 "codeType": "optimize",
                 "code": "function twoSum(nums: number[], target: number): number[] {\n    const map = new Map<number, number>();\n    for (let i = 0; i < nums.length; i++) {\n        const complement = target - nums[i];\n        if (map.has(complement)) {\n            return [map.get(complement)!, i];\n        }\n        map.set(nums[i], i);\n    }\n    return [];\n}",
-                "explanationBefore": "<div class='space-y-4'><h4 class='font-semibold'>Overview:</h4><p>This approach involves iterating through the array once while using a Hash Map to store the numbers we have seen so far and their indices. By storing the complement (target - current) in the map, we can achieve O(1) lookups.</p></div><div class='space-y-4'><h4 class='font-semibold'>Intuition:</h4><p>In a brute force approach, for every element <code class='font-mono'>x</code>, we search for <code class='font-mono'>target - x</code> in the rest of the array. This search takes O(n). A Hash Map allows us to perform this search in O(1) time. As we iterate, we ask, 'Have I seen the complement of the current number before?' If yes, we found the pair.</p></div><div class='space-y-4'><h4 class='font-semibold'>Steps to Solve:</h4></div><ol class='list-decimal list-inside space-y-2'><li>Create an empty Hash Map.</li><li>Iterate through the array.</li><li>Calculate complement.</li><li>Check map for complement.</li><li>If found, return indices.</li><li>Else, add current number to map.</li></ol><div class='mt-4 p-3 bg-muted rounded-lg'><p><strong>Time Complexity:</strong> O(n)</p></div><div class='mt-2 p-3 bg-muted rounded-lg'><p><strong>Space Complexity:</strong> O(n)</p></div><div class='mt-2'><a href='/complexity' class='text-primary hover:underline'>Learn more about time & space complexity</a></div>",
-                "explanationAfter": "<div class='mt-4'><h4 class='font-semibold'>Complexity Comparison:</h4></div><div class='overflow-x-auto mt-2'><table class='min-w-full divide-y divide-border'><thead><tr><th class='px-4 py-2 text-left'>Approach</th><th class='px-4 py-2 text-left'>Time</th><th class='px-4 py-2 text-left'>Space</th></tr></thead><tbody><tr><td class='px-4 py-2'>Brute Force</td><td class='px-4 py-2'>O(n^2)</td><td class='px-4 py-2'>O(1)</td></tr><tr><td class='px-4 py-2'>One-pass Hash Table</td><td class='px-4 py-2'>O(n)</td><td class='px-4 py-2'>O(n)</td></tr></tbody></table></div>"
+                "explanationBefore": "<p><strong>Overview:</strong><br />This approach involves iterating through the array once while using a Hash Map to store the numbers we have seen so far and their indices. By storing the complement (target - current) in the map, we can achieve O(1) lookups.</p><p><strong>Intuition:</strong><br />In a brute force approach, for every element <code className=\"font-mono\">x</code>, we search for <code className=\"font-mono\">target - x</code> in the rest of the array. This search takes O(n). A Hash Map allows us to perform this search in O(1) time. As we iterate, we ask, 'Have I seen the complement of the current number before?' If yes, we found the pair.</p><p><strong>Steps to Solve:</strong></p><ol><li>Create an empty Hash Map.</li><li>Iterate through the array.</li><li>Calculate complement.</li><li>Check map for complement.</li><li>If found, return indices.</li><li>Else, add current number to map.</li></ol><p><strong>Time Complexity:</strong> O(n)</p><p><strong>Space Complexity:</strong> O(n)</p><p className=\"p-2\"><AlgoLink url=\"/complexity\">Learn more about time & space complexity</AlgoLink></p>",
+                "explanationAfter": "<p>Time Complexity: O(n)</p>"
               }
             ]
           }
@@ -220,8 +227,6 @@ Deno.serve(async (req) => {
       
       Output JUST the JSON object for this single algorithm.
     `;
-
-        console.log(`Generating algorithm for topic: ${topic}`);
 
         const response = await fetch(
             `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
@@ -266,13 +271,12 @@ Deno.serve(async (req) => {
         }
 
         const parsedAlgorithm = JSON.parse(jsonString);
-        console.log(`Successfully generated algorithm: ${parsedAlgorithm.id}`);
 
         return new Response(JSON.stringify(parsedAlgorithm), {
             headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
     } catch (error) {
-        console.error("Error in generate-algorithm:", error);
+        console.error(error);
         return new Response(JSON.stringify({ error: (error as Error).message }), {
             headers: { ...corsHeaders, "Content-Type": "application/json" },
             status: 500,
