@@ -9,6 +9,7 @@ COPY src ./src
 COPY public ./public
 COPY index.html ./
 COPY vite.config.ts ./
+COPY vite.ssr.plugin.ts ./
 COPY tsconfig*.json ./
 COPY generate-sitemap.ts ./
 COPY verify-ssg.ts ./
