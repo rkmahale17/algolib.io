@@ -31,7 +31,9 @@ ENV VITE_SUPABASE_PUBLISHABLE_KEY=$VITE_SUPABASE_PUBLISHABLE_KEY
 ENV VITE_SUPABASE_PROJECT_ID=$VITE_SUPABASE_PROJECT_ID
 ENV VITE_ADMIN_USER_ID=$VITE_ADMIN_USER_ID
 
-RUN npm install
+# Remove package-lock.json to avoid optional dependency issues
+RUN rm -f package-lock.json
+RUN npm install --force
 RUN npm run build
 # RUN cd /usr/dist && find . -type f -exec brotli {} \; # Optional: Compress if serving static directly, but express static handles gzip usually. keeping simple for now.
 
