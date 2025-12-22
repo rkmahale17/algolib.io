@@ -7,6 +7,33 @@ interface TestCase {
     expectedOutput: any;
 }
 
+/**
+ * Generates a complete test runner that combines user code with test harness.
+ * 
+ * WHAT IS SENT TO THE JUDGE:
+ * ===========================
+ * The judge receives a COMPLETE, EXECUTABLE code file containing:
+ * 1. User's function code (the solution they wrote)
+ * 2. Generated test harness that:
+ *    - Formats test case inputs according to the language (arrays, lists, etc.)
+ *    - Calls the user's function with formatted inputs
+ *    - Captures the actual output
+ *    - Compares actual vs expected output
+ *    - Returns results as JSON between markers: ___TEST_RESULTS_START___ and ___TEST_RESULTS_END___
+ * 
+ * COMPATIBILITY:
+ * ==============
+ * - TypeScript: Uses JSON.stringify for all values
+ * - Python: Converts JSON to Python syntax (True/False/None, lists)
+ * - Java: Uses formatJavaArrayLiteral for arrays (handles int[], int[][], String[][], char[][], etc.)
+ * - C++: Uses vector initialization syntax with type deduction
+ * 
+ * 2D ARRAY HANDLING:
+ * ==================
+ * - Input schema supports: number[][], string[][], char[][]
+ * - Test case format: input is an array, e.g., [[[1,2],[3,4]]] for a 2D array parameter
+ * - Each language's formatValue/formatLiteral handles the nested structure appropriately
+ */
 export const generateTestRunner = (
     userCode: string,
     language: Language,
@@ -71,8 +98,24 @@ const formatValue = (value: any, type: string, lang: Language, targetJavaType?: 
     return String(value);
 };
 
-// Helper: Recursively formats Java array literals
-// Handles int[], int[][], String[], String[][], char[][] etc.
+/**
+ * Recursively formats Java array literals for all dimensions.
+ * 
+ * HANDLES:
+ * - 1D arrays: int[], String[], char[], boolean[]
+ * - 2D arrays: int[][], String[][], char[][]
+ * - Higher dimensions: int[][][], etc.
+ * 
+ * TYPE DETECTION:
+ * - Uses targetJavaType hint if provided (e.g., "char[][]" from method signature)
+ * - Falls back to inferring from actual values (string -> String, number -> int)
+ * 
+ * EXAMPLES:
+ * - [1, 2, 3] -> "new int[]{1, 2, 3}"
+ * - [[1, 2], [3, 4]] -> "new int[][]{{1, 2}, {3, 4}}"
+ * - [["a", "b"], ["c", "d"]] -> "new String[][]{{"a", "b"}, {"c", "d"}}"
+ * - [['1', '0'], ['0', '1']] with targetJavaType="char[][]" -> "new char[][]{{'1', '0'}, {'0', '1'}}"
+ */
 const formatJavaArrayLiteral = (arr: any[], targetJavaType?: string): string => {
     if (!Array.isArray(arr)) return String(arr); // Should not happen given usage, but safe guard
 
