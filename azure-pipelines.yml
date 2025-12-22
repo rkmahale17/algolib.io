@@ -43,7 +43,8 @@ stages:
           - script: |
               export VITE_SUPABASE_URL=$(VITE_SUPABASE_URL)
               export VITE_SUPABASE_PUBLISHABLE_KEY=$(VITE_SUPABASE_PUBLISHABLE_KEY)
-              npm ci
+              rm -f package-lock.json
+              npm install --force
               npm run build
             displayName: "Build app"
 
