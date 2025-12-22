@@ -10,7 +10,9 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "generate-sitemap": "tsx generate-sitemap.ts",
-    "verify-ssg": "tsx verify-ssg.ts"
+    "verify-ssg": "tsx verify-ssg.ts",
+    "server": "node server.js",
+    "start": "node server.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -45,11 +47,15 @@
     "@supabase/supabase-js": "^2.58.0",
     "@tanstack/react-query": "^5.83.0",
     "@types/react-syntax-highlighter": "^15.5.13",
+    "axios": "^1.7.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
+    "cors": "^2.8.5",
     "date-fns": "^3.6.0",
+    "dotenv": "^16.4.5",
     "embla-carousel-react": "^8.6.0",
+    "express": "^4.19.2",
     "framer-motion": "^12.23.24",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.462.0",

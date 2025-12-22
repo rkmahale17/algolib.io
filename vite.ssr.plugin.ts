@@ -1,6 +1,7 @@
 import type { Plugin } from 'vite';
 import React from 'react';
 import { algorithms } from './src/data/algorithms';
+import { blind75Problems } from './src/data/blind75';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import path from 'path';
@@ -95,12 +96,17 @@ export function prerenderPlugin(): Plugin {
 
             const algorithmRoutes = algorithms.map((data: { id: any; }) => ({
                 path: `/problem/${data.id}`,
-                dir: `algorithm/${data.id}`
+                dir: `problem/${data.id}`
             }));
 
-            const allRoutes = [...staticRoutes, ...algorithmRoutes];
+            const blind75Routes = blind75Problems.map((data: { slug: any; }) => ({
+                path: `/problem/${data.slug}`,
+                dir: `problem/${data.slug}`
+            }));
 
-            console.log(`📄 Prerendering ${allRoutes.length} routes...\n`);
+            const allRoutes = [...staticRoutes, ...algorithmRoutes, ...blind75Routes];
+
+            console.log(`📄 Prerendering ${allRoutes.length} routes...`);
 
             let successCount = 0;
             let errorCount = 0;
