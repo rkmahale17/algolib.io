@@ -211,7 +211,7 @@ export const WhiteboardComponent = ({
         isExpand ? "h-full" : "h-[700px]"
       }`}
     >
-      <Tldraw snapshot={restoreData} className="tldraw-algolib">
+      <Tldraw snapshot={restoreData} className="tldraw-rulcode">
         <div>
           <SaveButton
             algorithmId={algorithmId}

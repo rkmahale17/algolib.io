@@ -48,23 +48,23 @@ export const BlogSidebar = ({ category }: BlogSidebarProps) => {
     if (category?.toLowerCase().includes("dynamic")) {
       return [
         ...baseLinks,
-        { title: "Climbing Stairs", link: "/algorithm/climbing-stairs", description: "Classic DP problem" },
-        { title: "House Robber", link: "/algorithm/house-robber", description: "Decision-making DP" },
-        { title: "Coin Change", link: "/algorithm/coin-change", description: "Unbounded knapsack" }
+        { title: "Climbing Stairs", link: "/problem/climbing-stairs", description: "Classic DP problem" },
+        { title: "House Robber", link: "/problem/house-robber", description: "Decision-making DP" },
+        { title: "Coin Change", link: "/problem/coin-change", description: "Unbounded knapsack" }
       ];
     } else if (category?.toLowerCase().includes("graph")) {
       return [
         ...baseLinks,
-        { title: "Graph DFS", link: "/algorithm/graph-dfs", description: "Depth-first search" },
-        { title: "Graph BFS", link: "/algorithm/graph-bfs", description: "Breadth-first search" },
-        { title: "Dijkstra's Algorithm", link: "/algorithm/dijkstras", description: "Shortest path" }
+        { title: "Graph DFS", link: "/problem/graph-dfs", description: "Depth-first search" },
+        { title: "Graph BFS", link: "/problem/graph-bfs", description: "Breadth-first search" },
+        { title: "Dijkstra's Algorithm", link: "/problem/dijkstras", description: "Shortest path" }
       ];
     } else if (category?.toLowerCase().includes("array")) {
       return [
         ...baseLinks,
-        { title: "Two Sum", link: "/algorithm/two-sum", description: "Hash map technique" },
-        { title: "Two Pointers", link: "/algorithm/two-pointers", description: "Efficient array traversal" },
-        { title: "Kadane's Algorithm", link: "/algorithm/kadanes", description: "Maximum subarray" }
+        { title: "Two Sum", link: "/problem/two-sum", description: "Hash map technique" },
+        { title: "Two Pointers", link: "/problem/two-pointers", description: "Efficient array traversal" },
+        { title: "Kadane's Algorithm", link: "/problem/kadanes", description: "Maximum subarray" }
       ];
     }
 

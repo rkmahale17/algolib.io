@@ -14,41 +14,41 @@ const Blog = () => {
   return (
     <>
       <Helmet>
-        <title>AlgoLib Blog - Algorithm Tutorials & DSA Patterns | 200+ Free Guides</title>
+        <title>RulCode Blog - Algorithm Tutorials & DSA Patterns | 200+ Free Guides</title>
         <meta
           name="description"
           content="Explore algorithms, coding tips, and system design guides. Learn DSA patterns, interview strategies, and master data structures through clear explanations and examples. Free resources for competitive programming."
         />
         <meta name="keywords" content="algorithm tutorials, DSA patterns, data structures, competitive programming, coding interview preparation, Blind 75, LeetCode solutions" />
-        <link rel="canonical" href="https://algolib.io/blog" />
+        <link rel="canonical" href="https://rulcode.com/blog" />
         
         {/* Open Graph */}
-        <meta property="og:title" content="AlgoLib Blog - Algorithm Tutorials & DSA Patterns" />
+        <meta property="og:title" content="RulCode Blog - Algorithm Tutorials & DSA Patterns" />
         <meta property="og:description" content="Master algorithms through interactive tutorials and comprehensive guides." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://algolib.io/blog" />
-        <meta property="og:image" content="https://algolib.io/og-image.png" />
+        <meta property="og:url" content="https://rulcode.com/blog" />
+        <meta property="og:image" content="https://rulcode.com/og-image.png" />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="AlgoLib Blog - Algorithm Tutorials" />
+        <meta name="twitter:title" content="RulCode Blog - Algorithm Tutorials" />
         <meta name="twitter:description" content="Master algorithms through interactive tutorials and guides." />
-        <meta name="twitter:image" content="https://algolib.io/og-image.png" />
+        <meta name="twitter:image" content="https://rulcode.com/og-image.png" />
         
         {/* JSON-LD Structured Data */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Blog",
-            "name": "AlgoLib Blog",
+            "name": "RulCode Blog",
             "description": "Algorithm tutorials, DSA patterns, and competitive programming guides",
-            "url": "https://algolib.io/blog",
+            "url": "https://rulcode.com/blog",
             "publisher": {
               "@type": "Organization",
-              "name": "AlgoLib.io",
+              "name": "RulCode.com",
               "logo": {
                 "@type": "ImageObject",
-                "url": "https://algolib.io/android-chrome-512x512.png"
+                "url": "https://rulcode.com/android-chrome-512x512.png"
               }
             }
           })}
@@ -60,7 +60,7 @@ const Blog = () => {
           {/* Header */}
           <div className="text-center mb-16">
             <h2 className="text-2xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              AlgoLib Blogs
+              RulCode Blogs
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Explore algorithms, coding tips, and system design guides

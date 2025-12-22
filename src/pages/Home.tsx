@@ -130,7 +130,7 @@ const Home = () => {
     <>
       <Helmet>
         <title>
-          AlgoLib.io - Master 200+ Algorithms with Interactive Visualizations |
+          RulCode.com - Master 200+ Algorithms with Interactive Visualizations |
           Free & Open Source
         </title>
         <meta
@@ -141,45 +141,45 @@ const Home = () => {
           name="keywords"
           content="algorithms, data structures, leetcode, coding interviews, blind 75, competitive programming, algorithm visualization, learn algorithms, DSA, python algorithms, java algorithms, c++ algorithms, typescript algorithms, free algorithm library, interactive games"
         />
-        <link rel="canonical" href="https://algolib.io/" />
+        <link rel="canonical" href="https://rulcode.com/" />
 
         {/* Open Graph */}
         <meta
           property="og:title"
-          content="AlgoLib.io - Master 200+ Algorithms with Interactive Visualizations"
+          content="RulCode.com - Master 200+ Algorithms with Interactive Visualizations"
         />
         <meta
           property="og:description"
           content="Free open-source algorithm library with 200+ interactive visualizations across 20 categories. Learn DSA for coding interviews with Blind 75, games, and tutorials."
         />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://algolib.io/" />
-        <meta property="og:image" content="https://algolib.io/og-image.png" />
+        <meta property="og:url" content="https://rulcode.com/" />
+        <meta property="og:image" content="https://rulcode.com/og-image.png" />
 
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta
           name="twitter:title"
-          content="AlgoLib.io - Master 200+ Algorithms Visually"
+          content="RulCode.com - Master 200+ Algorithms Visually"
         />
         <meta
           name="twitter:description"
           content="Free interactive algorithm visualizations with 20 categories, Blind 75, and games for coding interviews"
         />
-        <meta name="twitter:image" content="https://algolib.io/og-image.png" />
+        <meta name="twitter:image" content="https://rulcode.com/og-image.png" />
 
         {/* Structured Data - WebSite */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebSite",
-            name: "AlgoLib.io",
-            url: "https://algolib.io",
+            name: "RulCode.com",
+            url: "https://rulcode.com",
             description:
               "Free and open-source algorithm library with interactive visualizations for learning data structures and algorithms",
             potentialAction: {
               "@type": "SearchAction",
-              target: "https://algolib.io/?search={search_term_string}",
+              target: "https://rulcode.com/?search={search_term_string}",
               "query-input": "required name=search_term_string",
             },
           })}
@@ -190,20 +190,20 @@ const Home = () => {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "EducationalOrganization",
-            name: "AlgoLib.io",
-            url: "https://algolib.io",
+            name: "RulCode.com",
+            url: "https://rulcode.com",
             logo: {
               "@type": "ImageObject",
-              url: "https://algolib.io/android-chrome-512x512.png",
+              url: "https://rulcode.com/android-chrome-512x512.png",
               width: 512,
               height: 512,
             },
             sameAs: [
-              "https://x.com/algolib_io",
+              "https://x.com/rulcode_com",
               "https://github.com/rkmahale17/algolib.io",
             ],
             description:
-              "AlgoLib.io is a free and open-source algorithm library that helps developers learn and visualize algorithms with interactive animations and clean code snippets in multiple programming languages.",
+              "RulCode.com is a free and open-source algorithm library that helps developers learn and visualize algorithms with interactive animations and clean code snippets in multiple programming languages.",
           })}
         </script>
 
@@ -219,7 +219,7 @@ const Home = () => {
               position: index + 1,
               item: {
                 "@type": "Thing",
-                "@id": `https://algolib.io/?category=${encodeURIComponent(
+                "@id": `https://rulcode.com/?category=${encodeURIComponent(
                   category
                 )}`,
                 name: `${category} Algorithms`,
@@ -234,10 +234,10 @@ const Home = () => {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "CollectionPage",
-            name: "AlgoLib.io - Algorithm Library",
+            name: "RulCode.com - Algorithm Library",
             description:
               "Browse 200+ algorithms with step-by-step visualizations across 20 categories",
-            url: "https://algolib.io",
+            url: "https://rulcode.com",
             mainEntity: {
               "@type": "ItemList",
               numberOfItems: algorithms.length,
@@ -248,7 +248,7 @@ const Home = () => {
                   "@type": "TechArticle",
                   name: algo.name,
                   description: algo.description,
-                  url: `https://algolib.io/algorithm/${algo.id}`,
+                  url: `https://rulcode.com/problem/${algo.id}`,
                   articleSection: algo.category,
                   proficiencyLevel: algo.difficulty,
                 },
@@ -325,6 +325,45 @@ const Home = () => {
           </div>
         </div>
 
+        {/* Announcement Banner - Modern Design */}
+        <div className="relative border-y border-border/50 bg-gradient-to-br from-primary/10 via-background to-secondary/10 overflow-hidden">
+          {/* Animated background gradient */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(120,119,198,0.1),transparent_50%),radial-gradient(circle_at_70%_50%,rgba(74,222,128,0.1),transparent_50%)]" />
+          
+          <div className="container mx-auto px-4 py-6 relative">
+            <div className="max-w-5xl mx-auto">
+              <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6">
+                {/* Badge */}
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary/20 to-secondary/20 border border-primary/30 backdrop-blur-sm">
+                  <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+                  <span className="text-sm font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                    Coming Soon
+                  </span>
+                </div>
+
+                {/* Features */}
+                <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6">
+                  <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all">
+                    <div className="text-2xl">🎨</div>
+                    <div className="text-left">
+                      <div className="text-sm font-semibold text-foreground">New Problem Page UX</div>
+                      <div className="text-xs text-muted-foreground">Enhanced visualizations</div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-card/50 backdrop-blur-sm border border-border/50 hover:border-secondary/50 transition-all">
+                    <div className="text-2xl">⚡</div>
+                    <div className="text-left">
+                      <div className="text-sm font-semibold text-foreground">Code Runner</div>
+                      <div className="text-xs text-muted-foreground">Test solutions live!</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Featured Section */}
         <FeaturedSection />
 
@@ -382,7 +421,7 @@ const Home = () => {
             {filteredAlgorithms.map((algo, index) => (
               <Link
                 key={algo.id}
-                to={`/algorithm/${algo.id}`}
+                to={`/problem/${algo.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >

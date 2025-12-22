@@ -12,7 +12,6 @@ import {
   LogOut,
   Menu as MenuIcon,
   MessageSquare,
-  Trophy,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -20,12 +19,14 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./ThemeToggle";
 import logo from "@/assets/logo.svg";
+import logo_text from "@/assets/logo_test_2.svg";
+
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const Navbar = () => {
   const [user, setUser] = useState<any>(null);
-  const [completedCount, setCompletedCount] = useState(0);
   const location = useLocation();
   const isAuthPage = location.pathname === "/auth";
 
@@ -33,9 +34,6 @@ const Navbar = () => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProgress(session.user.id);
-      }
     });
 
     // Listen for auth changes
@@ -43,53 +41,12 @@ const Navbar = () => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProgress(session.user.id);
-      } else {
-        setCompletedCount(0);
-      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  const fetchProgress = async (userId: string) => {
-    const { data, error } = await supabase
-      .from("user_progress")
-      .select("*", { count: "exact" })
-      .eq("user_id", userId)
-      .eq("completed", true);
 
-    if (!error && data) {
-      setCompletedCount(data.length);
-    }
-  };
-
-  // Set up realtime subscription for progress updates
-  useEffect(() => {
-    if (!user) return;
-
-    const channel = supabase
-      .channel("user_progress_changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "user_progress",
-          filter: `user_id=eq.${user.id}`,
-        },
-        () => {
-          // Refetch progress when any change occurs
-          fetchProgress(user.id);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user]);
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -106,21 +63,13 @@ const Navbar = () => {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-4">
-            <Link
+ <Link
               to="/"
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
             >
-              <img src={logo} alt="Algo Lib Logo" className="w-8 h-8" />
-              <span className="font-bold text-xl">Algo Lib</span>
+              <img src={logo} alt="RulCode Logo" className="w-8 h-8" />
+              <img src={logo_text} alt="RulCode Logo Text" className="hidden md:block sm:hidden h-6" />
             </Link>
-            <a
-              href="https://neetcode.io"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden md:block text-xs text-muted-foreground hover:text-foreground transition-colors"
-            >
-              With Neetcode videos
-            </a>
           </div>
 
           {/* Navigation Links */}
@@ -188,7 +137,7 @@ const Navbar = () => {
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <a
-                    href="https://github.com/chandeldivyam/AlgoLib"
+                    href="https://github.com/chandeldivyam/RulCode"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 cursor-pointer"
@@ -203,14 +152,6 @@ const Navbar = () => {
             <ThemeToggle />
             {user && !isAuthPage ? (
               <>
-                {/* Progress indicator */}
-                <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/50 border border-border/50">
-                  <Trophy className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-medium">
-                    {completedCount} / 80 completed
-                  </span>
-                </div>
-
                 {/* User menu */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

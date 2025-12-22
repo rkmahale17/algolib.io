@@ -22,140 +22,44 @@ import { BrainstormSection } from "@/components/brainstorm/BrainstormSection";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { CopyCodeButton } from "@/components/CopyCodeButton";
 import { Separator } from "@/components/ui/separator";
 import { ShareButton } from "@/components/ShareButton";
 import { TreeVisualization } from "@/components/visualizations/TreeVisualization";
 import { YouTubePlayer } from "@/components/YouTubePlayer";
 import { algorithms } from "@/data/algorithms";
+import { blind75Problems } from "@/data/blind75";
 import { getAlgorithmImplementation } from "@/data/algorithmImplementations";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 
 const AlgorithmDetail: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
-  const algorithm = algorithms.find((a) => a.id === id);
+  
+  // Check both algorithms and blind75Problems arrays
+  const algorithm = algorithms.find((a) => a.id === id) || 
+                    blind75Problems.find((p) => p.slug === id);
+  
   const implementation = getAlgorithmImplementation(id || "");
   const [showBreadcrumb, setShowBreadcrumb] = useState(true);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [user, setUser] = useState<any>(null);
-  const [isCompleted, setIsCompleted] = useState(false);
-  const [isLoadingProgress, setIsLoadingProgress] = useState(true);
 
-  // Check authentication and load progress
+  // Check authentication status
   useEffect(() => {
-    const checkAuth = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-
-      if (session?.user && id) {
-        await fetchProgress(session.user.id);
-      } else {
-        setIsLoadingProgress(false);
-      }
-      setIsCheckingAuth(true);
-    };
-
-    checkAuth();
+    });
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      if (session?.user && id) {
-        fetchProgress(session.user.id);
-      } else {
-        setIsCompleted(false);
-        setIsLoadingProgress(false);
-      }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, id]);
+  }, []);
 
-  // Fetch user's progress for this algorithm
-  const fetchProgress = async (userId: string) => {
-    if (!id) return;
 
-    setIsLoadingProgress(true);
-    const { data, error } = await supabase
-      .from("user_progress")
-      .select("completed")
-      .eq("user_id", userId)
-      .eq("algorithm_id", id)
-      .maybeSingle();
-
-    if (!error && data) {
-      setIsCompleted(data.completed);
-    } else {
-      setIsCompleted(false);
-    }
-    setIsLoadingProgress(false);
-  };
-
-  // Toggle completion status
-  const toggleCompletion = async () => {
-    if (!user || !id) {
-      toast.error("Please sign in to track your progress");
-      navigate("/auth");
-      return;
-    }
-
-    const newCompletedState = !isCompleted;
-
-    // Optimistic update
-    setIsCompleted(newCompletedState);
-
-    // Check if record exists
-    const { data: existing } = await supabase
-      .from("user_progress")
-      .select("id")
-      .eq("user_id", user.id)
-      .eq("algorithm_id", id)
-      .maybeSingle();
-
-    if (existing) {
-      // Update existing record
-      const { error } = await supabase
-        .from("user_progress")
-        .update({
-          completed: newCompletedState,
-          completed_at: newCompletedState ? new Date().toISOString() : null,
-        })
-        .eq("user_id", user.id)
-        .eq("algorithm_id", id);
-
-      if (error) {
-        // Revert on error
-        setIsCompleted(!newCompletedState);
-        toast.error("Failed to update progress");
-        console.error(error);
-      } else {
-        toast.success(newCompletedState ? "Marked as completed! 🎉" : "Marked as incomplete");
-      }
-    } else {
-      // Insert new record
-      const { error } = await supabase.from("user_progress").insert({
-        user_id: user.id,
-        algorithm_id: id,
-        completed: newCompletedState,
-        completed_at: newCompletedState ? new Date().toISOString() : null,
-      });
-
-      if (error) {
-        // Revert on error
-        setIsCompleted(!newCompletedState);
-        toast.error("Failed to save progress");
-        console.error(error);
-      } else {
-        toast.success("Marked as completed! 🎉");
-      }
-    }
-  };
 
   // Scroll to top on mount/route change
   React.useEffect(() => {
@@ -1234,35 +1138,7 @@ const AlgorithmDetail: React.FC = () => {
         <div className="container mx-auto px-4 py-8 overflow-x-hidden">
           {/* Single column layout for all screen sizes */}
           <div className="space-y-6 mx-auto">
-            {/* Completion Tracker (Only for logged-in users) */}
-            {user && (
-              <Card className="p-4 glass-card border-primary/20">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-full ${isCompleted ? "bg-green-500/20" : "bg-muted"}`}>
-                      <CheckCircle2 className={`w-5 h-5 ${isCompleted ? "text-green-500" : "text-muted-foreground"}`} />
-                    </div>
-                    <div>
-                      <p className="font-medium">Track Your Progress</p>
-                      <p className="text-xs text-muted-foreground">Mark this algorithm as completed</p>
-                    </div>
-                  </div>
-                  <Checkbox
-                    checked={isCompleted}
-                    onCheckedChange={toggleCompletion}
-                    disabled={isLoadingProgress}
-                    className="h-6 w-6"
-                  />
-                </div>
-              </Card>
-            )}
-            {/* Brainstorm Section - Only visible when logged in */}
-
-            {user && id && (
-              <div className="container mx-auto px-4 mb-8">
-                <BrainstormSection algorithmId={id} algorithmTitle={algorithm.name} />
-              </div>
-            )}
+            {/* Main Content */}
             {/* 1. Animation - Login Required */}
             <Card className="p-4 sm:p-6 glass-card overflow-hidden">
               <div className="space-y-4">
@@ -1488,7 +1364,7 @@ const AlgorithmDetail: React.FC = () => {
                     <div className="pt-2 border-t border-border/50">
                       <p className="text-xs text-muted-foreground">
                         <strong>Credits:</strong> Video tutorial by NeetCode (used with permission). All written
-                        explanations, code examples, and additional insights provided by Algolib.io.
+                        explanations, code examples, and additional insights provided by RulCode.com.
                       </p>
                     </div>
                   </div>

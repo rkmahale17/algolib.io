@@ -8,33 +8,33 @@ export default function About() {
   return (
     <>
       <Helmet>
-        <title>About AlgoLib.io - Free Open Source Algorithm Learning Platform</title>
+        <title>About RulCode.com - Free Open Source Algorithm Learning Platform</title>
         <meta 
           name="description" 
-          content="Learn about AlgoLib.io's mission to make algorithm learning accessible through interactive visualizations. 100% free, open-source, and community-driven platform for developers and competitive programmers." 
+          content="Learn about RulCode.com's mission to make algorithm learning accessible through interactive visualizations. 100% free, open-source, and community-driven platform for developers and competitive programmers." 
         />
         <meta 
           name="keywords" 
-          content="about algolib, algorithm learning platform, open source algorithms, free coding education, interactive algorithm visualizations" 
+          content="about rulcode, algorithm learning platform, open source algorithms, free coding education, interactive algorithm visualizations" 
         />
-        <link rel="canonical" href="https://algolib.io/about" />
+        <link rel="canonical" href="https://rulcode.com/about" />
         
-        <meta property="og:title" content="About AlgoLib.io - Free Algorithm Learning Platform" />
+        <meta property="og:title" content="About RulCode.com - Free Algorithm Learning Platform" />
         <meta property="og:description" content="100% free and open-source platform for learning algorithms with interactive visualizations" />
-        <meta property="og:url" content="https://algolib.io/about" />
+        <meta property="og:url" content="https://rulcode.com/about" />
         
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "AboutPage",
-            "name": "About AlgoLib.io",
-            "description": "AlgoLib.io is an open-source platform designed to make algorithm learning accessible, interactive, and enjoyable for everyone",
-            "url": "https://algolib.io/about",
+            "name": "About RulCode.com",
+            "description": "RulCode.com is an open-source platform designed to make algorithm learning accessible, interactive, and enjoyable for everyone",
+            "url": "https://rulcode.com/about",
             "mainEntity": {
               "@type": "EducationalOrganization",
-              "name": "AlgoLib.io",
+              "name": "RulCode.com",
               "description": "Free and open-source algorithm library for competitive programming and coding interviews",
-              "url": "https://algolib.io"
+              "url": "https://rulcode.com"
             }
           })}
         </script>
@@ -44,7 +44,7 @@ export default function About() {
         <main className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="space-y-8">
           <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold text-foreground">About AlgoLib.io</h1>
+            <h1 className="text-4xl font-bold text-foreground">About RulCode.com</h1>
             <p className="text-xl text-muted-foreground">
               Learn, visualize, and master algorithms with interactive explanations
             </p>
@@ -59,14 +59,14 @@ export default function About() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
-                AlgoLib.io is an open-source platform designed to make algorithm learning accessible, 
+                RulCode.com is an open-source platform designed to make algorithm learning accessible, 
                 interactive, and enjoyable for everyone. We provide comprehensive explanations, 
                 multi-language implementations, and visual representations of popular algorithms and 
                 data structures.
               </p>
               <p className="text-muted-foreground">
                 Whether you're preparing for coding interviews, learning computer science fundamentals, 
-                or expanding your programming knowledge, AlgoLib.io offers a structured approach to 
+                or expanding your programming knowledge, RulCode.com offers a structured approach to 
                 mastering algorithmic thinking.
               </p>
             </CardContent>
@@ -81,7 +81,7 @@ export default function About() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
-                AlgoLib.io is completely free to use and will remain so forever. Our entire codebase 
+                RulCode.com is completely free to use and will remain so forever. Our entire codebase 
                 is open source and available on GitHub, allowing developers to contribute, learn from 
                 the code, and even fork the project for their own purposes.
               </p>
@@ -119,7 +119,7 @@ export default function About() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
-                We welcome contributions from the community! Help us expand AlgoLib.io with:
+                We welcome contributions from the community! Help us expand RulCode.com with:
               </p>
               <ul className="list-disc list-inside space-y-2 text-muted-foreground ml-4">
                 <li>New algorithm implementations and explanations</li>

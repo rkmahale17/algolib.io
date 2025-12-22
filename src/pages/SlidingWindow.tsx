@@ -24,15 +24,15 @@ const SlidingWindow = () => {
   return (
     <>
       <Helmet>
-        <title>Sliding Window Ninja Game - Master Sliding Window Technique | AlgoLib.io</title>
+        <title>Sliding Window Ninja Game - Master Sliding Window Technique | RulCode.com</title>
         <meta name="description" content="Master the sliding window algorithm through interactive gameplay. Learn fixed window, variable window, and optimization techniques for substring and subarray problems." />
         <meta name="keywords" content="sliding window game, sliding window technique, subarray game, substring problems, algorithm optimization, coding interview patterns" />
-        <link rel="canonical" href="https://algolib.io/games/sliding-window" />
+        <link rel="canonical" href="https://rulcode.com/games/sliding-window" />
         
         <meta property="og:title" content="Sliding Window Ninja - Interactive Algorithm Game" />
         <meta property="og:description" content="Master sliding window technique through gameplay." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://algolib.io/games/sliding-window" />
+        <meta property="og:url" content="https://rulcode.com/games/sliding-window" />
         
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Sliding Window Ninja - Learn Optimization" />

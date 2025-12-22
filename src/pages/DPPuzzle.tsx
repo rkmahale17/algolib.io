@@ -24,15 +24,15 @@ const DPPuzzle = () => {
   return (
     <>
       <Helmet>
-        <title>DP Puzzle Grid Game - Learn Dynamic Programming | AlgoLib.io</title>
+        <title>DP Puzzle Grid Game - Learn Dynamic Programming | RulCode.com</title>
         <meta name="description" content="Master dynamic programming through interactive table-filling puzzles. Learn Fibonacci, Knapsack, LCS, and more DP patterns by solving visual challenges." />
         <meta name="keywords" content="dynamic programming game, DP table game, knapsack game, fibonacci game, LCS game, memoization learning, coding interview DP" />
-        <link rel="canonical" href="https://algolib.io/games/dp-puzzle" />
+        <link rel="canonical" href="https://rulcode.com/games/dp-puzzle" />
         
         <meta property="og:title" content="DP Puzzle Grid - Dynamic Programming Game" />
         <meta property="og:description" content="Master DP by filling tables for classic problems." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://algolib.io/games/dp-puzzle" />
+        <meta property="og:url" content="https://rulcode.com/games/dp-puzzle" />
         
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="DP Puzzle Grid - Learn Dynamic Programming" />

@@ -3,7 +3,7 @@ import { algorithms } from "@/data/algorithms";
 import { useParams } from "react-router-dom";
 
 // Helper utilities
-const siteBase = "https://algolib.io";
+const siteBase = "https://rulcode.com";
 const defaultOg = `${siteBase}/og-image.png`;
 
 function escapeHtml(s: string) {
@@ -15,7 +15,7 @@ function escapeHtml(s: string) {
 }
 
 function buildTitle(algo: any) {
-  return `${algo.name} – AlgoLib.io | ${algo.category} | ${capitalize(
+  return `${algo.name} – RulCode.com | ${algo.category} | ${capitalize(
     algo.difficulty
   )}`;
 }
@@ -34,10 +34,10 @@ export function AlgoMetaHead({ id }: { id?: string }) {
   // Build page-level defaults
   const title = algo
     ? buildTitle(algo)
-    : "AlgoLib.io - Master 200+ Algorithms with Interactive Visualizations | Free & Open Source";
+    : "RulCode.com - Master 200+ Algorithms with Interactive Visualizations | Free & Open Source";
   const description = algo
     ? `${algo.name}: ${algo.description}. Code snippets in Python, Java, C++, and TypeScript. Time: ${algo.timeComplexity}. Space: ${algo.spaceComplexity}. Free & open-source resource for competitive programming.`
-    : "AlgoLib.io is a free and open-source algorithm library for competitive programmers. Learn, visualize, and master algorithms with step-by-step explanations and multi-language snippets.";
+    : "RulCode.com is a free and open-source algorithm library for competitive programmers. Learn, visualize, and master algorithms with step-by-step explanations and multi-language snippets.";
 
   const keywords = algo
     ? [
@@ -50,11 +50,11 @@ export function AlgoMetaHead({ id }: { id?: string }) {
         "java",
         "c++",
         "typescript",
-        "algolib",
+        "rulcode",
       ].join(", ")
-    : "algorithms, open source, free, competitive programming, algorithm library, algolib";
+    : "algorithms, open source, free, competitive programming, algorithm library, rulcode";
 
-  const pageUrl = algo ? `${siteBase}/algorithm/${algo.id}` : siteBase;
+  const pageUrl = algo ? `${siteBase}/problem/${algo.id}` : siteBase;
   const ogImage = `${siteBase}/og-image.png`; // Use default OG image for all pages
 
   // Build JSON-LD structured data
@@ -64,7 +64,7 @@ export function AlgoMetaHead({ id }: { id?: string }) {
         "@type": "TechArticle",
         headline: algo.name,
         description: algo.description,
-        url: `${siteBase}/algorithm/${algo.id}`,
+        url: `${siteBase}/problem/${algo.id}`,
         image: {
           "@type": "ImageObject",
           url: ogImage,
@@ -73,7 +73,7 @@ export function AlgoMetaHead({ id }: { id?: string }) {
         },
         author: {
           "@type": "Organization",
-          name: "AlgoLib.io",
+          name: "RulCode.com",
           url: siteBase,
           logo: {
             "@type": "ImageObject",
@@ -84,7 +84,7 @@ export function AlgoMetaHead({ id }: { id?: string }) {
         },
         publisher: {
           "@type": "Organization",
-          name: "AlgoLib.io",
+          name: "RulCode.com",
           url: siteBase,
           logo: {
             "@type": "ImageObject",
@@ -97,7 +97,7 @@ export function AlgoMetaHead({ id }: { id?: string }) {
         dateModified: new Date().toISOString().split("T")[0],
         mainEntityOfPage: {
           "@type": "WebPage",
-          "@id": `${siteBase}/algorithm/${algo.id}`,
+          "@id": `${siteBase}/problem/${algo.id}`,
         },
         about: {
           "@type": "Thing",
@@ -125,13 +125,13 @@ export function AlgoMetaHead({ id }: { id?: string }) {
     : {
         "@context": "https://schema.org",
         "@type": "WebSite",
-        name: "AlgoLib.io",
+        name: "RulCode.com",
         url: siteBase,
         description:
           "Free and open-source algorithm library for competitive programming",
         publisher: {
           "@type": "Organization",
-          name: "AlgoLib.io",
+          name: "RulCode.com",
           url: siteBase,
           logo: {
             "@type": "ImageObject",
@@ -164,7 +164,7 @@ export function AlgoMetaHead({ id }: { id?: string }) {
 
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:site" content="@algolib_io" />
+      <meta name="twitter:site" content="@rulcode_com" />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={ogImage || defaultOg} />
@@ -204,7 +204,7 @@ export function AlgoMetaHead({ id }: { id?: string }) {
                 "@type": "ListItem",
                 position: 3,
                 item: {
-                  "@id": `${siteBase}/algorithm/${algo.id}`,
+                  "@id": `${siteBase}/problem/${algo.id}`,
                   name: algo.name,
                 },
               },

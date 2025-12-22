@@ -29,18 +29,18 @@ let failCount = 0;
 
 for (const test of testPages) {
     const filePath = path.join(distPath, test.path);
-    
+
     if (!fs.existsSync(filePath)) {
         console.log(`❌ ${test.name}: File not found at ${test.path}`);
         failCount++;
         continue;
     }
-    
+
     const content = fs.readFileSync(filePath, 'utf-8');
-    
+
     // Check for content indicators
     const checks: Array<{ name: string; pass: boolean }> = [];
-    
+
     if (test.path.includes('algorithm/')) {
         // Algorithm pages should have content
         checks.push({
@@ -61,7 +61,7 @@ for (const test of testPages) {
         });
         checks.push({
             name: 'Has unique title',
-            pass: content.includes('<title>') && !content.includes('<title>AlgoLib.io – Open-Source Algorithm Library')
+            pass: content.includes('<title>') && !content.includes('<title>RulCode.com – Open-Source Algorithm Library')
         });
     } else if (test.path === 'sitemap.xml') {
         checks.push({
@@ -109,9 +109,9 @@ for (const test of testPages) {
             pass: !content.includes('<div id="root"><!--app-html--></div>')
         });
     }
-    
+
     const allPassed = checks.every(c => c.pass);
-    
+
     if (allPassed) {
         console.log(`✅ ${test.name}`);
         checks.forEach(c => console.log(`   ✓ ${c.name}`));
@@ -127,7 +127,7 @@ for (const test of testPages) {
         });
         failCount++;
     }
-    
+
     console.log('');
 }
 

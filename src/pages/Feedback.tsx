@@ -47,20 +47,20 @@ const Feedback = () => {
   return (
     <>
       <Helmet>
-        <title>Feedback & Suggestions - AlgoLib.io | Report Bugs & Request Features</title>
+        <title>Feedback & Suggestions - RulCode.com | Report Bugs & Request Features</title>
         <meta 
           name="description" 
-          content="Share your feedback, report bugs, or request new features for AlgoLib.io. Help us improve our free algorithm learning platform. Submit issues on GitHub." 
+          content="Share your feedback, report bugs, or request new features for RulCode.com. Help us improve our free algorithm learning platform. Submit issues on GitHub." 
         />
         <meta 
           name="keywords" 
-          content="algolib feedback, report bug, feature request, algorithm platform feedback, contribute feedback" 
+          content="rulcode feedback, report bug, feature request, algorithm platform feedback, contribute feedback" 
         />
-        <link rel="canonical" href="https://algolib.io/feedback" />
+        <link rel="canonical" href="https://rulcode.com/feedback" />
         
-        <meta property="og:title" content="Feedback & Suggestions - AlgoLib.io" />
-        <meta property="og:description" content="Help us improve AlgoLib.io by sharing your feedback and suggestions" />
-        <meta property="og:url" content="https://algolib.io/feedback" />
+        <meta property="og:title" content="Feedback & Suggestions - RulCode.com" />
+        <meta property="og:description" content="Help us improve RulCode.com by sharing your feedback and suggestions" />
+        <meta property="og:url" content="https://rulcode.com/feedback" />
         <meta name="robots" content="index, follow" />
       </Helmet>
       

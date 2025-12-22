@@ -61,20 +61,20 @@ const Games = () => {
   return (
     <>
       <Helmet>
-        <title>Algorithmic Games - Learn Algorithms Interactively | AlgoLib.io</title>
+        <title>Algorithmic Games - Learn Algorithms Interactively | RulCode.com</title>
         <meta
           name="description"
           content="Master data structures and algorithms through interactive games. Play Sort Hero, Graph Explorer, Stack Master, DP Puzzle, Sliding Window Ninja, and Two Pointer Race. Free educational games for coding interview preparation."
         />
         <meta name="keywords" content="algorithm games, coding games, interactive learning, data structures games, competitive programming practice, sorting algorithms game, graph algorithms game" />
-        <link rel="canonical" href="https://algolib.io/games" />
+        <link rel="canonical" href="https://rulcode.com/games" />
         
         {/* Open Graph */}
         <meta property="og:title" content="Algorithmic Games - Learn Through Play" />
         <meta property="og:description" content="Master algorithms through interactive games and challenges." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://algolib.io/games" />
-        <meta property="og:image" content="https://algolib.io/og-image.png" />
+        <meta property="og:url" content="https://rulcode.com/games" />
+        <meta property="og:image" content="https://rulcode.com/og-image.png" />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
@@ -88,7 +88,7 @@ const Games = () => {
             "@type": "WebPage",
             "name": "Algorithmic Games",
             "description": "Interactive algorithm learning games",
-            "url": "https://algolib.io/games",
+            "url": "https://rulcode.com/games",
             "mainEntity": {
               "@type": "ItemList",
               "itemListElement": games.map((game, index) => ({

@@ -38,9 +38,8 @@ const App = () => (
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/algorithm/:id" element={<AlgorithmDetail />} />
+          <Route path="/problem/:id" element={<AlgorithmDetail />} />
           <Route path="/blind75" element={<ProtectedRoute><Blind75 /></ProtectedRoute>} />
-          <Route path="/blind75/:slug" element={<ProtectedRoute><Blind75Detail /></ProtectedRoute>} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/about" element={<About />} />

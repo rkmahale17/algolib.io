@@ -24,15 +24,15 @@ const TwoPointer = () => {
   return (
     <>
       <Helmet>
-        <title>Two Pointer Race Game - Learn Two Pointer Technique | AlgoLib.io</title>
+        <title>Two Pointer Race Game - Learn Two Pointer Technique | RulCode.com</title>
         <meta name="description" content="Master the two-pointer technique through interactive gameplay. Find valid pairs, learn sorted array patterns, and optimize your algorithm skills." />
         <meta name="keywords" content="two pointer game, two pointer technique, algorithm pattern game, sorted array problems, coding interview prep, pair sum game" />
-        <link rel="canonical" href="https://algolib.io/games/two-pointer" />
+        <link rel="canonical" href="https://rulcode.com/games/two-pointer" />
         
         <meta property="og:title" content="Two Pointer Race - Interactive Algorithm Game" />
         <meta property="og:description" content="Master the two-pointer technique through interactive gameplay." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://algolib.io/games/two-pointer" />
+        <meta property="og:url" content="https://rulcode.com/games/two-pointer" />
         
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Two Pointer Race - Learn Algorithm Patterns" />

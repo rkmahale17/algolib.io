@@ -1,8 +1,8 @@
-# Welcome to AlgoLib.io 🚀
+# Welcome to RulCode.com 🚀
 
-AlgoLib.io is an open-source platform to **learn, visualize, and master algorithms** with interactive explanations and multi-language code snippets (Python, Java, C++, and TypeScript).
+RulCode.com is an open-source platform to **learn, visualize, and master algorithms** with interactive explanations and multi-language code snippets (Python, Java, C++, and TypeScript).
 
-🌐 **Visit Live:** [https://algolib.io](https://algolib.io)
+🌐 **Visit Live:** [https://rulcode.com](https://rulcode.com)
 
 ---
 
@@ -11,140 +11,140 @@ AlgoLib.io is an open-source platform to **learn, visualize, and master algorith
 <details>
 <summary><strong>Arrays & Strings</strong></summary>
 
-- [Two Pointers](https://algolib.io/algorithm/two-pointers) — Use two pointers to traverse arrays efficiently
-- [Sliding Window](https://algolib.io/algorithm/sliding-window) — Maintain a window of elements for efficient computation
-- [Prefix Sum](https://algolib.io/algorithm/prefix-sum) — Pre-compute cumulative sums for range queries
-- [Binary Search](https://algolib.io/algorithm/binary-search) — Search in sorted arrays in logarithmic time
-- [Kadane's Algorithm](https://algolib.io/algorithm/kadanes-algorithm) — Find maximum subarray sum efficiently
-- [Dutch National Flag](https://algolib.io/algorithm/dutch-national-flag) — Sort array of three distinct elements
-- [Merge Intervals](https://algolib.io/algorithm/merge-intervals) — Merge overlapping intervals
-- [Monotonic Stack](https://algolib.io/algorithm/monotonic-stack) — Stack with monotonic properties for efficient queries
-- [Rotate Array In-Place](https://algolib.io/algorithm/rotate-array) — Rotate array elements without extra space
-- [Cyclic Sort](https://algolib.io/algorithm/cyclic-sort) — Sort by placing elements at their correct index
+- [Two Pointers](https://rulcode.com/problem/two-pointers) — Use two pointers to traverse arrays efficiently
+- [Sliding Window](https://rulcode.com/problem/sliding-window) — Maintain a window of elements for efficient computation
+- [Prefix Sum](https://rulcode.com/problem/prefix-sum) — Pre-compute cumulative sums for range queries
+- [Binary Search](https://rulcode.com/problem/binary-search) — Search in sorted arrays in logarithmic time
+- [Kadane's Algorithm](https://rulcode.com/problem/kadanes-algorithm) — Find maximum subarray sum efficiently
+- [Dutch National Flag](https://rulcode.com/problem/dutch-national-flag) — Sort array of three distinct elements
+- [Merge Intervals](https://rulcode.com/problem/merge-intervals) — Merge overlapping intervals
+- [Monotonic Stack](https://rulcode.com/problem/monotonic-stack) — Stack with monotonic properties for efficient queries
+- [Rotate Array In-Place](https://rulcode.com/problem/rotate-array) — Rotate array elements without extra space
+- [Cyclic Sort](https://rulcode.com/problem/cyclic-sort) — Sort by placing elements at their correct index
 
 </details>
 
 <details>
 <summary><strong>Linked List</strong></summary>
 
-- [Fast & Slow Pointers](https://algolib.io/algorithm/fast-slow-pointers) — Detect cycles and find middle using two pointers
-- [Reverse Linked List](https://algolib.io/algorithm/reverse-linked-list) — Reverse a singly linked list
-- [Merge Two Sorted Lists](https://algolib.io/algorithm/merge-sorted-lists) — Merge two sorted linked lists
-- [Detect Cycle](https://algolib.io/algorithm/detect-cycle) — Floyd's algorithm to detect cycles
-- [Middle Node](https://algolib.io/algorithm/middle-node) — Find middle node using fast and slow pointers
+- [Fast & Slow Pointers](https://rulcode.com/problem/fast-slow-pointers) — Detect cycles and find middle using two pointers
+- [Reverse Linked List](https://rulcode.com/problem/reverse-linked-list) — Reverse a singly linked list
+- [Merge Two Sorted Lists](https://rulcode.com/problem/merge-sorted-lists) — Merge two sorted linked lists
+- [Detect Cycle](https://rulcode.com/problem/detect-cycle) — Floyd's algorithm to detect cycles
+- [Middle Node](https://rulcode.com/problem/middle-node) — Find middle node using fast and slow pointers
 
 </details>
 
 <details>
 <summary><strong>Trees & BSTs</strong></summary>
 
-- [DFS Preorder](https://algolib.io/algorithm/dfs-preorder) — Visit root, left, then right subtree
-- [DFS Inorder](https://algolib.io/algorithm/dfs-inorder) — Visit left, root, then right subtree
-- [DFS Postorder](https://algolib.io/algorithm/dfs-postorder) — Visit left, right, then root
-- [BFS Level Order](https://algolib.io/algorithm/bfs-level-order) — Traverse tree level by level
-- [BST Insert](https://algolib.io/algorithm/bst-insert) — Insert node in binary search tree
-- [Lowest Common Ancestor](https://algolib.io/algorithm/lca) — Find LCA of two nodes in tree
-- [Recover BST](https://algolib.io/algorithm/recover-bst) — Fix BST with two swapped nodes
-- [Serialize Tree](https://algolib.io/algorithm/serialize-tree) — Serialize and deserialize binary tree
-- [Trie (Prefix Tree)](https://algolib.io/algorithm/trie) — Efficient string storage and retrieval
+- [DFS Preorder](https://rulcode.com/problem/dfs-preorder) — Visit root, left, then right subtree
+- [DFS Inorder](https://rulcode.com/problem/dfs-inorder) — Visit left, root, then right subtree
+- [DFS Postorder](https://rulcode.com/problem/dfs-postorder) — Visit left, right, then root
+- [BFS Level Order](https://rulcode.com/problem/bfs-level-order) — Traverse tree level by level
+- [BST Insert](https://rulcode.com/problem/bst-insert) — Insert node in binary search tree
+- [Lowest Common Ancestor](https://rulcode.com/problem/lca) — Find LCA of two nodes in tree
+- [Recover BST](https://rulcode.com/problem/recover-bst) — Fix BST with two swapped nodes
+- [Serialize Tree](https://rulcode.com/problem/serialize-tree) — Serialize and deserialize binary tree
+- [Trie (Prefix Tree)](https://rulcode.com/problem/trie) — Efficient string storage and retrieval
 
 </details>
 
 <details>
 <summary><strong>Graphs</strong></summary>
 
-- [Graph DFS](https://algolib.io/algorithm/graph-dfs) — Depth-first traversal of graphs
-- [Graph BFS](https://algolib.io/algorithm/graph-bfs) — Breadth-first traversal of graphs
-- [Topological Sort](https://algolib.io/algorithm/topological-sort) — Kahn's algorithm for DAG ordering
-- [Union-Find](https://algolib.io/algorithm/union-find) — Disjoint set data structure
-- [Kruskal's Algorithm](https://algolib.io/algorithm/kruskals) — Find minimum spanning tree
-- [Prim's Algorithm](https://algolib.io/algorithm/prims) — Find MST using greedy approach
-- [Dijkstra's Algorithm](https://algolib.io/algorithm/dijkstras) — Single-source shortest path
-- [Bellman-Ford](https://algolib.io/algorithm/bellman-ford) — Shortest path with negative weights
-- [Floyd-Warshall](https://algolib.io/algorithm/floyd-warshall) — All-pairs shortest paths
-- [A\* Search](https://algolib.io/algorithm/a-star) — Heuristic pathfinding algorithm
+- [Graph DFS](https://rulcode.com/problem/graph-dfs) — Depth-first traversal of graphs
+- [Graph BFS](https://rulcode.com/problem/graph-bfs) — Breadth-first traversal of graphs
+- [Topological Sort](https://rulcode.com/problem/topological-sort) — Kahn's algorithm for DAG ordering
+- [Union-Find](https://rulcode.com/problem/union-find) — Disjoint set data structure
+- [Kruskal's Algorithm](https://rulcode.com/problem/kruskals) — Find minimum spanning tree
+- [Prim's Algorithm](https://rulcode.com/problem/prims) — Find MST using greedy approach
+- [Dijkstra's Algorithm](https://rulcode.com/problem/dijkstras) — Single-source shortest path
+- [Bellman-Ford](https://rulcode.com/problem/bellman-ford) — Shortest path with negative weights
+- [Floyd-Warshall](https://rulcode.com/problem/floyd-warshall) — All-pairs shortest paths
+- [A\* Search](https://rulcode.com/problem/a-star) — Heuristic pathfinding algorithm
 
 </details>
 
 <details>
 <summary><strong>Dynamic Programming</strong></summary>
 
-- [0/1 Knapsack](https://algolib.io/algorithm/knapsack-01) — Maximize value with weight constraint
-- [Coin Change](https://algolib.io/algorithm/coin-change) — Minimum coins for target amount
-- [Longest Common Subsequence](https://algolib.io/algorithm/lcs) — Find longest common subsequence
-- [Longest Increasing Subsequence](https://algolib.io/algorithm/lis) — Find LIS in array
-- [Edit Distance](https://algolib.io/algorithm/edit-distance) — Minimum edits to transform strings
-- [Matrix Path DP](https://algolib.io/algorithm/matrix-path-dp) — Find unique or minimum paths in matrix
-- [Partition Equal Subset](https://algolib.io/algorithm/partition-equal-subset) — Check if array can be partitioned equally
-- [House Robber](https://algolib.io/algorithm/house-robber) — Maximum sum without adjacent elements
-- [Climbing Stairs](https://algolib.io/algorithm/climbing-stairs) — Count ways to climb n stairs
-- [Word Break](https://algolib.io/algorithm/word-break) — Segment string into dictionary words
+- [0/1 Knapsack](https://rulcode.com/problem/knapsack-01) — Maximize value with weight constraint
+- [Coin Change](https://rulcode.com/problem/coin-change) — Minimum coins for target amount
+- [Longest Common Subsequence](https://rulcode.com/problem/lcs) — Find longest common subsequence
+- [Longest Increasing Subsequence](https://rulcode.com/problem/lis) — Find LIS in array
+- [Edit Distance](https://rulcode.com/problem/edit-distance) — Minimum edits to transform strings
+- [Matrix Path DP](https://rulcode.com/problem/matrix-path-dp) — Find unique or minimum paths in matrix
+- [Partition Equal Subset](https://rulcode.com/problem/partition-equal-subset) — Check if array can be partitioned equally
+- [House Robber](https://rulcode.com/problem/house-robber) — Maximum sum without adjacent elements
+- [Climbing Stairs](https://rulcode.com/problem/climbing-stairs) — Count ways to climb n stairs
+- [Word Break](https://rulcode.com/problem/word-break) — Segment string into dictionary words
 
 </details>
 
 <details>
 <summary><strong>Greedy</strong></summary>
 
-- [Activity Selection](https://algolib.io/algorithm/activity-selection) — Select maximum non-overlapping activities
-- [Interval Scheduling](https://algolib.io/algorithm/interval-scheduling) — Schedule intervals optimally
-- [Huffman Encoding](https://algolib.io/algorithm/huffman-encoding) — Optimal prefix-free encoding
-- [Gas Station](https://algolib.io/algorithm/gas-station) — Find starting station for circular tour
+- [Activity Selection](https://rulcode.com/problem/activity-selection) — Select maximum non-overlapping activities
+- [Interval Scheduling](https://rulcode.com/problem/interval-scheduling) — Schedule intervals optimally
+- [Huffman Encoding](https://rulcode.com/problem/huffman-encoding) — Optimal prefix-free encoding
+- [Gas Station](https://rulcode.com/problem/gas-station) — Find starting station for circular tour
 
 </details>
 
 <details>
 <summary><strong>Backtracking</strong></summary>
 
-- [Subsets](https://algolib.io/algorithm/subsets) — Generate all subsets of a set
-- [Permutations](https://algolib.io/algorithm/permutations) — Generate all permutations
-- [Combinations](https://algolib.io/algorithm/combinations) — Generate all k-combinations
-- [Combination Sum](https://algolib.io/algorithm/combination-sum) — Find combinations summing to target
-- [Word Search](https://algolib.io/algorithm/word-search-grid) — Find word in 2D grid
-- [N-Queens](https://algolib.io/algorithm/n-queens) — Place N queens on N×N board
-- [Sudoku Solver](https://algolib.io/algorithm/sudoku-solver) — Solve Sudoku puzzle
+- [Subsets](https://rulcode.com/problem/subsets) — Generate all subsets of a set
+- [Permutations](https://rulcode.com/problem/permutations) — Generate all permutations
+- [Combinations](https://rulcode.com/problem/combinations) — Generate all k-combinations
+- [Combination Sum](https://rulcode.com/problem/combination-sum) — Find combinations summing to target
+- [Word Search](https://rulcode.com/problem/word-search-grid) — Find word in 2D grid
+- [N-Queens](https://rulcode.com/problem/n-queens) — Place N queens on N×N board
+- [Sudoku Solver](https://rulcode.com/problem/sudoku-solver) — Solve Sudoku puzzle
 
 </details>
 
 <details>
 <summary><strong>Bit Manipulation</strong></summary>
 
-- [XOR Trick](https://algolib.io/algorithm/xor-trick) — Find single number using XOR
-- [Count Bits](https://algolib.io/algorithm/count-bits) — Brian Kernighan's algorithm
-- [Subset Generation with Bits](https://algolib.io/algorithm/subset-generation-bits) — Generate subsets using bitmasks
+- [XOR Trick](https://rulcode.com/problem/xor-trick) — Find single number using XOR
+- [Count Bits](https://rulcode.com/problem/count-bits) — Brian Kernighan's algorithm
+- [Subset Generation with Bits](https://rulcode.com/problem/subset-generation-bits) — Generate subsets using bitmasks
 
 </details>
 
 <details>
 <summary><strong>Heap / Priority Queue</strong></summary>
 
-- [Kth Largest Element](https://algolib.io/algorithm/kth-largest) — Find kth largest using min heap
-- [Merge K Sorted Lists](https://algolib.io/algorithm/merge-k-lists) — Merge using min heap
-- [Sliding Window Maximum](https://algolib.io/algorithm/sliding-window-maximum) — Find max in each window
+- [Kth Largest Element](https://rulcode.com/problem/kth-largest) — Find kth largest using min heap
+- [Merge K Sorted Lists](https://rulcode.com/problem/merge-k-lists) — Merge using min heap
+- [Sliding Window Maximum](https://rulcode.com/problem/sliding-window-maximum) — Find max in each window
 
 </details>
 
 <details>
 <summary><strong>Math & Number Theory</strong></summary>
 
-- [GCD (Euclidean)](https://algolib.io/algorithm/gcd-euclidean) — Euclid's algorithm for GCD
-- [Sieve of Eratosthenes](https://algolib.io/algorithm/sieve-eratosthenes) — Generate all primes up to n
-- [Modular Exponentiation](https://algolib.io/algorithm/modular-exponentiation) — Fast power with modulo
-- [Karatsuba Multiplication](https://algolib.io/algorithm/karatsuba) — Fast multiplication algorithm
+- [GCD (Euclidean)](https://rulcode.com/problem/gcd-euclidean) — Euclid's algorithm for GCD
+- [Sieve of Eratosthenes](https://rulcode.com/problem/sieve-eratosthenes) — Generate all primes up to n
+- [Modular Exponentiation](https://rulcode.com/problem/modular-exponentiation) — Fast power with modulo
+- [Karatsuba Multiplication](https://rulcode.com/problem/karatsuba) — Fast multiplication algorithm
 
 </details>
 
 <details>
 <summary><strong>Advanced</strong></summary>
 
-- [Segment Tree](https://algolib.io/algorithm/segment-tree) — Range query data structure
-- [Fenwick Tree (BIT)](https://algolib.io/algorithm/fenwick-tree) — Binary indexed tree for prefix sums
-- [Sparse Table](https://algolib.io/algorithm/sparse-table) — Range minimum query in O(1)
-- [KMP String Matching](https://algolib.io/algorithm/kmp) — Linear time pattern matching
-- [Rabin-Karp](https://algolib.io/algorithm/rabin-karp) — Rolling hash pattern matching
-- [Manacher's Algorithm](https://algolib.io/algorithm/manachers) — Longest palindromic substring
-- [Union by Rank + Path Compression](https://algolib.io/algorithm/union-by-rank) — Optimized union-find
-- [Tarjan's Algorithm](https://algolib.io/algorithm/tarjans) — Find strongly connected components
-- [Binary Lifting](https://algolib.io/algorithm/binary-lifting) — LCA using binary lifting
+- [Segment Tree](https://rulcode.com/problem/segment-tree) — Range query data structure
+- [Fenwick Tree (BIT)](https://rulcode.com/problem/fenwick-tree) — Binary indexed tree for prefix sums
+- [Sparse Table](https://rulcode.com/problem/sparse-table) — Range minimum query in O(1)
+- [KMP String Matching](https://rulcode.com/problem/kmp) — Linear time pattern matching
+- [Rabin-Karp](https://rulcode.com/problem/rabin-karp) — Rolling hash pattern matching
+- [Manacher's Algorithm](https://rulcode.com/problem/manachers) — Longest palindromic substring
+- [Union by Rank + Path Compression](https://rulcode.com/problem/union-by-rank) — Optimized union-find
+- [Tarjan's Algorithm](https://rulcode.com/problem/tarjans) — Find strongly connected components
+- [Binary Lifting](https://rulcode.com/problem/binary-lifting) — LCA using binary lifting
 
 </details>
 
@@ -155,79 +155,79 @@ AlgoLib.io is an open-source platform to **learn, visualize, and master algorith
 
 - Array & Hashing
 
-  - [Two Sum](https://algolib.io/blind75/two-sum) — Find pair that sums to target
-  - [Contains Duplicate](https://algolib.io/blind75/contains-duplicate) — Check for duplicates in array
-  - [Valid Anagram](https://algolib.io/blind75/valid-anagram) — Check if strings are anagrams
-  - [Group Anagrams](https://algolib.io/blind75/group-anagrams) — Group strings by anagram
-  - [Top K Frequent](https://algolib.io/blind75/top-k-frequent) — Find k most frequent elements
-  - [Product Except Self](https://algolib.io/blind75/product-except-self) — Array product without division
-  - [Encode Decode Strings](https://algolib.io/blind75/encode-decode) — Encode/decode string array
-  - [Longest Consecutive](https://algolib.io/blind75/longest-consecutive) — Longest consecutive sequence
+  - [Two Sum](https://rulcode.com/problem/two-sum) — Find pair that sums to target
+  - [Contains Duplicate](https://rulcode.com/problem/contains-duplicate) — Check for duplicates in array
+  - [Valid Anagram](https://rulcode.com/problem/valid-anagram) — Check if strings are anagrams
+  - [Group Anagrams](https://rulcode.com/problem/group-anagrams) — Group strings by anagram
+  - [Top K Frequent](https://rulcode.com/problem/top-k-frequent) — Find k most frequent elements
+  - [Product Except Self](https://rulcode.com/problem/product-except-self) — Array product without division
+  - [Encode Decode Strings](https://rulcode.com/problem/encode-decode) — Encode/decode string array
+  - [Longest Consecutive](https://rulcode.com/problem/longest-consecutive) — Longest consecutive sequence
 
 - Two Pointers
 
-  - [Valid Palindrome](https://algolib.io/blind75/valid-palindrome) — Check if string is palindrome
-  - [Three Sum](https://algolib.io/blind75/three-sum) — Find triplets that sum to zero
-  - [Container With Most Water](https://algolib.io/blind75/container-water) — Max water container area
+  - [Valid Palindrome](https://rulcode.com/problem/valid-palindrome) — Check if string is palindrome
+  - [Three Sum](https://rulcode.com/problem/three-sum) — Find triplets that sum to zero
+  - [Container With Most Water](https://rulcode.com/problem/container-water) — Max water container area
 
 - Sliding Window
 
-  - [Best Time to Buy Sell](https://algolib.io/blind75/best-time-buy-sell) — Max profit from stock prices
-  - [Longest Substring](https://algolib.io/blind75/longest-substring) — Longest substring without repeating chars
-  - [Longest Repeating](https://algolib.io/blind75/longest-repeating) — Longest repeating char replacement
-  - [Minimum Window](https://algolib.io/blind75/minimum-window) — Minimum window substring
+  - [Best Time to Buy Sell](https://rulcode.com/problem/best-time-buy-sell) — Max profit from stock prices
+  - [Longest Substring](https://rulcode.com/problem/longest-substring) — Longest substring without repeating chars
+  - [Longest Repeating](https://rulcode.com/problem/longest-repeating) — Longest repeating char replacement
+  - [Minimum Window](https://rulcode.com/problem/minimum-window) — Minimum window substring
 
 - Stack
 
-  - [Valid Parentheses](https://algolib.io/blind75/valid-parentheses) — Check valid bracket sequence
-  - [Min Stack](https://algolib.io/blind75/min-stack) — Stack with constant time minimum
+  - [Valid Parentheses](https://rulcode.com/problem/valid-parentheses) — Check valid bracket sequence
+  - [Min Stack](https://rulcode.com/problem/min-stack) — Stack with constant time minimum
 
 - Binary Search
 
-  - [Find Minimum in Rotated](https://algolib.io/blind75/find-minimum) — Min in rotated sorted array
-  - [Search in Rotated](https://algolib.io/blind75/search-rotated) — Search in rotated sorted array
+  - [Find Minimum in Rotated](https://rulcode.com/problem/find-minimum) — Min in rotated sorted array
+  - [Search in Rotated](https://rulcode.com/problem/search-rotated) — Search in rotated sorted array
 
 - Trees
 
-  - [Maximum Depth](https://algolib.io/blind75/maximum-depth) — Max depth of binary tree
-  - [Same Tree](https://algolib.io/blind75/same-tree) — Check if trees are identical
-  - [Invert Binary Tree](https://algolib.io/blind75/invert-tree) — Mirror a binary tree
-  - [Binary Tree Maximum Path](https://algolib.io/blind75/maximum-path) — Max path sum in binary tree
-  - [Binary Tree Level Order](https://algolib.io/blind75/level-order) — Level order traversal
-  - [Serialize Deserialize](https://algolib.io/blind75/serialize) — Serialize/deserialize binary tree
-  - [Subtree of Another](https://algolib.io/blind75/subtree) — Check if tree is subtree
-  - [Construct from Preorder](https://algolib.io/blind75/construct-preorder) — Build tree from traversal
+  - [Maximum Depth](https://rulcode.com/problem/maximum-depth) — Max depth of binary tree
+  - [Same Tree](https://rulcode.com/problem/same-tree) — Check if trees are identical
+  - [Invert Binary Tree](https://rulcode.com/problem/invert-tree) — Mirror a binary tree
+  - [Binary Tree Maximum Path](https://rulcode.com/problem/maximum-path) — Max path sum in binary tree
+  - [Binary Tree Level Order](https://rulcode.com/problem/level-order) — Level order traversal
+  - [Serialize Deserialize](https://rulcode.com/problem/serialize) — Serialize/deserialize binary tree
+  - [Subtree of Another](https://rulcode.com/problem/subtree) — Check if tree is subtree
+  - [Construct from Preorder](https://rulcode.com/problem/construct-preorder) — Build tree from traversal
 
 - Tries
 
-  - [Implement Trie](https://algolib.io/blind75/implement-trie) — Implement prefix tree
-  - [Word Search II](https://algolib.io/blind75/word-search-ii) — Find words in board using trie
+  - [Implement Trie](https://rulcode.com/problem/implement-trie) — Implement prefix tree
+  - [Word Search II](https://rulcode.com/problem/word-search-ii) — Find words in board using trie
 
 - Heap / Priority Queue
 
-  - [Find Median from Stream](https://algolib.io/blind75/median-stream) — Running median with heaps
+  - [Find Median from Stream](https://rulcode.com/problem/median-stream) — Running median with heaps
 
 - Backtracking
 
-  - [Combination Sum](https://algolib.io/blind75/combination-sum) — Find combinations that sum to target
-  - [Word Search](https://algolib.io/blind75/word-search) — Find word in board
+  - [Combination Sum](https://rulcode.com/problem/combination-sum) — Find combinations that sum to target
+  - [Word Search](https://rulcode.com/problem/word-search) — Find word in board
 
 - Graphs
 
-  - [Number of Islands](https://algolib.io/blind75/number-islands) — Count islands in grid
-  - [Clone Graph](https://algolib.io/blind75/clone-graph) — Deep copy of graph
-  - [Pacific Atlantic](https://algolib.io/blind75/pacific-atlantic) — Water flow between oceans
-  - [Course Schedule](https://algolib.io/blind75/course-schedule) — Course prerequisites graph
-  - [Number of Connected](https://algolib.io/blind75/connected-components) — Count connected components
-  - [Graph Valid Tree](https://algolib.io/blind75/valid-tree) — Check if graph is valid tree
+  - [Number of Islands](https://rulcode.com/problem/number-islands) — Count islands in grid
+  - [Clone Graph](https://rulcode.com/problem/clone-graph) — Deep copy of graph
+  - [Pacific Atlantic](https://rulcode.com/problem/pacific-atlantic) — Water flow between oceans
+  - [Course Schedule](https://rulcode.com/problem/course-schedule) — Course prerequisites graph
+  - [Number of Connected](https://rulcode.com/problem/connected-components) — Count connected components
+  - [Graph Valid Tree](https://rulcode.com/problem/valid-tree) — Check if graph is valid tree
 
 - Dynamic Programming
-  - [Climbing Stairs](https://algolib.io/blind75/climbing-stairs) — Ways to climb n stairs
-  - [House Robber](https://algolib.io/blind75/house-robber) — Max money without adjacent houses
-  - [House Robber II](https://algolib.io/blind75/house-robber-ii) — Circular house robber
-  - [Longest Palindromic](https://algolib.io/blind75/longest-palindromic) — Longest palindromic substring
-  - [Unique Paths](https://algolib.io/blind75/unique-paths) — Unique paths in grid
-  - [Jump Game](https://algolib.io/blind75/jump-game) — Can reach last index
+  - [Climbing Stairs](https://rulcode.com/problem/climbing-stairs) — Ways to climb n stairs
+  - [House Robber](https://rulcode.com/problem/house-robber) — Max money without adjacent houses
+  - [House Robber II](https://rulcode.com/problem/house-robber-ii) — Circular house robber
+  - [Longest Palindromic](https://rulcode.com/problem/longest-palindromic) — Longest palindromic substring
+  - [Unique Paths](https://rulcode.com/problem/unique-paths) — Unique paths in grid
+  - [Jump Game](https://rulcode.com/problem/jump-game) — Can reach last index
 
 </details>
 
@@ -283,7 +283,7 @@ npm run dev
 ## 🤝 Contribute
 
 We welcome contributions!  
-Help us expand AlgoLib.io with more algorithms, better explanations, and improved visualizations.
+Help us expand RulCode.com with more algorithms, better explanations, and improved visualizations.
 
 Fork → Edit → Pull Request.
 

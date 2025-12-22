@@ -39,7 +39,7 @@ export function prerenderPlugin(): Plugin {
 
             // 🔧 SANITIZATION: Convert any http:// to https:// for production URLs
             indexHtml = indexHtml.replace(
-                /http:\/\/(qaalgo|prodalgolib|algolib\.io)/g,
+                /http:\/\/(qaalgo|prodalgolib|rulcode\.com)/g,
                 'https://$1'
             );
 
@@ -94,7 +94,7 @@ export function prerenderPlugin(): Plugin {
             ];
 
             const algorithmRoutes = algorithms.map((data: { id: any; }) => ({
-                path: `/algorithm/${data.id}`,
+                path: `/problem/${data.id}`,
                 dir: `algorithm/${data.id}`
             }));
 
@@ -156,7 +156,7 @@ export function prerenderPlugin(): Plugin {
                             );
 
                             // Update meta tags
-                            const title = `${algo.name} - AlgoLib.io`;
+                            const title = `${algo.name} - RulCode.com`;
                             const description = `${algo.description}. Time: ${algo.timeComplexity}, Space: ${algo.spaceComplexity}. Learn ${algo.name} algorithm with examples and LeetCode problems.`;
 
                             routeHtml = routeHtml.replace(
@@ -181,19 +181,19 @@ export function prerenderPlugin(): Plugin {
 
                             routeHtml = routeHtml.replace(
                                 /<link rel="canonical" href="[^"]*"/,
-                                `<link rel="canonical" href="https://algolib.io${route.path}"`
+                                `<link rel="canonical" href="https://rulcode.com${route.path}"`
                             );
                         }
                     } else {
                         // For static pages, add SEO content with actual page content
                         const pageContent: Record<string, { title: string; description: string; content: string }> = {
                             '/about': {
-                                title: 'About AlgoLib.io - Free & Open Source Algorithm Library',
-                                description: 'AlgoLib.io is a free and open-source algorithm library with 72+ algorithms, interactive visualizations, and code snippets in Python, Java, C++, and TypeScript. Perfect for coding interviews and competitive programming.',
+                                title: 'About RulCode.com - Free & Open Source Algorithm Library',
+                                description: 'RulCode.com is a free and open-source algorithm library with 72+ algorithms, interactive visualizations, and code snippets in Python, Java, C++, and TypeScript. Perfect for coding interviews and competitive programming.',
                                 content: `
                                     <div style="padding: 40px 20px; max-width: 1200px; margin: 0 auto;">
-                                        <h1>About AlgoLib.io</h1>
-                                        <p>AlgoLib.io is a comprehensive, free, and open-source algorithm library designed to help developers master data structures and algorithms through interactive visualizations and clean code examples.</p>
+                                        <h1>About RulCode.com</h1>
+                                        <p>RulCode.com is a comprehensive, free, and open-source algorithm library designed to help developers master data structures and algorithms through interactive visualizations and clean code examples.</p>
                                         <h2>Our Mission</h2>
                                         <p>We believe that learning algorithms should be accessible to everyone. That's why we've created a platform that combines visual learning with practical code examples in multiple programming languages.</p>
                                         <h2>What We Offer</h2>
@@ -217,14 +217,14 @@ export function prerenderPlugin(): Plugin {
                                 `
                             },
                             '/privacy': {
-                                title: 'Privacy Policy - AlgoLib.io',
-                                description: 'Privacy policy for AlgoLib.io - how we handle your data and protect your privacy while you learn algorithms.',
+                                title: 'Privacy Policy - RulCode.com',
+                                description: 'Privacy policy for RulCode.com - how we handle your data and protect your privacy while you learn algorithms.',
                                 content: `
                                     <div style="padding: 40px 20px; max-width: 1200px; margin: 0 auto;">
                                         <h1>Privacy Policy</h1>
                                         <p>Last updated: October 2025</p>
                                         <h2>Your Privacy Matters</h2>
-                                        <p>AlgoLib.io is committed to protecting your privacy. This policy explains how we collect, use, and safeguard your information.</p>
+                                        <p>RulCode.com is committed to protecting your privacy. This policy explains how we collect, use, and safeguard your information.</p>
                                         <h2>Information We Collect</h2>
                                         <p>We collect minimal information necessary to provide our services, including usage analytics to improve the platform.</p>
                                         <h2>How We Use Your Information</h2>
@@ -233,28 +233,28 @@ export function prerenderPlugin(): Plugin {
                                 `
                             },
                             '/terms': {
-                                title: 'Terms of Service - AlgoLib.io',
-                                description: 'Terms of service for using AlgoLib.io algorithm library and educational platform.',
+                                title: 'Terms of Service - RulCode.com',
+                                description: 'Terms of service for using RulCode.com algorithm library and educational platform.',
                                 content: `
                                     <div style="padding: 40px 20px; max-width: 1200px; margin: 0 auto;">
                                         <h1>Terms of Service</h1>
                                         <p>Last updated: October 2025</p>
                                         <h2>Acceptance of Terms</h2>
-                                        <p>By accessing AlgoLib.io, you agree to these terms of service.</p>
+                                        <p>By accessing RulCode.com, you agree to these terms of service.</p>
                                         <h2>Use of Service</h2>
-                                        <p>AlgoLib.io is a free educational platform for learning algorithms and data structures.</p>
+                                        <p>RulCode.com is a free educational platform for learning algorithms and data structures.</p>
                                         <h2>Open Source</h2>
                                         <p>Our code is open source and available on GitHub for educational purposes.</p>
                                     </div>
                                 `
                             },
                             '/feedback': {
-                                title: 'Feedback - Help Us Improve AlgoLib.io',
-                                description: 'Share your feedback and suggestions to help us improve AlgoLib.io algorithm library.',
+                                title: 'Feedback - Help Us Improve RulCode.com',
+                                description: 'Share your feedback and suggestions to help us improve RulCode.com algorithm library.',
                                 content: `
                                     <div style="padding: 40px 20px; max-width: 1200px; margin: 0 auto;">
                                         <h1>We Value Your Feedback</h1>
-                                        <p>Help us make AlgoLib.io better! Share your thoughts, suggestions, and bug reports.</p>
+                                        <p>Help us make RulCode.com better! Share your thoughts, suggestions, and bug reports.</p>
                                         <h2>What We're Looking For</h2>
                                         <ul>
                                             <li>Algorithm requests</li>
@@ -267,11 +267,11 @@ export function prerenderPlugin(): Plugin {
                                 `
                             },
                             '/auth': {
-                                title: 'Sign In - AlgoLib.io',
-                                description: 'Sign in to AlgoLib.io to track your progress, save favorite algorithms, and personalize your learning experience.',
+                                title: 'Sign In - RulCode.com',
+                                description: 'Sign in to RulCode.com to track your progress, save favorite algorithms, and personalize your learning experience.',
                                 content: `
                                     <div style="padding: 40px 20px; max-width: 1200px; margin: 0 auto;">
-                                        <h1>Sign In to AlgoLib.io</h1>
+                                        <h1>Sign In to RulCode.com</h1>
                                         <p>Create an account to unlock personalized features and track your algorithm learning progress.</p>
                                         <h2>Benefits of Signing In</h2>
                                         <ul>
@@ -306,7 +306,7 @@ export function prerenderPlugin(): Plugin {
 
                             routeHtml = routeHtml.replace(
                                 /<link rel="canonical" href="[^"]*"/,
-                                `<link rel="canonical" href="https://algolib.io${route.path}"`
+                                `<link rel="canonical" href="https://rulcode.com${route.path}"`
                             );
                         }
                     }
@@ -343,14 +343,14 @@ export function prerenderPlugin(): Plugin {
                 const homePageContent = `
                     <div id="root">
                         <div style="padding: 40px 20px; max-width: 1200px; margin: 0 auto;">
-                            <h1>AlgoLib.io - Master 200+ Algorithms with Interactive Visualizations</h1>
+                            <h1>RulCode.com - Master 200+ Algorithms with Interactive Visualizations</h1>
                             <p style="font-size: 1.125rem; margin: 20px 0;">
                                 Free and open-source algorithm library for developers, students, and competitive programmers. 
                                 Learn data structures and algorithms with step-by-step visualizations, clean code examples in 
                                 Python, Java, C++, and TypeScript, and direct links to LeetCode practice problems.
                             </p>
                             
-                            <h2>Why AlgoLib.io?</h2>
+                            <h2>Why RulCode.com?</h2>
                             <ul style="margin: 20px 0; line-height: 1.8;">
                                 <li><strong>72+ Algorithm Implementations</strong> - Comprehensive coverage from basic to advanced</li>
                                 <li><strong>Interactive Visualizations</strong> - See algorithms in action with step-by-step animations</li>
@@ -367,7 +367,7 @@ export function prerenderPlugin(): Plugin {
                                     <ul style="line-height: 1.8;">
                                         ${algos.map((algo: any) => `
                                             <li>
-                                                <a href="/algorithm/${algo.id}" style="color: #3b82f6; text-decoration: none;">
+                                                <a href="/problem/${algo.id}" style="color: #3b82f6; text-decoration: none;">
                                                     <strong>${algo.name}</strong>
                                                 </a> - ${algo.description} 
                                                 (Time: ${algo.timeComplexity}, Space: ${algo.spaceComplexity})
@@ -388,16 +388,16 @@ export function prerenderPlugin(): Plugin {
                             
                             <h2>Popular Algorithms</h2>
                             <ul style="line-height: 1.8;">
-                                <li><a href="/algorithm/two-pointers">Two Pointers</a> - Efficient array traversal technique</li>
-                                <li><a href="/algorithm/sliding-window">Sliding Window</a> - Optimize subarray problems</li>
-                                <li><a href="/algorithm/binary-search">Binary Search</a> - Fast search in sorted arrays</li>
-                                <li><a href="/algorithm/dfs">Depth-First Search (DFS)</a> - Graph traversal algorithm</li>
-                                <li><a href="/algorithm/bfs">Breadth-First Search (BFS)</a> - Level-order graph traversal</li>
-                                <li><a href="/algorithm/dynamic-programming">Dynamic Programming</a> - Optimization technique</li>
-                                <li><a href="/algorithm/dijkstra">Dijkstra's Algorithm</a> - Shortest path finding</li>
-                                <li><a href="/algorithm/merge-sort">Merge Sort</a> - Efficient O(n log n) sorting</li>
-                                <li><a href="/algorithm/quick-sort">Quick Sort</a> - Fast in-place sorting</li>
-                                <li><a href="/algorithm/backtracking">Backtracking</a> - Solve constraint satisfaction problems</li>
+                                <li><a href="/problem/two-pointers">Two Pointers</a> - Efficient array traversal technique</li>
+                                <li><a href="/problem/sliding-window">Sliding Window</a> - Optimize subarray problems</li>
+                                <li><a href="/problem/binary-search">Binary Search</a> - Fast search in sorted arrays</li>
+                                <li><a href="/problem/dfs">Depth-First Search (DFS)</a> - Graph traversal algorithm</li>
+                                <li><a href="/problem/bfs">Breadth-First Search (BFS)</a> - Level-order graph traversal</li>
+                                <li><a href="/problem/dynamic-programming">Dynamic Programming</a> - Optimization technique</li>
+                                <li><a href="/problem/dijkstra">Dijkstra's Algorithm</a> - Shortest path finding</li>
+                                <li><a href="/problem/merge-sort">Merge Sort</a> - Efficient O(n log n) sorting</li>
+                                <li><a href="/problem/quick-sort">Quick Sort</a> - Fast in-place sorting</li>
+                                <li><a href="/problem/backtracking">Backtracking</a> - Solve constraint satisfaction problems</li>
                             </ul>
                             
                             <h2>Start Learning Today</h2>
@@ -418,7 +418,7 @@ export function prerenderPlugin(): Plugin {
                 // Update home page meta tags for better SEO
                 homeHtml = homeHtml.replace(
                     /<title>[^<]*<\/title>/,
-                    '<title>AlgoLib.io - Master 200+ Algorithms with Interactive Visualizations | Free & Open Source</title>'
+                    '<title>RulCode.com - Master 200+ Algorithms with Interactive Visualizations | Free & Open Source</title>'
                 );
 
                 homeHtml = homeHtml.replace(

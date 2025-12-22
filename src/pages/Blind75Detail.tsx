@@ -216,7 +216,7 @@ const Blind75Detail: React.FC = () => {
     return (
       <>
         <Helmet>
-          <title>Problem Not Found - Blind 75 | AlgoLib.io</title>
+          <title>Problem Not Found - Blind 75 | RulCode.com</title>
         </Helmet>
 
         <div className="min-h-screen flex items-center justify-center">
@@ -1724,7 +1724,7 @@ const Blind75Detail: React.FC = () => {
     <>
       <Helmet>
         <title>
-          {problem.title} - Blind 75 | AlgoLib.io | LeetCode Solution
+          {problem.title} - Blind 75 | RulCode.com | LeetCode Solution
         </title>
         <meta
           name="description"
@@ -1745,19 +1745,19 @@ const Blind75Detail: React.FC = () => {
             ", "
           )}, coding interview, algorithm, ${problem.companies.join(", ")}`}
         />
-        <meta name="author" content="AlgoLib.io" />
+        <meta name="author" content="RulCode.com" />
         <meta
           name="robots"
           content="index, follow, max-snippet:-1, max-image-preview:large"
         />
         <link
           rel="canonical"
-          href={`https://algolib.io/blind75/${problem.slug}`}
+          href={`https://rulcode.com/problem/${problem.slug}`}
         />
 
         {/* Open Graph */}
         <meta property="og:type" content="article" />
-        <meta property="og:site_name" content="AlgoLib.io" />
+        <meta property="og:site_name" content="RulCode.com" />
         <meta
           property="og:title"
           content={`${problem.title} - Blind 75 LeetCode Solution`}
@@ -1768,9 +1768,9 @@ const Blind75Detail: React.FC = () => {
         />
         <meta
           property="og:url"
-          content={`https://algolib.io/blind75/${problem.slug}`}
+          content={`https://rulcode.com/problem/${problem.slug}`}
         />
-        <meta property="og:image" content="https://algolib.io/og-image.png" />
+        <meta property="og:image" content="https://rulcode.com/og-image.png" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:locale" content="en_US" />
@@ -1782,8 +1782,8 @@ const Blind75Detail: React.FC = () => {
 
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@algolib_io" />
-        <meta name="twitter:creator" content="@algolib_io" />
+        <meta name="twitter:site" content="@rulcode_com" />
+        <meta name="twitter:creator" content="@rulcode_com" />
         <meta
           name="twitter:title"
           content={`${problem.title} - Blind 75 Solution`}
@@ -1792,7 +1792,7 @@ const Blind75Detail: React.FC = () => {
           name="twitter:description"
           content={`${problem.difficulty} ${problem.category} problem. Time: ${problem.timeComplexity}, Space: ${problem.spaceComplexity}`}
         />
-        <meta name="twitter:image" content="https://algolib.io/og-image.png" />
+        <meta name="twitter:image" content="https://rulcode.com/og-image.png" />
 
         {/* TechArticle Schema */}
         <script type="application/ld+json">
@@ -1801,10 +1801,10 @@ const Blind75Detail: React.FC = () => {
             "@type": "TechArticle",
             headline: problem.title,
             description: problem.description,
-            url: `https://algolib.io/blind75/${problem.slug}`,
+            url: `https://rulcode.com/problem/${problem.slug}`,
             image: {
               "@type": "ImageObject",
-              url: "https://algolib.io/og-image.png",
+              url: "https://rulcode.com/og-image.png",
               width: 1200,
               height: 630,
             },
@@ -1812,25 +1812,25 @@ const Blind75Detail: React.FC = () => {
             dateModified: new Date().toISOString().split("T")[0],
             author: {
               "@type": "Organization",
-              name: "AlgoLib.io",
-              url: "https://algolib.io",
+              name: "RulCode.com",
+              url: "https://rulcode.com",
               logo: {
                 "@type": "ImageObject",
-                url: "https://algolib.io/android-chrome-512x512.png",
+                url: "https://rulcode.com/android-chrome-512x512.png",
               },
             },
             publisher: {
               "@type": "Organization",
-              name: "AlgoLib.io",
-              url: "https://algolib.io",
+              name: "RulCode.com",
+              url: "https://rulcode.com",
               logo: {
                 "@type": "ImageObject",
-                url: "https://algolib.io/android-chrome-512x512.png",
+                url: "https://rulcode.com/android-chrome-512x512.png",
               },
             },
             mainEntityOfPage: {
               "@type": "WebPage",
-              "@id": `https://algolib.io/blind75/${problem.slug}`,
+              "@id": `https://rulcode.com/problem/${problem.slug}`,
             },
             articleSection: problem.category,
             articleBody: problem.description,
@@ -1867,7 +1867,7 @@ const Blind75Detail: React.FC = () => {
                 "@type": "ListItem",
                 position: 1,
                 item: {
-                  "@id": "https://algolib.io",
+                  "@id": "https://rulcode.com",
                   name: "Home",
                 },
               },
@@ -1875,7 +1875,7 @@ const Blind75Detail: React.FC = () => {
                 "@type": "ListItem",
                 position: 2,
                 item: {
-                  "@id": "https://algolib.io/blind75",
+                  "@id": "https://rulcode.com/blind75",
                   name: "Blind 75",
                 },
               },
@@ -1883,7 +1883,7 @@ const Blind75Detail: React.FC = () => {
                 "@type": "ListItem",
                 position: 3,
                 item: {
-                  "@id": `https://algolib.io/blind75?category=${encodeURIComponent(
+                  "@id": `https://rulcode.com/blind75?category=${encodeURIComponent(
                     problem.category
                   )}`,
                   name: problem.category,
@@ -1893,7 +1893,7 @@ const Blind75Detail: React.FC = () => {
                 "@type": "ListItem",
                 position: 4,
                 item: {
-                  "@id": `https://algolib.io/blind75/${problem.slug}`,
+                  "@id": `https://rulcode.com/problem/${problem.slug}`,
                   name: problem.title,
                 },
               },

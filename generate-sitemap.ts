@@ -8,34 +8,34 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const baseUrl = 'https://algolib.io';
+const baseUrl = 'https://rulcode.com';
 
 const staticRoutes = [
-    '/',
-    '/about',
-    '/privacy',
-    '/terms',
-    '/content-rights',
-    '/feedback',
-    '/auth',
-    '/games',
-    '/games/leaderboard',
-    '/blind75',
-    '/blog',
+  '/',
+  '/about',
+  '/privacy',
+  '/terms',
+  '/content-rights',
+  '/feedback',
+  '/auth',
+  '/games',
+  '/games/leaderboard',
+  '/blind75',
+  '/blog',
 ];
 
-const algorithmRoutes = algorithms.map((algo) => `/algorithm/${algo.id}`);
-const blind75Routes = blind75Problems.map((problem) => `/blind75/${problem.slug}`);
+const algorithmRoutes = algorithms.map((algo) => `/problem/${algo.id}`);
+const blind75Routes = blind75Problems.map((problem) => `/problem/${problem.slug}`);
 const blogRoutes = blogPosts.map((post) => `/blog/${post.slug}`);
 
 // Game routes
 const gameRoutes = [
-    '/games/sort-hero',
-    '/games/graph-explorer',
-    '/games/stack-master',
-    '/games/dp-puzzle',
-    '/games/sliding-window',
-    '/games/two-pointer',
+  '/games/sort-hero',
+  '/games/graph-explorer',
+  '/games/stack-master',
+  '/games/dp-puzzle',
+  '/games/sliding-window',
+  '/games/two-pointer',
 ];
 
 const allRoutes = [...staticRoutes, ...algorithmRoutes, ...blind75Routes, ...blogRoutes, ...gameRoutes];
@@ -46,27 +46,25 @@ const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 ${allRoutes.map(route => `  <url>
     <loc>${baseUrl}${route}</loc>
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
-    <changefreq>${
-      route === '/' ? 'daily' : 
-      route.startsWith('/algorithm/') || route.startsWith('/blind75/') ? 'weekly' : 
+    <changefreq>${route === '/' ? 'daily' :
+    route.startsWith('/problem/') ? 'weekly' :
       route.startsWith('/blog/') ? 'weekly' :
-      route.startsWith('/games/') ? 'weekly' :
-      'monthly'
-    }</changefreq>
-    <priority>${
-      route === '/' ? '1.0' : 
-      route.startsWith('/algorithm/') || route.startsWith('/blind75/') ? '0.8' : 
+        route.startsWith('/games/') ? 'weekly' :
+          'monthly'
+  }</changefreq>
+    <priority>${route === '/' ? '1.0' :
+    route.startsWith('/problem/') ? '0.8' :
       route.startsWith('/blog/') ? '0.7' :
-      route.startsWith('/games/') ? '0.6' :
-      '0.5'
-    }</priority>
+        route.startsWith('/games/') ? '0.6' :
+          '0.5'
+  }</priority>
   </url>`).join('\n')}
 </urlset>`;
 
 // Write to public folder (will be copied to dist during build)
 const publicDir = path.join(__dirname, 'public');
 if (!fs.existsSync(publicDir)) {
-    fs.mkdirSync(publicDir, { recursive: true });
+  fs.mkdirSync(publicDir, { recursive: true });
 }
 
 fs.writeFileSync(path.join(publicDir, 'sitemap.xml'), sitemap, 'utf-8');

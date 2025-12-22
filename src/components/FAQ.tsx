@@ -8,12 +8,12 @@ import { Helmet } from "react-helmet-async";
 
 const faqs = [
   {
-    question: "What is AlgoLib.io?",
-    answer: "AlgoLib.io is a free, open-source platform that helps you learn data structures and algorithms through interactive visualizations. We provide step-by-step animated explanations of 200+ popular algorithms with code implementations in Python, Java, C++, and TypeScript."
+    question: "What is RulCode.com?",
+    answer: "RulCode.com is a free, open-source platform that helps you learn data structures and algorithms through interactive visualizations. We provide step-by-step animated explanations of 200+ popular algorithms with code implementations in Python, Java, C++, and TypeScript."
   },
   {
-    question: "Is AlgoLib.io really free?",
-    answer: "Yes! AlgoLib.io is 100% free and will remain free forever. We believe education should be accessible to everyone. Our entire codebase is open source and available on GitHub."
+    question: "Is RulCode.com really free?",
+    answer: "Yes! RulCode.com is 100% free and will remain free forever. We believe education should be accessible to everyone. Our entire codebase is open source and available on GitHub."
   },
   {
     question: "What programming languages are supported?",
@@ -24,11 +24,11 @@ const faqs = [
     answer: "Each algorithm comes with an interactive step-by-step visualization that shows how the algorithm processes data in real-time. You can control the speed, pause at any step, and see the code execution highlighted line by line."
   },
   {
-    question: "Is AlgoLib good for interview preparation?",
-    answer: "Absolutely! AlgoLib.io covers essential algorithms frequently asked in coding interviews at top tech companies. Our visual approach helps you understand the 'why' behind each algorithm, not just the 'how', which is crucial for technical interviews."
+    question: "Is RulCode good for interview preparation?",
+    answer: "Absolutely! RulCode.com covers essential algorithms frequently asked in coding interviews at top tech companies. Our visual approach helps you understand the 'why' behind each algorithm, not just the 'how', which is crucial for technical interviews."
   },
   {
-    question: "Can I contribute to AlgoLib.io?",
+    question: "Can I contribute to RulCode.com?",
     answer: "Yes! We welcome contributions from the community. You can add new algorithms, improve existing visualizations, fix bugs, or enhance documentation. Visit our GitHub repository to get started."
   },
   {
@@ -36,8 +36,8 @@ const faqs = [
     answer: "No account is required to access and learn from all our algorithms. However, creating a free account allows you to track your progress and save your favorite algorithms."
   },
   {
-    question: "What's the difference between AlgoLib and LeetCode?",
-    answer: "While LeetCode focuses on practice problems, AlgoLib.io focuses on understanding algorithms through visual learning. We're complementary - use AlgoLib to learn and understand algorithms, then practice on LeetCode to master them."
+    question: "What's the difference between RulCode and LeetCode?",
+    answer: "While LeetCode focuses on practice problems, RulCode.com focuses on understanding algorithms through visual learning. We're complementary - use RulCode to learn and understand algorithms, then practice on LeetCode to master them."
   }
 ];
 
@@ -70,7 +70,7 @@ export const FAQ = () => {
               Frequently Asked Questions
             </h2>
             <p className="text-lg text-muted-foreground">
-              Everything you need to know about AlgoLib.io
+              Everything you need to know about RulCode.com
             </p>
           </div>
 

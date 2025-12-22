@@ -18,15 +18,15 @@ const StackMaster = () => {
   return (
     <>
       <Helmet>
-        <title>Stack Master Game - Learn Stack Data Structure | AlgoLib.io</title>
+        <title>Stack Master Game - Learn Stack Data Structure | RulCode.com</title>
         <meta name="description" content="Master stack operations through fast-paced symbol matching game. Learn LIFO data structure, push/pop operations, and valid parentheses patterns interactively." />
         <meta name="keywords" content="stack data structure game, learn stack operations, LIFO game, parentheses matching, data structure learning, interactive stack tutorial" />
-        <link rel="canonical" href="https://algolib.io/games/stack-master" />
+        <link rel="canonical" href="https://rulcode.com/games/stack-master" />
         
         <meta property="og:title" content="Stack Master - Interactive Stack Learning Game" />
         <meta property="og:description" content="Master stack operations through fast-paced symbol matching." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://algolib.io/games/stack-master" />
+        <meta property="og:url" content="https://rulcode.com/games/stack-master" />
         
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Stack Master - Learn Stack Data Structure" />

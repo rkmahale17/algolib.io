@@ -25,15 +25,15 @@ const SortHero = () => {
   return (
     <>
       <Helmet>
-        <title>Sort Hero Game - Learn Sorting Algorithms Interactively | AlgoLib.io</title>
+        <title>Sort Hero Game - Learn Sorting Algorithms Interactively | RulCode.com</title>
         <meta name="description" content="Master bubble sort, selection sort, and quicksort through interactive gameplay. Learn sorting algorithms with step-by-step visualizations and challenges." />
         <meta name="keywords" content="sorting algorithms game, bubble sort game, quicksort game, learn sorting interactively, algorithm visualization game, coding education" />
-        <link rel="canonical" href="https://algolib.io/games/sort-hero" />
+        <link rel="canonical" href="https://rulcode.com/games/sort-hero" />
         
         <meta property="og:title" content="Sort Hero - Interactive Sorting Algorithms Game" />
         <meta property="og:description" content="Learn sorting algorithms through interactive gameplay." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://algolib.io/games/sort-hero" />
+        <meta property="og:url" content="https://rulcode.com/games/sort-hero" />
         
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Sort Hero - Learn Sorting Algorithms" />

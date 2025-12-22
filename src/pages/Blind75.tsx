@@ -78,7 +78,7 @@ const Blind75 = () => {
   return (
     <>
       <Helmet>
-        <title>Blind 75 LeetCode Problems - AlgoLib.io | FAANG Interview Preparation Guide</title>
+        <title>Blind 75 LeetCode Problems - RulCode.com | FAANG Interview Preparation Guide</title>
         <meta 
           name="description"
           content="Master the Blind 75 - curated list of 75 essential LeetCode problems for coding interviews. Complete solutions in Python, Java, C++, TypeScript with detailed explanations and visualizations." 
@@ -87,28 +87,28 @@ const Blind75 = () => {
           name="keywords" 
           content="blind 75, leetcode, coding interview, interview preparation, leetcode problems, algorithm interview, FAANG interview, technical interview, coding practice" 
         />
-        <meta name="author" content="AlgoLib.io" />
+        <meta name="author" content="RulCode.com" />
         <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
-        <link rel="canonical" href="https://algolib.io/blind75" />
+        <link rel="canonical" href="https://rulcode.com/blind75" />
         
         {/* Open Graph */}
         <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="AlgoLib.io" />
+        <meta property="og:site_name" content="RulCode.com" />
         <meta property="og:title" content="Blind 75 LeetCode Problems - Complete Interview Guide" />
         <meta property="og:description" content="Master the 75 most important LeetCode problems for coding interviews with detailed solutions and visualizations" />
-        <meta property="og:url" content="https://algolib.io/blind75" />
-        <meta property="og:image" content="https://algolib.io/og-image.png" />
+        <meta property="og:url" content="https://rulcode.com/blind75" />
+        <meta property="og:image" content="https://rulcode.com/og-image.png" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:locale" content="en_US" />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@algolib_io" />
-        <meta name="twitter:creator" content="@algolib_io" />
+        <meta name="twitter:site" content="@rulcode_com" />
+        <meta name="twitter:creator" content="@rulcode_com" />
         <meta name="twitter:title" content="Blind 75 LeetCode Problems - Complete Interview Guide" />
         <meta name="twitter:description" content="Master the 75 most important LeetCode problems for coding interviews with detailed solutions and visualizations" />
-        <meta name="twitter:image" content="https://algolib.io/og-image.png" />
+        <meta name="twitter:image" content="https://rulcode.com/og-image.png" />
         
         {/* CollectionPage Schema */}
         <script type="application/ld+json">
@@ -117,12 +117,12 @@ const Blind75 = () => {
             "@type": "CollectionPage",
             "name": "Blind 75 LeetCode Problems",
             "description": "Curated list of 75 essential LeetCode problems for interview preparation",
-            "url": "https://algolib.io/blind75",
+            "url": "https://rulcode.com/blind75",
             "inLanguage": "en-US",
             "isPartOf": {
               "@type": "WebSite",
-              "name": "AlgoLib.io",
-              "url": "https://algolib.io"
+              "name": "RulCode.com",
+              "url": "https://rulcode.com"
             },
             "mainEntity": {
               "@type": "ItemList",
@@ -134,7 +134,7 @@ const Blind75 = () => {
                   "@type": "TechArticle",
                   "name": problem.title,
                   "description": problem.description,
-                  "url": `https://algolib.io/blind75/${problem.slug}`,
+                  "url": `https://rulcode.com/problem/${problem.slug}`,
                   "articleSection": problem.category,
                   "proficiencyLevel": problem.difficulty
                 }
@@ -153,7 +153,7 @@ const Blind75 = () => {
                 "@type": "ListItem",
                 "position": 1,
                 "item": {
-                  "@id": "https://algolib.io",
+                  "@id": "https://rulcode.com",
                   "name": "Home"
                 }
               },
@@ -161,7 +161,7 @@ const Blind75 = () => {
                 "@type": "ListItem",
                 "position": 2,
                 "item": {
-                  "@id": "https://algolib.io/blind75",
+                  "@id": "https://rulcode.com/blind75",
                   "name": "Blind 75"
                 }
               }
@@ -320,7 +320,7 @@ const Blind75 = () => {
         <div className="container mx-auto px-4 pb-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredProblems.map((problem, index) => (
-              <Link key={problem.id} to={`/blind75/${problem.slug}`} target="_blank" rel="noopener noreferrer">
+              <Link key={problem.id} to={`/problem/${problem.slug}`} target="_blank" rel="noopener noreferrer">
                 <Card 
                   className="p-6 hover-lift cursor-pointer glass-card group h-full"
                   style={{ animationDelay: `${index * 50}ms` }}
