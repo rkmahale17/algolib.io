@@ -35,10 +35,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const Blind75Detail: React.FC = () => {
-  const { slug } = useParams<{ slug?: string }>();
+  const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
-  const problem = blind75Problems.find((p) => p.slug === slug);
-  const implementation = slug ? blind75Implementations[slug] : null;
+  const problem = blind75Problems.find((p) => p.slug === id);
+  const implementation = id ? blind75Implementations[id] : null;
   const [showBreadcrumb, setShowBreadcrumb] = useState(true);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [user, setUser] = useState<any>(null);
@@ -56,7 +56,7 @@ const Blind75Detail: React.FC = () => {
       } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
 
-      if (session?.user && slug) {
+      if (session?.user && id) {
         await fetchProgress(session.user.id);
       } else {
         setIsLoadingProgress(false);
@@ -70,7 +70,7 @@ const Blind75Detail: React.FC = () => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
-      if (session?.user && slug) {
+      if (session?.user && id) {
         fetchProgress(session.user.id);
       } else {
         setIsCompleted(false);
@@ -79,18 +79,18 @@ const Blind75Detail: React.FC = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, slug]);
+  }, [navigate, id]);
 
   // Fetch user's progress for this problem
   const fetchProgress = async (userId: string) => {
-    if (!slug) return;
+    if (!id) return;
 
     setIsLoadingProgress(true);
     const { data, error } = await supabase
       .from("user_progress")
       .select("completed")
       .eq("user_id", userId)
-      .eq("algorithm_id", `blind75-${slug}`)
+      .eq("algorithm_id", `blind75-${id}`)
       .maybeSingle();
 
     if (!error && data) {
@@ -103,7 +103,7 @@ const Blind75Detail: React.FC = () => {
 
   // Toggle completion status
   const toggleCompletion = async () => {
-    if (!user || !slug) {
+    if (!user || !id) {
       toast.error("Please sign in to track your progress");
       navigate("/auth");
       return;
@@ -119,7 +119,7 @@ const Blind75Detail: React.FC = () => {
       .from("user_progress")
       .select("id")
       .eq("user_id", user.id)
-      .eq("algorithm_id", `blind75-${slug}`)
+      .eq("algorithm_id", `blind75-${id}`)
       .maybeSingle();
 
     if (existing) {
@@ -131,7 +131,7 @@ const Blind75Detail: React.FC = () => {
           completed_at: newCompletedState ? new Date().toISOString() : null,
         })
         .eq("user_id", user.id)
-        .eq("algorithm_id", `blind75-${slug}`);
+        .eq("algorithm_id", `blind75-${id}`);
 
       if (error) {
         // Revert on error
@@ -147,7 +147,7 @@ const Blind75Detail: React.FC = () => {
       // Insert new record
       const { error } = await supabase.from("user_progress").insert({
         user_id: user.id,
-        algorithm_id: `blind75-${slug}`,
+        algorithm_id: `blind75-${id}`,
         completed: newCompletedState,
         completed_at: newCompletedState ? new Date().toISOString() : null,
       });
@@ -166,7 +166,7 @@ const Blind75Detail: React.FC = () => {
   // Scroll to top on mount/route change
   React.useEffect(() => {
     window.scrollTo(0, 0);
-  }, [slug]);
+  }, [id]);
 
   React.useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -223,7 +223,7 @@ const Blind75Detail: React.FC = () => {
           <div className="text-center space-y-4">
             <h2 className="text-2xl font-bold">Problem not found</h2>
             <p className="text-sm text-muted-foreground">
-              The problem <code>{slug}</code> could not be found.
+              The problem <code>{id}</code> could not be found.
             </p>
             <Link to="/blind75">
               <Button>Go to Blind 75</Button>
@@ -1752,7 +1752,7 @@ const Blind75Detail: React.FC = () => {
         />
         <link
           rel="canonical"
-          href={`https://rulcode.com/problem/${problem.slug}`}
+          href={`https://rulcode.com/problem/${problem.id}`}
         />
 
         {/* Open Graph */}
@@ -1768,7 +1768,7 @@ const Blind75Detail: React.FC = () => {
         />
         <meta
           property="og:url"
-          content={`https://rulcode.com/problem/${problem.slug}`}
+          content={`https://rulcode.com/problem/${problem.id}`}
         />
         <meta property="og:image" content="https://rulcode.com/og-image.png" />
         <meta property="og:image:width" content="1200" />
@@ -1801,7 +1801,7 @@ const Blind75Detail: React.FC = () => {
             "@type": "TechArticle",
             headline: problem.title,
             description: problem.description,
-            url: `https://rulcode.com/problem/${problem.slug}`,
+            url: `https://rulcode.com/problem/${problem.id}`,
             image: {
               "@type": "ImageObject",
               url: "https://rulcode.com/og-image.png",
@@ -1830,7 +1830,7 @@ const Blind75Detail: React.FC = () => {
             },
             mainEntityOfPage: {
               "@type": "WebPage",
-              "@id": `https://rulcode.com/problem/${problem.slug}`,
+              "@id": `https://rulcode.com/problem/${problem.id}`,
             },
             articleSection: problem.category,
             articleBody: problem.description,
@@ -1893,7 +1893,7 @@ const Blind75Detail: React.FC = () => {
                 "@type": "ListItem",
                 position: 4,
                 item: {
-                  "@id": `https://rulcode.com/problem/${problem.slug}`,
+                  "@id": `https://rulcode.com/problem/${problem.id}`,
                   name: problem.title,
                 },
               },
@@ -2091,10 +2091,10 @@ const Blind75Detail: React.FC = () => {
               </div>
             </Card>
             {/* Brainstorm Section - Only visible when logged in */}
-            {user && slug && (
+            {user && id && (
               <div className="container mx-auto px-4 mb-8">
                 <BrainstormSection
-                  algorithmId={`blind75-${slug}`}
+                  algorithmId={`blind75-${id}`}
                   algorithmTitle={problem.title}
                 />
               </div>

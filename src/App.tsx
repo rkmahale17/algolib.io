@@ -7,6 +7,7 @@ import Home from "./pages/Home";
 import AlgorithmDetail from "./pages/AlgorithmDetail";
 import Blind75 from "./pages/Blind75";
 import Blind75Detail from "./pages/Blind75Detail";
+import ProblemRouter from "./pages/ProblemRouter";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import Feedback from "./pages/Feedback";
@@ -38,7 +39,7 @@ const App = () => (
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/problem/:id" element={<AlgorithmDetail />} />
+          <Route path="/problem/:id" element={<ProblemRouter />} />
           <Route path="/blind75" element={<ProtectedRoute><Blind75 /></ProtectedRoute>} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/feedback" element={<Feedback />} />

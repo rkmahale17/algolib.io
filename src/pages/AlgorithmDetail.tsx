@@ -28,7 +28,6 @@ import { ShareButton } from "@/components/ShareButton";
 import { TreeVisualization } from "@/components/visualizations/TreeVisualization";
 import { YouTubePlayer } from "@/components/YouTubePlayer";
 import { algorithms } from "@/data/algorithms";
-import { blind75Problems } from "@/data/blind75";
 import { getAlgorithmImplementation } from "@/data/algorithmImplementations";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -36,9 +35,8 @@ const AlgorithmDetail: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
   
-  // Check both algorithms and blind75Problems arrays
-  const algorithm = algorithms.find((a) => a.id === id) || 
-                    blind75Problems.find((p) => p.slug === id);
+  // Find algorithm by ID
+  const algorithm = algorithms.find((a) => a.id === id);
   
   const implementation = getAlgorithmImplementation(id || "");
   const [showBreadcrumb, setShowBreadcrumb] = useState(true);
