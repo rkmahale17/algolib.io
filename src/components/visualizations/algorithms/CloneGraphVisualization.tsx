@@ -28,7 +28,7 @@ export const CloneGraphVisualization = () => {
       mapSize: 0,
       variables: { graph: '1--2--3--4--1' },
       explanation: "Graph: 1 connects to 2, 2 to 3, 3 to 4, 4 back to 1 (cycle). Clone entire graph structure.",
-      highlightedLines: [1, 2, 3],
+      highlightedLines: [1],
       lineExecution: "function cloneGraph(node: Node | null): Node | null"
     },
     {
@@ -36,20 +36,20 @@ export const CloneGraphVisualization = () => {
       visited: [],
       cloned: [],
       mapSize: 0,
-      variables: { node: 'null?' },
-      explanation: "Check if input node is null. If so, return null immediately.",
-      highlightedLines: [4],
-      lineExecution: "if (!node) return null; // node exists, continue"
+      variables: { oldToNew: 'new Map()' },
+      explanation: "Initialize Map to store mappings between original nodes and their clones.",
+      highlightedLines: [3],
+      lineExecution: "const oldToNew = new Map<Node, Node>();"
     },
     {
       currentNode: -1,
       visited: [],
       cloned: [],
       mapSize: 0,
-      variables: { map: 'new Map()' },
-      explanation: "Create HashMap to store original -> clone mappings. Prevents infinite loops in cyclic graphs.",
-      highlightedLines: [5],
-      lineExecution: "const map = new Map<Node, Node>();"
+      variables: { node: 1 },
+      explanation: "Start DFS from the input node (Node 1).",
+      highlightedLines: [33],
+      lineExecution: "return node ? dfs(node) : null;"
     },
     {
       currentNode: 1,
@@ -57,152 +57,275 @@ export const CloneGraphVisualization = () => {
       cloned: [],
       mapSize: 0,
       variables: { node: 1 },
-      explanation: "Start DFS from node 1. Define dfs helper function.",
-      highlightedLines: [7],
-      lineExecution: "function dfs(node: Node): Node"
+      explanation: "Enter dfs function check if node is null.",
+      highlightedLines: [6, 8],
+      lineExecution: "if (!node) { return null; }"
     },
     {
       currentNode: 1,
       visited: [],
       cloned: [],
       mapSize: 0,
-      variables: { 'map.has(1)': false },
-      explanation: "Check if node 1 already cloned: map.has(node)? No, continue cloning.",
-      highlightedLines: [8],
-      lineExecution: "if (map.has(node)) return map.get(node)!; // false"
+      variables: { 'oldToNew.has(1)': false },
+      explanation: "Check if node 1 is already in the map. It's not.",
+      highlightedLines: [13],
+      lineExecution: "if (oldToNew.has(node))"
     },
     {
       currentNode: 1,
       visited: [],
       cloned: [1],
       mapSize: 0,
-      variables: { clone: 'Node(1)' },
-      explanation: "Create clone of node 1: new Node(1). Clone has same value but no neighbors yet.",
-      highlightedLines: [10],
-      lineExecution: "const clone = new Node(node.val); // Node(1)"
+      variables: { copy: 'Node(1)' },
+      explanation: "Create a new copy of Node 1.",
+      highlightedLines: [18],
+      lineExecution: "const copy = new Node(node.val);"
     },
     {
       currentNode: 1,
       visited: [1],
       cloned: [1],
       mapSize: 1,
-      variables: { 'map.size': 1 },
-      explanation: "Add to map: map.set(node1, clone1). Now node 1 is marked as cloned.",
-      highlightedLines: [11],
-      lineExecution: "map.set(node, clone); // map: {1 -> clone1}"
+      variables: { 'oldToNew.size': 1 },
+      explanation: "Store mapping: 1 -> copy(1) in oldToNew map.",
+      highlightedLines: [21],
+      lineExecution: "oldToNew.set(node, copy);"
+    },
+    {
+      currentNode: 1,
+      visited: [1],
+      cloned: [1],
+      mapSize: 1,
+      variables: { neighbor: 2 },
+      explanation: "Iterate over neighbors of Node 1. First neighbor is 2.",
+      highlightedLines: [24],
+      lineExecution: "for (const neighbor of node.neighbors)"
+    },
+    {
+      currentNode: 1,
+      visited: [1],
+      cloned: [1],
+      mapSize: 1,
+      variables: { neighbor: 2 },
+      explanation: "Recursively call dfs for neighbor 2.",
+      highlightedLines: [25],
+      lineExecution: "copy.neighbors.push(dfs(neighbor));"
     },
     {
       currentNode: 2,
       visited: [1],
       cloned: [1],
       mapSize: 1,
-      variables: { neighbor: 2 },
-      explanation: "Process neighbor 2 of node 1. Recursively call dfs(2).",
-      highlightedLines: [13, 14],
-      lineExecution: "for (const neighbor of node.neighbors) // neighbor = 2"
+      variables: { node: 2 },
+      explanation: "Enter dfs(2). Check if node is null (no) and if in map (no).",
+      highlightedLines: [8, 13],
+      lineExecution: "if (!node)... if (oldToNew.has(node))..."
     },
     {
       currentNode: 2,
       visited: [1],
       cloned: [1, 2],
       mapSize: 1,
-      variables: { clone: 'Node(2)' },
-      explanation: "Node 2 not in map. Create clone: new Node(2).",
-      highlightedLines: [10],
-      lineExecution: "const clone = new Node(node.val); // Node(2)"
+      variables: { copy: 'Node(2)' },
+      explanation: "Create copy of Node 2.",
+      highlightedLines: [18],
+      lineExecution: "const copy = new Node(node.val);"
     },
     {
       currentNode: 2,
       visited: [1, 2],
       cloned: [1, 2],
       mapSize: 2,
-      variables: { 'map.size': 2 },
-      explanation: "Add to map: map.set(node2, clone2). Node 2 marked as cloned.",
-      highlightedLines: [11],
-      lineExecution: "map.set(node, clone); // map: {1 -> clone1, 2 -> clone2}"
+      variables: { 'oldToNew.size': 2 },
+      explanation: "Store mapping: 2 -> copy(2) in oldToNew map.",
+      highlightedLines: [21],
+      lineExecution: "oldToNew.set(node, copy);"
+    },
+    {
+      currentNode: 2,
+      visited: [1, 2],
+      cloned: [1, 2],
+      mapSize: 2,
+      variables: { neighbor: 3 },
+      explanation: "Recursively call dfs for neighbor 3.",
+      highlightedLines: [24, 25],
+      lineExecution: "copy.neighbors.push(dfs(neighbor)); // neighbor 3"
     },
     {
       currentNode: 3,
       visited: [1, 2],
       cloned: [1, 2, 3],
+      mapSize: 2,
+      variables: { copy: 'Node(3)' },
+      explanation: "Inside dfs(3): Create copy of Node 3.",
+      highlightedLines: [18],
+      lineExecution: "const copy = new Node(3);"
+    },
+    {
+      currentNode: 3,
+      visited: [1, 2, 3],
+      cloned: [1, 2, 3],
       mapSize: 3,
-      variables: { neighbor: 3 },
-      explanation: "Process neighbor 3 of node 2. Create clone: Node(3). Add to map.",
-      highlightedLines: [10, 11, 13, 14],
-      lineExecution: "dfs(3) -> clone Node(3), map.set(3, clone3)"
+      variables: { 'oldToNew.size': 3 },
+      explanation: "Store mapping: 3 -> copy(3) in oldToNew map.",
+      highlightedLines: [21],
+      lineExecution: "oldToNew.set(node, copy);"
+    },
+    {
+      currentNode: 3,
+      visited: [1, 2, 3],
+      cloned: [1, 2, 3],
+      mapSize: 3,
+      variables: { neighbor: 4 },
+      explanation: "Recursively call dfs for neighbor 4.",
+      highlightedLines: [24, 25],
+      lineExecution: "copy.neighbors.push(dfs(neighbor)); // neighbor 4"
     },
     {
       currentNode: 4,
       visited: [1, 2, 3],
       cloned: [1, 2, 3, 4],
+      mapSize: 3,
+      variables: { copy: 'Node(4)' },
+      explanation: "Inside dfs(4): Create copy of Node 4.",
+      highlightedLines: [18],
+      lineExecution: "const copy = new Node(4);"
+    },
+    {
+      currentNode: 4,
+      visited: [1, 2, 3, 4],
+      cloned: [1, 2, 3, 4],
       mapSize: 4,
-      variables: { neighbor: 4 },
-      explanation: "Process neighbor 4 of node 3. Create clone: Node(4). Add to map.",
-      highlightedLines: [10, 11, 13, 14],
-      lineExecution: "dfs(4) -> clone Node(4), map.set(4, clone4)"
+      variables: { 'oldToNew.size': 4 },
+      explanation: "Store mapping: 4 -> copy(4).",
+      highlightedLines: [21],
+      lineExecution: "oldToNew.set(node, copy);"
+    },
+    {
+      currentNode: 4,
+      visited: [1, 2, 3, 4],
+      cloned: [1, 2, 3, 4],
+      mapSize: 4,
+      variables: { neighbor: 1 },
+      explanation: "Neighbor of 4 is 1. Recursively call dfs(1).",
+      highlightedLines: [24, 25],
+      lineExecution: "copy.neighbors.push(dfs(neighbor)); // neighbor 1"
     },
     {
       currentNode: 1,
       visited: [1, 2, 3, 4],
       cloned: [1, 2, 3, 4],
       mapSize: 4,
-      variables: { neighbor: 1, 'map.has(1)': true },
-      explanation: "Node 4's neighbor is 1 (cycle!). Check map: node 1 already cloned. Return existing clone.",
-      highlightedLines: [8],
-      lineExecution: "if (map.has(node)) return map.get(node)!; // true, return clone1"
+      variables: { node: 1, 'oldToNew.has(1)': true },
+      explanation: "Inside dfs(1): Check map. Node 1 is already cloned!",
+      highlightedLines: [13],
+      lineExecution: "if (oldToNew.has(node))"
+    },
+    {
+      currentNode: 1,
+      visited: [1, 2, 3, 4],
+      cloned: [1, 2, 3, 4],
+      mapSize: 4,
+      variables: { return: 'copy(1)' },
+      explanation: "Return existing clone of Node 1 from map.",
+      highlightedLines: [14],
+      lineExecution: "return oldToNew.get(node) || null;"
     },
     {
       currentNode: 4,
       visited: [1, 2, 3, 4],
       cloned: [1, 2, 3, 4],
       mapSize: 4,
-      variables: { 'clone4.neighbors': '[clone1]' },
-      explanation: "Add clone1 to clone4's neighbors. Completes the cycle in cloned graph.",
-      highlightedLines: [14],
-      lineExecution: "clone.neighbors.push(dfs(neighbor)); // clone4.neighbors = [clone1]"
+      variables: { 'copy(4).neighbors': '[copy(1)]' },
+      explanation: "Back in dfs(4): Added copy(1) to copy(4)'s neighbors.",
+      highlightedLines: [25],
+      lineExecution: "copy.neighbors.push(dfs(neighbor)); // pushed copy(1)"
+    },
+    {
+      currentNode: 4,
+      visited: [1, 2, 3, 4],
+      cloned: [1, 2, 3, 4],
+      mapSize: 4,
+      variables: { return: 'copy(4)' },
+      explanation: "Return copy(4) to caller (dfs(3)).",
+      highlightedLines: [29],
+      lineExecution: "return copy;"
+    },
+    {
+      currentNode: 3,
+      visited: [1, 2, 3, 4],
+      cloned: [1, 2, 3, 4],
+      mapSize: 4,
+      variables: { 'copy(3).neighbors': '[copy(4)]' },
+      explanation: "Back in dfs(3): Added copy(4) to copy(3)'s neighbors. Return copy(3).",
+      highlightedLines: [29],
+      lineExecution: "return copy;"
+    },
+    {
+      currentNode: 2,
+      visited: [1, 2, 3, 4],
+      cloned: [1, 2, 3, 4],
+      mapSize: 4,
+      variables: { 'copy(2).neighbors': '[copy(3)]' },
+      explanation: "Back in dfs(2): Added copy(3) to copy(2)'s neighbors. Return copy(2).",
+      highlightedLines: [29],
+      lineExecution: "return copy;"
+    },
+    {
+      currentNode: 1,
+      visited: [1, 2, 3, 4],
+      cloned: [1, 2, 3, 4],
+      mapSize: 4,
+      variables: { 'copy(1).neighbors': '[copy(2)]' },
+      explanation: "Back in dfs(1): Added copy(2) to copy(1)'s neighbors. Recursion complete for this branch.",
+      highlightedLines: [25],
+      lineExecution: "copy.neighbors.push(dfs(neighbor)); // pushed copy(2)"
     },
     {
       currentNode: -1,
       visited: [1, 2, 3, 4],
       cloned: [1, 2, 3, 4],
       mapSize: 4,
-      variables: { result: 'clone1' },
-      explanation: "Return clone of starting node (clone1). All neighbors recursively cloned.",
-      highlightedLines: [17, 20],
-      lineExecution: "return clone; // return clone1"
-    },
-    {
-      currentNode: -1,
-      visited: [1, 2, 3, 4],
-      cloned: [1, 2, 3, 4],
-      mapSize: 4,
-      variables: { nodes: 4, edges: 4, complexity: 'O(V+E)' },
-      explanation: "Algorithm complete! Cloned all nodes and edges. HashMap prevents infinite loops. Time: O(V+E), Space: O(V).",
-      highlightedLines: [20],
-      lineExecution: "Result: cloned graph with same structure"
+      variables: { result: 'copy(1)' },
+      explanation: "Return copy(1). Deep copy complete.",
+      highlightedLines: [33],
+      lineExecution: "return dfs(node);"
     }
   ];
 
-  const code = `function cloneGraph(
-  node: Node | null
-): Node | null {
-  if (!node) return null;
-  const map = new Map<Node, Node>();
-  
-  function dfs(node: Node): Node {
-    if (map.has(node)) return map.get(node)!;
-    
-    const clone = new Node(node.val);
-    map.set(node, clone);
-    
-    for (const neighbor of node.neighbors) {
-      clone.neighbors.push(dfs(neighbor));
+  const code = `function cloneGraph(node: Node | null): Node | null {
+  // Use a Map to store the mapping between original nodes and their clones.
+  const oldToNew = new Map<Node, Node>();
+
+  // Define a Depth-First Search (DFS) function to recursively clone the graph.
+  function dfs(node: Node | null): Node | null {
+    // If the node is null, return null.
+    if (!node) {
+      return null;
     }
-    
-    return clone;
+
+    // If the node has already been cloned, return the clone from the map.
+    if (oldToNew.has(node)) {
+      return oldToNew.get(node) || null; // Ensure to return null if undefined
+    }
+
+    // Create a new node with the same value as the original node.
+    const copy = new Node(node.val);
+
+    // Store the mapping between the original node and its clone in the map.
+    oldToNew.set(node, copy);
+
+    // Iterate over the neighbors of the original node and recursively clone them.
+    for (const neighbor of node.neighbors) {
+      copy.neighbors.push(dfs(neighbor)); // Correctly push the cloned neighbors
+    }
+
+    // Return the cloned node.
+    return copy;
   }
-  
-  return dfs(node);
+
+  // If the input node is null, return null. Otherwise, start the DFS from the input node.
+  return node ? dfs(node) : null;
 }`;
 
   const step = steps[currentStep];
@@ -317,8 +440,8 @@ export const CloneGraphVisualization = () => {
             <Card className="p-4 bg-blue-500/10">
               <h3 className="font-semibold mb-2 text-sm">Key Insight:</h3>
               <div className="text-xs text-muted-foreground">
-                Use HashMap to track original → clone mappings. When revisiting a node (cycle
-                detection), return existing clone instead of creating new one.
+                Use HashMap (oldToNew) to track original → clone mappings. If we encounter a node that's already in the
+                map (like when closing a cycle), we return the existing clone instead of creating a new one.
               </div>
             </Card>
           </motion.div>

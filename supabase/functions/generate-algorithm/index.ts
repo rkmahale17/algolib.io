@@ -138,7 +138,7 @@ Deno.serve(async (req) => {
             "io": [{"input": "...", "output": "...", "explanation": "..."}]
           },
           "test_cases": [{"input": [1, 2], "output": 3, "description": "...", "isSubmission": false}],
-          "input_schema": [{"name": "nums", "type": "number[]", "label": "Numbers"}],
+          "input_schema": [{"name": "nums", "type": "number[] (or number[][], string[][], etc)", "label": "Numbers"}],
           "metadata": {
             "overview": "Detailed Guide. Max 300 words. Split into many  paragraphs (break after ~60 words).",
             "companyTags": [], "likes": 0, "dislikes": 0
@@ -183,7 +183,7 @@ Deno.serve(async (req) => {
         {
           "implementations": [
             {
-              "lang": "${langs[0] === 'typescript' ? 'typeScript' : langs[0]}", // MUST be strict: "typeScript" (camelCase for TS), "java", "python", "cpp"
+              "lang": "${langs[0] === 'typescript' ? 'TypeScript' : langs[0]}", // MUST be strict: "TypeScript" (camelCase for TS), "java", "python", "cpp"
               "code": [
                 {
                   "codeType": "${target === 'add_approaches' ? 'descriptive-method-name' : 'optimize'}", 
