@@ -26,8 +26,9 @@ Deno.serve(async (req) => {
   const headers = Object.fromEntries(req.headers)
 
   console.log('Received email hook request')
+  console.log(`Hook secret present: ${Boolean(hookSecret)}`)
 
-  const wh = new Webhook("EEg<-_IHs6J<Is4lw9o17{X)|T||L")
+  const wh = new Webhook(hookSecret)
 
   try {
     const {
