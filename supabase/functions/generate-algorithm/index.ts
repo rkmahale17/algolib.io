@@ -120,9 +120,20 @@ Deno.serve(async (req) => {
     const corePrompt = `
         ${BASE_SYSTEM_PROMPT}
 
+
         TASK: Generate the CORE METADATA and EXPLANATION for this algorithm.
         Generate COMPLETE metadata.
         Do NOT generate code implementations yet.
+
+        **CRITICAL JSON FORMATTING RULES**:
+        1. **Escape Control Characters**: In JSON strings, you MUST properly escape:
+           - Newlines: Use \\\\n (NOT literal newlines)
+           - Tabs: Use \\\\t (NOT literal tabs)
+           - Quotes: Use \\\\" for double quotes inside strings
+           - Backslashes: Use \\\\\\\\ for literal backslashes
+        2. **No Literal Line Breaks**: NEVER include actual line breaks inside JSON string values
+        3. **Example**: Instead of "text with\nactual newline", use "text with\\\\nescaped newline"
+        4. **HTML Content**: HTML strings can be long but must be on a single line with escaped newlines
 
         JSON Structure:
         {
@@ -188,9 +199,9 @@ Deno.serve(async (req) => {
            - **Example**: If input_schema has [{"name": "nums", ...}, {"name": "target", ...}]
              Then io input should be: "nums = [2, 7, 11, 15], target = 9"
            - **NOT**: Just "[2, 7, 11, 15], 9" or raw arrays
-           - **Multi-line for readability**: For complex inputs (2D arrays, long arrays), use multi-line format:
-             "grid = [[1,2,3],\n        [4,5,6],\n        [7,8,9]]"
-           - Provide 3-5 diverse examples covering edge cases
+            - **Multi-line for readability**: For complex inputs (2D arrays, long arrays), use escaped newlines in JSON strings:
+              Example: \"grid = [[1,2,3],\\\\n        [4,5,6],\\\\n        [7,8,9]]\"
+            - Provide 3-5 diverse examples covering edge cases
         
         3. **Comparison Table**: MUST use this EXACT HTML structure: \n ${TABLE_STRUCTURE}
         
@@ -270,6 +281,16 @@ Deno.serve(async (req) => {
                  - "better" - Intermediate optimization
              `
         }
+
+        **CRITICAL JSON FORMATTING RULES**:
+        1. **Escape Control Characters**: In JSON strings, you MUST properly escape:
+           - Newlines: Use \\\\n (NOT literal newlines)
+           - Tabs: Use \\\\t (NOT literal tabs)
+           - Quotes: Use \\\\" for double quotes inside strings
+           - Backslashes: Use \\\\\\\\ for literal backslashes
+        2. **No Literal Line Breaks**: NEVER include actual line breaks inside JSON string values
+        3. **Code Strings**: When including code in "code" field, ensure all newlines are escaped as \\\\n
+        4. **HTML Content**: HTML in "explanationBefore" and "explanationAfter" must have escaped newlines
 
         JSON Structure:
         {
