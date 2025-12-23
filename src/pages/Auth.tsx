@@ -67,7 +67,12 @@ const Auth = () => {
         toast.success('Welcome back!');
       }
     } catch (error: any) {
-      toast.error(error.message || 'Authentication failed');
+      // Check if the error is due to unconfirmed email
+      if (error.message && error.message.toLowerCase().includes('email not confirmed')) {
+        toast.error('Please verify your email address before signing in. Check your inbox for the verification link.');
+      } else {
+        toast.error(error.message || 'Authentication failed');
+      }
     } finally {
       setIsLoading(false);
     }

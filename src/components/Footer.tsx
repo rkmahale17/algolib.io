@@ -103,6 +103,14 @@ export function Footer() {
                   Content Rights
                 </Link>
               </li>
+              <li>
+                <a 
+                  href="mailto:support@rulcode.com" 
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Support
+                </a>
+              </li>
             </ul>
           </div>
         </div>
