@@ -81,7 +81,7 @@ Deno.serve(async (req) => {
     console.log('Email HTML rendered successfully')
 
     const { error } = await resend.emails.send({
-      from: 'RulCode <onboarding@resend.dev>',
+      from: 'RulCode <no-reply@rulcode.com>',
       to: [user.email],
       subject: getSubject(email_action_type),
       html,
