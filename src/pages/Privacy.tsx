@@ -158,7 +158,13 @@ export default function Privacy() {
               <p className="text-muted-foreground">
                 Rulcode.com is suitable for all ages and does not knowingly collect personal information 
                 from children under 13. If you are a parent and believe your child has provided us with 
-                personal information, please contact us.
+                personal information, please contact us at{" "}
+                <a 
+                  href="mailto:support@rulcode.com" 
+                  className="text-primary hover:underline"
+                >
+                  support@rulcode.com
+                </a>.
               </p>
             </CardContent>
           </Card>
@@ -198,7 +204,14 @@ export default function Privacy() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
-                If you have questions or concerns about this privacy policy, please open an issue on our{" "}
+                If you have questions or concerns about this privacy policy, please contact us at{" "}
+                <a 
+                  href="mailto:support@rulcode.com" 
+                  className="text-primary hover:underline"
+                >
+                  support@rulcode.com
+                </a>{" "}
+                or open an issue on our{" "}
                 <a 
                   href="https://github.com/rkmahale17/algolib.io/issues" 
                   target="_blank" 

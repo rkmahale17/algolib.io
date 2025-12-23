@@ -140,7 +140,14 @@ export default function TermsOfService() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
-                If you have any questions about these Terms of Service, please open an issue on our{" "}
+                If you have any questions about these Terms of Service, please contact us at{" "}
+                <a 
+                  href="mailto:support@rulcode.com" 
+                  className="text-primary hover:underline"
+                >
+                  support@rulcode.com
+                </a>{" "}
+                or open an issue on our{" "}
                 <a 
                   href="https://github.com/rkmahale17/algolib.io/issues" 
                   target="_blank" 

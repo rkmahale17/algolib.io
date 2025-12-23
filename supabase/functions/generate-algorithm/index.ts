@@ -292,6 +292,16 @@ Deno.serve(async (req) => {
         3. **Code Strings**: When including code in "code" field, ensure all newlines are escaped as \\\\n
         4. **HTML Content**: HTML in "explanationBefore" and "explanationAfter" must have escaped newlines
 
+        **CRITICAL JSON FORMATTING RULES**:
+        1. **Escape Control Characters**: In JSON strings, you MUST properly escape:
+           - Newlines: Use \\\\n (NOT literal newlines)
+           - Tabs: Use \\\\t (NOT literal tabs)
+           - Quotes: Use \\\\" for double quotes inside strings
+           - Backslashes: Use \\\\\\\\ for literal backslashes
+        2. **No Literal Line Breaks**: NEVER include actual line breaks inside JSON string values
+        3. **Code Strings**: When including code in "code" field, ensure all newlines are escaped as \\\\n
+        4. **HTML Content**: HTML in "explanationBefore" and "explanationAfter" must have escaped newlines
+
         JSON Structure:
         {
           "implementations": [
