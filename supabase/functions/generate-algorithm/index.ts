@@ -1,4 +1,3 @@
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -11,7 +10,15 @@ Deno.serve(async (req) => {
 
   try {
     // target: "all" (default) | "add_approaches"
-    const { topic, referenceCode, userPrompt, existingApproaches = [], approachCount = 2, mode = "problem", target = "all" } = await req.json();
+    const {
+      topic,
+      referenceCode,
+      userPrompt,
+      existingApproaches = [],
+      approachCount = 2,
+      mode = "problem",
+      target = "all",
+    } = await req.json();
     const apiKey = Deno.env.get("GEMINI_API_KEY");
 
     if (!apiKey) {
@@ -68,9 +75,9 @@ Deno.serve(async (req) => {
     const BASE_SYSTEM_PROMPT = `
         You are an expert algorithm tutor.
         TOPIC: "${topic}"
-        MODE: ${mode === 'core' ? 'Core Algorithm (Define problem yourself)' : 'LeetCode Problem (Match standard definition)'}
-        ${referenceCode ? `REFERENCE CODE PROVIDED (Use for Logic): \n${referenceCode}` : ''}
-        ${userPrompt ? `USER CONTEXT / INSTRUCTIONS: \n"${userPrompt}"\n(Follow these instructions specifically. This may include LeetCode problem description, examples, constraints, or other context to help you generate accurate content.)` : ''}
+        MODE: ${mode === "core" ? "Core Algorithm (Define problem yourself)" : "LeetCode Problem (Match standard definition)"}
+        ${referenceCode ? `REFERENCE CODE PROVIDED (Use for Logic): \n${referenceCode}` : ""}
+        ${userPrompt ? `USER CONTEXT / INSTRUCTIONS: \n"${userPrompt}"\n(Follow these instructions specifically. This may include LeetCode problem description, examples, constraints, or other context to help you generate accurate content.)` : ""}
 
         GENERAL RULES:
         1. **Truthfulness**: Verify complexity. No hallucinations.
@@ -89,7 +96,7 @@ Deno.serve(async (req) => {
           body: JSON.stringify({
             contents: [{ parts: [{ text: promptText }] }],
           }),
-        }
+        },
       );
       if (!response.ok) {
         const errText = await response.text();
@@ -241,12 +248,13 @@ Deno.serve(async (req) => {
 
         TASK: Generate Code Implementations for: ${langs.join(", ")}.
         
-        ${target === 'add_approaches'
-        ? `GENERATE **${approachCount} NEW** distinct approaches. 
+        ${
+          target === "add_approaches"
+            ? `GENERATE **${approachCount} NEW** distinct approaches. 
               EXCLUDE these existing approaches: ${existingApproaches.join(", ")}.
               Use strategy-based naming (e.g., "dfs", "bfs", "dp", "greedy", "two-pointer", "sliding-window", "binary-search", "sorting").
-              Context from User: "${userPrompt || 'Provide additional unique methods'}"`
-        : `You MUST generate MULTIPLE VIABLE APPROACHES (at least 2, MAX 4).
+              Context from User: "${userPrompt || "Provide additional unique methods"}"`
+            : `You MUST generate MULTIPLE VIABLE APPROACHES (at least 2, MAX 4).
               **APPROACH STRUCTURE & ORDER**:
               1. **Optimized Approach** (MUST BE FIRST) - codeType: "optimize"
                  - This is the BEST solution with optimal time/space complexity
@@ -272,7 +280,17 @@ Deno.serve(async (req) => {
                  - "recursive" - Recursive implementation
                  - "better" - Intermediate optimization
              `
-      }
+        }
+
+        **CRITICAL JSON FORMATTING RULES**:
+        1. **Escape Control Characters**: In JSON strings, you MUST properly escape:
+           - Newlines: Use \\\\n (NOT literal newlines)
+           - Tabs: Use \\\\t (NOT literal tabs)
+           - Quotes: Use \\\\" for double quotes inside strings
+           - Backslashes: Use \\\\\\\\ for literal backslashes
+        2. **No Literal Line Breaks**: NEVER include actual line breaks inside JSON string values
+        3. **Code Strings**: When including code in "code" field, ensure all newlines are escaped as \\\\n
+        4. **HTML Content**: HTML in "explanationBefore" and "explanationAfter" must have escaped newlines
 
         **CRITICAL JSON FORMATTING RULES**:
         1. **Escape Control Characters**: In JSON strings, you MUST properly escape:
@@ -288,15 +306,15 @@ Deno.serve(async (req) => {
         {
           "implementations": [
             {
-              "lang": "${langs[0] === 'typescript' ? 'TypeScript' : langs[0]}", // MUST be strict: "TypeScript" (camelCase for TS), "java", "python", "cpp"
+              "lang": "${langs[0] === "typescript" ? "TypeScript" : langs[0]}", // MUST be strict: "TypeScript" (camelCase for TS), "java", "python", "cpp"
               "code": [
                 {
-                  "codeType": "${target === 'add_approaches' ? 'strategy-name (e.g., "dfs", "bfs", "dp", "greedy")' : 'optimize'}", 
+                  "codeType": "${target === "add_approaches" ? 'strategy-name (e.g., "dfs", "bfs", "dp", "greedy")' : "optimize"}", 
                   "code": "FUNCTION CODE ONLY",
                   "explanationBefore": "EXTREMELY DETAILED HTML (1000+ words)",
                   "explanationAfter": "HTML content"
                 }
-                // ... generate ${target === 'add_approaches' ? approachCount : '2-4'} approaches
+                // ... generate ${target === "add_approaches" ? approachCount : "2-4"} approaches
               ]
             }
             // ... repeat for other languages
@@ -458,7 +476,7 @@ Deno.serve(async (req) => {
            - Java: \`public int[] twoSum(int[] nums, int target) {\n    \n}\`
            - C++: \`vector<int> twoSum(vector<int>& nums, int target) {\n    \n}\`
         
-        6. **Reference Code**: ${target === 'add_approaches' ? 'Use only if relevant to new approaches.' : "If provided, use it for 'optimize' logic."}
+        6. **Reference Code**: ${target === "add_approaches" ? "Use only if relevant to new approaches." : "If provided, use it for 'optimize' logic."}
         
         
         HTML RULES (explanationBefore):
@@ -471,7 +489,7 @@ Deno.serve(async (req) => {
         3. **Step-by-step**: Educational. If a step is long, split it.
         4. **General**: **STRICT RULE**: NO single paragraph should exceed 60 words. Divide and conquer the text.
         
-        ${target === 'all' ? `**COMPARISON TABLE UPDATE**: For the **Optimize** approach (which is FIRST), put the Comparison Table HTML in 'explanationAfter'.` : ''}
+        ${target === "all" ? `**COMPARISON TABLE UPDATE**: For the **Optimize** approach (which is FIRST), put the Comparison Table HTML in 'explanationAfter'.` : ""}
 
         `;
 
@@ -482,11 +500,11 @@ Deno.serve(async (req) => {
     let implsPart1 = null;
     let implsPart2 = null;
 
-    if (target === 'all') {
+    if (target === "all") {
       [coreData, implsPart1, implsPart2] = await Promise.all([
         generateChunk(corePrompt),
         generateChunk(implsPrompt(["typescript", "python"])),
-        generateChunk(implsPrompt(["java", "cpp"]))
+        generateChunk(implsPrompt(["java", "cpp"])),
       ]);
 
       if (!coreData) throw new Error("Failed to generate Core Data.");
@@ -494,7 +512,7 @@ Deno.serve(async (req) => {
       // Add Approaches Mode: Only run impls chunks
       [implsPart1, implsPart2] = await Promise.all([
         generateChunk(implsPrompt(["typescript", "python"])),
-        generateChunk(implsPrompt(["java", "cpp"]))
+        generateChunk(implsPrompt(["java", "cpp"])),
       ]);
     }
 
@@ -503,16 +521,12 @@ Deno.serve(async (req) => {
     // --- MERGE ---
     const finalJson = {
       ...(coreData || {}), // If null (add_approaches), we return empty core. Client handles merge.
-      implementations: [
-        ...(implsPart1.implementations || []),
-        ...(implsPart2.implementations || [])
-      ]
+      implementations: [...(implsPart1.implementations || []), ...(implsPart2.implementations || [])],
     };
 
     return new Response(JSON.stringify(finalJson), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-
   } catch (error) {
     console.error("Error in generate-algorithm:", error);
     return new Response(JSON.stringify({ error: (error as Error).message }), {
