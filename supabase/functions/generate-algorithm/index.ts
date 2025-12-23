@@ -113,9 +113,20 @@ Deno.serve(async (req) => {
     const corePrompt = `
         ${BASE_SYSTEM_PROMPT}
 
+
         TASK: Generate the CORE METADATA and EXPLANATION for this algorithm.
         Generate COMPLETE metadata.
         Do NOT generate code implementations yet.
+
+        **CRITICAL JSON FORMATTING RULES**:
+        1. **Escape Control Characters**: In JSON strings, you MUST properly escape:
+           - Newlines: Use \\\\n (NOT literal newlines)
+           - Tabs: Use \\\\t (NOT literal tabs)
+           - Quotes: Use \\\\" for double quotes inside strings
+           - Backslashes: Use \\\\\\\\ for literal backslashes
+        2. **No Literal Line Breaks**: NEVER include actual line breaks inside JSON string values
+        3. **Example**: Instead of "text with\nactual newline", use "text with\\\\nescaped newline"
+        4. **HTML Content**: HTML strings can be long but must be on a single line with escaped newlines
 
         JSON Structure:
         {
@@ -181,9 +192,9 @@ Deno.serve(async (req) => {
            - **Example**: If input_schema has [{"name": "nums", ...}, {"name": "target", ...}]
              Then io input should be: "nums = [2, 7, 11, 15], target = 9"
            - **NOT**: Just "[2, 7, 11, 15], 9" or raw arrays
-           - **Multi-line for readability**: For complex inputs (2D arrays, long arrays), use multi-line format:
-             "grid = [[1,2,3],\n        [4,5,6],\n        [7,8,9]]"
-           - Provide 3-5 diverse examples covering edge cases
+            - **Multi-line for readability**: For complex inputs (2D arrays, long arrays), use escaped newlines in JSON strings:
+              Example: \"grid = [[1,2,3],\\\\n        [4,5,6],\\\\n        [7,8,9]]\"
+            - Provide 3-5 diverse examples covering edge cases
         
         3. **Comparison Table**: MUST use this EXACT HTML structure: \n ${TABLE_STRUCTURE}
         
@@ -263,6 +274,16 @@ Deno.serve(async (req) => {
              `
       }
 
+        **CRITICAL JSON FORMATTING RULES**:
+        1. **Escape Control Characters**: In JSON strings, you MUST properly escape:
+           - Newlines: Use \\\\n (NOT literal newlines)
+           - Tabs: Use \\\\t (NOT literal tabs)
+           - Quotes: Use \\\\" for double quotes inside strings
+           - Backslashes: Use \\\\\\\\ for literal backslashes
+        2. **No Literal Line Breaks**: NEVER include actual line breaks inside JSON string values
+        3. **Code Strings**: When including code in "code" field, ensure all newlines are escaped as \\\\n
+        4. **HTML Content**: HTML in "explanationBefore" and "explanationAfter" must have escaped newlines
+
         JSON Structure:
         {
           "implementations": [
@@ -299,7 +320,25 @@ Deno.serve(async (req) => {
            - **Return ONLY the standalone function** (with typing import for Python if needed).
            - The test runner will wrap your function automatically - you provide ONLY the function itself.
         
-        2. **EXACT CODE FORMAT BY LANGUAGE**:
+        2. **HELPER FUNCTIONS PLACEMENT (CRITICAL)**:
+           - **ALL helper functions MUST be placed ABOVE the main function**
+           - **NEVER place helper functions below or after the main function**
+           - **Order**: Helper functions first, then main function at the bottom
+           - **Example Pattern**:
+             * Helper Function 1 (defined first)
+             * Helper Function 2 (defined second)
+             * Main Function (defined LAST - this is the entry point)
+           - **Why This Matters**: The test runner needs to find the main function, and having helpers above ensures they're available when the main function is called
+           - **Applies to ALL languages**: TypeScript, Python, Java, AND C++
+        
+        3. **ALL LANGUAGES REQUIRED (CRITICAL)**:
+           - **EVERY approach MUST have implementations in ALL 4 languages**: TypeScript, Python, Java, AND C++
+           - **If you cannot provide a valid implementation in ALL 4 languages for an approach, DO NOT include that approach at all**
+           - **No partial approaches**: An approach with only 2-3 language implementations is NOT acceptable
+           - **Quality over quantity**: It's better to have 2 complete approaches (all 4 languages) than 4 partial approaches
+           - **Verification**: Before including an approach, verify you can implement it in TypeScript, Python, Java, AND C++
+        
+        4. **EXACT CODE FORMAT BY LANGUAGE**:
         
            **TypeScript Format:**
            \`\`\`typescript
