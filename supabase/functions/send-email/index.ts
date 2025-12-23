@@ -24,11 +24,11 @@ Deno.serve(async (req) => {
 
   const payload = await req.text()
   const headers = Object.fromEntries(req.headers)
-  
+
   console.log('Received email hook request')
-  
-  const wh = new Webhook(hookSecret)
-  
+
+  const wh = new Webhook("EEg<-_IHs6J<Is4lw9o17{X)|T||L")
+
   try {
     const {
       user,
