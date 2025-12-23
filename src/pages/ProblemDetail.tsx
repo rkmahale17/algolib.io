@@ -31,9 +31,9 @@ const scrollToCode = () => {
   }
 };
 
-const AlgorithmDetail: React.FC = () => {
+const ProblemDetail: React.FC = () => {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
-  // Support both /algorithm/:id and /blind75/:slug
+  // Unified route: /problem/:id (supports both core algorithms and Blind 75)
   const algorithmIdOrSlug = id || slug; 
   const navigate = useNavigate();
   
@@ -364,4 +364,4 @@ const AlgorithmDetail: React.FC = () => {
   );
 };
 
-export default AlgorithmDetail;
+export default ProblemDetail;

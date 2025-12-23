@@ -13,7 +13,7 @@ import Navbar from "./components/Navbar";
 
 // Lazy load everything else to reduce initial bundle size
 const ProfilePage = lazy(() => import("./pages/Profile"));
-const AlgorithmDetail = lazy(() => import('@/pages/AlgorithmDetail'));
+const ProblemDetail = lazy(() => import('@/pages/ProblemDetail'));
 const Blind75 = lazy(() => import("./pages/Blind75"));
 const Auth = lazy(() => import("./pages/Auth"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -52,8 +52,7 @@ const queryClient = new QueryClient();
 const ConditionalNavbar = () => {
   const location = useLocation();
   // Hide navbar on algorithm detail pages and blind75 detail pages
-  const hideNavbar = location.pathname.startsWith('/algorithm/') || 
-                     (location.pathname.startsWith('/blind75/') && location.pathname !== '/blind75') ||
+  const hideNavbar = location.pathname.startsWith('/problem/') && location.pathname !== '/problem' ||
                      location.pathname.startsWith('/admin');
   
   if (hideNavbar) return null;
@@ -84,16 +83,16 @@ const AppContent = () => {
               <Suspense fallback={<PremiumLoader text="Loading..." />}>
                 <Routes>
                   <Route path="/" element={<Home />} />
-                  <Route path="/algorithm/:id" element={<AlgorithmDetail />} />
+                  <Route path="/problem/:id" element={<ProblemDetail />} />
 
                   <Route path="/blind75" element={
                     <FeatureProtectedRoute flag="blind_75">
                       <ProtectedRoute><Blind75 /></ProtectedRoute>
                     </FeatureProtectedRoute>
                   } />
-                  <Route path="/blind75/:slug" element={
+                  <Route path="/problem/:slug" element={
                     <FeatureProtectedRoute flag="blind_75">
-                      <ProtectedRoute><AlgorithmDetail /></ProtectedRoute>
+                      <ProtectedRoute><ProblemDetail /></ProtectedRoute>
                     </FeatureProtectedRoute>
                   } />
                 <Route path="/auth" element={<Auth />} />

@@ -7,7 +7,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { AlgorithmList } from '@/components/AlgorithmList';
+import { ProblemList } from '@/components/ProblemList';
 import { PremiumLoader } from '@/components/PremiumLoader';
 import { ListType, DIFFICULTY_MAP } from "@/types/algorithm";
 import { useAlgorithms } from "@/hooks/useAlgorithms";
@@ -51,7 +51,7 @@ const Blind75 = () => {
   };
 
   if (isLoading) {
-    // Return with isLoading prop tailored for AlgorithmList instead of blocking
+    // Return with isLoading prop tailored for ProblemList instead of blocking
   }
 
   return (
@@ -140,7 +140,7 @@ const Blind75 = () => {
 
         {/* Algorithm List with Filters */}
         <div className="container mx-auto px-4 py-8">
-           <AlgorithmList 
+           <ProblemList 
               algorithms={algorithms} 
               isLoading={isLoading}
               emptyMessage="No Blind 75 problems found."

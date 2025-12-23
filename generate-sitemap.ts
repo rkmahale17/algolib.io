@@ -69,14 +69,10 @@ async function generateSitemap() {
     process.exit(1);
   }
 
-  const algorithmRoutes = algorithms.map((algo) => `/algorithm/${algo.id}`);
+  // All algorithms now use unified /problem/ route
+  const problemRoutes = algorithms.map((algo) => `/problem/${algo.id}`);
 
-  // For Blind 75, we check list_type or metadata
-  const blind75Routes = algorithms
-    .filter(algo => algo.list_type === 'blind75') // Using string check as per ListType in codebase
-    .map(algo => `/blind75/${algo.id}`); // Using ID for consistency, unless slug is available in metadata
-
-  const allRoutes = [...staticRoutes, ...algorithmRoutes, ...blind75Routes, ...blogRoutes, ...gameRoutes];
+  const allRoutes = [...staticRoutes, ...problemRoutes, ...blogRoutes, ...gameRoutes];
 
   // Generate sitemap XML
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -85,13 +81,13 @@ ${allRoutes.map(route => `  <url>
     <loc>${baseUrl}${route}</loc>
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>${route === '/' ? 'daily' :
-      route.startsWith('/algorithm/') || route.startsWith('/blind75/') ? 'weekly' :
+      route.startsWith('/problem/') ? 'weekly' :
         route.startsWith('/blog/') ? 'weekly' :
           route.startsWith('/games/') ? 'weekly' :
             'monthly'
     }</changefreq>
     <priority>${route === '/' ? '1.0' :
-      route.startsWith('/algorithm/') || route.startsWith('/blind75/') ? '0.8' :
+      route.startsWith('/problem/') ? '0.8' :
         route.startsWith('/blog/') ? '0.7' :
           route.startsWith('/games/') ? '0.6' :
             '0.5'

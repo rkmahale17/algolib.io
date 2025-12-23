@@ -32,11 +32,11 @@ The home page now includes:
 <h3>Arrays & Strings</h3>
 <ul>
   <li>
-    <a href="/algorithm/two-pointers"><strong>Two Pointers</strong></a> - Use
+    <a href="/problem/two-pointers"><strong>Two Pointers</strong></a> - Use
     two pointers to traverse arrays efficiently (Time: O(n), Space: O(1))
   </li>
   <li>
-    <a href="/algorithm/sliding-window"><strong>Sliding Window</strong></a> -
+    <a href="/problem/sliding-window"><strong>Sliding Window</strong></a> -
     Maintain a window of elements... (Time: O(n), Space: O(1))
   </li>
   <!-- All algorithms listed -->
@@ -45,11 +45,11 @@ The home page now includes:
 <h2>Popular Algorithms</h2>
 <ul>
   <li>
-    <a href="/algorithm/two-pointers">Two Pointers</a> - Efficient array
+    <a href="/problem/two-pointers">Two Pointers</a> - Efficient array
     traversal
   </li>
   <li>
-    <a href="/algorithm/binary-search">Binary Search</a> - Fast search in sorted
+    <a href="/problem/binary-search">Binary Search</a> - Fast search in sorted
     arrays
   </li>
   <!-- Top 10 algorithms -->
@@ -267,13 +267,13 @@ For algorithm pages:
       "@type": "ListItem",
       "position": 1,
       "name": "Home",
-      "item": "https://algolib.io"
+      "item": "https://rulcode.com"
     },
     {
       "@type": "ListItem",
       "position": 2,
       "name": "Arrays & Strings",
-      "item": "https://algolib.io/category/arrays-strings"
+      "item": "https://rulcode.com/category/arrays-strings"
     },
     {
       "@type": "ListItem",
@@ -305,7 +305,7 @@ Mark the platform as an educational course:
 
 ### Google Search Console
 
-1. **Submit sitemap**: `https://algolib.io/sitemap.xml`
+1. **Submit sitemap**: `https://rulcode.com/sitemap.xml`
 2. **Monitor coverage**: Check for indexing errors
 3. **Track queries**: See which keywords drive traffic
 4. **Analyze CTR**: Optimize titles/descriptions based on data

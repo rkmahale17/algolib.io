@@ -556,7 +556,7 @@ export const ProblemDescriptionPanel = React.memo(({
                           {algorithm.problems_to_solve.internal.map((problem: any, i: number) => (
                             <Link
                               key={`internal-${i}`}
-                              to={`/algorithm/${problem.url}`}
+                              to={`/problem/${problem.url}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"

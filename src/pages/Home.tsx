@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PremiumLoader } from "@/components/PremiumLoader";
 import { appStatus } from "@/utils/appStatus";
 import { FeatureGuard } from "@/components/FeatureGuard";
-import { AlgorithmList } from "@/components/AlgorithmList";
+import { ProblemList } from "@/components/ProblemList";
 import { ListType, AlgorithmListItem } from "@/types/algorithm";
 import { useAlgorithms } from "@/hooks/useAlgorithms";
 
@@ -209,7 +209,7 @@ const Home = () => {
                   Core algorithms
                 </h2>
              </div>
-             <AlgorithmList 
+             <ProblemList 
                algorithms={algorithms} 
                emptyMessage="No algorithms found matching your search." 
                defaultListType={ListType.Core}
