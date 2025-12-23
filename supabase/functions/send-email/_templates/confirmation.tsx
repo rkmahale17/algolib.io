@@ -32,13 +32,13 @@ export const ConfirmationEmail = ({
   const getSubjectAndHeading = () => {
     switch (email_action_type) {
       case 'signup':
-        return { heading: 'Welcome to AlgoLib!', preview: 'Confirm your email to get started' }
+        return { heading: 'Welcome to RulCode!', preview: 'Confirm your email to get started' }
       case 'recovery':
         return { heading: 'Reset Your Password', preview: 'Click the link to reset your password' }
       case 'invite':
-        return { heading: "You're Invited!", preview: 'Accept your invitation to AlgoLib' }
+        return { heading: "You're Invited!", preview: 'Accept your invitation to RulCode' }
       case 'magiclink':
-        return { heading: 'Your Magic Link', preview: 'Click to sign in to AlgoLib' }
+        return { heading: 'Your Magic Link', preview: 'Click to sign in to RulCode' }
       case 'email_change':
         return { heading: 'Confirm Email Change', preview: 'Verify your new email address' }
       default:
@@ -75,7 +75,7 @@ export const ConfirmationEmail = ({
         <Container style={container}>
           {/* Header with Logo */}
           <Section style={header}>
-            <Text style={logo}>AlgoLib</Text>
+            <Text style={logo}>RulCode</Text>
           </Section>
 
           <Section style={content}>
@@ -83,7 +83,7 @@ export const ConfirmationEmail = ({
             
             {email_action_type === 'signup' && (
               <Text style={text}>
-                Thanks for signing up! Please confirm your email address to start mastering algorithms and data structures.
+                Thanks for signing up! Please confirm your email address to get started with RulCode.
               </Text>
             )}
             
@@ -95,7 +95,7 @@ export const ConfirmationEmail = ({
 
             {email_action_type === 'magiclink' && (
               <Text style={text}>
-                Click the button below to sign in to your AlgoLib account.
+                Click the button below to sign in to your RulCode account.
               </Text>
             )}
 
@@ -134,10 +134,10 @@ export const ConfirmationEmail = ({
 
           <Section style={footerSection}>
             <Text style={footerText}>
-              © {new Date().getFullYear()} AlgoLib. All rights reserved.
+              © {new Date().getFullYear()} RulCode. All rights reserved.
             </Text>
-            <Link href="https://algolib.io" style={footerLink}>
-              algolib.io
+            <Link href="https://rulcode.com" style={footerLink}>
+              rulcode.com
             </Link>
           </Section>
         </Container>

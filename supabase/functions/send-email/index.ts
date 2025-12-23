@@ -53,17 +53,17 @@ Deno.serve(async (req) => {
     const getSubject = (actionType: string): string => {
       switch (actionType) {
         case 'signup':
-          return 'Welcome to AlgoLib - Confirm Your Email'
+          return 'Welcome to RulCode - Confirm Your Email'
         case 'recovery':
-          return 'AlgoLib - Reset Your Password'
+          return 'RulCode - Reset Your Password'
         case 'invite':
-          return "You're Invited to AlgoLib!"
+          return "You're Invited to RulCode!"
         case 'magiclink':
-          return 'AlgoLib - Your Magic Link'
+          return 'RulCode - Your Magic Link'
         case 'email_change':
-          return 'AlgoLib - Confirm Your New Email'
+          return 'RulCode - Confirm Your New Email'
         default:
-          return 'AlgoLib - Verify Your Email'
+          return 'RulCode - Verify Your Email'
       }
     }
 
@@ -81,7 +81,7 @@ Deno.serve(async (req) => {
     console.log('Email HTML rendered successfully')
 
     const { error } = await resend.emails.send({
-      from: 'AlgoLib <onboarding@resend.dev>',
+      from: 'RulCode <onboarding@resend.dev>',
       to: [user.email],
       subject: getSubject(email_action_type),
       html,
