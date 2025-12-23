@@ -12,7 +12,8 @@ import Home from "./pages/Home";
 import Navbar from "./components/Navbar";
 
 // Lazy load everything else to reduce initial bundle size
-const ProfilePage = lazy(() => import("./pages/Profile"));
+const ProfileEdit = lazy(() => import("./pages/Profile"));
+const PublicProfile = lazy(() => import("./pages/PublicProfile"));
 const ProblemDetail = lazy(() => import('@/pages/ProblemDetail'));
 const Blind75 = lazy(() => import("./pages/Blind75"));
 const Auth = lazy(() => import("./pages/Auth"));
@@ -187,9 +188,12 @@ const AppContent = () => {
 
                   <Route path="/profile" element={
                     <FeatureProtectedRoute flag="profiles">
-                      <ProtectedRoute><ProfilePage /></ProtectedRoute>
+                      <ProtectedRoute><ProfileEdit /></ProtectedRoute>
                     </FeatureProtectedRoute>
                   } />
+
+                  {/* Public profile route - no auth required */}
+                  <Route path="/profile/:username" element={<PublicProfile />} />
 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />

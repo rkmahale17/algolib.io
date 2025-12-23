@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AlgorithmListItem } from "@/types/algorithm";
+import { getAllUserAlgorithmData } from "@/utils/userAlgorithmDataHelpers";
 
 export interface PaginatedAlgorithmsResult {
     algorithms: AlgorithmListItem[];
@@ -11,7 +12,7 @@ export interface PaginatedAlgorithmsResult {
 }
 
 export const useAlgorithms = (
-    search?: string, 
+    search?: string,
     category?: string,
     page: number = 1,
     pageSize: number = 20
@@ -72,6 +73,34 @@ export const useCategories = () => {
             return uniqueCats;
         },
         staleTime: 1000 * 60 * 60, // 1 hour
+    });
+};
+
+export type ProgressStatus = 'solved' | 'attempted' | 'none';
+
+export const useUserProgressMap = (userId?: string) => {
+    return useQuery({
+        queryKey: ["userProgressMap", userId],
+        queryFn: async (): Promise<Record<string, ProgressStatus>> => {
+            if (!userId) return {};
+
+            const data = await getAllUserAlgorithmData(userId);
+            const map: Record<string, ProgressStatus> = {};
+
+            data.forEach(item => {
+                if (item.completed) {
+                    map[item.algorithm_id] = 'solved';
+                } else if (item.submissions && Array.isArray(item.submissions) && item.submissions.length > 0) {
+                    map[item.algorithm_id] = 'attempted';
+                } else {
+                    map[item.algorithm_id] = 'none';
+                }
+            });
+
+            return map;
+        },
+        enabled: !!userId,
+        staleTime: 1000 * 60 * 5, // 5 minutes
     });
 };
 

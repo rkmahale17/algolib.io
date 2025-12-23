@@ -11,6 +11,7 @@ export interface Profile {
     github_url: string | null;
     website_url: string | null;
     username: string | null;
+    is_public: boolean;
     created_at: string;
     updated_at: string;
 }
@@ -26,4 +27,5 @@ export interface ProfileUpdateData {
     website_url?: string | null;
     username?: string | null;
     avatar_url?: string | null;
+    is_public?: boolean;
 }

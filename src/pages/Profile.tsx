@@ -1,33 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
-import { SubmissionHeatmap } from "@/components/profile/SubmissionHeatmap";
-import { ProgressStats } from "@/components/profile/ProgressStats";
-import { RecentSubmissions } from "@/components/profile/RecentSubmissions";
 import { PremiumLoader } from "@/components/PremiumLoader";
 import type { Profile } from "@/types/profile";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { EditProfileDialog } from "@/components/profile/EditProfileDialog";
-import { DIFFICULTY_MAP } from "@/types/algorithm";
-import { format } from "date-fns";
 
-const ProfilePage = () => {
+const ProfileEdit = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({
-    totalSolved: 0,
-    totalQuestions: 0, 
-    easySolved: 0,
-    easyTotal: 0, // Need to calculate
-    mediumSolved: 0,
-    mediumTotal: 0,
-    hardSolved: 0,
-    hardTotal: 0,
-    heatmapData: [] as { date: string; count: number }[],
-    recentSubmissions: [] as any[]
-  });
   const [isEditOpen, setIsEditOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -43,7 +26,6 @@ const ProfilePage = () => {
             return;
         }
 
-        // 1. Fetch Profile
         const { data: profileData, error: profileError } = await supabase
             .from('profiles')
             .select('*')
@@ -51,87 +33,12 @@ const ProfilePage = () => {
             .single();
         
         if (profileError) throw profileError;
-        setProfile(profileData);
+        setProfile({ ...profileData, is_public: true } as Profile);
 
-        // 2. Fetch User Algorithm Data (Stats)
-        const { data: algoData, error: algoError } = await supabase
-            .from('user_algorithm_data')
-            .select('*')
-            .eq('user_id', user.id);
-
-        if (algoError) throw algoError;
-
-        // 3. Fetch All Algorithms Metadata (for totals and names)
-        const { data: allAlgorithms, error: metaError } = await supabase
-            .from('algorithms')
-            .select('id, name, difficulty');
-        
-        if (metaError) throw metaError;
-
-        // Process Stats
-        let easy = 0, med = 0, hard = 0;
-        let heatmapRaw: Record<string, number> = {};
-        let recents: any[] = [];
-
-        // Create a map for quick lookup of algo details
-        const algoMap = new Map();
-        allAlgorithms?.forEach(a => algoMap.set(a.id, a));
-        
-        // Count solved
-        algoData?.forEach(entry => {
-            if (entry.completed) {
-                // Find algo difficulty from DB metadata
-                const algo = algoMap.get(entry.algorithm_id);
-                // Normalize difficulty
-                const rawDiff = algo?.difficulty?.toLowerCase() || '';
-                const diff = (DIFFICULTY_MAP[rawDiff] || rawDiff).toLowerCase();
-
-                if (diff === 'easy') easy++;
-                else if (diff === 'medium') med++;
-                else if (diff === 'hard') hard++;
-            }
-
-            // Process submissions for heatmap and recents
-            const subs = (entry.submissions as any[]) || [];
-            subs.forEach(s => {
-                // Use local date for heatmap to match user's perspective
-                const dateKey = format(new Date(s.timestamp), 'yyyy-MM-dd');
-                heatmapRaw[dateKey] = (heatmapRaw[dateKey] || 0) + 1;
-                
-                recents.push({
-                    id: s.id,
-                    algorithmId: entry.algorithm_id,
-                    algorithmName: algoMap.get(entry.algorithm_id)?.name || entry.algorithm_id, 
-                    status: s.status,
-                    timestamp: s.timestamp,
-                    language: s.language
-                });
-            });
-        });
-
-        // Calculate Totals from DB metadata using normalization
-        let totalEasy = 0, totalMed = 0, totalHard = 0;
-        allAlgorithms?.forEach(a => {
-            const rawDiff = a.difficulty?.toLowerCase() || '';
-            const diff = (DIFFICULTY_MAP[rawDiff] || rawDiff).toLowerCase();
-            if (diff === 'easy') totalEasy++;
-            else if (diff === 'medium') totalMed++;
-            else if (diff === 'hard') totalHard++;
-        });
-
-        setStats({
-            totalSolved: easy + med + hard,
-            totalQuestions: allAlgorithms?.length || 0,
-            easySolved: easy,
-            easyTotal: totalEasy,
-            mediumSolved: med,
-            mediumTotal: totalMed,
-            hardSolved: hard,
-            hardTotal: totalHard,
-            heatmapData: Object.entries(heatmapRaw).map(([date, count]) => ({ date, count })),
-            recentSubmissions: recents.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 20)
-        });
-
+        // If user has username, redirect to public view
+        if (profileData?.username) {
+            navigate(`/profile/${profileData.username}`);
+        }
     } catch (error) {
         console.error("Error fetching profile:", error);
         toast.error("Failed to load profile");
@@ -154,50 +61,34 @@ const ProfilePage = () => {
             isOwnProfile={true} 
         />
 
-        {/* Edit Dialog (Lazy loaded or conditional) */}
+        {/* Edit Dialog */}
         {isEditOpen && (
             <EditProfileDialog 
                 open={isEditOpen} 
                 onOpenChange={setIsEditOpen} 
                 profile={profile} 
                 onSave={() => {
-                    fetchProfileData(); // Reload data
+                    fetchProfileData();
                     setIsEditOpen(false);
                 }}
             />
         )}
 
-        {/* Dashboard Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            {/* Left Col: Submission Heatmap (Spans 2 cols on large) */}
-            <div className="lg:col-span-2">
-                <SubmissionHeatmap submissions={stats.heatmapData} />
-            </div>
-
-            {/* Right Col: Progress Stats */}
-            <div className="lg:col-span-1">
-                <ProgressStats 
-                    totalSolved={stats.totalSolved}
-                    totalQuestions={stats.totalQuestions}
-                    easySolved={stats.easySolved}
-                    easyTotal={stats.easyTotal}
-                    mediumSolved={stats.mediumSolved}
-                    mediumTotal={stats.mediumTotal}
-                    hardSolved={stats.hardSolved}
-                    hardTotal={stats.hardTotal}
-                />
-            </div>
-
-            {/* Full Width: Recent Activity */}
-            <div className="lg:col-span-3">
-                <RecentSubmissions submissions={stats.recentSubmissions} />
-            </div>
-        </div>
-
+        {/* Message to set username */}
+        {!profile.username && (
+          <div className="text-center py-12">
+            <h2 className="text-2xl font-bold mb-4">Welcome to Your Profile!</h2>
+            <p className="text-muted-foreground mb-6">
+              Set up your username to make your profile shareable and start tracking your progress.
+            </p>
+            <Button onClick={() => setIsEditOpen(true)} size="lg">
+              Set Up Profile
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-export default ProfilePage;
+export default ProfileEdit;

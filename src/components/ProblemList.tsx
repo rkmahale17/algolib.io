@@ -1,12 +1,14 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, TrendingUp, BookOpen } from 'lucide-react';
+import { Search, TrendingUp, BookOpen, CheckCircle2, Circle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ListType, LIST_TYPE_LABELS, DIFFICULTY_MAP, AlgorithmListItem } from '@/types/algorithm';
+import { useUserProgressMap } from '@/hooks/useAlgorithms';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ProblemListProps {
   algorithms: AlgorithmListItem[];
@@ -50,6 +52,22 @@ export const ProblemList = ({
   const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
   const [selectedListType, setSelectedListType] = useState<string | null>(defaultListType === 'all' ? null : defaultListType);
   const [sortBy, setSortBy] = useState<string>('serial-asc');
+  const [userId, setUserId] = useState<string | undefined>(undefined);
+
+  // Get current user for progress tracking
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUserId(session?.user?.id);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserId(session?.user?.id);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const { data: progressMap } = useUserProgressMap(userId);
 
   // Extract unique categories
   const categories = useMemo(() => {
@@ -194,83 +212,114 @@ export const ProblemList = ({
         </div>
       </div>
 
-      {/* Grid */}
+      {/* List */}
       {isLoading ? (
         <ProblemListSkeleton />
       ) : (
-        <>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredAndSortedAlgorithms.map((algo, index) => (
-          <Link 
-            key={algo.id} 
-            to={algo.slug ? `/problem/${algo.slug}` : `/problem/${algo.id}`}
-            rel="noopener noreferrer"
-          >
-            <Card 
-              className="p-6 hover-lift cursor-pointer glass-card group h-full"
-              style={{ animationDelay: `${index * 50}ms` }}
-            >
-              <div className="space-y-4">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-lg group-hover:text-primary transition-colors truncate">
-                      <span className="mr-2 text-muted-foreground font-mono text-base text-x opacity-70">
-                        {index + 1}.
-                      </span>
-                      {algo.displayTitle}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {algo.category}
-                    </p>
-                  </div>
-                  <Badge 
-                    variant="outline" 
-                    className={`${difficultyColors[algo.mappedDifficulty]} shrink-0`}
-                  >
-                    {algo.mappedDifficulty}
-                  </Badge>
-                </div>
-
-                <p className="text-sm text-muted-foreground line-clamp-2">
-                  {algo.description}
-                </p>
-
-                <div className="flex items-center gap-4 text-xs">
-                  {algo.timeComplexity && (
-                    <div className="flex items-center gap-1">
-                      <TrendingUp className="w-3 h-3" />
-                      <span className="text-muted-foreground">Time: {algo.timeComplexity}</span>
+        <div className="flex flex-col gap-3">
+          {filteredAndSortedAlgorithms.map((algo, index) => {
+            const status = progressMap?.[algo.id] || 'none';
+            
+            return (
+              <Link 
+                key={algo.id} 
+                to={algo.slug ? `/problem/${algo.slug}` : `/problem/${algo.id}`}
+                className="block group"
+              >
+                <Card 
+                  className={`p-4 hover-lift glass-card border-border/40 transition-all duration-300 relative overflow-hidden h-full flex flex-col md:flex-row items-center gap-4 ${status === 'solved' ? 'border-primary/20 bg-primary/5' : ''}`}
+                  style={{ animationDelay: `${index * 40}ms` }}
+                >
+                  {/* Serial & Title Section */}
+                  <div className="flex items-center gap-4 flex-1 min-w-0 w-full md:w-auto">
+                    <div className="w-10 h-10 rounded-full bg-muted/30 flex items-center justify-center shrink-0 font-mono text-sm text-muted-foreground group-hover:bg-primary/20 group-hover:text-primary transition-colors">
+                      {algo.serial_no || index + 1}
                     </div>
-                  )}
-                  {algo.spaceComplexity && (
-                    <div className="flex items-center gap-1">
-                      <BookOpen className="w-3 h-3" />
-                      <span className="text-muted-foreground">Space: {algo.spaceComplexity}</span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <h3 className="font-semibold text-base md:text-lg truncate group-hover:text-primary transition-colors">
+                          {algo.displayTitle}
+                        </h3>
+                        {status === 'solved' && (
+                          <CheckCircle2 className="w-4 h-4 text-primary shrink-0 animate-in zoom-in duration-300" />
+                        )}
+                        {status === 'attempted' && (
+                          <Circle className="w-4 h-4 text-orange-400 shrink-0 fill-orange-400/20" />
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-wider">
+                        <span>{algo.category}</span>
+                        {algo.timeComplexity && (
+                          <>
+                            <span className="w-1 h-1 rounded-full bg-border" />
+                            <span className="flex items-center gap-1">
+                              <TrendingUp className="w-3 h-3" />
+                              {algo.timeComplexity}
+                            </span>
+                          </>
+                        )}
+                      </div>
                     </div>
-                  )}
-                </div>
-
-                 {algo.companies && algo.companies.length > 0 && (
-                  <div className="flex flex-wrap gap-1 pt-2">
-                    {algo.companies.slice(0, 3).map((company: string) => (
-                      <Badge key={company} variant="secondary" className="text-xs">
-                        {company}
-                      </Badge>
-                    ))}
                   </div>
-                )}
-              </div>
-            </Card>
-          </Link>
-        ))}
-      </div>
 
-      {filteredAndSortedAlgorithms.length === 0 && (
-        <div className="text-center py-16">
-          <p className="text-muted-foreground">{emptyMessage}</p>
+                  {/* Middle Section - Meta Info */}
+                  <div className="flex items-center gap-6 justify-center md:justify-end w-full md:w-auto shrink-0 border-t md:border-t-0 pt-4 md:pt-0 border-border/30">
+                    {/* Status Badge */}
+                    <div className="hidden lg:block min-w-[100px] text-center">
+                       {status === 'solved' ? (
+                          <Badge className="bg-primary/20 text-primary border-primary/30 hover:bg-primary/30 transition-colors">
+                            Solved
+                          </Badge>
+                       ) : status === 'attempted' ? (
+                          <Badge variant="outline" className="text-orange-400 border-orange-400/30 bg-orange-400/5">
+                            Attempted
+                          </Badge>
+                       ) : null}
+                    </div>
+
+                    {/* Difficulty */}
+                    <Badge 
+                      variant="outline" 
+                      className={`${difficultyColors[algo.mappedDifficulty]} min-w-[80px] justify-center py-1`}
+                    >
+                      {algo.mappedDifficulty}
+                    </Badge>
+
+                    {/* Companies */}
+                    <div className="hidden sm:flex items-center gap-1">
+                       {algo.companies && algo.companies.length > 0 ? (
+                         <div className="flex -space-x-2 overflow-hidden">
+                           {algo.companies.slice(0, 3).map((company, i) => (
+                             <div 
+                                key={company}
+                                className="w-7 h-7 rounded-full border-2 border-background bg-muted flex items-center justify-center text-[10px] font-bold uppercase tracking-tighter"
+                                title={company}
+                             >
+                               {company.charAt(0)}
+                             </div>
+                           ))}
+                           {algo.companies.length > 3 && (
+                             <div className="w-7 h-7 rounded-full border-2 border-background bg-muted flex items-center justify-center text-[8px] font-bold">
+                               +{algo.companies.length - 3}
+                             </div>
+                           )}
+                         </div>
+                       ) : (
+                         <span className="text-[10px] text-muted-foreground/40 italic">Global</span>
+                       )}
+                    </div>
+                  </div>
+                </Card>
+              </Link>
+            );
+          })}
+
+          {filteredAndSortedAlgorithms.length === 0 && (
+            <div className="text-center py-16">
+              <p className="text-muted-foreground">{emptyMessage}</p>
+            </div>
+          )}
         </div>
-      )}
-      </>
       )}
     </div>
   );
