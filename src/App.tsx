@@ -95,7 +95,7 @@ const AppContent = () => {
                       <ProtectedRoute><ProblemDetail /></ProtectedRoute>
                     </FeatureProtectedRoute>
                   } />
-                <Route path="/auth" element={<Auth />} />
+                <Route path="/login" element={<Auth />} />
                 <Route path="/feedback" element={<Feedback />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/privacy" element={<Privacy />} />

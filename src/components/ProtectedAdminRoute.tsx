@@ -34,7 +34,7 @@ export const ProtectedAdminRoute = ({ children }: { children: React.ReactNode })
   }
 
   if (!session) {
-    return <Navigate to="/auth" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   // Deny access if admin ID is not configured or if user is not the admin

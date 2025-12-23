@@ -65,7 +65,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Link to="/auth">
+          <Link to="/login">
             <Button className="gap-2">
               <LogIn className="w-4 h-4" />
               Sign In

@@ -127,7 +127,7 @@ export function prerenderPlugin(): Plugin {
                 { path: '/privacy', dir: 'privacy' },
                 { path: '/terms', dir: 'terms' },
                 { path: '/feedback', dir: 'feedback' },
-                { path: '/auth', dir: 'auth' },
+                { path: '/login', dir: 'login' },
             ];
 
             const algorithmRoutes = algorithms.map((data: { id: any; }) => ({
@@ -303,7 +303,7 @@ export function prerenderPlugin(): Plugin {
                                     </div>
                                 `
                             },
-                            '/auth': {
+                            '/login': {
                                 title: 'Sign In - Rulcode.com',
                                 description: 'Sign in to Rulcode.com to track your progress, save favorite algorithms, and personalize your learning experience.',
                                 content: `

@@ -32,7 +32,7 @@ import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
 const Navbar = () => {
   const [user, setUser] = useState<any>(null);
   const location = useLocation();
-  const isAuthPage = location.pathname === "/auth";
+  const isAuthPage = location.pathname === "/login";
   const adminId = import.meta.env.VITE_ADMIN_USER_ID;
 
   useEffect(() => {
@@ -253,7 +253,7 @@ const Navbar = () => {
                 </DropdownMenu>
               </>
             ) : (
-              <Link to="/auth">
+              <Link to="/login">
                 {" "}
                 <Button className="none">Sign In</Button>{" "}
               </Link>
