@@ -50,7 +50,7 @@ export function AlgoMetaHead({ algorithm }: { algorithm?: any }) {
       ].join(", ")
     : "algorithms, open source, free, competitive programming, algorithm library, rulcode";
 
-  const pageUrl = algo ? `${siteBase}/algorithm/${algo.id}` : siteBase;
+  const pageUrl = algo ? `${siteBase}/problem/${algo.id}` : siteBase;
   const ogImage = `${siteBase}/og-image.png`; // Use default OG image for all pages
 
   // Build JSON-LD structured data
@@ -60,7 +60,7 @@ export function AlgoMetaHead({ algorithm }: { algorithm?: any }) {
         "@type": "TechArticle",
         headline: algo.name,
         description: algo.description,
-        url: `${siteBase}/algorithm/${algo.id}`,
+        url: `${siteBase}/problem/${algo.id}`,
         image: {
           "@type": "ImageObject",
           url: ogImage,
@@ -93,7 +93,7 @@ export function AlgoMetaHead({ algorithm }: { algorithm?: any }) {
         dateModified: new Date().toISOString().split("T")[0],
         mainEntityOfPage: {
           "@type": "WebPage",
-          "@id": `${siteBase}/algorithm/${algo.id}`,
+          "@id": `${siteBase}/problem/${algo.id}`,
         },
         about: {
           "@type": "Thing",
@@ -200,7 +200,7 @@ export function AlgoMetaHead({ algorithm }: { algorithm?: any }) {
                 "@type": "ListItem",
                 position: 3,
                 item: {
-                  "@id": `${siteBase}/algorithm/${algo.id}`,
+                  "@id": `${siteBase}/problem/${algo.id}`,
                   name: algo.name,
                 },
               },

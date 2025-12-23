@@ -269,8 +269,14 @@ export function AlgorithmFormBuilder({
       });
       
       // Reconstruct array
+      // Helper to restore canonical casing
+      const normalizeLangKey = (key: string) => {
+          if (key === 'typescript') return 'TypeScript';
+          return key;
+      };
+
       const mergedImpls = Array.from(implMap.entries()).map(([lang, code]) => ({
-          lang, // Should be normalized? We used lowercase key.
+          lang: normalizeLangKey(lang),
           code
       }));
       

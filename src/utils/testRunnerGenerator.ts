@@ -7,6 +7,33 @@ interface TestCase {
     expectedOutput: any;
 }
 
+/**
+ * Generates a complete test runner that combines user code with test harness.
+ * 
+ * WHAT IS SENT TO THE JUDGE:
+ * ===========================
+ * The judge receives a COMPLETE, EXECUTABLE code file containing:
+ * 1. User's function code (the solution they wrote)
+ * 2. Generated test harness that:
+ *    - Formats test case inputs according to the language (arrays, lists, etc.)
+ *    - Calls the user's function with formatted inputs
+ *    - Captures the actual output
+ *    - Compares actual vs expected output
+ *    - Returns results as JSON between markers: ___TEST_RESULTS_START___ and ___TEST_RESULTS_END___
+ * 
+ * COMPATIBILITY:
+ * ==============
+ * - TypeScript: Uses JSON.stringify for all values
+ * - Python: Converts JSON to Python syntax (True/False/None, lists)
+ * - Java: Uses formatJavaArrayLiteral for arrays (handles int[], int[][], String[][], char[][], etc.)
+ * - C++: Uses vector initialization syntax with type deduction
+ * 
+ * 2D ARRAY HANDLING:
+ * ==================
+ * - Input schema supports: number[][], string[][], char[][]
+ * - Test case format: input is an array, e.g., [[[1,2],[3,4]]] for a 2D array parameter
+ * - Each language's formatValue/formatLiteral handles the nested structure appropriately
+ */
 export const generateTestRunner = (
     userCode: string,
     language: Language,
@@ -51,7 +78,7 @@ const formatValue = (value: any, type: string, lang: Language, targetJavaType?: 
             }
 
             // Detect dimensions and type for Java Array
-            return formatJavaArrayLiteral(value);
+            return formatJavaArrayLiteral(value, targetJavaType);
         }
         if (lang === 'cpp') {
             // Basic vector syntax
@@ -63,7 +90,7 @@ const formatValue = (value: any, type: string, lang: Language, targetJavaType?: 
             if (targetJavaType && targetJavaType.includes('List')) {
                 return `Arrays.asList(${value.join(', ')})`;
             }
-            return formatJavaArrayLiteral(value);
+            return formatJavaArrayLiteral(value, targetJavaType);
         }
         if (lang === 'cpp') return `{${value.join(', ')}}`;
         return `[${value.join(', ')}]`;
@@ -71,9 +98,25 @@ const formatValue = (value: any, type: string, lang: Language, targetJavaType?: 
     return String(value);
 };
 
-// Helper: Recursively formats Java array literals
-// Handles int[], int[][], String[], String[][], char[][] etc.
-const formatJavaArrayLiteral = (arr: any[]): string => {
+/**
+ * Recursively formats Java array literals for all dimensions.
+ * 
+ * HANDLES:
+ * - 1D arrays: int[], String[], char[], boolean[]
+ * - 2D arrays: int[][], String[][], char[][]
+ * - Higher dimensions: int[][][], etc.
+ * 
+ * TYPE DETECTION:
+ * - Uses targetJavaType hint if provided (e.g., "char[][]" from method signature)
+ * - Falls back to inferring from actual values (string -> String, number -> int)
+ * 
+ * EXAMPLES:
+ * - [1, 2, 3] -> "new int[]{1, 2, 3}"
+ * - [[1, 2], [3, 4]] -> "new int[][]{{1, 2}, {3, 4}}"
+ * - [["a", "b"], ["c", "d"]] -> "new String[][]{{"a", "b"}, {"c", "d"}}"
+ * - [['1', '0'], ['0', '1']] with targetJavaType="char[][]" -> "new char[][]{{'1', '0'}, {'0', '1'}}"
+ */
+const formatJavaArrayLiteral = (arr: any[], targetJavaType?: string): string => {
     if (!Array.isArray(arr)) return String(arr); // Should not happen given usage, but safe guard
 
     // 1. Determine base type and dimensions
@@ -89,9 +132,16 @@ const formatJavaArrayLiteral = (arr: any[]): string => {
     }
 
     let type = 'int';
-    if (typeof current === 'string') type = 'String';
+
+    // Check if target type specifies char
+    if (targetJavaType && targetJavaType.includes('char')) {
+        type = 'char';
+    } else if (typeof current === 'string') {
+        type = 'String';
+    }
+
     if (typeof current === 'boolean') type = 'boolean';
-    // Add other types if needed (char, double etc)
+    // Add other types if needed (double etc)
 
     // Construct the "new Type[][]..." prefix
     const brackets = '[]'.repeat(dimensions);
@@ -103,6 +153,9 @@ const formatJavaArrayLiteral = (arr: any[]): string => {
             // Leaf array
             if (type === 'String') {
                 return `{${a.map(v => JSON.stringify(v)).join(', ')}}`;
+            } else if (type === 'char') {
+                // For char, wrap single characters in single quotes
+                return `{${a.map(v => `'${v}'`).join(', ')}}`;
             }
             return `{${a.join(', ')}}`;
         }
@@ -219,6 +272,7 @@ import time
 import sys
 import io
 import math
+import collections
 from typing import List, Optional
 
 ${userCode}
@@ -432,32 +486,90 @@ const generateCppRunner = (
     const entryInfo = findEntryFunction(userCode, 'cpp', inputSchema, entryFunctionName);
     const userFuncName = entryInfo.name;
 
-    // Helper to deduce C++ type from value
-    const deduceCppType = (val: any): string => {
+    // Parse C++ argument types from the function signature
+    // e.g., "vector<vector<char>>& grid, int k" -> ["vector<vector<char>>&", "int"]
+    const splitCppArgs = (argsStr: string): string[] => {
+        if (!argsStr || argsStr.trim() === '') return [];
+
+        const args: string[] = [];
+        let current = '';
+        let depth = 0;
+
+        for (const char of argsStr) {
+            if (char === '<' || char === '(') depth++;
+            else if (char === '>' || char === ')') depth--;
+
+            if (char === ',' && depth === 0) {
+                args.push(current.trim());
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        if (current.trim()) args.push(current.trim());
+        return args;
+    };
+
+    const rawArgs = splitCppArgs(entryInfo.argsStr);
+
+    // Extract types from raw args (everything before the last space/identifier is the type)
+    const userArgTypes = rawArgs.map(arg => {
+        const trimmed = arg.trim();
+        // Remove variable name - find the last word that's not part of type syntax
+        // e.g., "vector<vector<char>>& grid" -> "vector<vector<char>>&"
+        const match = trimmed.match(/^(.+?)\s+\w+$/);
+        return match ? match[1] : trimmed;
+    });
+
+    // Helper to deduce C++ type from value, with optional target type hint
+    const deduceCppType = (val: any, targetCppType?: string): string => {
         if (Array.isArray(val)) {
-            if (val.length === 0) return 'vector<int>'; // Default for empty array
+            if (val.length === 0) {
+                // If we have a target type, use it for empty arrays
+                if (targetCppType) {
+                    // Extract the base type from target (e.g., "vector<vector<char>>" -> use it)
+                    const cleanType = targetCppType.replace(/[&*\s]/g, '');
+                    return cleanType;
+                }
+                return 'vector<int>'; // Default for empty array
+            }
             const first = val[0];
             if (Array.isArray(first)) {
                 // Nested vector
-                const innerType = deduceCppType(first);
+                const innerType = deduceCppType(first, targetCppType);
                 return `vector<${innerType}>`;
+            }
+            // Check if target type specifies char
+            if (targetCppType && targetCppType.includes('char')) {
+                return 'vector<char>';
             }
             if (typeof first === 'string') return 'vector<string>';
             if (typeof first === 'boolean') return 'vector<bool>';
             return 'vector<int>';
         }
-        if (typeof val === 'string') return 'string';
+        if (typeof val === 'string') {
+            // Check if target expects char
+            if (targetCppType && targetCppType.includes('char') && val.length === 1) {
+                return 'char';
+            }
+            return 'string';
+        }
         if (typeof val === 'boolean') return 'bool';
         return 'int';
     };
 
-    // Helper to format C++ literal
-    const formatCppLiteral = (val: any): string => {
+    // Helper to format C++ literal, with type hint for char handling
+    const formatCppLiteral = (val: any, isChar: boolean = false): string => {
         if (Array.isArray(val)) {
-            const inner = val.map(v => formatCppLiteral(v)).join(', ');
+            const inner = val.map(v => formatCppLiteral(v, isChar)).join(', ');
             return `{${inner}}`;
         }
-        if (typeof val === 'string') return JSON.stringify(val); // FIX: use JSON.stringify
+        if (typeof val === 'string') {
+            if (isChar && val.length === 1) {
+                return `'${val}'`; // Single char literal
+            }
+            return JSON.stringify(val); // String literal
+        }
         if (typeof val === 'boolean') return val ? 'true' : 'false';
         return String(val);
     };
@@ -501,17 +613,11 @@ const generateCppRunner = (
     const testCalls = testCases.map((tc, index) => {
         // Declare variables for inputs to avoid rvalue binding issues
         const inputDecls = tc.input.map((val, i) => {
-            const cppType = deduceCppType(val);
-            // ... (rest of logic same) ...
-
-            // Fix: if schema type implies 2D, we need proper C++ type string.
-            let typeToUse = cppType;
-            if (Array.isArray(val) && Array.isArray(val[0])) {
-                typeToUse = deduceCppType(val);
-            }
-
-            const valStr = formatCppLiteral(val);
-            return `${typeToUse} arg${i} = ${valStr};`;
+            const targetType = userArgTypes[i] || '';
+            const cppType = deduceCppType(val, targetType);
+            const isCharType = targetType.includes('char');
+            const valStr = formatCppLiteral(val, isCharType);
+            return `${cppType} arg${i} = ${valStr};`;
         }).join('\n            ');
 
         const args = tc.input.map((_, i) => `arg${i}`).join(', ');

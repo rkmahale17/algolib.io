@@ -282,7 +282,7 @@ export const useAlgorithmInteractions = ({
         const { data } = await supabase.from('algorithms').select('id');
         if (data && data.length > 0) {
             const random = data[Math.floor(Math.random() * data.length)];
-            navigate(`/algorithm/${random.id}`);
+            navigate(`/problem/${random.id}`);
         }
     }, [navigate]);
 
@@ -300,7 +300,7 @@ export const useAlgorithmInteractions = ({
                     .single();
 
                 if (prevAlgo) {
-                    navigate(`/algorithm/${prevAlgo.id}`);
+                    navigate(`/problem/${prevAlgo.id}`);
                     return;
                 }
             }
@@ -326,7 +326,7 @@ export const useAlgorithmInteractions = ({
                     .single(); // Use single() as we expect at most one, or null if none
 
                 if (nextAlgo) {
-                    navigate(`/algorithm/${nextAlgo.id}`);
+                    navigate(`/problem/${nextAlgo.id}`);
                     return;
                 }
             }

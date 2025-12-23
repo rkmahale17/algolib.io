@@ -173,7 +173,7 @@ export function SmartFillDialog({ onFill, initialTopic = "", existingApproaches 
           Smart Fill
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[1200px] h-[90vh] flex flex-col">
+      <DialogContent className="sm:max-w-[1800px] h-[100vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-purple-500" />
@@ -206,165 +206,167 @@ export function SmartFillDialog({ onFill, initialTopic = "", existingApproaches 
                   />
             </TabsContent>
 
-            <TabsContent value="generate" className="h-full mt-0 flex flex-col gap-4">
-               {/* Search Bar */}
-               <div className="flex gap-2 items-end shrink-0">
-
-                  <div className="flex-1 space-y-2">
-                    <Label htmlFor="topic">Algorithm Name / LeetCode ID</Label>
+            <TabsContent value="generate" className="h-full mt-0 flex flex-col gap-6">
+               
+               {/* 1. Primary Action Section */}
+               <div className="flex gap-4 items-end shrink-0">
+                  <div className="flex-[2] space-y-2">
+                    <Label htmlFor="topic" className="text-base font-semibold">Algorithm Topic</Label>
                     <Input 
                         id="topic"
                         placeholder="e.g. Merge Sort, two-sum, 3Sum" 
                         value={topic}
                         onChange={(e) => setTopic(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleGenerate()}
+                        className="h-12 text-lg px-4 shadow-sm"
                     />
                   </div>
-
-                  <div className="flex-1 space-y-2">
-                    <Label>Generation Mode</Label>
-                    <div className="flex items-center gap-2 border rounded-md p-1 h-10 bg-muted/30">
-                        <Button 
-                            variant={generatorMode === "problem" ? "secondary" : "ghost"}
-                            size="sm"
-                            className="flex-1 h-8"
-                            onClick={() => setGeneratorMode("problem")}
-                        >
-                            <FileCode className="w-4 h-4 mr-2" />
-                            LeetCode
-                        </Button>
-                        <Button 
-                            variant={generatorMode === "core" ? "secondary" : "ghost"} 
-                            size="sm"
-                            className="flex-1 h-8"
-                            onClick={() => setGeneratorMode("core")}
-                        >
-                            <BookOpen className="w-4 h-4 mr-2" />
-                            Core Algo
-                        </Button>
-                    </div>
-                  </div>
-
-                  <div className="flex-1 space-y-2">
-                     <div className="flex gap-2">
-                         <div className="flex-1 space-y-1.5">
-                            <Label>Generation Strategy</Label>
-                            <Select value={target} onValueChange={(val: any) => setTarget(val)}>
-                                <SelectTrigger className="h-8 text-xs">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">Full Generate (New)</SelectItem>
-                                    <SelectItem value="add_approaches">Add More Approaches</SelectItem>
-                                </SelectContent>
-                            </Select>
-                         </div>
-                         
-                         {target === 'add_approaches' && (
-                             <div className="w-24 space-y-1.5">
-                                <Label>Count</Label>
-                                <Input 
-                                    type="number" 
-                                    min={1} 
-                                    max={3} 
-                                    value={approachCount}
-                                    onChange={(e) => setApproachCount(parseInt(e.target.value) || 1)}
-                                    className="h-8 text-xs"
-                                />
-                             </div>
-                         )}
-                     </div>
-                  </div>
-
-                  <div className="flex-1 space-y-2">
-                     <Label htmlFor="userPrompt">Additional Instructions (Optional)</Label>
-                     <Textarea
-                        id="userPrompt"
-                        placeholder="e.g. 'Use BFS approach', 'Mention time complexity trade-offs', 'Focus on recursive solution'..."
-                        value={userPrompt}
-                        onChange={(e) => setUserPrompt(e.target.value)}
-                        className="font-mono text-xs h-16 resize-y"
-                     />
-                  </div>
-
-                  <div className="flex-1 space-y-2">
-                     <Label htmlFor="referenceCode">Reference Code (Optional)</Label>
-                     <Textarea
-                        id="referenceCode"
-                        placeholder="Paste optimized code (Python/JS/etc) here. AI will use this logic for the 'optimize' approach."
-                        value={referenceCode}
-                        onChange={(e) => setReferenceCode(e.target.value)}
-                        className="font-mono text-xs h-16 resize-y"
-                     />
-                  </div>
-                  <Button onClick={handleGenerate} disabled={isGenerating} className="gap-2 min-w-[120px]">
+                  <Button 
+                    onClick={handleGenerate} 
+                    disabled={isGenerating} 
+                    size="lg"
+                    className="h-12 px-8 min-w-[140px] shadow-sm bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold"
+                  >
                     {isGenerating ? (
                         <>
-                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <Loader2 className="h-5 w-5 animate-spin mr-2" />
                             Generating...
                         </>
                     ) : (
                         <>
-                            <Wand2 className="h-4 w-4" />
+                            <Wand2 className="h-5 w-5 mr-2" />
                             Generate
                         </>
                     )}
                   </Button>
                </div>
 
-               {/* Results Area */}
-               {generatedData ? (
-                 <div className="flex-1 flex flex-col min-h-0 gap-4">
-                    <div className="bg-muted/30 border rounded-md p-3">
-                        <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
+               {/* 2. Configuration Section */}
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-muted/20 border rounded-lg">
+                  <div className="space-y-3">
+                    <Label className="flex items-center gap-2 text-muted-foreground">
+                        <FileCode className="w-4 h-4" />
+                        Generation Mode
+                    </Label>
+                    <div className="flex items-center p-1 bg-muted/40 rounded-lg border">
+                        <Button 
+                            variant={generatorMode === "problem" ? "secondary" : "ghost"}
+                            size="sm"
+                            className="flex-1 shadow-none"
+                            onClick={() => setGeneratorMode("problem")}
+                        >
+                            LeetCode Problem
+                        </Button>
+                        <Button 
+                            variant={generatorMode === "core" ? "secondary" : "ghost"} 
+                            size="sm"
+                            className="flex-1 shadow-none"
+                            onClick={() => setGeneratorMode("core")}
+                        >
+                            Core Algorithm
+                        </Button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label className="flex items-center gap-2 text-muted-foreground">
+                        <Layers className="w-4 h-4" />
+                        Strategy
+                    </Label>
+                    <div className="flex gap-3">
+                        <Select value={target} onValueChange={(val: any) => setTarget(val)}>
+                            <SelectTrigger className="flex-1 h-9 bg-background">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">Full Generation (Standard)</SelectItem>
+                                <SelectItem value="add_approaches">Add More Approaches</SelectItem>
+                            </SelectContent>
+                        </Select>
+                         
+                        {target === 'add_approaches' && (
+                             <div className="w-24 shrink-0">
+                                <Input 
+                                    type="number" 
+                                    min={1} 
+                                    max={3} 
+                                    value={approachCount}
+                                    onChange={(e) => setApproachCount(parseInt(e.target.value) || 1)}
+                                    className="h-9 bg-background text-center"
+                                />
+                             </div>
+                        )}
+                    </div>
+                  </div>
+               </div>
+
+               {/* 3. Context Section */}
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1 min-h-0">
+                  <div className="space-y-2 flex flex-col h-full">
+                     <Label htmlFor="userPrompt" className="text-xs font-semibold uppercase text-muted-foreground tracking-wide">
+                        User Instructions
+                     </Label>
+                     <Textarea
+                        id="userPrompt"
+                        placeholder="e.g. 'Use BFS approach', 'Explain time complexity trade-offs', 'Focus on recursive solution'..."
+                        value={userPrompt}
+                        onChange={(e) => setUserPrompt(e.target.value)}
+                        className="font-mono text-xs flex-1 resize-none bg-background/50 focus:bg-background transition-colors"
+                     />
+                  </div>
+
+                  <div className="space-y-2 flex flex-col h-full">
+                     <Label htmlFor="referenceCode" className="text-xs font-semibold uppercase text-muted-foreground tracking-wide">
+                        Reference Code
+                     </Label>
+                     <Textarea
+                        id="referenceCode"
+                        placeholder="Paste optimized code here. The AI will adhere to this logic for the 'optimize' approach."
+                        value={referenceCode}
+                        onChange={(e) => setReferenceCode(e.target.value)}
+                        className="font-mono text-xs flex-1 resize-none bg-background/50 focus:bg-background transition-colors"
+                     />
+                  </div>
+               </div>
+
+               {/* Results Area (Hidden until generated) */}
+               {generatedData && (
+                  <div className="mt-4 flex flex-col gap-4 border-t pt-4 animate-in slide-in-from-bottom-5 fade-in duration-300">
+                     <div className="bg-green-50/50 dark:bg-green-950/10 border border-green-200/50 dark:border-green-800/50 rounded-md p-3">
+                        <h4 className="font-semibold text-sm mb-3 flex items-center gap-2 text-green-700 dark:text-green-400">
                             <CheckSquare className="h-4 w-4" />
                             Select Fields to Apply
                         </h4>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="flex flex-wrap gap-4">
                             {FIELD_GROUPS.map(group => (
-                                <div key={group.id} className="flex items-start space-x-2">
+                                <div key={group.id} className="flex items-center space-x-2 bg-background/80 px-2 py-1 rounded border shadow-sm">
                                     <Checkbox 
                                         id={group.id} 
                                         checked={selectedGroups.includes(group.id)}
                                         onCheckedChange={() => toggleGroup(group.id)}
                                     />
-                                    <div className="grid gap-1.5 leading-none">
-                                        <label
-                                            htmlFor={group.id}
-                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                                        >
-                                            {group.label}
-                                        </label>
-                                    </div>
+                                    <label
+                                        htmlFor={group.id}
+                                        className="text-xs font-medium cursor-pointer select-none"
+                                    >
+                                        {group.label.split('(')[0].trim()}
+                                    </label>
                                 </div>
                             ))}
                         </div>
-                    </div>
+                     </div>
 
-                    <div className="flex-1 border rounded-md bg-muted/10 flex flex-col min-h-0">
-                        <div className="p-2 border-b bg-muted/20 text-xs font-semibold text-muted-foreground flex justify-between items-center">
-                             <span>Preview Generated JSON</span>
-                             <span className="text-[10px] bg-background border px-1.5 py-0.5 rounded-full">
-                                {generatedData.implementations?.[0]?.code?.length || 0} approaches
-                             </span>
+                     <div className="border rounded-md bg-muted/30 p-2">
+                        <div className="text-xs font-semibold text-muted-foreground mb-2 flex justify-between">
+                             <span>Preview ({generatedData.implementations?.length || 0} implementations)</span>
                         </div>
-                        <ScrollArea className="flex-1">
-                            <pre className="p-4 text-xs font-mono whitespace-pre-wrap text-muted-foreground">
+                        <ScrollArea className="h-40 bg-background border rounded-md">
+                            <pre className="p-3 text-[10px] font-mono whitespace-pre-wrap text-muted-foreground">
                                 {JSON.stringify(generatedData, null, 2)}
                             </pre>
                         </ScrollArea>
-                    </div>
-                 </div>
-               ) : (
-                 !isGenerating && (
-                    <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground bg-muted/10 rounded-md border-dashed border">
-                        <Wand2 className="h-8 w-8 mb-2 opacity-20" />
-                        <p className="text-sm">Enter a topic (e.g. "Two Sum") and click Generate</p>
-                        <p className="text-xs text-muted-foreground/60 mt-1 max-w-xs text-center">
-                            AI will search for the exact LeetCode problem details and formatting.
-                        </p>
-                    </div>
-                 )
+                     </div>
+                  </div>
                )}
             </TabsContent>
           </div>

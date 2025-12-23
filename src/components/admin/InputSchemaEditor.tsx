@@ -30,6 +30,9 @@ const FIELD_TYPES = [
   { value: "boolean", label: "Boolean" },
   { value: "number[]", label: "Number Array" },
   { value: "string[]", label: "String Array" },
+  { value: "number[][]", label: "2D Number Array" },
+  { value: "string[][]", label: "2D String Array" },
+  { value: "boolean[][]", label: "2D Boolean Array" },
   { value: "object", label: "Object" },
 ];
 

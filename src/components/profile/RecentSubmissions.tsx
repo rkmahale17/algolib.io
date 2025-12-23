@@ -40,7 +40,7 @@ export const RecentSubmissions = ({ submissions }: RecentSubmissionsProps) => {
                         <Clock className="w-4 h-4 text-yellow-500" />
                     )}
                     <div>
-                        <Link to={`/algorithm/${sub.algorithmId}`} className="font-medium text-sm hover:underline">
+                        <Link to={`/problem/${sub.algorithmId}`} className="font-medium text-sm hover:underline">
                             {sub.algorithmName}
                         </Link>
                         <div className="text-xs text-muted-foreground flex gap-2">

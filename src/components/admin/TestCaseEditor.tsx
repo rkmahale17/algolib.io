@@ -315,7 +315,22 @@ export function TestCaseEditor({
                             </span>
                         )}
                         </CardTitle>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 items-center">
+                            {/* Inline Submission Toggle */}
+                             <div className="flex items-center space-x-2 mr-4" onClick={(e) => e.stopPropagation()}>
+                                <Label htmlFor={`header-sub-${index}`} className="text-xs text-muted-foreground cursor-pointer">
+                                    Submission
+                                </Label>
+                                <input
+                                    type="checkbox"
+                                    id={`header-sub-${index}`}
+                                    checked={testCase.isSubmission || false}
+                                    onChange={(e) =>
+                                        handleUpdate(index, { isSubmission: e.target.checked })
+                                    }
+                                    className="h-4 w-4 rounded border-gray-300"
+                                />
+                             </div>
                         <Button
                             type="button"
                             variant="ghost"

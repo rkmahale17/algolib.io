@@ -154,7 +154,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: "cta",
-        link: '/algorithm/two-pointers/',
+        link: '/problem/two-pointers/',
         content: 'Visualize two pointer problems on Rulcode.com'
       },
 
@@ -179,7 +179,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: "cta",
-        link: '/algorithm/fast-slow-pointers/',
+        link: '/problem/fast-slow-pointers/',
         content: 'Visualize slow fast problems on Rulcode.com'
       },
 
@@ -201,7 +201,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: "cta",
-        link: '/algorithm/binary-search',
+        link: '/problem/binary-search',
         content: 'Visualize binary search on Rulcode.com'
       },
 
@@ -224,24 +224,24 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: "cta",
-        link: '/algorithm/bfs-level-order/',
+        link: '/problem/bfs-level-order/',
         content: 'Visualize BFS on Rulcode.com'
       },
       {
         type: "cta",
-        link: '/algorithm/dfs-preorder/',
+        link: '/problem/dfs-preorder/',
         content: 'Visualize DFS preorder on Rulcode.com'
       },
 
       {
         type: "cta",
-        link: '/algorithm/dfs-inorder/',
+        link: '/problem/dfs-inorder/',
         content: 'Visualize DFS inorder on Rulcode.com'
       },
 
       {
         type: "cta",
-        link: '/algorithm/dfs-postorder/',
+        link: '/problem/dfs-postorder/',
         content: 'Visualize DFS postorder on Rulcode.com'
       },
 
@@ -266,7 +266,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: "cta",
-        link: '/algorithm/coin-change/',
+        link: '/problem/coin-change/',
         content: 'Visualize Dyanamic Programming on Rulcode.com'
       },
       {
@@ -287,7 +287,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: "cta",
-        link: '/algorithm/subsets/',
+        link: '/problem/subsets/',
         content: 'Visualize Backtracking on Rulcode.com'
       },
 
@@ -310,7 +310,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: "cta",
-        link: '/blind75/valid-parentheses',
+        link: '/problem/valid-parentheses',
         content: 'Visualize Stack, Queues on Rulcode.com'
       },
 
@@ -893,7 +893,7 @@ class LRUCache:
       {
         type: 'cta',
         content: 'Explore the LRU Cache Visualization on Rulcode.com',
-        link: '/algorithm/lru-cache'
+        link: '/problem/lru-cache'
       },
 
       {
@@ -1121,7 +1121,7 @@ class LRUCache:
       },
       {
         "type": "cta",
-        link: '/algorithm/coin-change',
+        link: '/problem/coin-change',
         content: 'Visualize Coin Change on Rulcode.com'
 
       },
@@ -1207,7 +1207,7 @@ class LRUCache:
       {
         "type": 'cta',
         "content": 'House robber visualization on Rulcode.com',
-        "link": '/algorithm/house-robber'
+        "link": '/problem/house-robber'
       },
 
       {
@@ -1335,7 +1335,7 @@ class LRUCache:
       {
         type: 'cta',
         content: 'Learn Knapsack Algo by visualizing on Rulcode.com',
-        link: '/algorithm/knapsack-01'
+        link: '/problem/knapsack-01'
       },
 
 
@@ -1361,26 +1361,26 @@ class LRUCache:
       {
         "type": "cta",
         "content": "Max subarray visualization on Rulcode.com",
-        "link": '/blind75/maximum-subarray'
+        "link": '/problem/maximum-subarray'
       },
 
       {
         "type": "cta",
         "content": "Knapsack Algo visualization on Rulcode.com",
-        "link": '/algorithm/knapsack-01'
+        "link": '/problem/knapsack-01'
       },
 
       {
         "type": "cta",
         "content": "Longest common subsequence visualization on Rulcode.com",
-        "link": '/blind75/longest-common-subsequence'
+        "link": '/problem/longest-common-subsequence'
       },
 
 
       {
         "type": "cta",
         "content": "Check all dynamic problems on Rulcode.com",
-        "link": '/blind75/longest-common-subsequence'
+        "link": '/problem/longest-common-subsequence'
       },
 
       {

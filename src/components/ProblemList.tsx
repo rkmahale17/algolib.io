@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ListType, LIST_TYPE_LABELS, DIFFICULTY_MAP, AlgorithmListItem } from '@/types/algorithm';
 
-interface AlgorithmListProps {
+interface ProblemListProps {
   algorithms: AlgorithmListItem[];
   emptyMessage?: string;
   defaultListType?: string;
@@ -17,7 +17,7 @@ interface AlgorithmListProps {
   isLoading?: boolean;
 }
 
-const AlgorithmListSkeleton = () => (
+const ProblemListSkeleton = () => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
     {[...Array(6)].map((_, i) => (
       <div key={i} className="h-[200px] rounded-xl bg-muted/20 animate-pulse" />
@@ -37,14 +37,14 @@ const difficultyColors: Record<string, string> = {
   'Hard': 'bg-red-500/10 text-red-500 border-red-500/20',
 };
 
-export const AlgorithmList = ({ 
+export const ProblemList = ({ 
     algorithms, 
     emptyMessage = "No algorithms found.",
     defaultListType = "all",
     availableListTypes = ["all", ListType.Core, ListType.Blind75, ListType.CoreAndBlind75],
     hideListSelection = false,
     isLoading = false
-}: AlgorithmListProps) => {
+}: ProblemListProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
@@ -196,14 +196,14 @@ export const AlgorithmList = ({
 
       {/* Grid */}
       {isLoading ? (
-        <AlgorithmListSkeleton />
+        <ProblemListSkeleton />
       ) : (
         <>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredAndSortedAlgorithms.map((algo, index) => (
           <Link 
             key={algo.id} 
-            to={algo.slug ? `/algorithm/${algo.slug}` : `/algorithm/${algo.id}`}
+            to={algo.slug ? `/problem/${algo.slug}` : `/problem/${algo.id}`}
             rel="noopener noreferrer"
           >
             <Card 

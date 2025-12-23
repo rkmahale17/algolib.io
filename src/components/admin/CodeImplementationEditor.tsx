@@ -48,7 +48,7 @@ interface CodeImplementationEditorProps {
 }
 
 const LANGUAGES = [
-  { id: "typeScript", label: "TypeScript", monacoLang: "typescript" },
+  { id: "TypeScript", label: "TypeScript", monacoLang: "typescript" },
   { id: "python", label: "Python", monacoLang: "python" },
   { id: "java", label: "Java", monacoLang: "java" },
   { id: "cpp", label: "C++", monacoLang: "cpp" },
@@ -58,8 +58,14 @@ export function CodeImplementationEditor({
   implementations,
   onChange,
 }: CodeImplementationEditorProps) {
+  // Normalize legacy keys
+  const getNormalizedLangId = (lang: string) => {
+     if (lang === 'typescript' || lang === 'typeScript') return 'TypeScript';
+     return lang;
+  };
+
   const [activeLanguage, setActiveLanguage] = useState(
-    implementations[0]?.lang || "typeScript"
+    getNormalizedLangId(implementations[0]?.lang) || "TypeScript"
   );
   // Default to optimize if available, else first one, or "optimize" as fallback
   const currentImpl = implementations.find((impl) => impl.lang === activeLanguage);
@@ -158,7 +164,8 @@ export function CodeImplementationEditor({
         const langId = id;
         onChange(implementations.filter((impl) => impl.lang !== langId));
         if (activeLanguage === langId) {
-          setActiveLanguage(implementations[0]?.lang || "typeScript");
+          // Normalize fallback
+          setActiveLanguage(getNormalizedLangId(implementations[0]?.lang) || "TypeScript");
         }
     } else if (type === 'approach') {
         const codeType = id;
@@ -332,7 +339,9 @@ export function CodeImplementationEditor({
   );
 
   const getMonacoLanguage = (langId: string) => {
-    return LANGUAGES.find((l) => l.id === langId)?.monacoLang || "typescript";
+    // Also try normalized ID if exact match fails
+    const normalized = getNormalizedLangId(langId);
+    return LANGUAGES.find((l) => l.id === normalized)?.monacoLang || "typescript";
   };
 
   return (

@@ -76,7 +76,7 @@ export function prerenderPlugin(): Plugin {
 
             // 🔧 SANITIZATION: Convert any http:// to https:// for production URLs
             indexHtml = indexHtml.replace(
-                /http:\/\/(qaalgo|prodalgolib|algolib\.io|rulcode\.com)/g,
+                /http:\/\/(qaalgo|prodalgolib|rulcode\.com)/g,
                 'https://$1'
             );
 
@@ -131,7 +131,7 @@ export function prerenderPlugin(): Plugin {
             ];
 
             const algorithmRoutes = algorithms.map((data: { id: any; }) => ({
-                path: `/algorithm/${data.id}`,
+                path: `/problem/${data.id}`,
                 dir: `algorithm/${data.id}`
             }));
 
@@ -404,7 +404,7 @@ export function prerenderPlugin(): Plugin {
                                     <ul style="line-height: 1.8;">
                                         ${algos.map((algo: any) => `
                                             <li>
-                                                <a href="/algorithm/${algo.id}" style="color: #3b82f6; text-decoration: none;">
+                                                <a href="/problem/${algo.id}" style="color: #3b82f6; text-decoration: none;">
                                                     <strong>${algo.name}</strong>
                                                 </a> - ${algo.description} 
                                                 (Time: ${algo.timeComplexity}, Space: ${algo.spaceComplexity})
@@ -425,16 +425,16 @@ export function prerenderPlugin(): Plugin {
                             
                             <h2>Popular Algorithms</h2>
                             <ul style="line-height: 1.8;">
-                                <li><a href="/algorithm/two-pointers">Two Pointers</a> - Efficient array traversal technique</li>
-                                <li><a href="/algorithm/sliding-window">Sliding Window</a> - Optimize subarray problems</li>
-                                <li><a href="/algorithm/binary-search">Binary Search</a> - Fast search in sorted arrays</li>
-                                <li><a href="/algorithm/dfs">Depth-First Search (DFS)</a> - Graph traversal algorithm</li>
-                                <li><a href="/algorithm/bfs">Breadth-First Search (BFS)</a> - Level-order graph traversal</li>
-                                <li><a href="/algorithm/dynamic-programming">Dynamic Programming</a> - Optimization technique</li>
-                                <li><a href="/algorithm/dijkstra">Dijkstra's Algorithm</a> - Shortest path finding</li>
-                                <li><a href="/algorithm/merge-sort">Merge Sort</a> - Efficient O(n log n) sorting</li>
-                                <li><a href="/algorithm/quick-sort">Quick Sort</a> - Fast in-place sorting</li>
-                                <li><a href="/algorithm/backtracking">Backtracking</a> - Solve constraint satisfaction problems</li>
+                                <li><a href="/problem/two-pointers">Two Pointers</a> - Efficient array traversal technique</li>
+                                <li><a href="/problem/sliding-window">Sliding Window</a> - Optimize subarray problems</li>
+                                <li><a href="/problem/binary-search">Binary Search</a> - Fast search in sorted arrays</li>
+                                <li><a href="/problem/dfs">Depth-First Search (DFS)</a> - Graph traversal algorithm</li>
+                                <li><a href="/problem/bfs">Breadth-First Search (BFS)</a> - Level-order graph traversal</li>
+                                <li><a href="/problem/dynamic-programming">Dynamic Programming</a> - Optimization technique</li>
+                                <li><a href="/problem/dijkstra">Dijkstra's Algorithm</a> - Shortest path finding</li>
+                                <li><a href="/problem/merge-sort">Merge Sort</a> - Efficient O(n log n) sorting</li>
+                                <li><a href="/problem/quick-sort">Quick Sort</a> - Fast in-place sorting</li>
+                                <li><a href="/problem/backtracking">Backtracking</a> - Solve constraint satisfaction problems</li>
                             </ul>
                             
                             <h2>Start Learning Today</h2>
