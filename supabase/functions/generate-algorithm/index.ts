@@ -1,4 +1,3 @@
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -11,7 +10,15 @@ Deno.serve(async (req) => {
 
   try {
     // target: "all" (default) | "add_approaches"
-    const { topic, referenceCode, userPrompt, existingApproaches = [], approachCount = 2, mode = "problem", target = "all" } = await req.json();
+    const {
+      topic,
+      referenceCode,
+      userPrompt,
+      existingApproaches = [],
+      approachCount = 2,
+      mode = "problem",
+      target = "all",
+    } = await req.json();
     const apiKey = Deno.env.get("GEMINI_API_KEY");
 
     if (!apiKey) {
@@ -68,9 +75,9 @@ Deno.serve(async (req) => {
     const BASE_SYSTEM_PROMPT = `
         You are an expert algorithm tutor.
         TOPIC: "${topic}"
-        MODE: ${mode === 'core' ? 'Core Algorithm (Define problem yourself)' : 'LeetCode Problem (Match standard definition)'}
-        ${referenceCode ? `REFERENCE CODE PROVIDED (Use for Logic): \n${referenceCode}` : ''}
-        ${userPrompt ? `USER CONTEXT / INSTRUCTIONS: \n"${userPrompt}"\n(Follow these instructions specifically. This may include LeetCode problem description, examples, constraints, or other context to help you generate accurate content.)` : ''}
+        MODE: ${mode === "core" ? "Core Algorithm (Define problem yourself)" : "LeetCode Problem (Match standard definition)"}
+        ${referenceCode ? `REFERENCE CODE PROVIDED (Use for Logic): \n${referenceCode}` : ""}
+        ${userPrompt ? `USER CONTEXT / INSTRUCTIONS: \n"${userPrompt}"\n(Follow these instructions specifically. This may include LeetCode problem description, examples, constraints, or other context to help you generate accurate content.)` : ""}
 
         GENERAL RULES:
         1. **Truthfulness**: Verify complexity. No hallucinations.
@@ -89,7 +96,7 @@ Deno.serve(async (req) => {
           body: JSON.stringify({
             contents: [{ parts: [{ text: promptText }] }],
           }),
-        }
+        },
       );
       if (!response.ok) {
         const errText = await response.text();
@@ -230,12 +237,13 @@ Deno.serve(async (req) => {
 
         TASK: Generate Code Implementations for: ${langs.join(", ")}.
         
-        ${target === 'add_approaches'
-        ? `GENERATE **${approachCount} NEW** distinct approaches. 
+        ${
+          target === "add_approaches"
+            ? `GENERATE **${approachCount} NEW** distinct approaches. 
               EXCLUDE these existing approaches: ${existingApproaches.join(", ")}.
               Use strategy-based naming (e.g., "dfs", "bfs", "dp", "greedy", "two-pointer", "sliding-window", "binary-search", "sorting").
-              Context from User: "${userPrompt || 'Provide additional unique methods'}"`
-        : `You MUST generate MULTIPLE VIABLE APPROACHES (at least 2, MAX 4).
+              Context from User: "${userPrompt || "Provide additional unique methods"}"`
+            : `You MUST generate MULTIPLE VIABLE APPROACHES (at least 2, MAX 4).
               **APPROACH STRUCTURE & ORDER**:
               1. **Optimized Approach** (MUST BE FIRST) - codeType: "optimize"
                  - This is the BEST solution with optimal time/space complexity
@@ -261,21 +269,21 @@ Deno.serve(async (req) => {
                  - "recursive" - Recursive implementation
                  - "better" - Intermediate optimization
              `
-      }
+        }
 
         JSON Structure:
         {
           "implementations": [
             {
-              "lang": "${langs[0] === 'typescript' ? 'TypeScript' : langs[0]}", // MUST be strict: "TypeScript" (camelCase for TS), "java", "python", "cpp"
+              "lang": "${langs[0] === "typescript" ? "TypeScript" : langs[0]}", // MUST be strict: "TypeScript" (camelCase for TS), "java", "python", "cpp"
               "code": [
                 {
-                  "codeType": "${target === 'add_approaches' ? 'strategy-name (e.g., "dfs", "bfs", "dp", "greedy")' : 'optimize'}", 
+                  "codeType": "${target === "add_approaches" ? 'strategy-name (e.g., "dfs", "bfs", "dp", "greedy")' : "optimize"}", 
                   "code": "FUNCTION CODE ONLY",
                   "explanationBefore": "EXTREMELY DETAILED HTML (1000+ words)",
                   "explanationAfter": "HTML content"
                 }
-                // ... generate ${target === 'add_approaches' ? approachCount : '2-4'} approaches
+                // ... generate ${target === "add_approaches" ? approachCount : "2-4"} approaches
               ]
             }
             // ... repeat for other languages
@@ -299,7 +307,25 @@ Deno.serve(async (req) => {
            - **Return ONLY the standalone function** (with typing import for Python if needed).
            - The test runner will wrap your function automatically - you provide ONLY the function itself.
         
-        2. **EXACT CODE FORMAT BY LANGUAGE**:
+        2. **HELPER FUNCTIONS PLACEMENT (CRITICAL)**:
+           - **ALL helper functions MUST be placed ABOVE the main function**
+           - **NEVER place helper functions below or after the main function**
+           - **Order**: Helper functions first, then main function at the bottom
+           - **Example Pattern**:
+             * Helper Function 1 (defined first)
+             * Helper Function 2 (defined second)
+             * Main Function (defined LAST - this is the entry point)
+           - **Why This Matters**: The test runner needs to find the main function, and having helpers above ensures they're available when the main function is called
+           - **Applies to ALL languages**: TypeScript, Python, Java, AND C++
+        
+        3. **ALL LANGUAGES REQUIRED (CRITICAL)**:
+           - **EVERY approach MUST have implementations in ALL 4 languages**: TypeScript, Python, Java, AND C++
+           - **If you cannot provide a valid implementation in ALL 4 languages for an approach, DO NOT include that approach at all**
+           - **No partial approaches**: An approach with only 2-3 language implementations is NOT acceptable
+           - **Quality over quantity**: It's better to have 2 complete approaches (all 4 languages) than 4 partial approaches
+           - **Verification**: Before including an approach, verify you can implement it in TypeScript, Python, Java, AND C++
+        
+        4. **EXACT CODE FORMAT BY LANGUAGE**:
         
            **TypeScript Format:**
            \`\`\`typescript
@@ -419,7 +445,7 @@ Deno.serve(async (req) => {
            - Java: \`public int[] twoSum(int[] nums, int target) {\n    \n}\`
            - C++: \`vector<int> twoSum(vector<int>& nums, int target) {\n    \n}\`
         
-        6. **Reference Code**: ${target === 'add_approaches' ? 'Use only if relevant to new approaches.' : "If provided, use it for 'optimize' logic."}
+        6. **Reference Code**: ${target === "add_approaches" ? "Use only if relevant to new approaches." : "If provided, use it for 'optimize' logic."}
         
         
         HTML RULES (explanationBefore):
@@ -432,7 +458,7 @@ Deno.serve(async (req) => {
         3. **Step-by-step**: Educational. If a step is long, split it.
         4. **General**: **STRICT RULE**: NO single paragraph should exceed 60 words. Divide and conquer the text.
         
-        ${target === 'all' ? `**COMPARISON TABLE UPDATE**: For the **Optimize** approach (which is FIRST), put the Comparison Table HTML in 'explanationAfter'.` : ''}
+        ${target === "all" ? `**COMPARISON TABLE UPDATE**: For the **Optimize** approach (which is FIRST), put the Comparison Table HTML in 'explanationAfter'.` : ""}
 
         `;
 
@@ -443,11 +469,11 @@ Deno.serve(async (req) => {
     let implsPart1 = null;
     let implsPart2 = null;
 
-    if (target === 'all') {
+    if (target === "all") {
       [coreData, implsPart1, implsPart2] = await Promise.all([
         generateChunk(corePrompt),
         generateChunk(implsPrompt(["typescript", "python"])),
-        generateChunk(implsPrompt(["java", "cpp"]))
+        generateChunk(implsPrompt(["java", "cpp"])),
       ]);
 
       if (!coreData) throw new Error("Failed to generate Core Data.");
@@ -455,7 +481,7 @@ Deno.serve(async (req) => {
       // Add Approaches Mode: Only run impls chunks
       [implsPart1, implsPart2] = await Promise.all([
         generateChunk(implsPrompt(["typescript", "python"])),
-        generateChunk(implsPrompt(["java", "cpp"]))
+        generateChunk(implsPrompt(["java", "cpp"])),
       ]);
     }
 
@@ -464,16 +490,12 @@ Deno.serve(async (req) => {
     // --- MERGE ---
     const finalJson = {
       ...(coreData || {}), // If null (add_approaches), we return empty core. Client handles merge.
-      implementations: [
-        ...(implsPart1.implementations || []),
-        ...(implsPart2.implementations || [])
-      ]
+      implementations: [...(implsPart1.implementations || []), ...(implsPart2.implementations || [])],
     };
 
     return new Response(JSON.stringify(finalJson), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-
   } catch (error) {
     console.error("Error in generate-algorithm:", error);
     return new Response(JSON.stringify({ error: (error as Error).message }), {
