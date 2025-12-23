@@ -435,7 +435,7 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <Link to="/auth">
+          <Link to="/login">
             <Button size="sm">Sign In</Button>
           </Link>
         )}
