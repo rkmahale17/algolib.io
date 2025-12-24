@@ -6,7 +6,7 @@ import React from 'react';
 
 // Lazy load all visualization components
 export const visualizationMap: Record<string, React.LazyExoticComponent<React.ComponentType<any>>> = {
-  // Core Algorithms
+  // Core Patterns
   'two-pointers': React.lazy(() => import('@/components/visualizations/algorithms/TwoPointersVisualization').then(m => ({ default: m.TwoPointersVisualization }))),
   'sliding-window': React.lazy(() => import('@/components/visualizations/algorithms/SlidingWindowVisualization').then(m => ({ default: m.SlidingWindowVisualization }))),
   'prefix-sum': React.lazy(() => import('@/components/visualizations/algorithms/PrefixSumVisualization').then(m => ({ default: m.PrefixSumVisualization }))),

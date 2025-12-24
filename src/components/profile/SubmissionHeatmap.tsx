@@ -99,7 +99,7 @@ export const SubmissionHeatmap = ({ submissions }: SubmissionHeatmapProps) => {
       <CardHeader className="pb-2">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-                 <CardTitle className="text-xl font-bold flex items-center gap-2">
+                 <CardTitle className="text-sm font-bold flex items-center gap-2">
                     {totalSubmissionsInPeriod}
                     <span className="text-base font-normal text-muted-foreground mr-1">submissions in</span>
                     {selectedYear === "Current" ? "the past one year" : selectedYear} 
@@ -115,8 +115,6 @@ export const SubmissionHeatmap = ({ submissions }: SubmissionHeatmapProps) => {
             </div>
             
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <span className="hidden md:inline">Total active days: <span className="text-foreground font-medium">{activeDays}</span></span>
-                <span className="hidden md:inline">Max streak: <span className="text-foreground font-medium">{maxStreak}</span></span>
                 
                 <Select value={selectedYear} onValueChange={setSelectedYear}>
                     <SelectTrigger className="w-[100px] h-8 text-xs bg-muted/50 border-input/50">
@@ -133,7 +131,6 @@ export const SubmissionHeatmap = ({ submissions }: SubmissionHeatmapProps) => {
         {/* Mobile stats visible below */}
         <div className="flex items-center gap-4 text-xs text-muted-foreground md:hidden mt-2">
                 <span>Active days: <span className="text-foreground font-medium">{activeDays}</span></span>
-                <span>Max streak: <span className="text-foreground font-medium">{maxStreak}</span></span>
         </div>
       </CardHeader>
       <CardContent>

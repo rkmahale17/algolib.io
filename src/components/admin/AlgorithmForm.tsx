@@ -314,11 +314,9 @@ export function AlgorithmForm({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="coreAlgo">Core Algorithm</SelectItem>
+                    <SelectItem value="core">Core Pattern</SelectItem>
                     <SelectItem value="blind75">Blind 75</SelectItem>
-                    <SelectItem value="core+Blind75">
-                      Core + Blind 75 (Both)
-                    </SelectItem>
+                    <SelectItem value="core+blind75">Core + Blind 75</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

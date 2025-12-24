@@ -1,27 +1,32 @@
 import {
   Sparkles,
   Coffee,
+  Zap,
+  Terminal,
+  Play,
+  ArrowRight,
+  Github,
+  Globe,
+  Eye,
+  Lightbulb,
+  Trophy,
+  Keyboard,
+  ExternalLink,
+  Layers,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { FAQ } from "@/components/FAQ";
 import { FeaturedSection } from "@/components/FeaturedSection";
 import { Footer } from "@/components/Footer";
 import { Helmet } from "react-helmet-async";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { PremiumLoader } from "@/components/PremiumLoader";
-import { appStatus } from "@/utils/appStatus";
-import { FeatureGuard } from "@/components/FeatureGuard";
-import { ProblemList } from "@/components/ProblemList";
-import { ListType, AlgorithmListItem } from "@/types/algorithm";
-import { useAlgorithms } from "@/hooks/useAlgorithms";
+import { Button } from "@/components/ui/button";
 
 const Home = () => {
   const [user, setUser] = useState<User | null>(null);
-  // Fetch algorithms using React Query
-  const { data, isLoading: loading } = useAlgorithms();
-  const algorithms = data?.algorithms ?? [];
-
+  
   // Check authentication status
   useEffect(() => {
     if (!supabase) {
@@ -42,34 +47,31 @@ const Home = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Extract categories for SEO from fetched data or use defaults if empty
-  const categories = Array.from(new Set(algorithms.map(a => a.category).filter(Boolean))).sort();
-
   return (
     <>
       <Helmet>
         <title>
-          Rulcode.com - Master 200+ Algorithms with Interactive Visualizations |
+          RulCode - Master Competitive Programming & Technical Interviews |
           Free & Open Source
         </title>
         <meta
           name="description"
-          content="Learn data structures and algorithms with step-by-step visualizations across 20 categories. 200+ algorithm animations, Blind 75 problems, interactive games, and tutorials. Perfect for coding interviews, LeetCode practice, and competitive programming. 100% free and open source."
+          content="Accelerate your FAANG preparation with interactive visualizations, code execution in 4+ languages, and multi-approach solutions. Master Blind 75 and 200+ algorithms visually."
         />
         <meta
           name="keywords"
-          content="algorithms, data structures, leetcode, coding interviews, blind 75, competitive programming, algorithm visualization, learn algorithms, DSA, python algorithms, java algorithms, c++ algorithms, typescript algorithms, free algorithm library, interactive games"
+          content="competitive programming, leetcode, coding interviews, faang preparation, algorithm visualization, code runner, open source coding"
         />
         <link rel="canonical" href="https://rulcode.com/" />
 
         {/* Open Graph */}
         <meta
           property="og:title"
-          content="Rulcode.com - Master 200+ Algorithms with Interactive Visualizations"
+          content="RulCode - Master Competitive Programming & Technical Interviews"
         />
         <meta
           property="og:description"
-          content="Free open-source algorithm library with 200+ interactive visualizations across 20 categories. Learn DSA for coding interviews with Blind 75, games, and tutorials."
+          content="Interactive visualizations, integrated code runner, and multi-approach solutions in 4+ languages. Master Blind 75 and 200+ algorithms visually."
         />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://rulcode.com/" />
@@ -79,50 +81,22 @@ const Home = () => {
         <meta name="twitter:card" content="summary_large_image" />
         <meta
           name="twitter:title"
-          content="Rulcode.com - Master 200+ Algorithms Visually"
+          content="RulCode - Master Algorithms & Solve Visually"
         />
         <meta
           name="twitter:description"
-          content="Free interactive algorithm visualizations with 20 categories, Blind 75, and games for coding interviews"
+          content="Free interactive algorithm visualizations and integrated code runner for FAANG interview preparation."
         />
         <meta name="twitter:image" content="https://rulcode.com/og-image.png" />
 
-        {/* Structured Data - WebSite */}
+        {/* Structured Data */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebSite",
-            name: "Rulcode.com",
+            name: "RulCode",
             url: "https://rulcode.com",
-            description:
-              "Free and open-source algorithm library with interactive visualizations for learning data structures and algorithms",
-            potentialAction: {
-              "@type": "SearchAction",
-              target: "https://rulcode.com/?search={search_term_string}",
-              "query-input": "required name=search_term_string",
-            },
-          })}
-        </script>
-
-        {/* Structured Data - Organization */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "EducationalOrganization",
-            name: "Rulcode.com",
-            url: "https://rulcode.com",
-            logo: {
-              "@type": "ImageObject",
-              url: "https://rulcode.com/android-chrome-512x512.png",
-              width: 512,
-              height: 512,
-            },
-            sameAs: [
-              "https://x.com/rulcode_io",
-              "https://github.com/rkmahale17/algolib.io",
-            ],
-            description:
-              "Rulcode.com is a free and open-source algorithm library that helps developers learn and visualize algorithms with interactive animations and clean code snippets in multiple programming languages.",
+            description: "Interactive competitive coding and algorithm visualization platform",
           })}
         </script>
       </Helmet>
@@ -142,83 +116,103 @@ const Home = () => {
         </a>
 
         {/* Hero Section */}
-        <div className="relative overflow-hidden bg-gradient-to-b from-background via-muted/20 to-background border-b border-border/50">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
-
-          <div className="container mx-auto px-4 py-16 relative">
-            <div className="text-center max-w-4xl mx-auto space-y-6">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
+        <div className="relative overflow-hidden bg-gradient-to-b from-background via-primary/5 to-background border-b border-border/50">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent opacity-50" />
+          
+          <div className="container mx-auto px-4 py-20 relative lg:py-32">
+            <div className="text-center max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom duration-700">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
                 <Sparkles className="w-4 h-4 text-primary" />
                 <span className="text-sm font-medium text-primary">
-                  Master Algorithms Visually
+                  Cracking FAANG Interviews Made Simple
                 </span>
               </div>
 
-              <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
-                <span className="gradient-text">
-                  All Competitive Algorithms
-                </span>
-                <br />
-                In Your Pocket
-              </h1>
+              <div className="space-y-4">
+                <h1 className="text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1]">
+                  Don't Just Solve Problems.
+                  <br />
+                  <span className="gradient-text">Understand the Patterns.</span>
+                </h1>
+                <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed opacity-90">
+                  Visualize algorithms, uncover recurring patterns, check different approaches and build the intuition needed to crack real interview questions — not just sample ones.
+                </p>
+              </div>
 
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Step-by-step visualizations of all required algorithms. Watch
-                code come to life with interactive animations.
-              </p>
+              {/* Feature Markers */}
+              <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4 text-sm font-medium text-muted-foreground pt-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-primary/5 flex items-center justify-center">
+                    <Keyboard className="w-4 h-4 text-primary/60" />
+                  </div>
+                  <span>Practice</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-primary/5 flex items-center justify-center">
+                    <Zap className="w-4 h-4 text-primary/60" />
+                  </div>
+                  <span>Code faster</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-primary/5 flex items-center justify-center">
+                    <Trophy className="w-4 h-4 text-primary/60" />
+                  </div>
+                  <span>Crack Interview</span>
+                </div>
+              </div>
 
-              {/* Stats */}
-              <div className="flex items-center justify-center gap-8 pt-8">
-                <div className="text-center">
-                
-                    <div className="text-3xl font-bold text-primary">200+</div>
-                  
-                  <div className="text-sm text-muted-foreground">
-                    Algorithms
-                  </div>
+              <div className="space-y-4">
+                <div className="flex flex-wrap justify-center gap-4">
+                  <Button size="lg" className="rounded-full px-8 gap-2 bg-primary hover:bg-primary/90 shadow-glow" asChild>
+                    <Link to="/problems">
+                      Explore Problems
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </Button>
+                  <Button size="lg" variant="outline" className="rounded-full px-8 gap-2 backdrop-blur-sm bg-background/50 border-primary/20 hover:bg-primary/5" asChild>
+                    <Link to="/core-patterns">
+                      <Layers className="w-4 h-4" />
+                      Core Patterns
+                    </Link>
+                  </Button>
+                  <Button size="lg" variant="ghost" className="rounded-full px-8 gap-2 border hover:border-primary/10" asChild>
+                    <a href="https://github.com/rkmahale17/algolib.io" target="_blank" rel="noopener noreferrer">
+                      <Github className="w-4 h-4" />
+                      Contribute
+                         <ExternalLink className="w-4 h-4" />
+                    </a>
+                  </Button>
                 </div>
-                <div className="h-12 w-px bg-border" />
-                <div className="text-center">
-            
-                    <div className="text-3xl font-bold text-secondary">{categories.length || 19}</div>
-                  
-                  <div className="text-sm text-muted-foreground">
-                    Categories
-                  </div>
-                </div>
-                <div className="h-12 w-px bg-border" />
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-primary">100%</div>
-                  <div className="text-sm text-muted-foreground">
-                    Developer Centric
-                  </div>
-                </div>
+                <p className="text-sm text-muted-foreground/60 italic">
+                  Completely free. No hidden charges for learning.
+                </p>
+              </div>
+
+              <div className="flex items-center justify-center gap-6 pt-4 grayscale opacity-60">
+                 <div className="flex flex-col items-center">
+                    <span className="text-xl font-bold">200+</span>
+                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Problems</span>
+                 </div>
+                 <div className="h-6 w-px bg-border" />
+                 <div className="flex flex-col items-center">
+                    <span className="text-xl font-bold">4+</span>
+                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Languages</span>
+                 </div>
+                 <div className="h-6 w-px bg-border" />
+                 <div className="flex flex-col items-center text-primary opacity-100 grayscale-0">
+                    <Globe className="w-4 h-4 mb-0.5" />
+                    <span className="text-[10px] uppercase tracking-wider font-bold">Open Source</span>
+                 </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Featured Section */}
-        <FeaturedSection />
-
-        <FeatureGuard flag="core_algo">
-          {/* Main Algorithm List */}
-          <div className="container mx-auto px-4 py-8" id="algorithms">
-             <div className="max-w-4xl mx-auto space-y-6 mb-8 text-center">
-                <h2 className="text-3xl md:text-4xl font-bold gradient-text mb-2">
-                  Core algorithms
-                </h2>
-             </div>
-             <ProblemList 
-               algorithms={algorithms} 
-               emptyMessage="No algorithms found matching your search." 
-               defaultListType={ListType.Core}
-               availableListTypes={[ListType.Core, ListType.CoreAndBlind75]}
-               hideListSelection={true}
-               isLoading={loading}
-             />
-          </div>
-        </FeatureGuard>
+        <div className="container mx-auto px-4 py-16">
+          <h2 className="text-3xl  text-center mb-12">Learning Paths</h2>
+          <FeaturedSection />
+        </div>
 
         {/* FAQ Section */}
         <FAQ />

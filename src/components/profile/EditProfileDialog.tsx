@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { Profile, ProfileUpdateData } from "@/types/profile";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
 
 interface EditProfileDialogProps {
   open: boolean;
@@ -27,20 +29,32 @@ export const EditProfileDialog = ({ open, onOpenChange, profile, onSave }: EditP
     github_url: profile.github_url,
     twitter_url: profile.twitter_url,
     linkedin_url: profile.linkedin_url,
+    is_public: profile.is_public,
   });
   const [saving, setSaving] = useState(false);
   const [usernameError, setUsernameError] = useState<string | null>(null);
+  const [usernameValid, setUsernameValid] = useState(false);
   const [checkingUsername, setCheckingUsername] = useState(false);
+  const isPrivateProfileEnabled = useFeatureFlag('profile_private');
 
-  // Check username availability
-  const checkUsername = async (username: string) => {
+  // Debounced username validation
+  const checkUsername = useCallback(async (username: string) => {
     if (!username || username === profile.username) {
         setUsernameError(null);
+        setUsernameValid(username === profile.username);
         return;
     }
 
+    // Validate format
     if (username.length < 3) {
         setUsernameError("Username must be at least 3 characters");
+        setUsernameValid(false);
+        return;
+    }
+
+    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+        setUsernameError("Username can only contain letters, numbers, and underscores");
+        setUsernameValid(false);
         return;
     }
 
@@ -50,22 +64,41 @@ export const EditProfileDialog = ({ open, onOpenChange, profile, onSave }: EditP
             .from('profiles')
             .select('id')
             .eq('username', username)
-            .neq('id', profile.id) // Exclude current user
+            .neq('id', profile.id)
             .maybeSingle();
 
         if (error) throw error;
 
         if (data) {
             setUsernameError("Username is already taken");
+            setUsernameValid(false);
         } else {
             setUsernameError(null);
+            setUsernameValid(true);
         }
     } catch (err) {
         console.error("Error checking username:", err);
+        setUsernameError("Failed to check username availability");
+        setUsernameValid(false);
     } finally {
         setCheckingUsername(false);
     }
-  };
+  }, [profile.username, profile.id]);
+
+  // Debounce username checking
+  useEffect(() => {
+    if (!formData.username) {
+      setUsernameError(null);
+      setUsernameValid(false);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      checkUsername(formData.username!);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [formData.username, checkUsername]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,20 +145,29 @@ export const EditProfileDialog = ({ open, onOpenChange, profile, onSave }: EditP
                             id="username" 
                             value={formData.username || ''} 
                             onChange={e => {
-                                setFormData({...formData, username: e.target.value});
-                                setUsernameError(null); // Clear error while typing
+                                const value = e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
+                                setFormData({...formData, username: value});
                             }}
-                            onBlur={(e) => checkUsername(e.target.value)}
-                            className={usernameError ? "border-red-500" : ""}
+                            placeholder="johndoe"
+                            className={usernameError ? "border-red-500 pr-10" : usernameValid && formData.username ? "border-green-500 pr-10" : "pr-10"}
                         />
-                        {checkingUsername && (
-                            <div className="absolute right-3 top-2.5">
+                        <div className="absolute right-3 top-2.5">
+                            {checkingUsername && (
                                 <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                            </div>
-                        )}
+                            )}
+                            {!checkingUsername && usernameValid && formData.username && formData.username !== profile.username && (
+                                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                            )}
+                            {!checkingUsername && usernameError && (
+                                <XCircle className="h-4 w-4 text-red-500" />
+                            )}
+                        </div>
                     </div>
                     {usernameError && (
                         <p className="text-xs text-red-500">{usernameError}</p>
+                    )}
+                    {usernameValid && formData.username && !usernameError && formData.username !== profile.username && (
+                        <p className="text-xs text-green-600">Username is available!</p>
                     )}
                 </div>
             </div>
@@ -136,9 +178,27 @@ export const EditProfileDialog = ({ open, onOpenChange, profile, onSave }: EditP
                     id="bio" 
                     value={formData.bio || ''} 
                     onChange={e => setFormData({...formData, bio: e.target.value})}
-                    rows={3} 
+                    rows={3}
+                    placeholder="Tell us about yourself..."
                 />
             </div>
+
+            {/* Privacy Toggle - Only show if feature flag is enabled */}
+            {isPrivateProfileEnabled && (
+                <div className="flex items-center justify-between p-4 border rounded-lg bg-muted/30">
+                    <div className="space-y-0.5">
+                        <Label htmlFor="is_public" className="text-base">Public Profile</Label>
+                        <p className="text-sm text-muted-foreground">
+                            Allow others to view your profile at /profile/{formData.username || 'username'}
+                        </p>
+                    </div>
+                    <Switch
+                        id="is_public"
+                        checked={formData.is_public ?? true}
+                        onCheckedChange={(checked) => setFormData({...formData, is_public: checked})}
+                    />
+                </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -203,7 +263,7 @@ export const EditProfileDialog = ({ open, onOpenChange, profile, onSave }: EditP
 
             <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-                <Button type="submit" disabled={saving}>
+                <Button type="submit" disabled={saving || checkingUsername || (!!formData.username && !!usernameError)}>
                     {saving && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
                     Save Changes
                 </Button>
