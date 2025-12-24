@@ -109,8 +109,8 @@ Deno.serve(async (req) => {
       // cleanup json - attempt to extract the first { ... } block
       rawText = rawText.trim();
 
-      const firstBrace = rawText.indexOf('{');
-      const lastBrace = rawText.lastIndexOf('}');
+      const firstBrace = rawText.indexOf("{");
+      const lastBrace = rawText.lastIndexOf("}");
 
       if (firstBrace !== -1 && lastBrace !== -1) {
         rawText = rawText.substring(firstBrace, lastBrace + 1);
@@ -118,16 +118,23 @@ Deno.serve(async (req) => {
 
       // Pre-parsing cleanup for common AI mistakes
       const cleanedText = rawText
-        .replace(/,\s*([\}\]])/g, '$1') // Remove trailing commas
-        .replace(/[\u0000-\u0009\u000B-\u000C\u000E-\u001F\u007F-\u009F]/g, ''); // Remove non-whitespace control characters
+        .replace(/,\s*([\}\]])/g, "$1") // Remove trailing commas
+        .replace(/[\u0000-\u001F\u007F-\u009F]/g, (c: string) => {
+          // Replace control characters
+          if (c === "\n") return "\\n";
+          if (c === "\r") return "\\r";
+          if (c === "\t") return "\\t";
+          return "";
+        });
 
       try {
-        return JSON.parse(cleanedText);
+        console.log(cleanedText);
+        return rawText;
       } catch (e: any) {
         console.error("JSON Parse Error. Cleaned Text:", cleanedText);
-        // Include more of the snippet to help debug
-        const snippet = cleanedText.length > 200 ? cleanedText.substring(0, 200) : cleanedText;
-        throw new Error(`Failed to parse AI response as JSON: ${e.message}. Click 'Smart Fill' again. Snippet: ${snippet}...`);
+        throw new Error(
+          `Failed to parse AI response as JSON: ${e.message}. Click 'Smart Fill' again. Snippet: ${cleanedText.substring(0, 100)}...`,
+        );
       }
     }
 
@@ -260,12 +267,13 @@ Deno.serve(async (req) => {
 
         TASK: Generate Code Implementations for: ${langs.join(", ")}.
         
-        ${target === "add_approaches"
-        ? `GENERATE **${approachCount} NEW** distinct approaches. 
+        ${
+          target === "add_approaches"
+            ? `GENERATE **${approachCount} NEW** distinct approaches. 
               EXCLUDE these existing approaches: ${existingApproaches.join(", ")}.
               Use strategy-based naming (e.g., "dfs", "bfs", "dp", "greedy", "two-pointer", "sliding-window", "binary-search", "sorting").
               Context from User: "${userPrompt || "Provide additional unique methods"}"`
-        : `You MUST generate MULTIPLE VIABLE APPROACHES (at least 2, MAX 4).
+            : `You MUST generate MULTIPLE VIABLE APPROACHES (at least 2, MAX 4).
               **APPROACH STRUCTURE & ORDER**:
               1. **Optimized Approach** (MUST BE FIRST) - codeType: "optimize"
                  - This is the BEST solution with optimal time/space complexity
@@ -291,7 +299,7 @@ Deno.serve(async (req) => {
                  - "recursive" - Recursive implementation
                  - "better" - Intermediate optimization
              `
-      }
+        }
 
         **STRICT JSON COMPLIANCE RULES**:
         1. **Quotes**: Escape ALL internal double quotes in strings with \\".
