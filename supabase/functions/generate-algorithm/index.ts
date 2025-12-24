@@ -109,15 +109,28 @@ Deno.serve(async (req) => {
       // cleanup json - attempt to extract the first { ... } block
       rawText = rawText.trim();
 
-      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        rawText = jsonMatch[0];
+      const firstBrace = rawText.indexOf('{');
+      const lastBrace = rawText.lastIndexOf('}');
+
+      if (firstBrace !== -1 && lastBrace !== -1) {
+        rawText = rawText.substring(firstBrace, lastBrace + 1);
       }
+
+      // Pre-parsing cleanup for common AI mistakes
+      const cleanedText = rawText
+        .replace(/,\s*([\}\]])/g, '$1') // Remove trailing commas
+        .replace(/[\u0000-\u001F\u007F-\u009F]/g, (c: string) => { // Replace control characters
+          if (c === '\n') return '\\n';
+          if (c === '\r') return '\\r';
+          if (c === '\t') return '\\t';
+          return '';
+        });
+
       try {
-        return JSON.parse(rawText);
+        return JSON.parse(cleanedText);
       } catch (e: any) {
-        console.error("JSON Parse Error. Raw Text:", rawText);
-        throw new Error(`Failed to parse AI response as JSON: ${e.message}. Snippet: ${rawText.substring(0, 100)}...`);
+        console.error("JSON Parse Error. Cleaned Text:", cleanedText);
+        throw new Error(`Failed to parse AI response as JSON: ${e.message}. Click 'Smart Fill' again. Snippet: ${cleanedText.substring(0, 100)}...`);
       }
     }
 
@@ -130,10 +143,11 @@ Deno.serve(async (req) => {
         Generate COMPLETE metadata.
         Do NOT generate code implementations yet.
 
-        **CRITICAL FORMATTING**:
-        - Return ONLY a valid JSON object.
-        - Ensure all strings are properly escaped (newlines as \n, quotes as \").
-        - NEVER include actual line breaks inside a JSON string value.
+        **STRICT JSON COMPLIANCE RULES**:
+        1. **Quotes**: Escape ALL internal double quotes in strings with \\".
+        2. **Newlines**: Use \\n for all newlines inside strings. NO literal line breaks.
+        3. **No Trailing Commas**: Ensure no comma exists after the last item in an object or array.
+        4. **Standard**: Use double quotes for all keys and string values.
 
         JSON Structure:
         {
@@ -282,10 +296,11 @@ Deno.serve(async (req) => {
              `
       }
 
-        **CRITICAL FORMATTING**:
-        - Return ONLY a valid JSON object.
-        - Ensure all strings are properly escaped (newlines as \n, quotes as \").
-        - NEVER include actual line breaks inside a JSON string value.
+        **STRICT JSON COMPLIANCE RULES**:
+        1. **Quotes**: Escape ALL internal double quotes in strings with \\".
+        2. **Newlines**: Use \\n for all newlines inside strings. NO literal line breaks.
+        3. **No Trailing Commas**: Ensure no comma exists after the last item in an object or array.
+        4. **Standard**: Use double quotes for all keys and string values.
 
         JSON Structure:
         {
