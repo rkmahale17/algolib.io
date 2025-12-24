@@ -337,6 +337,7 @@ export type Database = {
           full_name: string | null
           github_url: string | null
           id: string
+          is_public: boolean | null
           linkedin_url: string | null
           location: string | null
           twitter_url: string | null
@@ -354,6 +355,7 @@ export type Database = {
           full_name?: string | null
           github_url?: string | null
           id: string
+          is_public?: boolean | null
           linkedin_url?: string | null
           location?: string | null
           twitter_url?: string | null
@@ -371,6 +373,7 @@ export type Database = {
           full_name?: string | null
           github_url?: string | null
           id?: string
+          is_public?: boolean | null
           linkedin_url?: string | null
           location?: string | null
           twitter_url?: string | null
