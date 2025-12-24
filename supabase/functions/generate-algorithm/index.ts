@@ -119,18 +119,15 @@ Deno.serve(async (req) => {
       // Pre-parsing cleanup for common AI mistakes
       const cleanedText = rawText
         .replace(/,\s*([\}\]])/g, '$1') // Remove trailing commas
-        .replace(/[\u0000-\u001F\u007F-\u009F]/g, (c: string) => { // Replace control characters
-          if (c === '\n') return '\\n';
-          if (c === '\r') return '\\r';
-          if (c === '\t') return '\\t';
-          return '';
-        });
+        .replace(/[\u0000-\u0009\u000B-\u000C\u000E-\u001F\u007F-\u009F]/g, ''); // Remove non-whitespace control characters
 
       try {
         return JSON.parse(cleanedText);
       } catch (e: any) {
         console.error("JSON Parse Error. Cleaned Text:", cleanedText);
-        throw new Error(`Failed to parse AI response as JSON: ${e.message}. Click 'Smart Fill' again. Snippet: ${cleanedText.substring(0, 100)}...`);
+        // Include more of the snippet to help debug
+        const snippet = cleanedText.length > 200 ? cleanedText.substring(0, 200) : cleanedText;
+        throw new Error(`Failed to parse AI response as JSON: ${e.message}. Click 'Smart Fill' again. Snippet: ${snippet}...`);
       }
     }
 
