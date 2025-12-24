@@ -2,10 +2,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import React, { Suspense, lazy } from 'react';
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { PremiumLoader } from "@/components/PremiumLoader";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { useEffect } from "react";
+import { fetchAlgorithms } from "@/hooks/useAlgorithms";
 
 // Eager load Home for best LCP
 import Home from "./pages/Home";
@@ -16,6 +18,8 @@ const ProfileEdit = lazy(() => import("./pages/Profile"));
 const PublicProfile = lazy(() => import("./pages/PublicProfile"));
 const ProblemDetail = lazy(() => import('@/pages/ProblemDetail'));
 const Blind75 = lazy(() => import("./pages/Blind75"));
+const CorePatterns = lazy(() => import("./pages/CorePatterns"));
+const Problems = lazy(() => import("./pages/Problems"));
 const Auth = lazy(() => import("./pages/Auth"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Feedback = lazy(() => import("./pages/Feedback"));
@@ -62,12 +66,26 @@ const ConditionalNavbar = () => {
 
 import { appStatus } from "@/utils/appStatus";
 
-import { FeatureFlagProvider, useFeatureFlag } from "@/contexts/FeatureFlagContext"; // Added useFeatureFlag
+import { FeatureFlagProvider, useFeatureFlag, useFeatureFlags } from "@/contexts/FeatureFlagContext"; // Added useFeatureFlags
 import MaintenancePage from "./pages/MaintenancePage"; // Added MaintenancePage
 
 const AppContent = () => {
-  const isMaintenanceMode = useFeatureFlag('maintenance_mode');
+  const { flags, isLoading: isLoadingFlags } = useFeatureFlags();
+  const isMaintenanceMode = flags['maintenance_mode'] ?? false;
   const location = useLocation();
+  const queryClient = useQueryClient();
+
+  // Background pre-fetch algorithms (non-blocking)
+  // We wait for flags to load first as requested
+  useEffect(() => {
+    if (isLoadingFlags) return;
+
+    queryClient.prefetchQuery({
+      queryKey: ["algorithms", undefined, undefined],
+      queryFn: () => fetchAlgorithms(),
+      staleTime: 1000 * 60 * 5,
+    });
+  }, [queryClient, isLoadingFlags]);
 
   const isMaintenanceActive = isMaintenanceMode && !location.pathname.startsWith('/admin');
 
@@ -96,6 +114,12 @@ const AppContent = () => {
                       <ProtectedRoute><ProblemDetail /></ProtectedRoute>
                     </FeatureProtectedRoute>
                   } />
+                  <Route path="/core-patterns" element={
+                    <FeatureProtectedRoute flag="core_algo">
+                      <CorePatterns />
+                    </FeatureProtectedRoute>
+                  } />
+                  <Route path="/problems" element={<Problems />} />
                 <Route path="/login" element={<Auth />} />
                 <Route path="/feedback" element={<Feedback />} />
                 <Route path="/about" element={<About />} />

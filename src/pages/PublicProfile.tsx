@@ -149,7 +149,9 @@ const PublicProfile = () => {
       // Check if the user is viewing their own profile
       const isOwnProfile = user.id === profileData.id;
       
-      if (!isOwnProfile && !profileData.is_public) {
+      const isPublic = (profileData as any).is_public;
+      
+      if (!isOwnProfile && !isPublic) {
         // Only block if profile is private AND not own profile
         setError("private");
         return;
@@ -158,8 +160,9 @@ const PublicProfile = () => {
       // Filter sensitive data for public view
       const publicProfile: Profile = {
         ...profileData,
+        is_public: !!isPublic,
         email: "", // Hide email
-      };
+      } as Profile;
 
       setProfile(publicProfile);
       setIsOwnProfile(isOwnProfile);

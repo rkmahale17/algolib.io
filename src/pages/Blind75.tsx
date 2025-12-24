@@ -104,8 +104,7 @@ const Blind75 = () => {
               
               <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
                 <span className="gradient-text">Blind 75</span>
-                <br />
-                LeetCode Problems
+                <br /> Problems
               </h1>
               
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">

@@ -11,6 +11,39 @@ export interface PaginatedAlgorithmsResult {
     totalPages: number;
 }
 
+export const fetchAlgorithms = async (search?: string, category?: string): Promise<PaginatedAlgorithmsResult> => {
+    // Build query params for edge function
+    const params = new URLSearchParams();
+    if (search) params.append('search', search);
+    if (category && category !== 'all') params.append('category', category);
+
+    // Call edge function via fetch (GET with query params)
+    const response = await fetch(
+        `https://mitejukmgshjyusgnpps.supabase.co/functions/v1/fetch-algorithms?${params.toString()}`,
+        {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }
+    );
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch algorithms');
+    }
+
+    const result = await response.json();
+
+    return {
+        algorithms: result.algorithms || [],
+        totalCount: result.totalCount || 0,
+        hasMore: false,
+        currentPage: 1,
+        totalPages: 1
+    };
+};
+
 export const useAlgorithms = (
     search?: string,
     category?: string,
@@ -19,38 +52,7 @@ export const useAlgorithms = (
 ) => {
     return useQuery({
         queryKey: ["algorithms", search, category],
-        queryFn: async (): Promise<PaginatedAlgorithmsResult> => {
-            // Build query params for edge function
-            const params = new URLSearchParams();
-            if (search) params.append('search', search);
-            if (category && category !== 'all') params.append('category', category);
-
-            // Call edge function via fetch (GET with query params)
-            const response = await fetch(
-                `https://mitejukmgshjyusgnpps.supabase.co/functions/v1/fetch-algorithms?${params.toString()}`,
-                {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                }
-            );
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to fetch algorithms');
-            }
-
-            const result = await response.json();
-
-            return {
-                algorithms: result.algorithms || [],
-                totalCount: result.totalCount || 0,
-                hasMore: false,
-                currentPage: 1,
-                totalPages: 1
-            };
-        },
+        queryFn: () => fetchAlgorithms(search, category),
         staleTime: 1000 * 60 * 5,
         gcTime: 1000 * 60 * 30,
         refetchOnWindowFocus: false,

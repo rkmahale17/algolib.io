@@ -37,7 +37,7 @@ const faqs = [
   },
   {
     question: "What's the difference between Rulcode and LeetCode?",
-    answer: "While LeetCode focuses on practice problems, Rulcode.com focuses on understanding algorithms through visual learning. We're complementary - use Rulcode to learn and understand algorithms, then practice on LeetCode to master them."
+    answer: "While LeetCode focuses on practice problems, Rulcode.com focuses on understanding algorithms through visual learning. We're complementary - use Rulcode to learn and understand"
   }
 ];
 

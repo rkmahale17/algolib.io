@@ -106,14 +106,19 @@ Deno.serve(async (req) => {
       let rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!rawText) return null;
 
-      // cleanup json
+      // cleanup json - attempt to extract the first { ... } block
       rawText = rawText.trim();
-      if (rawText.startsWith("```json")) {
-        rawText = rawText.replace(/^```json\s*/, "").replace(/\s*```$/, "");
-      } else if (rawText.startsWith("```")) {
-        rawText = rawText.replace(/^```\s*/, "").replace(/\s*```$/, "");
+
+      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        rawText = jsonMatch[0];
       }
-      return JSON.parse(rawText);
+      try {
+        return JSON.parse(rawText);
+      } catch (e: any) {
+        console.error("JSON Parse Error. Raw Text:", rawText);
+        throw new Error(`Failed to parse AI response as JSON: ${e.message}. Snippet: ${rawText.substring(0, 100)}...`);
+      }
     }
 
     // --- CHUNK 1: CORE DATA PROMPT ---
@@ -125,15 +130,10 @@ Deno.serve(async (req) => {
         Generate COMPLETE metadata.
         Do NOT generate code implementations yet.
 
-        **CRITICAL JSON FORMATTING RULES**:
-        1. **Escape Control Characters**: In JSON strings, you MUST properly escape:
-           - Newlines: Use \\\\n (NOT literal newlines)
-           - Tabs: Use \\\\t (NOT literal tabs)
-           - Quotes: Use \\\\" for double quotes inside strings
-           - Backslashes: Use \\\\\\\\ for literal backslashes
-        2. **No Literal Line Breaks**: NEVER include actual line breaks inside JSON string values
-        3. **Example**: Instead of "text with\nactual newline", use "text with\\\\nescaped newline"
-        4. **HTML Content**: HTML strings can be long but must be on a single line with escaped newlines
+        **CRITICAL FORMATTING**:
+        - Return ONLY a valid JSON object.
+        - Ensure all strings are properly escaped (newlines as \n, quotes as \").
+        - NEVER include actual line breaks inside a JSON string value.
 
         JSON Structure:
         {
@@ -163,13 +163,13 @@ Deno.serve(async (req) => {
               }
             ]
           },
-          "test_cases": [{{"input": [1, 2], "output": 3, "description": "...", "isSubmission": false}}],
+          "test_cases": [{"input": [1, 2], "output": 3, "description": "...", "isSubmission": false}],
           "input_schema": [
-            {{
+            {
               "name": "nums", 
               "type": "number[] | number[][] | string[][] | etc", 
               "label": "Numbers"
-            }}
+            }
           ],
           "metadata": {
             "overview": "Detailed Guide. Max 300 words. Split into many  paragraphs (break after ~60 words).",
@@ -201,15 +201,16 @@ Deno.serve(async (req) => {
            - **NOT**: Just "[2, 7, 11, 15], 9" or raw arrays
             - **Multi-line for readability**: For complex inputs (2D arrays, long arrays), use escaped newlines in JSON strings:
               Example: \"grid = [[1,2,3],\\\\n        [4,5,6],\\\\n        [7,8,9]]\"
+              Example: \\"grid = [[1,2,3],\\\\n        [4,5,6],\\\\n        [7,8,9]]\\"
             - Provide 3-5 diverse examples covering edge cases
         
         3. **Comparison Table**: MUST use this EXACT HTML structure: \n ${TABLE_STRUCTURE}
         
         4. **Test Cases - HIGH QUALITY REQUIRED**: 
-            - **Input Format**: 'input' MUST be an **ARRAY of values** matching input_schema order. Example: \`[2, [[1,0]]]\`. 
-            - **Do NOT** use an object like \`{{"num": 2}}\`. IT MUST BE AN ARRAY: \`[2]\`.
+            - **Input Format**: 'input' MUST be an **ARRAY of values** matching input_schema order. Example: \`[2, [[1, 0]]]\`. 
+            - **Do NOT** use an object like \`{"num": 2}\`. IT MUST BE AN ARRAY: \`[2]\`.
             - **2D Arrays**: For 2D array inputs (type: "number[][]" or "string[][]"), the test case input should contain the nested array directly. 
-              Example: If input_schema has {{"name": "grid", "type": "number[][]"}}, then test case input is: \`[[[1,2],[3,4]]]\` (array containing the 2D array).
+              Example: If input_schema has {"name": "grid", "type": "number[][]"}, then test case input is: \`[[[1, 2], [3, 4]]]\` (array containing the 2D array).
             
             - **QUALITY REQUIREMENTS** (12 total test cases):
               1. **Basic/Happy Path** (2 cases) - Standard valid inputs
@@ -248,13 +249,12 @@ Deno.serve(async (req) => {
 
         TASK: Generate Code Implementations for: ${langs.join(", ")}.
         
-        ${
-          target === "add_approaches"
-            ? `GENERATE **${approachCount} NEW** distinct approaches. 
+        ${target === "add_approaches"
+        ? `GENERATE **${approachCount} NEW** distinct approaches. 
               EXCLUDE these existing approaches: ${existingApproaches.join(", ")}.
               Use strategy-based naming (e.g., "dfs", "bfs", "dp", "greedy", "two-pointer", "sliding-window", "binary-search", "sorting").
               Context from User: "${userPrompt || "Provide additional unique methods"}"`
-            : `You MUST generate MULTIPLE VIABLE APPROACHES (at least 2, MAX 4).
+        : `You MUST generate MULTIPLE VIABLE APPROACHES (at least 2, MAX 4).
               **APPROACH STRUCTURE & ORDER**:
               1. **Optimized Approach** (MUST BE FIRST) - codeType: "optimize"
                  - This is the BEST solution with optimal time/space complexity
@@ -280,27 +280,12 @@ Deno.serve(async (req) => {
                  - "recursive" - Recursive implementation
                  - "better" - Intermediate optimization
              `
-        }
+      }
 
-        **CRITICAL JSON FORMATTING RULES**:
-        1. **Escape Control Characters**: In JSON strings, you MUST properly escape:
-           - Newlines: Use \\\\n (NOT literal newlines)
-           - Tabs: Use \\\\t (NOT literal tabs)
-           - Quotes: Use \\\\" for double quotes inside strings
-           - Backslashes: Use \\\\\\\\ for literal backslashes
-        2. **No Literal Line Breaks**: NEVER include actual line breaks inside JSON string values
-        3. **Code Strings**: When including code in "code" field, ensure all newlines are escaped as \\\\n
-        4. **HTML Content**: HTML in "explanationBefore" and "explanationAfter" must have escaped newlines
-
-        **CRITICAL JSON FORMATTING RULES**:
-        1. **Escape Control Characters**: In JSON strings, you MUST properly escape:
-           - Newlines: Use \\\\n (NOT literal newlines)
-           - Tabs: Use \\\\t (NOT literal tabs)
-           - Quotes: Use \\\\" for double quotes inside strings
-           - Backslashes: Use \\\\\\\\ for literal backslashes
-        2. **No Literal Line Breaks**: NEVER include actual line breaks inside JSON string values
-        3. **Code Strings**: When including code in "code" field, ensure all newlines are escaped as \\\\n
-        4. **HTML Content**: HTML in "explanationBefore" and "explanationAfter" must have escaped newlines
+        **CRITICAL FORMATTING**:
+        - Return ONLY a valid JSON object.
+        - Ensure all strings are properly escaped (newlines as \n, quotes as \").
+        - NEVER include actual line breaks inside a JSON string value.
 
         JSON Structure:
         {

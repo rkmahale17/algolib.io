@@ -263,7 +263,7 @@ export function SmartFillDialog({ onFill, initialTopic = "", existingApproaches 
                             className="flex-1 shadow-none"
                             onClick={() => setGeneratorMode("core")}
                         >
-                            Core Algorithm
+                            Core Pattern
                         </Button>
                     </div>
                   </div>

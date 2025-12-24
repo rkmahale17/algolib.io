@@ -5,7 +5,7 @@ export enum ListType {
 }
 
 export const LIST_TYPE_LABELS: Record<ListType, string> = {
-    [ListType.Core]: 'Core Algorithms',
+    [ListType.Core]: 'Core Patterns',
     [ListType.Blind75]: 'Blind 75',
     [ListType.CoreAndBlind75]: 'Core + Blind 75',
 };

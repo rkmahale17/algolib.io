@@ -4,6 +4,7 @@ import {
   Code2,
   Gamepad2,
   ListChecks,
+  Layers,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -14,13 +15,12 @@ import { FeatureGuard } from "./FeatureGuard";
 
 const features = [
   {
-    id: "core-algorithms",
-    title: "Core Algorithms",
-    description:
-      "Explore step-by-step visualizations of 74+ essential algorithms across 11 categories.",
-    icon: Code2,
-    link: "#algorithms",
-    action: "Browse Algorithms",
+    id: "core-patterns",
+    title: "Core Patterns",
+    description: "Fundamental building blocks of algorithms and data structures.",
+    icon: Layers,
+    link: "/core-patterns",
+    action: "Master Patterns",
     flag: "core_algo",
   },
   {
@@ -56,15 +56,6 @@ const features = [
 ];
 
 export const FeaturedSection = () => {
-  const handleCoreAlgorithmsClick = (
-    e: React.MouseEvent<HTMLAnchorElement>
-  ) => {
-    if (features[0].link.startsWith("#")) {
-      e.preventDefault();
-      const element = document.getElementById("algorithms");
-      element?.scrollIntoView({ behavior: "smooth" });
-    }
-  };
 
   return (
     <section className="py-12 px-4">
@@ -78,8 +69,7 @@ export const FeaturedSection = () => {
               <Link
                 key={feature.id}
                 to={feature.link}
-                onClick={isFirstCard ? handleCoreAlgorithmsClick : undefined}
-                className="group block"
+                className="group block w-full"
               >
                 <Card className="overflow-hidden  border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg bg-card max-w-72">
                   <div className="relative h-32 bg-gradient-to-br from-primary/40 to-primary/5 flex items-center justify-center overflow-hidden">

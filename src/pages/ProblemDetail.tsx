@@ -33,7 +33,7 @@ const scrollToCode = () => {
 
 const ProblemDetail: React.FC = () => {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
-  // Unified route: /problem/:id (supports both core algorithms and Blind 75)
+  // Unified route: /problem/:id (supports both core patterns and Blind 75)
   const algorithmIdOrSlug = id || slug; 
   const navigate = useNavigate();
   

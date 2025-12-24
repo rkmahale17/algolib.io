@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, TrendingUp, BookOpen, CheckCircle2, Circle } from 'lucide-react';
+import { Search, TrendingUp, BookOpen, CheckCircle2, Circle, MoreVertical, Timer, Database, ExternalLink } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -20,9 +20,15 @@ interface ProblemListProps {
 }
 
 const ProblemListSkeleton = () => (
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-    {[...Array(6)].map((_, i) => (
-      <div key={i} className="h-[200px] rounded-xl bg-muted/20 animate-pulse" />
+  <div className="space-y-2">
+    {[...Array(8)].map((_, i) => (
+      <div key={i} className="flex items-center gap-4 px-8 py-4 bg-muted/5 rounded-xl border border-border/20">
+        <div className="w-12 h-4 bg-muted/20 animate-pulse rounded" />
+        <div className="flex-1 h-5 bg-muted/20 animate-pulse rounded max-w-md" />
+        <div className="w-32 h-4 bg-muted/20 animate-pulse rounded hidden md:block" />
+        <div className="w-24 h-6 bg-muted/20 animate-pulse rounded" />
+        <div className="w-24 h-4 bg-muted/20 animate-pulse rounded" />
+      </div>
     ))}
   </div>
 );
@@ -131,195 +137,193 @@ export const ProblemList = ({
 
   return (
     <div className="space-y-6">
-      {/* Filters */}
-      <div className="space-y-4">
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <Input
-            type="text"
-            placeholder="Search algorithms..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-12 h-14 text-lg bg-card border-border/50"
-          />
-        </div>
 
-        <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
-          <div className="flex flex-wrap gap-2">
-            <Button
-              variant={selectedCategory === null ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setSelectedCategory(null)}
-              className="rounded-full"
-            >
-              All
-            </Button>
-            {categories.map((category) => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedCategory(category)}
-                className="rounded-full"
-              >
-                {category}
-              </Button>
-            ))}
-          </div>
-
-          <div className="flex flex-wrap gap-2 w-full md:w-auto">
-            {!hideListSelection && (
-              <Select value={selectedListType || "all"} onValueChange={(val) => setSelectedListType(val === "all" ? null : val)}>
-                <SelectTrigger className="w-[160px] rounded-full">
-                  <SelectValue placeholder="List Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableListTypes.includes("all") && <SelectItem value="all">All Lists</SelectItem>}
-                  {availableListTypes.includes(ListType.Core) && <SelectItem value={ListType.Core}>{LIST_TYPE_LABELS[ListType.Core]}</SelectItem>}
-                  {availableListTypes.includes(ListType.Blind75) && <SelectItem value={ListType.Blind75}>{LIST_TYPE_LABELS[ListType.Blind75]}</SelectItem>}
-                  {availableListTypes.includes(ListType.CoreAndBlind75) && <SelectItem value={ListType.CoreAndBlind75}>{LIST_TYPE_LABELS[ListType.CoreAndBlind75]}</SelectItem>}
-                </SelectContent>
-              </Select>
-            )}
-
-             <Select value={selectedDifficulty || "all"} onValueChange={(val) => setSelectedDifficulty(val === "all" ? null : val)}>
-              <SelectTrigger className="w-[140px] rounded-full">
-                <SelectValue placeholder="Difficulty" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Levels</SelectItem>
-                <SelectItem value="Easy">Easy</SelectItem>
-                <SelectItem value="Medium">Medium</SelectItem>
-                <SelectItem value="Hard">Hard</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[140px] rounded-full">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="default">Default</SelectItem>
-                <SelectItem value="serial-asc">Serial No (Asc)</SelectItem>
-                <SelectItem value="serial-desc">Serial No (Desc)</SelectItem>
-                <SelectItem value="name-asc">Name (A-Z)</SelectItem>
-                <SelectItem value="name-desc">Name (Z-A)</SelectItem>
-                <SelectItem value="difficulty-asc">Difficulty (Easy-Hard)</SelectItem>
-                <SelectItem value="difficulty-desc">Difficulty (Hard-Easy)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </div>
-
-      {/* List */}
-      {isLoading ? (
+      {/* Single Container Table */}
+      {isLoading || !algorithms ? (
         <ProblemListSkeleton />
       ) : (
-        <div className="flex flex-col gap-3">
-          {filteredAndSortedAlgorithms.map((algo, index) => {
-            const status = progressMap?.[algo.id] || 'none';
-            
-            return (
-              <Link 
-                key={algo.id} 
-                to={algo.slug ? `/problem/${algo.slug}` : `/problem/${algo.id}`}
-                className="block group"
+        <Card className="rounded-2xl border-border/40 overflow-hidden glass-card bg-card/30 backdrop-blur-xl">
+          {/* Integrated Header & Filters */}
+          <div className="p-4 md:p-6 space-y-4 border-b border-border/40 bg-muted/5">
+            <div className="flex flex-col lg:flex-row gap-4 justify-between items-stretch lg:items-center">
+              <div className="relative flex-1 group">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                <Input
+                  type="text"
+                  placeholder="Filter algorithms by name or description..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 h-10 text-sm bg-background/50 border-border/50 focus-visible:ring-primary/20"
+                />
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                {!hideListSelection && (
+                  <Select value={selectedListType || "all"} onValueChange={(val) => setSelectedListType(val === "all" ? null : val)}>
+                    <SelectTrigger className="h-10 w-[140px] rounded-lg bg-background/50 border-border/50">
+                      <SelectValue placeholder="List Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableListTypes.includes("all") && <SelectItem value="all">All Lists</SelectItem>}
+                      {availableListTypes.includes(ListType.Core) && <SelectItem value={ListType.Core}>{LIST_TYPE_LABELS[ListType.Core]}</SelectItem>}
+                      {availableListTypes.includes(ListType.Blind75) && <SelectItem value={ListType.Blind75}>{LIST_TYPE_LABELS[ListType.Blind75]}</SelectItem>}
+                      {availableListTypes.includes(ListType.CoreAndBlind75) && <SelectItem value={ListType.CoreAndBlind75}>{LIST_TYPE_LABELS[ListType.CoreAndBlind75]}</SelectItem>}
+                    </SelectContent>
+                  </Select>
+                )}
+
+                <Select value={selectedDifficulty || "all"} onValueChange={(val) => setSelectedDifficulty(val === "all" ? null : val)}>
+                  <SelectTrigger className="h-10 w-[130px] rounded-lg bg-background/50 border-border/50">
+                    <SelectValue placeholder="Difficulty" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Levels</SelectItem>
+                    <SelectItem value="Easy">Easy</SelectItem>
+                    <SelectItem value="Medium">Medium</SelectItem>
+                    <SelectItem value="Hard">Hard</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="h-10 w-[130px] rounded-lg bg-background/50 border-border/50">
+                    <SelectValue placeholder="Sort" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="serial-asc">Serial No ↑</SelectItem>
+                    <SelectItem value="serial-desc">Serial No ↓</SelectItem>
+                    <SelectItem value="name-asc">Name A-Z</SelectItem>
+                    <SelectItem value="name-desc">Name Z-A</SelectItem>
+                    <SelectItem value="difficulty-asc">Easy → Hard</SelectItem>
+                    <SelectItem value="difficulty-desc">Hard → Easy</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Category Filter Pills (Integrated) */}
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              <button
+                onClick={() => setSelectedCategory(null)}
+                className={`px-3 py-1 rounded-full text-[11px] font-medium transition-all ${
+                  selectedCategory === null 
+                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' 
+                    : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+                }`}
               >
-                <Card 
-                  className={`p-4 hover-lift glass-card border-border/40 transition-all duration-300 relative overflow-hidden h-full flex flex-col md:flex-row items-center gap-4 ${status === 'solved' ? 'border-primary/20 bg-primary/5' : ''}`}
-                  style={{ animationDelay: `${index * 40}ms` }}
+                All Categories
+              </button>
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`px-3 py-1 rounded-full text-[11px] font-medium transition-all ${
+                    selectedCategory === category 
+                      ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' 
+                      : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+                  }`}
                 >
-                  {/* Serial & Title Section */}
-                  <div className="flex items-center gap-4 flex-1 min-w-0 w-full md:w-auto">
-                    <div className="w-10 h-10 rounded-full bg-muted/30 flex items-center justify-center shrink-0 font-mono text-sm text-muted-foreground group-hover:bg-primary/20 group-hover:text-primary transition-colors">
-                      {algo.serial_no || index + 1}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <h3 className="font-semibold text-base md:text-lg truncate group-hover:text-primary transition-colors">
+                  {category}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Table Header (Desktop only) */}
+          <div className="hidden md:flex items-center gap-4 px-8 py-3 bg-muted/20 border-b border-border/40 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+            <div className="w-12 shrink-0">#</div>
+            <div className="flex-1 min-w-0">Title</div>
+            <div className="w-32 shrink-0">Category</div>
+            <div className="w-24 shrink-0">Difficulty</div>
+            <div className="w-24 shrink-0">Done</div>
+          </div>
+
+          <div className="divide-y divide-border/20">
+            {filteredAndSortedAlgorithms.map((algo, index) => {
+              const status = progressMap?.[algo.id] || 'none';
+              const firstLetter = (algo.category || 'A').charAt(0).toUpperCase();
+
+              return (
+                <Link 
+                  key={algo.id} 
+                  to={algo.slug ? `/problem/${algo.slug}` : `/problem/${algo.id}`}
+                  className={`block transition-all duration-300 hover:bg-primary/5 group relative
+                    ${status === 'solved' 
+                      ? 'bg-green-500/[0.03] border-l-4 border-green-500/30' 
+                      : 'border-l-4 border-transparent'}`}
+                >
+                  <div className="flex flex-col md:flex-row md:items-center gap-4 px-6 md:px-8 py-3 md:py-2.5">
+                    {/* ID & Title Column */}
+                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                      <div className="hidden md:flex w-12 shrink-0 font-mono text-xs text-muted-foreground/40 group-hover:text-primary/60 transition-colors">
+                        {(algo.serial_no || index + 1).toString().padStart(2, '0')}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-semibold text-[15px] leading-tight group-hover:text-primary transition-colors truncate">
                           {algo.displayTitle}
                         </h3>
-                        {status === 'solved' && (
-                          <CheckCircle2 className="w-4 h-4 text-primary shrink-0 animate-in zoom-in duration-300" />
-                        )}
-                        {status === 'attempted' && (
-                          <Circle className="w-4 h-4 text-orange-400 shrink-0 fill-orange-400/20" />
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-wider">
-                        <span>{algo.category}</span>
-                        {algo.timeComplexity && (
-                          <>
-                            <span className="w-1 h-1 rounded-full bg-border" />
-                            <span className="flex items-center gap-1">
-                              <TrendingUp className="w-3 h-3" />
-                              {algo.timeComplexity}
-                            </span>
-                          </>
-                        )}
+                        {/* Mobile-only category */}
+                        <p className="md:hidden text-[10px] text-muted-foreground mt-0.5">
+                          {algo.category} • ALGO-{(algo.serial_no || index + 1).toString().padStart(2, '0')}
+                        </p>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Middle Section - Meta Info */}
-                  <div className="flex items-center gap-6 justify-center md:justify-end w-full md:w-auto shrink-0 border-t md:border-t-0 pt-4 md:pt-0 border-border/30">
-                    {/* Status Badge */}
-                    <div className="hidden lg:block min-w-[100px] text-center">
-                       {status === 'solved' ? (
-                          <Badge className="bg-primary/20 text-primary border-primary/30 hover:bg-primary/30 transition-colors">
-                            Solved
-                          </Badge>
-                       ) : status === 'attempted' ? (
-                          <Badge variant="outline" className="text-orange-400 border-orange-400/30 bg-orange-400/5">
-                            Attempted
-                          </Badge>
-                       ) : null}
+                    {/* Category Column (Desktop) */}
+                    <div className="hidden md:block w-32 shrink-0 text-xs font-medium text-muted-foreground truncate">
+                      {algo.category}
                     </div>
 
-                    {/* Difficulty */}
-                    <Badge 
-                      variant="outline" 
-                      className={`${difficultyColors[algo.mappedDifficulty]} min-w-[80px] justify-center py-1`}
-                    >
-                      {algo.mappedDifficulty}
-                    </Badge>
+                    {/* Difficulty Column */}
+                    <div className="w-24 shrink-0 flex items-center">
+                      <Badge 
+                        variant="outline" 
+                        className={`${difficultyColors[algo.mappedDifficulty]} text-[10px] font-bold px-2 py-0 h-5 border-none bg-transparent md:bg-inherit`}
+                      >
+                        {algo.mappedDifficulty}
+                      </Badge>
+                    </div>
 
-                    {/* Companies */}
-                    <div className="hidden sm:flex items-center gap-1">
-                       {algo.companies && algo.companies.length > 0 ? (
-                         <div className="flex -space-x-2 overflow-hidden">
-                           {algo.companies.slice(0, 3).map((company, i) => (
-                             <div 
-                                key={company}
-                                className="w-7 h-7 rounded-full border-2 border-background bg-muted flex items-center justify-center text-[10px] font-bold uppercase tracking-tighter"
-                                title={company}
-                             >
-                               {company.charAt(0)}
-                             </div>
-                           ))}
-                           {algo.companies.length > 3 && (
-                             <div className="w-7 h-7 rounded-full border-2 border-background bg-muted flex items-center justify-center text-[8px] font-bold">
-                               +{algo.companies.length - 3}
-                             </div>
-                           )}
-                         </div>
-                       ) : (
-                         <span className="text-[10px] text-muted-foreground/40 italic">Global</span>
-                       )}
+
+                    {/* Status Column */}
+                    <div className="w-24 shrink-0 flex items-center">
+                      {status === 'solved' ? (
+                        <div className="flex items-center gap-1.5 text-green-500">
+                          <CheckCircle2 className="w-4 h-4" />
+                          <span className="text-[10px] font-bold uppercase tracking-wider">Solved</span>
+                        </div>
+                      ) : status === 'attempted' ? (
+                        <div className="flex items-center gap-1.5 text-orange-400">
+                          <Circle className="w-4 h-4" />
+                          <span className="text-[10px] font-bold uppercase tracking-wider hidden lg:inline">Attempted</span>
+                        </div>
+                      ) : (
+                        <span className="text-[10px] text-muted-foreground/30 font-mono">PENDING</span>
+                      )}
                     </div>
                   </div>
-                </Card>
-              </Link>
-            );
-          })}
+                </Link>
+              );
+            })}
+          </div>
 
           {filteredAndSortedAlgorithms.length === 0 && (
-            <div className="text-center py-16">
-              <p className="text-muted-foreground">{emptyMessage}</p>
+            <div className="text-center py-24">
+              <p className="text-muted-foreground text-sm">{emptyMessage}</p>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedCategory(null);
+                  setSelectedDifficulty(null);
+                }}
+                className="mt-4 text-primary hover:text-primary/80"
+              >
+                Clear all filters
+              </Button>
             </div>
           )}
-        </div>
+        </Card>
       )}
     </div>
   );
