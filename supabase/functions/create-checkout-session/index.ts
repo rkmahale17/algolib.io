@@ -50,6 +50,7 @@ serve(async (req) => {
                     country: 'IN',
                 },
                 payment_methods: ['card'],
+                return_url: `${req.headers.get('origin') || 'http://localhost:5173'}/`, // Redirect back to home after payment
             }),
         })
 
