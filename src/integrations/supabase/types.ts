@@ -332,6 +332,7 @@ export type Database = {
           bio: string | null
           company: string | null
           created_at: string | null
+          current_period_end: string | null
           display_name: string | null
           email: string | null
           full_name: string | null
@@ -340,6 +341,9 @@ export type Database = {
           is_public: boolean | null
           linkedin_url: string | null
           location: string | null
+          subscription_id: string | null
+          subscription_status: string | null
+          trial_end_date: string | null
           twitter_url: string | null
           updated_at: string | null
           username: string | null
@@ -350,6 +354,7 @@ export type Database = {
           bio?: string | null
           company?: string | null
           created_at?: string | null
+          current_period_end?: string | null
           display_name?: string | null
           email?: string | null
           full_name?: string | null
@@ -358,6 +363,9 @@ export type Database = {
           is_public?: boolean | null
           linkedin_url?: string | null
           location?: string | null
+          subscription_id?: string | null
+          subscription_status?: string | null
+          trial_end_date?: string | null
           twitter_url?: string | null
           updated_at?: string | null
           username?: string | null
@@ -368,6 +376,7 @@ export type Database = {
           bio?: string | null
           company?: string | null
           created_at?: string | null
+          current_period_end?: string | null
           display_name?: string | null
           email?: string | null
           full_name?: string | null
@@ -376,6 +385,9 @@ export type Database = {
           is_public?: boolean | null
           linkedin_url?: string | null
           location?: string | null
+          subscription_id?: string | null
+          subscription_status?: string | null
+          trial_end_date?: string | null
           twitter_url?: string | null
           updated_at?: string | null
           username?: string | null
