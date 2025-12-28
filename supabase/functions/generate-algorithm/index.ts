@@ -106,29 +106,14 @@ Deno.serve(async (req) => {
       let rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!rawText) return null;
 
-      // cleanup json - attempt to extract the first { ... } block
+      // cleanup json
       rawText = rawText.trim();
-
-      const firstBrace = rawText.indexOf('{');
-      const lastBrace = rawText.lastIndexOf('}');
-
-      if (firstBrace !== -1 && lastBrace !== -1) {
-        rawText = rawText.substring(firstBrace, lastBrace + 1);
+      if (rawText.startsWith("```json")) {
+        rawText = rawText.replace(/^```json\s*/, "").replace(/\s*```$/, "");
+      } else if (rawText.startsWith("```")) {
+        rawText = rawText.replace(/^```\s*/, "").replace(/\s*```$/, "");
       }
-
-      // Pre-parsing cleanup for common AI mistakes
-      const cleanedText = rawText
-        .replace(/,\s*([\}\]])/g, '$1') // Remove trailing commas
-        .replace(/[\u0000-\u0009\u000B-\u000C\u000E-\u001F\u007F-\u009F]/g, ''); // Remove non-whitespace control characters
-
-      try {
-        return JSON.parse(cleanedText);
-      } catch (e: any) {
-        console.error("JSON Parse Error. Cleaned Text:", cleanedText);
-        // Include more of the snippet to help debug
-        const snippet = cleanedText.length > 200 ? cleanedText.substring(0, 200) : cleanedText;
-        throw new Error(`Failed to parse AI response as JSON: ${e.message}. Click 'Smart Fill' again. Snippet: ${snippet}...`);
-      }
+      return JSON.parse(rawText);
     }
 
     // --- CHUNK 1: CORE DATA PROMPT ---
@@ -140,11 +125,15 @@ Deno.serve(async (req) => {
         Generate COMPLETE metadata.
         Do NOT generate code implementations yet.
 
-        **STRICT JSON COMPLIANCE RULES**:
-        1. **Quotes**: Escape ALL internal double quotes in strings with \\".
-        2. **Newlines**: Use \\n for all newlines inside strings. NO literal line breaks.
-        3. **No Trailing Commas**: Ensure no comma exists after the last item in an object or array.
-        4. **Standard**: Use double quotes for all keys and string values.
+        **CRITICAL JSON FORMATTING RULES**:
+        1. **Escape Control Characters**: In JSON strings, you MUST properly escape:
+           - Newlines: Use \\\\n (NOT literal newlines)
+           - Tabs: Use \\\\t (NOT literal tabs)
+           - Quotes: Use \\\\" for double quotes inside strings
+           - Backslashes: Use \\\\\\\\ for literal backslashes
+        2. **No Literal Line Breaks**: NEVER include actual line breaks inside JSON string values
+        3. **Example**: Instead of "text with\nactual newline", use "text with\\\\nescaped newline"
+        4. **HTML Content**: HTML strings can be long but must be on a single line with escaped newlines
 
         JSON Structure:
         {
@@ -174,13 +163,13 @@ Deno.serve(async (req) => {
               }
             ]
           },
-          "test_cases": [{"input": [1, 2], "output": 3, "description": "...", "isSubmission": false}],
+          "test_cases": [{{"input": [1, 2], "output": 3, "description": "...", "isSubmission": false}}],
           "input_schema": [
-            {
+            {{
               "name": "nums", 
               "type": "number[] | number[][] | string[][] | etc", 
               "label": "Numbers"
-            }
+            }}
           ],
           "metadata": {
             "overview": "Detailed Guide. Max 300 words. Split into many  paragraphs (break after ~60 words).",
@@ -212,16 +201,15 @@ Deno.serve(async (req) => {
            - **NOT**: Just "[2, 7, 11, 15], 9" or raw arrays
             - **Multi-line for readability**: For complex inputs (2D arrays, long arrays), use escaped newlines in JSON strings:
               Example: \"grid = [[1,2,3],\\\\n        [4,5,6],\\\\n        [7,8,9]]\"
-              Example: \\"grid = [[1,2,3],\\\\n        [4,5,6],\\\\n        [7,8,9]]\\"
             - Provide 3-5 diverse examples covering edge cases
         
         3. **Comparison Table**: MUST use this EXACT HTML structure: \n ${TABLE_STRUCTURE}
         
         4. **Test Cases - HIGH QUALITY REQUIRED**: 
-            - **Input Format**: 'input' MUST be an **ARRAY of values** matching input_schema order. Example: \`[2, [[1, 0]]]\`. 
-            - **Do NOT** use an object like \`{"num": 2}\`. IT MUST BE AN ARRAY: \`[2]\`.
+            - **Input Format**: 'input' MUST be an **ARRAY of values** matching input_schema order. Example: \`[2, [[1,0]]]\`. 
+            - **Do NOT** use an object like \`{{"num": 2}}\`. IT MUST BE AN ARRAY: \`[2]\`.
             - **2D Arrays**: For 2D array inputs (type: "number[][]" or "string[][]"), the test case input should contain the nested array directly. 
-              Example: If input_schema has {"name": "grid", "type": "number[][]"}, then test case input is: \`[[[1, 2], [3, 4]]]\` (array containing the 2D array).
+              Example: If input_schema has {{"name": "grid", "type": "number[][]"}}, then test case input is: \`[[[1,2],[3,4]]]\` (array containing the 2D array).
             
             - **QUALITY REQUIREMENTS** (12 total test cases):
               1. **Basic/Happy Path** (2 cases) - Standard valid inputs
@@ -260,12 +248,13 @@ Deno.serve(async (req) => {
 
         TASK: Generate Code Implementations for: ${langs.join(", ")}.
         
-        ${target === "add_approaches"
-        ? `GENERATE **${approachCount} NEW** distinct approaches. 
+        ${
+          target === "add_approaches"
+            ? `GENERATE **${approachCount} NEW** distinct approaches. 
               EXCLUDE these existing approaches: ${existingApproaches.join(", ")}.
               Use strategy-based naming (e.g., "dfs", "bfs", "dp", "greedy", "two-pointer", "sliding-window", "binary-search", "sorting").
               Context from User: "${userPrompt || "Provide additional unique methods"}"`
-        : `You MUST generate MULTIPLE VIABLE APPROACHES (at least 2, MAX 4).
+            : `You MUST generate MULTIPLE VIABLE APPROACHES (at least 2, MAX 4).
               **APPROACH STRUCTURE & ORDER**:
               1. **Optimized Approach** (MUST BE FIRST) - codeType: "optimize"
                  - This is the BEST solution with optimal time/space complexity
@@ -291,13 +280,17 @@ Deno.serve(async (req) => {
                  - "recursive" - Recursive implementation
                  - "better" - Intermediate optimization
              `
-      }
+        }
 
-        **STRICT JSON COMPLIANCE RULES**:
-        1. **Quotes**: Escape ALL internal double quotes in strings with \\".
-        2. **Newlines**: Use \\n for all newlines inside strings. NO literal line breaks.
-        3. **No Trailing Commas**: Ensure no comma exists after the last item in an object or array.
-        4. **Standard**: Use double quotes for all keys and string values.
+        **CRITICAL JSON FORMATTING RULES**:
+        1. **Escape Control Characters**: In JSON strings, you MUST properly escape:
+           - Newlines: Use \\\\n (NOT literal newlines)
+           - Tabs: Use \\\\t (NOT literal tabs)
+           - Quotes: Use \\\\" for double quotes inside strings
+           - Backslashes: Use \\\\\\\\ for literal backslashes
+        2. **No Literal Line Breaks**: NEVER include actual line breaks inside JSON string values
+        3. **Code Strings**: When including code in "code" field, ensure all newlines are escaped as \\\\n
+        4. **HTML Content**: HTML in "explanationBefore" and "explanationAfter" must have escaped newlines
 
         JSON Structure:
         {
