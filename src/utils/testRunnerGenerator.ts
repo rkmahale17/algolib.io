@@ -122,7 +122,7 @@ const formatJavaArrayLiteral = (arr: any[], targetJavaType?: string): string => 
 
     // 1. Determine base type and dimensions
     let dimensions = 0;
-    let current = arr;
+    let current: any = arr;
     while (Array.isArray(current) && current.length > 0) {
         dimensions++;
         current = current[0];
