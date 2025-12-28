@@ -73,10 +73,11 @@ serve(async (req) => {
             JSON.stringify(data),
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
         )
-    } catch (error) {
-        console.error('Error:', error.message)
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred'
+        console.error('Error:', errorMessage)
         return new Response(
-            JSON.stringify({ error: error.message }),
+            JSON.stringify({ error: errorMessage }),
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
         )
     }
