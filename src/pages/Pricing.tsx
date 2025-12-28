@@ -35,6 +35,7 @@ const Pricing: React.FC = () => {
         body: {
           productId: 'pdt_0NV36FeTxOWDylUeDQQQS',
           customerEmail: user?.email || '',
+          returnUrl: window.location.href,
         }
       });
 

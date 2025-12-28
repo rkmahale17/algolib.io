@@ -21,6 +21,7 @@ export const Paywall: React.FC<PaywallProps> = ({ onUpgrade }) => {
         body: {
           productId: 'pdt_0NV36FeTxOWDylUeDQQQS',
           customerEmail: user?.email || '',
+          returnUrl: window.location.href,
         }
       });
 
