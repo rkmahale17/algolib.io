@@ -12,7 +12,7 @@ serve(async (req) => {
     }
 
     try {
-        const { productId: reqProductId, customerEmail } = await req.json()
+        const { productId: reqProductId, customerEmail, returnUrl } = await req.json()
         const dodoApiKey = Deno.env.get('DODO_API_KEY')
         const envProductId = Deno.env.get('DODO_PRODUCT_ID')
         const productId = envProductId || reqProductId
@@ -49,8 +49,7 @@ serve(async (req) => {
                     // Defaulting to US if not provided, Dodo requires a country
                     country: 'IN',
                 },
-                payment_methods: ['card'],
-                return_url: `${req.headers.get('origin') || 'http://localhost:5173'}/`, // Redirect back to home after payment
+                return_url: returnUrl || `${req.headers.get('origin') || 'http://localhost:5173'}/`, // Redirect back after payment
             }),
         })
 
