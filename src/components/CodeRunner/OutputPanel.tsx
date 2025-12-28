@@ -8,6 +8,35 @@ import { Button } from "@/components/ui/button";
 import { FeatureGuard } from "@/components/FeatureGuard";
 import { TestCaseEditor } from './TestCaseEditor';
 import { Submission } from '@/types/userAlgorithmData';
+import { diffStrings } from '@/utils/diffUtils';
+
+const DiffView = ({ expected, actual }: { expected: any, actual: any }) => {
+  const expectedStr = typeof expected === 'string' ? expected : JSON.stringify(expected, null, 2);
+  const actualStr = typeof actual === 'string' ? actual : JSON.stringify(actual, null, 2);
+  const diff = diffStrings(expectedStr, actualStr);
+
+  return (
+    <div className="font-mono text-xs whitespace-pre-wrap leading-relaxed">
+      {diff.map((part, i) => {
+        if (part.added) {
+          return (
+            <span key={i} className="bg-green-500/20 text-green-600 dark:text-green-400 border-b border-green-500/50">
+              {part.value}
+            </span>
+          );
+        }
+        if (part.removed) {
+          return (
+            <span key={i} className="bg-red-500/20 text-red-600 dark:text-red-400 line-through decoration-red-500/50">
+              {part.value}
+            </span>
+          );
+        }
+        return <span key={i} className="text-foreground/70">{part.value}</span>;
+      })}
+    </div>
+  );
+};
 
 interface OutputPanelProps {
   output: any | null;
@@ -406,6 +435,29 @@ export const OutputPanel = ({
                                   return JSON.stringify(result.expected, null, 2);
                                 })()}
                               </div>
+                            </div>
+                          )}
+
+                          {/* Diff (for failed cases) */}
+                          {result.status !== 'pass' && result.expected !== undefined && (
+                            <div className="space-y-2">
+                                <div className="text-xs font-medium text-destructive flex items-center gap-2">
+                                    <AlertTriangle className="w-3 h-3" />
+                                    <span>Comparison (Expected vs Actual)</span>
+                                </div>
+                                <div className="p-3 rounded-md bg-muted/10 border border-destructive/20 overflow-hidden">
+                                    <DiffView expected={result.expected} actual={result.actual} />
+                                    <div className="mt-3 flex gap-4 text-[10px] text-muted-foreground border-t pt-2 border-muted">
+                                        <div className="flex items-center gap-1">
+                                            <div className="w-2 h-2 bg-red-500/20 border border-red-500/50"></div>
+                                            <span>Expected but missing</span>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <div className="w-2 h-2 bg-green-500/20 border border-green-500/50"></div>
+                                            <span>Found but not expected</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                           )}
                           

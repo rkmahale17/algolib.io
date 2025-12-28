@@ -3,6 +3,7 @@ import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 import { Resend } from 'https://esm.sh/resend@4.0.0'
 import { renderAsync } from 'https://esm.sh/@react-email/components@0.0.22'
 import { ConfirmationEmail } from './_templates/confirmation.tsx'
+import { SubscriptionEmail } from './_templates/subscription.tsx'
 
 const resend = new Resend(Deno.env.get('RESEND_API_KEY') as string)
 const hookSecret = Deno.env.get('SEND_EMAIL_HOOK_SECRET') as string
@@ -31,10 +32,7 @@ Deno.serve(async (req) => {
   const wh = new Webhook(hookSecret)
 
   try {
-    const {
-      user,
-      email_data: { token, token_hash, redirect_to, email_action_type },
-    } = wh.verify(payload, headers) as {
+    const payload_data = wh.verify(payload, headers) as {
       user: {
         email: string
       }
@@ -47,7 +45,16 @@ Deno.serve(async (req) => {
         token_new: string
         token_hash_new: string
       }
+      subscription_data?: {
+        action_type: 'active' | 'cancelled' | 'trial_ending'
+        period_end?: string
+      }
     }
+
+    const {
+      user,
+      email_data: { token, token_hash, redirect_to, email_action_type },
+    } = payload_data
 
     console.log(`Processing ${email_action_type} email for ${user.email}`)
 
@@ -63,21 +70,31 @@ Deno.serve(async (req) => {
           return 'RulCode - Your Magic Link'
         case 'email_change':
           return 'RulCode - Confirm Your New Email'
+        case 'subscription':
+          return 'RulCode - Premium Subscription Update'
         default:
           return 'RulCode - Verify Your Email'
       }
     }
 
-    const html = await renderAsync(
-      React.createElement(ConfirmationEmail, {
-        supabase_url: Deno.env.get('SUPABASE_URL') ?? '',
-        token,
-        token_hash,
-        redirect_to,
-        email_action_type,
-        user_email: user.email,
-      })
-    )
+    const html = email_action_type === 'subscription'
+      ? await renderAsync(
+        React.createElement(SubscriptionEmail, {
+          user_email: user.email,
+          action_type: payload_data.subscription_data?.action_type || 'active',
+          period_end: payload_data.subscription_data?.period_end,
+        })
+      )
+      : await renderAsync(
+        React.createElement(ConfirmationEmail, {
+          supabase_url: Deno.env.get('SUPABASE_URL') ?? '',
+          token,
+          token_hash,
+          redirect_to,
+          email_action_type,
+          user_email: user.email,
+        })
+      )
 
     console.log('Email HTML rendered successfully')
 

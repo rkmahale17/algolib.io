@@ -12,6 +12,10 @@ export interface Profile {
     website_url: string | null;
     username: string | null;
     is_public: boolean;
+    subscription_status: 'trialing' | 'active' | 'canceled' | 'none' | null;
+    subscription_id: string | null;
+    trial_end_date: string | null;
+    current_period_end: string | null;
     created_at: string;
     updated_at: string;
 }
@@ -28,4 +32,8 @@ export interface ProfileUpdateData {
     username?: string | null;
     avatar_url?: string | null;
     is_public?: boolean;
+    subscription_status?: 'trialing' | 'active' | 'canceled' | 'none' | null;
+    subscription_id?: string | null;
+    trial_end_date?: string | null;
+    current_period_end?: string | null;
 }

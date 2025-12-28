@@ -90,14 +90,17 @@ export function CodeImplementationEditor({
     id: ''
   });
 
-  // Sync activeCodeType when language changes or if current type doesn't exist
+  // Get all unique code types across all languages to ensure we see the union of all implementations
+  const allApproaches = Array.from(
+    new Set(implementations.flatMap(impl => impl.code.map(c => c.codeType)))
+  );
+
+  // Sync activeCodeType if current one is completely gone from all implementations
   useEffect(() => {
-    if (currentImpl && currentImpl.code.length > 0) {
-      if (!currentImpl.code.find(c => c.codeType === activeCodeType)) {
-        setActiveCodeType(currentImpl.code[0].codeType);
-      }
+    if (allApproaches.length > 0 && !allApproaches.includes(activeCodeType)) {
+      setActiveCodeType(allApproaches[0]);
     }
-  }, [activeLanguage, currentImpl, activeCodeType]);
+  }, [allApproaches, activeCodeType]);
 
   const currentCode = currentImpl?.code.find(
     (c) => c.codeType === activeCodeType
@@ -271,6 +274,26 @@ export function CodeImplementationEditor({
     setIsDialogOpen(false);
   };
 
+  const addApproachToLanguage = (langId: string, codeType: string) => {
+    onChange(implementations.map(impl => {
+      if (impl.lang === langId) {
+        // Check if already exists
+        if (impl.code.find(c => c.codeType === codeType)) return impl;
+        
+        return {
+          ...impl,
+          code: [...impl.code, {
+            codeType: codeType,
+            code: "",
+            explanationBefore: "",
+            explanationAfter: ""
+          }]
+        };
+      }
+      return impl;
+    }));
+  };
+
   // Updates a field for the specific language implementation (e.g. code)
   const updateCodeField = (field: keyof CodeBlock, value: string) => {
     onChange(
@@ -301,33 +324,40 @@ export function CodeImplementationEditor({
   };
 
   const moveApproach = (index: number, direction: 'left' | 'right') => {
-    if (!currentImpl) return;
-    
     const newIndex = direction === 'left' ? index - 1 : index + 1;
     
     // Boundary checks
-    if (newIndex < 0 || newIndex >= currentImpl.code.length) return;
+    if (newIndex < 0 || newIndex >= allApproaches.length) return;
 
     // Get the codeType we are moving
-    const movingCodeType = currentImpl.code[index].codeType;
-    const swapTargetCodeType = currentImpl.code[newIndex].codeType;
+    const movingCodeType = allApproaches[index];
+    const swapTargetCodeType = allApproaches[newIndex];
 
     // We need to reorder this key in ALL implementations to keep them in sync
     const updatedImpls = implementations.map(impl => {
+        // Create a copy of the code array
         const newCode = [...impl.code];
         
-        // Find indices in this specific implementation (should match, but safe to find)
+        // Find indices in this specific implementation
         const idx1 = newCode.findIndex(c => c.codeType === movingCodeType);
         const idx2 = newCode.findIndex(c => c.codeType === swapTargetCodeType);
         
         if (idx1 !== -1 && idx2 !== -1) {
-            // Swap
+            // Both exist, swap them
             [newCode[idx1], newCode[idx2]] = [newCode[idx2], newCode[idx1]];
+        } else if (idx1 !== -1 && idx2 === -1) {
+            // Only moving one exists, we need to decide where to move it.
+            // This is tricky because the other one doesn't exist.
+            // For now, let's just swap them in the order if we can.
+            // Actually, if we want to keep them in sync, we should probably 
+            // ensure all languages HAVE the same set of approaches if they are missing?
+            // User requested "Add remaining language", so it's okay if they are out of sync.
+            // If they are out of sync, "moving" only works if both exist.
         }
         
         return {
-            ...impl,
-            code: newCode
+          ...impl,
+          code: newCode
         };
     });
 
@@ -399,16 +429,22 @@ export function CodeImplementationEditor({
             {/* Approach Selection Row (Top) */}
             {currentImpl && (
              <div className="flex items-center justify-between border-b pb-4">
-                <div className="flex items-center gap-2 overflow-x-auto max-w-[80%] pb-2">
-                    {currentImpl.code.map((block, index) => (
+                <div className="flex items-center gap-2 overflow-x-auto max-w-full pb-2">
+                    {allApproaches.map((codeType, index) => {
+                        const block = currentImpl.code.find(c => c.codeType === codeType);
+                        const isMissing = !block;
+                        
+                        return (
                         <div 
-                           key={block.codeType}
-                           onClick={() => setActiveCodeType(block.codeType)}
+                           key={codeType}
+                           onClick={() => setActiveCodeType(codeType)}
                            className={`
                              pl-3 pr-2 py-1.5 rounded-lg text-sm font-medium cursor-pointer flex items-center gap-1 transition-colors whitespace-nowrap border
-                             ${activeCodeType === block.codeType 
+                             ${activeCodeType === codeType 
                                 ? 'bg-primary text-primary-foreground border-primary' 
-                                : 'bg-background hover:bg-muted text-foreground border-border'}
+                                : isMissing
+                                    ? 'bg-muted/30 text-muted-foreground border-dashed border-muted-foreground/30 hover:bg-muted/50'
+                                    : 'bg-background hover:bg-muted text-foreground border-border'}
                            `}
                         >
                             {/* Reorder Buttons */}
@@ -429,36 +465,41 @@ export function CodeImplementationEditor({
                                 </button>
                             </div>
 
-                            <span className="capitalize select-none">{block.codeType.replace(/-/g, ' ')}</span>
+                            <span className="capitalize select-none flex items-center gap-2">
+                                {codeType.replace(/-/g, ' ')}
+                                {isMissing && (
+                                    <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 border-muted-foreground/30 text-muted-foreground">
+                                        Missing
+                                    </Badge>
+                                )}
+                            </span>
                             
                             <div className="flex items-center gap-1 ml-1">
                                  {/* Edit Button */}
                                  <button
                                      type="button"
-                                     className={`p-1 hover:bg-white/20 rounded transition-colors ${activeCodeType === block.codeType ? 'text-primary-foreground/80 hover:text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                                     className={`p-1 hover:bg-white/20 rounded transition-colors ${activeCodeType === codeType ? 'text-primary-foreground/80 hover:text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
                                      onClick={(e) => {
                                          e.stopPropagation();
-                                         openRenameDialog(block.codeType);
+                                         openRenameDialog(codeType);
                                      }}
                                      title="Rename Approach"
                                  >
                                      <Pencil className="w-3 h-3" />
                                  </button>
 
-                                 {/* Only show delete if there's more than one approach OR if user wants to delete the last one */}
-                                {currentImpl.code.length > 0 && (
-                                    <button
-                                        type="button"
-                                        className={`p-1 hover:bg-white/20 rounded transition-colors ${activeCodeType === block.codeType ? 'text-primary-foreground/80 hover:text-primary-foreground' : 'text-muted-foreground hover:text-destructive'}`}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            confirmRemoveApproach(block.codeType);
-                                        }}
-                                        title="Delete Approach"
-                                    >
-                                        <X className="w-3 h-3" />
-                                    </button>
-                                )}
+                                 {/* Delete Button */}
+                                 <button
+                                     type="button"
+                                     className={`p-1 hover:bg-white/20 rounded transition-colors ${activeCodeType === codeType ? 'text-primary-foreground/80 hover:text-primary-foreground' : 'text-muted-foreground hover:text-destructive'}`}
+                                     onClick={(e) => {
+                                         e.stopPropagation();
+                                         confirmRemoveApproach(codeType);
+                                     }}
+                                     title="Delete Approach"
+                                 >
+                                     <X className="w-3 h-3" />
+                                 </button>
                                 
                                 <button
                                     type="button"
@@ -466,21 +507,22 @@ export function CodeImplementationEditor({
                                         e.stopPropagation();
                                         moveApproach(index, 'right');
                                     }}
-                                    disabled={index === currentImpl.code.length - 1}
+                                    disabled={index === allApproaches.length - 1}
                                     className={`
                                         p-0.5 hover:bg-white/20 rounded 
-                                        ${index === currentImpl.code.length - 1 ? 'opacity-30 cursor-not-allowed' : 'opacity-70 hover:opacity-100'}
+                                        ${index === allApproaches.length - 1 ? 'opacity-30 cursor-not-allowed' : 'opacity-70 hover:opacity-100'}
                                     `}
                                 >
                                     <ChevronRight className="w-3 h-3" />
                                 </button>
                             </div>
                         </div>
-                    ))}
+                        );
+                    })}
                     
                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                       <DialogTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-full border border-dashed">
+                        <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-full border border-dashed ml-2">
                             <Plus className="h-4 w-4" />
                         </Button>
                       </DialogTrigger>
@@ -566,7 +608,7 @@ export function CodeImplementationEditor({
             </div>
         </CardHeader>
 
-        {currentImpl && (
+        {currentImpl && currentCode && (
           <CardContent className="space-y-6">
             
             {/* Code Editor */}
@@ -620,6 +662,27 @@ export function CodeImplementationEditor({
             </div>
 
           </CardContent>
+        )}
+
+        {currentImpl && !currentCode && (
+           <CardContent className="py-24 text-center space-y-4">
+              <div className="flex flex-col items-center gap-2">
+                  <div className="p-3 rounded-full bg-muted/50 border-2 border-dashed">
+                      <Plus className="w-8 h-8 text-muted-foreground/50" />
+                  </div>
+                  <h3 className="text-lg font-semibold mt-2">Implementation Missing</h3>
+                  <p className="text-muted-foreground max-w-sm mx-auto">
+                      The <span className="font-bold text-foreground capitalize">{activeCodeType.replace(/-/g, ' ')}</span> approach is not yet implemented in <span className="font-bold text-foreground">{activeLanguage}</span>.
+                  </p>
+              </div>
+              <Button 
+                onClick={() => addApproachToLanguage(activeLanguage, activeCodeType)}
+                className="gap-2"
+              >
+                  <Plus className="w-4 h-4" />
+                  Initialize {activeLanguage} code
+              </Button>
+           </CardContent>
         )}
 
       {implementations.length === 0 && (

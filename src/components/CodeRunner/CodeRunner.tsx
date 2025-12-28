@@ -501,9 +501,9 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
       const algo = activeAlgorithm;
       let fullCode = code;
 
-      const preparedTestCases = casesToRun.map(tc => ({
+      const preparedTestCases = casesToRun.map((tc: any) => ({
         input: tc.input,
-        expectedOutput: tc.expectedOutput,
+        expectedOutput: tc.expectedOutput ?? tc.output,
         description: tc.isCustom ? 'Custom Case' : `Case ${tc.id + 1}`
       }));
 
@@ -512,20 +512,30 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
         
         // Use specified function name or derive from ID
         const entryFunctionName = algo.function_name || algo.metadata?.function_name;
+
+        // Ensure metadata is an object (it might be a string from DB)
+        const metadata = typeof algo.metadata === 'string' 
+          ? JSON.parse(algo.metadata) 
+          : (algo.metadata || {});
         
         fullCode = generateTestRunner(
           code,
           language,
           preparedTestCases,
           algo.input_schema || [],
-          entryFunctionName
+          entryFunctionName,
+          {
+            unordered: metadata.unordered || algo.unordered,
+            multiExpected: metadata.multi_expected || algo.multi_expected
+          }
         );
       }
 
       const response = await axios.post('/api/execute', {
         language_id: LANGUAGE_IDS[language],
         source_code: fullCode,
-        stdin: "" 
+        stdin: "",
+        compiler_options: language === 'typescript' ? "--target ES2020 --downlevelIteration" : undefined
       });
 
       const endTime = performance.now();

@@ -53,6 +53,7 @@
     "cmdk": "^1.1.1",
     "cors": "^2.8.5",
     "date-fns": "^3.6.0",
+    "dodopayments-checkout": "^1.4.0",
     "dotenv": "^17.2.3",
     "embla-carousel-react": "^8.6.0",
     "express": "^4.18.2",

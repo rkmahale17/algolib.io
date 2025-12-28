@@ -39,17 +39,18 @@ export const generateTestRunner = (
     language: Language,
     testCases: TestCase[],
     inputSchema: any[],
-    entryFunctionName?: string
+    entryFunctionName?: string,
+    options?: { unordered?: boolean; multiExpected?: boolean }
 ): string => {
     switch (language) {
         case 'typescript':
-            return generateTypeScriptRunner(userCode, testCases, inputSchema, entryFunctionName);
+            return generateTypeScriptRunner(userCode, testCases, inputSchema, entryFunctionName, options);
         case 'python':
-            return generatePythonRunner(userCode, testCases, inputSchema, entryFunctionName);
+            return generatePythonRunner(userCode, testCases, inputSchema, entryFunctionName, options);
         case 'java':
-            return generateJavaRunner(userCode, testCases, inputSchema, entryFunctionName);
+            return generateJavaRunner(userCode, testCases, inputSchema, entryFunctionName, options);
         case 'cpp':
-            return generateCppRunner(userCode, testCases, inputSchema, entryFunctionName);
+            return generateCppRunner(userCode, testCases, inputSchema, entryFunctionName, options);
         default:
             return userCode;
     }
@@ -117,7 +118,7 @@ const formatValue = (value: any, type: string, lang: Language, targetJavaType?: 
  * - [['1', '0'], ['0', '1']] with targetJavaType="char[][]" -> "new char[][]{{'1', '0'}, {'0', '1'}}"
  */
 const formatJavaArrayLiteral = (arr: any[], targetJavaType?: string): string => {
-    if (!Array.isArray(arr)) return String(arr); // Should not happen given usage, but safe guard
+    if (!Array.isArray(arr)) return String(arr);
 
     // 1. Determine base type and dimensions
     let dimensions = 0;
@@ -126,40 +127,44 @@ const formatJavaArrayLiteral = (arr: any[], targetJavaType?: string): string => 
         dimensions++;
         current = current[0];
     }
-    // If empty array, default to int[] (or we need context, but int[] is safe for empty usually)
+
+    // If empty array, or higher dimension empty array
     if (dimensions === 0 && Array.isArray(arr)) {
-        return 'new int[]{}';
+        // We need a type to return something valid, default to Object or int if unknown
+        const type = (targetJavaType && targetJavaType.replace(/[\[\]]/g, '')) || 'int';
+        return `new ${type}[0]`;
     }
 
     let type = 'int';
 
-    // Check if target type specifies char
-    if (targetJavaType && targetJavaType.includes('char')) {
-        type = 'char';
-    } else if (typeof current === 'string') {
-        type = 'String';
+    // Check if target type specifies char or String or boolean
+    if (targetJavaType) {
+        if (targetJavaType.includes('char')) type = 'char';
+        else if (targetJavaType.includes('String')) type = 'String';
+        else if (targetJavaType.includes('boolean')) type = 'boolean';
+        else if (targetJavaType.includes('double')) type = 'double';
+        else if (targetJavaType.includes('long')) type = 'long';
+    } else {
+        // Infer from content
+        if (typeof current === 'string') {
+            type = current.length === 1 ? 'char' : 'String';
+        } else if (typeof current === 'boolean') {
+            type = 'boolean';
+        } else if (typeof current === 'number' && !Number.isInteger(current)) {
+            type = 'double';
+        }
     }
 
-    if (typeof current === 'boolean') type = 'boolean';
-    // Add other types if needed (double etc)
-
-    // Construct the "new Type[][]..." prefix
     const brackets = '[]'.repeat(dimensions);
 
-    // Recursive content generation
     const generateContent = (a: any[]): string => {
         if (a.length === 0) return '{}';
         if (!Array.isArray(a[0])) {
-            // Leaf array
-            if (type === 'String') {
-                return `{${a.map(v => JSON.stringify(v)).join(', ')}}`;
-            } else if (type === 'char') {
-                // For char, wrap single characters in single quotes
-                return `{${a.map(v => `'${v}'`).join(', ')}}`;
-            }
+            if (type === 'String') return `{${a.map(v => JSON.stringify(v)).join(', ')}}`;
+            if (type === 'char') return `{${a.map(v => `'${v}'`).join(', ')}}`;
+            if (type === 'boolean') return `{${a.join(', ')}}`;
             return `{${a.join(', ')}}`;
         }
-        // Nested array
         return `{${a.map((sub: any) => generateContent(sub)).join(', ')}}`;
     };
 
@@ -168,7 +173,7 @@ const formatJavaArrayLiteral = (arr: any[], targetJavaType?: string): string => 
 
 
 const jsonToPython = (val: any): string => {
-    if (val === null) return 'None';
+    if (val === null || val === undefined) return 'None';
     if (val === true) return 'True';
     if (val === false) return 'False';
     if (Array.isArray(val)) {
@@ -187,7 +192,8 @@ const generateTypeScriptRunner = (
     userCode: string,
     testCases: TestCase[],
     inputSchema: any[],
-    entryFunctionName?: string
+    entryFunctionName?: string,
+    options?: { unordered?: boolean; multiExpected?: boolean }
 ): string => {
     const entryInfo = findEntryFunction(userCode, 'typescript', inputSchema, entryFunctionName);
     const userFuncName = entryInfo.name;
@@ -199,7 +205,7 @@ const generateTypeScriptRunner = (
     }).join(',\n  ');
 
     return `
-/// <reference lib="es2015" />
+/// <reference lib="esnext" />
 ${userCode}
 
 // Test Runner
@@ -224,7 +230,23 @@ const results = testCases.map((tc, index) => {
     const start = Date.now();
     const actual = ${userFuncName}.apply(null, tc.input);
     const end = Date.now();
-    const passed = JSON.stringify(actual) === JSON.stringify(tc.expected);
+    
+    const isEqual = (a, b) => {
+      const normalize = (val) => {
+        if (!${!!options?.unordered}) return val;
+        if (Array.isArray(val)) return [...val].sort((x, y) => JSON.stringify(x).localeCompare(JSON.stringify(y))).map(normalize);
+        return val;
+      };
+      return JSON.stringify(normalize(a)) === JSON.stringify(normalize(b));
+    };
+
+    let passed = false;
+    if (${!!options?.multiExpected} && Array.isArray(tc.expected)) {
+        passed = tc.expected.some(variant => isEqual(actual, variant));
+    } else {
+        passed = isEqual(actual, tc.expected);
+    }
+
     return {
       status: passed ? 'pass' : 'fail',
       input: tc.input,
@@ -255,7 +277,8 @@ const generatePythonRunner = (
     userCode: string,
     testCases: TestCase[],
     inputSchema: any[],
-    entryFunctionName?: string
+    entryFunctionName?: string,
+    options?: { unordered?: boolean; multiExpected?: boolean }
 ): string => {
     const entryInfo = findEntryFunction(userCode, 'python', inputSchema, entryFunctionName);
     const userFuncName = entryInfo.name;
@@ -308,8 +331,21 @@ for tc in test_cases:
         actual = ${userFuncName}(*tc['input'])
         end = time.time()
         
-        # Compare logic (simple equality for now)
-        passed = actual == tc['expected']
+        def normalize(val):
+            if not ${!!options?.unordered}:
+                return val
+            if isinstance(val, list):
+                return sorted([normalize(x) for x in val], key=lambda x: json.dumps(x, sort_keys=True))
+            return val
+
+        def is_equal(a, b):
+            return normalize(a) == normalize(b)
+
+        passed = False
+        if ${!!options?.multiExpected} and isinstance(tc['expected'], list):
+            passed = any(is_equal(actual, variant) for variant in tc['expected'])
+        else:
+            passed = is_equal(actual, tc['expected'])
         
         sys.stdout = original_stdout # Restore stdout before appending result
         logs = captured_output.getvalue()
@@ -368,7 +404,8 @@ const generateJavaRunner = (
     userCode: string,
     testCases: TestCase[],
     inputSchema: any[],
-    entryFunctionName?: string
+    entryFunctionName?: string,
+    options?: { unordered?: boolean; multiExpected?: boolean }
 ): string => {
     // 1. Find the correct entry function using signature matching
     const entryInfo = findEntryFunction(userCode, 'java', inputSchema, entryFunctionName);
@@ -391,10 +428,11 @@ const generateJavaRunner = (
     // Helper to infer Java literal from value
     // Replaced by global formatJavaArrayLiteral for recursion support
     const toJavaLiteral = (val: any): string => {
+        if (val === null || val === undefined) return "null";
         if (Array.isArray(val)) {
             return formatJavaArrayLiteral(val);
         }
-        if (typeof val === 'string') return JSON.stringify(val);
+        if (typeof val === "string") return JSON.stringify(val);
         return String(val);
     };
 
@@ -410,6 +448,8 @@ const generateJavaRunner = (
 
         return `
         {
+            if (!first) System.out.print(",");
+            first = false;
             try {
                 long start = System.nanoTime();
                 ${entryInfo.hasSolutionClass ? `Solution sol = new Solution();` : ''}
@@ -417,43 +457,44 @@ const generateJavaRunner = (
                 long end = System.nanoTime();
                 
                 Object expected = ${expectedJavaLiteral};
-                boolean passed;
+                boolean passed = false;
                 
-                if (expected instanceof int[] && actual instanceof int[]) {
-                    passed = Arrays.equals((int[])expected, (int[])actual);
-                } else if (expected instanceof String[] && actual instanceof String[]) {
-                    passed = Arrays.equals((String[])expected, (String[])actual);
-                } else if (expected instanceof int[][] && actual instanceof int[][]) {
-                    passed = Arrays.deepEquals((int[][])expected, (int[][])actual);
-                } else if (expected instanceof String[][] && actual instanceof String[][]) {
-                    passed = Arrays.deepEquals((String[][])expected, (String[][])actual);
+                if (${!!options?.multiExpected}) {
+                    if (expected instanceof List) {
+                        List<?> variants = (List<?>) expected;
+                        for (Object variant : variants) {
+                            if (isEqual(actual, variant, ${!!options?.unordered})) {
+                                passed = true;
+                                break;
+                            }
+                        }
+                    } else if (expected != null && expected.getClass().isArray()) {
+                        int len = java.lang.reflect.Array.getLength(expected);
+                        for (int i = 0; i < len; i++) {
+                            Object variant = java.lang.reflect.Array.get(expected, i);
+                            if (isEqual(actual, variant, ${!!options?.unordered})) {
+                                passed = true;
+                                break;
+                            }
+                        }
+                    } else {
+                        passed = isEqual(actual, expected, ${!!options?.unordered});
+                    }
                 } else {
-                    passed = Objects.equals(expected, actual);
+                    passed = isEqual(actual, expected, ${!!options?.unordered});
                 }
-                
-                String formattedExpected = String.valueOf(expected);
-                if (expected instanceof int[]) formattedExpected = Arrays.toString((int[])expected);
-                if (expected instanceof String[]) formattedExpected = Arrays.toString((String[])expected);
-                if (expected instanceof int[][]) formattedExpected = Arrays.deepToString((int[][])expected);
-                if (expected instanceof String[][]) formattedExpected = Arrays.deepToString((String[][])expected);
-                
-                String formattedActual = String.valueOf(actual);
-                if (actual instanceof int[]) formattedActual = Arrays.toString((int[])actual);
-                if (actual instanceof String[]) formattedActual = Arrays.toString((String[])actual);
-                if (actual instanceof int[][]) formattedActual = Arrays.deepToString((int[][])actual);
-                if (actual instanceof String[][]) formattedActual = Arrays.deepToString((String[][])actual);
                 
                 System.out.print("{");
                 System.out.print("\\"status\\":\\"" + (passed ? "pass" : "fail") + "\\",");
-                System.out.print("\\"expected\\":" + formattedExpected + ",");
-                System.out.print("\\"actual\\":" + formattedActual + ",");
+                System.out.print("\\"expected\\":" + toJson(expected) + ",");
+                System.out.print("\\"actual\\":" + toJson(actual) + ",");
                 System.out.print("\\"time\\":" + ((end - start) / 1000000.0));
-                System.out.print("},");
+                System.out.print("}");
             } catch (Exception e) {
                 System.out.print("{");
                 System.out.print("\\"status\\":\\"error\\",");
-                System.out.print("\\"error\\":\\"" + e.toString().replace("\\"", "\\\\\\"") + "\\"");
-                System.out.print("},");
+                System.out.print("\\"error\\":\\"" + e.toString().replace("\\\"", "\\\\\\\"") + "\\"");
+                System.out.print("}");
             }
         }`;
     }).join('\n');
@@ -465,11 +506,95 @@ import java.util.HashSet;
 public class Main {
     ${userCodeClean}
 
+    private static Object normalize(Object obj, boolean unordered) {
+        if (!unordered || obj == null) return obj;
+        if (obj instanceof List) {
+            List<Object> list = new ArrayList<>((List<?>) obj);
+            for (int i = 0; i < list.size(); i++) {
+                list.set(i, normalize(list.get(i), unordered));
+            }
+            list.sort((a, b) -> toJson(a).compareTo(toJson(b)));
+            return list;
+        }
+        if (obj.getClass().isArray()) {
+            if (obj instanceof int[]) {
+                int[] arr = (int[]) obj;
+                Arrays.sort(arr);
+                return arr;
+            }
+            if (obj instanceof Object[]) {
+                Object[] arr = (Object[]) obj;
+                for (int i = 0; i < arr.length; i++) {
+                    arr[i] = normalize(arr[i], unordered);
+                }
+                Arrays.sort(arr, (a, b) -> toJson(a).compareTo(toJson(b)));
+                return arr;
+            }
+        }
+        return obj;
+    }
+
+    private static boolean isEqual(Object a, Object b, boolean unordered) {
+        if (unordered) {
+            // Primitive arrays need careful handling for sorting
+            if (a instanceof int[] && b instanceof int[]) {
+                int[] aArr = ((int[]) a).clone();
+                int[] bArr = ((int[]) b).clone();
+                Arrays.sort(aArr);
+                Arrays.sort(bArr);
+                return Arrays.equals(aArr, bArr);
+            }
+            // For others, use normalization (List/Object[])
+            return toJson(normalize(a, true)).equals(toJson(normalize(b, true)));
+        }
+        
+        if (a instanceof int[] && b instanceof int[]) return Arrays.equals((int[]) a, (int[]) b);
+        if (a instanceof Object[] && b instanceof Object[]) return Arrays.deepEquals((Object[]) a, (Object[]) b);
+        return Objects.equals(a, b);
+    }
+
+    private static String toJson(Object obj) {
+        if (obj == null) return "null";
+        if (obj instanceof String) return "\\"" + ((String) obj).replace("\\\\", "\\\\\\\\").replace("\\"", "\\\\\\"") + "\\\"";
+        if (obj instanceof Character) return "\\"" + obj + "\\\"";
+        if (obj instanceof Boolean || obj instanceof Number) return String.valueOf(obj);
+        if (obj instanceof int[]) return Arrays.toString((int[]) obj);
+        if (obj instanceof long[]) return Arrays.toString((long[]) obj);
+        if (obj instanceof double[]) return Arrays.toString((double[]) obj);
+        if (obj instanceof boolean[]) return Arrays.toString((boolean[]) obj);
+        if (obj instanceof char[]) {
+            char[] arr = (char[]) obj;
+            StringBuilder sb = new StringBuilder("[");
+            for (int i = 0; i < arr.length; i++) {
+                sb.append("\\"").append(arr[i]).append("\\"").append(i == arr.length - 1 ? "" : ",");
+            }
+            return sb.append("]").toString();
+        }
+        if (obj instanceof Object[]) {
+            Object[] arr = (Object[]) obj;
+            StringBuilder sb = new StringBuilder("[");
+            for (int i = 0; i < arr.length; i++) {
+                sb.append(toJson(arr[i])).append(i == arr.length - 1 ? "" : ",");
+            }
+            return sb.append("]").toString();
+        }
+        if (obj instanceof List) {
+            List<?> list = (List<?>) obj;
+            StringBuilder sb = new StringBuilder("[");
+            for (int i = 0; i < list.size(); i++) {
+                sb.append(toJson(list.get(i))).append(i == list.size() - 1 ? "" : ",");
+            }
+            return sb.append("]").toString();
+        }
+        return "\\"" + String.valueOf(obj).replace("\\\\", "\\\\\\\\").replace("\\"", "\\\\\\"") + "\\\"";
+    }
+
     public static void main(String[] args) {
         System.out.println("___TEST_RESULTS_START___");
         System.out.print("[");
+        boolean first = true;
         ${testCalls}
-        System.out.print("{}]"); // Dummy last element to handle trailing comma
+        System.out.print("]");
         System.out.println();
         System.out.println("___TEST_RESULTS_END___");
     }
@@ -481,7 +606,8 @@ const generateCppRunner = (
     userCode: string,
     testCases: TestCase[],
     inputSchema: any[],
-    entryFunctionName?: string
+    entryFunctionName?: string,
+    options?: { unordered?: boolean; multiExpected?: boolean }
 ): string => {
     const entryInfo = findEntryFunction(userCode, 'cpp', inputSchema, entryFunctionName);
     const userFuncName = entryInfo.name;
@@ -560,6 +686,7 @@ const generateCppRunner = (
 
     // Helper to format C++ literal, with type hint for char handling
     const formatCppLiteral = (val: any, isChar: boolean = false): string => {
+        if (val === null || val === undefined) return "{}"; // Default for vectors/objects
         if (Array.isArray(val)) {
             const inner = val.map(v => formatCppLiteral(v, isChar)).join(', ');
             return `{${inner}}`;
@@ -628,18 +755,64 @@ const generateCppRunner = (
 
         return `
         {
-            ${inputDecls}
-            ${expectedDecl}
-            ${entryInfo.hasSolutionClass ? 'Solution sol;' : ''}
-            auto actual = ${entryInfo.hasSolutionClass ? 'sol.' : ''}${userFuncName}(${args});
-            
-            bool passed = (expected == actual);
-            
-            cout << "{" 
-                 << "\\"status\\":\\"" << (passed ? "pass" : "fail") << "\\","
-                 << "\\"expected\\":" << expected << ","
-                 << "\\"actual\\":" << actual
-                 << "},";
+            if (!first) cout << ",";
+            first = false;
+            try {
+                ${inputDecls}
+                ${expectedDecl}
+                ${entryInfo.hasSolutionClass ? 'Solution sol;' : ''}
+                auto start = chrono::high_resolution_clock::now();
+                auto actual = ${entryInfo.hasSolutionClass ? 'sol.' : ''}${userFuncName}(${args});
+                auto end = chrono::high_resolution_clock::now();
+                chrono::duration<double, milli> duration = end - start;
+                
+                auto is_equal = [&](auto a, auto b) {
+                    if constexpr (${!!options?.unordered}) {
+                        auto a_norm = a;
+                        auto b_norm = b;
+                        // Basic sort if it's a vector
+                        if constexpr (is_vector_v<decltype(a)>) {
+                            sort(a_norm.begin(), a_norm.end());
+                            sort(b_norm.begin(), b_norm.end());
+                        }
+                        return a_norm == b_norm;
+                    } else {
+                        return a == b;
+                    }
+                };
+
+                bool passed = false;
+                if constexpr (${!!options?.multiExpected}) {
+                    // For C++, variants would likely be in a vector
+                    // We need a helper to iterate if expected is a vector of variants
+                    // However, determing if expected is variants vs single output is tricky in C++
+                    // Let's assume for now expected is a vector of variants if multiExpected is true
+                    // For C++, variants are in a vector if multiExpected is true
+                    // and we generated it from an array.
+                    // If expected is a vector, we iterate it.
+                    if constexpr (is_vector_v<decltype(expected)>) {
+                        for (const auto& variant : expected) {
+                            if (is_equal(actual, variant)) {
+                                passed = true;
+                                break;
+                            }
+                        }
+                    } else {
+                         passed = is_equal(actual, expected);
+                    }
+                } else {
+                    passed = is_equal(actual, expected);
+                }
+                
+                cout << "{" 
+                     << "\\"status\\":\\"" << (passed ? "pass" : "fail") << "\\","
+                     << "\\"expected\\":" << toJson(expected) << ","
+                     << "\\"actual\\":" << toJson(actual) << ","
+                     << "\\"time\\":" << duration.count()
+                     << "}";
+            } catch (...) {
+                cout << "{\\"status\\":\\"error\\",\\"error\\":\\"Unknown Error\\"}";
+            }
         }
     `;
     }).join('\n');
@@ -656,18 +829,38 @@ const generateCppRunner = (
 #include <bitset>
 #include <queue>
 #include <unordered_map>
+#include <type_traits>
+#include <chrono>
 using namespace std;
 
-// Helper to print vectors
+// Type traits for vector detection
+template<typename T> struct is_vector : false_type {};
+template<typename T, typename A> struct is_vector<vector<T, A>> : true_type {};
+template<typename T> inline constexpr bool is_vector_v = is_vector<T>::value;
+
+// Helper to convert values to JSON strings
 template<typename T>
-ostream& operator<<(ostream& os, const vector<T>& v) {
-    os << "[";
-    for (size_t i = 0; i < v.size(); ++i) {
-        os << v[i];
-        if (i != v.size() - 1) os << ", ";
+string toJson(const T& v) {
+    if constexpr (is_same_v<T, string>) {
+        return "\\"" + v + "\\"";
+    } else if constexpr (is_same_v<T, char>) {
+        return string("\\"") + v + "\\"";
+    } else if constexpr (is_same_v<T, bool>) {
+        return v ? "true" : "false";
+    } else {
+        return to_string(v);
     }
-    os << "]";
-    return os;
+}
+
+template<typename T>
+string toJson(const vector<T>& v) {
+    string res = "[";
+    for (size_t i = 0; i < v.size(); ++i) {
+        res += toJson(v[i]);
+        if (i != v.size() - 1) res += ",";
+    }
+    res += "]";
+    return res;
 }
 
 ${userCode}
@@ -675,8 +868,10 @@ ${userCode}
 int main() {
     cout << "___TEST_RESULTS_START___" << endl;
     cout << "[";
+    bool first = true;
     ${testCalls}
-    cout << "{}]" << endl; // Dummy last element to handle comma
+    cout << "]";
+    cout << endl;
     cout << "___TEST_RESULTS_END___" << endl;
     return 0;
 }

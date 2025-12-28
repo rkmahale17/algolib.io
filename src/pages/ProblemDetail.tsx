@@ -15,6 +15,7 @@ import { CodeRunnerRef } from "@/components/CodeRunner/CodeRunner";
 import { AlgorithmHeader } from "@/components/algorithm/AlgorithmHeader";
 import { ProblemDescriptionPanel } from "@/components/algorithm/ProblemDescriptionPanel";
 import { CodeWorkspacePanel } from "@/components/algorithm/CodeWorkspacePanel";
+import { Paywall } from "@/components/Paywall";
 
 // New Hooks
 import { useAlgorithmLayout } from "@/hooks/useAlgorithmLayout";
@@ -22,6 +23,8 @@ import { useInterviewSession } from "@/hooks/useInterviewSession";
 import { useAlgorithmInteractions } from "@/hooks/useAlgorithmInteractions";
 import { useUserAlgorithmData } from "@/hooks/useUserAlgorithmData";
 import { useAlgorithm } from "@/hooks/useAlgorithm";
+import { useApp } from "@/contexts/AppContext";
+import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
 
 // Helper for scrolling to code section on mobile
 const scrollToCode = () => {
@@ -39,7 +42,14 @@ const ProblemDetail: React.FC = () => {
   
   // -- Data Fetching State --
   const { data: algorithm, isLoading: isLoadingAlgorithm } = useAlgorithm(algorithmIdOrSlug);
-  const [user, setUser] = useState<any>(null);
+  const { user, hasPremiumAccess } = useApp();
+  const isPaywallEnabled = useFeatureFlag('paywall_enabled');
+
+  const isPremiumAlgorithm = useMemo(() => {
+    if (!algorithm?.list_type) return false;
+    const type = algorithm.list_type.toLowerCase();
+    return type !== 'core' && type !== 'core+blind75';
+  }, [algorithm?.list_type]);
 
   // -- Hooks --
   const layout = useAlgorithmLayout();
@@ -84,17 +94,7 @@ const ProblemDetail: React.FC = () => {
 
   // -- Effects --
   
-  // 1. Auth Listener
-  useEffect(() => {
-    if (!supabase) return;
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-    });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-    return () => subscription.unsubscribe();
-  }, []);
+  // 1. Auth Listener - Removed as it's now handled by AppContext
 
   // 2. Set Likes/Dislikes Initial State from Algorithm Data
   useEffect(() => {
@@ -168,6 +168,11 @@ const ProblemDetail: React.FC = () => {
     return <PremiumLoader text="Fetching Algorithm Details" />;
   }
 
+  // Paywall Logic
+  if (isPaywallEnabled && isPremiumAlgorithm && !hasPremiumAccess) {
+    return <Paywall />;
+  }
+
 
 
   // Not Found
@@ -226,8 +231,7 @@ const ProblemDetail: React.FC = () => {
       />
 
       <div className={`flex-1 relative ${showHorizontalScroll ? 'overflow-x-auto overflow-y-hidden' : 'overflow-hidden'}`}>
-         
-         {(algorithm?.controls as any)?.maintenance_mode ? (
+        {(algorithm?.controls as any)?.maintenance_mode ? (
             <div className="h-full w-full flex flex-col items-center justify-center bg-card/30 backdrop-blur-sm p-4 text-center space-y-6 animate-in fade-in zoom-in duration-500">
               <div className="relative">
                  <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping opacity-20" />

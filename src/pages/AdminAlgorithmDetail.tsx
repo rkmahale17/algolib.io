@@ -10,11 +10,11 @@ export default function AdminAlgorithmDetail() {
   const { data: algorithm, isLoading, error } = useAlgorithm(id || '');
 
   const handleCancel = () => {
-    navigate('/admin/algorithms');
+    navigate('/admin/problems');
   };
 
   const handleSuccess = () => {
-    navigate('/admin/algorithms');
+    navigate('/admin/problems');
   };
 
   if (id && isLoading) {
@@ -31,7 +31,7 @@ export default function AdminAlgorithmDetail() {
         <h1 className="text-2xl font-bold text-destructive">Error loading algorithm</h1>
         <p className="text-muted-foreground">{error.message}</p>
         <button
-          onClick={() => navigate('/admin/algorithms')}
+          onClick={() => navigate('/admin/problems')}
           className="mt-4 text-primary hover:underline"
         >
           Back to list
