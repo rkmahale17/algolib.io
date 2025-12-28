@@ -19,13 +19,20 @@ Deno.serve(async (req) => {
     }
 
     const payload = await req.text()
-    const headers = Object.fromEntries(req.headers)
+
+    // Extract specific webhook headers
+    const webhookHeaders = {
+        'webhook-id': req.headers.get('webhook-id') || '',
+        'webhook-signature': req.headers.get('webhook-signature') || '',
+        'webhook-timestamp': req.headers.get('webhook-timestamp') || '',
+    }
 
     // Verify webhook signature if secret is provided
     if (dodoWebhookSecret) {
         try {
             const wh = new Webhook(dodoWebhookSecret)
-            wh.verify(payload, headers)
+            // Verify using the raw text payload and structured headers
+            wh.verify(payload, webhookHeaders)
         } catch (err) {
             console.error('Webhook verification failed:', err)
             return new Response('Invalid signature', { status: 401 })

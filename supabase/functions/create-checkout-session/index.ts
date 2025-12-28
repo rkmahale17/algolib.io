@@ -12,8 +12,10 @@ serve(async (req) => {
     }
 
     try {
-        const { productId, customerEmail } = await req.json()
+        const { productId: reqProductId, customerEmail } = await req.json()
         const dodoApiKey = Deno.env.get('DODO_API_KEY')
+        const envProductId = Deno.env.get('DODO_PRODUCT_ID')
+        const productId = envProductId || reqProductId
 
         if (!dodoApiKey) {
             throw new Error('DODO_API_KEY is not set')
@@ -24,7 +26,8 @@ serve(async (req) => {
         const isTest = dodoApiKey.startsWith('zxx') || dodoApiKey.startsWith('test')
         const baseUrl = isTest ? 'https://test.dodopayments.com' : 'https://live.dodopayments.com'
 
-        console.log(`Creating Dodo checkout session for product: ${productId} and user: ${customerEmail}`)
+        console.log(`Environment: ${isTest ? 'TEST' : 'LIVE'} (Key starts with: ${dodoApiKey.substring(0, 8)}...)`)
+        console.log(`Creating Dodo session at ${baseUrl} for product: ${productId} (User: ${customerEmail})`)
 
         const response = await fetch(`${baseUrl}/v1/checkout-sessions`, {
             method: 'POST',
@@ -50,11 +53,20 @@ serve(async (req) => {
             }),
         })
 
-        const data = await response.json()
+        let data;
+        const responseText = await response.text();
+
+        try {
+            data = JSON.parse(responseText);
+        } catch (e) {
+            console.error('Failed to parse Dodo response as JSON:', responseText);
+            throw new Error(`Invalid response from Dodo: ${response.statusText}`);
+        }
 
         if (!response.ok) {
-            console.error('Dodo API Error:', data)
-            throw new Error(data.message || 'Failed to create Dodo checkout session')
+            console.error('Dodo API Error Status:', response.status);
+            console.error('Dodo API Error Body:', responseText);
+            throw new Error(data.message || `Dodo API Error: ${response.statusText}`);
         }
 
         return new Response(
