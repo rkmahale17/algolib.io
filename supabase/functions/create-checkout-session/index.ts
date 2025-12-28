@@ -29,7 +29,7 @@ serve(async (req) => {
         console.log(`Environment: ${isTest ? 'TEST' : 'LIVE'} (Key starts with: ${dodoApiKey.substring(0, 8)}...)`)
         console.log(`Creating Dodo session at ${baseUrl} for product: ${productId} (User: ${customerEmail})`)
 
-        const response = await fetch(`${baseUrl}/v1/checkout-sessions`, {
+        const response = await fetch(`${baseUrl}/checkouts`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${dodoApiKey}`,
