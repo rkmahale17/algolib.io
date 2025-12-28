@@ -50,58 +50,82 @@ function inferReturnType(functionName: string, language: Language): string {
 
 // Map input type to language-specific type
 function mapType(type: string, language: Language): string {
+    const rawType = type.toLowerCase();
+    const is2D = rawType.includes('[][]') || rawType.endsWith('2d');
+    const is1D = (rawType.includes('[]') || rawType.endsWith('array')) && !is2D;
+
+    // Normalize shorthand
+    let base = rawType.replace(/[\[\]\d]/g, '');
+    if (base === 'n') base = 'number';
+    if (base === 's') base = 'string';
+    if (base === 'b') base = 'boolean';
+    if (base === 'c') base = 'char';
+
     const typeMap: Record<Language, Record<string, string>> = {
         typescript: {
             'number': 'number',
-            'number[]': 'number[]',
             'string': 'string',
-            'boolean': 'boolean'
+            'boolean': 'boolean',
+            'char': 'string'
         },
         python: {
             'number': 'int',
-            'number[]': 'List[int]',  // Use List[int] for Python 3.8 compatibility
             'string': 'str',
-            'boolean': 'bool'
+            'boolean': 'bool',
+            'char': 'str'
         },
         cpp: {
             'number': 'int',
-            'number[]': 'vector<int>&',
             'string': 'string',
-            'boolean': 'bool'
+            'boolean': 'bool',
+            'char': 'char'
         },
         java: {
             'number': 'int',
-            'number[]': 'int[]',
             'string': 'String',
-            'boolean': 'boolean'
+            'boolean': 'boolean',
+            'char': 'char'
         }
     };
 
-    return typeMap[language][type] || type;
+    let mappedBase = typeMap[language][base] || base;
+
+    if (is2D) {
+        if (language === 'typescript') return `${mappedBase}[][]`;
+        if (language === 'python') return `List[List[${mappedBase}]]`;
+        if (language === 'cpp') return `vector<vector<${mappedBase}>>&`;
+        if (language === 'java') return `${mappedBase}[][]`;
+    }
+
+    if (is1D) {
+        if (language === 'typescript') return `${mappedBase}[]`;
+        if (language === 'python') return `List[${mappedBase}]`;
+        if (language === 'cpp') return `vector<${mappedBase}>&`;
+        if (language === 'java') return `${mappedBase}[]`;
+    }
+
+    return mappedBase;
 }
 
 // Format value for language-specific syntax
 function formatValue(value: any, type: string, language: Language): string {
-    if (type === 'number' || type === 'boolean') {
+    if (Array.isArray(value)) {
+        const inner = value.map(v => formatValue(v, type.replace('[]', ''), language)).join(', ');
+        if (language === 'java' || language === 'cpp') return `{${inner}}`;
+        return `[${inner}]`;
+    }
+
+    const rawType = type.toLowerCase();
+    if (rawType.includes('string') || rawType.includes('s')) {
+        return JSON.stringify(value);
+    }
+    if (rawType.includes('char') || rawType.includes('c')) {
+        if (language === 'python' || language === 'typescript') return JSON.stringify(value);
+        return `'${value}'`;
+    }
+    if (rawType.includes('boolean') || rawType.includes('b')) {
+        if (language === 'python') return value ? 'True' : 'False';
         return String(value);
-    }
-
-    if (type === 'string') {
-        return `"${value}"`;
-    }
-
-    if (type === 'number[]') {
-        const arr = Array.isArray(value) ? value : JSON.parse(value);
-
-        if (language === 'java') {
-            return `{${arr.join(', ')}}`;
-        } else if (language === 'cpp') {
-            return `{${arr.join(', ')}}`;
-        } else if (language === 'python') {
-            return `[${arr.join(', ')}]`;
-        } else {
-            return `[${arr.join(', ')}]`;
-        }
     }
 
     return String(value);

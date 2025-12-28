@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrayEditor } from "./ArrayEditor";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { X } from "lucide-react";
 import { useState } from "react";
 
@@ -15,6 +16,8 @@ interface MetadataData {
   visualizationUrl: string;
   likes?: number;
   dislikes?: number;
+  unordered?: boolean;
+  multi_expected?: boolean;
 }
 
 interface MetadataEditorProps {
@@ -67,6 +70,42 @@ export function MetadataEditor({ data, onChange }: MetadataEditorProps) {
             placeholder="High-level overview of the algorithm..."
             rows={4}
           />
+        </CardContent>
+      </Card>
+
+      {/* Test Comparison Options */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Test Comparison Options</CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-2 gap-6">
+            <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                    <Label htmlFor="unordered-toggle" className="font-semibold">Unordered Comparison</Label>
+                    <Switch 
+                        id="unordered-toggle" 
+                        checked={data.unordered || false} 
+                        onCheckedChange={(val) => updateField("unordered", val)} 
+                    />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                    If enabled, array results will be sorted before comparison. Useful for problems like "Find All Subsets" where order doesn't matter.
+                </p>
+            </div>
+
+            <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                    <Label htmlFor="multi-expected-toggle" className="font-semibold">Multiple Valid Outputs</Label>
+                    <Switch 
+                        id="multi-expected-toggle" 
+                        checked={data.multi_expected || false} 
+                        onCheckedChange={(val) => updateField("multi_expected", val)} 
+                    />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                    If enabled, "expectedOutput" should be an array of valid results. Code passes if actual matches ANY variant.
+                </p>
+            </div>
         </CardContent>
       </Card>
 

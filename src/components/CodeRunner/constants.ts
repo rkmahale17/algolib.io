@@ -31,9 +31,9 @@ int main() {
 };
 
 export const LANGUAGE_IDS: Record<Language, number> = {
-    cpp: 54, // C++ (GCC 9.2.0)
-    java: 62, // Java (OpenJDK 13.0.1)
-    python: 71, // Python (3.8.1)
-    typescript: 74, // TypeScript (3.7.4)
+    cpp: 105, // C++ (GCC 14.1.0)
+    java: 91, // Java (OpenJDK 17.0.6)
+    python: 109, // Python (3.13.2)
+    typescript: 101, // TypeScript (5.6.2)
 };
 

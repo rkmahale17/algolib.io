@@ -44,11 +44,15 @@ const Blog = lazy(() => import("./pages/Blog"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const AdminFeatureFlags = lazy(() => import("./pages/AdminFeatureFlags"));
 const AdminSimulator = lazy(() => import("./pages/AdminSimulator"));
+const CompilerDocs = lazy(() => import("./pages/CompilerDocs"));
+const Pricing = lazy(() => import("./pages/Pricing"));
+
+import { DodoPayments } from 'dodopayments-checkout';
 
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { ProtectedAdminRoute } from "./components/ProtectedAdminRoute";
 import { FeatureProtectedRoute } from "./components/FeatureProtectedRoute";
-import { AppProvider } from "./contexts/AppContext";
+import { AppProvider, useApp } from "./contexts/AppContext";
 // import ComplexityCard from "./components/complexity/ComplexityCard"; // Unused in routes currently, checking usage
 
 const queryClient = new QueryClient();
@@ -71,6 +75,7 @@ import MaintenancePage from "./pages/MaintenancePage"; // Added MaintenancePage
 
 const AppContent = () => {
   const { flags, isLoading: isLoadingFlags } = useFeatureFlags();
+  const { refreshProfile, user } = useApp();
   const isMaintenanceMode = flags['maintenance_mode'] ?? false;
   const location = useLocation();
   const queryClient = useQueryClient();
@@ -83,9 +88,23 @@ const AppContent = () => {
     queryClient.prefetchQuery({
       queryKey: ["algorithms", undefined, undefined],
       queryFn: () => fetchAlgorithms(),
-      staleTime: 1000 * 60 * 5,
+      staleTime: 1000 * 60 * 60 * 12, // 12 hours
     });
   }, [queryClient, isLoadingFlags]);
+
+  // Initialize Dodo Payments
+  useEffect(() => {
+    DodoPayments.Initialize({
+      mode: 'test',
+      onEvent: (event: any) => {
+        console.log('Dodo Event:', event);
+        const eventType = event.eventType || event.event_type;
+        if (eventType === 'checkout.closed' || eventType === 'payment.succeeded') {
+           refreshProfile();
+        }
+      }
+    });
+  }, [user?.id, refreshProfile]);
 
   const isMaintenanceActive = isMaintenanceMode && !location.pathname.startsWith('/admin');
 
@@ -120,6 +139,7 @@ const AppContent = () => {
                     </FeatureProtectedRoute>
                   } />
                   <Route path="/problems" element={<Problems />} />
+                  <Route path="/pricing" element={<Pricing />} />
                 <Route path="/login" element={<Auth />} />
                 <Route path="/feedback" element={<Feedback />} />
                 <Route path="/about" element={<About />} />
@@ -127,6 +147,7 @@ const AppContent = () => {
                 <Route path="/terms" element={<TermsOfService />} />
                 <Route path="/content-rights" element={<ContentRights />} />
                 <Route path="/complexity" element={<TimeComplexity />} />
+                <Route path="/docs" element={<CompilerDocs />} />
                 <Route path="/games" element={
                   <FeatureProtectedRoute flag="algo_games">
                     <ProtectedRoute><Games /></ProtectedRoute>
@@ -170,17 +191,17 @@ const AppContent = () => {
                 <Route path="/blog/:slug" element={<BlogPost />} />
                 <Route path="/blog" element={<Blog />} />
 
-                <Route path="/admin/algorithms" element={
+                <Route path="/admin/problems" element={
                   <ProtectedAdminRoute>
                     <AdminAlgorithms />
                   </ProtectedAdminRoute>
                 } />
-                <Route path="/admin/algorithms/new" element={
+                <Route path="/admin/problem/new" element={
                   <ProtectedAdminRoute>
                     <AdminAlgorithmDetail />
                   </ProtectedAdminRoute>
                 } />
-                <Route path="/admin/algorithm/:id" element={
+                <Route path="/admin/problem/:id" element={
                   <ProtectedAdminRoute>
                     <AdminAlgorithmDetail />
                   </ProtectedAdminRoute>

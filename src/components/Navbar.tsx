@@ -14,6 +14,9 @@ import {
   MessageSquare,
   ShieldCheck,
   User,
+  Crown,
+  Timer,
+  Info,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -28,9 +31,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { FeatureGuard } from "./FeatureGuard";
 import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
+import { useApp } from "@/contexts/AppContext";
+import { Badge } from "./ui/badge";
 
 const Navbar = () => {
   const [user, setUser] = useState<any>(null);
+  const { profile, hasPremiumAccess } = useApp();
   const location = useLocation();
   const isAuthPage = location.pathname === "/login";
   const adminId = import.meta.env.VITE_ADMIN_USER_ID;
@@ -101,6 +107,12 @@ const Navbar = () => {
               Blog
             </Link>
             <Link
+              to="/docs"
+              className="text-sm font-medium hover:text-primary transition-colors"
+            >
+              Docs
+            </Link>
+            <Link
               to="/feedback"
               className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1.5"
             >
@@ -127,6 +139,14 @@ const Navbar = () => {
               <Github className="w-4 h-4" />
               GitHub
             </a>
+
+            <Link
+              to="/pricing"
+              className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1.5"
+            >
+              <Crown className="w-4 h-4 text-amber-500" />
+              Pricing
+            </Link>
           </div>
 
           {/* Right side */}
@@ -152,6 +172,11 @@ const Navbar = () => {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
+                  <Link to="/docs" className="cursor-pointer">
+                    Docs
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link
                     to="/feedback"
                     className="flex items-center gap-2 cursor-pointer"
@@ -174,6 +199,16 @@ const Navbar = () => {
                 )}
 
                 <DropdownMenuItem asChild>
+                  <Link
+                    to="/pricing"
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <Crown className="w-4 h-4 text-amber-500" />
+                    Pricing
+                  </Link>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem asChild>
                   <a
                     href="https://github.com/rkmahale17/algolib.io"
                     target="_blank"
@@ -190,6 +225,24 @@ const Navbar = () => {
             <ThemeToggle />
             {user && !isAuthPage ? (
               <>
+                {profile?.subscription_status === 'trialing' && profile.trial_end_date && (
+                  <div className="hidden md:flex items-center gap-2 mr-2 animate-in fade-in slide-in-from-right-4">
+                    <Badge variant="outline" className="text-[10px] font-bold py-0 h-6 gap-1 border-primary/20 bg-primary/5 text-primary">
+                      <Timer className="w-3 h-3" />
+                      {Math.ceil((new Date(profile.trial_end_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} DAYS LEFT
+                    </Badge>
+                  </div>
+                )}
+                
+                {profile?.subscription_status === 'active' && (
+                   <div className="hidden md:flex items-center gap-2 mr-2">
+                    <Badge variant="outline" className="text-[10px] font-bold py-0 h-6 gap-1 border-amber-500/20 bg-amber-500/5 text-amber-600">
+                      <Crown className="w-3 h-3" />
+                      PREMIUM
+                    </Badge>
+                  </div>
+                )}
+
                 {/* User menu */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

@@ -5,6 +5,7 @@ import {
   Gamepad2,
   ListChecks,
   Layers,
+  Lock,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,9 @@ import { Card } from "@/components/ui/card";
 import React from 'react';
 import { Link } from "react-router-dom";
 import { FeatureGuard } from "./FeatureGuard";
+import { useApp } from "@/contexts/AppContext";
+import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
+import { Badge as UiBadge} from "@/components/ui/badge";
 
 const features = [
   {
@@ -56,23 +60,24 @@ const features = [
 ];
 
 export const FeaturedSection = () => {
+  const { hasPremiumAccess } = useApp();
+  const isPaywallEnabled = useFeatureFlag('paywall_enabled');
 
   return (
     <section className="py-12 px-4">
-      <div className="container mx-auto max-w-5xl">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 place-items-center">
+      <div className="container mx-auto max-w-6xl">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 place-items-stretch">
           {features.map((feature, index) => {
             const Icon = feature.icon;
-            const isFirstCard = index === 0;
 
             const cardContent = (
               <Link
                 key={feature.id}
                 to={feature.link}
-                className="group block w-full"
+                className="group block h-full mx-auto w-full max-w-[300px]"
               >
-                <Card className="overflow-hidden  border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg bg-card max-w-72">
-                  <div className="relative h-32 bg-gradient-to-br from-primary/40 to-primary/5 flex items-center justify-center overflow-hidden">
+                <Card className="h-full overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg bg-card flex flex-col">
+                  <div className="relative h-32 bg-gradient-to-br from-primary/40 to-primary/5 flex items-center justify-center shrink-0 overflow-hidden">
                     {feature.badge ? (
                       <div className="text-6xl font-bold text-primary/80 group-hover:text-primary/60 transition-all duration-500 group-hover:scale-110 ">
                         {feature.badge}
@@ -82,22 +87,31 @@ export const FeaturedSection = () => {
                         <Icon className="w-16 h-16 text-primary/80 group-hover:text-primary/60 transition-colors duration-300 group-hover:scale-110 transform" />
                       )
                     )}
+
+                    {isPaywallEnabled && feature.id !== 'core-patterns' && feature.id !== 'blog' && !hasPremiumAccess && (
+                      <div className="absolute top-2 right-2">
+                        <UiBadge variant="secondary" className="bg-background/80 backdrop-blur-sm border-amber-500/50 text-amber-600 gap-1 text-[10px] font-bold">
+                          <Lock className="w-3 h-3" />
+                          PREMIUM
+                        </UiBadge>
+                      </div>
+                    )}
                   </div>
 
-                  <div className="p-5">
+                  <div className="p-5 flex-1 flex flex-col">
                     <h4 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">
                       {feature.title}
                     </h4>
 
-                    <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                    <p className="text-sm text-muted-foreground mb-6 leading-relaxed flex-1">
                       {feature.description}
                     </p>
 
-                    <div className="flex justify-end">
+                    <div className="flex justify-end mt-auto">
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="text-primary hover:text-primary hover:bg-primary/10 gap-1"
+                        className="text-primary hover:text-primary hover:bg-primary/10 gap-1 p-0 h-auto font-semibold hover:bg-transparent"
                       >
                         {feature.action}
                         <ArrowRight className="w-4 h-4" />

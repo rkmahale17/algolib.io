@@ -22,7 +22,7 @@ app.use(express.static(path.join(__dirname, 'dist')));
 // Judge0 API Proxy
 app.post('/api/execute', async (req, res) => {
   try {
-    const { language_id, source_code, stdin } = req.body;
+    const { language_id, source_code, stdin, compiler_options } = req.body;
     
     const judge0Url = process.env.JUDGE0_API_URL || 'https://judge0-ce.p.rapidapi.com/submissions';
     const judge0Key = process.env.JUDGE0_API_KEY;
@@ -46,7 +46,8 @@ app.post('/api/execute', async (req, res) => {
       data: {
         language_id,
         source_code: Buffer.from(source_code).toString('base64'),
-        stdin: stdin ? Buffer.from(stdin).toString('base64') : undefined
+        stdin: stdin ? Buffer.from(stdin).toString('base64') : undefined,
+        compiler_options: compiler_options || undefined
       }
     };
 

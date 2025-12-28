@@ -27,7 +27,7 @@ export default function AdminDashboard() {
       title: "Algorithm Management",
       description: "Create, edit, and manage algorithm coding challenges, test cases, and solutions.",
       icon: Code2,
-      path: "/admin/algorithms",
+      path: "/admin/problems",
       color: "text-blue-500",
       bgColor: "bg-blue-500/10",
       gradient: "from-blue-500/20 to-cyan-500/20"

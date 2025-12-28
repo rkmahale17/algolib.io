@@ -120,16 +120,16 @@ export function AlgorithmList() {
           >
              <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-3xl font-bold">Algorithm Management</h1>
+          <h1 className="text-3xl font-bold">Problem Management</h1>
           {!isLoading && (
             <span className="text-muted-foreground">
               Total: {filteredAlgorithms?.length || 0}
             </span>
           )}
         </div>
-        <Button onClick={() => navigate('/admin/algorithms/new')} className="gap-2">
+        <Button onClick={() => navigate('/admin/problem/new')} className="gap-2">
           <Plus className="h-4 w-4" />
-          Add Algorithm
+          Add Problem
         </Button>
       </div>
 
@@ -204,7 +204,7 @@ export function AlgorithmList() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => navigate(`/admin/algorithm/${algo.id}`)}
+                          onClick={() => navigate(`/admin/problem/${algo.id}`)}
                           className="h-8 w-8 hover:bg-muted"
                           title="Edit Algorithm"
                         >
@@ -228,7 +228,7 @@ export function AlgorithmList() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => navigate(`/admin/algorithm/${algo.id}`)}
+                          onClick={() => navigate(`/admin/problem/${algo.id}`)}
                           className="gap-2"
                         >
                           Edit

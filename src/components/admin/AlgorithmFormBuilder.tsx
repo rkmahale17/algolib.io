@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -331,13 +332,13 @@ export function AlgorithmFormBuilder({
               <div className="mb-1">
           <Button
             variant="ghost"
-            onClick={() => navigate('/admin/algorithms')}
+            onClick={() => navigate('/admin/problems')}
             className="gap-2 pl-0 hover:pl-2 transition-all"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Algorithms
+            Back to Problems
           </Button>
-          {algorithm ? "Edit Algorithm" : "Create New Algorithm"} - {algorithm?.name}
+          {algorithm ? "Edit Problem" : "Create New Problem"} - {algorithm?.name}
       </div> 
           </h2>
         
@@ -521,6 +522,43 @@ export function AlgorithmFormBuilder({
                         setFormData({ ...formData, input_schema })
                       }
                     />
+
+                    <div className="grid grid-cols-2 gap-6 p-4 border rounded-lg bg-muted/30">
+                        <div className="flex flex-col gap-2">
+                            <div className="flex items-center justify-between">
+                                <Label htmlFor="unordered-toggle" className="font-semibold">Unordered Comparison</Label>
+                                <Switch 
+                                    id="unordered-toggle" 
+                                    checked={formData.metadata?.unordered || false} 
+                                    onCheckedChange={(val) => setFormData({
+                                        ...formData,
+                                        metadata: { ...formData.metadata, unordered: val }
+                                    })} 
+                                />
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                                If enabled, array results will be sorted before comparison. Useful for problems like "Find All Subsets" where order doesn't matter.
+                            </p>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                            <div className="flex items-center justify-between">
+                                <Label htmlFor="multi-expected-toggle" className="font-semibold">Multiple Valid Outputs</Label>
+                                <Switch 
+                                    id="multi-expected-toggle" 
+                                    checked={formData.metadata?.multi_expected || false} 
+                                    onCheckedChange={(val) => setFormData({
+                                        ...formData,
+                                        metadata: { ...formData.metadata, multi_expected: val }
+                                    })} 
+                                />
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                                If enabled, "expectedOutput" should be an array of valid results. Code passes if actual matches ANY variant.
+                            </p>
+                        </div>
+                    </div>
+
                     <TestCaseEditor
                       testCases={formData.test_cases}
                       inputSchema={formData.input_schema}

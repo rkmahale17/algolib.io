@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, TrendingUp, BookOpen, CheckCircle2, Circle, MoreVertical, Timer, Database, ExternalLink } from 'lucide-react';
+import { Search, TrendingUp, BookOpen, CheckCircle2, Circle, MoreVertical, Timer, Database, ExternalLink, Lock } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ListType, LIST_TYPE_LABELS, DIFFICULTY_MAP, AlgorithmListItem } from '@/types/algorithm';
 import { useUserProgressMap } from '@/hooks/useAlgorithms';
 import { supabase } from '@/integrations/supabase/client';
+import { useApp } from '@/contexts/AppContext';
+import { useFeatureFlag } from '@/contexts/FeatureFlagContext';
 
 interface ProblemListProps {
   algorithms: AlgorithmListItem[];
@@ -59,6 +61,9 @@ export const ProblemList = ({
   const [selectedListType, setSelectedListType] = useState<string | null>(defaultListType === 'all' ? null : defaultListType);
   const [sortBy, setSortBy] = useState<string>('serial-asc');
   const [userId, setUserId] = useState<string | undefined>(undefined);
+  
+  const { hasPremiumAccess } = useApp();
+  const isPaywallEnabled = useFeatureFlag('paywall_enabled');
 
   // Get current user for progress tracking
   useEffect(() => {
@@ -261,16 +266,29 @@ export const ProblemList = ({
                         <h3 className="font-semibold text-[15px] leading-tight group-hover:text-primary transition-colors truncate">
                           {algo.displayTitle}
                         </h3>
-                        {/* Mobile-only category */}
-                        <p className="md:hidden text-[10px] text-muted-foreground mt-0.5">
-                          {algo.category} • ALGO-{(algo.serial_no || index + 1).toString().padStart(2, '0')}
-                        </p>
+                        {/* Mobile-only category and Premium Tag */}
+                        <div className="md:hidden flex items-center gap-2 mt-0.5">
+                          <p className="text-[10px] text-muted-foreground">
+                            {algo.category} • ALGO-{(algo.serial_no || index + 1).toString().padStart(2, '0')}
+                          </p>
+                          {isPaywallEnabled && algo.listType !== 'core' && algo.listType !== 'core+blind75' && !hasPremiumAccess && (
+                            <div className="flex items-center gap-0.5 text-[9px] font-bold text-amber-500 uppercase">
+                              <Lock className="w-2.5 h-2.5" />
+                              Premium
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
 
                     {/* Category Column (Desktop) */}
-                    <div className="hidden md:block w-32 shrink-0 text-xs font-medium text-muted-foreground truncate">
-                      {algo.category}
+                    <div className="hidden md:flex w-32 shrink-0 items-center gap-2">
+                       <span className="text-xs font-medium text-muted-foreground truncate">{algo.category}</span>
+                       {isPaywallEnabled && algo.listType !== 'core' && algo.listType !== 'core+blind75' && !hasPremiumAccess && (
+                         <div className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 text-[8px] font-bold uppercase ring-1 ring-amber-500/20">
+                           <Lock className="w-2 h-2" />
+                         </div>
+                       )}
                     </div>
 
                     {/* Difficulty Column */}

@@ -41,6 +41,23 @@ const AdminSimulator: React.FC = () => {
   const [simulationStats, setSimulationStats] = useState<SimulationStats>({ total: 0, passed: 0, failed: 0, skipped: 0 });
   const [searchTerm, setSearchTerm] = useState("");
   const [approachFilter, setApproachFilter] = useState("optimize"); // Default to 'optimize'
+  const [listTypeFilter, setListTypeFilter] = useState<string>("all");
+
+  // LocalStorage Persistence
+  useEffect(() => {
+    const saved = localStorage.getItem('admin_simulator_selected_algos');
+    if (saved) {
+      try {
+        setSelectedAlgos(new Set(JSON.parse(saved)));
+      } catch (e) {
+        console.error("Failed to parse selected algos from localStorage", e);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('admin_simulator_selected_algos', JSON.stringify(Array.from(selectedAlgos)));
+  }, [selectedAlgos]);
   
   // Expanded Algo State
   const [expandedAlgoId, setExpandedAlgoId] = useState<string | null>(null);
@@ -61,7 +78,7 @@ const AdminSimulator: React.FC = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('algorithms')
-        .select('id, title, category, difficulty, serial_no')
+        .select('id, title, category, difficulty, serial_no, list_type')
         .order('serial_no', { ascending: true })
         .limit(1000);
       if (error) throw error;
@@ -99,12 +116,25 @@ const AdminSimulator: React.FC = () => {
   };
 
   const toggleSelectAll = () => {
-    if (!algorithms) return;
-    if (selectedAlgos.size === algorithms.length) {
-      setSelectedAlgos(new Set());
+    if (!filteredAlgorithms) return;
+    
+    // If all currently filtered algos are selected, deselect them
+    const allFilteredSelected = filteredAlgorithms.every(a => selectedAlgos.has(a.id));
+    
+    const newSet = new Set(selectedAlgos);
+    if (allFilteredSelected) {
+      filteredAlgorithms.forEach(a => newSet.delete(a.id));
     } else {
-      setSelectedAlgos(new Set(algorithms.map(a => a.id)));
+      filteredAlgorithms.forEach(a => newSet.add(a.id));
     }
+    setSelectedAlgos(newSet);
+  };
+
+  const deselectAllFiltered = () => {
+    if (!filteredAlgorithms) return;
+    const newSet = new Set(selectedAlgos);
+    filteredAlgorithms.forEach(a => newSet.delete(a.id));
+    setSelectedAlgos(newSet);
   };
   
   // Expand/Collapse Logic
@@ -495,10 +525,12 @@ const AdminSimulator: React.FC = () => {
     addLog("Stop requested...", 'warning');
   };
   
-  const filteredAlgorithms = algorithms?.filter(a => 
-    a.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    a.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredAlgorithms = algorithms?.filter(a => {
+    const matchesSearch = a.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         a.category.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesListType = listTypeFilter === 'all' || (a.list_type || 'core') === listTypeFilter;
+    return matchesSearch && matchesListType;
+  });
 
   return (
     <div className="h-[calc(100vh-4rem)] p-6 gap-6 grid grid-cols-12 bg-background">
@@ -516,10 +548,49 @@ const AdminSimulator: React.FC = () => {
              onChange={(e) => setSearchTerm(e.target.value)}
              className="mt-2 h-8"
            />
-           <div className="flex gap-2 mt-2">
-             <Button variant="ghost" size="sm" onClick={toggleSelectAll} className="h-6 px-2 text-xs">
-                {selectedAlgos.size === algorithms?.length ? 'Deselect All' : 'Select All'}
-             </Button>
+            <div className="flex flex-col gap-2 mt-2">
+             <div className="flex gap-2">
+               <Button variant="ghost" size="sm" onClick={toggleSelectAll} className="h-6 px-2 text-xs">
+                  {filteredAlgorithms?.length && filteredAlgorithms.every(a => selectedAlgos.has(a.id)) ? 'Deselect All Filtered' : 'Select All Filtered'}
+               </Button>
+               {selectedAlgos.size > 0 && (
+                 <Button variant="ghost" size="sm" onClick={() => setSelectedAlgos(new Set())} className="h-6 px-2 text-xs text-destructive hover:text-destructive">
+                    Clear All
+                 </Button>
+               )}
+             </div>
+             
+             <div className="flex flex-wrap gap-1 items-center">
+               <span className="text-[10px] uppercase text-muted-foreground font-semibold mr-1">Lists:</span>
+               <Badge 
+                 variant={listTypeFilter === 'all' ? 'default' : 'outline'} 
+                 className="cursor-pointer text-[10px] px-1.5 py-0"
+                 onClick={() => setListTypeFilter('all')}
+               >
+                 All
+               </Badge>
+               <Badge 
+                 variant={listTypeFilter === 'core' ? 'default' : 'outline'} 
+                 className="cursor-pointer text-[10px] px-1.5 py-0"
+                 onClick={() => setListTypeFilter('core')}
+               >
+                 Core
+               </Badge>
+               <Badge 
+                 variant={listTypeFilter === 'blind75' ? 'default' : 'outline'} 
+                 className="cursor-pointer text-[10px] px-1.5 py-0"
+                 onClick={() => setListTypeFilter('blind75')}
+               >
+                 Blind 75
+               </Badge>
+               <Badge 
+                 variant={listTypeFilter === 'core+blind75' ? 'default' : 'outline'} 
+                 className="cursor-pointer text-[10px] px-1.5 py-0"
+                 onClick={() => setListTypeFilter('core+blind75')}
+               >
+                 C+B75
+               </Badge>
+             </div>
            </div>
         </CardHeader>
         <CardContent className="flex-1 p-0 overflow-hidden">

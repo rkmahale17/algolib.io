@@ -1,9 +1,10 @@
 // Global application context for state management and caching
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User } from '@supabase/supabase-js';
 import type { UserAlgorithmData } from '@/types/userAlgorithmData';
+import type { Profile } from '@/types/profile';
 import { getAllUserAlgorithmData } from '@/utils/userAlgorithmDataHelpers';
 
 interface Algorithm {
@@ -18,9 +19,11 @@ interface Algorithm {
 }
 
 interface AppContextType {
-  // Auth
+  // Auth & Profile
   user: User | null;
+  profile: Profile | null;
   isAuthLoading: boolean;
+  hasPremiumAccess: boolean;
   
   // Algorithms
   algorithms: Algorithm[];
@@ -31,6 +34,8 @@ interface AppContextType {
   userAlgorithmData: UserAlgorithmData[];
   isUserDataLoading: boolean;
   refreshUserData: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
+  activateTrial: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -45,6 +50,7 @@ interface CacheData {
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
   
   const [algorithms, setAlgorithms] = useState<Algorithm[]>([]);
@@ -52,6 +58,61 @@ export function AppProvider({ children }: { children: ReactNode }) {
   
   const [userAlgorithmData, setUserAlgorithmData] = useState<UserAlgorithmData[]>([]);
   const [isUserDataLoading, setIsUserDataLoading] = useState(false);
+
+  const fetchProfile = useCallback(async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) throw error;
+      setProfile(data as Profile);
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  }, []);
+
+  const hasPremiumAccess = React.useMemo(() => {
+    if (!profile) return false;
+    
+    if (profile.subscription_status === 'active') return true;
+    
+    // Trial access temporarily disabled for testing payment workflow
+    /*
+    if (profile.subscription_status === 'trialing' && profile.trial_end_date) {
+      return new Date(profile.trial_end_date) > new Date();
+    }
+    */
+    return false;
+  }, [profile]);
+
+  const activateTrial = async () => {
+    if (!user || !profile) return;
+    if (profile.trial_end_date) {
+      // toast.error("You have already used your trial."); // Assuming toast is available
+      console.error("You have already used your trial.");
+      return;
+    }
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        subscription_status: 'trialing',
+        trial_end_date: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString()
+      })
+      .eq('id', user.id);
+
+    if (error) {
+      // toast.error("Failed to activate trial"); // Assuming toast is available
+      console.error("Failed to activate trial", error);
+    } else {
+      // toast.success("Trial activated! Enjoy 10 days of Premium."); // Assuming toast is available
+      console.log("Trial activated! Enjoy 10 days of Premium.");
+      await fetchProfile(user.id);
+    }
+  };
 
   // Fetch algorithms from cache or database
   const fetchAlgorithms = async (forceRefresh = false) => {
@@ -139,11 +200,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      }
       setIsAuthLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      } else {
+        setProfile(null);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -187,13 +256,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const value: AppContextType = {
     user,
+    profile,
     isAuthLoading,
+    hasPremiumAccess,
     algorithms,
     isAlgorithmsLoading,
     refreshAlgorithms: () => fetchAlgorithms(true),
     userAlgorithmData,
     isUserDataLoading,
     refreshUserData: fetchUserData,
+    refreshProfile: useCallback(() => user ? fetchProfile(user.id) : Promise.resolve(), [user, fetchProfile]),
+    activateTrial,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

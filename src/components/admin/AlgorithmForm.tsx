@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,8 @@ export function AlgorithmForm({
   const [activeTab, setActiveTab] = useState("basic");
   const [jsonErrors, setJsonErrors] = useState<Record<string, string>>({});
   const [listType, setListType] = useState("coreAlgo");
+  const [unordered, setUnordered] = useState(false);
+  const [multiExpected, setMultiExpected] = useState(false);
 
   const createMutation = useCreateAlgorithm();
   const updateMutation = useUpdateAlgorithm();
@@ -67,11 +70,13 @@ export function AlgorithmForm({
   // Reset form when algorithm changes
   useEffect(() => {
     if (algorithm) {
-      // Extract listType from metadata
       const metadataObj = typeof algorithm.metadata === 'string' 
         ? JSON.parse(algorithm.metadata) 
         : algorithm.metadata;
+      
       setListType(metadataObj?.listType || "coreAlgo");
+      setUnordered(!!metadataObj?.unordered);
+      setMultiExpected(!!metadataObj?.multi_expected);
 
       reset({
         ...algorithm,
@@ -104,8 +109,11 @@ export function AlgorithmForm({
             ? algorithm.metadata
             : JSON.stringify(algorithm.metadata),
       });
+
     } else {
       setListType("coreAlgo");
+      setUnordered(false);
+      setMultiExpected(false);
       reset({
         id: "",
         name: "",
@@ -181,6 +189,8 @@ export function AlgorithmForm({
       metadata: {
         ...JSON.parse(data.metadata),
         listType: listType, // Include listType from state
+        unordered: unordered,
+        multi_expected: multiExpected,
       },
     };
 
@@ -419,6 +429,36 @@ export function AlgorithmForm({
                   {errors.test_cases?.message as string}
                 </p>
               )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-6 p-4 border rounded-lg bg-muted/30">
+                <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                        <Label htmlFor="unordered-toggle" className="font-semibold">Unordered Comparison</Label>
+                        <Switch 
+                            id="unordered-toggle" 
+                            checked={unordered} 
+                            onCheckedChange={setUnordered} 
+                        />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                        If enabled, array results will be sorted before comparison. Useful for problems like "Find All Subsets" where order doesn't matter.
+                    </p>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                        <Label htmlFor="multi-expected-toggle" className="font-semibold">Multiple Valid Outputs</Label>
+                        <Switch 
+                            id="multi-expected-toggle" 
+                            checked={multiExpected} 
+                            onCheckedChange={setMultiExpected} 
+                        />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                        If enabled, "expectedOutput" should be an array of valid results. Code passes if actual matches ANY variant.
+                    </p>
+                </div>
             </div>
 
             <div className="space-y-2">

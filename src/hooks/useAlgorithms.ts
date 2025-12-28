@@ -53,8 +53,8 @@ export const useAlgorithms = (
     return useQuery({
         queryKey: ["algorithms", search, category],
         queryFn: () => fetchAlgorithms(search, category),
-        staleTime: 1000 * 60 * 5,
-        gcTime: 1000 * 60 * 30,
+        staleTime: 1000 * 60 * 60 * 12, // 12 hours
+        gcTime: 1000 * 60 * 60 * 12, // 12 hours
         refetchOnWindowFocus: false,
         placeholderData: (previousData) => previousData,
     });
