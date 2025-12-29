@@ -2,8 +2,8 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.1'
 import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 
 const resendApiKey = Deno.env.get('RESEND_API_KEY')
-const supabaseUrl = Deno.env.get('SUPABASE_URL')
-const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+const supabaseUrl = Deno.env.get('SUPABASE_URL') || Deno.env.get('VITE_SUPABASE_URL')
+const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || Deno.env.get('VITE_SUPABASE_PUBLISHABLE_KEY')
 const dodoWebhookSecret = Deno.env.get('DODO_WEBHOOK_SECRET')
 
 const supabase = createClient(supabaseUrl!, supabaseServiceKey!)
@@ -107,6 +107,11 @@ Deno.serve(async (req) => {
                 console.log(`Unhandled event type: ${event_type}`)
         }
 
+        // Send welcome email on new subscription
+        if (event_type === 'subscription.created' || event_type === 'payment.succeeded') {
+            await sendWelcomeEmail(customerEmail)
+        }
+
         return new Response(JSON.stringify({ success: true }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 200,
@@ -116,3 +121,42 @@ Deno.serve(async (req) => {
         return new Response('Error updating profile', { status: 500 })
     }
 })
+
+async function sendWelcomeEmail(email: string) {
+    if (!resendApiKey) {
+        console.log('RESEND_API_KEY not set, skipping email')
+        return
+    }
+
+    try {
+        const res = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${resendApiKey}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                from: 'RulCode <support@rulcode.com>',
+                to: email,
+                subject: 'Welcome to RulCode Pro!',
+                html: `
+                    <h1>Welcome to RulCode Pro! 🚀</h1>
+                    <p>Thank you for subscribing. You now have full access to all algorithms and premium content.</p>
+                    <p>Start mastering algorithms today: <a href="https://rulcode.com">https://rulcode.com</a></p>
+                    <br/>
+                    <p>Happy Coding,</p>
+                    <p>The RulCode Team</p>
+                `,
+            }),
+        })
+
+        if (!res.ok) {
+            const error = await res.text()
+            console.error('Error sending email:', error)
+        } else {
+            console.log(`Welcome email sent to ${email}`)
+        }
+    } catch (e) {
+        console.error('Failed to send welcome email:', e)
+    }
+}
