@@ -241,11 +241,14 @@ const results = testCases.map((tc, index) => {
     };
 
     let passed = false;
-    if (${!!options?.multiExpected} && Array.isArray(tc.expected)) {
-        passed = tc.expected.some(variant => isEqual(actual, variant));
+    ${options?.multiExpected ? `
+    if (Array.isArray(tc.expected)) {
+        passed = (tc.expected as any[]).some(variant => isEqual(actual, variant));
     } else {
         passed = isEqual(actual, tc.expected);
-    }
+    }` : `
+    passed = isEqual(actual, tc.expected);
+    `}
 
     return {
       status: passed ? 'pass' : 'fail',
@@ -332,7 +335,7 @@ for tc in test_cases:
         end = time.time()
         
         def normalize(val):
-            if not ${!!options?.unordered}:
+            if not ${options?.unordered ? 'True' : 'False'}:
                 return val
             if isinstance(val, list):
                 return sorted([normalize(x) for x in val], key=lambda x: json.dumps(x, sort_keys=True))
@@ -342,7 +345,7 @@ for tc in test_cases:
             return normalize(a) == normalize(b)
 
         passed = False
-        if ${!!options?.multiExpected} and isinstance(tc['expected'], list):
+        if ${options?.multiExpected ? 'True' : 'False'} and isinstance(tc['expected'], list):
             passed = any(is_equal(actual, variant) for variant in tc['expected'])
         else:
             passed = is_equal(actual, tc['expected'])
@@ -750,7 +753,26 @@ const generateCppRunner = (
         const args = tc.input.map((_, i) => `arg${i}`).join(', ');
 
         // Use the common type for expected output
-        const expectedValStr = formatCppLiteral(tc.expectedOutput);
+        let expectedValStr = formatCppLiteral(tc.expectedOutput);
+
+        // Handle mismatched depth (e.g. if common type is vector<string> but this specific case is just string "foo")
+        const targetDepth = (commonExpectedType.match(/vector</g) || []).length;
+
+        const getDepth = (val: any): number => {
+            if (Array.isArray(val)) {
+                // If empty, it's at least depth 1. But checking [0] might be undefined.
+                if (val.length === 0) return 1;
+                return 1 + getDepth(val[0]);
+            }
+            return 0;
+        };
+        const valDepth = getDepth(tc.expectedOutput);
+
+        if (valDepth < targetDepth) {
+            const diff = targetDepth - valDepth;
+            expectedValStr = `${'{'.repeat(diff)}${expectedValStr}${'}'.repeat(diff)}`;
+        }
+
         const expectedDecl = `${commonExpectedType} expected = ${expectedValStr};`;
 
         return `
@@ -767,42 +789,45 @@ const generateCppRunner = (
                 chrono::duration<double, milli> duration = end - start;
                 
                 auto is_equal = [&](auto a, auto b) {
+                    using TA = decltype(a);
+                    using TB = decltype(b);
                     if constexpr (${!!options?.unordered}) {
-                        auto a_norm = a;
-                        auto b_norm = b;
-                        // Basic sort if it's a vector
-                        if constexpr (is_vector_v<decltype(a)>) {
-                            sort(a_norm.begin(), a_norm.end());
-                            sort(b_norm.begin(), b_norm.end());
+                        // ... unordered logic handling ...
+                        // For simplicity in this patch, we also guard this
+                        if constexpr (is_equality_comparable_v<TA, TB>) {
+                             auto a_norm = a;
+                             auto b_norm = b;
+                             if constexpr (is_vector_v<TA>) {
+                                 sort(a_norm.begin(), a_norm.end());
+                                 sort(b_norm.begin(), b_norm.end());
+                             }
+                             return a_norm == b_norm;
+                        } else {
+                            return false;
                         }
-                        return a_norm == b_norm;
                     } else {
-                        return a == b;
+                        if constexpr (is_equality_comparable_v<TA, TB>) {
+                            return a == b;
+                        } else {
+                            return false;
+                        }
                     }
                 };
 
                 bool passed = false;
-                if constexpr (${!!options?.multiExpected}) {
-                    // For C++, variants would likely be in a vector
-                    // We need a helper to iterate if expected is a vector of variants
-                    // However, determing if expected is variants vs single output is tricky in C++
-                    // Let's assume for now expected is a vector of variants if multiExpected is true
-                    // For C++, variants are in a vector if multiExpected is true
-                    // and we generated it from an array.
-                    // If expected is a vector, we iterate it.
-                    if constexpr (is_vector_v<decltype(expected)>) {
-                        for (const auto& variant : expected) {
-                            if (is_equal(actual, variant)) {
-                                passed = true;
-                                break;
-                            }
+                ${options?.multiExpected ? `
+                if constexpr (is_vector_v<decltype(expected)>) {
+                    for (const auto& variant : expected) {
+                        if (is_equal(actual, variant)) {
+                            passed = true;
+                            break;
                         }
-                    } else {
-                         passed = is_equal(actual, expected);
                     }
                 } else {
-                    passed = is_equal(actual, expected);
-                }
+                        passed = is_equal(actual, expected);
+                }` : `
+                 passed = is_equal(actual, expected);
+                `}
                 
                 cout << "{" 
                      << "\\"status\\":\\"" << (passed ? "pass" : "fail") << "\\","
@@ -837,6 +862,16 @@ using namespace std;
 template<typename T> struct is_vector : false_type {};
 template<typename T, typename A> struct is_vector<vector<T, A>> : true_type {};
 template<typename T> inline constexpr bool is_vector_v = is_vector<T>::value;
+
+// Type trait for equality checks
+template<typename T, typename U, typename = void>
+struct is_equality_comparable : std::false_type {};
+
+template<typename T, typename U>
+struct is_equality_comparable<T, U, std::void_t<decltype(std::declval<T>() == std::declval<U>())>> : std::true_type {};
+
+template<typename T, typename U>
+inline constexpr bool is_equality_comparable_v = is_equality_comparable<T, U>::value;
 
 // Helper to convert values to JSON strings
 template<typename T>

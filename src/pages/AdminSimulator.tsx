@@ -166,13 +166,32 @@ const AdminSimulator: React.FC = () => {
 
   // --- Execution Logic ---
 
-  const executeCode = async (code: string, language: Language, testCases: any[], schema: any[]) => {
+  const executeCode = async (code: string, language: Language, testCases: any[], schema: any[], algo: any) => {
     try {
-      const fullCode = generateTestRunner(code, language, testCases, schema);
+      const entryFunctionName = algo.function_name || algo.metadata?.function_name;
+
+      // Ensure metadata is an object (it might be a string from DB)
+      const metadata = typeof algo.metadata === 'string' 
+        ? JSON.parse(algo.metadata) 
+        : (algo.metadata || {});
+
+      const fullCode = generateTestRunner(
+        code, 
+        language, 
+        testCases, 
+        schema,
+        entryFunctionName,
+        {
+           unordered: metadata.unordered || algo.unordered,
+           multiExpected: metadata.multi_expected || algo.multi_expected
+        }
+      );
+
       const response = await axios.post('/api/execute', {
         language_id: LANGUAGE_IDS[language],
         source_code: fullCode,
-        stdin: ""
+        stdin: "",
+        compiler_options: language === 'typescript' ? "--target ES2020 --downlevelIteration" : undefined
       });
       return response.data;
     } catch (e: any) {
@@ -371,7 +390,8 @@ const AdminSimulator: React.FC = () => {
               codeBlock.code, 
               (lang as string).toLowerCase() as Language, 
               testCases, 
-              (algo.input_schema as any[])
+              (algo.input_schema as any[]),
+              algo
           );
           
           const { passed, errorMsg, failedItems } = parseResult(result);
@@ -473,7 +493,7 @@ const AdminSimulator: React.FC = () => {
              addLog(`Running ${algo.title} [${lang}/${block.codeType}]...`, 'info');
              ranAny = true;
 
-             const result = await executeCode(block.code, lang, testCases, (algo.input_schema as any[]));
+             const result = await executeCode(block.code, lang, testCases, (algo.input_schema as any[]), algo);
              const { passed, errorMsg, failedItems } = parseResult(result);
 
              if (passed) {
