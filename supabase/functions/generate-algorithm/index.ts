@@ -254,7 +254,7 @@ Deno.serve(async (req) => {
               EXCLUDE these existing approaches: ${existingApproaches.join(", ")}.
               Use strategy-based naming (e.g., "dfs", "bfs", "dp", "greedy", "two-pointer", "sliding-window", "binary-search", "sorting").
               Context from User: "${userPrompt || "Provide additional unique methods"}"`
-            : `You MUST generate MULTIPLE VIABLE APPROACHES (at least 2, MAX 4).
+            : `You MUST generate MULTIPLE VIABLE APPROACHES (at least 1, MAX 3).
               **APPROACH STRUCTURE & ORDER**:
               1. **Optimized Approach** (MUST BE FIRST) - codeType: "optimize"
                  - This is the BEST solution with optimal time/space complexity
@@ -301,7 +301,7 @@ Deno.serve(async (req) => {
                 {
                   "codeType": "${target === "add_approaches" ? 'strategy-name (e.g., "dfs", "bfs", "dp", "greedy")' : "optimize"}", 
                   "code": "FUNCTION CODE ONLY",
-                  "explanationBefore": "Detailed HTML (approx 300-500 words)",
+                  "explanationBefore": "Detailed HTML (approx 500+ words)",
                   "explanationAfter": "HTML content"
                 }
                 // ... generate ${target === "add_approaches" ? approachCount : "2-4"} approaches
