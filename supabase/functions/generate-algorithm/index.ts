@@ -301,7 +301,7 @@ Deno.serve(async (req) => {
                 {
                   "codeType": "${target === "add_approaches" ? 'strategy-name (e.g., "dfs", "bfs", "dp", "greedy")' : "optimize"}", 
                   "code": "FUNCTION CODE ONLY",
-                  "explanationBefore": "EXTREMELY DETAILED HTML (1000+ words)",
+                  "explanationBefore": "Detailed HTML (approx 300-500 words)",
                   "explanationAfter": "HTML content"
                 }
                 // ... generate ${target === "add_approaches" ? approachCount : "2-4"} approaches
@@ -447,26 +447,24 @@ Deno.serve(async (req) => {
            }
            \`\`\`
         
-        3. **Python Type Hints**: 
+        5. **Python Type Hints**: 
            - **ALWAYS use \`List\` (capital L) from typing module** for list types
            - **NEVER use \`list\` (lowercase)** for type hints
            - Examples: \`List[int]\`, \`List[str]\`, \`List[List[int]]\`
            - Include \`from typing import List\` at the top when using List types
            - Also use \`Optional\` from typing when needed: \`Optional[int]\`
         
-        4. **Detailed Comments**: **EXTREME COMMENTING REQUIRED**. 
-           - **Rule**: Explain every 1-2 lines of code with detailed inline comments
-           - **Content**: Explain *WHY* we are doing this, the logic behind it, not just what the syntax does
-           - **Style**: Use inline comments (//, #) for line-by-line explanations
-           - **Quality**: See the examples above - every significant line has a comment explaining the reasoning
+        6. **Detailed Comments**: **Extensive commenting required**. 
+           - **Rule**: Explain key logic lines with inline comments
+           - **Content**: Explain *WHY* we are doing this, the logic behind it
         
-        5. **Starter Code**: Signature ONLY. No logic. Include typing imports for Python.
+        7. **Starter Code**: Signature ONLY. No logic. Include typing imports for Python.
            - TypeScript: \`function twoSum(nums: number[], target: number): number[] {\n    \n}\`
            - Python: \`from typing import List\n\ndef twoSum(nums: List[int], target: int) -> List[int]:\n    pass\`
            - Java: \`public int[] twoSum(int[] nums, int target) {\n    \n}\`
            - C++: \`vector<int> twoSum(vector<int>& nums, int target) {\n    \n}\`
         
-        6. **Reference Code**: ${target === "add_approaches" ? "Use only if relevant to new approaches." : "If provided, use it for 'optimize' logic."}
+        8. **Reference Code**: ${target === "add_approaches" ? "Use only if relevant to new approaches." : "If provided, use it for 'optimize' logic."}
         
         
         HTML RULES (explanationBefore):
@@ -474,10 +472,10 @@ Deno.serve(async (req) => {
         ${HTML_TEMPLATE}
 
         **DETAIL LEVEL**:
-        1. **Approach Overview**: ~400-700 words. **MUST split into multiple \`<p>\` tags**. Max 60 words per paragraph.
-        2. **Intuition**: ~400-700 words. **MUST split into multiple \`<p>\` tags**. Max 60 words per paragraph. Use Analogies ("Explain like I'm 5").
-        3. **Step-by-step**: Educational. If a step is long, split it.
-        4. **General**: **STRICT RULE**: NO single paragraph should exceed 60 words. Divide and conquer the text.
+        1. **Approach Overview**: ~300-500 words. **MUST split into multiple \`<p>\` tags**. Max 60 words per paragraph.
+        2. **Intuition**: ~300-500 words. **MUST split into multiple \`<p>\` tags**. Max 60 words per paragraph. Use Analogies.
+        3. **Step-by-step**: Educational.
+        4. **General**: **STRICT RULE**: NO single paragraph should exceed 60 words.
         
         ${target === "all" ? `**COMPARISON TABLE UPDATE**: For the **Optimize** approach (which is FIRST), put the Comparison Table HTML in 'explanationAfter'.` : ""}
 
@@ -487,31 +485,42 @@ Deno.serve(async (req) => {
     console.log(`Starting Generation... Mode: ${target}, Topic: ${topic}`);
 
     let coreData = null;
-    let implsPart1 = null;
-    let implsPart2 = null;
+    let tsData = null;
+    let pyData = null;
+    let javaData = null;
+    let cppData = null;
 
     if (target === "all") {
-      [coreData, implsPart1, implsPart2] = await Promise.all([
+      [coreData, tsData, pyData, javaData, cppData] = await Promise.all([
         generateChunk(corePrompt),
-        generateChunk(implsPrompt(["typescript", "python"])),
-        generateChunk(implsPrompt(["java", "cpp"])),
+        generateChunk(implsPrompt(["typescript"])),
+        generateChunk(implsPrompt(["python"])),
+        generateChunk(implsPrompt(["java"])),
+        generateChunk(implsPrompt(["cpp"])),
       ]);
 
       if (!coreData) throw new Error("Failed to generate Core Data.");
     } else {
       // Add Approaches Mode: Only run impls chunks
-      [implsPart1, implsPart2] = await Promise.all([
-        generateChunk(implsPrompt(["typescript", "python"])),
-        generateChunk(implsPrompt(["java", "cpp"])),
+      [tsData, pyData, javaData, cppData] = await Promise.all([
+        generateChunk(implsPrompt(["typescript"])),
+        generateChunk(implsPrompt(["python"])),
+        generateChunk(implsPrompt(["java"])),
+        generateChunk(implsPrompt(["cpp"])),
       ]);
     }
 
-    if (!implsPart1 || !implsPart2) throw new Error("Failed to generate Implementations.");
+    if (!tsData || !pyData || !javaData || !cppData) throw new Error("Failed to generate Implementations.");
 
     // --- MERGE ---
     const finalJson = {
       ...(coreData || {}), // If null (add_approaches), we return empty core. Client handles merge.
-      implementations: [...(implsPart1.implementations || []), ...(implsPart2.implementations || [])],
+      implementations: [
+        ...(tsData.implementations || []),
+        ...(pyData.implementations || []),
+        ...(javaData.implementations || []),
+        ...(cppData.implementations || []),
+      ],
     };
 
     return new Response(JSON.stringify(finalJson), {
