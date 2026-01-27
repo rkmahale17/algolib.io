@@ -128,6 +128,9 @@ export function SmartFillDialog({ onFill, initialTopic = "", existingApproaches 
     }
   };
 
+  // Loading State
+  const [loadingStage, setLoadingStage] = useState<string>(""); // "" | "info" | "tests" | "solutions"
+
   const handleGenerate = async () => {
     if (!topic.trim()) {
       toast.error("Please enter a topic");
@@ -136,24 +139,76 @@ export function SmartFillDialog({ onFill, initialTopic = "", existingApproaches 
 
     setIsGenerating(true);
     setGeneratedData(null);
+    setLoadingStage("info");
 
     try {
-      const { data, error } = await supabase.functions.invoke("generate-algorithm", {
-        body: { 
-            topic, 
-            referenceCode, 
-            userPrompt,
-            mode: generatorMode, 
-            target,
-            approachCount: target === 'add_approaches' ? approachCount : undefined,
-            existingApproaches: target === 'add_approaches' ? existingApproaches : []
-        },
-      });
+      let finalData: any = {};
 
-      if (error) throw error;
+      if (target === "all") {
+          // STEP 1: Info (Metadata, Description, Schema)
+          const { data: infoData, error: infoError } = await supabase.functions.invoke("generate-algorithm", {
+            body: { 
+                topic, 
+                referenceCode, 
+                userPrompt,
+                mode: generatorMode, 
+                target: "info"
+            },
+          });
+          if (infoError) throw infoError;
+          finalData = { ...infoData };
+          
+          // STEP 2: Test Cases
+          setLoadingStage("tests");
+          const { data: testData, error: testError } = await supabase.functions.invoke("generate-algorithm", {
+            body: { 
+                topic, // Context
+                mode: generatorMode,
+                target: "test_cases",
+                input_schema: finalData.input_schema // Pass schema from step 1
+            },
+          });
+          if (testError) throw testError;
+          finalData = { ...finalData, ...testData };
 
-      console.log("Generated Data:", data);
-      setGeneratedData(data);
+          // STEP 3: Solutions
+          setLoadingStage("solutions");
+          const { data: solutionsData, error: solutionsError } = await supabase.functions.invoke("generate-algorithm", {
+            body: { 
+                topic,
+                referenceCode,
+                userPrompt,
+                mode: generatorMode, 
+                target: "solutions",
+                input_schema: finalData.input_schema // Pass schema from step 1
+            },
+          });
+          if (solutionsError) throw solutionsError;
+          
+          finalData = { 
+              ...finalData, 
+              implementations: solutionsData.implementations || [] 
+          };
+
+      } else {
+          // target === 'add_approaches' (Legacy / Single Shot)
+          const { data, error } = await supabase.functions.invoke("generate-algorithm", {
+            body: { 
+                topic, 
+                referenceCode, 
+                userPrompt,
+                mode: generatorMode, 
+                target,
+                approachCount: target === 'add_approaches' ? approachCount : undefined,
+                existingApproaches: target === 'add_approaches' ? existingApproaches : []
+            },
+          });
+          if (error) throw error;
+          finalData = data;
+      }
+
+      console.log("Generated Data:", finalData);
+      setGeneratedData(finalData);
       // Ensure all selected by default on new generation
       setSelectedGroups(FIELD_GROUPS.map(g => g.id)); 
       toast.success("Algorithm generated! Please review and select fields.");
@@ -162,6 +217,7 @@ export function SmartFillDialog({ onFill, initialTopic = "", existingApproaches 
       toast.error("Failed to generate algorithm. Check console for details.");
     } finally {
       setIsGenerating(false);
+      setLoadingStage("");
     }
   };
 
@@ -230,7 +286,10 @@ export function SmartFillDialog({ onFill, initialTopic = "", existingApproaches 
                     {isGenerating ? (
                         <>
                             <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                            Generating...
+                            {loadingStage === "info" && "Info..."}
+                            {loadingStage === "tests" && "Tests..."}
+                            {loadingStage === "solutions" && "Code..."}
+                            {!loadingStage && "Generating..."}
                         </>
                     ) : (
                         <>

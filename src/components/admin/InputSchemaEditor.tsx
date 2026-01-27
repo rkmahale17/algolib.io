@@ -34,6 +34,11 @@ const FIELD_TYPES = [
   { value: "string[][]", label: "2D String Array" },
   { value: "boolean[][]", label: "2D Boolean Array" },
   { value: "object", label: "Object" },
+  { value: "ListNode", label: "Linked List (ListNode)" },
+  { value: "TreeNode", label: "Binary Tree (TreeNode)" },
+  { value: "Node", label: "Graph Node (Node)" },
+  { value: "Interval", label: "Interval" },
+  { value: "string", label: "Char (String)" },
 ];
 
 export function InputSchemaEditor({ schema, onChange }: InputSchemaEditorProps) {

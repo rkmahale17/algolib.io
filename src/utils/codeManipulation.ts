@@ -36,7 +36,7 @@ function countArguments(argsStr: string): number {
 /**
  * Strips comments from code string based on language.
  */
-function stripComments(code: string, language: Language): string {
+export function stripComments(code: string, language: Language): string {
     if (language === 'python') {
         // Python: Strip # comments and '''/""" docstrings
         // Naive stripping of docstrings (non-greedy) and hash comments
@@ -125,8 +125,8 @@ export function findEntryFunction(
                 const name = cMatch[3]; // Adjusted index due to lazy group
                 const args = cMatch[4] || "";
 
-                // Exclude keywords
-                if (/^(if|for|while|switch|catch|return)$/.test(name)) continue;
+                // Exclude keywords and known Class constructors
+                if (/^(if|for|while|switch|catch|return|Node|ListNode|TreeNode|Interval|Solution)$/.test(name)) continue;
 
                 candidates.push({
                     name: name,
