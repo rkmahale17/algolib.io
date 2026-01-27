@@ -71,11 +71,8 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link
-      rel="preconnect"
-      href="https://www.googletagmanager.com"
-      crossorigin
-    />
+    <!-- Performance optimizations: Preconnect to external domains -->
+    <link rel="preconnect" href="https://www.googletagmanager.com">
 
 
     <!-- Structured Data (JSON-LD) -->
@@ -121,43 +118,37 @@
       }
     </script>
 
-    <!-- Google tag (gtag.js) -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-B2KTX1L5TF"
-    ></script>
+    <!-- Google Tag Manager (Deferred) -->
+    <script>
+      const hostname = window.location.hostname;
+      if (hostname === 'rulcode.com' || hostname === 'www.rulcode.com') {
+        // Defer GTM loading
+        const loadGTM = () => {
+          console.log('✅ GTM loading for production domain:', hostname);
+          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer','GTM-T5ZJTVN4');
+        };
+
+        // Use requestIdleCallback if available, otherwise setTimeout
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(loadGTM, { timeout: 3000 });
+        } else {
+          setTimeout(loadGTM, 2500); 
+        }
+      } else {
+        console.log('🚫 GTM disabled for non-production domain:', hostname);
+      }
+    </script>
+    <!-- End Google Tag Manager -->
 
     <script
       async
       src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7476369512681084"
       crossorigin="anonymous"
     ></script>
-    <script>
-      // Only initialize Google Analytics on production domain (rulcode.com)
-      (function () {
-        const hostname = window.location.hostname;
-        const isProduction =
-          hostname === "rulcode.com" || hostname === "www.rulcode.com";
-
-        if (isProduction) {
-          window.dataLayer = window.dataLayer || [];
-          function gtag() {
-            dataLayer.push(arguments);
-          }
-          gtag("js", new Date());
-          gtag("config", "G-B2KTX1L5TF", { anonymize_ip: true });
-          console.log(
-            "✅ Google Analytics initialized for production domain:",
-            hostname
-          );
-        } else {
-          console.log(
-            "🚫 Google Analytics disabled for non-production domain:",
-            hostname
-          );
-        }
-      })();
-    </script>
 
 
 
@@ -168,6 +159,10 @@
   </head>
 
   <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T5ZJTVN4"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
     <base href="/" />
     <div id="root"><!--app-html--></div>
     <script type="module" src="/src/main.tsx"></script>
