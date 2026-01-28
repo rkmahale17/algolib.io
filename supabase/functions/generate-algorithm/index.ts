@@ -207,11 +207,16 @@ Deno.serve(async (req) => {
 
         TASK: Generate Code Implementations for: ${langs.join(", ")}.
         
-        ${target === "add_approaches"
-        ? `GENERATE **${approachCount} NEW** distinct approaches. 
+        ${mode === "core"
+        ? `GENERATE EXACTLY ONE APPROACH.
+           IF Reference Code is provided, use that logic.
+           ELSE use the best optimized approach for this core pattern.
+           - codeType: "optimize"`
+        : target === "add_approaches"
+          ? `GENERATE **${approachCount} NEW** distinct approaches. 
               EXCLUDE these existing approaches: ${existingApproaches.join(", ")}.
               Use strategy-based naming.`
-        : `You MUST generate MULTIPLE VIABLE APPROACHES (at least 1, MAX 3).
+          : `You MUST generate MULTIPLE VIABLE APPROACHES (at least 1, MAX 3).
               1. **Optimized Approach** (First) - codeType: "optimize"
               2. **Strategy-Based Approach** (Required) - e.g. "dfs", "bfs", "dp", "greedy"
               3. **Alternative Approaches** (Optional)`
