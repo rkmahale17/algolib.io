@@ -1,3 +1,4 @@
+import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -46,6 +47,7 @@ const AdminFeatureFlags = lazy(() => import("./pages/AdminFeatureFlags"));
 const AdminSimulator = lazy(() => import("./pages/AdminSimulator"));
 const CompilerDocs = lazy(() => import("./pages/CompilerDocs"));
 const Pricing = lazy(() => import("./pages/Pricing"));
+const AdminMail = lazy(() => import("./pages/AdminMail"));
 
 import { DodoPayments } from 'dodopayments-checkout';
 
@@ -231,6 +233,12 @@ const AppContent = () => {
                   </ProtectedAdminRoute>
                 } />
 
+                <Route path="/admin/mail" element={
+                  <ProtectedAdminRoute>
+                    <AdminMail />
+                  </ProtectedAdminRoute>
+                } />
+
                   <Route path="/profile" element={
                     <FeatureProtectedRoute flag="profiles">
                       <ProtectedRoute><ProfileEdit /></ProtectedRoute>
@@ -269,7 +277,9 @@ const App = () => {
           <Sonner />
           <ErrorBoundary>
             <BrowserRouter basename="/">
-               <AppContent />
+                <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+                   <AppContent />
+                </ThemeProvider>
             </BrowserRouter>
           </ErrorBoundary>
       </TooltipProvider>

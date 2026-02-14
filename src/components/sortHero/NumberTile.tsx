@@ -35,13 +35,13 @@ export const NumberTile = ({
         "shadow-lg hover:shadow-xl",
         isSelected && "scale-110 ring-4 ring-primary",
         isHighlighted && "ring-4 ring-yellow-500 animate-pulse",
-        isPivot && "ring-4 ring-purple-500",
+        isPivot && "ring-4 ring-blue-500",
         !isSelected && !isHighlighted && !isPivot && "bg-gradient-to-br from-primary/80 to-secondary/80 text-primary-foreground"
       )}
       style={{
         backgroundColor: isSelected ? "hsl(var(--primary))" : 
                         isHighlighted ? "hsl(var(--yellow-500))" :
-                        isPivot ? "hsl(var(--purple-500))" : undefined,
+                        isPivot ? "hsl(var(--blue-500))" : undefined,
         color: (isSelected || isHighlighted || isPivot) ? "white" : undefined,
       }}
     >

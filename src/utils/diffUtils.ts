@@ -9,6 +9,8 @@ export interface DiffPart {
  * For long strings, this might be slow, but for test case outputs it should be fine.
  */
 export function diffStrings(oldStr: string, newStr: string): DiffPart[] {
+    if (!oldStr) oldStr = "";
+    if (!newStr) newStr = "";
     const n = oldStr.length;
     const m = newStr.length;
     const dp: number[][] = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));

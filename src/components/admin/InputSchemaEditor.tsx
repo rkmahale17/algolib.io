@@ -10,6 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 
 interface SchemaField {
@@ -17,6 +19,7 @@ interface SchemaField {
   type: string;
   label: string;
   defaultValue?: any;
+  inplace?: boolean;
 }
 
 interface InputSchemaEditorProps {
@@ -34,6 +37,11 @@ const FIELD_TYPES = [
   { value: "string[][]", label: "2D String Array" },
   { value: "boolean[][]", label: "2D Boolean Array" },
   { value: "object", label: "Object" },
+  { value: "ListNode", label: "Linked List (ListNode)" },
+  { value: "TreeNode", label: "Binary Tree (TreeNode)" },
+  { value: "Node", label: "Graph Node (Node)" },
+  { value: "Interval", label: "Interval" },
+  { value: "string", label: "Char (String)" },
 ];
 
 export function InputSchemaEditor({ schema, onChange }: InputSchemaEditorProps) {
@@ -90,7 +98,7 @@ export function InputSchemaEditor({ schema, onChange }: InputSchemaEditorProps) 
             <CardContent className="pt-6">
               <div className="flex items-start gap-3">
                 <GripVertical className="h-5 w-5 text-muted-foreground mt-2 cursor-move" />
-                <div className="flex-1 grid grid-cols-3 gap-3">
+                <div className="flex-1 grid grid-cols-4 gap-3">
                   <div className="space-y-2">
                     <Label>Name</Label>
                     <Input
@@ -114,7 +122,7 @@ export function InputSchemaEditor({ schema, onChange }: InputSchemaEditorProps) 
                       </SelectTrigger>
                       <SelectContent>
                         {FIELD_TYPES.map((type) => (
-                          <SelectItem key={`${type.value}-option`} value={type.value}>
+                          <SelectItem key={type.label} value={type.value}>
                             {type.label}
                           </SelectItem>
                         ))}
@@ -130,6 +138,17 @@ export function InputSchemaEditor({ schema, onChange }: InputSchemaEditorProps) 
                       }
                       placeholder="e.g., Array"
                     />
+                  </div>
+                  
+                  <div className="space-y-2 flex flex-col justify-end pb-3">
+                     <div className="flex items-center gap-2">
+                        <Label htmlFor={`inplace-${index}`} className="cursor-pointer">In-Place?</Label>
+                        <Switch
+                            id={`inplace-${index}`}
+                            checked={field.inplace || false}
+                            onCheckedChange={(checked) => handleUpdate(index, { inplace: checked })}
+                        />
+                     </div>
                   </div>
                 </div>
                 <Button
@@ -154,7 +173,7 @@ export function InputSchemaEditor({ schema, onChange }: InputSchemaEditorProps) 
             <CardTitle className="text-base">New Input Field</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-4 gap-3">
               <div className="space-y-2">
                 <Label>Name *</Label>
                 <Input
@@ -178,7 +197,7 @@ export function InputSchemaEditor({ schema, onChange }: InputSchemaEditorProps) 
                   </SelectTrigger>
                   <SelectContent>
                     {FIELD_TYPES.map((type) => (
-                      <SelectItem key={type.value} value={type.value}>
+                      <SelectItem key={type.label} value={type.value}>
                         {type.label}
                       </SelectItem>
                     ))}
@@ -194,6 +213,16 @@ export function InputSchemaEditor({ schema, onChange }: InputSchemaEditorProps) 
                   }
                   placeholder="e.g., Array"
                 />
+              </div>
+              <div className="space-y-2 flex flex-col justify-end pb-3">
+                    <div className="flex items-center gap-2">
+                    <Label htmlFor="new-inplace" className="cursor-pointer">In-Place?</Label>
+                    <Switch
+                        id="new-inplace"
+                        checked={newField.inplace || false}
+                        onCheckedChange={(checked) => setNewField({ ...newField, inplace: checked })}
+                    />
+                    </div>
               </div>
             </div>
             <div className="flex gap-2 justify-end">

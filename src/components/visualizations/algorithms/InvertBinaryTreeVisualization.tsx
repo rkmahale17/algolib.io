@@ -62,7 +62,7 @@ export const InvertBinaryTreeVisualization = () => {
     if (editorRef.current && monacoRef.current) {
       const decorations = currentStep.highlightedLines.map(line => ({
         range: new monacoRef.current!.Range(line, 1, line, 1),
-        options: { isWholeLine: true, className: 'highlighted-line-purple' }
+        options: { isWholeLine: true, className: 'highlighted-line-blue' }
       }));
       editorRef.current.createDecorationsCollection(decorations);
     }
@@ -150,7 +150,7 @@ export const InvertBinaryTreeVisualization = () => {
         </div>
         <Card className="p-4"><div className="h-[700px]"><Editor height="100%" defaultLanguage="typescript" value={code} theme="vs-dark" options={{ readOnly: true, minimap: { enabled: false }, fontSize: 13 }} onMount={(editor, monaco) => { editorRef.current = editor; monacoRef.current = monaco; }} /></div></Card>
       </div>
-      <style>{`.highlighted-line-purple { background: rgba(168, 85, 247, 0.15); border-left: 3px solid rgb(168, 85, 247); }`}</style>
+      <style>{`.highlighted-line-blue { background: rgba(37, 99, 235, 0.15); border-left: 3px solid rgb(37, 99, 235); }`}</style>
     </div>
   );
 };

@@ -22,151 +22,118 @@ export const InsertIntervalVisualization = () => {
   const [currentStep, setCurrentStep] = useState(0);
 
   const intervals: [number, number][] = [[1, 3], [6, 9]];
-  const newInterval: [number, number] = [2, 5];
+  const newIntervalInput: [number, number] = [2, 5];
 
   const steps: Step[] = [
     {
       intervals,
-      newInterval,
+      newInterval: newIntervalInput,
       result: [],
       currentIdx: -1,
       merged: null,
       variables: { intervals: '[[1,3],[6,9]]', newInterval: '[2,5]' },
-      explanation: "Insert new interval [2,5] into sorted intervals [[1,3],[6,9]]. Merge if overlapping.",
-      highlightedLines: [1, 2, 3, 4],
-      lineExecution: "function insert(intervals: number[][], newInterval: number[][]): number[][]"
+      explanation: "Insert new interval [2,5] into sorted intervals [[1,3],[6,9]].",
+      highlightedLines: [1],
+      lineExecution: "function insert(intervals, newInterval)"
     },
     {
       intervals,
-      newInterval,
+      newInterval: newIntervalInput,
       result: [],
       currentIdx: -1,
       merged: null,
-      variables: { result: '[]' },
+      variables: { res: '[]' },
       explanation: "Initialize empty result array.",
-      highlightedLines: [5],
-      lineExecution: "const result: number[][] = [];"
+      highlightedLines: [2],
+      lineExecution: "const res: number[][] = [];"
     },
     {
       intervals,
-      newInterval,
+      newInterval: newIntervalInput,
       result: [],
       currentIdx: 0,
       merged: null,
-      variables: { i: 0, n: 2 },
-      explanation: "Initialize index i = 0, n = 2.",
-      highlightedLines: [6, 7],
-      lineExecution: "let i = 0; const n = intervals.length;"
+      variables: { i: 0, curr: '[1,3]' },
+      explanation: "Start loop. i=0, current interval is [1,3].",
+      highlightedLines: [4, 5],
+      lineExecution: "for (let i = 0; i < intervals.length; i++)"
     },
     {
       intervals,
-      newInterval,
+      newInterval: newIntervalInput,
       result: [],
       currentIdx: 0,
       merged: null,
-      variables: { i: 0, 'intervals[0][1]': 3, 'newInterval[0]': 2 },
-      explanation: "Check: intervals[0][1] (3) < newInterval[0] (2)? No. Skip this phase.",
+      variables: { 'newInterval[1]': 5, 'curr[0]': 1 },
+      explanation: "Check Case 1: newInterval[1] (5) < curr[0] (1)? False.",
+      highlightedLines: [8],
+      lineExecution: "if (newInterval[1] < curr[0]) // 5 < 1 -> false"
+    },
+    {
+      intervals,
+      newInterval: newIntervalInput,
+      result: [],
+      currentIdx: 0,
+      merged: null,
+      variables: { 'newInterval[0]': 2, 'curr[1]': 3 },
+      explanation: "Check Case 2: newInterval[0] (2) > curr[1] (3)? False.",
+      highlightedLines: [14],
+      lineExecution: "else if (newInterval[0] > curr[1]) // 2 > 3 -> false"
+    },
+    {
+      intervals,
+      newInterval: [1, 5],
+      result: [],
+      currentIdx: 0,
+      merged: [1, 5],
+      variables: { newInterval: '[1,5]' },
+      explanation: "Case 3: Overlap. Merge intervals. newInterval becomes [min(2,1), max(5,3)] = [1,5].",
+      highlightedLines: [20, 21, 22, 23],
+      lineExecution: "newInterval = [Math.min(...), Math.max(...)]"
+    },
+    {
+      intervals,
+      newInterval: [1, 5],
+      result: [],
+      currentIdx: 1,
+      merged: [1, 5],
+      variables: { i: 1, curr: '[6,9]' },
+      explanation: "Next iteration. i=1, current interval is [6,9].",
+      highlightedLines: [4, 5],
+      lineExecution: "i++ // i=1, curr=[6,9]"
+    },
+    {
+      intervals,
+      newInterval: [1, 5],
+      result: [],
+      currentIdx: 1,
+      merged: [1, 5],
+      variables: { 'newInterval[1]': 5, 'curr[0]': 6 },
+      explanation: "Check Case 1: newInterval[1] (5) < curr[0] (6)? True.",
+      highlightedLines: [8],
+      lineExecution: "if (newInterval[1] < curr[0]) // 5 < 6 -> true"
+    },
+    {
+      intervals,
+      newInterval: [1, 5],
+      result: [[1, 5]],
+      currentIdx: 1,
+      merged: [1, 5],
+      variables: { res: '[[1,5]]' },
+      explanation: "Case 1 met: Push newInterval [1,5] to result.",
+      highlightedLines: [9],
+      lineExecution: "res.push(newInterval);"
+    },
+    {
+      intervals,
+      newInterval: [1, 5],
+      result: [[1, 5], [6, 9]],
+      currentIdx: 1,
+      merged: null,
+      variables: { res: '[[1,5], [6,9]]' },
+      explanation: "Return result mixed with remaining intervals starting from i.",
       highlightedLines: [10],
-      lineExecution: "while (i < n && intervals[i][1] < newInterval[0]) // 3 < 2 -> false"
-    },
-    {
-      intervals,
-      newInterval,
-      result: [],
-      currentIdx: 0,
-      merged: null,
-      variables: { 'intervals[0][0]': 1, 'newInterval[1]': 5 },
-      explanation: "Check overlap: intervals[0][0] (1) <= newInterval[1] (5)? Yes! Overlapping.",
-      highlightedLines: [16],
-      lineExecution: "while (i < n && intervals[i][0] <= newInterval[1]) // 1 <= 5 -> true"
-    },
-    {
-      intervals,
-      newInterval: [1, 5],
-      result: [],
-      currentIdx: 0,
-      merged: [1, 5],
-      variables: { 'newInterval[0]': 1, merged: '[1,5]' },
-      explanation: "Merge: newInterval[0] = min(2, 1) = 1. Update newInterval to [1,5].",
-      highlightedLines: [17],
-      lineExecution: "newInterval[0] = Math.min(newInterval[0], intervals[i][0]); // min(2,1) = 1"
-    },
-    {
-      intervals,
-      newInterval: [1, 5],
-      result: [],
-      currentIdx: 0,
-      merged: [1, 5],
-      variables: { 'newInterval[1]': 5, merged: '[1,5]' },
-      explanation: "Merge: newInterval[1] = max(5, 3) = 5. Merged interval: [1,5].",
-      highlightedLines: [18],
-      lineExecution: "newInterval[1] = Math.max(newInterval[1], intervals[i][1]); // max(5,3) = 5"
-    },
-    {
-      intervals,
-      newInterval: [1, 5],
-      result: [],
-      currentIdx: 1,
-      merged: [1, 5],
-      variables: { i: 1 },
-      explanation: "Increment i = 1. Check next interval.",
-      highlightedLines: [19],
-      lineExecution: "i++; // i = 1"
-    },
-    {
-      intervals,
-      newInterval: [1, 5],
-      result: [],
-      currentIdx: 1,
-      merged: [1, 5],
-      variables: { 'intervals[1][0]': 6, 'newInterval[1]': 5 },
-      explanation: "Check: intervals[1][0] (6) <= newInterval[1] (5)? No. Exit merge loop.",
-      highlightedLines: [16],
-      lineExecution: "while (i < n && intervals[i][0] <= newInterval[1]) // 6 <= 5 -> false"
-    },
-    {
-      intervals,
-      newInterval: [1, 5],
-      result: [[1, 5]],
-      currentIdx: 1,
-      merged: [1, 5],
-      variables: { result: '[[1,5]]' },
-      explanation: "Push merged interval [1,5] to result.",
-      highlightedLines: [21],
-      lineExecution: "result.push(newInterval); // result = [[1,5]]"
-    },
-    {
-      intervals,
-      newInterval: [1, 5],
-      result: [[1, 5]],
-      currentIdx: 1,
-      merged: null,
-      variables: { i: 1, n: 2 },
-      explanation: "Add remaining intervals: Check i (1) < n (2)? Yes.",
-      highlightedLines: [24],
-      lineExecution: "while (i < n) // 1 < 2 -> true"
-    },
-    {
-      intervals,
-      newInterval: [1, 5],
-      result: [[1, 5], [6, 9]],
-      currentIdx: 1,
-      merged: null,
-      variables: { result: '[[1,5],[6,9]]' },
-      explanation: "Push intervals[1] = [6,9] to result. No overlap with merged interval.",
-      highlightedLines: [25, 26],
-      lineExecution: "result.push(intervals[i]); i++; // result = [[1,5],[6,9]]"
-    },
-    {
-      intervals,
-      newInterval: [1, 5],
-      result: [[1, 5], [6, 9]],
-      currentIdx: 2,
-      merged: null,
-      variables: { i: 2, n: 2 },
-      explanation: "Check: i (2) < n (2)? No. Exit loop.",
-      highlightedLines: [24],
-      lineExecution: "while (i < n) // 2 < 2 -> false"
+      lineExecution: "return res.concat(intervals.slice(i));"
     },
     {
       intervals,
@@ -174,50 +141,42 @@ export const InsertIntervalVisualization = () => {
       result: [[1, 5], [6, 9]],
       currentIdx: -1,
       merged: null,
-      variables: { result: '[[1,5],[6,9]]' },
-      explanation: "Return result: [[1,5],[6,9]]. Original [1,3] merged with [2,5].",
-      highlightedLines: [26],
-      lineExecution: "return result; // [[1,5],[6,9]]"
-    },
-    {
-      intervals,
-      newInterval: [1, 5],
-      result: [[1, 5], [6, 9]],
-      currentIdx: -1,
-      merged: null,
-      variables: { intervals: 2, complexity: 'O(n)' },
-      explanation: "Algorithm complete! Three phases: add before, merge overlapping, add after. Time: O(n), Space: O(n).",
-      highlightedLines: [26],
-      lineExecution: "Result: [[1,5],[6,9]]"
+      variables: { final: '[[1,5], [6,9]]' },
+      explanation: "Algorithm complete.",
+      highlightedLines: [],
+      lineExecution: "Finished"
     }
   ];
 
-  const code = `function insert(
-  intervals: number[][], 
-  newInterval: number[]
-): number[][] {
-  const result: number[][] = [];
-  let i = 0;
-  const n = intervals.length;
-  
-  while (i < n && intervals[i][1] < newInterval[0]) {
-    result.push(intervals[i]);
-    i++;
-  }
-  
-  while (i < n && intervals[i][0] <= newInterval[1]) {
-    newInterval[0] = Math.min(newInterval[0], intervals[i][0]);
-    newInterval[1] = Math.max(newInterval[1], intervals[i][1]);
-    i++;
-  }
-  result.push(newInterval);
-  
-  while (i < n) {
-    result.push(intervals[i]);
-    i++;
-  }
-  
-  return result;
+  const code = `function insert(intervals: number[][], newInterval: number[]): number[][] {
+    const res: number[][] = [];
+
+    for (let i = 0; i < intervals.length; i++) {
+        const curr = intervals[i];
+
+        // Case 1: newInterval comes before current interval
+        if (newInterval[1] < curr[0]) {
+            res.push(newInterval);
+            return res.concat(intervals.slice(i));
+        }
+
+        // Case 2: newInterval comes after current interval
+        else if (newInterval[0] > curr[1]) {
+            res.push(curr);
+        }
+
+        // Case 3: Overlapping intervals → merge
+        else {
+            newInterval = [
+                Math.min(newInterval[0], curr[0]),
+                Math.max(newInterval[1], curr[1])
+            ];
+        }
+    }
+
+    // Add the merged interval if not placed yet
+    res.push(newInterval);
+    return res;
 }`;
 
   const step = steps[currentStep];

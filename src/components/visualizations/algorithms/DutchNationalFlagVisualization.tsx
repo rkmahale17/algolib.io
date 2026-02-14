@@ -178,7 +178,7 @@ export const DutchNationalFlagVisualization = () => {
                     <div className="text-xs space-y-0.5 h-8">
                       {isLow && <div className="font-bold text-blue-500">LOW</div>}
                       {isMid && <div className="font-bold text-primary">MID</div>}
-                      {isHigh && <div className="font-bold text-purple-500">HIGH</div>}
+                      {isHigh && <div className="font-bold text-blue-500">HIGH</div>}
                     </div>
                     <div
                       className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all duration-300 ${getColorClass(

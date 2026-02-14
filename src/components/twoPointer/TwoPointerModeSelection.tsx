@@ -36,7 +36,7 @@ export const TwoPointerModeSelection = ({ onSelectMode }: TwoPointerModeSelectio
       icon: X,
       difficulty: "Advanced",
       explanation: "Balance multiplication by adjusting both pointers",
-      color: "text-purple-500",
+      color: "text-blue-500",
     },
   ];
   

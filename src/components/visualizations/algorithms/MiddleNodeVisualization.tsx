@@ -148,7 +148,7 @@ export const MiddleNodeVisualization: React.FC = () => {
                 <div
                   className={`w-16 h-16 flex items-center justify-center rounded-lg border-2 font-bold text-lg transition-all ${
                     currentStep.isMiddle && currentStep.slow === idx
-                      ? 'bg-purple-500/20 border-purple-500 text-purple-500'
+                      ? 'bg-blue-500/20 border-blue-500 text-blue-500'
                       : currentStep.slow === idx
                       ? 'bg-blue-500/20 border-blue-500 text-blue-500'
                       : currentStep.fast === idx
@@ -176,7 +176,7 @@ export const MiddleNodeVisualization: React.FC = () => {
             </div>
             {currentStep.isMiddle && (
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded bg-purple-500/20 border-2 border-purple-500"></div>
+                <div className="w-4 h-4 rounded bg-blue-500/20 border-2 border-blue-500"></div>
                 <span>Middle Node</span>
               </div>
             )}

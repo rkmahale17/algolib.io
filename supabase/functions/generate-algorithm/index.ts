@@ -207,16 +207,20 @@ Deno.serve(async (req) => {
 
         TASK: Generate Code Implementations for: ${langs.join(", ")}.
         
-        ${
-          target === "add_approaches"
-            ? `GENERATE **${approachCount} NEW** distinct approaches. 
+        ${mode === "core"
+        ? `GENERATE EXACTLY ONE APPROACH.
+           IF Reference Code is provided, use that logic.
+           ELSE use the best optimized approach for this core pattern.
+           - codeType: "optimize"`
+        : target === "add_approaches"
+          ? `GENERATE **${approachCount} NEW** distinct approaches. 
               EXCLUDE these existing approaches: ${existingApproaches.join(", ")}.
               Use strategy-based naming.`
-            : `You MUST generate MULTIPLE VIABLE APPROACHES (at least 1, MAX 3).
+          : `You MUST generate MULTIPLE VIABLE APPROACHES (at least 1, MAX 3).
               1. **Optimized Approach** (First) - codeType: "optimize"
               2. **Strategy-Based Approach** (Required) - e.g. "dfs", "bfs", "dp", "greedy"
               3. **Alternative Approaches** (Optional)`
-        }
+      }
 
         **CRITICAL JSON FORMATTING RULES**:
         1. **Escape Control Characters**: Use \\\\n for newlines, \\\\" for quotes.
@@ -259,12 +263,12 @@ Deno.serve(async (req) => {
       if (!input_schema) throw new Error("input_schema is required for test_cases generation");
       responseData = await generateChunk(testCasesPrompt);
       if (!responseData) throw new Error("Failed to generate Test Cases.");
+
     } else if (target === "solutions" || target === "add_approaches") {
       // 3. Generate Solutions
-      if (!input_schema && target !== "add_approaches")
-        throw new Error("input_schema is required for solutions generation");
-      // Note: add_approaches might not strictly need schema if it can infer from topic, but safer if provided.
-      // Existing flow didn't strictly leverage schema for code gen input args, it inferred.
+      if (!input_schema && target !== 'add_approaches') throw new Error("input_schema is required for solutions generation");
+      // Note: add_approaches might not strictly need schema if it can infer from topic, but safer if provided. 
+      // Existing flow didn't strictly leverage schema for code gen input args, it inferred. 
       // But passing it is good context.
 
       const [tsData, pyData, javaData, cppData] = await Promise.all([
@@ -281,9 +285,10 @@ Deno.serve(async (req) => {
           ...(tsData.implementations || []),
           ...(pyData.implementations || []),
           ...(javaData.implementations || []),
-          ...(cppData.implementations || []),
+          ...(cppData.implementations || [])
         ],
       };
+
     } else if (target === "all") {
       // Legacy Monolithic Mode (Optional, for backward compat or one-shot)
       // This runs EVERYTHING. Might still timeout.
@@ -292,7 +297,7 @@ Deno.serve(async (req) => {
           ALSO GENERATE "test_cases" (12 cases) AND "input_schema" in the SAME JSON.
        `;
       // Note: reusing prompts is tricky if they define contradicting JSON structures.
-      // It's safer to keep the old logic for "all" or simply deprecate it.
+      // It's safer to keep the old logic for "all" or simply deprecate it. 
       // User asked to SPLIT it. So I will implement "all" as a chained server-side call or just separate invocations?
       // Let's just do Promise.all if they really want "all", but with risk.
       // Actually, the prompt above for 'info' includes 'input_schema' but NOT 'test_cases'.
@@ -308,7 +313,7 @@ Deno.serve(async (req) => {
       const schema = infoData.input_schema;
       const testCasesPromptWithSchema = testCasesPrompt.replace(
         `INPUT SCHEMA PROVIDED:`,
-        `INPUT SCHEMA PROVIDED: \n${JSON.stringify(schema)}`,
+        `INPUT SCHEMA PROVIDED: \n${JSON.stringify(schema)}`
       );
       const testData = await generateChunk(testCasesPromptWithSchema);
 
@@ -327,7 +332,7 @@ Deno.serve(async (req) => {
           ...(tsData.implementations || []),
           ...(pyData.implementations || []),
           ...(javaData.implementations || []),
-          ...(cppData.implementations || []),
+          ...(cppData.implementations || [])
         ],
       };
     }

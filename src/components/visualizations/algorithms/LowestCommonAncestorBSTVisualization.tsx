@@ -80,7 +80,7 @@ export const LowestCommonAncestorBSTVisualization = () => {
         range: new monacoRef.current.Range(lineNum, 1, lineNum, 1),
         options: {
           isWholeLine: true,
-          className: 'highlighted-line-purple'
+          className: 'highlighted-line-blue'
         }
       }));
       editorRef.current.createDecorationsCollection(decorations);
@@ -252,9 +252,9 @@ export const LowestCommonAncestorBSTVisualization = () => {
       </div>
 
       <style>{`
-        .highlighted-line-purple {
-          background: rgba(168, 85, 247, 0.15);
-          border-left: 3px solid rgb(168, 85, 247);
+        .highlighted-line-blue {
+          background: rgba(37, 99, 235, 0.15);
+          border-left: 3px solid rgb(37, 99, 235);
         }
       `}</style>
     </div>

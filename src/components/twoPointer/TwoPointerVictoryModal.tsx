@@ -29,7 +29,7 @@ export const TwoPointerVictoryModal = ({
     if (grade === "S") return "text-yellow-500";
     if (grade === "A") return "text-green-500";
     if (grade === "B") return "text-blue-500";
-    if (grade === "C") return "text-purple-500";
+    if (grade === "C") return "text-blue-500";
     return "text-gray-500";
   };
   

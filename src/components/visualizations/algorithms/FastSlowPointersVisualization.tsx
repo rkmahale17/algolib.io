@@ -221,7 +221,7 @@ export const FastSlowPointersVisualization: React.FC = () => {
                 <div
                   className={`w-16 h-16 rounded-full flex flex-col items-center justify-center font-bold text-lg border-2 transition-all ${
                     currentStep.slow === idx && currentStep.fast === idx
-                      ? 'bg-purple-500/20 border-purple-500 scale-110'
+                      ? 'bg-blue-500/20 border-blue-500 scale-110'
                       : currentStep.slow === idx
                       ? 'bg-blue-500/20 border-blue-500 scale-110'
                       : currentStep.fast === idx

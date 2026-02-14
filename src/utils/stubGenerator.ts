@@ -1,6 +1,7 @@
 // Stub Generator Utility for Code Runner
 // Generates complete function stubs with driver code for all supported languages
 
+import { getDSDetails, DSName, SUPPORTED_DS } from '@/lib/dsa-registry';
 export type Language = 'typescript' | 'python' | 'cpp' | 'java';
 
 export interface InputField {
@@ -90,10 +91,15 @@ function mapType(type: string, language: Language): string {
 
     let mappedBase = typeMap[language][base] || base;
 
+    // Handle C++ Pointers for DS
+    if (language === 'cpp' && (base === 'listnode' || base === 'treenode' || base === 'graphnode' || base === 'trienode')) {
+        mappedBase += '*';
+    }
+
     if (is2D) {
         if (language === 'typescript') return `${mappedBase}[][]`;
         if (language === 'python') return `List[List[${mappedBase}]]`;
-        if (language === 'cpp') return `vector<vector<${mappedBase}>>&`;
+        if (language === 'cpp') return `vector<vector<${mappedBase}>>&`; // Pass complex types by ref
         if (language === 'java') return `${mappedBase}[][]`;
     }
 
@@ -384,16 +390,55 @@ export function generateStub(
         inputs
     };
 
+    // Inject Definitions
+    const required = new Set<DSName>();
+
+    const checkType = (t: string) => {
+        if (!t) return;
+        const typeStr = String(t).toLowerCase();
+        SUPPORTED_DS.forEach(ds => {
+            // Use regex for whole-word matching to avoid 'Node' matching 'TreeNode'
+            // Escape special chars in DS name just in case
+            const dsLower = ds.toLowerCase();
+            const escaped = dsLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(`\\b${escaped}\\b`);
+            if (regex.test(typeStr)) required.add(ds);
+        });
+    };
+
+    inputSchema.forEach(i => checkType(i.type));
+    if (returnType) checkType(returnType);
+
+    // Heuristic: specific problem names that imply a DS
+    if (functionName.toLowerCase().includes('clonegraph')) {
+        required.add('Node');
+    }
+
+    let definitions = "";
+    required.forEach(ds => {
+        const details = getDSDetails(ds, language);
+        if (details) {
+            definitions += details.definition + "\n\n";
+        }
+    });
+
+    let stub = "";
     switch (language) {
         case 'typescript':
-            return generateTypeScriptStub(config);
+            stub = generateTypeScriptStub(config);
+            break;
         case 'python':
-            return generatePythonStub(config);
+            stub = generatePythonStub(config);
+            break;
         case 'cpp':
-            return generateCppStub(config);
+            stub = generateCppStub(config);
+            break;
         case 'java':
-            return generateJavaStub(config);
+            stub = generateJavaStub(config);
+            break;
         default:
             throw new Error(`Unsupported language: ${language}`);
     }
+
+    return definitions + stub;
 }

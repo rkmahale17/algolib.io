@@ -130,7 +130,7 @@ export const BinaryTreeLevelOrderVisualization = () => {
       ref.current.createDecorationsCollection(
         step.highlightedLines.map(l => ({
           range: new monaco.current!.Range(l, 1, l, 1),
-          options: { isWholeLine: true, className: 'highlighted-line-purple' }
+          options: { isWholeLine: true, className: 'highlighted-line-blue' }
         }))
       );
     }
@@ -269,7 +269,7 @@ export const BinaryTreeLevelOrderVisualization = () => {
         </Card>
       </div>
 
-      <style>{`.highlighted-line-purple { background: rgba(168, 85, 247, 0.15); border-left: 3px solid rgb(168, 85, 247); }`}</style>
+      <style>{`.highlighted-line-blue { background: rgba(37, 99, 235, 0.15); border-left: 3px solid rgb(37, 99, 235); }`}</style>
     </div>
   );
 };

@@ -36,7 +36,7 @@ export const SlidingWindowModeSelection = ({ onSelectMode }: SlidingWindowModeSe
       icon: Grid3x3,
       difficulty: "Intermediate",
       explanation: "Shrink when duplicates appear",
-      color: "text-purple-500",
+      color: "text-blue-500",
     },
     {
       id: "substring" as WindowMode,

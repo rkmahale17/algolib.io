@@ -223,14 +223,14 @@ export const QuickSelectVisualization = () => {
                       <div className="absolute -top-8 text-xs font-bold text-primary animate-bounce">PIVOT</div>
                     )}
                     {isPartition && (
-                      <div className="absolute -top-8 text-xs font-bold text-purple-500">FINAL</div>
+                      <div className="absolute -top-8 text-xs font-bold text-blue-500">FINAL</div>
                     )}
                     <div
                       className={`w-full rounded-t transition-all duration-300 ${
                         isK && isPivot
                           ? 'bg-green-500 shadow-lg shadow-green-500/50 scale-110'
                           : isPartition
-                          ? 'bg-purple-500 shadow-lg'
+                          ? 'bg-blue-500 shadow-lg'
                           : isPivot
                           ? 'bg-primary shadow-lg shadow-primary/50 scale-105'
                           : !isInRange

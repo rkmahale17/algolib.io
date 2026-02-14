@@ -169,7 +169,7 @@ const Home = () => {
                       <ArrowRight className="w-4 h-4" />
                     </Link>
                   </Button>
-                  <Button size="lg" variant="outline" className="rounded-full px-8 gap-2 backdrop-blur-sm bg-background/50 border-primary/20 hover:bg-primary/5" asChild>
+                  <Button size="lg" variant="outline" className="rounded-full px-8 gap-2 backdrop-blur-sm bg-background/50 border-primary/20 hover:bg-primary hover:text-primary-foreground" asChild>
                     <Link to="/core-patterns">
                       <Layers className="w-4 h-4" />
                       Core Patterns

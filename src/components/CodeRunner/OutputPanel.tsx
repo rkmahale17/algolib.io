@@ -11,8 +11,8 @@ import { Submission } from '@/types/userAlgorithmData';
 import { diffStrings } from '@/utils/diffUtils';
 
 const DiffView = ({ expected, actual }: { expected: any, actual: any }) => {
-  const expectedStr = typeof expected === 'string' ? expected : JSON.stringify(expected, null, 2);
-  const actualStr = typeof actual === 'string' ? actual : JSON.stringify(actual, null, 2);
+  const expectedStr = (typeof expected === 'string' ? expected : JSON.stringify(expected, null, 2)) || "";
+  const actualStr = (typeof actual === 'string' ? actual : JSON.stringify(actual, null, 2)) || "";
   const diff = diffStrings(expectedStr, actualStr);
 
   return (
@@ -304,15 +304,32 @@ export const OutputPanel = ({
                     <span>Running Tests...</span>
                   </div>
                 ) : (
-                  <>
-                    {getStatusText(output.status?.id, output.status?.description, output.testResults)}
+                  <div className="flex items-center gap-2">
+                    <span>{getStatusText(output.status?.id, output.status?.description, output.testResults)}</span>
+                    
+                    {/* Debug/Info: Show In-Place Status */}
+                    {(() => {
+                        const meta = algorithmMeta?.metadata;
+                        const isInPlace = !!((algorithmMeta as any)?.return_modified_input || (typeof meta === 'object' && meta?.return_modified_input));
+                        
+                        if (isInPlace) {
+                            return (
+                                <span className="text-[10px] font-normal border border-blue-200 bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded-full flex items-center gap-1">
+                                    <Zap className="w-3 h-3" />
+                                    In-Place
+                                </span>
+                            );
+                        }
+                        return null;
+                    })()}
+                    
                     {executionTime !== null && (
                       <span className="text-xs font-normal text-muted-foreground bg-muted px-2 py-1 rounded-full flex items-center gap-1">
                         <Clock className="w-3 h-3" />
                         {executionTime} ms
                       </span>
                     )}
-                  </>
+                  </div>
                 )}
               </div>
             </div>
@@ -393,7 +410,7 @@ export const OutputPanel = ({
                                         {inputSchema.map((field, i) => (
                                             <div key={i} className="flex gap-2">
                                                 <span className="text-muted-foreground select-none">{field.name}:</span>
-                                                <span>{JSON.stringify(inputData[i])}</span>
+                                                <span>{typeof inputData[i] === 'string' ? inputData[i] : JSON.stringify(inputData[i])}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -420,7 +437,8 @@ export const OutputPanel = ({
                             <div className="p-3 rounded-md bg-muted/30 border font-mono text-sm">
                               {(() => {
                                 const tc = executedTestCases ? executedTestCases[index] : allTestCases[index];
-                                return JSON.stringify(result.actual, null, 2);
+                                const actual = result.actual;
+                                return actual === undefined ? "void / undefined" : JSON.stringify(actual, null, 2);
                               })()}
                             </div>
                           </div>

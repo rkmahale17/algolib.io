@@ -294,7 +294,7 @@ const PublicProfile = () => {
 
               {/* Heading */}
               <div className="space-y-2">
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-primary to-purple-400 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-primary to-blue-400 bg-clip-text text-transparent">
                   Profile Not Found
                 </h1>
                 <p className="text-gray-400 text-base">
@@ -355,7 +355,7 @@ const PublicProfile = () => {
 
               {/* Heading */}
               <div className="space-y-2">
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-primary to-purple-400 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-primary to-blue-400 bg-clip-text text-transparent">
                   Private Profile
                 </h1>
                 <p className="text-gray-400 text-base">
@@ -416,7 +416,7 @@ const PublicProfile = () => {
 
               {/* Heading */}
               <div className="space-y-2">
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-primary to-purple-400 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-primary to-blue-400 bg-clip-text text-transparent">
                   Welcome Back
                 </h1>
                 <p className="text-gray-400 text-base">

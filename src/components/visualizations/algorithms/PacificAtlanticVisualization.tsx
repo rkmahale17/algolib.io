@@ -232,7 +232,7 @@ export const PacificAtlanticVisualization = () => {
                             isCurrent
                               ? 'bg-primary text-primary-foreground ring-2 ring-primary'
                               : isBoth
-                              ? 'bg-purple-500/30 ring-2 ring-purple-500'
+                              ? 'bg-blue-500/30 ring-2 ring-blue-500'
                               : isPacific
                               ? 'bg-blue-500/20'
                               : isAtlantic
@@ -260,7 +260,7 @@ export const PacificAtlanticVisualization = () => {
                   <span>Atlantic</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <div className="w-4 h-4 bg-purple-500/30 rounded ring-2 ring-purple-500"></div>
+                  <div className="w-4 h-4 bg-blue-500/30 rounded ring-2 ring-blue-500"></div>
                   <span>Both</span>
                 </div>
               </div>
