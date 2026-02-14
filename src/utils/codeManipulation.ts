@@ -4,6 +4,7 @@ interface CandidateFunction {
     name: string;
     argCount: number;
     argsStr: string; // [NEW] Store the raw argument string (e.g., "int[] nums, int k")
+    returnType?: string; // [NEW] Store return type
     isPublic: boolean;
     isSolutionValues: boolean;
     index: number; // Appearance order
@@ -12,6 +13,8 @@ interface CandidateFunction {
 export interface EntryFunctionInfo {
     name: string;
     argsStr: string;
+    hasSolutionClass: boolean;
+    returnType?: string;
 }
 
 /**
@@ -54,7 +57,7 @@ export function findEntryFunction(
     language: Language,
     inputSchema: any[],
     metadataFunctionName?: string
-): { name: string, argsStr: string, hasSolutionClass: boolean } {
+): { name: string, argsStr: string, hasSolutionClass: boolean, returnType?: string } {
 
     // Detect if "class Solution" is present (naive check but effective for LeetCode style)
     const hasSolutionClass = /class\s+Solution/.test(userCode);
@@ -122,6 +125,7 @@ export function findEntryFunction(
             let cMatch;
             while ((cMatch = cStyleRegex.exec(codeToScan)) !== null) {
                 const modifiers = cMatch[1] || "";
+                const returnType = cMatch[2].trim();
                 const name = cMatch[3]; // Adjusted index due to lazy group
                 const args = cMatch[4] || "";
 
@@ -132,6 +136,7 @@ export function findEntryFunction(
                     name: name,
                     argCount: countArguments(args),
                     argsStr: args,
+                    returnType: returnType,
                     isPublic: modifiers.includes('public'),
                     isSolutionValues: name.toLowerCase().includes('solution') || name.toLowerCase() === 'solve',
                     index: cMatch.index
@@ -148,11 +153,11 @@ export function findEntryFunction(
         // 1. If we found ANY candidates, try to find one that matches the metadata name (ignoring arg count).
         if (candidates.length > 0) {
             const nameMatch = candidates.find(c => c.name === metadataFunctionName);
-            if (nameMatch) return { name: nameMatch.name, argsStr: nameMatch.argsStr, hasSolutionClass };
+            if (nameMatch) return { name: nameMatch.name, argsStr: nameMatch.argsStr, hasSolutionClass, returnType: nameMatch.returnType };
 
             // 2. If no name match, just return the first candidate (likely the main function)
             // This is better than returning a ghost name "valid" that causes compilation errors.
-            return { name: candidates[0].name, argsStr: candidates[0].argsStr, hasSolutionClass };
+            return { name: candidates[0].name, argsStr: candidates[0].argsStr, hasSolutionClass, returnType: candidates[0].returnType };
         }
 
         // 3. If NO candidates found at all (parsing failed completely), return metadata name or default.
@@ -186,7 +191,7 @@ export function findEntryFunction(
         return a.index - b.index;
     });
 
-    return { name: validCandidates[0].name, argsStr: validCandidates[0].argsStr, hasSolutionClass };
+    return { name: validCandidates[0].name, argsStr: validCandidates[0].argsStr, hasSolutionClass, returnType: validCandidates[0].returnType };
 }
 
 /**

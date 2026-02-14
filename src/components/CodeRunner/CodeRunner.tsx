@@ -518,15 +518,30 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
           ? JSON.parse(algo.metadata) 
           : (algo.metadata || {});
         
+        // Check if any input field has inplace flag set
+        const inputSchema = algo.input_schema || [];
+        const inplaceFieldIndex = inputSchema.findIndex((field: any) => field.inplace === true || String(field.inplace) === 'true');
+        const hasInplaceField = inplaceFieldIndex !== -1;
+        
+        console.log("DEBUG: Inplace detection", {
+            hasInplaceField,
+            inplaceFieldIndex,
+            metadataInplace: metadata.inplace,
+            metadataReturnModified: metadata.return_modified_input,
+            algoReturnModified: algo.return_modified_input
+        });
+
         fullCode = generateTestRunner(
           code,
           language,
           preparedTestCases,
-          algo.input_schema || [],
+          inputSchema,
           entryFunctionName,
           {
             unordered: metadata.unordered || algo.unordered,
-            multiExpected: metadata.multi_expected || algo.multi_expected
+            multiExpected: metadata.multi_expected || algo.multi_expected,
+            returnModifiedInput: hasInplaceField || metadata.return_modified_input === true || String(metadata.return_modified_input) === 'true' || metadata.inplace === true || String(metadata.inplace) === 'true' || algo.return_modified_input === true || String(algo.return_modified_input) === 'true',
+            modifiedInputIndex: hasInplaceField ? inplaceFieldIndex : (metadata.modified_input_index !== undefined ? Number(metadata.modified_input_index) : (algo.modified_input_index !== undefined ? Number(algo.modified_input_index) : 0))
           }
         );
       }

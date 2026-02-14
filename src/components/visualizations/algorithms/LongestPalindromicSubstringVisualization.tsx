@@ -162,7 +162,7 @@ export const LongestPalindromicSubstringVisualization = () => {
               animate={{ scale: 1, opacity: 1 }}
               className={`px-2 py-1 rounded text-xs font-semibold ${
                 currentStep.phase === 'odd' ? 'bg-blue-500/20 text-blue-600' :
-                currentStep.phase === 'even' ? 'bg-purple-500/20 text-purple-600' :
+                currentStep.phase === 'even' ? 'bg-blue-500/20 text-blue-600' :
                 currentStep.phase === 'done' ? 'bg-green-500/20 text-green-600' :
                 'bg-muted text-muted-foreground'
               }`}

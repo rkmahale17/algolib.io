@@ -35,7 +35,7 @@ const modes = [
     icon: Code,
     description: "Match opening and closing HTML tags like a parser",
     difficulty: "Advanced",
-    color: "from-purple-500 to-pink-500",
+    color: "from-blue-500 to-cyan-500",
     symbols: "<div> <p> <span>",
     features: ["Real-world parsing", "Complex matching", "Advanced patterns"]
   },

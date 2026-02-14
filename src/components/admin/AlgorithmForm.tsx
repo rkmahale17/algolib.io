@@ -21,6 +21,7 @@ import { Loader2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
+import { InputSchemaEditor } from "./InputSchemaEditor";
 
 interface AlgorithmFormProps {
   algorithm?: Algorithm | null;
@@ -37,7 +38,10 @@ export function AlgorithmForm({
   const [jsonErrors, setJsonErrors] = useState<Record<string, string>>({});
   const [listType, setListType] = useState("coreAlgo");
   const [unordered, setUnordered] = useState(false);
+
   const [multiExpected, setMultiExpected] = useState(false);
+  const [returnModifiedInput, setReturnModifiedInput] = useState(false);
+  const [modifiedInputIndex, setModifiedInputIndex] = useState(0);
 
   const createMutation = useCreateAlgorithm();
   const updateMutation = useUpdateAlgorithm();
@@ -76,7 +80,10 @@ export function AlgorithmForm({
       
       setListType(metadataObj?.listType || "coreAlgo");
       setUnordered(!!metadataObj?.unordered);
+
       setMultiExpected(!!metadataObj?.multi_expected);
+      setReturnModifiedInput(!!metadataObj?.return_modified_input);
+      setModifiedInputIndex(metadataObj?.modified_input_index !== undefined ? metadataObj.modified_input_index : 0);
 
       reset({
         ...algorithm,
@@ -113,7 +120,10 @@ export function AlgorithmForm({
     } else {
       setListType("coreAlgo");
       setUnordered(false);
+
       setMultiExpected(false);
+      setReturnModifiedInput(false);
+      setModifiedInputIndex(0);
       reset({
         id: "",
         name: "",
@@ -191,6 +201,8 @@ export function AlgorithmForm({
         listType: listType, // Include listType from state
         unordered: unordered,
         multi_expected: multiExpected,
+        return_modified_input: returnModifiedInput,
+        modified_input_index: returnModifiedInput ? modifiedInputIndex : undefined,
       },
     };
 
@@ -431,7 +443,7 @@ export function AlgorithmForm({
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-6 p-4 border rounded-lg bg-muted/30">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 border rounded-lg bg-muted/30">
                 <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between">
                         <Label htmlFor="unordered-toggle" className="font-semibold">Unordered Comparison</Label>
@@ -459,20 +471,38 @@ export function AlgorithmForm({
                         If enabled, "expectedOutput" should be an array of valid results. Code passes if actual matches ANY variant.
                     </p>
                 </div>
+
             </div>
 
+            {/* In-Place Algorithm Section moved to InputSchemaEditor */}
             <div className="space-y-2">
-              <Label htmlFor="input_schema">Input Schema (JSON Array) *</Label>
-              <Textarea
-                id="input_schema"
-                {...register("input_schema", {
-                  required: "Input schema is required",
-                })}
-                placeholder='[{"name": "arr", "type": "number[]", "label": "Array"}]'
-                rows={8}
-                className="font-mono text-sm"
-                onBlur={(e) => validateJSON("input_schema", e.target.value)}
+              <Label>Input Schema</Label>
+              <InputSchemaEditor
+                schema={(() => {
+                  try {
+                    const parsed = JSON.parse(watch("input_schema") || "[]");
+                    return parsed.map((f: any, i: number) => ({
+                      ...f,
+                      inplace: returnModifiedInput && modifiedInputIndex === i
+                    }));
+                  } catch {
+                    return [];
+                  }
+                })()}
+                onChange={(newSchema) => {
+                  setValue("input_schema", JSON.stringify(newSchema), { shouldValidate: true });
+                  
+                  const inplaceIndex = newSchema.findIndex((f) => f.inplace);
+                  if (inplaceIndex !== -1) {
+                    setReturnModifiedInput(true);
+                    setModifiedInputIndex(inplaceIndex);
+                  } else {
+                    setReturnModifiedInput(false);
+                    setModifiedInputIndex(0);
+                  }
+                }}
               />
+              <input type="hidden" {...register("input_schema", { required: "Input schema is required" })} />
               {jsonErrors.input_schema && (
                 <p className="text-sm text-destructive">
                   {jsonErrors.input_schema}

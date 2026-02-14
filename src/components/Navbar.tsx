@@ -86,7 +86,7 @@ const Navbar = () => {
             >
               <img src={logo} alt="RulCode Logo" className="w-8 h-8" />
               <span className="hidden sm:block sm:hidden font-bold text-xl font-mono whitespace-nowrap">RulCode</span>
-              <img src={logo_text} alt="RulCode Logo Text" className="hidden xs:block h-6" />
+             <h2 className="text-xl tracking-wider">Rulcode</h2>
            
             </Link>
          

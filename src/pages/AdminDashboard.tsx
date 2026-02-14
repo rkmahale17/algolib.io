@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Code2, MessageSquare, Database, ArrowRight, Activity, ShieldCheck, Users } from "lucide-react";
+import { Code2, MessageSquare, Database, ArrowRight, Activity, ShieldCheck, Users, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function AdminDashboard() {
@@ -37,9 +37,9 @@ export default function AdminDashboard() {
       description: "Review and respond to user bug reports, feature requests, and general feedback.",
       icon: MessageSquare,
       path: "/admin/feedback",
-      color: "text-purple-500",
-      bgColor: "bg-purple-500/10",
-      gradient: "from-purple-500/20 to-pink-500/20"
+      color: "text-blue-500",
+      bgColor: "bg-blue-500/10",
+      gradient: "from-green-500/20 to-emerald-500/20"
     },
     {
       title: "Feature Management",
@@ -49,6 +49,15 @@ export default function AdminDashboard() {
       color: "text-emerald-500",
       bgColor: "bg-emerald-500/10",
       gradient: "from-emerald-500/20 to-teal-500/20"
+    },
+    {
+      title: "Email Management",
+      description: "Send broadcast emails to users or test email functionality.",
+      icon: Mail,
+      path: "/admin/mail",
+      color: "text-orange-500",
+      bgColor: "bg-orange-500/10",
+      gradient: "from-orange-500/20 to-red-500/20"
     }
   ];
 

@@ -175,15 +175,22 @@ const AdminSimulator: React.FC = () => {
         ? JSON.parse(algo.metadata) 
         : (algo.metadata || {});
 
+      // Check if any input field has inplace flag set
+      const inputSchema = schema || [];
+      const inplaceFieldIndex = inputSchema.findIndex((field: any) => field.inplace === true);
+      const hasInplaceField = inplaceFieldIndex !== -1;
+
       const fullCode = generateTestRunner(
         code, 
         language, 
         testCases, 
-        schema,
+        inputSchema,
         entryFunctionName,
         {
            unordered: metadata.unordered || algo.unordered,
-           multiExpected: metadata.multi_expected || algo.multi_expected
+           multiExpected: metadata.multi_expected || algo.multi_expected,
+           returnModifiedInput: hasInplaceField || metadata.return_modified_input || metadata.inplace || algo.return_modified_input,
+           modifiedInputIndex: hasInplaceField ? inplaceFieldIndex : (metadata.modified_input_index !== undefined ? metadata.modified_input_index : (algo.modified_input_index !== undefined ? algo.modified_input_index : 0))
         }
       );
 

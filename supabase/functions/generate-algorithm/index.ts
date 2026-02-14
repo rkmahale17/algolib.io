@@ -258,7 +258,6 @@ Deno.serve(async (req) => {
       // 1. Generate Info
       responseData = await generateChunk(infoPrompt);
       if (!responseData) throw new Error("Failed to generate Info.");
-
     } else if (target === "test_cases") {
       // 2. Generate Test Cases
       if (!input_schema) throw new Error("input_schema is required for test_cases generation");

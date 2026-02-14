@@ -1,374 +1,242 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { SimpleArrayVisualization } from '../shared/SimpleArrayVisualization';
-import { SimpleStepControls } from '../shared/SimpleStepControls';
+import { useEffect, useRef, useState } from 'react';
+
+import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
-import { VisualizationLayout } from '../shared/VisualizationLayout';
 
 interface Step {
   array: number[];
-  highlighting: number[];
-  subarrayRange: number[];
-  variables: Record<string, any>;
-  explanation: string;
-  highlightedLines: number[];
-  lineExecution: string;
+  i: number;
+  maxSub: number;
+  curSum: number;
+  message: string;
+  lineNumber: number;
+  highlightIndices: number[];
 }
 
 export const MaximumSubarrayVisualization = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const nums = [-2, 1, -3, 4, -1, 2, 1, -5, 4];
-  
-  const steps: Step[] = [
-    {
-      array: nums,
-      highlighting: [],
-      subarrayRange: [],
-      variables: {},
-      explanation: "🎬 Starting execution: Input array [-2, 1, -3, 4, -1, 2, 1, -5, 4]",
-      highlightedLines: [1],
-      lineExecution: "function maxSubArray(nums: number[])"
-    },
-    {
-      array: nums,
-      highlighting: [0],
-      subarrayRange: [0],
-      variables: { maxSum: -2, 'nums[0]': -2 },
-      explanation: "📝 Initialize maxSum = nums[0] = -2",
-      highlightedLines: [2],
-      lineExecution: "let maxSum = nums[0];"
-    },
-    {
-      array: nums,
-      highlighting: [0],
-      subarrayRange: [0],
-      variables: { maxSum: -2, currentSum: -2, 'nums[0]': -2 },
-      explanation: "📝 Initialize currentSum = nums[0] = -2 (tracks sum ending here)",
-      highlightedLines: [3],
-      lineExecution: "let currentSum = nums[0];"
-    },
-    {
-      array: nums,
-      highlighting: [0],
-      subarrayRange: [0],
-      variables: { maxSum: -2, currentSum: -2, i: 1 },
-      explanation: "🔄 Loop: Start iteration with i = 1",
-      highlightedLines: [5],
-      lineExecution: "for (let i = 1; i < nums.length; i++)"
-    },
-    {
-      array: nums,
-      highlighting: [0, 1],
-      subarrayRange: [1],
-      variables: { maxSum: -2, currentSum: 1, i: 1, 'nums[1]': 1, 'comparison': 'max(1, -2+1) = max(1, -1)' },
-      explanation: "🔢 i=1: currentSum = max(nums[1], currentSum + nums[1]) = max(1, -1) = 1. Start new subarray!",
-      highlightedLines: [6],
-      lineExecution: "currentSum = Math.max(nums[i], currentSum + nums[i]);"
-    },
-    {
-      array: nums,
-      highlighting: [0, 1],
-      subarrayRange: [1],
-      variables: { maxSum: 1, currentSum: 1, i: 1 },
-      explanation: "✨ Update global max: maxSum = max(-2, 1) = 1",
-      highlightedLines: [7],
-      lineExecution: "maxSum = Math.max(maxSum, currentSum);"
-    },
-    {
-      array: nums,
-      highlighting: [1],
-      subarrayRange: [1],
-      variables: { maxSum: 1, currentSum: 1, i: 2 },
-      explanation: "🔄 Loop: Continue with i = 2",
-      highlightedLines: [5],
-      lineExecution: "for (let i = 1; i < nums.length; i++)"
-    },
-    {
-      array: nums,
-      highlighting: [1, 2],
-      subarrayRange: [1, 2],
-      variables: { maxSum: 1, currentSum: -2, i: 2, 'nums[2]': -3, 'comparison': 'max(-3, 1+(-3)) = max(-3, -2)' },
-      explanation: "🔢 i=2: currentSum = max(-3, 1-3) = max(-3, -2) = -2. Extend subarray",
-      highlightedLines: [6],
-      lineExecution: "currentSum = Math.max(nums[i], currentSum + nums[i]);"
-    },
-    {
-      array: nums,
-      highlighting: [1, 2],
-      subarrayRange: [1, 2],
-      variables: { maxSum: 1, currentSum: -2, i: 2 },
-      explanation: "✨ Update global max: maxSum = max(1, -2) = 1 (stays 1)",
-      highlightedLines: [7],
-      lineExecution: "maxSum = Math.max(maxSum, currentSum);"
-    },
-    {
-      array: nums,
-      highlighting: [2],
-      subarrayRange: [1, 2],
-      variables: { maxSum: 1, currentSum: -2, i: 3 },
-      explanation: "🔄 Loop: Continue with i = 3",
-      highlightedLines: [5],
-      lineExecution: "for (let i = 1; i < nums.length; i++)"
-    },
-    {
-      array: nums,
-      highlighting: [2, 3],
-      subarrayRange: [3],
-      variables: { maxSum: 1, currentSum: 4, i: 3, 'nums[3]': 4, 'comparison': 'max(4, -2+4) = max(4, 2)' },
-      explanation: "🔢 i=3: currentSum = max(4, -2+4) = max(4, 2) = 4. Start new subarray!",
-      highlightedLines: [6],
-      lineExecution: "currentSum = Math.max(nums[i], currentSum + nums[i]);"
-    },
-    {
-      array: nums,
-      highlighting: [2, 3],
-      subarrayRange: [3],
-      variables: { maxSum: 4, currentSum: 4, i: 3 },
-      explanation: "✨ Update global max: maxSum = max(1, 4) = 4 🎉",
-      highlightedLines: [7],
-      lineExecution: "maxSum = Math.max(maxSum, currentSum);"
-    },
-    {
-      array: nums,
-      highlighting: [3],
-      subarrayRange: [3],
-      variables: { maxSum: 4, currentSum: 4, i: 4 },
-      explanation: "🔄 Loop: Continue with i = 4",
-      highlightedLines: [5],
-      lineExecution: "for (let i = 1; i < nums.length; i++)"
-    },
-    {
-      array: nums,
-      highlighting: [3, 4],
-      subarrayRange: [3, 4],
-      variables: { maxSum: 4, currentSum: 3, i: 4, 'nums[4]': -1, 'comparison': 'max(-1, 4+(-1)) = max(-1, 3)' },
-      explanation: "🔢 i=4: currentSum = max(-1, 4-1) = max(-1, 3) = 3. Extend subarray",
-      highlightedLines: [6],
-      lineExecution: "currentSum = Math.max(nums[i], currentSum + nums[i]);"
-    },
-    {
-      array: nums,
-      highlighting: [3, 4],
-      subarrayRange: [3, 4],
-      variables: { maxSum: 4, currentSum: 3, i: 4 },
-      explanation: "✨ Update global max: maxSum = max(4, 3) = 4 (stays 4)",
-      highlightedLines: [7],
-      lineExecution: "maxSum = Math.max(maxSum, currentSum);"
-    },
-    {
-      array: nums,
-      highlighting: [4],
-      subarrayRange: [3, 4],
-      variables: { maxSum: 4, currentSum: 3, i: 5 },
-      explanation: "🔄 Loop: Continue with i = 5",
-      highlightedLines: [5],
-      lineExecution: "for (let i = 1; i < nums.length; i++)"
-    },
-    {
-      array: nums,
-      highlighting: [4, 5],
-      subarrayRange: [3, 4, 5],
-      variables: { maxSum: 4, currentSum: 5, i: 5, 'nums[5]': 2, 'comparison': 'max(2, 3+2) = max(2, 5)' },
-      explanation: "🔢 i=5: currentSum = max(2, 3+2) = max(2, 5) = 5. Extend subarray",
-      highlightedLines: [6],
-      lineExecution: "currentSum = Math.max(nums[i], currentSum + nums[i]);"
-    },
-    {
-      array: nums,
-      highlighting: [4, 5],
-      subarrayRange: [3, 4, 5],
-      variables: { maxSum: 5, currentSum: 5, i: 5 },
-      explanation: "✨ Update global max: maxSum = max(4, 5) = 5 🎉",
-      highlightedLines: [7],
-      lineExecution: "maxSum = Math.max(maxSum, currentSum);"
-    },
-    {
-      array: nums,
-      highlighting: [5],
-      subarrayRange: [3, 4, 5],
-      variables: { maxSum: 5, currentSum: 5, i: 6 },
-      explanation: "🔄 Loop: Continue with i = 6",
-      highlightedLines: [5],
-      lineExecution: "for (let i = 1; i < nums.length; i++)"
-    },
-    {
-      array: nums,
-      highlighting: [5, 6],
-      subarrayRange: [3, 4, 5, 6],
-      variables: { maxSum: 5, currentSum: 6, i: 6, 'nums[6]': 1, 'comparison': 'max(1, 5+1) = max(1, 6)' },
-      explanation: "🔢 i=6: currentSum = max(1, 5+1) = max(1, 6) = 6. Extend subarray",
-      highlightedLines: [6],
-      lineExecution: "currentSum = Math.max(nums[i], currentSum + nums[i]);"
-    },
-    {
-      array: nums,
-      highlighting: [5, 6],
-      subarrayRange: [3, 4, 5, 6],
-      variables: { maxSum: 6, currentSum: 6, i: 6 },
-      explanation: "✨ Update global max: maxSum = max(5, 6) = 6 🎉 New best!",
-      highlightedLines: [7],
-      lineExecution: "maxSum = Math.max(maxSum, currentSum);"
-    },
-    {
-      array: nums,
-      highlighting: [6],
-      subarrayRange: [3, 4, 5, 6],
-      variables: { maxSum: 6, currentSum: 6, i: 7 },
-      explanation: "🔄 Loop: Continue with i = 7",
-      highlightedLines: [5],
-      lineExecution: "for (let i = 1; i < nums.length; i++)"
-    },
-    {
-      array: nums,
-      highlighting: [6, 7],
-      subarrayRange: [3, 4, 5, 6],
-      variables: { maxSum: 6, currentSum: 1, i: 7, 'nums[7]': -5, 'comparison': 'max(-5, 6+(-5)) = max(-5, 1)' },
-      explanation: "🔢 i=7: currentSum = max(-5, 6-5) = max(-5, 1) = 1. Extend but sum drops",
-      highlightedLines: [6],
-      lineExecution: "currentSum = Math.max(nums[i], currentSum + nums[i]);"
-    },
-    {
-      array: nums,
-      highlighting: [6, 7],
-      subarrayRange: [3, 4, 5, 6],
-      variables: { maxSum: 6, currentSum: 1, i: 7 },
-      explanation: "✨ Update global max: maxSum = max(6, 1) = 6 (stays 6)",
-      highlightedLines: [7],
-      lineExecution: "maxSum = Math.max(maxSum, currentSum);"
-    },
-    {
-      array: nums,
-      highlighting: [7],
-      subarrayRange: [3, 4, 5, 6],
-      variables: { maxSum: 6, currentSum: 1, i: 8 },
-      explanation: "🔄 Loop: Continue with i = 8 (last element)",
-      highlightedLines: [5],
-      lineExecution: "for (let i = 1; i < nums.length; i++)"
-    },
-    {
-      array: nums,
-      highlighting: [7, 8],
-      subarrayRange: [3, 4, 5, 6],
-      variables: { maxSum: 6, currentSum: 5, i: 8, 'nums[8]': 4, 'comparison': 'max(4, 1+4) = max(4, 5)' },
-      explanation: "🔢 i=8: currentSum = max(4, 1+4) = max(4, 5) = 5. Extend subarray",
-      highlightedLines: [6],
-      lineExecution: "currentSum = Math.max(nums[i], currentSum + nums[i]);"
-    },
-    {
-      array: nums,
-      highlighting: [7, 8],
-      subarrayRange: [3, 4, 5, 6],
-      variables: { maxSum: 6, currentSum: 5, i: 8 },
-      explanation: "✨ Update global max: maxSum = max(6, 5) = 6 (stays 6)",
-      highlightedLines: [7],
-      lineExecution: "maxSum = Math.max(maxSum, currentSum);"
-    },
-    {
-      array: nums,
-      highlighting: [],
-      subarrayRange: [3, 4, 5, 6],
-      variables: { maxSum: 6, currentSum: 5, i: 9 },
-      explanation: "🔄 Loop: i = 9, condition (i < 9) is false, exit loop",
-      highlightedLines: [5],
-      lineExecution: "for (let i = 1; i < nums.length; i++)"
-    },
-    {
-      array: nums,
-      highlighting: [],
-      subarrayRange: [3, 4, 5, 6],
-      variables: { result: 6 },
-      explanation: "🎉 Return result: maxSum = 6. Best subarray is [4,-1,2,1] with sum 6!",
-      highlightedLines: [10],
-      lineExecution: "return maxSum;"
-    }
-  ];
+  const [steps, setSteps] = useState<Step[]>([]);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [speed, setSpeed] = useState(1);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const code = `function maxSubArray(nums: number[]): number {
-  let maxSum = nums[0];
-  let currentSum = nums[0];
-  
-  for (let i = 1; i < nums.length; i++) {
-    currentSum = Math.max(nums[i], currentSum + nums[i]);
-    maxSum = Math.max(maxSum, currentSum);
+  // Initialize maxSub with the first element
+  let maxSub = nums[0];
+
+  // Current subarray sum
+  let curSum = 0;
+
+  for (const n of nums) {
+    // If current sum becomes negative,
+    // reset it because it won't help future sums
+    if (curSum < 0) {
+      curSum = 0;
+    }
+
+    // Add current number to current sum
+    curSum += n;
+
+    // Update maximum subarray sum
+    maxSub = Math.max(maxSub, curSum);
   }
-  
-  return maxSum;
+
+  return maxSub;
 }`;
 
-  const leftContent = (
-    <>
-      <motion.div
-        key={currentStep}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        <SimpleArrayVisualization
-          array={steps[currentStep].array}
-          highlights={[...steps[currentStep].highlighting, ...steps[currentStep].subarrayRange]}
-          label="Array (Best subarray highlighted with full color)"
-        />
-      </motion.div>
+  const generateSteps = () => {
+    const nums = [-2, 1, -3, 4, -1, 2, 1, -5, 4];
+    const newSteps: Step[] = [];
+    
+    // Initial state
+    let maxSub = nums[0];
+    let curSum = 0;
+    
+    newSteps.push({
+      array: [...nums],
+      i: -1,
+      maxSub,
+      curSum,
+      message: `Initialize maxSub = ${maxSub}, curSum = 0`,
+      lineNumber: 3,
+      highlightIndices: []
+    });
+
+    for (let i = 0; i < nums.length; i++) {
+      const n = nums[i];
       
-      <motion.div 
-        key={`explanation-${currentStep}`}
-     
-        className="p-4 bg-primary/20 rounded-lg border border-primary/30"
-      >
-        <p className="text-sm font-medium">{steps[currentStep].explanation}</p>
-      </motion.div>
+      // Start of loop iteration
+      newSteps.push({
+        array: [...nums],
+        i,
+        maxSub,
+        curSum,
+        message: `Processing number: ${n}`,
+        lineNumber: 8,
+        highlightIndices: [i]
+      });
 
-      <motion.div 
+      // Check if curSum < 0
+      if (curSum < 0) {
+        newSteps.push({
+          array: [...nums],
+          i,
+          maxSub,
+          curSum,
+          message: `curSum (${curSum}) is negative. Resetting to 0.`,
+          lineNumber: 11,
+        highlightIndices: [i]
+        });
+        
+        curSum = 0;
+        
+        newSteps.push({
+          array: [...nums],
+          i,
+          maxSub,
+          curSum,
+          message: `curSum reset to 0`,
+          lineNumber: 12,
+        highlightIndices: [i]
+        });
+      }
 
-        className="p-3 bg-muted/50 rounded-lg border"
-      >
-        <div className="text-xs font-mono text-muted-foreground">
-          <span className="text-primary font-semibold">Line {steps[currentStep].highlightedLines[0]}:</span>{' '}
-          {steps[currentStep].lineExecution}
-        </div>
-      </motion.div>
+      // Add current number
+      const oldSum = curSum;
+      curSum += n;
+      
+      newSteps.push({
+        array: [...nums],
+        i,
+        maxSub,
+        curSum,
+        message: `Add ${n} to curSum: ${oldSum} + ${n} = ${curSum}`,
+        lineNumber: 16,
+        highlightIndices: [i]
+      });
 
-      <motion.div 
- 
-        className="p-3 bg-accent/50 rounded-lg border border-accent"
-      >
-        <p className="text-xs text-muted-foreground">
-          💡 <strong>Kadane's Algorithm:</strong> At each position, decide whether to extend the current subarray or start fresh. Track the maximum sum seen so far.
-        </p>
-      </motion.div>
+      // Update maxSub
+      const oldMax = maxSub;
+      maxSub = Math.max(maxSub, curSum);
+      
+      newSteps.push({
+        array: [...nums],
+        i,
+        maxSub,
+        curSum,
+        message: `Update maxSub: max(${oldMax}, ${curSum}) = ${maxSub}`,
+        lineNumber: 19,
+        highlightIndices: [i]
+      });
+    }
 
-      <motion.div
-        key={`variables-${currentStep}`}
-       
-        transition={{ duration: 0.3, delay: 0.3 }}
-      >
-        <VariablePanel variables={steps[currentStep].variables} />
-      </motion.div>
-    </>
-  );
+    // Final result
+    newSteps.push({
+      array: [...nums],
+      i: nums.length,
+      maxSub,
+      curSum,
+      message: `Finished! Maximum Subarray Sum is ${maxSub}`,
+      lineNumber: 22,
+      highlightIndices: []
+    });
 
-  const rightContent = (
-    <AnimatedCodeEditor
-      code={code}
-      language="TypeScript"
-      highlightedLines={steps[currentStep].highlightedLines}
-    />
-  );
+    setSteps(newSteps);
+    setCurrentStepIndex(0);
+  };
 
-  const controls = (
-    <SimpleStepControls
-      currentStep={currentStep}
-      totalSteps={steps.length}
-      onStepChange={setCurrentStep}
-    />
-  );
+  useEffect(() => {
+    generateSteps();
+  }, []);
+
+  useEffect(() => {
+    if (isPlaying && currentStepIndex < steps.length - 1) {
+      intervalRef.current = setInterval(() => {
+        setCurrentStepIndex(prev => {
+          if (prev >= steps.length - 1) {
+            setIsPlaying(false);
+            return prev;
+          }
+          return prev + 1;
+        });
+      }, 1000 / speed);
+    } else {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    }
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [isPlaying, currentStepIndex, steps.length, speed]);
+
+  const handlePlay = () => setIsPlaying(true);
+  const handlePause = () => setIsPlaying(false);
+  const handleStepForward = () => currentStepIndex < steps.length - 1 && setCurrentStepIndex(prev => prev + 1);
+  const handleStepBack = () => currentStepIndex > 0 && setCurrentStepIndex(prev => prev - 1);
+  const handleReset = () => {
+    setCurrentStepIndex(0);
+    setIsPlaying(false);
+    generateSteps();
+  };
+
+  if (steps.length === 0) return null;
+
+  const currentStep = steps[currentStepIndex];
 
   return (
-    <VisualizationLayout
-      leftContent={leftContent}
-      rightContent={rightContent}
-      controls={controls}
-    />
+    <div className="space-y-6">
+      <StepControls
+        isPlaying={isPlaying}
+        onPlay={handlePlay}
+        onPause={handlePause}
+        onStepForward={handleStepForward}
+        onStepBack={handleStepBack}
+        onReset={handleReset}
+        speed={speed}
+        onSpeedChange={setSpeed}
+        currentStep={currentStepIndex}
+        totalSteps={steps.length - 1}
+      />
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <div className="bg-muted/30 rounded-lg border border-border/50 p-6">
+            <div className="flex items-center justify-center gap-2 overflow-x-auto">
+              {currentStep.array.map((value, index) => (
+                <div key={index} className="flex flex-col items-center gap-2">
+                  <div
+                    className={`w-12 h-12 md:w-16 md:h-16 rounded flex items-center justify-center font-bold text-lg transition-all duration-300 ${
+                      index === currentStep.i
+                        ? 'bg-primary text-primary-foreground shadow-lg scale-110'
+                        : 'bg-muted text-foreground'
+                    }`}
+                  >
+                    {value}
+                  </div>
+                  <span className="text-xs text-muted-foreground">{index}</span>
+                  {index === currentStep.i && <span className="text-xs font-bold text-primary">n</span>}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-accent/50 rounded-lg border border-accent p-4">
+            <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
+          </div>
+          
+          <div className="rounded-lg border p-4">
+            <VariablePanel
+              variables={{
+                maxSub: currentStep.maxSub,
+                curSum: currentStep.curSum,
+                n: currentStep.i >= 0 && currentStep.i < currentStep.array.length ? currentStep.array[currentStep.i] : 'N/A'
+              }}
+            />
+          </div>
+        </div>
+
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
+      </div>
+    </div>
   );
 };

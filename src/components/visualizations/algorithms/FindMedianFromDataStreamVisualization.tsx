@@ -105,11 +105,11 @@ export const FindMedianFromDataStreamVisualization = () => {
               </div>
               <div>
                 <div className="text-sm font-medium mb-2">MinHeap (Right Half):</div>
-                <div className="p-4 bg-purple-500/10 rounded min-h-[80px]">
+                <div className="p-4 bg-blue-500/10 rounded min-h-[80px]">
                   <div className="flex flex-col gap-1">
                     {currentStep.minHeap.map((val, idx) => (
-                      <div key={idx} className={`px-3 py-2 rounded font-mono bg-purple-500/20 text-purple-700 font-bold ${
-                        idx === 0 ? 'ring-2 ring-purple-500' : ''
+                      <div key={idx} className={`px-3 py-2 rounded font-mono bg-blue-500/20 text-blue-700 font-bold ${
+                        idx === 0 ? 'ring-2 ring-green-500' : ''
                       }`}>
                         {val}
                       </div>

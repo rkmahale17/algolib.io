@@ -52,13 +52,13 @@ const getSymbolColor = (char: string): string => {
   if (char.includes('(') || char.includes(')')) return 'text-green-500';
   if (char.includes('[') || char.includes(']')) return 'text-blue-500';
   if (char.includes('{') || char.includes('}')) return 'text-orange-500';
-  if (char.includes('<')) return 'text-purple-500';
+  if (char.includes('<')) return 'text-blue-500';
   return 'text-foreground';
 };
 
 export const useStackGame = (mode: StackMode) => {
   const { playSuccess, playError, playLevelComplete } = useGameAudio();
-  
+
   const [gameState, setGameState] = useState<StackGameState>({
     stack: [],
     fallingSymbols: [],
@@ -89,7 +89,7 @@ export const useStackGame = (mode: StackMode) => {
     const pairs = symbolPairs[mode];
     const pair = pairs[Math.floor(Math.random() * pairs.length)];
     const isOpen = Math.random() > 0.5;
-    
+
     return {
       id: gameState.nextSymbolId,
       char: isOpen ? pair.open : pair.close,
@@ -106,7 +106,7 @@ export const useStackGame = (mode: StackMode) => {
     const comboBonus = maxCombo * 5;
     const levelBonus = level * 50;
     const accuracyBonus = Math.floor(accuracy * 200);
-    
+
     return Math.max(0, Math.min(1000, Math.floor(baseScore + comboBonus + levelBonus + accuracyBonus)));
   }, []);
 
@@ -134,12 +134,12 @@ export const useStackGame = (mode: StackMode) => {
   const push = useCallback((symbol: FallingSymbol) => {
     setGameState(prev => {
       const isCorrect = symbol.type === 'open';
-      
+
       if (isCorrect) {
         playSuccess();
         const newCombo = prev.combo + 1;
         const comboBonus = newCombo >= 10 ? Math.floor(newCombo / 10) * 20 : 0;
-        
+
         return {
           ...prev,
           stack: [...prev.stack, symbol.char],
@@ -153,7 +153,7 @@ export const useStackGame = (mode: StackMode) => {
       } else {
         playError();
         const newLives = prev.lives - 1;
-        
+
         return {
           ...prev,
           lives: newLives,
@@ -169,17 +169,17 @@ export const useStackGame = (mode: StackMode) => {
 
   const pop = useCallback((symbol: FallingSymbol) => {
     setGameState(prev => {
-      const isCorrect = symbol.type === 'close' && 
-                       prev.stack.length > 0 && 
-                       prev.stack[prev.stack.length - 1] === symbol.matchedWith;
-      
+      const isCorrect = symbol.type === 'close' &&
+        prev.stack.length > 0 &&
+        prev.stack[prev.stack.length - 1] === symbol.matchedWith;
+
       if (isCorrect) {
         playSuccess();
         const newStack = [...prev.stack];
         newStack.pop();
         const newCombo = prev.combo + 1;
         const comboBonus = newCombo >= 10 ? Math.floor(newCombo / 10) * 20 : 0;
-        
+
         return {
           ...prev,
           stack: newStack,
@@ -193,7 +193,7 @@ export const useStackGame = (mode: StackMode) => {
       } else {
         playError();
         const newLives = prev.lives - 1;
-        
+
         return {
           ...prev,
           lives: newLives,
@@ -261,7 +261,7 @@ export const useStackGame = (mode: StackMode) => {
 
     const animate = () => {
       const now = Date.now();
-      
+
       // Spawn new symbols
       if (now - lastSpawnTimeRef.current > getSpawnInterval()) {
         const newSymbol = generateSymbol();
@@ -299,7 +299,7 @@ export const useStackGame = (mode: StackMode) => {
 
         // Level up every 20 correct moves
         const newLevel = Math.floor(prev.correctMoves / 20) + 1;
-        
+
         return {
           ...prev,
           fallingSymbols: updatedSymbols,

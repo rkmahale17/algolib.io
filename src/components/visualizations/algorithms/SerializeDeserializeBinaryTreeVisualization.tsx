@@ -167,7 +167,7 @@ export const SerializeDeserializeBinaryTreeVisualization = () => {
       ref.current.createDecorationsCollection(
         step.highlightedLines.map(l => ({
           range: new monaco.current!.Range(l, 1, l, 1),
-          options: { isWholeLine: true, className: 'highlighted-line-purple' }
+          options: { isWholeLine: true, className: 'highlighted-line-blue' }
         }))
       );
     }
@@ -203,7 +203,7 @@ export const SerializeDeserializeBinaryTreeVisualization = () => {
                   r="24"
                   className={`transition-all duration-300 ${
                     isCurrent
-                      ? step.phase === 'serialize' ? 'fill-purple-500' : 'fill-green-500'
+                      ? step.phase === 'serialize' ? 'fill-green-500' : 'fill-green-500'
                       : isProcessed
                       ? 'fill-blue-500'
                       : 'fill-card'
@@ -253,8 +253,8 @@ export const SerializeDeserializeBinaryTreeVisualization = () => {
             {renderTree()}
           </Card>
           <Card className="p-6">
-          <motion.div key={step.phase} className={`p-4 rounded mb-4 ${step.phase === 'serialize' ? 'bg-purple-500/10' : 'bg-green-500/10'}`}>
-            <p className={`text-2xl font-bold text-center ${step.phase === 'serialize' ? 'text-purple-600' : 'text-green-600'}`}>
+          <motion.div key={step.phase} className={`p-4 rounded mb-4 ${step.phase === 'serialize' ? 'bg-green-500/10' : 'bg-green-500/10'}`}>
+            <p className={`text-2xl font-bold text-center ${step.phase === 'serialize' ? 'text-green-600' : 'text-green-600'}`}>
               {step.phase === 'serialize' ? 'SERIALIZE' : 'DESERIALIZE'}
             </p>
           </motion.div>

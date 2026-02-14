@@ -33,7 +33,7 @@ export const ModeSelection = ({ onSelectMode }: ModeSelectionProps) => {
       description: "Partition numbers around a pivot to sort efficiently",
       difficulty: "Advanced",
       icon: Zap,
-      color: "from-purple-500 to-pink-500"
+      color: "from-blue-500 to-cyan-500"
     }
   ];
 

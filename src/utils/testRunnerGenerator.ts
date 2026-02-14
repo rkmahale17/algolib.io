@@ -2,7 +2,7 @@ import { Language } from '@/components/CodeRunner/LanguageSelector';
 import { findEntryFunction, ensureStaticMethods, stripComments } from './codeManipulation';
 import { getDSDetails, DSName, SUPPORTED_DS } from '@/lib/dsa-registry';
 
-const getRegistryCode = (inputSchema: any[], language: Language, userCode: string) => {
+export const getRegistryCode = (inputSchema: any[], language: Language, userCode: string) => {
     const required = new Set<DSName>();
     const types = inputSchema.map(i => i.type);
 
@@ -135,7 +135,7 @@ export const generateTestRunner = (
     testCases: TestCase[],
     inputSchema: any[],
     entryFunctionName?: string,
-    options?: { unordered?: boolean; multiExpected?: boolean }
+    options?: { unordered?: boolean; multiExpected?: boolean; returnModifiedInput?: boolean; modifiedInputIndex?: number }
 ): string => {
     switch (language) {
         case 'typescript':
@@ -376,7 +376,7 @@ const generateTypeScriptRunner = (
     testCases: TestCase[],
     inputSchema: any[],
     entryFunctionName?: string,
-    options?: { unordered?: boolean; multiExpected?: boolean }
+    options?: { unordered?: boolean; multiExpected?: boolean; returnModifiedInput?: boolean; modifiedInputIndex?: number }
 ): string => {
     const entryInfo = findEntryFunction(userCode, 'typescript', inputSchema, entryFunctionName);
     const userFuncName = entryInfo.name;
@@ -431,8 +431,13 @@ const results = testCases.map((tc, index) => {
 
   try {
     const start = Date.now();
-    const actual = ${userFuncName}.apply(null, tc.input);
+    let actual = ${userFuncName}.apply(null, tc.input);
     const end = Date.now();
+    
+    // Support in-place algorithms (e.g. sortColors) where return is void but input is modified
+    if (${options?.returnModifiedInput ? 'true' : 'false'}) {
+        actual = tc.input[${options?.modifiedInputIndex ?? 0}];
+    }
     
     // Auto-serialize result before comparison if it's a DS
     let serializedActual = actual;
@@ -508,7 +513,7 @@ const generatePythonRunner = (
     testCases: TestCase[],
     inputSchema: any[],
     entryFunctionName?: string,
-    options?: { unordered?: boolean; multiExpected?: boolean }
+    options?: { unordered?: boolean; multiExpected?: boolean; returnModifiedInput?: boolean; modifiedInputIndex?: number }
 ): string => {
     const entryInfo = findEntryFunction(userCode, 'python', inputSchema, entryFunctionName);
     const userFuncName = entryInfo.name;
@@ -573,6 +578,10 @@ for tc in test_cases:
         start = time.time()
         actual = ${userFuncName}(*tc['input'])
         end = time.time()
+        
+        # Support in-place algorithms
+        if ${options?.returnModifiedInput ? 'True' : 'False'}:
+            actual = tc['input'][${options?.modifiedInputIndex ?? 0}]
         
         # Auto-serialize result for comparison
         serialized_actual = actual
@@ -661,14 +670,27 @@ const generateJavaRunner = (
     testCases: TestCase[],
     inputSchema: any[],
     entryFunctionName?: string,
-    options?: { unordered?: boolean; multiExpected?: boolean }
+    options?: { unordered?: boolean; multiExpected?: boolean; returnModifiedInput?: boolean; modifiedInputIndex?: number }
 ): string => {
+    console.log("DEBUG: generateJavaRunner options:", options);
     // 1. Find the correct entry function using signature matching
     const entryInfo = findEntryFunction(userCode, 'java', inputSchema, entryFunctionName);
     const userFuncName = entryInfo.name;
 
     // 2. Ensure all helper methods are static (ONLY if not using class Solution)
     const userCodeClean = entryInfo.hasSolutionClass ? userCode : ensureStaticMethods(userCode);
+
+    // Auto-detect inplace from schema if not provided in options
+    let returnModifiedInput = options?.returnModifiedInput;
+    let modifiedInputIndex = options?.modifiedInputIndex ?? 0;
+
+    if (returnModifiedInput === undefined) {
+        const inplaceIdx = inputSchema.findIndex(i => i.inplace === true || String(i.inplace) === 'true');
+        if (inplaceIdx !== -1) {
+            returnModifiedInput = true;
+            modifiedInputIndex = inplaceIdx;
+        }
+    }
 
     // 3. Parse Argument Types from User Code to handle List<T> vs T[]
     const rawArgs = splitJavaArgs(entryInfo.argsStr); // ["String s", "List<String> wordDict"]
@@ -709,8 +731,22 @@ const generateJavaRunner = (
             try {
                 long start = System.nanoTime();
                 ${entryInfo.hasSolutionClass ? `Solution sol = new Solution();` : ''}
-                Object actual = ${entryInfo.hasSolutionClass ? 'sol.' : ''}${userFuncName}(${args});
                 
+                // Declare arguments
+                ${tc.input.map((val, i) => {
+            const type = userArgTypes[i] || 'Object';
+            return `${type} arg${i} = ${formatValue(val, inputSchema[i]?.type || 'any', 'java', userArgTypes[i] || '')};`;
+        }).join('\n                ')}
+
+                Object actual;
+                // Support in-place algorithms (void return type)
+                ${returnModifiedInput ? `
+                    ${entryInfo.hasSolutionClass ? 'sol.' : ''}${userFuncName}(${tc.input.map((_, i) => `arg${i}`).join(', ')});
+                    actual = arg${modifiedInputIndex};
+                ` : `
+                    actual = ${entryInfo.hasSolutionClass ? 'sol.' : ''}${userFuncName}(${tc.input.map((_, i) => `arg${i}`).join(', ')});
+                `}
+
                 // Auto-serialize result if it is a DS
                 Object serializedActual = actual;
                 ${requiredDS.includes('ListNode') ? `if (actual instanceof ListNode) serializedActual = listNodeToArray((ListNode)actual);` : ''}
@@ -895,7 +931,7 @@ const generateCppRunner = (
     testCases: TestCase[],
     inputSchema: any[],
     entryFunctionName?: string,
-    options?: { unordered?: boolean; multiExpected?: boolean }
+    options?: { unordered?: boolean; multiExpected?: boolean; returnModifiedInput?: boolean; modifiedInputIndex?: number }
 ): string => {
     const entryInfo = findEntryFunction(userCode, 'cpp', inputSchema, entryFunctionName);
     const userFuncName = entryInfo.name;
@@ -1023,6 +1059,23 @@ const generateCppRunner = (
         const expectedType = deduceCppType(tc.expectedOutput);
         const expectedDecl = `${expectedType} expected = ${expectedValStr};`;
 
+        // Logic for execution line:
+        // If in-place (returnModifiedInput=true), the function might return void.
+        // So we execute: userFunc(args); auto actual = arg0;
+        // Else: auto actual = userFunc(args);
+
+        let executionBlock = '';
+        if (options?.returnModifiedInput) {
+            executionBlock = `
+                 ${entryInfo.hasSolutionClass ? 'sol.' : ''}${userFuncName}(${args});
+                 auto actual = arg${options?.modifiedInputIndex ?? 0};
+             `;
+        } else {
+            executionBlock = `
+                 auto actual = ${entryInfo.hasSolutionClass ? 'sol.' : ''}${userFuncName}(${args});
+             `;
+        }
+
         return `
         {
             if (!first) cout << ",";
@@ -1032,7 +1085,7 @@ const generateCppRunner = (
                 ${expectedDecl}
                 ${entryInfo.hasSolutionClass ? 'Solution sol;' : ''}
                 auto start = chrono::high_resolution_clock::now();
-                auto actual = ${entryInfo.hasSolutionClass ? 'sol.' : ''}${userFuncName}(${args});
+                ${executionBlock}
                 
                 // Auto-serialize result
                 auto get_serialized = [&](auto& val) {
@@ -1065,10 +1118,6 @@ const generateCppRunner = (
                 };
 
                 bool passed = false;
-                if constexpr (${!!options?.multiExpected}) {
-                    // C++ multi expect handling requires variant or generic loop
-                    // For now simplicity: assume single expected
-                } 
                 passed = is_equal(serializedActual, expected);
 
                 cout << "{";

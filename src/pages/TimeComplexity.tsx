@@ -30,7 +30,7 @@ const TimeComplexity = () => {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Hero Section */}
-      <div className="relative h-[300px] w-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-blue-600/20 via-primary/10 to-purple-600/20">
+      <div className="relative h-[300px] w-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-blue-600/20 via-primary/10 to-green-600/20">
         <div className="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,white,transparent)]" />
         <div className="container relative z-10 flex flex-col items-center text-center p-4">
           <Link to="/" className="absolute top-4 left-4 md:left-12">
@@ -41,7 +41,7 @@ const TimeComplexity = () => {
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-6xl font-extrabold tracking-tight bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent"
+            className="text-4xl md:text-6xl font-extrabold tracking-tight bg-gradient-to-r from-blue-500 to-blue-500 bg-clip-text text-transparent"
           >
             Time & Space Complexity
           </motion.h1>
@@ -71,10 +71,10 @@ const TimeComplexity = () => {
               How the running time of an algorithm increases as the size of the input (N) increases. It's not about seconds, but about operations.
             </CardContent>
           </Card>
-          <Card className="bg-card/50 backdrop-blur-sm border-t-4 border-t-purple-500">
+          <Card className="bg-card/50 backdrop-blur-sm border-t-4 border-t-blue-500">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Server className="w-5 h-5 text-purple-500" />
+                <Server className="w-5 h-5 text-blue-500" />
                 Space Complexity
               </CardTitle>
             </CardHeader>
