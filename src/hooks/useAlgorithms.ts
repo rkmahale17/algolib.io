@@ -19,7 +19,7 @@ export const fetchAlgorithms = async (search?: string, category?: string): Promi
 
     // Call edge function via fetch (GET with query params)
     const response = await fetch(
-        `https://mitejukmgshjyusgnpps.supabase.co/functions/v1/fetch-algorithms?${params.toString()}`,
+        `https://dkebbjneobjtmuzzrsdo.supabase.co/functions/v1/fetch-algorithms?${params.toString()}`,
         {
             method: 'GET',
             headers: {
