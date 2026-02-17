@@ -24,6 +24,7 @@ import SlidingWindow from "./pages/SlidingWindow";
 import TwoPointer from "./pages/TwoPointer";
 import Leaderboard from "./pages/Leaderboard";
 import Navbar from "./components/Navbar";
+import MigrationBanner from "./components/MigrationBanner";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
@@ -36,6 +37,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter basename="/">
+        <MigrationBanner />
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
