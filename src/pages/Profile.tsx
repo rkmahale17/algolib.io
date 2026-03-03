@@ -20,30 +20,30 @@ const ProfileEdit = () => {
 
   const fetchProfileData = async () => {
     try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-            navigate('/login');
-            return;
-        }
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate('/login');
+        return;
+      }
 
-        const { data: profileData, error: profileError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', user.id)
-            .single();
-        
-        if (profileError) throw profileError;
-        setProfile({ ...profileData, is_public: true } as Profile);
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .maybeSingle();
 
-        // If user has username, redirect to public view
-        if (profileData?.username) {
-            navigate(`/profile/${profileData.username}`);
-        }
+      if (profileError) throw profileError;
+      setProfile({ ...profileData, is_public: true } as Profile);
+
+      // If user has username, redirect to public view
+      if (profileData?.username) {
+        navigate(`/profile/${profileData.username}`);
+      }
     } catch (error) {
-        console.error("Error fetching profile:", error);
-        toast.error("Failed to load profile");
+      console.error("Error fetching profile:", error);
+      toast.error("Failed to load profile");
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -53,25 +53,25 @@ const ProfileEdit = () => {
   return (
     <div className="min-h-screen bg-background pt-24 pb-12 px-4 md:px-8">
       <div className="max-w-6xl mx-auto space-y-8">
-        
+
         {/* Header */}
-        <ProfileHeader 
-            profile={profile} 
-            onEdit={() => setIsEditOpen(true)} 
-            isOwnProfile={true} 
+        <ProfileHeader
+          profile={profile}
+          onEdit={() => setIsEditOpen(true)}
+          isOwnProfile={true}
         />
 
         {/* Edit Dialog */}
         {isEditOpen && (
-            <EditProfileDialog 
-                open={isEditOpen} 
-                onOpenChange={setIsEditOpen} 
-                profile={profile} 
-                onSave={() => {
-                    fetchProfileData();
-                    setIsEditOpen(false);
-                }}
-            />
+          <EditProfileDialog
+            open={isEditOpen}
+            onOpenChange={setIsEditOpen}
+            profile={profile}
+            onSave={() => {
+              fetchProfileData();
+              setIsEditOpen(false);
+            }}
+          />
         )}
 
         {/* Message to set username */}

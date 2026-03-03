@@ -77,21 +77,21 @@ export const BrainstormSection = ({
         onValueChange={handleTabChange}
         className="h-full flex flex-col"
       >
-        <div className="flex items-center justify-between border-b bg-muted/10 shrink-0">
-          <TabsList className="flex-1 flex p-0 bg-transparent gap-0 rounded-none h-12">
+        <div className="flex items-center justify-between border-b shrink-0">
+          <TabsList className="flex-1 flex p-0 bg-transparent gap-0 rounded-none h-10">
             <TooltipProvider>
               <FeatureGuard flag="drawing">
                 {controls?.whiteboard !== false && (
                   <TabsTrigger
                     value="whiteboard"
-                    className="flex-1 gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none"
+                    className="flex-1 gap-2 data-[state=active]:bg-transparent data-[state=active]:text-black dark:data-[state=active]:text-white border-b-2 border-transparent data-[state=active]:border-primary rounded-none"
                   >
                     {isCompact ? (
                       <Tooltip>
                         <TooltipTrigger asChild>
-                           <div className="flex items-center justify-center w-full h-full">
-                              <Palette className="w-4 h-4" />
-                           </div>
+                          <div className="flex items-center justify-center w-full h-full">
+                            <Palette className="w-4 h-4" />
+                          </div>
                         </TooltipTrigger>
                         <TooltipContent>Whiteboard</TooltipContent>
                       </Tooltip>
@@ -107,15 +107,15 @@ export const BrainstormSection = ({
               <FeatureGuard flag="notes">
                 {controls?.notes !== false && (
                   <TabsTrigger
-                      value="notes"
-                      className="flex-1 gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none"
+                    value="notes"
+                    className="flex-1 gap-2 data-[state=active]:bg-transparent data-[state=active]:text-black dark:data-[state=active]:text-white border-b-2 border-transparent data-[state=active]:border-primary rounded-none"
                   >
                     {isCompact ? (
-                       <Tooltip>
+                      <Tooltip>
                         <TooltipTrigger asChild>
-                           <div className="flex items-center justify-center w-full h-full">
-                             <FileText className="w-4 h-4" />
-                           </div>
+                          <div className="flex items-center justify-center w-full h-full">
+                            <FileText className="w-4 h-4" />
+                          </div>
                         </TooltipTrigger>
                         <TooltipContent>Notes</TooltipContent>
                       </Tooltip>
@@ -128,34 +128,34 @@ export const BrainstormSection = ({
                   </TabsTrigger>
                 )}
               </FeatureGuard>
-                  <FeatureGuard flag="history">
-              <TabsTrigger
-                value="history"
-                className="flex-1 gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none"
-              >
+              <FeatureGuard flag="history">
+                <TabsTrigger
+                  value="history"
+                  className="flex-1 gap-2 data-[state=active]:bg-transparent data-[state=active]:text-black dark:data-[state=active]:text-white border-b-2 border-transparent data-[state=active]:border-primary rounded-none"
+                >
                   {isCompact ? (
-                     <Tooltip>
-                        <TooltipTrigger asChild>
-                           <div className="flex items-center justify-center w-full h-full">
-                             <History className="w-4 h-4" />
-                           </div>
-                        </TooltipTrigger>
-                        <TooltipContent>History</TooltipContent>
-                      </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="flex items-center justify-center w-full h-full">
+                          <History className="w-4 h-4" />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>History</TooltipContent>
+                    </Tooltip>
                   ) : (
                     <>
                       <History className="w-4 h-4" />
                       History
                     </>
                   )}
-              </TabsTrigger>
+                </TabsTrigger>
               </FeatureGuard>
             </TooltipProvider>
           </TabsList>
-          
+
           <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
             <DialogTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-12 w-12 rounded-none border-l">
+              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-none border-l">
                 <Maximize2 className="w-4 h-4" />
               </Button>
             </DialogTrigger>
@@ -167,22 +167,22 @@ export const BrainstormSection = ({
               >
                 <TabsList className="w-full justify-start rounded-none border-b px-4 bg-background">
                   <FeatureGuard flag="drawing">
-                   {controls?.whiteboard !== false && (
-                    <TabsTrigger value="whiteboard" className="gap-2">
-                      <Palette className="w-4 h-4" />
-                      Whiteboard
-                    </TabsTrigger>
-                   )}
+                    {controls?.whiteboard !== false && (
+                      <TabsTrigger value="whiteboard" className="gap-2 data-[state=active]:bg-transparent data-[state=active]:text-black dark:data-[state=active]:text-white">
+                        <Palette className="w-4 h-4" />
+                        Whiteboard
+                      </TabsTrigger>
+                    )}
                   </FeatureGuard>
                   <FeatureGuard flag="notes">
-                   {controls?.notes !== false && (
-                    <TabsTrigger value="notes" className="gap-2">
-                      <FileText className="w-4 h-4" />
-                      Notes
-                    </TabsTrigger>
-                   )}
+                    {controls?.notes !== false && (
+                      <TabsTrigger value="notes" className="gap-2 data-[state=active]:bg-transparent data-[state=active]:text-black dark:data-[state=active]:text-white">
+                        <FileText className="w-4 h-4" />
+                        Notes
+                      </TabsTrigger>
+                    )}
                   </FeatureGuard>
-                  <TabsTrigger value="history" className="gap-2">
+                  <TabsTrigger value="history" className="gap-2 data-[state=active]:bg-transparent data-[state=active]:text-black dark:data-[state=active]:text-white">
                     <History className="w-4 h-4" />
                     History
                   </TabsTrigger>
@@ -190,28 +190,28 @@ export const BrainstormSection = ({
 
                 <div className="flex-1 overflow-hidden">
                   <FeatureGuard flag="drawing">
-                   {controls?.whiteboard !== false && (
-                    <TabsContent value="whiteboard" className="h-full m-0">
-                      <LazyWhiteboardComponent
-                        algorithmId={algorithmId}
-                        algorithmTitle={algorithmTitle}
-                        restoreData={whiteboardRestore}
-                        isExpand={isModalOpen}
-                      />
-                    </TabsContent>
-                   )}
+                    {controls?.whiteboard !== false && (
+                      <TabsContent value="whiteboard" className="h-full m-0">
+                        <LazyWhiteboardComponent
+                          algorithmId={algorithmId}
+                          algorithmTitle={algorithmTitle}
+                          restoreData={whiteboardRestore}
+                          isExpand={isModalOpen}
+                        />
+                      </TabsContent>
+                    )}
                   </FeatureGuard>
 
                   <FeatureGuard flag="notes">
-                   {controls?.notes !== false && (
-                    <TabsContent value="notes" className="h-full m-0">
-                      <NotesComponent
-                        algorithmId={algorithmId}
-                        algorithmTitle={algorithmTitle}
-                        restoreData={noteRestore}
-                      />
-                    </TabsContent>
-                   )}
+                    {controls?.notes !== false && (
+                      <TabsContent value="notes" className="h-full m-0">
+                        <NotesComponent
+                          algorithmId={algorithmId}
+                          algorithmTitle={algorithmTitle}
+                          restoreData={noteRestore}
+                        />
+                      </TabsContent>
+                    )}
                   </FeatureGuard>
 
                   <TabsContent
@@ -232,27 +232,27 @@ export const BrainstormSection = ({
 
         <div className="flex-1 overflow-hidden">
           <FeatureGuard flag="drawing">
-           {controls?.whiteboard !== false && (
-            <TabsContent value="whiteboard" className="h-full m-0">
-              <LazyWhiteboardComponent
-                algorithmId={algorithmId}
-                algorithmTitle={algorithmTitle}
-                restoreData={whiteboardRestore}
-              />
-            </TabsContent>
-           )}
+            {controls?.whiteboard !== false && (
+              <TabsContent value="whiteboard" className="h-full m-0">
+                <LazyWhiteboardComponent
+                  algorithmId={algorithmId}
+                  algorithmTitle={algorithmTitle}
+                  restoreData={whiteboardRestore}
+                />
+              </TabsContent>
+            )}
           </FeatureGuard>
 
           <FeatureGuard flag="notes">
-           {controls?.notes !== false && (
-            <TabsContent value="notes" className="h-full m-0">
-              <NotesComponent
-                algorithmId={algorithmId}
-                algorithmTitle={algorithmTitle}
-                restoreData={noteRestore}
-              />
-            </TabsContent>
-           )}
+            {controls?.notes !== false && (
+              <TabsContent value="notes" className="h-full m-0">
+                <NotesComponent
+                  algorithmId={algorithmId}
+                  algorithmTitle={algorithmTitle}
+                  restoreData={noteRestore}
+                />
+              </TabsContent>
+            )}
           </FeatureGuard>
 
           <TabsContent value="history" className="h-full m-0 p-4 overflow-auto">

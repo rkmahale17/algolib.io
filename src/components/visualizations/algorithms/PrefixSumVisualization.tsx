@@ -20,7 +20,7 @@ export const PrefixSumVisualization = () => {
   const [speed, setSpeed] = useState(1);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const code = `function prefixSum(arr) {
+  const code = `function prefixSum(arr: number[]): number[] {
   const prefix = [arr[0]];
   
   for (let i = 1; i < arr.length; i++) {
@@ -35,46 +35,71 @@ export const PrefixSumVisualization = () => {
     const newSteps: Step[] = [];
     const prefix: number[] = [];
 
+    // Line 1: Function entry
     newSteps.push({
       originalArray: [...array],
       prefixArray: [],
       currentIndex: -1,
       sum: 0,
-      message: 'Initialize prefix array with first element',
+      message: 'Starting Prefix Sum calculation.',
       lineNumber: 1
     });
 
+    // Line 2: Initialize prefix with first element
     prefix.push(array[0]);
     newSteps.push({
       originalArray: [...array],
       prefixArray: [...prefix],
       currentIndex: 0,
       sum: array[0],
-      message: `prefix[0] = arr[0] = ${array[0]}`,
-      lineNumber: 1
+      message: `Initialize prefix array with the first element: prefix[0] = arr[0] = ${array[0]}.`,
+      lineNumber: 2
     });
 
     for (let i = 1; i < array.length; i++) {
-      const sum = prefix[i - 1] + array[i];
-      prefix.push(sum);
-      
+      // Line 4: For loop check
       newSteps.push({
         originalArray: [...array],
         prefixArray: [...prefix],
         currentIndex: i,
-        sum,
-        message: `prefix[${i}] = prefix[${i - 1}] + arr[${i}] = ${prefix[i - 1]} + ${array[i]} = ${sum}`,
+        sum: prefix[i - 1],
+        message: `Iteration i = ${i}. We will calculate prefix[${i}] using the previous sum.`,
         lineNumber: 4
+      });
+
+      const currentVal = array[i];
+      const prevSum = prefix[i - 1];
+      const newSum = prevSum + currentVal;
+
+      // Line 5: Calculate and assign
+      newSteps.push({
+        originalArray: [...array],
+        prefixArray: [...prefix],
+        currentIndex: i,
+        sum: newSum,
+        message: `Calculate prefix[${i}]: prefix[${i - 1}] (${prevSum}) + arr[${i}] (${currentVal}) = ${newSum}.`,
+        lineNumber: 5
+      });
+
+      prefix.push(newSum);
+      newSteps.push({
+        originalArray: [...array],
+        prefixArray: [...prefix],
+        currentIndex: i,
+        sum: newSum,
+        message: `prefix[${i}] is now stored as ${newSum}.`,
+        lineNumber: 5
       });
     }
 
+    // Line 8: Return
     newSteps.push({
       originalArray: [...array],
       prefixArray: [...prefix],
       currentIndex: array.length - 1,
       sum: prefix[prefix.length - 1],
-      message: `Prefix sum array complete! Total sum = ${prefix[prefix.length - 1]}`,
-      lineNumber: 7
+      message: 'Prefix sum array calculation complete.',
+      lineNumber: 8
     });
 
     setSteps(newSteps);
@@ -157,9 +182,8 @@ export const PrefixSumVisualization = () => {
                         </div>
                       )}
                       <div
-                        className={`w-full rounded-t transition-all duration-300 ${
-                          isActive ? 'bg-primary shadow-lg shadow-primary/50 scale-105' : 'bg-gradient-to-t from-accent/60 to-accent/40'
-                        }`}
+                        className={`w-full rounded-t transition-all duration-300 ${isActive ? 'bg-primary shadow-lg shadow-primary/50 scale-105' : 'bg-gradient-to-t from-accent/60 to-accent/40'
+                          }`}
                         style={{ height: `${(value / getMaxValue()) * 100}%`, minHeight: '20px' }}
                       />
                       <span className={`text-xs font-mono ${isActive ? 'text-primary font-bold text-base' : 'text-muted-foreground'}`}>
@@ -179,9 +203,8 @@ export const PrefixSumVisualization = () => {
                   return (
                     <div key={index} className="flex flex-col items-center gap-2 flex-1 max-w-[60px]">
                       <div
-                        className={`w-full rounded-t transition-all duration-300 ${
-                          isActive ? 'bg-primary shadow-lg shadow-primary/50 scale-105' : 'bg-gradient-to-t from-primary/60 to-primary/40'
-                        }`}
+                        className={`w-full rounded-t transition-all duration-300 ${isActive ? 'bg-primary shadow-lg shadow-primary/50 scale-105' : 'bg-gradient-to-t from-primary/60 to-primary/40'
+                          }`}
                         style={{ height: `${(value / getMaxValue()) * 100}%`, minHeight: '20px' }}
                       />
                       <span className={`text-xs font-mono ${isActive ? 'text-primary font-bold text-base' : 'text-muted-foreground'}`}>
@@ -198,22 +221,22 @@ export const PrefixSumVisualization = () => {
             <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
           </div>
 
-          
+
           <div className=" rounded-lg border  p-4">
             <VariablePanel
-            variables={{
-              i: currentStep.currentIndex >= 0 ? currentStep.currentIndex : 'N/A',
-              'arr[i]': currentStep.currentIndex >= 0 ? currentStep.originalArray[currentStep.currentIndex] : 'N/A',
-              'prefix[i-1]': currentStep.currentIndex > 0 ? currentStep.prefixArray[currentStep.currentIndex - 1] : 'N/A',
-              sum: currentStep.sum,
-              prefixLength: currentStep.prefixArray.length
-            }}
-          />
+              variables={{
+                i: currentStep.currentIndex >= 0 ? currentStep.currentIndex : 'N/A',
+                'arr[i]': currentStep.currentIndex >= 0 ? currentStep.originalArray[currentStep.currentIndex] : 'N/A',
+                'prefix[i-1]': currentStep.currentIndex > 0 ? currentStep.prefixArray[currentStep.currentIndex - 1] : 'N/A',
+                sum: currentStep.sum,
+                prefixLength: currentStep.prefixArray.length
+              }}
+            />
           </div>
         </div>
 
         <div className="space-y-4">
-          
+
           <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
         </div>
       </div>

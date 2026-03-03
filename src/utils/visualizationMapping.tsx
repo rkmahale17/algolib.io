@@ -21,7 +21,7 @@ export const visualizationMap: Record<string, React.LazyExoticComponent<React.Co
   'trapping-rain-water': React.lazy(() => import('@/components/visualizations/algorithms/TrappingRainWaterVisualization').then(m => ({ default: m.TrappingRainWaterVisualization }))),
   'rotate-array': React.lazy(() => import('@/components/visualizations/algorithms/RotateArrayVisualization').then(m => ({ default: m.RotateArrayVisualization }))),
   'cyclic-sort': React.lazy(() => import('@/components/visualizations/algorithms/CyclicSortVisualization').then(m => ({ default: m.CyclicSortVisualization }))),
-  
+
   // Tree Algorithms
   'dfs-preorder': React.lazy(() => import('@/components/visualizations/algorithms/DFSPreorderVisualization').then(m => ({ default: m.DFSPreorderVisualization }))),
   'dfs-inorder': React.lazy(() => import('@/components/visualizations/algorithms/DFSInorderVisualization').then(m => ({ default: m.DFSInorderVisualization }))),
@@ -32,16 +32,17 @@ export const visualizationMap: Record<string, React.LazyExoticComponent<React.Co
   'serialize-tree': React.lazy(() => import('@/components/visualizations/algorithms/SerializeTreeVisualization').then(m => ({ default: m.SerializeTreeVisualization }))),
   'recover-bst': React.lazy(() => import('@/components/visualizations/algorithms/RecoverBSTVisualization').then(m => ({ default: m.RecoverBSTVisualization }))),
   'trie': React.lazy(() => import('@/components/visualizations/algorithms/TrieVisualization').then(m => ({ default: m.TrieVisualization }))),
-  
+
   // Linked List Algorithms
   'fast-slow-pointers': React.lazy(() => import('@/components/visualizations/algorithms/FastSlowPointersVisualization').then(m => ({ default: m.FastSlowPointersVisualization }))),
   'reverse-linked-list': React.lazy(() => import('@/components/visualizations/algorithms/ReverseLinkedListVisualization').then(m => ({ default: m.ReverseLinkedListVisualization }))),
   'detect-cycle': React.lazy(() => import('@/components/visualizations/algorithms/DetectCycleVisualization').then(m => ({ default: m.DetectCycleVisualization }))),
   'middle-node': React.lazy(() => import('@/components/visualizations/algorithms/MiddleNodeVisualization').then(m => ({ default: m.MiddleNodeVisualization }))),
-  'merge-sorted-lists': React.lazy(() => import('@/components/visualizations/algorithms/MergeSortedListsVisualization').then(m => ({ default: m.MergeSortedListsVisualization }))),
+  'merge-sorted-lists': React.lazy(() => import('@/components/visualizations/algorithms/MergeSortLinkedListVisualization').then(m => ({ default: m.MergeSortLinkedListVisualization }))),
+  'merge-two-sorted-lists': React.lazy(() => import('@/components/visualizations/algorithms/MergeSortLinkedListVisualization').then(m => ({ default: m.MergeSortLinkedListVisualization }))),
   'merge-k-lists': React.lazy(() => import('@/components/visualizations/algorithms/MergeKSortedListsVisualization').then(m => ({ default: m.MergeKSortedListsVisualization }))),
   'merge-k-sorted-lists': React.lazy(() => import('@/components/visualizations/algorithms/MergeKSortedListsVisualization').then(m => ({ default: m.MergeKSortedListsVisualization }))),
-  
+
   // Graph Algorithms
   'graph-dfs': React.lazy(() => import('@/components/visualizations/algorithms/GraphDFSVisualization').then(m => ({ default: m.GraphDFSVisualization }))),
   'graph-bfs': React.lazy(() => import('@/components/visualizations/algorithms/GraphBFSVisualization').then(m => ({ default: m.GraphBFSVisualization }))),
@@ -53,7 +54,7 @@ export const visualizationMap: Record<string, React.LazyExoticComponent<React.Co
   'bellman-ford': React.lazy(() => import('@/components/visualizations/algorithms/BellmanFordVisualization').then(m => ({ default: m.BellmanFordVisualization }))),
   'floyd-warshall': React.lazy(() => import('@/components/visualizations/algorithms/FloydWarshallVisualization').then(m => ({ default: m.FloydWarshallVisualization }))),
   'a-star': React.lazy(() => import('@/components/visualizations/algorithms/AStarVisualization').then(m => ({ default: m.AStarVisualization }))),
-  
+
   // Dynamic Programming
   'knapsack-01': React.lazy(() => import('@/components/visualizations/algorithms/KnapsackVisualization').then(m => ({ default: m.KnapsackVisualization }))),
   'coin-change': React.lazy(() => import('@/components/visualizations/algorithms/CoinChangeVisualization').then(m => ({ default: m.CoinChangeVisualization }))),
@@ -65,7 +66,7 @@ export const visualizationMap: Record<string, React.LazyExoticComponent<React.Co
   'climbing-stairs': React.lazy(() => import('@/components/visualizations/algorithms/ClimbingStairsVisualization').then(m => ({ default: m.ClimbingStairsVisualization }))),
   'partition-equal-subset': React.lazy(() => import('@/components/visualizations/algorithms/PartitionEqualSubsetVisualization').then(m => ({ default: m.PartitionEqualSubsetVisualization }))),
   'word-break': React.lazy(() => import('@/components/visualizations/algorithms/WordBreakVisualization').then(m => ({ default: m.WordBreakVisualization }))),
-  
+
   // Backtracking
   'subsets': React.lazy(() => import('@/components/visualizations/algorithms/SubsetsVisualization').then(m => ({ default: m.SubsetsVisualization }))),
   'permutations': React.lazy(() => import('@/components/visualizations/algorithms/PermutationsVisualization').then(m => ({ default: m.PermutationsVisualization }))),
@@ -75,33 +76,33 @@ export const visualizationMap: Record<string, React.LazyExoticComponent<React.Co
   'word-search-grid': React.lazy(() => import('@/components/visualizations/algorithms/WordSearchVisualization').then(m => ({ default: m.WordSearchVisualization }))),
   'n-queens': React.lazy(() => import('@/components/visualizations/algorithms/NQueensVisualization').then(m => ({ default: m.NQueensVisualization }))),
   'sudoku-solver': React.lazy(() => import('@/components/visualizations/algorithms/SudokuSolverVisualization').then(m => ({ default: m.SudokuSolverVisualization }))),
-  
+
   // Advanced Data Structures
   'segment-tree': React.lazy(() => import('@/components/visualizations/algorithms/SegmentTreeVisualization').then(m => ({ default: m.SegmentTreeVisualization }))),
   'fenwick-tree': React.lazy(() => import('@/components/visualizations/algorithms/FenwickTreeVisualization').then(m => ({ default: m.FenwickTreeVisualization }))),
-  
+
   // String Algorithms
   'kmp': React.lazy(() => import('@/components/visualizations/algorithms/KMPVisualization').then(m => ({ default: m.KMPVisualization }))),
   'kmp-string-matching': React.lazy(() => import('@/components/visualizations/algorithms/KMPVisualization').then(m => ({ default: m.KMPVisualization }))),
   'rabin-karp': React.lazy(() => import('@/components/visualizations/algorithms/RabinKarpVisualization').then(m => ({ default: m.RabinKarpVisualization }))),
-  
+
   // Greedy Algorithms
   'activity-selection': React.lazy(() => import('@/components/visualizations/algorithms/ActivitySelectionVisualization').then(m => ({ default: m.ActivitySelectionVisualization }))),
-  
+
   // Bit Manipulation
   'xor-trick': React.lazy(() => import('@/components/visualizations/algorithms/XORTrickVisualization').then(m => ({ default: m.XORTrickVisualization }))),
   'count-bits': React.lazy(() => import('@/components/visualizations/algorithms/CountBitsVisualization').then(m => ({ default: m.CountBitsVisualization }))),
   'subset-generation-bits': React.lazy(() => import('@/components/visualizations/algorithms/SubsetBitsVisualization').then(m => ({ default: m.SubsetBitsVisualization }))),
-  
+
   // Heap/Priority Queue
   'kth-largest': React.lazy(() => import('@/components/visualizations/algorithms/KthLargestVisualization').then(m => ({ default: m.KthLargestVisualization }))),
   'kth-largest-element': React.lazy(() => import('@/components/visualizations/algorithms/KthLargestVisualization').then(m => ({ default: m.KthLargestVisualization }))),
   'sliding-window-maximum': React.lazy(() => import('@/components/visualizations/algorithms/SlidingWindowMaxVisualization').then(m => ({ default: m.SlidingWindowMaxVisualization }))),
-  
+
   // Cache Algorithms
   'lru-cache': React.lazy(() => import('@/components/visualizations/algorithms/LRUCacheVisualization').then(m => ({ default: m.LRUCacheVisualization }))),
   'lru': React.lazy(() => import('@/components/visualizations/algorithms/LRUCacheVisualization').then(m => ({ default: m.LRUCacheVisualization }))),
-  
+
   // Math Algorithms
   'gcd-euclidean': React.lazy(() => import('@/components/visualizations/algorithms/GCDVisualization').then(m => ({ default: m.GCDVisualization }))),
   'gcd': React.lazy(() => import('@/components/visualizations/algorithms/GCDVisualization').then(m => ({ default: m.GCDVisualization }))),
@@ -134,11 +135,11 @@ export function hasVisualization(algorithmId: string): boolean {
  */
 export function renderVisualization(algorithmId: string): JSX.Element | null {
   const VisualizationComponent = getVisualizationComponent(algorithmId);
-  
+
   if (!VisualizationComponent) {
     return null;
   }
-  
+
   return (
     <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}>
       <VisualizationComponent />

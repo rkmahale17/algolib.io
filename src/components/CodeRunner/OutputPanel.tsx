@@ -9,6 +9,8 @@ import { FeatureGuard } from "@/components/FeatureGuard";
 import { TestCaseEditor } from './TestCaseEditor';
 import { Submission } from '@/types/userAlgorithmData';
 import { diffStrings } from '@/utils/diffUtils';
+import { TreeDiagram } from '../visualizations/TreeDiagram';
+import { isTreeType, parseTreeValue } from '@/utils/treeUtils';
 
 const DiffView = ({ expected, actual }: { expected: any, actual: any }) => {
   const expectedStr = (typeof expected === 'string' ? expected : JSON.stringify(expected, null, 2)) || "";
@@ -46,24 +48,24 @@ interface OutputPanelProps {
   testCases?: Array<{ input: any[]; output: any }>;
   executionTime?: number | null;
   algorithmMeta?: Algorithm | null;
-  
+
   // LeetCode Style Props
   activeTab: "testcase" | "result" | "submissions";
   onTabChange: (tab: "testcase" | "result" | "submissions") => void;
-  
+
   allTestCases: Array<{ id: number; input: any[]; expectedOutput: any; isCustom: boolean; description?: string; isSubmission?: boolean }>;
   onAddTestCase: () => void;
   onUpdateTestCase: (id: number, data: any) => void;
   onDeleteTestCase: (id: number) => void;
-  
+
   // Editing State
   editingTestCaseId: number | null;
   onEditTestCase: (id: number | null) => void;
   onCancelEdit: () => void;
-  
+
   inputSchema?: any[];
   controls?: any;
-  
+
   // New Prop
   submissions?: Submission[];
   executedTestCases?: Array<{ id: number; input: any[]; expectedOutput: any; isCustom: boolean; description?: string; isSubmission?: boolean }>;
@@ -98,7 +100,7 @@ export const OutputPanel = ({
   submissions = [],
   executedTestCases,
   onSelectSubmission,
-  activeTestCaseTab: controlledActiveTestCaseTab, 
+  activeTestCaseTab: controlledActiveTestCaseTab,
   onTestCaseTabChange,
   onToggleExpand,
   isExpanded,
@@ -107,7 +109,7 @@ export const OutputPanel = ({
   const [internalActiveTestCaseTab, setInternalActiveTestCaseTab] = useState<string>("");
   const activeTestCaseTab = controlledActiveTestCaseTab ?? internalActiveTestCaseTab;
   const setActiveTestCaseTab = onTestCaseTabChange ?? setInternalActiveTestCaseTab;
-  
+
   const containerRef = React.useRef<HTMLDivElement>(null);
   const [panelWidth, setPanelWidth] = useState(300);
 
@@ -125,7 +127,7 @@ export const OutputPanel = ({
   const [activeResultTab, setActiveResultTab] = useState("result-0");
   React.useEffect(() => {
     if (output && output.testResults && output.testResults.length > 0) {
-       setActiveResultTab("result-0");
+      setActiveResultTab("result-0");
     }
   }, [output]);
 
@@ -134,10 +136,10 @@ export const OutputPanel = ({
     // ...
     if (statusId === 3) {
       const allPassed = testResults?.every((r: any) => r.status === 'pass');
-      return allPassed ? "text-green-500" : "text-destructive";
+      return allPassed ? "text-green-500" : "text-red-500";
     }
-    if (statusId === 6) return "text-yellow-500"; // Compilation Error
-    return "text-destructive"; // Runtime Error or Wrong Answer
+    if (statusId === 6) return "text-red-600 dark:text-red-400"; // Compilation Error
+    return "text-red-500"; // Runtime Error or Wrong Answer
   };
 
   const getStatusText = (statusId?: number, description?: string, testResults?: any[]) => {
@@ -148,63 +150,63 @@ export const OutputPanel = ({
     }
     return description || "Error";
   };
-  
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString();
   };
 
   return (
-    <div className="h-full flex flex-col bg-muted/10 border-t overflow-hidden">
+    <div className="h-full flex flex-col border-t overflow-hidden">
       {/* Top Bar / Tabs */}
-      <div className="flex items-center justify-between border-b bg-background/50 shrink-0">
+      <div className="flex items-center justify-between border-b shrink-0">
         {/* Scrollable Tabs Area */}
-        <div className="flex-1 flex items-center gap-1 p-1 overflow-x-auto scrollbar-thin mask-image-linear-gradient-to-r pb-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onTabChange("testcase")}
-              className={`h-8 text-xs gap-2 shrink-0 ${activeTab === "testcase" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}
-            >
-              <FlaskConical className="w-3.5 h-3.5" />
-              Testcase
-            </Button>
+        <div className="flex-1 flex items-center gap-1 p-1 overflow-x-auto scrollbar-thin mask-image-linear-gradient-to-r">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onTabChange("testcase")}
+            className={`h-10 text-xs gap-2 shrink-0 rounded-none transition-all ${activeTab === "testcase" ? "text-foreground bg-muted/50" : "text-muted-foreground"}`}
+          >
+            <FlaskConical className="w-3.5 h-3.5" />
+            Testcase
+          </Button>
 
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onTabChange("result")}
-              className={`h-8 text-xs gap-2 shrink-0 ${activeTab === "result" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}
-              disabled={!output}
-            >
-              <Terminal className="w-3.5 h-3.5" />
-              Test Result
-            </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onTabChange("result")}
+            className={`h-10 text-xs gap-2 shrink-0 rounded-none transition-all ${activeTab === "result" ? "text-foreground bg-muted/50" : "text-muted-foreground"}`}
+            disabled={!output}
+          >
+            <Terminal className="w-3.5 h-3.5" />
+            Test Result
+          </Button>
 
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onTabChange("submissions")}
-              className={`h-8 text-xs gap-2 shrink-0 ${activeTab === "submissions" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}
-            >
-              <History className="w-3.5 h-3.5" />
-              Submissions
-            </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onTabChange("submissions")}
+            className={`h-10 text-xs gap-2 shrink-0 rounded-none transition-all ${activeTab === "submissions" ? "text-foreground bg-muted/50" : "text-muted-foreground"}`}
+          >
+            <History className="w-3.5 h-3.5" />
+            Submissions
+          </Button>
         </div>
 
         {/* Fixed Right Actions */}
         <div className="flex items-center px-2 shrink-0 bg-background/50 h-full shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)] z-10">
-            {onToggleExpand && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onToggleExpand}
-                className="h-6 w-6 text-muted-foreground hover:text-foreground"
-                title={isExpanded ? "Collapse" : "Expand output"}
-              >
-                     
-                {isExpanded ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
-              </Button>
-            )}
+          {onToggleExpand && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onToggleExpand}
+              className="h-6 w-6 text-muted-foreground hover:text-foreground"
+              title={isExpanded ? "Collapse" : "Expand output"}
+            >
+
+              {isExpanded ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+            </Button>
+          )}
         </div>
       </div>
       {/* TABS content */}
@@ -212,24 +214,24 @@ export const OutputPanel = ({
         {/* TESTCASE TAB */}
         {activeTab === "testcase" && (
           <div className="h-full flex flex-col min-h-0">
-            <Tabs 
-              value={activeTestCaseTab} 
+            <Tabs
+              value={activeTestCaseTab}
               onValueChange={setActiveTestCaseTab}
               className="flex-1 flex flex-col min-h-0"
             >
               <div className="flex items-center justify-between border-b bg-background/50 shrink-0">
                 {/* Scrollable Tabs List */}
                 <div className="flex-1 overflow-x-auto scrollbar-thin mask-image-linear-gradient-to-r pb-1">
-                   <TabsList className="h-9 bg-transparent p-0 gap-1 flex-nowrap w-max justify-start mb-1">
+                  <TabsList className="h-9 bg-transparent p-0 gap-1 flex-nowrap w-max justify-start mb-1">
                     {allTestCases.filter(tc => !tc.isSubmission).map((tc, index) => (
                       <TabsTrigger
                         key={tc.id}
                         value={`case-${tc.id}`}
-                        className="text-xs px-3 h-7 whitespace-nowrap data-[state=active]:bg-primary/10 relative group shrink-0"
+                        className="text-xs px-3 h-7 whitespace-nowrap data-[state=active]:bg-primary/10 data-[state=active]:text-primary relative group shrink-0"
                       >
                         {tc.isCustom ? `Case ${index + 1}` : `Case ${index + 1}`}
                         {/* Delete button for all cases */}
-                        <div 
+                        <div
                           className="ml-2 hover:bg-destructive/20 rounded-full p-0.5 cursor-pointer opacity-70 hover:opacity-100 transition-opacity"
                           onClick={(e) => {
                             e.stopPropagation();
@@ -240,32 +242,32 @@ export const OutputPanel = ({
                         </div>
                       </TabsTrigger>
                     ))}
-                    
+
                     <FeatureGuard flag="custom_test_case_addtion">
                       {controls?.add_test_case !== false && (
-                          <div className="sticky right-0 top-0 z-10 flex items-center pl-1 bg-background/80 backdrop-blur-sm h-full shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)]">
-                            <TooltipProvider delayDuration={0}>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button 
-                                    variant="ghost" 
-                                    size="icon" 
-                                    onClick={onAddTestCase}
-                                    className="h-6 w-6 rounded-full bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 shadow-sm"
-                                    disabled={loading}
-                                  >
-                                    <Plus className="w-4 h-4" />
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>Add Custom Test Case</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          </div>
+                        <div className="sticky right-0 top-0 z-10 flex items-center pl-1 bg-background/80 backdrop-blur-sm h-full shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)]">
+                          <TooltipProvider delayDuration={0}>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={onAddTestCase}
+                                  className="h-6 w-6 rounded-full bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 shadow-sm"
+                                  disabled={loading}
+                                >
+                                  <Plus className="w-4 h-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Add Custom Test Case</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
                       )}
-                     </FeatureGuard>
-                   </TabsList>
+                    </FeatureGuard>
+                  </TabsList>
                 </div>
               </div>
 
@@ -273,17 +275,17 @@ export const OutputPanel = ({
                 <ScrollArea className="h-full" type="always">
                   {allTestCases.filter(tc => !tc.isSubmission).map((tc) => (
                     <TabsContent key={tc.id} value={`case-${tc.id}`} className="h-full m-0 p-4">
-                        <div className="relative">
-                          <TestCaseEditor
-                            testCase={tc}
-                            inputSchema={inputSchema}
-                            onSave={(updated) => onUpdateTestCase(tc.id, updated)}
-                            onCancel={() => onCancelEdit()} 
-                            isEditing={editingTestCaseId === tc.id}
-                            onEdit={() => onEditTestCase(tc.id)}
-                            canEdit={tc.isCustom}
-                          />
-                        </div>
+                      <div className="relative">
+                        <TestCaseEditor
+                          testCase={tc}
+                          inputSchema={inputSchema}
+                          onSave={(updated) => onUpdateTestCase(tc.id, updated)}
+                          onCancel={() => onCancelEdit()}
+                          isEditing={editingTestCaseId === tc.id}
+                          onEdit={() => onEditTestCase(tc.id)}
+                          canEdit={tc.isCustom}
+                        />
+                      </div>
                     </TabsContent>
                   ))}
                 </ScrollArea>
@@ -306,23 +308,23 @@ export const OutputPanel = ({
                 ) : (
                   <div className="flex items-center gap-2">
                     <span>{getStatusText(output.status?.id, output.status?.description, output.testResults)}</span>
-                    
+
                     {/* Debug/Info: Show In-Place Status */}
                     {(() => {
-                        const meta = algorithmMeta?.metadata;
-                        const isInPlace = !!((algorithmMeta as any)?.return_modified_input || (typeof meta === 'object' && meta?.return_modified_input));
-                        
-                        if (isInPlace) {
-                            return (
-                                <span className="text-[10px] font-normal border border-blue-200 bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded-full flex items-center gap-1">
-                                    <Zap className="w-3 h-3" />
-                                    In-Place
-                                </span>
-                            );
-                        }
-                        return null;
+                      const meta = algorithmMeta?.metadata;
+                      const isInPlace = !!((algorithmMeta as any)?.return_modified_input || (typeof meta === 'object' && meta?.return_modified_input));
+
+                      if (isInPlace) {
+                        return (
+                          <span className="text-[10px] font-normal border border-blue-200 bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded-full flex items-center gap-1">
+                            <Zap className="w-3 h-3" />
+                            In-Place
+                          </span>
+                        );
+                      }
+                      return null;
                     })()}
-                    
+
                     {executionTime !== null && (
                       <span className="text-xs font-normal text-muted-foreground bg-muted px-2 py-1 rounded-full flex items-center gap-1">
                         <Clock className="w-3 h-3" />
@@ -336,237 +338,266 @@ export const OutputPanel = ({
 
             {/* Scrollable content area */}
             <div className="flex-1 min-h-0">
-                {/* Compilation/Runtime Error */}
-                {(output.status?.id === 6 || (output.stderr && !output.testResults)) && (
-                  <div className="p-4 h-full min-h-0">
-                    <div className="w-full h-full rounded-lg bg-destructive/10 border border-destructive/20 text-destructive font-mono text-sm overflow-hidden flex flex-col">
-                        <div className="flex-1 overflow-y-auto p-4 whitespace-pre-wrap">
-                            {output.compile_output || output.stderr || output.message}
-                        </div>
+              {/* Compilation/Runtime Error */}
+              {(output.status?.id === 6 || (output.stderr && !output.testResults)) && (
+                <div className="p-4 h-full min-h-0">
+                  <div className="w-full h-full rounded-lg bg-red-50 border border-red-100 text-red-800 dark:bg-red-900/20 dark:border-red-900/30 dark:text-red-400 font-mono text-sm overflow-hidden flex flex-col">
+                    <div className="flex-1 overflow-y-auto p-4 whitespace-pre-wrap">
+                      {output.compile_output || output.stderr || output.message}
                     </div>
                   </div>
-                )}
+                </div>
+              )}
 
-                {/* Test Results */}
-                {output.testResults && (
-                   <div className="h-full flex flex-col min-h-0">
+              {/* Test Results */}
+              {output.testResults && (
+                <div className="h-full flex flex-col min-h-0">
                   <Tabs value={activeResultTab} onValueChange={setActiveResultTab} className="flex-1 flex flex-col min-h-0">
                     <div className="flex border-b bg-background/50 shrink-0 sticky top-0 z-10 overflow-x-auto overflow-y-hidden">
                       <div className="flex-1 overflow-x-auto scrollbar-thin mask-image-linear-gradient-to-r px-4 pb-1">
                         <TabsList className="h-9 bg-transparent p-0 gap-2 flex-nowrap w-max justify-start mb-1">
-                        {output.testResults.map((result: any, index: number) => (
-                          <TabsTrigger
-                            key={index}
-                            value={`result-${index}`}
-                            className={`text-xs px-3 h-7 whitespace-nowrap gap-2 bg-transparent data-[state=active]:bg-muted data-[state=active]:shadow-none ${
-                              result.status === 'pass' ? 'text-green-500 data-[state=active]:text-green-500' : 'text-destructive data-[state=active]:text-destructive'
-                            }`}
-                          >
-                            {result.status === 'pass' ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
-                            Case {index + 1}
-                            {/* Show tooltip or small indicator if description exists */}
-                            {(() => {
+                          {output.testResults.map((result: any, index: number) => (
+                            <TabsTrigger
+                              key={index}
+                              value={`result-${index}`}
+                              className={`text-xs px-3 h-7 whitespace-nowrap gap-2 shadow-none transition-colors ${result.status === 'pass' 
+                                ? 'bg-green-500/10 text-green-600 hover:bg-green-500/20 data-[state=active]:bg-green-500/20 data-[state=active]:text-green-700' 
+                                : 'bg-red-500/10 text-red-600 hover:bg-red-500/20 data-[state=active]:bg-red-500/20 data-[state=active]:text-red-700'
+                                }`}
+                            >
+                              {result.status === 'pass' ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
+                              Case {index + 1}
+                              {/* Show tooltip or small indicator if description exists */}
+                              {(() => {
                                 // Resolve test case from executed list if available, else allTestCases (fallback/legacy)
                                 // Note: result index matches executedTestCases index
                                 const tc = executedTestCases ? executedTestCases[index] : allTestCases[index];
                                 return tc?.description && (
-                                    <span className="ml-2 text-[10px] text-muted-foreground/70 hidden sm:inline-block truncate max-w-[100px]">
-                                        {/* - {tc.description} */}
-                                    </span>
+                                  <span className="ml-2 text-[10px] text-muted-foreground/70 hidden sm:inline-block truncate max-w-[100px]">
+                                    {/* - {tc.description} */}
+                                  </span>
                                 );
-                            })()}
+                              })()}
 
-                            {/* Hide details for submission cases in tabs? Or show them but mask content? 
+                              {/* Hide details for submission cases in tabs? Or show them but mask content? 
                                 User Requirement: "test cases which mark as a submission also visiable here" -> imply they see them but shouldn't?
                                 Or "should at test visible" -> "should NOT be visible"?
                                 Let's show them in RESULTS but mark as hidden.
                             */}
-                          </TabsTrigger>
-                        ))}
-                      </TabsList>
+                            </TabsTrigger>
+                          ))}
+                        </TabsList>
+                      </div>
                     </div>
-                  </div>
                     <ScrollArea className="h-full" type="always">
-                    <div className="p-4">
-                      {output.testResults.map((result: any, index: number) => (
-                        <TabsContent key={index} value={`result-${index}`} className="m-0 space-y-6">
-                          {/* Input */}
-                          <div className="space-y-2">
-                            <div className="text-xs font-medium text-muted-foreground">Input</div>
-                            <div className="p-3 rounded-md bg-muted/30 border font-mono text-sm">
-                              {(() => {
-                                const tc = executedTestCases ? executedTestCases[index] : allTestCases[index];
-
-                                // Don't hide submission cases as per user request
-                                // const isHidden = tc?.isSubmission; 
-                                // if (isHidden) return "Hidden Test Case";
-
-                                // Fallback to original test case input if result input is missing
-                                const inputData = result.input !== undefined ? result.input : tc?.input;
-                                
-                                if (inputSchema && inputSchema.length > 0 && Array.isArray(inputData)) {
-                                   return (
-                                    <div className="space-y-1">
-                                        {inputSchema.map((field, i) => (
-                                            <div key={i} className="flex gap-2">
-                                                <span className="text-muted-foreground select-none">{field.name}:</span>
-                                                <span>{typeof inputData[i] === 'string' ? inputData[i] : JSON.stringify(inputData[i])}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                   );
-                                }
-                                return JSON.stringify(inputData, null, 2);
-                              })()}
-                            </div>
-                          </div>
-
-                          {/* Stdout (if any) */}
-                          {result.logs && result.logs.length > 0 && (
+                      <div className="p-4">
+                        {output.testResults.map((result: any, index: number) => (
+                          <TabsContent key={index} value={`result-${index}`} className="m-0 space-y-6">
+                            {/* Input */}
                             <div className="space-y-2">
-                              <div className="text-xs font-medium text-muted-foreground">Stdout</div>
-                              <div className="p-3 rounded-md bg-muted/30 border font-mono text-sm whitespace-pre-wrap">
-                                {Array.isArray(result.logs) ? result.logs.join('\n') : result.logs}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Output */}
-                          <div className="space-y-2">
-                            <div className="text-xs font-medium text-muted-foreground">Output</div>
-                            <div className="p-3 rounded-md bg-muted/30 border font-mono text-sm">
-                              {(() => {
-                                const tc = executedTestCases ? executedTestCases[index] : allTestCases[index];
-                                const actual = result.actual;
-                                return actual === undefined ? "void / undefined" : JSON.stringify(actual, null, 2);
-                              })()}
-                            </div>
-                          </div>
-
-                          {/* Expected */}
-                          {result.expected !== undefined && (
-                            <div className="space-y-2">
-                              <div className="text-xs font-medium text-muted-foreground">Expected</div>
+                              <div className="text-xs font-medium text-muted-foreground">Input</div>
                               <div className="p-3 rounded-md bg-muted/30 border font-mono text-sm">
                                 {(() => {
                                   const tc = executedTestCases ? executedTestCases[index] : allTestCases[index];
-                                  return JSON.stringify(result.expected, null, 2);
+
+                                  // Don't hide submission cases as per user request
+                                  // const isHidden = tc?.isSubmission; 
+                                  // if (isHidden) return "Hidden Test Case";
+
+                                  // Fallback to original test case input if result input is missing
+                                  const inputData = result.input !== undefined ? result.input : tc?.input;
+
+                                  if (inputSchema && inputSchema.length > 0 && Array.isArray(inputData)) {
+                                    return (
+                                      <div className="space-y-1">
+                                        {inputSchema.map((field, i) => (
+                                          <div key={i} className="flex flex-col gap-1">
+                                            <div className="flex gap-2">
+                                              <span className="text-muted-foreground select-none">{field.name}:</span>
+                                              <span>{(() => {
+                                                const val = inputData[i];
+                                                if (isTreeType(field.type)) {
+                                                  const treeArr = parseTreeValue(val);
+                                                  if (treeArr) return JSON.stringify(treeArr);
+                                                }
+                                                return typeof val === 'string' ? val : JSON.stringify(val);
+                                              })()}</span>
+                                            </div>
+                                            {isTreeType(field.type) && (
+                                              <div className="mt-1">
+                                                <TreeDiagram data={inputData[i]} height={120} />
+                                              </div>
+                                            )}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    );
+                                  }
+                                  return JSON.stringify(inputData, null, 2);
                                 })()}
                               </div>
                             </div>
-                          )}
 
-                          {/* Diff (for failed cases) */}
-                          {result.status !== 'pass' && result.expected !== undefined && (
-                            <div className="space-y-2">
-                                <div className="text-xs font-medium text-destructive flex items-center gap-2">
-                                    <AlertTriangle className="w-3 h-3" />
-                                    <span>Comparison (Expected vs Actual)</span>
+                            {/* Stdout (if any) */}
+                            {result.logs && result.logs.length > 0 && (
+                              <div className="space-y-2">
+                                <div className="text-xs font-medium text-muted-foreground">Stdout</div>
+                                <div className="p-3 rounded-md bg-muted/30 border font-mono text-sm whitespace-pre-wrap">
+                                  {Array.isArray(result.logs) ? result.logs.join('\n') : result.logs}
                                 </div>
-                                <div className="p-3 rounded-md bg-muted/10 border border-destructive/20 overflow-hidden">
-                                    <DiffView expected={result.expected} actual={result.actual} />
-                                    <div className="mt-3 flex gap-4 text-[10px] text-muted-foreground border-t pt-2 border-muted">
-                                        <div className="flex items-center gap-1">
-                                            <div className="w-2 h-2 bg-red-500/20 border border-red-500/50"></div>
-                                            <span>Expected but missing</span>
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                            <div className="w-2 h-2 bg-green-500/20 border border-green-500/50"></div>
-                                            <span>Found but not expected</span>
-                                        </div>
+                              </div>
+                            )}
+
+                            {/* Output */}
+                            <div className="space-y-2">
+                              <div className="text-xs font-medium text-muted-foreground">Output</div>
+                              <div className="p-3 rounded-md bg-muted/30 border font-mono text-sm">
+                                {(() => {
+                                  const tc = executedTestCases ? executedTestCases[index] : allTestCases[index];
+                                  const actual = result.actual;
+                                  const treeArr = actual !== undefined ? parseTreeValue(actual) : null;
+                                  const content = actual === undefined ? "void / undefined" : JSON.stringify(treeArr || actual, null, 2);
+                                  return (
+                                    <div className="space-y-3">
+                                      <div>{content}</div>
+                                      {actual !== undefined && actual !== null && (
+                                        <TreeDiagram data={actual} height={120} />
+                                      )}
                                     </div>
-                                </div>
-                            </div>
-                          )}
-                          
-                          {/* Error Message */}
-                          {result.error && (
-                            <div className="space-y-2">
-                              <div className="text-xs font-medium text-destructive">Error</div>
-                              <div className="p-3 rounded-md bg-destructive/10 border border-destructive/20 font-mono text-sm text-destructive whitespace-pre-wrap">
-                                {result.error}
+                                  );
+                                })()}
                               </div>
                             </div>
-                          )}
-                        </TabsContent>
-                      ))}
-                    </div>
+
+                            {/* Expected */}
+                            {result.expected !== undefined && (
+                              <div className="space-y-2">
+                                <div className="text-xs font-medium text-muted-foreground">Expected</div>
+                                <div className="p-3 rounded-md bg-muted/30 border font-mono text-sm">
+                                  {(() => {
+                                    const content = JSON.stringify(parseTreeValue(result.expected) || result.expected, null, 2);
+                                    return (
+                                      <div className="space-y-3">
+                                        <div>{content}</div>
+                                        <TreeDiagram data={result.expected} height={120} />
+                                      </div>
+                                    );
+                                  })()}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Diff (for failed cases) */}
+                            {result.status !== 'pass' && result.expected !== undefined && (
+                              <div className="space-y-2">
+                                <div className="text-xs font-medium text-destructive flex items-center gap-2">
+                                  <AlertTriangle className="w-3 h-3" />
+                                  <span>Comparison (Expected vs Actual)</span>
+                                </div>
+                                <div className="p-3 rounded-md bg-muted/10 border border-destructive/20 overflow-hidden">
+                                  <DiffView expected={result.expected} actual={result.actual} />
+                                  <div className="mt-3 flex gap-4 text-[10px] text-muted-foreground border-t pt-2 border-muted">
+                                    <div className="flex items-center gap-1">
+                                      <div className="w-2 h-2 bg-red-500/20 border border-red-500/50"></div>
+                                      <span>Expected but missing</span>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                      <div className="w-2 h-2 bg-green-500/20 border border-green-500/50"></div>
+                                      <span>Found but not expected</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Error Message */}
+                            {result.error && (
+                              <div className="space-y-2">
+                                <div className="text-xs font-medium text-destructive">Error</div>
+                                <div className="p-3 rounded-md bg-red-50 border border-red-100 font-mono text-sm text-red-800 dark:bg-red-900/20 dark:border-red-900/30 dark:text-red-400 whitespace-pre-wrap">
+                                  {result.error}
+                                </div>
+                              </div>
+                            )}
+                          </TabsContent>
+                        ))}
+                      </div>
                     </ScrollArea>
                   </Tabs>
-                  </div>
-                )}
+                </div>
+              )}
             </div>
           </div>
         )}
-        
+
         {/* SUBMISSIONS TAB */}
         {activeTab === "submissions" && (
           <div className="h-full flex flex-col min-h-0 bg-background/50">
-             {submissions.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-muted-foreground p-8 text-center">
-                    <History className="w-12 h-12 mb-4 opacity-20" />
-                    <p>No submissions yet</p>
-                    <p className="text-xs mt-1">Submit your code to see history here</p>
-                </div>
-             ) : (
-                <ScrollArea className="h-full">
-                    <div className="p-4 space-y-3">
-                        {/* Header */}
-                        <div className="grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground px-3 mb-2">
-                            <div className="col-span-4">Status</div>
-                            <div className="col-span-2">Lang</div>
-                        </div>
-                        
-                        {/* List */}
-                        <div className="space-y-2">
-                        {[...submissions].reverse().map((sub) => (
-                          <div 
-                             key={sub.id} 
-                             className="grid grid-cols-12 gap-2 p-3 rounded-lg border bg-card hover:bg-muted/50 cursor-pointer transition-colors items-center text-sm shadow-sm"
-                             onClick={() => onSelectSubmission?.(sub)}
-                          >
-                             <div className="col-span-4 flex items-center gap-2">
-                                {sub.status === 'passed' ? (
-                                   <CheckCircle2 className="w-4 h-4 text-green-500" />
-                                ) : sub.status === 'error' ? (
-                                   <AlertTriangle className="w-4 h-4 text-yellow-500" />
-                                ) : (
-                                   <XCircle className="w-4 h-4 text-destructive" />
-                                )}
-                                <div className="flex flex-col">
-                                   <span className={`font-medium ${sub.status === 'passed' ? 'text-green-600' : 'text-destructive'}`}>
-                                      {sub.status === 'passed' ? 'Accepted' : (sub.status === 'error' ? 'Runtime Error' : 'Wrong Answer')}
-                                   </span>
-                                   <span className="text-[10px] text-muted-foreground mt-0.5">
-                                      {sub.test_results?.passed ?? 0} / {sub.test_results?.total ?? 0} passed
-                                   </span>
-                                </div>
-                             </div>
-                             <div className="col-span-2 text-xs capitalize text-muted-foreground">
-                                {sub.language}
-                             </div>
-                              <div className="col-span-3 text-xs text-muted-foreground font-mono">
-                                  {sub.test_results?.execution_time_ms ? `${sub.test_results.execution_time_ms} ms` : '-'}
-                              </div>
-                              <div className="col-span-3 text-right text-xs text-muted-foreground">
-                                  {new Date(sub.timestamp).toLocaleString()}
-                              </div>
+            {submissions.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-muted-foreground p-8 text-center">
+                <History className="w-12 h-12 mb-4 opacity-20" />
+                <p>No submissions yet</p>
+                <p className="text-xs mt-1">Submit your code to see history here</p>
+              </div>
+            ) : (
+              <ScrollArea className="h-full">
+                <div className="p-4 space-y-3">
+                  {/* Header */}
+                  <div className="grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground px-3 mb-2">
+                    <div className="col-span-4">Status</div>
+                    <div className="col-span-2">Lang</div>
+                  </div>
+
+                  {/* List */}
+                  <div className="space-y-2">
+                    {[...submissions].reverse().map((sub) => (
+                      <div
+                        key={sub.id}
+                        className="grid grid-cols-12 gap-2 p-3 rounded-lg border bg-card hover:bg-muted/50 cursor-pointer transition-colors items-center text-sm shadow-sm"
+                        onClick={() => onSelectSubmission?.(sub)}
+                      >
+                        <div className="col-span-4 flex items-center gap-2">
+                          {sub.status === 'passed' ? (
+                            <CheckCircle2 className="w-4 h-4 text-green-500" />
+                          ) : sub.status === 'error' ? (
+                            <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                          ) : (
+                            <XCircle className="w-4 h-4 text-destructive" />
+                          )}
+                          <div className="flex flex-col">
+                            <span className={`font-medium ${sub.status === 'passed' ? 'text-green-600' : 'text-destructive'}`}>
+                              {sub.status === 'passed' ? 'Accepted' : (sub.status === 'error' ? 'Runtime Error' : 'Wrong Answer')}
+                            </span>
+                            <span className="text-[10px] text-muted-foreground mt-0.5">
+                              {sub.test_results?.passed ?? 0} / {sub.test_results?.total ?? 0} passed
+                            </span>
                           </div>
-                        ))}
+                        </div>
+                        <div className="col-span-2 text-xs capitalize text-muted-foreground">
+                          {sub.language}
+                        </div>
+                        <div className="col-span-3 text-xs text-muted-foreground font-mono">
+                          {sub.test_results?.execution_time_ms ? `${sub.test_results.execution_time_ms} ms` : '-'}
+                        </div>
+                        <div className="col-span-3 text-right text-xs text-muted-foreground">
+                          {new Date(sub.timestamp).toLocaleString()}
+                        </div>
                       </div>
-                    </div>
-                </ScrollArea>
-              )}
+                    ))}
+                  </div>
+                </div>
+              </ScrollArea>
+            )}
           </div>
         )}
-        
+
         {/* Empty State / Loading for Result Tab */}
         {activeTab === "result" && !output && !loading && !submitting && (
           <div className="h-full flex flex-col items-center justify-center text-muted-foreground">
             <div className="text-sm">Run the code to see results</div>
           </div>
         )}
-        
+
         {(loading || submitting) && (
           <div className="absolute inset-0 bg-background/50 backdrop-blur-sm flex flex-col items-center justify-center z-10">
             <div className="relative">
@@ -581,7 +612,7 @@ export const OutputPanel = ({
           </div>
         )}
       </div>
-   
+
     </div>
   );
 };

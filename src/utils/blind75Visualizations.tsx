@@ -35,7 +35,7 @@ export const renderBlind75Visualization = (algoId: string): React.ReactNode | nu
     "longest-common-subsequence": () => import("@/components/visualizations/algorithms/LCSVisualization").then(m => ({ default: m.LCSVisualization })),
     "word-break": () => import("@/components/visualizations/algorithms/WordBreakVisualization").then(m => ({ default: m.WordBreakVisualization })),
     "word-break-problem": () => import("@/components/visualizations/algorithms/WordBreakVisualization").then(m => ({ default: m.WordBreakVisualization })),
-    
+
     "valid-parentheses": () => import("@/components/visualizations/algorithms/ValidParenthesesVisualization").then(m => ({ default: m.ValidParenthesesVisualization })),
     "longest-palindromic-substring": () => import("@/components/visualizations/algorithms/LongestPalindromicSubstringVisualization").then(m => ({ default: m.LongestPalindromicSubstringVisualization })),
     "palindromic-substrings": () => import("@/components/visualizations/algorithms/PalindromicSubstringsVisualization").then(m => ({ default: m.PalindromicSubstringsVisualization })),
@@ -63,7 +63,7 @@ export const renderBlind75Visualization = (algoId: string): React.ReactNode | nu
     "meeting-rooms-ii": () => import("@/components/visualizations/algorithms/MeetingRoomsIIVisualization").then(m => ({ default: m.MeetingRoomsIIVisualization })),
     "reverse-linked-list": () => import("@/components/visualizations/algorithms/ReverseLinkedListVisualization").then(m => ({ default: m.ReverseLinkedListVisualization })),
     "detect-cycle": () => import("@/components/visualizations/algorithms/DetectCycleVisualization").then(m => ({ default: m.DetectCycleVisualization })),
-    "merge-two-sorted-lists": () => import("@/components/visualizations/algorithms/MergeSortedListsVisualization").then(m => ({ default: m.MergeSortedListsVisualization })),
+    "merge-two-sorted-lists": () => import("@/components/visualizations/algorithms/MergeSortLinkedListVisualization").then(m => ({ default: m.MergeSortLinkedListVisualization })),
     "merge-k-sorted-lists": () => import("@/components/visualizations/algorithms/MergeKSortedListsVisualization").then(m => ({ default: m.MergeKSortedListsVisualization })),
     "remove-nth-node-from-end-of-list": () => import("@/components/visualizations/algorithms/RemoveNthNodeVisualization").then(m => ({ default: m.RemoveNthNodeVisualization })),
     "reorder-list": () => import("@/components/visualizations/algorithms/ReorderListVisualization").then(m => ({ default: m.ReorderListVisualization })),
@@ -93,13 +93,13 @@ export const renderBlind75Visualization = (algoId: string): React.ReactNode | nu
   };
 
   const loader = visualizationMap[algoId];
-  
+
   if (!loader) {
     return null;
   }
 
   const VisualizationComponent = React.lazy(loader);
-  
+
   return (
     <React.Suspense fallback={<div className="text-center py-12">Loading visualization...</div>}>
       <VisualizationComponent />

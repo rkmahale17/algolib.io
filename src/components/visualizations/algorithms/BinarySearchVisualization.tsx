@@ -22,7 +22,7 @@ export const BinarySearchVisualization = () => {
   const [speed, setSpeed] = useState(1);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const code = `function binarySearch(arr, target) {
+  const code = `function binarySearch(arr: number[], target: number): number {
   let left = 0;
   let right = arr.length - 1;
   
@@ -48,20 +48,57 @@ export const BinarySearchVisualization = () => {
     let left = 0;
     let right = array.length - 1;
 
+    // Line 1: Function entry
     newSteps.push({
       array: [...array],
-      left,
-      right,
+      left: -1,
+      right: -1,
       mid: -1,
       target,
       found: false,
-      message: `Searching for ${target}. Initialize left=0, right=${right}`,
+      message: `Starting Binary Search for target ${target}.`,
       lineNumber: 1
     });
 
+    // Line 2: Initialize left
+    newSteps.push({
+      array: [...array],
+      left: 0,
+      right: -1,
+      mid: -1,
+      target,
+      found: false,
+      message: 'Initialize left pointer at index 0.',
+      lineNumber: 2
+    });
+
+    // Line 3: Initialize right
+    newSteps.push({
+      array: [...array],
+      left: 0,
+      right: array.length - 1,
+      mid: -1,
+      target,
+      found: false,
+      message: `Initialize right pointer at index ${array.length - 1}.`,
+      lineNumber: 3
+    });
+
     while (left <= right) {
+      // Line 5: While condition
+      newSteps.push({
+        array: [...array],
+        left,
+        right,
+        mid: -1,
+        target,
+        found: false,
+        message: `Check condition: left (${left}) <= right (${right}) is true.`,
+        lineNumber: 5
+      });
+
       const mid = Math.floor((left + right) / 2);
-      
+      // Line 6: Calculate mid
       newSteps.push({
         array: [...array],
         left,
@@ -69,8 +106,20 @@ export const BinarySearchVisualization = () => {
         mid,
         target,
         found: false,
-        message: `Calculate mid = (${left} + ${right}) / 2 = ${mid}. arr[${mid}] = ${array[mid]}`,
-        lineNumber: 5
+        message: `Calculate mid: Math.floor((${left} + ${right}) / 2) = ${mid}.`,
+        lineNumber: 6
+      });
+
+      // Line 8: Check if arr[mid] === target
+      newSteps.push({
+        array: [...array],
+        left,
+        right,
+        mid,
+        target,
+        found: false,
+        message: `Compare arr[${mid}] (${array[mid]}) with target (${target}).`,
+        lineNumber: 8
       });
 
       if (array[mid] === target) {
@@ -81,11 +130,12 @@ export const BinarySearchVisualization = () => {
           mid,
           target,
           found: true,
-          message: `Found! arr[${mid}] = ${array[mid]} equals target ${target}`,
-          lineNumber: 7
+          message: `Success! arr[${mid}] matches target ${target}. Returning index ${mid}.`,
+          lineNumber: 9
         });
         break;
       } else if (array[mid] < target) {
+        // Line 10: Check if arr[mid] < target
         newSteps.push({
           array: [...array],
           left,
@@ -93,11 +143,11 @@ export const BinarySearchVisualization = () => {
           mid,
           target,
           found: false,
-          message: `arr[${mid}] = ${array[mid]} < ${target}. Search right half: left = ${mid + 1}`,
-          lineNumber: 9
+          message: `${array[mid]} is less than ${target}. Search the right half.`,
+          lineNumber: 10
         });
+        // Line 11: left = mid + 1
         left = mid + 1;
-      } else {
         newSteps.push({
           array: [...array],
           left,
@@ -105,11 +155,48 @@ export const BinarySearchVisualization = () => {
           mid,
           target,
           found: false,
-          message: `arr[${mid}] = ${array[mid]} > ${target}. Search left half: right = ${mid - 1}`,
+          message: `Update left pointer to mid + 1 = ${left}.`,
           lineNumber: 11
         });
+      } else {
+        // Line 12: arr[mid] > target
+        newSteps.push({
+          array: [...array],
+          left,
+          right,
+          mid,
+          target,
+          found: false,
+          message: `${array[mid]} is greater than ${target}. Search the left half.`,
+          lineNumber: 12
+        });
+        // Line 13: right = mid - 1
         right = mid - 1;
+        newSteps.push({
+          array: [...array],
+          left,
+          right,
+          mid,
+          target,
+          found: false,
+          message: `Update right pointer to mid - 1 = ${right}.`,
+          lineNumber: 13
+        });
       }
+    }
+
+    if (left > right && newSteps[newSteps.length - 1].lineNumber !== 9) {
+      // Line 17: Return -1
+      newSteps.push({
+        array: [...array],
+        left,
+        right,
+        mid: -1,
+        target,
+        found: false,
+        message: `Search range exhausted (left > right). Target ${target} not found. Returning -1.`,
+        lineNumber: 17
+      });
     }
 
     setSteps(newSteps);
@@ -190,21 +277,19 @@ export const BinarySearchVisualization = () => {
                       <div className="absolute -top-8 text-xs font-bold text-primary animate-bounce">MID</div>
                     )}
                     <div
-                      className={`w-full rounded-t transition-all duration-300 ${
-                        isMid && currentStep.found
+                      className={`w-full rounded-t transition-all duration-300 ${isMid && currentStep.found
                           ? 'bg-green-500 shadow-lg shadow-green-500/50 scale-110'
                           : isMid
-                          ? 'bg-primary shadow-lg shadow-primary/50 scale-105'
-                          : isOutOfRange
-                          ? 'bg-muted opacity-30'
-                          : 'bg-gradient-to-t from-primary/60 to-primary/40'
-                      }`}
+                            ? 'bg-primary shadow-lg shadow-primary/50 scale-105'
+                            : isOutOfRange
+                              ? 'bg-muted opacity-30'
+                              : 'bg-gradient-to-t from-primary/60 to-primary/40'
+                        }`}
                       style={{ height: `${(value / getMaxValue()) * 100}%`, minHeight: '20px' }}
                     />
                     <span
-                      className={`text-xs font-mono ${
-                        isMid ? 'text-primary font-bold text-base' : isOutOfRange ? 'text-muted-foreground opacity-30' : 'text-muted-foreground'
-                      }`}
+                      className={`text-xs font-mono ${isMid ? 'text-primary font-bold text-base' : isOutOfRange ? 'text-muted-foreground opacity-30' : 'text-muted-foreground'
+                        }`}
                     >
                       {value}
                     </span>
@@ -219,23 +304,23 @@ export const BinarySearchVisualization = () => {
           </div>
           <div className={`rounded-lg border p-4 `}>
 
-             <VariablePanel
-        variables={{
-          left: currentStep.left,
-          right: currentStep.right,
-          mid: currentStep.mid >= 0 ? currentStep.mid : 'calculating...',
-          target: currentStep.target,
-          'arr[mid]': currentStep.mid >= 0 ? currentStep.array[currentStep.mid] : 'N/A',
-          searchSpace: currentStep.right - currentStep.left + 1
-        }}
-      />
+            <VariablePanel
+              variables={{
+                left: currentStep.left,
+                right: currentStep.right,
+                mid: currentStep.mid >= 0 ? currentStep.mid : 'calculating...',
+                target: currentStep.target,
+                'arr[mid]': currentStep.mid >= 0 ? currentStep.array[currentStep.mid] : 'N/A',
+                searchSpace: currentStep.right - currentStep.left + 1
+              }}
+            />
           </div>
         </div>
 
         <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
       </div>
 
-     
+
     </div>
   );
 };

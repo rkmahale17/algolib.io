@@ -1,6 +1,7 @@
 import { Language } from '@/components/CodeRunner/LanguageSelector';
-import { findEntryFunction, ensureStaticMethods, stripComments } from './codeManipulation';
+import { findEntryFunction, ensureStaticMethods, splitCppCode, stripComments } from './codeManipulation';
 import { getDSDetails, DSName, SUPPORTED_DS } from '@/lib/dsa-registry';
+import { convertTreeNodeToArray } from './treeUtils';
 
 export const getRegistryCode = (inputSchema: any[], language: Language, userCode: string) => {
     const required = new Set<DSName>();
@@ -129,6 +130,29 @@ interface TestCase {
  * - Test case format: input is an array, e.g., [[[1,2],[3,4]]] for a 2D array parameter
  * - Each language's formatValue/formatLiteral handles the nested structure appropriately
  */
+const preprocessInputs = (schema: any[], inputs: any[]) => {
+    let processedSchema = [...schema];
+    let processedInputs = [...inputs];
+
+    const listNodeIdx = schema.findIndex(i => i.type.includes('ListNode'));
+    const posIdx = schema.findIndex(i => i.name.toLowerCase() === 'pos' || i.name.toLowerCase() === 'cyclepos');
+
+    if (listNodeIdx !== -1 && posIdx !== -1) {
+        const headValue = inputs[listNodeIdx];
+        const posValue = inputs[posIdx];
+
+        // Wrap them for the parser
+        if (!(typeof headValue === 'object' && !Array.isArray(headValue) && 'head' in headValue)) {
+            processedInputs[listNodeIdx] = { head: headValue, pos: posValue };
+        }
+
+        // Remove pos from inputs and schema so it's not passed to user function
+        processedInputs.splice(posIdx, 1);
+        processedSchema.splice(posIdx, 1);
+    }
+    return { schema: processedSchema, inputs: processedInputs };
+};
+
 export const generateTestRunner = (
     userCode: string,
     language: Language,
@@ -137,15 +161,24 @@ export const generateTestRunner = (
     entryFunctionName?: string,
     options?: { unordered?: boolean; multiExpected?: boolean; returnModifiedInput?: boolean; modifiedInputIndex?: number }
 ): string => {
+    // 1. Preprocess ALL test cases up front
+    // We need both the processed inputs and the common processed schema
+    const processedTestCases = testCases.map(tc => {
+        const { inputs, schema } = preprocessInputs(inputSchema, tc.input);
+        return { ...tc, input: inputs, processedSchema: schema };
+    });
+
+    const finalSchema = processedTestCases.length > 0 ? processedTestCases[0].processedSchema : inputSchema;
+
     switch (language) {
         case 'typescript':
-            return generateTypeScriptRunner(userCode, testCases, inputSchema, entryFunctionName, options);
+            return generateTypeScriptRunner(userCode, processedTestCases, finalSchema, entryFunctionName, options);
         case 'python':
-            return generatePythonRunner(userCode, testCases, inputSchema, entryFunctionName, options);
+            return generatePythonRunner(userCode, processedTestCases, finalSchema, entryFunctionName, options);
         case 'java':
-            return generateJavaRunner(userCode, testCases, inputSchema, entryFunctionName, options);
+            return generateJavaRunner(userCode, processedTestCases, finalSchema, entryFunctionName, options);
         case 'cpp':
-            return generateCppRunner(userCode, testCases, inputSchema, entryFunctionName, options);
+            return generateCppRunner(userCode, processedTestCases, finalSchema, entryFunctionName, options);
         default:
             return userCode;
     }
@@ -157,13 +190,27 @@ const formatValue = (value: any, type: string, lang: Language, targetJavaType?: 
         if (lang === 'typescript') return `jsonToListNode(${JSON.stringify(value)})`;
         if (lang === 'python') return `json_to_list_node(${jsonToPython(value)})`;
         if (lang === 'java') return `jsonToListNode(${JSON.stringify(JSON.stringify(value))})`; // Pass as JSON string
-        if (lang === 'cpp') return `jsonToListNode(${formatValue(value, 'number[]', 'cpp')})`; // Pass as vector
+        if (lang === 'cpp') {
+            const values = Array.isArray(value) ? value : (value.head || []);
+            const pos = Array.isArray(value) ? -1 : (value.pos !== undefined ? value.pos : -1);
+            return `jsonToListNode(${formatValue(values, 'number[]', 'cpp')}, ${pos})`;
+        }
     }
     if (type.includes('TreeNode')) {
         if (lang === 'typescript') return `jsonToTreeNode(${JSON.stringify(value)})`;
         if (lang === 'python') return `json_to_tree_node(${jsonToPython(value)})`;
-        if (lang === 'java') return `arrayToTreeNode(${formatJavaArrayLiteral(value, 'Integer[]')})`;
-        if (lang === 'cpp') return `jsonToTreeNode(${formatValue(value.map((v: any) => v === null ? "null" : String(v)), 'string[]', 'cpp')})`;
+
+        // Ensure value is an array for Java/C++ which expect BFS format
+        let treeArr = value;
+        if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+            treeArr = convertTreeNodeToArray(value) || [];
+        }
+
+        if (lang === 'java') return `arrayToTreeNode(${formatJavaArrayLiteral(Array.isArray(treeArr) ? treeArr : [], 'Integer[]')})`;
+        if (lang === 'cpp') {
+            const arr = Array.isArray(treeArr) ? treeArr : [];
+            return `jsonToTreeNode(${formatValue(arr.map((v: any) => v === null ? "null" : String(v)), 'string[]', 'cpp')})`;
+        }
     }
     if (type.includes('Interval')) {
         if (type.includes('[]')) {
@@ -343,10 +390,13 @@ const formatJavaArrayLiteral = (arr: any[], targetJavaType?: string): string => 
     const generateContent = (a: any[]): string => {
         if (a.length === 0) return '{}';
         if (!Array.isArray(a[0])) {
-            if (type === 'String') return `{${a.map(v => JSON.stringify(v)).join(', ')}}`;
-            if (type === 'char') return `{${a.map(v => `'${v}'`).join(', ')}}`;
-            if (type === 'boolean') return `{${a.join(', ')}}`;
-            return `{${a.join(', ')}}`;
+            const items = a.map(v => {
+                if (v === null || v === undefined) return 'null';
+                if (type === 'String') return JSON.stringify(v);
+                if (type === 'char') return `'${v}'`;
+                return String(v);
+            });
+            return `{${items.join(', ')}}`;
         }
         return `{${a.map((sub: any) => generateContent(sub)).join(', ')}}`;
     };
@@ -384,7 +434,6 @@ const generateTypeScriptRunner = (
     const { definitions, parsers, serializers, requiredDS } = getRegistryCode(inputSchema, 'typescript', userCode);
 
     const testCasesStr = testCases.map(tc => {
-        // Use modified formatValue which calls builders
         const inputs = tc.input.map((val, i) => formatValue(val, inputSchema[i]?.type || 'any', 'typescript')).join(', ');
         const expectedOutput = JSON.stringify(tc.expectedOutput);
         return `{ input: [${inputs}], expected: ${expectedOutput} }`;
@@ -406,11 +455,17 @@ const testCases = [
 ];
 
 const safeStringify = (obj: any) => {
-    const cache = new Set();
+    const cache = new Map();
+    let index = 0;
     return JSON.stringify(obj, (key, value) => {
         if (typeof value === 'object' && value !== null) {
-            if (cache.has(value)) return '[Circular]';
-            cache.add(value);
+            if (cache.has(value)) return cache.get(value);
+            // Only assign index if it looks like a ListNode or Node
+            if ('val' in value && ('next' in value || 'neighbors' in value)) {
+                cache.set(value, index++);
+            } else {
+                cache.set(value, "[Circular]");
+            }
         }
         return value;
     });
@@ -422,16 +477,17 @@ const results = testCases.map((tc, index) => {
   console.log = (...args) => {
       logs.push(args.map(a => {
           try { 
-            return typeof a === 'object' ? JSON.stringify(a) : String(a); 
+            return typeof a === 'object' ? safeStringify(a) : String(a); 
           } catch(e) { 
             return String(a); 
           }
       }).join(' '));
   };
 
-  try {
+    try {
     const start = Date.now();
-    let actual = ${userFuncName}.apply(null, tc.input);
+    const argsArray = tc.input;
+    let actual = ${userFuncName}.apply(null, argsArray);
     const end = Date.now();
     
     // Support in-place algorithms (e.g. sortColors) where return is void but input is modified
@@ -451,12 +507,33 @@ const results = testCases.map((tc, index) => {
     } catch(e) { serializedActual = "Serialization Failed: " + (e as Error).message; }
     
     const isEqual = (a, b) => {
-      const normalize = (val) => {
-        if (!${!!options?.unordered}) return val;
-        // Recursive sort for unordered comparison
-        if (Array.isArray(val)) return [...val].sort((x, y) => JSON.stringify(x).localeCompare(JSON.stringify(y))).map(normalize);
+      const flatten = (val) => {
+        if (Array.isArray(val)) return val;
+        // If it's the {head, pos} format from serializer, flatten it for comparison if needed
+        if (val && typeof val === 'object' && 'head' in val && 'pos' in val) return val.head;
+
+        if (val && typeof val === 'object' && 'val' in val) {
+            const result: any[] = [];
+            const visited = new Set();
+            let curr = val;
+            while (curr && !visited.has(curr)) {
+                visited.add(curr);
+                result.push(curr.val);
+                if (typeof curr.next === 'number') break; // It's a cycle to that index
+                curr = curr.next;
+            }
+            return result;
+        }
         return val;
       };
+
+      const normalize = (val) => {
+        const flat = flatten(val);
+        if (!${!!options?.unordered}) return flat;
+        if (Array.isArray(flat)) return [...flat].sort((x, y) => JSON.stringify(x).localeCompare(JSON.stringify(y))).map(normalize);
+        return flat;
+      };
+      
       return JSON.stringify(normalize(a)) === JSON.stringify(normalize(b));
     };
 
@@ -472,17 +549,26 @@ const results = testCases.map((tc, index) => {
 
     return {
       status: passed ? 'pass' : 'fail',
-      input: tc.input.map(i => {
+      input: tc.input.flatMap((i, idx) => {
          // Try serialized form for proper display in frontend
+         let serialized;
          try {
-             ${requiredDS.includes('ListNode') ? `if (i instanceof ListNode) return listNodeToJson(i);` : ''}
-             ${requiredDS.includes('TreeNode') ? `if (i instanceof TreeNode) return treeNodeToJson(i);` : ''}
-             ${requiredDS.includes('Interval') ? `if (i instanceof Interval) return intervalToJson(i);
-             if (Array.isArray(i) && i.length > 0 && i[0] instanceof Interval) return intervalArrayToJson(i);` : ''}
-             ${requiredDS.includes('GraphNode') ? `if ((i instanceof Node) || (i && typeof i === 'object' && 'neighbors' in i && 'val' in i)) return graphNodeToJson(i as Node);` : ''}
-             ${requiredDS.includes('TrieNode') ? `if (i instanceof TrieNode) return trieNodeToJson(i);` : ''}
-         } catch(e) { return "Serialization Failed: " + (e as Error).message; }
-         return safeStringify(i);
+             ${requiredDS.includes('ListNode') ? `if (i instanceof ListNode) serialized = listNodeToJson(i);` : ''}
+             ${requiredDS.includes('TreeNode') ? `if (i instanceof TreeNode) serialized = treeNodeToJson(i);` : ''}
+             ${requiredDS.includes('Interval') ? `if (i instanceof Interval) serialized = intervalToJson(i);
+             if (Array.isArray(i) && i.length > 0 && i[0] instanceof Interval) serialized = intervalArrayToJson(i);` : ''}
+             ${requiredDS.includes('GraphNode') ? `if ((i instanceof Node) || (i && typeof i === 'object' && 'neighbors' in i && 'val' in i)) serialized = graphNodeToJson(i as Node);` : ''}
+             ${requiredDS.includes('TrieNode') ? `if (i instanceof TrieNode) serialized = trieNodeToJson(i);` : ''}
+         } catch(e) { return ["Serialization Failed: " + (e as Error).message]; }
+         
+         const finalVal = serialized !== undefined ? serialized : i;
+         
+         // Special case: if it's a cyclic list result {head, pos}, flatten it into two inputs for the UI
+         if (finalVal && typeof finalVal === 'object' && 'head' in finalVal && 'pos' in finalVal) {
+             return [safeStringify(finalVal.head), safeStringify(finalVal.pos)];
+         }
+         
+         return [safeStringify(finalVal)];
       }),
       expected: tc.expected,
       actual: serializedActual,
@@ -521,7 +607,6 @@ const generatePythonRunner = (
     const { definitions, parsers, serializers, requiredDS } = getRegistryCode(inputSchema, 'python', userCode);
 
     const testCasesStr = testCases.map(tc => {
-        // Use modified formatValue which calls builders
         const inputs = tc.input.map((val, i) => formatValue(val, inputSchema[i]?.type || 'any', 'python')).join(', ');
         const expectedOutput = jsonToPython(tc.expectedOutput);
         return `{"input": [${inputs}], "expected": ${expectedOutput}}`;
@@ -604,7 +689,10 @@ for tc in test_cases:
             return val
 
         def is_equal(a, b):
-            return normalize(a) == normalize(b)
+            # If it's the {head, pos} format from serializer, flatten it for comparison
+            a_flat = a["head"] if isinstance(a, dict) and "head" in a and "pos" in a else a
+            b_flat = b["head"] if isinstance(b, dict) and "head" in b and "pos" in b else b
+            return normalize(a_flat) == normalize(b_flat)
 
         passed = False
         if ${options?.multiExpected ? 'True' : 'False'} and isinstance(tc['expected'], list):
@@ -615,9 +703,19 @@ for tc in test_cases:
         sys.stdout = original_stdout # Restore stdout before appending result
         logs = captured_output.getvalue()
         
+        # Flatten inputs for display
+        final_inputs = []
+        for x in tc['input']:
+            ser_x = to_json_serializable(x)
+            if isinstance(ser_x, dict) and "head" in ser_x and "pos" in ser_x:
+                final_inputs.append(to_json_serializable(ser_x["head"]))
+                final_inputs.append(ser_x["pos"])
+            else:
+                final_inputs.append(ser_x)
+
         results.append({
             "status": "pass" if passed else "fail",
-            "input": to_json_serializable(tc['input']),
+            "input": final_inputs,
             "expected": to_json_serializable(tc['expected']),
             "actual": to_json_serializable(serialized_actual),
             "time": (end - start) * 1000,
@@ -740,12 +838,15 @@ const generateJavaRunner = (
 
                 Object actual;
                 // Support in-place algorithms (void return type)
-                ${returnModifiedInput ? `
-                    ${entryInfo.hasSolutionClass ? 'sol.' : ''}${userFuncName}(${tc.input.map((_, i) => `arg${i}`).join(', ')});
+                ${(() => {
+                const args = tc.input.map((_, i) => `arg${i}`).join(', ');
+                return returnModifiedInput ? `
+                    ${entryInfo.hasSolutionClass ? 'sol.' : ''}${userFuncName}(${args});
                     actual = arg${modifiedInputIndex};
                 ` : `
-                    actual = ${entryInfo.hasSolutionClass ? 'sol.' : ''}${userFuncName}(${tc.input.map((_, i) => `arg${i}`).join(', ')});
-                `}
+                    actual = ${entryInfo.hasSolutionClass ? 'sol.' : ''}${userFuncName}(${args});
+                `;
+            })()}
 
                 // Auto-serialize result if it is a DS
                 Object serializedActual = actual;
@@ -1038,41 +1139,26 @@ const generateCppRunner = (
         // Declare variables for inputs
         const inputDecls = tc.input.map((val, i) => {
             const targetType = userArgTypes[i] || ''; // e.g. "ListNode*"
-            // If targetType is ListNode*, formatValue returns jsonToListNode(...) string.
-            // But we need to declare variable: "ListNode* arg0 = ..."
-
             const cppType = deduceCppType(val, targetType);
-
-            // Should pass 'cpp' language to formatValue to get jsonToListNode(...)
             const type = inputSchema[i]?.type || 'any';
             const valStr = formatValue(val, type, 'cpp');
-
             return `${cppType} arg${i} = ${valStr};`;
         }).join('\n            ');
 
         const args = tc.input.map((_, i) => `arg${i}`).join(', ');
-
         const expectedValStr = formatCppLiteral(tc.expectedOutput);
-
-        // Expected type is vector<int> usually for simple DS
-        // But if Array<Array>...
         const expectedType = deduceCppType(tc.expectedOutput);
         const expectedDecl = `${expectedType} expected = ${expectedValStr};`;
-
-        // Logic for execution line:
-        // If in-place (returnModifiedInput=true), the function might return void.
-        // So we execute: userFunc(args); auto actual = arg0;
-        // Else: auto actual = userFunc(args);
 
         let executionBlock = '';
         if (options?.returnModifiedInput) {
             executionBlock = `
-                 ${entryInfo.hasSolutionClass ? 'sol.' : ''}${userFuncName}(${args});
+                 ${entryInfo.hasSolutionClass ? 'sol.' : 'user_sol::'}${userFuncName}(${args});
                  auto actual = arg${options?.modifiedInputIndex ?? 0};
              `;
         } else {
             executionBlock = `
-                 auto actual = ${entryInfo.hasSolutionClass ? 'sol.' : ''}${userFuncName}(${args});
+                 auto actual = ${entryInfo.hasSolutionClass ? 'sol.' : 'user_sol::'}${userFuncName}(${args});
              `;
         }
 
@@ -1083,7 +1169,7 @@ const generateCppRunner = (
             try {
                 ${inputDecls}
                 ${expectedDecl}
-                ${entryInfo.hasSolutionClass ? 'Solution sol;' : ''}
+                ${entryInfo.hasSolutionClass ? 'user_sol::Solution sol;' : ''}
                 auto start = chrono::high_resolution_clock::now();
                 ${executionBlock}
                 
@@ -1136,6 +1222,8 @@ const generateCppRunner = (
         }`;
     }).join('\n');
 
+    const { headers: userHeaders, body: userBody } = splitCppCode(userCode);
+
     return `
 #include <iostream>
 #include <vector>
@@ -1149,6 +1237,7 @@ const generateCppRunner = (
 #include <unordered_set>
 #include <unordered_map>
 using namespace std;
+#include <stack>
 
 ${definitions}
 ${parsers}
@@ -1191,8 +1280,12 @@ void printJSON(const T& val) {
     cout << toJson(val);
 }
 
+${userHeaders}
 
-${userCode}
+namespace user_sol {
+${userBody}
+} // namespace user_sol
+
 
 int main() {
     cout << "___TEST_RESULTS_START___" << endl;

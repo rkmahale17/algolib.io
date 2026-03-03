@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom'; // Added Link
 import { ExternalLink, Loader2, MessageSquare, Trash2, CheckCircle, Clock, XCircle, ArrowLeft } from 'lucide-react'; // Added ArrowLeft
+import { cn } from "@/lib/utils";
 
 import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
@@ -30,6 +31,8 @@ interface FeedbackItem {
   description: string;
   image_url: string | null;
   user_email: string | null;
+  type: 'suggestion' | 'bug';
+  upvotes_count: number;
   status: string;
   created_at: string;
 }
@@ -89,7 +92,7 @@ const FeedbackAdmin = () => {
 
   const deleteFeedback = async (id: string) => {
     if (!supabase) return;
-    
+
     if (!confirm('Are you sure you want to delete this feedback?')) return;
 
     const { error } = await supabase
@@ -124,21 +127,21 @@ const FeedbackAdmin = () => {
         <div className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-between mb-8">
             <div className="space-y-4">
-               <Link to="/admin">
-                    <Button variant="ghost" className="gap-2 -ml-2 text-muted-foreground">
-                        <ArrowLeft className="w-4 h-4" />
-                        Back to Dashboard
-                    </Button>
-               </Link>
-               <div>
-                  <h1 className="text-3xl font-bold flex items-center gap-2">
-                    <MessageSquare className="w-8 h-8 text-primary" />
-                    Feedback Management
-                  </h1>
-                  <p className="text-muted-foreground mt-1">
-                    {feedback.length} feedback submission{feedback.length !== 1 ? 's' : ''}
-                  </p>
-               </div>
+              <Link to="/admin">
+                <Button variant="ghost" className="gap-2 -ml-2 text-muted-foreground">
+                  <ArrowLeft className="w-4 h-4" />
+                  Back to Dashboard
+                </Button>
+              </Link>
+              <div>
+                <h1 className="text-3xl font-bold flex items-center gap-2">
+                  <MessageSquare className="w-8 h-8 text-primary" />
+                  Feedback Management
+                </h1>
+                <p className="text-muted-foreground mt-1">
+                  {feedback.length} feedback submission{feedback.length !== 1 ? 's' : ''}
+                </p>
+              </div>
             </div>
           </div>
 
@@ -167,24 +170,40 @@ const FeedbackAdmin = () => {
                           />
                         </button>
                       )}
-                      
+
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-4 mb-2">
-                          <h3 className="font-semibold text-lg truncate">{item.title}</h3>
+                          <div className="flex flex-col gap-1">
+                            <h3 className="font-semibold text-lg truncate">{item.title}</h3>
+                            <div className="flex gap-2">
+                              <Badge
+                                variant="outline"
+                                className={cn(
+                                  "capitalize py-0.5 text-[10px]",
+                                  item.type === 'bug' ? "bg-red-50 text-red-600 border-red-200" : "bg-green-50 text-green-600 border-green-200"
+                                )}
+                              >
+                                {item.type}
+                              </Badge>
+                              <Badge variant="secondary" className="text-[10px] py-0.5">
+                                {item.upvotes_count} votes
+                              </Badge>
+                            </div>
+                          </div>
                           <Badge variant={statusConfig[item.status]?.variant || 'secondary'}>
                             <StatusIcon className="w-3 h-3 mr-1" />
                             {statusConfig[item.status]?.label || item.status}
                           </Badge>
                         </div>
-                        
+
                         <p className="text-muted-foreground whitespace-pre-wrap mb-3">
                           {item.description}
                         </p>
-                        
+
                         <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                           <span>{format(new Date(item.created_at), 'MMM d, yyyy h:mm a')}</span>
                           {item.user_email && (
-                            <a 
+                            <a
                               href={`mailto:${item.user_email}`}
                               className="text-primary hover:underline flex items-center gap-1"
                             >
@@ -210,7 +229,7 @@ const FeedbackAdmin = () => {
                             <SelectItem value="rejected">Rejected</SelectItem>
                           </SelectContent>
                         </Select>
-                        
+
                         <Button
                           variant="destructive"
                           size="icon"

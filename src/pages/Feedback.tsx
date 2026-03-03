@@ -1,111 +1,286 @@
-import { ImagePlus, Loader2, MessageSquare, X } from 'lucide-react';
-
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Loader2, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
-import { useState, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Footer } from '@/components/Footer';
 import { Helmet } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
+import { FeedbackCard } from '@/components/feedback/FeedbackCard';
+import { FeedbackFilters } from '@/components/feedback/FeedbackFilters';
+import { FeedbackSubmissionSidebar } from '@/components/feedback/FeedbackSubmissionSidebar';
+import { FeedbackDetailModal } from '@/components/feedback/FeedbackDetailModal';
+
+interface FeedbackItem {
+  id: string;
+  title: string;
+  description: string;
+  type: 'suggestion' | 'bug';
+  status: string;
+  upvotes_count: number;
+  is_anonymous: boolean;
+  user_id: string;
+  created_at: string;
+  profiles: {
+    full_name: string;
+    avatar_url: string;
+  } | null;
+  has_voted: boolean;
+  comments_count: number;
+}
 
 const Feedback = () => {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [email, setEmail] = useState('');
-  const [image, setImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [items, setItems] = useState<FeedbackItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [activeTab, setActiveTab] = useState<'all' | 'suggestions' | 'bugs'>('all');
+  const [activeSort, setActiveSort] = useState<'hot' | 'top' | 'new'>('hot');
+  const [counts, setCounts] = useState({ all: 0, suggestions: 0, bugs: 0 });
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error('Image size must be less than 5MB');
-        return;
+  // Modal state
+  const [selectedFeedback, setSelectedFeedback] = useState<FeedbackItem | null>(null);
+  const [comments, setComments] = useState<any[]>([]);
+  const [loadingComments, setLoadingComments] = useState(false);
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+
+  useEffect(() => {
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setCurrentUser(session?.user ?? null);
+
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        setCurrentUser(session?.user ?? null);
+      });
+
+      return () => subscription.unsubscribe();
+    };
+
+    getSession();
+  }, []);
+
+  const fetchFeedback = useCallback(async () => {
+    if (!supabase) return;
+    setLoading(true);
+
+    try {
+      // Fetch all items to calculate counts correctly
+      let query = supabase
+        .from('feedback')
+        .select(`
+          *,
+          profiles:user_id (full_name, avatar_url),
+          votes:feedback_votes (user_id),
+          comments:feedback_comments (id)
+        `);
+
+      const { data: allData, error: allErr } = await query;
+      if (allErr) throw allErr;
+
+      const suggCount = (allData as any[]).filter(i => i.type === 'suggestion').length;
+      const bugCount = (allData as any[]).filter(i => i.type === 'bug').length;
+      setCounts({
+        all: (allData as any[]).length,
+        suggestions: suggCount,
+        bugs: bugCount
+      });
+
+      // Now apply filters for display
+      let displayQuery = supabase
+        .from('feedback')
+        .select(`
+          *,
+          profiles:user_id (full_name, avatar_url),
+          votes:feedback_votes (user_id),
+          comments:feedback_comments (id)
+        `);
+
+      if (activeTab === 'suggestions') {
+        displayQuery = displayQuery.eq('type', 'suggestion');
+      } else if (activeTab === 'bugs') {
+        displayQuery = displayQuery.eq('type', 'bug');
       }
-      setImage(file);
-      setImagePreview(URL.createObjectURL(file));
-    }
-  };
 
-  const removeImage = () => {
-    setImage(null);
-    setImagePreview(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
+      // Sort logic
+      if (activeSort === 'new') {
+        displayQuery = displayQuery.order('created_at', { ascending: false });
+      } else if (activeSort === 'top') {
+        displayQuery = displayQuery.order('upvotes_count', { ascending: false });
+      } else if (activeSort === 'hot') {
+        displayQuery = displayQuery.order('upvotes_count', { ascending: false }).order('created_at', { ascending: false });
+      }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!title.trim() || !description.trim()) {
-      toast.error('Please fill in title and description');
+      const { data, error } = await displayQuery;
+
+      if (error) throw error;
+
+      const formattedData = (data as any[]).map(item => ({
+        ...item,
+        has_voted: item.votes?.some((v: any) => v.user_id === currentUser?.id),
+        comments_count: item.comments?.length || 0
+      }));
+
+      setItems(formattedData);
+    } catch (error) {
+      console.error('Error fetching feedback:', error);
+      toast.error('Failed to load feedback');
+    } finally {
+      setLoading(false);
+    }
+  }, [activeTab, activeSort, currentUser?.id]);
+
+  useEffect(() => {
+    fetchFeedback();
+  }, [fetchFeedback]);
+
+  const handleVote = async (feedbackId: string) => {
+    if (!currentUser) {
+      toast.error('Please login to upvote');
       return;
     }
 
-    if (!supabase) {
-      toast.error('Database connection not available');
+    const item = items.find(i => i.id === feedbackId);
+    if (!item) return;
+
+    try {
+      if (item.has_voted) {
+        // Remove vote
+        const { error } = await supabase
+          .from('feedback_votes')
+          .delete()
+          .match({ feedback_id: feedbackId, user_id: currentUser.id });
+
+        if (error) throw error;
+      } else {
+        // Add vote
+        const { error } = await supabase
+          .from('feedback_votes')
+          .insert({ feedback_id: feedbackId, user_id: currentUser.id });
+
+        if (error) throw error;
+      }
+
+      // Update local state for immediate feedback
+      setItems(prev => prev.map(i => {
+        if (i.id === feedbackId) {
+          return {
+            ...i,
+            has_voted: !i.has_voted,
+            upvotes_count: i.has_voted ? Math.max(0, i.upvotes_count - 1) : i.upvotes_count + 1
+          };
+        }
+        return i;
+      }));
+
+      if (selectedFeedback?.id === feedbackId) {
+        setSelectedFeedback(prev => prev ? {
+          ...prev,
+          has_voted: !prev.has_voted,
+          upvotes_count: prev.has_voted ? Math.max(0, prev.upvotes_count - 1) : prev.upvotes_count + 1
+        } : null);
+      }
+
+    } catch (error) {
+      console.error('Vote error:', error);
+      toast.error('Failed to update vote');
+    }
+  };
+
+  const handleSubmitFeedback = async (data: { title: string; description: string; type: 'suggestion' | 'bug'; is_anonymous: boolean }) => {
+    if (!currentUser) {
+      toast.error('Please login to submit feedback');
       return;
     }
 
     setIsSubmitting(true);
-
     try {
-      let imageUrl: string | null = null;
-
-      // Upload image if provided
-      if (image) {
-        const fileExt = image.name.split('.').pop();
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-        
-        const { error: uploadError } = await supabase.storage
-          .from('feedback-images')
-          .upload(fileName, image);
-
-        if (uploadError) {
-          console.error('Upload error:', uploadError);
-          toast.error('Failed to upload image');
-          return;
-        }
-
-        const { data: urlData } = supabase.storage
-          .from('feedback-images')
-          .getPublicUrl(fileName);
-        
-        imageUrl = urlData.publicUrl;
-      }
-
-      // Insert feedback into database
-      const { error: insertError } = await supabase
+      const { error } = await supabase
         .from('feedback')
         .insert({
-          title: title.trim(),
-          description: description.trim(),
-          user_email: email.trim() || null,
-          image_url: imageUrl,
+          ...data,
+          user_id: currentUser.id,
+          status: 'pending'
         });
 
-      if (insertError) {
-        console.error('Insert error:', insertError);
-        toast.error('Failed to submit feedback');
-        return;
-      }
+      if (error) throw error;
 
-      toast.success('Thank you for your feedback!');
-      setTitle('');
-      setDescription('');
-      setEmail('');
-      removeImage();
+      toast.success('Feedback submitted successfully!');
+      fetchFeedback();
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Submission error:', error);
       toast.error('Failed to submit feedback');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleOpenDetail = async (feedback: FeedbackItem) => {
+    setSelectedFeedback(feedback);
+    setLoadingComments(true);
+    try {
+      const { data, error } = await supabase
+        .from('feedback_comments')
+        .select('*, profiles:user_id(full_name, avatar_url)')
+        .eq('feedback_id', feedback.id)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      setComments(data.map(c => ({
+        ...c,
+        user_full_name: c.profiles?.full_name || 'User'
+      })));
+    } catch (error) {
+      console.error('Comments fetch error:', error);
+      toast.error('Failed to load comments');
+    } finally {
+      setLoadingComments(false);
+    }
+  };
+
+  const handleAddComment = async (content: string, isAnonymous: boolean) => {
+    if (!currentUser || !selectedFeedback) {
+      toast.error('Please login to comment');
+      return;
+    }
+
+    setIsSubmittingComment(true);
+    try {
+      const { data, error } = await supabase
+        .from('feedback_comments')
+        .insert({
+          feedback_id: selectedFeedback.id,
+          user_id: currentUser.id,
+          content,
+          is_anonymous: isAnonymous
+        })
+        .select('*, profiles:user_id(full_name, avatar_url)')
+        .single();
+
+      if (error) throw error;
+
+      const newComment = {
+        ...data,
+        user_full_name: data.profiles?.full_name || 'User'
+      };
+
+      setComments(prev => [...prev, newComment]);
+
+      // Update comment count in main list
+      setItems(prev => prev.map(i => {
+        if (i.id === selectedFeedback.id) {
+          return { ...i, comments_count: i.comments_count + 1 };
+        }
+        return i;
+      }));
+
+      // Update comment count in selected feedback
+      setSelectedFeedback(prev => prev ? { ...prev, comments_count: prev.comments_count + 1 } : null);
+
+      toast.success('Comment added');
+    } catch (error) {
+      console.error('Comment error:', error);
+      toast.error('Failed to add comment');
+    } finally {
+      setIsSubmittingComment(false);
     }
   };
 
@@ -113,138 +288,83 @@ const Feedback = () => {
     <>
       <Helmet>
         <title>Feedback & Suggestions - Rulcode.com | Report Bugs & Request Features</title>
-        <meta 
-          name="description" 
-          content="Share your feedback, report bugs, or request new features for Rulcode.com. Help us improve our free algorithm learning platform." 
-        />
-        <meta 
-          name="keywords" 
-          content="rulcode feedback, report bug, feature request, algorithm platform feedback, contribute feedback" 
+        <meta
+          name="description"
+          content="Share your feedback, report bugs, or request new features for Rulcode.com. Help us improve our free algorithm learning platform."
         />
         <link rel="canonical" href="https://rulcode.com/feedback" />
-        
-        <meta property="og:title" content="Feedback & Suggestions - Rulcode.com" />
-        <meta property="og:description" content="Help us improve Rulcode.com by sharing your feedback and suggestions" />
-        <meta property="og:url" content="https://rulcode.com/feedback" />
-        <meta name="robots" content="index, follow" />
       </Helmet>
-      
+
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-16">
-          <div className="max-w-2xl mx-auto">
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
-                <MessageSquare className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium text-primary">We Value Your Input</span>
-              </div>
-              <h1 className="text-4xl font-bold mb-4">Feedback & Suggestions</h1>
-              <p className="text-muted-foreground">
-                Help us improve Rulcode by sharing your feedback, bug reports, or feature requests.
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <h1 className="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight">
+                Suggest a <span className="text-green-600 bg-green-50 px-2 rounded-lg">feature</span> or Report <br className="hidden md:block" /> a <span className="text-green-600 bg-green-50 px-2 rounded-lg">bug</span>
+              </h1>
+              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                Help us shape the future of Rulcode. Your ideas matter. Found <br className="hidden md:block" /> an issue? Let us know so we can fix it.
               </p>
             </div>
 
-            <Card className="p-6 glass-card">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email (optional)</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="your@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={isSubmitting}
-                  />
-                  <p className="text-xs text-muted-foreground">We'll only use this to follow up on your feedback</p>
-                </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+              <div className="lg:col-span-2">
+                <FeedbackFilters
+                  activeTab={activeTab}
+                  setActiveTab={setActiveTab}
+                  activeSort={activeSort}
+                  setActiveSort={setActiveSort}
+                  counts={counts}
+                />
 
-                <div className="space-y-2">
-                  <Label htmlFor="title">Title *</Label>
-                  <Input
-                    id="title"
-                    placeholder="Brief description of your feedback"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    required
-                    disabled={isSubmitting}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="description">Description *</Label>
-                  <Textarea
-                    id="description"
-                    placeholder="Please provide detailed feedback, bug reports, or feature requests..."
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    required
-                    disabled={isSubmitting}
-                    className="min-h-[200px] resize-none"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Screenshot (optional)</Label>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="hidden"
-                    disabled={isSubmitting}
-                  />
-                  
-                  {imagePreview ? (
-                    <div className="relative inline-block">
-                      <img 
-                        src={imagePreview} 
-                        alt="Preview" 
-                        className="max-h-48 rounded-lg border"
+                {loading ? (
+                  <div className="flex flex-col items-center justify-center py-20 bg-muted/20 rounded-xl border border-dashed">
+                    <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
+                    <p className="text-muted-foreground">Loading feedback...</p>
+                  </div>
+                ) : items.length === 0 ? (
+                  <div className="text-center py-20 bg-muted/20 rounded-xl border border-dashed">
+                    <MessageSquare className="w-12 h-12 mx-auto text-muted-foreground mb-4 opacity-20" />
+                    <h3 className="text-lg font-medium text-muted-foreground">No feedback found</h3>
+                    <p className="text-sm text-muted-foreground/60">Be the first to suggest something!</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {items.map((item) => (
+                      <FeedbackCard
+                        key={item.id}
+                        {...item}
+                        user_full_name={item.profiles?.full_name}
+                        user_avatar={item.profiles?.avatar_url}
+                        onVote={() => handleVote(item.id)}
+                        onClick={() => handleOpenDetail(item)}
                       />
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="icon"
-                        className="absolute -top-2 -right-2 h-6 w-6"
-                        onClick={removeImage}
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  ) : (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={isSubmitting}
-                      className="h-8 text-xs"
-                    >
-                      <ImagePlus className="w-3.5 h-3.5 mr-2" />
-                      Add Screenshot
-                    </Button>
-                  )}
-                  <p className="text-xs text-muted-foreground">Max 5MB, helps us understand the issue better</p>
-                </div>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-                <Button type="submit" disabled={isSubmitting} className="w-full">
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Submitting...
-                    </>
-                  ) : (
-                    <>
-                      <MessageSquare className="w-4 h-4 mr-2" />
-                      Submit Feedback
-                    </>
-                  )}
-                </Button>
-              </form>
-            </Card>
+              <div className="lg:col-span-1">
+                <FeedbackSubmissionSidebar
+                  isSubmitting={isSubmitting}
+                  onSubmit={handleSubmitFeedback}
+                />
+              </div>
+            </div>
           </div>
         </div>
         <Footer />
       </div>
+
+      <FeedbackDetailModal
+        isOpen={!!selectedFeedback}
+        onClose={() => setSelectedFeedback(null)}
+        feedback={selectedFeedback}
+        comments={comments}
+        isSubmittingComment={isSubmittingComment}
+        onVote={handleVote}
+        onAddComment={handleAddComment}
+      />
     </>
   );
 };

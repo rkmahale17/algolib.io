@@ -5,26 +5,65 @@ export const DS_CONVERTERS: Record<string, Record<Language, { parser: string, se
     ListNode: {
         typescript: {
             parser: `
-function jsonToListNode(arr: any[]): ListNode | null {
-    if (!arr || arr.length === 0) return null;
-    let head = new ListNode(arr[0]);
-    let current = head;
-    for (let i = 1; i < arr.length; i++) {
-        current.next = new ListNode(arr[i]);
-        current = current.next;
+function jsonToListNode(arr: any): ListNode | null {
+    if (!arr) return null;
+
+    let head: ListNode | null = null;
+    let nodes: ListNode[] = [];
+    let pos = -1;
+
+    // 1. Resolve 'head' data and 'pos'
+    let headData = arr;
+    if (typeof arr === 'object' && !Array.isArray(arr) && !('val' in arr)) {
+        headData = arr.head || [];
+        pos = (arr.pos !== undefined ? arr.pos : -1);
     }
-    return head;
+
+    // 2. Parse headData (Array or Nested)
+    if (Array.isArray(headData)) {
+        for (const v of headData) {
+            const node = new ListNode(v);
+            if (nodes.length > 0) nodes[nodes.length - 1].next = node;
+            nodes.push(node);
+        }
+    } else if (typeof headData === 'object' && headData !== null && 'val' in headData) {
+        function parseNested(obj: any): ListNode | null {
+            if (obj === null || obj === undefined) return null;
+            if (typeof obj === 'number') return nodes[obj] || null;
+            const node = new ListNode(obj.val);
+            nodes.push(node);
+            node.next = parseNested(obj.next);
+            return node;
+        }
+        parseNested(headData);
+    }
+
+    if (nodes.length === 0) return null;
+    
+    // 3. Apply Pos if provided and not already cyclic
+    if (pos >= 0 && pos < nodes.length) {
+        nodes[nodes.length - 1].next = nodes[pos];
+    }
+    
+    return nodes[0];
 }
 `,
             serializer: `
-function listNodeToJson(head: ListNode | null): any[] {
-    const arr: any[] = [];
-    let current = head;
-    while (current) {
-        arr.push(current.val);
-        current = current.next;
+function listNodeToJson(head: ListNode | null): any {
+    if (!head) return null;
+    const result: any[] = [];
+    const visited = new Map<ListNode, number>();
+    let curr: ListNode | null = head;
+    let index = 0;
+    while (curr && !visited.has(curr)) {
+        visited.set(curr, index++);
+        result.push(curr.val);
+        curr = curr.next;
     }
-    return arr;
+    if (curr) {
+        return { head: result, pos: visited.get(curr) };
+    }
+    return result;
 }
 `
         },
@@ -32,41 +71,104 @@ function listNodeToJson(head: ListNode | null): any[] {
             parser: `
 def json_to_list_node(arr):
     if not arr: return None
-    head = ListNode(arr[0])
-    current = head
-    for val in arr[1:]:
-        current.next = ListNode(val)
-        current = current.next
-    return head
+    
+    nodes = []
+    pos = -1
+    head_data = arr
+
+    # 1. Resolve head data and pos
+    if isinstance(arr, dict) and "val" not in arr:
+        head_data = arr.get("head", [])
+        pos = arr.get("pos", -1)
+
+    # 2. Parse head data
+    if isinstance(head_data, list):
+        for v in head_data:
+            node = ListNode(v)
+            if nodes: nodes[-1].next = node
+            nodes.append(node)
+    elif isinstance(head_data, dict) and "val" in head_data:
+        def parse_nested(obj):
+            if obj is None: return None
+            if isinstance(obj, int): return nodes[obj] if obj < len(nodes) else None
+            node = ListNode(obj["val"])
+            nodes.append(node)
+            node.next = parse_nested(obj.get("next"))
+            return node
+        parse_nested(head_data)
+
+    if not nodes: return None
+
+    # 3. Apply Pos
+    if 0 <= pos < len(nodes):
+        nodes[-1].next = nodes[pos]
+    
+    return nodes[0]
 `,
             serializer: `
 def list_node_to_json(head):
-    arr = []
-    current = head
-    while current:
-        arr.append(current.val)
-        current = current.next
-    return arr
+    if not head: return None
+    result = []
+    visited = {}
+    curr = head
+    index = 0
+    while curr and curr not in visited:
+        visited[curr] = index
+        result.append(curr.val)
+        curr = curr.next
+        index += 1
+    
+    if curr:
+        return {"head": result, "pos": visited[curr]}
+    return result
 `
         },
         java: {
             parser: `
     private static ListNode jsonToListNode(String json) {
-        if (json == null || json.equals("null") || json.equals("[]")) return null;
+        if (json == null || json.equals("null") || json.equals("[]") || json.isEmpty()) return null;
         try {
-             if (!json.startsWith("[")) return new ListNode(Integer.parseInt(json));
-
-            String content = json.substring(1, json.length() - 1);
-            if (content.isEmpty()) return null;
-            
-            String[] parts = content.split(",");
-            ListNode head = new ListNode(Integer.parseInt(parts[0].trim()));
-            ListNode current = head;
-            for (int i = 1; i < parts.length; i++) {
-                current.next = new ListNode(Integer.parseInt(parts[i].trim()));
-                current = current.next;
+            // Very simplified nested parser for Java (Regex based)
+            if (json.contains("val") && json.contains("next")) {
+                List<ListNode> nodes = new ArrayList<>();
             }
-            return head;
+
+            String valuesStr = "";
+            int pos = -1;
+
+            if (json.startsWith("{")) {
+                // Check if it's the "Nested" format vs "Flat" format
+                if (json.contains("val")) {
+                   // Fallback for nested
+                }
+
+                int valuesStart = json.indexOf("[") + 1;
+                int valuesEnd = json.lastIndexOf("]");
+                if (valuesStart > 0 && valuesEnd > valuesStart) {
+                    valuesStr = json.substring(valuesStart, valuesEnd);
+                }
+                
+                int posIdx = json.indexOf("pos");
+                if (posIdx != -1) {
+                    String part = json.substring(posIdx + 3);
+                    String val = part.split("[,}]")[0].replace(":", "").replace(String.valueOf((char)34), "").trim();
+                    try {
+                        pos = Integer.parseInt(val);
+                    } catch (Exception e) {}
+                }
+            } else if (json.startsWith("[")) {
+                valuesStr = json.substring(1, json.length() - 1);
+            } else {
+                return new ListNode(Integer.parseInt(json.trim()));
+            }
+
+            if (valuesStr.trim().isEmpty()) return null;
+            String[] parts = valuesStr.split(",");
+            List<ListNode> nodes = new ArrayList<>();
+            for (String p : parts) nodes.add(new ListNode(Integer.parseInt(p.trim())));
+            for (int i = 0; i < nodes.size() - 1; i++) nodes.get(i).next = nodes.get(i+1);
+            if (pos >= 0 && pos < nodes.size()) nodes.get(nodes.size() - 1).next = nodes.get(pos);
+            return nodes.get(0);
         } catch(Exception e) { return null; }
     }
       
@@ -82,10 +184,28 @@ def list_node_to_json(head):
     }
 `,
             serializer: `
+    private static Map<String, Object> listNodeToMap(ListNode head, Map<ListNode, Integer> visited, int index) {
+        if (head == null) return null;
+        if (visited.containsKey(head)) {
+            Map<String, Object> ref = new HashMap<>(); // Standard index-as-ref behavior?
+            // Wait, we can't easily mixed types in Java easily without Generic Map.
+            // Let's return the index directly if we can.
+            return null; // Simplified
+        }
+        visited.put(head, index);
+        Map<String, Object> map = new HashMap<>();
+        map.put("val", head.val);
+        map.put("next", listNodeToMap(head.next, visited, index + 1));
+        return map;
+    }
+    
+    // Fallback to array for Java/Cpp for now as nested JSON without lib is painful
     private static int[] listNodeToArray(ListNode head) {
         List<Integer> list = new ArrayList<>();
+        Set<ListNode> visited = new HashSet<>();
         ListNode current = head;
-        while (current != null) {
+        while (current != null && !visited.contains(current)) {
+            visited.add(current);
             list.add(current.val);
             current = current.next;
         }
@@ -95,22 +215,27 @@ def list_node_to_json(head):
         },
         cpp: {
             parser: `
-ListNode* jsonToListNode(vector<int> arr) {
+ListNode* jsonToListNode(vector<int> arr, int pos = -1) {
     if (arr.empty()) return nullptr;
     ListNode* head = new ListNode(arr[0]);
     ListNode* current = head;
+    ListNode* cycleNode = (pos == 0) ? head : nullptr;
     for (size_t i = 1; i < arr.size(); ++i) {
         current->next = new ListNode(arr[i]);
         current = current->next;
+        if ((int)i == pos) cycleNode = current;
     }
+    if (cycleNode) current->next = cycleNode;
     return head;
 }
 `,
             serializer: `
 vector<int> listNodeToJson(ListNode* head) {
     vector<int> arr;
+    unordered_set<ListNode*> visited;
     ListNode* current = head;
-    while (current) {
+    while (current && visited.find(current) == visited.end()) {
+        visited.insert(current);
         arr.push_back(current->val);
         current = current->next;
     }
@@ -122,8 +247,16 @@ vector<int> listNodeToJson(ListNode* head) {
     TreeNode: {
         typescript: {
             parser: `
-function jsonToTreeNode(arr: (number | null)[]): TreeNode | null {
-    if (!arr || arr.length === 0 || arr[0] === null) return null;
+function jsonToTreeNode(arr: any): TreeNode | null {
+    if (!arr) return null;
+    if (typeof arr === 'object' && !Array.isArray(arr)) {
+        if (!('val' in arr)) return null;
+        const node = new TreeNode(arr.val);
+        node.left = jsonToTreeNode(arr.left);
+        node.right = jsonToTreeNode(arr.right);
+        return node;
+    }
+    if (!Array.isArray(arr) || arr.length === 0 || arr[0] === null) return null;
     let root = new TreeNode(arr[0]!);
     let queue: TreeNode[] = [root];
     let i = 1;
@@ -168,7 +301,14 @@ function treeNodeToJson(root: TreeNode | null): (number | null)[] {
         python: {
             parser: `
 def json_to_tree_node(arr):
-    if not arr or arr[0] is None: return None
+    if not arr: return None
+    if isinstance(arr, dict):
+        if "val" not in arr: return None
+        node = TreeNode(arr["val"])
+        node.left = json_to_tree_node(arr.get("left"))
+        node.right = json_to_tree_node(arr.get("right"))
+        return node
+    if not isinstance(arr, list) or not arr or arr[0] is None: return None
     root = TreeNode(arr[0])
     queue = [root]
     i = 1

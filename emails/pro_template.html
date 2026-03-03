@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rulcode - The Developer's Canvas</title>
+    <style>
+        /* Base Reset */
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100% !important;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8fafc;
+            /* Grid Background Effect */
+            background-image: 
+                linear-gradient(#e2e8f0 1px, transparent 1px),
+                linear-gradient(90deg, #e2e8f0 1px, transparent 1px);
+            background-size: 40px 40px;
+            color: #1e293b;
+        }
+
+        .wrapper {
+            width: 100%;
+            table-layout: fixed;
+            padding: 40px 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 640px;
+            margin: 0 auto;
+            background-color: transparent;
+        }
+
+        /* Main Card */
+        .content-card {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        }
+
+        .header {
+            padding: 40px;
+            text-align: center;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            color: #7c3aed;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .logo-accent {
+            background: linear-gradient(135deg, #7c3aed, #2563eb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 48px 48px 24px;
+            text-align: left;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0 0 20px 0;
+            line-height: 1.2;
+            letter-spacing: -0.03em;
+        }
+
+        .lead {
+            font-size: 18px;
+            color: #475569;
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        /* Features Section (Modern Cards) */
+        .features {
+            padding: 0 48px 48px;
+        }
+
+        .feature-item {
+            padding: 24px;
+            background-color: #f8fafc;
+            border: 1px solid #f1f5f9;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .feature-icon {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            background: #f5f3ff;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .feature-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .feature-desc {
+            font-size: 14px;
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        /* CTA */
+        .cta-section {
+            padding: 12px 48px 48px;
+            text-align: center;
+        }
+
+        .btn {
+            display: inline-block;
+            background: #7c3aed;
+            background: linear-gradient(135deg, #7c3aed, #2563eb);
+            color: #ffffff !important;
+            padding: 16px 40px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 4px 6px -1px rgba(124, 58, 237, 0.2);
+            transition: transform 0.2s;
+        }
+
+        /* Stats/Code View */
+        .code-preview {
+            background-color: #0f172a;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 32px 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: #94a3b8;
+            border: 1px solid #1e293b;
+        }
+
+        .code-keyword { color: #c084fc; }
+        .code-func { color: #38bdf8; }
+        .code-string { color: #4ade80; }
+
+        /* Footer */
+        .footer {
+            padding: 40px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        .footer a { color: #7c3aed; text-decoration: none; font-weight: 600; }
+
+        /* Dark Mode */
+        @media (prefers-color-scheme: dark) {
+            body { 
+                background-color: #020617; 
+                background-image: 
+                    linear-gradient(#1e293b 1px, transparent 1px),
+                    linear-gradient(90deg, #1e293b 1px, transparent 1px);
+            }
+            .content-card { background-color: #0f172a; border-color: #1e293b; }
+            .header { border-bottom-color: #1e293b; }
+            h1 { color: #f8fafc; }
+            .lead { color: #94a3b8; }
+            .feature-item { background-color: #1e293b; border-color: #334155; }
+            .feature-title { color: #f8fafc; }
+            .feature-desc { color: #94a3b8; }
+            .feature-icon { background: #2e1065; }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <div class="content-card">
+                <!-- Branding -->
+                <div class="header">
+                    <a href="https://rulcode.com" class="logo">
+                        <span class="logo-accent">rulcode</span>
+                    </a>
+                </div>
+
+                <!-- Main Content -->
+                <div class="hero">
+                    <h1>Visualize your vision.</h1>
+                    <p class="lead">
+                        Welcome to Rulcode, the next-generation platform for developers to build, test, and visualize complex algorithms in real-time. We've turned code into a canvas.
+                    </p>
+
+                    <div class="code-preview">
+                        <span class="code-keyword">const</span> <span class="code-func">rulcode</span> = <span class="code-keyword">await</span> connect({<br>
+                        &nbsp;&nbsp;id: <span class="code-string">"{{project_id}}"</span>,<br>
+                        &nbsp;&nbsp;mode: <span class="code-string">"visualization"</span><br>
+                        });<br><br>
+                        <span class="code-func">rulcode.animate</span>(<span class="code-string">"growth"</span>);
+                    </div>
+                </div>
+
+                <!-- descriptive sections -->
+                <div class="features">
+                    <div class="feature-item">
+                        <div class="feature-icon">✨</div>
+                        <div class="feature-title">Real-time Visualization</div>
+                        <div class="feature-desc">Watch your data structures flow and evolve. Our engine renders complex graphs and JSON trees with 60FPS fluid animations.</div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">🛠️</div>
+                        <div class="feature-title">Interactive Workspace</div>
+                        <div class="feature-desc">Manipulate nodes, trace execution paths, and debug visually. It's like having X-ray vision for your algorithms.</div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon">🚀</div>
+                        <div class="feature-title">Performance Insights</div>
+                        <div class="feature-desc">Get detailed analytics on time complexity and memory usage as your code executes in our sandboxed environment.</div>
+                    </div>
+                </div>
+
+                <!-- Final CTA -->
+                <div class="cta-section">
+                    <a href="{{cta_url}}" class="btn">Launch Your Dashboard</a>
+                </div>
+            </div>
+
+            <!-- Global Footer -->
+            <div class="footer">
+                <p>You received this because you're part of the Rulcode developer community.</p>
+                <p>
+                    <a href="https://rulcode.com">Website</a> &bull; 
+                    <a href="https://github.com/rulcode">GitHub</a> &bull; 
+                    <a href="https://twitter.com/rulcode">Twitter</a>
+                </p>
+                <p style="margin-top: 24px;">
+                    &copy; 2026 rulcode &bull; Designed for developers.<br>
+                    <a href="#" style="font-size: 11px; color: #64748b;">Manage preferences or unsubscribe</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
