@@ -4,6 +4,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Check, X, Edit2 } from 'lucide-react';
+import { TreeDiagram } from '../visualizations/TreeDiagram';
+import { isTreeType, serializeTree, parseTreeValue } from '@/utils/treeUtils';
 
 interface InputField {
   name: string;
@@ -38,7 +40,14 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
   canEdit = false
 }) => {
   const [editedInputs, setEditedInputs] = useState<string[]>(
-    testCase.input.map(val => JSON.stringify(val))
+    testCase.input.map((val, idx) => {
+      const field = inputSchema[idx];
+      if (field && isTreeType(field.type)) {
+        const treeArr = parseTreeValue(val);
+        if (treeArr) return JSON.stringify(treeArr);
+      }
+      return JSON.stringify(val);
+    })
   );
   const [editedExpected, setEditedExpected] = useState<string>(
     testCase.expectedOutput !== undefined ? JSON.stringify(testCase.expectedOutput) : ''
@@ -48,10 +57,17 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
 
   // Sync state with props when testCase changes (e.g. after save or external update)
   React.useEffect(() => {
-    setEditedInputs(testCase.input.map(val => JSON.stringify(val)));
+    setEditedInputs(testCase.input.map((val, idx) => {
+      const field = inputSchema[idx];
+      if (field && isTreeType(field.type)) {
+        const treeArr = parseTreeValue(val);
+        if (treeArr) return JSON.stringify(treeArr);
+      }
+      return JSON.stringify(val);
+    }));
     setEditedExpected(testCase.expectedOutput !== undefined ? JSON.stringify(testCase.expectedOutput) : '');
     setErrors({});
-  }, [testCase]);
+  }, [testCase, inputSchema]);
 
   const handleInputChange = (index: number, value: string) => {
     const newInputs = [...editedInputs];
@@ -74,7 +90,7 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
 
   const handleExpectedChange = (value: string) => {
     setEditedExpected(value);
-    
+
     // Validate JSON
     try {
       JSON.parse(value);
@@ -119,15 +135,15 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
   const hasErrors = Object.keys(errors).length > 0;
 
   return (
-    <div className="space-y-3 p-4 border rounded-lg bg-muted/20">
+    <div className="space-y-3 p-4">
       <div className="flex items-center justify-between mb-2">
         <h4 className="text-sm font-semibold">
           {isEditing ? 'Edit Test Case' : 'Test Case Details'}
         </h4>
         {!isEditing && canEdit && (
-            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={onEdit}>
-                <Edit2 className="h-3 w-3" />
-            </Button>
+          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={onEdit}>
+            <Edit2 className="h-3 w-3" />
+          </Button>
         )}
       </div>
 
@@ -142,9 +158,8 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
               id={`input-${index}`}
               value={editedInputs[index] || ''}
               onChange={(e) => handleInputChange(index, e.target.value)}
-              className={`font-mono text-xs ${
-                errors[index] ? 'border-destructive focus-visible:ring-destructive' : ''
-              }`}
+              className={`font-mono text-xs ${errors[index] ? 'border-destructive focus-visible:ring-destructive' : ''
+                }`}
               placeholder={`Enter ${field.type}`}
               readOnly={!isEditing}
               disabled={!isEditing}
@@ -157,6 +172,11 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
           </div>
           {errors[index] && (
             <p className="text-xs text-destructive">{errors[index]}</p>
+          )}
+          {isTreeType(field.type) && editedInputs[index] && !errors[index] && (
+            <div className="mt-2">
+              <TreeDiagram data={editedInputs[index]} height={120} />
+            </div>
           )}
         </div>
       ))}
@@ -171,9 +191,8 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
             id="input-expected"
             value={editedExpected}
             onChange={(e) => handleExpectedChange(e.target.value)}
-            className={`font-mono text-xs ${
-              errors['expected'] ? 'border-destructive focus-visible:ring-destructive' : ''
-            }`}
+            className={`font-mono text-xs ${errors['expected'] ? 'border-destructive focus-visible:ring-destructive' : ''
+              }`}
             placeholder="e.g. [1, 2] or 5 or true"
             readOnly={!isEditing}
             disabled={!isEditing}
@@ -186,6 +205,12 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
         </div>
         {errors['expected'] && (
           <p className="text-xs text-destructive">{errors['expected']}</p>
+        )}
+        {/* We don't have an explicit type for 'expected' in inputSchema, but we can check if it's likely a tree */}
+        {editedExpected && !errors['expected'] && (
+          <div className="mt-2">
+            <TreeDiagram data={editedExpected} height={120} />
+          </div>
         )}
       </div>
 

@@ -21,7 +21,7 @@ export const useAlgorithm = (algorithmIdOrSlug: string | undefined) => {
             // Let's mirror the existing logic:
             query = query.eq('id', algorithmIdOrSlug);
 
-            const { data, error } = await query.single();
+            const { data, error } = await query.maybeSingle();
 
             if (error) throw error;
 

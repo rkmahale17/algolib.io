@@ -21,7 +21,7 @@ export const TwoPointersVisualization = () => {
   const [speed, setSpeed] = useState(1);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const code = `function twoSum(arr, target) {
+  const code = `function twoSum(arr: number[], target: number): number[] {
   let left = 0;
   let right = arr.length - 1;
   
@@ -41,33 +41,80 @@ export const TwoPointersVisualization = () => {
 }`;
 
   const generateSteps = () => {
-    const array = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-    const target = 11;
+    const array = [1, 3, 4, 6, 8, 9, 11, 12, 15];
+    const target = 15;
     const newSteps: Step[] = [];
     let left = 0;
     let right = array.length - 1;
 
+    // Line 1: Function entry (implied)
+    newSteps.push({
+      array: [...array],
+      left: -1,
+      right: -1,
+      sum: 0,
+      target,
+      message: `Starting Two-Sum with Target = ${target}. Initializing pointers.`,
+      lineNumber: 1
+    });
+
+    // Line 2: Initialize left
+    left = 0;
+    newSteps.push({
+      array: [...array],
+      left,
+      right: -1,
+      sum: 0,
+      target,
+      message: 'Initialize left pointer at index 0.',
+      lineNumber: 2
+    });
+
+    // Line 3: Initialize right
+    right = array.length - 1;
     newSteps.push({
       array: [...array],
       left,
       right,
       sum: 0,
       target,
-      message: 'Initialize left pointer at start and right pointer at end',
-      lineNumber: 1
+      message: `Initialize right pointer at index ${right} (end of array).`,
+      lineNumber: 3
     });
 
     while (left < right) {
+      // Line 5: While condition
+      newSteps.push({
+        array: [...array],
+        left,
+        right,
+        sum: 0,
+        target,
+        message: `Check condition: left (${left}) < right (${right}) is true.`,
+        lineNumber: 5
+      });
+
       const sum = array[left] + array[right];
-      
+      // Line 6: Calculate sum
       newSteps.push({
         array: [...array],
         left,
         right,
         sum,
         target,
-        message: `Calculate sum: arr[${left}] + arr[${right}] = ${array[left]} + ${array[right]} = ${sum}`,
-        lineNumber: 5
+        message: `Calculate sum: arr[${left}] (${array[left]}) + arr[${right}] (${array[right]}) = ${sum}.`,
+        lineNumber: 6
+      });
+
+      // Line 8: Check if sum equals target
+      newSteps.push({
+        array: [...array],
+        left,
+        right,
+        sum,
+        target,
+        message: `Compare sum (${sum}) with target (${target}).`,
+        lineNumber: 8
       });
 
       if (sum === target) {
@@ -77,33 +124,67 @@ export const TwoPointersVisualization = () => {
           right,
           sum,
           target,
-          message: `Found! Sum equals target (${target})`,
-          lineNumber: 7
+          message: `Success! ${sum} matches target ${target}. Returning indices [${left}, ${right}].`,
+          lineNumber: 9
         });
         break;
       } else if (sum < target) {
+        // Line 10: Check if sum < target
         newSteps.push({
           array: [...array],
           left,
           right,
           sum,
           target,
-          message: `Sum ${sum} < target ${target}, move left pointer right`,
-          lineNumber: 9
+          message: `${sum} is less than ${target}. We need a larger sum, so move left pointer right.`,
+          lineNumber: 10
         });
+        // Line 11: left++
         left++;
-      } else {
         newSteps.push({
           array: [...array],
           left,
           right,
           sum,
           target,
-          message: `Sum ${sum} > target ${target}, move right pointer left`,
+          message: `Incremented left pointer to index ${left}.`,
           lineNumber: 11
         });
+      } else {
+        // Line 12: Sum > target
+        newSteps.push({
+          array: [...array],
+          left,
+          right,
+          sum,
+          target,
+          message: `${sum} is greater than ${target}. We need a smaller sum, so move right pointer left.`,
+          lineNumber: 12
+        });
+        // Line 13: right--
         right--;
+        newSteps.push({
+          array: [...array],
+          left,
+          right,
+          sum,
+          target,
+          message: `Decremented right pointer to index ${right}.`,
+          lineNumber: 13
+        });
       }
+    }
+
+    if (left >= right && newSteps[newSteps.length - 1].lineNumber !== 9) {
+      newSteps.push({
+        array: [...array],
+        left,
+        right,
+        sum: 0,
+        target,
+        message: 'Target not found in the array.',
+        lineNumber: 17
+      });
     }
 
     setSteps(newSteps);
@@ -201,20 +282,18 @@ export const TwoPointersVisualization = () => {
                       </div>
                     )}
                     <div
-                      className={`w-full rounded-t transition-all duration-300 ${
-                        isActive
+                      className={`w-full rounded-t transition-all duration-300 ${isActive
                           ? 'bg-primary shadow-lg shadow-primary/50 scale-105'
                           : 'bg-gradient-to-t from-primary/60 to-primary/40'
-                      }`}
+                        }`}
                       style={{
                         height: `${(value / getMaxValue()) * 100}%`,
                         minHeight: '20px'
                       }}
                     />
                     <span
-                      className={`text-xs font-mono transition-colors ${
-                        isActive ? 'text-primary font-bold text-base' : 'text-muted-foreground'
-                      }`}
+                      className={`text-xs font-mono transition-colors ${isActive ? 'text-primary font-bold text-base' : 'text-muted-foreground'
+                        }`}
                     >
                       {value}
                     </span>
@@ -227,23 +306,23 @@ export const TwoPointersVisualization = () => {
           <div className="bg-accent/50 rounded-lg border border-accent p-4">
             <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
           </div>
-                  <div className="rounded-lg border  p-4">
+          <div className="rounded-lg border  p-4">
 
-               <VariablePanel
-            variables={{
-              left: currentStep.left,
-              right: currentStep.right,
-              sum: currentStep.sum,
-              target: currentStep.target,
-              'arr[left]': currentStep.array[currentStep.left],
-              'arr[right]': currentStep.array[currentStep.right]
-            }}
-          />
+            <VariablePanel
+              variables={{
+                left: currentStep.left,
+                right: currentStep.right,
+                sum: currentStep.sum,
+                target: currentStep.target,
+                'arr[left]': currentStep.array[currentStep.left],
+                'arr[right]': currentStep.array[currentStep.right]
+              }}
+            />
           </div>
         </div>
 
         <div className="space-y-4">
-       
+
           <CodeHighlighter
             code={code}
             highlightedLine={currentStep.lineNumber}

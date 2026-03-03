@@ -25,7 +25,7 @@ export const NotesComponent = ({ algorithmId, algorithmTitle, restoreData }: Not
 
   // Get current user
   const [userId, setUserId] = useState<string | null>(null);
-  
+
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUserId(user?.id || null);
@@ -92,7 +92,7 @@ export const NotesComponent = ({ algorithmId, algorithmTitle, restoreData }: Not
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Note title"
-          className="flex-1 min-w-[200px] bg-background"
+          className="flex-1 min-w-[200px] bg-background dark:bg-white dark:text-black dark:border-black"
         />
         <div className="flex gap-2">
           <Button
@@ -117,7 +117,7 @@ export const NotesComponent = ({ algorithmId, algorithmTitle, restoreData }: Not
             onClick={() => saveMutation.mutate()}
             disabled={saveMutation.isPending}
             size="sm"
-            className="gap-2"
+            className="gap-2 bg-black text-white hover:text-white/80"
           >
             {saveMutation.isPending ? (
               <Loader2 className="w-4 h-4 animate-spin" />

@@ -246,7 +246,7 @@ export const useAlgorithmInteractions = ({
                     .from('algorithms')
                     .select('metadata')
                     .eq('id', algorithm.id)
-                    .single();
+                    .maybeSingle();
 
                 if (current && !fetchError) {
                     const currentMeta = (current.metadata as any) || {};
@@ -297,7 +297,7 @@ export const useAlgorithmInteractions = ({
                     .lt('serial_no', algorithm.serial_no)
                     .order('serial_no', { ascending: false })
                     .limit(1)
-                    .single();
+                    .maybeSingle();
 
                 if (prevAlgo) {
                     navigate(`/problem/${prevAlgo.id}`);
@@ -323,7 +323,7 @@ export const useAlgorithmInteractions = ({
                     .gt('serial_no', algorithm.serial_no)
                     .order('serial_no', { ascending: true })
                     .limit(1)
-                    .single(); // Use single() as we expect at most one, or null if none
+                    .maybeSingle(); // Use maybeSingle() as we expect at most one, or null if none
 
                 if (nextAlgo) {
                     navigate(`/problem/${nextAlgo.id}`);

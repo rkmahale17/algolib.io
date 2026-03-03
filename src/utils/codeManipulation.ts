@@ -1,5 +1,46 @@
 import { Language } from '@/components/CodeRunner/LanguageSelector';
 
+/**
+ * Splits C++ code into headers (includes, usings, defines) and the rest of the body.
+ * This ensures headers stay in global scope when wrapping the rest in a namespace.
+ */
+export function splitCppCode(code: string): { headers: string, body: string } {
+    const includeRegex = /^\s*(#include|using\s+namespace|#define|typedef|using\s+\w+\s*=)/;
+    const lines = code.split('\n');
+    let splitIdx = 0;
+    let inComment = false;
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const trimmed = line.trim();
+
+        if (inComment) {
+            if (trimmed.includes('*/')) inComment = false;
+            splitIdx = i + 1;
+            continue;
+        }
+
+        if (trimmed.startsWith('/*')) {
+            inComment = !trimmed.includes('*/');
+            splitIdx = i + 1;
+            continue;
+        }
+
+        if (includeRegex.test(line) || trimmed === '' || trimmed.startsWith('//')) {
+            splitIdx = i + 1;
+            continue;
+        }
+
+        // Stop at first non-header, non-empty, non-comment line
+        break;
+    }
+
+    return {
+        headers: lines.slice(0, splitIdx).join('\n'),
+        body: lines.slice(splitIdx).join('\n')
+    };
+}
+
 interface CandidateFunction {
     name: string;
     argCount: number;
@@ -108,41 +149,104 @@ export function findEntryFunction(
             break;
 
         case 'java':
-        case 'cpp':
-            // public type name(...) or type name(...)
-            // We scan for typical C-style function headers. 
-            // Exclude keywords like if, for, while, switch, catch
+        case 'cpp': {
+            // Helper to extract the body of the first class/struct named 'Solution'
+            const extractClassBody = (code: string): string | null => {
+                const classStart = code.search(/\b(class|struct)\s+Solution\b/);
+                if (classStart === -1) return null;
+                let depth = 0;
+                let bodyStart = -1;
+                for (let i = classStart; i < code.length; i++) {
+                    if (code[i] === '{') {
+                        if (depth === 0) bodyStart = i + 1;
+                        depth++;
+                    } else if (code[i] === '}') {
+                        depth--;
+                        if (depth === 0 && bodyStart !== -1) {
+                            return code.slice(bodyStart, i);
+                        }
+                    }
+                }
+                return null;
+            };
+
+            // Helper to strip all class/struct bodies from code (to scan only global functions)
+            const stripClassBodies = (code: string): string => {
+                let result = '';
+                let depth = 0;
+                let i = 0;
+                // Simple approach: track brace depth, include code at depth 0 only
+                while (i < code.length) {
+                    if (code[i] === '{') {
+                        depth++;
+                        i++;
+                    } else if (code[i] === '}') {
+                        if (depth > 0) depth--;
+                        i++;
+                    } else if (depth === 0) {
+                        result += code[i];
+                        i++;
+                    } else {
+                        i++;
+                    }
+                }
+                return result;
+            };
+
+            // Determine the code region to scan for functions
+            let scanRegion: string;
+            let insideClass = false;
+
+            if (hasSolutionClass) {
+                const classBody = extractClassBody(codeToScan);
+                if (classBody) {
+                    scanRegion = classBody;
+                    insideClass = true;
+                } else {
+                    scanRegion = codeToScan;
+                }
+            } else {
+                // Only scan global scope - strip class bodies to avoid picking up member methods
+                scanRegion = stripClassBodies(codeToScan);
+            }
 
             // Regex explanation:
             // ((?:public|private|protected|static)\s+)* : Optional modifiers
-            // (.+?) : Return type (Lazy capture allows spaces, commas, refs, pointers without greediness)
+            // ([\w<>:*&\[\]\s]+?) : Return type (restrictive to avoid matching too much, now includes [])
             // (\w+) : Method Name
             // \s*\( : Start of args
-            // ([^)]*) : Args content
+            // ([\s\S]*?) : Args content (allowing multiline)
             // \) : End of args
-            const cStyleRegex = /(?:((?:public|private|protected|static)\s+)*)(.+?)\s+(\w+)\s*\(([^)]*)\)/g;
+            const cStyleRegex = /(?:((?:public|private|protected|static)\s+)*)([\w<>:*&\[\]\s]+?)\s+(\w+)\s*\(([\s\S]*?)\)/g;
 
             let cMatch;
-            while ((cMatch = cStyleRegex.exec(codeToScan)) !== null) {
-                const modifiers = cMatch[1] || "";
+            while ((cMatch = cStyleRegex.exec(scanRegion)) !== null) {
+                const modifiers = cMatch[1] || '';
                 const returnType = cMatch[2].trim();
-                const name = cMatch[3]; // Adjusted index due to lazy group
-                const args = cMatch[4] || "";
+                const name = cMatch[3];
+                const args = cMatch[4] || '';
 
-                // Exclude keywords and known Class constructors
-                if (/^(if|for|while|switch|catch|return|Node|ListNode|TreeNode|Interval|Solution)$/.test(name)) continue;
+                // Exclude flow-control keywords and known constructors/type names
+                const exclusionList = insideClass
+                    ? /^(if|for|while|switch|catch|return|Solution)$/
+                    : /^(if|for|while|switch|catch|return|Node|ListNode|TreeNode|Interval|Solution)$/;
+                if (exclusionList.test(name)) continue;
+
+                // Exclude destructor-like (~name)
+                if (returnType.includes('~')) continue;
 
                 candidates.push({
-                    name: name,
+                    name,
                     argCount: countArguments(args),
                     argsStr: args,
-                    returnType: returnType,
-                    isPublic: modifiers.includes('public'),
+                    returnType,
+                    isPublic: modifiers.includes('public') || (!modifiers.includes('private') && insideClass),
                     isSolutionValues: name.toLowerCase().includes('solution') || name.toLowerCase() === 'solve',
                     index: cMatch.index
                 });
             }
             break;
+        }
     }
 
     // Filter Step: Must match argument count
@@ -207,7 +311,7 @@ export function ensureStaticMethods(userCode: string): string {
     userCodeClean = userCodeClean.replace(/(public|private|protected)\s+(?!static|class|interface|enum|record)/g, '$1 static ');
 
     // 2. default access modifier (heuristic)
-    const commonTypes = 'int|void|boolean|char|double|float|long|short|String|List(?:<[^>]+>)?|Set(?:<[^>]+>)?|Map(?:<[^>]+>)?|TreeNode|ListNode';
+    const commonTypes = '(?:int|void|boolean|char|double|float|long|short|String|List(?:<[^>]+>)?|Set(?:<[^>]+>)?|Map(?:<[^>]+>)?|TreeNode|ListNode)(?:\\[\\])*';
     // Look for: whitespace + Type + Name + ( ...
     // Negative lookbehind ensures we don't match if preceded by modifiers or keywords
     const defaultAccessRegex = new RegExp(`(?<!public|private|protected|static|new|return|case|default|transient|volatile|final|native|synchronized|abstract|strictfp)\\s+(${commonTypes})\\s+(\\w+)\\s*\\(`, 'g');

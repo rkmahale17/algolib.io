@@ -64,8 +64,25 @@ export const FeaturedSection = () => {
   const isPaywallEnabled = useFeatureFlag('paywall_enabled');
 
   return (
-    <section className="py-12 px-4">
-      <div className="container mx-auto max-w-6xl">
+    <section className="py-24 px-4 relative overflow-hidden bg-background">
+      {/* Grid Pattern Background */}
+      <div className="absolute inset-0 z-0 opacity-[0.4] dark:opacity-[0.1]" 
+        style={{ 
+          backgroundImage: `radial-gradient(circle at 1px 1px, hsl(var(--foreground)) 1px, transparent 0)`,
+          backgroundSize: '32px 32px' 
+        }} 
+      />
+
+      <div className="container mx-auto max-w-6xl relative z-10">
+        <div className="text-center mb-16 space-y-4">
+          <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
+            Master Algorithms with <span className="text-primary">Visualizations</span>
+          </h2>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            Deep dive into data structures and algorithm patterns with our interactive, step-by-step visualizers.
+          </p>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 place-items-stretch">
           {features.map((feature, index) => {
             const Icon = feature.icon;

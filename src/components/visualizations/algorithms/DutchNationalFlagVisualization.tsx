@@ -20,8 +20,9 @@ export const DutchNationalFlagVisualization = () => {
   const [speed, setSpeed] = useState(1);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const code = `function sortColors(nums) {
-  let low = 0, mid = 0;
+  const code = `function sortColors(nums: number[]): void {
+  let low = 0;
+  let mid = 0;
   let high = nums.length - 1;
   
   while (mid <= high) {
@@ -39,64 +40,174 @@ export const DutchNationalFlagVisualization = () => {
 }`;
 
   const generateSteps = () => {
-    const array = [2, 0, 2, 1, 1, 0, 2, 1, 0];
+    const initialArray = [2, 0, 2, 1, 1, 0, 2, 1, 0];
     const newSteps: Step[] = [];
-    const nums = [...array];
+    const nums = [...initialArray];
     let low = 0, mid = 0, high = nums.length - 1;
 
+    // Line 1: Function entry
+    newSteps.push({
+      array: [...nums],
+      low: -1,
+      mid: -1,
+      high: -1,
+      message: 'Starting Dutch National Flag algorithm (Sort Colors).',
+      lineNumber: 1
+    });
+
+    // Line 2: Initialize low
+    low = 0;
+    newSteps.push({
+      array: [...nums],
+      low,
+      mid: -1,
+      high: -1,
+      message: 'Initialize low pointer at index 0.',
+      lineNumber: 2
+    });
+
+    // Line 3: Initialize mid
+    mid = 0;
+    newSteps.push({
+      array: [...nums],
+      low,
+      mid,
+      high: -1,
+      message: 'Initialize mid pointer at index 0.',
+      lineNumber: 3
+    });
+
+    // Line 4: Initialize high
+    high = nums.length - 1;
     newSteps.push({
       array: [...nums],
       low,
       mid,
       high,
-      message: 'Initialize: low=0, mid=0, high=last index. Goal: 0s left, 1s middle, 2s right',
-      lineNumber: 1
+      message: `Initialize high pointer at index ${high}.`,
+      lineNumber: 4
     });
 
     while (mid <= high) {
+      // Line 6: While condition
+      newSteps.push({
+        array: [...nums],
+        low,
+        mid,
+        high,
+        message: `Check condition: mid (${mid}) <= high (${high}) is true.`,
+        lineNumber: 6
+      });
+
+      // Line 7: Check if nums[mid] === 0
+      newSteps.push({
+        array: [...nums],
+        low,
+        mid,
+        high,
+        message: `Check if nums[mid] (${nums[mid]}) is 0.`,
+        lineNumber: 7
+      });
+
       if (nums[mid] === 0) {
+        // Line 8: Swap low and mid
         [nums[low], nums[mid]] = [nums[mid], nums[low]];
         newSteps.push({
           array: [...nums],
           low,
           mid,
           high,
-          message: `nums[${mid}] = 0. Swap with low pointer. Move both low and mid forward.`,
-          lineNumber: 6
+          message: `nums[mid] is 0. Swap nums[low] and nums[mid].`,
+          lineNumber: 8
         });
+
+        // Line 9: low++
         low++;
-        mid++;
-      } else if (nums[mid] === 1) {
         newSteps.push({
           array: [...nums],
           low,
           mid,
           high,
-          message: `nums[${mid}] = 1. Already in correct region. Move mid forward.`,
+          message: 'Move low pointer forward.',
+          lineNumber: 9
+        });
+
+        // Line 10: mid++
+        mid++;
+        newSteps.push({
+          array: [...nums],
+          low,
+          mid,
+          high,
+          message: 'Move mid pointer forward.',
           lineNumber: 10
         });
+
+      } else if (nums[mid] === 1) {
+        // Line 11: Check if nums[mid] === 1
+        newSteps.push({
+          array: [...nums],
+          low,
+          mid,
+          high,
+          message: `nums[mid] is 1. Already in the middle region.`,
+          lineNumber: 11
+        });
+
+        // Line 12: mid++
         mid++;
+        newSteps.push({
+          array: [...nums],
+          low,
+          mid,
+          high,
+          message: 'Move mid pointer forward.',
+          lineNumber: 12
+        });
+
       } else {
+        // Line 13: nums[mid] is 2
+        newSteps.push({
+          array: [...nums],
+          low,
+          mid,
+          high,
+          message: `nums[mid] is 2. Needs to go to the high region.`,
+          lineNumber: 11 // Mapping else if check or the logic below
+        });
+
+        // Line 14: Swap mid and high
         [nums[mid], nums[high]] = [nums[high], nums[mid]];
         newSteps.push({
           array: [...nums],
           low,
           mid,
           high,
-          message: `nums[${mid}] = 2. Swap with high pointer. Move high backward. Don't move mid (need to check swapped value).`,
-          lineNumber: 12
+          message: `Swap nums[mid] and nums[high].`,
+          lineNumber: 14
         });
+
+        // Line 15: high--
         high--;
+        newSteps.push({
+          array: [...nums],
+          low,
+          mid,
+          high,
+          message: 'Move high pointer backward. Mid stays current to check swapped value.',
+          lineNumber: 15
+        });
       }
     }
 
+    // Line 18: Completion
     newSteps.push({
       array: [...nums],
       low,
       mid,
       high,
-      message: 'Complete! Array sorted: all 0s, then 1s, then 2s.',
-      lineNumber: 16
+      message: 'Algorithm complete. Array is now sorted.',
+      lineNumber: 18
     });
 
     setSteps(newSteps);
@@ -183,10 +294,9 @@ export const DutchNationalFlagVisualization = () => {
                     <div
                       className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all duration-300 ${getColorClass(
                         value
-                      )} ${
-                        isMid ? 'shadow-lg shadow-primary/50 scale-110 ring-4 ring-primary' : 
-                        isLow || isHigh ? 'scale-105' : ''
-                      }`}
+                      )} ${isMid ? 'shadow-lg shadow-primary/50 scale-110 ring-4 ring-primary' :
+                          isLow || isHigh ? 'scale-105' : ''
+                        }`}
                     >
                       <span className={value === 1 ? 'text-gray-800' : 'text-white'}>{value}</span>
                     </div>
@@ -216,22 +326,22 @@ export const DutchNationalFlagVisualization = () => {
             <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
           </div>
 
-            <div className=" rounded-lg p-4">
-                <VariablePanel
-        variables={{
-          low: currentStep.low,
-          mid: currentStep.mid,
-          high: currentStep.high,
-          'nums[mid]': currentStep.mid <= currentStep.high ? currentStep.array[currentStep.mid] : 'done'
-        }}
-      />
+          <div className=" rounded-lg p-4">
+            <VariablePanel
+              variables={{
+                low: currentStep.low,
+                mid: currentStep.mid,
+                high: currentStep.high,
+                'nums[mid]': currentStep.mid <= currentStep.high ? currentStep.array[currentStep.mid] : 'done'
+              }}
+            />
           </div>
         </div>
 
         <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
       </div>
 
-    
+
     </div>
   );
 };

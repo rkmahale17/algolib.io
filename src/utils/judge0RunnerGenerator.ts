@@ -1,5 +1,5 @@
 import { Language } from '@/components/CodeRunner/LanguageSelector';
-import { findEntryFunction, ensureStaticMethods } from './codeManipulation';
+import { findEntryFunction, ensureStaticMethods, splitCppCode } from './codeManipulation';
 import { getRegistryCode } from './testRunnerGenerator';
 
 interface Judge0Options {
@@ -179,6 +179,7 @@ const generateCppRunner = (
 
     // We'll generate a `readInput` helper based on schema
     const { definitions, parsers, serializers } = getRegistryCode(inputSchema, 'cpp', userCode);
+    const { headers: userHeaders, body: userBody } = splitCppCode(userCode);
     const entryInfo = findEntryFunction(userCode, 'cpp', inputSchema, entryFunctionName);
 
     let readerCode = ``;
@@ -216,7 +217,13 @@ ${definitions}
 ${parsers} // May include helpers
 ${serializers}
 
-${userCode}
+
+${userHeaders}
+
+namespace user_sol {
+${userBody}
+} // namespace user_sol
+
 
 int main() {
     // Fast I/O
@@ -226,7 +233,7 @@ int main() {
 ${readerCode}
 
     // Execute
-    ${entryInfo.name}(${callerArgs});
+    ${entryInfo.hasSolutionClass ? 'user_sol::Solution sol; sol.' : 'user_sol::'}${entryInfo.name}(${callerArgs});
 
     // In-Place: Print modified arg
     // Only support modified input 0 for now or void return implicit check

@@ -5,10 +5,14 @@ import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
 interface Step {
-  array: number[];
+  heights: number[];
   stack: number[];
   currentIndex: number;
-  result: number[];
+  maxArea: number;
+  currentArea: number;
+  width: number;
+  topIndex: number;
+  activeRange: [number, number] | null;
   message: string;
   lineNumber: number;
 }
@@ -20,88 +24,199 @@ export const MonotonicStackVisualization = () => {
   const [speed, setSpeed] = useState(1);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const code = `function nextGreaterElement(arr) {
-  const result = new Array(arr.length).fill(-1);
-  const stack = [];
-  
-  for (let i = 0; i < arr.length; i++) {
-    while (stack.length > 0 && arr[i] > arr[stack[stack.length - 1]]) {
-      const idx = stack.pop();
-      result[idx] = arr[i];
+  const code = `function largestRectangleArea(heights: number[]): number {
+  let maxArea = 0;
+  const stack: number[] = [];
+
+  for (let i = 0; i <= heights.length; i++) {
+    while (
+      stack.length > 0 &&
+      (i === heights.length || heights[stack[stack.length - 1]] >= heights[i])
+    ) {
+      const top = stack.pop()!;
+      const width = stack.length === 0 
+        ? i 
+        : i - stack[stack.length - 1] - 1;
+      
+      const area = heights[top] * width;
+      maxArea = Math.max(maxArea, area);
     }
     stack.push(i);
   }
-  
-  return result;
+  return maxArea;
 }`;
 
   const generateSteps = () => {
-    const array = [4, 5, 2, 10, 8];
+    const heights = [2, 1, 5, 6, 2, 3];
     const newSteps: Step[] = [];
-    const result = new Array(array.length).fill(-1);
     const stack: number[] = [];
+    let maxArea = 0;
 
+    // Line 1: Function entry
     newSteps.push({
-      array: [...array],
-      stack: [...stack],
+      heights: [...heights],
+      stack: [],
       currentIndex: -1,
-      result: [...result],
-      message: 'Initialize: result array with -1, empty stack',
+      maxArea: 0,
+      currentArea: 0,
+      width: 0,
+      topIndex: -1,
+      activeRange: null,
+      message: 'Starting Largest Rectangle in Histogram calculation.',
       lineNumber: 1
     });
 
-    for (let i = 0; i < array.length; i++) {
+    // Line 2: Initialize maxArea
+    newSteps.push({
+      heights: [...heights],
+      stack: [],
+      currentIndex: -1,
+      maxArea: 0,
+      currentArea: 0,
+      width: 0,
+      topIndex: -1,
+      activeRange: null,
+      message: 'Initialize maxArea to 0.',
+      lineNumber: 2
+    });
+
+    for (let i = 0; i <= heights.length; i++) {
+      // Line 5: For loop
       newSteps.push({
-        array: [...array],
+        heights: [...heights],
         stack: [...stack],
         currentIndex: i,
-        result: [...result],
-        message: `Process arr[${i}] = ${array[i]}`,
-        lineNumber: 4
+        maxArea,
+        currentArea: 0,
+        width: 0,
+        topIndex: -1,
+        activeRange: null,
+        message: i === heights.length
+          ? 'Reached the end. Processing remaining bars in stack.'
+          : `Processing bar at index ${i} with height ${heights[i]}.`,
+        lineNumber: 5
       });
 
-      while (stack.length > 0 && array[i] > array[stack[stack.length - 1]]) {
-        const idx = stack[stack.length - 1];
+      while (
+        stack.length > 0 &&
+        (i === heights.length || heights[stack[stack.length - 1]] >= heights[i])
+      ) {
+        // Line 6-9: While condition check
+        const top = stack[stack.length - 1];
         newSteps.push({
-          array: [...array],
+          heights: [...heights],
           stack: [...stack],
           currentIndex: i,
-          result: [...result],
-          message: `${array[i]} > arr[${idx}] = ${array[idx]}. Found next greater!`,
-          lineNumber: 5
-        });
-        
-        stack.pop();
-        result[idx] = array[i];
-        
-        newSteps.push({
-          array: [...array],
-          stack: [...stack],
-          currentIndex: i,
-          result: [...result],
-          message: `Set result[${idx}] = ${array[i]}, pop ${idx} from stack`,
+          maxArea,
+          currentArea: 0,
+          width: 0,
+          topIndex: top,
+          activeRange: null,
+          message: i === heights.length
+            ? 'Stack is not empty at end. Flushing...'
+            : `Bar at index ${i} (${heights[i]}) is shorter than or equal to bar at index ${top} (${heights[top]}). Breaking increasing pattern.`,
           lineNumber: 6
+        });
+
+        // Line 10: Pop top
+        stack.pop();
+        newSteps.push({
+          heights: [...heights],
+          stack: [...stack],
+          currentIndex: i,
+          maxArea,
+          currentArea: 0,
+          width: 0,
+          topIndex: top,
+          activeRange: null,
+          message: `Pop index ${top} from stack. This will be the height of our rectangle.`,
+          lineNumber: 10
+        });
+
+        // Line 11-13: Calculate width
+        const width = stack.length === 0 ? i : i - stack[stack.length - 1] - 1;
+        const leftBoundary = stack.length === 0 ? 0 : stack[stack.length - 1] + 1;
+        const rightBoundary = i - 1;
+
+        newSteps.push({
+          heights: [...heights],
+          stack: [...stack],
+          currentIndex: i,
+          maxArea,
+          currentArea: 0,
+          width,
+          topIndex: top,
+          activeRange: [leftBoundary, rightBoundary],
+          message: stack.length === 0
+            ? `Stack is empty. Width = i = ${i}. Rectangle spans from index 0 to ${i - 1}.`
+            : `New stack top is ${stack[stack.length - 1]}. Width = i - stackTop - 1 = ${i} - ${stack[stack.length - 1]} - 1 = ${width}.`,
+          lineNumber: 11
+        });
+
+        // Line 15: Calculate area
+        const area = heights[top] * width;
+        newSteps.push({
+          heights: [...heights],
+          stack: [...stack],
+          currentIndex: i,
+          maxArea,
+          currentArea: area,
+          width,
+          topIndex: top,
+          activeRange: [leftBoundary, rightBoundary],
+          message: `Calculate area: height (${heights[top]}) * width (${width}) = ${area}.`,
+          lineNumber: 15
+        });
+
+        // Line 16: Update maxArea
+        const oldMax = maxArea;
+        maxArea = Math.max(maxArea, area);
+        newSteps.push({
+          heights: [...heights],
+          stack: [...stack],
+          currentIndex: i,
+          maxArea,
+          currentArea: area,
+          width,
+          topIndex: top,
+          activeRange: [leftBoundary, rightBoundary],
+          message: area > oldMax
+            ? `New max area found! ${area} > ${oldMax}.`
+            : `Max area remains ${maxArea}.`,
+          lineNumber: 16
         });
       }
 
-      stack.push(i);
-      newSteps.push({
-        array: [...array],
-        stack: [...stack],
-        currentIndex: i,
-        result: [...result],
-        message: `Push index ${i} to stack`,
-        lineNumber: 9
-      });
+      if (i < heights.length) {
+        // Line 18: Push i
+        stack.push(i);
+        newSteps.push({
+          heights: [...heights],
+          stack: [...stack],
+          currentIndex: i,
+          maxArea,
+          currentArea: 0,
+          width: 0,
+          topIndex: -1,
+          activeRange: null,
+          message: `Push index ${i} to stack. Maintains increasing height order.`,
+          lineNumber: 18
+        });
+      }
     }
 
+    // Line 21: Return
     newSteps.push({
-      array: [...array],
+      heights: [...heights],
       stack: [...stack],
-      currentIndex: array.length - 1,
-      result: [...result],
-      message: `Complete! Remaining stack elements have no next greater element`,
-      lineNumber: 12
+      currentIndex: heights.length,
+      maxArea,
+      currentArea: 0,
+      width: 0,
+      topIndex: -1,
+      activeRange: null,
+      message: `Final maximum rectangle area is ${maxArea}.`,
+      lineNumber: 21
     });
 
     setSteps(newSteps);
@@ -144,7 +259,7 @@ export const MonotonicStackVisualization = () => {
   if (steps.length === 0) return null;
 
   const currentStep = steps[currentStepIndex];
-  const getMaxValue = () => Math.max(...currentStep.array);
+  const maxVal = Math.max(...currentStep.heights);
 
   return (
     <div className="space-y-6">
@@ -163,74 +278,96 @@ export const MonotonicStackVisualization = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 space-y-6">
-            <div>
-              <h4 className="text-sm font-semibold mb-3 text-muted-foreground">Array</h4>
-              <div className="flex items-end justify-center gap-2 h-32">
-                {currentStep.array.map((value, index) => {
-                  const isCurrent = index === currentStep.currentIndex;
-                  const isInStack = currentStep.stack.includes(index);
+          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 space-y-8">
+            <div className="relative pt-12">
+              <h4 className="text-sm font-semibold mb-6 text-muted-foreground">Histogram</h4>
+              <div className="flex items-end justify-center gap-1 h-48">
+                {currentStep.heights.map((h, idx) => {
+                  const isCurrent = idx === currentStep.currentIndex;
+                  const isInStack = currentStep.stack.includes(idx);
+                  const isTop = idx === currentStep.topIndex;
+                  const isActiveRange = currentStep.activeRange &&
+                    idx >= currentStep.activeRange[0] &&
+                    idx <= currentStep.activeRange[1];
+
                   return (
-                    <div key={index} className="flex flex-col items-center gap-2 flex-1 max-w-[60px] relative">
+                    <div key={idx} className="flex flex-col items-center gap-1 flex-1 max-w-[40px] relative">
                       {isCurrent && (
-                        <div className="absolute -top-8 text-xs font-bold text-primary animate-bounce">▼</div>
+                        <div className="absolute -top-8 text-xs font-bold text-primary animate-bounce">CURR</div>
+                      )}
+                      {isTop && (
+                        <div className="absolute -top-12 text-xs font-bold text-orange-500">HEIGHT</div>
                       )}
                       <div
-                        className={`w-full rounded-t transition-all duration-300 ${
-                          isCurrent
-                            ? 'bg-primary shadow-lg shadow-primary/50 scale-105'
-                            : isInStack
-                            ? 'bg-yellow-500 shadow-lg'
-                            : 'bg-gradient-to-t from-primary/60 to-primary/40'
-                        }`}
-                        style={{ height: `${(value / getMaxValue()) * 100}%`, minHeight: '20px' }}
+                        className={`w-full rounded-t transition-all duration-300 ${isTop
+                            ? 'bg-orange-500 ring-2 ring-orange-500 shadow-lg scale-105'
+                            : isActiveRange
+                              ? 'bg-primary/80 ring-1 ring-primary'
+                              : isCurrent
+                                ? 'bg-primary/40'
+                                : isInStack
+                                  ? 'bg-yellow-500/80 shadow-sm'
+                                  : 'bg-muted/40'
+                          }`}
+                        style={{ height: `${(h / maxVal) * 100}%`, minHeight: '4px' }}
                       />
-                      <span className={`text-xs font-mono ${isCurrent ? 'text-primary font-bold text-base' : 'text-muted-foreground'}`}>
-                        {value}
+                      <span className={`text-[10px] font-mono ${isTop ? 'text-orange-500 font-bold' : 'text-muted-foreground'}`}>
+                        {h}
                       </span>
                     </div>
                   );
                 })}
               </div>
-            </div>
-
-            <div>
-              <h4 className="text-sm font-semibold mb-3 text-muted-foreground">Stack (indices)</h4>
-              <div className="flex flex-col-reverse gap-1 h-32 justify-end">
-                {currentStep.stack.length > 0 ? (
-                  currentStep.stack.map((idx, i) => (
-                    <div
-                      key={i}
-                      className="bg-yellow-500 text-white rounded px-4 py-2 text-center font-mono font-bold animate-in slide-in-from-bottom"
-                    >
-                      {idx} (val: {currentStep.array[idx]})
+              {currentStep.activeRange && (
+                <div className="absolute bottom-[24px] flex justify-center w-full pointer-events-none">
+                  <div className="bg-primary/20 border-x-2 border-t-2 border-primary/40 h-[170px]"
+                    style={{
+                      width: `${(currentStep.width / currentStep.heights.length) * 100}%`,
+                      marginLeft: `${((currentStep.activeRange[0] - (currentStep.heights.length - currentStep.width) / 2) / currentStep.heights.length) * 0}%`, // Simplified centering logic
+                      position: 'absolute',
+                      left: `${(currentStep.activeRange[0] / currentStep.heights.length) * 100}%`,
+                      width: `${((currentStep.activeRange[1] - currentStep.activeRange[0] + 1) / currentStep.heights.length) * 100}%`
+                    }}>
+                    <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-primary bg-background px-1">
+                      WIDTH: {currentStep.width}
                     </div>
-                  ))
-                ) : (
-                  <div className="text-sm text-muted-foreground text-center">Empty</div>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <h4 className="text-sm font-semibold mb-3 text-muted-foreground">Result (Next Greater)</h4>
-              <div className="flex gap-2 justify-center">
-                {currentStep.result.map((val, idx) => (
-                  <div key={idx} className="flex flex-col items-center">
-                    <div className={`w-14 h-14 rounded flex items-center justify-center font-mono font-bold ${
-                      val !== -1 ? 'bg-green-500 text-white' : 'bg-muted text-muted-foreground'
-                    }`}>
-                      {val}
-                    </div>
-                    <span className="text-xs text-muted-foreground mt-1">[{idx}]</span>
                   </div>
-                ))}
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <h4 className="text-sm font-semibold mb-3 text-muted-foreground">Stack (indices)</h4>
+                <div className="flex flex-row gap-1 h-12 items-end">
+                  {currentStep.stack.length > 0 ? (
+                    currentStep.stack.map((idx, i) => (
+                      <div
+                        key={i}
+                        className="bg-yellow-500 text-white rounded text-[10px] w-8 h-8 flex items-center justify-center font-mono font-bold animate-in slide-in-from-bottom"
+                      >
+                        {idx}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-xs text-muted-foreground italic">empty</div>
+                  )}
+                </div>
+              </div>
+              <div className="flex-1 border-l pl-4">
+                <h4 className="text-sm font-semibold mb-1 text-muted-foreground">Current Check</h4>
+                <div className="space-y-1">
+                  <div className="text-xs">Max Area: <span className="font-bold text-green-600">{currentStep.maxArea}</span></div>
+                  {currentStep.currentArea > 0 && (
+                    <div className="text-xs font-medium text-primary animate-pulse">Rect: {currentStep.currentArea}</div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-accent/50 rounded-lg border border-accent p-4">
-            <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
+          <div className="bg-accent/50 rounded-lg border border-accent p-4 min-h-[80px]">
+            <p className="text-sm text-foreground font-medium leading-relaxed">{currentStep.message}</p>
           </div>
         </div>
 
@@ -239,10 +376,12 @@ export const MonotonicStackVisualization = () => {
 
           <VariablePanel
             variables={{
-              i: currentStep.currentIndex >= 0 ? currentStep.currentIndex : 'init',
-              'arr[i]': currentStep.currentIndex >= 0 ? currentStep.array[currentStep.currentIndex] : 'N/A',
-              stackSize: currentStep.stack.length,
-              stackTop: currentStep.stack.length > 0 ? `${currentStep.stack[currentStep.stack.length - 1]} (${currentStep.array[currentStep.stack[currentStep.stack.length - 1]]})` : 'empty'
+              i: currentStep.currentIndex <= currentStep.heights.length ? currentStep.currentIndex : 'done',
+              maxArea: currentStep.maxArea,
+              stack: `[${currentStep.stack.join(', ')}]`,
+              height: currentStep.topIndex >= 0 ? currentStep.heights[currentStep.topIndex] : 'N/A',
+              width: currentStep.width > 0 ? currentStep.width : 'N/A',
+              area: currentStep.currentArea > 0 ? currentStep.currentArea : 'N/A'
             }}
           />
         </div>
@@ -250,3 +389,4 @@ export const MonotonicStackVisualization = () => {
     </div>
   );
 };
+

@@ -24,18 +24,22 @@ interface AppContextType {
   profile: Profile | null;
   isAuthLoading: boolean;
   hasPremiumAccess: boolean;
-  
+
   // Algorithms
   algorithms: Algorithm[];
   isAlgorithmsLoading: boolean;
   refreshAlgorithms: () => Promise<void>;
-  
+
   // User Data
   userAlgorithmData: UserAlgorithmData[];
   isUserDataLoading: boolean;
   refreshUserData: () => Promise<void>;
   refreshProfile: () => Promise<void>;
   activateTrial: () => Promise<void>;
+
+  // List Context
+  activeListType: string;
+  setActiveListType: (type: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -52,12 +56,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
-  
+
   const [algorithms, setAlgorithms] = useState<Algorithm[]>([]);
   const [isAlgorithmsLoading, setIsAlgorithmsLoading] = useState(true);
-  
+
   const [userAlgorithmData, setUserAlgorithmData] = useState<UserAlgorithmData[]>([]);
   const [isUserDataLoading, setIsUserDataLoading] = useState(false);
+
+  const [activeListType, setActiveListType] = useState<string>(() => {
+    return localStorage.getItem('rulcode_active_list_type') || 'all';
+  });
+
+  const updateActiveListType = (type: string) => {
+    setActiveListType(type);
+    localStorage.setItem('rulcode_active_list_type', type);
+  };
 
   const fetchProfile = useCallback(async (userId: string) => {
     try {
@@ -65,7 +78,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       setProfile(data as Profile);
@@ -76,9 +89,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const hasPremiumAccess = React.useMemo(() => {
     if (!profile) return false;
-    
+
     if (profile.subscription_status === 'active') return true;
-    
+
     // Trial access temporarily disabled for testing payment workflow
     /*
     if (profile.subscription_status === 'trialing' && profile.trial_end_date) {
@@ -129,7 +142,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         if (cached) {
           const cacheData: CacheData = JSON.parse(cached);
           const age = Date.now() - cacheData.timestamp;
-          
+
           if (age < CACHE_DURATION) {
             setAlgorithms(cacheData.algorithms);
             setIsAlgorithmsLoading(false);
@@ -267,6 +280,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     refreshUserData: fetchUserData,
     refreshProfile: useCallback(() => user ? fetchProfile(user.id) : Promise.resolve(), [user, fetchProfile]),
     activateTrial,
+    activeListType,
+    setActiveListType: updateActiveListType,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -22,17 +22,15 @@ export const SlidingWindowVisualization = () => {
   const [speed, setSpeed] = useState(1);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const code = `function maxSumSubarray(arr, k) {
+  const code = `function maxSumSubarray(arr: number[], k: number): number {
   let maxSum = 0;
   let windowSum = 0;
   
-  // Calculate first window
   for (let i = 0; i < k; i++) {
     windowSum += arr[i];
   }
   maxSum = windowSum;
   
-  // Slide the window
   for (let i = k; i < arr.length; i++) {
     windowSum = windowSum - arr[i - k] + arr[i];
     maxSum = Math.max(maxSum, windowSum);
@@ -48,33 +46,72 @@ export const SlidingWindowVisualization = () => {
     let windowSum = 0;
     let maxSum = 0;
 
-    // Initial window calculation
+    // Line 1: Function entry
     newSteps.push({
       array: [...array],
-      windowStart: 0,
+      windowStart: -1,
       windowEnd: -1,
       windowSize: k,
       windowSum: 0,
       maxSum: 0,
-      message: `Initialize: window size k = ${k}`,
+      message: `Starting Maximum Sum Subarray with k = ${k}.`,
       lineNumber: 1
     });
 
+    // Line 2: Initialize maxSum
+    newSteps.push({
+      array: [...array],
+      windowStart: -1,
+      windowEnd: -1,
+      windowSize: k,
+      windowSum: 0,
+      maxSum: 0,
+      message: 'Initialize maxSum = 0.',
+      lineNumber: 2
+    });
+
+    // Line 3: Initialize windowSum
+    newSteps.push({
+      array: [...array],
+      windowStart: -1,
+      windowEnd: -1,
+      windowSize: k,
+      windowSum: 0,
+      maxSum: 0,
+      message: 'Initialize windowSum = 0.',
+      lineNumber: 3
+    });
+
+    // Building first window
     for (let i = 0; i < k; i++) {
+      // Line 5: For loop check
+      newSteps.push({
+        array: [...array],
+        windowStart: 0,
+        windowEnd: i - 1,
+        windowSize: k,
+        windowSum,
+        maxSum,
+        message: `Building first window: i = ${i}.`,
+        lineNumber: 5
+      });
+
       windowSum += array[i];
+      // Line 6: Add to windowSum
       newSteps.push({
         array: [...array],
         windowStart: 0,
         windowEnd: i,
         windowSize: k,
         windowSum,
-        maxSum: 0,
-        message: `Building first window: add arr[${i}] = ${array[i]}, windowSum = ${windowSum}`,
+        maxSum,
+        message: `Add arr[${i}] (${array[i]}) to windowSum. windowSum is now ${windowSum}.`,
         lineNumber: 6
       });
     }
-    maxSum = windowSum;
 
+    maxSum = windowSum;
+    // Line 8: Set initial maxSum
     newSteps.push({
       array: [...array],
       windowStart: 0,
@@ -82,42 +119,75 @@ export const SlidingWindowVisualization = () => {
       windowSize: k,
       windowSum,
       maxSum,
-      message: `First window complete! windowSum = ${windowSum}, maxSum = ${maxSum}`,
+      message: `First window built. Set initial maxSum = windowSum = ${maxSum}.`,
       lineNumber: 8
     });
 
     // Sliding window
     for (let i = k; i < array.length; i++) {
-      const oldElement = array[i - k];
-      const newElement = array[i];
-      windowSum = windowSum - oldElement + newElement;
-      
+      const oldIndex = i - k;
+      const newIndex = i;
+
+      // Line 10: For loop check
       newSteps.push({
         array: [...array],
-        windowStart: i - k + 1,
-        windowEnd: i,
+        windowStart: oldIndex,
+        windowEnd: newIndex - 1,
         windowSize: k,
         windowSum,
         maxSum,
-        message: `Slide window: remove arr[${i - k}] = ${oldElement}, add arr[${i}] = ${newElement}`,
-        lineNumber: 12
+        message: `Sliding window: i = ${i}.`,
+        lineNumber: 10
       });
 
-      if (windowSum > maxSum) {
-        maxSum = windowSum;
-        newSteps.push({
-          array: [...array],
-          windowStart: i - k + 1,
-          windowEnd: i,
-          windowSize: k,
-          windowSum,
-          maxSum,
-          message: `New maximum found! windowSum ${windowSum} > maxSum, update maxSum = ${maxSum}`,
-          lineNumber: 13
-        });
-      }
+      // Line 11: Subtract old, add new
+      const oldVal = array[oldIndex];
+      const newVal = array[newIndex];
+
+      // Show subtraction first
+      newSteps.push({
+        array: [...array],
+        windowStart: oldIndex + 1,
+        windowEnd: newIndex - 1,
+        windowSize: k,
+        windowSum: windowSum - oldVal,
+        maxSum,
+        message: `Remove arr[${oldIndex}] (${oldVal}) from windowSum.`,
+        lineNumber: 11
+      });
+
+      windowSum = windowSum - oldVal + newVal;
+
+      // Show addition
+      newSteps.push({
+        array: [...array],
+        windowStart: oldIndex + 1,
+        windowEnd: newIndex,
+        windowSize: k,
+        windowSum,
+        maxSum,
+        message: `Add arr[${newIndex}] (${newVal}) to windowSum. windowSum is now ${windowSum}.`,
+        lineNumber: 11
+      });
+
+      // Line 12: Update maxSum
+      const prevMax = maxSum;
+      maxSum = Math.max(maxSum, windowSum);
+      newSteps.push({
+        array: [...array],
+        windowStart: oldIndex + 1,
+        windowEnd: newIndex,
+        windowSize: k,
+        windowSum,
+        maxSum,
+        message: windowSum > prevMax
+          ? `New maximum found! ${windowSum} > ${prevMax}. Update maxSum = ${maxSum}.`
+          : `${windowSum} is not greater than ${prevMax}. maxSum remains ${maxSum}.`,
+        lineNumber: 12
+      });
     }
 
+    // Line 15: Return
     newSteps.push({
       array: [...array],
       windowStart: array.length - k,
@@ -125,8 +195,8 @@ export const SlidingWindowVisualization = () => {
       windowSize: k,
       windowSum,
       maxSum,
-      message: `Complete! Maximum sum of ${k} consecutive elements is ${maxSum}`,
-      lineNumber: 16
+      message: `Algorithm complete. The maximum sum subarray of size ${k} has sum ${maxSum}.`,
+      lineNumber: 15
     });
 
     setSteps(newSteps);
@@ -224,11 +294,10 @@ export const SlidingWindowVisualization = () => {
                       </div>
                     )}
                     <div
-                      className={`w-full rounded-t transition-all duration-300 relative ${
-                        isInWindow
+                      className={`w-full rounded-t transition-all duration-300 relative ${isInWindow
                           ? 'bg-primary shadow-lg shadow-primary/50 scale-105'
                           : 'bg-gradient-to-t from-primary/60 to-primary/40'
-                      }`}
+                        }`}
                       style={{
                         height: `${(value / getMaxValue()) * 100}%`,
                         minHeight: '20px'
@@ -239,9 +308,8 @@ export const SlidingWindowVisualization = () => {
                       )}
                     </div>
                     <span
-                      className={`text-xs font-mono transition-colors ${
-                        isInWindow ? 'text-primary font-bold text-base' : 'text-muted-foreground'
-                      }`}
+                      className={`text-xs font-mono transition-colors ${isInWindow ? 'text-primary font-bold text-base' : 'text-muted-foreground'
+                        }`}
                     >
                       {value}
                     </span>
@@ -255,25 +323,25 @@ export const SlidingWindowVisualization = () => {
             <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
           </div>
 
-           <div className=" rounded-lg border p-4">
+          <div className=" rounded-lg border p-4">
 
-<VariablePanel
-            variables={{
-              windowStart: currentStep.windowStart,
-              windowEnd: currentStep.windowEnd,
-              windowSize: currentStep.windowSize,
-              windowSum: currentStep.windowSum,
-              maxSum: currentStep.maxSum,
-              'window': currentStep.array.slice(currentStep.windowStart, currentStep.windowEnd + 1)
-            }}
-          />
+            <VariablePanel
+              variables={{
+                windowStart: currentStep.windowStart,
+                windowEnd: currentStep.windowEnd,
+                windowSize: currentStep.windowSize,
+                windowSum: currentStep.windowSum,
+                maxSum: currentStep.maxSum,
+                'window': currentStep.array.slice(currentStep.windowStart, currentStep.windowEnd + 1)
+              }}
+            />
           </div>
 
-            
+
         </div>
 
         <div className="space-y-4">
-    
+
           <CodeHighlighter
             code={code}
             highlightedLine={currentStep.lineNumber}

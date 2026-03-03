@@ -31,7 +31,7 @@ export async function getUserAlgorithmData(
         .select('*')
         .eq('user_id', userId)
         .eq('algorithm_id', algorithmId)
-        .single();
+        .maybeSingle();
 
     if (error) {
         if (error.code === 'PGRST116') {
@@ -62,7 +62,7 @@ export async function upsertUserAlgorithmData(
             onConflict: 'user_id,algorithm_id',
         })
         .select()
-        .single();
+        .maybeSingle();
 
     if (error) {
         console.error('Error upserting user algorithm data:', error);

@@ -85,11 +85,11 @@ const Navbar = () => {
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
             >
               <img src={logo} alt="RulCode Logo" className="w-8 h-8" />
-              <span className="hidden sm:block sm:hidden font-bold text-xl font-mono whitespace-nowrap">RulCode</span>
-             <h2 className="text-xl tracking-wider">Rulcode</h2>
-           
+              <span className="hidden sm:block sm:hidden font-bold text-xl font-mono whitespace-nowrap">RULCODE</span>
+              <h2 className="text-xl tracking-wider">RULCODE</h2>
+
             </Link>
-         
+
           </div>
 
           {/* Navigation Links */}
@@ -119,7 +119,7 @@ const Navbar = () => {
               <MessageSquare className="w-4 h-4" />
               Feedback
             </Link>
-            
+
             {isAdmin && (
               <Link
                 to="/admin"
@@ -139,14 +139,14 @@ const Navbar = () => {
               <Github className="w-4 h-4" />
               GitHub
             </a>
-
+            {/* 
             <Link
               to="/pricing"
               className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1.5"
             >
               <Crown className="w-4 h-4 text-amber-500" />
               Pricing
-            </Link>
+            </Link> */}
           </div>
 
           {/* Right side */}
@@ -185,7 +185,7 @@ const Navbar = () => {
                     Feedback
                   </Link>
                 </DropdownMenuItem>
-                
+
                 {isAdmin && (
                   <DropdownMenuItem asChild>
                     <Link
@@ -225,17 +225,17 @@ const Navbar = () => {
             <ThemeToggle />
             {user && !isAuthPage ? (
               <>
-                {profile?.subscription_status === 'trialing' && profile.trial_end_date && (
+                {/* {profile?.subscription_status === 'trialing' && profile.trial_end_date && (
                   <div className="hidden md:flex items-center gap-2 mr-2 animate-in fade-in slide-in-from-right-4">
                     <Badge variant="outline" className="text-[10px] font-bold py-0 h-6 gap-1 border-primary/20 bg-primary/5 text-primary">
                       <Timer className="w-3 h-3" />
                       {Math.ceil((new Date(profile.trial_end_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} DAYS LEFT
                     </Badge>
                   </div>
-                )}
-                
+                )} */}
+
                 {profile?.subscription_status === 'active' && (
-                   <div className="hidden md:flex items-center gap-2 mr-2">
+                  <div className="hidden md:flex items-center gap-2 mr-2">
                     <Badge variant="outline" className="text-[10px] font-bold py-0 h-6 gap-1 border-amber-500/20 bg-amber-500/5 text-amber-600">
                       <Crown className="w-3 h-3" />
                       PREMIUM
@@ -284,14 +284,14 @@ const Navbar = () => {
                         <span>Feedback</span>
                       </Link>
                     </DropdownMenuItem>
-                    
+
                     {isAdmin && (
-                       <DropdownMenuItem asChild>
-                          <Link to="/admin">
-                            <ShieldCheck className="mr-2 h-4 w-4 text-emerald-500" />
-                            <span className="text-emerald-500 font-medium">Admin Dashboard</span>
-                          </Link>
-                       </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin">
+                          <ShieldCheck className="mr-2 h-4 w-4 text-emerald-500" />
+                          <span className="text-emerald-500 font-medium">Admin Dashboard</span>
+                        </Link>
+                      </DropdownMenuItem>
                     )}
 
                     <DropdownMenuSeparator />

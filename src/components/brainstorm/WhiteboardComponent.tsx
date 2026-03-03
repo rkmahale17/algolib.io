@@ -31,7 +31,7 @@ const SaveButton = ({
 
   // Get current user
   const [userId, setUserId] = useState<string | null>(null);
-  
+
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUserId(user?.id || null);
@@ -52,7 +52,7 @@ const SaveButton = ({
         // Validate whiteboard data has required structure
         if (userAlgoData.whiteboard_data && typeof userAlgoData.whiteboard_data === 'object') {
           editor.store.loadSnapshot(userAlgoData.whiteboard_data as any);
-          
+
           // Center the canvas on the content after loading
           setTimeout(() => {
             editor.zoomToFit();
@@ -151,18 +151,19 @@ const SaveButton = ({
   }, [editor, title]);
 
   return (
-    <div className="relative top-0  z-10 flex gap-2 bg-background border border-border p-3 ">
+    <div className="relative top-0  z-10 flex gap-2 p-3 ">
       <Input
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Whiteboard title"
-        className="bg-background text-foreground border-border"
+        className="bg-background text-foreground border-border dark:bg-white dark:text-black dark:border-black"
       />
       <Button
         onClick={handleSave}
         disabled={isSaving}
         size="sm"
-        className="gap-2"
+
+        className="gap-2  bg-black text-white  hover:text-black"
       >
         {isSaving ? (
           <Loader2 className="w-4 h-4 animate-spin" />
@@ -171,7 +172,7 @@ const SaveButton = ({
         )}
         Save
       </Button>
-      <Button onClick={handleExportPNG} size="sm" className="gap-2">
+      <Button onClick={handleExportPNG} size="sm" className="gap-2 bg-black  text-white hover:text-black">
         <Download className="w-4 h-4" />
         Export PNG
       </Button>
@@ -187,9 +188,8 @@ export const WhiteboardComponent = ({
 }: WhiteboardComponentProps) => {
   return (
     <div
-      className={` relative w-full  border rounded-lg overflow-hidden z-10 ${
-        isExpand ? "h-full" : "h-[700px]"
-      }`}
+      className={` relative w-full  border rounded-lg overflow-hidden z-10 ${isExpand ? "h-full" : "h-[700px]"
+        }`}
     >
       <Tldraw snapshot={restoreData} className="tldraw-rulcode">
         <div>

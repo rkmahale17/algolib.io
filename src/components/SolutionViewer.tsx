@@ -320,7 +320,7 @@ const SolutionApproach: React.FC<{
       >
         <div className="relative rounded-lg border overflow-hidden">
           {/* Header with Language Tabs/Dropdown and Copy Button */}
-          <div className="flex items-center justify-between border-b bg-muted/10 shrink-0">
+          <div className="flex items-center justify-between border-b shrink-0">
             {/* LEFT SIDE: Language Selection (Tabs or Dropdown) */}
             <div className="flex-1 overflow-hidden min-w-0">
               
@@ -332,7 +332,7 @@ const SolutionApproach: React.FC<{
                       <TabsTrigger
                         key={impl.lang}
                         value={impl.lang}
-                        className="flex-1 min-w-[100px] data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10 px-4 whitespace-nowrap"
+                        className="flex-1 min-w-[100px] data-[state=active]:bg-transparent data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10 px-4 whitespace-nowrap"
                       >
                         {getLanguageDisplayName(impl.lang)}
                       </TabsTrigger>
