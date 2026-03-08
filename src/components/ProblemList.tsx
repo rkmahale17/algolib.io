@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, TrendingUp, BookOpen, CheckCircle2, Circle, MoreVertical, Timer, Database, ExternalLink, Lock, LayoutGrid, List } from 'lucide-react';
+import { Search, TrendingUp, BookOpen, Check, Circle, MoreVertical, Timer, Database, ExternalLink, Lock, LayoutGrid, List } from 'lucide-react';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
@@ -21,6 +21,8 @@ interface ProblemListProps {
   availableListTypes?: string[];
   hideListSelection?: boolean;
   isLoading?: boolean;
+  variant?: 'default' | 'sidebar';
+  initialViewMode?: 'list' | 'grid';
 }
 
 const ProblemListSkeleton = () => (
@@ -55,7 +57,9 @@ export const ProblemList = ({
   defaultListType = "all",
   availableListTypes = ["all", ListType.Core, ListType.Blind75, ListType.CoreAndBlind75],
   hideListSelection = false,
-  isLoading = false
+  isLoading = false,
+  variant = 'default',
+  initialViewMode
 }: ProblemListProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -63,6 +67,7 @@ export const ProblemList = ({
   const [selectedListType, setSelectedListType] = useState<string | null>(defaultListType === 'all' ? null : defaultListType);
   const [sortBy, setSortBy] = useState<string>('serial-asc');
   const [viewMode, setViewMode] = useState<'list' | 'grid'>(() => {
+    if (initialViewMode) return initialViewMode;
     const savedMode = localStorage.getItem('problem-list-view-mode');
     return (savedMode === 'list' || savedMode === 'grid') ? savedMode : 'grid';
   });
@@ -161,30 +166,32 @@ export const ProblemList = ({
     return result;
   }, [algorithms, searchQuery, selectedCategory, selectedDifficulty, selectedListType, sortBy]);
 
+  const isSidebar = variant === 'sidebar';
+
   return (
-    <div className="space-y-6">
+    <div className={isSidebar ? "space-y-4" : "space-y-6"}>
 
       {/* Single Container Table */}
       {isLoading || !algorithms ? (
         <ProblemListSkeleton />
       ) : (
         <div className="space-y-4">
-          <Card className="rounded-2xl border-border/40 overflow-hidden glass-card bg-card/30 backdrop-blur-xl">
+          <div className={isSidebar ? "" : "rounded-2xl border-border/40 overflow-hidden glass-card bg-card/30 backdrop-blur-xl border"}>
             {/* Integrated Header & Filters */}
-            <div className="p-4 md:p-6 space-y-4 border-b border-border/40 bg-muted/5">
+            <div className={`${isSidebar ? "p-0 pb-4" : "p-4 md:p-6"} space-y-4 ${isSidebar ? "" : "border-b border-border/40 bg-muted/5"}`}>
               <div className="flex flex-col lg:flex-row gap-4 justify-between items-stretch lg:items-center">
-                <div className="relative flex-1 group">
+                <div className={`relative flex-1 group ${isSidebar ? "w-full lg:w-auto" : ""}`}>
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                   <Input
                     type="text"
-                    placeholder="Filter algorithms by name or description..."
+                    placeholder="Filter..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-9 h-10 text-sm bg-background/50 border-border/50 focus-visible:ring-primary/20"
                   />
                 </div>
 
-                <div className="flex flex-wrap gap-2">
+                <div className={`flex flex-wrap gap-2 ${isSidebar ? "w-full lg:w-auto" : ""}`}>
                   {!hideListSelection && (
                     <Select value={selectedListType || "all"} onValueChange={(val) => setSelectedListType(val === "all" ? null : val)}>
                       <SelectTrigger className="h-10 w-[140px] rounded-lg bg-background/50 border-border/50">
@@ -225,57 +232,61 @@ export const ProblemList = ({
                     </SelectContent>
                   </Select>
 
-                  <div className="bg-background/50 border border-border/50 rounded-lg p-1 flex gap-1 h-10 items-center">
-                    <Button
-                      variant={viewMode === 'list' ? 'secondary' : 'ghost'}
-                      size="sm"
-                      className={`h-8 w-8 p-0 ${viewMode === 'list' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'}`}
-                      onClick={() => setViewMode('list')}
-                    >
-                      <List className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
-                      size="sm"
-                      className={`h-8 w-8 p-0 ${viewMode === 'grid' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'}`}
-                      onClick={() => setViewMode('grid')}
-                    >
-                      <LayoutGrid className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  {!isSidebar && (
+                    <div className="bg-background/50 border border-border/50 rounded-lg p-1 flex gap-1 h-10 items-center">
+                      <Button
+                        variant={viewMode === 'list' ? 'secondary' : 'ghost'}
+                        size="sm"
+                        className={`h-8 w-8 p-0 ${viewMode === 'list' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'}`}
+                        onClick={() => setViewMode('list')}
+                      >
+                        <List className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
+                        size="sm"
+                        className={`h-8 w-8 p-0 ${viewMode === 'grid' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'}`}
+                        onClick={() => setViewMode('grid')}
+                      >
+                        <LayoutGrid className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {/* Category Filter Pills (Integrated) */}
-              <div className="flex flex-wrap gap-1.5 pt-1">
-                <button
-                  onClick={() => setSelectedCategory(null)}
-                  className={`px-3 py-1 rounded-full text-[11px] font-medium transition-all ${selectedCategory === null
-                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
-                    : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
-                    }`}
-                >
-                  All Categories
-                </button>
-                {categories.map((category) => (
+              {!isSidebar && (
+                /* Category Filter Pills (Integrated) */
+                <div className="flex flex-wrap gap-1.5 pt-1">
                   <button
-                    key={category}
-                    onClick={() => setSelectedCategory(category)}
-                    className={`px-3 py-1 rounded-full text-[11px] font-medium transition-all ${selectedCategory === category
+                    onClick={() => setSelectedCategory(null)}
+                    className={`px-3 py-1 rounded-full text-[11px] font-medium transition-all ${selectedCategory === null
                       ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
                       : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
                       }`}
                   >
-                    {category}
+                    All Categories
                   </button>
-                ))}
-              </div>
+                  {categories.map((category) => (
+                    <button
+                      key={category}
+                      onClick={() => setSelectedCategory(category)}
+                      className={`px-3 py-1 rounded-full text-[11px] font-medium transition-all ${selectedCategory === category
+                        ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
+                        : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+                        }`}
+                    >
+                      {category}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* List View */}
             {viewMode === 'list' && (
               <>
-                <div className="hidden md:flex items-center gap-4 px-8 py-3 bg-muted/20 border-b border-border/40 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                <div className={`${isSidebar ? "hidden" : "hidden md:flex"} items-center gap-4 px-8 py-3 bg-muted/20 border-b border-border/40 text-[10px] font-bold uppercase tracking-wider text-muted-foreground`}>
                   <div className="w-12 shrink-0">#</div>
                   <div className="flex-1 min-w-0">Title</div>
                   <div className="w-32 shrink-0">Category</div>
@@ -292,21 +303,21 @@ export const ProblemList = ({
                         to={algo.slug ? `/problem/${algo.slug}` : `/problem/${algo.id}`}
                         className={`block transition-all duration-300 hover:bg-primary/5 group relative
                           ${status === 'solved'
-                            ? 'bg-green-500/[0.03] border-l-4 border-green-500/30'
-                            : 'border-l-4 border-transparent'}`}
+                            ? 'bg-green-500/[0.03] border-l-2 border-green-500/30'
+                            : 'border-l-2 border-transparent'}`}
                       >
-                        <div className="flex flex-col md:flex-row md:items-center gap-4 px-6 md:px-8 py-3 md:py-2.5">
+                        <div className={`flex flex-col ${isSidebar ? "" : "md:flex-row md:items-center"} gap-4 ${isSidebar ? "px-4" : "px-6 md:px-8"} py-3 md:py-2.5`}>
                           {/* ID & Title Column */}
                           <div className="flex items-center gap-4 flex-1 min-w-0">
-                            <div className="hidden md:flex w-12 shrink-0 font-mono text-xs text-muted-foreground/40 group-hover:text-primary/60 transition-colors">
+                            <div className={`${isSidebar ? "hidden" : "hidden md:flex"} w-12 shrink-0 font-mono text-xs text-muted-foreground/40 group-hover:text-primary/60 transition-colors`}>
                               {(algo.serial_no || index + 1).toString().padStart(2, '0')}
                             </div>
                             <div className="min-w-0 flex-1">
                               <h3 className="font-semibold text-[15px] leading-tight group-hover:text-primary transition-colors truncate">
                                 {algo.displayTitle}
                               </h3>
-                              {/* Mobile-only category and Premium Tag */}
-                              <div className="md:hidden flex items-center gap-2 mt-0.5">
+                              {/* Category and Premium Tag */}
+                              <div className={`${isSidebar ? "flex" : "md:hidden flex"} items-center gap-2 mt-0.5`}>
                                 <p className="text-[10px] text-muted-foreground">
                                   {algo.category} • ALGO-{(algo.serial_no || index + 1).toString().padStart(2, '0')}
                                 </p>
@@ -321,17 +332,19 @@ export const ProblemList = ({
                           </div>
 
                           {/* Category Column (Desktop) */}
-                          <div className="hidden md:flex w-32 shrink-0 items-center gap-2">
-                            <span className="text-xs font-medium text-muted-foreground truncate">{algo.category}</span>
-                            {isPaywallEnabled && algo.listType !== 'core' && algo.listType !== 'core+blind75' && !hasPremiumAccess && (
-                              <div className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 text-[8px] font-bold uppercase ring-1 ring-amber-500/20">
-                                <Lock className="w-2 h-2" />
-                              </div>
-                            )}
-                          </div>
+                          {!isSidebar && (
+                            <div className="hidden md:flex w-32 shrink-0 items-center gap-2">
+                              <span className="text-xs font-medium text-muted-foreground truncate">{algo.category}</span>
+                              {isPaywallEnabled && algo.listType !== 'core' && algo.listType !== 'core+blind75' && !hasPremiumAccess && (
+                                <div className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 text-[8px] font-bold uppercase ring-1 ring-amber-500/20">
+                                  <Lock className="w-2 h-2" />
+                                </div>
+                              )}
+                            </div>
+                          )}
 
                           {/* Difficulty Column */}
-                          <div className="w-24 shrink-0 flex items-center">
+                          <div className={`${isSidebar ? "hidden" : "w-24 shrink-0 flex items-center"}`}>
                             <Badge
                               variant="outline"
                               className={`${difficultyColors[algo.mappedDifficulty]} text-[10px] font-bold px-2 py-0 h-5 border-none bg-transparent md:bg-inherit`}
@@ -342,19 +355,19 @@ export const ProblemList = ({
 
 
                           {/* Status Column */}
-                          <div className="w-24 shrink-0 flex items-center">
+                          <div className={`${isSidebar ? "shrink-0" : "w-24 shrink-0"} flex items-center`}>
                             {status === 'solved' ? (
                               <div className="flex items-center gap-1.5 text-green-500">
-                                <CheckCircle2 className="w-4 h-4" />
-                                <span className="text-[10px] font-bold uppercase tracking-wider">Solved</span>
+                                <Check className="w-4 h-4" />
+                                {!isSidebar && <span className="text-[10px] font-bold uppercase tracking-wider">Solved</span>}
                               </div>
                             ) : status === 'attempted' ? (
                               <div className="flex items-center gap-1.5 text-orange-400">
                                 <Circle className="w-4 h-4" />
-                                <span className="text-[10px] font-bold uppercase tracking-wider hidden lg:inline">Attempted</span>
+                                {!isSidebar && <span className="text-[10px] font-bold uppercase tracking-wider hidden lg:inline">Attempted</span>}
                               </div>
                             ) : (
-                              <span className="text-[10px] text-muted-foreground/30 font-mono">PENDING</span>
+                              !isSidebar && <span className="text-[10px] text-muted-foreground/30 font-mono">PENDING</span>
                             )}
                           </div>
                         </div>
@@ -410,7 +423,7 @@ export const ProblemList = ({
 
                           {status === 'solved' ? (
                             <div className="flex items-center gap-1.5 text-green-500">
-                              <CheckCircle2 className="w-3.5 h-3.5" />
+                              <Check className="w-3.5 h-3.5" />
                               <span className="text-[10px] font-bold uppercase tracking-wider">Solved</span>
                             </div>
                           ) : status === 'attempted' ? (
@@ -449,7 +462,7 @@ export const ProblemList = ({
                 </Button>
               </div>
             )}
-          </Card>
+          </div>
         </div>
       )}
     </div>

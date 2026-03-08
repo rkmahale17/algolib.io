@@ -41,6 +41,56 @@ export function splitCppCode(code: string): { headers: string, body: string } {
     };
 }
 
+/**
+ * Extracts function signatures from C++ code to use as forward declarations.
+ */
+export function extractCppSignatures(code: string): string[] {
+    const codeToScan = stripComments(code, 'cpp');
+
+    // Identify top-level function/class signatures by skipping bodies
+    let result = '';
+    let i = 0;
+    while (i < codeToScan.length) {
+        if (codeToScan[i] === '{') {
+            result += ' { } ';
+            let depth = 1;
+            i++;
+            while (i < codeToScan.length && depth > 0) {
+                if (codeToScan[i] === '{') depth++;
+                else if (codeToScan[i] === '}') depth--;
+                i++;
+            }
+        } else {
+            result += codeToScan[i];
+            i++;
+        }
+    }
+
+    // Regex to match function definitions, excluding keywords like if/while/etc.
+    // Matches signatures ending in { (which we replaced with { } above)
+    const cStyleRegex = /(?:((?:public|private|protected|static)\s+)*)([\w<>:*&\[\]\s]+?)\s+(\w+)\s*\(([\s\S]*?)\)\s*\{/g;
+
+    const signatures: string[] = [];
+    const seenNames = new Set<string>();
+
+    let match;
+    while ((match = cStyleRegex.exec(result)) !== null) {
+        const returnType = match[2].trim();
+        const name = match[3].trim();
+        const args = match[4].replace(/\s+/g, ' ').trim();
+
+        const exclusionList = /^(if|for|while|switch|catch|return|Solution|main)$/;
+        if (exclusionList.test(name)) continue;
+        if (returnType.includes('~') || returnType.includes('class') || returnType.includes('struct') || returnType.includes('public') || returnType.includes('private')) continue;
+
+        if (!seenNames.has(name)) {
+            signatures.push(`${returnType} ${name}(${args});`);
+            seenNames.add(name);
+        }
+    }
+    return signatures;
+}
+
 interface CandidateFunction {
     name: string;
     argCount: number;
@@ -321,4 +371,32 @@ export function ensureStaticMethods(userCode: string): string {
     });
 
     return userCodeClean;
+}
+
+/**
+ * Robustly extracts the type from a language-specific argument string.
+ * e.g. "vector<int> &nums" -> "vector<int> &"
+ * e.g. "List<Integer> list" -> "List<Integer>"
+ */
+export function extractType(arg: string, language: Language): string {
+    const trimmed = arg.trim();
+    if (language === 'python') {
+        const parts = trimmed.split(':');
+        return parts.length > 1 ? parts[1].trim() : 'any';
+    }
+
+    // C++/Java: Find the last identifier which is the variable name
+    // Match anything before the last word. Handle refs/pointers for C++.
+    // Improved regex: require either whitespace before the name OR it to be preceded by & or *
+    // This prevents "char" being split into "c" and "har"
+    const match = trimmed.match(/^(.+?)(?:\s+|(?=[&*]))(&|\*)?\s*\w+$/);
+    if (match) {
+        return (match[1] + (match[2] || '')).trim();
+    }
+
+    // Fallback: split by space and take everything but the last word
+    const parts = trimmed.split(/\s+/);
+    if (parts.length > 1) return parts.slice(0, parts.length - 1).join(' ');
+
+    return trimmed;
 }

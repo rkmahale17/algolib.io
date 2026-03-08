@@ -1,5 +1,5 @@
 import { Language } from '@/components/CodeRunner/LanguageSelector';
-import { findEntryFunction, ensureStaticMethods, splitCppCode, stripComments } from './codeManipulation';
+import { findEntryFunction, ensureStaticMethods, splitCppCode, stripComments, extractCppSignatures, extractType } from './codeManipulation';
 import { getDSDetails, DSName, SUPPORTED_DS } from '@/lib/dsa-registry';
 import { convertTreeNodeToArray } from './treeUtils';
 
@@ -184,12 +184,12 @@ export const generateTestRunner = (
     }
 };
 
-const formatValue = (value: any, type: string, lang: Language, targetJavaType?: string): string => {
-    // DS Construction Helpers
+const formatValue = (value: any, type: string, lang: Language, typeHint?: string): string => {
+    // 1. Known DS Construction Helpers
     if (type.includes('ListNode')) {
         if (lang === 'typescript') return `jsonToListNode(${JSON.stringify(value)})`;
         if (lang === 'python') return `json_to_list_node(${jsonToPython(value)})`;
-        if (lang === 'java') return `jsonToListNode(${JSON.stringify(JSON.stringify(value))})`; // Pass as JSON string
+        if (lang === 'java') return `jsonToListNode(${JSON.stringify(JSON.stringify(value))})`;
         if (lang === 'cpp') {
             const values = Array.isArray(value) ? value : (value.head || []);
             const pos = Array.isArray(value) ? -1 : (value.pos !== undefined ? value.pos : -1);
@@ -199,13 +199,10 @@ const formatValue = (value: any, type: string, lang: Language, targetJavaType?: 
     if (type.includes('TreeNode')) {
         if (lang === 'typescript') return `jsonToTreeNode(${JSON.stringify(value)})`;
         if (lang === 'python') return `json_to_tree_node(${jsonToPython(value)})`;
-
-        // Ensure value is an array for Java/C++ which expect BFS format
         let treeArr = value;
         if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
             treeArr = convertTreeNodeToArray(value) || [];
         }
-
         if (lang === 'java') return `arrayToTreeNode(${formatJavaArrayLiteral(Array.isArray(treeArr) ? treeArr : [], 'Integer[]')})`;
         if (lang === 'cpp') {
             const arr = Array.isArray(treeArr) ? treeArr : [];
@@ -214,7 +211,6 @@ const formatValue = (value: any, type: string, lang: Language, targetJavaType?: 
     }
     if (type.includes('Interval')) {
         if (type.includes('[]')) {
-            // Array of Intervals
             if (lang === 'typescript') return `jsonToIntervalArray(${JSON.stringify(value)})`;
             if (lang === 'python') return `json_to_interval_array(${jsonToPython(value)})`;
             if (lang === 'java') return `jsonToIntervalArray(${formatJavaArrayLiteral(value, 'int[][]')})`;
@@ -226,72 +222,53 @@ const formatValue = (value: any, type: string, lang: Language, targetJavaType?: 
             if (lang === 'cpp') return `jsonToInterval(${formatValue(value, 'int[]', 'cpp')})`;
         }
     }
-
     if (type.includes('GraphNode') || type.includes('Node')) {
-        const val = typeof value === 'string' ? JSON.parse(value) : value; // Handle potentially stringified inputs
+        const val = typeof value === 'string' ? JSON.parse(value) : value;
         if (lang === 'typescript') return `jsonToGraphNode(${JSON.stringify(val)})`;
         if (lang === 'python') return `json_to_graph_node(${jsonToPython(val)})`;
-        if (lang === 'java') return `jsonToGraphNode(${formatJavaArrayLiteral(val, 'int[][]')})`;
-        if (lang === 'cpp') return `jsonToGraphNode(${formatValue(val, 'int[][]', 'cpp')})`;
+        if (lang === 'java') return `jsonToGraphNode(${formatValue(val, 'any', 'java', 'List<List<Integer>>')})`;
+        if (lang === 'cpp') return `jsonToGraphNode(${formatValue(val, 'any', 'cpp', 'vector<vector<int>>')})`;
     }
     if (type.includes('TrieNode')) {
         if (lang === 'typescript') return `jsonToTrieNode(${JSON.stringify(value)})`;
         if (lang === 'python') return `json_to_trie_node(${jsonToPython(value)})`;
-        if (lang === 'java') return `jsonToTrieNode("${JSON.stringify(value).replace(/"/g, '\\"')}")`; // Fallback
-        if (lang === 'cpp') return `jsonToTrieNode("${JSON.stringify(value).replace(/"/g, '\\"')}")`;
+        if (lang === 'java' || lang === 'cpp') return `jsonToTrieNode("${JSON.stringify(value).replace(/"/g, '\\"')}")`;
     }
 
+    // 2. Language-Specific Recursive Handling
+    if (lang === 'typescript') return JSON.stringify(value);
+    if (lang === 'python') return jsonToPython(value);
 
-    if (lang === 'python') {
-        return jsonToPython(value);
-    }
-    if (lang === 'typescript') {
-        return JSON.stringify(value);
+    if (lang === 'java') {
+        if (typeHint?.startsWith('List')) {
+            if (!Array.isArray(value)) return String(value);
+            if (value.length === 0) return "Arrays.asList()";
+            const match = typeHint.match(/List<\s*(.+)\s*>/);
+            const inner = match ? match[1].trim() : 'Object';
+            return `Arrays.asList(${value.map(v => formatValue(v, 'any', 'java', inner)).join(', ')})`;
+        }
+        if (Array.isArray(value)) return formatJavaArrayLiteral(value, typeHint);
     }
 
-    // Legacy/Specific handling for Java/C++
+    if (lang === 'cpp') {
+        if (Array.isArray(value)) {
+            let innerHint = typeHint ? extractType(typeHint, 'cpp') : undefined;
+            if (innerHint?.includes('vector<')) {
+                const s = innerHint.indexOf('<') + 1;
+                const e = innerHint.lastIndexOf('>');
+                if (s >= 0 && e > s) innerHint = innerHint.substring(s, e).trim();
+            }
+            return `{${value.map(v => formatValue(v, 'any', 'cpp', innerHint)).join(', ')}}`;
+        }
+        const cleanHint = typeHint ? extractType(typeHint, 'cpp') : undefined;
+        if (cleanHint?.includes('char') || type === 'char') {
+            if (typeof value === 'string' && value.length === 1) return `'${value}'`;
+        }
+    }
+
+    // 3. Primitives Fallback
     if (type === 'number' || type === 'boolean') return String(value);
-    if (type === 'string') return JSON.stringify(value);
-    if (type === 'number[]' || type === 'int[]') { // Added int[] for robustness
-        if (lang === 'java') {
-            if (targetJavaType && targetJavaType.includes('List')) {
-                return `Arrays.asList(${value.join(', ')})`;
-            }
-            return formatJavaArrayLiteral(value, targetJavaType);
-        }
-        if (lang === 'cpp') {
-            // Recursive vector syntax
-            return `{${value.map(v => formatValue(v, 'number', 'cpp')).join(', ')}}`;
-        }
-        return `[${value.join(', ')}]`;
-    }
-    if (type.includes('[]')) {
-        // Generic multi-dimensional array handling if not caught above
-        if (lang === 'cpp' && Array.isArray(value)) {
-            const subType = type.substring(0, type.lastIndexOf('[]'));
-            return `{${value.map(v => formatValue(v, subType, 'cpp')).join(', ')}}`;
-        }
-    }
-
-    if (Array.isArray(value)) { // Generic array handling for Java/C++ fallback (Moved to end)
-        if (lang === 'java') {
-            // Check if target expects a List
-            if (targetJavaType && targetJavaType.includes('List')) {
-                if (value.length > 0 && typeof value[0] === 'string') {
-                    return `Arrays.asList(${value.map((v: any) => JSON.stringify(v)).join(', ')})`;
-                }
-                // List<Integer> etc - Autoboxing handles int -> Integer? Arrays.asList expects objects.
-                return `Arrays.asList(${value.join(', ')})`;
-            }
-
-            // Detect dimensions and type for Java Array
-            return formatJavaArrayLiteral(value, targetJavaType);
-        }
-        if (lang === 'cpp') {
-            // Basic vector syntax - only reached if type didn't match [] patterns
-            return `{${value.map(v => formatValue(v, 'any', 'cpp')).join(', ')}}`; // Use recursive formatting even here!
-        }
-    }
+    if (type === 'string' || typeof value === 'string') return JSON.stringify(value);
     return String(value);
 };
 
@@ -357,11 +334,11 @@ const formatJavaArrayLiteral = (arr: any[], targetJavaType?: string): string => 
     }
 
     // If empty array, and we have a target type, just return empty init
-    // e.g. new int[0][] is valid? No, new int[0][0] or new int[][]{}
     if (arr.length === 0 && targetJavaType) {
-        const typeName = targetJavaType.replace(/\[\]/g, ''); // int
-        return `new ${targetJavaType.replace('[]', '[0]')}`; // new int[0][] ? No.
-        // Better: new int[][]{}
+        // e.g. targetJavaType="int[][]" -> dimensions=2 -> new int[0][0]
+        const typeName = targetJavaType.replace(/\[\]/g, '');
+        const emptyBrackets = '[0]'.repeat(dimensions);
+        return `new ${typeName}${emptyBrackets}`;
     }
 
     // ... logic continues ... except I replaced lines 272-307.
@@ -383,6 +360,22 @@ const formatJavaArrayLiteral = (arr: any[], targetJavaType?: string): string => 
         } else if (typeof current === 'number' && !Number.isInteger(current)) {
             type = 'double';
         }
+    }
+
+    // CHECK FOR NULLS to see if we need to use wrapper types
+    const containsNullValue = (a: any[]): boolean => {
+        for (const item of a) {
+            if (item === null || item === undefined) return true;
+            if (Array.isArray(item) && containsNullValue(item)) return true;
+        }
+        return false;
+    };
+
+    if (containsNullValue(arr)) {
+        if (type === 'int') type = 'Integer';
+        else if (type === 'boolean') type = 'Boolean';
+        else if (type === 'double') type = 'Double';
+        else if (type === 'char') type = 'Character';
     }
 
     const brackets = '[]'.repeat(dimensions);
@@ -484,6 +477,29 @@ const results = testCases.map((tc, index) => {
       }).join(' '));
   };
 
+    // Capture original inputs before they might be modified in-place
+    const originalInputs = tc.input.flatMap((i, idx) => {
+         // Try serialized form for proper display in frontend
+         let serialized;
+         try {
+             ${requiredDS.includes('ListNode') ? `if (i instanceof ListNode) serialized = listNodeToJson(i);` : ''}
+             ${requiredDS.includes('TreeNode') ? `if (i instanceof TreeNode) serialized = treeNodeToJson(i);` : ''}
+             ${requiredDS.includes('Interval') ? `if (i instanceof Interval) serialized = intervalToJson(i);
+             if (Array.isArray(i) && i.length > 0 && i[0] instanceof Interval) serialized = intervalArrayToJson(i);` : ''}
+             ${requiredDS.includes('GraphNode') ? `if ((i instanceof Node) || (i && typeof i === 'object' && 'neighbors' in i && 'val' in i)) serialized = graphNodeToJson(i as Node);` : ''}
+             ${requiredDS.includes('TrieNode') ? `if (i instanceof TrieNode) serialized = trieNodeToJson(i);` : ''}
+         } catch(e) { return ["Serialization Failed: " + (e as Error).message]; }
+         
+         const finalVal = serialized !== undefined ? serialized : i;
+         
+         // Special case: if it's a cyclic list result {head, pos}, flatten it into two inputs for the UI
+         if (finalVal && typeof finalVal === 'object' && 'head' in finalVal && 'pos' in finalVal) {
+             return [safeStringify(finalVal.head), safeStringify(finalVal.pos)];
+         }
+         
+         return [safeStringify(finalVal)];
+    });
+
     try {
     const start = Date.now();
     const argsArray = tc.input;
@@ -549,27 +565,7 @@ const results = testCases.map((tc, index) => {
 
     return {
       status: passed ? 'pass' : 'fail',
-      input: tc.input.flatMap((i, idx) => {
-         // Try serialized form for proper display in frontend
-         let serialized;
-         try {
-             ${requiredDS.includes('ListNode') ? `if (i instanceof ListNode) serialized = listNodeToJson(i);` : ''}
-             ${requiredDS.includes('TreeNode') ? `if (i instanceof TreeNode) serialized = treeNodeToJson(i);` : ''}
-             ${requiredDS.includes('Interval') ? `if (i instanceof Interval) serialized = intervalToJson(i);
-             if (Array.isArray(i) && i.length > 0 && i[0] instanceof Interval) serialized = intervalArrayToJson(i);` : ''}
-             ${requiredDS.includes('GraphNode') ? `if ((i instanceof Node) || (i && typeof i === 'object' && 'neighbors' in i && 'val' in i)) serialized = graphNodeToJson(i as Node);` : ''}
-             ${requiredDS.includes('TrieNode') ? `if (i instanceof TrieNode) serialized = trieNodeToJson(i);` : ''}
-         } catch(e) { return ["Serialization Failed: " + (e as Error).message]; }
-         
-         const finalVal = serialized !== undefined ? serialized : i;
-         
-         // Special case: if it's a cyclic list result {head, pos}, flatten it into two inputs for the UI
-         if (finalVal && typeof finalVal === 'object' && 'head' in finalVal && 'pos' in finalVal) {
-             return [safeStringify(finalVal.head), safeStringify(finalVal.pos)];
-         }
-         
-         return [safeStringify(finalVal)];
-      }),
+      input: originalInputs,
       expected: tc.expected,
       actual: serializedActual,
       time: end - start,
@@ -660,6 +656,16 @@ for tc in test_cases:
     sys.stdout = captured_output
     
     try:
+        # Capture original inputs before they might be modified in-place
+        final_inputs = []
+        for x in tc['input']:
+            ser_x = to_json_serializable(x)
+            if isinstance(ser_x, dict) and "head" in ser_x and "pos" in ser_x:
+                final_inputs.append(to_json_serializable(ser_x["head"]))
+                final_inputs.append(ser_x["pos"])
+            else:
+                final_inputs.append(ser_x)
+
         start = time.time()
         actual = ${userFuncName}(*tc['input'])
         end = time.time()
@@ -703,16 +709,6 @@ for tc in test_cases:
         sys.stdout = original_stdout # Restore stdout before appending result
         logs = captured_output.getvalue()
         
-        # Flatten inputs for display
-        final_inputs = []
-        for x in tc['input']:
-            ser_x = to_json_serializable(x)
-            if isinstance(ser_x, dict) and "head" in ser_x and "pos" in ser_x:
-                final_inputs.append(to_json_serializable(ser_x["head"]))
-                final_inputs.append(ser_x["pos"])
-            else:
-                final_inputs.append(ser_x)
-
         results.append({
             "status": "pass" if passed else "fail",
             "input": final_inputs,
@@ -791,14 +787,8 @@ const generateJavaRunner = (
     }
 
     // 3. Parse Argument Types from User Code to handle List<T> vs T[]
-    const rawArgs = splitJavaArgs(entryInfo.argsStr); // ["String s", "List<String> wordDict"]
-
-    // Extract types from raw args
-    const userArgTypes = rawArgs.map(arg => {
-        const parts = arg.trim().split(/\s+/);
-        if (parts.length < 2) return arg;
-        return parts.slice(0, parts.length - 1).join(' ');
-    });
+    const rawArgs = splitJavaArgs(entryInfo.argsStr);
+    const userArgTypes = rawArgs.map(arg => extractType(arg, 'java'));
 
     const { definitions, parsers, serializers, requiredDS } = getRegistryCode(inputSchema, 'java', userCode);
 
@@ -930,12 +920,27 @@ public class Main {
         }
         if (obj.getClass().isArray()) {
             if (obj instanceof int[]) {
-                int[] arr = (int[]) obj;
+                int[] arr = ((int[]) obj).clone();
+                Arrays.sort(arr);
+                return arr;
+            }
+            if (obj instanceof long[]) {
+                long[] arr = ((long[]) obj).clone();
+                Arrays.sort(arr);
+                return arr;
+            }
+            if (obj instanceof double[]) {
+                double[] arr = ((double[]) obj).clone();
+                Arrays.sort(arr);
+                return arr;
+            }
+            if (obj instanceof char[]) {
+                char[] arr = ((char[]) obj).clone();
                 Arrays.sort(arr);
                 return arr;
             }
             if (obj instanceof Object[]) {
-                Object[] arr = (Object[]) obj;
+                Object[] arr = ((Object[]) obj).clone();
                 for (int i = 0; i < arr.length; i++) {
                     arr[i] = normalize(arr[i], unordered);
                 }
@@ -1059,50 +1064,48 @@ const generateCppRunner = (
     };
 
     const rawArgs = splitCppArgs(entryInfo.argsStr);
-
-    const userArgTypes = rawArgs.map(arg => {
-        const trimmed = arg.trim();
-        const match = trimmed.match(/^(.+?)\s+\w+$/);
-        return match ? match[1] : trimmed;
-    });
+    const userArgTypes = rawArgs.map(arg => extractType(arg, 'cpp'));
 
     const { definitions, parsers, serializers, requiredDS } = getRegistryCode(inputSchema, 'cpp', userCode);
 
     // Helper to deduce C++ type from value, with optional target type hint
-    const deduceCppType = (val: any, targetCppType?: string): string => {
-        if (targetCppType?.includes('ListNode')) return 'ListNode*';
-        if (targetCppType?.includes('TreeNode')) return 'TreeNode*';
-        if (targetCppType?.includes('Node') || targetCppType?.includes('GraphNode')) return 'Node*';
-        if (targetCppType?.includes('Interval')) {
-            if (targetCppType.includes('vector')) return 'vector<Interval>';
+    const deduceCppType = (val: any, targetType?: string): string => {
+        // First, clean targetType if it exists
+        const cleanTarget = targetType ? extractType(targetType, 'cpp') : undefined;
+
+        if (cleanTarget?.includes('ListNode')) return 'ListNode*';
+        if (cleanTarget?.includes('TreeNode')) return 'TreeNode*';
+        if (cleanTarget?.includes('Node') || cleanTarget?.includes('GraphNode')) return 'Node*';
+        if (cleanTarget?.includes('Interval')) {
+            if (cleanTarget.includes('vector')) return 'vector<Interval>';
             return 'Interval';
         }
 
         if (Array.isArray(val)) {
             if (val.length === 0) {
-                if (targetCppType) {
-                    const cleanType = targetCppType.replace(/[&*\s]/g, '');
-                    return cleanType;
-                }
+                if (cleanTarget) return cleanTarget.replace(/&/g, '').trim();
                 return 'vector<int>';
             }
+
+            if (val.some(v => v === null || v === undefined)) return 'vector<string>';
+
             const first = val[0];
             if (Array.isArray(first)) {
-                // Remove recursive call ambiguity by explicitly handling C++ vector syntax deduction
-                const innerType = deduceCppType(first, targetCppType?.replace('vector<', '').replace('>', ''));
-                return `vector<${innerType}>`;
+                let innerHint = cleanTarget;
+                if (innerHint?.includes('vector<')) {
+                    const s = innerHint.indexOf('<') + 1;
+                    const e = innerHint.lastIndexOf('>');
+                    if (s >= 0 && e > s) innerHint = innerHint.substring(s, e).trim();
+                }
+                return `vector<${deduceCppType(first, innerHint)}>`;
             }
-            if (targetCppType && targetCppType.includes('char')) {
-                return 'vector<char>';
-            }
+            if (cleanTarget && cleanTarget.includes('char')) return 'vector<char>';
             if (typeof first === 'string') return 'vector<string>';
             if (typeof first === 'boolean') return 'vector<bool>';
             return 'vector<int>';
         }
         if (typeof val === 'string') {
-            if (targetCppType && targetCppType.includes('char') && val.length === 1) {
-                return 'char';
-            }
+            if (cleanTarget && cleanTarget.includes('char') && val.length === 1) return 'char';
             return 'string';
         }
         if (typeof val === 'boolean') return 'bool';
@@ -1111,8 +1114,14 @@ const generateCppRunner = (
 
     // Helper to format C++ literal
     const formatCppLiteral = (val: any, isChar: boolean = false): string => {
-        if (val === null || val === undefined) return "{}";
+        if (val === null || val === undefined) return "nullptr";
         if (Array.isArray(val)) {
+            const containsNull = val.some(v => v === null || v === undefined);
+            if (containsNull) {
+                // Promote to vector<string> logic for simplicity with "null"
+                const inner = val.map(v => v === null || v === undefined ? '"null"' : JSON.stringify(String(v))).join(', ');
+                return `{${inner}}`;
+            }
             const inner = val.map(v => formatCppLiteral(v, isChar)).join(', ');
             return `{${inner}}`;
         }
@@ -1138,17 +1147,25 @@ const generateCppRunner = (
     const testCalls = testCases.map((tc, index) => {
         // Declare variables for inputs
         const inputDecls = tc.input.map((val, i) => {
-            const targetType = userArgTypes[i] || ''; // e.g. "ListNode*"
-            const cppType = deduceCppType(val, targetType);
-            const type = inputSchema[i]?.type || 'any';
-            const valStr = formatValue(val, type, 'cpp');
+            const targetType = userArgTypes[i] || ''; // e.g. "vector<vector<int>>&"
+            let cppType = deduceCppType(val, targetType);
+            // References cannot be declared as top-level variables without an object to refer to.
+            // When declaring argN, we want the object type itself.
+            cppType = cppType.replace(/&/g, '').trim();
+
+            const typeHint = inputSchema[i]?.type || 'any';
+            const valStr = formatValue(val, typeHint, 'cpp', targetType);
             return `${cppType} arg${i} = ${valStr};`;
         }).join('\n            ');
 
         const args = tc.input.map((_, i) => `arg${i}`).join(', ');
-        const expectedValStr = formatCppLiteral(tc.expectedOutput);
         const expectedType = deduceCppType(tc.expectedOutput);
-        const expectedDecl = `${expectedType} expected = ${expectedValStr};`;
+        let expectedDecl = "";
+        if (options?.multiExpected && Array.isArray(tc.expectedOutput)) {
+            expectedDecl = `vector<${expectedType}> expected_variants = ${formatCppLiteral(tc.expectedOutput)};`;
+        } else {
+            expectedDecl = `${expectedType} expected = ${formatCppLiteral(tc.expectedOutput)};`;
+        }
 
         let executionBlock = '';
         if (options?.returnModifiedInput) {
@@ -1176,7 +1193,6 @@ const generateCppRunner = (
                 // Auto-serialize result
                 auto get_serialized = [&](auto& val) {
                     using T = std::remove_reference_t<decltype(val)>;
-                    using TP = std::remove_pointer_t<T>;
                     if constexpr (false) {}
                     ${requiredDS.includes('ListNode') ? `else if constexpr (std::is_same_v<T, ListNode*>) return listNodeToJson(val);` : ''}
                     ${requiredDS.includes('TreeNode') ? `else if constexpr (std::is_same_v<T, TreeNode*>) return treeNodeToJson(val);` : ''}
@@ -1191,24 +1207,24 @@ const generateCppRunner = (
                 chrono::duration<double, milli> duration = end - start;
                 
                 auto is_equal = [&](auto a, auto b) {
-                     // Simple structural equality for vectors/primitives
-                     // If unordered custom logic needed, add here
-                     if constexpr (${!!options?.unordered}) {
-                         auto a_norm = a;
-                         auto b_norm = b;
-                         std::sort(a_norm.begin(), a_norm.end());
-                         std::sort(b_norm.begin(), b_norm.end());
-                         return a_norm == b_norm;
-                     }
-                     return a == b;
+                     return toJson(normalize(a, ${!!options?.unordered})) == toJson(normalize(b, ${!!options?.unordered}));
                 };
 
                 bool passed = false;
+                ${options?.multiExpected ? `
+                for (auto& variant : expected_variants) {
+                    if (is_equal(serializedActual, variant)) {
+                        passed = true;
+                        break;
+                    }
+                }
+                ` : `
                 passed = is_equal(serializedActual, expected);
+                `}
 
                 cout << "{";
                 cout << "\\"status\\":\\"" << (passed ? "pass" : "fail") << "\\",";
-                cout << "\\"expected\\":"; printJSON(expected); cout << ",";
+                ${options?.multiExpected ? `cout << "\\"expected\\":"; printJSON(expected_variants); cout << ",";` : `cout << "\\"expected\\":"; printJSON(expected); cout << ",";`}
                 cout << "\\"actual\\":"; printJSON(serializedActual); cout << ",";
                 cout << "\\"time\\":" << duration.count();
                 cout << "}";
@@ -1223,6 +1239,7 @@ const generateCppRunner = (
     }).join('\n');
 
     const { headers: userHeaders, body: userBody } = splitCppCode(userCode);
+    const forwardDecls = extractCppSignatures(userBody).join('\n    ');
 
     return `
 #include <iostream>
@@ -1234,10 +1251,15 @@ const generateCppRunner = (
 #include <map>
 #include <type_traits>
 #include <sstream>
+#include <cctype>
 #include <unordered_set>
 #include <unordered_map>
-using namespace std;
 #include <stack>
+#include <variant>
+#include <climits>
+#include <set>
+using namespace std;
+
 
 ${definitions}
 ${parsers}
@@ -1245,24 +1267,53 @@ ${serializers}
 
 
 // Helper to check if type is vector
-template<typename T> struct is_vector : std::false_type {};
-template<typename T> struct is_vector<std::vector<T>> : std::true_type {};
-template<typename T> inline constexpr bool is_vector_v = is_vector<T>::value;
+template < typename T > struct is_vector: std::false_type { };
+template < typename T > struct is_vector < std:: vector < T >> : std::true_type { };
+template < typename T > inline constexpr bool is_vector_v = is_vector<T>:: value;
 
 // Forward decl
-template<typename T> string toJson(const T& val);
+template < typename T > string toJson(const T& val);
 
-template<typename T>
-string toJson(const T& val) {
-    if constexpr (std::is_same_v<T, bool>) {
+template < typename T >
+    T normalize(T val, bool unordered) {
+    if (!unordered) return val;
+    if constexpr(is_vector_v<T>) {
+        T res = val;
+        for (auto & item : res) {
+            item = normalize(item, unordered);
+        }
+        std:: sort(res.begin(), res.end(), [](const auto& a, const auto& b) {
+            return toJson(a) < toJson(b);
+        });
+        return res;
+    } else {
+        return val;
+    }
+}
+
+template < typename T >
+    string toJson(const T& val) {
+    if constexpr(std:: is_same_v<T, bool>) {
         return val ? "true" : "false";
-    } else if constexpr (std::is_arithmetic_v<T>) {
-        return to_string(val);
-    } else if constexpr (std::is_same_v<T, string>) {
-        return "\\"" + val + "\\"";
-    } else if constexpr (std::is_same_v<T, char>) {
+    } else if constexpr(std:: is_pointer_v<T>) {
+        if (val == nullptr) return "null";
+        return "{}";
+    } else if constexpr(std:: is_same_v<T, char>) {
         return "\\"" + string(1, val) + "\\"";
-    } else if constexpr (is_vector_v<T>) {
+    } else if constexpr(std:: is_arithmetic_v<T>) {
+        return to_string(val);
+    } else if constexpr(std:: is_same_v<T, string>) {
+        if (val == "null") return "null";
+        // Check for numeric string to avoid redundant quotes in tree-serialized output
+        if (!val.empty()) {
+            bool isNum = true;
+            for (char curr_char : val) {
+                if (!std:: isdigit(static_cast < unsigned char > (curr_char)) && curr_char != '-' && curr_char != '.') { isNum = false; break; }
+            }
+            if (isNum) return val;
+        }
+        return "\\"" + val + "\\"";
+    } else if constexpr(is_vector_v<T>) {
         string res = "[";
         for (size_t i = 0; i < val.size(); ++i) {
             res += toJson(val[i]);
@@ -1271,18 +1322,21 @@ string toJson(const T& val) {
         res += "]";
         return res;
     } else {
-        return "{}"; // Fallback
+        return "null";
     }
 }
 
-template<typename T>
-void printJSON(const T& val) {
+template < typename T >
+    void printJSON(const T& val) {
     cout << toJson(val);
 }
 
 ${userHeaders}
 
 namespace user_sol {
+    // Forward declarations for helper functions
+    ${forwardDecls}
+
 ${userBody}
 } // namespace user_sol
 

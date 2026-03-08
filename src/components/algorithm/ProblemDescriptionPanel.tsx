@@ -44,6 +44,7 @@ import { renderBlind75Visualization } from "@/utils/blind75Visualizations";
 import { renderVisualization as renderVizFromMapping, hasVisualization } from "@/utils/visualizationMapping";
 import { DIFFICULTY_MAP } from "@/types/algorithm";
 import { TreeDiagram } from "../visualizations/TreeDiagram";
+import { GraphDiagram } from "../visualizations/GraphDiagram";
 import { isTreeType } from "@/utils/treeUtils";
 import { AlgoLink } from "../AlgoLink";
 
@@ -312,14 +313,28 @@ export const ProblemDescriptionPanel = React.memo(({
                       <div key={index} className="border rounded-lg p-4 bg-muted/20">
                         <h4 className="font-semibold mb-3">Example {index + 1}:</h4>
                         <div className="space-y-2 font-mono text-sm">
+                          {example.inputBeforeHtml && (
+                            <RichText content={example.inputBeforeHtml} className="mb-2" />
+                          )}
                           {example.input && (
                             <div className="space-y-2">
                               <div>
                                 <span className="font-semibold">Input:</span>{' '}
                                 <code className="bg-muted px-2 py-0.5 rounded">{example.input}</code>
                               </div>
-                              <TreeDiagram data={example.input} height={120} />
+                              {example.inputAfterHtml && (
+                                <RichText content={example.inputAfterHtml} className="mt-2" />
+                              )}
+                              {algorithm?.controls?.show_tree_visualization && (
+                                <TreeDiagram data={example.input} height={120} />
+                              )}
+                              {algorithm?.controls?.show_graph_visualization && (
+                                <GraphDiagram data={example.input} height={120} />
+                              )}
                             </div>
+                          )}
+                          {example.outputBeforeHtml && (
+                            <RichText content={example.outputBeforeHtml} className="mb-2" />
                           )}
                           {example.output && (
                             <div className="space-y-2">
@@ -327,7 +342,15 @@ export const ProblemDescriptionPanel = React.memo(({
                                 <span className="font-semibold">Output:</span>{' '}
                                 <code className="bg-muted px-2 py-0.5 rounded">{example.output}</code>
                               </div>
-                              <TreeDiagram data={example.output} height={120} />
+                              {example.outputAfterHtml && (
+                                <RichText content={example.outputAfterHtml} className="mt-2" />
+                              )}
+                              {algorithm?.controls?.show_tree_visualization && (
+                                <TreeDiagram data={example.output} height={120} />
+                              )}
+                              {algorithm?.controls?.show_graph_visualization && (
+                                <GraphDiagram data={example.output} height={120} />
+                              )}
                             </div>
                           )}
                           {example.explanation && (

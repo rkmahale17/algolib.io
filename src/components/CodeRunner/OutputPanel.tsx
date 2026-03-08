@@ -11,6 +11,8 @@ import { Submission } from '@/types/userAlgorithmData';
 import { diffStrings } from '@/utils/diffUtils';
 import { TreeDiagram } from '../visualizations/TreeDiagram';
 import { isTreeType, parseTreeValue } from '@/utils/treeUtils';
+import { GraphDiagram } from '../visualizations/GraphDiagram';
+import { isGraphType, parseGraphValue } from '@/utils/graphUtils';
 
 const DiffView = ({ expected, actual }: { expected: any, actual: any }) => {
   const expectedStr = (typeof expected === 'string' ? expected : JSON.stringify(expected, null, 2)) || "";
@@ -227,7 +229,7 @@ export const OutputPanel = ({
                       <TabsTrigger
                         key={tc.id}
                         value={`case-${tc.id}`}
-                        className="text-xs px-3 h-7 whitespace-nowrap data-[state=active]:bg-primary/10 data-[state=active]:text-primary relative group shrink-0"
+                        className="text-xs px-3 h-7 whitespace-nowrap data-[state=active]:bg-primary/10 data-[state=active]:text-black dark:data-[state=active]:text-white relative group shrink-0"
                       >
                         {tc.isCustom ? `Case ${index + 1}` : `Case ${index + 1}`}
                         {/* Delete button for all cases */}
@@ -238,7 +240,7 @@ export const OutputPanel = ({
                             onDeleteTestCase(tc.id);
                           }}
                         >
-                          <XCircle className="w-3.5 h-3.5 text-muted-foreground hover:text-destructive" />
+                          <XCircle className="w-3.5 h-3.5 text-muted-foreground hover:text-red-500" />
                         </div>
                       </TabsTrigger>
                     ))}
@@ -284,6 +286,7 @@ export const OutputPanel = ({
                           isEditing={editingTestCaseId === tc.id}
                           onEdit={() => onEditTestCase(tc.id)}
                           canEdit={tc.isCustom}
+                          controls={algorithmMeta?.controls || controls}
                         />
                       </div>
                     </TabsContent>
@@ -360,8 +363,8 @@ export const OutputPanel = ({
                             <TabsTrigger
                               key={index}
                               value={`result-${index}`}
-                              className={`text-xs px-3 h-7 whitespace-nowrap gap-2 shadow-none transition-colors ${result.status === 'pass' 
-                                ? 'bg-green-500/10 text-green-600 hover:bg-green-500/20 data-[state=active]:bg-green-500/20 data-[state=active]:text-green-700' 
+                              className={`text-xs px-3 h-7 whitespace-nowrap gap-2 shadow-none transition-colors ${result.status === 'pass'
+                                ? 'bg-green-500/10 text-green-600 hover:bg-green-500/20 data-[state=active]:bg-green-500/20 data-[state=active]:text-green-700'
                                 : 'bg-red-500/10 text-red-600 hover:bg-red-500/20 data-[state=active]:bg-red-500/20 data-[state=active]:text-red-700'
                                 }`}
                             >
@@ -423,9 +426,14 @@ export const OutputPanel = ({
                                                 return typeof val === 'string' ? val : JSON.stringify(val);
                                               })()}</span>
                                             </div>
-                                            {isTreeType(field.type) && (
+                                            {algorithmMeta?.controls?.show_tree_visualization && isTreeType(field.type) && (
                                               <div className="mt-1">
                                                 <TreeDiagram data={inputData[i]} height={120} />
+                                              </div>
+                                            )}
+                                            {algorithmMeta?.controls?.show_graph_visualization && isGraphType(field.type) && (
+                                              <div className="mt-1">
+                                                <GraphDiagram data={inputData[i]} height={120} />
                                               </div>
                                             )}
                                           </div>
@@ -460,8 +468,11 @@ export const OutputPanel = ({
                                   return (
                                     <div className="space-y-3">
                                       <div>{content}</div>
-                                      {actual !== undefined && actual !== null && (
+                                      {algorithmMeta?.controls?.show_tree_visualization && actual !== undefined && actual !== null && (
                                         <TreeDiagram data={actual} height={120} />
+                                      )}
+                                      {algorithmMeta?.controls?.show_graph_visualization && actual !== undefined && actual !== null && (
+                                        <GraphDiagram data={actual} height={120} />
                                       )}
                                     </div>
                                   );
@@ -479,7 +490,12 @@ export const OutputPanel = ({
                                     return (
                                       <div className="space-y-3">
                                         <div>{content}</div>
-                                        <TreeDiagram data={result.expected} height={120} />
+                                        {algorithmMeta?.controls?.show_tree_visualization && (
+                                          <TreeDiagram data={result.expected} height={120} />
+                                        )}
+                                        {algorithmMeta?.controls?.show_graph_visualization && (
+                                          <GraphDiagram data={result.expected} height={120} />
+                                        )}
                                       </div>
                                     );
                                   })()}

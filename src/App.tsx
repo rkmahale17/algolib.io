@@ -48,6 +48,7 @@ const AdminSimulator = lazy(() => import("./pages/AdminSimulator"));
 const CompilerDocs = lazy(() => import("./pages/CompilerDocs"));
 const Pricing = lazy(() => import("./pages/Pricing"));
 const AdminMail = lazy(() => import("./pages/AdminMail"));
+import AdminViewToggle from "./components/AdminViewToggle";
 
 import { DodoPayments } from 'dodopayments-checkout';
 
@@ -64,8 +65,8 @@ const ConditionalNavbar = () => {
   const location = useLocation();
   // Hide navbar on algorithm detail pages and blind75 detail pages
   const hideNavbar = location.pathname.startsWith('/problem/') && location.pathname !== '/problem' ||
-                     location.pathname.startsWith('/admin');
-  
+    location.pathname.startsWith('/admin');
+
   if (hideNavbar) return null;
   return <Navbar />;
 };
@@ -102,7 +103,7 @@ const AppContent = () => {
         console.log('Dodo Event:', event);
         const eventType = event.eventType || event.event_type;
         if (eventType === 'checkout.closed' || eventType === 'payment.succeeded') {
-           refreshProfile();
+          refreshProfile();
         }
       }
     });
@@ -111,155 +112,156 @@ const AppContent = () => {
   const isMaintenanceActive = isMaintenanceMode && !location.pathname.startsWith('/admin');
 
   return (
+    <>
+      {isMaintenanceActive ? (
         <>
-          {isMaintenanceActive ? (
-            <>
-              <Navbar />
-              <MaintenancePage />
-            </>
-          ) : (
-            <>
-              <ConditionalNavbar />
-              <Suspense fallback={<PremiumLoader text="Loading..." />}>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/problem/:id" element={<ProblemDetail />} />
-
-                  <Route path="/blind75" element={
-                    <FeatureProtectedRoute flag="blind_75">
-                      <ProtectedRoute><Blind75 /></ProtectedRoute>
-                    </FeatureProtectedRoute>
-                  } />
-                  <Route path="/problem/:slug" element={
-                    <FeatureProtectedRoute flag="blind_75">
-                      <ProtectedRoute><ProblemDetail /></ProtectedRoute>
-                    </FeatureProtectedRoute>
-                  } />
-                  <Route path="/core-patterns" element={
-                    <FeatureProtectedRoute flag="core_algo">
-                      <CorePatterns />
-                    </FeatureProtectedRoute>
-                  } />
-                  <Route path="/problems" element={<Problems />} />
-                  <Route path="/pricing" element={<Pricing />} />
-                <Route path="/login" element={<Auth />} />
-                <Route path="/feedback" element={<Feedback />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="/terms" element={<TermsOfService />} />
-                <Route path="/content-rights" element={<ContentRights />} />
-                <Route path="/complexity" element={<TimeComplexity />} />
-                <Route path="/docs" element={<CompilerDocs />} />
-                <Route path="/games" element={
-                  <FeatureProtectedRoute flag="algo_games">
-                    <ProtectedRoute><Games /></ProtectedRoute>
-                  </FeatureProtectedRoute>
-                } />
-                <Route path="/games/sort-hero" element={
-                  <FeatureProtectedRoute flag="algo_games">
-                    <ProtectedRoute><SortHero /></ProtectedRoute>
-                  </FeatureProtectedRoute>
-                } />
-                <Route path="/games/graph-explorer" element={
-                  <FeatureProtectedRoute flag="algo_games">
-                    <ProtectedRoute><GraphExplorer /></ProtectedRoute>
-                  </FeatureProtectedRoute>
-                } />
-                <Route path="/games/stack-master" element={
-                  <FeatureProtectedRoute flag="algo_games">
-                    <ProtectedRoute><StackMaster /></ProtectedRoute>
-                  </FeatureProtectedRoute>
-                } />
-                <Route path="/games/dp-puzzle" element={
-                  <FeatureProtectedRoute flag="algo_games">
-                    <ProtectedRoute><DPPuzzle /></ProtectedRoute>
-                  </FeatureProtectedRoute>
-                } />
-                <Route path="/games/sliding-window" element={
-                  <FeatureProtectedRoute flag="algo_games">
-                    <ProtectedRoute><SlidingWindow /></ProtectedRoute>
-                  </FeatureProtectedRoute>
-                } />
-                <Route path="/games/two-pointer" element={
-                  <FeatureProtectedRoute flag="algo_games">
-                    <ProtectedRoute><TwoPointer /></ProtectedRoute>
-                  </FeatureProtectedRoute>
-                } />
-                <Route path="/games/leaderboard" element={
-                  <FeatureProtectedRoute flag="algo_games">
-                    <ProtectedRoute><Leaderboard /></ProtectedRoute>
-                  </FeatureProtectedRoute>
-                } />
-                <Route path="/blog/:slug" element={<BlogPost />} />
-                <Route path="/blog" element={<Blog />} />
-
-                <Route path="/admin/problems" element={
-                  <ProtectedAdminRoute>
-                    <AdminAlgorithms />
-                  </ProtectedAdminRoute>
-                } />
-                <Route path="/admin/problem/new" element={
-                  <ProtectedAdminRoute>
-                    <AdminAlgorithmDetail />
-                  </ProtectedAdminRoute>
-                } />
-                <Route path="/admin/problem/:id" element={
-                  <ProtectedAdminRoute>
-                    <AdminAlgorithmDetail />
-                  </ProtectedAdminRoute>
-                } />
-                <Route path="/admin/feedback" element={
-                  <ProtectedAdminRoute>
-                    <FeedbackAdmin />
-                  </ProtectedAdminRoute>
-                } />
-
-                  <Route path="/admin/simulator" element={
-                    <ProtectedAdminRoute>
-                      <AdminSimulator />
-                    </ProtectedAdminRoute>
-                  } />
-                
-
-                <Route path="/admin/features" element={
-                  <ProtectedAdminRoute>
-                    <AdminFeatureFlags />
-                  </ProtectedAdminRoute>
-                } />
-
-                <Route path="/admin" element={
-                  <ProtectedAdminRoute>
-                    <AdminDashboard />
-                  </ProtectedAdminRoute>
-                } />
-
-                <Route path="/admin/mail" element={
-                  <ProtectedAdminRoute>
-                    <AdminMail />
-                  </ProtectedAdminRoute>
-                } />
-
-                  <Route path="/profile" element={
-                    <FeatureProtectedRoute flag="profiles">
-                      <ProtectedRoute><ProfileEdit /></ProtectedRoute>
-                    </FeatureProtectedRoute>
-                  } />
-
-                  {/* Public profile route - no auth required */}
-                  <Route path="/profile/:username" element={<PublicProfile />} />
-
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-                </Routes>
-              </Suspense>
-            </>
-          )}
+          <Navbar />
+          <MaintenancePage />
         </>
+      ) : (
+        <>
+          <ConditionalNavbar />
+          <Suspense fallback={<PremiumLoader text="Loading..." />}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/problem/:id" element={<ProblemDetail />} />
+
+              <Route path="/blind75" element={
+                <FeatureProtectedRoute flag="blind_75">
+                  <ProtectedRoute><Blind75 /></ProtectedRoute>
+                </FeatureProtectedRoute>
+              } />
+              <Route path="/problem/:slug" element={
+                <FeatureProtectedRoute flag="blind_75">
+                  <ProtectedRoute><ProblemDetail /></ProtectedRoute>
+                </FeatureProtectedRoute>
+              } />
+              <Route path="/core-patterns" element={
+                <FeatureProtectedRoute flag="core_algo">
+                  <CorePatterns />
+                </FeatureProtectedRoute>
+              } />
+              <Route path="/problems" element={<Problems />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/login" element={<Auth />} />
+              <Route path="/feedback" element={<Feedback />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<TermsOfService />} />
+              <Route path="/content-rights" element={<ContentRights />} />
+              <Route path="/complexity" element={<TimeComplexity />} />
+              <Route path="/docs" element={<CompilerDocs />} />
+              <Route path="/games" element={
+                <FeatureProtectedRoute flag="algo_games">
+                  <ProtectedRoute><Games /></ProtectedRoute>
+                </FeatureProtectedRoute>
+              } />
+              <Route path="/games/sort-hero" element={
+                <FeatureProtectedRoute flag="algo_games">
+                  <ProtectedRoute><SortHero /></ProtectedRoute>
+                </FeatureProtectedRoute>
+              } />
+              <Route path="/games/graph-explorer" element={
+                <FeatureProtectedRoute flag="algo_games">
+                  <ProtectedRoute><GraphExplorer /></ProtectedRoute>
+                </FeatureProtectedRoute>
+              } />
+              <Route path="/games/stack-master" element={
+                <FeatureProtectedRoute flag="algo_games">
+                  <ProtectedRoute><StackMaster /></ProtectedRoute>
+                </FeatureProtectedRoute>
+              } />
+              <Route path="/games/dp-puzzle" element={
+                <FeatureProtectedRoute flag="algo_games">
+                  <ProtectedRoute><DPPuzzle /></ProtectedRoute>
+                </FeatureProtectedRoute>
+              } />
+              <Route path="/games/sliding-window" element={
+                <FeatureProtectedRoute flag="algo_games">
+                  <ProtectedRoute><SlidingWindow /></ProtectedRoute>
+                </FeatureProtectedRoute>
+              } />
+              <Route path="/games/two-pointer" element={
+                <FeatureProtectedRoute flag="algo_games">
+                  <ProtectedRoute><TwoPointer /></ProtectedRoute>
+                </FeatureProtectedRoute>
+              } />
+              <Route path="/games/leaderboard" element={
+                <FeatureProtectedRoute flag="algo_games">
+                  <ProtectedRoute><Leaderboard /></ProtectedRoute>
+                </FeatureProtectedRoute>
+              } />
+              <Route path="/blog/:slug" element={<BlogPost />} />
+              <Route path="/blog" element={<Blog />} />
+
+              <Route path="/admin/problems" element={
+                <ProtectedAdminRoute>
+                  <AdminAlgorithms />
+                </ProtectedAdminRoute>
+              } />
+              <Route path="/admin/problem/new" element={
+                <ProtectedAdminRoute>
+                  <AdminAlgorithmDetail />
+                </ProtectedAdminRoute>
+              } />
+              <Route path="/admin/problem/:id" element={
+                <ProtectedAdminRoute>
+                  <AdminAlgorithmDetail />
+                </ProtectedAdminRoute>
+              } />
+              <Route path="/admin/feedback" element={
+                <ProtectedAdminRoute>
+                  <FeedbackAdmin />
+                </ProtectedAdminRoute>
+              } />
+
+              <Route path="/admin/simulator" element={
+                <ProtectedAdminRoute>
+                  <AdminSimulator />
+                </ProtectedAdminRoute>
+              } />
+
+
+              <Route path="/admin/features" element={
+                <ProtectedAdminRoute>
+                  <AdminFeatureFlags />
+                </ProtectedAdminRoute>
+              } />
+
+              <Route path="/admin" element={
+                <ProtectedAdminRoute>
+                  <AdminDashboard />
+                </ProtectedAdminRoute>
+              } />
+
+              <Route path="/admin/mail" element={
+                <ProtectedAdminRoute>
+                  <AdminMail />
+                </ProtectedAdminRoute>
+              } />
+
+              <Route path="/profile" element={
+                <FeatureProtectedRoute flag="profiles">
+                  <ProtectedRoute><ProfileEdit /></ProtectedRoute>
+                </FeatureProtectedRoute>
+              } />
+
+              {/* Public profile route - no auth required */}
+              <Route path="/profile/:username" element={<PublicProfile />} />
+
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <AdminViewToggle />
+          </Suspense>
+        </>
+      )}
+    </>
   );
 };
 
 const App = () => {
-    // Set initialized flag after first mount (so subsequent internal navigations know app is loaded)
+  // Set initialized flag after first mount (so subsequent internal navigations know app is loaded)
   React.useEffect(() => {
     // Small timeout to allow the initial route (like Home) to render with "isInitialized: false" first
     const timer = setTimeout(() => {
@@ -269,24 +271,24 @@ const App = () => {
   }, []);
 
   return (
-  <QueryClientProvider client={queryClient}>
-    <AppProvider>
-      <FeatureFlagProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <ErrorBoundary>
-            <BrowserRouter basename="/">
+    <QueryClientProvider client={queryClient}>
+      <AppProvider>
+        <FeatureFlagProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <ErrorBoundary>
+              <BrowserRouter basename="/">
                 <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-                   <AppContent />
+                  <AppContent />
                 </ThemeProvider>
-            </BrowserRouter>
-          </ErrorBoundary>
-      </TooltipProvider>
-    </FeatureFlagProvider>
-  </AppProvider>
-</QueryClientProvider>
-);
+              </BrowserRouter>
+            </ErrorBoundary>
+          </TooltipProvider>
+        </FeatureFlagProvider>
+      </AppProvider>
+    </QueryClientProvider>
+  );
 };
 
 export default App;

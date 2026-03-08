@@ -28,6 +28,7 @@ interface TestCaseEditorProps {
   isEditing?: boolean;
   onEdit?: () => void;
   canEdit?: boolean;
+  controls?: any;
 }
 
 export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
@@ -37,7 +38,8 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
   onCancel,
   isEditing = false,
   onEdit,
-  canEdit = false
+  canEdit = false,
+  controls
 }) => {
   const [editedInputs, setEditedInputs] = useState<string[]>(
     testCase.input.map((val, idx) => {
@@ -173,7 +175,7 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
           {errors[index] && (
             <p className="text-xs text-destructive">{errors[index]}</p>
           )}
-          {isTreeType(field.type) && editedInputs[index] && !errors[index] && (
+          {controls?.show_tree_visualization && isTreeType(field.type) && editedInputs[index] && !errors[index] && (
             <div className="mt-2">
               <TreeDiagram data={editedInputs[index]} height={120} />
             </div>
@@ -207,7 +209,7 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
           <p className="text-xs text-destructive">{errors['expected']}</p>
         )}
         {/* We don't have an explicit type for 'expected' in inputSchema, but we can check if it's likely a tree */}
-        {editedExpected && !errors['expected'] && (
+        {controls?.show_tree_visualization && editedExpected && !errors['expected'] && (
           <div className="mt-2">
             <TreeDiagram data={editedExpected} height={120} />
           </div>
