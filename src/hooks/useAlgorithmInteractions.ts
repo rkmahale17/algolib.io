@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -35,6 +35,12 @@ export const useAlgorithmInteractions = ({
     );
     const [codeCache, setCodeCache] = useState<Record<string, string>>({});
     const [isUserModified, setIsUserModified] = useState(false);
+    const latestCodeRef = useRef(savedCode);
+
+    // Update ref whenever savedCode changes
+    useEffect(() => {
+        latestCodeRef.current = savedCode;
+    }, [savedCode]);
 
     const isNaughtyCloud = useFeatureFlag("naugty_cloud");
 
@@ -83,10 +89,10 @@ export const useAlgorithmInteractions = ({
 
     // Auto-save Effect
     useEffect(() => {
-        if (!isUserModified) return;
+        if (!isUserModified || !savedCode) return;
 
         const saveTimeout = setTimeout(async () => {
-            if (!user || !algorithmId || !savedCode) return;
+            if (!user || !algorithmId) return;
 
             try {
                 const success = await updateCode(user.id, algorithmId, {
@@ -102,25 +108,33 @@ export const useAlgorithmInteractions = ({
                     });
                 }
 
-                setIsUserModified(false);
-                refetchUserData(); // Sync latest state to prevent stale overwrites
+                // ONLY reset if no further changes happened during the save
+                if (latestCodeRef.current === savedCode) {
+                    setIsUserModified(false);
+                }
+
+                // Background refetch to sync
+                refetchUserData();
             } catch (err) {
                 console.error("Error saving code:", err);
             }
-        }, 4000);
+        }, 2000); // Reduced to 2s for better retention
 
         return () => clearTimeout(saveTimeout);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [savedCode, user, algorithmId, selectedLanguage, isUserModified, isNaughtyCloud]);
 
     const handleCodeChange = useCallback((newCode: string) => {
+        // Prevent setting modified if it's the same or if we are just initializing
+        if (newCode === savedCode) return;
+
         setSavedCode(newCode);
         setIsUserModified(true);
         setCodeCache(prev => ({
             ...prev,
             [selectedLanguage]: newCode
         }));
-    }, [selectedLanguage]);
+    }, [selectedLanguage, savedCode]);
 
     const toggleCompletion = useCallback(async () => {
         if (!user || !algorithmId) {

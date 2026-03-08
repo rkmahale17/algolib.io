@@ -15,8 +15,8 @@ interface Edge {
 interface Step {
   edges: Edge[];
   parent: number[];
-  rank: number[];
   mstEdges: Edge[];
+  currentEdge: Edge | null;
   message: string;
   lineNumber: number;
 }
@@ -28,123 +28,140 @@ export const KruskalsVisualization = () => {
   const [speed, setSpeed] = useState(1);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const code = `function kruskalMST(edges, n) {
-  // Sort edges by weight
-  edges.sort((a, b) => a.weight - b.weight);
-  
-  const parent = Array(n).fill(0).map((_, i) => i);
-  const rank = Array(n).fill(0);
-  const mst = [];
-  
-  for (const edge of edges) {
-    const rootU = find(edge.from, parent);
-    const rootV = find(edge.to, parent);
-    
-    if (rootU !== rootV) {
-      mst.push(edge);
-      union(rootU, rootV, parent, rank);
+  const code = `function minCostConnectPoints(points: number[][]): number {
+  const n = points.length;
+  const edges: [number, number, number][] = [];
+
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const cost = Math.abs(points[i][0] - points[j][0]) +
+                   Math.abs(points[i][1] - points[j][1]);
+      edges.push([cost, i, j]);
     }
   }
-  return mst;
+
+  edges.sort((a, b) => a[0] - b[0]);
+
+  const parent = new Array(n).fill(0).map((_, i) => i);
+
+  function find(x: number) {
+    if (parent[x] !== x) parent[x] = find(parent[x]);
+    return parent[x];
+  }
+
+  function union(x, y) {
+    const rootX = find(x);
+    const rootY = find(y);
+    if (rootX === rootY) return false;
+    parent[rootX] = rootY;
+    return true;
+  }
+
+  let totalCost = 0, edgesUsed = 0;
+  for (const [cost, u, v] of edges) {
+    if (union(u, v)) {
+      totalCost += cost;
+      edgesUsed++;
+      if (edgesUsed === n - 1) break;
+    }
+  }
+  return totalCost;
 }`;
 
   const generateSteps = () => {
-    const nodes = 5;
-    const edges: Edge[] = [
-      { from: 0, to: 1, weight: 2 },
-      { from: 0, to: 3, weight: 6 },
-      { from: 1, to: 2, weight: 3 },
-      { from: 1, to: 3, weight: 8 },
-      { from: 1, to: 4, weight: 5 },
-      { from: 2, to: 4, weight: 7 },
-      { from: 3, to: 4, weight: 9 }
-    ];
+    const points = [[0, 0], [2, 2], [3, 10], [5, 2], [7, 0]];
+    const n = points.length;
+    const allEdges: Edge[] = [];
+
+    // All possible edges
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        const cost = Math.abs(points[i][0] - points[j][0]) +
+          Math.abs(points[i][1] - points[j][1]);
+        allEdges.push({ from: i, to: j, weight: cost });
+      }
+    }
 
     const newSteps: Step[] = [];
-    const parent = Array(nodes).fill(0).map((_, i) => i);
-    const rank = Array(nodes).fill(0);
-    const mstEdges: Edge[] = [];
-
-    const find = (x: number): number => {
-      if (parent[x] !== x) parent[x] = find(parent[x]);
-      return parent[x];
-    };
-
-    const union = (x: number, y: number) => {
-      if (rank[x] < rank[y]) {
-        parent[x] = y;
-      } else if (rank[x] > rank[y]) {
-        parent[y] = x;
-      } else {
-        parent[y] = x;
-        rank[x]++;
-      }
-    };
+    let parent = Array(n).fill(0).map((_, i) => i);
+    let mstEdges: Edge[] = [];
 
     newSteps.push({
-      edges: edges.map(e => ({ ...e })),
+      edges: allEdges.map(e => ({ ...e })),
       parent: [...parent],
-      rank: [...rank],
       mstEdges: [],
-      message: 'Start Kruskal\'s algorithm. Sort edges by weight',
-      lineNumber: 2
+      currentEdge: null,
+      message: 'Create all possible edges using Manhattan distance',
+      lineNumber: 5
     });
 
-    edges.sort((a, b) => a.weight - b.weight);
+    const sortedEdges = [...allEdges].sort((a, b) => a.weight - b.weight);
 
     newSteps.push({
-      edges: edges.map(e => ({ ...e })),
+      edges: sortedEdges.map(e => ({ ...e })),
       parent: [...parent],
-      rank: [...rank],
       mstEdges: [],
-      message: 'Edges sorted. Initialize Union-Find',
-      lineNumber: 4
+      currentEdge: null,
+      message: 'Sort edges by weight (ascending)',
+      lineNumber: 13
     });
 
-    for (const edge of edges) {
-      const rootU = find(edge.from);
-      const rootV = find(edge.to);
+    const find = (x: number, p: number[]): number => {
+      if (p[x] !== x) p[x] = find(p[x], p);
+      return p[x];
+    };
+
+    let totalCost = 0, edgesUsed = 0;
+
+    for (const edge of sortedEdges) {
+      const pCopy = [...parent];
+      const rootU = find(edge.from, pCopy);
+      const rootV = find(edge.to, pCopy);
 
       newSteps.push({
-        edges: edges.map(e => ({ ...e, considered: e === edge })),
+        edges: sortedEdges.map(e => ({ ...e, considered: e === edge })),
         parent: [...parent],
-        rank: [...rank],
         mstEdges: [...mstEdges],
+        currentEdge: edge,
         message: `Consider edge ${edge.from}-${edge.to} (weight: ${edge.weight})`,
-        lineNumber: 9
+        lineNumber: 31
       });
 
       if (rootU !== rootV) {
+        parent[rootU] = rootV;
         mstEdges.push({ ...edge, selected: true });
-        union(rootU, rootV);
-        
+        totalCost += edge.weight;
+        edgesUsed++;
+
         newSteps.push({
-          edges: edges.map(e => ({ ...e })),
+          edges: sortedEdges.map(e => ({ ...e })),
           parent: [...parent],
-          rank: [...rank],
           mstEdges: [...mstEdges],
-          message: `Add edge ${edge.from}-${edge.to} to MST`,
-          lineNumber: 13
+          currentEdge: edge,
+          message: `Union: root ${rootU} connected to ${rootV}. Add to MST. (Total: ${totalCost})`,
+          lineNumber: 35
         });
+
+        if (edgesUsed === n - 1) break;
       } else {
         newSteps.push({
-          edges: edges.map(e => ({ ...e })),
+          edges: sortedEdges.map(e => ({ ...e })),
           parent: [...parent],
-          rank: [...rank],
           mstEdges: [...mstEdges],
-          message: `Skip edge ${edge.from}-${edge.to} (creates cycle)`,
-          lineNumber: 11
+          currentEdge: edge,
+          message: `Roots match (${rootU}), skip edge ${edge.from}-${edge.to} to avoid cycle`,
+          lineNumber: 33
         });
       }
     }
 
     newSteps.push({
-      edges: edges.map(e => ({ ...e })),
+      edges: sortedEdges.map(e => ({ ...e })),
       parent: [...parent],
-      rank: [...rank],
       mstEdges: [...mstEdges],
-      message: `MST complete! Total weight: ${mstEdges.reduce((sum, e) => sum + e.weight, 0)}`,
-      lineNumber: 17
+      currentEdge: null,
+      message: `MST complete! Total cost: ${totalCost}`,
+      lineNumber: 39
     });
 
     setSteps(newSteps);
@@ -189,11 +206,11 @@ export const KruskalsVisualization = () => {
   const currentStep = steps[currentStepIndex];
 
   const nodePositions = [
-    { x: 100, y: 50 },
-    { x: 200, y: 100 },
-    { x: 300, y: 50 },
-    { x: 150, y: 200 },
-    { x: 250, y: 200 }
+    { x: 50, y: 230 },   // [0,0]
+    { x: 150, y: 190 },  // [2,2]
+    { x: 200, y: 30 },   // [3,10]
+    { x: 300, y: 190 },  // [5,2]
+    { x: 350, y: 230 },  // [7,0]
   ];
 
   return (
@@ -218,11 +235,14 @@ export const KruskalsVisualization = () => {
               {currentStep.edges.map((edge, idx) => {
                 const from = nodePositions[edge.from];
                 const to = nodePositions[edge.to];
-                const inMST = currentStep.mstEdges.some(e => 
-                  (e.from === edge.from && e.to === edge.to) || 
+                const inMST = currentStep.mstEdges.some(e =>
+                  (e.from === edge.from && e.to === edge.to) ||
                   (e.from === edge.to && e.to === edge.from)
                 );
-                
+                const isCurrent = currentStep.currentEdge &&
+                  ((currentStep.currentEdge.from === edge.from && currentStep.currentEdge.to === edge.to) ||
+                    (currentStep.currentEdge.from === edge.to && currentStep.currentEdge.to === edge.from));
+
                 return (
                   <g key={idx}>
                     <line
@@ -230,29 +250,30 @@ export const KruskalsVisualization = () => {
                       y1={from.y}
                       x2={to.x}
                       y2={to.y}
-                      className={`transition-all duration-300 ${
-                        inMST ? 'stroke-green-500' : edge.considered ? 'stroke-primary' : 'stroke-border'
-                      }`}
-                      strokeWidth={inMST ? 3 : edge.considered ? 3 : 2}
+                      className={`transition-all duration-300 ${inMST ? 'stroke-green-500' : isCurrent ? 'stroke-primary' : 'stroke-border/10'
+                        }`}
+                      strokeWidth={inMST ? 3 : isCurrent ? 3 : 1}
                     />
-                    <text
-                      x={(from.x + to.x) / 2}
-                      y={(from.y + to.y) / 2}
-                      className="fill-foreground text-xs font-bold"
-                      textAnchor="middle"
-                    >
-                      {edge.weight}
-                    </text>
+                    {inMST && (
+                      <text
+                        x={(from.x + to.x) / 2}
+                        y={(from.y + to.y) / 2}
+                        className="fill-foreground text-[10px] font-bold"
+                        textAnchor="middle"
+                      >
+                        {edge.weight}
+                      </text>
+                    )}
                   </g>
                 );
               })}
-              
+
               {nodePositions.map((pos, idx) => (
                 <g key={idx}>
                   <circle
                     cx={pos.x}
                     cy={pos.y}
-                    r="20"
+                    r="15"
                     className="fill-muted stroke-border"
                     strokeWidth="2"
                   />
@@ -261,30 +282,39 @@ export const KruskalsVisualization = () => {
                     y={pos.y}
                     textAnchor="middle"
                     dy=".3em"
-                    className="fill-foreground font-bold"
+                    className="fill-foreground text-[10px] font-bold"
                   >
                     {idx}
+                  </text>
+                  <text
+                    x={pos.x}
+                    y={pos.y + 25}
+                    textAnchor="middle"
+                    className="fill-muted-foreground text-[8px]"
+                  >
+                    P: {currentStep.parent[idx]}
                   </text>
                 </g>
               ))}
             </svg>
           </div>
 
-          <div className="bg-accent/50 rounded-lg border border-accent p-4">
+          <div className="bg-accent/50 rounded-lg border border-accent p-4 min-h-[60px]">
             <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
           </div>
           <div className="rounded-lg">
             <VariablePanel
-            variables={{
-              'MST Edges': currentStep.mstEdges.length,
-              'Total Weight': currentStep.mstEdges.reduce((sum, e) => sum + e.weight, 0)
-            }}
-          />
+              variables={{
+                'MST Edges': currentStep.mstEdges.length,
+                'Total Cost': currentStep.mstEdges.reduce((sum, e) => sum + e.weight, 0),
+                'Union-Find (Parent)': currentStep.parent.join(', ')
+              }}
+            />
           </div>
         </div>
 
         <div className="space-y-4">
-          
+
           <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
         </div>
       </div>

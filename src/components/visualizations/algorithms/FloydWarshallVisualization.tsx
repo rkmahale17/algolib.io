@@ -20,43 +20,75 @@ export const FloydWarshallVisualization = () => {
   const [speed, setSpeed] = useState(1);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const code = `function floydWarshall(graph) {
-  const dist = [...graph];
-  const n = graph.length;
-  
+  const code = `function floydWarshall(n: number, edges: [number, number, number][]): number[][] {
+  const dist = Array.from({ length: n }, () => Array(n).fill(Infinity));
+
+  for (let i = 0; i < n; i++) dist[i][i] = 0;
+
+  for (const [u, v, w] of edges) {
+    dist[u][v] = Math.min(dist[u][v], w);
+  }
+
   for (let k = 0; k < n; k++) {
     for (let i = 0; i < n; i++) {
       for (let j = 0; j < n; j++) {
-        if (dist[i][k] + dist[k][j] < dist[i][j]) {
-          dist[i][j] = dist[i][k] + dist[k][j];
-        }
+        dist[i][j] = Math.min(dist[i][j], dist[i][k] + dist[k][j]);
       }
     }
   }
+
   return dist;
 }`;
 
+
   const generateSteps = () => {
-    const INF = 9999;
+    const INF = Infinity;
     const n = 4;
-    const matrix = [
-      [0, 3, INF, 7],
-      [8, 0, 2, INF],
-      [5, INF, 0, 1],
-      [2, INF, INF, 0]
+    const edges: [number, number, number][] = [
+      [0, 1, 3],
+      [0, 3, 7],
+      [1, 0, 8],
+      [1, 2, 2],
+      [2, 0, 5],
+      [2, 3, 1],
+      [3, 0, 2]
     ];
 
     const newSteps: Step[] = [];
-    const dist = matrix.map(row => [...row]);
+    const dist = Array.from({ length: n }, () => Array(n).fill(INF));
 
     newSteps.push({
       matrix: dist.map(row => [...row]),
       k: -1,
       i: -1,
       j: -1,
-      message: 'Initialize distance matrix',
-      lineNumber: 1
+      message: 'Initializing distance matrix with Infinity',
+      lineNumber: 2
     });
+
+    for (let i = 0; i < n; i++) {
+      dist[i][i] = 0;
+      newSteps.push({
+        matrix: dist.map(row => [...row]),
+        k: -1,
+        i,
+        j: i,
+        message: `Setting distance from node ${i} to itself as 0`,
+        lineNumber: 4
+      });
+    }
+
+    for (const [u, v, w] of edges) {
+      dist[u][v] = Math.min(dist[u][v], w);
+      newSteps.push({
+        matrix: dist.map(row => [...row]),
+        k: -1,
+        i: u,
+        j: v,
+        message: `Processing edge (${u}, ${v}) with weight ${w}`,
+        lineNumber: 7
+      });
+    }
 
     for (let k = 0; k < n; k++) {
       newSteps.push({
@@ -65,7 +97,7 @@ export const FloydWarshallVisualization = () => {
         i: -1,
         j: -1,
         message: `Using node ${k} as intermediate node`,
-        lineNumber: 4
+        lineNumber: 10
       });
 
       for (let i = 0; i < n; i++) {
@@ -78,8 +110,8 @@ export const FloydWarshallVisualization = () => {
             k,
             i,
             j,
-            message: `Check path ${i}→${k}→${j}: ${dist[i][k]} + ${dist[k][j]} = ${throughK} vs ${direct}`,
-            lineNumber: 7
+            message: `Check path ${i}→${k}→${j}: ${dist[i][k] === INF ? '∞' : dist[i][k]} + ${dist[k][j] === INF ? '∞' : dist[k][j]} = ${throughK >= INF ? '∞' : throughK} vs ${direct === INF ? '∞' : direct}`,
+            lineNumber: 13
           });
 
           if (throughK < dist[i][j]) {
@@ -90,7 +122,7 @@ export const FloydWarshallVisualization = () => {
               i,
               j,
               message: `Update dist[${i}][${j}] = ${throughK}`,
-              lineNumber: 8
+              lineNumber: 13
             });
           }
         }
@@ -103,12 +135,13 @@ export const FloydWarshallVisualization = () => {
       i: -1,
       j: -1,
       message: 'All pairs shortest paths computed!',
-      lineNumber: 13
+      lineNumber: 18
     });
 
     setSteps(newSteps);
     setCurrentStepIndex(0);
   };
+
 
   useEffect(() => {
     generateSteps();
@@ -173,16 +206,16 @@ export const FloydWarshallVisualization = () => {
                       {row.map((cell, j) => (
                         <td
                           key={j}
-                          className={`border border-border p-3 text-center font-mono transition-all duration-300 ${
-                            i === currentStep.i && j === currentStep.j
+                          className={`border border-border p-3 text-center font-mono transition-all duration-300 ${i === currentStep.i && j === currentStep.j
                               ? 'bg-primary text-white'
-                              : i === currentStep.i || j === currentStep.j
-                              ? 'bg-accent'
-                              : 'bg-muted/20'
-                          }`}
+                              : (i === currentStep.i || j === currentStep.j) && currentStep.i !== -1
+                                ? 'bg-accent'
+                                : 'bg-muted/20'
+                            }`}
                         >
-                          {cell === 9999 ? '∞' : cell}
+                          {cell === Infinity ? '∞' : cell}
                         </td>
+
                       ))}
                     </tr>
                   ))}
@@ -196,19 +229,19 @@ export const FloydWarshallVisualization = () => {
           </div>
           <div className="rounded-lg">
             <VariablePanel
-        variables={{
-          k: currentStep.k >= 0 ? currentStep.k : 'N/A',
-          i: currentStep.i >= 0 ? currentStep.i : 'N/A',
-          j: currentStep.j >= 0 ? currentStep.j : 'N/A'
-        }}
-      />
+              variables={{
+                k: currentStep.k >= 0 ? currentStep.k : 'N/A',
+                i: currentStep.i >= 0 ? currentStep.i : 'N/A',
+                j: currentStep.j >= 0 ? currentStep.j : 'N/A'
+              }}
+            />
           </div>
         </div>
 
         <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
       </div>
 
-      
+
     </div>
   );
 };

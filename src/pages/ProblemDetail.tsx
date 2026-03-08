@@ -378,7 +378,7 @@ const ProblemDetail: React.FC = () => {
           )}
         </div>
 
-        <SheetContent side="left" className="w-[300px] sm:w-[450px] p-0 border-r border-border/40">
+        <SheetContent side="left" className="w-[400px] sm:w-[540px] p-0 border-r border-border/40">
           <SheetHeader className="p-6 border-b border-border/40">
             <SheetTitle className="text-xl font-bold">{activeListType === 'core' ? 'Core Patterns' : activeListType === 'blind75' ? 'Blind 75' : 'All Problems'}</SheetTitle>
           </SheetHeader>
@@ -388,6 +388,8 @@ const ProblemDetail: React.FC = () => {
               isLoading={isAlgorithmsLoading}
               hideListSelection={true}
               defaultListType={activeListType}
+              variant="sidebar"
+              initialViewMode="list"
             />
           </div>
         </SheetContent>

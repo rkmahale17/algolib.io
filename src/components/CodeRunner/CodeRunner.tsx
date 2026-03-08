@@ -222,6 +222,8 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
       const fetchAlgo = async () => {
         try {
           const { data, error } = await supabase
+            .from('algorithms')
+            .select('*')
             .eq('id', algorithmId)
             .maybeSingle();
 
@@ -275,7 +277,6 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
       // If we have valid initialCode (user saved code), prioritize it!
       if (initialCode && initialCode.trim().length > 0) {
         setCode(initialCode);
-        onCodeChange?.(initialCode);
         return;
       }
 
@@ -310,16 +311,13 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
 
       if (algoCode) {
         setCode(algoCode);
-        onCodeChange?.(algoCode);
       } else {
         setCode(DEFAULT_CODE[language]);
-        onCodeChange?.(DEFAULT_CODE[language]);
       }
 
     } else {
       if (!initialCode) {
         setCode(DEFAULT_CODE[language]);
-        onCodeChange?.(DEFAULT_CODE[language]);
       }
     }
   }, [activeAlgorithm, language, algorithmId]);
@@ -1079,8 +1077,8 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
                               size="sm"
                               variant="default"
                               className={`h-8 px-3 text-xs rounded-full transition-all border-0 group ${lastRunSuccess
-                                  ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                                  : 'bg-muted text-muted-foreground'
+                                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                                : 'bg-muted text-muted-foreground'
                                 } ${(!lastRunSuccess && !isLoading && !isSubmitting) ? 'opacity-50' : ''}`}
                             >
                               {isSubmitting ? (
@@ -1211,8 +1209,8 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
 
   const content = (
     <div className={`w-full bg-background shadow-sm flex flex-col ${isFullscreen
-        ? 'fixed inset-0 z-50 h-screen w-screen rounded-none border-0'
-        : `border rounded-lg overflow-hidden ${className || 'h-[calc(100vh-100px)]'}`
+      ? 'fixed inset-0 z-50 h-screen w-screen rounded-none border-0'
+      : `border rounded-lg overflow-hidden ${className || 'h-[calc(100vh-100px)]'}`
       }`}>
       {isMobile ? (
         <div className="h-full flex flex-col">

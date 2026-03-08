@@ -17,6 +17,10 @@ interface ExplanationData {
     input: string;
     output: string;
     explanation: string;
+    inputBeforeHtml?: string;
+    inputAfterHtml?: string;
+    outputBeforeHtml?: string;
+    outputAfterHtml?: string;
   }>;
 }
 
@@ -85,10 +89,10 @@ export function ExplanationEditor({ data, onChange }: ExplanationEditorProps) {
         </CardHeader>
         <CardContent>
           <Textarea
-             value={Array.isArray(data.steps) ? data.steps.join('\n') : data.steps}
-             onChange={(e) => updateField("steps", e.target.value)}
-             placeholder="Enter steps (HTML supported)..."
-             rows={5}
+            value={Array.isArray(data.steps) ? data.steps.join('\n') : data.steps}
+            onChange={(e) => updateField("steps", e.target.value)}
+            placeholder="Enter steps (HTML supported)..."
+            rows={5}
           />
         </CardContent>
       </Card>
@@ -107,7 +111,7 @@ export function ExplanationEditor({ data, onChange }: ExplanationEditorProps) {
           />
         </CardContent>
       </Card>
-      
+
       {/* Comparison Table */}
       <Card>
         <CardHeader>

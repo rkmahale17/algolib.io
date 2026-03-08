@@ -10,6 +10,10 @@ interface IOExample {
   input: string;
   output: string;
   explanation: string;
+  inputBeforeHtml?: string;
+  inputAfterHtml?: string;
+  outputBeforeHtml?: string;
+  outputAfterHtml?: string;
 }
 
 interface IOExamplesEditorProps {
@@ -21,7 +25,18 @@ export function IOExamplesEditor({ examples, onChange }: IOExamplesEditorProps) 
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
   const handleAdd = () => {
-    onChange([...examples, { input: "", output: "", explanation: "" }]);
+    onChange([
+      ...examples,
+      {
+        input: "",
+        output: "",
+        explanation: "",
+        inputBeforeHtml: "",
+        inputAfterHtml: "",
+        outputBeforeHtml: "",
+        outputAfterHtml: "",
+      },
+    ]);
     setExpandedIndex(examples.length);
   };
 
@@ -96,6 +111,29 @@ export function IOExamplesEditor({ examples, onChange }: IOExamplesEditorProps) 
 
             {expandedIndex === index && (
               <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Input Before HTML</Label>
+                    <Textarea
+                      value={example.inputBeforeHtml || ""}
+                      onChange={(e) => handleUpdate(index, "inputBeforeHtml", e.target.value)}
+                      placeholder="HTML to show before Input label"
+                      rows={2}
+                      className="font-mono text-xs"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Input After HTML</Label>
+                    <Textarea
+                      value={example.inputAfterHtml || ""}
+                      onChange={(e) => handleUpdate(index, "inputAfterHtml", e.target.value)}
+                      placeholder="HTML to show after Input code"
+                      rows={2}
+                      className="font-mono text-xs"
+                    />
+                  </div>
+                </div>
+
                 <div className="space-y-2">
                   <Label>Input *</Label>
                   <Input
@@ -103,6 +141,29 @@ export function IOExamplesEditor({ examples, onChange }: IOExamplesEditorProps) 
                     onChange={(e) => handleUpdate(index, "input", e.target.value)}
                     placeholder='e.g., nums = [2,7,11,15], target = 9'
                   />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Output Before HTML</Label>
+                    <Textarea
+                      value={example.outputBeforeHtml || ""}
+                      onChange={(e) => handleUpdate(index, "outputBeforeHtml", e.target.value)}
+                      placeholder="HTML to show before Output label"
+                      rows={2}
+                      className="font-mono text-xs"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Output After HTML</Label>
+                    <Textarea
+                      value={example.outputAfterHtml || ""}
+                      onChange={(e) => handleUpdate(index, "outputAfterHtml", e.target.value)}
+                      placeholder="HTML to show after Output code"
+                      rows={2}
+                      className="font-mono text-xs"
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">

@@ -5,9 +5,11 @@ import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
 interface Step {
-  distances: number[];
-  visited: boolean[];
+  distances: Record<number, number>;
+  visited: number[];
+  minHeap: [number, number][];
   currentNode: number | null;
+  maxTime: number;
   message: string;
   lineNumber: number;
 }
@@ -19,105 +21,167 @@ export const DijkstrasVisualization = () => {
   const [speed, setSpeed] = useState(1);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const code = `function dijkstra(graph, start) {
-  const dist = Array(n).fill(Infinity);
-  const visited = Array(n).fill(false);
-  dist[start] = 0;
-  
-  for (let i = 0; i < n; i++) {
-    let u = minDistance(dist, visited);
-    visited[u] = true;
-    
-    for (let v of graph[u]) {
-      if (!visited[v.to]) {
-        const alt = dist[u] + v.weight;
-        if (alt < dist[v.to]) {
-          dist[v.to] = alt;
-        }
-      }
+  const code = `function networkDelayTime(times: number[][], n: number, k: number): number {
+    const edges: Map<number, [number, number][]> = new Map();
+
+    // Build adjacency list
+    for (const [u, v, w] of times) {
+        if (!edges.has(u)) edges.set(u, []);
+        edges.get(u)!.push([v, w]);
     }
-  }
-  return dist;
+
+    const minHeap: [number, number][] = [[0, k]];
+    const visit = new Set<number>();
+    let t = 0;
+
+    while (minHeap.length > 0) {
+        minHeap.sort((a, b) => a[0] - b[0]);
+        const [w1, n1] = minHeap.shift()!;
+
+        if (visit.has(n1)) continue;
+
+        visit.add(n1);
+        t = Math.max(t, w1);
+
+        const neighbors = edges.get(n1) || [];
+        for (const [n2, w2] of neighbors) {
+            if (!visit.has(n2)) {
+                minHeap.push([w1 + w2, n2]);
+            }
+        }
+    }
+
+    return visit.size === n ? t : -1;
 }`;
 
   const generateSteps = () => {
-    const nodes = 5;
-    const graph = [
-      [{ to: 1, weight: 4 }, { to: 2, weight: 1 }],
-      [{ to: 3, weight: 1 }],
-      [{ to: 1, weight: 2 }, { to: 3, weight: 5 }],
-      [{ to: 4, weight: 3 }],
-      []
-    ];
+    const n = 4;
+    const k = 2;
+    const times = [[2, 1, 1], [2, 3, 1], [3, 4, 1]];
 
     const newSteps: Step[] = [];
-    const distances = Array(nodes).fill(Infinity);
-    const visited = Array(nodes).fill(false);
-    distances[0] = 0;
+    const edges: Map<number, [number, number][]> = new Map();
+    const distances: Record<number, number> = {};
+    const visit = new Set<number>();
+    let t = 0;
 
+    // Adjacency List Initialization
     newSteps.push({
-      distances: [...distances],
-      visited: [...visited],
+      distances: { ...distances },
+      visited: Array.from(visit),
+      minHeap: [],
       currentNode: null,
-      message: 'Initialize distances. Start from node 0',
-      lineNumber: 1
+      maxTime: t,
+      message: 'Initializing adjacency list...',
+      lineNumber: 2
     });
 
-    for (let i = 0; i < nodes; i++) {
-      let minDist = Infinity;
-      let u = -1;
+    for (const [u, v, w] of times) {
+      if (!edges.has(u)) edges.set(u, []);
+      edges.get(u)!.push([v, w]);
+    }
 
-      for (let j = 0; j < nodes; j++) {
-        if (!visited[j] && distances[j] < minDist) {
-          minDist = distances[j];
-          u = j;
-        }
-      }
+    // MinHeap Initialization
+    const minHeap: [number, number][] = [[0, k]];
+    newSteps.push({
+      distances: { ...distances },
+      visited: Array.from(visit),
+      minHeap: [...minHeap],
+      currentNode: null,
+      maxTime: t,
+      message: `Starting Dijkstra from node ${k} with time 0.`,
+      lineNumber: 11
+    });
 
-      if (u === -1) break;
-
-      visited[u] = true;
-
+    while (minHeap.length > 0) {
+      // Sort step
       newSteps.push({
-        distances: [...distances],
-        visited: [...visited],
-        currentNode: u,
-        message: `Select node ${u} with distance ${distances[u]}`,
-        lineNumber: 7
+        distances: { ...distances },
+        visited: Array.from(visit),
+        minHeap: [...minHeap],
+        currentNode: null,
+        maxTime: t,
+        message: 'Sorting minHeap by time.',
+        lineNumber: 16
+      });
+      minHeap.sort((a, b) => a[0] - b[0]);
+
+      // Pop step
+      const [w1, n1] = minHeap.shift()!;
+      newSteps.push({
+        distances: { ...distances },
+        visited: Array.from(visit),
+        minHeap: [...minHeap],
+        currentNode: n1,
+        maxTime: t,
+        message: `Popped node ${n1} with current time ${w1}.`,
+        lineNumber: 17
       });
 
-      for (const edge of graph[u]) {
-        if (!visited[edge.to]) {
-          const alt = distances[u] + edge.weight;
+      // Visited Check
+      if (visit.has(n1)) {
+        newSteps.push({
+          distances: { ...distances },
+          visited: Array.from(visit),
+          minHeap: [...minHeap],
+          currentNode: n1,
+          maxTime: t,
+          message: `Node ${n1} already visited. Skipping.`,
+          lineNumber: 19
+        });
+        continue;
+      }
 
+      // Add to Visit
+      visit.add(n1);
+      distances[n1] = w1;
+      t = Math.max(t, w1);
+      newSteps.push({
+        distances: { ...distances },
+        visited: Array.from(visit),
+        minHeap: [...minHeap],
+        currentNode: n1,
+        maxTime: t,
+        message: `Marking node ${n1} as visited. Updated max time t = ${t}.`,
+        lineNumber: 21
+      });
+
+      // Explore neighbors
+      const neighbors = edges.get(n1) || [];
+      for (const [n2, w2] of neighbors) {
+        newSteps.push({
+          distances: { ...distances },
+          visited: Array.from(visit),
+          minHeap: [...minHeap],
+          currentNode: n1,
+          maxTime: t,
+          message: `Checking neighbor ${n2} of node ${n1}.`,
+          lineNumber: 26
+        });
+
+        if (!visit.has(n2)) {
+          minHeap.push([w1 + w2, n2]);
           newSteps.push({
-            distances: [...distances],
-            visited: [...visited],
-            currentNode: u,
-            message: `Check edge ${u}→${edge.to}: ${distances[u]} + ${edge.weight} = ${alt}`,
-            lineNumber: 11
+            distances: { ...distances },
+            visited: Array.from(visit),
+            minHeap: [...minHeap],
+            currentNode: n1,
+            maxTime: t,
+            message: `Adding node ${n2} to heap with distance ${w1 + w2}.`,
+            lineNumber: 28
           });
-
-          if (alt < distances[edge.to]) {
-            distances[edge.to] = alt;
-            newSteps.push({
-              distances: [...distances],
-              visited: [...visited],
-              currentNode: u,
-              message: `Update distance to node ${edge.to}: ${alt}`,
-              lineNumber: 13
-            });
-          }
         }
       }
     }
 
     newSteps.push({
-      distances: [...distances],
-      visited: [...visited],
+      distances: { ...distances },
+      visited: Array.from(visit),
+      minHeap: [...minHeap],
       currentNode: null,
-      message: 'Shortest paths found!',
-      lineNumber: 18
+      maxTime: t,
+      message: visit.size === n ? `All nodes reachable. Max time: ${t}` : 'Not all nodes reached.',
+      lineNumber: 33
     });
 
     setSteps(newSteps);
@@ -161,12 +225,12 @@ export const DijkstrasVisualization = () => {
 
   const currentStep = steps[currentStepIndex];
 
+  // Node positions for a simple graph loop
   const nodePositions = [
-    { x: 50, y: 100 },
-    { x: 150, y: 50 },
-    { x: 150, y: 150 },
-    { x: 250, y: 100 },
-    { x: 350, y: 100 }
+    { x: 100, y: 150 }, // 1
+    { x: 50, y: 70 },   // 2
+    { x: 150, y: 70 },  // 3
+    { x: 200, y: 150 }  // 4
   ];
 
   return (
@@ -186,68 +250,64 @@ export const DijkstrasVisualization = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 overflow-x-auto">
-            <svg width="400" height="220" className="mx-auto">
-              {nodePositions.map((pos, idx) => (
-                <g key={idx}>
-                  <circle
-                    cx={pos.x}
-                    cy={pos.y}
-                    r="25"
-                    className={`transition-all duration-300 ${
-                      currentStep.currentNode === idx
-                        ? 'fill-primary stroke-primary'
-                        : currentStep.visited[idx]
-                        ? 'fill-green-500 stroke-green-500'
-                        : 'fill-muted stroke-border'
-                    }`}
-                    strokeWidth="2"
-                  />
-                  <text
-                    x={pos.x}
-                    y={pos.y - 5}
-                    textAnchor="middle"
-                    className={`font-bold ${
-                      currentStep.currentNode === idx || currentStep.visited[idx]
-                        ? 'fill-white'
-                        : 'fill-foreground'
-                    }`}
-                  >
-                    {idx}
-                  </text>
-                  <text
-                    x={pos.x}
-                    y={pos.y + 10}
-                    textAnchor="middle"
-                    className={`text-xs font-bold ${
-                      currentStep.currentNode === idx || currentStep.visited[idx]
-                        ? 'fill-white'
-                        : 'fill-foreground'
-                    }`}
-                  >
-                    {currentStep.distances[idx] === Infinity ? '∞' : currentStep.distances[idx]}
-                  </text>
-                </g>
-              ))}
+          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 overflow-x-auto text-center">
+            <svg width="300" height="220" className="mx-auto">
+              {/* Edges */}
+              {[
+                { from: 2, to: 1, weight: 1 },
+                { from: 2, to: 3, weight: 1 },
+                { from: 3, to: 4, weight: 1 }
+              ].map((edge, i) => {
+                const start = nodePositions[edge.from - 1];
+                const end = nodePositions[edge.to - 1];
+                return (
+                  <g key={i}>
+                    <line x1={start.x} y1={start.y} x2={end.x} y2={end.y} className="stroke-muted-foreground/30" strokeWidth="2" markerEnd="url(#arrowhead)" />
+                    <text x={(start.x + end.x) / 2} y={(start.y + end.y) / 2 - 5} className="fill-muted-foreground text-[10px]">{edge.weight}</text>
+                  </g>
+                );
+              })}
+              <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="23" refY="3.5" orient="auto">
+                  <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
+                </marker>
+              </defs>
+
+              {nodePositions.map((pos, idx) => {
+                const nodeNum = idx + 1;
+                const isVisited = currentStep.visited.includes(nodeNum);
+                const isCurrent = currentStep.currentNode === nodeNum;
+                return (
+                  <g key={idx}>
+                    <circle
+                      cx={pos.x}
+                      cy={pos.y}
+                      r="18"
+                      className={`transition-all duration-300 ${isCurrent ? 'fill-primary stroke-primary' : isVisited ? 'fill-green-500 stroke-green-500' : 'fill-muted stroke-border'}`}
+                      strokeWidth="2"
+                    />
+                    <text x={pos.x} y={pos.y + 5} textAnchor="middle" className={`text-xs font-bold ${isCurrent || isVisited ? 'fill-white' : 'fill-foreground'}`}>{nodeNum}</text>
+                    <text x={pos.x} y={pos.y - 25} textAnchor="middle" className="text-[10px] fill-muted-foreground">{currentStep.distances[nodeNum] !== undefined ? `d=${currentStep.distances[nodeNum]}` : 'd=∞'}</text>
+                  </g>
+                );
+              })}
             </svg>
           </div>
 
           <div className="bg-accent/50 rounded-lg border border-accent p-4">
             <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
           </div>
-          <div className="rounded-lg">
-  <VariablePanel
+
+          <VariablePanel
             variables={{
-              distances: currentStep.distances.map(d => d === Infinity ? '∞' : d),
-              visited: currentStep.visited.filter(v => v).length
+              "Current Max Time (t)": currentStep.maxTime,
+              "Visited Set": `{${currentStep.visited.join(', ')}}`,
+              "Min Heap": JSON.stringify(currentStep.minHeap)
             }}
           />
         </div>
-        </div>
-        
 
         <div className="space-y-4">
-        
           <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
         </div>
       </div>
