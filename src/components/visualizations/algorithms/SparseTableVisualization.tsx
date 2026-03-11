@@ -186,78 +186,76 @@ export const SparseTableVisualization: React.FC = () => {
       />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-      <div className="bg-card rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4">Array</h3>
-        <div className="flex gap-2 mb-6">
-          {currentStep.array.map((val, idx) => (
-            <div
-              key={idx}
-              className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
-                idx >= currentStep.queryL && idx <= currentStep.queryR && currentStep.queryL >= 0
+        <div className="bg-card rounded-lg p-6 border">
+          <h3 className="text-lg font-semibold mb-4">Array</h3>
+          <div className="flex gap-2 mb-6">
+            {currentStep.array.map((val, idx) => (
+              <div
+                key={idx}
+                className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font- transition-all ${idx >= currentStep.queryL && idx <= currentStep.queryR && currentStep.queryL >= 0
                   ? 'bg-primary/20 border-primary'
                   : 'bg-card border-border'
-              }`}
-            >
-              {val}
-            </div>
-          ))}
-        </div>
+                  }`}
+              >
+                {val}
+              </div>
+            ))}
+          </div>
 
-        <h3 className="text-lg font-semibold mb-4">Sparse Table (2D: [index][power])</h3>
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-sm">
-            <thead>
-              <tr>
-                <th className="border p-2 bg-muted">i\j</th>
-                {currentStep.table[0].map((_, j) => (
-                  <th key={j} className="border p-2 bg-muted">2^{j}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {currentStep.table.map((row, i) => (
-                <tr key={i}>
-                  <td className="border p-2 bg-muted font-bold">{i}</td>
-                  {row.map((val, j) => (
-                    <td
-                      key={j}
-                      className={`border p-2 text-center ${
-                        val !== 0 ? 'bg-blue-500/10 font-bold' : ''
-                      }`}
-                    >
-                      {val !== 0 ? val : '-'}
-                    </td>
+          <h3 className="text-lg font-semibold mb-4">Sparse Table (2D: [index][power])</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-sm">
+              <thead>
+                <tr>
+                  <th className="border p-2 bg-muted">i\j</th>
+                  {currentStep.table[0].map((_, j) => (
+                    <th key={j} className="border p-2 bg-muted">2^{j}</th>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {currentStep.result !== null && (
-          <div className="mt-4 p-4 bg-green-500/10 border border-green-500 rounded">
-            <p className="text-sm font-semibold">
-              Query [{currentStep.queryL}, {currentStep.queryR}]: Minimum = {currentStep.result}
-            </p>
+              </thead>
+              <tbody>
+                {currentStep.table.map((row, i) => (
+                  <tr key={i}>
+                    <td className="border p-2 bg-muted font-">{i}</td>
+                    {row.map((val, j) => (
+                      <td
+                        key={j}
+                        className={`border p-2 text-center ${val !== 0 ? 'bg-blue-500/10 font-' : ''
+                          }`}
+                      >
+                        {val !== 0 ? val : '-'}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        )}
 
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
-        </div>
-        
-        <div className="mt-4 p-4 bg-muted rounded">
-               <VariablePanel
-        variables={{
-          'array size': currentStep.array.length,
-          'query range': currentStep.queryL >= 0 ? `[${currentStep.queryL}, ${currentStep.queryR}]` : 'none',
-          'result': currentStep.result !== null ? currentStep.result : 'building'
-        }}
-      />
-        </div>
+          {currentStep.result !== null && (
+            <div className="mt-4 p-4 bg-green-500/10 border border-green-500 rounded">
+              <p className="text-sm font-semibold">
+                Query [{currentStep.queryL}, {currentStep.queryR}]: Minimum = {currentStep.result}
+              </p>
+            </div>
+          )}
 
-      </div>
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+          <div className="mt-4 p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
+          </div>
+
+          <div className="mt-4 p-4 bg-muted rounded">
+            <VariablePanel
+              variables={{
+                'array size': currentStep.array.length,
+                'query range': currentStep.queryL >= 0 ? `[${currentStep.queryL}, ${currentStep.queryR}]` : 'none',
+                'result': currentStep.result !== null ? currentStep.result : 'building'
+              }}
+            />
+          </div>
+
+        </div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
 
       </div>
 

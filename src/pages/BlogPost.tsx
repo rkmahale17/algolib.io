@@ -36,7 +36,7 @@ const BlogPost = () => {
         <meta name="description" content={post.description} />
         <meta name="keywords" content={`${post.category}, algorithms, ${post.title}, coding tutorial, DSA, competitive programming`} />
         <link rel="canonical" href={`https://rulcode.com/blog/${post.slug}`} />
-        
+
         {/* Open Graph */}
         <meta property="og:title" content={`${post.title} | Rulcode Blog`} />
         <meta property="og:description" content={post.description} />
@@ -46,13 +46,13 @@ const BlogPost = () => {
         <meta property="article:published_time" content={post.date} />
         <meta property="article:author" content={post.author} />
         <meta property="article:section" content={post.category} />
-        
+
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={post.title} />
         <meta name="twitter:description" content={post.description} />
         <meta name="twitter:image" content={post.image || 'https://rulcode.com/og-image.png'} />
-        
+
         {/* JSON-LD Structured Data */}
         <script type="application/ld+json">
           {JSON.stringify({
@@ -107,7 +107,7 @@ const BlogPost = () => {
                 </Badge>
               </div>
 
-              <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground font-roboto">
+              <h1 className="text-4xl md:text-5xl font- mb-4 text-foreground font-roboto">
                 {post.title}
               </h1>
 
@@ -134,7 +134,7 @@ const BlogPost = () => {
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                 <Clock className="w-4 h-4" />
+                  <Clock className="w-4 h-4" />
                   <span>{post.readTime}</span>
                 </div>
               </div>

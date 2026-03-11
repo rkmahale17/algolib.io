@@ -86,9 +86,9 @@ export const UnionFindVisualization: React.FC = () => {
     const union = (x: number, y: number): boolean => {
       const rootX = find(x);
       const rootY = find(y);
-      
+
       if (rootX === rootY) return false;
-      
+
       if (rank[rootX] < rank[rootY]) {
         parent[rootX] = rootY;
       } else if (rank[rootX] > rank[rootY]) {
@@ -194,52 +194,51 @@ export const UnionFindVisualization: React.FC = () => {
         onSpeedChange={setSpeed}
       />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div className="bg-card rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4">Union-Find (Disjoint Set)</h3>
-        
-        <div className="grid grid-cols-6 gap-4 mb-6">
-          {currentStep.parent.map((parent, idx) => (
-            <div key={idx} className="flex flex-col items-center gap-2">
-              <div
-                className={`w-16 h-16 rounded-full border-2 flex items-center justify-center font-bold text-lg transition-all ${
-                  idx === currentStep.x || idx === currentStep.y
+        <div className="bg-card rounded-lg p-6 border">
+          <h3 className="text-lg font-semibold mb-4">Union-Find (Disjoint Set)</h3>
+
+          <div className="grid grid-cols-6 gap-4 mb-6">
+            {currentStep.parent.map((parent, idx) => (
+              <div key={idx} className="flex flex-col items-center gap-2">
+                <div
+                  className={`w-16 h-16 rounded-full border-2 flex items-center justify-center font- text-lg transition-all ${idx === currentStep.x || idx === currentStep.y
                     ? 'bg-primary/20 border-primary text-primary scale-110'
                     : parent === idx
-                    ? 'bg-green-500/20 border-green-500 text-green-500'
-                    : 'bg-card border-border'
-                }`}
-              >
-                {idx}
+                      ? 'bg-green-500/20 border-green-500 text-green-500'
+                      : 'bg-card border-border'
+                    }`}
+                >
+                  {idx}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Parent: {parent}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Rank: {currentStep.rank[idx]}
+                </div>
               </div>
-              <div className="text-xs text-muted-foreground">
-                Parent: {parent}
-              </div>
-              <div className="text-xs text-muted-foreground">
-                Rank: {currentStep.rank[idx]}
-              </div>
-            </div>
-          ))}
-        </div>
-      
+            ))}
+          </div>
 
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
+
+          <div className="mt-4 p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
+          </div>
+          <div className="mt-4 p-4 bg-muted rounded">
+            <VariablePanel
+              variables={{
+                operation: currentStep.operation,
+                x: currentStep.x,
+                y: currentStep.y !== undefined ? currentStep.y : 'N/A',
+                result: String(currentStep.result)
+              }}
+            />
+          </div>
+
         </div>
-        <div className="mt-4 p-4 bg-muted rounded">
-        <VariablePanel
-        variables={{
-          operation: currentStep.operation,
-          x: currentStep.x,
-          y: currentStep.y !== undefined ? currentStep.y : 'N/A',
-          result: String(currentStep.result)
-        }}
-      />
-</div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
 
       </div>
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
-
-        </div>
 
 
     </div>

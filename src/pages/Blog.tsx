@@ -21,20 +21,20 @@ const Blog = () => {
         />
         <meta name="keywords" content="algorithm tutorials, DSA patterns, data structures, competitive programming, coding interview preparation, Blind 75, LeetCode solutions" />
         <link rel="canonical" href="https://rulcode.com/blog" />
-        
+
         {/* Open Graph */}
         <meta property="og:title" content="Rulcode Blog - Algorithm Tutorials & DSA Patterns" />
         <meta property="og:description" content="Master algorithms through interactive tutorials and comprehensive guides." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://rulcode.com/blog" />
         <meta property="og:image" content="https://rulcode.com/og-image.png" />
-        
+
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Rulcode Blog - Algorithm Tutorials" />
         <meta name="twitter:description" content="Master algorithms through interactive tutorials and guides." />
         <meta name="twitter:image" content="https://rulcode.com/og-image.png" />
-        
+
         {/* JSON-LD Structured Data */}
         <script type="application/ld+json">
           {JSON.stringify({
@@ -59,7 +59,7 @@ const Blog = () => {
         <div className="container mx-auto max-w-7xl">
           {/* Header */}
           <div className="text-center mb-16">
-            <h2 className="text-2xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <h2 className="text-2xl md:text-4xl font- mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Rulcode Blogs
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -102,7 +102,7 @@ const Blog = () => {
           {/* Bottom CTA Card */}
           <Card className="bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border-primary/20">
             <CardContent className="p-8 text-center">
-              <h2 className="text-2xl font-bold mb-3">
+              <h2 className="text-2xl font- mb-3">
                 Play Algo Games for learning algo in fun way!
               </h2>
               <p className="text-muted-foreground mb-6">

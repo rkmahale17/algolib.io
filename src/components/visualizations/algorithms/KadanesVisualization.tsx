@@ -57,7 +57,7 @@ export const KadanesVisualization = () => {
     for (let i = 1; i < array.length; i++) {
       const extendSum = currentSum + array[i];
       const startNew = array[i];
-      
+
       if (startNew > extendSum) {
         currentSum = startNew;
         tempStart = i;
@@ -180,18 +180,17 @@ export const KadanesVisualization = () => {
                 return (
                   <div key={index} className="flex flex-col items-center gap-2 relative">
                     {isCurrent && (
-                      <div className="absolute -top-8 text-xs font-bold text-primary animate-bounce">▼</div>
+                      <div className="absolute -top-8 text-xs font- text-primary animate-bounce">▼</div>
                     )}
                     <div
-                      className={`w-14 h-14 rounded flex items-center justify-center font-mono font-bold text-sm transition-all duration-300 ${
-                        isInMaxSubarray
+                      className={`w-14 h-14 rounded flex items-center justify-center font-mono font- text-sm transition-all duration-300 ${isInMaxSubarray
                           ? 'bg-green-500 text-white shadow-lg shadow-green-500/50 scale-110'
                           : isCurrent
-                          ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/50 scale-105'
-                          : value < 0
-                          ? 'bg-red-500/20 text-red-500 border border-red-500/30'
-                          : 'bg-blue-500/20 text-blue-500 border border-blue-500/30'
-                      }`}
+                            ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/50 scale-105'
+                            : value < 0
+                              ? 'bg-red-500/20 text-red-500 border border-red-500/30'
+                              : 'bg-blue-500/20 text-blue-500 border border-blue-500/30'
+                        }`}
                     >
                       {value}
                     </div>
@@ -212,24 +211,24 @@ export const KadanesVisualization = () => {
               [{currentStep.subarrayStart}...{currentStep.subarrayEnd}] = {currentStep.maxSum}
             </div>
           </div>
-           <div className=" border  rounded-lg p-4">
-  <VariablePanel
-        variables={{
-          i: currentStep.currentIndex,
-          'arr[i]': currentStep.array[currentStep.currentIndex],
-          currentSum: currentStep.currentSum,
-          maxSum: currentStep.maxSum,
-          subarrayRange: `[${currentStep.subarrayStart}, ${currentStep.subarrayEnd}]`
-        }}
-      />
-</div>
+          <div className=" border  rounded-lg p-4">
+            <VariablePanel
+              variables={{
+                i: currentStep.currentIndex,
+                'arr[i]': currentStep.array[currentStep.currentIndex],
+                currentSum: currentStep.currentSum,
+                maxSum: currentStep.maxSum,
+                subarrayRange: `[${currentStep.subarrayStart}, ${currentStep.subarrayEnd}]`
+              }}
+            />
+          </div>
         </div>
-         
+
 
         <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
       </div>
 
-    
+
 
     </div>
   );

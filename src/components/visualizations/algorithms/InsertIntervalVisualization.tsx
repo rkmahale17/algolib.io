@@ -242,8 +242,8 @@ export const InsertIntervalVisualization = () => {
                       {renderInterval(
                         interval,
                         step.merged &&
-                        interval[0] === step.merged[0] &&
-                        interval[1] === step.merged[1]
+                          interval[0] === step.merged[0] &&
+                          interval[1] === step.merged[1]
                           ? 'bg-green-500/20 border border-green-500'
                           : 'bg-secondary/50'
                       )}

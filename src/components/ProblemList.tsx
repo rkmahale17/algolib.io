@@ -13,6 +13,8 @@ import { useUserProgressMap } from '@/hooks/useAlgorithms';
 import { supabase } from '@/integrations/supabase/client';
 import { useApp } from '@/contexts/AppContext';
 import { useFeatureFlag } from '@/contexts/FeatureFlagContext';
+import { cn } from '@/lib/utils';
+import { AlgorithmCard } from './AlgorithmCard';
 
 interface ProblemListProps {
   algorithms: AlgorithmListItem[];
@@ -179,8 +181,11 @@ export const ProblemList = ({
           <div className={isSidebar ? "" : "rounded-2xl border-border/40 overflow-hidden glass-card bg-card/30 backdrop-blur-xl border"}>
             {/* Integrated Header & Filters */}
             <div className={`${isSidebar ? "p-0 pb-4" : "p-4 md:p-6"} space-y-4 ${isSidebar ? "" : "border-b border-border/40 bg-muted/5"}`}>
-              <div className="flex flex-col lg:flex-row gap-4 justify-between items-stretch lg:items-center">
-                <div className={`relative flex-1 group ${isSidebar ? "w-full lg:w-auto" : ""}`}>
+              <div className={cn(
+                "flex gap-4 justify-between items-stretch",
+                isSidebar ? "flex-col" : "flex-col lg:flex-row lg:items-center"
+              )}>
+                <div className={cn("relative flex-1 group", isSidebar ? "w-full" : "")}>
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                   <Input
                     type="text"
@@ -191,10 +196,10 @@ export const ProblemList = ({
                   />
                 </div>
 
-                <div className={`flex flex-wrap gap-2 ${isSidebar ? "w-full lg:w-auto" : ""}`}>
+                <div className={cn("flex flex-wrap gap-2", isSidebar ? "w-full" : "")}>
                   {!hideListSelection && (
                     <Select value={selectedListType || "all"} onValueChange={(val) => setSelectedListType(val === "all" ? null : val)}>
-                      <SelectTrigger className="h-10 w-[140px] rounded-lg bg-background/50 border-border/50">
+                      <SelectTrigger className={cn("h-10 rounded-lg bg-background/50 border-border/50", isSidebar ? "flex-1" : "w-[140px]")}>
                         <SelectValue placeholder="List Type" />
                       </SelectTrigger>
                       <SelectContent>
@@ -207,7 +212,7 @@ export const ProblemList = ({
                   )}
 
                   <Select value={selectedDifficulty || "all"} onValueChange={(val) => setSelectedDifficulty(val === "all" ? null : val)}>
-                    <SelectTrigger className="h-10 w-[130px] rounded-lg bg-background/50 border-border/50">
+                    <SelectTrigger className={cn("h-10 rounded-lg bg-background/50 border-border/50", isSidebar ? "flex-1" : "w-[130px]")}>
                       <SelectValue placeholder="Difficulty" />
                     </SelectTrigger>
                     <SelectContent>
@@ -219,7 +224,7 @@ export const ProblemList = ({
                   </Select>
 
                   <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="h-10 w-[130px] rounded-lg bg-background/50 border-border/50">
+                    <SelectTrigger className={cn("h-10 rounded-lg bg-background/50 border-border/50", isSidebar ? "flex-1" : "w-[130px]")}>
                       <SelectValue placeholder="Sort" />
                     </SelectTrigger>
                     <SelectContent>
@@ -285,97 +290,23 @@ export const ProblemList = ({
 
             {/* List View */}
             {viewMode === 'list' && (
-              <>
-                <div className={`${isSidebar ? "hidden" : "hidden md:flex"} items-center gap-4 px-8 py-3 bg-muted/20 border-b border-border/40 text-[10px] font-bold uppercase tracking-wider text-muted-foreground`}>
-                  <div className="w-12 shrink-0">#</div>
-                  <div className="flex-1 min-w-0">Title</div>
-                  <div className="w-32 shrink-0">Category</div>
-                  <div className="w-24 shrink-0">Difficulty</div>
-                  <div className="w-24 shrink-0">Done</div>
-                </div>
+              <div className="divide-y divide-border/10">
+                {filteredAndSortedAlgorithms.map((algo, index) => {
+                  const status = progressMap?.[algo.id] || 'none';
+                  const isPremium = isPaywallEnabled && algo.listType !== 'core' && algo.listType !== 'core+blind75' && !hasPremiumAccess;
 
-                <div className="divide-y divide-border/20">
-                  {filteredAndSortedAlgorithms.map((algo, index) => {
-                    const status = progressMap?.[algo.id] || 'none';
-                    return (
-                      <Link
-                        key={algo.id}
-                        to={algo.slug ? `/problem/${algo.slug}` : `/problem/${algo.id}`}
-                        className={`block transition-all duration-300 hover:bg-primary/5 group relative
-                          ${status === 'solved'
-                            ? 'bg-green-500/[0.03] border-l-2 border-green-500/30'
-                            : 'border-l-2 border-transparent'}`}
-                      >
-                        <div className={`flex flex-col ${isSidebar ? "" : "md:flex-row md:items-center"} gap-4 ${isSidebar ? "px-4" : "px-6 md:px-8"} py-3 md:py-2.5`}>
-                          {/* ID & Title Column */}
-                          <div className="flex items-center gap-4 flex-1 min-w-0">
-                            <div className={`${isSidebar ? "hidden" : "hidden md:flex"} w-12 shrink-0 font-mono text-xs text-muted-foreground/40 group-hover:text-primary/60 transition-colors`}>
-                              {(algo.serial_no || index + 1).toString().padStart(2, '0')}
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <h3 className="font-semibold text-[15px] leading-tight group-hover:text-primary transition-colors truncate">
-                                {algo.displayTitle}
-                              </h3>
-                              {/* Category and Premium Tag */}
-                              <div className={`${isSidebar ? "flex" : "md:hidden flex"} items-center gap-2 mt-0.5`}>
-                                <p className="text-[10px] text-muted-foreground">
-                                  {algo.category} • ALGO-{(algo.serial_no || index + 1).toString().padStart(2, '0')}
-                                </p>
-                                {isPaywallEnabled && algo.listType !== 'core' && algo.listType !== 'core+blind75' && !hasPremiumAccess && (
-                                  <div className="flex items-center gap-0.5 text-[9px] font-bold text-amber-500 uppercase">
-                                    <Lock className="w-2.5 h-2.5" />
-                                    Premium
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Category Column (Desktop) */}
-                          {!isSidebar && (
-                            <div className="hidden md:flex w-32 shrink-0 items-center gap-2">
-                              <span className="text-xs font-medium text-muted-foreground truncate">{algo.category}</span>
-                              {isPaywallEnabled && algo.listType !== 'core' && algo.listType !== 'core+blind75' && !hasPremiumAccess && (
-                                <div className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 text-[8px] font-bold uppercase ring-1 ring-amber-500/20">
-                                  <Lock className="w-2 h-2" />
-                                </div>
-                              )}
-                            </div>
-                          )}
-
-                          {/* Difficulty Column */}
-                          <div className={`${isSidebar ? "hidden" : "w-24 shrink-0 flex items-center"}`}>
-                            <Badge
-                              variant="outline"
-                              className={`${difficultyColors[algo.mappedDifficulty]} text-[10px] font-bold px-2 py-0 h-5 border-none bg-transparent md:bg-inherit`}
-                            >
-                              {algo.mappedDifficulty}
-                            </Badge>
-                          </div>
-
-
-                          {/* Status Column */}
-                          <div className={`${isSidebar ? "shrink-0" : "w-24 shrink-0"} flex items-center`}>
-                            {status === 'solved' ? (
-                              <div className="flex items-center gap-1.5 text-green-500">
-                                <Check className="w-4 h-4" />
-                                {!isSidebar && <span className="text-[10px] font-bold uppercase tracking-wider">Solved</span>}
-                              </div>
-                            ) : status === 'attempted' ? (
-                              <div className="flex items-center gap-1.5 text-orange-400">
-                                <Circle className="w-4 h-4" />
-                                {!isSidebar && <span className="text-[10px] font-bold uppercase tracking-wider hidden lg:inline">Attempted</span>}
-                              </div>
-                            ) : (
-                              !isSidebar && <span className="text-[10px] text-muted-foreground/30 font-mono">PENDING</span>
-                            )}
-                          </div>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </>
+                  return (
+                    <AlgorithmCard
+                      key={algo.id}
+                      algorithm={algo}
+                      status={status as any}
+                      isPremium={isPremium}
+                      index={index}
+                      isSidebar={isSidebar}
+                    />
+                  );
+                })}
+              </div>
             )}
 
             {/* Grid View */}
@@ -400,7 +331,7 @@ export const ProblemList = ({
                             <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">
                               <span>ALGO-{(algo.serial_no || index + 1).toString().padStart(2, '0')}</span>
                               {isPaywallEnabled && algo.listType !== 'core' && algo.listType !== 'core+blind75' && !hasPremiumAccess && (
-                                <div className="flex items-center gap-0.5 text-amber-500 font-bold">
+                                <div className="flex items-center gap-0.5 text-amber-500 font-">
                                   <Lock className="w-2.5 h-2.5" />
                                   PREMIUM
                                 </div>
@@ -412,7 +343,7 @@ export const ProblemList = ({
                           </div>
                           <Badge
                             variant="outline"
-                            className={`${difficultyColors[algo.mappedDifficulty]} shrink-0 text-[10px] font-bold px-2 py-0.5 h-auto border-none`}
+                            className={`${difficultyColors[algo.mappedDifficulty]} shrink-0 text-[10px] font- px-2 py-0.5 h-auto border-none`}
                           >
                             {algo.mappedDifficulty}
                           </Badge>
@@ -424,16 +355,16 @@ export const ProblemList = ({
                           {status === 'solved' ? (
                             <div className="flex items-center gap-1.5 text-green-500">
                               <Check className="w-3.5 h-3.5" />
-                              <span className="text-[10px] font-bold uppercase tracking-wider">Solved</span>
+                              <span className="text-[10px] font- uppercase tracking-wider">Solved</span>
                             </div>
                           ) : status === 'attempted' ? (
                             <div className="flex items-center gap-1.5 text-orange-400">
                               <Circle className="w-3.5 h-3.5" />
-                              <span className="text-[10px] font-bold uppercase tracking-wider">Attempted</span>
+                              <span className="text-[10px] font- uppercase tracking-wider">Attempted</span>
                             </div>
                           ) : (
                             <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity text-primary/60">
-                              <span className="text-[10px] font-bold uppercase tracking-wider">Solve</span>
+                              <span className="text-[10px] font- uppercase tracking-wider">Solve</span>
                               <ExternalLink className="w-3 h-3" />
                             </div>
                           )}

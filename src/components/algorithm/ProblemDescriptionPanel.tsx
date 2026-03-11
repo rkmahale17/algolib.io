@@ -235,7 +235,7 @@ export const ProblemDescriptionPanel = React.memo(({
                 {/* Title & Progress */}
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <h1 className="text-2xl font-bold mb-3">{algorithm.name}</h1>
+                    <h1 className="text-2xl font- mb-3">{algorithm.name}</h1>
 
                     {/* Difficulty and Company Tags */}
                     <div className="flex flex-wrap items-center gap-2 mb-4">

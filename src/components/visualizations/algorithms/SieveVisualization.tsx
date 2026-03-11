@@ -76,7 +76,7 @@ export const SieveVisualization: React.FC = () => {
     }
 
     const primes = sieve.map((isPrime, i) => isPrime ? i : -1).filter(x => x > 0);
-    
+
     newSteps.push({
       n,
       sieve: [...sieve],
@@ -153,20 +153,19 @@ export const SieveVisualization: React.FC = () => {
 
       <div className="bg-card rounded-lg p-6 border">
         <h3 className="text-lg font-semibold mb-4">Sieve Array (2 to {currentStep.n})</h3>
-        
+
         <div className="grid grid-cols-10 gap-2 mb-6">
           {currentStep.sieve.slice(2).map((isPrime, idx) => {
             const num = idx + 2;
             return (
               <div
                 key={num}
-                className={`aspect-square flex items-center justify-center rounded border-2 font-bold text-sm transition-all ${
-                  num === currentStep.current
-                    ? 'bg-primary/20 border-primary scale-110'
-                    : isPrime
+                className={`aspect-square flex items-center justify-center rounded border-2 font- text-sm transition-all ${num === currentStep.current
+                  ? 'bg-primary/20 border-primary scale-110'
+                  : isPrime
                     ? 'bg-green-500/20 border-green-500'
                     : 'bg-red-500/10 border-red-500/30'
-                }`}
+                  }`}
               >
                 {num}
               </div>

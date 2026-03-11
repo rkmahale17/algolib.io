@@ -181,7 +181,7 @@ function reverse(nums, left, right) {
           <div className="bg-muted/30 rounded-lg border border-border/50 p-6">
             <div className="flex flex-col items-center gap-8">
               {currentStep.phase && (
-                <div className="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full uppercase tracking-wider border border-primary/20">
+                <div className="px-3 py-1 bg-primary/10 text-primary text-xs font- rounded-full uppercase tracking-wider border border-primary/20">
                   {currentStep.phase}
                 </div>
               )}
@@ -189,11 +189,11 @@ function reverse(nums, left, right) {
                 {currentStep.array.map((value, index) => (
                   <div key={index} className="flex flex-col items-center gap-2 flex-1 relative">
                     <div
-                      className={`w-full aspect-square rounded flex items-center justify-center font-bold text-lg transition-all duration-300 ${currentStep.highlightIndices.includes(index)
-                          ? 'bg-primary text-primary-foreground shadow-lg scale-110'
-                          : index === currentStep.left || index === currentStep.right
-                            ? 'bg-accent text-accent-foreground border-2 border-primary ring-2 ring-primary/20 scale-105'
-                            : 'bg-muted text-foreground'
+                      className={`w-full aspect-square rounded flex items-center justify-center font- text-lg transition-all duration-300 ${currentStep.highlightIndices.includes(index)
+                        ? 'bg-primary text-primary-foreground shadow-lg scale-110'
+                        : index === currentStep.left || index === currentStep.right
+                          ? 'bg-accent text-accent-foreground border-2 border-primary ring-2 ring-primary/20 scale-105'
+                          : 'bg-muted text-foreground'
                         }`}
                     >
                       {value}

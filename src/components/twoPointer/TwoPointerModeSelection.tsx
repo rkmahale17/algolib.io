@@ -39,12 +39,12 @@ export const TwoPointerModeSelection = ({ onSelectMode }: TwoPointerModeSelectio
       color: "text-blue-500",
     },
   ];
-  
+
   return (
     <div className="space-y-6">
       <div className="mb-6">
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           onClick={() => navigate('/games')}
           className="gap-2"
         >
@@ -52,12 +52,12 @@ export const TwoPointerModeSelection = ({ onSelectMode }: TwoPointerModeSelectio
           Back to Games
         </Button>
       </div>
-      
+
       <div className="text-center space-y-2">
-        <h2 className="text-2xl font-bold">Choose Your Challenge</h2>
+        <h2 className="text-2xl font-">Choose Your Challenge</h2>
         <p className="text-muted-foreground">Master the two-pointer technique for finding pairs</p>
       </div>
-      
+
       <div className="grid md:grid-cols-3 gap-4">
         {modes.map((mode) => {
           const Icon = mode.icon;
@@ -95,7 +95,7 @@ export const TwoPointerModeSelection = ({ onSelectMode }: TwoPointerModeSelectio
           );
         })}
       </div>
-      
+
       <Card className="bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
         <CardHeader>
           <CardTitle className="text-lg">How to Play</CardTitle>

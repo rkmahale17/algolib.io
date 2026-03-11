@@ -231,13 +231,12 @@ export const GraphValidTreeVisualization = () => {
                 {Array.from({ length: step.n }, (_, i) => (
                   <div
                     key={i}
-                    className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${
-                      i === step.currentNode
-                        ? 'bg-primary text-primary-foreground'
-                        : step.visited.has(i)
+                    className={`w-12 h-12 rounded-full flex items-center justify-center font- text-lg ${i === step.currentNode
+                      ? 'bg-primary text-primary-foreground'
+                      : step.visited.has(i)
                         ? 'bg-green-500/20 border-2 border-green-500'
                         : 'bg-muted'
-                    }`}
+                      }`}
                   >
                     {i}
                   </div>
@@ -274,9 +273,8 @@ export const GraphValidTreeVisualization = () => {
               <Card className="p-4">
                 <div className="text-sm font-semibold mb-2">Valid Tree?</div>
                 <div
-                  className={`text-3xl font-bold ${
-                    step.isValid ? 'text-green-500' : 'text-red-500'
-                  }`}
+                  className={`text-3xl font- ${step.isValid ? 'text-green-500' : 'text-red-500'
+                    }`}
                 >
                   {step.isValid ? 'YES ✓' : 'NO ✗'}
                 </div>

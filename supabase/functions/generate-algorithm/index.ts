@@ -9,7 +9,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // target: "info" | "test_cases" | "solutions" | "add_approaches" | "all" (legacy)
+    // target: "info" | "test_cases" | "solutions" | "add_approaches" | "all" (legacy) | "enhance_comments" | "starter_code"
     const {
       topic,
       referenceCode,
@@ -18,7 +18,9 @@ Deno.serve(async (req) => {
       approachCount = 2,
       mode = "problem",
       target = "all",
-      input_schema, // Required for 'test_cases' and 'solutions'
+      input_schema, // Required for 'test_cases', 'solutions', 'starter_code'
+      implementations: inputImplementations, // For 'enhance_comments'
+      lang: targetLang, // For 'starter_code'
     } = await req.json();
     const apiKey = Deno.env.get("GEMINI_API_KEY");
 
@@ -249,6 +251,64 @@ Deno.serve(async (req) => {
         ${HTML_TEMPLATE}
         `;
 
+    // 4. ENHANCE COMMENTS PROMPT
+    const enhanceCommentsPrompt = (impls: any[]) => `
+        ${BASE_SYSTEM_PROMPT}
+
+        TASK: ENHANCE COMMENTS for the provided code implementations.
+        
+        RULES:
+        1. **NO CODE CHANGE**: Do NOT change any logic, variables, names, or structure.
+        2. **Educational Comments**: Add professional, well-formatted comments explaining the logic, considering a new developer reading the code.
+        3. **Formatting**: Ensure proper indentation and formatting.
+        4. **Return Exact Structure**: Return the same implementation array but with commented code.
+
+        INPUT CODE:
+        ${JSON.stringify(impls)}
+
+        JSON Structure:
+        {
+          "implementations": [
+            {
+              "lang": "TypeScript",
+              "code": [
+                {
+                  "codeType": "...", 
+                  "code": "CODE WITH COMMENTS",
+                  "explanationBefore": "Keep existing or slightly improve",
+                  "explanationAfter": "Keep existing or slightly improve"
+                }
+              ]
+            }
+          ]
+        }
+    `;
+
+    // 5. STARTER CODE PROMPT
+    const starterCodePrompt = (reference: string, lang: string) => `
+        ${BASE_SYSTEM_PROMPT}
+
+        TASK: Generate a STARTER TEMPLATE for the "${lang}" language.
+        
+        REFERENCE CODE (Optimized Solution):
+        ${reference}
+
+        RULES:
+        1. **Strip Logic**: Remove the implementation details but KEEP the function signature and any necessary setup.
+        2. **Placeholder**: Use "// TODO: Implement" or similar.
+        3. **Common Classes**: If the problem uses classes like \`ListNode\`, \`TreeNode\`, \`GraphNode\`, etc., you MUST include commented-out definitions of these classes in the specific language's syntax at the top.
+        4. **Educational**: Add comments telling the user what to do.
+        5. **Strict Wrapping (Java/C++)**:
+           - For **Java**: You MUST wrap everything in \`public static class Solution { ... }\`.
+           - For **C++**: You MUST wrap everything in \`class Solution { public: ... };\`.
+           - NO main function, NO example calls, NO extra boilerplates outside the class.
+
+        JSON Structure:
+        {
+          "code": "STARTER CODE CONTENT"
+        }
+    `;
+
     // --- EXECUTE BASED ON TARGET ---
     console.log(`Starting Generation... Mode: ${target}, Topic: ${topic}`);
 
@@ -288,6 +348,16 @@ Deno.serve(async (req) => {
           ...(cppData.implementations || [])
         ],
       };
+
+    } else if (target === "enhance_comments") {
+      if (!inputImplementations) throw new Error("implementations is required for enhance_comments");
+      responseData = await generateChunk(enhanceCommentsPrompt(inputImplementations));
+      if (!responseData) throw new Error("Failed to enhance comments.");
+
+    } else if (target === "starter_code") {
+      if (!referenceCode || !targetLang) throw new Error("referenceCode and lang are required for starter_code");
+      responseData = await generateChunk(starterCodePrompt(referenceCode, targetLang));
+      if (!responseData) throw new Error("Failed to generate starter code.");
 
     } else if (target === "all") {
       // Legacy Monolithic Mode (Optional, for backward compat or one-shot)

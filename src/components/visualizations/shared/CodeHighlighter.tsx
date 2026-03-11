@@ -6,7 +6,7 @@ interface CodeHighlighterProps {
 
 export const CodeHighlighter = ({ code, highlightedLine = -1, language }: CodeHighlighterProps) => {
   const lines = code.split('\n');
-  
+
   return (
     <div className="bg-muted/50 rounded-lg border border-border overflow-hidden">
       <div className="bg-muted px-4 py-2 border-b border-border">
@@ -17,16 +17,15 @@ export const CodeHighlighter = ({ code, highlightedLine = -1, language }: CodeHi
           {lines.map((line, index) => (
             <div
               key={index}
-              className={`flex ${
-                index === highlightedLine
-                  ? 'bg-primary/20 border-l-2 border-primary'
-                  : ''
-              } transition-colors duration-300`}
+              className={`flex ${index === highlightedLine
+                ? 'bg-primary/20 border-l-2 border-primary'
+                : ''
+                } transition-colors duration-300`}
             >
               <span className="inline-block min-w-[2.5rem] w-10 text-right pr-3 text-muted-foreground select-none shrink-0">
                 {index + 1}
               </span>
-              <code className={`flex-1 whitespace-pre ${index === highlightedLine ? 'font-bold' : ''}`}>
+              <code className={`flex-1 whitespace-pre ${index === highlightedLine ? 'font-' : ''}`}>
                 {line || ' '}
               </code>
             </div>

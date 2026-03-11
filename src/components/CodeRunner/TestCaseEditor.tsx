@@ -6,6 +6,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Check, X, Edit2 } from 'lucide-react';
 import { TreeDiagram } from '../visualizations/TreeDiagram';
 import { isTreeType, serializeTree, parseTreeValue } from '@/utils/treeUtils';
+import { isListType, parseListValue } from '@/utils/listUtils';
 
 interface InputField {
   name: string;
@@ -48,6 +49,10 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
         const treeArr = parseTreeValue(val);
         if (treeArr) return JSON.stringify(treeArr);
       }
+      if (field && isListType(field.type)) {
+        const listArr = parseListValue(val);
+        if (listArr) return JSON.stringify(listArr);
+      }
       return JSON.stringify(val);
     })
   );
@@ -64,6 +69,10 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
       if (field && isTreeType(field.type)) {
         const treeArr = parseTreeValue(val);
         if (treeArr) return JSON.stringify(treeArr);
+      }
+      if (field && isListType(field.type)) {
+        const listArr = parseListValue(val);
+        if (listArr) return JSON.stringify(listArr);
       }
       return JSON.stringify(val);
     }));

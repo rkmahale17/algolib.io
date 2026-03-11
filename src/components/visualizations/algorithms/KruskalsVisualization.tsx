@@ -258,7 +258,7 @@ export const KruskalsVisualization = () => {
                       <text
                         x={(from.x + to.x) / 2}
                         y={(from.y + to.y) / 2}
-                        className="fill-foreground text-[10px] font-bold"
+                        className="fill-foreground text-[10px] font-"
                         textAnchor="middle"
                       >
                         {edge.weight}
@@ -282,7 +282,7 @@ export const KruskalsVisualization = () => {
                     y={pos.y}
                     textAnchor="middle"
                     dy=".3em"
-                    className="fill-foreground text-[10px] font-bold"
+                    className="fill-foreground text-[10px] font-"
                   >
                     {idx}
                   </text>

@@ -100,24 +100,37 @@ const parseErrorLines = (output: string, lang: string): Array<{ line: number; co
   const errors: Array<{ line: number; column?: number; message: string }> = [];
   const lines = output.split('\n');
 
-  for (const line of lines) {
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
     let match;
+
     // Python: File "script.py", line 10, in <module>
     if (lang === 'python') {
       match = line.match(/File ".*", line (\d+)/);
       if (match) {
-        errors.push({ line: parseInt(match[1]), message: line });
+        const lineNum = parseInt(match[1]);
+        // Try to get the next line which usually contains the actual error message in tracebacks
+        let message = line;
+        if (i + 1 < lines.length) {
+          message += '\n' + lines[i + 1];
+          if (i + 2 < lines.length) message += '\n' + lines[i + 2];
+        }
+        errors.push({ line: lineNum, message: message.trim() });
+      } else if (line.includes('Error:') || line.includes('Exception:')) {
+        // Fallback for direct error lines
+        errors.push({ line: 1, message: line }); // Default to line 1 if trace not found
       }
     }
     // Java: Solution.java:10: error: ...
     // C++: solution.cpp:12:5: error: ...
     else if (lang === 'java' || lang === 'cpp') {
-      match = line.match(/:(\d+):(?:(\d+):)?\s*(error|warning):/);
+      // Improved regex to handle various compiler output formats
+      match = line.match(/(?::| )(\d+)[: ](?:(\d+)[: ])?\s*(error|warning|fatal error):(.*)/i);
       if (match) {
         errors.push({
           line: parseInt(match[1]),
           column: match[2] ? parseInt(match[2]) : undefined,
-          message: line
+          message: match[4]?.trim() || line
         });
       }
     }
@@ -419,6 +432,8 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
         case 'array': return [];
         case 'integer[]': return [];
         case 'string[]': return [];
+        case 'ListNode[]': return [];
+        case 'TreeNode[]': return [];
         case 'object': return {};
         default: return null;
       }

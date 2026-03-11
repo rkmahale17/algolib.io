@@ -9,7 +9,7 @@ import { VisualizationLayout } from '../shared/VisualizationLayout';
 export const MaximumProductSubarrayVisualization = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const nums = [2, 3, -2, 4];
-  
+
   // Line-by-line execution steps - like a real debugger
   const steps = [
     {
@@ -253,8 +253,8 @@ export const MaximumProductSubarrayVisualization = () => {
           label="Array"
         />
       </motion.div>
-      
-      <motion.div 
+
+      <motion.div
         key={`explanation-${currentStep}`}
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
@@ -264,7 +264,7 @@ export const MaximumProductSubarrayVisualization = () => {
         <p className="text-sm font-medium">{steps[currentStep].explanation}</p>
       </motion.div>
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3, delay: 0.2 }}
@@ -276,7 +276,7 @@ export const MaximumProductSubarrayVisualization = () => {
         </div>
       </motion.div>
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3, delay: 0.25 }}

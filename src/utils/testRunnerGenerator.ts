@@ -186,7 +186,30 @@ export const generateTestRunner = (
 
 const formatValue = (value: any, type: string, lang: Language, typeHint?: string): string => {
     // 1. Known DS Construction Helpers
+    const isArrayOf = (dsName: string) => {
+        if (!type.includes(dsName)) return false;
+        if (type.includes('[]')) return true;
+        if (!typeHint) return false;
+        if (typeHint.includes('[]')) return true;
+        return /\b(vector|List|ArrayList|LinkedList|Set|HashSet|Collection)\b\s*</.test(typeHint);
+    };
+
     if (type.includes('ListNode')) {
+        if (isArrayOf('ListNode') && Array.isArray(value)) {
+            if (lang === 'typescript') return `[${value.map(v => formatValue(v, 'ListNode', 'typescript')).join(', ')}]`;
+            if (lang === 'python') return `[${value.map(v => formatValue(v, 'ListNode', 'python')).join(', ')}]`;
+            if (lang === 'java') {
+                const items = value.map(v => formatValue(v, 'ListNode', 'java', 'ListNode'));
+                if (typeHint && /\bList\b/.test(typeHint)) {
+                    return `Arrays.asList(${items.join(', ')})`;
+                }
+                return `new ListNode[]{${items.join(', ')}}`;
+            }
+            if (lang === 'cpp') {
+                const items = value.map(v => formatValue(v, 'ListNode', 'cpp', 'ListNode*'));
+                return `{${items.join(', ')}}`;
+            }
+        }
         if (lang === 'typescript') return `jsonToListNode(${JSON.stringify(value)})`;
         if (lang === 'python') return `json_to_list_node(${jsonToPython(value)})`;
         if (lang === 'java') return `jsonToListNode(${JSON.stringify(JSON.stringify(value))})`;
@@ -197,6 +220,21 @@ const formatValue = (value: any, type: string, lang: Language, typeHint?: string
         }
     }
     if (type.includes('TreeNode')) {
+        if (isArrayOf('TreeNode') && Array.isArray(value)) {
+            if (lang === 'typescript') return `[${value.map(v => formatValue(v, 'TreeNode', 'typescript')).join(', ')}]`;
+            if (lang === 'python') return `[${value.map(v => formatValue(v, 'TreeNode', 'python')).join(', ')}]`;
+            if (lang === 'java') {
+                const items = value.map(v => formatValue(v, 'TreeNode', 'java', 'TreeNode'));
+                if (typeHint && /\bList\b/.test(typeHint)) {
+                    return `Arrays.asList(${items.join(', ')})`;
+                }
+                return `new TreeNode[]{${items.join(', ')}}`;
+            }
+            if (lang === 'cpp') {
+                const items = value.map(v => formatValue(v, 'TreeNode', 'cpp', 'TreeNode*'));
+                return `{${items.join(', ')}}`;
+            }
+        }
         if (lang === 'typescript') return `jsonToTreeNode(${JSON.stringify(value)})`;
         if (lang === 'python') return `json_to_tree_node(${jsonToPython(value)})`;
         let treeArr = value;
@@ -224,12 +262,42 @@ const formatValue = (value: any, type: string, lang: Language, typeHint?: string
     }
     if (type.includes('GraphNode') || type.includes('Node')) {
         const val = typeof value === 'string' ? JSON.parse(value) : value;
+        if (isArrayOf('Node') || isArrayOf('GraphNode')) {
+            if (lang === 'typescript') return `[${value.map(v => formatValue(v, 'Node', 'typescript')).join(', ')}]`;
+            if (lang === 'python') return `[${value.map(v => formatValue(v, 'Node', 'python')).join(', ')}]`;
+            if (lang === 'java') {
+                const items = value.map(v => formatValue(v, 'Node', 'java', 'Node'));
+                if (typeHint && /\bList\b/.test(typeHint)) {
+                    return `Arrays.asList(${items.join(', ')})`;
+                }
+                return `new Node[]{${items.join(', ')}}`;
+            }
+            if (lang === 'cpp') {
+                const items = value.map(v => formatValue(v, 'Node', 'cpp', 'Node*'));
+                return `{${items.join(', ')}}`;
+            }
+        }
         if (lang === 'typescript') return `jsonToGraphNode(${JSON.stringify(val)})`;
         if (lang === 'python') return `json_to_graph_node(${jsonToPython(val)})`;
         if (lang === 'java') return `jsonToGraphNode(${formatValue(val, 'any', 'java', 'List<List<Integer>>')})`;
         if (lang === 'cpp') return `jsonToGraphNode(${formatValue(val, 'any', 'cpp', 'vector<vector<int>>')})`;
     }
     if (type.includes('TrieNode')) {
+        if (isArrayOf('TrieNode') && Array.isArray(value)) {
+            if (lang === 'typescript') return `[${value.map(v => formatValue(v, 'TrieNode', 'typescript')).join(', ')}]`;
+            if (lang === 'python') return `[${value.map(v => formatValue(v, 'TrieNode', 'python')).join(', ')}]`;
+            if (lang === 'java') {
+                const items = value.map(v => formatValue(v, 'TrieNode', 'java', 'TrieNode'));
+                if (typeHint && /\bList\b/.test(typeHint)) {
+                    return `Arrays.asList(${items.join(', ')})`;
+                }
+                return `new TrieNode[]{${items.join(', ')}}`;
+            }
+            if (lang === 'cpp') {
+                const items = value.map(v => formatValue(v, 'TrieNode', 'cpp', 'TrieNode*'));
+                return `{${items.join(', ')}}`;
+            }
+        }
         if (lang === 'typescript') return `jsonToTrieNode(${JSON.stringify(value)})`;
         if (lang === 'python') return `json_to_trie_node(${jsonToPython(value)})`;
         if (lang === 'java' || lang === 'cpp') return `jsonToTrieNode("${JSON.stringify(value).replace(/"/g, '\\"')}")`;
@@ -1072,13 +1140,19 @@ const generateCppRunner = (
     const deduceCppType = (val: any, targetType?: string): string => {
         // First, clean targetType if it exists
         const cleanTarget = targetType ? extractType(targetType, 'cpp') : undefined;
-
-        if (cleanTarget?.includes('ListNode')) return 'ListNode*';
-        if (cleanTarget?.includes('TreeNode')) return 'TreeNode*';
-        if (cleanTarget?.includes('Node') || cleanTarget?.includes('GraphNode')) return 'Node*';
-        if (cleanTarget?.includes('Interval')) {
-            if (cleanTarget.includes('vector')) return 'vector<Interval>';
-            return 'Interval';
+        if (cleanTarget) {
+            const t = cleanTarget.replace(/&/g, '').trim();
+            // If it's a known DS collection or pointer, return it as is (cleaned of refs)
+            if (t.includes('ListNode*') || t.includes('TreeNode*') || t.includes('Node*')) {
+                return t;
+            }
+            if (t === 'ListNode') return 'ListNode*';
+            if (t === 'TreeNode') return 'TreeNode*';
+            if (t === 'Node' || t === 'GraphNode') return 'Node*';
+            if (t.includes('Interval')) {
+                if (t.includes('vector')) return 'vector<Interval>';
+                return 'Interval';
+            }
         }
 
         if (Array.isArray(val)) {

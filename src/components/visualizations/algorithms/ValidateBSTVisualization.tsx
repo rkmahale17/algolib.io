@@ -112,22 +112,21 @@ export const ValidateBSTVisualization = () => {
           {positions.map((pos, i) => {
             const isCurrent = step.currentNode === pos.value;
             const isInvalid = step.isValid === false && step.currentNode === pos.value;
-            
+
             return (
               <g key={i}>
                 <circle
                   cx={pos.x}
                   cy={pos.y}
                   r="24"
-                  className={`transition-all duration-300 ${
-                    isInvalid
-                      ? 'fill-red-500'
-                      : isCurrent
+                  className={`transition-all duration-300 ${isInvalid
+                    ? 'fill-red-500'
+                    : isCurrent
                       ? 'fill-yellow-500'
                       : step.isValid === true && i < 2
-                      ? 'fill-green-500'
-                      : 'fill-card'
-                  }`}
+                        ? 'fill-green-500'
+                        : 'fill-card'
+                    }`}
                   stroke="currentColor"
                   strokeWidth="2"
                 />
@@ -135,7 +134,7 @@ export const ValidateBSTVisualization = () => {
                   x={pos.x}
                   y={pos.y + 6}
                   textAnchor="middle"
-                  className="text-sm font-bold fill-foreground"
+                  className="text-sm font- fill-foreground"
                 >
                   {pos.value}
                 </text>
@@ -189,7 +188,7 @@ export const ValidateBSTVisualization = () => {
           </AnimatePresence>
 
           <Card className="p-4 bg-primary/5 border-primary/20">
-            <motion.p 
+            <motion.p
               key={`msg-${idx}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

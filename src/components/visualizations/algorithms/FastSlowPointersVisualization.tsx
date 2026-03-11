@@ -262,7 +262,7 @@ export const FastSlowPointersVisualization: React.FC = () => {
               </svg>
             </div>
 
-            <h3 className="text-base sm:text-lg font-bold mb-8 flex items-center gap-2">
+            <h3 className="text-base sm:text-lg font- mb-8 flex items-center gap-2">
               <span className={`w-3 h-3 rounded-full bg-blue-500 animate-pulse`}></span>
               Fast & Slow Pointer Visualization
             </h3>
@@ -299,7 +299,7 @@ export const FastSlowPointersVisualization: React.FC = () => {
                     </div>
 
                     {/* Index Label */}
-                    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-tighter">
+                    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] font- text-muted-foreground/60 uppercase tracking-tighter">
                       Idx {idx}
                     </div>
                   </div>

@@ -214,7 +214,7 @@ export const DetectCycleVisualization: React.FC = () => {
               </svg>
             </div>
 
-            <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
+            <h3 className="text-lg font- mb-6 flex items-center gap-2">
               <span className={`w-3 h-3 rounded-full ${currentStep.phase === 'detection' ? 'bg-blue-500' : 'bg-purple-500'}`}></span>
               {currentStep.phase === 'detection' ? 'Phase 1: Cycle Detection' : 'Phase 2: Find Cycle Start'}
             </h3>
@@ -225,14 +225,14 @@ export const DetectCycleVisualization: React.FC = () => {
                   <div className="relative">
                     <div
                       className={`w-16 h-16 flex items-center justify-center rounded-2xl border-2 font-black text-xl transition-all duration-300 ${currentStep.cycleStart === idx
-                          ? 'bg-green-500 text-white border-green-600 shadow-lg scale-110'
-                          : idx === currentStep.slow && idx === currentStep.fast
-                            ? 'bg-amber-500 text-white border-amber-600 shadow-md scale-105'
-                            : idx === currentStep.slow
-                              ? 'bg-blue-500 text-white border-blue-600'
-                              : idx === currentStep.fast
-                                ? 'bg-purple-500 text-white border-purple-600'
-                                : 'bg-muted/50 border-border text-muted-foreground'
+                        ? 'bg-green-500 text-white border-green-600 shadow-lg scale-110'
+                        : idx === currentStep.slow && idx === currentStep.fast
+                          ? 'bg-amber-500 text-white border-amber-600 shadow-md scale-105'
+                          : idx === currentStep.slow
+                            ? 'bg-blue-500 text-white border-blue-600'
+                            : idx === currentStep.fast
+                              ? 'bg-purple-500 text-white border-purple-600'
+                              : 'bg-muted/50 border-border text-muted-foreground'
                         }`}
                     >
                       {val}
@@ -241,12 +241,12 @@ export const DetectCycleVisualization: React.FC = () => {
                     {/* Pointer Labels */}
                     <div className="absolute -top-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
                       {idx === currentStep.slow && currentStep.slow !== null && (
-                        <div className={`px-2 py-0.5 rounded text-[10px] font-bold shadow-sm ${currentStep.movingPointer === 'slow' || currentStep.movingPointer === 'both' ? 'bg-blue-600 text-white animate-bounce' : 'bg-blue-100 text-blue-700'}`}>
+                        <div className={`px-2 py-0.5 rounded text-[10px] font- shadow-sm ${currentStep.movingPointer === 'slow' || currentStep.movingPointer === 'both' ? 'bg-blue-600 text-white animate-bounce' : 'bg-blue-100 text-blue-700'}`}>
                           SLOW
                         </div>
                       )}
                       {idx === currentStep.fast && currentStep.fast !== null && (
-                        <div className={`px-2 py-0.5 rounded text-[10px] font-bold shadow-sm mt-1 ${currentStep.movingPointer === 'fast' || currentStep.movingPointer === 'both' ? 'bg-purple-600 text-white animate-bounce' : 'bg-purple-100 text-purple-700'}`}>
+                        <div className={`px-2 py-0.5 rounded text-[10px] font- shadow-sm mt-1 ${currentStep.movingPointer === 'fast' || currentStep.movingPointer === 'both' ? 'bg-purple-600 text-white animate-bounce' : 'bg-purple-100 text-purple-700'}`}>
                           FAST
                         </div>
                       )}
@@ -263,7 +263,7 @@ export const DetectCycleVisualization: React.FC = () => {
                         <path d="M 0 30 Q 40 30 40 -30" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="4,2" />
                         <path d="M 35 -20 L 40 -30 L 45 -20" fill="none" stroke="currentColor" strokeWidth="2" />
                       </svg>
-                      <span className="text-[10px] font-bold text-muted-foreground absolute -bottom-2 -right-4">CYCLE</span>
+                      <span className="text-[10px] font- text-muted-foreground absolute -bottom-2 -right-4">CYCLE</span>
                     </div>
                   )}
                 </div>

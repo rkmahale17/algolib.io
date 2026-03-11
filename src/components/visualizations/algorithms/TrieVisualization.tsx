@@ -67,7 +67,7 @@ class Trie {
   const generateSteps = () => {
     const newSteps: Step[] = [];
     const words = ['cat', 'car', 'card'];
-    
+
     // Insert operations
     words.forEach(word => {
       const path: string[] = [];
@@ -102,22 +102,22 @@ class Trie {
         path.push(word[i]);
         const exists = (word === 'cat') || (i < 2);
         if (!exists) found = false;
-        
+
         newSteps.push({
           currentNode: [...path],
           operation: 'search',
           word,
           currentIndex: i,
           found: exists ? null : false,
-          message: exists 
+          message: exists
             ? `Searching "${word}": Found '${word[i]}'`
             : `Searching "${word}": Character '${word[i]}' not found`,
           lineNumber: 22
         });
-        
+
         if (!exists) break;
       }
-      
+
       if (found) {
         newSteps.push({
           currentNode: [...path],
@@ -200,55 +200,53 @@ class Trie {
       />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-      <div className="bg-card rounded-lg p-6 border space-y-4">
-        <h3 className="text-lg font-semibold mb-4">
-          {currentStep.operation === 'insert' ? 'Inserting' : 'Searching'}: {currentStep.word}
-        </h3>
-        <div className="bg-muted/30 rounded p-4 min-h-[200px] flex items-center justify-center">
-          <div className="flex flex-col items-center gap-2">
-            <div className="text-sm font-mono text-muted-foreground">Trie Structure</div>
-            <div className="flex gap-2">
-              {currentStep.currentNode.map((char, idx) => (
-                <div
-                  key={idx}
-                  className={`w-12 h-12 rounded-lg border-2 flex items-center justify-center font-bold text-lg transition-all ${
-                    idx === currentStep.currentIndex
+        <div className="bg-card rounded-lg p-6 border space-y-4">
+          <h3 className="text-lg font-semibold mb-4">
+            {currentStep.operation === 'insert' ? 'Inserting' : 'Searching'}: {currentStep.word}
+          </h3>
+          <div className="bg-muted/30 rounded p-4 min-h-[200px] flex items-center justify-center">
+            <div className="flex flex-col items-center gap-2">
+              <div className="text-sm font-mono text-muted-foreground">Trie Structure</div>
+              <div className="flex gap-2">
+                {currentStep.currentNode.map((char, idx) => (
+                  <div
+                    key={idx}
+                    className={`w-12 h-12 rounded-lg border-2 flex items-center justify-center font- text-lg transition-all ${idx === currentStep.currentIndex
                       ? 'bg-primary/20 border-primary text-primary scale-110'
                       : 'bg-card border-border'
-                  }`}
-                >
-                  {char}
-                </div>
-              ))}
-            </div>
-            {currentStep.found !== null && (
-              <div className={`mt-4 px-4 py-2 rounded-lg ${
-                currentStep.found ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'
-              }`}>
-                {currentStep.found ? '✓ Found' : '✗ Not Found'}
+                      }`}
+                  >
+                    {char}
+                  </div>
+                ))}
               </div>
-            )}
+              {currentStep.found !== null && (
+                <div className={`mt-4 px-4 py-2 rounded-lg ${currentStep.found ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'
+                  }`}>
+                  {currentStep.found ? '✓ Found' : '✗ Not Found'}
+                </div>
+              )}
+            </div>
           </div>
+
+          <div className="mt-4 p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
+          </div>
+          <VariablePanel
+            variables={{
+              operation: currentStep.operation,
+              word: currentStep.word,
+              currentChar: currentStep.currentIndex < currentStep.word.length
+                ? currentStep.word[currentStep.currentIndex]
+                : 'end',
+              found: currentStep.found !== null ? String(currentStep.found) : 'searching...'
+            }}
+          />
         </div>
-        
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
-        </div> 
-           <VariablePanel
-        variables={{
-          operation: currentStep.operation,
-          word: currentStep.word,
-          currentChar: currentStep.currentIndex < currentStep.word.length 
-            ? currentStep.word[currentStep.currentIndex] 
-            : 'end',
-          found: currentStep.found !== null ? String(currentStep.found) : 'searching...'
-        }}
-      />
-      </div>
         <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
 
-     </div>
-   
+      </div>
+
 
 
     </div>

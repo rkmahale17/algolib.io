@@ -79,7 +79,7 @@ export const TreeDiagram: React.FC<TreeDiagramProps> = ({
                             y={node.y + 1}
                             textAnchor="middle"
                             dominantBaseline="middle"
-                            className="fill-foreground font-mono text-[10px] font-bold"
+                            className="fill-foreground font-mono text-[10px] font-"
                         >
                             {node.val}
                         </text>

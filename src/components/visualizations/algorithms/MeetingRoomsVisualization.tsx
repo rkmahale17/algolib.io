@@ -117,7 +117,7 @@ export const MeetingRoomsVisualization = () => {
         <Card className="p-6">
           <h3 className="text-lg font-semibold mb-4">Meeting Rooms</h3>
           <div className="space-y-4">
-            <motion.div 
+            <motion.div
               key={`intervals-${currentStepIndex}`}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -131,13 +131,12 @@ export const MeetingRoomsVisualization = () => {
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: idx * 0.05 }}
-                    className={`px-3 py-2 rounded font-mono transition-all ${
-                      idx === currentStep.currentIdx 
-                        ? 'bg-primary text-primary-foreground shadow-lg scale-105' 
-                        : idx < currentStep.currentIdx 
-                        ? 'bg-secondary/50 text-secondary-foreground' 
+                    className={`px-3 py-2 rounded font-mono transition-all ${idx === currentStep.currentIdx
+                      ? 'bg-primary text-primary-foreground shadow-lg scale-105'
+                      : idx < currentStep.currentIdx
+                        ? 'bg-secondary/50 text-secondary-foreground'
                         : 'bg-muted text-muted-foreground'
-                    }`}
+                      }`}
                   >
                     [{interval[0]}, {interval[1]}]
                   </motion.div>
@@ -149,15 +148,13 @@ export const MeetingRoomsVisualization = () => {
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className={`p-4 rounded-lg border-2 ${
-                  currentStep.canAttend 
-                    ? 'bg-primary/20 border-primary' 
-                    : 'bg-destructive/20 border-destructive'
-                }`}
+                className={`p-4 rounded-lg border-2 ${currentStep.canAttend
+                  ? 'bg-primary/20 border-primary'
+                  : 'bg-destructive/20 border-destructive'
+                  }`}
               >
-                <div className={`text-2xl font-bold ${
-                  currentStep.canAttend ? 'text-primary' : 'text-destructive'
-                }`}>
+                <div className={`text-2xl font- ${currentStep.canAttend ? 'text-primary' : 'text-destructive'
+                  }`}>
                   {currentStep.canAttend ? '✓ Can attend' : '✗ Cannot attend'}
                 </div>
               </motion.div>
@@ -197,9 +194,9 @@ export const MeetingRoomsVisualization = () => {
         <Card className="p-6 overflow-hidden flex flex-col">
           <h3 className="text-lg font-semibold mb-4">TypeScript Implementation</h3>
           <div className="flex-1 overflow-auto">
-            <AnimatedCodeEditor 
-              code={code} 
-              language="typescript" 
+            <AnimatedCodeEditor
+              code={code}
+              language="typescript"
               highlightedLines={currentStep.highlightedLines}
             />
           </div>

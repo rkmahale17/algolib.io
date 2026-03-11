@@ -107,18 +107,16 @@ export const LinkedListVisualization = ({ algorithmId }: LinkedListVisualization
         {nodes.map((node, index) => (
           <div key={index} className="flex items-center gap-4">
             <div
-              className={`flex flex-col items-center justify-center w-16 h-16 rounded-lg border-2 transition-all duration-300 ${
-                highlightIndices.includes(index)
+              className={`flex flex-col items-center justify-center w-16 h-16 rounded-lg border-2 transition-all duration-300 ${highlightIndices.includes(index)
                   ? 'border-primary bg-primary/20 shadow-lg shadow-primary/50 scale-110'
                   : 'border-border bg-card'
-              }`}
+                }`}
             >
-              <span className="text-lg font-bold">{node.value}</span>
+              <span className="text-lg font-">{node.value}</span>
             </div>
             {node.next !== null && (
-              <ArrowRight className={`transition-colors ${
-                highlightIndices.includes(index) ? 'text-primary' : 'text-muted-foreground'
-              }`} />
+              <ArrowRight className={`transition-colors ${highlightIndices.includes(index) ? 'text-primary' : 'text-muted-foreground'
+                }`} />
             )}
           </div>
         ))}

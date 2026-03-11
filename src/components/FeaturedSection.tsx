@@ -15,7 +15,7 @@ import { Link } from "react-router-dom";
 import { FeatureGuard } from "./FeatureGuard";
 import { useApp } from "@/contexts/AppContext";
 import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
-import { Badge as UiBadge} from "@/components/ui/badge";
+import { Badge as UiBadge } from "@/components/ui/badge";
 
 const features = [
   {
@@ -66,16 +66,16 @@ export const FeaturedSection = () => {
   return (
     <section className="py-24 px-4 relative overflow-hidden bg-background">
       {/* Grid Pattern Background */}
-      <div className="absolute inset-0 z-0 opacity-[0.4] dark:opacity-[0.1]" 
-        style={{ 
+      <div className="absolute inset-0 z-0 opacity-[0.4] dark:opacity-[0.1]"
+        style={{
           backgroundImage: `radial-gradient(circle at 1px 1px, hsl(var(--foreground)) 1px, transparent 0)`,
-          backgroundSize: '32px 32px' 
-        }} 
+          backgroundSize: '32px 32px'
+        }}
       />
 
       <div className="container mx-auto max-w-6xl relative z-10">
         <div className="text-center mb-16 space-y-4">
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
+          <h2 className="text-3xl md:text-5xl font- tracking-tight">
             Master Algorithms with <span className="text-primary">Visualizations</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
@@ -96,7 +96,7 @@ export const FeaturedSection = () => {
                 <Card className="h-full overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg bg-card flex flex-col">
                   <div className="relative h-32 bg-gradient-to-br from-primary/40 to-primary/5 flex items-center justify-center shrink-0 overflow-hidden">
                     {feature.badge ? (
-                      <div className="text-6xl font-bold text-primary/80 group-hover:text-primary/60 transition-all duration-500 group-hover:scale-110 ">
+                      <div className="text-6xl font- text-primary/80 group-hover:text-primary/60 transition-all duration-500 group-hover:scale-110 ">
                         {feature.badge}
                       </div>
                     ) : (
@@ -107,7 +107,7 @@ export const FeaturedSection = () => {
 
                     {isPaywallEnabled && feature.id !== 'core-patterns' && feature.id !== 'blog' && !hasPremiumAccess && (
                       <div className="absolute top-2 right-2">
-                        <UiBadge variant="secondary" className="bg-background/80 backdrop-blur-sm border-amber-500/50 text-amber-600 gap-1 text-[10px] font-bold">
+                        <UiBadge variant="secondary" className="bg-background/80 backdrop-blur-sm border-amber-500/50 text-amber-600 gap-1 text-[10px] font-">
                           <Lock className="w-3 h-3" />
                           PREMIUM
                         </UiBadge>

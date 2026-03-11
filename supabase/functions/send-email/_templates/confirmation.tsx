@@ -80,13 +80,13 @@ export const ConfirmationEmail = ({
 
           <Section style={content}>
             <Heading style={h1}>{heading}</Heading>
-            
+
             {email_action_type === 'signup' && (
               <Text style={text}>
                 Thanks for signing up! Please confirm your email address to get started with RulCode.
               </Text>
             )}
-            
+
             {email_action_type === 'recovery' && (
               <Text style={text}>
                 We received a request to reset your password. Click the button below to create a new password.
@@ -167,7 +167,7 @@ const header = {
 const logo = {
   color: '#22d3ee',
   fontSize: '32px',
-  fontWeight: 'bold',
+  fontWeight: '',
   margin: '0',
   letterSpacing: '-1px',
 }
@@ -182,7 +182,7 @@ const content = {
 const h1 = {
   color: '#ffffff',
   fontSize: '28px',
-  fontWeight: 'bold',
+  fontWeight: '',
   margin: '0 0 24px',
   textAlign: 'center' as const,
 }
@@ -206,7 +206,7 @@ const button = {
   color: '#0f0f23',
   display: 'inline-block',
   fontSize: '16px',
-  fontWeight: 'bold',
+  fontWeight: '',
   padding: '14px 32px',
   textDecoration: 'none',
   textAlign: 'center' as const,

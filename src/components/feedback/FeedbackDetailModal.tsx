@@ -76,7 +76,7 @@ export const FeedbackDetailModal = ({
                             >
                                 <ChevronUp className="w-5 h-5" />
                             </Button>
-                            <span className="text-sm font-bold text-green-700 leading-none">
+                            <span className="text-sm font- text-green-700 leading-none">
                                 {feedback.upvotes_count}
                             </span>
                         </div>
@@ -94,7 +94,7 @@ export const FeedbackDetailModal = ({
                                     <span>{feedback.comments_count} comments</span>
                                 </div>
                             </div>
-                            <DialogTitle className="text-xl md:text-2xl font-bold">{feedback.title}</DialogTitle>
+                            <DialogTitle className="text-xl md:text-2xl font-">{feedback.title}</DialogTitle>
                         </div>
                     </DialogHeader>
 
@@ -106,7 +106,7 @@ export const FeedbackDetailModal = ({
                         <h4 className="font-semibold text-lg">Discussion</h4>
 
                         <div className="flex gap-4">
-                            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-bold flex-shrink-0">
+                            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 font- flex-shrink-0">
                                 U
                             </div>
                             <div className="flex-1 space-y-4">
@@ -144,12 +144,12 @@ export const FeedbackDetailModal = ({
                                 <div className="space-y-6 pt-4">
                                     {comments.map((comment) => (
                                         <div key={comment.id} className="flex gap-4">
-                                            <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 font-bold flex-shrink-0">
+                                            <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 font- flex-shrink-0">
                                                 {comment.is_anonymous ? <User className="w-5 h-5 text-muted-foreground" /> : comment.user_full_name.charAt(0)}
                                             </div>
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    <span className="font-bold text-sm">
+                                                    <span className="font- text-sm">
                                                         {comment.is_anonymous ? 'Anonymous' : comment.user_full_name}
                                                     </span>
                                                     <span className="text-xs text-muted-foreground">

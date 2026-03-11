@@ -20,7 +20,7 @@ export const NumIslandsVisualization = () => {
     ['0', '0', '1', '0', '0'],
     ['0', '0', '0', '1', '1']
   ];
-  
+
   const [currentStep, setCurrentStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(1000);
@@ -167,7 +167,7 @@ export const NumIslandsVisualization = () => {
     <div className="space-y-4">
       <Card className="p-4">
         <h3 className="font-semibold mb-4">Number of Islands</h3>
-        
+
         <div className="space-y-4">
           <div className="inline-flex flex-col gap-1">
             {step.grid.map((row, r) => (
@@ -175,7 +175,7 @@ export const NumIslandsVisualization = () => {
                 {row.map((cell, c) => (
                   <div
                     key={`${r}-${c}`}
-                    className={`w-12 h-12 border-2 flex items-center justify-center font-bold rounded ${getCellColor(r, c, cell)}`}
+                    className={`w-12 h-12 border-2 flex items-center justify-center font- rounded ${getCellColor(r, c, cell)}`}
                   >
                     {cell}
                   </div>
@@ -199,7 +199,7 @@ export const NumIslandsVisualization = () => {
             </div>
           </div>
 
-          <div className="text-2xl font-bold text-center p-4 bg-primary/10 rounded">
+          <div className="text-2xl font- text-center p-4 bg-primary/10 rounded">
             Islands Found: {step.islandCount}
           </div>
 

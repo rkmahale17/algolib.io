@@ -116,7 +116,7 @@ export const RabinKarpVisualization: React.FC = () => {
             break;
           }
         }
-        
+
         if (match) {
           newSteps.push({
             text,
@@ -213,66 +213,65 @@ export const RabinKarpVisualization: React.FC = () => {
       />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-      <div className="bg-card rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4">Text</h3>
-        <div className="flex gap-1 mb-6">
-          {currentStep.text.split('').map((char, idx) => (
-            <div
-              key={idx}
-              className={`w-10 h-10 flex items-center justify-center rounded border-2 font-mono transition-all ${
-                idx >= currentStep.textIndex && idx < currentStep.textIndex + currentStep.pattern.length
+        <div className="bg-card rounded-lg p-6 border">
+          <h3 className="text-lg font-semibold mb-4">Text</h3>
+          <div className="flex gap-1 mb-6">
+            {currentStep.text.split('').map((char, idx) => (
+              <div
+                key={idx}
+                className={`w-10 h-10 flex items-center justify-center rounded border-2 font-mono transition-all ${idx >= currentStep.textIndex && idx < currentStep.textIndex + currentStep.pattern.length
                   ? currentStep.matched ? 'bg-green-500/20 border-green-500' : 'bg-primary/20 border-primary'
                   : 'bg-card border-border'
-              }`}
-            >
-              {char}
-            </div>
-          ))}
-        </div>
-
-        <h3 className="text-lg font-semibold mb-4">Pattern</h3>
-        <div className="flex gap-1 mb-6">
-          {currentStep.pattern.split('').map((char, idx) => (
-            <div
-              key={idx}
-              className="w-10 h-10 flex items-center justify-center rounded border-2 bg-blue-500/20 border-blue-500 font-mono"
-            >
-              {char}
-            </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="p-4 bg-muted rounded border">
-            <div className="text-sm text-muted-foreground mb-1">Pattern Hash</div>
-            <div className="text-xl font-bold">{currentStep.patternHash}</div>
+                  }`}
+              >
+                {char}
+              </div>
+            ))}
           </div>
-          <div className="p-4 bg-muted rounded border">
-            <div className="text-sm text-muted-foreground mb-1">Window Hash</div>
-            <div className={`text-xl font-bold ${currentStep.patternHash === currentStep.windowHash ? 'text-green-500' : ''}`}>
-              {currentStep.windowHash}
+
+          <h3 className="text-lg font-semibold mb-4">Pattern</h3>
+          <div className="flex gap-1 mb-6">
+            {currentStep.pattern.split('').map((char, idx) => (
+              <div
+                key={idx}
+                className="w-10 h-10 flex items-center justify-center rounded border-2 bg-blue-500/20 border-blue-500 font-mono"
+              >
+                {char}
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="p-4 bg-muted rounded border">
+              <div className="text-sm text-muted-foreground mb-1">Pattern Hash</div>
+              <div className="text-xl font-">{currentStep.patternHash}</div>
+            </div>
+            <div className="p-4 bg-muted rounded border">
+              <div className="text-sm text-muted-foreground mb-1">Window Hash</div>
+              <div className={`text-xl font- ${currentStep.patternHash === currentStep.windowHash ? 'text-green-500' : ''}`}>
+                {currentStep.windowHash}
+              </div>
             </div>
           </div>
+
+          <div className="mt-4 p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
+          </div>
+          <VariablePanel
+            variables={{
+              'text index': currentStep.textIndex,
+              'pattern hash': currentStep.patternHash,
+              'window hash': currentStep.windowHash,
+              'hash match': String(currentStep.patternHash === currentStep.windowHash)
+            }}
+          />
         </div>
-
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
-        </div>
-           <VariablePanel
-        variables={{
-          'text index': currentStep.textIndex,
-          'pattern hash': currentStep.patternHash,
-          'window hash': currentStep.windowHash,
-          'hash match': String(currentStep.patternHash === currentStep.windowHash)
-        }}
-      />
-      </div>
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
 
 
       </div>
-      </div>
-   
+    </div>
+
 
   );
 };

@@ -42,53 +42,53 @@ export const ConstructBinaryTreeVisualization = () => {
 }`;
 
   const steps: Step[] = [
-    { preorder: [3,9,20,15,7], inorder: [9,3,15,20,7], preStart: 0, preEnd: 4, inStart: 0, inEnd: 4, rootVal: null, rootIndex: null, builtNodes: [], message: "Start: Build tree from arrays", highlightedLines: [1], variables: { preorder: '[3,9,20,15,7]', inorder: '[9,3,15,20,7]' } },
-    { preorder: [3,9,20,15,7], inorder: [9,3,15,20,7], preStart: 0, preEnd: 4, inStart: 0, inEnd: 4, rootVal: null, rootIndex: null, builtNodes: [], message: "Check if preorder is empty", highlightedLines: [2], variables: { 'preorder.length': 5 } },
-    { preorder: [3,9,20,15,7], inorder: [9,3,15,20,7], preStart: 0, preEnd: 4, inStart: 0, inEnd: 4, rootVal: null, rootIndex: null, builtNodes: [], message: "Not empty, continue", highlightedLines: [2], variables: { 'preorder.length': 5 } },
-    { preorder: [3,9,20,15,7], inorder: [9,3,15,20,7], preStart: 0, preEnd: 4, inStart: 0, inEnd: 4, rootVal: 3, rootIndex: null, builtNodes: [], message: "Root value is first element in preorder: 3", highlightedLines: [4], variables: { rootVal: 3, preorder: '[3,9,20,15,7]' } },
-    { preorder: [3,9,20,15,7], inorder: [9,3,15,20,7], preStart: 0, preEnd: 4, inStart: 0, inEnd: 4, rootVal: 3, rootIndex: null, builtNodes: [3], message: "Create root node with value 3", highlightedLines: [5], variables: { root: '3', rootVal: 3 } },
-    { preorder: [3,9,20,15,7], inorder: [9,3,15,20,7], preStart: 0, preEnd: 4, inStart: 0, inEnd: 4, rootVal: 3, rootIndex: 1, builtNodes: [3], message: "Find root in inorder: index 1", highlightedLines: [6], variables: { mid: 1, rootVal: 3, inorder: '[9,3,15,20,7]' } },
-    { preorder: [3,9,20,15,7], inorder: [9,3,15,20,7], preStart: 0, preEnd: 4, inStart: 0, inEnd: 4, rootVal: 3, rootIndex: 1, builtNodes: [3], message: "Elements before index 1 go to left subtree", highlightedLines: [8], variables: { mid: 1, 'left elements': 1 } },
+    { preorder: [3, 9, 20, 15, 7], inorder: [9, 3, 15, 20, 7], preStart: 0, preEnd: 4, inStart: 0, inEnd: 4, rootVal: null, rootIndex: null, builtNodes: [], message: "Start: Build tree from arrays", highlightedLines: [1], variables: { preorder: '[3,9,20,15,7]', inorder: '[9,3,15,20,7]' } },
+    { preorder: [3, 9, 20, 15, 7], inorder: [9, 3, 15, 20, 7], preStart: 0, preEnd: 4, inStart: 0, inEnd: 4, rootVal: null, rootIndex: null, builtNodes: [], message: "Check if preorder is empty", highlightedLines: [2], variables: { 'preorder.length': 5 } },
+    { preorder: [3, 9, 20, 15, 7], inorder: [9, 3, 15, 20, 7], preStart: 0, preEnd: 4, inStart: 0, inEnd: 4, rootVal: null, rootIndex: null, builtNodes: [], message: "Not empty, continue", highlightedLines: [2], variables: { 'preorder.length': 5 } },
+    { preorder: [3, 9, 20, 15, 7], inorder: [9, 3, 15, 20, 7], preStart: 0, preEnd: 4, inStart: 0, inEnd: 4, rootVal: 3, rootIndex: null, builtNodes: [], message: "Root value is first element in preorder: 3", highlightedLines: [4], variables: { rootVal: 3, preorder: '[3,9,20,15,7]' } },
+    { preorder: [3, 9, 20, 15, 7], inorder: [9, 3, 15, 20, 7], preStart: 0, preEnd: 4, inStart: 0, inEnd: 4, rootVal: 3, rootIndex: null, builtNodes: [3], message: "Create root node with value 3", highlightedLines: [5], variables: { root: '3', rootVal: 3 } },
+    { preorder: [3, 9, 20, 15, 7], inorder: [9, 3, 15, 20, 7], preStart: 0, preEnd: 4, inStart: 0, inEnd: 4, rootVal: 3, rootIndex: 1, builtNodes: [3], message: "Find root in inorder: index 1", highlightedLines: [6], variables: { mid: 1, rootVal: 3, inorder: '[9,3,15,20,7]' } },
+    { preorder: [3, 9, 20, 15, 7], inorder: [9, 3, 15, 20, 7], preStart: 0, preEnd: 4, inStart: 0, inEnd: 4, rootVal: 3, rootIndex: 1, builtNodes: [3], message: "Elements before index 1 go to left subtree", highlightedLines: [8], variables: { mid: 1, 'left elements': 1 } },
     { preorder: [9], inorder: [9], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 3, rootIndex: 1, builtNodes: [3], message: "Build left subtree: preorder=[9], inorder=[9]", highlightedLines: [1], variables: { preorder: '[9]', inorder: '[9]' } },
     { preorder: [9], inorder: [9], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 3, rootIndex: 1, builtNodes: [3], message: "Check if preorder is empty", highlightedLines: [2], variables: { 'preorder.length': 1 } },
     { preorder: [9], inorder: [9], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 9, rootIndex: 1, builtNodes: [3], message: "Root value for left subtree: 9", highlightedLines: [4], variables: { rootVal: 9, preorder: '[9]' } },
-    { preorder: [9], inorder: [9], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 9, rootIndex: 1, builtNodes: [3,9], message: "Create node 9 as left child of 3", highlightedLines: [5], variables: { root: '9', parent: '3' } },
-    { preorder: [9], inorder: [9], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 9, rootIndex: 0, builtNodes: [3,9], message: "Find 9 in inorder: index 0", highlightedLines: [6], variables: { mid: 0, rootVal: 9 } },
-    { preorder: [9], inorder: [9], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 9, rootIndex: 0, builtNodes: [3,9], message: "Build left subtree of 9: empty", highlightedLines: [8], variables: { preorder: '[]', inorder: '[]' } },
-    { preorder: [], inorder: [], preStart: 0, preEnd: -1, inStart: 0, inEnd: -1, rootVal: 9, rootIndex: 0, builtNodes: [3,9], message: "Empty array, return null", highlightedLines: [2], variables: { 'preorder.length': 0 } },
-    { preorder: [9], inorder: [9], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 9, rootIndex: 0, builtNodes: [3,9], message: "Left of 9 is null, build right", highlightedLines: [12], variables: { 'root.left': 'null' } },
-    { preorder: [], inorder: [], preStart: 0, preEnd: -1, inStart: 0, inEnd: -1, rootVal: 9, rootIndex: 0, builtNodes: [3,9], message: "Empty array, return null", highlightedLines: [2], variables: { 'preorder.length': 0 } },
-    { preorder: [9], inorder: [9], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 9, rootIndex: 0, builtNodes: [3,9], message: "Right of 9 is null, node 9 complete", highlightedLines: [17], variables: { root: '9', 'root.left': 'null', 'root.right': 'null' } },
-    { preorder: [3,9,20,15,7], inorder: [9,3,15,20,7], preStart: 0, preEnd: 4, inStart: 0, inEnd: 4, rootVal: 3, rootIndex: 1, builtNodes: [3,9], message: "Left subtree complete, build right subtree", highlightedLines: [12], variables: { mid: 1, 'elements after': 3 } },
-    { preorder: [20,15,7], inorder: [15,20,7], preStart: 0, preEnd: 2, inStart: 0, inEnd: 2, rootVal: 3, rootIndex: 1, builtNodes: [3,9], message: "Build right subtree: preorder=[20,15,7]", highlightedLines: [1], variables: { preorder: '[20,15,7]', inorder: '[15,20,7]' } },
-    { preorder: [20,15,7], inorder: [15,20,7], preStart: 0, preEnd: 2, inStart: 0, inEnd: 2, rootVal: 3, rootIndex: 1, builtNodes: [3,9], message: "Check if preorder is empty", highlightedLines: [2], variables: { 'preorder.length': 3 } },
-    { preorder: [20,15,7], inorder: [15,20,7], preStart: 0, preEnd: 2, inStart: 0, inEnd: 2, rootVal: 20, rootIndex: 1, builtNodes: [3,9], message: "Root value for right subtree: 20", highlightedLines: [4], variables: { rootVal: 20, preorder: '[20,15,7]' } },
-    { preorder: [20,15,7], inorder: [15,20,7], preStart: 0, preEnd: 2, inStart: 0, inEnd: 2, rootVal: 20, rootIndex: 1, builtNodes: [3,9,20], message: "Create node 20 as right child of 3", highlightedLines: [5], variables: { root: '20', parent: '3' } },
-    { preorder: [20,15,7], inorder: [15,20,7], preStart: 0, preEnd: 2, inStart: 0, inEnd: 2, rootVal: 20, rootIndex: 1, builtNodes: [3,9,20], message: "Find 20 in inorder: index 1", highlightedLines: [6], variables: { mid: 1, rootVal: 20, inorder: '[15,20,7]' } },
-    { preorder: [20,15,7], inorder: [15,20,7], preStart: 0, preEnd: 2, inStart: 0, inEnd: 2, rootVal: 20, rootIndex: 1, builtNodes: [3,9,20], message: "Build left subtree of 20", highlightedLines: [8], variables: { preorder: '[15]', inorder: '[15]' } },
-    { preorder: [15], inorder: [15], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 20, rootIndex: 1, builtNodes: [3,9,20], message: "Build node 15", highlightedLines: [1], variables: { preorder: '[15]', inorder: '[15]' } },
-    { preorder: [15], inorder: [15], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 20, rootIndex: 1, builtNodes: [3,9,20], message: "Check if preorder is empty", highlightedLines: [2], variables: { 'preorder.length': 1 } },
-    { preorder: [15], inorder: [15], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 15, rootIndex: 1, builtNodes: [3,9,20], message: "Root value: 15", highlightedLines: [4], variables: { rootVal: 15 } },
-    { preorder: [15], inorder: [15], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 15, rootIndex: 1, builtNodes: [3,9,20,15], message: "Create node 15 as left child of 20", highlightedLines: [5], variables: { root: '15', parent: '20' } },
-    { preorder: [15], inorder: [15], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 15, rootIndex: 0, builtNodes: [3,9,20,15], message: "Find 15 in inorder: index 0", highlightedLines: [6], variables: { mid: 0 } },
-    { preorder: [15], inorder: [15], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 15, rootIndex: 0, builtNodes: [3,9,20,15], message: "Build left of 15: empty", highlightedLines: [8], variables: { preorder: '[]' } },
-    { preorder: [], inorder: [], preStart: 0, preEnd: -1, inStart: 0, inEnd: -1, rootVal: 15, rootIndex: 0, builtNodes: [3,9,20,15], message: "Empty, return null", highlightedLines: [2], variables: { 'preorder.length': 0 } },
-    { preorder: [15], inorder: [15], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 15, rootIndex: 0, builtNodes: [3,9,20,15], message: "Build right of 15: empty", highlightedLines: [12], variables: { preorder: '[]' } },
-    { preorder: [], inorder: [], preStart: 0, preEnd: -1, inStart: 0, inEnd: -1, rootVal: 15, rootIndex: 0, builtNodes: [3,9,20,15], message: "Empty, return null", highlightedLines: [2], variables: { 'preorder.length': 0 } },
-    { preorder: [15], inorder: [15], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 15, rootIndex: 0, builtNodes: [3,9,20,15], message: "Node 15 complete (leaf)", highlightedLines: [17], variables: { root: '15' } },
-    { preorder: [20,15,7], inorder: [15,20,7], preStart: 0, preEnd: 2, inStart: 0, inEnd: 2, rootVal: 20, rootIndex: 1, builtNodes: [3,9,20,15], message: "Left of 20 complete, build right", highlightedLines: [12], variables: { preorder: '[7]', inorder: '[7]' } },
-    { preorder: [7], inorder: [7], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 20, rootIndex: 1, builtNodes: [3,9,20,15], message: "Build node 7", highlightedLines: [1], variables: { preorder: '[7]', inorder: '[7]' } },
-    { preorder: [7], inorder: [7], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 20, rootIndex: 1, builtNodes: [3,9,20,15], message: "Check if preorder is empty", highlightedLines: [2], variables: { 'preorder.length': 1 } },
-    { preorder: [7], inorder: [7], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 7, rootIndex: 1, builtNodes: [3,9,20,15], message: "Root value: 7", highlightedLines: [4], variables: { rootVal: 7 } },
-    { preorder: [7], inorder: [7], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 7, rootIndex: 1, builtNodes: [3,9,20,15,7], message: "Create node 7 as right child of 20", highlightedLines: [5], variables: { root: '7', parent: '20' } },
-    { preorder: [7], inorder: [7], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 7, rootIndex: 0, builtNodes: [3,9,20,15,7], message: "Find 7 in inorder: index 0", highlightedLines: [6], variables: { mid: 0 } },
-    { preorder: [7], inorder: [7], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 7, rootIndex: 0, builtNodes: [3,9,20,15,7], message: "Build left of 7: empty", highlightedLines: [8], variables: { preorder: '[]' } },
-    { preorder: [], inorder: [], preStart: 0, preEnd: -1, inStart: 0, inEnd: -1, rootVal: 7, rootIndex: 0, builtNodes: [3,9,20,15,7], message: "Empty, return null", highlightedLines: [2], variables: { 'preorder.length': 0 } },
-    { preorder: [7], inorder: [7], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 7, rootIndex: 0, builtNodes: [3,9,20,15,7], message: "Build right of 7: empty", highlightedLines: [12], variables: { preorder: '[]' } },
-    { preorder: [], inorder: [], preStart: 0, preEnd: -1, inStart: 0, inEnd: -1, rootVal: 7, rootIndex: 0, builtNodes: [3,9,20,15,7], message: "Empty, return null", highlightedLines: [2], variables: { 'preorder.length': 0 } },
-    { preorder: [7], inorder: [7], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 7, rootIndex: 0, builtNodes: [3,9,20,15,7], message: "Node 7 complete (leaf)", highlightedLines: [17], variables: { root: '7' } },
-    { preorder: [20,15,7], inorder: [15,20,7], preStart: 0, preEnd: 2, inStart: 0, inEnd: 2, rootVal: 20, rootIndex: 1, builtNodes: [3,9,20,15,7], message: "Node 20 complete with children 15 and 7", highlightedLines: [17], variables: { root: '20' } },
-    { preorder: [3,9,20,15,7], inorder: [9,3,15,20,7], preStart: 0, preEnd: 4, inStart: 0, inEnd: 4, rootVal: 3, rootIndex: 1, builtNodes: [3,9,20,15,7], message: "Complete! Tree built successfully ✓", highlightedLines: [17], variables: { root: '3', nodes: '[3,9,20,15,7]' } }
+    { preorder: [9], inorder: [9], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 9, rootIndex: 1, builtNodes: [3, 9], message: "Create node 9 as left child of 3", highlightedLines: [5], variables: { root: '9', parent: '3' } },
+    { preorder: [9], inorder: [9], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 9, rootIndex: 0, builtNodes: [3, 9], message: "Find 9 in inorder: index 0", highlightedLines: [6], variables: { mid: 0, rootVal: 9 } },
+    { preorder: [9], inorder: [9], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 9, rootIndex: 0, builtNodes: [3, 9], message: "Build left subtree of 9: empty", highlightedLines: [8], variables: { preorder: '[]', inorder: '[]' } },
+    { preorder: [], inorder: [], preStart: 0, preEnd: -1, inStart: 0, inEnd: -1, rootVal: 9, rootIndex: 0, builtNodes: [3, 9], message: "Empty array, return null", highlightedLines: [2], variables: { 'preorder.length': 0 } },
+    { preorder: [9], inorder: [9], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 9, rootIndex: 0, builtNodes: [3, 9], message: "Left of 9 is null, build right", highlightedLines: [12], variables: { 'root.left': 'null' } },
+    { preorder: [], inorder: [], preStart: 0, preEnd: -1, inStart: 0, inEnd: -1, rootVal: 9, rootIndex: 0, builtNodes: [3, 9], message: "Empty array, return null", highlightedLines: [2], variables: { 'preorder.length': 0 } },
+    { preorder: [9], inorder: [9], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 9, rootIndex: 0, builtNodes: [3, 9], message: "Right of 9 is null, node 9 complete", highlightedLines: [17], variables: { root: '9', 'root.left': 'null', 'root.right': 'null' } },
+    { preorder: [3, 9, 20, 15, 7], inorder: [9, 3, 15, 20, 7], preStart: 0, preEnd: 4, inStart: 0, inEnd: 4, rootVal: 3, rootIndex: 1, builtNodes: [3, 9], message: "Left subtree complete, build right subtree", highlightedLines: [12], variables: { mid: 1, 'elements after': 3 } },
+    { preorder: [20, 15, 7], inorder: [15, 20, 7], preStart: 0, preEnd: 2, inStart: 0, inEnd: 2, rootVal: 3, rootIndex: 1, builtNodes: [3, 9], message: "Build right subtree: preorder=[20,15,7]", highlightedLines: [1], variables: { preorder: '[20,15,7]', inorder: '[15,20,7]' } },
+    { preorder: [20, 15, 7], inorder: [15, 20, 7], preStart: 0, preEnd: 2, inStart: 0, inEnd: 2, rootVal: 3, rootIndex: 1, builtNodes: [3, 9], message: "Check if preorder is empty", highlightedLines: [2], variables: { 'preorder.length': 3 } },
+    { preorder: [20, 15, 7], inorder: [15, 20, 7], preStart: 0, preEnd: 2, inStart: 0, inEnd: 2, rootVal: 20, rootIndex: 1, builtNodes: [3, 9], message: "Root value for right subtree: 20", highlightedLines: [4], variables: { rootVal: 20, preorder: '[20,15,7]' } },
+    { preorder: [20, 15, 7], inorder: [15, 20, 7], preStart: 0, preEnd: 2, inStart: 0, inEnd: 2, rootVal: 20, rootIndex: 1, builtNodes: [3, 9, 20], message: "Create node 20 as right child of 3", highlightedLines: [5], variables: { root: '20', parent: '3' } },
+    { preorder: [20, 15, 7], inorder: [15, 20, 7], preStart: 0, preEnd: 2, inStart: 0, inEnd: 2, rootVal: 20, rootIndex: 1, builtNodes: [3, 9, 20], message: "Find 20 in inorder: index 1", highlightedLines: [6], variables: { mid: 1, rootVal: 20, inorder: '[15,20,7]' } },
+    { preorder: [20, 15, 7], inorder: [15, 20, 7], preStart: 0, preEnd: 2, inStart: 0, inEnd: 2, rootVal: 20, rootIndex: 1, builtNodes: [3, 9, 20], message: "Build left subtree of 20", highlightedLines: [8], variables: { preorder: '[15]', inorder: '[15]' } },
+    { preorder: [15], inorder: [15], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 20, rootIndex: 1, builtNodes: [3, 9, 20], message: "Build node 15", highlightedLines: [1], variables: { preorder: '[15]', inorder: '[15]' } },
+    { preorder: [15], inorder: [15], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 20, rootIndex: 1, builtNodes: [3, 9, 20], message: "Check if preorder is empty", highlightedLines: [2], variables: { 'preorder.length': 1 } },
+    { preorder: [15], inorder: [15], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 15, rootIndex: 1, builtNodes: [3, 9, 20], message: "Root value: 15", highlightedLines: [4], variables: { rootVal: 15 } },
+    { preorder: [15], inorder: [15], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 15, rootIndex: 1, builtNodes: [3, 9, 20, 15], message: "Create node 15 as left child of 20", highlightedLines: [5], variables: { root: '15', parent: '20' } },
+    { preorder: [15], inorder: [15], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 15, rootIndex: 0, builtNodes: [3, 9, 20, 15], message: "Find 15 in inorder: index 0", highlightedLines: [6], variables: { mid: 0 } },
+    { preorder: [15], inorder: [15], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 15, rootIndex: 0, builtNodes: [3, 9, 20, 15], message: "Build left of 15: empty", highlightedLines: [8], variables: { preorder: '[]' } },
+    { preorder: [], inorder: [], preStart: 0, preEnd: -1, inStart: 0, inEnd: -1, rootVal: 15, rootIndex: 0, builtNodes: [3, 9, 20, 15], message: "Empty, return null", highlightedLines: [2], variables: { 'preorder.length': 0 } },
+    { preorder: [15], inorder: [15], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 15, rootIndex: 0, builtNodes: [3, 9, 20, 15], message: "Build right of 15: empty", highlightedLines: [12], variables: { preorder: '[]' } },
+    { preorder: [], inorder: [], preStart: 0, preEnd: -1, inStart: 0, inEnd: -1, rootVal: 15, rootIndex: 0, builtNodes: [3, 9, 20, 15], message: "Empty, return null", highlightedLines: [2], variables: { 'preorder.length': 0 } },
+    { preorder: [15], inorder: [15], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 15, rootIndex: 0, builtNodes: [3, 9, 20, 15], message: "Node 15 complete (leaf)", highlightedLines: [17], variables: { root: '15' } },
+    { preorder: [20, 15, 7], inorder: [15, 20, 7], preStart: 0, preEnd: 2, inStart: 0, inEnd: 2, rootVal: 20, rootIndex: 1, builtNodes: [3, 9, 20, 15], message: "Left of 20 complete, build right", highlightedLines: [12], variables: { preorder: '[7]', inorder: '[7]' } },
+    { preorder: [7], inorder: [7], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 20, rootIndex: 1, builtNodes: [3, 9, 20, 15], message: "Build node 7", highlightedLines: [1], variables: { preorder: '[7]', inorder: '[7]' } },
+    { preorder: [7], inorder: [7], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 20, rootIndex: 1, builtNodes: [3, 9, 20, 15], message: "Check if preorder is empty", highlightedLines: [2], variables: { 'preorder.length': 1 } },
+    { preorder: [7], inorder: [7], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 7, rootIndex: 1, builtNodes: [3, 9, 20, 15], message: "Root value: 7", highlightedLines: [4], variables: { rootVal: 7 } },
+    { preorder: [7], inorder: [7], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 7, rootIndex: 1, builtNodes: [3, 9, 20, 15, 7], message: "Create node 7 as right child of 20", highlightedLines: [5], variables: { root: '7', parent: '20' } },
+    { preorder: [7], inorder: [7], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 7, rootIndex: 0, builtNodes: [3, 9, 20, 15, 7], message: "Find 7 in inorder: index 0", highlightedLines: [6], variables: { mid: 0 } },
+    { preorder: [7], inorder: [7], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 7, rootIndex: 0, builtNodes: [3, 9, 20, 15, 7], message: "Build left of 7: empty", highlightedLines: [8], variables: { preorder: '[]' } },
+    { preorder: [], inorder: [], preStart: 0, preEnd: -1, inStart: 0, inEnd: -1, rootVal: 7, rootIndex: 0, builtNodes: [3, 9, 20, 15, 7], message: "Empty, return null", highlightedLines: [2], variables: { 'preorder.length': 0 } },
+    { preorder: [7], inorder: [7], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 7, rootIndex: 0, builtNodes: [3, 9, 20, 15, 7], message: "Build right of 7: empty", highlightedLines: [12], variables: { preorder: '[]' } },
+    { preorder: [], inorder: [], preStart: 0, preEnd: -1, inStart: 0, inEnd: -1, rootVal: 7, rootIndex: 0, builtNodes: [3, 9, 20, 15, 7], message: "Empty, return null", highlightedLines: [2], variables: { 'preorder.length': 0 } },
+    { preorder: [7], inorder: [7], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 7, rootIndex: 0, builtNodes: [3, 9, 20, 15, 7], message: "Node 7 complete (leaf)", highlightedLines: [17], variables: { root: '7' } },
+    { preorder: [20, 15, 7], inorder: [15, 20, 7], preStart: 0, preEnd: 2, inStart: 0, inEnd: 2, rootVal: 20, rootIndex: 1, builtNodes: [3, 9, 20, 15, 7], message: "Node 20 complete with children 15 and 7", highlightedLines: [17], variables: { root: '20' } },
+    { preorder: [3, 9, 20, 15, 7], inorder: [9, 3, 15, 20, 7], preStart: 0, preEnd: 4, inStart: 0, inEnd: 4, rootVal: 3, rootIndex: 1, builtNodes: [3, 9, 20, 15, 7], message: "Complete! Tree built successfully ✓", highlightedLines: [17], variables: { root: '3', nodes: '[3,9,20,15,7]' } }
   ];
 
   const [idx, setIdx] = useState(0);
@@ -147,20 +147,19 @@ export const ConstructBinaryTreeVisualization = () => {
           {positions.map((pos, i) => {
             const isBuilt = step.builtNodes.includes(pos.value);
             const isCurrent = step.rootVal === pos.value;
-            
+
             return (
               <g key={i}>
                 <circle
                   cx={pos.x}
                   cy={pos.y}
                   r="24"
-                  className={`transition-all duration-300 ${
-                    isCurrent
-                      ? 'fill-yellow-500'
-                      : isBuilt
+                  className={`transition-all duration-300 ${isCurrent
+                    ? 'fill-yellow-500'
+                    : isBuilt
                       ? 'fill-green-500'
                       : 'fill-muted/30'
-                  }`}
+                    }`}
                   stroke="currentColor"
                   strokeWidth="2"
                   strokeDasharray={isBuilt ? '0' : '4'}
@@ -169,9 +168,8 @@ export const ConstructBinaryTreeVisualization = () => {
                   x={pos.x}
                   y={pos.y + 6}
                   textAnchor="middle"
-                  className={`text-sm font-bold ${
-                    isBuilt ? 'fill-foreground' : 'fill-muted-foreground'
-                  }`}
+                  className={`text-sm font- ${isBuilt ? 'fill-foreground' : 'fill-muted-foreground'
+                    }`}
                 >
                   {pos.value}
                 </text>
@@ -225,7 +223,7 @@ export const ConstructBinaryTreeVisualization = () => {
           </AnimatePresence>
 
           <Card className="p-4 bg-primary/5 border-primary/20">
-            <motion.p 
+            <motion.p
               key={`msg-${idx}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

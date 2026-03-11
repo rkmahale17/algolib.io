@@ -220,14 +220,14 @@ export const MergeSortLinkedListVisualization = () => {
                 <div className="flex flex-col items-center">
                     {label && <span className="text-[10px] font-mono text-muted-foreground mb-1 uppercase">{label}</span>}
                     <div
-                        className={`w-12 h-12 rounded-lg border-2 flex items-center justify-center font-bold transition-all duration-300 relative ${isDummy ? 'bg-muted/50 border-dashed border-muted-foreground' :
-                                isHighlighted ? 'bg-primary/20 border-primary text-primary scale-110 shadow-lg shadow-primary/20' :
-                                    'bg-card border-border text-card-foreground'
+                        className={`w-12 h-12 rounded-lg border-2 flex items-center justify-center font- transition-all duration-300 relative ${isDummy ? 'bg-muted/50 border-dashed border-muted-foreground' :
+                            isHighlighted ? 'bg-primary/20 border-primary text-primary scale-110 shadow-lg shadow-primary/20' :
+                                'bg-card border-border text-card-foreground'
                             } ${isTail ? 'ring-2 ring-offset-2 ring-primary ring-offset-background' : ''}`}
                     >
                         {isDummy ? 'D' : node.val}
                         {isTail && (
-                            <div className="absolute -top-6 bg-primary text-primary-foreground text-[10px] px-1 rounded font-bold">
+                            <div className="absolute -top-6 bg-primary text-primary-foreground text-[10px] px-1 rounded font-">
                                 TAIL
                             </div>
                         )}
@@ -335,22 +335,22 @@ export const MergeSortLinkedListVisualization = () => {
                     <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
 
                     <div className="bg-card rounded-lg border border-border p-4">
-                        <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">Algorithm Logic</h4>
+                        <h4 className="text-xs font- uppercase tracking-wider text-muted-foreground mb-3">Algorithm Logic</h4>
                         <ul className="text-xs space-y-2 text-muted-foreground">
                             <li className="flex gap-2">
-                                <span className="text-primary font-bold">•</span>
+                                <span className="text-primary font-">•</span>
                                 <span>Use a <strong>dummy node</strong> to avoid edge cases with the head of the list.</span>
                             </li>
                             <li className="flex gap-2">
-                                <span className="text-primary font-bold">•</span>
+                                <span className="text-primary font-">•</span>
                                 <span>The <strong>tail pointer</strong> always tracks the end of the newly formed list.</span>
                             </li>
                             <li className="flex gap-2">
-                                <span className="text-primary font-bold">•</span>
+                                <span className="text-primary font-">•</span>
                                 <span>Compare heads of both lists and connect the smaller one to <code>tail.next</code>.</span>
                             </li>
                             <li className="flex gap-2">
-                                <span className="text-primary font-bold">•</span>
+                                <span className="text-primary font-">•</span>
                                 <span>Once one list is empty, attach the remaining nodes of the other list in <strong>O(1)</strong> time.</span>
                             </li>
                         </ul>

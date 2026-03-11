@@ -272,7 +272,7 @@ export const ConnectedComponentsVisualization = () => {
                 {Array.from({ length: step.n }, (_, i) => (
                   <div
                     key={i}
-                    className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${getNodeColor(
+                    className={`w-12 h-12 rounded-full flex items-center justify-center font- text-lg ${getNodeColor(
                       i
                     )}`}
                   >
@@ -320,7 +320,7 @@ export const ConnectedComponentsVisualization = () => {
             >
               <Card className="p-4">
                 <div className="text-sm font-semibold mb-2">Components Found</div>
-                <div className="text-3xl font-bold text-primary">{step.componentCount}</div>
+                <div className="text-3xl font- text-primary">{step.componentCount}</div>
               </Card>
             </motion.div>
           )}

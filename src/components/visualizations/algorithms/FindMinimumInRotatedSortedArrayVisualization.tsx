@@ -78,22 +78,22 @@ export const FindMinimumInRotatedSortedArrayVisualization = () => {
 
         // Calc mid
         newSteps.push({
-            array: [...nums],
-            highlights: [left, mid, right],
-            variables: { left, right, mid },
-            explanation: `Calculate mid index: Math.floor((${left} + ${right}) / 2) = ${mid}.`,
-            highlightedLines: [5],
-            lineExecution: "const mid = Math.floor((left + right) / 2);"
+          array: [...nums],
+          highlights: [left, mid, right],
+          variables: { left, right, mid },
+          explanation: `Calculate mid index: Math.floor((${left} + ${right}) / 2) = ${mid}.`,
+          highlightedLines: [5],
+          lineExecution: "const mid = Math.floor((left + right) / 2);"
         });
 
         // Check condition
         newSteps.push({
-            array: [...nums],
-            highlights: [mid, right],
-            variables: { left, right, mid },
-            explanation: `Compare nums[mid] (${nums[mid]}) > nums[right] (${nums[right]})? ${nums[mid] > nums[right] ? 'Yes' : 'No'}.`,
-            highlightedLines: [7],
-            lineExecution: `if (nums[mid] > nums[right])`
+          array: [...nums],
+          highlights: [mid, right],
+          variables: { left, right, mid },
+          explanation: `Compare nums[mid] (${nums[mid]}) > nums[right] (${nums[right]})? ${nums[mid] > nums[right] ? 'Yes' : 'No'}.`,
+          highlightedLines: [7],
+          lineExecution: `if (nums[mid] > nums[right])`
         });
 
         if (nums[mid] > nums[right]) {
@@ -168,11 +168,10 @@ export const FindMinimumInRotatedSortedArrayVisualization = () => {
                       className="flex flex-col items-center gap-2"
                     >
                       <div
-                        className={`w-14 h-14 rounded flex items-center justify-center font-bold transition-all duration-300 ${
-                          step.highlights.includes(index)
-                            ? 'bg-primary text-primary-foreground scale-110'
-                            : 'bg-muted text-foreground'
-                        }`}
+                        className={`w-14 h-14 rounded flex items-center justify-center font- transition-all duration-300 ${step.highlights.includes(index)
+                          ? 'bg-primary text-primary-foreground scale-110'
+                          : 'bg-muted text-foreground'
+                          }`}
                       >
                         {value}
                       </div>

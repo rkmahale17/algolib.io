@@ -45,7 +45,7 @@ export const ArrayVisualization = ({ algorithmId }: ArrayVisualizationProps) => 
     setIsAnimating(true);
     const sortedArray = [...array].sort((a, b) => a - b);
     setArray(sortedArray);
-    
+
     let left = 0;
     let right = sortedArray.length - 1;
 
@@ -53,7 +53,7 @@ export const ArrayVisualization = ({ algorithmId }: ArrayVisualizationProps) => 
       const mid = Math.floor((left + right) / 2);
       setHighlightIndices([left, mid, right]);
       await new Promise(resolve => setTimeout(resolve, 800));
-      
+
       if (Math.random() > 0.5) {
         left = mid + 1;
       } else {
@@ -115,19 +115,17 @@ export const ArrayVisualization = ({ algorithmId }: ArrayVisualizationProps) => 
             className="flex flex-col items-center gap-2 flex-1 max-w-[60px]"
           >
             <div
-              className={`w-full rounded-t transition-all duration-300 ${
-                highlightIndices.includes(index)
+              className={`w-full rounded-t transition-all duration-300 ${highlightIndices.includes(index)
                   ? 'bg-primary shadow-lg shadow-primary/50'
                   : 'bg-gradient-to-t from-primary/60 to-primary/40'
-              }`}
+                }`}
               style={{
                 height: `${(value / getMaxValue()) * 100}%`,
                 minHeight: '20px'
               }}
             />
-            <span className={`text-xs font-mono transition-colors ${
-              highlightIndices.includes(index) ? 'text-primary font-bold' : 'text-muted-foreground'
-            }`}>
+            <span className={`text-xs font-mono transition-colors ${highlightIndices.includes(index) ? 'text-primary font-' : 'text-muted-foreground'
+              }`}>
               {value}
             </span>
           </div>

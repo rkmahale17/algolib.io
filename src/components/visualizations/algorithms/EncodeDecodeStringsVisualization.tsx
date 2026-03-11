@@ -48,21 +48,21 @@ function decode(s: string): string[] {
 
   const steps: Step[] = [
     { strs: ["hello", "world"], encoded: "", decoded: [], phase: "encode-start", currentIdx: -1, currentStr: "", i: -1, j: -1, length: 0, message: "ENCODE: Start with input array", highlightedLines: [2] },
-    
+
     { strs: ["hello", "world"], encoded: "", decoded: [], phase: "encode-process", currentIdx: 0, currentStr: "hello", i: -1, j: -1, length: 5, message: "Processing str[0]: 'hello' (length=5)", highlightedLines: [3] },
     { strs: ["hello", "world"], encoded: "5", decoded: [], phase: "encode-len", currentIdx: 0, currentStr: "hello", i: -1, j: -1, length: 5, message: "Add length: '5'", highlightedLines: [4] },
     { strs: ["hello", "world"], encoded: "5#", decoded: [], phase: "encode-delim", currentIdx: 0, currentStr: "hello", i: -1, j: -1, length: 5, message: "Add delimiter: '#'", highlightedLines: [4] },
     { strs: ["hello", "world"], encoded: "5#hello", decoded: [], phase: "encode-str", currentIdx: 0, currentStr: "hello", i: -1, j: -1, length: 5, message: "Add string: 'hello'", highlightedLines: [4] },
-    
+
     { strs: ["hello", "world"], encoded: "5#hello", decoded: [], phase: "encode-process", currentIdx: 1, currentStr: "world", i: -1, j: -1, length: 5, message: "Processing str[1]: 'world' (length=5)", highlightedLines: [3] },
     { strs: ["hello", "world"], encoded: "5#hello5", decoded: [], phase: "encode-len", currentIdx: 1, currentStr: "world", i: -1, j: -1, length: 5, message: "Add length: '5'", highlightedLines: [4] },
     { strs: ["hello", "world"], encoded: "5#hello5#", decoded: [], phase: "encode-delim", currentIdx: 1, currentStr: "world", i: -1, j: -1, length: 5, message: "Add delimiter: '#'", highlightedLines: [4] },
     { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: [], phase: "encode-str", currentIdx: 1, currentStr: "world", i: -1, j: -1, length: 5, message: "Add string: 'world'", highlightedLines: [4] },
     { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: [], phase: "encode-done", currentIdx: -1, currentStr: "", i: -1, j: -1, length: 0, message: "Encoding complete! Result: '5#hello5#world'", highlightedLines: [6] },
-    
+
     { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: [], phase: "decode-start", currentIdx: -1, currentStr: "", i: 0, j: -1, length: 0, message: "DECODE: Start parsing encoded string", highlightedLines: [10] },
     { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: [], phase: "decode-init", currentIdx: -1, currentStr: "", i: 0, j: -1, length: 0, message: "Initialize: i=0, result=[]", highlightedLines: [11] },
-    
+
     { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: [], phase: "decode-loop", currentIdx: 0, currentStr: "", i: 0, j: 0, length: 0, message: "Loop iteration 1: i=0, j=0", highlightedLines: [13] },
     { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: [], phase: "decode-find", currentIdx: 0, currentStr: "", i: 0, j: 0, length: 0, message: "Find delimiter: s[0]='5' != '#'", highlightedLines: [15] },
     { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: [], phase: "decode-find", currentIdx: 0, currentStr: "", i: 0, j: 1, length: 0, message: "s[1]='#' found! j=1", highlightedLines: [15] },
@@ -70,7 +70,7 @@ function decode(s: string): string[] {
     { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: [], phase: "decode-extract", currentIdx: 0, currentStr: "hello", i: 0, j: 1, length: 5, message: "Extract string: substring(2,7)='hello'", highlightedLines: [17] },
     { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: ["hello"], phase: "decode-push", currentIdx: 0, currentStr: "hello", i: 0, j: 1, length: 5, message: "Push 'hello' to result array", highlightedLines: [18] },
     { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: ["hello"], phase: "decode-advance", currentIdx: 0, currentStr: "", i: 7, j: 1, length: 5, message: "Advance pointer: i = 1 + 1 + 5 = 7", highlightedLines: [19] },
-    
+
     { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: ["hello"], phase: "decode-loop", currentIdx: 1, currentStr: "", i: 7, j: 7, length: 0, message: "Loop iteration 2: i=7, j=7", highlightedLines: [13] },
     { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: ["hello"], phase: "decode-find", currentIdx: 1, currentStr: "", i: 7, j: 7, length: 0, message: "Find delimiter: s[7]='5' != '#'", highlightedLines: [15] },
     { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: ["hello"], phase: "decode-find", currentIdx: 1, currentStr: "", i: 7, j: 8, length: 0, message: "s[8]='#' found! j=8", highlightedLines: [15] },
@@ -78,7 +78,7 @@ function decode(s: string): string[] {
     { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: ["hello"], phase: "decode-extract", currentIdx: 1, currentStr: "world", i: 7, j: 8, length: 5, message: "Extract string: substring(9,14)='world'", highlightedLines: [17] },
     { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: ["hello", "world"], phase: "decode-push", currentIdx: 1, currentStr: "world", i: 7, j: 8, length: 5, message: "Push 'world' to result array", highlightedLines: [18] },
     { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: ["hello", "world"], phase: "decode-advance", currentIdx: 1, currentStr: "", i: 14, j: 8, length: 5, message: "Advance pointer: i = 8 + 1 + 5 = 14", highlightedLines: [19] },
-    
+
     { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: ["hello", "world"], phase: "decode-check", currentIdx: -1, currentStr: "", i: 14, j: -1, length: 0, message: "Check loop: i=14 >= s.length=14, exit loop", highlightedLines: [13] },
     { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: ["hello", "world"], phase: "decode-done", currentIdx: -1, currentStr: "", i: -1, j: -1, length: 0, message: "Decoding complete! Return ['hello', 'world'] ✓", highlightedLines: [22] }
   ];
@@ -108,18 +108,18 @@ function decode(s: string): string[] {
           <Button onClick={() => setCurrentStepIndex(0)} variant="outline" size="sm">
             <RotateCcw className="h-4 w-4" />
           </Button>
-          <Button 
-            onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))} 
-            disabled={currentStepIndex === 0} 
-            variant="outline" 
+          <Button
+            onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))}
+            disabled={currentStepIndex === 0}
+            variant="outline"
             size="sm"
           >
             <SkipBack className="h-4 w-4" />
           </Button>
-          <Button 
-            onClick={() => setCurrentStepIndex(Math.min(steps.length - 1, currentStepIndex + 1))} 
-            disabled={currentStepIndex === steps.length - 1} 
-            variant="outline" 
+          <Button
+            onClick={() => setCurrentStepIndex(Math.min(steps.length - 1, currentStepIndex + 1))}
+            disabled={currentStepIndex === steps.length - 1}
+            variant="outline"
             size="sm"
           >
             <SkipForward className="h-4 w-4" />
@@ -136,11 +136,10 @@ function decode(s: string): string[] {
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className={`px-3 py-1 rounded text-xs font-semibold ${
-                currentStep.phase.startsWith('encode') ? 'bg-blue-500/20 text-blue-600' :
+              className={`px-3 py-1 rounded text-xs font-semibold ${currentStep.phase.startsWith('encode') ? 'bg-blue-500/20 text-blue-600' :
                 currentStep.phase.startsWith('decode') ? 'bg-green-500/20 text-green-600' :
-                'bg-muted text-muted-foreground'
-              }`}
+                  'bg-muted text-muted-foreground'
+                }`}
             >
               {currentStep.phase.startsWith('encode') ? 'ENCODE' : 'DECODE'}
             </motion.div>
@@ -155,9 +154,8 @@ function decode(s: string): string[] {
                   initial={{ scale: 0.95 }}
                   animate={{ scale: idx === currentStep.currentIdx ? 1.05 : 1 }}
                   transition={{ duration: 0.2 }}
-                  className={`px-3 py-2 rounded border-2 font-mono text-sm ${
-                    idx === currentStep.currentIdx ? 'bg-yellow-500/20 border-yellow-500' : 'bg-muted/50 border-border'
-                  }`}
+                  className={`px-3 py-2 rounded border-2 font-mono text-sm ${idx === currentStep.currentIdx ? 'bg-yellow-500/20 border-yellow-500' : 'bg-muted/50 border-border'
+                    }`}
                 >
                   "{str}"
                 </motion.div>
@@ -176,14 +174,13 @@ function decode(s: string): string[] {
                 {currentStep.encoded.split('').map((char, idx) => (
                   <span
                     key={idx}
-                    className={`${
-                      (currentStep.phase.includes('decode') && idx >= currentStep.i && idx <= currentStep.j) ||
+                    className={`${(currentStep.phase.includes('decode') && idx >= currentStep.i && idx <= currentStep.j) ||
                       (currentStep.phase === 'encode-len' && idx === currentStep.encoded.length - 1) ||
                       (currentStep.phase === 'encode-delim' && idx === currentStep.encoded.length - 1) ||
                       (currentStep.phase === 'encode-str' && idx >= currentStep.encoded.length - currentStep.currentStr.length)
-                        ? 'bg-yellow-500/30 px-0.5'
-                        : ''
-                    }`}
+                      ? 'bg-yellow-500/30 px-0.5'
+                      : ''
+                      }`}
                   >
                     {char}
                   </span>

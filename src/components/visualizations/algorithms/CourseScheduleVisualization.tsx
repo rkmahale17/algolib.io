@@ -306,15 +306,14 @@ export const CourseScheduleVisualization = () => {
                 {Array.from({ length: step.courses }, (_, i) => (
                   <div
                     key={i}
-                    className={`w-16 h-16 rounded-full flex items-center justify-center font-bold text-lg ${
-                      i === step.currentCourse
-                        ? 'bg-primary text-primary-foreground ring-4 ring-primary'
-                        : step.visited.includes(i)
+                    className={`w-16 h-16 rounded-full flex items-center justify-center font- text-lg ${i === step.currentCourse
+                      ? 'bg-primary text-primary-foreground ring-4 ring-primary'
+                      : step.visited.includes(i)
                         ? 'bg-green-500/30'
                         : step.visiting.includes(i)
-                        ? 'bg-yellow-500/30'
-                        : 'bg-muted'
-                    }`}
+                          ? 'bg-yellow-500/30'
+                          : 'bg-muted'
+                      }`}
                   >
                     {i}
                   </div>

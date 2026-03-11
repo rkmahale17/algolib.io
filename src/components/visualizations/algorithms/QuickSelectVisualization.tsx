@@ -217,32 +217,30 @@ export const QuickSelectVisualization = () => {
                 return (
                   <div key={index} className="flex flex-col items-center gap-2 flex-1 max-w-[60px] relative">
                     {isK && (
-                      <div className="absolute -top-8 text-xs font-bold text-green-500">TARGET</div>
+                      <div className="absolute -top-8 text-xs font- text-green-500">TARGET</div>
                     )}
                     {isPivot && !isPartition && (
-                      <div className="absolute -top-8 text-xs font-bold text-primary animate-bounce">PIVOT</div>
+                      <div className="absolute -top-8 text-xs font- text-primary animate-bounce">PIVOT</div>
                     )}
                     {isPartition && (
-                      <div className="absolute -top-8 text-xs font-bold text-blue-500">FINAL</div>
+                      <div className="absolute -top-8 text-xs font- text-blue-500">FINAL</div>
                     )}
                     <div
-                      className={`w-full rounded-t transition-all duration-300 ${
-                        isK && isPivot
+                      className={`w-full rounded-t transition-all duration-300 ${isK && isPivot
                           ? 'bg-green-500 shadow-lg shadow-green-500/50 scale-110'
                           : isPartition
-                          ? 'bg-blue-500 shadow-lg'
-                          : isPivot
-                          ? 'bg-primary shadow-lg shadow-primary/50 scale-105'
-                          : !isInRange
-                          ? 'bg-muted opacity-30'
-                          : 'bg-gradient-to-t from-primary/60 to-primary/40'
-                      }`}
+                            ? 'bg-blue-500 shadow-lg'
+                            : isPivot
+                              ? 'bg-primary shadow-lg shadow-primary/50 scale-105'
+                              : !isInRange
+                                ? 'bg-muted opacity-30'
+                                : 'bg-gradient-to-t from-primary/60 to-primary/40'
+                        }`}
                       style={{ height: `${(value / getMaxValue()) * 100}%`, minHeight: '20px' }}
                     />
                     <span
-                      className={`text-xs font-mono ${
-                        isPivot || isK ? 'text-primary font-bold text-base' : !isInRange ? 'opacity-30 text-muted-foreground' : 'text-muted-foreground'
-                      }`}
+                      className={`text-xs font-mono ${isPivot || isK ? 'text-primary font- text-base' : !isInRange ? 'opacity-30 text-muted-foreground' : 'text-muted-foreground'
+                        }`}
                     >
                       {value}
                     </span>

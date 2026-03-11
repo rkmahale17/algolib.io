@@ -393,7 +393,7 @@ function deserialize(data: string): TreeNode | null {
           y={node.y}
           textAnchor="middle"
           dy=".3em"
-          className={`font-bold transition-all duration-300 ${isActive ? 'fill-white' :
+          className={`font- transition-all duration-300 ${isActive ? 'fill-white' :
             (currentStep.phase === 'serialize' && isVisited) || isBuilt ? 'fill-foreground' :
               'fill-foreground/20'
             }`}
@@ -409,7 +409,7 @@ function deserialize(data: string): TreeNode | null {
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-        <h2 className="text-xl font-bold text-foreground">
+        <h2 className="text-xl font- text-foreground">
           {currentStep.phase === 'serialize' ? 'Phase 1: Serialize' : 'Phase 2: Deserialize'}
         </h2>
         <StepControls
@@ -434,10 +434,10 @@ function deserialize(data: string): TreeNode | null {
             </svg>
 
             <div className="absolute top-2 right-2 flex gap-2">
-              <div className={`px-2 py-1 rounded text-[10px] uppercase font-bold ${currentStep.phase === 'serialize' ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'}`}>
+              <div className={`px-2 py-1 rounded text-[10px] uppercase font- ${currentStep.phase === 'serialize' ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'}`}>
                 Serialize
               </div>
-              <div className={`px-2 py-1 rounded text-[10px] uppercase font-bold ${currentStep.phase === 'deserialize' ? 'bg-green-500 text-white' : 'bg-muted text-muted-foreground'}`}>
+              <div className={`px-2 py-1 rounded text-[10px] uppercase font- ${currentStep.phase === 'deserialize' ? 'bg-green-500 text-white' : 'bg-muted text-muted-foreground'}`}>
                 Deserialize
               </div>
             </div>

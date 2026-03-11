@@ -130,7 +130,7 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
           className="flex items-center gap-2 px-2 py-1 rounded-md hover:bg-muted transition-colors group"
         >
           <ListIcon className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-          <span className="text-xs font-bold text-muted-foreground group-hover:text-foreground transition-colors uppercase tracking-wider">
+          <span className="text-xs font- text-muted-foreground group-hover:text-foreground transition-colors uppercase tracking-wider">
             {listLabel}
           </span>
         </button>

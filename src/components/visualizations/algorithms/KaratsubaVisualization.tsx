@@ -54,7 +54,7 @@ export const KaratsubaVisualization: React.FC = () => {
 
   const generateSteps = () => {
     const newSteps: Step[] = [];
-    
+
     const multiply = (x: bigint, y: bigint, depth: number): bigint => {
       newSteps.push({
         num1: x.toString(),
@@ -112,7 +112,7 @@ export const KaratsubaVisualization: React.FC = () => {
         depth,
         operation: 'combine',
         result: result.toString(),
-        message: `Combine: ${ac} × 10^${2*m} + ${adbc} × 10^${m} + ${bd} = ${result}`,
+        message: `Combine: ${ac} × 10^${2 * m} + ${adbc} × 10^${m} + ${bd} = ${result}`,
         lineNumber: 23
       });
 
@@ -189,13 +189,12 @@ export const KaratsubaVisualization: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-card rounded-lg p-6 border">
           <h3 className="text-lg font-semibold mb-4">Karatsuba Multiplication</h3>
-          
+
           <div className="space-y-4">
-            <div className={`p-4 rounded-lg border-2 ${
-              currentStep.operation === 'start' ? 'bg-primary/10 border-primary' : 'bg-muted/30 border-border'
-            }`}>
+            <div className={`p-4 rounded-lg border-2 ${currentStep.operation === 'start' ? 'bg-primary/10 border-primary' : 'bg-muted/30 border-border'
+              }`}>
               <div className="text-xs text-muted-foreground mb-2">Input</div>
-              <div className="font-mono text-2xl font-bold">
+              <div className="font-mono text-2xl font-">
                 {currentStep.num1} × {currentStep.num2}
               </div>
               <div className="text-xs text-muted-foreground mt-2">Depth: {currentStep.depth}</div>
@@ -205,19 +204,19 @@ export const KaratsubaVisualization: React.FC = () => {
               <div className="grid grid-cols-2 gap-2">
                 <div className="p-3 rounded bg-blue-500/10 border border-blue-500/20">
                   <div className="text-xs text-muted-foreground">High (a)</div>
-                  <div className="font-mono font-bold text-blue-400">{currentStep.parts.a}</div>
+                  <div className="font-mono font- text-blue-400">{currentStep.parts.a}</div>
                 </div>
                 <div className="p-3 rounded bg-blue-500/10 border border-blue-500/20">
                   <div className="text-xs text-muted-foreground">Low (b)</div>
-                  <div className="font-mono font-bold text-blue-400">{currentStep.parts.b}</div>
+                  <div className="font-mono font- text-blue-400">{currentStep.parts.b}</div>
                 </div>
                 <div className="p-3 rounded bg-green-500/10 border border-green-500/20">
                   <div className="text-xs text-muted-foreground">High (c)</div>
-                  <div className="font-mono font-bold text-green-400">{currentStep.parts.c}</div>
+                  <div className="font-mono font- text-green-400">{currentStep.parts.c}</div>
                 </div>
                 <div className="p-3 rounded bg-green-500/10 border border-green-500/20">
                   <div className="text-xs text-muted-foreground">Low (d)</div>
-                  <div className="font-mono font-bold text-green-400">{currentStep.parts.d}</div>
+                  <div className="font-mono font- text-green-400">{currentStep.parts.d}</div>
                 </div>
               </div>
             )}
@@ -225,7 +224,7 @@ export const KaratsubaVisualization: React.FC = () => {
             {currentStep.result && (
               <div className="p-4 rounded-lg bg-green-500/10 border-2 border-green-500">
                 <div className="text-xs text-muted-foreground mb-2">Result</div>
-                <div className="font-mono text-xl font-bold text-green-400">
+                <div className="font-mono text-xl font- text-green-400">
                   {currentStep.result}
                 </div>
               </div>
@@ -247,10 +246,10 @@ export const KaratsubaVisualization: React.FC = () => {
           </div>
         </div>
 
-        <CodeHighlighter 
-          code={code} 
-          highlightedLine={currentStep.lineNumber} 
-          language="typescript" 
+        <CodeHighlighter
+          code={code}
+          highlightedLine={currentStep.lineNumber}
+          language="typescript"
         />
       </div>
     </div>

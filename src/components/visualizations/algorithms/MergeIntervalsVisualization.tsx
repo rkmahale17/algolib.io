@@ -221,7 +221,7 @@ export const MergeIntervalsVisualization = () => {
         <Card className="p-6">
           <h3 className="text-lg font-semibold mb-4">Merge Intervals</h3>
           <div className="space-y-4">
-            <motion.div 
+            <motion.div
               key={`intervals-${currentStepIndex}`}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -235,13 +235,12 @@ export const MergeIntervalsVisualization = () => {
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: idx * 0.05 }}
-                    className={`px-3 py-2 rounded font-mono transition-all ${
-                      idx === currentStep.currentIdx 
-                        ? 'bg-primary text-primary-foreground shadow-lg scale-105' 
-                        : idx < currentStep.currentIdx 
-                        ? 'bg-secondary/50 text-secondary-foreground' 
+                    className={`px-3 py-2 rounded font-mono transition-all ${idx === currentStep.currentIdx
+                      ? 'bg-primary text-primary-foreground shadow-lg scale-105'
+                      : idx < currentStep.currentIdx
+                        ? 'bg-secondary/50 text-secondary-foreground'
                         : 'bg-muted text-muted-foreground'
-                    }`}
+                      }`}
                   >
                     [{interval[0]}, {interval[1]}]
                   </motion.div>
@@ -307,9 +306,9 @@ export const MergeIntervalsVisualization = () => {
         <Card className="p-6 overflow-hidden flex flex-col">
           <h3 className="text-lg font-semibold mb-4">TypeScript Implementation</h3>
           <div className="flex-1 overflow-auto">
-            <AnimatedCodeEditor 
-              code={code} 
-              language="typescript" 
+            <AnimatedCodeEditor
+              code={code}
+              language="typescript"
               highlightedLines={currentStep.highlightedLines}
             />
           </div>

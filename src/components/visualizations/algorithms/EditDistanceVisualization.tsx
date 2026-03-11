@@ -86,9 +86,8 @@ export const EditDistanceVisualization: React.FC = () => {
             word1,
             word2,
             operation: "match",
-            message: `Match! '${word1[i - 1]}' === '${
-              word2[j - 1]
-            }': No operation needed`,
+            message: `Match! '${word1[i - 1]}' === '${word2[j - 1]
+              }': No operation needed`,
             lineNumber: 14,
           });
         } else {
@@ -102,8 +101,8 @@ export const EditDistanceVisualization: React.FC = () => {
             minOp === deleteOp
               ? "delete"
               : minOp === insertOp
-              ? "insert"
-              : "replace";
+                ? "insert"
+                : "replace";
 
           newSteps.push({
             dp: dp.map((row) => [...row]),
@@ -112,11 +111,9 @@ export const EditDistanceVisualization: React.FC = () => {
             word1,
             word2,
             operation,
-            message: `'${word1[i - 1]}' ≠ '${
-              word2[j - 1]
-            }': ${operation} (del=${deleteOp}, ins=${insertOp}, rep=${replaceOp}) → ${
-              dp[i][j]
-            }`,
+            message: `'${word1[i - 1]}' ≠ '${word2[j - 1]
+              }': ${operation} (del=${deleteOp}, ins=${insertOp}, rep=${replaceOp}) → ${dp[i][j]
+              }`,
             lineNumber: 16,
           });
         }
@@ -226,13 +223,12 @@ export const EditDistanceVisualization: React.FC = () => {
                     {row.map((val, j) => (
                       <td
                         key={j}
-                        className={`border border-border p-2 text-center transition-all ${
-                          i === currentStep.i && j === currentStep.j
-                            ? "bg-primary/20 font-bold"
-                            : val > 0
+                        className={`border border-border p-2 text-center transition-all ${i === currentStep.i && j === currentStep.j
+                          ? "bg-primary/20 font-"
+                          : val > 0
                             ? "bg-green-500/10"
                             : ""
-                        }`}
+                          }`}
                       >
                         {val}
                       </td>
@@ -254,7 +250,7 @@ export const EditDistanceVisualization: React.FC = () => {
                 operation: currentStep.operation,
                 minDistance:
                   currentStep.dp[currentStep.dp.length - 1][
-                    currentStep.dp[0].length - 1
+                  currentStep.dp[0].length - 1
                   ],
               }}
             />

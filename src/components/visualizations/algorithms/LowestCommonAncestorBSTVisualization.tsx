@@ -160,19 +160,19 @@ export const LowestCommonAncestorBSTVisualization = () => {
                   cx={pos.x}
                   cy={pos.y}
                   className={`transition-all duration-300 ${isLCA
-                      ? 'fill-green-500 stroke-green-600'
-                      : isCurrent
-                        ? 'fill-yellow-500 stroke-yellow-600'
-                        : isTarget
-                          ? 'fill-blue-500 stroke-blue-600'
-                          : 'fill-card stroke-border'
+                    ? 'fill-green-500 stroke-green-600'
+                    : isCurrent
+                      ? 'fill-yellow-500 stroke-yellow-600'
+                      : isTarget
+                        ? 'fill-blue-500 stroke-blue-600'
+                        : 'fill-card stroke-border'
                     }`}
                 />
                 <text
                   x={pos.x}
                   y={pos.y + 6}
                   textAnchor="middle"
-                  className={`text-sm font-bold ${isTarget || isCurrent || isLCA ? 'fill-white' : 'fill-foreground'}`}
+                  className={`text-sm font- ${isTarget || isCurrent || isLCA ? 'fill-white' : 'fill-foreground'}`}
                 >
                   {pos.val}
                 </text>
@@ -181,7 +181,7 @@ export const LowestCommonAncestorBSTVisualization = () => {
                     x={pos.x}
                     y={pos.y - 30}
                     textAnchor="middle"
-                    className="text-xs fill-blue-600 font-bold"
+                    className="text-xs fill-blue-600 font-"
                   >
                     {pos.val === step.p ? 'p' : 'q'}
                   </text>

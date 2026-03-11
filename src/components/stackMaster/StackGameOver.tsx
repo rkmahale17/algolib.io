@@ -13,18 +13,18 @@ interface StackGameOverProps {
   onBackToMenu: () => void;
 }
 
-export const StackGameOver = ({ 
+export const StackGameOver = ({
   isOpen,
-  score, 
+  score,
   correctMoves,
   totalMoves,
   maxCombo,
   level,
-  onRestart, 
-  onBackToMenu 
+  onRestart,
+  onBackToMenu
 }: StackGameOverProps) => {
   const accuracy = totalMoves > 0 ? Math.round((correctMoves / totalMoves) * 100) : 0;
-  
+
   const getGrade = () => {
     if (accuracy >= 95) return "A+";
     if (accuracy >= 85) return "A";
@@ -53,40 +53,40 @@ export const StackGameOver = ({
             {getMessage()}
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="space-y-4">
           <div className="text-center py-4 bg-primary/10 rounded-lg">
             <p className="text-sm text-muted-foreground mb-1">Final Score</p>
-            <p className="text-5xl font-bold text-primary">{score}</p>
+            <p className="text-5xl font- text-primary">{score}</p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center space-y-1 p-3 bg-muted/50 rounded-lg">
               <p className="text-sm text-muted-foreground">Grade</p>
-              <p className="text-3xl font-bold text-secondary">{getGrade()}</p>
+              <p className="text-3xl font- text-secondary">{getGrade()}</p>
             </div>
             <div className="text-center space-y-1 p-3 bg-muted/50 rounded-lg">
               <p className="text-sm text-muted-foreground">Level</p>
-              <p className="text-2xl font-bold">{level}</p>
+              <p className="text-2xl font-">{level}</p>
             </div>
             <div className="text-center space-y-1 p-3 bg-muted/50 rounded-lg">
               <p className="text-sm text-muted-foreground">Accuracy</p>
-              <p className="text-2xl font-bold text-primary">{accuracy}%</p>
+              <p className="text-2xl font- text-primary">{accuracy}%</p>
             </div>
             <div className="text-center space-y-1 p-3 bg-muted/50 rounded-lg">
               <p className="text-sm text-muted-foreground">Max Combo</p>
-              <p className="text-2xl font-bold text-secondary">×{maxCombo}</p>
+              <p className="text-2xl font- text-secondary">×{maxCombo}</p>
             </div>
           </div>
 
           <div className="p-4 bg-muted/50 rounded-lg space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Correct Moves:</span>
-              <span className="font-bold text-green-500">{correctMoves}</span>
+              <span className="font- text-green-500">{correctMoves}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Total Moves:</span>
-              <span className="font-bold">{totalMoves}</span>
+              <span className="font-">{totalMoves}</span>
             </div>
           </div>
 

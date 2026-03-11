@@ -239,25 +239,25 @@ export const JumpGameVisualization = () => {
                       idx === step.i
                         ? 'ring-2 ring-primary scale-110 z-10'
                         : ''
-                    } ${
+                      } ${
                       // Goal index coloration
-                      idx === step.maxReach 
-                        ? 'bg-green-500 text-white shadow-lg' 
-                        : idx > step.maxReach 
-                        ? 'bg-green-100 opacity-50' // Already solved part (right of goal)
-                        : 'bg-muted'
-                    }`}
+                      idx === step.maxReach
+                        ? 'bg-green-500 text-white shadow-lg'
+                        : idx > step.maxReach
+                          ? 'bg-green-100 opacity-50' // Already solved part (right of goal)
+                          : 'bg-muted'
+                      }`}
                   >
-                    <div className="text-[10px] uppercase font-bold mb-1 opacity-70">
-                        {idx === step.maxReach ? 'GOAL' : `IDX ${idx}`}
+                    <div className="text-[10px] uppercase font- mb-1 opacity-70">
+                      {idx === step.maxReach ? 'GOAL' : `IDX ${idx}`}
                     </div>
-                    <div className="font-bold text-xl">{num}</div>
-                    
+                    <div className="font- text-xl">{num}</div>
+
                     {/* Visualizing Jump Range */}
                     {idx === step.i && step.i >= 0 && (
-                        <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] text-primary whitespace-nowrap font-semibold">
-                            Reaches {idx + num}
-                        </div>
+                      <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] text-primary whitespace-nowrap font-semibold">
+                        Reaches {idx + num}
+                      </div>
                     )}
                   </div>
                 ))}
@@ -272,22 +272,22 @@ export const JumpGameVisualization = () => {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="mt-4"
           >
-             {/* Simple visualization of the goal moving */}
-             <Card className="p-4 bg-orange-50/50 border-orange-200">
-                <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium text-muted-foreground">Current Goal Post:</span>
-                    <span className="font-bold text-xl text-orange-600">Index {step.maxReach}</span>
-                </div>
-                <div className="w-full bg-gray-200 h-2 rounded-full mt-2 overflow-hidden">
-                    <div 
-                        className="bg-orange-500 h-full transition-all duration-500"
-                        style={{ width: `${100 - (step.maxReach / (step.nums.length - 1)) * 100}%` }}
-                    />
-                </div>
-                <div className="text-xs text-right mt-1 text-muted-foreground">
-                    dist to start: {step.maxReach} steps
-                </div>
-             </Card>
+            {/* Simple visualization of the goal moving */}
+            <Card className="p-4 bg-orange-50/50 border-orange-200">
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-medium text-muted-foreground">Current Goal Post:</span>
+                <span className="font- text-xl text-orange-600">Index {step.maxReach}</span>
+              </div>
+              <div className="w-full bg-gray-200 h-2 rounded-full mt-2 overflow-hidden">
+                <div
+                  className="bg-orange-500 h-full transition-all duration-500"
+                  style={{ width: `${100 - (step.maxReach / (step.nums.length - 1)) * 100}%` }}
+                />
+              </div>
+              <div className="text-xs text-right mt-1 text-muted-foreground">
+                dist to start: {step.maxReach} steps
+              </div>
+            </Card>
           </motion.div>
 
           <motion.div

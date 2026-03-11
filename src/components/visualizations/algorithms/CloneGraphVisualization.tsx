@@ -344,42 +344,38 @@ export const CloneGraphVisualization = () => {
               <h3 className="text-sm font-semibold mb-3">Original Graph</h3>
               <div className="flex items-center justify-center gap-8 p-6 bg-muted/30 rounded">
                 <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center font-bold ${
-                    step.currentNode === 1
-                      ? 'bg-primary text-primary-foreground ring-4 ring-primary'
-                      : 'bg-secondary'
-                  }`}
+                  className={`w-12 h-12 rounded-full flex items-center justify-center font- ${step.currentNode === 1
+                    ? 'bg-primary text-primary-foreground ring-4 ring-primary'
+                    : 'bg-secondary'
+                    }`}
                 >
                   1
                 </div>
                 <div className="text-2xl">—</div>
                 <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center font-bold ${
-                    step.currentNode === 2
-                      ? 'bg-primary text-primary-foreground ring-4 ring-primary'
-                      : 'bg-secondary'
-                  }`}
+                  className={`w-12 h-12 rounded-full flex items-center justify-center font- ${step.currentNode === 2
+                    ? 'bg-primary text-primary-foreground ring-4 ring-primary'
+                    : 'bg-secondary'
+                    }`}
                 >
                   2
                 </div>
               </div>
               <div className="flex items-center justify-center gap-8 p-6 bg-muted/30 rounded mt-2">
                 <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center font-bold ${
-                    step.currentNode === 4
-                      ? 'bg-primary text-primary-foreground ring-4 ring-primary'
-                      : 'bg-secondary'
-                  }`}
+                  className={`w-12 h-12 rounded-full flex items-center justify-center font- ${step.currentNode === 4
+                    ? 'bg-primary text-primary-foreground ring-4 ring-primary'
+                    : 'bg-secondary'
+                    }`}
                 >
                   4
                 </div>
                 <div className="text-2xl">—</div>
                 <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center font-bold ${
-                    step.currentNode === 3
-                      ? 'bg-primary text-primary-foreground ring-4 ring-primary'
-                      : 'bg-secondary'
-                  }`}
+                  className={`w-12 h-12 rounded-full flex items-center justify-center font- ${step.currentNode === 3
+                    ? 'bg-primary text-primary-foreground ring-4 ring-primary'
+                    : 'bg-secondary'
+                    }`}
                 >
                   3
                 </div>
@@ -402,7 +398,7 @@ export const CloneGraphVisualization = () => {
                   step.cloned.map((node, idx) => (
                     <div
                       key={idx}
-                      className="px-4 py-2 rounded-full bg-green-500/20 text-green-600 font-bold"
+                      className="px-4 py-2 rounded-full bg-green-500/20 text-green-600 font-"
                     >
                       {node}
                     </div>

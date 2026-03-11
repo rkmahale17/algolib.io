@@ -234,13 +234,12 @@ export const DecodeWaysVisualization = () => {
                 {step.s.split('').map((char, idx) => (
                   <div
                     key={idx}
-                    className={`px-4 py-3 rounded font-mono text-xl font-bold ${
-                      idx < step.i - 1
-                        ? 'bg-secondary'
-                        : idx === step.i - 1
+                    className={`px-4 py-3 rounded font-mono text-xl font- ${idx < step.i - 1
+                      ? 'bg-secondary'
+                      : idx === step.i - 1
                         ? 'bg-primary text-primary-foreground'
                         : 'bg-muted'
-                    }`}
+                      }`}
                   >
                     {char}
                   </div>
@@ -265,16 +264,15 @@ export const DecodeWaysVisualization = () => {
                   {step.dp.map((val, idx) => (
                     <div
                       key={idx}
-                      className={`px-4 py-3 rounded font-mono text-center ${
-                        idx === step.i
-                          ? 'bg-green-500/20 ring-2 ring-green-500'
-                          : idx < step.i
+                      className={`px-4 py-3 rounded font-mono text-center ${idx === step.i
+                        ? 'bg-green-500/20 ring-2 ring-green-500'
+                        : idx < step.i
                           ? 'bg-green-500/10'
                           : 'bg-muted'
-                      }`}
+                        }`}
                     >
                       <div className="text-xs">dp[{idx}]</div>
-                      <div className="font-bold text-lg">{val}</div>
+                      <div className="font- text-lg">{val}</div>
                     </div>
                   ))}
                 </div>

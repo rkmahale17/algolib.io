@@ -60,21 +60,21 @@ export const KthSmallestInBSTVisualization = () => {
     { currentNode: null, k: 3, count: 1, visited: [1], found: false, result: null, message: "Node is null, return", highlightedLines: [6], variables: { node: 'null', action: 'return' } },
     { currentNode: 1, k: 3, count: 1, visited: [1], found: false, result: null, message: "Node 1 complete, return to parent", highlightedLines: [16], variables: { node: '1', status: 'complete' } },
     { currentNode: 3, k: 3, count: 1, visited: [1], found: false, result: null, message: "Back to node 3, left subtree done", highlightedLines: [8], variables: { node: '3' } },
-    { currentNode: 3, k: 3, count: 1, visited: [1,3], found: false, result: null, message: "Visit node 3, increment count", highlightedLines: [10], variables: { node: '3', count: 2, k: 3 } },
-    { currentNode: 3, k: 3, count: 2, visited: [1,3], found: false, result: null, message: "Check if count === k", highlightedLines: [11], variables: { count: 2, k: 3, 'count === k': false } },
-    { currentNode: 3, k: 3, count: 2, visited: [1,3], found: false, result: null, message: "Not yet, traverse right of 3", highlightedLines: [16], variables: { node: '3', direction: 'right' } },
-    { currentNode: 4, k: 3, count: 2, visited: [1,3], found: false, result: null, message: "Call inorder(right=4)", highlightedLines: [5], variables: { node: '4', k: 3 } },
-    { currentNode: 4, k: 3, count: 2, visited: [1,3], found: false, result: null, message: "Check if node 4 is null", highlightedLines: [6], variables: { node: '4', 'node === null': false } },
-    { currentNode: 4, k: 3, count: 2, visited: [1,3], found: false, result: null, message: "Not null, traverse left of 4", highlightedLines: [8], variables: { node: '4', direction: 'left' } },
-    { currentNode: null, k: 3, count: 2, visited: [1,3], found: false, result: null, message: "Call inorder(left=null)", highlightedLines: [5], variables: { node: 'null' } },
-    { currentNode: null, k: 3, count: 2, visited: [1,3], found: false, result: null, message: "Node is null, return", highlightedLines: [6], variables: { node: 'null', action: 'return' } },
-    { currentNode: 4, k: 3, count: 2, visited: [1,3], found: false, result: null, message: "Back to node 4, left done", highlightedLines: [8], variables: { node: '4' } },
-    { currentNode: 4, k: 3, count: 2, visited: [1,3,4], found: false, result: null, message: "Visit node 4, increment count", highlightedLines: [10], variables: { node: '4', count: 3, k: 3 } },
-    { currentNode: 4, k: 3, count: 3, visited: [1,3,4], found: false, result: null, message: "Check if count === k", highlightedLines: [11], variables: { count: 3, k: 3, 'count === k': true } },
-    { currentNode: 4, k: 3, count: 3, visited: [1,3,4], found: true, result: 4, message: "Found! 3rd smallest element is 4 ✓", highlightedLines: [12], variables: { count: 3, k: 3, result: 4 } },
-    { currentNode: 4, k: 3, count: 3, visited: [1,3,4], found: true, result: 4, message: "Set result = 4 and return early", highlightedLines: [13], variables: { result: 4, action: 'return' } },
-    { currentNode: null, k: 3, count: 3, visited: [1,3,4], found: true, result: 4, message: "Return result: 4", highlightedLines: [20], variables: { result: 4 } },
-    { currentNode: null, k: 3, count: 3, visited: [1,3,4], found: true, result: 4, message: "Complete! Kth smallest = 4 ✓", highlightedLines: [20], variables: { k: 3, result: 4, visited: '[1,3,4]' } }
+    { currentNode: 3, k: 3, count: 1, visited: [1, 3], found: false, result: null, message: "Visit node 3, increment count", highlightedLines: [10], variables: { node: '3', count: 2, k: 3 } },
+    { currentNode: 3, k: 3, count: 2, visited: [1, 3], found: false, result: null, message: "Check if count === k", highlightedLines: [11], variables: { count: 2, k: 3, 'count === k': false } },
+    { currentNode: 3, k: 3, count: 2, visited: [1, 3], found: false, result: null, message: "Not yet, traverse right of 3", highlightedLines: [16], variables: { node: '3', direction: 'right' } },
+    { currentNode: 4, k: 3, count: 2, visited: [1, 3], found: false, result: null, message: "Call inorder(right=4)", highlightedLines: [5], variables: { node: '4', k: 3 } },
+    { currentNode: 4, k: 3, count: 2, visited: [1, 3], found: false, result: null, message: "Check if node 4 is null", highlightedLines: [6], variables: { node: '4', 'node === null': false } },
+    { currentNode: 4, k: 3, count: 2, visited: [1, 3], found: false, result: null, message: "Not null, traverse left of 4", highlightedLines: [8], variables: { node: '4', direction: 'left' } },
+    { currentNode: null, k: 3, count: 2, visited: [1, 3], found: false, result: null, message: "Call inorder(left=null)", highlightedLines: [5], variables: { node: 'null' } },
+    { currentNode: null, k: 3, count: 2, visited: [1, 3], found: false, result: null, message: "Node is null, return", highlightedLines: [6], variables: { node: 'null', action: 'return' } },
+    { currentNode: 4, k: 3, count: 2, visited: [1, 3], found: false, result: null, message: "Back to node 4, left done", highlightedLines: [8], variables: { node: '4' } },
+    { currentNode: 4, k: 3, count: 2, visited: [1, 3, 4], found: false, result: null, message: "Visit node 4, increment count", highlightedLines: [10], variables: { node: '4', count: 3, k: 3 } },
+    { currentNode: 4, k: 3, count: 3, visited: [1, 3, 4], found: false, result: null, message: "Check if count === k", highlightedLines: [11], variables: { count: 3, k: 3, 'count === k': true } },
+    { currentNode: 4, k: 3, count: 3, visited: [1, 3, 4], found: true, result: 4, message: "Found! 3rd smallest element is 4 ✓", highlightedLines: [12], variables: { count: 3, k: 3, result: 4 } },
+    { currentNode: 4, k: 3, count: 3, visited: [1, 3, 4], found: true, result: 4, message: "Set result = 4 and return early", highlightedLines: [13], variables: { result: 4, action: 'return' } },
+    { currentNode: null, k: 3, count: 3, visited: [1, 3, 4], found: true, result: 4, message: "Return result: 4", highlightedLines: [20], variables: { result: 4 } },
+    { currentNode: null, k: 3, count: 3, visited: [1, 3, 4], found: true, result: 4, message: "Complete! Kth smallest = 4 ✓", highlightedLines: [20], variables: { k: 3, result: 4, visited: '[1,3,4]' } }
   ];
 
   const [idx, setIdx] = useState(0);
@@ -131,22 +131,21 @@ export const KthSmallestInBSTVisualization = () => {
             const isVisited = step.visited.includes(pos.value);
             const isResult = step.found && step.result === pos.value;
             const visitOrder = step.visited.indexOf(pos.value) + 1;
-            
+
             return (
               <g key={i}>
                 <circle
                   cx={pos.x}
                   cy={pos.y}
                   r="24"
-                  className={`transition-all duration-300 ${
-                    isResult
-                      ? 'fill-green-500'
-                      : isCurrent
+                  className={`transition-all duration-300 ${isResult
+                    ? 'fill-green-500'
+                    : isCurrent
                       ? 'fill-yellow-500'
                       : isVisited
-                      ? 'fill-blue-500'
-                      : 'fill-card'
-                  }`}
+                        ? 'fill-blue-500'
+                        : 'fill-card'
+                    }`}
                   stroke="currentColor"
                   strokeWidth="2"
                 />
@@ -154,7 +153,7 @@ export const KthSmallestInBSTVisualization = () => {
                   x={pos.x}
                   y={pos.y + 6}
                   textAnchor="middle"
-                  className="text-sm font-bold fill-foreground"
+                  className="text-sm font- fill-foreground"
                 >
                   {pos.value}
                 </text>
@@ -163,7 +162,7 @@ export const KthSmallestInBSTVisualization = () => {
                     x={pos.x}
                     y={pos.y + 45}
                     textAnchor="middle"
-                    className="text-xs fill-primary font-bold"
+                    className="text-xs fill-primary font-"
                   >
                     #{visitOrder}
                   </text>
@@ -218,7 +217,7 @@ export const KthSmallestInBSTVisualization = () => {
           </AnimatePresence>
 
           <Card className="p-4 bg-primary/5 border-primary/20">
-            <motion.p 
+            <motion.p
               key={`msg-${idx}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

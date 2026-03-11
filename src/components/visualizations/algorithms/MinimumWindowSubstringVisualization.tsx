@@ -336,7 +336,7 @@ export const MinimumWindowSubstringVisualization = () => {
                   key={idx}
                   initial={{ scale: 0.8 }}
                   animate={{ scale: 1 }}
-                  className="w-10 h-10 flex items-center justify-center rounded bg-primary/20 border-2 border-primary font-mono font-bold"
+                  className="w-10 h-10 flex items-center justify-center rounded bg-primary/20 border-2 border-primary font-mono font-"
                 >
                   {char}
                 </motion.div>
@@ -354,13 +354,12 @@ export const MinimumWindowSubstringVisualization = () => {
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ duration: 0.3, delay: idx * 0.02 }}
-                    className={`w-10 h-10 flex items-center justify-center rounded font-mono font-bold border-2 ${
-                      isInWindow
-                        ? 'bg-primary/20 border-primary text-primary'
-                        : isResult
+                    className={`w-10 h-10 flex items-center justify-center rounded font-mono font- border-2 ${isInWindow
+                      ? 'bg-primary/20 border-primary text-primary'
+                      : isResult
                         ? 'bg-green-500/20 border-green-500 text-green-600'
                         : 'bg-muted/50 border-border text-muted-foreground'
-                    }`}
+                      }`}
                   >
                     {char}
                   </motion.div>
@@ -383,7 +382,7 @@ export const MinimumWindowSubstringVisualization = () => {
               <div className="grid grid-cols-2 gap-2">
                 {Object.entries(currentStep.tCount).map(([char]) => (
                   <div key={char} className="flex justify-between items-center p-2 bg-muted/50 rounded">
-                    <span className="font-mono font-bold">{char}</span>
+                    <span className="font-mono font-">{char}</span>
                     <span className="font-mono text-sm">
                       {currentStep.windowCount[char] || 0} / {currentStep.tCount[char]}
                     </span>

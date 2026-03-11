@@ -61,7 +61,7 @@ export const AStarVisualization = () => {
     const rows = 6;
     const cols = 8;
     const grid = Array(rows).fill(0).map(() => Array(cols).fill('.'));
-    
+
     // Add obstacles
     grid[2][3] = '#';
     grid[2][4] = '#';
@@ -142,7 +142,7 @@ export const AStarVisualization = () => {
           const h = heuristic(neighborCell, goal);
           neighborCell.h = h;
           neighborCell.f = tentativeG + h;
-          
+
           cameFrom.set(`${neighbor.x},${neighbor.y}`, current);
 
           if (!existingOpen) {
@@ -237,23 +237,22 @@ export const AStarVisualization = () => {
                     return (
                       <div
                         key={x}
-                        className={`w-10 h-10 border border-border flex items-center justify-center text-xs font-bold transition-all duration-300 ${
-                          cell === '#'
+                        className={`w-10 h-10 border border-border flex items-center justify-center text-xs font- transition-all duration-300 ${cell === '#'
                             ? 'bg-gray-800'
                             : inPath
-                            ? 'bg-green-500 text-white'
-                            : isCurrent
-                            ? 'bg-primary text-white'
-                            : isStart
-                            ? 'bg-blue-500 text-white'
-                            : isGoal
-                            ? 'bg-red-500 text-white'
-                            : inOpen
-                            ? 'bg-yellow-500/30'
-                            : inClosed
-                            ? 'bg-gray-500/30'
-                            : 'bg-muted/20'
-                        }`}
+                              ? 'bg-green-500 text-white'
+                              : isCurrent
+                                ? 'bg-primary text-white'
+                                : isStart
+                                  ? 'bg-blue-500 text-white'
+                                  : isGoal
+                                    ? 'bg-red-500 text-white'
+                                    : inOpen
+                                      ? 'bg-yellow-500/30'
+                                      : inClosed
+                                        ? 'bg-gray-500/30'
+                                        : 'bg-muted/20'
+                          }`}
                       >
                         {cell === '#' ? '#' : isStart ? 'S' : isGoal ? 'G' : ''}
                       </div>
@@ -268,18 +267,18 @@ export const AStarVisualization = () => {
             <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
           </div>
           <div className="rounded-lg">
-             <VariablePanel
-            variables={{
-              'Open Set': currentStep.openSet.length,
-              'Closed Set': currentStep.closedSet.length,
-              'Path Length': currentStep.path.length
-            }}
-          />
+            <VariablePanel
+              variables={{
+                'Open Set': currentStep.openSet.length,
+                'Closed Set': currentStep.closedSet.length,
+                'Path Length': currentStep.path.length
+              }}
+            />
           </div>
         </div>
 
         <div className="space-y-4">
-         
+
           <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
         </div>
       </div>

@@ -92,7 +92,7 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ youtubeUrl, algori
         </div>
 
         {/* Video Title */}
-        {/* <h4 className="text-lg font-bold text-foreground">{metadata.title}</h4> */}
+        {/* <h4 className="text-lg font- text-foreground">{metadata.title}</h4> */}
 
         {/* Responsive YouTube Player */}
         <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
@@ -109,9 +109,9 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ youtubeUrl, algori
         <div className="space-y-3 pt-2">
           <h3 className="text-lg font-semibold">What This Video Teaches</h3>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            This tutorial provides a comprehensive walkthrough of the {algorithmName || 'algorithm'}, 
-            demonstrating its practical application through step-by-step code implementation. 
-            The video breaks down complex concepts into digestible segments, making it easier to 
+            This tutorial provides a comprehensive walkthrough of the {algorithmName || 'algorithm'},
+            demonstrating its practical application through step-by-step code implementation.
+            The video breaks down complex concepts into digestible segments, making it easier to
             understand how the algorithm works under the hood and when to apply it in real-world scenarios.
           </p>
         </div>
@@ -119,7 +119,7 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ youtubeUrl, algori
         {/* Credits */}
         <div className="pt-4 border-t border-border/50">
           <p className="text-xs text-muted-foreground">
-            <strong>Credits:</strong> Video tutorial by NeetCode (used with permission). 
+            <strong>Credits:</strong> Video tutorial by NeetCode (used with permission).
             All written explanations, code examples, and additional insights provided by Rulcode.com
           </p>
         </div>

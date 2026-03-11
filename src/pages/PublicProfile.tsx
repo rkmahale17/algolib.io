@@ -285,7 +285,7 @@ const PublicProfile = () => {
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                     const fallback = document.createElement('div');
-                    fallback.className = 'text-3xl font-bold text-white';
+                    fallback.className = 'text-3xl font- text-white';
                     fallback.textContent = 'C';
                     e.currentTarget.parentElement?.appendChild(fallback);
                   }}
@@ -294,7 +294,7 @@ const PublicProfile = () => {
 
               {/* Heading */}
               <div className="space-y-2">
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-primary to-blue-400 bg-clip-text text-transparent">
+                <h1 className="text-3xl font- bg-gradient-to-r from-white via-primary to-blue-400 bg-clip-text text-transparent">
                   Profile Not Found
                 </h1>
                 <p className="text-gray-400 text-base">
@@ -346,7 +346,7 @@ const PublicProfile = () => {
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                     const fallback = document.createElement('div');
-                    fallback.className = 'text-3xl font-bold text-white';
+                    fallback.className = 'text-3xl font- text-white';
                     fallback.textContent = 'C';
                     e.currentTarget.parentElement?.appendChild(fallback);
                   }}
@@ -355,7 +355,7 @@ const PublicProfile = () => {
 
               {/* Heading */}
               <div className="space-y-2">
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-primary to-blue-400 bg-clip-text text-transparent">
+                <h1 className="text-3xl font- bg-gradient-to-r from-white via-primary to-blue-400 bg-clip-text text-transparent">
                   Private Profile
                 </h1>
                 <p className="text-gray-400 text-base">
@@ -407,7 +407,7 @@ const PublicProfile = () => {
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                     const fallback = document.createElement('div');
-                    fallback.className = 'text-3xl font-bold text-white';
+                    fallback.className = 'text-3xl font- text-white';
                     fallback.textContent = 'C';
                     e.currentTarget.parentElement?.appendChild(fallback);
                   }}
@@ -416,7 +416,7 @@ const PublicProfile = () => {
 
               {/* Heading */}
               <div className="space-y-2">
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-primary to-blue-400 bg-clip-text text-transparent">
+                <h1 className="text-3xl font- bg-gradient-to-r from-white via-primary to-blue-400 bg-clip-text text-transparent">
                   Welcome Back
                 </h1>
                 <p className="text-gray-400 text-base">
@@ -491,14 +491,14 @@ const PublicProfile = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="bg-card rounded-xl border border-border/40 shadow-sm p-5 hover:shadow-md transition-shadow">
                 <div className="text-sm font-medium text-muted-foreground mb-2">Total Solved</div>
-                <div className="text-3xl font-bold text-primary">{stats.totalSolved}</div>
+                <div className="text-3xl font- text-primary">{stats.totalSolved}</div>
                 <div className="text-xs text-muted-foreground mt-1">
                   out of {stats.totalQuestions} questions
                 </div>
               </div>
               <div className="bg-card rounded-xl border border-border/40 shadow-sm p-5 hover:shadow-md transition-shadow">
                 <div className="text-sm font-medium text-muted-foreground mb-2">Current Streak</div>
-                <div className="text-3xl font-bold text-orange-500">
+                <div className="text-3xl font- text-orange-500">
                   {stats.currentStreak} <span className="text-sm font-normal text-muted-foreground">days</span>
                 </div>
                 <div className="text-xs text-muted-foreground mt-1 flex justify-between items-center">
@@ -507,7 +507,7 @@ const PublicProfile = () => {
               </div>
               <div className="bg-card rounded-xl border border-border/40 shadow-sm p-5 hover:shadow-md transition-shadow">
                 <div className="text-sm font-medium text-muted-foreground mb-2">Max Streak</div>
-                <div className="text-3xl font-bold text-amber-500">
+                <div className="text-3xl font- text-amber-500">
                   {stats.longestStreak} <span className="text-sm font-normal text-muted-foreground">days</span>
                 </div>
                 <div className="text-xs text-muted-foreground mt-1">
@@ -516,7 +516,7 @@ const PublicProfile = () => {
               </div>
               <div className="bg-card rounded-xl border border-border/40 shadow-sm p-5 hover:shadow-md transition-shadow">
                 <div className="text-sm font-medium text-muted-foreground mb-2">Total Active Days</div>
-                <div className="text-3xl font-bold text-green-500">
+                <div className="text-3xl font- text-green-500">
                   {stats.totalActiveDays}
                 </div>
                 <div className="text-xs text-muted-foreground mt-1">

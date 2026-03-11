@@ -157,7 +157,7 @@ export function AlgorithmFormBuilder({
         // but user requested "direct column instead of meta data".
         // Let's remove it from metadata if we want to be strict, or just ignore it.
         // For now, I'll update it to match just in case.
-        listType: listType, 
+        listType: listType,
       },
     };
 
@@ -186,7 +186,7 @@ export function AlgorithmFormBuilder({
       const protectedFields = [
         "id", "name", "title", "category", "difficulty", "serial_no", "description"
       ];
-      
+
       const mergedTopLevel: any = {};
       protectedFields.forEach(field => {
         // If prev has value, keep it. Else take data.
@@ -197,7 +197,7 @@ export function AlgorithmFormBuilder({
       // Protect: companyTags, likes, dislikes, timeComplexity, spaceComplexity
       const prevMeta = prev.metadata || {};
       const newMeta = data.metadata || {};
-      
+
       const mergedMetadata = {
         ...newMeta, // Default to new
         // Restore protected if they exist in prev
@@ -227,72 +227,72 @@ export function AlgorithmFormBuilder({
       // 4. Implementations (Merge by codeType)
       const prevImpls = Array.isArray(prev.implementations) ? prev.implementations : [];
       const newImpls = Array.isArray(data.implementations) ? data.implementations : [];
-      
+
       // Strategy:
       // 1. Create a map of existing implementations by Language.
       // 2. For each language, map code types.
       // 3. Merge new implementations into this structure (overwriting same codeType, adding new).
-      
+
       const implMap = new Map<string, any[]>();
-      
+
       // Load previous
       prevImpls.forEach((impl: any) => {
-          if (impl.lang && Array.isArray(impl.code)) {
-              implMap.set(impl.lang.toLowerCase(), [...impl.code]);
-          }
+        if (impl.lang && Array.isArray(impl.code)) {
+          implMap.set(impl.lang.toLowerCase(), [...impl.code]);
+        }
       });
-      
+
       // Merge new
       newImpls.forEach((newImpl: any) => {
-          if (newImpl.lang && Array.isArray(newImpl.code)) {
-              const langKey = newImpl.lang.toLowerCase();
-              const existingCodes = implMap.get(langKey) || [];
-              
-              const mergedCodes = [...existingCodes];
-              
-              newImpl.code.forEach((newCode: any) => {
-                  const existingIndex = mergedCodes.findIndex(c => c.codeType === newCode.codeType);
-                  if (existingIndex >= 0) {
-                      // Overwrite existing (unless it's starter? No, if generator sends starter it's usually valid stub)
-                      // If prev was user-edited starter, maybe protect?
-                      // But for now, Smart Fill usually implies "Update".
-                      // Exception: If codeType is 'starter', we might want to preserve invalid user changes?
-                      // User said "more generated approch will merge".
-                      // So if it's a NEW approach, it appends. If it's existing, it updates.
-                      mergedCodes[existingIndex] = newCode; 
-                  } else {
-                      mergedCodes.push(newCode);
-                  }
-              });
-              
-              implMap.set(langKey, mergedCodes);
-          }
+        if (newImpl.lang && Array.isArray(newImpl.code)) {
+          const langKey = newImpl.lang.toLowerCase();
+          const existingCodes = implMap.get(langKey) || [];
+
+          const mergedCodes = [...existingCodes];
+
+          newImpl.code.forEach((newCode: any) => {
+            const existingIndex = mergedCodes.findIndex(c => c.codeType === newCode.codeType);
+            if (existingIndex >= 0) {
+              // Overwrite existing (unless it's starter? No, if generator sends starter it's usually valid stub)
+              // If prev was user-edited starter, maybe protect?
+              // But for now, Smart Fill usually implies "Update".
+              // Exception: If codeType is 'starter', we might want to preserve invalid user changes?
+              // User said "more generated approch will merge".
+              // So if it's a NEW approach, it appends. If it's existing, it updates.
+              mergedCodes[existingIndex] = newCode;
+            } else {
+              mergedCodes.push(newCode);
+            }
+          });
+
+          implMap.set(langKey, mergedCodes);
+        }
       });
-      
+
       // Reconstruct array
       // Helper to restore canonical casing
       const normalizeLangKey = (key: string) => {
-          if (key === 'typescript') return 'TypeScript';
-          return key;
+        if (key === 'typescript') return 'TypeScript';
+        return key;
       };
 
       const mergedImpls = Array.from(implMap.entries()).map(([lang, code]) => ({
-          lang: normalizeLangKey(lang),
-          code
+        lang: normalizeLangKey(lang),
+        code
       }));
-      
+
       // If we had no impls before, just take new (handled by logic above).
       // If we only have new impls (no prev), logic works.
-      
+
       // 5. Protected Arrays/Lists
       // 'tutorials', 'problems_to_solve'
-      const mergedTutorials = (prev.tutorials && prev.tutorials.length > 0) 
-          ? prev.tutorials 
-          : (data.tutorials || []);
+      const mergedTutorials = (prev.tutorials && prev.tutorials.length > 0)
+        ? prev.tutorials
+        : (data.tutorials || []);
 
       const mergedProblems = (prev.problems_to_solve && (prev.problems_to_solve.internal?.length > 0 || prev.problems_to_solve.external?.length > 0))
-          ? prev.problems_to_solve
-          : (data.problems_to_solve || { internal: [], external: [] });
+        ? prev.problems_to_solve
+        : (data.problems_to_solve || { internal: [], external: [] });
 
       // 6. List Type
       // If prev has list_type, keep it.
@@ -313,10 +313,10 @@ export function AlgorithmFormBuilder({
         // note: setListType is separate state, we might need to update it too if we wanted to overwrite (but we don't)
       };
     });
-    
+
     // Also update separate state if needed (but we are protecting it, so probably not)
     // if (data.list_type) setListType(data.list_type); 
-    
+
     toast.success("Form updated (Protected fields preserved)");
   };
 
@@ -328,31 +328,31 @@ export function AlgorithmFormBuilder({
       {/* Header with Action Buttons */}
       <div className="flex items-center justify-between sticky top-0 z-10 bg-background pb-0 border-b">
         <div>
-          <h2 className="text-2xl font-bold">
-              <div className="mb-1">
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/admin/problems')}
-            className="gap-2 pl-0 hover:pl-2 transition-all"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Problems
-          </Button>
-          {algorithm ? "Edit Problem" : "Create New Problem"} - {algorithm?.name}
-      </div> 
+          <h2 className="text-2xl font-">
+            <div className="mb-1">
+              <Button
+                variant="ghost"
+                onClick={() => navigate('/admin/problems')}
+                className="gap-2 pl-0 hover:pl-2 transition-all"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to Problems
+              </Button>
+              {algorithm ? "Edit Problem" : "Create New Problem"} - {algorithm?.name}
+            </div>
           </h2>
-        
+
         </div>
         <div className="flex items-center gap-2 pr-4">
-             <SmartFillDialog 
-                onFill={handleSmartFill} 
-                initialTopic={formData.id || formData.title}
-                existingApproaches={Array.from(new Set(
-                  (formData.implementations || []).flatMap((impl: any) => 
-                    (impl.code || []).map((c: any) => c.codeType)
-                  )
-                ))}
-             />
+          <SmartFillDialog
+            onFill={handleSmartFill}
+            initialTopic={formData.id || formData.title}
+            existingApproaches={Array.from(new Set(
+              (formData.implementations || []).flatMap((impl: any) =>
+                (impl.code || []).map((c: any) => c.codeType)
+              )
+            ))}
+          />
         </div>
 
       </div>
@@ -361,259 +361,259 @@ export function AlgorithmFormBuilder({
         <ResizablePanelGroup direction="horizontal" className="h-full border rounded-lg overflow-hidden">
           {/* Left Side - Form */}
           <ResizablePanel defaultSize={50} minSize={20} collapsible={true} className="min-w-0">
-             <div className="h-full overflow-y-auto p-6">
-                <Tabs value={activeTab} onValueChange={setActiveTab}>
-                  <TabsList className="grid w-full grid-cols-7 h-auto mb-4">
-                    <TabsTrigger value="basic" className="text-xs">
-                      Basic
-                    </TabsTrigger>
-                    <TabsTrigger value="explanation" className="text-xs">
-                      Explanation
-                    </TabsTrigger>
-                    <TabsTrigger value="code" className="text-xs">
-                      Code
-                    </TabsTrigger>
-                    <TabsTrigger value="tests" className="text-xs">
-                      Tests
-                    </TabsTrigger>
-                    <TabsTrigger value="metadata" className="text-xs">
-                      Metadata
-                    </TabsTrigger>
-                    <TabsTrigger value="problems" className="text-xs">
-                      Problems
-                    </TabsTrigger>
-                    <TabsTrigger value="tutorials" className="text-xs">
-                      Tutorials
-                    </TabsTrigger>
-                    <TabsTrigger value="controls" className="text-xs">
-                      Controls
-                    </TabsTrigger>
-                  </TabsList>
+            <div className="h-full overflow-y-auto p-6">
+              <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <TabsList className="grid w-full grid-cols-7 h-auto mb-4">
+                  <TabsTrigger value="basic" className="text-xs">
+                    Basic
+                  </TabsTrigger>
+                  <TabsTrigger value="explanation" className="text-xs">
+                    Explanation
+                  </TabsTrigger>
+                  <TabsTrigger value="code" className="text-xs">
+                    Code
+                  </TabsTrigger>
+                  <TabsTrigger value="tests" className="text-xs">
+                    Tests
+                  </TabsTrigger>
+                  <TabsTrigger value="metadata" className="text-xs">
+                    Metadata
+                  </TabsTrigger>
+                  <TabsTrigger value="problems" className="text-xs">
+                    Problems
+                  </TabsTrigger>
+                  <TabsTrigger value="tutorials" className="text-xs">
+                    Tutorials
+                  </TabsTrigger>
+                  <TabsTrigger value="controls" className="text-xs">
+                    Controls
+                  </TabsTrigger>
+                </TabsList>
 
-                  {/* Basic Info Tab */}
-                  <TabsContent value="basic" className="space-y-4">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Basic Information</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="space-y-2">
-                          <Label>
-                            ID * <span className="text-xs text-muted-foreground">(URL-friendly)</span>
-                          </Label>
-                          <Input
-                            value={formData.id}
-                            onChange={(e) =>
-                              setFormData({ ...formData, id: e.target.value })
-                            }
-                            placeholder="e.g., two-pointers"
-                            disabled={!!algorithm}
-                          />
-                        </div>
+                {/* Basic Info Tab */}
+                <TabsContent value="basic" className="space-y-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Basic Information</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-2">
+                        <Label>
+                          ID * <span className="text-xs text-muted-foreground">(URL-friendly)</span>
+                        </Label>
+                        <Input
+                          value={formData.id}
+                          onChange={(e) =>
+                            setFormData({ ...formData, id: e.target.value })
+                          }
+                          placeholder="e.g., two-pointers"
+                          disabled={!!algorithm}
+                        />
+                      </div>
 
-                        <div className="space-y-2">
-                          <Label>Name *</Label>
-                          <Input
-                            value={formData.name}
-                            onChange={(e) =>
-                              setFormData({ ...formData, name: e.target.value })
-                            }
-                            placeholder="e.g., Two Pointers"
-                          />
-                        </div>
+                      <div className="space-y-2">
+                        <Label>Name *</Label>
+                        <Input
+                          value={formData.name}
+                          onChange={(e) =>
+                            setFormData({ ...formData, name: e.target.value })
+                          }
+                          placeholder="e.g., Two Pointers"
+                        />
+                      </div>
 
-                        <div className="space-y-2">
-                          <Label>Title *</Label>
-                          <Input
-                            value={formData.title}
-                            onChange={(e) =>
-                              setFormData({ ...formData, title: e.target.value })
-                            }
-                            placeholder="e.g., Two Pointers"
-                          />
-                        </div>
+                      <div className="space-y-2">
+                        <Label>Title *</Label>
+                        <Input
+                          value={formData.title}
+                          onChange={(e) =>
+                            setFormData({ ...formData, title: e.target.value })
+                          }
+                          placeholder="e.g., Two Pointers"
+                        />
+                      </div>
 
-                        <div className="space-y-2">
-                          <Label>Serial No</Label>
-                          <Input
-                            type="number"
-                            value={formData.serial_no}
-                            onChange={(e) =>
-                              setFormData({ ...formData, serial_no: e.target.value })
-                            }
-                            placeholder="e.g., 1"
-                          />
-                        </div>
+                      <div className="space-y-2">
+                        <Label>Serial No</Label>
+                        <Input
+                          type="number"
+                          value={formData.serial_no}
+                          onChange={(e) =>
+                            setFormData({ ...formData, serial_no: e.target.value })
+                          }
+                          placeholder="e.g., 1"
+                        />
+                      </div>
 
-                        <div className="space-y-2">
-                          <Label>Category *</Label>
-                          <Input
-                            value={formData.category}
-                            onChange={(e) =>
-                              setFormData({ ...formData, category: e.target.value })
-                            }
-                            placeholder="e.g., Arrays & Strings"
-                          />
-                        </div>
+                      <div className="space-y-2">
+                        <Label>Category *</Label>
+                        <Input
+                          value={formData.category}
+                          onChange={(e) =>
+                            setFormData({ ...formData, category: e.target.value })
+                          }
+                          placeholder="e.g., Arrays & Strings"
+                        />
+                      </div>
 
-                        <div className="space-y-2">
-                          <Label>Difficulty *</Label>
-                          <Select
-                            value={formData.difficulty}
-                            onValueChange={(value) =>
-                              setFormData({ ...formData, difficulty: value })
-                            }
-                          >
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="easy">Easy</SelectItem>
-                              <SelectItem value="intermediate">Intermediate</SelectItem>
-                              <SelectItem value="advance">Advance</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
+                      <div className="space-y-2">
+                        <Label>Difficulty *</Label>
+                        <Select
+                          value={formData.difficulty}
+                          onValueChange={(value) =>
+                            setFormData({ ...formData, difficulty: value })
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="easy">Easy</SelectItem>
+                            <SelectItem value="intermediate">Intermediate</SelectItem>
+                            <SelectItem value="advance">Advance</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-                        <div className="space-y-2">
-                          <Label>List Type</Label>
-                          <Select value={listType} onValueChange={setListType}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select list type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {LIST_TYPE_OPTIONS.map((opt) => (
-                                <SelectItem key={opt.value} value={opt.value}>
-                                  {opt.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </TabsContent>
+                      <div className="space-y-2">
+                        <Label>List Type</Label>
+                        <Select value={listType} onValueChange={setListType}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select list type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {LIST_TYPE_OPTIONS.map((opt) => (
+                              <SelectItem key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
 
-                  {/* Explanation Tab */}
-                  <TabsContent value="explanation" className="mt-4">
-                    <ExplanationEditor
-                      data={formData.explanation}
-                      onChange={(explanation) =>
-                        setFormData({ ...formData, explanation })
-                      }
-                    />
-                  </TabsContent>
+                {/* Explanation Tab */}
+                <TabsContent value="explanation" className="mt-4">
+                  <ExplanationEditor
+                    data={formData.explanation}
+                    onChange={(explanation) =>
+                      setFormData({ ...formData, explanation })
+                    }
+                  />
+                </TabsContent>
 
-                  {/* Code Tab */}
-                  <TabsContent value="code" className="mt-4">
-                    <CodeImplementationEditor
-                      implementations={formData.implementations}
-                      onChange={(implementations) =>
-                        setFormData({ ...formData, implementations })
-                      }
-                    />
-                  </TabsContent>
+                {/* Code Tab */}
+                <TabsContent value="code" className="mt-4">
+                  <CodeImplementationEditor
+                    implementations={formData.implementations}
+                    onChange={(implementations) =>
+                      setFormData({ ...formData, implementations })
+                    }
+                  />
+                </TabsContent>
 
-                  {/* Tests Tab */}
-                  <TabsContent value="tests" className="mt-4 space-y-6">
-                    <InputSchemaEditor
-                      schema={formData.input_schema}
-                      onChange={(input_schema) =>
-                        setFormData({ ...formData, input_schema })
-                      }
-                    />
+                {/* Tests Tab */}
+                <TabsContent value="tests" className="mt-4 space-y-6">
+                  <InputSchemaEditor
+                    schema={formData.input_schema}
+                    onChange={(input_schema) =>
+                      setFormData({ ...formData, input_schema })
+                    }
+                  />
 
-                    <div className="grid grid-cols-2 gap-6 p-4 border rounded-lg bg-muted/30">
-                        <div className="flex flex-col gap-2">
-                            <div className="flex items-center justify-between">
-                                <Label htmlFor="unordered-toggle" className="font-semibold">Unordered Comparison</Label>
-                                <Switch 
-                                    id="unordered-toggle" 
-                                    checked={formData.metadata?.unordered || false} 
-                                    onCheckedChange={(val) => setFormData({
-                                        ...formData,
-                                        metadata: { ...formData.metadata, unordered: val }
-                                    })} 
-                                />
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                                If enabled, array results will be sorted before comparison. Useful for problems like "Find All Subsets" where order doesn't matter.
-                            </p>
-                        </div>
-
-                        <div className="flex flex-col gap-2">
-                            <div className="flex items-center justify-between">
-                                <Label htmlFor="multi-expected-toggle" className="font-semibold">Multiple Valid Outputs</Label>
-                                <Switch 
-                                    id="multi-expected-toggle" 
-                                    checked={formData.metadata?.multi_expected || false} 
-                                    onCheckedChange={(val) => setFormData({
-                                        ...formData,
-                                        metadata: { ...formData.metadata, multi_expected: val }
-                                    })} 
-                                />
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                                If enabled, "expectedOutput" should be an array of valid results. Code passes if actual matches ANY variant.
-                            </p>
-                        </div>
+                  <div className="grid grid-cols-2 gap-6 p-4 border rounded-lg bg-muted/30">
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="unordered-toggle" className="font-semibold">Unordered Comparison</Label>
+                        <Switch
+                          id="unordered-toggle"
+                          checked={formData.metadata?.unordered || false}
+                          onCheckedChange={(val) => setFormData({
+                            ...formData,
+                            metadata: { ...formData.metadata, unordered: val }
+                          })}
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        If enabled, array results will be sorted before comparison. Useful for problems like "Find All Subsets" where order doesn't matter.
+                      </p>
                     </div>
 
-                    <TestCaseEditor
-                      testCases={formData.test_cases}
-                      inputSchema={formData.input_schema}
-                      onChange={(test_cases) =>
-                        setFormData({ ...formData, test_cases })
-                      }
-                    />
-                  </TabsContent>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="multi-expected-toggle" className="font-semibold">Multiple Valid Outputs</Label>
+                        <Switch
+                          id="multi-expected-toggle"
+                          checked={formData.metadata?.multi_expected || false}
+                          onCheckedChange={(val) => setFormData({
+                            ...formData,
+                            metadata: { ...formData.metadata, multi_expected: val }
+                          })}
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        If enabled, "expectedOutput" should be an array of valid results. Code passes if actual matches ANY variant.
+                      </p>
+                    </div>
+                  </div>
 
-                  {/* Metadata Tab */}
-                  <TabsContent value="metadata" className="mt-4">
-                    <MetadataEditor
-                      data={formData.metadata}
-                      onChange={(metadata) => setFormData({ ...formData, metadata })}
-                    />
-                  </TabsContent>
+                  <TestCaseEditor
+                    testCases={formData.test_cases}
+                    inputSchema={formData.input_schema}
+                    onChange={(test_cases) =>
+                      setFormData({ ...formData, test_cases })
+                    }
+                  />
+                </TabsContent>
 
-                  {/* Problems Tab */}
-                  <TabsContent value="problems" className="mt-4">
-                    <ProblemsEditor
-                      data={formData.problems_to_solve}
-                      onChange={(problems_to_solve) =>
-                        setFormData({ ...formData, problems_to_solve })
-                      }
-                    />
-                  </TabsContent>
+                {/* Metadata Tab */}
+                <TabsContent value="metadata" className="mt-4">
+                  <MetadataEditor
+                    data={formData.metadata}
+                    onChange={(metadata) => setFormData({ ...formData, metadata })}
+                  />
+                </TabsContent>
 
-                  {/* Tutorials Tab */}
-                  <TabsContent value="tutorials" className="mt-4">
-                    <TutorialsEditor
-                      tutorials={formData.tutorials}
-                      onChange={(tutorials) => setFormData({ ...formData, tutorials })}
-                    />
-                  </TabsContent>
+                {/* Problems Tab */}
+                <TabsContent value="problems" className="mt-4">
+                  <ProblemsEditor
+                    data={formData.problems_to_solve}
+                    onChange={(problems_to_solve) =>
+                      setFormData({ ...formData, problems_to_solve })
+                    }
+                  />
+                </TabsContent>
 
-                  {/* Controls Tab */}
-                  <TabsContent value="controls" className="mt-4">
-                     <ControlsEditor
-                      controls={formData.controls}
-                      onChange={(controls) => setFormData({ ...formData, controls })}
-                      implementations={formData.implementations}
-                      onImplementationsChange={(implementations) => setFormData({ ...formData, implementations })}
-                    />
-                  </TabsContent>
-                </Tabs>
-             </div>
+                {/* Tutorials Tab */}
+                <TabsContent value="tutorials" className="mt-4">
+                  <TutorialsEditor
+                    tutorials={formData.tutorials}
+                    onChange={(tutorials) => setFormData({ ...formData, tutorials })}
+                  />
+                </TabsContent>
+
+                {/* Controls Tab */}
+                <TabsContent value="controls" className="mt-4">
+                  <ControlsEditor
+                    controls={formData.controls}
+                    onChange={(controls) => setFormData({ ...formData, controls })}
+                    implementations={formData.implementations}
+                    onImplementationsChange={(implementations) => setFormData({ ...formData, implementations })}
+                  />
+                </TabsContent>
+              </Tabs>
+            </div>
           </ResizablePanel>
 
           <ResizableHandle withHandle />
 
           {/* Right Side - Preview */}
           <ResizablePanel defaultSize={50} minSize={20} collapsible={true} className="min-w-0 bg-muted/5">
-             <div className="h-full overflow-hidden p-2">
-                 <AlgorithmPreview algorithm={formData} />
-             </div>
+            <div className="h-full overflow-hidden p-2">
+              <AlgorithmPreview algorithm={formData} />
+            </div>
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
@@ -631,9 +631,9 @@ export function AlgorithmFormBuilder({
           Cancel
         </Button>
         <div className="h-6 w-px bg-border" />
-        <Button 
-          onClick={handleSave} 
-          disabled={isLoading} 
+        <Button
+          onClick={handleSave}
+          disabled={isLoading}
           className="gap-2 rounded-full"
         >
           {isLoading ? (

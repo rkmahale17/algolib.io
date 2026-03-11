@@ -39,7 +39,7 @@ export const BestTimeToBuyAndSellStockVisualization = () => {
   const generateSteps = () => {
     const prices = [7, 1, 5, 3, 6, 4];
     const newSteps: Step[] = [];
-    
+
     let l = 0;
     let r = 1;
     let maxProfit = 0;
@@ -70,7 +70,7 @@ export const BestTimeToBuyAndSellStockVisualization = () => {
         const profit = prices[r] - prices[l];
         const oldMaxProfit = maxProfit;
         maxProfit = Math.max(maxProfit, profit);
-        
+
         newSteps.push({
           array: [...prices],
           highlights: [l, r],
@@ -95,7 +95,7 @@ export const BestTimeToBuyAndSellStockVisualization = () => {
 
       r = r + 1;
       if (r < prices.length) {
-         newSteps.push({
+        newSteps.push({
           array: [...prices],
           highlights: [l, r],
           minIndex: l,
@@ -184,20 +184,19 @@ export const BestTimeToBuyAndSellStockVisualization = () => {
                 // r is stored in variables.r
                 const l = currentStep.variables.l;
                 const r = currentStep.variables.r;
-                
+
                 const isL = idx === l;
                 const isR = idx === r;
-                
+
                 return (
                   <div key={idx} className="flex flex-col items-center gap-2 flex-1 max-w-[50px] relative">
-                    {isL && <div className="absolute -top-6 text-xs font-bold text-green-500">L</div>}
-                    {isR && <div className="absolute -top-6 text-xs font-bold text-blue-500">R</div>}
+                    {isL && <div className="absolute -top-6 text-xs font- text-green-500">L</div>}
+                    {isR && <div className="absolute -top-6 text-xs font- text-blue-500">R</div>}
                     <div
-                      className={`w-full rounded-t transition-all duration-300 ${
-                         isL || isR
-                          ? 'bg-primary shadow-lg shadow-primary/50'
-                          : 'bg-muted/60'
-                      }`}
+                      className={`w-full rounded-t transition-all duration-300 ${isL || isR
+                        ? 'bg-primary shadow-lg shadow-primary/50'
+                        : 'bg-muted/60'
+                        }`}
                       style={{ height: `${(value / maxPrice) * 100}%`, minHeight: '20px' }}
                     />
                     <span className="text-xs font-mono">${value}</span>

@@ -16,7 +16,7 @@ interface Step {
 
 export const NumberOf1BitsVisualization = () => {
   const [currentStep, setCurrentStep] = useState(0);
-  
+
   const steps: Step[] = [
     {
       variables: { n: 11, nBinary: '00001011', count: '?' },
@@ -250,11 +250,10 @@ export const NumberOf1BitsVisualization = () => {
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: idx * 0.05 }}
-                    className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center font-mono text-lg border-2 rounded transition-all ${
-                      bit === '1' 
-                        ? 'bg-primary/30 border-primary font-bold' 
-                        : 'bg-muted border-border'
-                    } ${idx === step.checkingBit ? 'ring-2 ring-accent scale-110' : ''}`}
+                    className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center font-mono text-lg border-2 rounded transition-all ${bit === '1'
+                      ? 'bg-primary/30 border-primary font-'
+                      : 'bg-muted border-border'
+                      } ${idx === step.checkingBit ? 'ring-2 ring-accent scale-110' : ''}`}
                   >
                     {bit}
                   </motion.div>
@@ -266,7 +265,7 @@ export const NumberOf1BitsVisualization = () => {
               </div>
             </div>
           </motion.div>
-          
+
           <motion.div
             key={`execution-${currentStep}`}
             initial={{ opacity: 0, x: -20 }}

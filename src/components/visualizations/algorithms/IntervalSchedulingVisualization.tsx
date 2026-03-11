@@ -54,7 +54,7 @@ export const IntervalSchedulingVisualization: React.FC = () => {
     const newSteps: Step[] = [];
 
     intervals.sort((a, b) => a.end - b.end);
-    
+
     newSteps.push({
       intervals: [...intervals],
       selected: [],
@@ -69,7 +69,7 @@ export const IntervalSchedulingVisualization: React.FC = () => {
 
     for (let i = 0; i < intervals.length; i++) {
       const interval = intervals[i];
-      
+
       newSteps.push({
         intervals: [...intervals],
         selected: [...selected],
@@ -175,7 +175,7 @@ export const IntervalSchedulingVisualization: React.FC = () => {
 
       <div className="bg-card rounded-lg p-6 border">
         <h3 className="text-lg font-semibold mb-4">Intervals Timeline</h3>
-        
+
         <div className="space-y-3 mb-6">
           {currentStep.intervals.map((interval, idx) => (
             <div key={idx} className="flex items-center gap-4">
@@ -185,13 +185,12 @@ export const IntervalSchedulingVisualization: React.FC = () => {
                   <div className="w-full h-2 bg-muted rounded"></div>
                 </div>
                 <div
-                  className={`absolute h-8 rounded border-2 flex items-center justify-center text-xs font-bold transition-all ${
-                    currentStep.selected.includes(idx)
-                      ? 'bg-green-500/20 border-green-500'
-                      : idx === currentStep.current
+                  className={`absolute h-8 rounded border-2 flex items-center justify-center text-xs font- transition-all ${currentStep.selected.includes(idx)
+                    ? 'bg-green-500/20 border-green-500'
+                    : idx === currentStep.current
                       ? 'bg-primary/20 border-primary'
                       : 'bg-blue-500/10 border-blue-500/50'
-                  }`}
+                    }`}
                   style={{
                     left: `${(interval.start / 10) * 100}%`,
                     width: `${((interval.end - interval.start) / 10) * 100}%`

@@ -20,10 +20,10 @@ export const CoinChangeVisualization = () => {
 
   const coins = [1, 2, 5];
   const amount = 6;
-  
+
   // Helper to init array with logic value
   const INF = 7; // amount + 1
-  
+
   const steps: Step[] = [
     {
       array: [],
@@ -148,7 +148,7 @@ export const CoinChangeVisualization = () => {
       highlightedLines: [19],
       lineExecution: "dp[3] = 2"
     },
-     // a = 4
+    // a = 4
     {
       array: [0, 1, 1, 2, 7, 7, 7],
       highlighting: [],
@@ -306,11 +306,10 @@ export const CoinChangeVisualization = () => {
                     className="flex flex-col items-center gap-1 flex-shrink-0"
                   >
                     <div
-                      className={`w-10 h-10 rounded flex items-center justify-center font-bold text-sm transition-all duration-300 ${
-                        step.highlighting.includes(index)
-                          ? 'bg-primary text-primary-foreground scale-110'
-                          : 'bg-muted text-foreground'
-                      }`}
+                      className={`w-10 h-10 rounded flex items-center justify-center font- text-sm transition-all duration-300 ${step.highlighting.includes(index)
+                        ? 'bg-primary text-primary-foreground scale-110'
+                        : 'bg-muted text-foreground'
+                        }`}
                     >
                       {value}
                     </div>
@@ -320,7 +319,7 @@ export const CoinChangeVisualization = () => {
               </div>
             </Card>
           </motion.div>
-          
+
           <motion.div
             key={`execution-${currentStep}`}
           >
@@ -354,7 +353,7 @@ export const CoinChangeVisualization = () => {
 
           <motion.div
             key={`variables-${currentStep}`}
-       
+
           >
             <VariablePanel variables={step.variables} />
           </motion.div>

@@ -45,7 +45,7 @@ const Auth = () => {
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!supabase) {
       toast.error('Authentication is not available. Please contact support.');
       return;
@@ -67,7 +67,7 @@ const Auth = () => {
         });
 
         if (error) throw error;
-        
+
         setShowVerificationMessage(true);
         toast.success('Account created! Please check your email to verify your account.');
       } else {
@@ -92,7 +92,7 @@ const Auth = () => {
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!supabase) {
       toast.error('Authentication is not available. Please contact support.');
       return;
@@ -111,7 +111,7 @@ const Auth = () => {
       });
 
       if (error) throw error;
-      
+
       toast.success('Password reset email sent! Check your inbox for instructions.');
       setIsForgotPassword(false);
       setEmail('');
@@ -160,10 +160,10 @@ const Auth = () => {
           {/* Logo and Header */}
           <div className="text-center mb-8">
             <div className="flex justify-center mb-6">
-              <img 
-                src={Logo} 
-                alt="RulCode" 
-                className="h-16 w-16 rounded-2xl shadow-lg" 
+              <img
+                src={Logo}
+                alt="RulCode"
+                className="h-16 w-16 rounded-2xl shadow-lg"
               />
             </div>
             <h1 className="text-2xl font-semibold mb-2">
@@ -173,8 +173,8 @@ const Auth = () => {
               {isForgotPassword
                 ? 'Enter your email to receive reset instructions'
                 : isSignUp
-                ? 'Start your journey to master algorithms'
-                : 'Continue learning algorithms visually'}
+                  ? 'Start your journey to master algorithms'
+                  : 'Continue learning algorithms visually'}
             </p>
           </div>
 

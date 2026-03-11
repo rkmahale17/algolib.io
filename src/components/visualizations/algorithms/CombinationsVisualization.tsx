@@ -155,63 +155,62 @@ export const CombinationsVisualization: React.FC = () => {
       />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-      <div className="bg-card rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4">Range: 1 to {currentStep.n}, Choose {currentStep.k}</h3>
-        <div className="flex gap-2 mb-6">
-          {Array.from({ length: currentStep.n }, (_, i) => i + 1).map((val) => (
-            <div
-              key={val}
-              className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
-                val === currentStep.start ? 'bg-primary/20 border-primary' :
-                currentStep.current.includes(val) ? 'bg-green-500/20 border-green-500' :
-                'bg-card border-border'
-              }`}
-            >
-              {val}
-            </div>
-          ))}
-        </div>
-
-        <h3 className="text-lg font-semibold mb-4">Current Combination ({currentStep.current.length}/{currentStep.k})</h3>
-        <div className="flex gap-2 mb-6 min-h-[3rem]">
-          {currentStep.current.length > 0 ? (
-            currentStep.current.map((val, idx) => (
+        <div className="bg-card rounded-lg p-6 border">
+          <h3 className="text-lg font-semibold mb-4">Range: 1 to {currentStep.n}, Choose {currentStep.k}</h3>
+          <div className="flex gap-2 mb-6">
+            {Array.from({ length: currentStep.n }, (_, i) => i + 1).map((val) => (
               <div
-                key={idx}
-                className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-blue-500/20 border-blue-500 font-bold"
+                key={val}
+                className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font- transition-all ${val === currentStep.start ? 'bg-primary/20 border-primary' :
+                  currentStep.current.includes(val) ? 'bg-green-500/20 border-green-500' :
+                    'bg-card border-border'
+                  }`}
               >
                 {val}
               </div>
-            ))
-          ) : (
-            <div className="text-muted-foreground italic">Empty</div>
-          )}
-        </div>
+            ))}
+          </div>
 
-        <h3 className="text-lg font-semibold mb-4">All Combinations ({currentStep.allCombinations.length})</h3>
-        <div className="flex flex-wrap gap-2">
-          {currentStep.allCombinations.map((comb, idx) => (
-            <div key={idx} className="px-3 py-1 bg-muted rounded border text-sm">
-              [{comb.join(', ')}]
-            </div>
-          ))}
-        </div>
+          <h3 className="text-lg font-semibold mb-4">Current Combination ({currentStep.current.length}/{currentStep.k})</h3>
+          <div className="flex gap-2 mb-6 min-h-[3rem]">
+            {currentStep.current.length > 0 ? (
+              currentStep.current.map((val, idx) => (
+                <div
+                  key={idx}
+                  className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-blue-500/20 border-blue-500 font-"
+                >
+                  {val}
+                </div>
+              ))
+            ) : (
+              <div className="text-muted-foreground italic">Empty</div>
+            )}
+          </div>
 
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
+          <h3 className="text-lg font-semibold mb-4">All Combinations ({currentStep.allCombinations.length})</h3>
+          <div className="flex flex-wrap gap-2">
+            {currentStep.allCombinations.map((comb, idx) => (
+              <div key={idx} className="px-3 py-1 bg-muted rounded border text-sm">
+                [{comb.join(', ')}]
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4 p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
+          </div>
+          <div className="mt-4 p-4 bg-muted rounded">
+            <VariablePanel
+              variables={{
+                'n': currentStep.n,
+                'k': currentStep.k,
+                'current size': currentStep.current.length,
+                'total combinations': currentStep.allCombinations.length
+              }}
+            />
+          </div>
         </div>
-           <div className="mt-4 p-4 bg-muted rounded">
-           <VariablePanel
-        variables={{
-          'n': currentStep.n,
-          'k': currentStep.k,
-          'current size': currentStep.current.length,
-          'total combinations': currentStep.allCombinations.length
-        }}
-      />
-      </div>
-      </div>
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
 
       </div>
     </div>

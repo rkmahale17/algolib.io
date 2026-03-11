@@ -74,10 +74,10 @@ export function AlgorithmForm({
   // Reset form when algorithm changes
   useEffect(() => {
     if (algorithm) {
-      const metadataObj = typeof algorithm.metadata === 'string' 
-        ? JSON.parse(algorithm.metadata) 
+      const metadataObj = typeof algorithm.metadata === 'string'
+        ? JSON.parse(algorithm.metadata)
         : algorithm.metadata;
-      
+
       setListType(metadataObj?.listType || "coreAlgo");
       setUnordered(!!metadataObj?.unordered);
 
@@ -228,7 +228,7 @@ export function AlgorithmForm({
   return (
     <div className="bg-background border rounded-lg shadow-sm w-[100vw]">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold tracking-tight">
+        <h2 className="text-2xl font- tracking-tight">
           {algorithm ? "Edit Algorithm" : "Create New Algorithm"}
         </h2>
         <p className="text-muted-foreground">
@@ -444,33 +444,33 @@ export function AlgorithmForm({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 border rounded-lg bg-muted/30">
-                <div className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between">
-                        <Label htmlFor="unordered-toggle" className="font-semibold">Unordered Comparison</Label>
-                        <Switch 
-                            id="unordered-toggle" 
-                            checked={unordered} 
-                            onCheckedChange={setUnordered} 
-                        />
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                        If enabled, array results will be sorted before comparison. Useful for problems like "Find All Subsets" where order doesn't matter.
-                    </p>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="unordered-toggle" className="font-semibold">Unordered Comparison</Label>
+                  <Switch
+                    id="unordered-toggle"
+                    checked={unordered}
+                    onCheckedChange={setUnordered}
+                  />
                 </div>
+                <p className="text-xs text-muted-foreground">
+                  If enabled, array results will be sorted before comparison. Useful for problems like "Find All Subsets" where order doesn't matter.
+                </p>
+              </div>
 
-                <div className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between">
-                        <Label htmlFor="multi-expected-toggle" className="font-semibold">Multiple Valid Outputs</Label>
-                        <Switch 
-                            id="multi-expected-toggle" 
-                            checked={multiExpected} 
-                            onCheckedChange={setMultiExpected} 
-                        />
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                        If enabled, "expectedOutput" should be an array of valid results. Code passes if actual matches ANY variant.
-                    </p>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="multi-expected-toggle" className="font-semibold">Multiple Valid Outputs</Label>
+                  <Switch
+                    id="multi-expected-toggle"
+                    checked={multiExpected}
+                    onCheckedChange={setMultiExpected}
+                  />
                 </div>
+                <p className="text-xs text-muted-foreground">
+                  If enabled, "expectedOutput" should be an array of valid results. Code passes if actual matches ANY variant.
+                </p>
+              </div>
 
             </div>
 
@@ -491,7 +491,7 @@ export function AlgorithmForm({
                 })()}
                 onChange={(newSchema) => {
                   setValue("input_schema", JSON.stringify(newSchema), { shouldValidate: true });
-                  
+
                   const inplaceIndex = newSchema.findIndex((f) => f.inplace);
                   if (inplaceIndex !== -1) {
                     setReturnModifiedInput(true);

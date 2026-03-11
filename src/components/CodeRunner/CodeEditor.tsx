@@ -18,16 +18,16 @@ const basicFormat = (code: string, language: string): string => {
   const lines = code.split('\n').map(line => line.trim());
   let formatted = '';
   let indentLevel = 0;
-  const indentSize = 2; 
+  const indentSize = 2;
 
   if (language === 'python') return code; // Skip Python to avoid breaking logic
 
   for (const line of lines) {
     if (!line) {
-        formatted += '\n';
-        continue;
+      formatted += '\n';
+      continue;
     }
-    
+
     if (line.startsWith('}') || line.startsWith(']')) {
       indentLevel = Math.max(0, indentLevel - 1);
     }
@@ -36,9 +36,9 @@ const basicFormat = (code: string, language: string): string => {
 
     const openBraces = (line.match(/\{/g) || []).length;
     const closeBraces = (line.match(/\}/g) || []).length;
-    
+
     if (openBraces > closeBraces) {
-        indentLevel++;
+      indentLevel++;
     }
   }
   return formatted;
@@ -94,44 +94,75 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(({
           editorRef.current.setValue(formatted);
         } catch (error) {
           console.error("Prettier formatting failed:", error);
-           // Fallback to basic
-           const formatted = basicFormat(currentCode, language);
-           editorRef.current.setValue(formatted);
+          // Fallback to basic
+          const formatted = basicFormat(currentCode, language);
+          editorRef.current.setValue(formatted);
         }
       } else {
-         // Custom basic formatter for Java/C++
-         if (['java', 'cpp'].includes(language)) {
-             const formatted = basicFormat(currentCode, language);
-             editorRef.current.setValue(formatted);
-         } else {
-             editorRef.current.getAction('editor.action.formatDocument')?.run();
-         }
+        // Custom basic formatter for Java/C++
+        if (['java', 'cpp'].includes(language)) {
+          const formatted = basicFormat(currentCode, language);
+          editorRef.current.setValue(formatted);
+        } else {
+          editorRef.current.getAction('editor.action.formatDocument')?.run();
+        }
       }
     },
     setErrors: (errors) => {
-        if (!editorRef.current) return;
-        const model = editorRef.current.getModel();
-        if (!model) return;
+      if (!editorRef.current) return;
+      const model = editorRef.current.getModel();
+      if (!model) return;
 
-        const markers = errors.map(e => ({
-            startLineNumber: e.line,
-            startColumn: e.column || 1,
-            endLineNumber: e.line,
-            endColumn: 1000,
-            message: e.message,
-            severity: monaco.MarkerSeverity.Error
-        }));
+      const markers = errors.map(e => ({
+        startLineNumber: e.line,
+        startColumn: e.column || 1,
+        endLineNumber: e.line,
+        endColumn: 1000,
+        message: e.message,
+        severity: monaco.MarkerSeverity.Error
+      }));
 
-        monaco.editor.setModelMarkers(model, "owner", markers);
+      monaco.editor.setModelMarkers(model, "owner", markers);
     },
     layout: () => {
-        editorRef.current?.layout();
+      editorRef.current?.layout();
     }
 
   }));
 
   const handleEditorDidMount: OnMount = (editor, monacoInstance) => {
     editorRef.current = editor;
+
+    // Add common DSA class definitions for TypeScript IntelliSense
+    monacoInstance.languages.typescript.typescriptDefaults.addExtraLib(`
+      class ListNode {
+          val: number;
+          next: ListNode | null;
+          constructor(val?: number, next?: ListNode | null);
+      }
+      class TreeNode {
+          val: number;
+          left: TreeNode | null;
+          right: TreeNode | null;
+          constructor(val?: number, left?: TreeNode | null, right?: TreeNode | null);
+      }
+      class Interval {
+          start: number;
+          end: number;
+          constructor(start: number, end: number);
+      }
+      class Node {
+          val: number;
+          neighbors: Node[];
+          constructor(val?: number, neighbors?: Node[]);
+      }
+      class TrieNode {
+          children: { [key: string]: TrieNode };
+          isEnd: boolean;
+          constructor();
+      }
+    `, 'filename/extra-libs.d.ts');
+
     if (onMount) {
       onMount(editor, monacoInstance);
     }
@@ -139,7 +170,7 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(({
 
   // Map our language names to Monaco language IDs
   const getMonacoLanguage = (lang: string) => {
-    switch(lang) {
+    switch (lang) {
       case 'typescript': return 'typescript';
       case 'javascript': return 'javascript';
       case 'cpp': return 'cpp';
@@ -150,15 +181,15 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(({
   };
 
   // Determine effective theme
-  const effectiveTheme = customTheme === 'dark' || (customTheme === 'system' && systemTheme === 'dark') 
-    ? 'night-owl' 
+  const effectiveTheme = customTheme === 'dark' || (customTheme === 'system' && systemTheme === 'dark')
+    ? 'night-owl'
     : 'light';
 
-    // If customTheme is explicit 'light' or 'dark', use it. 
-    // If it's 'system' (or undefined), fallback to next-themes 'theme'.
-  const monacoTheme = customTheme 
-      ? (customTheme === 'dark' ? 'night-owl' : (customTheme === 'light' ? 'light' : (systemTheme === 'dark' ? 'night-owl' : 'light')))
-      : (systemTheme === 'dark' ? 'night-owl' : 'light');
+  // If customTheme is explicit 'light' or 'dark', use it. 
+  // If it's 'system' (or undefined), fallback to next-themes 'theme'.
+  const monacoTheme = customTheme
+    ? (customTheme === 'dark' ? 'night-owl' : (customTheme === 'light' ? 'light' : (systemTheme === 'dark' ? 'night-owl' : 'light')))
+    : (systemTheme === 'dark' ? 'night-owl' : 'light');
 
   return (
     <div className={`h-full w-full overflow-hidden bg-background min-h-[300px] `}>
@@ -173,7 +204,7 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(({
         onMount={handleEditorDidMount}
         beforeMount={defineThemes}
         options={{
-          minimap: { enabled: false},
+          minimap: { enabled: false },
           fontSize: customOptions?.fontSize || 15,
           lineNumbers: customOptions?.lineNumbers || 'on',
           roundedSelection: false,
@@ -187,7 +218,7 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(({
           detectIndentation: false,
           insertSpaces: true,
           wordWrap: customOptions?.wordWrap || 'off',
-          
+
           // Autocomplete settings
           quickSuggestions: customOptions?.autocomplete !== false,
           suggestOnTriggerCharacters: customOptions?.autocomplete !== false,

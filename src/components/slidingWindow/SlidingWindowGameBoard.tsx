@@ -25,12 +25,12 @@ export const SlidingWindowGameBoard = ({ mode, level, onBackToMenu, onNextLevel 
     reset,
     getAccuracy,
   } = useSlidingWindowGame(mode, level);
-  
+
   // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (gameState.isComplete) return;
-      
+
       switch (e.key) {
         case "ArrowRight":
           e.preventDefault();
@@ -46,11 +46,11 @@ export const SlidingWindowGameBoard = ({ mode, level, onBackToMenu, onNextLevel 
           break;
       }
     };
-    
+
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [gameState.isComplete]);
-  
+
   const getModeTitle = () => {
     const titles: Record<WindowMode, string> = {
       maxSum: "Max Sum",
@@ -60,7 +60,7 @@ export const SlidingWindowGameBoard = ({ mode, level, onBackToMenu, onNextLevel 
     };
     return titles[mode];
   };
-  
+
   const getTargetLabel = () => {
     switch (mode) {
       case "maxSum":
@@ -75,7 +75,7 @@ export const SlidingWindowGameBoard = ({ mode, level, onBackToMenu, onNextLevel 
         return "";
     }
   };
-  
+
   const getCurrentStatus = () => {
     switch (mode) {
       case "maxSum":
@@ -89,7 +89,7 @@ export const SlidingWindowGameBoard = ({ mode, level, onBackToMenu, onNextLevel 
         return "";
     }
   };
-  
+
   const getGrade = () => {
     const accuracy = getAccuracy();
     if (accuracy >= 95) return "S";
@@ -99,7 +99,7 @@ export const SlidingWindowGameBoard = ({ mode, level, onBackToMenu, onNextLevel 
     if (accuracy >= 60) return "D";
     return "F";
   };
-  
+
   return (
     <>
       <div className="space-y-4">
@@ -110,11 +110,11 @@ export const SlidingWindowGameBoard = ({ mode, level, onBackToMenu, onNextLevel 
                 <ArrowLeft className="w-4 h-4" />
               </Button>
               <div>
-                <h2 className="text-xl font-bold">{getModeTitle()}</h2>
+                <h2 className="text-xl font-">{getModeTitle()}</h2>
                 <p className="text-sm text-muted-foreground">Level {level}</p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-4 text-sm">
               <div className="text-center">
                 <div className="font-semibold text-primary text-xl">{gameState.score}</div>
@@ -131,7 +131,7 @@ export const SlidingWindowGameBoard = ({ mode, level, onBackToMenu, onNextLevel 
             </div>
           </div>
         </Card>
-        
+
         <div className="grid lg:grid-cols-3 gap-4">
           <div className="lg:col-span-2 space-y-4">
             <Card className="p-6">
@@ -140,34 +140,34 @@ export const SlidingWindowGameBoard = ({ mode, level, onBackToMenu, onNextLevel 
                   <h3 className="font-semibold text-lg">{getTargetLabel()}</h3>
                   <span className="text-sm text-muted-foreground">{getCurrentStatus()}</span>
                 </div>
-                
+
                 <SlidingWindowArray
                   array={gameState.array}
                   left={gameState.left}
                   right={gameState.right}
                   messageType={gameState.messageType}
                 />
-                
+
                 <div className="text-center text-sm text-muted-foreground">
                   Window: [{gameState.left}, {gameState.right}] = [{windowData.windowArray.join(", ")}]
                 </div>
               </div>
             </Card>
-            
+
             {gameState.message && (
               <Alert
                 className={
                   gameState.messageType === "success"
                     ? "bg-green-500/10 border-green-500"
                     : gameState.messageType === "error"
-                    ? "bg-red-500/10 border-red-500"
-                    : "bg-blue-500/10 border-blue-500"
+                      ? "bg-red-500/10 border-red-500"
+                      : "bg-blue-500/10 border-blue-500"
                 }
               >
                 <AlertDescription className="font-medium">{gameState.message}</AlertDescription>
               </Alert>
             )}
-            
+
             <Card className="p-4">
               <h3 className="font-semibold mb-3">Controls</h3>
               <div className="grid grid-cols-2 gap-2">
@@ -181,7 +181,7 @@ export const SlidingWindowGameBoard = ({ mode, level, onBackToMenu, onNextLevel 
                   <ChevronLeft className="w-4 h-4 mr-2" />
                   Shrink (←)
                 </Button>
-                
+
                 <Button
                   onClick={expand}
                   variant="outline"
@@ -192,7 +192,7 @@ export const SlidingWindowGameBoard = ({ mode, level, onBackToMenu, onNextLevel 
                   <ChevronRight className="w-4 h-4 mr-2" />
                   Expand (→)
                 </Button>
-                
+
                 <Button
                   onClick={check}
                   variant="default"
@@ -206,7 +206,7 @@ export const SlidingWindowGameBoard = ({ mode, level, onBackToMenu, onNextLevel 
               </div>
             </Card>
           </div>
-          
+
           <div className="space-y-4">
             <Card className="p-4">
               <h3 className="font-semibold mb-3">Actions</h3>
@@ -220,14 +220,14 @@ export const SlidingWindowGameBoard = ({ mode, level, onBackToMenu, onNextLevel 
                   <Lightbulb className="w-4 h-4 mr-2" />
                   Hint ({gameState.hintsRemaining})
                 </Button>
-                
+
                 <Button onClick={reset} variant="outline" className="w-full">
                   <RotateCcw className="w-4 h-4 mr-2" />
                   Reset
                 </Button>
               </div>
             </Card>
-            
+
             <Card className="p-4 bg-gradient-to-br from-primary/5 to-secondary/5">
               <h3 className="font-semibold mb-2">Stats</h3>
               <div className="space-y-2 text-sm">
@@ -245,7 +245,7 @@ export const SlidingWindowGameBoard = ({ mode, level, onBackToMenu, onNextLevel 
                 </div>
               </div>
             </Card>
-            
+
             <Card className="p-4 border-primary/50 bg-primary/5">
               <h3 className="font-semibold mb-2 text-primary">Strategy</h3>
               <p className="text-sm text-muted-foreground">
@@ -258,7 +258,7 @@ export const SlidingWindowGameBoard = ({ mode, level, onBackToMenu, onNextLevel 
           </div>
         </div>
       </div>
-      
+
       <SlidingWindowVictoryModal
         isOpen={gameState.isComplete}
         score={gameState.score}

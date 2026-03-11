@@ -28,7 +28,7 @@ const Leaderboard = () => {
 
   const fetchLeaderboard = async () => {
     setLoading(true);
-    
+
     // All-time leaderboard - fetch sessions and profiles separately
     const { data: allTimeSessions } = await supabase
       .from('game_sessions')
@@ -53,7 +53,7 @@ const Leaderboard = () => {
     // Today's leaderboard
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
-    
+
     const { data: todaySessions } = await supabase
       .from('game_sessions')
       .select('id, user_id, score, level, moves, grade, completed_at')
@@ -106,14 +106,14 @@ const Leaderboard = () => {
     if (index === 0) return <Trophy className="w-6 h-6 text-yellow-500" />;
     if (index === 1) return <Medal className="w-6 h-6 text-gray-400" />;
     if (index === 2) return <Award className="w-6 h-6 text-amber-700" />;
-    return <span className="w-6 text-center font-bold text-muted-foreground">{index + 1}</span>;
+    return <span className="w-6 text-center font- text-muted-foreground">{index + 1}</span>;
   };
 
   const LeaderboardTable = ({ data }: { data: LeaderboardEntry[] }) => (
     <div className="space-y-2">
       {data.map((entry, index) => {
         const displayName = entry.profiles?.display_name || entry.profiles?.email?.split('@')[0] || `Player ${entry.user_id.slice(0, 8)}`;
-        
+
         return (
           <div
             key={entry.id}
@@ -125,7 +125,7 @@ const Leaderboard = () => {
               <p className="text-sm text-muted-foreground">Level {entry.level} • {entry.moves} moves</p>
             </div>
             <div className="text-right">
-              <p className="text-2xl font-bold text-primary">{entry.score} pts</p>
+              <p className="text-2xl font- text-primary">{entry.score} pts</p>
               <p className="text-sm text-muted-foreground">Grade: {entry.grade}</p>
             </div>
           </div>
@@ -142,7 +142,7 @@ const Leaderboard = () => {
       <div className="container mx-auto max-w-4xl">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">
+            <h1 className="text-4xl font- bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">
               Leaderboard
             </h1>
             <p className="text-muted-foreground">Top players - Sort Hero</p>

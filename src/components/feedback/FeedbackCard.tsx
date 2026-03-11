@@ -78,7 +78,7 @@ export const FeedbackCard = ({
                                 </div>
                             ) : (
                                 <div className="flex items-center gap-1.5">
-                                    <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary border border-primary/20">
+                                    <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font- text-primary border border-primary/20">
                                         {user_full_name?.charAt(0) || 'U'}
                                     </div>
                                     <span>{user_full_name || 'User'}</span>
@@ -111,7 +111,7 @@ export const FeedbackCard = ({
                         }}
                     >
                         <ChevronUp className={cn("w-5 h-5", has_voted ? "text-white" : "")} />
-                        <span className={cn("text-xs font-bold leading-none", has_voted ? "text-white" : "")}>
+                        <span className={cn("text-xs font- leading-none", has_voted ? "text-white" : "")}>
                             {upvotes_count}
                         </span>
                     </Button>

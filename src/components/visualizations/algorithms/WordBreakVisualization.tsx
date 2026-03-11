@@ -50,7 +50,7 @@ export const WordBreakVisualization = () => {
     const n = s.length;
     const wordSet = new Set(wordDict);
     const dp = new Array(n + 1).fill(false);
-    
+
     // Initial state
     steps.push({
       s,
@@ -105,7 +105,7 @@ export const WordBreakVisualization = () => {
         const sub = s.substring(j, i);
         const dpVal = dp[j];
         const inDict = wordSet.has(sub);
-        
+
         steps.push({
           s,
           dp: [...dp],
@@ -118,43 +118,43 @@ export const WordBreakVisualization = () => {
         });
 
         if (dpVal && inDict) {
-            steps.push({
-                s,
-                dp: [...dp],
-                i,
-                j,
-                currentSubstring: sub,
-                variables: { i, j, substring: `"${sub}"`, found: true },
-                explanation: `Match found! dp[${j}] is true AND "${sub}" is in dictionary.`,
-                highlightedLines: [13]
-            });
-            
-            dp[i] = true;
-            steps.push({
-                s,
-                dp: [...dp],
-                i,
-                j,
-                currentSubstring: sub,
-                variables: { i, 'dp[i]': true },
-                explanation: `Set dp[${i}] = true. We can form the prefix of length ${i}. Break inner loop.`,
-                highlightedLines: [14, 15]
-            });
-            break;
+          steps.push({
+            s,
+            dp: [...dp],
+            i,
+            j,
+            currentSubstring: sub,
+            variables: { i, j, substring: `"${sub}"`, found: true },
+            explanation: `Match found! dp[${j}] is true AND "${sub}" is in dictionary.`,
+            highlightedLines: [13]
+          });
+
+          dp[i] = true;
+          steps.push({
+            s,
+            dp: [...dp],
+            i,
+            j,
+            currentSubstring: sub,
+            variables: { i, 'dp[i]': true },
+            explanation: `Set dp[${i}] = true. We can form the prefix of length ${i}. Break inner loop.`,
+            highlightedLines: [14, 15]
+          });
+          break;
         }
       }
     }
 
     // Return result
     steps.push({
-        s,
-        dp: [...dp],
-        i: n,
-        j: -1,
-        currentSubstring: '',
-        variables: { result: dp[n] },
-        explanation: `Computation complete. Return dp[${n}] = ${dp[n]}.`,
-        highlightedLines: [20]
+      s,
+      dp: [...dp],
+      i: n,
+      j: -1,
+      currentSubstring: '',
+      variables: { result: dp[n] },
+      explanation: `Computation complete. Return dp[${n}] = ${dp[n]}.`,
+      highlightedLines: [20]
     });
 
     return steps;
@@ -183,25 +183,25 @@ export const WordBreakVisualization = () => {
                     let className = "bg-muted border-border";
                     const isCurrentRange = step.j !== -1 && idx >= step.j && idx < step.i;
                     const isProcessed = idx < step.i;
-                    
+
                     if (isCurrentRange) {
-                        className = "bg-blue-500/20 border-blue-500 text-blue-500";
+                      className = "bg-blue-500/20 border-blue-500 text-blue-500";
                     } else if (isProcessed) {
-                        className = "bg-green-500/10 border-green-500/30 text-green-600";
+                      className = "bg-green-500/10 border-green-500/30 text-green-600";
                     }
 
                     return (
-                        <motion.div
-                          key={idx}
-                          initial={{ scale: 0.8, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          className={`w-10 h-10 flex items-center justify-center font-bold border-2 rounded ${className}`}
-                        >
-                          {char}
-                          <span className="absolute -bottom-5 text-[10px] text-muted-foreground font-normal border-none">
-                              {idx}
-                          </span>
-                        </motion.div>
+                      <motion.div
+                        key={idx}
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className={`w-10 h-10 flex items-center justify-center font- border-2 rounded ${className}`}
+                      >
+                        {char}
+                        <span className="absolute -bottom-5 text-[10px] text-muted-foreground font-normal border-none">
+                          {idx}
+                        </span>
+                      </motion.div>
                     );
                   })}
                 </div>
@@ -211,32 +211,31 @@ export const WordBreakVisualization = () => {
           </motion.div>
 
           <motion.div
-              key={`dp-${currentStep}`}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-            >
-              <Card className="p-3 bg-muted/50">
-                <div className="text-xs font-semibold mb-2">DP Array (dp[i] = can segment prefix of length i)</div>
-                <div className="flex gap-1 overflow-x-auto pb-4">
-                  {step.dp.map((val, idx) => (
-                    <div key={idx} className="relative">
-                        <div
-                        className={`min-w-[2.5rem] h-10 flex items-center justify-center font-bold text-sm border-2 rounded ${
-                            val ? 'bg-green-500/20 border-green-500 text-green-500' : 'bg-muted border-border'
+            key={`dp-${currentStep}`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            <Card className="p-3 bg-muted/50">
+              <div className="text-xs font-semibold mb-2">DP Array (dp[i] = can segment prefix of length i)</div>
+              <div className="flex gap-1 overflow-x-auto pb-4">
+                {step.dp.map((val, idx) => (
+                  <div key={idx} className="relative">
+                    <div
+                      className={`min-w-[2.5rem] h-10 flex items-center justify-center font- text-sm border-2 rounded ${val ? 'bg-green-500/20 border-green-500 text-green-500' : 'bg-muted border-border'
                         } ${idx === step.i ? 'ring-2 ring-primary ring-offset-2' : ''}`}
-                        >
-                        {val ? 'T' : 'F'}
-                        </div>
-                        <div className="absolute -bottom-5 left-0 right-0 text-center text-[10px] text-muted-foreground">
-                            {idx}
-                        </div>
+                    >
+                      {val ? 'T' : 'F'}
                     </div>
-                  ))}
-                </div>
-              </Card>
-            </motion.div>
-          
+                    <div className="absolute -bottom-5 left-0 right-0 text-center text-[10px] text-muted-foreground">
+                      {idx}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </motion.div>
+
           <motion.div
             key={`execution-${currentStep}`}
             initial={{ opacity: 0, x: -20 }}

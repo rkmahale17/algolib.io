@@ -156,7 +156,7 @@ export const CountBitsVisualization: React.FC = () => {
               <div className="flex items-center gap-4">
                 <div>
                   <div className="text-xs text-muted-foreground">Binary</div>
-                  <div className="text-xl font-mono font-bold">
+                  <div className="text-xl font-mono font-">
                     {currentStep.binary}
                   </div>
                 </div>
@@ -164,7 +164,7 @@ export const CountBitsVisualization: React.FC = () => {
                   <div className="text-xs text-muted-foreground">
                     Count of 1s
                   </div>
-                  <div className="text-xl font-bold text-primary">
+                  <div className="text-xl font- text-primary">
                     {currentStep.bitCount}
                   </div>
                 </div>
@@ -180,11 +180,10 @@ export const CountBitsVisualization: React.FC = () => {
                   [{idx}]
                 </div>
                 <div
-                  className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
-                    idx === currentStep.current
-                      ? "bg-primary/20 border-primary"
-                      : "bg-blue-500/10 border-blue-500/50"
-                  }`}
+                  className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font- transition-all ${idx === currentStep.current
+                    ? "bg-primary/20 border-primary"
+                    : "bg-blue-500/10 border-blue-500/50"
+                    }`}
                 >
                   {val}
                 </div>

@@ -10,11 +10,11 @@ interface AnimatedCodeEditorProps {
   className?: string;
 }
 
-export const AnimatedCodeEditor = ({ 
-  code, 
-  language, 
+export const AnimatedCodeEditor = ({
+  code,
+  language,
   highlightedLines = [],
-  className = '' 
+  className = ''
 }: AnimatedCodeEditorProps) => {
   const editorRef = useRef<any>(null);
   const { theme, resolvedTheme } = useTheme();
@@ -28,7 +28,7 @@ export const AnimatedCodeEditor = ({
     if (!model) return;
 
     // Clear previous decorations
-    const newDecorations = decorations.length > 0 
+    const newDecorations = decorations.length > 0
       ? editor.deltaDecorations(decorations, [])
       : [];
 

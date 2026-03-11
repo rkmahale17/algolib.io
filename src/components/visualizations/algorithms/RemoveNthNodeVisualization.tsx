@@ -186,7 +186,7 @@ export const RemoveNthNodeVisualization = () => {
             <div className="flex items-center gap-2 overflow-x-auto pb-2">
               {currentStep.dummy && (
                 <div className="flex items-center">
-                  <div className="w-14 h-14 flex items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground bg-muted/30 font-bold text-sm">
+                  <div className="w-14 h-14 flex items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground bg-muted/30 font- text-sm">
                     D
                   </div>
                   <div className="text-xl mx-1 text-muted-foreground">→</div>
@@ -195,15 +195,14 @@ export const RemoveNthNodeVisualization = () => {
               {currentStep.list.map((val, idx) => (
                 <div key={idx} className="flex items-center">
                   <div
-                    className={`w-14 h-14 flex items-center justify-center rounded-lg border-2 font-bold text-lg transition-all ${
-                      currentStep.toRemove === idx
-                        ? 'bg-destructive/20 border-destructive text-destructive scale-110'
-                        : currentStep.slow === idx
+                    className={`w-14 h-14 flex items-center justify-center rounded-lg border-2 font- text-lg transition-all ${currentStep.toRemove === idx
+                      ? 'bg-destructive/20 border-destructive text-destructive scale-110'
+                      : currentStep.slow === idx
                         ? 'bg-primary/20 border-primary text-primary'
                         : currentStep.fast === idx
-                        ? 'bg-secondary/20 border-secondary text-secondary-foreground'
-                        : 'bg-card border-border text-foreground'
-                    }`}
+                          ? 'bg-secondary/20 border-secondary text-secondary-foreground'
+                          : 'bg-card border-border text-foreground'
+                      }`}
                   >
                     {val}
                   </div>

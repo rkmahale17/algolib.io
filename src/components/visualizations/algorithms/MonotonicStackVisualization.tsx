@@ -293,25 +293,25 @@ export const MonotonicStackVisualization = () => {
                   return (
                     <div key={idx} className="flex flex-col items-center gap-1 flex-1 max-w-[40px] relative">
                       {isCurrent && (
-                        <div className="absolute -top-8 text-xs font-bold text-primary animate-bounce">CURR</div>
+                        <div className="absolute -top-8 text-xs font- text-primary animate-bounce">CURR</div>
                       )}
                       {isTop && (
-                        <div className="absolute -top-12 text-xs font-bold text-orange-500">HEIGHT</div>
+                        <div className="absolute -top-12 text-xs font- text-orange-500">HEIGHT</div>
                       )}
                       <div
                         className={`w-full rounded-t transition-all duration-300 ${isTop
-                            ? 'bg-orange-500 ring-2 ring-orange-500 shadow-lg scale-105'
-                            : isActiveRange
-                              ? 'bg-primary/80 ring-1 ring-primary'
-                              : isCurrent
-                                ? 'bg-primary/40'
-                                : isInStack
-                                  ? 'bg-yellow-500/80 shadow-sm'
-                                  : 'bg-muted/40'
+                          ? 'bg-orange-500 ring-2 ring-orange-500 shadow-lg scale-105'
+                          : isActiveRange
+                            ? 'bg-primary/80 ring-1 ring-primary'
+                            : isCurrent
+                              ? 'bg-primary/40'
+                              : isInStack
+                                ? 'bg-yellow-500/80 shadow-sm'
+                                : 'bg-muted/40'
                           }`}
                         style={{ height: `${(h / maxVal) * 100}%`, minHeight: '4px' }}
                       />
-                      <span className={`text-[10px] font-mono ${isTop ? 'text-orange-500 font-bold' : 'text-muted-foreground'}`}>
+                      <span className={`text-[10px] font-mono ${isTop ? 'text-orange-500 font-' : 'text-muted-foreground'}`}>
                         {h}
                       </span>
                     </div>
@@ -322,13 +322,12 @@ export const MonotonicStackVisualization = () => {
                 <div className="absolute bottom-[24px] flex justify-center w-full pointer-events-none">
                   <div className="bg-primary/20 border-x-2 border-t-2 border-primary/40 h-[170px]"
                     style={{
-                      width: `${(currentStep.width / currentStep.heights.length) * 100}%`,
                       marginLeft: `${((currentStep.activeRange[0] - (currentStep.heights.length - currentStep.width) / 2) / currentStep.heights.length) * 0}%`, // Simplified centering logic
                       position: 'absolute',
                       left: `${(currentStep.activeRange[0] / currentStep.heights.length) * 100}%`,
                       width: `${((currentStep.activeRange[1] - currentStep.activeRange[0] + 1) / currentStep.heights.length) * 100}%`
                     }}>
-                    <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-primary bg-background px-1">
+                    <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font- text-primary bg-background px-1">
                       WIDTH: {currentStep.width}
                     </div>
                   </div>
@@ -344,7 +343,7 @@ export const MonotonicStackVisualization = () => {
                     currentStep.stack.map((idx, i) => (
                       <div
                         key={i}
-                        className="bg-yellow-500 text-white rounded text-[10px] w-8 h-8 flex items-center justify-center font-mono font-bold animate-in slide-in-from-bottom"
+                        className="bg-yellow-500 text-white rounded text-[10px] w-8 h-8 flex items-center justify-center font-mono font- animate-in slide-in-from-bottom"
                       >
                         {idx}
                       </div>
@@ -357,7 +356,7 @@ export const MonotonicStackVisualization = () => {
               <div className="flex-1 border-l pl-4">
                 <h4 className="text-sm font-semibold mb-1 text-muted-foreground">Current Check</h4>
                 <div className="space-y-1">
-                  <div className="text-xs">Max Area: <span className="font-bold text-green-600">{currentStep.maxArea}</span></div>
+                  <div className="text-xs">Max Area: <span className="font- text-green-600">{currentStep.maxArea}</span></div>
                   {currentStep.currentArea > 0 && (
                     <div className="text-xs font-medium text-primary animate-pulse">Rect: {currentStep.currentArea}</div>
                   )}

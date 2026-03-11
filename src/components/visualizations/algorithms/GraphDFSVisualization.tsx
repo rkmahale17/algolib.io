@@ -248,7 +248,7 @@ export const GraphDFSVisualization: React.FC = () => {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Local Variables</h4>
+              <h4 className="text-xs font- uppercase tracking-wider text-muted-foreground">Local Variables</h4>
               <VariablePanel
                 variables={{
                   node: currentStep.currentNode !== null ? currentStep.currentNode : 'undefined',
@@ -257,14 +257,14 @@ export const GraphDFSVisualization: React.FC = () => {
               />
             </div>
             <div className="space-y-2">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Recursion Stack</h4>
+              <h4 className="text-xs font- uppercase tracking-wider text-muted-foreground">Recursion Stack</h4>
               <div className="bg-muted/30 rounded border p-2 min-h-[80px]">
                 {currentStep.recursionStack.length === 0 ? (
                   <p className="text-xs text-muted-foreground italic">Empty stack</p>
                 ) : (
                   <div className="flex flex-col-reverse gap-1">
                     {currentStep.recursionStack.map((node, i) => (
-                      <div key={i} className={`text-xs p-1 rounded border ${i === currentStep.recursionStack.length - 1 ? 'bg-primary/20 border-primary font-bold' : 'bg-background border-border text-muted-foreground'}`}>
+                      <div key={i} className={`text-xs p-1 rounded border ${i === currentStep.recursionStack.length - 1 ? 'bg-primary/20 border-primary font-' : 'bg-background border-border text-muted-foreground'}`}>
                         explore({node})
                       </div>
                     ))}

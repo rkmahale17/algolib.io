@@ -23,7 +23,7 @@ export const RotateImageVisualization = () => {
 
   const steps: Step[] = [
     {
-      matrix: [[1,2,3],[4,5,6],[7,8,9]],
+      matrix: [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
       currentRow: -1,
       currentCol: -1,
       swapWith: [],
@@ -34,7 +34,7 @@ export const RotateImageVisualization = () => {
       phase: "init"
     },
     {
-      matrix: [[1,2,3],[4,5,6],[7,8,9]],
+      matrix: [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
       currentRow: -1,
       currentCol: -1,
       swapWith: [],
@@ -45,7 +45,7 @@ export const RotateImageVisualization = () => {
       phase: "init"
     },
     {
-      matrix: [[1,2,3],[4,5,6],[7,8,9]],
+      matrix: [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
       currentRow: 0,
       currentCol: 1,
       swapWith: [],
@@ -56,10 +56,10 @@ export const RotateImageVisualization = () => {
       phase: "transpose"
     },
     {
-      matrix: [[1,2,3],[4,5,6],[7,8,9]],
+      matrix: [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
       currentRow: 0,
       currentCol: 1,
-      swapWith: [[1,0]],
+      swapWith: [[1, 0]],
       variables: { swap: '[0][1] ↔ [1][0]', values: '2 ↔ 4' },
       explanation: "Swap matrix[0][1] (value 2) with matrix[1][0] (value 4).",
       highlightedLines: [7],
@@ -67,7 +67,7 @@ export const RotateImageVisualization = () => {
       phase: "transpose"
     },
     {
-      matrix: [[1,4,3],[2,5,6],[7,8,9]],
+      matrix: [[1, 4, 3], [2, 5, 6], [7, 8, 9]],
       currentRow: 0,
       currentCol: 1,
       swapWith: [],
@@ -78,10 +78,10 @@ export const RotateImageVisualization = () => {
       phase: "transpose"
     },
     {
-      matrix: [[1,4,3],[2,5,6],[7,8,9]],
+      matrix: [[1, 4, 3], [2, 5, 6], [7, 8, 9]],
       currentRow: 0,
       currentCol: 2,
-      swapWith: [[2,0]],
+      swapWith: [[2, 0]],
       variables: { swap: '[0][2] ↔ [2][0]', values: '3 ↔ 7' },
       explanation: "Swap matrix[0][2] (value 3) with matrix[2][0] (value 7).",
       highlightedLines: [7],
@@ -89,7 +89,7 @@ export const RotateImageVisualization = () => {
       phase: "transpose"
     },
     {
-      matrix: [[1,4,7],[2,5,6],[3,8,9]],
+      matrix: [[1, 4, 7], [2, 5, 6], [3, 8, 9]],
       currentRow: 0,
       currentCol: 2,
       swapWith: [],
@@ -100,10 +100,10 @@ export const RotateImageVisualization = () => {
       phase: "transpose"
     },
     {
-      matrix: [[1,4,7],[2,5,6],[3,8,9]],
+      matrix: [[1, 4, 7], [2, 5, 6], [3, 8, 9]],
       currentRow: 1,
       currentCol: 2,
-      swapWith: [[2,1]],
+      swapWith: [[2, 1]],
       variables: { swap: '[1][2] ↔ [2][1]', values: '6 ↔ 8' },
       explanation: "Continue row 1. Swap matrix[1][2] (value 6) with matrix[2][1] (value 8).",
       highlightedLines: [7],
@@ -111,7 +111,7 @@ export const RotateImageVisualization = () => {
       phase: "transpose"
     },
     {
-      matrix: [[1,4,7],[2,5,8],[3,6,9]],
+      matrix: [[1, 4, 7], [2, 5, 8], [3, 6, 9]],
       currentRow: 1,
       currentCol: 2,
       swapWith: [],
@@ -122,7 +122,7 @@ export const RotateImageVisualization = () => {
       phase: "transpose"
     },
     {
-      matrix: [[1,4,7],[2,5,8],[3,6,9]],
+      matrix: [[1, 4, 7], [2, 5, 8], [3, 6, 9]],
       currentRow: -1,
       currentCol: -1,
       swapWith: [],
@@ -133,7 +133,7 @@ export const RotateImageVisualization = () => {
       phase: "transpose-done"
     },
     {
-      matrix: [[1,4,7],[2,5,8],[3,6,9]],
+      matrix: [[1, 4, 7], [2, 5, 8], [3, 6, 9]],
       currentRow: 0,
       currentCol: -1,
       swapWith: [],
@@ -144,10 +144,10 @@ export const RotateImageVisualization = () => {
       phase: "reverse"
     },
     {
-      matrix: [[1,4,7],[2,5,8],[3,6,9]],
+      matrix: [[1, 4, 7], [2, 5, 8], [3, 6, 9]],
       currentRow: 0,
       currentCol: 0,
-      swapWith: [[0,2]],
+      swapWith: [[0, 2]],
       variables: { swap: '[0][0] ↔ [0][2]', values: '1 ↔ 7' },
       explanation: "Reverse row 0. Swap matrix[0][0] (value 1) with matrix[0][2] (value 7).",
       highlightedLines: [14],
@@ -155,7 +155,7 @@ export const RotateImageVisualization = () => {
       phase: "reverse"
     },
     {
-      matrix: [[7,4,1],[2,5,8],[3,6,9]],
+      matrix: [[7, 4, 1], [2, 5, 8], [3, 6, 9]],
       currentRow: 0,
       currentCol: -1,
       swapWith: [],
@@ -166,10 +166,10 @@ export const RotateImageVisualization = () => {
       phase: "reverse"
     },
     {
-      matrix: [[7,4,1],[2,5,8],[3,6,9]],
+      matrix: [[7, 4, 1], [2, 5, 8], [3, 6, 9]],
       currentRow: 1,
       currentCol: 0,
-      swapWith: [[1,2]],
+      swapWith: [[1, 2]],
       variables: { swap: '[1][0] ↔ [1][2]', values: '2 ↔ 8' },
       explanation: "Reverse row 1. Swap matrix[1][0] (value 2) with matrix[1][2] (value 8).",
       highlightedLines: [14],
@@ -177,7 +177,7 @@ export const RotateImageVisualization = () => {
       phase: "reverse"
     },
     {
-      matrix: [[7,4,1],[8,5,2],[3,6,9]],
+      matrix: [[7, 4, 1], [8, 5, 2], [3, 6, 9]],
       currentRow: 1,
       currentCol: -1,
       swapWith: [],
@@ -188,10 +188,10 @@ export const RotateImageVisualization = () => {
       phase: "reverse"
     },
     {
-      matrix: [[7,4,1],[8,5,2],[3,6,9]],
+      matrix: [[7, 4, 1], [8, 5, 2], [3, 6, 9]],
       currentRow: 2,
       currentCol: 0,
-      swapWith: [[2,2]],
+      swapWith: [[2, 2]],
       variables: { swap: '[2][0] ↔ [2][2]', values: '3 ↔ 9' },
       explanation: "Reverse row 2. Swap matrix[2][0] (value 3) with matrix[2][2] (value 9).",
       highlightedLines: [14],
@@ -199,7 +199,7 @@ export const RotateImageVisualization = () => {
       phase: "reverse"
     },
     {
-      matrix: [[7,4,1],[8,5,2],[9,6,3]],
+      matrix: [[7, 4, 1], [8, 5, 2], [9, 6, 3]],
       currentRow: 2,
       currentCol: -1,
       swapWith: [],
@@ -210,7 +210,7 @@ export const RotateImageVisualization = () => {
       phase: "reverse"
     },
     {
-      matrix: [[7,4,1],[8,5,2],[9,6,3]],
+      matrix: [[7, 4, 1], [8, 5, 2], [9, 6, 3]],
       currentRow: -1,
       currentCol: -1,
       swapWith: [],
@@ -221,7 +221,7 @@ export const RotateImageVisualization = () => {
       phase: "complete"
     },
     {
-      matrix: [[7,4,1],[8,5,2],[9,6,3]],
+      matrix: [[7, 4, 1], [8, 5, 2], [9, 6, 3]],
       currentRow: -1,
       currentCol: -1,
       swapWith: [],
@@ -232,7 +232,7 @@ export const RotateImageVisualization = () => {
       phase: "complete"
     },
     {
-      matrix: [[7,4,1],[8,5,2],[9,6,3]],
+      matrix: [[7, 4, 1], [8, 5, 2], [9, 6, 3]],
       currentRow: -1,
       currentCol: -1,
       swapWith: [],
@@ -286,7 +286,7 @@ export const RotateImageVisualization = () => {
             Rotate Image 90°
           </h3>
           <div className="space-y-4">
-            <motion.div 
+            <motion.div
               key={`matrix-${currentStepIndex}`}
               initial={{ opacity: 0, rotate: -5 }}
               animate={{ opacity: 1, rotate: 0 }}
@@ -302,11 +302,11 @@ export const RotateImageVisualization = () => {
                       <motion.div
                         key={`${rowIdx}-${colIdx}`}
                         initial={{ scale: 0.8 }}
-                        animate={{ 
-                          scale: (rowIdx === currentStep.currentRow && colIdx === currentStep.currentCol) || 
-                                 currentStep.swapWith.some(([r, c]) => r === rowIdx && c === colIdx) ? 1.1 : 1 
+                        animate={{
+                          scale: (rowIdx === currentStep.currentRow && colIdx === currentStep.currentCol) ||
+                            currentStep.swapWith.some(([r, c]) => r === rowIdx && c === colIdx) ? 1.1 : 1
                         }}
-                        className={`w-12 h-12 flex items-center justify-center font-mono font-bold text-lg rounded border-2 transition-all ${getCellColor(rowIdx, colIdx)}`}
+                        className={`w-12 h-12 flex items-center justify-center font-mono font- text-lg rounded border-2 transition-all ${getCellColor(rowIdx, colIdx)}`}
                       >
                         {cell}
                       </motion.div>
@@ -362,9 +362,9 @@ export const RotateImageVisualization = () => {
         <Card className="p-6 overflow-hidden flex flex-col">
           <h3 className="text-lg font-semibold mb-4">Implementation</h3>
           <div className="flex-1 overflow-auto">
-            <AnimatedCodeEditor 
-              code={code} 
-              language="typescript" 
+            <AnimatedCodeEditor
+              code={code}
+              language="typescript"
               highlightedLines={(currentStep.highlightedLines || []).filter((n) => n >= 1 && n <= code.split('\n').length)}
             />
           </div>

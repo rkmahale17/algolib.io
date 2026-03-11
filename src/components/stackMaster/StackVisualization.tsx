@@ -21,7 +21,7 @@ export const StackVisualization = ({ stack, getSymbolColor }: StackVisualization
           <div className="text-xs text-muted-foreground mb-3">
             Last In, First Out
           </div>
-          
+
           <ScrollArea className="h-[400px] w-full border-2 border-primary/20 rounded-lg p-2 bg-muted/20">
             {stack.length === 0 ? (
               <div className="h-full flex items-center justify-center text-muted-foreground text-sm">
@@ -32,7 +32,7 @@ export const StackVisualization = ({ stack, getSymbolColor }: StackVisualization
                 {stack.map((item, index) => (
                   <div
                     key={index}
-                    className={`p-3 rounded-md border-2 border-primary/30 bg-card text-center font-mono text-lg font-bold transition-all duration-200 animate-in slide-in-from-top-2 ${getSymbolColor(item)}`}
+                    className={`p-3 rounded-md border-2 border-primary/30 bg-card text-center font-mono text-lg font- transition-all duration-200 animate-in slide-in-from-top-2 ${getSymbolColor(item)}`}
                   >
                     {item}
                     {index === stack.length - 1 && (
@@ -46,7 +46,7 @@ export const StackVisualization = ({ stack, getSymbolColor }: StackVisualization
 
           <div className="mt-4 p-3 bg-muted/50 rounded-lg">
             <div className="text-xs text-muted-foreground mb-2">Stack Size:</div>
-            <div className="text-2xl font-bold text-primary">{stack.length}</div>
+            <div className="text-2xl font- text-primary">{stack.length}</div>
           </div>
         </div>
       </CardContent>

@@ -75,23 +75,23 @@ export function AlgorithmList() {
     let bValue = b[sortConfig.key];
 
     if (sortConfig.key === 'serial_no') {
-        const aNum = aValue === null || aValue === undefined || aValue === '' ? -1 : Number(aValue);
-        const bNum = bValue === null || bValue === undefined || bValue === '' ? -1 : Number(bValue);
-        
-        // If sorting strictly by what exists, we might want nulls at bottom.
-        // Let's stick to the previous pattern: nulls last.
-        const aIsNull = aValue === null || aValue === undefined || aValue === '';
-        const bIsNull = bValue === null || bValue === undefined || bValue === '';
+      const aNum = aValue === null || aValue === undefined || aValue === '' ? -1 : Number(aValue);
+      const bNum = bValue === null || bValue === undefined || bValue === '' ? -1 : Number(bValue);
 
-        if (aIsNull && bIsNull) return 0;
-        if (aIsNull) return 1;
-        if (bIsNull) return -1;
+      // If sorting strictly by what exists, we might want nulls at bottom.
+      // Let's stick to the previous pattern: nulls last.
+      const aIsNull = aValue === null || aValue === undefined || aValue === '';
+      const bIsNull = bValue === null || bValue === undefined || bValue === '';
 
-        return sortConfig.direction === 'asc' ? aNum - bNum : bNum - aNum;
+      if (aIsNull && bIsNull) return 0;
+      if (aIsNull) return 1;
+      if (bIsNull) return -1;
+
+      return sortConfig.direction === 'asc' ? aNum - bNum : bNum - aNum;
     }
 
     if (aValue === bValue) return 0;
-    
+
     // Handle null/undefined values - push to end
     if (aValue === null || aValue === undefined) return 1;
     if (bValue === null || bValue === undefined) return -1;
@@ -112,15 +112,15 @@ export function AlgorithmList() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div className="flex items-baseline gap-4">
-          <Button 
-             variant="ghost" 
-             size="icon" 
-             onClick={() => navigate('/admin')}
-             className="mr-2"
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/admin')}
+            className="mr-2"
           >
-             <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-3xl font-bold">Problem Management</h1>
+          <h1 className="text-3xl font-">Problem Management</h1>
           {!isLoading && (
             <span className="text-muted-foreground">
               Total: {filteredAlgorithms?.length || 0}
@@ -164,11 +164,11 @@ export function AlgorithmList() {
           <SelectContent>
             <SelectItem value="all">All List Types</SelectItem>
 
-            
+
             {LIST_TYPE_OPTIONS_ADMIN.map(opt => (
-                <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+              <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
             ))}
-          </SelectContent>  
+          </SelectContent>
         </Select>
       </div>
 
@@ -185,7 +185,7 @@ export function AlgorithmList() {
                 <TableHead onClick={() => handleSort('name')} className="cursor-pointer hover:bg-muted/50">Name</TableHead>
                 <TableHead onClick={() => handleSort('category')} className="cursor-pointer hover:bg-muted/50">Category</TableHead>
                 <TableHead onClick={() => handleSort('difficulty')} className="cursor-pointer hover:bg-muted/50">Difficulty</TableHead>
-                <TableHead onClick={() => handleSort('serial_no')} className="cursor-pointer hover:bg-muted/50 font-bold text-primary">Serial No</TableHead>
+                <TableHead onClick={() => handleSort('serial_no')} className="cursor-pointer hover:bg-muted/50 font- text-primary">Serial No</TableHead>
                 <TableHead onClick={() => handleSort('list_type')} className="cursor-pointer hover:bg-muted/50">List Type</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -201,15 +201,15 @@ export function AlgorithmList() {
                 filteredAlgorithms?.map((algo) => (
                   <TableRow key={algo.id}>
                     <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => navigate(`/admin/problem/${algo.id}`)}
-                          className="h-8 w-8 hover:bg-muted"
-                          title="Edit Algorithm"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => navigate(`/admin/problem/${algo.id}`)}
+                        className="h-8 w-8 hover:bg-muted"
+                        title="Edit Algorithm"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
                     </TableCell>
                     <TableCell className="font-mono text-sm">{algo.id}</TableCell>
                     <TableCell className="font-medium">{algo.name}</TableCell>

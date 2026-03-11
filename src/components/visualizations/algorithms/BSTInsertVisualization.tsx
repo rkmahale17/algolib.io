@@ -209,13 +209,12 @@ export const BSTInsertVisualization = () => {
           cx={node.x}
           cy={node.y}
           r="24"
-          className={`transition-all duration-300 ${
-            currentStep.current === node.val
+          className={`transition-all duration-300 ${currentStep.current === node.val
               ? 'fill-primary stroke-primary'
               : node.val === currentStep.insertValue
-              ? 'fill-green-500 stroke-green-500'
-              : 'fill-muted stroke-border'
-          }`}
+                ? 'fill-green-500 stroke-green-500'
+                : 'fill-muted stroke-border'
+            }`}
           strokeWidth="2"
         />
         <text
@@ -223,9 +222,8 @@ export const BSTInsertVisualization = () => {
           y={node.y}
           textAnchor="middle"
           dy=".3em"
-          className={`font-bold ${
-            currentStep.current === node.val || node.val === currentStep.insertValue ? 'fill-white' : 'fill-foreground'
-          }`}
+          className={`font- ${currentStep.current === node.val || node.val === currentStep.insertValue ? 'fill-white' : 'fill-foreground'
+            }`}
         >
           {node.val}
         </text>
@@ -264,12 +262,12 @@ export const BSTInsertVisualization = () => {
 
           <div className='rounded-lg '>
 
-      <VariablePanel
-        variables={{
-          insertValue: currentStep.insertValue,
-          current: currentStep.current || 'null'
-        }}
-      />
+            <VariablePanel
+              variables={{
+                insertValue: currentStep.insertValue,
+                current: currentStep.current || 'null'
+              }}
+            />
           </div>
         </div>
 

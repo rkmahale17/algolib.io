@@ -28,7 +28,7 @@ export default function AdminAlgorithmDetail() {
   if (id && error) {
     return (
       <div className="container mx-auto py-8 text-center">
-        <h1 className="text-2xl font-bold text-destructive">Error loading algorithm</h1>
+        <h1 className="text-2xl font- text-destructive">Error loading algorithm</h1>
         <p className="text-muted-foreground">{error.message}</p>
         <button
           onClick={() => navigate('/admin/problems')}
@@ -42,7 +42,7 @@ export default function AdminAlgorithmDetail() {
 
   return (
     <div className=" mx-auto  mx-2">
-   
+
       <AlgorithmFormBuilder
         algorithm={algorithm}
         onCancel={handleCancel}

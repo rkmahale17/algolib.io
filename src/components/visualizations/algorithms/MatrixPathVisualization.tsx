@@ -70,9 +70,8 @@ export const MatrixPathVisualization: React.FC = () => {
           dp: dp.map((row) => [...row]),
           i,
           j,
-          message: `dp[${i}][${j}] = dp[${i - 1}][${j}] + dp[${i}][${
-            j - 1
-          }] = ${dp[i - 1][j]} + ${dp[i][j - 1]} = ${dp[i][j]}`,
+          message: `dp[${i}][${j}] = dp[${i - 1}][${j}] + dp[${i}][${j - 1
+            }] = ${dp[i - 1][j]} + ${dp[i][j - 1]} = ${dp[i][j]}`,
           lineNumber: 11,
         });
       }
@@ -170,13 +169,12 @@ export const MatrixPathVisualization: React.FC = () => {
                   {row.map((val, j) => (
                     <div
                       key={`${i}-${j}`}
-                      className={`w-16 h-16 border-2 flex items-center justify-center font-bold text-lg transition-all ${
-                        i === currentStep.i && j === currentStep.j
-                          ? "bg-primary/20 border-primary text-primary scale-110"
-                          : val > 0
+                      className={`w-16 h-16 border-2 flex items-center justify-center font- text-lg transition-all ${i === currentStep.i && j === currentStep.j
+                        ? "bg-primary/20 border-primary text-primary scale-110"
+                        : val > 0
                           ? "bg-green-500/20 border-green-500 text-green-500"
                           : "bg-card border-border"
-                      }`}
+                        }`}
                     >
                       {val}
                     </div>
@@ -209,7 +207,7 @@ export const MatrixPathVisualization: React.FC = () => {
                 paths: currentStep.dp[currentStep.i][currentStep.j],
                 totalPaths:
                   currentStep.dp[currentStep.dp.length - 1][
-                    currentStep.dp[0].length - 1
+                  currentStep.dp[0].length - 1
                   ],
               }}
             />

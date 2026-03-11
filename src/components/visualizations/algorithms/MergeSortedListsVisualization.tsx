@@ -187,9 +187,8 @@ export const MergeSortedListsVisualization = () => {
                 {currentStep.list1.map((val, idx) => (
                   <div
                     key={idx}
-                    className={`w-12 h-12 rounded flex items-center justify-center font-bold transition-all duration-300 ${
-                      idx === currentStep.p1 ? 'bg-primary/20 border-2 border-primary text-primary scale-110' : 'bg-muted text-foreground border border-border'
-                    }`}
+                    className={`w-12 h-12 rounded flex items-center justify-center font- transition-all duration-300 ${idx === currentStep.p1 ? 'bg-primary/20 border-2 border-primary text-primary scale-110' : 'bg-muted text-foreground border border-border'
+                      }`}
                   >
                     {val}
                   </div>
@@ -203,9 +202,8 @@ export const MergeSortedListsVisualization = () => {
                 {currentStep.list2.map((val, idx) => (
                   <div
                     key={idx}
-                    className={`w-12 h-12 rounded flex items-center justify-center font-bold transition-all duration-300 ${
-                      idx === currentStep.p2 ? 'bg-secondary/20 border-2 border-secondary text-secondary-foreground scale-110' : 'bg-muted text-foreground border border-border'
-                    }`}
+                    className={`w-12 h-12 rounded flex items-center justify-center font- transition-all duration-300 ${idx === currentStep.p2 ? 'bg-secondary/20 border-2 border-secondary text-secondary-foreground scale-110' : 'bg-muted text-foreground border border-border'
+                      }`}
                   >
                     {val}
                   </div>
@@ -219,7 +217,7 @@ export const MergeSortedListsVisualization = () => {
                 {currentStep.merged.map((val, idx) => (
                   <div
                     key={idx}
-                    className="w-12 h-12 rounded flex items-center justify-center font-bold bg-primary text-primary-foreground"
+                    className="w-12 h-12 rounded flex items-center justify-center font- bg-primary text-primary-foreground"
                   >
                     {val}
                   </div>
@@ -234,19 +232,19 @@ export const MergeSortedListsVisualization = () => {
 
           <div className="rounder-lg border">
             <VariablePanel
-            variables={{
-              p1: currentStep.p1,
-              p2: currentStep.p2,
-              'merged.length': currentStep.merged.length,
-              list1: currentStep.list1,
-              list2: currentStep.list2
-            }}
-          />
+              variables={{
+                p1: currentStep.p1,
+                p2: currentStep.p2,
+                'merged.length': currentStep.merged.length,
+                list1: currentStep.list1,
+                list2: currentStep.list2
+              }}
+            />
           </div>
         </div>
 
         <div className="space-y-4">
-          
+
           <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
         </div>
       </div>

@@ -215,9 +215,8 @@ export const ValidParenthesesVisualization = () => {
                 <motion.div
                   key={idx}
                   animate={{ scale: idx === currentStep.idx ? 1.1 : 1 }}
-                  className={`w-12 h-12 flex items-center justify-center rounded font-mono font-bold text-lg border-2 ${
-                    idx === currentStep.idx ? 'bg-primary/20 border-primary text-primary ring-2 ring-primary' : idx < currentStep.idx ? 'bg-green-500/10 border-green-500/30' : 'bg-muted/50 border-border'
-                  }`}
+                  className={`w-12 h-12 flex items-center justify-center rounded font-mono font- text-lg border-2 ${idx === currentStep.idx ? 'bg-primary/20 border-primary text-primary ring-2 ring-primary' : idx < currentStep.idx ? 'bg-green-500/10 border-green-500/30' : 'bg-muted/50 border-border'
+                    }`}
                 >
                   {char}
                 </motion.div>
@@ -230,7 +229,7 @@ export const ValidParenthesesVisualization = () => {
                 {currentStep.stack.length > 0 ? (
                   <div className="flex gap-2">
                     {currentStep.stack.map((item, idx) => (
-                      <motion.div key={idx} initial={{ scale: 0.5, y: -20 }} animate={{ scale: 1, y: 0 }} className="w-12 h-12 flex items-center justify-center rounded bg-primary/20 border-2 border-primary font-mono font-bold">
+                      <motion.div key={idx} initial={{ scale: 0.5, y: -20 }} animate={{ scale: 1, y: 0 }} className="w-12 h-12 flex items-center justify-center rounded bg-primary/20 border-2 border-primary font-mono font-">
                         {item}
                       </motion.div>
                     ))}
@@ -245,7 +244,7 @@ export const ValidParenthesesVisualization = () => {
 
             {currentStep.isValid !== undefined && (
               <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} className={`p-4 rounded mt-4 ${currentStep.isValid ? 'bg-green-500/10 border border-green-500/20' : 'bg-red-500/10 border border-red-500/20'}`}>
-                <p className={`text-lg font-bold ${currentStep.isValid ? 'text-green-600' : 'text-red-600'}`}>
+                <p className={`text-lg font- ${currentStep.isValid ? 'text-green-600' : 'text-red-600'}`}>
                   {currentStep.isValid ? '✓ Valid Parentheses' : '✗ Invalid'}
                 </p>
               </motion.div>

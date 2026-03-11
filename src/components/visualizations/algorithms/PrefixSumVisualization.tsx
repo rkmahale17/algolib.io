@@ -177,7 +177,7 @@ export const PrefixSumVisualization = () => {
                   return (
                     <div key={index} className="flex flex-col items-center gap-2 flex-1 max-w-[60px] relative">
                       {isActive && (
-                        <div className="absolute -top-8 text-xs font-bold text-primary animate-bounce">
+                        <div className="absolute -top-8 text-xs font- text-primary animate-bounce">
                           CURRENT
                         </div>
                       )}
@@ -186,7 +186,7 @@ export const PrefixSumVisualization = () => {
                           }`}
                         style={{ height: `${(value / getMaxValue()) * 100}%`, minHeight: '20px' }}
                       />
-                      <span className={`text-xs font-mono ${isActive ? 'text-primary font-bold text-base' : 'text-muted-foreground'}`}>
+                      <span className={`text-xs font-mono ${isActive ? 'text-primary font- text-base' : 'text-muted-foreground'}`}>
                         {value}
                       </span>
                     </div>
@@ -207,7 +207,7 @@ export const PrefixSumVisualization = () => {
                           }`}
                         style={{ height: `${(value / getMaxValue()) * 100}%`, minHeight: '20px' }}
                       />
-                      <span className={`text-xs font-mono ${isActive ? 'text-primary font-bold text-base' : 'text-muted-foreground'}`}>
+                      <span className={`text-xs font-mono ${isActive ? 'text-primary font- text-base' : 'text-muted-foreground'}`}>
                         {value}
                       </span>
                     </div>

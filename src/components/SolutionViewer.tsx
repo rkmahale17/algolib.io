@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Editor from '@monaco-editor/react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Copy, Check, Maximize2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { RichText } from '@/components/RichText';
-import { defineThemes } from "@/utils/monacoThemes";
+import { IsolatedSolutionEditor } from "./algorithm/IsolatedSolutionEditor";
 
 interface CodeBlock {
   codeType: string;
@@ -52,49 +51,26 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
 }) => {
   const [copiedTab, setCopiedTab] = useState<string | null>(null);
   const [isAppDark, setIsAppDark] = useState(false);
-  const [settingsTheme, setSettingsTheme] = useState<'light' | 'dark' | 'system'>('system');
-
-  // Load settings and listen for changes
-  useEffect(() => {
-    const loadSettings = () => {
-        const saved = localStorage.getItem('monaco-editor-settings');
-        if (saved) {
-            try {
-                const parsed = JSON.parse(saved);
-                if (parsed.theme) setSettingsTheme(parsed.theme);
-            } catch (e) {
-                console.error("Failed to parse settings", e);
-            }
-        }
-    };
-
-    loadSettings();
-    const handleSettingsChange = () => loadSettings();
-    window.addEventListener('monaco-settings-changed', handleSettingsChange);
-    return () => window.removeEventListener('monaco-settings-changed', handleSettingsChange);
-  }, []);
 
   // Detect theme from document class
   useEffect(() => {
     const checkTheme = () => {
       setIsAppDark(document.documentElement.classList.contains('dark'));
     };
-    
+
     checkTheme();
-    
+
     // Watch for theme changes
     const observer = new MutationObserver(checkTheme);
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['class'],
     });
-    
+
     return () => observer.disconnect();
   }, []);
 
-  const effectiveTheme = settingsTheme === 'dark' ? 'night-owl' : 
-                         (settingsTheme === 'light' ? 'light' : 
-                         (isAppDark ? 'night-owl' : 'light'));
+  const effectiveTheme = isAppDark ? 'night-owl' : 'light';
 
   const handleCopy = async (code: string, tabName: string) => {
     try {
@@ -163,12 +139,12 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
       {(() => {
         // Group implementations by code type (approach)
         const approachesByType: Record<string, { lang: string; code: string; explanationBefore?: string; explanationAfter?: string; showExplanationBefore?: boolean; showExplanationAfter?: boolean }[]> = {};
-        
+
         implementations.forEach((impl) => {
           // Check if language is enabled
           const normalizedLang = impl.lang.toLowerCase();
-          const isLangEnabled = !controls?.languages || 
-                               (typeof controls.languages === 'boolean' ? controls.languages : controls.languages[normalizedLang] !== false);
+          const isLangEnabled = !controls?.languages ||
+            (typeof controls.languages === 'boolean' ? controls.languages : controls.languages[normalizedLang] !== false);
 
           if (!isLangEnabled) return;
 
@@ -193,10 +169,10 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
         });
 
         const approaches = Object.entries(approachesByType);
-        
+
         // Filter approaches based on controls
-        const filteredApproaches = (controls?.approaches === false) 
-          ? approaches.slice(0, 1) 
+        const filteredApproaches = (controls?.approaches === false)
+          ? approaches.slice(0, 1)
           : approaches;
 
         if (filteredApproaches.length === 0) {
@@ -204,9 +180,9 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
             <div className="text-center py-12 text-muted-foreground border rounded-lg border-dashed">
               No solutions available.
               {implementations.length > 0 && (
-                 <p className="text-xs mt-2 text-muted-foreground/80">
-                   Some solutions might be hidden by your display settings.
-                 </p>
+                <p className="text-xs mt-2 text-muted-foreground/80">
+                  Some solutions might be hidden by your display settings.
+                </p>
               )}
             </div>
           );
@@ -215,7 +191,7 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
         return (
           <div className="space-y-12">
             {filteredApproaches.map(([codeType, langImplementations], approachIndex) => (
-              <SolutionApproach 
+              <SolutionApproach
                 key={codeType}
                 codeType={codeType}
                 langImplementations={langImplementations}
@@ -268,175 +244,156 @@ const SolutionApproach: React.FC<{
   getLanguageForMonaco,
   getFileExtension,
 }) => {
-  // Local state for the active tab to ensure Copy button works and persistence
-  const [activeLang, setActiveLang] = useState(langImplementations[0]?.lang || 'typescript');
-  const [isNarrow, setIsNarrow] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [monacoLoaded, setMonacoLoaded] = useState(false); 
+    // Local state for the active tab to ensure Copy button works and persistence
+    const [activeLang, setActiveLang] = useState(langImplementations[0]?.lang || 'typescript');
+    const [isNarrow, setIsNarrow] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [monacoLoaded, setMonacoLoaded] = useState(false);
 
-  // ResizeObserver to detect container width
-  useEffect(() => {
-    if (!containerRef.current) return;
+    // ResizeObserver to detect container width
+    useEffect(() => {
+      if (!containerRef.current) return;
 
-    const resizeObserver = new ResizeObserver((entries) => {
+      const resizeObserver = new ResizeObserver((entries) => {
         for (const entry of entries) {
-            setIsNarrow(entry.contentRect.width < 580);
+          setIsNarrow(entry.contentRect.width < 580);
         }
-    });
+      });
 
-    resizeObserver.observe(containerRef.current);
-    
-    return () => resizeObserver.disconnect();
-  }, []);
+      resizeObserver.observe(containerRef.current);
 
-  // Find current code based on activeLang
-  const activeImpl = langImplementations.find(i => i.lang === activeLang) || langImplementations[0];
-  const explanationBefore = langImplementations[0]?.explanationBefore;
-  const explanationAfter = langImplementations[0]?.explanationAfter;
+      return () => resizeObserver.disconnect();
+    }, []);
 
-  const showPre = activeImpl.showExplanationBefore !== false;
-  const showPost = activeImpl.showExplanationAfter !== false;
+    // Find current code based on activeLang
+    const activeImpl = langImplementations.find(i => i.lang === activeLang) || langImplementations[0];
+    const explanationBefore = langImplementations[0]?.explanationBefore;
+    const explanationAfter = langImplementations[0]?.explanationAfter;
 
-  return (
-    <div className="space-y-4" ref={containerRef}>
-      {/* Approach Header */}
-      <h3 className="text-base font-semibold">
-        Approach {approachIndex + 1}: {codeType === 'optimize' ? 'Optimized' : codeType.charAt(0).toUpperCase() + codeType.slice(1)}
-      </h3>
+    const showPre = activeImpl.showExplanationBefore !== false;
+    const showPost = activeImpl.showExplanationAfter !== false;
 
-      {/* Explanation Before */}
-      {explanationBefore && controls?.explanation_before !== false && showPre && (
-        <RichText 
-          content={explanationBefore} 
-          className="text-sm text-muted-foreground mb-4"
-        />
-      )}
+    return (
+      <div className="space-y-4" ref={containerRef}>
+        {/* Approach Header */}
+        <h3 className="text-base font-semibold">
+          Approach {approachIndex + 1}: {codeType === 'optimize' ? 'Optimized' : codeType.charAt(0).toUpperCase() + codeType.slice(1)}
+        </h3>
 
-      {/* Language Tabs for this approach */}
-      <Tabs 
-        value={activeLang} 
-        onValueChange={setActiveLang} 
-        className="w-full"
-      >
-        <div className="relative rounded-lg border overflow-hidden">
-          {/* Header with Language Tabs/Dropdown and Copy Button */}
-          <div className="flex items-center justify-between border-b shrink-0">
-            {/* LEFT SIDE: Language Selection (Tabs or Dropdown) */}
-            <div className="flex-1 overflow-hidden min-w-0">
-              
-              {/* DESKTOP: Tabs List */}
-              {(controls?.languages !== false && langImplementations.length > 1) && !isNarrow && (
-                <div className="overflow-hidden">
-                  <TabsList className="flex p-0 bg-transparent gap-0 rounded-none w-full justify-start overflow-x-auto no-scrollbar">
-                    {langImplementations.map((impl) => (
-                      <TabsTrigger
-                        key={impl.lang}
-                        value={impl.lang}
-                        className="flex-1 min-w-[100px] data-[state=active]:bg-transparent data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10 px-4 whitespace-nowrap"
-                      >
-                        {getLanguageDisplayName(impl.lang)}
-                      </TabsTrigger>
-                    ))}
-                  </TabsList>
-                </div>
-              )}
+        {/* Explanation Before */}
+        {explanationBefore && controls?.explanation_before !== false && showPre && (
+          <RichText
+            content={explanationBefore}
+            className="text-sm text-muted-foreground mb-4"
+          />
+        )}
 
-              {/* MOBILE: Select Dropdown */}
-              {(controls?.languages !== false && langImplementations.length > 1) && isNarrow && (
-                <div className="px-2 py-1">
-                   <Select value={activeLang} onValueChange={setActiveLang}>
-                    <SelectTrigger className="h-8 w-[140px] border-none shadow-none bg-transparent focus:ring-0 focus:ring-offset-0 text-sm font-medium">
-                      <SelectValue placeholder="Language" />
-                    </SelectTrigger>
-                    <SelectContent>
+        {/* Language Tabs for this approach */}
+        <Tabs
+          value={activeLang}
+          onValueChange={setActiveLang}
+          className="w-full"
+        >
+          <div className="relative rounded-lg border overflow-hidden">
+            {/* Header with Language Tabs/Dropdown and Copy Button */}
+            <div className="flex items-center justify-between border-b shrink-0">
+              {/* LEFT SIDE: Language Selection (Tabs or Dropdown) */}
+              <div className="flex-1 overflow-hidden min-w-0">
+
+                {/* DESKTOP: Tabs List */}
+                {(controls?.languages !== false && langImplementations.length > 1) && !isNarrow && (
+                  <div className="overflow-hidden">
+                    <TabsList className="flex p-0 bg-transparent gap-0 rounded-none w-full justify-start overflow-x-auto no-scrollbar">
                       {langImplementations.map((impl) => (
-                        <SelectItem key={impl.lang} value={impl.lang}>
+                        <TabsTrigger
+                          key={impl.lang}
+                          value={impl.lang}
+                          className="flex-1 min-w-[100px] data-[state=active]:bg-transparent data-[state=active]:text-foreground border-b-2 border-transparent data-[state=active]:border-primary rounded-none h-10 px-4 whitespace-nowrap"
+                        >
                           {getLanguageDisplayName(impl.lang)}
-                        </SelectItem>
+                        </TabsTrigger>
                       ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
+                    </TabsList>
+                  </div>
+                )}
 
-              {/* Single Language Header - Show if only 1 language or tabs disabled */}
-              {(controls?.languages === false || langImplementations.length === 1) && (
-                <div className="px-4 flex items-center h-10 text-sm font-medium text-muted-foreground bg-muted/5">
-                  {getLanguageDisplayName(activeImpl?.lang || 'Code')}
-                </div>
-              )}
+                {/* MOBILE: Select Dropdown */}
+                {(controls?.languages !== false && langImplementations.length > 1) && isNarrow && (
+                  <div className="px-2 py-1">
+                    <Select value={activeLang} onValueChange={setActiveLang}>
+                      <SelectTrigger className="h-8 w-[140px] border-none shadow-none bg-transparent focus:ring-0 focus:ring-offset-0 text-sm font-medium">
+                        <SelectValue placeholder="Language" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {langImplementations.map((impl) => (
+                          <SelectItem key={impl.lang} value={impl.lang}>
+                            {getLanguageDisplayName(impl.lang)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {/* Single Language Header - Show if only 1 language or tabs disabled */}
+                {(controls?.languages === false || langImplementations.length === 1) && (
+                  <div className="px-4 flex items-center h-10 text-sm font-medium text-muted-foreground bg-muted/5">
+                    {getLanguageDisplayName(activeImpl?.lang || 'Code')}
+                  </div>
+                )}
+              </div>
+
+              {/* RIGHT SIDE: Copy Button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleCopy(activeImpl.code, `${codeType}-${activeLang}`)}
+                className="gap-2 h-10 rounded-none border-l shrink-0 hover:bg-primary/10 hover:text-primary"
+              >
+                {copiedTab === `${codeType}-${activeLang}` ? (
+                  <>
+                    <Check className="w-4 h-4" />
+                    <span className={isNarrow ? "" : "hidden sm:inline"}>
+                      {!isNarrow ? "Copied" : ""}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4" />
+                  </>
+                )}
+              </Button>
             </div>
 
-            {/* RIGHT SIDE: Copy Button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleCopy(activeImpl.code, `${codeType}-${activeLang}`)}
-              className="gap-2 h-10 rounded-none border-l shrink-0 hover:bg-primary/10 hover:text-primary"
-            >
-              {copiedTab === `${codeType}-${activeLang}` ? (
-                <>
-                  <Check className="w-4 h-4" />
-                  <span className={isNarrow ? "" : "hidden sm:inline"}>
-                    {!isNarrow ? "Copied" : ""}
-                  </span>
-                </>
-              ) : (
-                <>
-                  <Copy className="w-4 h-4" />
-                </>
-              )}
-            </Button>
-          </div>
-
-          {/* Resizable Container for Editor */}
-          <div className="resize-y overflow-hidden h-[500px] min-h-[200px] w-full border-b relative group">
-             {/* Resize Hint Overlay */}
-             <div className="absolute bottom-1 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+            {/* Resizable Container for Editor */}
+            <div className="resize-y overflow-hidden h-[500px] min-h-[200px] w-full border-b relative group">
+              {/* Resize Hint Overlay */}
+              <div className="absolute bottom-1 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
                 <Maximize2 className="w-3 h-3 text-muted-foreground/50" />
-             </div>
+              </div>
 
-             {langImplementations.map(langImpl => (
-               <TabsContent key={langImpl.lang} value={langImpl.lang} className="absolute inset-0 mt-0 data-[state=inactive]:hidden">
-                  <Editor
-                    height="100%"
-                    width="100%"
-                    path={`solution://${codeType}/${langImpl.lang}/solution.${getFileExtension(langImpl.lang)}`}
-                    language={getLanguageForMonaco(langImpl.lang)}
-                    value={langImpl.code}
-                    theme={editorTheme}
-                    beforeMount={defineThemes}
-                    options={{
-                      readOnly: true,
-                      minimap: { enabled: false },
-                      scrollBeyondLastLine: false,
-                      fontSize: 14,
-                      lineNumbers: 'on',
-                      renderLineHighlight: 'none',
-                      scrollbar: {
-                        vertical: 'visible',
-                        horizontal: 'visible',
-                      },
-                      overviewRulerLanes: 0,
-                      hideCursorInOverviewRuler: true,
-                      overviewRulerBorder: false,
-                      automaticLayout: true,
-                      padding: { top: 16, bottom: 16 }
-                    }}
-                  />
-               </TabsContent>
-             ))}
+              {langImplementations.map(langImpl => (
+                langImpl.lang === activeLang && (
+                  <TabsContent key={langImpl.lang} value={langImpl.lang} className="absolute inset-0 mt-0">
+                    <IsolatedSolutionEditor
+                      code={langImpl.code}
+                      language={getLanguageForMonaco(langImpl.lang)}
+                      theme={editorTheme as any}
+                    />
+                  </TabsContent>
+                )
+              ))}
+            </div>
           </div>
-        </div>
-      </Tabs>
+        </Tabs>
 
-      {/* Explanation After */}
-      {explanationAfter && controls?.explanation_after !== false && showPost && (
-        <RichText 
-          content={explanationAfter} 
-          className="text-sm text-muted-foreground mt-4"
-        />
-      )}
-    </div>
-  );
-};
+        {/* Explanation After */}
+        {explanationAfter && controls?.explanation_after !== false && showPost && (
+          <RichText
+            content={explanationAfter}
+            className="text-sm text-muted-foreground mt-4"
+          />
+        )}
+      </div>
+    );
+  };

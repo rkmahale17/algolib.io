@@ -149,7 +149,7 @@ export const ReorderListVisualization = () => {
     for (let i = 0; i < maxLen; i++) {
       if (i < firstHalf.length) result.push(firstHalf[i]);
       if (i < reversedSecond.length) result.push(reversedSecond[i]);
-      
+
       newSteps.push({
         list: [...list],
         phase: 'merge',
@@ -254,13 +254,12 @@ export const ReorderListVisualization = () => {
                   {currentStep.list.map((val, idx) => (
                     <div key={idx} className="flex items-center">
                       <div
-                        className={`w-14 h-14 flex items-center justify-center rounded-lg border-2 font-bold text-lg transition-all ${
-                          currentStep.slow === idx
-                            ? 'bg-primary/20 border-primary text-primary'
-                            : currentStep.fast === idx
+                        className={`w-14 h-14 flex items-center justify-center rounded-lg border-2 font- text-lg transition-all ${currentStep.slow === idx
+                          ? 'bg-primary/20 border-primary text-primary'
+                          : currentStep.fast === idx
                             ? 'bg-secondary/20 border-secondary text-secondary-foreground'
                             : 'bg-card border-border text-foreground'
-                        }`}
+                          }`}
                       >
                         {val}
                       </div>
@@ -282,7 +281,7 @@ export const ReorderListVisualization = () => {
                     {currentStep.firstHalf.map((val, idx) => (
                       <div
                         key={idx}
-                        className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-primary/20 border-primary text-primary font-bold"
+                        className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-primary/20 border-primary text-primary font-"
                       >
                         {val}
                       </div>
@@ -298,7 +297,7 @@ export const ReorderListVisualization = () => {
                     {currentStep.secondHalf.map((val, idx) => (
                       <div
                         key={idx}
-                        className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-secondary/20 border-secondary text-secondary-foreground font-bold"
+                        className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-secondary/20 border-secondary text-secondary-foreground font-"
                       >
                         {val}
                       </div>
@@ -313,7 +312,7 @@ export const ReorderListVisualization = () => {
                       {currentStep.result.map((val, idx) => (
                         <div
                           key={idx}
-                          className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-accent/20 border-accent text-accent-foreground font-bold"
+                          className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-accent/20 border-accent text-accent-foreground font-"
                         >
                           {val}
                         </div>

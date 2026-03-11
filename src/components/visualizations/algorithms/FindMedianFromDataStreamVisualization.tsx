@@ -24,7 +24,7 @@ export const FindMedianFromDataStreamVisualization = () => {
     { operation: "findMedian", num: null, maxHeap: [1], minHeap: [], median: 1, message: "Median: Only maxHeap has 1. Return 1.0", lineNumber: 22 },
     { operation: "addNum", num: 2, maxHeap: [1], minHeap: [2], median: null, message: "Add 2: 2 > max(maxHeap). Add to minHeap. Balance: [1] | [2]", lineNumber: 13 },
     { operation: "findMedian", num: null, maxHeap: [1], minHeap: [2], median: 1.5, message: "Median: Even count. (max(maxHeap) + min(minHeap))/2 = (1+2)/2 = 1.5", lineNumber: 24 },
-    { operation: "addNum", num: 3, maxHeap: [1], minHeap: [2,3], median: null, message: "Add 3: 3 > 1. Add to minHeap. Balance: [1] | [2,3]", lineNumber: 13 },
+    { operation: "addNum", num: 3, maxHeap: [1], minHeap: [2, 3], median: null, message: "Add 3: 3 > 1. Add to minHeap. Balance: [1] | [2,3]", lineNumber: 13 },
     { operation: "findMedian", num: null, maxHeap: [2], minHeap: [3], median: 2, message: "Rebalance: Move 2 to maxHeap. Median = 2. Time: O(log n), Space: O(n)", lineNumber: 22 }
   ];
 
@@ -88,9 +88,8 @@ export const FindMedianFromDataStreamVisualization = () => {
                 <div className="p-4 bg-blue-500/10 rounded min-h-[80px]">
                   <div className="flex flex-col gap-1">
                     {currentStep.maxHeap.map((val, idx) => (
-                      <div key={idx} className={`px-3 py-2 rounded font-mono bg-blue-500/20 text-blue-700 font-bold ${
-                        idx === 0 ? 'ring-2 ring-blue-500' : ''
-                      }`}>
+                      <div key={idx} className={`px-3 py-2 rounded font-mono bg-blue-500/20 text-blue-700 font- ${idx === 0 ? 'ring-2 ring-blue-500' : ''
+                        }`}>
                         {val}
                       </div>
                     ))}
@@ -108,9 +107,8 @@ export const FindMedianFromDataStreamVisualization = () => {
                 <div className="p-4 bg-blue-500/10 rounded min-h-[80px]">
                   <div className="flex flex-col gap-1">
                     {currentStep.minHeap.map((val, idx) => (
-                      <div key={idx} className={`px-3 py-2 rounded font-mono bg-blue-500/20 text-blue-700 font-bold ${
-                        idx === 0 ? 'ring-2 ring-green-500' : ''
-                      }`}>
+                      <div key={idx} className={`px-3 py-2 rounded font-mono bg-blue-500/20 text-blue-700 font- ${idx === 0 ? 'ring-2 ring-green-500' : ''
+                        }`}>
                         {val}
                       </div>
                     ))}
@@ -127,7 +125,7 @@ export const FindMedianFromDataStreamVisualization = () => {
             {currentStep.median !== null && (
               <div className="p-4 bg-green-500/20 rounded text-center">
                 <div className="text-sm text-muted-foreground mb-1">Current Median</div>
-                <div className="text-3xl font-bold text-green-600">{currentStep.median}</div>
+                <div className="text-3xl font- text-green-600">{currentStep.median}</div>
               </div>
             )}
             <div className="p-4 bg-muted/50 rounded text-sm">{currentStep.message}</div>

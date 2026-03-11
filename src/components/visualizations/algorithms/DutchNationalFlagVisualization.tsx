@@ -287,15 +287,15 @@ export const DutchNationalFlagVisualization = () => {
                 return (
                   <div key={index} className="flex flex-col items-center gap-2 relative">
                     <div className="text-xs space-y-0.5 h-8">
-                      {isLow && <div className="font-bold text-blue-500">LOW</div>}
-                      {isMid && <div className="font-bold text-primary">MID</div>}
-                      {isHigh && <div className="font-bold text-blue-500">HIGH</div>}
+                      {isLow && <div className="font- text-blue-500">LOW</div>}
+                      {isMid && <div className="font- text-primary">MID</div>}
+                      {isHigh && <div className="font- text-blue-500">HIGH</div>}
                     </div>
                     <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all duration-300 ${getColorClass(
+                      className={`w-12 h-12 rounded-full flex items-center justify-center font- text-lg transition-all duration-300 ${getColorClass(
                         value
                       )} ${isMid ? 'shadow-lg shadow-primary/50 scale-110 ring-4 ring-primary' :
-                          isLow || isHigh ? 'scale-105' : ''
+                        isLow || isHigh ? 'scale-105' : ''
                         }`}
                     >
                       <span className={value === 1 ? 'text-gray-800' : 'text-white'}>{value}</span>

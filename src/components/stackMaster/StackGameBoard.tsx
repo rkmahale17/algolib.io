@@ -26,7 +26,7 @@ export const StackGameBoard = ({ mode, onBackToMenu }: StackGameBoardProps) => {
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (!gameState.isPlaying || gameState.isGameOver) return;
-      
+
       const topSymbol = gameState.fallingSymbols[0];
       if (!topSymbol) return;
 
@@ -67,22 +67,22 @@ export const StackGameBoard = ({ mode, onBackToMenu }: StackGameBoardProps) => {
               <div className="grid grid-cols-5 gap-3 text-center">
                 <div className="space-y-1">
                   <p className="text-xs text-muted-foreground">Score</p>
-                  <p className={`text-xl font-bold ${getScoreColor()}`}>{gameState.score}</p>
+                  <p className={`text-xl font- ${getScoreColor()}`}>{gameState.score}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-xs text-muted-foreground">Level</p>
-                  <p className="text-xl font-bold text-primary">{gameState.level}</p>
+                  <p className="text-xl font- text-primary">{gameState.level}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-xs text-muted-foreground">Combo</p>
-                  <p className="text-xl font-bold text-orange-500 flex items-center justify-center gap-1">
+                  <p className="text-xl font- text-orange-500 flex items-center justify-center gap-1">
                     {gameState.combo > 0 && <Flame className="w-4 h-4" />}
                     ×{gameState.combo}
                   </p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-xs text-muted-foreground">Max</p>
-                  <p className="text-xl font-bold text-secondary">×{gameState.maxCombo}</p>
+                  <p className="text-xl font- text-secondary">×{gameState.maxCombo}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-xs text-muted-foreground">Lives</p>
@@ -90,11 +90,10 @@ export const StackGameBoard = ({ mode, onBackToMenu }: StackGameBoardProps) => {
                     {Array.from({ length: 3 }).map((_, i) => (
                       <Heart
                         key={i}
-                        className={`w-5 h-5 ${
-                          i < gameState.lives
-                            ? "fill-red-500 text-red-500"
-                            : "fill-muted text-muted"
-                        }`}
+                        className={`w-5 h-5 ${i < gameState.lives
+                          ? "fill-red-500 text-red-500"
+                          : "fill-muted text-muted"
+                          }`}
                       />
                     ))}
                   </div>
@@ -163,9 +162,9 @@ export const StackGameBoard = ({ mode, onBackToMenu }: StackGameBoardProps) => {
             </CardContent>
           </Card>
         </div>
-        
+
         <div className="lg:col-span-1">
-          <StackVisualization 
+          <StackVisualization
             stack={gameState.stack}
             getSymbolColor={getSymbolColor}
           />

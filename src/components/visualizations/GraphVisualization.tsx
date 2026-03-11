@@ -127,9 +127,8 @@ export const GraphVisualization = ({ algorithmId }: GraphVisualizationProps) => 
                     y1={positions[from].y}
                     x2={positions[to].x}
                     y2={positions[to].y}
-                    className={`transition-all duration-300 ${
-                      highlighted ? 'stroke-primary' : 'stroke-border'
-                    }`}
+                    className={`transition-all duration-300 ${highlighted ? 'stroke-primary' : 'stroke-border'
+                      }`}
                     strokeWidth={highlighted ? '3' : '2'}
                   />
                 );
@@ -150,13 +149,12 @@ export const GraphVisualization = ({ algorithmId }: GraphVisualizationProps) => 
                   cx={pos.x}
                   cy={pos.y}
                   r="28"
-                  className={`transition-all duration-300 ${
-                    isCurrent
+                  className={`transition-all duration-300 ${isCurrent
                       ? 'fill-primary stroke-primary shadow-lg'
                       : isVisited
-                      ? 'fill-primary/60 stroke-primary'
-                      : 'fill-card stroke-border'
-                  }`}
+                        ? 'fill-primary/60 stroke-primary'
+                        : 'fill-card stroke-border'
+                    }`}
                   strokeWidth="2"
                   style={{
                     filter: isCurrent ? 'drop-shadow(0 0 8px hsl(var(--primary)))' : 'none'
@@ -166,9 +164,8 @@ export const GraphVisualization = ({ algorithmId }: GraphVisualizationProps) => 
                   x={pos.x}
                   y={pos.y + 6}
                   textAnchor="middle"
-                  className={`text-base font-bold transition-colors ${
-                    isVisited ? 'fill-primary-foreground' : 'fill-foreground'
-                  }`}
+                  className={`text-base font- transition-colors ${isVisited ? 'fill-primary-foreground' : 'fill-foreground'
+                    }`}
                 >
                   {index}
                 </text>
@@ -177,7 +174,7 @@ export const GraphVisualization = ({ algorithmId }: GraphVisualizationProps) => 
                     x={pos.x}
                     y={pos.y + 45}
                     textAnchor="middle"
-                    className="text-xs fill-primary font-bold"
+                    className="text-xs fill-primary font-"
                   >
                     {visitOrder + 1}
                   </text>

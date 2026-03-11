@@ -284,12 +284,11 @@ export const AlienDictionaryVisualization = () => {
                 {step.words.map((word, idx) => (
                   <div
                     key={idx}
-                    className={`px-3 py-1 rounded font-mono text-sm ${
-                      step.currentPair &&
+                    className={`px-3 py-1 rounded font-mono text-sm ${step.currentPair &&
                       (word === step.currentPair[0] || word === step.currentPair[1])
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted'
-                    }`}
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted'
+                      }`}
                   >
                     {word}
                   </div>
@@ -327,7 +326,7 @@ export const AlienDictionaryVisualization = () => {
             >
               <Card className="p-4">
                 <h3 className="text-sm font-semibold mb-3">Alien Order</h3>
-                <div className="text-2xl font-bold text-green-500">{step.result.join('')}</div>
+                <div className="text-2xl font- text-green-500">{step.result.join('')}</div>
               </Card>
             </motion.div>
           )}

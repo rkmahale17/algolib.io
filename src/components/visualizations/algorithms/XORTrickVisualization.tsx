@@ -145,11 +145,10 @@ export const XORTrickVisualization: React.FC = () => {
             {currentStep.array.map((val, idx) => (
               <div
                 key={idx}
-                className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
-                  idx === currentStep.index
-                    ? "bg-primary/20 border-primary"
-                    : "bg-card border-border"
-                }`}
+                className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font- transition-all ${idx === currentStep.index
+                  ? "bg-primary/20 border-primary"
+                  : "bg-card border-border"
+                  }`}
               >
                 {val}
               </div>
@@ -161,13 +160,13 @@ export const XORTrickVisualization: React.FC = () => {
               <div className="text-sm text-muted-foreground mb-1">
                 XOR Result (Decimal)
               </div>
-              <div className="text-2xl font-bold">{currentStep.xorResult}</div>
+              <div className="text-2xl font-">{currentStep.xorResult}</div>
             </div>
             <div className="p-4 bg-muted rounded border">
               <div className="text-sm text-muted-foreground mb-1">
                 XOR Result (Binary)
               </div>
-              <div className="text-2xl font-mono font-bold">
+              <div className="text-2xl font-mono font-">
                 {currentStep.binary}
               </div>
             </div>

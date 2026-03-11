@@ -22,8 +22,8 @@ export const NumberOfIslandsVisualization = () => {
 
   const steps: Step[] = [
     {
-      grid: [['1','1','0','0'],['1','1','0','0'],['0','0','1','0'],['0','0','0','1']],
-      visited: [[false,false,false,false],[false,false,false,false],[false,false,false,false],[false,false,false,false]],
+      grid: [['1', '1', '0', '0'], ['1', '1', '0', '0'], ['0', '0', '1', '0'], ['0', '0', '0', '1']],
+      visited: [[false, false, false, false], [false, false, false, false], [false, false, false, false], [false, false, false, false]],
       current: null,
       islandCount: 0,
       variables: { m: 4, n: 4 },
@@ -32,8 +32,8 @@ export const NumberOfIslandsVisualization = () => {
       lineExecution: "function numIslands(grid: string[][]): number"
     },
     {
-      grid: [['1','1','0','0'],['1','1','0','0'],['0','0','1','0'],['0','0','0','1']],
-      visited: [[false,false,false,false],[false,false,false,false],[false,false,false,false],[false,false,false,false]],
+      grid: [['1', '1', '0', '0'], ['1', '1', '0', '0'], ['0', '0', '1', '0'], ['0', '0', '0', '1']],
+      visited: [[false, false, false, false], [false, false, false, false], [false, false, false, false], [false, false, false, false]],
       current: null,
       islandCount: 0,
       variables: { m: 4, n: 4, count: 0 },
@@ -42,8 +42,8 @@ export const NumberOfIslandsVisualization = () => {
       lineExecution: "const m = grid.length, n = grid[0].length; let count = 0;"
     },
     {
-      grid: [['1','1','0','0'],['1','1','0','0'],['0','0','1','0'],['0','0','0','1']],
-      visited: [[false,false,false,false],[false,false,false,false],[false,false,false,false],[false,false,false,false]],
+      grid: [['1', '1', '0', '0'], ['1', '1', '0', '0'], ['0', '0', '1', '0'], ['0', '0', '0', '1']],
+      visited: [[false, false, false, false], [false, false, false, false], [false, false, false, false], [false, false, false, false]],
       current: null,
       islandCount: 0,
       variables: {},
@@ -52,8 +52,8 @@ export const NumberOfIslandsVisualization = () => {
       lineExecution: "function dfs(r: number, c: number)"
     },
     {
-      grid: [['1','1','0','0'],['1','1','0','0'],['0','0','1','0'],['0','0','0','1']],
-      visited: [[false,false,false,false],[false,false,false,false],[false,false,false,false],[false,false,false,false]],
+      grid: [['1', '1', '0', '0'], ['1', '1', '0', '0'], ['0', '0', '1', '0'], ['0', '0', '0', '1']],
+      visited: [[false, false, false, false], [false, false, false, false], [false, false, false, false], [false, false, false, false]],
       current: [0, 0],
       islandCount: 0,
       variables: { i: 0, j: 0 },
@@ -62,8 +62,8 @@ export const NumberOfIslandsVisualization = () => {
       lineExecution: "for (let i = 0; i < m; i++) for (let j = 0; j < n; j++) if (grid[i][j] === '1')"
     },
     {
-      grid: [['1','1','0','0'],['1','1','0','0'],['0','0','1','0'],['0','0','0','1']],
-      visited: [[false,false,false,false],[false,false,false,false],[false,false,false,false],[false,false,false,false]],
+      grid: [['1', '1', '0', '0'], ['1', '1', '0', '0'], ['0', '0', '1', '0'], ['0', '0', '0', '1']],
+      visited: [[false, false, false, false], [false, false, false, false], [false, false, false, false], [false, false, false, false]],
       current: [0, 0],
       islandCount: 1,
       variables: { count: 1 },
@@ -72,8 +72,8 @@ export const NumberOfIslandsVisualization = () => {
       lineExecution: "count++; // count = 1"
     },
     {
-      grid: [['1','1','0','0'],['1','1','0','0'],['0','0','1','0'],['0','0','0','1']],
-      visited: [[true,true,false,false],[true,true,false,false],[false,false,false,false],[false,false,false,false]],
+      grid: [['1', '1', '0', '0'], ['1', '1', '0', '0'], ['0', '0', '1', '0'], ['0', '0', '0', '1']],
+      visited: [[true, true, false, false], [true, true, false, false], [false, false, false, false], [false, false, false, false]],
       current: [0, 0],
       islandCount: 1,
       variables: { markedCells: 4 },
@@ -82,8 +82,8 @@ export const NumberOfIslandsVisualization = () => {
       lineExecution: "dfs(i, j); // marks all connected '1' cells"
     },
     {
-      grid: [['1','1','0','0'],['1','1','0','0'],['0','0','1','0'],['0','0','0','1']],
-      visited: [[true,true,false,false],[true,true,false,false],[false,false,false,false],[false,false,false,false]],
+      grid: [['1', '1', '0', '0'], ['1', '1', '0', '0'], ['0', '0', '1', '0'], ['0', '0', '0', '1']],
+      visited: [[true, true, false, false], [true, true, false, false], [false, false, false, false], [false, false, false, false]],
       current: [0, 2],
       islandCount: 1,
       variables: { i: 0, j: 2 },
@@ -92,8 +92,8 @@ export const NumberOfIslandsVisualization = () => {
       lineExecution: "if (grid[0][2] === '1') // false, skip"
     },
     {
-      grid: [['1','1','0','0'],['1','1','0','0'],['0','0','1','0'],['0','0','0','1']],
-      visited: [[true,true,false,false],[true,true,false,false],[false,false,false,false],[false,false,false,false]],
+      grid: [['1', '1', '0', '0'], ['1', '1', '0', '0'], ['0', '0', '1', '0'], ['0', '0', '0', '1']],
+      visited: [[true, true, false, false], [true, true, false, false], [false, false, false, false], [false, false, false, false]],
       current: [2, 2],
       islandCount: 1,
       variables: { i: 2, j: 2 },
@@ -102,8 +102,8 @@ export const NumberOfIslandsVisualization = () => {
       lineExecution: "if (grid[2][2] === '1') // true"
     },
     {
-      grid: [['1','1','0','0'],['1','1','0','0'],['0','0','1','0'],['0','0','0','1']],
-      visited: [[true,true,false,false],[true,true,false,false],[false,false,false,false],[false,false,false,false]],
+      grid: [['1', '1', '0', '0'], ['1', '1', '0', '0'], ['0', '0', '1', '0'], ['0', '0', '0', '1']],
+      visited: [[true, true, false, false], [true, true, false, false], [false, false, false, false], [false, false, false, false]],
       current: [2, 2],
       islandCount: 2,
       variables: { count: 2 },
@@ -112,8 +112,8 @@ export const NumberOfIslandsVisualization = () => {
       lineExecution: "count++; // count = 2"
     },
     {
-      grid: [['1','1','0','0'],['1','1','0','0'],['0','0','1','0'],['0','0','0','1']],
-      visited: [[true,true,false,false],[true,true,false,false],[false,false,true,false],[false,false,false,false]],
+      grid: [['1', '1', '0', '0'], ['1', '1', '0', '0'], ['0', '0', '1', '0'], ['0', '0', '0', '1']],
+      visited: [[true, true, false, false], [true, true, false, false], [false, false, true, false], [false, false, false, false]],
       current: [2, 2],
       islandCount: 2,
       variables: { markedCells: 1 },
@@ -122,8 +122,8 @@ export const NumberOfIslandsVisualization = () => {
       lineExecution: "dfs(2, 2); // marks (2,2)"
     },
     {
-      grid: [['1','1','0','0'],['1','1','0','0'],['0','0','1','0'],['0','0','0','1']],
-      visited: [[true,true,false,false],[true,true,false,false],[false,false,true,false],[false,false,false,false]],
+      grid: [['1', '1', '0', '0'], ['1', '1', '0', '0'], ['0', '0', '1', '0'], ['0', '0', '0', '1']],
+      visited: [[true, true, false, false], [true, true, false, false], [false, false, true, false], [false, false, false, false]],
       current: [3, 3],
       islandCount: 2,
       variables: { i: 3, j: 3 },
@@ -132,8 +132,8 @@ export const NumberOfIslandsVisualization = () => {
       lineExecution: "if (grid[3][3] === '1') // true"
     },
     {
-      grid: [['1','1','0','0'],['1','1','0','0'],['0','0','1','0'],['0','0','0','1']],
-      visited: [[true,true,false,false],[true,true,false,false],[false,false,true,false],[false,false,false,false]],
+      grid: [['1', '1', '0', '0'], ['1', '1', '0', '0'], ['0', '0', '1', '0'], ['0', '0', '0', '1']],
+      visited: [[true, true, false, false], [true, true, false, false], [false, false, true, false], [false, false, false, false]],
       current: [3, 3],
       islandCount: 3,
       variables: { count: 3 },
@@ -142,8 +142,8 @@ export const NumberOfIslandsVisualization = () => {
       lineExecution: "count++; // count = 3"
     },
     {
-      grid: [['1','1','0','0'],['1','1','0','0'],['0','0','1','0'],['0','0','0','1']],
-      visited: [[true,true,false,false],[true,true,false,false],[false,false,true,false],[false,false,false,true]],
+      grid: [['1', '1', '0', '0'], ['1', '1', '0', '0'], ['0', '0', '1', '0'], ['0', '0', '0', '1']],
+      visited: [[true, true, false, false], [true, true, false, false], [false, false, true, false], [false, false, false, true]],
       current: [3, 3],
       islandCount: 3,
       variables: { markedCells: 1 },
@@ -152,8 +152,8 @@ export const NumberOfIslandsVisualization = () => {
       lineExecution: "dfs(3, 3); // marks (3,3)"
     },
     {
-      grid: [['1','1','0','0'],['1','1','0','0'],['0','0','1','0'],['0','0','0','1']],
-      visited: [[true,true,false,false],[true,true,false,false],[false,false,true,false],[false,false,false,true]],
+      grid: [['1', '1', '0', '0'], ['1', '1', '0', '0'], ['0', '0', '1', '0'], ['0', '0', '0', '1']],
+      visited: [[true, true, false, false], [true, true, false, false], [false, false, true, false], [false, false, false, true]],
       current: null,
       islandCount: 3,
       variables: { i: 4, m: 4 },
@@ -162,8 +162,8 @@ export const NumberOfIslandsVisualization = () => {
       lineExecution: "for (let i = 4; i < m; i++) // 4 < 4 -> false"
     },
     {
-      grid: [['1','1','0','0'],['1','1','0','0'],['0','0','1','0'],['0','0','0','1']],
-      visited: [[true,true,false,false],[true,true,false,false],[false,false,true,false],[false,false,false,true]],
+      grid: [['1', '1', '0', '0'], ['1', '1', '0', '0'], ['0', '0', '1', '0'], ['0', '0', '0', '1']],
+      visited: [[true, true, false, false], [true, true, false, false], [false, false, true, false], [false, false, false, true]],
       current: null,
       islandCount: 3,
       variables: { result: 3 },
@@ -172,8 +172,8 @@ export const NumberOfIslandsVisualization = () => {
       lineExecution: "return count; // 3"
     },
     {
-      grid: [['1','1','0','0'],['1','1','0','0'],['0','0','1','0'],['0','0','0','1']],
-      visited: [[true,true,false,false],[true,true,false,false],[false,false,true,false],[false,false,false,true]],
+      grid: [['1', '1', '0', '0'], ['1', '1', '0', '0'], ['0', '0', '1', '0'], ['0', '0', '0', '1']],
+      visited: [[true, true, false, false], [true, true, false, false], [false, false, true, false], [false, false, false, true]],
       current: null,
       islandCount: 3,
       variables: { islands: 3, complexity: 'O(m×n)' },
@@ -233,17 +233,16 @@ export const NumberOfIslandsVisualization = () => {
                     {row.map((cell, j) => (
                       <div
                         key={j}
-                        className={`w-14 h-14 rounded flex items-center justify-center font-bold text-lg ${
-                          step.current && step.current[0] === i && step.current[1] === j
-                            ? 'bg-primary text-primary-foreground ring-2 ring-primary'
-                            : step.visited[i][j]
+                        className={`w-14 h-14 rounded flex items-center justify-center font- text-lg ${step.current && step.current[0] === i && step.current[1] === j
+                          ? 'bg-primary text-primary-foreground ring-2 ring-primary'
+                          : step.visited[i][j]
                             ? cell === '1'
                               ? 'bg-green-500/30'
                               : 'bg-blue-500/10'
                             : cell === '1'
-                            ? 'bg-green-500/50'
-                            : 'bg-blue-500/20'
-                        }`}
+                              ? 'bg-green-500/50'
+                              : 'bg-blue-500/20'
+                          }`}
                       >
                         {cell}
                       </div>
@@ -276,7 +275,7 @@ export const NumberOfIslandsVisualization = () => {
           >
             <Card className="p-4">
               <div className="p-3 bg-primary/20 rounded">
-                <div className="text-center font-bold text-2xl">
+                <div className="text-center font- text-2xl">
                   Islands Found: {step.islandCount}
                 </div>
               </div>

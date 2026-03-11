@@ -168,12 +168,12 @@ export const ContainerWithMostWaterVisualization = () => {
                       className="flex flex-col items-center gap-2 flex-1 max-w-[50px] relative"
                     >
                       {isLeft && (
-                        <div className="absolute -top-8 text-xs font-bold text-primary">
+                        <div className="absolute -top-8 text-xs font- text-primary">
                           LEFT
                         </div>
                       )}
                       {isRight && (
-                        <div className="absolute -top-8 text-xs font-bold text-primary">
+                        <div className="absolute -top-8 text-xs font- text-primary">
                           RIGHT
                         </div>
                       )}
@@ -185,11 +185,10 @@ export const ContainerWithMostWaterVisualization = () => {
                         }}
                       >
                         <div
-                          className={`absolute bottom-0 w-full rounded-t transition-all duration-300 ${
-                            isLeft || isRight
-                              ? 'bg-primary shadow-lg shadow-primary/50'
-                              : 'bg-muted'
-                          }`}
+                          className={`absolute bottom-0 w-full rounded-t transition-all duration-300 ${isLeft || isRight
+                            ? 'bg-primary shadow-lg shadow-primary/50'
+                            : 'bg-muted'
+                            }`}
                           style={{ height: '100%' }}
                         />
                         {isInContainer &&
@@ -204,11 +203,10 @@ export const ContainerWithMostWaterVisualization = () => {
                           )}
                       </div>
                       <span
-                        className={`text-xs font-mono ${
-                          isLeft || isRight
-                            ? 'text-primary font-bold'
-                            : 'text-muted-foreground'
-                        }`}
+                        className={`text-xs font-mono ${isLeft || isRight
+                          ? 'text-primary font-'
+                          : 'text-muted-foreground'
+                          }`}
                       >
                         {height}
                       </span>

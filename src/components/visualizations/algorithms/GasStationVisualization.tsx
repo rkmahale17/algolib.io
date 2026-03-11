@@ -104,8 +104,8 @@ export const GasStationVisualization: React.FC = () => {
       current: -1,
       totalGas,
       totalCost,
-      message: result >= 0 
-        ? `Solution: Start at station ${result}` 
+      message: result >= 0
+        ? `Solution: Start at station ${result}`
         : 'No solution: total gas < total cost',
       lineNumber: 15
     });
@@ -182,21 +182,19 @@ export const GasStationVisualization: React.FC = () => {
               return (
                 <div
                   key={idx}
-                  className={`flex flex-col items-center p-3 rounded border-2 transition-all ${
-                    idx === currentStep.current
-                      ? 'bg-primary/20 border-primary scale-110'
-                      : idx === currentStep.start
+                  className={`flex flex-col items-center p-3 rounded border-2 transition-all ${idx === currentStep.current
+                    ? 'bg-primary/20 border-primary scale-110'
+                    : idx === currentStep.start
                       ? 'bg-green-500/20 border-green-500'
                       : 'bg-card border-border'
-                  }`}
+                    }`}
                 >
                   <div className="text-xs text-muted-foreground mb-1">{idx}</div>
-                  <div className="text-sm font-bold text-green-500">G: {gas}</div>
-                  <div className="text-sm font-bold text-red-500">C: {cost}</div>
+                  <div className="text-sm font- text-green-500">G: {gas}</div>
+                  <div className="text-sm font- text-red-500">C: {cost}</div>
                   <div
-                    className={`text-xs font-bold ${
-                      net >= 0 ? 'text-green-500' : 'text-red-500'
-                    }`}
+                    className={`text-xs font- ${net >= 0 ? 'text-green-500' : 'text-red-500'
+                      }`}
                   >
                     {net >= 0 ? '+' : ''}{net}
                   </div>
@@ -208,17 +206,17 @@ export const GasStationVisualization: React.FC = () => {
           <div className="grid grid-cols-3 gap-4">
             <div className="p-4 bg-muted rounded border">
               <div className="text-sm text-muted-foreground mb-1">Start Station</div>
-              <div className="text-2xl font-bold text-green-500">{currentStep.start}</div>
+              <div className="text-2xl font- text-green-500">{currentStep.start}</div>
             </div>
             <div className="p-4 bg-muted rounded border">
               <div className="text-sm text-muted-foreground mb-1">Current Tank</div>
-              <div className={`text-2xl font-bold ${currentStep.tank >= 0 ? 'text-primary' : 'text-red-500'}`}>
+              <div className={`text-2xl font- ${currentStep.tank >= 0 ? 'text-primary' : 'text-red-500'}`}>
                 {currentStep.tank}
               </div>
             </div>
             <div className="p-4 bg-muted rounded border">
               <div className="text-sm text-muted-foreground mb-1">Total Balance</div>
-              <div className={`text-2xl font-bold ${currentStep.totalGas >= currentStep.totalCost ? 'text-green-500' : 'text-red-500'}`}>
+              <div className={`text-2xl font- ${currentStep.totalGas >= currentStep.totalCost ? 'text-green-500' : 'text-red-500'}`}>
                 {currentStep.totalGas - currentStep.totalCost}
               </div>
             </div>

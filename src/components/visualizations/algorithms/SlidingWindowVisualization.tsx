@@ -284,19 +284,19 @@ export const SlidingWindowVisualization = () => {
                     className="flex flex-col items-center gap-2 flex-1 max-w-[60px] relative"
                   >
                     {isWindowStart && (
-                      <div className="absolute -top-8 text-xs font-bold text-primary">
+                      <div className="absolute -top-8 text-xs font- text-primary">
                         START
                       </div>
                     )}
                     {isWindowEnd && (
-                      <div className="absolute -top-8 text-xs font-bold text-primary">
+                      <div className="absolute -top-8 text-xs font- text-primary">
                         END
                       </div>
                     )}
                     <div
                       className={`w-full rounded-t transition-all duration-300 relative ${isInWindow
-                          ? 'bg-primary shadow-lg shadow-primary/50 scale-105'
-                          : 'bg-gradient-to-t from-primary/60 to-primary/40'
+                        ? 'bg-primary shadow-lg shadow-primary/50 scale-105'
+                        : 'bg-gradient-to-t from-primary/60 to-primary/40'
                         }`}
                       style={{
                         height: `${(value / getMaxValue()) * 100}%`,
@@ -308,7 +308,7 @@ export const SlidingWindowVisualization = () => {
                       )}
                     </div>
                     <span
-                      className={`text-xs font-mono transition-colors ${isInWindow ? 'text-primary font-bold text-base' : 'text-muted-foreground'
+                      className={`text-xs font-mono transition-colors ${isInWindow ? 'text-primary font- text-base' : 'text-muted-foreground'
                         }`}
                     >
                       {value}

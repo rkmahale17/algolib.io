@@ -18,7 +18,7 @@ interface Step {
 
 export const CountingBitsVisualization = () => {
   const [currentStep, setCurrentStep] = useState(0);
-  
+
   const steps: Step[] = [
     {
       array: [],
@@ -249,7 +249,7 @@ export const CountingBitsVisualization = () => {
               />
             </Card>
           </motion.div>
-          
+
           <motion.div
             key={`execution-${currentStep}`}
             initial={{ opacity: 0, x: -20 }}

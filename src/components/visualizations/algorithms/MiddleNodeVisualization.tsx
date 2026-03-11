@@ -228,7 +228,7 @@ export const MiddleNodeVisualization: React.FC = () => {
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
-                                className="bg-secondary text-secondary-foreground text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm"
+                                className="bg-secondary text-secondary-foreground text-[10px] px-2 py-0.5 rounded-full font- shadow-sm"
                               >
                                 FAST
                               </motion.div>
@@ -238,7 +238,7 @@ export const MiddleNodeVisualization: React.FC = () => {
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
-                                className="bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm"
+                                className="bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded-full font- shadow-sm"
                               >
                                 SLOW
                               </motion.div>
@@ -252,8 +252,8 @@ export const MiddleNodeVisualization: React.FC = () => {
                             scale: isHighlighted ? 1.15 : 1,
                             borderColor: isMiddle ? 'var(--primary)' : isHighlighted ? 'var(--primary)' : 'var(--border)',
                           }}
-                          className={`w-14 h-14 rounded-full border-2 flex items-center justify-center font-bold text-lg transition-colors relative ${isMiddle ? 'bg-primary/20 ring-4 ring-primary/20' :
-                              isHighlighted ? 'bg-primary/10' : 'bg-card'
+                          className={`w-14 h-14 rounded-full border-2 flex items-center justify-center font- text-lg transition-colors relative ${isMiddle ? 'bg-primary/20 ring-4 ring-primary/20' :
+                            isHighlighted ? 'bg-primary/10' : 'bg-card'
                             }`}
                         >
                           {node.val}
@@ -272,7 +272,7 @@ export const MiddleNodeVisualization: React.FC = () => {
                       {/* Arrow */}
                       {node.nextId && (
                         <div className={`mx-1 mt-10 transition-colors duration-300 ${currentStep.highlightNodes.includes(id) && currentStep.highlightNodes.includes(node.nextId)
-                            ? 'text-primary' : 'text-muted-foreground/30'
+                          ? 'text-primary' : 'text-muted-foreground/30'
                           }`}>
                           <ArrowRight size={24} />
                         </div>
@@ -315,7 +315,7 @@ export const MiddleNodeVisualization: React.FC = () => {
           <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
 
           <div className="bg-card rounded-xl border border-border p-6 shadow-sm">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4 flex items-center gap-2">
+            <h4 className="text-xs font- uppercase tracking-wider text-muted-foreground mb-4 flex items-center gap-2">
               <LayoutList size={14} className="text-primary" /> How it Works
             </h4>
             <div className="space-y-4">
@@ -327,15 +327,15 @@ export const MiddleNodeVisualization: React.FC = () => {
               </div>
               <ul className="text-xs space-y-3">
                 <li className="flex gap-3 items-start">
-                  <div className="bg-primary/10 text-primary rounded w-5 h-5 flex items-center justify-center shrink-0 mt-0.5 font-bold">1</div>
+                  <div className="bg-primary/10 text-primary rounded w-5 h-5 flex items-center justify-center shrink-0 mt-0.5 font-">1</div>
                   <span><strong>Slow</strong> moves forward one node at a time.</span>
                 </li>
                 <li className="flex gap-3 items-start">
-                  <div className="bg-secondary/10 text-secondary-foreground rounded w-5 h-5 flex items-center justify-center shrink-0 mt-0.5 font-bold">2</div>
+                  <div className="bg-secondary/10 text-secondary-foreground rounded w-5 h-5 flex items-center justify-center shrink-0 mt-0.5 font-">2</div>
                   <span><strong>Fast</strong> moves twice as fast, skipping one node each turn.</span>
                 </li>
                 <li className="flex gap-3 items-start">
-                  <div className="bg-muted text-muted-foreground rounded w-5 h-5 flex items-center justify-center shrink-0 mt-0.5 font-bold">3</div>
+                  <div className="bg-muted text-muted-foreground rounded w-5 h-5 flex items-center justify-center shrink-0 mt-0.5 font-">3</div>
                   <span>When <strong>Fast</strong> hits the end (<code>null</code>) or its <code>next</code> is null, the loop ends.</span>
                 </li>
               </ul>

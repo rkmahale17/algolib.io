@@ -261,47 +261,44 @@ export const MaximumDepthOfBinaryTreeVisualization = () => {
     return (
       <div className="flex flex-col items-center space-y-6">
         <motion.div
-          animate={{ 
+          animate={{
             scale: currentStep.currentNode === 3 ? 1.2 : 1,
           }}
-          className={`w-12 h-12 rounded-full flex items-center justify-center font-bold border-2 ${
-            currentStep.currentNode === 3
-              ? 'bg-primary/20 border-primary text-primary ring-2 ring-primary'
-              : currentStep.visitedNodes.includes(3)
+          className={`w-12 h-12 rounded-full flex items-center justify-center font- border-2 ${currentStep.currentNode === 3
+            ? 'bg-primary/20 border-primary text-primary ring-2 ring-primary'
+            : currentStep.visitedNodes.includes(3)
               ? 'bg-green-500/20 border-green-500 text-green-600'
               : 'bg-muted/50 border-border text-foreground'
-          }`}
+            }`}
         >
           3
         </motion.div>
 
         <div className="flex gap-24">
           <motion.div
-            animate={{ 
+            animate={{
               scale: currentStep.currentNode === 9 ? 1.2 : 1,
             }}
-            className={`w-12 h-12 rounded-full flex items-center justify-center font-bold border-2 ${
-              currentStep.currentNode === 9
-                ? 'bg-primary/20 border-primary text-primary ring-2 ring-primary'
-                : currentStep.visitedNodes.includes(9)
+            className={`w-12 h-12 rounded-full flex items-center justify-center font- border-2 ${currentStep.currentNode === 9
+              ? 'bg-primary/20 border-primary text-primary ring-2 ring-primary'
+              : currentStep.visitedNodes.includes(9)
                 ? 'bg-green-500/20 border-green-500 text-green-600'
                 : 'bg-muted/50 border-border text-foreground'
-            }`}
+              }`}
           >
             9
           </motion.div>
 
           <motion.div
-            animate={{ 
+            animate={{
               scale: currentStep.currentNode === 20 ? 1.2 : 1,
             }}
-            className={`w-12 h-12 rounded-full flex items-center justify-center font-bold border-2 ${
-              currentStep.currentNode === 20
-                ? 'bg-primary/20 border-primary text-primary ring-2 ring-primary'
-                : currentStep.visitedNodes.includes(20)
+            className={`w-12 h-12 rounded-full flex items-center justify-center font- border-2 ${currentStep.currentNode === 20
+              ? 'bg-primary/20 border-primary text-primary ring-2 ring-primary'
+              : currentStep.visitedNodes.includes(20)
                 ? 'bg-green-500/20 border-green-500 text-green-600'
                 : 'bg-muted/50 border-border text-foreground'
-            }`}
+              }`}
           >
             20
           </motion.div>
@@ -309,31 +306,29 @@ export const MaximumDepthOfBinaryTreeVisualization = () => {
 
         <div className="flex gap-12 ml-24">
           <motion.div
-            animate={{ 
+            animate={{
               scale: currentStep.currentNode === 15 ? 1.2 : 1,
             }}
-            className={`w-12 h-12 rounded-full flex items-center justify-center font-bold border-2 ${
-              currentStep.currentNode === 15
-                ? 'bg-primary/20 border-primary text-primary ring-2 ring-primary'
-                : currentStep.visitedNodes.includes(15)
+            className={`w-12 h-12 rounded-full flex items-center justify-center font- border-2 ${currentStep.currentNode === 15
+              ? 'bg-primary/20 border-primary text-primary ring-2 ring-primary'
+              : currentStep.visitedNodes.includes(15)
                 ? 'bg-green-500/20 border-green-500 text-green-600'
                 : 'bg-muted/50 border-border text-foreground'
-            }`}
+              }`}
           >
             15
           </motion.div>
 
           <motion.div
-            animate={{ 
+            animate={{
               scale: currentStep.currentNode === 7 ? 1.2 : 1,
             }}
-            className={`w-12 h-12 rounded-full flex items-center justify-center font-bold border-2 ${
-              currentStep.currentNode === 7
-                ? 'bg-primary/20 border-primary text-primary ring-2 ring-primary'
-                : currentStep.visitedNodes.includes(7)
+            className={`w-12 h-12 rounded-full flex items-center justify-center font- border-2 ${currentStep.currentNode === 7
+              ? 'bg-primary/20 border-primary text-primary ring-2 ring-primary'
+              : currentStep.visitedNodes.includes(7)
                 ? 'bg-green-500/20 border-green-500 text-green-600'
                 : 'bg-muted/50 border-border text-foreground'
-            }`}
+              }`}
           >
             7
           </motion.div>
@@ -371,12 +366,12 @@ export const MaximumDepthOfBinaryTreeVisualization = () => {
                 className="p-4 bg-green-500/10 rounded border border-green-500/20"
               >
                 <p className="text-xs text-muted-foreground mb-1">Max Depth</p>
-                <p className="text-3xl font-bold text-green-600">{currentStep.maxDepth}</p>
+                <p className="text-3xl font- text-green-600">{currentStep.maxDepth}</p>
               </motion.div>
 
               <div className="p-4 bg-primary/10 rounded border border-primary/20">
                 <p className="text-xs text-muted-foreground mb-1">Current Depth</p>
-                <p className="text-3xl font-bold text-primary">{currentStep.currentDepth}</p>
+                <p className="text-3xl font- text-primary">{currentStep.currentDepth}</p>
               </div>
             </div>
 
@@ -392,7 +387,7 @@ export const MaximumDepthOfBinaryTreeVisualization = () => {
                         animate={{ x: 0, opacity: 1 }}
                         className="flex items-center gap-3 p-2 bg-background rounded"
                       >
-                        <span className="w-10 h-10 rounded-full bg-primary/20 border-2 border-primary flex items-center justify-center font-bold">
+                        <span className="w-10 h-10 rounded-full bg-primary/20 border-2 border-primary flex items-center justify-center font-">
                           {item.node}
                         </span>
                         <span className="text-sm">depth={item.depth}</span>

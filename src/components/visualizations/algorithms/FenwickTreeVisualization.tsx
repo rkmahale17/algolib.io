@@ -224,11 +224,10 @@ export const FenwickTreeVisualization: React.FC = () => {
                   [{idx}]
                 </div>
                 <div
-                  className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
-                    idx === currentStep.index
-                      ? "bg-primary/20 border-primary"
-                      : "bg-blue-500/20 border-blue-500"
-                  }`}
+                  className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font- transition-all ${idx === currentStep.index
+                    ? "bg-primary/20 border-primary"
+                    : "bg-blue-500/20 border-blue-500"
+                    }`}
                 >
                   {val}
                 </div>
@@ -244,14 +243,13 @@ export const FenwickTreeVisualization: React.FC = () => {
                   [{idx + 1}]
                 </div>
                 <div
-                  className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
-                    idx === currentStep.index &&
+                  className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font- transition-all ${idx === currentStep.index &&
                     currentStep.operation !== "init"
-                      ? "bg-green-500/20 border-green-500"
-                      : val !== 0
+                    ? "bg-green-500/20 border-green-500"
+                    : val !== 0
                       ? "bg-blue-500/20 border-blue-500"
                       : "bg-card border-border"
-                  }`}
+                    }`}
                 >
                   {val}
                 </div>

@@ -32,27 +32,27 @@ export class ErrorBoundary extends Component<Props, State> {
           <div className="bg-destructive/10 p-4 rounded-full mb-4">
             <AlertCircle className="w-12 h-12 text-destructive" />
           </div>
-          <h1 className="text-2xl font-bold mb-2">Something went wrong</h1>
+          <h1 className="text-2xl font- mb-2">Something went wrong</h1>
           <p className="text-muted-foreground mb-4 max-w-md">
             We encountered an unexpected error.
           </p>
           {this.state.error && (
-             <div className="bg-muted p-4 rounded-md overflow-auto max-w-2xl w-full text-left font-mono text-xs border border-border mb-6">
-                <p className="font-semibold text-destructive mb-2">Error Details:</p>
-                {this.state.error.toString()}
-             </div>
+            <div className="bg-muted p-4 rounded-md overflow-auto max-w-2xl w-full text-left font-mono text-xs border border-border mb-6">
+              <p className="font-semibold text-destructive mb-2">Error Details:</p>
+              {this.state.error.toString()}
+            </div>
           )}
           <div className="flex gap-4">
             <Button
-                variant="outline"
-                onClick={() => window.location.href = '/'}
+              variant="outline"
+              onClick={() => window.location.href = '/'}
             >
-                Go Home
+              Go Home
             </Button>
             <Button
-                onClick={() => window.location.reload()}
+              onClick={() => window.location.reload()}
             >
-                Refresh Page
+              Refresh Page
             </Button>
           </div>
         </div>

@@ -363,11 +363,10 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ duration: 0.3, delay: idx * 0.05 }}
-                    className={`w-12 h-12 flex items-center justify-center rounded font-mono font-bold text-lg border-2 ${
-                      isInWindow
-                        ? 'bg-primary/20 border-primary text-primary'
-                        : 'bg-muted/50 border-border text-muted-foreground'
-                    }`}
+                    className={`w-12 h-12 flex items-center justify-center rounded font-mono font- text-lg border-2 ${isInWindow
+                      ? 'bg-primary/20 border-primary text-primary'
+                      : 'bg-muted/50 border-border text-muted-foreground'
+                      }`}
                   >
                     {char}
                   </motion.div>
@@ -378,22 +377,22 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
             <div className="space-y-2 text-sm mb-4">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Window:</span>
-                <span className="font-mono font-bold text-primary">
-                  {currentStep.right >= 0 
+                <span className="font-mono font- text-primary">
+                  {currentStep.right >= 0
                     ? currentStep.s.slice(currentStep.left, currentStep.right + 1)
                     : 'empty'}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Window Size:</span>
-                <span className="font-mono font-bold">
+                <span className="font-mono font-">
                   {currentStep.right >= 0 ? currentStep.right - currentStep.left + 1 : 0}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Replacements Needed:</span>
-                <span className="font-mono font-bold">
-                  {currentStep.right >= 0 
+                <span className="font-mono font-">
+                  {currentStep.right >= 0
                     ? Math.max(0, (currentStep.right - currentStep.left + 1) - currentStep.maxCount)
                     : 0}
                 </span>
@@ -411,7 +410,7 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
                       animate={{ x: 0, opacity: 1 }}
                       className="flex justify-between items-center p-2 bg-muted/50 rounded"
                     >
-                      <span className="font-mono font-bold">{char}</span>
+                      <span className="font-mono font-">{char}</span>
                       <span className="font-mono text-primary">{count}</span>
                     </motion.div>
                   ))}
@@ -452,18 +451,18 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
                   glyphMargin: false,
                   folding: false,
                 }}
-              onMount={(editor, monaco) => {
-                editorRef.current = editor;
-                monacoRef.current = monaco;
-                const decorations = currentStep.highlightedLines.map(line => ({
-                  range: new monaco.Range(line, 1, line, 1),
-                  options: {
-                    isWholeLine: true,
-                    className: 'highlighted-line',
-                  }
-                }));
-                editor.createDecorationsCollection(decorations);
-              }}
+                onMount={(editor, monaco) => {
+                  editorRef.current = editor;
+                  monacoRef.current = monaco;
+                  const decorations = currentStep.highlightedLines.map(line => ({
+                    range: new monaco.Range(line, 1, line, 1),
+                    options: {
+                      isWholeLine: true,
+                      className: 'highlighted-line',
+                    }
+                  }));
+                  editor.createDecorationsCollection(decorations);
+                }}
               />
             </div>
           </Card>

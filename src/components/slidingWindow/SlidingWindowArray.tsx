@@ -19,13 +19,13 @@ export const SlidingWindowArray = ({
         const isInWindow = index >= left && index <= right;
         const isLeftPointer = index === left;
         const isRightPointer = index === right;
-        
+
         return (
           <div key={index} className="relative">
             {/* Cell */}
             <div
               className={cn(
-                "w-16 h-16 flex items-center justify-center rounded-lg text-xl font-bold transition-all duration-300",
+                "w-16 h-16 flex items-center justify-center rounded-lg text-xl font- transition-all duration-300",
                 "border-2",
                 isInWindow && "scale-110",
                 isInWindow && messageType === "success" && "bg-green-500/20 border-green-500 animate-pulse",
@@ -36,7 +36,7 @@ export const SlidingWindowArray = ({
             >
               {value}
             </div>
-            
+
             {/* Pointer labels */}
             {isLeftPointer && (
               <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-semibold text-primary">
@@ -48,7 +48,7 @@ export const SlidingWindowArray = ({
                 R
               </div>
             )}
-            
+
             {/* Index label */}
             <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs text-muted-foreground">
               {index}

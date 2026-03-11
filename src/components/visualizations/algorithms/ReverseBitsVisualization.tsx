@@ -41,12 +41,12 @@ export const ReverseBitsVisualization = () => {
     const generatedSteps: Step[] = [];
     // Example number n = 43261596 (binary ...0010100101000001111010011100)
     // Using n = 11 for consistency with previous example, but showing full 32 bits
-    const nVal = 11; 
+    const nVal = 11;
     let res = 0;
-    
+
     // Helper to get 32-bit string array
-    const toBits = (num: number) => 
-        (num >>> 0).toString(2).padStart(32, '0').split('');
+    const toBits = (num: number) =>
+      (num >>> 0).toString(2).padStart(32, '0').split('');
 
     // Initial state
     generatedSteps.push({
@@ -59,62 +59,62 @@ export const ReverseBitsVisualization = () => {
     });
 
     for (let i = 0; i < 32; i++) {
-        // Visual mappings:
-        // Array index 0 is MSB (bit 31), Array index 31 is LSB (bit 0).
-        // Logic 'i' is bit position from LSB (0..31).
-        // So bit 'i' is located at array index 31 - i.
-        const visualActiveIndex = 31 - i;
+      // Visual mappings:
+      // Array index 0 is MSB (bit 31), Array index 31 is LSB (bit 0).
+      // Logic 'i' is bit position from LSB (0..31).
+      // So bit 'i' is located at array index 31 - i.
+      const visualActiveIndex = 31 - i;
 
-        // Step: Loop Check
-        generatedSteps.push({
-            variables: { n: nVal, res, i },
-            explanation: `Loop i = ${i}. Processing bit at position ${i} of n.`,
-            highlightedLines: [5],
-            lineExecution: `for (let i = 0; i < 32; i++)`,
-            bitsN: toBits(nVal),
-            bitsResult: toBits(res),
-            activeBitIndex: visualActiveIndex
-        });
+      // Step: Loop Check
+      generatedSteps.push({
+        variables: { n: nVal, res, i },
+        explanation: `Loop i = ${i}. Processing bit at position ${i} of n.`,
+        highlightedLines: [5],
+        lineExecution: `for (let i = 0; i < 32; i++)`,
+        bitsN: toBits(nVal),
+        bitsResult: toBits(res),
+        activeBitIndex: visualActiveIndex
+      });
 
-        // Step: Extract Bit
-        const bit = (nVal >> i) & 1;
-        generatedSteps.push({
-            variables: { n: nVal, res, i, bit },
-            explanation: `Extract i-th bit: (n >> ${i}) & 1 = ${bit}.`,
-            highlightedLines: [7],
-            lineExecution: `const bit = (n >> i) & 1;`,
-            bitsN: toBits(nVal),
-            bitsResult: toBits(res),
-            activeBitIndex: visualActiveIndex
-        });
+      // Step: Extract Bit
+      const bit = (nVal >> i) & 1;
+      generatedSteps.push({
+        variables: { n: nVal, res, i, bit },
+        explanation: `Extract i-th bit: (n >> ${i}) & 1 = ${bit}.`,
+        highlightedLines: [7],
+        lineExecution: `const bit = (n >> i) & 1;`,
+        bitsN: toBits(nVal),
+        bitsResult: toBits(res),
+        activeBitIndex: visualActiveIndex
+      });
 
-        // Step: Place Bit
-        const targetPos = 31 - i;
-        // Target bit position visual index: 31 - targetPos = 31 - (31-i) = i.
-        const visualTargetIndex = i;
-        const shiftVal = bit << targetPos;
-        res |= shiftVal;
-        
-        generatedSteps.push({
-            variables: { n: nVal, res: res >>> 0, i, bit },
-            explanation: `Place bit at reversed position ${targetPos}.\nUpdate res: Set bit ${targetPos} to ${bit}.`,
-            highlightedLines: [10],
-            lineExecution: `res |= bit << (31 - i);`,
-            bitsN: toBits(nVal),
-            bitsResult: toBits(res),
-            activeBitIndex: visualActiveIndex,
-            targetBitIndex: visualTargetIndex
-        });
+      // Step: Place Bit
+      const targetPos = 31 - i;
+      // Target bit position visual index: 31 - targetPos = 31 - (31-i) = i.
+      const visualTargetIndex = i;
+      const shiftVal = bit << targetPos;
+      res |= shiftVal;
+
+      generatedSteps.push({
+        variables: { n: nVal, res: res >>> 0, i, bit },
+        explanation: `Place bit at reversed position ${targetPos}.\nUpdate res: Set bit ${targetPos} to ${bit}.`,
+        highlightedLines: [10],
+        lineExecution: `res |= bit << (31 - i);`,
+        bitsN: toBits(nVal),
+        bitsResult: toBits(res),
+        activeBitIndex: visualActiveIndex,
+        targetBitIndex: visualTargetIndex
+      });
     }
 
     // Final result
     generatedSteps.push({
-        variables: { n: nVal, res: res >>> 0 },
-        explanation: "Loop complete. Return unsigned 32-bit result.",
-        highlightedLines: [14],
-        lineExecution: "return res >>> 0;",
-        bitsN: toBits(nVal),
-        bitsResult: toBits(res)
+      variables: { n: nVal, res: res >>> 0 },
+      explanation: "Loop complete. Return unsigned 32-bit result.",
+      highlightedLines: [14],
+      lineExecution: "return res >>> 0;",
+      bitsN: toBits(nVal),
+      bitsResult: toBits(res)
     });
 
     return generatedSteps;
@@ -134,7 +134,7 @@ export const ReverseBitsVisualization = () => {
           >
             <Card className="p-4">
               <h3 className="font-semibold mb-2 text-sm">Input n (32 bits)</h3>
-               {/* 
+              {/* 
                  Visual mapping: Array index 0 = MSB (bit 31). Array index 31 = LSB (bit 0).
                  Bit labels row below provides context.
                */}
@@ -144,9 +144,8 @@ export const ReverseBitsVisualization = () => {
                   return (
                     <motion.div
                       key={idx}
-                      className={`w-6 h-8 flex items-center justify-center font-mono text-xs border rounded transition-colors ${
-                        bit === '1' ? 'bg-primary/20 border-primary text-primary' : 'bg-muted border-border text-muted-foreground'
-                      } ${isActive ? 'ring-2 ring-yellow-500 bg-yellow-500/10 z-10 scale-110 shadow-md' : ''}`}
+                      className={`w-6 h-8 flex items-center justify-center font-mono text-xs border rounded transition-colors ${bit === '1' ? 'bg-primary/20 border-primary text-primary' : 'bg-muted border-border text-muted-foreground'
+                        } ${isActive ? 'ring-2 ring-yellow-500 bg-yellow-500/10 z-10 scale-110 shadow-md' : ''}`}
                       title={`Bit ${31 - idx}`}
                     >
                       {bit}
@@ -155,8 +154,8 @@ export const ReverseBitsVisualization = () => {
                 })}
               </div>
               <div className="flex justify-between px-1 mt-1 text-[10px] text-muted-foreground font-mono w-full">
-                 <span>31 (MSB)</span>
-                 <span>(LSB) 0</span>
+                <span>31 (MSB)</span>
+                <span>(LSB) 0</span>
               </div>
             </Card>
           </motion.div>
@@ -175,9 +174,8 @@ export const ReverseBitsVisualization = () => {
                   return (
                     <motion.div
                       key={idx}
-                      className={`w-6 h-8 flex items-center justify-center font-mono text-xs border rounded transition-colors ${
-                        bit === '1' ? 'bg-green-500/20 border-green-500 text-green-700 dark:text-green-300' : 'bg-muted border-border text-muted-foreground'
-                      } ${isTarget ? 'ring-2 ring-green-500 bg-green-500/10 z-10 scale-110 shadow-md' : ''}`}
+                      className={`w-6 h-8 flex items-center justify-center font-mono text-xs border rounded transition-colors ${bit === '1' ? 'bg-green-500/20 border-green-500 text-green-700 dark:text-green-300' : 'bg-muted border-border text-muted-foreground'
+                        } ${isTarget ? 'ring-2 ring-green-500 bg-green-500/10 z-10 scale-110 shadow-md' : ''}`}
                       title={`Bit ${31 - idx}`}
                     >
                       {bit}
@@ -186,12 +184,12 @@ export const ReverseBitsVisualization = () => {
                 })}
               </div>
               <div className="flex justify-between px-1 mt-1 text-[10px] text-muted-foreground font-mono w-full">
-                 <span>31 (MSB)</span>
-                 <span>(LSB) 0</span>
+                <span>31 (MSB)</span>
+                <span>(LSB) 0</span>
               </div>
             </Card>
           </motion.div>
-          
+
           <motion.div
             key={`execution-${currentStep}`}
             initial={{ opacity: 0, x: -20 }}
@@ -213,7 +211,7 @@ export const ReverseBitsVisualization = () => {
 
           {/* Variable Panel */}
           <div className="p-1">
-             <VariablePanel variables={step.variables} />
+            <VariablePanel variables={step.variables} />
           </div>
 
         </>

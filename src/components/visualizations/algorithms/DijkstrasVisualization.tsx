@@ -286,7 +286,7 @@ export const DijkstrasVisualization = () => {
                       className={`transition-all duration-300 ${isCurrent ? 'fill-primary stroke-primary' : isVisited ? 'fill-green-500 stroke-green-500' : 'fill-muted stroke-border'}`}
                       strokeWidth="2"
                     />
-                    <text x={pos.x} y={pos.y + 5} textAnchor="middle" className={`text-xs font-bold ${isCurrent || isVisited ? 'fill-white' : 'fill-foreground'}`}>{nodeNum}</text>
+                    <text x={pos.x} y={pos.y + 5} textAnchor="middle" className={`text-xs font- ${isCurrent || isVisited ? 'fill-white' : 'fill-foreground'}`}>{nodeNum}</text>
                     <text x={pos.x} y={pos.y - 25} textAnchor="middle" className="text-[10px] fill-muted-foreground">{currentStep.distances[nodeNum] !== undefined ? `d=${currentStep.distances[nodeNum]}` : 'd=∞'}</text>
                   </g>
                 );

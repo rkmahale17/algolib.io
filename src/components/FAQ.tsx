@@ -62,11 +62,11 @@ export const FAQ = () => {
           {JSON.stringify(faqSchema)}
         </script>
       </Helmet>
-      
+
       <section className="py-16 bg-muted/30">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            <h2 className="text-3xl md:text-4xl font- mb-4">
               Frequently Asked Questions
             </h2>
             <p className="text-lg text-muted-foreground">

@@ -819,7 +819,7 @@ const AdminSimulator: React.FC = () => {
                   <span className="text-slate-600 select-none hidden sm:inline">[{log.timestamp}]</span>
                   <span className={`
                                  grow break-all
-                                 ${log.type === 'error' ? 'text-red-500 font-bold' : ''}
+                                 ${log.type === 'error' ? 'text-red-500 font-' : ''}
                                  ${log.type === 'success' ? 'text-green-500' : ''}
                                  ${log.type === 'warning' ? 'text-yellow-500' : ''}
                                  ${log.type === 'info' ? 'text-slate-300' : ''}

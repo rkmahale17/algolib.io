@@ -139,11 +139,10 @@ export const SearchInRotatedSortedArrayVisualization = () => {
                 {step.array.map((value, index) => (
                   <div key={index} className="flex flex-col items-center gap-2">
                     <div
-                      className={`w-14 h-14 rounded flex items-center justify-center font-bold transition-all duration-300 ${
-                        step.highlights.includes(index)
-                          ? 'bg-primary text-primary-foreground scale-110'
-                          : 'bg-muted text-foreground'
-                      }`}
+                      className={`w-14 h-14 rounded flex items-center justify-center font- transition-all duration-300 ${step.highlights.includes(index)
+                        ? 'bg-primary text-primary-foreground scale-110'
+                        : 'bg-muted text-foreground'
+                        }`}
                     >
                       {value}
                     </div>

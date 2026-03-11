@@ -60,7 +60,7 @@ function computeLPS(pattern: string): number[] {
     // Compute LPS
     const lps = new Array(pattern.length).fill(0);
     let len = 0, idx = 1;
-    
+
     newSteps.push({
       text,
       pattern,
@@ -97,7 +97,7 @@ function computeLPS(pattern: string): number[] {
 
     // KMP Search
     let i = 0, j = 0;
-    
+
     newSteps.push({
       text,
       pattern,
@@ -227,11 +227,10 @@ function computeLPS(pattern: string): number[] {
           {currentStep.text.split('').map((char, idx) => (
             <div
               key={idx}
-              className={`w-10 h-10 flex items-center justify-center rounded border-2 font-mono transition-all ${
-                idx === currentStep.textIndex
-                  ? currentStep.matched ? 'bg-green-500/20 border-green-500' : 'bg-primary/20 border-primary'
-                  : 'bg-card border-border'
-              }`}
+              className={`w-10 h-10 flex items-center justify-center rounded border-2 font-mono transition-all ${idx === currentStep.textIndex
+                ? currentStep.matched ? 'bg-green-500/20 border-green-500' : 'bg-primary/20 border-primary'
+                : 'bg-card border-border'
+                }`}
             >
               {char}
             </div>
@@ -243,11 +242,10 @@ function computeLPS(pattern: string): number[] {
           {currentStep.pattern.split('').map((char, idx) => (
             <div
               key={idx}
-              className={`w-10 h-10 flex items-center justify-center rounded border-2 font-mono transition-all ${
-                idx === currentStep.patternIndex
-                  ? 'bg-blue-500/20 border-blue-500'
-                  : 'bg-card border-border'
-              }`}
+              className={`w-10 h-10 flex items-center justify-center rounded border-2 font-mono transition-all ${idx === currentStep.patternIndex
+                ? 'bg-blue-500/20 border-blue-500'
+                : 'bg-card border-border'
+                }`}
             >
               {char}
             </div>

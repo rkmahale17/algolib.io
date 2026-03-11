@@ -169,11 +169,10 @@ export const ThreeSumVisualization = () => {
                 {step.array.map((value, index) => (
                   <div key={index} className="flex flex-col items-center gap-2">
                     <div
-                      className={`w-16 h-16 rounded flex items-center justify-center font-bold transition-all duration-300 ${
-                        step.highlights.includes(index)
-                          ? 'bg-primary text-primary-foreground scale-110'
-                          : 'bg-muted text-foreground'
-                      }`}
+                      className={`w-16 h-16 rounded flex items-center justify-center font- transition-all duration-300 ${step.highlights.includes(index)
+                        ? 'bg-primary text-primary-foreground scale-110'
+                        : 'bg-muted text-foreground'
+                        }`}
                     >
                       {value}
                     </div>

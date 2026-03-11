@@ -1,12 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Circle, 
-  Triangle, 
-  Square, 
-  GitGraph, 
-  Activity, 
-  Network, 
+import {
+  Circle,
+  Triangle,
+  Square,
+  GitGraph,
+  Activity,
+  Network,
   Workflow,
   Binary
 } from "lucide-react";
@@ -26,7 +26,7 @@ export const AlgorithmLoader = () => {
       </div>
 
       {/* Central Content Card */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
@@ -55,9 +55,9 @@ export const AlgorithmLoader = () => {
         </div>
 
         <div className="flex flex-col items-center gap-3">
-          <motion.h2 
-            className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-500 to-pink-500"
-            animate={{ 
+          <motion.h2
+            className="text-3xl font- bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-500 to-pink-500"
+            animate={{
               backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
             }}
             transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
@@ -65,25 +65,25 @@ export const AlgorithmLoader = () => {
           >
             Loading Algorithm Problem
           </motion.h2>
-          
+
           <div className="flex items-center gap-1.5">
-             <motion.span 
-               className="w-2 h-2 rounded-full bg-primary"
-               animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
-               transition={{ duration: 1, repeat: Infinity, delay: 0 }}
-             />
-             <motion.span 
-               className="w-2 h-2 rounded-full bg-primary"
-               animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
-               transition={{ duration: 1, repeat: Infinity, delay: 0.2 }}
-             />
-             <motion.span 
-               className="w-2 h-2 rounded-full bg-primary"
-               animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
-               transition={{ duration: 1, repeat: Infinity, delay: 0.4 }}
-             />
+            <motion.span
+              className="w-2 h-2 rounded-full bg-primary"
+              animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 1, repeat: Infinity, delay: 0 }}
+            />
+            <motion.span
+              className="w-2 h-2 rounded-full bg-primary"
+              animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 1, repeat: Infinity, delay: 0.2 }}
+            />
+            <motion.span
+              className="w-2 h-2 rounded-full bg-primary"
+              animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 1, repeat: Infinity, delay: 0.4 }}
+            />
           </div>
-          
+
           <p className="text-sm text-muted-foreground/80 mt-2 font-mono">
             Initializing environment & visualizations...
           </p>
@@ -98,8 +98,8 @@ const FloatingIcon = ({ icon: Icon, x, y, color, duration, delay, size }: any) =
     className={`absolute ${color}`}
     style={{ left: `calc(50% + ${x})`, top: `calc(50% + ${y})` }}
     initial={{ opacity: 0, scale: 0.5, rotate: 0 }}
-    animate={{ 
-      opacity: [0.1, 0.3, 0.1], 
+    animate={{
+      opacity: [0.1, 0.3, 0.1],
       y: [0, -30, 0],
       rotate: [0, 45, 0],
       scale: [1, 1.1, 1]

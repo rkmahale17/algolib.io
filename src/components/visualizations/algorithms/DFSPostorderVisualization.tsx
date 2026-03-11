@@ -177,13 +177,12 @@ export const DFSPostorderVisualization = () => {
           cx={node.x}
           cy={node.y}
           r="24"
-          className={`transition-all duration-300 ${
-            currentStep.current === node.val
+          className={`transition-all duration-300 ${currentStep.current === node.val
               ? 'fill-primary stroke-primary'
               : currentStep.visited.includes(node.val)
-              ? 'fill-green-500 stroke-green-500'
-              : 'fill-muted stroke-border'
-          }`}
+                ? 'fill-green-500 stroke-green-500'
+                : 'fill-muted stroke-border'
+            }`}
           strokeWidth="2"
         />
         <text
@@ -191,7 +190,7 @@ export const DFSPostorderVisualization = () => {
           y={node.y}
           textAnchor="middle"
           dy=".3em"
-          className={`font-bold ${currentStep.visited.includes(node.val) || currentStep.current === node.val ? 'fill-white' : 'fill-foreground'}`}
+          className={`font- ${currentStep.visited.includes(node.val) || currentStep.current === node.val ? 'fill-white' : 'fill-foreground'}`}
         >
           {node.val}
         </text>
@@ -232,7 +231,7 @@ export const DFSPostorderVisualization = () => {
             <p className="text-xs text-muted-foreground mb-2">Visited Order:</p>
             <div className="flex gap-2 flex-wrap">
               {currentStep.visited.map((val, idx) => (
-                <div key={idx} className="w-10 h-10 rounded bg-green-500 text-white flex items-center justify-center font-bold">
+                <div key={idx} className="w-10 h-10 rounded bg-green-500 text-white flex items-center justify-center font-">
                   {val}
                 </div>
               ))}

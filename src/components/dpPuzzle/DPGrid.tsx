@@ -29,7 +29,7 @@ export const DPGrid = ({
   const isHighlighted = (row: number, col: number) => {
     return highlightedCells.some(h => h.row === row && h.col === col);
   };
-  
+
   const getRowLabel = (row: number) => {
     if (mode === "fibonacci") return "";
     if (mode === "knapsack") return row === 0 ? "W" : `${row - 1}`;
@@ -43,7 +43,7 @@ export const DPGrid = ({
     }
     return row.toString();
   };
-  
+
   const getColLabel = (col: number) => {
     if (mode === "fibonacci") return col.toString();
     if (mode === "knapsack") return col.toString();
@@ -54,10 +54,10 @@ export const DPGrid = ({
     if (mode === "coinChange") return col.toString();
     return col.toString();
   };
-  
+
   const rows = grid.length;
   const cols = grid[0]?.length || 0;
-  
+
   return (
     <div className="overflow-x-auto">
       <div className="inline-block min-w-full">

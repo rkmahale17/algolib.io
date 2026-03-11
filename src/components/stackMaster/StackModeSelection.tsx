@@ -53,12 +53,12 @@ const modes = [
 
 export const StackModeSelection = ({ onSelectMode }: StackModeSelectionProps) => {
   const navigate = useNavigate();
-  
+
   return (
     <div className="space-y-6">
       <div className="mb-6">
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           onClick={() => navigate('/games')}
           className="gap-2"
         >
@@ -66,9 +66,9 @@ export const StackModeSelection = ({ onSelectMode }: StackModeSelectionProps) =>
           Back to Games
         </Button>
       </div>
-      
+
       <div className="text-center space-y-2">
-        <h2 className="text-2xl font-bold">Choose Your Challenge</h2>
+        <h2 className="text-2xl font-">Choose Your Challenge</h2>
         <p className="text-muted-foreground">
           Learn stack operations through fast-paced symbol matching
         </p>
@@ -78,7 +78,7 @@ export const StackModeSelection = ({ onSelectMode }: StackModeSelectionProps) =>
         {modes.map((mode) => {
           const Icon = mode.icon;
           return (
-            <Card 
+            <Card
               key={mode.id}
               className="backdrop-blur-sm bg-card/80 hover:bg-card/90 transition-all duration-300 hover:scale-105 cursor-pointer group"
               onClick={() => onSelectMode(mode.id)}

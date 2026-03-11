@@ -13,9 +13,11 @@ import { fetchAlgorithms } from "@/hooks/useAlgorithms";
 // Eager load Home for best LCP
 import Home from "./pages/Home";
 import Navbar from "./components/Navbar";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "./components/AppSidebar";
 
 // Lazy load everything else to reduce initial bundle size
-const ProfileEdit = lazy(() => import("./pages/Profile"));
+const Dashboard = lazy(() => import("./pages/Profile"));
 const PublicProfile = lazy(() => import("./pages/PublicProfile"));
 const ProblemDetail = lazy(() => import('@/pages/ProblemDetail'));
 const Blind75 = lazy(() => import("./pages/Blind75"));
@@ -48,6 +50,7 @@ const AdminSimulator = lazy(() => import("./pages/AdminSimulator"));
 const CompilerDocs = lazy(() => import("./pages/CompilerDocs"));
 const Pricing = lazy(() => import("./pages/Pricing"));
 const AdminMail = lazy(() => import("./pages/AdminMail"));
+const Roadmap = lazy(() => import("./pages/Roadmap"));
 import AdminViewToggle from "./components/AdminViewToggle";
 
 import { DodoPayments } from 'dodopayments-checkout';
@@ -65,7 +68,11 @@ const ConditionalNavbar = () => {
   const location = useLocation();
   // Hide navbar on algorithm detail pages and blind75 detail pages
   const hideNavbar = location.pathname.startsWith('/problem/') && location.pathname !== '/problem' ||
-    location.pathname.startsWith('/admin');
+    location.pathname.startsWith('/admin') ||
+    location.pathname === '/problems' ||
+    location.pathname === '/blind75' ||
+    location.pathname === '/core-patterns' ||
+    location.pathname === '/dashboard';
 
   if (hideNavbar) return null;
   return <Navbar />;
@@ -146,6 +153,7 @@ const AppContent = () => {
               <Route path="/login" element={<Auth />} />
               <Route path="/feedback" element={<Feedback />} />
               <Route path="/about" element={<About />} />
+              <Route path="/roadmap" element={<Roadmap />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<TermsOfService />} />
               <Route path="/content-rights" element={<ContentRights />} />
@@ -240,9 +248,9 @@ const AppContent = () => {
                 </ProtectedAdminRoute>
               } />
 
-              <Route path="/profile" element={
+              <Route path="/dashboard" element={
                 <FeatureProtectedRoute flag="profiles">
-                  <ProtectedRoute><ProfileEdit /></ProtectedRoute>
+                  <ProtectedRoute><Dashboard /></ProtectedRoute>
                 </FeatureProtectedRoute>
               } />
 
@@ -280,7 +288,14 @@ const App = () => {
             <ErrorBoundary>
               <BrowserRouter basename="/">
                 <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-                  <AppContent />
+                  <SidebarProvider defaultOpen={false}>
+                    <div className="flex min-h-screen w-full">
+                      <AppSidebar />
+                      <div className="flex-1">
+                        <AppContent />
+                      </div>
+                    </div>
+                  </SidebarProvider>
                 </ThemeProvider>
               </BrowserRouter>
             </ErrorBoundary>

@@ -179,7 +179,7 @@ export const ModularExpVisualization: React.FC = () => {
               <div className="text-sm text-muted-foreground mb-1">
                 Current Base
               </div>
-              <div className="text-2xl font-bold text-primary">
+              <div className="text-2xl font- text-primary">
                 {currentStep.currentBase}
               </div>
             </div>
@@ -187,17 +187,17 @@ export const ModularExpVisualization: React.FC = () => {
               <div className="text-sm text-muted-foreground mb-1">
                 Current Exp
               </div>
-              <div className="text-2xl font-bold text-blue-500">
+              <div className="text-2xl font- text-blue-500">
                 {currentStep.currentExp}
               </div>
             </div>
             <div className="p-4 bg-muted rounded border">
               <div className="text-sm text-muted-foreground mb-1">Modulo</div>
-              <div className="text-2xl font-bold">{currentStep.mod}</div>
+              <div className="text-2xl font-">{currentStep.mod}</div>
             </div>
             <div className="p-4 bg-muted rounded border">
               <div className="text-sm text-muted-foreground mb-1">Result</div>
-              <div className="text-2xl font-bold text-green-500">
+              <div className="text-2xl font- text-green-500">
                 {currentStep.result}
               </div>
             </div>

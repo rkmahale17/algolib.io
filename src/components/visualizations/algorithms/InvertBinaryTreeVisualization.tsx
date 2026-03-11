@@ -40,16 +40,16 @@ export const InvertBinaryTreeVisualization = () => {
     { currentNode: 4, leftVal: 2, rightVal: 7, swapped: false, tree: initialTree, message: "Store left child in temp: temp=2", highlightedLines: [4], stackDepth: 1 },
     { currentNode: 4, leftVal: 7, rightVal: 7, swapped: false, tree: initialTree, message: "Swap: root.left = root.right (7)", highlightedLines: [5], stackDepth: 1 },
     { currentNode: 4, leftVal: 7, rightVal: 2, swapped: true, tree: { ...initialTree, 4: { left: 7, right: 2 } }, message: "Swap: root.right = temp (2). Children swapped! ✓", highlightedLines: [6], stackDepth: 1 },
-    
+
     { currentNode: 7, leftVal: 6, rightVal: 9, swapped: false, tree: { ...initialTree, 4: { left: 7, right: 2 } }, message: "Recurse left: invertTree(7)", highlightedLines: [8], stackDepth: 2 },
     { currentNode: 7, leftVal: 6, rightVal: 9, swapped: false, tree: { ...initialTree, 4: { left: 7, right: 2 } }, message: "Check: node 7 is not null", highlightedLines: [2], stackDepth: 2 },
     { currentNode: 7, leftVal: 6, rightVal: 9, swapped: false, tree: { ...initialTree, 4: { left: 7, right: 2 } }, message: "Store left child: temp=6", highlightedLines: [4], stackDepth: 2 },
     { currentNode: 7, leftVal: 9, rightVal: 9, swapped: false, tree: { ...initialTree, 4: { left: 7, right: 2 } }, message: "Swap: root.left = 9", highlightedLines: [5], stackDepth: 2 },
     { currentNode: 7, leftVal: 9, rightVal: 6, swapped: true, tree: { 4: { left: 7, right: 2 }, 2: { left: 1, right: 3 }, 7: { left: 9, right: 6 }, 1: { left: null, right: null }, 3: { left: null, right: null }, 6: { left: null, right: null }, 9: { left: null, right: null } }, message: "Swap: root.right = 6. Swapped! ✓", highlightedLines: [6], stackDepth: 2 },
-    
+
     { currentNode: 2, leftVal: 1, rightVal: 3, swapped: false, tree: { 4: { left: 7, right: 2 }, 2: { left: 1, right: 3 }, 7: { left: 9, right: 6 }, 1: { left: null, right: null }, 3: { left: null, right: null }, 6: { left: null, right: null }, 9: { left: null, right: null } }, message: "Recurse right: invertTree(2)", highlightedLines: [9], stackDepth: 2 },
     { currentNode: 2, leftVal: 3, rightVal: 1, swapped: true, tree: { 4: { left: 7, right: 2 }, 2: { left: 3, right: 1 }, 7: { left: 9, right: 6 }, 1: { left: null, right: null }, 3: { left: null, right: null }, 6: { left: null, right: null }, 9: { left: null, right: null } }, message: "Swap: root.right = 1. Swapped! ✓", highlightedLines: [6], stackDepth: 2 },
-    
+
     { currentNode: 4, leftVal: 7, rightVal: 2, swapped: true, tree: { 4: { left: 7, right: 2 }, 2: { left: 3, right: 1 }, 7: { left: 9, right: 6 }, 1: { left: null, right: null }, 3: { left: null, right: null }, 6: { left: null, right: null }, 9: { left: null, right: null } }, message: "Complete! Tree fully inverted ✓", highlightedLines: [11], stackDepth: 1 }
   ];
 
@@ -94,20 +94,19 @@ export const InvertBinaryTreeVisualization = () => {
           {positions.map((pos, i) => {
             const isCurrent = currentStep.currentNode === pos.value;
             const isSwapped = currentStep.swapped && currentStep.currentNode === pos.value;
-            
+
             return (
               <g key={i}>
                 <circle
                   cx={pos.x}
                   cy={pos.y}
                   r="24"
-                  className={`transition-all duration-300 ${
-                    isSwapped
-                      ? 'fill-green-500'
-                      : isCurrent
+                  className={`transition-all duration-300 ${isSwapped
+                    ? 'fill-green-500'
+                    : isCurrent
                       ? 'fill-yellow-500'
                       : 'fill-card'
-                  }`}
+                    }`}
                   stroke="currentColor"
                   strokeWidth="2"
                 />
@@ -115,7 +114,7 @@ export const InvertBinaryTreeVisualization = () => {
                   x={pos.x}
                   y={pos.y + 6}
                   textAnchor="middle"
-                  className="text-sm font-bold fill-foreground"
+                  className="text-sm font- fill-foreground"
                 >
                   {pos.value}
                 </text>

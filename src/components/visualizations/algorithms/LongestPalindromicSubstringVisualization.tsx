@@ -47,50 +47,50 @@ export const LongestPalindromicSubstringVisualization = () => {
 
   const steps: Step[] = [
     { s: "babad", i: -1, left: -1, right: -1, longestPalindrome: "", start: 0, maxLen: 0, currentLen: 0, phase: "init", message: "Initialize: start=0, maxLen=0", highlightedLines: [2] },
-    
+
     { s: "babad", i: 0, left: 0, right: 0, longestPalindrome: "", start: 0, maxLen: 0, currentLen: 0, phase: "odd", message: "i=0: Start odd expansion from center 'b'", highlightedLines: [17] },
     { s: "babad", i: 0, left: 0, right: 0, longestPalindrome: "", start: 0, maxLen: 0, currentLen: 0, phase: "odd", message: "Check: s[0]='b' == s[0]='b' ✓", highlightedLines: [5] },
     { s: "babad", i: 0, left: 0, right: 0, longestPalindrome: "b", start: 0, maxLen: 1, currentLen: 1, phase: "odd", message: "Found palindrome 'b' (len=1). Update maxLen=1", highlightedLines: [7] },
     { s: "babad", i: 0, left: -1, right: 1, longestPalindrome: "b", start: 0, maxLen: 1, currentLen: 0, phase: "odd", message: "Expand: left=-1 out of bounds ✗", highlightedLines: [5] },
-    
+
     { s: "babad", i: 0, left: 0, right: 1, longestPalindrome: "b", start: 0, maxLen: 1, currentLen: 0, phase: "even", message: "i=0: Start even expansion between 'b' and 'a'", highlightedLines: [18] },
     { s: "babad", i: 0, left: 0, right: 1, longestPalindrome: "b", start: 0, maxLen: 1, currentLen: 0, phase: "even", message: "Check: s[0]='b' != s[1]='a' ✗", highlightedLines: [5] },
-    
+
     { s: "babad", i: 1, left: 1, right: 1, longestPalindrome: "b", start: 0, maxLen: 1, currentLen: 0, phase: "odd", message: "i=1: Start odd expansion from center 'a'", highlightedLines: [17] },
     { s: "babad", i: 1, left: 1, right: 1, longestPalindrome: "b", start: 0, maxLen: 1, currentLen: 0, phase: "odd", message: "Check: s[1]='a' == s[1]='a' ✓", highlightedLines: [5] },
     { s: "babad", i: 1, left: 1, right: 1, longestPalindrome: "b", start: 0, maxLen: 1, currentLen: 1, phase: "odd", message: "Found 'a' (len=1). No improvement", highlightedLines: [7] },
     { s: "babad", i: 1, left: 0, right: 2, longestPalindrome: "b", start: 0, maxLen: 1, currentLen: 0, phase: "odd", message: "Expand: Check s[0]='b' == s[2]='b' ✓", highlightedLines: [5] },
     { s: "babad", i: 1, left: 0, right: 2, longestPalindrome: "bab", start: 0, maxLen: 3, currentLen: 3, phase: "odd", message: "Found 'bab' (len=3)! Update maxLen=3, start=0", highlightedLines: [7] },
     { s: "babad", i: 1, left: -1, right: 3, longestPalindrome: "bab", start: 0, maxLen: 3, currentLen: 0, phase: "odd", message: "Expand: left=-1 out of bounds ✗", highlightedLines: [5] },
-    
+
     { s: "babad", i: 1, left: 1, right: 2, longestPalindrome: "bab", start: 0, maxLen: 3, currentLen: 0, phase: "even", message: "i=1: Start even expansion between 'a' and 'b'", highlightedLines: [18] },
     { s: "babad", i: 1, left: 1, right: 2, longestPalindrome: "bab", start: 0, maxLen: 3, currentLen: 0, phase: "even", message: "Check: s[1]='a' != s[2]='b' ✗", highlightedLines: [5] },
-    
+
     { s: "babad", i: 2, left: 2, right: 2, longestPalindrome: "bab", start: 0, maxLen: 3, currentLen: 0, phase: "odd", message: "i=2: Start odd expansion from center 'b'", highlightedLines: [17] },
     { s: "babad", i: 2, left: 2, right: 2, longestPalindrome: "bab", start: 0, maxLen: 3, currentLen: 0, phase: "odd", message: "Check: s[2]='b' == s[2]='b' ✓", highlightedLines: [5] },
     { s: "babad", i: 2, left: 2, right: 2, longestPalindrome: "bab", start: 0, maxLen: 3, currentLen: 1, phase: "odd", message: "Found 'b' (len=1). No improvement", highlightedLines: [7] },
     { s: "babad", i: 2, left: 1, right: 3, longestPalindrome: "bab", start: 0, maxLen: 3, currentLen: 0, phase: "odd", message: "Expand: Check s[1]='a' == s[3]='a' ✓", highlightedLines: [5] },
     { s: "babad", i: 2, left: 1, right: 3, longestPalindrome: "bab", start: 0, maxLen: 3, currentLen: 3, phase: "odd", message: "Found 'aba' (len=3). Equal to maxLen, no update", highlightedLines: [7] },
     { s: "babad", i: 2, left: 0, right: 4, longestPalindrome: "bab", start: 0, maxLen: 3, currentLen: 0, phase: "odd", message: "Expand: s[0]='b' != s[4]='d' ✗", highlightedLines: [5] },
-    
+
     { s: "babad", i: 2, left: 2, right: 3, longestPalindrome: "bab", start: 0, maxLen: 3, currentLen: 0, phase: "even", message: "i=2: Start even expansion between 'b' and 'a'", highlightedLines: [18] },
     { s: "babad", i: 2, left: 2, right: 3, longestPalindrome: "bab", start: 0, maxLen: 3, currentLen: 0, phase: "even", message: "Check: s[2]='b' != s[3]='a' ✗", highlightedLines: [5] },
-    
+
     { s: "babad", i: 3, left: 3, right: 3, longestPalindrome: "bab", start: 0, maxLen: 3, currentLen: 0, phase: "odd", message: "i=3: Start odd expansion from center 'a'", highlightedLines: [17] },
     { s: "babad", i: 3, left: 3, right: 3, longestPalindrome: "bab", start: 0, maxLen: 3, currentLen: 0, phase: "odd", message: "Check: s[3]='a' == s[3]='a' ✓", highlightedLines: [5] },
     { s: "babad", i: 3, left: 3, right: 3, longestPalindrome: "bab", start: 0, maxLen: 3, currentLen: 1, phase: "odd", message: "Found 'a' (len=1). No improvement", highlightedLines: [7] },
     { s: "babad", i: 3, left: 2, right: 4, longestPalindrome: "bab", start: 0, maxLen: 3, currentLen: 0, phase: "odd", message: "Expand: s[2]='b' != s[4]='d' ✗", highlightedLines: [5] },
-    
+
     { s: "babad", i: 3, left: 3, right: 4, longestPalindrome: "bab", start: 0, maxLen: 3, currentLen: 0, phase: "even", message: "i=3: Start even expansion between 'a' and 'd'", highlightedLines: [18] },
     { s: "babad", i: 3, left: 3, right: 4, longestPalindrome: "bab", start: 0, maxLen: 3, currentLen: 0, phase: "even", message: "Check: s[3]='a' != s[4]='d' ✗", highlightedLines: [5] },
-    
+
     { s: "babad", i: 4, left: 4, right: 4, longestPalindrome: "bab", start: 0, maxLen: 3, currentLen: 0, phase: "odd", message: "i=4: Start odd expansion from center 'd'", highlightedLines: [17] },
     { s: "babad", i: 4, left: 4, right: 4, longestPalindrome: "bab", start: 0, maxLen: 3, currentLen: 0, phase: "odd", message: "Check: s[4]='d' == s[4]='d' ✓", highlightedLines: [5] },
     { s: "babad", i: 4, left: 4, right: 4, longestPalindrome: "bab", start: 0, maxLen: 3, currentLen: 1, phase: "odd", message: "Found 'd' (len=1). No improvement", highlightedLines: [7] },
     { s: "babad", i: 4, left: 3, right: 5, longestPalindrome: "bab", start: 0, maxLen: 3, currentLen: 0, phase: "odd", message: "Expand: right=5 out of bounds ✗", highlightedLines: [5] },
-    
+
     { s: "babad", i: 4, left: 4, right: 5, longestPalindrome: "bab", start: 0, maxLen: 3, currentLen: 0, phase: "even", message: "i=4: Even expansion, right=5 out of bounds ✗", highlightedLines: [18] },
-    
+
     { s: "babad", i: -1, left: -1, right: -1, longestPalindrome: "bab", start: 0, maxLen: 3, currentLen: 0, phase: "return", message: "Loop complete! Return substring from start=0, len=3", highlightedLines: [21] },
     { s: "babad", i: -1, left: -1, right: -1, longestPalindrome: "bab", start: 0, maxLen: 3, currentLen: 0, phase: "done", message: "Result: 'bab' ✓", highlightedLines: [21] }
   ];
@@ -131,18 +131,18 @@ export const LongestPalindromicSubstringVisualization = () => {
           <Button onClick={() => setCurrentStepIndex(0)} variant="outline" size="sm">
             <RotateCcw className="h-4 w-4" />
           </Button>
-          <Button 
-            onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))} 
-            disabled={currentStepIndex === 0} 
-            variant="outline" 
+          <Button
+            onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))}
+            disabled={currentStepIndex === 0}
+            variant="outline"
             size="sm"
           >
             <SkipBack className="h-4 w-4" />
           </Button>
-          <Button 
-            onClick={() => setCurrentStepIndex(Math.min(steps.length - 1, currentStepIndex + 1))} 
-            disabled={currentStepIndex === steps.length - 1} 
-            variant="outline" 
+          <Button
+            onClick={() => setCurrentStepIndex(Math.min(steps.length - 1, currentStepIndex + 1))}
+            disabled={currentStepIndex === steps.length - 1}
+            variant="outline"
             size="sm"
           >
             <SkipForward className="h-4 w-4" />
@@ -160,16 +160,15 @@ export const LongestPalindromicSubstringVisualization = () => {
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className={`px-2 py-1 rounded text-xs font-semibold ${
-                currentStep.phase === 'odd' ? 'bg-blue-500/20 text-blue-600' :
+              className={`px-2 py-1 rounded text-xs font-semibold ${currentStep.phase === 'odd' ? 'bg-blue-500/20 text-blue-600' :
                 currentStep.phase === 'even' ? 'bg-blue-500/20 text-blue-600' :
-                currentStep.phase === 'done' ? 'bg-green-500/20 text-green-600' :
-                'bg-muted text-muted-foreground'
-              }`}
+                  currentStep.phase === 'done' ? 'bg-green-500/20 text-green-600' :
+                    'bg-muted text-muted-foreground'
+                }`}
             >
-              {currentStep.phase === 'odd' ? 'ODD' : 
-               currentStep.phase === 'even' ? 'EVEN' : 
-               currentStep.phase === 'done' ? 'DONE' : 'INIT'}
+              {currentStep.phase === 'odd' ? 'ODD' :
+                currentStep.phase === 'even' ? 'EVEN' :
+                  currentStep.phase === 'done' ? 'DONE' : 'INIT'}
             </motion.div>
           </div>
 
@@ -178,12 +177,12 @@ export const LongestPalindromicSubstringVisualization = () => {
               <motion.div
                 key={idx}
                 initial={{ scale: 0.9 }}
-                animate={{ 
-                  scale: idx === currentStep.i ? 1.15 : 
-                         (idx >= currentStep.left && idx <= currentStep.right && currentStep.left >= 0) ? 1.1 : 1
+                animate={{
+                  scale: idx === currentStep.i ? 1.15 :
+                    (idx >= currentStep.left && idx <= currentStep.right && currentStep.left >= 0) ? 1.1 : 1
                 }}
                 transition={{ duration: 0.2 }}
-                className={`w-12 h-12 flex items-center justify-center rounded font-mono font-bold border-2 transition-all ${getCharClass(idx)}`}
+                className={`w-12 h-12 flex items-center justify-center rounded font-mono font- border-2 transition-all ${getCharClass(idx)}`}
               >
                 {char}
               </motion.div>

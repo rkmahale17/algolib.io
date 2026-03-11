@@ -6,7 +6,7 @@ import { VisualizationLayout } from '../shared/VisualizationLayout';
 
 export const SumOfTwoIntegersVisualization = () => {
   const [currentStep, setCurrentStep] = useState(0);
-  
+
   const steps = [
     {
       variables: { a: 3, b: 5, aBinary: '0011', bBinary: '0101', carry: '-', result: '-' },
@@ -166,7 +166,7 @@ export const SumOfTwoIntegersVisualization = () => {
             </div>
             <p className="font-mono text-center mt-2 text-sm">{step.variables.aBinary} = {step.variables.a}</p>
           </div>
-          
+
           <div className="p-4 bg-secondary/10 rounded-lg border border-secondary/20 flex-1">
             <h3 className="font-semibold mb-2 text-sm">b (carry)</h3>
             <div className="flex gap-1 justify-center flex-wrap">
@@ -194,7 +194,7 @@ export const SumOfTwoIntegersVisualization = () => {
           </div>
         )}
       </div>
-      
+
       <div className="p-4 bg-primary/20 rounded-lg border border-primary/30">
         <p className="text-sm font-medium">{step.explanation}</p>
       </div>
@@ -214,8 +214,8 @@ export const SumOfTwoIntegersVisualization = () => {
 
   const rightContent = (
     <>
-      <CodeHighlighter 
-        code={code} 
+      <CodeHighlighter
+        code={code}
         language="TypeScript"
         highlightedLine={step.highlightedLine}
       />

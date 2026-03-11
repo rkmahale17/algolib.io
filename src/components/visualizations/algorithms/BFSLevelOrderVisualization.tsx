@@ -209,15 +209,14 @@ export const BFSLevelOrderVisualization = () => {
           cx={node.x}
           cy={node.y}
           r="24"
-          className={`transition-all duration-300 ${
-            currentStep.current === node.val
+          className={`transition-all duration-300 ${currentStep.current === node.val
               ? 'fill-primary stroke-primary'
               : currentStep.visited.includes(node.val)
-              ? 'fill-green-500 stroke-green-500'
-              : currentStep.queue.includes(node.val)
-              ? 'fill-blue-500 stroke-blue-500'
-              : 'fill-muted stroke-border'
-          }`}
+                ? 'fill-green-500 stroke-green-500'
+                : currentStep.queue.includes(node.val)
+                  ? 'fill-blue-500 stroke-blue-500'
+                  : 'fill-muted stroke-border'
+            }`}
           strokeWidth="2"
         />
         <text
@@ -225,11 +224,10 @@ export const BFSLevelOrderVisualization = () => {
           y={node.y}
           textAnchor="middle"
           dy=".3em"
-          className={`font-bold ${
-            currentStep.visited.includes(node.val) || currentStep.current === node.val || currentStep.queue.includes(node.val)
+          className={`font- ${currentStep.visited.includes(node.val) || currentStep.current === node.val || currentStep.queue.includes(node.val)
               ? 'fill-white'
               : 'fill-foreground'
-          }`}
+            }`}
         >
           {node.val}
         </text>
@@ -271,7 +269,7 @@ export const BFSLevelOrderVisualization = () => {
               <p className="text-xs text-muted-foreground mb-2">Queue:</p>
               <div className="flex gap-2 flex-wrap">
                 {currentStep.queue.map((val, idx) => (
-                  <div key={idx} className="w-10 h-10 rounded bg-blue-500 text-white flex items-center justify-center font-bold">
+                  <div key={idx} className="w-10 h-10 rounded bg-blue-500 text-white flex items-center justify-center font-">
                     {val}
                   </div>
                 ))}
@@ -282,7 +280,7 @@ export const BFSLevelOrderVisualization = () => {
               <p className="text-xs text-muted-foreground mb-2">Visited:</p>
               <div className="flex gap-2 flex-wrap">
                 {currentStep.visited.map((val, idx) => (
-                  <div key={idx} className="w-10 h-10 rounded bg-green-500 text-white flex items-center justify-center font-bold">
+                  <div key={idx} className="w-10 h-10 rounded bg-green-500 text-white flex items-center justify-center font-">
                     {val}
                   </div>
                 ))}
@@ -292,20 +290,20 @@ export const BFSLevelOrderVisualization = () => {
             </div>
             <div className=" rounded-lg p-4">
 
-            <VariablePanel
-            variables={{
-              current: currentStep.current || 'null',
-              level: currentStep.currentLevel,
-              'queue.length': currentStep.queue.length,
-              'visited.length': currentStep.visited.length
-            }}
-          />
-          </div>
+              <VariablePanel
+                variables={{
+                  current: currentStep.current || 'null',
+                  level: currentStep.currentLevel,
+                  'queue.length': currentStep.queue.length,
+                  'visited.length': currentStep.visited.length
+                }}
+              />
+            </div>
           </div>
         </div>
 
         <div className="space-y-4">
-          
+
           <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
         </div>
       </div>

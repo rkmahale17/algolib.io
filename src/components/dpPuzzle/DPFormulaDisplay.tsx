@@ -8,7 +8,7 @@ interface DPFormulaDisplayProps {
 
 export const DPFormulaDisplay = ({ mode, show }: DPFormulaDisplayProps) => {
   if (!show) return null;
-  
+
   const formulas: Record<DPMode, { title: string; formula: string; explanation: string }> = {
     fibonacci: {
       title: "Fibonacci Recurrence",
@@ -31,9 +31,9 @@ export const DPFormulaDisplay = ({ mode, show }: DPFormulaDisplayProps) => {
       explanation: "Ways to make amount: exclude coin + include coin (if amount allows)",
     },
   };
-  
+
   const { title, formula, explanation } = formulas[mode];
-  
+
   return (
     <Card className="p-4 bg-primary/5 border-primary/20">
       <h3 className="font-semibold text-primary mb-2">{title}</h3>

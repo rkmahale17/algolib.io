@@ -230,13 +230,12 @@ export const RecoverBSTVisualization = () => {
           cx={node.x}
           cy={node.y}
           r="24"
-          className={`transition-all duration-300 ${
-            node.val === currentStep.first || node.val === currentStep.second
+          className={`transition-all duration-300 ${node.val === currentStep.first || node.val === currentStep.second
               ? 'fill-red-500 stroke-red-500'
               : currentStep.current === node.val
-              ? 'fill-primary stroke-primary'
-              : 'fill-muted stroke-border'
-          }`}
+                ? 'fill-primary stroke-primary'
+                : 'fill-muted stroke-border'
+            }`}
           strokeWidth="2"
         />
         <text
@@ -244,11 +243,10 @@ export const RecoverBSTVisualization = () => {
           y={node.y}
           textAnchor="middle"
           dy=".3em"
-          className={`font-bold ${
-            node.val === currentStep.first || node.val === currentStep.second || currentStep.current === node.val
+          className={`font- ${node.val === currentStep.first || node.val === currentStep.second || currentStep.current === node.val
               ? 'fill-white'
               : 'fill-foreground'
-          }`}
+            }`}
         >
           {node.val}
         </text>
@@ -288,32 +286,32 @@ export const RecoverBSTVisualization = () => {
           <div className="grid grid-cols-3 gap-2 text-xs">
             <div className="bg-red-500/10 border border-red-500/30 rounded p-2 text-center">
               <div className="text-muted-foreground">First</div>
-              <div className="font-bold text-red-500">{currentStep.first || 'null'}</div>
+              <div className="font- text-red-500">{currentStep.first || 'null'}</div>
             </div>
             <div className="bg-red-500/10 border border-red-500/30 rounded p-2 text-center">
               <div className="text-muted-foreground">Second</div>
-              <div className="font-bold text-red-500">{currentStep.second || 'null'}</div>
+              <div className="font- text-red-500">{currentStep.second || 'null'}</div>
             </div>
             <div className="bg-blue-500/10 border border-blue-500/30 rounded p-2 text-center">
               <div className="text-muted-foreground">Prev</div>
-              <div className="font-bold text-blue-500">{currentStep.prev || 'null'}</div>
+              <div className="font- text-blue-500">{currentStep.prev || 'null'}</div>
             </div>
           </div>
 
           <div className="rounded-lg ">
-               <VariablePanel
-            variables={{
-              current: currentStep.current || 'null',
-              first: currentStep.first || 'null',
-              second: currentStep.second || 'null',
-              prev: currentStep.prev || 'null'
-            }}
-          />
+            <VariablePanel
+              variables={{
+                current: currentStep.current || 'null',
+                first: currentStep.first || 'null',
+                second: currentStep.second || 'null',
+                prev: currentStep.prev || 'null'
+              }}
+            />
           </div>
         </div>
 
         <div className="space-y-4">
-       
+
           <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
         </div>
       </div>

@@ -40,36 +40,36 @@ export const PalindromicSubstringsVisualization = () => {
 
   const steps: Step[] = [
     { s: "aaa", i: -1, left: -1, right: -1, count: 0, phase: "init", message: "Initialize: count=0", highlightedLines: [2] },
-    
+
     { s: "aaa", i: 0, left: 0, right: 0, count: 0, phase: "odd", message: "i=0: Start odd expansion from center 'a'", highlightedLines: [12] },
     { s: "aaa", i: 0, left: 0, right: 0, count: 0, phase: "odd", message: "Check: s[0]='a' == s[0]='a' ✓", highlightedLines: [5] },
     { s: "aaa", i: 0, left: 0, right: 0, count: 1, phase: "odd", message: "Found palindrome 'a'. count=1", highlightedLines: [6] },
     { s: "aaa", i: 0, left: -1, right: 1, count: 1, phase: "odd", message: "Expand: left=-1 out of bounds ✗", highlightedLines: [7] },
-    
+
     { s: "aaa", i: 0, left: 0, right: 1, count: 1, phase: "even", message: "i=0: Start even expansion between positions 0 and 1", highlightedLines: [13] },
     { s: "aaa", i: 0, left: 0, right: 1, count: 1, phase: "even", message: "Check: s[0]='a' == s[1]='a' ✓", highlightedLines: [5] },
     { s: "aaa", i: 0, left: 0, right: 1, count: 2, phase: "even", message: "Found palindrome 'aa'. count=2", highlightedLines: [6] },
     { s: "aaa", i: 0, left: -1, right: 2, count: 2, phase: "even", message: "Expand: left=-1 out of bounds ✗", highlightedLines: [7] },
-    
+
     { s: "aaa", i: 1, left: 1, right: 1, count: 2, phase: "odd", message: "i=1: Start odd expansion from center 'a'", highlightedLines: [12] },
     { s: "aaa", i: 1, left: 1, right: 1, count: 2, phase: "odd", message: "Check: s[1]='a' == s[1]='a' ✓", highlightedLines: [5] },
     { s: "aaa", i: 1, left: 1, right: 1, count: 3, phase: "odd", message: "Found palindrome 'a'. count=3", highlightedLines: [6] },
     { s: "aaa", i: 1, left: 0, right: 2, count: 3, phase: "odd", message: "Expand: Check s[0]='a' == s[2]='a' ✓", highlightedLines: [5] },
     { s: "aaa", i: 1, left: 0, right: 2, count: 4, phase: "odd", message: "Found palindrome 'aaa'. count=4", highlightedLines: [6] },
     { s: "aaa", i: 1, left: -1, right: 3, count: 4, phase: "odd", message: "Expand: left=-1 out of bounds ✗", highlightedLines: [7] },
-    
+
     { s: "aaa", i: 1, left: 1, right: 2, count: 4, phase: "even", message: "i=1: Start even expansion between positions 1 and 2", highlightedLines: [13] },
     { s: "aaa", i: 1, left: 1, right: 2, count: 4, phase: "even", message: "Check: s[1]='a' == s[2]='a' ✓", highlightedLines: [5] },
     { s: "aaa", i: 1, left: 1, right: 2, count: 5, phase: "even", message: "Found palindrome 'aa'. count=5", highlightedLines: [6] },
     { s: "aaa", i: 1, left: 0, right: 3, count: 5, phase: "even", message: "Expand: right=3 out of bounds ✗", highlightedLines: [7] },
-    
+
     { s: "aaa", i: 2, left: 2, right: 2, count: 5, phase: "odd", message: "i=2: Start odd expansion from center 'a'", highlightedLines: [12] },
     { s: "aaa", i: 2, left: 2, right: 2, count: 5, phase: "odd", message: "Check: s[2]='a' == s[2]='a' ✓", highlightedLines: [5] },
     { s: "aaa", i: 2, left: 2, right: 2, count: 6, phase: "odd", message: "Found palindrome 'a'. count=6", highlightedLines: [6] },
     { s: "aaa", i: 2, left: 1, right: 3, count: 6, phase: "odd", message: "Expand: right=3 out of bounds ✗", highlightedLines: [7] },
-    
+
     { s: "aaa", i: 2, left: 2, right: 3, count: 6, phase: "even", message: "i=2: Even expansion, right=3 out of bounds ✗", highlightedLines: [13] },
-    
+
     { s: "aaa", i: -1, left: -1, right: -1, count: 6, phase: "done", message: "Complete! Total palindromic substrings = 6", highlightedLines: [16] }
   ];
 
@@ -106,18 +106,18 @@ export const PalindromicSubstringsVisualization = () => {
           <Button onClick={() => setCurrentStepIndex(0)} variant="outline" size="sm">
             <RotateCcw className="h-4 w-4" />
           </Button>
-          <Button 
-            onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))} 
-            disabled={currentStepIndex === 0} 
-            variant="outline" 
+          <Button
+            onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))}
+            disabled={currentStepIndex === 0}
+            variant="outline"
             size="sm"
           >
             <SkipBack className="h-4 w-4" />
           </Button>
-          <Button 
-            onClick={() => setCurrentStepIndex(Math.min(steps.length - 1, currentStepIndex + 1))} 
-            disabled={currentStepIndex === steps.length - 1} 
-            variant="outline" 
+          <Button
+            onClick={() => setCurrentStepIndex(Math.min(steps.length - 1, currentStepIndex + 1))}
+            disabled={currentStepIndex === steps.length - 1}
+            variant="outline"
             size="sm"
           >
             <SkipForward className="h-4 w-4" />
@@ -135,16 +135,15 @@ export const PalindromicSubstringsVisualization = () => {
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className={`px-2 py-1 rounded text-xs font-semibold ${
-                currentStep.phase === 'odd' ? 'bg-blue-500/20 text-blue-600' :
+              className={`px-2 py-1 rounded text-xs font-semibold ${currentStep.phase === 'odd' ? 'bg-blue-500/20 text-blue-600' :
                 currentStep.phase === 'even' ? 'bg-blue-500/20 text-blue-600' :
-                currentStep.phase === 'done' ? 'bg-green-500/20 text-green-600' :
-                'bg-muted text-muted-foreground'
-              }`}
+                  currentStep.phase === 'done' ? 'bg-green-500/20 text-green-600' :
+                    'bg-muted text-muted-foreground'
+                }`}
             >
-              {currentStep.phase === 'odd' ? 'ODD' : 
-               currentStep.phase === 'even' ? 'EVEN' : 
-               currentStep.phase === 'done' ? 'DONE' : 'INIT'}
+              {currentStep.phase === 'odd' ? 'ODD' :
+                currentStep.phase === 'even' ? 'EVEN' :
+                  currentStep.phase === 'done' ? 'DONE' : 'INIT'}
             </motion.div>
           </div>
 
@@ -153,12 +152,12 @@ export const PalindromicSubstringsVisualization = () => {
               <motion.div
                 key={idx}
                 initial={{ scale: 0.9 }}
-                animate={{ 
-                  scale: idx === currentStep.i ? 1.15 : 
-                         (idx >= currentStep.left && idx <= currentStep.right && currentStep.left >= 0) ? 1.1 : 1
+                animate={{
+                  scale: idx === currentStep.i ? 1.15 :
+                    (idx >= currentStep.left && idx <= currentStep.right && currentStep.left >= 0) ? 1.1 : 1
                 }}
                 transition={{ duration: 0.2 }}
-                className={`w-12 h-12 flex items-center justify-center rounded font-mono font-bold border-2 transition-all ${getCharClass(idx)}`}
+                className={`w-12 h-12 flex items-center justify-center rounded font-mono font- border-2 transition-all ${getCharClass(idx)}`}
               >
                 {char}
               </motion.div>
@@ -172,7 +171,7 @@ export const PalindromicSubstringsVisualization = () => {
             transition={{ duration: 0.3 }}
             className="p-4 bg-green-500/10 rounded border border-green-500/30 mb-4"
           >
-            <p className="text-3xl font-bold text-green-600 text-center">{currentStep.count}</p>
+            <p className="text-3xl font- text-green-600 text-center">{currentStep.count}</p>
             <p className="text-xs text-center text-muted-foreground mt-1">Palindromes Found</p>
           </motion.div>
 

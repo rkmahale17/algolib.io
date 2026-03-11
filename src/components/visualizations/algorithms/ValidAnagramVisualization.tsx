@@ -194,11 +194,10 @@ export const ValidAnagramVisualization = () => {
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ duration: 0.3, delay: idx * 0.05 }}
-                  className={`w-10 h-10 flex items-center justify-center rounded font-mono font-bold border-2 ${
-                    char === currentStep.currentChar || char === currentStep.checking
-                      ? 'bg-primary/20 border-primary text-primary'
-                      : 'bg-muted/50 border-border text-foreground'
-                  }`}
+                  className={`w-10 h-10 flex items-center justify-center rounded font-mono font- border-2 ${char === currentStep.currentChar || char === currentStep.checking
+                    ? 'bg-primary/20 border-primary text-primary'
+                    : 'bg-muted/50 border-border text-foreground'
+                    }`}
                 >
                   {char}
                 </motion.div>
@@ -213,11 +212,10 @@ export const ValidAnagramVisualization = () => {
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ duration: 0.3, delay: idx * 0.05 }}
-                  className={`w-10 h-10 flex items-center justify-center rounded font-mono font-bold border-2 ${
-                    char === currentStep.currentChar || char === currentStep.checking
-                      ? 'bg-secondary/20 border-secondary text-secondary-foreground'
-                      : 'bg-muted/50 border-border text-foreground'
-                  }`}
+                  className={`w-10 h-10 flex items-center justify-center rounded font-mono font- border-2 ${char === currentStep.currentChar || char === currentStep.checking
+                    ? 'bg-secondary/20 border-secondary text-secondary-foreground'
+                    : 'bg-muted/50 border-border text-foreground'
+                    }`}
                 >
                   {char}
                 </motion.div>
@@ -234,13 +232,12 @@ export const ValidAnagramVisualization = () => {
                         key={char}
                         initial={{ x: -20, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
-                        className={`flex justify-between items-center p-2 rounded ${
-                          char === currentStep.checking
-                            ? 'bg-primary/20 border border-primary'
-                            : 'bg-muted/50'
-                        }`}
+                        className={`flex justify-between items-center p-2 rounded ${char === currentStep.checking
+                          ? 'bg-primary/20 border border-primary'
+                          : 'bg-muted/50'
+                          }`}
                       >
-                        <span className="font-mono font-bold">{char}</span>
+                        <span className="font-mono font-">{char}</span>
                         <span className="font-mono text-primary">{count}</span>
                       </motion.div>
                     ))
@@ -259,13 +256,12 @@ export const ValidAnagramVisualization = () => {
                         key={char}
                         initial={{ x: 20, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
-                        className={`flex justify-between items-center p-2 rounded ${
-                          char === currentStep.checking
-                            ? 'bg-secondary/20 border border-secondary'
-                            : 'bg-muted/50'
-                        }`}
+                        className={`flex justify-between items-center p-2 rounded ${char === currentStep.checking
+                          ? 'bg-secondary/20 border border-secondary'
+                          : 'bg-muted/50'
+                          }`}
                       >
-                        <span className="font-mono font-bold">{char}</span>
+                        <span className="font-mono font-">{char}</span>
                         <span className="font-mono text-secondary">{count}</span>
                       </motion.div>
                     ))
@@ -282,7 +278,7 @@ export const ValidAnagramVisualization = () => {
                 animate={{ scale: 1, opacity: 1 }}
                 className={`p-4 rounded ${currentStep.isAnagram ? 'bg-green-500/10 border border-green-500/20' : 'bg-red-500/10 border border-red-500/20'}`}
               >
-                <p className={`text-lg font-bold ${currentStep.isAnagram ? 'text-green-600' : 'text-red-600'}`}>
+                <p className={`text-lg font- ${currentStep.isAnagram ? 'text-green-600' : 'text-red-600'}`}>
                   {currentStep.isAnagram ? '✓ Valid Anagram' : '✗ Not an Anagram'}
                 </p>
               </motion.div>

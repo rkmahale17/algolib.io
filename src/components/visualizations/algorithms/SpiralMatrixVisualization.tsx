@@ -21,13 +21,13 @@ interface Step {
 export const SpiralMatrixVisualization = () => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
-  const initialMatrix = [[1,2,3],[4,5,6],[7,8,9]];
-  
+  const initialMatrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
+
   const steps: Step[] = [
     {
       matrix: initialMatrix,
       result: [],
-      visited: [[false,false,false],[false,false,false],[false,false,false]],
+      visited: [[false, false, false], [false, false, false], [false, false, false]],
       currentRow: -1,
       currentCol: -1,
       variables: { matrix: '3x3' },
@@ -39,7 +39,7 @@ export const SpiralMatrixVisualization = () => {
     {
       matrix: initialMatrix,
       result: [],
-      visited: [[false,false,false],[false,false,false],[false,false,false]],
+      visited: [[false, false, false], [false, false, false], [false, false, false]],
       currentRow: -1,
       currentCol: -1,
       variables: { m: 3, n: 3 },
@@ -51,7 +51,7 @@ export const SpiralMatrixVisualization = () => {
     {
       matrix: initialMatrix,
       result: [],
-      visited: [[false,false,false],[false,false,false],[false,false,false]],
+      visited: [[false, false, false], [false, false, false], [false, false, false]],
       currentRow: -1,
       currentCol: -1,
       variables: { top: 0, bottom: 2, left: 0, right: 2 },
@@ -63,7 +63,7 @@ export const SpiralMatrixVisualization = () => {
     {
       matrix: initialMatrix,
       result: [],
-      visited: [[false,false,false],[false,false,false],[false,false,false]],
+      visited: [[false, false, false], [false, false, false], [false, false, false]],
       currentRow: -1,
       currentCol: -1,
       variables: { result: '[]' },
@@ -75,7 +75,7 @@ export const SpiralMatrixVisualization = () => {
     {
       matrix: initialMatrix,
       result: [],
-      visited: [[false,false,false],[false,false,false],[false,false,false]],
+      visited: [[false, false, false], [false, false, false], [false, false, false]],
       currentRow: 0,
       currentCol: 0,
       variables: { direction: 'RIGHT', col: 0, row: 0 },
@@ -87,7 +87,7 @@ export const SpiralMatrixVisualization = () => {
     {
       matrix: initialMatrix,
       result: [1],
-      visited: [[true,false,false],[false,false,false],[false,false,false]],
+      visited: [[true, false, false], [false, false, false], [false, false, false]],
       currentRow: 0,
       currentCol: 0,
       variables: { add: 1, result: '[1]' },
@@ -98,8 +98,8 @@ export const SpiralMatrixVisualization = () => {
     },
     {
       matrix: initialMatrix,
-      result: [1,2],
-      visited: [[true,true,false],[false,false,false],[false,false,false]],
+      result: [1, 2],
+      visited: [[true, true, false], [false, false, false], [false, false, false]],
       currentRow: 0,
       currentCol: 1,
       variables: { add: 2, result: '[1,2]' },
@@ -110,8 +110,8 @@ export const SpiralMatrixVisualization = () => {
     },
     {
       matrix: initialMatrix,
-      result: [1,2,3],
-      visited: [[true,true,true],[false,false,false],[false,false,false]],
+      result: [1, 2, 3],
+      visited: [[true, true, true], [false, false, false], [false, false, false]],
       currentRow: 0,
       currentCol: 2,
       variables: { add: 3, result: '[1,2,3]' },
@@ -122,8 +122,8 @@ export const SpiralMatrixVisualization = () => {
     },
     {
       matrix: initialMatrix,
-      result: [1,2,3],
-      visited: [[true,true,true],[false,false,false],[false,false,false]],
+      result: [1, 2, 3],
+      visited: [[true, true, true], [false, false, false], [false, false, false]],
       currentRow: 0,
       currentCol: 2,
       variables: { top: 1, action: 'increment top' },
@@ -134,8 +134,8 @@ export const SpiralMatrixVisualization = () => {
     },
     {
       matrix: initialMatrix,
-      result: [1,2,3],
-      visited: [[true,true,true],[false,false,false],[false,false,false]],
+      result: [1, 2, 3],
+      visited: [[true, true, true], [false, false, false], [false, false, false]],
       currentRow: 1,
       currentCol: 2,
       variables: { direction: 'DOWN', row: 1 },
@@ -146,8 +146,8 @@ export const SpiralMatrixVisualization = () => {
     },
     {
       matrix: initialMatrix,
-      result: [1,2,3,6],
-      visited: [[true,true,true],[false,false,true],[false,false,false]],
+      result: [1, 2, 3, 6],
+      visited: [[true, true, true], [false, false, true], [false, false, false]],
       currentRow: 1,
       currentCol: 2,
       variables: { add: 6, result: '[1,2,3,6]' },
@@ -158,8 +158,8 @@ export const SpiralMatrixVisualization = () => {
     },
     {
       matrix: initialMatrix,
-      result: [1,2,3,6,9],
-      visited: [[true,true,true],[false,false,true],[false,false,true]],
+      result: [1, 2, 3, 6, 9],
+      visited: [[true, true, true], [false, false, true], [false, false, true]],
       currentRow: 2,
       currentCol: 2,
       variables: { add: 9, result: '[1,2,3,6,9]' },
@@ -170,8 +170,8 @@ export const SpiralMatrixVisualization = () => {
     },
     {
       matrix: initialMatrix,
-      result: [1,2,3,6,9],
-      visited: [[true,true,true],[false,false,true],[false,false,true]],
+      result: [1, 2, 3, 6, 9],
+      visited: [[true, true, true], [false, false, true], [false, false, true]],
       currentRow: 2,
       currentCol: 2,
       variables: { right: 1, action: 'decrement right' },
@@ -182,8 +182,8 @@ export const SpiralMatrixVisualization = () => {
     },
     {
       matrix: initialMatrix,
-      result: [1,2,3,6,9],
-      visited: [[true,true,true],[false,false,true],[false,false,true]],
+      result: [1, 2, 3, 6, 9],
+      visited: [[true, true, true], [false, false, true], [false, false, true]],
       currentRow: 2,
       currentCol: 1,
       variables: { direction: 'LEFT', col: 1 },
@@ -194,8 +194,8 @@ export const SpiralMatrixVisualization = () => {
     },
     {
       matrix: initialMatrix,
-      result: [1,2,3,6,9,8],
-      visited: [[true,true,true],[false,false,true],[false,true,true]],
+      result: [1, 2, 3, 6, 9, 8],
+      visited: [[true, true, true], [false, false, true], [false, true, true]],
       currentRow: 2,
       currentCol: 1,
       variables: { add: 8, result: '[1,2,3,6,9,8]' },
@@ -206,8 +206,8 @@ export const SpiralMatrixVisualization = () => {
     },
     {
       matrix: initialMatrix,
-      result: [1,2,3,6,9,8,7],
-      visited: [[true,true,true],[false,false,true],[true,true,true]],
+      result: [1, 2, 3, 6, 9, 8, 7],
+      visited: [[true, true, true], [false, false, true], [true, true, true]],
       currentRow: 2,
       currentCol: 0,
       variables: { add: 7, result: '[1,2,3,6,9,8,7]' },
@@ -218,8 +218,8 @@ export const SpiralMatrixVisualization = () => {
     },
     {
       matrix: initialMatrix,
-      result: [1,2,3,6,9,8,7],
-      visited: [[true,true,true],[false,false,true],[true,true,true]],
+      result: [1, 2, 3, 6, 9, 8, 7],
+      visited: [[true, true, true], [false, false, true], [true, true, true]],
       currentRow: 2,
       currentCol: 0,
       variables: { bottom: 1, action: 'decrement bottom' },
@@ -230,8 +230,8 @@ export const SpiralMatrixVisualization = () => {
     },
     {
       matrix: initialMatrix,
-      result: [1,2,3,6,9,8,7],
-      visited: [[true,true,true],[false,false,true],[true,true,true]],
+      result: [1, 2, 3, 6, 9, 8, 7],
+      visited: [[true, true, true], [false, false, true], [true, true, true]],
       currentRow: 1,
       currentCol: 0,
       variables: { direction: 'UP', row: 1 },
@@ -242,8 +242,8 @@ export const SpiralMatrixVisualization = () => {
     },
     {
       matrix: initialMatrix,
-      result: [1,2,3,6,9,8,7,4],
-      visited: [[true,true,true],[true,false,true],[true,true,true]],
+      result: [1, 2, 3, 6, 9, 8, 7, 4],
+      visited: [[true, true, true], [true, false, true], [true, true, true]],
       currentRow: 1,
       currentCol: 0,
       variables: { add: 4, result: '[1,2,3,6,9,8,7,4]' },
@@ -254,8 +254,8 @@ export const SpiralMatrixVisualization = () => {
     },
     {
       matrix: initialMatrix,
-      result: [1,2,3,6,9,8,7,4],
-      visited: [[true,true,true],[true,false,true],[true,true,true]],
+      result: [1, 2, 3, 6, 9, 8, 7, 4],
+      visited: [[true, true, true], [true, false, true], [true, true, true]],
       currentRow: 1,
       currentCol: 0,
       variables: { left: 1, action: 'increment left' },
@@ -266,8 +266,8 @@ export const SpiralMatrixVisualization = () => {
     },
     {
       matrix: initialMatrix,
-      result: [1,2,3,6,9,8,7,4],
-      visited: [[true,true,true],[true,false,true],[true,true,true]],
+      result: [1, 2, 3, 6, 9, 8, 7, 4],
+      visited: [[true, true, true], [true, false, true], [true, true, true]],
       currentRow: 1,
       currentCol: 1,
       variables: { check: 'top=1, bottom=1', continue: true },
@@ -278,8 +278,8 @@ export const SpiralMatrixVisualization = () => {
     },
     {
       matrix: initialMatrix,
-      result: [1,2,3,6,9,8,7,4],
-      visited: [[true,true,true],[true,false,true],[true,true,true]],
+      result: [1, 2, 3, 6, 9, 8, 7, 4],
+      visited: [[true, true, true], [true, false, true], [true, true, true]],
       currentRow: 1,
       currentCol: 1,
       variables: { direction: 'RIGHT', col: 1 },
@@ -290,8 +290,8 @@ export const SpiralMatrixVisualization = () => {
     },
     {
       matrix: initialMatrix,
-      result: [1,2,3,6,9,8,7,4,5],
-      visited: [[true,true,true],[true,true,true],[true,true,true]],
+      result: [1, 2, 3, 6, 9, 8, 7, 4, 5],
+      visited: [[true, true, true], [true, true, true], [true, true, true]],
       currentRow: 1,
       currentCol: 1,
       variables: { add: 5, result: '[1,2,3,6,9,8,7,4,5]' },
@@ -302,8 +302,8 @@ export const SpiralMatrixVisualization = () => {
     },
     {
       matrix: initialMatrix,
-      result: [1,2,3,6,9,8,7,4,5],
-      visited: [[true,true,true],[true,true,true],[true,true,true]],
+      result: [1, 2, 3, 6, 9, 8, 7, 4, 5],
+      visited: [[true, true, true], [true, true, true], [true, true, true]],
       currentRow: -1,
       currentCol: -1,
       variables: { check: 'top=2, bottom=1', stop: true },
@@ -314,8 +314,8 @@ export const SpiralMatrixVisualization = () => {
     },
     {
       matrix: initialMatrix,
-      result: [1,2,3,6,9,8,7,4,5],
-      visited: [[true,true,true],[true,true,true],[true,true,true]],
+      result: [1, 2, 3, 6, 9, 8, 7, 4, 5],
+      visited: [[true, true, true], [true, true, true], [true, true, true]],
       currentRow: -1,
       currentCol: -1,
       variables: { result: '[1,2,3,6,9,8,7,4,5]' },
@@ -326,8 +326,8 @@ export const SpiralMatrixVisualization = () => {
     },
     {
       matrix: initialMatrix,
-      result: [1,2,3,6,9,8,7,4,5],
-      visited: [[true,true,true],[true,true,true],[true,true,true]],
+      result: [1, 2, 3, 6, 9, 8, 7, 4, 5],
+      visited: [[true, true, true], [true, true, true], [true, true, true]],
       currentRow: -1,
       currentCol: -1,
       variables: { time: 'O(m*n)', space: 'O(1)' },
@@ -404,14 +404,14 @@ export const SpiralMatrixVisualization = () => {
         <Card className="p-6">
           <h3 className="text-lg font-semibold mb-4">Spiral Matrix</h3>
           <div className="space-y-4">
-            <motion.div 
+            <motion.div
               key={`matrix-${currentStepIndex}`}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               className="space-y-2"
             >
               <div className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                Direction: 
+                Direction:
                 <span className="text-primary font-mono text-lg">
                   {getDirectionArrow(currentStep.direction)} {currentStep.direction.toUpperCase()}
                 </span>
@@ -424,7 +424,7 @@ export const SpiralMatrixVisualization = () => {
                         key={`${rowIdx}-${colIdx}`}
                         initial={{ scale: 0.8 }}
                         animate={{ scale: rowIdx === currentStep.currentRow && colIdx === currentStep.currentCol ? 1.1 : 1 }}
-                        className={`w-12 h-12 flex items-center justify-center font-mono font-bold text-lg rounded border-2 transition-all ${getCellColor(rowIdx, colIdx)}`}
+                        className={`w-12 h-12 flex items-center justify-center font-mono font- text-lg rounded border-2 transition-all ${getCellColor(rowIdx, colIdx)}`}
                       >
                         {cell}
                       </motion.div>
@@ -447,7 +447,7 @@ export const SpiralMatrixVisualization = () => {
                     key={idx}
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="w-10 h-10 flex items-center justify-center font-mono font-bold bg-primary text-primary-foreground rounded"
+                    className="w-10 h-10 flex items-center justify-center font-mono font- bg-primary text-primary-foreground rounded"
                   >
                     {num}
                   </motion.div>
@@ -489,9 +489,9 @@ export const SpiralMatrixVisualization = () => {
         <Card className="p-6 overflow-hidden flex flex-col">
           <h3 className="text-lg font-semibold mb-4">Implementation</h3>
           <div className="flex-1 overflow-auto">
-            <AnimatedCodeEditor 
-              code={code} 
-              language="typescript" 
+            <AnimatedCodeEditor
+              code={code}
+              language="typescript"
               highlightedLines={(currentStep.highlightedLines || []).filter((n) => n >= 1 && n <= code.split('\n').length)}
             />
           </div>

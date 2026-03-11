@@ -197,68 +197,66 @@ export const NQueensVisualization: React.FC = () => {
       />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-      <div className="bg-card rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4">{currentStep.n}-Queens Board</h3>
-        
-        <div className="grid gap-1 mb-6" style={{ gridTemplateColumns: `repeat(${currentStep.n}, minmax(0, 1fr))`, maxWidth: '400px' }}>
-          {currentStep.board.map((row, r) =>
-            row.map((cell, c) => (
-              <div
-                key={`${r}-${c}`}
-                className={`aspect-square flex items-center justify-center rounded border-2 font-bold text-2xl transition-all ${
-                  r === currentStep.row && c === currentStep.col
+        <div className="bg-card rounded-lg p-6 border">
+          <h3 className="text-lg font-semibold mb-4">{currentStep.n}-Queens Board</h3>
+
+          <div className="grid gap-1 mb-6" style={{ gridTemplateColumns: `repeat(${currentStep.n}, minmax(0, 1fr))`, maxWidth: '400px' }}>
+            {currentStep.board.map((row, r) =>
+              row.map((cell, c) => (
+                <div
+                  key={`${r}-${c}`}
+                  className={`aspect-square flex items-center justify-center rounded border-2 font- text-2xl transition-all ${r === currentStep.row && c === currentStep.col
                     ? 'bg-primary/20 border-primary'
                     : cell === 1
-                    ? 'bg-green-500/20 border-green-500'
-                    : (r + c) % 2 === 0
-                    ? 'bg-muted/30 border-border'
-                    : 'bg-card border-border'
-                }`}
-              >
-                {cell === 1 ? '♛' : ''}
-              </div>
-            ))
-          )}
-        </div>
+                      ? 'bg-green-500/20 border-green-500'
+                      : (r + c) % 2 === 0
+                        ? 'bg-muted/30 border-border'
+                        : 'bg-card border-border'
+                    }`}
+                >
+                  {cell === 1 ? '♛' : ''}
+                </div>
+              ))
+            )}
+          </div>
 
-        <h3 className="text-lg font-semibold mb-4">Solutions Found: {currentStep.allSolutions.length}</h3>
-        <div className="flex flex-wrap gap-4">
-          {currentStep.allSolutions.map((solution, idx) => (
-            <div key={idx} className="p-2 bg-muted rounded border">
-              <div className="text-xs mb-1">Solution {idx + 1}</div>
-              <div className="grid gap-0.5" style={{ gridTemplateColumns: `repeat(${currentStep.n}, minmax(0, 1fr))`, width: '80px' }}>
-                {solution.map((row, r) =>
-                  row.map((cell, c) => (
-                    <div
-                      key={`${r}-${c}`}
-                      className={`aspect-square flex items-center justify-center text-xs ${
-                        cell === 1 ? 'bg-green-500/40' : (r + c) % 2 === 0 ? 'bg-muted' : 'bg-card'
-                      }`}
-                    >
-                      {cell === 1 ? '♛' : ''}
-                    </div>
-                  ))
-                )}
+          <h3 className="text-lg font-semibold mb-4">Solutions Found: {currentStep.allSolutions.length}</h3>
+          <div className="flex flex-wrap gap-4">
+            {currentStep.allSolutions.map((solution, idx) => (
+              <div key={idx} className="p-2 bg-muted rounded border">
+                <div className="text-xs mb-1">Solution {idx + 1}</div>
+                <div className="grid gap-0.5" style={{ gridTemplateColumns: `repeat(${currentStep.n}, minmax(0, 1fr))`, width: '80px' }}>
+                  {solution.map((row, r) =>
+                    row.map((cell, c) => (
+                      <div
+                        key={`${r}-${c}`}
+                        className={`aspect-square flex items-center justify-center text-xs ${cell === 1 ? 'bg-green-500/40' : (r + c) % 2 === 0 ? 'bg-muted' : 'bg-card'
+                          }`}
+                      >
+                        {cell === 1 ? '♛' : ''}
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
+          <div className="mt-4 p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
+          </div>
+          <div className="mt-4 p-4 bg-muted rounded">
+            <VariablePanel
+              variables={{
+                'n': currentStep.n,
+                'current row': currentStep.row,
+                'current col': currentStep.col,
+                'solutions found': currentStep.allSolutions.length
+              }}
+            />
+          </div>
         </div>
-    <div className="mt-4 p-4 bg-muted rounded">
-              <VariablePanel
-        variables={{
-          'n': currentStep.n,
-          'current row': currentStep.row,
-          'current col': currentStep.col,
-          'solutions found': currentStep.allSolutions.length
-        }}
-      />
-      </div>
-      </div>
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
 
       </div>
 

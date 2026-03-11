@@ -67,7 +67,7 @@ export const HuffmanVisualization: React.FC = () => {
   const generateSteps = () => {
     const text = 'AABBBCCCC';
     const newSteps: Step[] = [];
-    
+
     const freq = new Map<string, number>();
     for (const char of text) {
       freq.set(char, (freq.get(char) || 0) + 1);
@@ -200,12 +200,12 @@ export const HuffmanVisualization: React.FC = () => {
 
       <div className="bg-card rounded-lg p-6 border">
         <h3 className="text-lg font-semibold mb-4">Input: "{currentStep.text}"</h3>
-        
+
         <h3 className="text-lg font-semibold mb-4">Character Frequencies</h3>
         <div className="flex gap-4 mb-6">
           {Array.from(currentStep.frequencies.entries()).map(([char, freq]) => (
             <div key={char} className="p-3 bg-muted rounded border">
-              <div className="text-xl font-bold mb-1">{char}</div>
+              <div className="text-xl font- mb-1">{char}</div>
               <div className="text-sm text-muted-foreground">freq: {freq}</div>
             </div>
           ))}
@@ -215,7 +215,7 @@ export const HuffmanVisualization: React.FC = () => {
         <div className="flex flex-wrap gap-3 mb-6">
           {currentStep.nodes.map((node, idx) => (
             <div key={idx} className="p-3 bg-blue-500/10 rounded border border-blue-500/50">
-              <div className="text-sm font-mono font-bold">{node.char}</div>
+              <div className="text-sm font-mono font-">{node.char}</div>
               <div className="text-xs text-muted-foreground">freq: {node.freq}</div>
             </div>
           ))}
@@ -227,7 +227,7 @@ export const HuffmanVisualization: React.FC = () => {
             <div className="grid grid-cols-2 gap-3 mb-6">
               {Array.from(currentStep.codes.entries()).map(([char, code]) => (
                 <div key={char} className="p-3 bg-green-500/10 rounded border border-green-500/50 flex justify-between">
-                  <span className="font-bold">{char}:</span>
+                  <span className="font-">{char}:</span>
                   <span className="font-mono">{code}</span>
                 </div>
               ))}

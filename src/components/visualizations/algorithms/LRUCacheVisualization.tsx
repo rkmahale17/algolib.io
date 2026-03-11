@@ -171,7 +171,7 @@ export const LRUCacheVisualization = () => {
 
     const generateGetSteps = (key: number) => {
       const hasKey = cache.has(key);
-      
+
       if (hasKey) {
         const nodeIdx = cache.get(key)!;
         const value = nodes[nodeIdx].value;
@@ -189,7 +189,7 @@ export const LRUCacheVisualization = () => {
 
         if (!isAlreadyHead) {
           generatedSteps.push(createStep("get", key, undefined, `Disconnecting node from current position...`, `Removing node from its current position in the doubly linked list`, 38, substep++, totalSubsteps, "delete", undefined, nodeIdx));
-          
+
           if (node.prev !== null) {
             generatedSteps.push(createStep("get", key, undefined, `Updating previous node's next pointer`, `Setting node[${node.prev}].next = ${node.next}`, 43, substep++, totalSubsteps, "update", undefined, node.prev));
             nodes[node.prev].next = node.next;
@@ -202,7 +202,7 @@ export const LRUCacheVisualization = () => {
           if (tail === nodeIdx) tail = node.prev;
 
           generatedSteps.push(createStep("get", key, undefined, `Reconnecting node at HEAD position...`, `Adding node to the front of the doubly linked list`, 40, substep++, totalSubsteps, "create", undefined, nodeIdx));
-          
+
           node.next = head;
           node.prev = null;
           if (head !== null) nodes[head].prev = nodeIdx;
@@ -236,7 +236,7 @@ export const LRUCacheVisualization = () => {
         generatedSteps.push(createStep("put", key, value, `Checking if key ${key} exists...`, `Searching HashMap to check if key already exists in cache`, 22, substep++, totalSubsteps, "search", undefined, undefined, key));
         generatedSteps.push(createStep("put", key, value, `Key ${key} found in cache`, `Key exists - will update the value instead of creating new node`, 22, substep++, totalSubsteps, "search", undefined, nodeIdx, key));
         generatedSteps.push(createStep("put", key, value, `Retrieved node from HashMap`, `Got reference to existing node at index ${nodeIdx}`, 23, substep++, totalSubsteps, "update", undefined, nodeIdx));
-        
+
         const oldValue = nodes[nodeIdx].value;
         nodes[nodeIdx].value = value;
         generatedSteps.push(createStep("put", key, value, `Updated value: ${oldValue} → ${value}`, `Changed node value from ${oldValue} to ${value}`, 24, substep++, totalSubsteps, "update", undefined, nodeIdx));
@@ -247,14 +247,14 @@ export const LRUCacheVisualization = () => {
 
         if (!isAlreadyHead) {
           generatedSteps.push(createStep("put", key, value, `Disconnecting from current position...`, `Removing node from its current position in the list`, 38, substep++, totalSubsteps, "delete", undefined, nodeIdx));
-          
+
           if (node.prev !== null) nodes[node.prev].next = node.next;
           if (node.next !== null) nodes[node.next].prev = node.prev;
           if (head === nodeIdx) head = node.next;
           if (tail === nodeIdx) tail = node.prev;
 
           generatedSteps.push(createStep("put", key, value, `Reconnecting at HEAD position...`, `Adding node to front of the doubly linked list`, 40, substep++, totalSubsteps, "create", undefined, nodeIdx));
-          
+
           node.next = head;
           node.prev = null;
           if (head !== null) nodes[head].prev = nodeIdx;
@@ -470,16 +470,15 @@ export const LRUCacheVisualization = () => {
                 ([key, nodeIdx]) => (
                   <div
                     key={key}
-                    className={`p-2 rounded border-2 transition-all ${
-                      currentStep.highlightedHashMapKey === key
-                        ? "border-primary bg-primary/20 scale-110 animate-pulse"
-                        : currentStep.highlightedNode === nodeIdx
+                    className={`p-2 rounded border-2 transition-all ${currentStep.highlightedHashMapKey === key
+                      ? "border-primary bg-primary/20 scale-110 animate-pulse"
+                      : currentStep.highlightedNode === nodeIdx
                         ? "border-secondary bg-secondary/20 scale-105"
                         : "border-border bg-muted/30"
-                    }`}
+                      }`}
                   >
                     <div className="text-xs text-muted-foreground">Key</div>
-                    <div className="font-mono font-bold">{key}</div>
+                    <div className="font-mono font-">{key}</div>
                     <div className="text-xs text-muted-foreground mt-1">→ node[{nodeIdx}]</div>
                   </div>
                 )
@@ -544,7 +543,7 @@ export const LRUCacheVisualization = () => {
                       <div className="text-xs text-muted-foreground">
                         K: {node.key}
                       </div>
-                      <div className="font-mono font-bold text-lg">
+                      <div className="font-mono font- text-lg">
                         V: {node.value}
                       </div>
                       {node.prev !== null && (

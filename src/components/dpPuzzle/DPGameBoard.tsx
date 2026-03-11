@@ -24,21 +24,21 @@ export const DPGameBoard = ({ mode, level, onBackToMenu, onNextLevel }: DPGameBo
     checkAll,
     getAccuracy,
   } = useDPGame(mode, level);
-  
+
   const [selectedCell, setSelectedCell] = useState<{ row: number; col: number } | null>(null);
-  
+
   const handleCellClick = (row: number, col: number) => {
     if (gameState.grid[row][col].isEditable) {
       setSelectedCell({ row, col });
     }
   };
-  
+
   const handleHint = () => {
     if (selectedCell && gameState.hintsRemaining > 0) {
       useHint(selectedCell.row, selectedCell.col);
     }
   };
-  
+
   const getModeTitle = () => {
     const titles: Record<DPMode, string> = {
       fibonacci: "Fibonacci",
@@ -48,7 +48,7 @@ export const DPGameBoard = ({ mode, level, onBackToMenu, onNextLevel }: DPGameBo
     };
     return titles[mode];
   };
-  
+
   const getGrade = () => {
     const accuracy = getAccuracy();
     if (accuracy >= 95) return "S";
@@ -58,7 +58,7 @@ export const DPGameBoard = ({ mode, level, onBackToMenu, onNextLevel }: DPGameBo
     if (accuracy >= 60) return "D";
     return "F";
   };
-  
+
   return (
     <>
       <div className="space-y-4">
@@ -69,11 +69,11 @@ export const DPGameBoard = ({ mode, level, onBackToMenu, onNextLevel }: DPGameBo
                 <ArrowLeft className="w-4 h-4" />
               </Button>
               <div>
-                <h2 className="text-xl font-bold">{getModeTitle()}</h2>
+                <h2 className="text-xl font-">{getModeTitle()}</h2>
                 <p className="text-sm text-muted-foreground">Level {level}</p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-4 text-sm">
               <div className="text-center">
                 <div className="font-semibold text-primary text-xl">{gameState.score}</div>
@@ -92,7 +92,7 @@ export const DPGameBoard = ({ mode, level, onBackToMenu, onNextLevel }: DPGameBo
             </div>
           </div>
         </Card>
-        
+
         <div className="grid lg:grid-cols-3 gap-4">
           <div className="lg:col-span-2 space-y-4">
             <Card className="p-4">
@@ -105,10 +105,10 @@ export const DPGameBoard = ({ mode, level, onBackToMenu, onNextLevel }: DPGameBo
                 problemData={gameState.problemData}
               />
             </Card>
-            
+
             <DPFormulaDisplay mode={mode} show={gameState.showFormula} />
           </div>
-          
+
           <div className="space-y-4">
             <Card className="p-4">
               <h3 className="font-semibold mb-3">Controls</h3>
@@ -122,24 +122,24 @@ export const DPGameBoard = ({ mode, level, onBackToMenu, onNextLevel }: DPGameBo
                   <Lightbulb className="w-4 h-4 mr-2" />
                   Use Hint ({gameState.hintsRemaining} left)
                 </Button>
-                
+
                 <Button onClick={toggleFormula} variant="outline" className="w-full">
                   <Eye className="w-4 h-4 mr-2" />
                   {gameState.showFormula ? "Hide" : "Show"} Formula
                 </Button>
-                
+
                 <Button onClick={checkAll} variant="outline" className="w-full">
                   <CheckCircle className="w-4 h-4 mr-2" />
                   Check All
                 </Button>
-                
+
                 <Button onClick={reset} variant="outline" className="w-full">
                   <RotateCcw className="w-4 h-4 mr-2" />
                   Reset
                 </Button>
               </div>
             </Card>
-            
+
             <Card className="p-4 bg-gradient-to-br from-primary/5 to-secondary/5">
               <h3 className="font-semibold mb-2">Stats</h3>
               <div className="space-y-2 text-sm">
@@ -157,7 +157,7 @@ export const DPGameBoard = ({ mode, level, onBackToMenu, onNextLevel }: DPGameBo
                 </div>
               </div>
             </Card>
-            
+
             {selectedCell && (
               <Card className="p-4 border-primary/50 bg-primary/5">
                 <h3 className="font-semibold mb-2 text-primary">Selected Cell</h3>
@@ -172,7 +172,7 @@ export const DPGameBoard = ({ mode, level, onBackToMenu, onNextLevel }: DPGameBo
           </div>
         </div>
       </div>
-      
+
       <DPVictoryModal
         isOpen={gameState.isComplete}
         score={gameState.score}

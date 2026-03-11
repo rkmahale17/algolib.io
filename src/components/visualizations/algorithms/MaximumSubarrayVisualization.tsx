@@ -48,11 +48,11 @@ export const MaximumSubarrayVisualization = () => {
   const generateSteps = () => {
     const nums = [-2, 1, -3, 4, -1, 2, 1, -5, 4];
     const newSteps: Step[] = [];
-    
+
     // Initial state
     let maxSub = nums[0];
     let curSum = 0;
-    
+
     newSteps.push({
       array: [...nums],
       i: -1,
@@ -65,7 +65,7 @@ export const MaximumSubarrayVisualization = () => {
 
     for (let i = 0; i < nums.length; i++) {
       const n = nums[i];
-      
+
       // Start of loop iteration
       newSteps.push({
         array: [...nums],
@@ -86,11 +86,11 @@ export const MaximumSubarrayVisualization = () => {
           curSum,
           message: `curSum (${curSum}) is negative. Resetting to 0.`,
           lineNumber: 11,
-        highlightIndices: [i]
+          highlightIndices: [i]
         });
-        
+
         curSum = 0;
-        
+
         newSteps.push({
           array: [...nums],
           i,
@@ -98,14 +98,14 @@ export const MaximumSubarrayVisualization = () => {
           curSum,
           message: `curSum reset to 0`,
           lineNumber: 12,
-        highlightIndices: [i]
+          highlightIndices: [i]
         });
       }
 
       // Add current number
       const oldSum = curSum;
       curSum += n;
-      
+
       newSteps.push({
         array: [...nums],
         i,
@@ -119,7 +119,7 @@ export const MaximumSubarrayVisualization = () => {
       // Update maxSub
       const oldMax = maxSub;
       maxSub = Math.max(maxSub, curSum);
-      
+
       newSteps.push({
         array: [...nums],
         i,
@@ -205,16 +205,15 @@ export const MaximumSubarrayVisualization = () => {
               {currentStep.array.map((value, index) => (
                 <div key={index} className="flex flex-col items-center gap-2">
                   <div
-                    className={`w-12 h-12 md:w-16 md:h-16 rounded flex items-center justify-center font-bold text-lg transition-all duration-300 ${
-                      index === currentStep.i
+                    className={`w-12 h-12 md:w-16 md:h-16 rounded flex items-center justify-center font- text-lg transition-all duration-300 ${index === currentStep.i
                         ? 'bg-primary text-primary-foreground shadow-lg scale-110'
                         : 'bg-muted text-foreground'
-                    }`}
+                      }`}
                   >
                     {value}
                   </div>
                   <span className="text-xs text-muted-foreground">{index}</span>
-                  {index === currentStep.i && <span className="text-xs font-bold text-primary">n</span>}
+                  {index === currentStep.i && <span className="text-xs font- text-primary">n</span>}
                 </div>
               ))}
             </div>
@@ -223,7 +222,7 @@ export const MaximumSubarrayVisualization = () => {
           <div className="bg-accent/50 rounded-lg border border-accent p-4">
             <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
           </div>
-          
+
           <div className="rounded-lg border p-4">
             <VariablePanel
               variables={{

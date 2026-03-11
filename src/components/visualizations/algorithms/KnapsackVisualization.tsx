@@ -73,9 +73,8 @@ export const KnapsackVisualization: React.FC = () => {
             i,
             w,
             value: dp[i][w],
-            message: `Item ${i - 1} (wt=${weights[i - 1]}, val=${
-              values[i - 1]
-            }): Include(${include}) vs Exclude(${exclude}) = ${dp[i][w]}`,
+            message: `Item ${i - 1} (wt=${weights[i - 1]}, val=${values[i - 1]
+              }): Include(${include}) vs Exclude(${exclude}) = ${dp[i][w]}`,
             lineNumber: 9,
           });
         } else {
@@ -192,13 +191,12 @@ export const KnapsackVisualization: React.FC = () => {
                     {row.map((val, w) => (
                       <td
                         key={w}
-                        className={`border border-border p-2 text-center transition-all ${
-                          i === currentStep.i && w === currentStep.w
-                            ? "bg-primary/20 font-bold"
-                            : val > 0
+                        className={`border border-border p-2 text-center transition-all ${i === currentStep.i && w === currentStep.w
+                          ? "bg-primary/20 font-"
+                          : val > 0
                             ? "bg-green-500/10"
                             : ""
-                        }`}
+                          }`}
                       >
                         {val}
                       </td>

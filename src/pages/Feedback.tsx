@@ -299,7 +299,7 @@ const Feedback = () => {
         <div className="container mx-auto px-4 py-16">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
-              <h1 className="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight">
+              <h1 className="text-4xl md:text-6xl font-extra mb-6 tracking-tight">
                 Suggest a <span className="text-green-600 bg-green-50 px-2 rounded-lg">feature</span> or Report <br className="hidden md:block" /> a <span className="text-green-600 bg-green-50 px-2 rounded-lg">bug</span>
               </h1>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">

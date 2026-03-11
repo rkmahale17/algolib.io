@@ -100,9 +100,18 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', sans-serif !important;
     font-feature-settings: "rlig" 1, "calt" 1;
     font-variation-settings: 'opsz' 32;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Inter', sans-serif !important;
   }
 
   code,
@@ -147,6 +156,46 @@
         hsl(var(--muted) / 0.3) 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite linear;
+  }
+
+  /* Premium Redesign Utilities */
+  .pill-badge {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EAFF96]/20 border border-[#EAFF96]/30 text-xs font-semibold text-[#84CC16];
+  }
+
+  .hero-title {
+    font-size: 3rem;
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    color: rgb(26 26 26);
+    max-width: 700px;
+    @apply dark:text-white;
+  }
+
+  .hero-subtitle {
+    @apply text-xl md:text-xl text-[#4B5563] dark:text-gray-400 leading-relaxed font-normal;
+  }
+
+
+
+  .btn-secondary-link {
+    @apply text-[#4B5563] hover:text-black dark:text-gray-400 dark:hover:text-white underline underline-offset-4 font-medium transition-colors;
+  }
+
+  .avatar-stack {
+    @apply flex -space-x-3 overflow-hidden;
+  }
+
+  .avatar-item {
+    @apply inline-block h-10 w-10 rounded-full ring-2 ring-white dark:ring-black object-cover;
+  }
+
+  .roadmap-card {
+    @apply p-4 bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm hover:shadow-md transition-all duration-300;
+  }
+
+  .roadmap-node {
+    @apply px-4 py-2 bg-white dark:bg-zinc-900 rounded-lg border border-gray-200 dark:border-zinc-800 text-sm font-medium shadow-sm flex items-center gap-2;
   }
 }
 

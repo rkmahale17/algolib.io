@@ -281,7 +281,7 @@ export const PrimsVisualization = () => {
                       <text
                         x={(from.x + to.x) / 2}
                         y={(from.y + to.y) / 2}
-                        className="fill-foreground text-[10px] font-bold"
+                        className="fill-foreground text-[10px] font-"
                         textAnchor="middle"
                       >
                         {edge.weight}
@@ -310,7 +310,7 @@ export const PrimsVisualization = () => {
                     y={pos.y}
                     textAnchor="middle"
                     dy=".3em"
-                    className={`text-[10px] font-bold ${currentStep.visited[idx] ||
+                    className={`text-[10px] font- ${currentStep.visited[idx] ||
                       currentStep.currentNode === idx
                       ? "fill-white"
                       : "fill-foreground"

@@ -44,7 +44,7 @@ const algorithmDetails = {
 export const AlgorithmInfo = ({ mode, frontier, visitedCount }: AlgorithmInfoProps) => {
   const info = algorithmDetails[mode];
   const Icon = info.icon;
-  
+
   return (
     <Card className="backdrop-blur-sm bg-card/80 h-full">
       <CardHeader>
@@ -56,7 +56,7 @@ export const AlgorithmInfo = ({ mode, frontier, visitedCount }: AlgorithmInfoPro
       <CardContent className="space-y-4">
         <div>
           <p className="text-sm text-muted-foreground mb-3">{info.description}</p>
-          
+
           <div className="space-y-2">
             <h4 className="text-sm font-semibold">Characteristics:</h4>
             <ul className="space-y-1">
@@ -75,7 +75,7 @@ export const AlgorithmInfo = ({ mode, frontier, visitedCount }: AlgorithmInfoPro
             <p className="text-xs font-semibold mb-1">Data Structure:</p>
             <p className="text-xs text-muted-foreground font-mono">{info.dataStructure}</p>
           </div>
-          
+
           <div>
             <p className="text-xs font-semibold mb-1">Complexity:</p>
             <p className="text-xs text-muted-foreground font-mono">{info.complexity}</p>
@@ -85,9 +85,9 @@ export const AlgorithmInfo = ({ mode, frontier, visitedCount }: AlgorithmInfoPro
         <div className="pt-2 border-t border-border space-y-2">
           <div className="flex justify-between items-center">
             <p className="text-xs font-semibold">Visited Nodes:</p>
-            <p className="text-sm font-bold text-primary">{visitedCount}</p>
+            <p className="text-sm font- text-primary">{visitedCount}</p>
           </div>
-          
+
           <div>
             <p className="text-xs font-semibold mb-2">
               {mode === "bfs" ? "Queue" : "Stack"} ({frontier.length} items):
@@ -98,12 +98,12 @@ export const AlgorithmInfo = ({ mode, frontier, visitedCount }: AlgorithmInfoPro
                   <p className="text-xs text-muted-foreground italic">Empty</p>
                 ) : (
                   frontier.map((pos, i) => (
-                    <div 
-                      key={i} 
+                    <div
+                      key={i}
                       className={cn(
                         "text-xs font-mono px-2 py-1 rounded",
-                        i === (mode === "bfs" ? 0 : frontier.length - 1) 
-                          ? "bg-primary/20 text-primary font-bold" 
+                        i === (mode === "bfs" ? 0 : frontier.length - 1)
+                          ? "bg-primary/20 text-primary font-"
                           : "bg-muted text-muted-foreground"
                       )}
                     >

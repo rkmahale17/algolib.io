@@ -23,7 +23,7 @@ export const SetMatrixZeroesVisualization = () => {
 
   const steps: Step[] = [
     {
-      matrix: [[1,1,1],[1,0,1],[1,1,1]],
+      matrix: [[1, 1, 1], [1, 0, 1], [1, 1, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: -1,
@@ -35,7 +35,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "init"
     },
     {
-      matrix: [[1,1,1],[1,0,1],[1,1,1]],
+      matrix: [[1, 1, 1], [1, 0, 1], [1, 1, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: -1,
@@ -47,7 +47,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "init"
     },
     {
-      matrix: [[1,1,1],[1,0,1],[1,1,1]],
+      matrix: [[1, 1, 1], [1, 0, 1], [1, 1, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: -1,
@@ -59,7 +59,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "init"
     },
     {
-      matrix: [[1,1,1],[1,0,1],[1,1,1]],
+      matrix: [[1, 1, 1], [1, 0, 1], [1, 1, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: 0,
@@ -71,7 +71,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "check-first-col"
     },
     {
-      matrix: [[1,1,1],[1,0,1],[1,1,1]],
+      matrix: [[1, 1, 1], [1, 0, 1], [1, 1, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: 0,
@@ -83,7 +83,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "check-first-col"
     },
     {
-      matrix: [[1,1,1],[1,0,1],[1,1,1]],
+      matrix: [[1, 1, 1], [1, 0, 1], [1, 1, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: 1,
@@ -95,7 +95,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "check-first-col"
     },
     {
-      matrix: [[1,1,1],[1,0,1],[1,1,1]],
+      matrix: [[1, 1, 1], [1, 0, 1], [1, 1, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: 1,
@@ -107,7 +107,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "check-first-col"
     },
     {
-      matrix: [[1,1,1],[1,0,1],[1,1,1]],
+      matrix: [[1, 1, 1], [1, 0, 1], [1, 1, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: 2,
@@ -119,7 +119,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "check-first-col"
     },
     {
-      matrix: [[1,1,1],[1,0,1],[1,1,1]],
+      matrix: [[1, 1, 1], [1, 0, 1], [1, 1, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: 0,
@@ -131,7 +131,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "check-first-row"
     },
     {
-      matrix: [[1,1,1],[1,0,1],[1,1,1]],
+      matrix: [[1, 1, 1], [1, 0, 1], [1, 1, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: 0,
@@ -143,7 +143,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "check-first-row"
     },
     {
-      matrix: [[1,1,1],[1,0,1],[1,1,1]],
+      matrix: [[1, 1, 1], [1, 0, 1], [1, 1, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: 0,
@@ -155,7 +155,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "check-first-row"
     },
     {
-      matrix: [[1,1,1],[1,0,1],[1,1,1]],
+      matrix: [[1, 1, 1], [1, 0, 1], [1, 1, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: 1,
@@ -167,7 +167,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "mark"
     },
     {
-      matrix: [[1,1,1],[1,0,1],[1,1,1]],
+      matrix: [[1, 1, 1], [1, 0, 1], [1, 1, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: 1,
@@ -179,7 +179,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "mark"
     },
     {
-      matrix: [[1,0,1],[1,0,1],[1,1,1]],
+      matrix: [[1, 0, 1], [1, 0, 1], [1, 1, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: 1,
@@ -191,7 +191,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "mark"
     },
     {
-      matrix: [[1,0,1],[0,0,1],[1,1,1]],
+      matrix: [[1, 0, 1], [0, 0, 1], [1, 1, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: 1,
@@ -203,7 +203,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "mark"
     },
     {
-      matrix: [[1,0,1],[0,0,1],[1,1,1]],
+      matrix: [[1, 0, 1], [0, 0, 1], [1, 1, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: 1,
@@ -215,7 +215,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "mark"
     },
     {
-      matrix: [[1,0,1],[0,0,1],[1,1,1]],
+      matrix: [[1, 0, 1], [0, 0, 1], [1, 1, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: 1,
@@ -227,7 +227,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "mark"
     },
     {
-      matrix: [[1,0,1],[0,0,1],[1,1,1]],
+      matrix: [[1, 0, 1], [0, 0, 1], [1, 1, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: 2,
@@ -239,7 +239,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "mark"
     },
     {
-      matrix: [[1,0,1],[0,0,1],[1,1,1]],
+      matrix: [[1, 0, 1], [0, 0, 1], [1, 1, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: 2,
@@ -251,7 +251,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "mark"
     },
     {
-      matrix: [[1,0,1],[0,0,1],[1,1,1]],
+      matrix: [[1, 0, 1], [0, 0, 1], [1, 1, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: 1,
@@ -263,7 +263,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "zero"
     },
     {
-      matrix: [[1,0,1],[0,0,1],[1,1,1]],
+      matrix: [[1, 0, 1], [0, 0, 1], [1, 1, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: 1,
@@ -275,7 +275,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "zero"
     },
     {
-      matrix: [[1,0,1],[0,0,1],[1,1,1]],
+      matrix: [[1, 0, 1], [0, 0, 1], [1, 1, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: 1,
@@ -287,7 +287,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "zero"
     },
     {
-      matrix: [[1,0,1],[0,0,1],[1,1,1]],
+      matrix: [[1, 0, 1], [0, 0, 1], [1, 1, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: 1,
@@ -299,7 +299,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "zero"
     },
     {
-      matrix: [[1,0,1],[0,0,0],[1,1,1]],
+      matrix: [[1, 0, 1], [0, 0, 0], [1, 1, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: 1,
@@ -311,7 +311,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "zero"
     },
     {
-      matrix: [[1,0,1],[0,0,0],[1,1,1]],
+      matrix: [[1, 0, 1], [0, 0, 0], [1, 1, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: 2,
@@ -323,7 +323,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "zero"
     },
     {
-      matrix: [[1,0,1],[0,0,0],[1,0,1]],
+      matrix: [[1, 0, 1], [0, 0, 0], [1, 0, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: 2,
@@ -335,7 +335,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "zero"
     },
     {
-      matrix: [[1,0,1],[0,0,0],[1,0,1]],
+      matrix: [[1, 0, 1], [0, 0, 0], [1, 0, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: 2,
@@ -347,7 +347,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "zero"
     },
     {
-      matrix: [[1,0,1],[0,0,0],[1,0,1]],
+      matrix: [[1, 0, 1], [0, 0, 0], [1, 0, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: 0,
@@ -359,7 +359,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "finalize"
     },
     {
-      matrix: [[1,0,1],[0,0,0],[1,0,1]],
+      matrix: [[1, 0, 1], [0, 0, 0], [1, 0, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: -1,
@@ -371,7 +371,7 @@ export const SetMatrixZeroesVisualization = () => {
       phase: "finalize"
     },
     {
-      matrix: [[1,0,1],[0,0,0],[1,0,1]],
+      matrix: [[1, 0, 1], [0, 0, 0], [1, 0, 1]],
       firstRowZero: false,
       firstColZero: false,
       currentRow: -1,
@@ -438,7 +438,7 @@ export const SetMatrixZeroesVisualization = () => {
       return 'bg-muted text-muted-foreground border-border';
     }
     const value = currentStep.matrix[row][col];
-    
+
     if (row === currentStep.currentRow && col === currentStep.currentCol) {
       return 'bg-primary text-primary-foreground border-primary';
     }
@@ -457,7 +457,7 @@ export const SetMatrixZeroesVisualization = () => {
         <Card className="p-6">
           <h3 className="text-lg font-semibold mb-4">Set Matrix Zeroes</h3>
           <div className="space-y-4">
-            <motion.div 
+            <motion.div
               key={`matrix-${currentStepIndex}`}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -474,7 +474,7 @@ export const SetMatrixZeroesVisualization = () => {
                         key={`${rowIdx}-${colIdx}`}
                         initial={{ scale: 0.8 }}
                         animate={{ scale: 1 }}
-                        className={`w-12 h-12 flex items-center justify-center font-mono font-bold text-lg rounded border-2 transition-all ${getCellColor(rowIdx, colIdx)}`}
+                        className={`w-12 h-12 flex items-center justify-center font-mono font- text-lg rounded border-2 transition-all ${getCellColor(rowIdx, colIdx)}`}
                       >
                         {cell}
                       </motion.div>
@@ -518,9 +518,9 @@ export const SetMatrixZeroesVisualization = () => {
         <Card className="p-6 overflow-hidden flex flex-col">
           <h3 className="text-lg font-semibold mb-4">Implementation</h3>
           <div className="flex-1 overflow-auto">
-            <AnimatedCodeEditor 
-              code={code} 
-              language="typescript" 
+            <AnimatedCodeEditor
+              code={code}
+              language="typescript"
               highlightedLines={(currentStep.highlightedLines || []).filter((n) => n >= 1 && n <= code.split('\n').length)}
             />
           </div>

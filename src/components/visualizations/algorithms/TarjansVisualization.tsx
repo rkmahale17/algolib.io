@@ -121,7 +121,7 @@ export const TarjansVisualization: React.FC = () => {
         if (disc[v] === -1) {
           dfs(v);
           low[u] = Math.min(low[u], low[v]);
-          
+
           newSteps.push({
             graph: graph.map(arr => [...arr]),
             currentNode: u,
@@ -136,7 +136,7 @@ export const TarjansVisualization: React.FC = () => {
           });
         } else if (onStack[v]) {
           low[u] = Math.min(low[u], disc[v]);
-          
+
           newSteps.push({
             graph: graph.map(arr => [...arr]),
             currentNode: u,
@@ -265,23 +265,22 @@ export const TarjansVisualization: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-card rounded-lg p-6 border">
           <h3 className="text-lg font-semibold mb-4">Tarjan's Algorithm (SCC)</h3>
-          
+
           <div className="space-y-4">
             <div className="grid grid-cols-6 gap-2">
               {currentStep.disc.map((_, idx) => (
                 <div
                   key={idx}
-                  className={`p-3 rounded-lg border-2 text-center ${
-                    idx === currentStep.currentNode
-                      ? 'bg-primary/20 border-primary'
-                      : currentStep.onStack[idx]
+                  className={`p-3 rounded-lg border-2 text-center ${idx === currentStep.currentNode
+                    ? 'bg-primary/20 border-primary'
+                    : currentStep.onStack[idx]
                       ? 'bg-yellow-500/20 border-yellow-500'
                       : currentStep.disc[idx] !== -1
-                      ? 'bg-green-500/20 border-green-500'
-                      : 'bg-muted/30 border-border'
-                  }`}
+                        ? 'bg-green-500/20 border-green-500'
+                        : 'bg-muted/30 border-border'
+                    }`}
                 >
-                  <div className="font-bold text-lg">{idx}</div>
+                  <div className="font- text-lg">{idx}</div>
                   <div className="text-xs text-muted-foreground mt-1">
                     d:{currentStep.disc[idx]}
                   </div>
@@ -341,10 +340,10 @@ export const TarjansVisualization: React.FC = () => {
           </div>
         </div>
 
-        <CodeHighlighter 
-          code={code} 
-          highlightedLine={currentStep.lineNumber} 
-          language="typescript" 
+        <CodeHighlighter
+          code={code}
+          highlightedLine={currentStep.lineNumber}
+          language="typescript"
         />
       </div>
     </div>

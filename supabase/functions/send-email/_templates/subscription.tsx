@@ -51,13 +51,13 @@ export const SubscriptionEmail = ({
 
           <Section style={content}>
             <Heading style={h1}>{heading}</Heading>
-            
+
             {action_type === 'active' && (
               <Text style={text}>
                 Congratulations! Your premium subscription is now active. You have full access to all algorithm patterns, Blind 75 problems, and advanced visualizations.
               </Text>
             )}
-            
+
             {action_type === 'cancelled' && (
               <Text style={text}>
                 Your subscription has been cancelled. You will continue to have premium access until {period_end ? new Date(period_end).toLocaleDateString() : 'the end of your current period'}.
@@ -118,7 +118,7 @@ const header = {
 const logo = {
   color: '#22d3ee',
   fontSize: '32px',
-  fontWeight: 'bold',
+  fontWeight: '',
   margin: '0',
   letterSpacing: '-1px',
 }
@@ -133,7 +133,7 @@ const content = {
 const h1 = {
   color: '#ffffff',
   fontSize: '28px',
-  fontWeight: 'bold',
+  fontWeight: '',
   margin: '0 0 24px',
   textAlign: 'center' as const,
 }
@@ -157,7 +157,7 @@ const button = {
   color: '#0f0f23',
   display: 'inline-block',
   fontSize: '16px',
-  fontWeight: 'bold',
+  fontWeight: '',
   padding: '14px 32px',
   textDecoration: 'none',
   textAlign: 'center' as const,

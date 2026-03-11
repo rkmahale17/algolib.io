@@ -20,12 +20,12 @@ export const AddAndSearchWordDataStructureVisualization = () => {
 
   const steps: Step[] = [
     { operation: "addWord", word: "bad", trie: [], searching: "", result: null, message: "Add 'bad' to Trie. Insert each character as nodes", lineNumber: 8 },
-    { operation: "addWord", word: "bad", trie: ["b","ba","bad"], searching: "", result: null, message: "Complete 'bad': b→a→d, mark end. Trie: ['bad']", lineNumber: 13 },
-    { operation: "addWord", word: "dad", trie: ["b","ba","bad","d","da","dad"], searching: "", result: null, message: "Add 'dad': d→a→d. Trie: ['bad', 'dad']", lineNumber: 13 },
-    { operation: "addWord", word: "mad", trie: ["b","ba","bad","d","da","dad","m","ma","mad"], searching: "", result: null, message: "Add 'mad': m→a→d. Trie: ['bad', 'dad', 'mad']", lineNumber: 13 },
-    { operation: "search", word: ".ad", trie: ["b","ba","bad","d","da","dad","m","ma","mad"], searching: "bad", result: true, message: "Search '.ad': '.' matches any char. Try b/d/m + 'ad'. Found 'bad'! ✓", lineNumber: 20 },
-    { operation: "search", word: "b..", trie: ["b","ba","bad","d","da","dad","m","ma","mad"], searching: "bad", result: true, message: "Search 'b..': 'b' + any 2 chars. Matches 'bad'! ✓", lineNumber: 20 },
-    { operation: "search", word: "..d", trie: ["b","ba","bad","d","da","dad","m","ma","mad"], searching: "bad", result: true, message: "Search '..d': any 2 + 'd'. Matches 'bad', 'dad', 'mad'! ✓ Time: O(m), Space: O(n)", lineNumber: 20 }
+    { operation: "addWord", word: "bad", trie: ["b", "ba", "bad"], searching: "", result: null, message: "Complete 'bad': b→a→d, mark end. Trie: ['bad']", lineNumber: 13 },
+    { operation: "addWord", word: "dad", trie: ["b", "ba", "bad", "d", "da", "dad"], searching: "", result: null, message: "Add 'dad': d→a→d. Trie: ['bad', 'dad']", lineNumber: 13 },
+    { operation: "addWord", word: "mad", trie: ["b", "ba", "bad", "d", "da", "dad", "m", "ma", "mad"], searching: "", result: null, message: "Add 'mad': m→a→d. Trie: ['bad', 'dad', 'mad']", lineNumber: 13 },
+    { operation: "search", word: ".ad", trie: ["b", "ba", "bad", "d", "da", "dad", "m", "ma", "mad"], searching: "bad", result: true, message: "Search '.ad': '.' matches any char. Try b/d/m + 'ad'. Found 'bad'! ✓", lineNumber: 20 },
+    { operation: "search", word: "b..", trie: ["b", "ba", "bad", "d", "da", "dad", "m", "ma", "mad"], searching: "bad", result: true, message: "Search 'b..': 'b' + any 2 chars. Matches 'bad'! ✓", lineNumber: 20 },
+    { operation: "search", word: "..d", trie: ["b", "ba", "bad", "d", "da", "dad", "m", "ma", "mad"], searching: "bad", result: true, message: "Search '..d': any 2 + 'd'. Matches 'bad', 'dad', 'mad'! ✓ Time: O(m), Space: O(n)", lineNumber: 20 }
   ];
 
   const code = `class TrieNode {
@@ -92,9 +92,8 @@ class WordDictionary {
               <div className="text-sm font-medium mb-2">Words in Trie:</div>
               <div className="flex gap-2 flex-wrap">
                 {["bad", "dad", "mad"].filter((_, idx) => idx < currentStep.trie.filter(t => t.length === 3).length / 3).map((word, idx) => (
-                  <div key={idx} className={`px-3 py-2 rounded font-mono ${
-                    currentStep.searching === word ? 'bg-green-500/30 text-green-700 font-bold ring-2 ring-green-500' : 'bg-secondary'
-                  }`}>
+                  <div key={idx} className={`px-3 py-2 rounded font-mono ${currentStep.searching === word ? 'bg-green-500/30 text-green-700 font- ring-2 ring-green-500' : 'bg-secondary'
+                    }`}>
                     {word}
                   </div>
                 ))}
@@ -104,9 +103,8 @@ class WordDictionary {
               <div className="text-sm font-medium mb-2">Search Pattern:</div>
               <div className="flex gap-1">
                 {currentStep.word.split('').map((char, idx) => (
-                  <div key={idx} className={`px-4 py-3 rounded font-mono text-xl font-bold ${
-                    char === '.' ? 'bg-yellow-500/20 text-yellow-700' : 'bg-primary/20 text-primary'
-                  }`}>
+                  <div key={idx} className={`px-4 py-3 rounded font-mono text-xl font- ${char === '.' ? 'bg-yellow-500/20 text-yellow-700' : 'bg-primary/20 text-primary'
+                    }`}>
                     {char}
                   </div>
                 ))}
@@ -118,12 +116,10 @@ class WordDictionary {
               )}
             </div>
             {currentStep.result !== null && (
-              <div className={`p-4 rounded text-center ${
-                currentStep.result ? 'bg-green-500/20' : 'bg-red-500/20'
-              }`}>
-                <div className={`text-lg font-bold ${
-                  currentStep.result ? 'text-green-600' : 'text-red-600'
+              <div className={`p-4 rounded text-center ${currentStep.result ? 'bg-green-500/20' : 'bg-red-500/20'
                 }`}>
+                <div className={`text-lg font- ${currentStep.result ? 'text-green-600' : 'text-red-600'
+                  }`}>
                   {currentStep.result ? 'Found ✓' : 'Not Found ✗'}
                 </div>
               </div>

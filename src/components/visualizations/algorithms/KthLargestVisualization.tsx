@@ -55,7 +55,7 @@ export const KthLargestVisualization: React.FC = () => {
 
     for (let i = 0; i < arr.length; i++) {
       const num = arr[i];
-      
+
       if (heap.length < k) {
         heap.push(num);
         heap.sort((a, b) => a - b);
@@ -174,11 +174,10 @@ export const KthLargestVisualization: React.FC = () => {
           {currentStep.array.map((val, idx) => (
             <div
               key={idx}
-              className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
-                idx === currentStep.current
-                  ? 'bg-primary/20 border-primary'
-                  : 'bg-card border-border'
-              }`}
+              className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font- transition-all ${idx === currentStep.current
+                ? 'bg-primary/20 border-primary'
+                : 'bg-card border-border'
+                }`}
             >
               {val}
             </div>
@@ -191,9 +190,8 @@ export const KthLargestVisualization: React.FC = () => {
             currentStep.heap.map((val, idx) => (
               <div
                 key={idx}
-                className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
-                  idx === 0 ? 'bg-green-500/20 border-green-500' : 'bg-blue-500/20 border-blue-500'
-                }`}
+                className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font- transition-all ${idx === 0 ? 'bg-green-500/20 border-green-500' : 'bg-blue-500/20 border-blue-500'
+                  }`}
               >
                 {val}
               </div>

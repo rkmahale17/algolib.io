@@ -20,13 +20,13 @@ export const TwoPointerArray = ({
           const isLeft = index === left;
           const isRight = index === right;
           const isBetween = index > left && index < right;
-          
+
           return (
             <div key={index} className="relative">
               {/* Cell */}
               <div
                 className={cn(
-                  "w-16 h-16 flex items-center justify-center rounded-lg text-xl font-bold transition-all duration-300",
+                  "w-16 h-16 flex items-center justify-center rounded-lg text-xl font- transition-all duration-300",
                   "border-2",
                   isLeft && "scale-110 bg-blue-500/20 border-blue-500",
                   isRight && "scale-110 bg-red-500/20 border-red-500",
@@ -38,12 +38,12 @@ export const TwoPointerArray = ({
               >
                 {value}
               </div>
-              
+
               {/* Pointer labels */}
               {isLeft && (
                 <div className="absolute -top-8 left-1/2 -translate-x-1/2">
                   <div className="flex flex-col items-center">
-                    <div className="text-xs font-bold text-blue-500 mb-1">LEFT</div>
+                    <div className="text-xs font- text-blue-500 mb-1">LEFT</div>
                     <div className="text-2xl text-blue-500">↓</div>
                   </div>
                 </div>
@@ -52,11 +52,11 @@ export const TwoPointerArray = ({
                 <div className="absolute -bottom-8 left-1/2 -translate-x-1/2">
                   <div className="flex flex-col items-center">
                     <div className="text-2xl text-red-500">↑</div>
-                    <div className="text-xs font-bold text-red-500 mt-1">RIGHT</div>
+                    <div className="text-xs font- text-red-500 mt-1">RIGHT</div>
                   </div>
                 </div>
               )}
-              
+
               {/* Index label */}
               <div className={cn(
                 "absolute left-1/2 -translate-x-1/2 text-xs text-muted-foreground",
@@ -68,13 +68,13 @@ export const TwoPointerArray = ({
           );
         })}
       </div>
-      
+
       {/* Connection line between pointers */}
       <div className="flex justify-center">
         <div className="text-sm text-muted-foreground">
-          <span className="text-blue-500 font-bold">L={left}</span>
+          <span className="text-blue-500 font-">L={left}</span>
           {" "}———{" "}
-          <span className="text-red-500 font-bold">R={right}</span>
+          <span className="text-red-500 font-">R={right}</span>
         </div>
       </div>
     </div>

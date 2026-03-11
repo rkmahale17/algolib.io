@@ -87,7 +87,7 @@ export const LISVisualization: React.FC = () => {
         });
 
         if (nums[i] < nums[j]) {
-           newSteps.push({
+          newSteps.push({
             array: [...nums],
             dp: [...LIS],
             currentIndex: i,
@@ -99,17 +99,17 @@ export const LISVisualization: React.FC = () => {
 
           const oldVal = LIS[i];
           LIS[i] = Math.max(LIS[i], 1 + LIS[j]);
-          
+
           if (LIS[i] !== oldVal) {
-             newSteps.push({
-                array: [...nums],
-                dp: [...LIS],
-                currentIndex: i,
-                compareIndex: j,
-                maxLength: Math.max(...LIS),
-                message: `Updated LIS[${i}] to ${LIS[i]}`,
-                lineNumber: 16,
-              });
+            newSteps.push({
+              array: [...nums],
+              dp: [...LIS],
+              currentIndex: i,
+              compareIndex: j,
+              maxLength: Math.max(...LIS),
+              message: `Updated LIS[${i}] to ${LIS[i]}`,
+              lineNumber: 16,
+            });
           }
         }
       }
@@ -212,18 +212,17 @@ export const LISVisualization: React.FC = () => {
                     style={{ minWidth: '40px' }}
                   >
                     <div
-                      className={`w-10 rounded-t transition-all duration-300 flex items-end justify-center pb-1 ${
-                        idx === currentStep.currentIndex
-                          ? "bg-primary shadow-lg shadow-primary/50 ring-2 ring-primary ring-offset-2"
-                          : idx === currentStep.compareIndex
+                      className={`w-10 rounded-t transition-all duration-300 flex items-end justify-center pb-1 ${idx === currentStep.currentIndex
+                        ? "bg-primary shadow-lg shadow-primary/50 ring-2 ring-primary ring-offset-2"
+                        : idx === currentStep.compareIndex
                           ? "bg-secondary ring-2 ring-secondary ring-offset-2"
                           : "bg-blue-500/30"
-                      }`}
+                        }`}
                       style={{
                         height: `${Math.max((value / maxVal) * 60, 24)}px`, // Base size logic
                       }}
                     >
-                        <span className="text-[10px] font-bold">{value}</span>
+                      <span className="text-[10px] font-">{value}</span>
                     </div>
                     <span className="text-xs font-mono text-muted-foreground">{idx}</span>
                   </div>
@@ -240,13 +239,12 @@ export const LISVisualization: React.FC = () => {
                 {currentStep.dp.map((length, idx) => (
                   <div key={idx} className="flex flex-col items-center gap-1 mb-2">
                     <div
-                      className={`w-10 h-10 rounded border-2 flex items-center justify-center font-bold transition-all ${
-                        idx === currentStep.currentIndex
-                          ? "bg-primary/20 border-primary text-primary scale-110"
-                          : length > 1
+                      className={`w-10 h-10 rounded border-2 flex items-center justify-center font- transition-all ${idx === currentStep.currentIndex
+                        ? "bg-primary/20 border-primary text-primary scale-110"
+                        : length > 1
                           ? "bg-green-500/10 border-green-500/50 text-green-600"
                           : "bg-card border-border"
-                      }`}
+                        }`}
                     >
                       {length}
                     </div>

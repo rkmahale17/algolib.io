@@ -195,60 +195,58 @@ export const SegmentTreeVisualization: React.FC = () => {
       />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-      <div className="bg-card rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4">Input Array</h3>
-        <div className="flex gap-2 mb-6">
-          {currentStep.array.map((val, idx) => (
-            <div
-              key={idx}
-              className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
-                idx >= currentStep.queryLeft && idx <= currentStep.queryRight && currentStep.queryLeft >= 0
+        <div className="bg-card rounded-lg p-6 border">
+          <h3 className="text-lg font-semibold mb-4">Input Array</h3>
+          <div className="flex gap-2 mb-6">
+            {currentStep.array.map((val, idx) => (
+              <div
+                key={idx}
+                className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font- transition-all ${idx >= currentStep.queryLeft && idx <= currentStep.queryRight && currentStep.queryLeft >= 0
                   ? 'bg-primary/20 border-primary'
                   : 'bg-card border-border'
-              }`}
-            >
-              {val}
-            </div>
-          ))}
-        </div>
-
-        <h3 className="text-lg font-semibold mb-4">Segment Tree (Array Representation)</h3>
-        <div className="flex flex-wrap gap-2 mb-6">
-          {currentStep.tree.slice(0, 15).map((val, idx) => (
-            <div key={idx} className="flex flex-col items-center">
-              <div className="text-xs text-muted-foreground mb-1">[{idx}]</div>
-              <div
-                className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
-                  val !== null ? 'bg-blue-500/20 border-blue-500' : 'bg-muted/20 border-border'
-                }`}
+                  }`}
               >
-                {val !== null ? val : '-'}
+                {val}
               </div>
-            </div>
-          ))}
-        </div>
-
-        {currentStep.result !== null && (
-          <div className="mb-4 p-4 bg-green-500/10 border border-green-500 rounded">
-            <p className="text-sm font-semibold">Query Result: {currentStep.result}</p>
+            ))}
           </div>
-        )}
 
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
+          <h3 className="text-lg font-semibold mb-4">Segment Tree (Array Representation)</h3>
+          <div className="flex flex-wrap gap-2 mb-6">
+            {currentStep.tree.slice(0, 15).map((val, idx) => (
+              <div key={idx} className="flex flex-col items-center">
+                <div className="text-xs text-muted-foreground mb-1">[{idx}]</div>
+                <div
+                  className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font- transition-all ${val !== null ? 'bg-blue-500/20 border-blue-500' : 'bg-muted/20 border-border'
+                    }`}
+                >
+                  {val !== null ? val : '-'}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {currentStep.result !== null && (
+            <div className="mb-4 p-4 bg-green-500/10 border border-green-500 rounded">
+              <p className="text-sm font-semibold">Query Result: {currentStep.result}</p>
+            </div>
+          )}
+
+          <div className="mt-4 p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
+          </div>
+          <div className="mt-4 p-4 bg-muted rounded">
+
+            <VariablePanel
+              variables={{
+                'array size': currentStep.array.length,
+                'query range': currentStep.queryLeft >= 0 ? `[${currentStep.queryLeft}, ${currentStep.queryRight}]` : 'none',
+                'result': currentStep.result !== null ? currentStep.result : 'pending'
+              }}
+            />
+          </div>
         </div>
-                <div className="mt-4 p-4 bg-muted rounded">
-  
-      <VariablePanel
-        variables={{
-          'array size': currentStep.array.length,
-          'query range': currentStep.queryLeft >= 0 ? `[${currentStep.queryLeft}, ${currentStep.queryRight}]` : 'none',
-          'result': currentStep.result !== null ? currentStep.result : 'pending'
-        }}
-      />
-        </div>
-      </div>
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
 
       </div>
 

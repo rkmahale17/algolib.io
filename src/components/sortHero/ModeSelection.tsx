@@ -40,8 +40,8 @@ export const ModeSelection = ({ onSelectMode }: ModeSelectionProps) => {
   return (
     <div>
       <div className="mb-6">
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           onClick={() => navigate('/games')}
           className="gap-2"
         >
@@ -49,36 +49,36 @@ export const ModeSelection = ({ onSelectMode }: ModeSelectionProps) => {
           Back to Games
         </Button>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {modes.map((mode) => {
-        const Icon = mode.icon;
-        return (
-          <Card key={mode.id} className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${mode.color} flex items-center justify-center mb-4`}>
-                <Icon className="w-8 h-8 text-white" />
-              </div>
-              <CardTitle>{mode.title}</CardTitle>
-              <CardDescription>{mode.description}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Difficulty:</span>
-                  <span className="font-semibold">{mode.difficulty}</span>
+        {modes.map((mode) => {
+          const Icon = mode.icon;
+          return (
+            <Card key={mode.id} className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${mode.color} flex items-center justify-center mb-4`}>
+                  <Icon className="w-8 h-8 text-white" />
                 </div>
-                <Button 
-                  onClick={() => onSelectMode(mode.id)}
-                  className="w-full"
-                >
-                  Play <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        );
-      })}
+                <CardTitle>{mode.title}</CardTitle>
+                <CardDescription>{mode.description}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Difficulty:</span>
+                    <span className="font-semibold">{mode.difficulty}</span>
+                  </div>
+                  <Button
+                    onClick={() => onSelectMode(mode.id)}
+                    className="w-full"
+                  >
+                    Play <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

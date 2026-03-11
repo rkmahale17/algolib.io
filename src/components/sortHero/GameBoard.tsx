@@ -61,11 +61,11 @@ export const GameBoard = ({ mode, level, onBackToMenu, onNextLevel }: GameBoardP
 
   return (
     <>
-      <MoveValidationFeedback 
-        isValid={gameState.lastMoveValid} 
+      <MoveValidationFeedback
+        isValid={gameState.lastMoveValid}
         message={gameState.feedbackMessage}
       />
-      
+
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           <Card className="backdrop-blur-sm bg-card/80">
@@ -79,73 +79,73 @@ export const GameBoard = ({ mode, level, onBackToMenu, onNextLevel }: GameBoardP
               </div>
             </CardHeader>
             <CardContent className="space-y-8">
-          {/* Stats */}
-          <div className="grid grid-cols-4 gap-4 text-center">
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">Score</p>
-              <p className={`text-2xl font-bold ${getScoreColor()}`}>{gameState.score}</p>
-            </div>
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">Moves</p>
-              <p className="text-2xl font-bold text-primary">{gameState.moves}</p>
-            </div>
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">Hints Left</p>
-              <p className="text-2xl font-bold text-secondary">{3 - gameState.hintsUsed}</p>
-            </div>
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">Errors</p>
-              <p className="text-2xl font-bold text-destructive">{gameState.errors}</p>
-            </div>
-          </div>
+              {/* Stats */}
+              <div className="grid grid-cols-4 gap-4 text-center">
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Score</p>
+                  <p className={`text-2xl font- ${getScoreColor()}`}>{gameState.score}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Moves</p>
+                  <p className="text-2xl font- text-primary">{gameState.moves}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Hints Left</p>
+                  <p className="text-2xl font- text-secondary">{3 - gameState.hintsUsed}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Errors</p>
+                  <p className="text-2xl font- text-destructive">{gameState.errors}</p>
+                </div>
+              </div>
 
-          {/* Game Board */}
-          <div className="flex items-center justify-center min-h-[200px]">
-            <div className="flex gap-4 flex-wrap justify-center">
-              {gameState.numbers.map((num, index) => (
-                <NumberTile
-                  key={`${num}-${index}`}
-                  value={num}
-                  index={index}
-                  isSelected={gameState.selectedIndex === index}
-                  isHighlighted={gameState.highlightIndices.includes(index)}
-                  isPivot={gameState.pivotIndex === index}
-                  onClick={() => selectTile(index)}
-                  onDragStart={handleDragStart(index)}
-                  onDrop={handleDrop(index)}
-                  onDragOver={handleDragOver}
-                />
-              ))}
-            </div>
-          </div>
+              {/* Game Board */}
+              <div className="flex items-center justify-center min-h-[200px]">
+                <div className="flex gap-4 flex-wrap justify-center">
+                  {gameState.numbers.map((num, index) => (
+                    <NumberTile
+                      key={`${num}-${index}`}
+                      value={num}
+                      index={index}
+                      isSelected={gameState.selectedIndex === index}
+                      isHighlighted={gameState.highlightIndices.includes(index)}
+                      isPivot={gameState.pivotIndex === index}
+                      onClick={() => selectTile(index)}
+                      onDragStart={handleDragStart(index)}
+                      onDrop={handleDrop(index)}
+                      onDragOver={handleDragOver}
+                    />
+                  ))}
+                </div>
+              </div>
 
-          {/* Controls */}
-          <div className="flex gap-2 justify-center flex-wrap">
-            <Button variant="outline" onClick={undo}>
-              <Undo2 className="mr-2 h-4 w-4" /> Undo
-            </Button>
-            <Button variant="outline" onClick={reset}>
-              <RotateCcw className="mr-2 h-4 w-4" /> Reset
-            </Button>
-            <Button 
-              variant="secondary" 
-              onClick={useHint}
-              disabled={gameState.hintsUsed >= 3}
-            >
-              <Lightbulb className="mr-2 h-4 w-4" /> Hint ({3 - gameState.hintsUsed})
-            </Button>
-          </div>
+              {/* Controls */}
+              <div className="flex gap-2 justify-center flex-wrap">
+                <Button variant="outline" onClick={undo}>
+                  <Undo2 className="mr-2 h-4 w-4" /> Undo
+                </Button>
+                <Button variant="outline" onClick={reset}>
+                  <RotateCcw className="mr-2 h-4 w-4" /> Reset
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={useHint}
+                  disabled={gameState.hintsUsed >= 3}
+                >
+                  <Lightbulb className="mr-2 h-4 w-4" /> Hint ({3 - gameState.hintsUsed})
+                </Button>
+              </div>
 
-          {/* Instructions */}
-          <div className="bg-muted/50 rounded-lg p-4 text-sm text-center">
-            {mode === "bubble" && "Click and drag to swap adjacent numbers. Only swap if left > right!"}
-            {mode === "selection" && "Select the smallest unsorted number and move it to its correct position."}
-            {mode === "quick" && `Partition numbers around the pivot (${gameState.pivotIndex !== null ? gameState.numbers[gameState.pivotIndex] : ""}). Smaller left, larger right!`}
-          </div>
+              {/* Instructions */}
+              <div className="bg-muted/50 rounded-lg p-4 text-sm text-center">
+                {mode === "bubble" && "Click and drag to swap adjacent numbers. Only swap if left > right!"}
+                {mode === "selection" && "Select the smallest unsorted number and move it to its correct position."}
+                {mode === "quick" && `Partition numbers around the pivot (${gameState.pivotIndex !== null ? gameState.numbers[gameState.pivotIndex] : ""}). Smaller left, larger right!`}
+              </div>
             </CardContent>
           </Card>
         </div>
-        
+
         <div className="lg:col-span-1">
           <AlgorithmExplainer mode={mode} />
         </div>

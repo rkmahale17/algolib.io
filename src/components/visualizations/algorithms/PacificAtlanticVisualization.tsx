@@ -228,19 +228,18 @@ export const PacificAtlanticVisualization = () => {
                       return (
                         <div
                           key={j}
-                          className={`w-16 h-16 rounded flex flex-col items-center justify-center text-xs ${
-                            isCurrent
-                              ? 'bg-primary text-primary-foreground ring-2 ring-primary'
-                              : isBoth
+                          className={`w-16 h-16 rounded flex flex-col items-center justify-center text-xs ${isCurrent
+                            ? 'bg-primary text-primary-foreground ring-2 ring-primary'
+                            : isBoth
                               ? 'bg-blue-500/30 ring-2 ring-blue-500'
                               : isPacific
-                              ? 'bg-blue-500/20'
-                              : isAtlantic
-                              ? 'bg-orange-500/20'
-                              : 'bg-muted'
-                          }`}
+                                ? 'bg-blue-500/20'
+                                : isAtlantic
+                                  ? 'bg-orange-500/20'
+                                  : 'bg-muted'
+                            }`}
                         >
-                          <div className="font-bold text-lg">{height}</div>
+                          <div className="font- text-lg">{height}</div>
                           <div className="text-[10px] text-muted-foreground">
                             ({i},{j})
                           </div>

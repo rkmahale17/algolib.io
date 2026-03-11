@@ -47,10 +47,10 @@ export const FallingSymbols = ({ symbols, onPush, onPop, getSymbolColor }: Falli
           onClick={() => handleSymbolClick(symbol)}
         >
           <div className="relative group">
-            <div className="text-6xl font-bold drop-shadow-lg animate-in fade-in zoom-in duration-300">
+            <div className="text-6xl font- drop-shadow-lg animate-in fade-in zoom-in duration-300">
               {symbol.char}
             </div>
-            
+
             {/* Hover tooltip */}
             <div className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-background/90 rounded text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
               {symbol.type === 'open' ? 'Click to PUSH' : 'Click to POP'}

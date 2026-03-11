@@ -129,7 +129,7 @@ export const SudokuSolverVisualization: React.FC = () => {
           }
         }
       }
-      
+
       newSteps.push({
         board: board.map(r => [...r]),
         row: -1,
@@ -206,45 +206,44 @@ export const SudokuSolverVisualization: React.FC = () => {
       />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-      <div className="bg-card rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4">4x4 Sudoku Board (Simplified)</h3>
-        
-        <div className="grid gap-1 mb-6" style={{ gridTemplateColumns: `repeat(4, minmax(0, 1fr))`, maxWidth: '300px' }}>
-          {currentStep.board.map((row, r) =>
-            row.map((cell, c) => (
-              <div
-                key={`${r}-${c}`}
-                className={`aspect-square flex items-center justify-center rounded border-2 font-bold text-xl transition-all ${
-                  r === currentStep.row && c === currentStep.col
+        <div className="bg-card rounded-lg p-6 border">
+          <h3 className="text-lg font-semibold mb-4">4x4 Sudoku Board (Simplified)</h3>
+
+          <div className="grid gap-1 mb-6" style={{ gridTemplateColumns: `repeat(4, minmax(0, 1fr))`, maxWidth: '300px' }}>
+            {currentStep.board.map((row, r) =>
+              row.map((cell, c) => (
+                <div
+                  key={`${r}-${c}`}
+                  className={`aspect-square flex items-center justify-center rounded border-2 font- text-xl transition-all ${r === currentStep.row && c === currentStep.col
                     ? 'bg-primary/20 border-primary scale-110'
                     : cell !== 0
-                    ? currentStep.solved ? 'bg-green-500/20 border-green-500' : 'bg-blue-500/20 border-blue-500'
-                    : 'bg-card border-border'
-                }`}
-              >
-                {cell !== 0 ? cell : ''}
-              </div>
-            ))
-          )}
-        </div>
+                      ? currentStep.solved ? 'bg-green-500/20 border-green-500' : 'bg-blue-500/20 border-blue-500'
+                      : 'bg-card border-border'
+                    }`}
+                >
+                  {cell !== 0 ? cell : ''}
+                </div>
+              ))
+            )}
+          </div>
 
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
-        </div>
-             <div className="mt-4 p-4 bg-muted rounded">
-               <VariablePanel
-        variables={{
-          'current row': currentStep.row >= 0 ? currentStep.row : 'done',
-          'current col': currentStep.col >= 0 ? currentStep.col : 'done',
-          'trying value': currentStep.value || 'none',
-          'solved': String(currentStep.solved)
-        }}
-      />
-        </div>
+          <div className="mt-4 p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
+          </div>
+          <div className="mt-4 p-4 bg-muted rounded">
+            <VariablePanel
+              variables={{
+                'current row': currentStep.row >= 0 ? currentStep.row : 'done',
+                'current col': currentStep.col >= 0 ? currentStep.col : 'done',
+                'trying value': currentStep.value || 'none',
+                'solved': String(currentStep.solved)
+              }}
+            />
+          </div>
 
+        </div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
       </div>
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
-</div>
-</div>
+    </div>
   );
 };

@@ -25,12 +25,12 @@ export const TwoPointerGameBoard = ({ mode, level, onBackToMenu, onNextLevel }: 
     reset,
     getAccuracy,
   } = useTwoPointerGame(mode, level);
-  
+
   // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (gameState.isComplete) return;
-      
+
       switch (e.key.toLowerCase()) {
         case "d":
           e.preventDefault();
@@ -54,11 +54,11 @@ export const TwoPointerGameBoard = ({ mode, level, onBackToMenu, onNextLevel }: 
           break;
       }
     };
-    
+
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [gameState.isComplete]);
-  
+
   const getModeTitle = () => {
     const titles: Record<PointerMode, string> = {
       sum: "Sum Mode",
@@ -67,7 +67,7 @@ export const TwoPointerGameBoard = ({ mode, level, onBackToMenu, onNextLevel }: 
     };
     return titles[mode];
   };
-  
+
   const getModeLabel = () => {
     switch (mode) {
       case "sum":
@@ -78,7 +78,7 @@ export const TwoPointerGameBoard = ({ mode, level, onBackToMenu, onNextLevel }: 
         return "Product";
     }
   };
-  
+
   const getGrade = () => {
     const accuracy = getAccuracy();
     if (accuracy >= 95) return "S";
@@ -88,7 +88,7 @@ export const TwoPointerGameBoard = ({ mode, level, onBackToMenu, onNextLevel }: 
     if (accuracy >= 60) return "D";
     return "F";
   };
-  
+
   return (
     <>
       <div className="space-y-4">
@@ -99,11 +99,11 @@ export const TwoPointerGameBoard = ({ mode, level, onBackToMenu, onNextLevel }: 
                 <ArrowLeft className="w-4 h-4" />
               </Button>
               <div>
-                <h2 className="text-xl font-bold">{getModeTitle()}</h2>
+                <h2 className="text-xl font-">{getModeTitle()}</h2>
                 <p className="text-sm text-muted-foreground">Level {level}</p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-4 text-sm">
               <div className="text-center">
                 <div className="font-semibold text-primary text-xl">{gameState.score}</div>
@@ -120,7 +120,7 @@ export const TwoPointerGameBoard = ({ mode, level, onBackToMenu, onNextLevel }: 
             </div>
           </div>
         </Card>
-        
+
         <div className="grid lg:grid-cols-3 gap-4">
           <div className="lg:col-span-2 space-y-4">
             <Card className="p-6">
@@ -128,39 +128,39 @@ export const TwoPointerGameBoard = ({ mode, level, onBackToMenu, onNextLevel }: 
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold text-lg">Target {getModeLabel()}: {gameState.target}</h3>
                   <span className="text-sm">
-                    Current: <span className="font-bold text-primary">{currentValue}</span>
+                    Current: <span className="font- text-primary">{currentValue}</span>
                   </span>
                 </div>
-                
+
                 <TwoPointerArray
                   array={gameState.array}
                   left={gameState.left}
                   right={gameState.right}
                   messageType={gameState.messageType}
                 />
-                
+
                 <div className="text-center text-sm text-muted-foreground">
-                  <span className="text-blue-500 font-bold">arr[{gameState.left}] = {gameState.array[gameState.left]}</span>
+                  <span className="text-blue-500 font-">arr[{gameState.left}] = {gameState.array[gameState.left]}</span>
                   {" • "}
-                  <span className="text-red-500 font-bold">arr[{gameState.right}] = {gameState.array[gameState.right]}</span>
+                  <span className="text-red-500 font-">arr[{gameState.right}] = {gameState.array[gameState.right]}</span>
                 </div>
               </div>
             </Card>
-            
+
             {gameState.message && (
               <Alert
                 className={
                   gameState.messageType === "success"
                     ? "bg-green-500/10 border-green-500"
                     : gameState.messageType === "error"
-                    ? "bg-red-500/10 border-red-500"
-                    : "bg-blue-500/10 border-blue-500"
+                      ? "bg-red-500/10 border-red-500"
+                      : "bg-blue-500/10 border-blue-500"
                 }
               >
                 <AlertDescription className="font-medium">{gameState.message}</AlertDescription>
               </Alert>
             )}
-            
+
             <Card className="p-4">
               <h3 className="font-semibold mb-3">Pointer Controls</h3>
               <div className="space-y-3">
@@ -187,7 +187,7 @@ export const TwoPointerGameBoard = ({ mode, level, onBackToMenu, onNextLevel }: 
                     </Button>
                   </div>
                 </div>
-                
+
                 <div>
                   <p className="text-sm text-muted-foreground mb-2">Right Pointer (Red)</p>
                   <div className="grid grid-cols-2 gap-2">
@@ -211,7 +211,7 @@ export const TwoPointerGameBoard = ({ mode, level, onBackToMenu, onNextLevel }: 
                     </Button>
                   </div>
                 </div>
-                
+
                 <Button
                   onClick={checkPair}
                   variant="default"
@@ -225,7 +225,7 @@ export const TwoPointerGameBoard = ({ mode, level, onBackToMenu, onNextLevel }: 
               </div>
             </Card>
           </div>
-          
+
           <div className="space-y-4">
             <Card className="p-4">
               <h3 className="font-semibold mb-3">Actions</h3>
@@ -239,14 +239,14 @@ export const TwoPointerGameBoard = ({ mode, level, onBackToMenu, onNextLevel }: 
                   <Lightbulb className="w-4 h-4 mr-2" />
                   Hint ({gameState.hintsRemaining})
                 </Button>
-                
+
                 <Button onClick={reset} variant="outline" className="w-full">
                   <RotateCcw className="w-4 h-4 mr-2" />
                   Reset
                 </Button>
               </div>
             </Card>
-            
+
             <Card className="p-4 bg-gradient-to-br from-primary/5 to-secondary/5">
               <h3 className="font-semibold mb-2">Stats</h3>
               <div className="space-y-2 text-sm">
@@ -268,7 +268,7 @@ export const TwoPointerGameBoard = ({ mode, level, onBackToMenu, onNextLevel }: 
                 </div>
               </div>
             </Card>
-            
+
             <Card className="p-4 border-primary/50 bg-primary/5">
               <h3 className="font-semibold mb-2 text-primary">Strategy</h3>
               <p className="text-sm text-muted-foreground">
@@ -280,7 +280,7 @@ export const TwoPointerGameBoard = ({ mode, level, onBackToMenu, onNextLevel }: 
           </div>
         </div>
       </div>
-      
+
       <TwoPointerVictoryModal
         isOpen={gameState.isComplete}
         score={gameState.score}

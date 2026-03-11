@@ -17,7 +17,7 @@ interface Step {
 
 export const ClimbingStairsVisualization = () => {
   const [currentStep, setCurrentStep] = useState(0);
-  
+
   const steps: Step[] = [
     {
       array: [],
@@ -225,12 +225,11 @@ export const ClimbingStairsVisualization = () => {
                     transition={{ delay: idx * 0.1 }}
                     className="flex flex-col items-center"
                   >
-                    <div className={`w-14 h-14 rounded-lg flex items-center justify-center border-2 transition-all duration-300 ${
-                      step.highlighting.includes(idx)
-                        ? 'bg-primary text-primary-foreground border-primary scale-110'
-                        : 'bg-primary/20 border-primary'
-                    }`}>
-                      <span className="font-bold text-lg">{val}</span>
+                    <div className={`w-14 h-14 rounded-lg flex items-center justify-center border-2 transition-all duration-300 ${step.highlighting.includes(idx)
+                      ? 'bg-primary text-primary-foreground border-primary scale-110'
+                      : 'bg-primary/20 border-primary'
+                      }`}>
+                      <span className="font- text-lg">{val}</span>
                     </div>
                   </motion.div>
                 ))}

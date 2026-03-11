@@ -147,13 +147,12 @@ export const ContainsDuplicateVisualization = () => {
               {currentStep.array.map((value, idx) => (
                 <div key={idx} className="flex flex-col items-center gap-2">
                   <div
-                    className={`w-10 h-10 sm:w-16 sm:h-16 rounded-lg flex items-center justify-center border-2 transition-all duration-300 ${
-                      currentStep.highlights.includes(idx)
-                        ? 'bg-primary border-primary scale-110 shadow-lg'
-                        : 'bg-muted/50 border-border'
-                    }`}
+                    className={`w-10 h-10 sm:w-16 sm:h-16 rounded-lg flex items-center justify-center border-2 transition-all duration-300 ${currentStep.highlights.includes(idx)
+                      ? 'bg-primary border-primary scale-110 shadow-lg'
+                      : 'bg-muted/50 border-border'
+                      }`}
                   >
-                    <span className="font-bold text-lg">{value}</span>
+                    <span className="font- text-lg">{value}</span>
                   </div>
                   <span className="text-xs text-muted-foreground">[{idx}]</span>
                 </div>

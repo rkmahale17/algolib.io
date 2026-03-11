@@ -19,13 +19,13 @@ export const WordSearchIIVisualization = () => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
   const steps: Step[] = [
-    { board: [["o","a","a","n"],["e","t","a","e"],["i","h","k","r"],["i","f","l","v"]], words: ["oath","pea","eat","rain"], found: [], currentPos: null, currentWord: "", message: "Find all words from list in board. Use Trie + DFS backtracking", lineNumber: 1 },
-    { board: [["o","a","a","n"],["e","t","a","e"],["i","h","k","r"],["i","f","l","v"]], words: ["oath","pea","eat","rain"], found: [], currentPos: [0,0], currentWord: "o", message: "Start DFS from (0,0): 'o'. Check Trie for prefix 'o'", lineNumber: 15 },
-    { board: [["o","a","a","n"],["e","t","a","e"],["i","h","k","r"],["i","f","l","v"]], words: ["oath","pea","eat","rain"], found: [], currentPos: [1,0], currentWord: "oe", message: "Continue: 'o'→'e'. Prefix 'oe' exists, keep searching", lineNumber: 18 },
-    { board: [["o","a","a","n"],["e","t","a","e"],["i","h","k","r"],["i","f","l","v"]], words: ["oath","pea","eat","rain"], found: [], currentPos: [1,1], currentWord: "oat", message: "Path: o→e→t = 'oat'. Check for 'oath'...", lineNumber: 18 },
-    { board: [["o","a","a","n"],["e","t","a","e"],["i","h","k","r"],["i","f","l","v"]], words: ["oath","pea","eat","rain"], found: ["oath"], currentPos: [2,1], currentWord: "oath", message: "Found 'oath'! o→a→t→h at (0,0)→(1,0)→(1,1)→(2,1) ✓", lineNumber: 21 },
-    { board: [["o","a","a","n"],["e","t","a","e"],["i","h","k","r"],["i","f","l","v"]], words: ["oath","pea","eat","rain"], found: ["oath","eat"], currentPos: [1,2], currentWord: "eat", message: "Found 'eat'! e→a→t at (1,0)→(1,1)→(1,2) ✓", lineNumber: 21 },
-    { board: [["o","a","a","n"],["e","t","a","e"],["i","h","k","r"],["i","f","l","v"]], words: ["oath","pea","eat","rain"], found: ["oath","eat"], currentPos: null, currentWord: "", message: "Complete! Found 2 words. Trie pruning optimizes search. Time: O(m*n*4^L)", lineNumber: 25 }
+    { board: [["o", "a", "a", "n"], ["e", "t", "a", "e"], ["i", "h", "k", "r"], ["i", "f", "l", "v"]], words: ["oath", "pea", "eat", "rain"], found: [], currentPos: null, currentWord: "", message: "Find all words from list in board. Use Trie + DFS backtracking", lineNumber: 1 },
+    { board: [["o", "a", "a", "n"], ["e", "t", "a", "e"], ["i", "h", "k", "r"], ["i", "f", "l", "v"]], words: ["oath", "pea", "eat", "rain"], found: [], currentPos: [0, 0], currentWord: "o", message: "Start DFS from (0,0): 'o'. Check Trie for prefix 'o'", lineNumber: 15 },
+    { board: [["o", "a", "a", "n"], ["e", "t", "a", "e"], ["i", "h", "k", "r"], ["i", "f", "l", "v"]], words: ["oath", "pea", "eat", "rain"], found: [], currentPos: [1, 0], currentWord: "oe", message: "Continue: 'o'→'e'. Prefix 'oe' exists, keep searching", lineNumber: 18 },
+    { board: [["o", "a", "a", "n"], ["e", "t", "a", "e"], ["i", "h", "k", "r"], ["i", "f", "l", "v"]], words: ["oath", "pea", "eat", "rain"], found: [], currentPos: [1, 1], currentWord: "oat", message: "Path: o→e→t = 'oat'. Check for 'oath'...", lineNumber: 18 },
+    { board: [["o", "a", "a", "n"], ["e", "t", "a", "e"], ["i", "h", "k", "r"], ["i", "f", "l", "v"]], words: ["oath", "pea", "eat", "rain"], found: ["oath"], currentPos: [2, 1], currentWord: "oath", message: "Found 'oath'! o→a→t→h at (0,0)→(1,0)→(1,1)→(2,1) ✓", lineNumber: 21 },
+    { board: [["o", "a", "a", "n"], ["e", "t", "a", "e"], ["i", "h", "k", "r"], ["i", "f", "l", "v"]], words: ["oath", "pea", "eat", "rain"], found: ["oath", "eat"], currentPos: [1, 2], currentWord: "eat", message: "Found 'eat'! e→a→t at (1,0)→(1,1)→(1,2) ✓", lineNumber: 21 },
+    { board: [["o", "a", "a", "n"], ["e", "t", "a", "e"], ["i", "h", "k", "r"], ["i", "f", "l", "v"]], words: ["oath", "pea", "eat", "rain"], found: ["oath", "eat"], currentPos: null, currentWord: "", message: "Complete! Found 2 words. Trie pruning optimizes search. Time: O(m*n*4^L)", lineNumber: 25 }
   ];
 
   const code = `function findWords(board: string[][], words: string[]): string[] {
@@ -88,11 +88,10 @@ export const WordSearchIIVisualization = () => {
                 {currentStep.board.map((row, r) => (
                   <div key={r} className="flex gap-1">
                     {row.map((cell, c) => (
-                      <div key={c} className={`w-10 h-10 rounded flex items-center justify-center font-mono font-bold ${
-                        currentStep.currentPos && currentStep.currentPos[0] === r && currentStep.currentPos[1] === c
-                          ? 'bg-primary text-primary-foreground ring-4 ring-primary'
-                          : 'bg-secondary'
-                      }`}>
+                      <div key={c} className={`w-10 h-10 rounded flex items-center justify-center font-mono font- ${currentStep.currentPos && currentStep.currentPos[0] === r && currentStep.currentPos[1] === c
+                        ? 'bg-primary text-primary-foreground ring-4 ring-primary'
+                        : 'bg-secondary'
+                        }`}>
                         {cell}
                       </div>
                     ))}
@@ -104,11 +103,10 @@ export const WordSearchIIVisualization = () => {
               <div className="text-sm font-medium mb-2">Words to Find:</div>
               <div className="flex gap-2 flex-wrap">
                 {currentStep.words.map((word, idx) => (
-                  <div key={idx} className={`px-3 py-2 rounded font-mono ${
-                    currentStep.found.includes(word)
-                      ? 'bg-green-500/30 text-green-700 line-through'
-                      : 'bg-muted'
-                  }`}>
+                  <div key={idx} className={`px-3 py-2 rounded font-mono ${currentStep.found.includes(word)
+                    ? 'bg-green-500/30 text-green-700 line-through'
+                    : 'bg-muted'
+                    }`}>
                     {word}
                   </div>
                 ))}
@@ -123,7 +121,7 @@ export const WordSearchIIVisualization = () => {
               <div className="text-sm font-medium mb-2">Found Words:</div>
               <div className="flex gap-2 flex-wrap">
                 {currentStep.found.map((word, idx) => (
-                  <div key={idx} className="px-3 py-2 rounded font-mono bg-green-500/30 text-green-700 font-bold">
+                  <div key={idx} className="px-3 py-2 rounded font-mono bg-green-500/30 text-green-700 font-">
                     {word} ✓
                   </div>
                 ))}

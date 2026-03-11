@@ -13,14 +13,14 @@ interface VictoryModalProps {
   onBackToMenu: () => void;
 }
 
-export const VictoryModal = ({ 
+export const VictoryModal = ({
   isOpen,
-  score, 
-  moves, 
-  errors, 
-  grade, 
-  onNextLevel, 
-  onBackToMenu 
+  score,
+  moves,
+  errors,
+  grade,
+  onNextLevel,
+  onBackToMenu
 }: VictoryModalProps) => {
   const navigate = useNavigate();
 
@@ -38,25 +38,25 @@ export const VictoryModal = ({
             Great job sorting those numbers!
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="space-y-4">
           <div className="text-center py-4 bg-primary/10 rounded-lg">
             <p className="text-sm text-muted-foreground mb-1">Final Score</p>
-            <p className="text-5xl font-bold text-primary">{score}</p>
+            <p className="text-5xl font- text-primary">{score}</p>
           </div>
 
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center space-y-1">
               <p className="text-sm text-muted-foreground">Grade</p>
-              <p className="text-3xl font-bold text-secondary">{grade}</p>
+              <p className="text-3xl font- text-secondary">{grade}</p>
             </div>
             <div className="text-center space-y-1">
               <p className="text-sm text-muted-foreground">Moves</p>
-              <p className="text-2xl font-bold">{moves}</p>
+              <p className="text-2xl font-">{moves}</p>
             </div>
             <div className="text-center space-y-1">
               <p className="text-sm text-muted-foreground">Errors</p>
-              <p className="text-2xl font-bold text-destructive">{errors}</p>
+              <p className="text-2xl font- text-destructive">{errors}</p>
             </div>
           </div>
 

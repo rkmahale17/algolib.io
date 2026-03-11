@@ -84,7 +84,7 @@ export function ProblemsEditor({ data, onChange }: ProblemsEditorProps) {
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-lg font-semibold">Practice Problems</h3>
+        <h3 className="text-lg font-semi">Practice Problems</h3>
         <p className="text-sm text-muted-foreground">
           Add related problems for users to practice
         </p>
@@ -242,9 +242,9 @@ export function ProblemsEditor({ data, onChange }: ProblemsEditorProps) {
                           <Input
                             value={problem.title}
                             onChange={(e) => {
-                                const updated = [...data.internal];
-                                updated[index] = { ...updated[index], title: e.target.value };
-                                onChange({ ...data, internal: updated });
+                              const updated = [...data.internal];
+                              updated[index] = { ...updated[index], title: e.target.value };
+                              onChange({ ...data, internal: updated });
                             }}
                             placeholder="Problem title"
                           />
@@ -254,9 +254,9 @@ export function ProblemsEditor({ data, onChange }: ProblemsEditorProps) {
                           <Select
                             value={problem.type}
                             onValueChange={(value: any) => {
-                                const updated = [...data.internal];
-                                updated[index] = { ...updated[index], type: value };
-                                onChange({ ...data, internal: updated });
+                              const updated = [...data.internal];
+                              updated[index] = { ...updated[index], type: value };
+                              onChange({ ...data, internal: updated });
                             }}
                           >
                             <SelectTrigger>
@@ -275,9 +275,9 @@ export function ProblemsEditor({ data, onChange }: ProblemsEditorProps) {
                         <Input
                           value={problem.url}
                           onChange={(e) => {
-                                const updated = [...data.internal];
-                                updated[index] = { ...updated[index], url: e.target.value };
-                                onChange({ ...data, internal: updated });
+                            const updated = [...data.internal];
+                            updated[index] = { ...updated[index], url: e.target.value };
+                            onChange({ ...data, internal: updated });
                           }}
                           placeholder="two-sum"
                         />

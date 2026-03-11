@@ -151,11 +151,10 @@ export const SubsetsVisualization: React.FC = () => {
             {currentStep.array.map((val, idx) => (
               <div
                 key={idx}
-                className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
-                  idx === currentStep.index
-                    ? "bg-primary/20 border-primary"
-                    : "bg-card border-border"
-                }`}
+                className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font- transition-all ${idx === currentStep.index
+                  ? "bg-primary/20 border-primary"
+                  : "bg-card border-border"
+                  }`}
               >
                 {val}
               </div>
@@ -168,7 +167,7 @@ export const SubsetsVisualization: React.FC = () => {
               currentStep.current.map((val, idx) => (
                 <div
                   key={idx}
-                  className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-blue-500/20 border-blue-500 font-bold"
+                  className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-blue-500/20 border-blue-500 font-"
                 >
                   {val}
                 </div>

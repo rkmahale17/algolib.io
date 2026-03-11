@@ -21,11 +21,11 @@ export const ImplementTriePrefixTreeVisualization = () => {
   const steps: Step[] = [
     { operation: "insert", word: "apple", trie: [], currentPath: "", result: null, message: "Insert 'apple' into empty Trie. Create nodes for each character", lineNumber: 3 },
     { operation: "insert", word: "apple", trie: ["a"], currentPath: "a", result: null, message: "Insert 'a': Create new TrieNode. children['a'] = new node", lineNumber: 5 },
-    { operation: "insert", word: "apple", trie: ["a","ap","app"], currentPath: "app", result: null, message: "Continue path: a→p→p. Each character gets a node", lineNumber: 5 },
-    { operation: "insert", word: "apple", trie: ["a","ap","app","appl","apple"], currentPath: "apple", result: null, message: "Complete 'apple': Mark last node as word end (isEnd=true)", lineNumber: 7 },
-    { operation: "search", word: "apple", trie: ["a","ap","app","appl","apple"], currentPath: "apple", result: true, message: "Search 'apple': Found path and isEnd=true. Return true", lineNumber: 12 },
-    { operation: "search", word: "app", trie: ["a","ap","app","appl","apple"], currentPath: "app", result: false, message: "Search 'app': Path exists but isEnd=false. Return false", lineNumber: 14 },
-    { operation: "startsWith", word: "app", trie: ["a","ap","app","appl","apple"], currentPath: "app", result: true, message: "Prefix 'app' exists in Trie. Return true. Time: O(m), Space: O(1)", lineNumber: 20 }
+    { operation: "insert", word: "apple", trie: ["a", "ap", "app"], currentPath: "app", result: null, message: "Continue path: a→p→p. Each character gets a node", lineNumber: 5 },
+    { operation: "insert", word: "apple", trie: ["a", "ap", "app", "appl", "apple"], currentPath: "apple", result: null, message: "Complete 'apple': Mark last node as word end (isEnd=true)", lineNumber: 7 },
+    { operation: "search", word: "apple", trie: ["a", "ap", "app", "appl", "apple"], currentPath: "apple", result: true, message: "Search 'apple': Found path and isEnd=true. Return true", lineNumber: 12 },
+    { operation: "search", word: "app", trie: ["a", "ap", "app", "appl", "apple"], currentPath: "app", result: false, message: "Search 'app': Path exists but isEnd=false. Return false", lineNumber: 14 },
+    { operation: "startsWith", word: "app", trie: ["a", "ap", "app", "appl", "apple"], currentPath: "app", result: true, message: "Prefix 'app' exists in Trie. Return true. Time: O(m), Space: O(1)", lineNumber: 20 }
   ];
 
   const code = `class TrieNode {
@@ -91,11 +91,10 @@ class Trie {
               <div className="text-sm font-medium mb-2">Trie Structure:</div>
               <div className="p-4 bg-muted/30 rounded">
                 <div className="font-mono text-sm">
-                  <div className="mb-2 text-primary font-bold">root</div>
+                  <div className="mb-2 text-primary font-">root</div>
                   {currentStep.trie.map((path, idx) => (
-                    <div key={idx} className={`ml-${(idx + 1) * 2} mb-1 ${
-                      currentStep.currentPath === path ? 'text-primary font-bold' : ''
-                    }`}>
+                    <div key={idx} className={`ml-${(idx + 1) * 2} mb-1 ${currentStep.currentPath === path ? 'text-primary font-' : ''
+                      }`}>
                       └─ {path.charAt(path.length - 1)} {path === "apple" ? "(isEnd ✓)" : ""}
                     </div>
                   ))}
@@ -107,7 +106,7 @@ class Trie {
               <div className="text-sm font-medium mb-2">Current Path:</div>
               <div className="flex gap-2 flex-wrap">
                 {currentStep.currentPath.split('').map((char, idx) => (
-                  <div key={idx} className="px-3 py-2 rounded font-mono bg-primary/20 text-primary font-bold">
+                  <div key={idx} className="px-3 py-2 rounded font-mono bg-primary/20 text-primary font-">
                     {char}
                   </div>
                 ))}
@@ -115,12 +114,10 @@ class Trie {
               </div>
             </div>
             {currentStep.result !== null && (
-              <div className={`p-4 rounded text-center ${
-                currentStep.result ? 'bg-green-500/20' : 'bg-red-500/20'
-              }`}>
-                <div className={`text-lg font-bold ${
-                  currentStep.result ? 'text-green-600' : 'text-red-600'
+              <div className={`p-4 rounded text-center ${currentStep.result ? 'bg-green-500/20' : 'bg-red-500/20'
                 }`}>
+                <div className={`text-lg font- ${currentStep.result ? 'text-green-600' : 'text-red-600'
+                  }`}>
                   Result: {currentStep.result ? 'true ✓' : 'false ✗'}
                 </div>
               </div>

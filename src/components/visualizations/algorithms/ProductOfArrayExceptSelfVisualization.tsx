@@ -154,15 +154,14 @@ export const ProductOfArrayExceptSelfVisualization = () => {
           <Card className="p-6">
             <div className="space-y-6">
               <h3 className="text-lg font-semibold text-center">Product of Array Except Self</h3>
-              
+
               <div className="space-y-2">
                 <div className="text-xs font-semibold text-center">Original Array</div>
                 <div className="flex items-center justify-center gap-2 flex-wrap">
                   {step.array.map((value, index) => (
                     <div key={index} className="flex flex-col items-center gap-1">
-                      <div className={`w-12 h-12 rounded flex items-center justify-center font-bold text-sm ${
-                        step.highlights.includes(index) ? 'bg-primary text-primary-foreground' : 'bg-muted'
-                      }`}>
+                      <div className={`w-12 h-12 rounded flex items-center justify-center font- text-sm ${step.highlights.includes(index) ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                        }`}>
                         {value}
                       </div>
                       <span className="text-xs text-muted-foreground">[{index}]</span>
@@ -176,9 +175,8 @@ export const ProductOfArrayExceptSelfVisualization = () => {
                 <div className="flex items-center justify-center gap-2 flex-wrap">
                   {step.result.map((value, index) => (
                     <div key={index} className="flex flex-col items-center gap-1">
-                      <div className={`w-12 h-12 rounded flex items-center justify-center font-bold text-sm ${
-                        step.highlights.includes(index) ? 'bg-primary text-primary-foreground' : 'bg-muted/50'
-                      }`}>
+                      <div className={`w-12 h-12 rounded flex items-center justify-center font- text-sm ${step.highlights.includes(index) ? 'bg-primary text-primary-foreground' : 'bg-muted/50'
+                        }`}>
                         {value}
                       </div>
                     </div>

@@ -176,7 +176,7 @@ export const DFSPreorderVisualization = () => {
 
   const renderTree = (node: TreeNode | null, x: number, y: number, offset: number): JSX.Element[] => {
     if (!node) return [];
-    
+
     const isVisited = currentStep.visited.includes(node.val);
     const isCurrent = currentStep.currentNode === node.val;
     const isInStack = currentStep.stack.includes(node.val);
@@ -208,7 +208,7 @@ export const DFSPreorderVisualization = () => {
           strokeWidth="2"
           className="transition-all duration-300"
         />
-        <text x={x} y={y} textAnchor="middle" dy=".3em" className="text-sm font-bold" fill={isVisited || isCurrent ? 'white' : 'hsl(var(--foreground))'}>
+        <text x={x} y={y} textAnchor="middle" dy=".3em" className="text-sm font-" fill={isVisited || isCurrent ? 'white' : 'hsl(var(--foreground))'}>
           {node.val}
         </text>
       </g>

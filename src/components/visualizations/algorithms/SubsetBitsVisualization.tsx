@@ -165,9 +165,8 @@ export const SubsetBitsVisualization: React.FC = () => {
             return (
               <div key={idx} className="flex flex-col items-center gap-2">
                 <div
-                  className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
-                    bitSet ? 'bg-green-500/20 border-green-500' : 'bg-card border-border'
-                  }`}
+                  className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font- transition-all ${bitSet ? 'bg-green-500/20 border-green-500' : 'bg-card border-border'
+                    }`}
                 >
                   {val}
                 </div>
@@ -180,15 +179,15 @@ export const SubsetBitsVisualization: React.FC = () => {
         <div className="grid grid-cols-3 gap-4 mb-6">
           <div className="p-4 bg-muted rounded border">
             <div className="text-sm text-muted-foreground mb-1">Mask (Decimal)</div>
-            <div className="text-2xl font-bold">{currentStep.mask}</div>
+            <div className="text-2xl font-">{currentStep.mask}</div>
           </div>
           <div className="p-4 bg-muted rounded border">
             <div className="text-sm text-muted-foreground mb-1">Mask (Binary)</div>
-            <div className="text-2xl font-mono font-bold">{currentStep.binary}</div>
+            <div className="text-2xl font-mono font-">{currentStep.binary}</div>
           </div>
           <div className="p-4 bg-muted rounded border">
             <div className="text-sm text-muted-foreground mb-1">Subset Size</div>
-            <div className="text-2xl font-bold text-primary">{currentStep.subset.length}</div>
+            <div className="text-2xl font- text-primary">{currentStep.subset.length}</div>
           </div>
         </div>
 
@@ -198,7 +197,7 @@ export const SubsetBitsVisualization: React.FC = () => {
             currentStep.subset.map((val, idx) => (
               <div
                 key={idx}
-                className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-blue-500/20 border-blue-500 font-bold"
+                className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-blue-500/20 border-blue-500 font-"
               >
                 {val}
               </div>

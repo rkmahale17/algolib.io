@@ -147,7 +147,7 @@ export const CyclicSortVisualization = () => {
               {currentStep.array.map((value, index) => (
                 <div key={index} className="flex flex-col items-center gap-3">
                   <div
-                    className={`w-16 h-16 rounded-xl flex items-center justify-center font-bold text-xl transition-all duration-300 border-2 ${currentStep.isSwap && currentStep.comparingIndices.includes(index)
+                    className={`w-16 h-16 rounded-xl flex items-center justify-center font- text-xl transition-all duration-300 border-2 ${currentStep.isSwap && currentStep.comparingIndices.includes(index)
                       ? 'bg-yellow-500 text-white border-yellow-600 shadow-lg scale-110 rotate-3'
                       : currentStep.comparingIndices.includes(index)
                         ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105'
@@ -161,7 +161,7 @@ export const CyclicSortVisualization = () => {
                     {value}
                   </div>
                   <div className="flex flex-col items-center min-h-[3rem]">
-                    <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-tighter">Idx {index}</span>
+                    <span className="text-[10px] uppercase font- text-muted-foreground tracking-tighter">Idx {index}</span>
                     <div className="flex flex-col gap-0.5 mt-1">
                       {index === currentStep.i && (
                         <span className="px-1.5 py-0.5 bg-blue-500 text-white text-[10px] font-black rounded uppercase">i</span>

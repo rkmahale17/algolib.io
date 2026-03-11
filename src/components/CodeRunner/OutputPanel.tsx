@@ -13,6 +13,7 @@ import { TreeDiagram } from '../visualizations/TreeDiagram';
 import { isTreeType, parseTreeValue } from '@/utils/treeUtils';
 import { GraphDiagram } from '../visualizations/GraphDiagram';
 import { isGraphType, parseGraphValue } from '@/utils/graphUtils';
+import { isListType, parseListValue } from '@/utils/listUtils';
 
 const DiffView = ({ expected, actual }: { expected: any, actual: any }) => {
   const expectedStr = (typeof expected === 'string' ? expected : JSON.stringify(expected, null, 2)) || "";
@@ -423,6 +424,10 @@ export const OutputPanel = ({
                                                   const treeArr = parseTreeValue(val);
                                                   if (treeArr) return JSON.stringify(treeArr);
                                                 }
+                                                if (isListType(field.type)) {
+                                                  const listArr = parseListValue(val);
+                                                  if (listArr) return JSON.stringify(listArr);
+                                                }
                                                 return typeof val === 'string' ? val : JSON.stringify(val);
                                               })()}</span>
                                             </div>
@@ -464,7 +469,8 @@ export const OutputPanel = ({
                                   const tc = executedTestCases ? executedTestCases[index] : allTestCases[index];
                                   const actual = result.actual;
                                   const treeArr = actual !== undefined ? parseTreeValue(actual) : null;
-                                  const content = actual === undefined ? "void / undefined" : JSON.stringify(treeArr || actual, null, 2);
+                                  const listArr = actual !== undefined ? parseListValue(actual) : null;
+                                  const content = actual === undefined ? "void / undefined" : JSON.stringify(treeArr || listArr || actual, null, 2);
                                   return (
                                     <div className="space-y-3">
                                       <div>{content}</div>
@@ -486,7 +492,8 @@ export const OutputPanel = ({
                                 <div className="text-xs font-medium text-muted-foreground">Expected</div>
                                 <div className="p-3 rounded-md bg-muted/30 border font-mono text-sm">
                                   {(() => {
-                                    const content = JSON.stringify(parseTreeValue(result.expected) || result.expected, null, 2);
+                                    const listArr = result.expected !== undefined ? parseListValue(result.expected) : null;
+                                    const content = JSON.stringify(parseTreeValue(result.expected) || listArr || result.expected, null, 2);
                                     return (
                                       <div className="space-y-3">
                                         <div>{content}</div>

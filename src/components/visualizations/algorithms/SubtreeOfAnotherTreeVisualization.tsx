@@ -150,13 +150,12 @@ function isSameTree(p: TreeNode | null, q: TreeNode | null): boolean {
                   cx={pos.x}
                   cy={pos.y}
                   r="24"
-                  className={`transition-all duration-300 ${
-                    pos.value === currentNodeValue && step.comparing
-                      ? 'fill-yellow-500'
-                      : step.found && [1, 2, 4].includes(pos.value)
+                  className={`transition-all duration-300 ${pos.value === currentNodeValue && step.comparing
+                    ? 'fill-yellow-500'
+                    : step.found && [1, 2, 4].includes(pos.value)
                       ? 'fill-green-500'
                       : 'fill-card'
-                  }`}
+                    }`}
                   stroke="currentColor"
                   strokeWidth="2"
                 />
@@ -164,7 +163,7 @@ function isSameTree(p: TreeNode | null, q: TreeNode | null): boolean {
                   x={pos.x}
                   y={pos.y + 6}
                   textAnchor="middle"
-                  className="text-sm font-bold fill-foreground"
+                  className="text-sm font- fill-foreground"
                 >
                   {pos.value}
                 </text>
@@ -182,11 +181,10 @@ function isSameTree(p: TreeNode | null, q: TreeNode | null): boolean {
                   cx={pos.x}
                   cy={pos.y}
                   r="24"
-                  className={`transition-all duration-300 ${
-                    pos.value === subNodeValue && step.comparing
-                      ? 'fill-purple-500'
-                      : 'fill-card'
-                  }`}
+                  className={`transition-all duration-300 ${pos.value === subNodeValue && step.comparing
+                    ? 'fill-purple-500'
+                    : 'fill-card'
+                    }`}
                   stroke="currentColor"
                   strokeWidth="2"
                 />
@@ -194,7 +192,7 @@ function isSameTree(p: TreeNode | null, q: TreeNode | null): boolean {
                   x={pos.x}
                   y={pos.y + 6}
                   textAnchor="middle"
-                  className="text-sm font-bold fill-foreground"
+                  className="text-sm font- fill-foreground"
                 >
                   {pos.value}
                 </text>
@@ -248,7 +246,7 @@ function isSameTree(p: TreeNode | null, q: TreeNode | null): boolean {
           </AnimatePresence>
 
           <Card className="p-4 bg-primary/5 border-primary/20">
-            <motion.p 
+            <motion.p
               key={`msg-${idx}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

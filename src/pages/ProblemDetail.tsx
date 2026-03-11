@@ -40,7 +40,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { ProblemList } from "@/components/ProblemList";
+import { ProblemSidebar } from "@/components/ProblemSidebar";
+import { useUserProgressMap } from "@/hooks/useAlgorithms";
 
 const ProblemDetail: React.FC = () => {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
@@ -71,6 +72,8 @@ const ProblemDetail: React.FC = () => {
     algorithmId: algorithmIdOrSlug || '',
     enabled: !!user && !!algorithmIdOrSlug,
   });
+
+  const { data: progressMap } = useUserProgressMap(user?.id);
 
   const interactions = useAlgorithmInteractions({
     user,
@@ -192,7 +195,7 @@ const ProblemDetail: React.FC = () => {
         <AlgoMetaHead />
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center space-y-4">
-            <h2 className="text-2xl font-bold">Algorithm not found</h2>
+            <h2 className="text-2xl font-">Algorithm not found</h2>
             <Link to="/">
               <Button>Go Home</Button>
             </Link>
@@ -253,7 +256,7 @@ const ProblemDetail: React.FC = () => {
                 </div>
               </div>
               <div className="space-y-2 max-w-md">
-                <h1 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
+                <h1 className="text-3xl font- tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
                   Under Maintenance
                 </h1>
                 <p className="text-muted-foreground">
@@ -378,18 +381,20 @@ const ProblemDetail: React.FC = () => {
           )}
         </div>
 
-        <SheetContent side="left" className="w-[400px] sm:w-[540px] p-0 border-r border-border/40">
-          <SheetHeader className="p-6 border-b border-border/40">
-            <SheetTitle className="text-xl font-bold">{activeListType === 'core' ? 'Core Patterns' : activeListType === 'blind75' ? 'Blind 75' : 'All Problems'}</SheetTitle>
-          </SheetHeader>
-          <div className="h-[calc(100vh-80px)] overflow-y-auto p-4 custom-scrollbar">
-            <ProblemList
+        <SheetContent side="left" className="w-full sm:max-w-[600px] p-0 border-r border-border shadow-2xl flex flex-col">
+          <div className="flex items-center justify-between p-4 border-b border-border bg-background">
+            <SheetTitle className="text-sm font- tracking-tight uppercase">
+              {activeListType === 'core' ? 'Core Patterns' : activeListType === 'blind75' ? 'Blind 75' : 'Problem List'}
+            </SheetTitle>
+          </div>
+          <div className="flex-1 overflow-hidden">
+            <ProblemSidebar
               algorithms={allAlgorithms as any}
-              isLoading={isAlgorithmsLoading}
-              hideListSelection={true}
-              defaultListType={activeListType}
-              variant="sidebar"
-              initialViewMode="list"
+              progressMap={progressMap || {}}
+              isPaywallEnabled={isPaywallEnabled}
+              hasPremiumAccess={hasPremiumAccess}
+              className="h-full"
+              onItemClick={() => setIsSidebarOpen(false)}
             />
           </div>
         </SheetContent>

@@ -71,7 +71,7 @@ export const AlgorithmExplainer = ({ mode }: AlgorithmExplainerProps) => {
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-muted-foreground">{info.description}</p>
-        
+
         <div>
           <h4 className="text-sm font-semibold mb-2">Rules:</h4>
           <ul className="space-y-1">

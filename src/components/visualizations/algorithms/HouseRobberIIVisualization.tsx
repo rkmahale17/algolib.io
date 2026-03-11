@@ -47,7 +47,7 @@ export const HouseRobberIIVisualization = () => {
 
   const steps = useMemo(() => {
     const steps: Step[] = [];
-    
+
     // Initial Step
     steps.push({
       nums,
@@ -107,12 +107,12 @@ export const HouseRobberIIVisualization = () => {
       for (let i = start; i <= end; i++) {
         // Loop Start
         steps.push({
-            nums,
-            range: rangeStr,
-            variables: { i, start, end, rob1, rob2 },
-            explanation: `Loop iteration i=${i}. Current house value is ${nums[i]}.`,
-            highlightedLines: [10],
-            lineExecution: `for (let i = ${start}; i <= ${end}; i++)` // conceptually
+          nums,
+          range: rangeStr,
+          variables: { i, start, end, rob1, rob2 },
+          explanation: `Loop iteration i=${i}. Current house value is ${nums[i]}.`,
+          highlightedLines: [10],
+          lineExecution: `for (let i = ${start}; i <= ${end}; i++)` // conceptually
         });
 
         const currentVal = nums[i];
@@ -121,12 +121,12 @@ export const HouseRobberIIVisualization = () => {
 
         // Temp calc
         steps.push({
-            nums,
-            range: rangeStr,
-            variables: { i, rob1, rob2, 'nums[i]': currentVal, temp },
-            explanation: `Calculate temp = max(rob1 + nums[i], rob2) = max(${rob1} + ${currentVal}, ${rob2}) = ${temp}.`,
-            highlightedLines: [12],
-            lineExecution: "const temp = Math.max(rob1 + nums[i], rob2);"
+          nums,
+          range: rangeStr,
+          variables: { i, rob1, rob2, 'nums[i]': currentVal, temp },
+          explanation: `Calculate temp = max(rob1 + nums[i], rob2) = max(${rob1} + ${currentVal}, ${rob2}) = ${temp}.`,
+          highlightedLines: [12],
+          lineExecution: "const temp = Math.max(rob1 + nums[i], rob2);"
         });
 
         const oldRob2 = rob2;
@@ -135,12 +135,12 @@ export const HouseRobberIIVisualization = () => {
 
         // Update vars
         steps.push({
-            nums,
-            range: rangeStr,
-            variables: { i, rob1, rob2, temp },
-            explanation: `Update rob1 = rob2 (${oldRob2}), rob2 = temp (${temp}).`,
-            highlightedLines: [13, 14],
-            lineExecution: "rob1 = rob2; rob2 = temp;"
+          nums,
+          range: rangeStr,
+          variables: { i, rob1, rob2, temp },
+          explanation: `Update rob1 = rob2 (${oldRob2}), rob2 = temp (${temp}).`,
+          highlightedLines: [13, 14],
+          lineExecution: "rob1 = rob2; rob2 = temp;"
         });
       }
 
@@ -193,28 +193,27 @@ export const HouseRobberIIVisualization = () => {
               <h3 className="text-sm font-semibold mb-3">Houses in Circle</h3>
               <div className="flex gap-2 flex-wrap items-center">
                 {step.nums.map((num, idx) => {
-                    // Determine if active based on range string [start..end]
-                    let isActive = false;
-                    if (step.range.startsWith('[')) {
-                        const parts = step.range.slice(1, -1).split('..');
-                        const s = parseInt(parts[0]);
-                        const e = parseInt(parts[1]);
-                        if (idx >= s && idx <= e) isActive = true;
-                    }
-                    
-                    return (
-                      <div
-                        key={idx}
-                        className={`px-4 py-3 rounded font-mono text-center ${
-                          isActive
-                            ? 'bg-primary text-primary-foreground'
-                            : 'bg-muted'
+                  // Determine if active based on range string [start..end]
+                  let isActive = false;
+                  if (step.range.startsWith('[')) {
+                    const parts = step.range.slice(1, -1).split('..');
+                    const s = parseInt(parts[0]);
+                    const e = parseInt(parts[1]);
+                    if (idx >= s && idx <= e) isActive = true;
+                  }
+
+                  return (
+                    <div
+                      key={idx}
+                      className={`px-4 py-3 rounded font-mono text-center ${isActive
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted'
                         }`}
-                      >
-                        <div className="text-xs">House {idx}</div>
-                        <div className="font-bold">${num}</div>
-                      </div>
-                    );
+                    >
+                      <div className="text-xs">House {idx}</div>
+                      <div className="font-">${num}</div>
+                    </div>
+                  );
                 })}
                 <div className="text-xl">🔄</div>
               </div>

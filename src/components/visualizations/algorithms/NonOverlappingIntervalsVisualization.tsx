@@ -261,7 +261,7 @@ export const NonOverlappingIntervalsVisualization = () => {
         <Card className="p-6">
           <h3 className="text-lg font-semibold mb-4">Non-Overlapping Intervals</h3>
           <div className="space-y-4">
-            <motion.div 
+            <motion.div
               key={`intervals-${currentStepIndex}`}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -275,15 +275,14 @@ export const NonOverlappingIntervalsVisualization = () => {
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: idx * 0.05 }}
-                    className={`px-3 py-2 rounded font-mono transition-all ${
-                      idx === currentStep.currentIdx && currentStep.removed
-                        ? 'bg-destructive/80 text-destructive-foreground line-through shadow-lg opacity-50'
-                        : idx === currentStep.currentIdx 
-                        ? 'bg-primary text-primary-foreground shadow-lg scale-105' 
-                        : idx < currentStep.currentIdx 
-                        ? 'bg-secondary/50 text-secondary-foreground' 
-                        : 'bg-muted text-muted-foreground'
-                    }`}
+                    className={`px-3 py-2 rounded font-mono transition-all ${idx === currentStep.currentIdx && currentStep.removed
+                      ? 'bg-destructive/80 text-destructive-foreground line-through shadow-lg opacity-50'
+                      : idx === currentStep.currentIdx
+                        ? 'bg-primary text-primary-foreground shadow-lg scale-105'
+                        : idx < currentStep.currentIdx
+                          ? 'bg-secondary/50 text-secondary-foreground'
+                          : 'bg-muted text-muted-foreground'
+                      }`}
                   >
                     [{interval[0]}, {interval[1]}]
                   </motion.div>
@@ -292,35 +291,35 @@ export const NonOverlappingIntervalsVisualization = () => {
             </motion.div>
 
             <div className="grid grid-cols-2 gap-4">
-                 <motion.div
-                  key={`kept-${currentStepIndex}`}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="p-4 bg-green-500/10 rounded-lg border-2 border-green-500/20"
-                >
-                  <div className="text-sm font-medium text-muted-foreground mb-1">Non-Overlapping (Kept):</div>
-                  <div className="text-3xl font-bold text-green-600">{currentStep.nonOverlappingCount}</div>
-                  {currentStep.lastEndTime > 0 && (
-                    <div className="mt-2 text-xs text-muted-foreground">
-                      Last End Time: <span className="font-mono text-foreground font-semibold">{currentStep.lastEndTime}</span>
-                    </div>
-                  )}
-                </motion.div>
-
-                <motion.div
-                  key={`removals-${currentStepIndex}`}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="p-4 bg-destructive/10 rounded-lg border-2 border-destructive/20"
-                >
-                  <div className="text-sm font-medium text-muted-foreground mb-1">ToRemove (Result):</div>
-                  <div className="text-3xl font-bold text-destructive">
-                     {Math.max(0, currentStep.intervals.length - currentStep.nonOverlappingCount)}
-                  </div>
+              <motion.div
+                key={`kept-${currentStepIndex}`}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="p-4 bg-green-500/10 rounded-lg border-2 border-green-500/20"
+              >
+                <div className="text-sm font-medium text-muted-foreground mb-1">Non-Overlapping (Kept):</div>
+                <div className="text-3xl font- text-green-600">{currentStep.nonOverlappingCount}</div>
+                {currentStep.lastEndTime > 0 && (
                   <div className="mt-2 text-xs text-muted-foreground">
-                     Total - Kept
+                    Last End Time: <span className="font-mono text-foreground font-semibold">{currentStep.lastEndTime}</span>
                   </div>
-                </motion.div>
+                )}
+              </motion.div>
+
+              <motion.div
+                key={`removals-${currentStepIndex}`}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="p-4 bg-destructive/10 rounded-lg border-2 border-destructive/20"
+              >
+                <div className="text-sm font-medium text-muted-foreground mb-1">ToRemove (Result):</div>
+                <div className="text-3xl font- text-destructive">
+                  {Math.max(0, currentStep.intervals.length - currentStep.nonOverlappingCount)}
+                </div>
+                <div className="mt-2 text-xs text-muted-foreground">
+                  Total - Kept
+                </div>
+              </motion.div>
             </div>
 
             <motion.div
@@ -357,9 +356,9 @@ export const NonOverlappingIntervalsVisualization = () => {
         <Card className="p-6 overflow-hidden flex flex-col">
           <h3 className="text-lg font-semibold mb-4">TypeScript Implementation</h3>
           <div className="flex-1 overflow-auto">
-            <AnimatedCodeEditor 
-              code={code} 
-              language="typescript" 
+            <AnimatedCodeEditor
+              code={code}
+              language="typescript"
               highlightedLines={currentStep.highlightedLines}
             />
           </div>

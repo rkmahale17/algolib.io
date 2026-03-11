@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { EditProfileDialog } from "@/components/profile/EditProfileDialog";
+import { SidebarLayout } from '@/components/SidebarLayout';
 
 const ProfileEdit = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -51,43 +52,45 @@ const ProfileEdit = () => {
   if (!profile) return null;
 
   return (
-    <div className="min-h-screen bg-background pt-24 pb-12 px-4 md:px-8">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <SidebarLayout>
+      <div className="min-h-screen bg-background pt-8 pb-12 px-4 md:px-8">
+        <div className="max-w-6xl mx-auto space-y-8">
 
-        {/* Header */}
-        <ProfileHeader
-          profile={profile}
-          onEdit={() => setIsEditOpen(true)}
-          isOwnProfile={true}
-        />
-
-        {/* Edit Dialog */}
-        {isEditOpen && (
-          <EditProfileDialog
-            open={isEditOpen}
-            onOpenChange={setIsEditOpen}
+          {/* Header */}
+          <ProfileHeader
             profile={profile}
-            onSave={() => {
-              fetchProfileData();
-              setIsEditOpen(false);
-            }}
+            onEdit={() => setIsEditOpen(true)}
+            isOwnProfile={true}
           />
-        )}
 
-        {/* Message to set username */}
-        {!profile.username && (
-          <div className="text-center py-12">
-            <h2 className="text-2xl font-bold mb-4">Welcome to Your Profile!</h2>
-            <p className="text-muted-foreground mb-6">
-              Set up your username to make your profile shareable and start tracking your progress.
-            </p>
-            <Button onClick={() => setIsEditOpen(true)} size="lg">
-              Set Up Profile
-            </Button>
-          </div>
-        )}
+          {/* Edit Dialog */}
+          {isEditOpen && (
+            <EditProfileDialog
+              open={isEditOpen}
+              onOpenChange={setIsEditOpen}
+              profile={profile}
+              onSave={() => {
+                fetchProfileData();
+                setIsEditOpen(false);
+              }}
+            />
+          )}
+
+          {/* Message to set username */}
+          {!profile.username && (
+            <div className="text-center py-12">
+              <h2 className="text-2xl font- mb-4">Welcome to Your Profile!</h2>
+              <p className="text-muted-foreground mb-6">
+                Set up your username to make your profile shareable and start tracking your progress.
+              </p>
+              <Button onClick={() => setIsEditOpen(true)} size="lg">
+                Set Up Profile
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </SidebarLayout>
   );
 };
 

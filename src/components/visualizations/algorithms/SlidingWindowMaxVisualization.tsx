@@ -176,79 +176,77 @@ export const SlidingWindowMaxVisualization: React.FC = () => {
       />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-      <div className="bg-card rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4">Array (Window Size = {currentStep.k})</h3>
-        <div className="flex gap-2 mb-6">
-          {currentStep.array.map((val, idx) => (
-            <div
-              key={idx}
-              className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
-                idx >= currentStep.windowStart && idx < currentStep.windowStart + currentStep.k
+        <div className="bg-card rounded-lg p-6 border">
+          <h3 className="text-lg font-semibold mb-4">Array (Window Size = {currentStep.k})</h3>
+          <div className="flex gap-2 mb-6">
+            {currentStep.array.map((val, idx) => (
+              <div
+                key={idx}
+                className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font- transition-all ${idx >= currentStep.windowStart && idx < currentStep.windowStart + currentStep.k
                   ? currentStep.deque[0] === idx
                     ? 'bg-green-500/20 border-green-500 scale-110'
                     : 'bg-primary/20 border-primary'
                   : 'bg-card border-border'
-              }`}
-            >
-              {val}
-            </div>
-          ))}
-        </div>
-
-        <h3 className="text-lg font-semibold mb-4">Deque (Indices)</h3>
-        <div className="flex gap-2 mb-6 min-h-[3rem]">
-          {currentStep.deque.length > 0 ? (
-            currentStep.deque.map((idx, i) => (
-              <div
-                key={i}
-                className={`w-16 h-12 flex flex-col items-center justify-center rounded-lg border-2 font-bold transition-all ${
-                  i === 0 ? 'bg-green-500/20 border-green-500' : 'bg-blue-500/20 border-blue-500'
-                }`}
+                  }`}
               >
-                <div className="text-xs text-muted-foreground">idx:{idx}</div>
-                <div>{currentStep.array[idx]}</div>
+                {val}
               </div>
-            ))
-          ) : (
-            <div className="text-muted-foreground italic">Empty deque</div>
-          )}
-        </div>
+            ))}
+          </div>
 
-        <h3 className="text-lg font-semibold mb-4">Result (Window Maximums)</h3>
-        <div className="flex gap-2 flex-wrap mb-6">
-          {currentStep.result.map((val, idx) => (
-            <div
-              key={idx}
-              className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-green-500/20 border-green-500 font-bold"
-            >
-              {val}
-            </div>
-          ))}
-          {currentStep.result.length === 0 && (
-            <div className="text-muted-foreground italic">No windows completed yet</div>
-          )}
-        </div>
+          <h3 className="text-lg font-semibold mb-4">Deque (Indices)</h3>
+          <div className="flex gap-2 mb-6 min-h-[3rem]">
+            {currentStep.deque.length > 0 ? (
+              currentStep.deque.map((idx, i) => (
+                <div
+                  key={i}
+                  className={`w-16 h-12 flex flex-col items-center justify-center rounded-lg border-2 font- transition-all ${i === 0 ? 'bg-green-500/20 border-green-500' : 'bg-blue-500/20 border-blue-500'
+                    }`}
+                >
+                  <div className="text-xs text-muted-foreground">idx:{idx}</div>
+                  <div>{currentStep.array[idx]}</div>
+                </div>
+              ))
+            ) : (
+              <div className="text-muted-foreground italic">Empty deque</div>
+            )}
+          </div>
 
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
-        </div>
-              <div className="mt-4 p-4 bg-muted rounded">
-                <VariablePanel
-        variables={{
-          'window start': currentStep.windowStart,
-          'k': currentStep.k,
-          'deque size': currentStep.deque.length,
-          'results': currentStep.result.length
-        }}
-      />
-        </div>
+          <h3 className="text-lg font-semibold mb-4">Result (Window Maximums)</h3>
+          <div className="flex gap-2 flex-wrap mb-6">
+            {currentStep.result.map((val, idx) => (
+              <div
+                key={idx}
+                className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-green-500/20 border-green-500 font-"
+              >
+                {val}
+              </div>
+            ))}
+            {currentStep.result.length === 0 && (
+              <div className="text-muted-foreground italic">No windows completed yet</div>
+            )}
+          </div>
+
+          <div className="mt-4 p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
+          </div>
+          <div className="mt-4 p-4 bg-muted rounded">
+            <VariablePanel
+              variables={{
+                'window start': currentStep.windowStart,
+                'k': currentStep.k,
+                'deque size': currentStep.deque.length,
+                'results': currentStep.result.length
+              }}
+            />
+          </div>
 
 
+
+        </div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
 
       </div>
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
-
-    </div>
     </div>
   );
 };

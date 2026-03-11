@@ -69,7 +69,7 @@ export const TreeVisualization = ({ algorithmId }: TreeVisualizationProps) => {
 
   const bfsTraversal = async () => {
     const queue = [0];
-    
+
     while (queue.length > 0) {
       const nodeIndex = queue.shift()!;
       setVisitedNodes(prev => [...prev, nodeIndex]);
@@ -147,9 +147,8 @@ export const TreeVisualization = ({ algorithmId }: TreeVisualizationProps) => {
           cx={x}
           cy={y}
           r="24"
-          className={`transition-all duration-300 ${
-            isVisited ? 'fill-primary' : 'fill-card'
-          }`}
+          className={`transition-all duration-300 ${isVisited ? 'fill-primary' : 'fill-card'
+            }`}
           stroke="currentColor"
           strokeWidth="2"
           style={{
@@ -161,9 +160,8 @@ export const TreeVisualization = ({ algorithmId }: TreeVisualizationProps) => {
           x={x}
           y={y + 6}
           textAnchor="middle"
-          className={`text-sm font-bold transition-colors ${
-            isVisited ? 'fill-primary-foreground' : 'fill-foreground'
-          }`}
+          className={`text-sm font- transition-colors ${isVisited ? 'fill-primary-foreground' : 'fill-foreground'
+            }`}
         >
           {node.value}
         </text>
@@ -172,7 +170,7 @@ export const TreeVisualization = ({ algorithmId }: TreeVisualizationProps) => {
             x={x}
             y={y + 45}
             textAnchor="middle"
-            className="text-xs fill-primary font-bold"
+            className="text-xs fill-primary font-"
           >
             {visitOrder + 1}
           </text>
@@ -194,7 +192,7 @@ export const TreeVisualization = ({ algorithmId }: TreeVisualizationProps) => {
 
     return (
       <svg width="400" height="220" className="mx-auto">
-        {positions.map((pos, index) => 
+        {positions.map((pos, index) =>
           renderNode(index, pos.x, pos.y, pos.offset)
         )}
       </svg>

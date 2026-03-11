@@ -160,63 +160,62 @@ export const PermutationsVisualization: React.FC = () => {
       />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-      <div className="bg-card rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4">Input Array</h3>
-        <div className="flex gap-2 mb-6">
-          {currentStep.array.map((val, idx) => (
-            <div
-              key={idx}
-              className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
-                currentStep.used[idx] ? 'bg-green-500/20 border-green-500' : 'bg-card border-border'
-              }`}
-            >
-              {val}
-            </div>
-          ))}
-        </div>
-
-        <h3 className="text-lg font-semibold mb-4">Current Permutation</h3>
-        <div className="flex gap-2 mb-6 min-h-[3rem]">
-          {currentStep.current.length > 0 ? (
-            currentStep.current.map((val, idx) => (
+        <div className="bg-card rounded-lg p-6 border">
+          <h3 className="text-lg font-semibold mb-4">Input Array</h3>
+          <div className="flex gap-2 mb-6">
+            {currentStep.array.map((val, idx) => (
               <div
                 key={idx}
-                className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-blue-500/20 border-blue-500 font-bold"
+                className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font- transition-all ${currentStep.used[idx] ? 'bg-green-500/20 border-green-500' : 'bg-card border-border'
+                  }`}
               >
                 {val}
               </div>
-            ))
-          ) : (
-            <div className="text-muted-foreground italic">Empty</div>
-          )}
-        </div>
+            ))}
+          </div>
 
-        <h3 className="text-lg font-semibold mb-4">All Permutations ({currentStep.allPerms.length})</h3>
-        <div className="flex flex-wrap gap-2">
-          {currentStep.allPerms.map((perm, idx) => (
-            <div key={idx} className="px-3 py-1 bg-muted rounded border text-sm">
-              [{perm.join(', ')}]
-            </div>
-          ))}
-        </div>
+          <h3 className="text-lg font-semibold mb-4">Current Permutation</h3>
+          <div className="flex gap-2 mb-6 min-h-[3rem]">
+            {currentStep.current.length > 0 ? (
+              currentStep.current.map((val, idx) => (
+                <div
+                  key={idx}
+                  className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-blue-500/20 border-blue-500 font-"
+                >
+                  {val}
+                </div>
+              ))
+            ) : (
+              <div className="text-muted-foreground italic">Empty</div>
+            )}
+          </div>
 
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
-        </div>
-        <div className="mt-4 p-4 bg-muted rounded">
+          <h3 className="text-lg font-semibold mb-4">All Permutations ({currentStep.allPerms.length})</h3>
+          <div className="flex flex-wrap gap-2">
+            {currentStep.allPerms.map((perm, idx) => (
+              <div key={idx} className="px-3 py-1 bg-muted rounded border text-sm">
+                [{perm.join(', ')}]
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4 p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
+          </div>
+          <div className="mt-4 p-4 bg-muted rounded">
             <VariablePanel
-        variables={{
-          'current length': currentStep.current.length,
-          'used count': currentStep.used.filter(u => u).length,
-          'total perms': currentStep.allPerms.length
-        }}
-      />
-      </div>
-      </div>
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+              variables={{
+                'current length': currentStep.current.length,
+                'used count': currentStep.used.filter(u => u).length,
+                'total perms': currentStep.allPerms.length
+              }}
+            />
+          </div>
+        </div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
 
-</div>
-  
+      </div>
+
 
     </div>
   );

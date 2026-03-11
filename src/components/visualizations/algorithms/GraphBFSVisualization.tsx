@@ -50,7 +50,7 @@ export const GraphBFSVisualization: React.FC = () => {
       4: [1],
       5: [2]
     };
-    
+
     const newSteps: Step[] = [];
     const visited = new Set<number>([0]);
     const queue = [0];
@@ -67,10 +67,10 @@ export const GraphBFSVisualization: React.FC = () => {
 
     while (queue.length > 0) {
       const levelSize = queue.length;
-      
+
       for (let i = 0; i < levelSize; i++) {
         const node = queue.shift()!;
-        
+
         newSteps.push({
           currentNode: node,
           visited: Array.from(visited),
@@ -84,7 +84,7 @@ export const GraphBFSVisualization: React.FC = () => {
           if (!visited.has(neighbor)) {
             visited.add(neighbor);
             queue.push(neighbor);
-            
+
             newSteps.push({
               currentNode: node,
               visited: Array.from(visited),
@@ -182,21 +182,20 @@ export const GraphBFSVisualization: React.FC = () => {
             {[0, 1, 2, 3, 4, 5].map(node => (
               <div
                 key={node}
-                className={`w-16 h-16 rounded-full flex items-center justify-center font-bold text-lg border-2 transition-all ${
-                  currentStep.currentNode === node
-                    ? 'bg-primary/20 border-primary text-primary scale-110 animate-pulse'
-                    : currentStep.visited.includes(node)
+                className={`w-16 h-16 rounded-full flex items-center justify-center font- text-lg border-2 transition-all ${currentStep.currentNode === node
+                  ? 'bg-primary/20 border-primary text-primary scale-110 animate-pulse'
+                  : currentStep.visited.includes(node)
                     ? 'bg-green-500/20 border-green-500 text-green-500'
                     : currentStep.queue.includes(node)
-                    ? 'bg-blue-500/20 border-blue-500 text-blue-500'
-                    : 'bg-card border-border text-muted-foreground'
-                }`}
+                      ? 'bg-blue-500/20 border-blue-500 text-blue-500'
+                      : 'bg-card border-border text-muted-foreground'
+                  }`}
               >
                 {node}
               </div>
             ))}
           </div>
-          
+
           <div className="flex gap-4 text-sm justify-center flex-wrap">
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 rounded-full bg-primary/20 border-2 border-primary"></div>
@@ -217,22 +216,22 @@ export const GraphBFSVisualization: React.FC = () => {
           </div>
           <div className="rounded-lg">
             <VariablePanel
-        variables={{
-          currentNode: currentStep.currentNode !== null ? currentStep.currentNode : 'none',
-          level: currentStep.level,
-          visitedCount: currentStep.visited.length,
-          queueSize: currentStep.queue.length,
-          queue: currentStep.queue.join(', ') || 'empty'
-        }}
-      />
+              variables={{
+                currentNode: currentStep.currentNode !== null ? currentStep.currentNode : 'none',
+                level: currentStep.level,
+                visitedCount: currentStep.visited.length,
+                queueSize: currentStep.queue.length,
+                queue: currentStep.queue.join(', ') || 'empty'
+              }}
+            />
+          </div>
         </div>
-        </div>
-        
+
 
         <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
       </div>
 
-    
+
     </div>
   );
 };

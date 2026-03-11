@@ -9,7 +9,7 @@ export const MissingNumberVisualization = () => {
   const [speed, setSpeed] = useState(1000);
 
   const nums = [3, 0, 1];
-  
+
   // Code line mapping (1-based):
   // 1: function...
   // 2:   // Start...
@@ -184,11 +184,10 @@ export const MissingNumberVisualization = () => {
               {step.array.map((value, index) => (
                 <div key={index} className="flex flex-col items-center gap-2">
                   <div
-                    className={`w-14 h-14 rounded flex items-center justify-center font-bold transition-all duration-300 ${
-                      step.highlighting.includes(index)
-                        ? 'bg-primary text-primary-foreground scale-110'
-                        : 'bg-muted text-foreground'
-                    }`}
+                    className={`w-14 h-14 rounded flex items-center justify-center font- transition-all duration-300 ${step.highlighting.includes(index)
+                      ? 'bg-primary text-primary-foreground scale-110'
+                      : 'bg-muted text-foreground'
+                      }`}
                   >
                     {value}
                   </div>
@@ -197,9 +196,9 @@ export const MissingNumberVisualization = () => {
               ))}
               {/* Virtual Nth element explanation visual */}
               <div className="flex flex-col items-center gap-2 opacity-50 border border-dashed rounded p-1">
-                 <div className="w-12 h-12 flex items-center justify-center text-xs text-center text-muted-foreground">
-                    n = {nums.length}
-                 </div>
+                <div className="w-12 h-12 flex items-center justify-center text-xs text-center text-muted-foreground">
+                  n = {nums.length}
+                </div>
               </div>
             </div>
           </Card>
@@ -210,7 +209,7 @@ export const MissingNumberVisualization = () => {
               <p className="font-mono text-center text-lg">{step.calc}</p>
             </Card>
           )}
-          
+
           <Card className="p-4">
             <p className="text-sm font-medium">{step.explanation}</p>
           </Card>
@@ -221,15 +220,15 @@ export const MissingNumberVisualization = () => {
               {Object.entries(step.variables).map(([key, value]) => (
                 <div key={key} className="flex items-center justify-between text-sm border-b pb-1">
                   <span className="font-mono text-muted-foreground">{key}</span>
-                  <span className="font-mono font-bold text-primary">
+                  <span className="font-mono font- text-primary">
                     {Array.isArray(value) ? `[${value.join(', ')}]` : String(value)}
                   </span>
                 </div>
               ))}
             </div>
           </Card>
-          
-           <Card className="p-4 bg-muted/20">
+
+          <Card className="p-4 bg-muted/20">
             <h3 className="font-semibold mb-2 text-sm">Why this works?</h3>
             <div className="text-xs space-y-1 text-muted-foreground">
               <p>Consider the sum of indices [0...n] and sum of values in array.</p>
@@ -250,16 +249,15 @@ export const MissingNumberVisualization = () => {
               {code.split('\n').map((line, index) => (
                 <div
                   key={index}
-                  className={`flex ${
-                    index + 1 === step.highlightedLine // Adjust for 1-based index vs 0-based loop
-                      ? 'bg-primary/20 border-l-2 border-primary'
-                      : ''
-                  } transition-colors duration-300`}
+                  className={`flex ${index + 1 === step.highlightedLine // Adjust for 1-based index vs 0-based loop
+                    ? 'bg-primary/20 border-l-2 border-primary'
+                    : ''
+                    } transition-colors duration-300`}
                 >
                   <span className="inline-block w-8 text-right pr-3 text-muted-foreground select-none">
                     {index + 1}
                   </span>
-                  <code className={index + 1 === step.highlightedLine ? 'font-bold' : ''}>
+                  <code className={index + 1 === step.highlightedLine ? 'font-' : ''}>
                     {line || ' '}
                   </code>
                 </div>

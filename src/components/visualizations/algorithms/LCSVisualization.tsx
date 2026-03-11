@@ -258,12 +258,12 @@ export const LCSVisualization: React.FC = () => {
                         <td
                           key={colIdx}
                           className={`border border-border p-2 text-center transition-all duration-300 w-10 h-10 ${isCurrent
-                              ? "bg-primary/20 ring-2 ring-primary ring-inset font-bold text-primary scale-105"
-                              : isDependency
-                                ? "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400"
-                                : val > 0
-                                  ? "bg-green-500/5 text-green-600 dark:text-green-400"
-                                  : ""
+                            ? "bg-primary/20 ring-2 ring-primary ring-inset font- text-primary scale-105"
+                            : isDependency
+                              ? "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400"
+                              : val > 0
+                                ? "bg-green-500/5 text-green-600 dark:text-green-400"
+                                : ""
                             }`}
                         >
                           {val}

@@ -194,10 +194,10 @@ export const TrappingRainWaterVisualization = () => {
                 return (
                   <div key={index} className="flex flex-col items-center gap-2 flex-1 max-w-[50px] relative">
                     {isLeft && (
-                      <div className="absolute -top-8 text-xs font-bold text-blue-500">L</div>
+                      <div className="absolute -top-8 text-xs font- text-blue-500">L</div>
                     )}
                     {isRight && (
-                      <div className="absolute -top-8 text-xs font-bold text-purple-500">R</div>
+                      <div className="absolute -top-8 text-xs font- text-purple-500">R</div>
                     )}
                     <div className="relative w-full flex-1 flex flex-col justify-end">
                       {waterLevel > 0 && (
@@ -207,15 +207,14 @@ export const TrappingRainWaterVisualization = () => {
                         />
                       )}
                       <div
-                        className={`w-full rounded-t transition-all duration-300 ${
-                          isLeft || isRight
+                        className={`w-full rounded-t transition-all duration-300 ${isLeft || isRight
                             ? 'bg-primary shadow-lg'
                             : 'bg-gradient-to-t from-gray-600 to-gray-400'
-                        }`}
+                          }`}
                         style={{ height: `${(height / getMaxHeight()) * 100}%`, minHeight: height > 0 ? '10px' : '0' }}
                       />
                     </div>
-                    <span className={`text-xs font-mono ${isLeft || isRight ? 'text-primary font-bold' : 'text-muted-foreground'}`}>
+                    <span className={`text-xs font-mono ${isLeft || isRight ? 'text-primary font-' : 'text-muted-foreground'}`}>
                       {height}
                     </span>
                   </div>
@@ -231,7 +230,7 @@ export const TrappingRainWaterVisualization = () => {
           <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
             <div className="text-center">
               <div className="text-sm text-muted-foreground">Total Trapped Water</div>
-              <div className="font-mono font-bold text-2xl text-blue-500">{currentStep.totalWater} units</div>
+              <div className="font-mono font- text-2xl text-blue-500">{currentStep.totalWater} units</div>
             </div>
           </div>
         </div>

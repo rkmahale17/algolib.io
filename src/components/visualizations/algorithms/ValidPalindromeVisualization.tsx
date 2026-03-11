@@ -245,15 +245,14 @@ export const ValidPalindromeVisualization = () => {
                         initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ duration: 0.3, delay: idx * 0.02 }}
-                        className={`w-9 h-9 flex items-center justify-center rounded font-mono font-bold text-sm border-2 ${
-                          isLeft
-                            ? 'bg-primary/20 border-primary text-primary ring-2 ring-primary'
-                            : isRight
+                        className={`w-9 h-9 flex items-center justify-center rounded font-mono font- text-sm border-2 ${isLeft
+                          ? 'bg-primary/20 border-primary text-primary ring-2 ring-primary'
+                          : isRight
                             ? 'bg-secondary/20 border-secondary text-secondary-foreground ring-2 ring-secondary'
                             : isChecked
-                            ? 'bg-green-500/10 border-green-500/30 text-green-600'
-                            : 'bg-muted/50 border-border text-foreground'
-                        }`}
+                              ? 'bg-green-500/10 border-green-500/30 text-green-600'
+                              : 'bg-muted/50 border-border text-foreground'
+                          }`}
                       >
                         {char}
                       </motion.div>
@@ -264,13 +263,13 @@ export const ValidPalindromeVisualization = () => {
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div className="p-3 bg-primary/10 rounded border border-primary/20">
                     <p className="text-xs text-muted-foreground mb-1">Left Pointer</p>
-                    <p className="font-mono font-bold text-primary">
+                    <p className="font-mono font- text-primary">
                       {currentStep.left} {currentStep.leftChar && `→ '${currentStep.leftChar}'`}
                     </p>
                   </div>
                   <div className="p-3 bg-secondary/10 rounded border border-secondary/20">
                     <p className="text-xs text-muted-foreground mb-1">Right Pointer</p>
-                    <p className="font-mono font-bold text-secondary-foreground">
+                    <p className="font-mono font- text-secondary-foreground">
                       {currentStep.right} {currentStep.rightChar && `→ '${currentStep.rightChar}'`}
                     </p>
                   </div>
@@ -293,7 +292,7 @@ export const ValidPalindromeVisualization = () => {
                 animate={{ scale: 1, opacity: 1 }}
                 className={`p-4 rounded mt-4 ${currentStep.isPalindrome ? 'bg-green-500/10 border border-green-500/20' : 'bg-red-500/10 border border-red-500/20'}`}
               >
-                <p className={`text-lg font-bold ${currentStep.isPalindrome ? 'text-green-600' : 'text-red-600'}`}>
+                <p className={`text-lg font- ${currentStep.isPalindrome ? 'text-green-600' : 'text-red-600'}`}>
                   {currentStep.isPalindrome ? '✓ Valid Palindrome' : '✗ Not a Palindrome'}
                 </p>
               </motion.div>

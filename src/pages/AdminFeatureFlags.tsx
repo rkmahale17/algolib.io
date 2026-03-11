@@ -73,14 +73,14 @@ export default function AdminFeatureFlags() {
       // @ts-ignore
       const { error } = await supabase
         .from('feature_flags')
-        .insert([{ 
-            key: newFlagKey.toLowerCase().replace(/\s+/g, '_'), 
-            description: newFlagDesc,
-            is_enabled: false 
+        .insert([{
+          key: newFlagKey.toLowerCase().replace(/\s+/g, '_'),
+          description: newFlagDesc,
+          is_enabled: false
         }]);
 
       if (error) throw error;
-      
+
       toast.success("Feature flag created");
       setNewFlagKey("");
       setNewFlagDesc("");
@@ -97,14 +97,14 @@ export default function AdminFeatureFlags() {
     if (!confirm("Are you sure? This might break the app if the code relies on this flag.")) return;
 
     try {
-        // @ts-ignore
-        const { error } = await supabase.from('feature_flags').delete().eq('id', id);
-        if (error) throw error;
-        toast.success("Flag deleted");
-        setFlags(flags.filter(f => f.id !== id));
+      // @ts-ignore
+      const { error } = await supabase.from('feature_flags').delete().eq('id', id);
+      if (error) throw error;
+      toast.success("Flag deleted");
+      setFlags(flags.filter(f => f.id !== id));
     } catch (error) {
-        toast.error("Failed to delete flag");
-        console.error(error);
+      toast.error("Failed to delete flag");
+      console.error(error);
     }
   };
 
@@ -112,95 +112,95 @@ export default function AdminFeatureFlags() {
     <div className="container mx-auto p-8 space-y-8">
       <div className="flex justify-between items-center">
         <div className="space-y-4">
-            <Link to="/admin">
-                <Button variant="ghost" className="gap-2 -ml-2 text-muted-foreground">
-                    <ArrowLeft className="w-4 h-4" />
-                    Back to Dashboard
-                </Button>
-            </Link>
-            <div>
-                <h1 className="text-3xl font-bold">Feature Flags</h1>
-                <p className="text-muted-foreground">Manage real-time feature toggles for the application.</p>
-            </div>
+          <Link to="/admin">
+            <Button variant="ghost" className="gap-2 -ml-2 text-muted-foreground">
+              <ArrowLeft className="w-4 h-4" />
+              Back to Dashboard
+            </Button>
+          </Link>
+          <div>
+            <h1 className="text-3xl font-">Feature Flags</h1>
+            <p className="text-muted-foreground">Manage real-time feature toggles for the application.</p>
+          </div>
         </div>
         <Button variant="outline" size="icon" onClick={fetchFlags} disabled={loading}>
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
         </Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Create New Flag */}
         <Card className="lg:col-span-1 h-fit">
-            <CardHeader>
-                <CardTitle>Add New Flag</CardTitle>
-                <CardDescription>Define a new meaningful key.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <form onSubmit={createFlag} className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="key">Key (snake_case)</Label>
-                        <Input 
-                            id="key" 
-                            placeholder="new_profile_page" 
-                            value={newFlagKey}
-                            onChange={e => setNewFlagKey(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="desc">Description</Label>
-                        <Input 
-                            id="desc" 
-                            placeholder="Enables the new profile UI" 
-                            value={newFlagDesc}
-                            onChange={e => setNewFlagDesc(e.target.value)}
-                        />
-                    </div>
-                    <Button type="submit" className="w-full" disabled={creating || !newFlagKey}>
-                        {creating && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                        Create Flag
-                    </Button>
-                </form>
-            </CardContent>
+          <CardHeader>
+            <CardTitle>Add New Flag</CardTitle>
+            <CardDescription>Define a new meaningful key.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={createFlag} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="key">Key (snake_case)</Label>
+                <Input
+                  id="key"
+                  placeholder="new_profile_page"
+                  value={newFlagKey}
+                  onChange={e => setNewFlagKey(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="desc">Description</Label>
+                <Input
+                  id="desc"
+                  placeholder="Enables the new profile UI"
+                  value={newFlagDesc}
+                  onChange={e => setNewFlagDesc(e.target.value)}
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={creating || !newFlagKey}>
+                {creating && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                Create Flag
+              </Button>
+            </form>
+          </CardContent>
         </Card>
 
         {/* List Flags */}
         <Card className="lg:col-span-2">
-             <CardHeader>
-                <CardTitle>Active Flags</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                {flags.length === 0 ? (
-                    <div className="text-center text-muted-foreground py-8">
-                        No feature flags defined.
+          <CardHeader>
+            <CardTitle>Active Flags</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {flags.length === 0 ? (
+              <div className="text-center text-muted-foreground py-8">
+                No feature flags defined.
+              </div>
+            ) : (
+              flags.map((flag) => (
+                <div key={flag.id} className="flex items-center justify-between p-4 border rounded-lg bg-card/50">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono font-semibold">{flag.key}</span>
+                      {flag.is_enabled ? (
+                        <Badge className="bg-green-500 hover:bg-green-600">Enabled</Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-muted-foreground">Disabled</Badge>
+                      )}
                     </div>
-                ) : (
-                    flags.map((flag) => (
-                        <div key={flag.id} className="flex items-center justify-between p-4 border rounded-lg bg-card/50">
-                            <div className="space-y-1">
-                                <div className="flex items-center gap-2">
-                                    <span className="font-mono font-semibold">{flag.key}</span>
-                                    {flag.is_enabled ? (
-                                        <Badge className="bg-green-500 hover:bg-green-600">Enabled</Badge>
-                                    ) : (
-                                        <Badge variant="outline" className="text-muted-foreground">Disabled</Badge>
-                                    )}
-                                </div>
-                                <p className="text-sm text-muted-foreground">{flag.description || "No description provided."}</p>
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <Switch 
-                                    checked={flag.is_enabled}
-                                    onCheckedChange={() => toggleFlag(flag)}
-                                />
-                                <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10" onClick={() => deleteFlag(flag.id)}>
-                                    <Trash2 className="w-4 h-4" />
-                                </Button>
-                            </div>
-                        </div>
-                    ))
-                )}
-            </CardContent>
+                    <p className="text-sm text-muted-foreground">{flag.description || "No description provided."}</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Switch
+                      checked={flag.is_enabled}
+                      onCheckedChange={() => toggleFlag(flag)}
+                    />
+                    <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10" onClick={() => deleteFlag(flag.id)}>
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))
+            )}
+          </CardContent>
         </Card>
       </div>
     </div>

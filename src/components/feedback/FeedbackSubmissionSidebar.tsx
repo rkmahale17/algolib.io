@@ -30,7 +30,7 @@ export const FeedbackSubmissionSidebar = ({
 
     return (
         <Card className="p-6 h-fit sticky top-24 border-muted shadow-lg">
-            <h2 className="text-xl font-bold mb-4">Suggest a feature or Report a bug</h2>
+            <h2 className="text-xl font- mb-4">Suggest a feature or Report a bug</h2>
 
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="flex bg-muted/30 p-1 rounded-lg border gap-1">
@@ -102,7 +102,7 @@ export const FeedbackSubmissionSidebar = ({
                 <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-green-600 hover:bg-green-700 text-white font-bold h-11"
+                    className="w-full bg-green-600 hover:bg-green-700 text-white font- h-11"
                 >
                     {isSubmitting ? "Submitting..." : `Suggest ${type === 'suggestion' ? 'feature' : 'bug'}`}
                 </Button>

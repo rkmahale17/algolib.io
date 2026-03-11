@@ -48,12 +48,12 @@ export const DPModeSelection = ({ onSelectMode }: DPModeSelectionProps) => {
       color: "text-orange-500",
     },
   ];
-  
+
   return (
     <div className="space-y-6">
       <div className="mb-6">
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           onClick={() => navigate('/games')}
           className="gap-2"
         >
@@ -61,12 +61,12 @@ export const DPModeSelection = ({ onSelectMode }: DPModeSelectionProps) => {
           Back to Games
         </Button>
       </div>
-      
+
       <div className="text-center space-y-2">
-        <h2 className="text-2xl font-bold">Choose Your Algorithm</h2>
+        <h2 className="text-2xl font-">Choose Your Algorithm</h2>
         <p className="text-muted-foreground">Select a Dynamic Programming problem to solve</p>
       </div>
-      
+
       <div className="grid md:grid-cols-2 gap-4">
         {modes.map((mode) => {
           const Icon = mode.icon;
@@ -104,7 +104,7 @@ export const DPModeSelection = ({ onSelectMode }: DPModeSelectionProps) => {
           );
         })}
       </div>
-      
+
       <Card className="bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
         <CardHeader>
           <CardTitle className="text-lg">How to Play</CardTitle>

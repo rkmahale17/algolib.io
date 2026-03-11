@@ -60,24 +60,24 @@ export const GraphGameBoard = ({ mode, level, onBackToMenu, onNextLevel }: Graph
               <div className="grid grid-cols-4 gap-4 text-center">
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Score</p>
-                  <p className={`text-2xl font-bold ${getScoreColor()}`}>{gameState.score}</p>
+                  <p className={`text-2xl font- ${getScoreColor()}`}>{gameState.score}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Moves</p>
-                  <p className="text-2xl font-bold text-primary">{gameState.moves}</p>
+                  <p className="text-2xl font- text-primary">{gameState.moves}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Hints Left</p>
-                  <p className="text-2xl font-bold text-secondary">{3 - gameState.hintsUsed}</p>
+                  <p className="text-2xl font- text-secondary">{3 - gameState.hintsUsed}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Frontier</p>
-                  <p className="text-2xl font-bold text-orange-500">{gameState.frontier.length}</p>
+                  <p className="text-2xl font- text-orange-500">{gameState.frontier.length}</p>
                 </div>
               </div>
 
               {/* Maze Grid */}
-              <MazeGrid 
+              <MazeGrid
                 grid={gameState.grid}
                 startPos={gameState.startPos}
                 goalPos={gameState.goalPos}
@@ -92,15 +92,15 @@ export const GraphGameBoard = ({ mode, level, onBackToMenu, onNextLevel }: Graph
                   </Button>
                 ) : (
                   <>
-                    <Button 
-                      variant="default" 
+                    <Button
+                      variant="default"
                       onClick={step}
                       disabled={gameState.frontier.length === 0 || gameState.isComplete || isAutoPlaying}
                     >
                       <StepForward className="mr-2 h-4 w-4" /> Next Step
                     </Button>
-                    <Button 
-                      variant="secondary" 
+                    <Button
+                      variant="secondary"
                       onClick={handleAutoPlay}
                       disabled={gameState.frontier.length === 0 || gameState.isComplete || isAutoPlaying}
                     >
@@ -112,8 +112,8 @@ export const GraphGameBoard = ({ mode, level, onBackToMenu, onNextLevel }: Graph
                 <Button variant="outline" onClick={reset}>
                   <RotateCcw className="mr-2 h-4 w-4" /> Reset
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={useHint}
                   disabled={gameState.hintsUsed >= 3 || !hasStarted}
                 >
@@ -135,10 +135,10 @@ export const GraphGameBoard = ({ mode, level, onBackToMenu, onNextLevel }: Graph
             </CardContent>
           </Card>
         </div>
-        
+
         <div className="lg:col-span-1">
-          <AlgorithmInfo 
-            mode={mode} 
+          <AlgorithmInfo
+            mode={mode}
             frontier={gameState.frontier}
             visitedCount={gameState.visited.size}
           />

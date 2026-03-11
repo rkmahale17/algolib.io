@@ -25,20 +25,20 @@ export default function About() {
     <>
       <Helmet>
         <title>About RulCode - Free Open Source Algorithm Learning Platform</title>
-        <meta 
-          name="description" 
-          content="Learn about RulCode's mission to make algorithm learning accessible through interactive visualizations. 100% free, open-source, and community-driven platform for developers and competitive programmers." 
+        <meta
+          name="description"
+          content="Learn about RulCode's mission to make algorithm learning accessible through interactive visualizations. 100% free, open-source, and community-driven platform for developers and competitive programmers."
         />
-        <meta 
-          name="keywords" 
-          content="about rulcode, algorithm learning platform, open source algorithms, free coding education, interactive algorithm visualizations, hotjar, google analytics" 
+        <meta
+          name="keywords"
+          content="about rulcode, algorithm learning platform, open source algorithms, free coding education, interactive algorithm visualizations, hotjar, google analytics"
         />
         <link rel="canonical" href="https://rulcode.com/about" />
-        
+
         <meta property="og:title" content="About RulCode - Free Algorithm Learning Platform" />
         <meta property="og:description" content="100% free and open-source platform for learning algorithms with interactive visualizations" />
         <meta property="og:url" content="https://rulcode.com/about" />
-        
+
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
@@ -55,7 +55,7 @@ export default function About() {
           })}
         </script>
       </Helmet>
-      
+
       <div className="min-h-screen bg-background relative overflow-hidden">
         {/* Background Gradients */}
         <div className="absolute inset-0 z-0 pointer-events-none">
@@ -64,7 +64,7 @@ export default function About() {
         </div>
 
         <main className="container mx-auto px-4 py-12 max-w-5xl relative z-10">
-          <motion.div 
+          <motion.div
             variants={container}
             initial="hidden"
             animate="show"
@@ -72,7 +72,7 @@ export default function About() {
           >
             {/* Header Section */}
             <motion.div variants={item} className="text-center space-y-6 py-8">
-              <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-500">
+              <h1 className="text-4xl md:text-5xl font- bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-500">
                 About RulCode
               </h1>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
@@ -123,9 +123,9 @@ export default function About() {
                     </p>
                     <div className="flex flex-wrap gap-4 pt-2">
                       <Button asChild className="gap-2">
-                        <a 
-                          href="https://github.com/rkmahale17/algolib.io" 
-                          target="_blank" 
+                        <a
+                          href="https://github.com/rkmahale17/algolib.io"
+                          target="_blank"
                           rel="noopener noreferrer"
                         >
                           <Github className="w-4 h-4" />
@@ -133,9 +133,9 @@ export default function About() {
                         </a>
                       </Button>
                       <Button variant="outline" asChild className="gap-2">
-                        <a 
-                          href="https://github.com/rkmahale17/algolib.io/issues/new" 
-                          target="_blank" 
+                        <a
+                          href="https://github.com/rkmahale17/algolib.io/issues/new"
+                          target="_blank"
                           rel="noopener noreferrer"
                         >
                           <ExternalLink className="w-4 h-4" />
@@ -150,9 +150,9 @@ export default function About() {
 
             {/* Tech Stack Section */}
             <motion.div variants={item}>
-              <h2 className="text-3xl font-bold text-center mb-8">Built With Modern Tech</h2>
+              <h2 className="text-3xl font- text-center mb-8">Built With Modern Tech</h2>
               <div className="grid md:grid-cols-3 gap-6">
-                
+
                 {/* Frontend */}
                 <Card className="bg-card/30 backdrop-blur-sm hover:bg-card/50 transition-colors">
                   <CardHeader>
@@ -223,14 +223,14 @@ export default function About() {
                   <div className="mx-auto w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center text-primary mb-4">
                     <Users className="w-6 h-6" />
                   </div>
-                  <h2 className="text-2xl font-bold">Join the Community</h2>
+                  <h2 className="text-2xl font-">Join the Community</h2>
                   <p className="text-muted-foreground max-w-2xl mx-auto">
                     We welcome contributions! Whether it's adding new algorithms, fixing bugs, or improving documentation.
                   </p>
                   <Button size="lg" className="bg-primary hover:bg-primary/90" asChild>
-                    <a 
-                      href="https://github.com/rkmahale17/algolib.io#-contribute" 
-                      target="_blank" 
+                    <a
+                      href="https://github.com/rkmahale17/algolib.io#-contribute"
+                      target="_blank"
                       rel="noopener noreferrer"
                     >
                       Start Contributing
@@ -242,7 +242,7 @@ export default function About() {
 
           </motion.div>
         </main>
-        
+
         <Footer />
       </div>
     </>

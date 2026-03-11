@@ -10,7 +10,7 @@ export const VariablePanel = ({ variables }: VariablePanelProps) => {
         {Object.entries(variables).map(([key, value]) => (
           <div key={key} className="flex items-center justify-between text-sm">
             <span className="font-mono text-muted-foreground">{key}</span>
-            <span className="font-mono font-bold text-primary bg-primary/10 px-2 py-1 rounded">
+            <span className="font-mono font- text-primary bg-primary/10 px-2 py-1 rounded">
               {Array.isArray(value) ? `[${value.join(', ')}]` : value}
             </span>
           </div>

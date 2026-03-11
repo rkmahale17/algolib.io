@@ -255,11 +255,10 @@ export const GroupAnagramsVisualization = () => {
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ duration: 0.3, delay: idx * 0.1 }}
-                  className={`px-4 py-2 rounded font-mono font-bold border-2 ${
-                    idx === currentStep.currentIndex
-                      ? 'bg-primary/20 border-primary text-primary'
-                      : 'bg-muted/50 border-border text-foreground'
-                  }`}
+                  className={`px-4 py-2 rounded font-mono font- border-2 ${idx === currentStep.currentIndex
+                    ? 'bg-primary/20 border-primary text-primary'
+                    : 'bg-muted/50 border-border text-foreground'
+                    }`}
                 >
                   "{word}"
                 </motion.div>
@@ -292,14 +291,13 @@ export const GroupAnagramsVisualization = () => {
                       key={key}
                       initial={{ y: -10, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
-                      className={`p-3 rounded border ${
-                        key === currentStep.sortedKey
-                          ? 'bg-primary/10 border-primary'
-                          : 'bg-muted/50 border-border'
-                      }`}
+                      className={`p-3 rounded border ${key === currentStep.sortedKey
+                        ? 'bg-primary/10 border-primary'
+                        : 'bg-muted/50 border-border'
+                        }`}
                     >
                       <div className="flex items-start gap-3">
-                        <span className="font-mono font-bold text-primary shrink-0">"{key}":</span>
+                        <span className="font-mono font- text-primary shrink-0">"{key}":</span>
                         <div className="flex flex-wrap gap-2">
                           {words.map((word, idx) => (
                             <span key={idx} className="px-2 py-1 bg-background rounded font-mono text-sm">

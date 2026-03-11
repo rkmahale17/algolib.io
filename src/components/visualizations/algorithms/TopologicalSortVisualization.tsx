@@ -62,16 +62,16 @@ export const TopologicalSortVisualization: React.FC = () => {
       4: []
     };
     const numNodes = 5;
-    
+
     const inDegree = Array(numNodes).fill(0);
     for (let node in graph) {
       for (let neighbor of graph[node]) {
         inDegree[neighbor]++;
       }
     }
-    
+
     const newSteps: Step[] = [];
-    
+
     newSteps.push({
       currentNode: null,
       inDegree: [...inDegree],
@@ -99,7 +99,7 @@ export const TopologicalSortVisualization: React.FC = () => {
     while (queue.length > 0) {
       const node = queue.shift()!;
       result.push(node);
-      
+
       newSteps.push({
         currentNode: node,
         inDegree: [...inDegree],
@@ -202,61 +202,60 @@ export const TopologicalSortVisualization: React.FC = () => {
       />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-      <div className="bg-card rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4">Topological Sort (Kahn's Algorithm)</h3>
-        
-        <div className="grid grid-cols-5 gap-4 mb-6">
-          {currentStep.inDegree.map((degree, idx) => (
-            <div key={idx} className="flex flex-col items-center gap-2">
-              <div
-                className={`w-16 h-16 rounded-full border-2 flex items-center justify-center font-bold text-lg transition-all ${
-                  currentStep.currentNode === idx
+        <div className="bg-card rounded-lg p-6 border">
+          <h3 className="text-lg font-semibold mb-4">Topological Sort (Kahn's Algorithm)</h3>
+
+          <div className="grid grid-cols-5 gap-4 mb-6">
+            {currentStep.inDegree.map((degree, idx) => (
+              <div key={idx} className="flex flex-col items-center gap-2">
+                <div
+                  className={`w-16 h-16 rounded-full border-2 flex items-center justify-center font- text-lg transition-all ${currentStep.currentNode === idx
                     ? 'bg-primary/20 border-primary text-primary scale-110'
                     : currentStep.result.includes(idx)
-                    ? 'bg-green-500/20 border-green-500 text-green-500'
-                    : currentStep.queue.includes(idx)
-                    ? 'bg-blue-500/20 border-blue-500 text-blue-500'
-                    : 'bg-card border-border'
-                }`}
-              >
-                {idx}
+                      ? 'bg-green-500/20 border-green-500 text-green-500'
+                      : currentStep.queue.includes(idx)
+                        ? 'bg-blue-500/20 border-blue-500 text-blue-500'
+                        : 'bg-card border-border'
+                    }`}
+                >
+                  {idx}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  In-degree: {degree}
+                </div>
               </div>
-              <div className="text-xs text-muted-foreground">
-                In-degree: {degree}
-              </div>
+            ))}
+          </div>
+
+          <div className="mt-4 space-y-2">
+            <div className="p-3 bg-blue-500/10 rounded">
+              <span className="text-sm font-semibold">Queue: </span>
+              <span className="text-sm">[{currentStep.queue.join(', ')}]</span>
             </div>
-          ))}
-        </div>
-
-        <div className="mt-4 space-y-2">
-          <div className="p-3 bg-blue-500/10 rounded">
-            <span className="text-sm font-semibold">Queue: </span>
-            <span className="text-sm">[{currentStep.queue.join(', ')}]</span>
+            <div className="p-3 bg-green-500/10 rounded">
+              <span className="text-sm font-semibold">Result: </span>
+              <span className="text-sm">[{currentStep.result.join(' → ')}]</span>
+            </div>
           </div>
-          <div className="p-3 bg-green-500/10 rounded">
-            <span className="text-sm font-semibold">Result: </span>
-            <span className="text-sm">[{currentStep.result.join(' → ')}]</span>
-          </div>
-        </div>
 
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
-        </div>
-      <div className="mt-4 p-4 bg-muted rounded">
+          <div className="mt-4 p-4 bg-muted rounded">
+            <p className="text-sm">{currentStep.message}</p>
+          </div>
+          <div className="mt-4 p-4 bg-muted rounded">
             <VariablePanel
-        variables={{
-          currentNode: currentStep.currentNode !== null ? currentStep.currentNode : 'none',
-          queueSize: currentStep.queue.length,
-          resultLength: currentStep.result.length
-        }}
-      />
-      </div>
-      </div>
+              variables={{
+                currentNode: currentStep.currentNode !== null ? currentStep.currentNode : 'none',
+                queueSize: currentStep.queue.length,
+                resultLength: currentStep.result.length
+              }}
+            />
+          </div>
+        </div>
 
-  
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
 
-</div>
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+
+      </div>
 
 
     </div>

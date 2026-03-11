@@ -167,16 +167,16 @@ export const UniquePathsVisualization = () => {
                         {row.map((val, j) => (
                           <div
                             key={j}
-                            className={`w-20 h-20 border border-border flex items-center justify-center text-2xl font-bold ${
+                            className={`w-20 h-20 border border-border flex items-center justify-center text-2xl font- ${
                               // Highlight logic
                               i === step.row && j === step.col
                                 ? 'bg-primary text-primary-foreground scale-105 transition-transform' // Current target
                                 : (i === step.row && j === step.col + 1) || (i === step.row + 1 && j === step.col)
-                                ? 'bg-secondary border-primary/50' // Dependencies
-                                : val > 0 && i >= step.row // Filled/Active rows
-                                ? 'bg-muted'
-                                : 'opacity-40' // Unvisited/Irrelevant
-                            }`}
+                                  ? 'bg-secondary border-primary/50' // Dependencies
+                                  : val > 0 && i >= step.row // Filled/Active rows
+                                    ? 'bg-muted'
+                                    : 'opacity-40' // Unvisited/Irrelevant
+                              }`}
                           >
                             {val > 0 ? val : ''}
                           </div>
@@ -185,7 +185,7 @@ export const UniquePathsVisualization = () => {
                     ))}
                   </div>
                   <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
-                     <p>We only store 'row' (bottom) and 'newRow' (current) in implementation.</p>
+                    <p>We only store 'row' (bottom) and 'newRow' (current) in implementation.</p>
                   </div>
                 </>
               )}
@@ -214,14 +214,14 @@ export const UniquePathsVisualization = () => {
           </motion.div>
 
           <motion.div
-             key={`variables-${currentStep}`}
-             initial={{ opacity: 0, scale: 0.95 }}
-             animate={{ opacity: 1, scale: 1 }}
-             transition={{ duration: 0.3, delay: 0.4 }}
-             className="mt-4"
-           >
-             <VariablePanel variables={step.variables} />
-           </motion.div>
+            key={`variables-${currentStep}`}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, delay: 0.4 }}
+            className="mt-4"
+          >
+            <VariablePanel variables={step.variables} />
+          </motion.div>
         </>
       }
       rightContent={

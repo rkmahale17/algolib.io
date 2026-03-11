@@ -38,7 +38,7 @@ export const WordSearchVisualization = () => {
       currentRow: -1,
       currentCol: -1,
       targetChar: '',
-      visited: [[false,false,false,false],[false,false,false,false],[false,false,false,false]],
+      visited: [[false, false, false, false], [false, false, false, false], [false, false, false, false]],
       path: [],
       found: false,
       variables: { board: '3x4', word: 'ABCCED', length: 6 },
@@ -53,7 +53,7 @@ export const WordSearchVisualization = () => {
       currentRow: -1,
       currentCol: -1,
       targetChar: '',
-      visited: [[false,false,false,false],[false,false,false,false],[false,false,false,false]],
+      visited: [[false, false, false, false], [false, false, false, false], [false, false, false, false]],
       path: [],
       found: false,
       variables: { m: 3, n: 4 },
@@ -68,7 +68,7 @@ export const WordSearchVisualization = () => {
       currentRow: 0,
       currentCol: 0,
       targetChar: 'A',
-      visited: [[false,false,false,false],[false,false,false,false],[false,false,false,false]],
+      visited: [[false, false, false, false], [false, false, false, false], [false, false, false, false]],
       path: [],
       found: false,
       variables: { start: '[0,0]', char: 'A', target: 'A' },
@@ -83,7 +83,7 @@ export const WordSearchVisualization = () => {
       currentRow: 0,
       currentCol: 0,
       targetChar: 'A',
-      visited: [[false,false,false,false],[false,false,false,false],[false,false,false,false]],
+      visited: [[false, false, false, false], [false, false, false, false], [false, false, false, false]],
       path: [],
       found: false,
       variables: { match: 'A === A', calling: 'dfs(0,0,0)' },
@@ -98,8 +98,8 @@ export const WordSearchVisualization = () => {
       currentRow: 0,
       currentCol: 0,
       targetChar: 'A',
-      visited: [[true,false,false,false],[false,false,false,false],[false,false,false,false]],
-      path: [[0,0]],
+      visited: [[true, false, false, false], [false, false, false, false], [false, false, false, false]],
+      path: [[0, 0]],
       found: false,
       variables: { row: 0, col: 0, idx: 0, visited: '[0,0]' },
       explanation: "Inside dfs(0,0,0). Mark [0,0] as visited. Current path: A",
@@ -113,8 +113,8 @@ export const WordSearchVisualization = () => {
       currentRow: 0,
       currentCol: 0,
       targetChar: 'B',
-      visited: [[true,false,false,false],[false,false,false,false],[false,false,false,false]],
-      path: [[0,0]],
+      visited: [[true, false, false, false], [false, false, false, false], [false, false, false, false]],
+      path: [[0, 0]],
       found: false,
       variables: { nextChar: 'B', idx: 1, exploring: 'neighbors' },
       explanation: "Found 'A'. Now search for next character 'B' from neighbors of [0,0].",
@@ -128,8 +128,8 @@ export const WordSearchVisualization = () => {
       currentRow: 0,
       currentCol: 1,
       targetChar: 'B',
-      visited: [[true,false,false,false],[false,false,false,false],[false,false,false,false]],
-      path: [[0,0]],
+      visited: [[true, false, false, false], [false, false, false, false], [false, false, false, false]],
+      path: [[0, 0]],
       found: false,
       variables: { checking: '[0,1]', char: 'B', match: 'B === B' },
       explanation: "Check right neighbor [0,1] = 'B'. It matches word[1] = 'B'!",
@@ -143,8 +143,8 @@ export const WordSearchVisualization = () => {
       currentRow: 0,
       currentCol: 1,
       targetChar: 'B',
-      visited: [[true,true,false,false],[false,false,false,false],[false,false,false,false]],
-      path: [[0,0],[0,1]],
+      visited: [[true, true, false, false], [false, false, false, false], [false, false, false, false]],
+      path: [[0, 0], [0, 1]],
       found: false,
       variables: { visited: '[0,1]', path: 'AB', idx: 1 },
       explanation: "Move to [0,1]. Mark visited. Current path: AB. Continue DFS.",
@@ -158,8 +158,8 @@ export const WordSearchVisualization = () => {
       currentRow: 0,
       currentCol: 2,
       targetChar: 'C',
-      visited: [[true,true,false,false],[false,false,false,false],[false,false,false,false]],
-      path: [[0,0],[0,1]],
+      visited: [[true, true, false, false], [false, false, false, false], [false, false, false, false]],
+      path: [[0, 0], [0, 1]],
       found: false,
       variables: { checking: '[0,2]', char: 'C', target: 'C' },
       explanation: "From [0,1], check right neighbor [0,2] = 'C'. Matches word[2] = 'C'!",
@@ -173,8 +173,8 @@ export const WordSearchVisualization = () => {
       currentRow: 0,
       currentCol: 2,
       targetChar: 'C',
-      visited: [[true,true,true,false],[false,false,false,false],[false,false,false,false]],
-      path: [[0,0],[0,1],[0,2]],
+      visited: [[true, true, true, false], [false, false, false, false], [false, false, false, false]],
+      path: [[0, 0], [0, 1], [0, 2]],
       found: false,
       variables: { visited: '[0,2]', path: 'ABC', idx: 2 },
       explanation: "Move to [0,2]. Mark visited. Current path: ABC.",
@@ -188,8 +188,8 @@ export const WordSearchVisualization = () => {
       currentRow: 1,
       currentCol: 2,
       targetChar: 'C',
-      visited: [[true,true,true,false],[false,false,false,false],[false,false,false,false]],
-      path: [[0,0],[0,1],[0,2]],
+      visited: [[true, true, true, false], [false, false, false, false], [false, false, false, false]],
+      path: [[0, 0], [0, 1], [0, 2]],
       found: false,
       variables: { checking: '[1,2]', char: 'C', target: 'C' },
       explanation: "From [0,2], check down neighbor [1,2] = 'C'. Matches word[3] = 'C'!",
@@ -203,8 +203,8 @@ export const WordSearchVisualization = () => {
       currentRow: 1,
       currentCol: 2,
       targetChar: 'C',
-      visited: [[true,true,true,false],[false,false,true,false],[false,false,false,false]],
-      path: [[0,0],[0,1],[0,2],[1,2]],
+      visited: [[true, true, true, false], [false, false, true, false], [false, false, false, false]],
+      path: [[0, 0], [0, 1], [0, 2], [1, 2]],
       found: false,
       variables: { visited: '[1,2]', path: 'ABCC', idx: 3 },
       explanation: "Move to [1,2]. Mark visited. Current path: ABCC.",
@@ -218,8 +218,8 @@ export const WordSearchVisualization = () => {
       currentRow: 2,
       currentCol: 2,
       targetChar: 'E',
-      visited: [[true,true,true,false],[false,false,true,false],[false,false,false,false]],
-      path: [[0,0],[0,1],[0,2],[1,2]],
+      visited: [[true, true, true, false], [false, false, true, false], [false, false, false, false]],
+      path: [[0, 0], [0, 1], [0, 2], [1, 2]],
       found: false,
       variables: { checking: '[2,2]', char: 'E', target: 'E' },
       explanation: "From [1,2], check down neighbor [2,2] = 'E'. Matches word[4] = 'E'!",
@@ -233,8 +233,8 @@ export const WordSearchVisualization = () => {
       currentRow: 2,
       currentCol: 2,
       targetChar: 'E',
-      visited: [[true,true,true,false],[false,false,true,false],[false,false,true,false]],
-      path: [[0,0],[0,1],[0,2],[1,2],[2,2]],
+      visited: [[true, true, true, false], [false, false, true, false], [false, false, true, false]],
+      path: [[0, 0], [0, 1], [0, 2], [1, 2], [2, 2]],
       found: false,
       variables: { visited: '[2,2]', path: 'ABCCE', idx: 4 },
       explanation: "Move to [2,2]. Mark visited. Current path: ABCCE. One more character!",
@@ -248,8 +248,8 @@ export const WordSearchVisualization = () => {
       currentRow: 2,
       currentCol: 1,
       targetChar: 'D',
-      visited: [[true,true,true,false],[false,false,true,false],[false,false,true,false]],
-      path: [[0,0],[0,1],[0,2],[1,2],[2,2]],
+      visited: [[true, true, true, false], [false, false, true, false], [false, false, true, false]],
+      path: [[0, 0], [0, 1], [0, 2], [1, 2], [2, 2]],
       found: false,
       variables: { checking: '[2,1]', char: 'D', target: 'D' },
       explanation: "From [2,2], check left neighbor [2,1] = 'D'. Matches word[5] = 'D'!",
@@ -263,8 +263,8 @@ export const WordSearchVisualization = () => {
       currentRow: 2,
       currentCol: 1,
       targetChar: 'D',
-      visited: [[true,true,true,false],[false,false,true,false],[false,true,true,false]],
-      path: [[0,0],[0,1],[0,2],[1,2],[2,2],[2,1]],
+      visited: [[true, true, true, false], [false, false, true, false], [false, true, true, false]],
+      path: [[0, 0], [0, 1], [0, 2], [1, 2], [2, 2], [2, 1]],
       found: false,
       variables: { visited: '[2,1]', path: 'ABCCED', idx: 5 },
       explanation: "Move to [2,1]. Mark visited. Current path: ABCCED. Complete word found!",
@@ -278,8 +278,8 @@ export const WordSearchVisualization = () => {
       currentRow: 2,
       currentCol: 1,
       targetChar: 'D',
-      visited: [[true,true,true,false],[false,false,true,false],[false,true,true,false]],
-      path: [[0,0],[0,1],[0,2],[1,2],[2,2],[2,1]],
+      visited: [[true, true, true, false], [false, false, true, false], [false, true, true, false]],
+      path: [[0, 0], [0, 1], [0, 2], [1, 2], [2, 2], [2, 1]],
       found: true,
       variables: { idx: 6, wordLen: 6, found: 'true' },
       explanation: "idx = 6 equals word.length. Complete word 'ABCCED' found! Return true.",
@@ -293,8 +293,8 @@ export const WordSearchVisualization = () => {
       currentRow: 2,
       currentCol: 1,
       targetChar: 'D',
-      visited: [[true,true,true,false],[false,false,true,false],[false,true,true,false]],
-      path: [[0,0],[0,1],[0,2],[1,2],[2,2],[2,1]],
+      visited: [[true, true, true, false], [false, false, true, false], [false, true, true, false]],
+      path: [[0, 0], [0, 1], [0, 2], [1, 2], [2, 2], [2, 1]],
       found: true,
       variables: { result: 'true', path: 'A→B→C→C→E→D' },
       explanation: "Word search successful! Path found: [0,0]→[0,1]→[0,2]→[1,2]→[2,2]→[2,1]",
@@ -308,8 +308,8 @@ export const WordSearchVisualization = () => {
       currentRow: -1,
       currentCol: -1,
       targetChar: '',
-      visited: [[false,false,false,false],[false,false,false,false],[false,false,false,false]],
-      path: [[0,0],[0,1],[0,2],[1,2],[2,2],[2,1]],
+      visited: [[false, false, false, false], [false, false, false, false], [false, false, false, false]],
+      path: [[0, 0], [0, 1], [0, 2], [1, 2], [2, 2], [2, 1]],
       found: true,
       variables: { time: 'O(m×n×4^L)', space: 'O(L)', L: 'word length' },
       explanation: "Algorithm complete! Time: O(m×n×4^L) for DFS from each cell. Space: O(L) for recursion stack.",
@@ -355,11 +355,11 @@ export const WordSearchVisualization = () => {
 
   const getCellColor = (row: number, col: number) => {
     if (!currentStep?.board || !currentStep?.visited?.[row]) return 'bg-muted text-muted-foreground border-border';
-    
+
     const isInPath = currentStep.path.some(([r, c]) => r === row && c === col);
     const isCurrent = row === currentStep.currentRow && col === currentStep.currentCol;
     const isVisited = currentStep.visited[row][col];
-    
+
     if (isCurrent) {
       return 'bg-primary text-primary-foreground border-primary shadow-lg scale-110';
     }
@@ -385,7 +385,7 @@ export const WordSearchVisualization = () => {
             Word Search DFS
           </h3>
           <div className="space-y-4">
-            <motion.div 
+            <motion.div
               key={`board-${currentStepIndex}`}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -404,10 +404,10 @@ export const WordSearchVisualization = () => {
                       <motion.div
                         key={`${rowIdx}-${colIdx}`}
                         initial={{ scale: 0.8 }}
-                        animate={{ 
-                          scale: (rowIdx === currentStep.currentRow && colIdx === currentStep.currentCol) ? 1.15 : 1 
+                        animate={{
+                          scale: (rowIdx === currentStep.currentRow && colIdx === currentStep.currentCol) ? 1.15 : 1
                         }}
-                        className={`w-14 h-14 flex items-center justify-center font-mono font-bold text-lg rounded border-2 transition-all ${getCellColor(rowIdx, colIdx)}`}
+                        className={`w-14 h-14 flex items-center justify-center font-mono font- text-lg rounded border-2 transition-all ${getCellColor(rowIdx, colIdx)}`}
                       >
                         {cell}
                       </motion.div>
@@ -465,9 +465,9 @@ export const WordSearchVisualization = () => {
         <Card className="p-6 overflow-hidden flex flex-col">
           <h3 className="text-lg font-semibold mb-4">Implementation</h3>
           <div className="flex-1 overflow-auto">
-            <AnimatedCodeEditor 
-              code={code} 
-              language="typescript" 
+            <AnimatedCodeEditor
+              code={code}
+              language="typescript"
               highlightedLines={(currentStep.highlightedLines || []).filter((n) => n >= 1 && n <= code.split('\n').length)}
             />
           </div>

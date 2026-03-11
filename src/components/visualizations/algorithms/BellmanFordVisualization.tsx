@@ -254,7 +254,7 @@ export const BellmanFordVisualization = () => {
                     <text
                       x={(from.x + to.x) / 2}
                       y={(from.y + to.y) / 2 - 10}
-                      className="fill-foreground text-[10px] font-bold"
+                      className="fill-foreground text-[10px] font-"
                       textAnchor="middle"
                     >
                       {edge.weight}
@@ -277,7 +277,7 @@ export const BellmanFordVisualization = () => {
                     x={pos.x}
                     y={pos.y - 5}
                     textAnchor="middle"
-                    className="text-[10px] font-bold fill-foreground"
+                    className="text-[10px] font- fill-foreground"
                   >
                     {idx}
                   </text>
@@ -285,7 +285,7 @@ export const BellmanFordVisualization = () => {
                     x={pos.x}
                     y={pos.y + 10}
                     textAnchor="middle"
-                    className="text-[10px] font-bold fill-foreground"
+                    className="text-[10px] font- fill-foreground"
                   >
                     {currentStep.tmpPrices[idx] === Infinity ? '∞' : currentStep.tmpPrices[idx]}
                   </text>

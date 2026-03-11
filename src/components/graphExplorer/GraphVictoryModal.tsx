@@ -13,13 +13,13 @@ interface GraphVictoryModalProps {
   onCompareModes?: () => void;
 }
 
-export const GraphVictoryModal = ({ 
+export const GraphVictoryModal = ({
   isOpen,
-  score, 
-  moves, 
+  score,
+  moves,
   visitedNodes,
   pathLength,
-  onNextLevel, 
+  onNextLevel,
   onBackToMenu,
   onCompareModes
 }: GraphVictoryModalProps) => {
@@ -44,36 +44,36 @@ export const GraphVictoryModal = ({
             You successfully navigated through the maze!
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="space-y-4">
           <div className="text-center py-4 bg-primary/10 rounded-lg">
             <p className="text-sm text-muted-foreground mb-1">Final Score</p>
-            <p className="text-5xl font-bold text-primary">{score}</p>
+            <p className="text-5xl font- text-primary">{score}</p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center space-y-1 p-3 bg-muted/50 rounded-lg">
               <p className="text-sm text-muted-foreground">Grade</p>
-              <p className="text-3xl font-bold text-secondary">{getGrade()}</p>
+              <p className="text-3xl font- text-secondary">{getGrade()}</p>
             </div>
             <div className="text-center space-y-1 p-3 bg-muted/50 rounded-lg">
               <p className="text-sm text-muted-foreground">Moves</p>
-              <p className="text-2xl font-bold">{moves}</p>
+              <p className="text-2xl font-">{moves}</p>
             </div>
             <div className="text-center space-y-1 p-3 bg-muted/50 rounded-lg">
               <p className="text-sm text-muted-foreground">Visited</p>
-              <p className="text-2xl font-bold text-primary">{visitedNodes}</p>
+              <p className="text-2xl font- text-primary">{visitedNodes}</p>
             </div>
             <div className="text-center space-y-1 p-3 bg-muted/50 rounded-lg">
               <p className="text-sm text-muted-foreground">Path Length</p>
-              <p className="text-2xl font-bold text-secondary">{pathLength}</p>
+              <p className="text-2xl font- text-secondary">{pathLength}</p>
             </div>
           </div>
 
           {onCompareModes && (
-            <Button 
-              variant="outline" 
-              onClick={onCompareModes} 
+            <Button
+              variant="outline"
+              onClick={onCompareModes}
               className="w-full"
             >
               <Target className="mr-2 h-4 w-4" /> Compare BFS vs DFS

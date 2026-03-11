@@ -178,19 +178,18 @@ export const ManachersVisualization: React.FC = () => {
 
       <div className="bg-card rounded-lg p-6 border">
         <h3 className="text-lg font-semibold mb-4">Original String: "{currentStep.original}"</h3>
-        
+
         <h3 className="text-lg font-semibold mb-4">Transformed String</h3>
         <div className="flex gap-1 mb-6 overflow-x-auto">
           {currentStep.transformed.split('').map((char, idx) => (
             <div
               key={idx}
-              className={`w-10 h-10 flex items-center justify-center rounded border-2 font-mono transition-all ${
-                idx === currentStep.center
-                  ? 'bg-primary/20 border-primary scale-110'
-                  : idx === currentStep.maxCenter
+              className={`w-10 h-10 flex items-center justify-center rounded border-2 font-mono transition-all ${idx === currentStep.center
+                ? 'bg-primary/20 border-primary scale-110'
+                : idx === currentStep.maxCenter
                   ? 'bg-green-500/20 border-green-500'
                   : 'bg-card border-border'
-              }`}
+                }`}
             >
               {char}
             </div>
@@ -202,13 +201,12 @@ export const ManachersVisualization: React.FC = () => {
           {currentStep.radius.map((r, idx) => (
             <div
               key={idx}
-              className={`w-10 h-10 flex items-center justify-center rounded border font-mono text-sm ${
-                idx === currentStep.center
-                  ? 'bg-primary/10 border-primary'
-                  : r > 0
+              className={`w-10 h-10 flex items-center justify-center rounded border font-mono text-sm ${idx === currentStep.center
+                ? 'bg-primary/10 border-primary'
+                : r > 0
                   ? 'bg-blue-500/10 border-blue-500/50'
                   : 'bg-card border-border'
-              }`}
+                }`}
             >
               {r}
             </div>
@@ -218,11 +216,11 @@ export const ManachersVisualization: React.FC = () => {
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="p-4 bg-muted rounded border">
             <div className="text-sm text-muted-foreground mb-1">Current Center</div>
-            <div className="text-2xl font-bold text-primary">{currentStep.center}</div>
+            <div className="text-2xl font- text-primary">{currentStep.center}</div>
           </div>
           <div className="p-4 bg-muted rounded border">
             <div className="text-sm text-muted-foreground mb-1">Max Palindrome Length</div>
-            <div className="text-2xl font-bold text-green-500">{currentStep.maxLen}</div>
+            <div className="text-2xl font- text-green-500">{currentStep.maxLen}</div>
           </div>
         </div>
 

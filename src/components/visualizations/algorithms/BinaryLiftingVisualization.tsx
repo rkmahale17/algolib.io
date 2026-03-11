@@ -102,7 +102,7 @@ export const BinaryLiftingVisualization: React.FC = () => {
     // DFS to build tree
     const dfs = (u: number, p: number) => {
       parent[u][0] = p;
-      
+
       newSteps.push({
         tree: tree.map(arr => [...arr]),
         parent: parent.map(arr => [...arr]),
@@ -128,9 +128,9 @@ export const BinaryLiftingVisualization: React.FC = () => {
     // Precompute ancestors
     for (let j = 1; j < LOG; j++) {
       for (let i = 0; i < n; i++) {
-        if (parent[i][j-1] !== -1) {
-          parent[i][j] = parent[parent[i][j-1]][j-1];
-          
+        if (parent[i][j - 1] !== -1) {
+          parent[i][j] = parent[parent[i][j - 1]][j - 1];
+
           newSteps.push({
             tree: tree.map(arr => [...arr]),
             parent: parent.map(arr => [...arr]),
@@ -139,7 +139,7 @@ export const BinaryLiftingVisualization: React.FC = () => {
             targetNode: -1,
             k: 0,
             operation: 'precompute',
-            message: `Precompute: parent[${i}][${j}] = parent[${parent[i][j-1]}][${j-1}] = ${parent[i][j]}`,
+            message: `Precompute: parent[${i}][${j}] = parent[${parent[i][j - 1]}][${j - 1}] = ${parent[i][j]}`,
             lineNumber: 29
           });
         }
@@ -167,7 +167,7 @@ export const BinaryLiftingVisualization: React.FC = () => {
       if ((k & (1 << i)) !== 0) {
         const prevNode = node;
         node = parent[node][i];
-        
+
         newSteps.push({
           tree: tree.map(arr => [...arr]),
           parent: parent.map(arr => [...arr]),
@@ -265,21 +265,20 @@ export const BinaryLiftingVisualization: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-card rounded-lg p-6 border">
           <h3 className="text-lg font-semibold mb-4">Binary Lifting (LCA)</h3>
-          
+
           <div className="space-y-4">
             <div className="grid grid-cols-4 gap-2">
               {currentStep.depth.map((d, idx) => (
                 <div
                   key={idx}
-                  className={`p-3 rounded-lg border-2 text-center ${
-                    idx === currentStep.currentNode
-                      ? 'bg-primary/20 border-primary scale-110'
-                      : idx === currentStep.targetNode
+                  className={`p-3 rounded-lg border-2 text-center ${idx === currentStep.currentNode
+                    ? 'bg-primary/20 border-primary scale-110'
+                    : idx === currentStep.targetNode
                       ? 'bg-yellow-500/20 border-yellow-500'
                       : 'bg-muted/30 border-border'
-                  } transition-all`}
+                    } transition-all`}
                 >
-                  <div className="font-bold text-lg">{idx}</div>
+                  <div className="font- text-lg">{idx}</div>
                   <div className="text-xs text-muted-foreground mt-1">
                     depth: {d}
                   </div>
@@ -306,7 +305,7 @@ export const BinaryLiftingVisualization: React.FC = () => {
                 <tbody>
                   {currentStep.parent.map((row, i) => (
                     <tr key={i} className={i === currentStep.currentNode ? 'bg-primary/20' : ''}>
-                      <td className="border border-border p-1 font-bold">{i}</td>
+                      <td className="border border-border p-1 font-">{i}</td>
                       {row.map((val, j) => (
                         <td key={j} className="border border-border p-1 text-center">
                           {val === -1 ? '-' : val}
@@ -334,10 +333,10 @@ export const BinaryLiftingVisualization: React.FC = () => {
           </div>
         </div>
 
-        <CodeHighlighter 
-          code={code} 
-          highlightedLine={currentStep.lineNumber} 
-          language="typescript" 
+        <CodeHighlighter
+          code={code}
+          highlightedLine={currentStep.lineNumber}
+          language="typescript"
         />
       </div>
     </div>

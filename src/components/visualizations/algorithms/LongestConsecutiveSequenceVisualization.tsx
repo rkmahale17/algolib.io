@@ -284,13 +284,12 @@ export const LongestConsecutiveSequenceVisualization = () => {
                 {step.nums.map((num, idx) => (
                   <div
                     key={idx}
-                    className={`w-14 h-14 rounded flex items-center justify-center font-mono text-sm font-bold ${
-                      num === step.currentNum
-                        ? 'bg-primary text-primary-foreground'
-                        : num === step.checking
+                    className={`w-14 h-14 rounded flex items-center justify-center font-mono text-sm font- ${num === step.currentNum
+                      ? 'bg-primary text-primary-foreground'
+                      : num === step.checking
                         ? 'bg-accent text-accent-foreground'
                         : 'bg-muted'
-                    }`}
+                      }`}
                   >
                     {num}
                   </div>
@@ -314,13 +313,12 @@ export const LongestConsecutiveSequenceVisualization = () => {
                     .map((num, idx) => (
                       <div
                         key={idx}
-                        className={`w-14 h-14 rounded flex items-center justify-center font-mono text-sm font-bold ${
-                          num === step.currentNum
-                            ? 'bg-primary text-primary-foreground'
-                            : num === step.checking
+                        className={`w-14 h-14 rounded flex items-center justify-center font-mono text-sm font- ${num === step.currentNum
+                          ? 'bg-primary text-primary-foreground'
+                          : num === step.checking
                             ? 'bg-accent text-accent-foreground'
                             : 'bg-secondary/50'
-                        }`}
+                          }`}
                       >
                         {num}
                       </div>

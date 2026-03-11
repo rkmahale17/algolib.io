@@ -187,13 +187,12 @@ export const ActivitySelectionVisualization: React.FC = () => {
                     <div className="w-full h-2 bg-muted rounded"></div>
                   </div>
                   <div
-                    className={`absolute h-8 rounded border-2 flex items-center justify-center text-xs font-bold transition-all ${
-                      currentStep.selected.includes(idx)
-                        ? "bg-green-500/20 border-green-500"
-                        : idx === currentStep.current
+                    className={`absolute h-8 rounded border-2 flex items-center justify-center text-xs font- transition-all ${currentStep.selected.includes(idx)
+                      ? "bg-green-500/20 border-green-500"
+                      : idx === currentStep.current
                         ? "bg-primary/20 border-primary"
                         : "bg-blue-500/10 border-blue-500/50"
-                    }`}
+                      }`}
                     style={{
                       left: `${(activity.start / 10) * 100}%`,
                       width: `${((activity.end - activity.start) / 10) * 100}%`,

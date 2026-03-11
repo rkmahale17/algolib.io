@@ -183,7 +183,7 @@ export const MergeKSortedListsVisualization: React.FC = () => {
 
       <div className="bg-card rounded-lg p-6 border">
         <h3 className="text-lg font-semibold mb-4">K Sorted Lists</h3>
-        
+
         <div className="space-y-3 mb-6">
           {currentStep.lists.map((list, listIdx) => (
             <div key={listIdx} className="flex items-center gap-2">
@@ -192,15 +192,14 @@ export const MergeKSortedListsVisualization: React.FC = () => {
                 {list.map((val, idx) => (
                   <div
                     key={idx}
-                    className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
-                      idx === currentStep.pointers[listIdx]
-                        ? currentStep.comparing.includes(listIdx)
-                          ? 'bg-primary/20 border-primary text-primary scale-110'
-                          : 'bg-secondary/20 border-secondary text-secondary-foreground'
-                        : idx < currentStep.pointers[listIdx]
+                    className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font- transition-all ${idx === currentStep.pointers[listIdx]
+                      ? currentStep.comparing.includes(listIdx)
+                        ? 'bg-primary/20 border-primary text-primary scale-110'
+                        : 'bg-secondary/20 border-secondary text-secondary-foreground'
+                      : idx < currentStep.pointers[listIdx]
                         ? 'bg-muted/50 border-border text-muted-foreground opacity-50'
                         : 'bg-card border-border text-foreground'
-                    }`}
+                      }`}
                   >
                     {val}
                   </div>
@@ -215,7 +214,7 @@ export const MergeKSortedListsVisualization: React.FC = () => {
           {currentStep.result.map((val, idx) => (
             <div
               key={idx}
-              className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-accent/20 border-accent text-accent-foreground font-bold"
+              className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-accent/20 border-accent text-accent-foreground font-"
             >
               {val}
             </div>

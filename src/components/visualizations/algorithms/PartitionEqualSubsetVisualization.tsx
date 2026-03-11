@@ -132,9 +132,8 @@ export const PartitionEqualSubsetVisualization = () => {
       i: nums.length,
       j: target,
       sum: target,
-      message: `Result: ${
-        dp[nums.length][target] ? "Can partition" : "Cannot partition"
-      }`,
+      message: `Result: ${dp[nums.length][target] ? "Can partition" : "Cannot partition"
+        }`,
       lineNumber: 22,
     });
 
@@ -215,19 +214,18 @@ export const PartitionEqualSubsetVisualization = () => {
                 <tbody>
                   {currentStep.dp.map((row, i) => (
                     <tr key={i}>
-                      <td className="border border-border p-2 font-bold">
+                      <td className="border border-border p-2 font-">
                         {i}
                       </td>
                       {row.map((cell, j) => (
                         <td
                           key={j}
-                          className={`border border-border p-2 text-center transition-all duration-300 ${
-                            i === currentStep.i && j === currentStep.j
+                          className={`border border-border p-2 text-center transition-all duration-300 ${i === currentStep.i && j === currentStep.j
                               ? "bg-primary text-white"
                               : cell
-                              ? "bg-green-500/30"
-                              : "bg-muted/20"
-                          }`}
+                                ? "bg-green-500/30"
+                                : "bg-muted/20"
+                            }`}
                         >
                           {cell ? "T" : "F"}
                         </td>

@@ -67,11 +67,10 @@ export const ReverseLinkedListVisualization = () => {
             <div className="flex items-center gap-2 overflow-x-auto pb-2">
               {currentStep.list.map((val, idx) => (
                 <div key={idx} className="flex items-center">
-                  <div className={`w-14 h-14 flex items-center justify-center rounded font-bold text-lg border-2 ${
-                    currentStep.current === idx ? 'bg-primary/20 border-primary text-primary' :
+                  <div className={`w-14 h-14 flex items-center justify-center rounded font- text-lg border-2 ${currentStep.current === idx ? 'bg-primary/20 border-primary text-primary' :
                     currentStep.prev === idx ? 'bg-accent/20 border-accent text-accent-foreground' :
-                    currentStep.next === idx ? 'bg-secondary/20 border-secondary text-secondary-foreground' : 'bg-muted border-border text-foreground'
-                  }`}>
+                      currentStep.next === idx ? 'bg-secondary/20 border-secondary text-secondary-foreground' : 'bg-muted border-border text-foreground'
+                    }`}>
                     {val}
                   </div>
                   {idx < currentStep.list.length - 1 && (

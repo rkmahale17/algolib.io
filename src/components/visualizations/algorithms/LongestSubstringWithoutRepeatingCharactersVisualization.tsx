@@ -108,7 +108,7 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
       s: inputString,
       left: 0,
       right: 1,
-      charSet: new Set(['a','b']),
+      charSet: new Set(['a', 'b']),
       maxLen: 1,
       currentSubstring: "ab",
       variables: { add: 'b', charSet: "{'a','b'}", window: 'ab' },
@@ -121,7 +121,7 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
       s: inputString,
       left: 0,
       right: 1,
-      charSet: new Set(['a','b']),
+      charSet: new Set(['a', 'b']),
       maxLen: 2,
       currentSubstring: "ab",
       variables: { windowSize: 2, maxLen: 2, update: 'true' },
@@ -134,7 +134,7 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
       s: inputString,
       left: 0,
       right: 2,
-      charSet: new Set(['a','b']),
+      charSet: new Set(['a', 'b']),
       maxLen: 2,
       currentSubstring: "ab",
       variables: { right: 2, char: 'c', inSet: false },
@@ -147,7 +147,7 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
       s: inputString,
       left: 0,
       right: 2,
-      charSet: new Set(['a','b','c']),
+      charSet: new Set(['a', 'b', 'c']),
       maxLen: 2,
       currentSubstring: "abc",
       variables: { add: 'c', charSet: "{'a','b','c'}", window: 'abc' },
@@ -160,7 +160,7 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
       s: inputString,
       left: 0,
       right: 2,
-      charSet: new Set(['a','b','c']),
+      charSet: new Set(['a', 'b', 'c']),
       maxLen: 3,
       currentSubstring: "abc",
       variables: { windowSize: 3, maxLen: 3, update: 'true' },
@@ -173,7 +173,7 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
       s: inputString,
       left: 0,
       right: 3,
-      charSet: new Set(['a','b','c']),
+      charSet: new Set(['a', 'b', 'c']),
       maxLen: 3,
       currentSubstring: "abc",
       variables: { right: 3, char: 'a', inSet: true },
@@ -186,7 +186,7 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
       s: inputString,
       left: 0,
       right: 3,
-      charSet: new Set(['b','c']),
+      charSet: new Set(['b', 'c']),
       maxLen: 3,
       currentSubstring: "bc",
       variables: { remove: 'a', left: 0, charSet: "{'b','c'}" },
@@ -199,7 +199,7 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
       s: inputString,
       left: 1,
       right: 3,
-      charSet: new Set(['b','c']),
+      charSet: new Set(['b', 'c']),
       maxLen: 3,
       currentSubstring: "bc",
       variables: { left: 1, window: 'bca', check: 'still duplicate?' },
@@ -212,7 +212,7 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
       s: inputString,
       left: 1,
       right: 3,
-      charSet: new Set(['b','c','a']),
+      charSet: new Set(['b', 'c', 'a']),
       maxLen: 3,
       currentSubstring: "bca",
       variables: { add: 'a', charSet: "{'b','c','a'}", window: 'bca' },
@@ -225,7 +225,7 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
       s: inputString,
       left: 1,
       right: 3,
-      charSet: new Set(['b','c','a']),
+      charSet: new Set(['b', 'c', 'a']),
       maxLen: 3,
       currentSubstring: "bca",
       variables: { windowSize: 3, maxLen: 3, noUpdate: 'same' },
@@ -238,7 +238,7 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
       s: inputString,
       left: 1,
       right: 4,
-      charSet: new Set(['b','c','a']),
+      charSet: new Set(['b', 'c', 'a']),
       maxLen: 3,
       currentSubstring: "bca",
       variables: { right: 4, char: 'b', inSet: true },
@@ -251,7 +251,7 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
       s: inputString,
       left: 1,
       right: 4,
-      charSet: new Set(['c','a']),
+      charSet: new Set(['c', 'a']),
       maxLen: 3,
       currentSubstring: "ca",
       variables: { remove: 'b', left: 1, charSet: "{'c','a'}" },
@@ -264,7 +264,7 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
       s: inputString,
       left: 2,
       right: 4,
-      charSet: new Set(['c','a','b']),
+      charSet: new Set(['c', 'a', 'b']),
       maxLen: 3,
       currentSubstring: "cab",
       variables: { add: 'b', charSet: "{'c','a','b'}", window: 'cab' },
@@ -277,7 +277,7 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
       s: inputString,
       left: 2,
       right: 4,
-      charSet: new Set(['c','a','b']),
+      charSet: new Set(['c', 'a', 'b']),
       maxLen: 3,
       currentSubstring: "cab",
       variables: { windowSize: 3, maxLen: 3, noUpdate: 'same' },
@@ -290,7 +290,7 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
       s: inputString,
       left: 2,
       right: 5,
-      charSet: new Set(['c','a','b']),
+      charSet: new Set(['c', 'a', 'b']),
       maxLen: 3,
       currentSubstring: "cab",
       variables: { right: 5, char: 'c', inSet: true },
@@ -303,7 +303,7 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
       s: inputString,
       left: 2,
       right: 5,
-      charSet: new Set(['a','b']),
+      charSet: new Set(['a', 'b']),
       maxLen: 3,
       currentSubstring: "ab",
       variables: { remove: 'c', left: 2, charSet: "{'a','b'}" },
@@ -316,7 +316,7 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
       s: inputString,
       left: 3,
       right: 5,
-      charSet: new Set(['a','b','c']),
+      charSet: new Set(['a', 'b', 'c']),
       maxLen: 3,
       currentSubstring: "abc",
       variables: { add: 'c', charSet: "{'a','b','c'}", window: 'abc' },
@@ -329,7 +329,7 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
       s: inputString,
       left: 3,
       right: 5,
-      charSet: new Set(['a','b','c']),
+      charSet: new Set(['a', 'b', 'c']),
       maxLen: 3,
       currentSubstring: "abc",
       variables: { windowSize: 3, maxLen: 3, noUpdate: 'same' },
@@ -342,7 +342,7 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
       s: inputString,
       left: 3,
       right: 6,
-      charSet: new Set(['a','b','c']),
+      charSet: new Set(['a', 'b', 'c']),
       maxLen: 3,
       currentSubstring: "abc",
       variables: { right: 6, char: 'b', inSet: true },
@@ -355,7 +355,7 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
       s: inputString,
       left: 4,
       right: 6,
-      charSet: new Set(['b','c']),
+      charSet: new Set(['b', 'c']),
       maxLen: 3,
       currentSubstring: "bc",
       variables: { removed: 'a', left: 4, charSet: "{'b','c'}" },
@@ -381,7 +381,7 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
       s: inputString,
       left: 5,
       right: 6,
-      charSet: new Set(['c','b']),
+      charSet: new Set(['c', 'b']),
       maxLen: 3,
       currentSubstring: "cb",
       variables: { add: 'b', charSet: "{'c','b'}", window: 'cb' },
@@ -394,7 +394,7 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
       s: inputString,
       left: 5,
       right: 6,
-      charSet: new Set(['c','b']),
+      charSet: new Set(['c', 'b']),
       maxLen: 3,
       currentSubstring: "cb",
       variables: { windowSize: 2, maxLen: 3, noUpdate: 'same' },
@@ -407,7 +407,7 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
       s: inputString,
       left: 5,
       right: 7,
-      charSet: new Set(['c','b']),
+      charSet: new Set(['c', 'b']),
       maxLen: 3,
       currentSubstring: "cb",
       variables: { right: 7, char: 'b', inSet: true },
@@ -517,11 +517,11 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
 
   const getCharColor = (index: number) => {
     if (!currentStep) return 'bg-muted text-muted-foreground border-border';
-    
+
     const inWindow = index >= currentStep.left && index <= currentStep.right;
     const isLeft = index === currentStep.left;
     const isRight = index === currentStep.right;
-    
+
     if (isRight && currentStep.phase === 'shrink') {
       return 'bg-destructive/80 text-destructive-foreground border-destructive shadow-lg scale-110';
     }
@@ -550,7 +550,7 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
             Longest Substring (Sliding Window)
           </h3>
           <div className="space-y-4">
-            <motion.div 
+            <motion.div
               key={`string-${currentStepIndex}`}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -568,10 +568,10 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
                     <motion.div
                       key={idx}
                       initial={{ scale: 0.8 }}
-                      animate={{ 
-                        scale: (idx === currentStep.right || idx === currentStep.left) ? 1.15 : 1 
+                      animate={{
+                        scale: (idx === currentStep.right || idx === currentStep.left) ? 1.15 : 1
                       }}
-                      className={`w-12 h-12 flex items-center justify-center font-mono font-bold text-lg rounded border-2 transition-all ${getCharColor(idx)}`}
+                      className={`w-12 h-12 flex items-center justify-center font-mono font- text-lg rounded border-2 transition-all ${getCharColor(idx)}`}
                     >
                       {char}
                     </motion.div>
@@ -594,7 +594,7 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
                 className="p-3 bg-secondary/10 rounded border border-secondary/30"
               >
                 <div className="text-xs text-muted-foreground mb-1">Left Pointer</div>
-                <div className="text-lg font-mono font-bold text-secondary">{currentStep.left >= 0 ? currentStep.left : '-'}</div>
+                <div className="text-lg font-mono font- text-secondary">{currentStep.left >= 0 ? currentStep.left : '-'}</div>
               </motion.div>
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -602,7 +602,7 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
                 className="p-3 bg-primary/10 rounded border border-primary/30"
               >
                 <div className="text-xs text-muted-foreground mb-1">Right Pointer</div>
-                <div className="text-lg font-mono font-bold text-primary">{currentStep.right >= 0 ? currentStep.right : '-'}</div>
+                <div className="text-lg font-mono font- text-primary">{currentStep.right >= 0 ? currentStep.right : '-'}</div>
               </motion.div>
             </div>
 
@@ -667,9 +667,9 @@ export const LongestSubstringWithoutRepeatingCharactersVisualization = () => {
         <Card className="p-6 overflow-hidden flex flex-col">
           <h3 className="text-lg font-semibold mb-4">Implementation</h3>
           <div className="flex-1 overflow-auto">
-            <AnimatedCodeEditor 
-              code={code} 
-              language="typescript" 
+            <AnimatedCodeEditor
+              code={code}
+              language="typescript"
               highlightedLines={(currentStep.highlightedLines || []).filter((n) => n >= 1 && n <= code.split('\n').length)}
             />
           </div>

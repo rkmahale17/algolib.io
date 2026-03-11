@@ -43,7 +43,7 @@ export const GCDVisualization: React.FC = () => {
 
     while (b !== 0) {
       const remainder = a % b;
-      
+
       newSteps.push({
         a,
         b,
@@ -140,19 +140,19 @@ export const GCDVisualization: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-card rounded-lg p-6 border space-y-4">
           <h3 className="text-lg font-semibold">Euclidean Algorithm</h3>
-          
+
           <div className="grid grid-cols-3 gap-4">
             <div className="p-4 bg-muted rounded border">
               <div className="text-sm text-muted-foreground mb-1">a</div>
-              <div className="text-3xl font-bold text-primary">{currentStep.a}</div>
+              <div className="text-3xl font- text-primary">{currentStep.a}</div>
             </div>
             <div className="p-4 bg-muted rounded border">
               <div className="text-sm text-muted-foreground mb-1">b</div>
-              <div className="text-3xl font-bold text-blue-500">{currentStep.b}</div>
+              <div className="text-3xl font- text-blue-500">{currentStep.b}</div>
             </div>
             <div className="p-4 bg-muted rounded border">
               <div className="text-sm text-muted-foreground mb-1">remainder</div>
-              <div className="text-3xl font-bold text-green-500">
+              <div className="text-3xl font- text-green-500">
                 {currentStep.remainder !== null ? currentStep.remainder : '-'}
               </div>
             </div>

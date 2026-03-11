@@ -76,10 +76,10 @@ export const GraphDiagram: React.FC<GraphDiagramProps> = ({
                                 cy={node.y}
                                 r="16"
                                 className={`transition-all duration-300 ${isCurrent
-                                        ? "fill-primary/20 stroke-primary stroke-[3] animate-pulse"
-                                        : isVisited
-                                            ? "fill-green-500/20 stroke-green-500"
-                                            : "fill-card stroke-primary/50"
+                                    ? "fill-primary/20 stroke-primary stroke-[3] animate-pulse"
+                                    : isVisited
+                                        ? "fill-green-500/20 stroke-green-500"
+                                        : "fill-card stroke-primary/50"
                                     }`}
                                 strokeWidth="1.5"
                             />
@@ -88,7 +88,7 @@ export const GraphDiagram: React.FC<GraphDiagramProps> = ({
                                 y={node.y + 1}
                                 textAnchor="middle"
                                 dominantBaseline="middle"
-                                className={`fill-foreground font-mono text-[10px] font-bold ${isCurrent ? "text-primary" : isVisited ? "text-green-500" : ""
+                                className={`fill-foreground font-mono text-[10px] font- ${isCurrent ? "text-primary" : isVisited ? "text-green-500" : ""
                                     }`}
                             >
                                 {node.val}

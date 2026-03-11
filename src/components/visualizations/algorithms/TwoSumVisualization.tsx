@@ -50,7 +50,7 @@ export const TwoSumVisualization = () => {
 
     for (let i = 0; i < nums.length; i++) {
       const complement = target - nums[i];
-      
+
       newSteps.push({
         array: [...nums],
         highlights: [i],
@@ -145,13 +145,12 @@ export const TwoSumVisualization = () => {
               {currentStep.array.map((value, idx) => (
                 <div key={idx} className="flex flex-col items-center gap-1 sm:gap-2">
                   <div
-                    className={`w-10 h-10 sm:w-16 sm:h-16 rounded-lg flex items-center justify-center border-2 transition-all duration-300 ${
-                      currentStep.highlights.includes(idx)
-                        ? 'bg-primary border-primary scale-110 shadow-lg'
-                        : 'bg-muted/50 border-border'
-                    }`}
+                    className={`w-10 h-10 sm:w-16 sm:h-16 rounded-lg flex items-center justify-center border-2 transition-all duration-300 ${currentStep.highlights.includes(idx)
+                      ? 'bg-primary border-primary scale-110 shadow-lg'
+                      : 'bg-muted/50 border-border'
+                      }`}
                   >
-                    <span className="font-bold text-sm sm:text-lg">{value}</span>
+                    <span className="font- text-sm sm:text-lg">{value}</span>
                   </div>
                   <span className="text-[10px] sm:text-xs text-muted-foreground">[{idx}]</span>
                 </div>
