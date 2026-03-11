@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /maps/
+Sitemap: https://rulcode.com/sitemap.xml

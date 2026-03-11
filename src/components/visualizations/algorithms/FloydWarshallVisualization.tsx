@@ -1,0 +1,247 @@
+import { useEffect, useRef, useState } from 'react';
+
+import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { StepControls } from '../shared/StepControls';
+import { VariablePanel } from '../shared/VariablePanel';
+
+interface Step {
+  matrix: number[][];
+  k: number;
+  i: number;
+  j: number;
+  message: string;
+  lineNumber: number;
+}
+
+export const FloydWarshallVisualization = () => {
+  const [steps, setSteps] = useState<Step[]>([]);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [speed, setSpeed] = useState(1);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const code = `function floydWarshall(n: number, edges: [number, number, number][]): number[][] {
+  const dist = Array.from({ length: n }, () => Array(n).fill(Infinity));
+
+  for (let i = 0; i < n; i++) dist[i][i] = 0;
+
+  for (const [u, v, w] of edges) {
+    dist[u][v] = Math.min(dist[u][v], w);
+  }
+
+  for (let k = 0; k < n; k++) {
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+        dist[i][j] = Math.min(dist[i][j], dist[i][k] + dist[k][j]);
+      }
+    }
+  }
+
+  return dist;
+}`;
+
+
+  const generateSteps = () => {
+    const INF = Infinity;
+    const n = 4;
+    const edges: [number, number, number][] = [
+      [0, 1, 3],
+      [0, 3, 7],
+      [1, 0, 8],
+      [1, 2, 2],
+      [2, 0, 5],
+      [2, 3, 1],
+      [3, 0, 2]
+    ];
+
+    const newSteps: Step[] = [];
+    const dist = Array.from({ length: n }, () => Array(n).fill(INF));
+
+    newSteps.push({
+      matrix: dist.map(row => [...row]),
+      k: -1,
+      i: -1,
+      j: -1,
+      message: 'Initializing distance matrix with Infinity',
+      lineNumber: 2
+    });
+
+    for (let i = 0; i < n; i++) {
+      dist[i][i] = 0;
+      newSteps.push({
+        matrix: dist.map(row => [...row]),
+        k: -1,
+        i,
+        j: i,
+        message: `Setting distance from node ${i} to itself as 0`,
+        lineNumber: 4
+      });
+    }
+
+    for (const [u, v, w] of edges) {
+      dist[u][v] = Math.min(dist[u][v], w);
+      newSteps.push({
+        matrix: dist.map(row => [...row]),
+        k: -1,
+        i: u,
+        j: v,
+        message: `Processing edge (${u}, ${v}) with weight ${w}`,
+        lineNumber: 7
+      });
+    }
+
+    for (let k = 0; k < n; k++) {
+      newSteps.push({
+        matrix: dist.map(row => [...row]),
+        k,
+        i: -1,
+        j: -1,
+        message: `Using node ${k} as intermediate node`,
+        lineNumber: 10
+      });
+
+      for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+          const direct = dist[i][j];
+          const throughK = dist[i][k] + dist[k][j];
+
+          newSteps.push({
+            matrix: dist.map(row => [...row]),
+            k,
+            i,
+            j,
+            message: `Check path ${i}→${k}→${j}: ${dist[i][k] === INF ? '∞' : dist[i][k]} + ${dist[k][j] === INF ? '∞' : dist[k][j]} = ${throughK >= INF ? '∞' : throughK} vs ${direct === INF ? '∞' : direct}`,
+            lineNumber: 13
+          });
+
+          if (throughK < dist[i][j]) {
+            dist[i][j] = throughK;
+            newSteps.push({
+              matrix: dist.map(row => [...row]),
+              k,
+              i,
+              j,
+              message: `Update dist[${i}][${j}] = ${throughK}`,
+              lineNumber: 13
+            });
+          }
+        }
+      }
+    }
+
+    newSteps.push({
+      matrix: dist.map(row => [...row]),
+      k: n,
+      i: -1,
+      j: -1,
+      message: 'All pairs shortest paths computed!',
+      lineNumber: 18
+    });
+
+    setSteps(newSteps);
+    setCurrentStepIndex(0);
+  };
+
+
+  useEffect(() => {
+    generateSteps();
+  }, []);
+
+  useEffect(() => {
+    if (isPlaying && currentStepIndex < steps.length - 1) {
+      intervalRef.current = setInterval(() => {
+        setCurrentStepIndex(prev => {
+          if (prev >= steps.length - 1) {
+            setIsPlaying(false);
+            return prev;
+          }
+          return prev + 1;
+        });
+      }, 1000 / speed);
+    } else {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    }
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [isPlaying, currentStepIndex, steps.length, speed]);
+
+  const handlePlay = () => setIsPlaying(true);
+  const handlePause = () => setIsPlaying(false);
+  const handleStepForward = () => currentStepIndex < steps.length - 1 && setCurrentStepIndex(prev => prev + 1);
+  const handleStepBack = () => currentStepIndex > 0 && setCurrentStepIndex(prev => prev - 1);
+  const handleReset = () => {
+    setCurrentStepIndex(0);
+    setIsPlaying(false);
+    generateSteps();
+  };
+
+  if (steps.length === 0) return null;
+
+  const currentStep = steps[currentStepIndex];
+
+  return (
+    <div className="space-y-6">
+      <StepControls
+        isPlaying={isPlaying}
+        onPlay={handlePlay}
+        onPause={handlePause}
+        onStepForward={handleStepForward}
+        onStepBack={handleStepBack}
+        onReset={handleReset}
+        speed={speed}
+        onSpeedChange={setSpeed}
+        currentStep={currentStepIndex}
+        totalSteps={steps.length - 1}
+      />
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <div className="bg-muted/30 rounded-lg border border-border/50 p-6">
+            <div className="overflow-x-auto">
+              <table className="mx-auto border-collapse">
+                <tbody>
+                  {currentStep.matrix.map((row, i) => (
+                    <tr key={i}>
+                      {row.map((cell, j) => (
+                        <td
+                          key={j}
+                          className={`border border-border p-3 text-center font-mono transition-all duration-300 ${i === currentStep.i && j === currentStep.j
+                              ? 'bg-primary text-white'
+                              : (i === currentStep.i || j === currentStep.j) && currentStep.i !== -1
+                                ? 'bg-accent'
+                                : 'bg-muted/20'
+                            }`}
+                        >
+                          {cell === Infinity ? '∞' : cell}
+                        </td>
+
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="bg-accent/50 rounded-lg border border-accent p-4">
+            <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
+          </div>
+          <div className="rounded-lg">
+            <VariablePanel
+              variables={{
+                k: currentStep.k >= 0 ? currentStep.k : 'N/A',
+                i: currentStep.i >= 0 ? currentStep.i : 'N/A',
+                j: currentStep.j >= 0 ? currentStep.j : 'N/A'
+              }}
+            />
+          </div>
+        </div>
+
+        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+      </div>
+
+
+    </div>
+  );
+};

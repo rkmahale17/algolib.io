@@ -1,0 +1,354 @@
+import { useEffect, useRef, useState } from 'react';
+
+import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { StepControls } from '../shared/StepControls';
+import { VariablePanel } from '../shared/VariablePanel';
+
+interface Step {
+  array: number[];
+  windowStart: number;
+  windowEnd: number;
+  windowSize: number;
+  windowSum: number;
+  maxSum: number;
+  message: string;
+  lineNumber: number;
+}
+
+export const SlidingWindowVisualization = () => {
+  const [steps, setSteps] = useState<Step[]>([]);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [speed, setSpeed] = useState(1);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const code = `function maxSumSubarray(arr: number[], k: number): number {
+  let maxSum = 0;
+  let windowSum = 0;
+  
+  for (let i = 0; i < k; i++) {
+    windowSum += arr[i];
+  }
+  maxSum = windowSum;
+  
+  for (let i = k; i < arr.length; i++) {
+    windowSum = windowSum - arr[i - k] + arr[i];
+    maxSum = Math.max(maxSum, windowSum);
+  }
+  
+  return maxSum;
+}`;
+
+  const generateSteps = () => {
+    const array = [2, 1, 5, 1, 3, 2, 4, 7, 1];
+    const k = 3;
+    const newSteps: Step[] = [];
+    let windowSum = 0;
+    let maxSum = 0;
+
+    // Line 1: Function entry
+    newSteps.push({
+      array: [...array],
+      windowStart: -1,
+      windowEnd: -1,
+      windowSize: k,
+      windowSum: 0,
+      maxSum: 0,
+      message: `Starting Maximum Sum Subarray with k = ${k}.`,
+      lineNumber: 1
+    });
+
+    // Line 2: Initialize maxSum
+    newSteps.push({
+      array: [...array],
+      windowStart: -1,
+      windowEnd: -1,
+      windowSize: k,
+      windowSum: 0,
+      maxSum: 0,
+      message: 'Initialize maxSum = 0.',
+      lineNumber: 2
+    });
+
+    // Line 3: Initialize windowSum
+    newSteps.push({
+      array: [...array],
+      windowStart: -1,
+      windowEnd: -1,
+      windowSize: k,
+      windowSum: 0,
+      maxSum: 0,
+      message: 'Initialize windowSum = 0.',
+      lineNumber: 3
+    });
+
+    // Building first window
+    for (let i = 0; i < k; i++) {
+      // Line 5: For loop check
+      newSteps.push({
+        array: [...array],
+        windowStart: 0,
+        windowEnd: i - 1,
+        windowSize: k,
+        windowSum,
+        maxSum,
+        message: `Building first window: i = ${i}.`,
+        lineNumber: 5
+      });
+
+      windowSum += array[i];
+      // Line 6: Add to windowSum
+      newSteps.push({
+        array: [...array],
+        windowStart: 0,
+        windowEnd: i,
+        windowSize: k,
+        windowSum,
+        maxSum,
+        message: `Add arr[${i}] (${array[i]}) to windowSum. windowSum is now ${windowSum}.`,
+        lineNumber: 6
+      });
+    }
+
+    maxSum = windowSum;
+    // Line 8: Set initial maxSum
+    newSteps.push({
+      array: [...array],
+      windowStart: 0,
+      windowEnd: k - 1,
+      windowSize: k,
+      windowSum,
+      maxSum,
+      message: `First window built. Set initial maxSum = windowSum = ${maxSum}.`,
+      lineNumber: 8
+    });
+
+    // Sliding window
+    for (let i = k; i < array.length; i++) {
+      const oldIndex = i - k;
+      const newIndex = i;
+
+      // Line 10: For loop check
+      newSteps.push({
+        array: [...array],
+        windowStart: oldIndex,
+        windowEnd: newIndex - 1,
+        windowSize: k,
+        windowSum,
+        maxSum,
+        message: `Sliding window: i = ${i}.`,
+        lineNumber: 10
+      });
+
+      // Line 11: Subtract old, add new
+      const oldVal = array[oldIndex];
+      const newVal = array[newIndex];
+
+      // Show subtraction first
+      newSteps.push({
+        array: [...array],
+        windowStart: oldIndex + 1,
+        windowEnd: newIndex - 1,
+        windowSize: k,
+        windowSum: windowSum - oldVal,
+        maxSum,
+        message: `Remove arr[${oldIndex}] (${oldVal}) from windowSum.`,
+        lineNumber: 11
+      });
+
+      windowSum = windowSum - oldVal + newVal;
+
+      // Show addition
+      newSteps.push({
+        array: [...array],
+        windowStart: oldIndex + 1,
+        windowEnd: newIndex,
+        windowSize: k,
+        windowSum,
+        maxSum,
+        message: `Add arr[${newIndex}] (${newVal}) to windowSum. windowSum is now ${windowSum}.`,
+        lineNumber: 11
+      });
+
+      // Line 12: Update maxSum
+      const prevMax = maxSum;
+      maxSum = Math.max(maxSum, windowSum);
+      newSteps.push({
+        array: [...array],
+        windowStart: oldIndex + 1,
+        windowEnd: newIndex,
+        windowSize: k,
+        windowSum,
+        maxSum,
+        message: windowSum > prevMax
+          ? `New maximum found! ${windowSum} > ${prevMax}. Update maxSum = ${maxSum}.`
+          : `${windowSum} is not greater than ${prevMax}. maxSum remains ${maxSum}.`,
+        lineNumber: 12
+      });
+    }
+
+    // Line 15: Return
+    newSteps.push({
+      array: [...array],
+      windowStart: array.length - k,
+      windowEnd: array.length - 1,
+      windowSize: k,
+      windowSum,
+      maxSum,
+      message: `Algorithm complete. The maximum sum subarray of size ${k} has sum ${maxSum}.`,
+      lineNumber: 15
+    });
+
+    setSteps(newSteps);
+    setCurrentStepIndex(0);
+  };
+
+  useEffect(() => {
+    generateSteps();
+  }, []);
+
+  useEffect(() => {
+    if (isPlaying && currentStepIndex < steps.length - 1) {
+      intervalRef.current = setInterval(() => {
+        setCurrentStepIndex(prev => {
+          if (prev >= steps.length - 1) {
+            setIsPlaying(false);
+            return prev;
+          }
+          return prev + 1;
+        });
+      }, 1000 / speed);
+    } else {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    }
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [isPlaying, currentStepIndex, steps.length, speed]);
+
+  const handlePlay = () => setIsPlaying(true);
+  const handlePause = () => setIsPlaying(false);
+  const handleStepForward = () => {
+    if (currentStepIndex < steps.length - 1) {
+      setCurrentStepIndex(prev => prev + 1);
+    }
+  };
+  const handleStepBack = () => {
+    if (currentStepIndex > 0) {
+      setCurrentStepIndex(prev => prev - 1);
+    }
+  };
+  const handleReset = () => {
+    setCurrentStepIndex(0);
+    setIsPlaying(false);
+    generateSteps();
+  };
+
+  if (steps.length === 0) return null;
+
+  const currentStep = steps[currentStepIndex];
+  const getMaxValue = () => Math.max(...currentStep.array);
+
+  return (
+    <div className="space-y-6">
+      <StepControls
+        isPlaying={isPlaying}
+        onPlay={handlePlay}
+        onPause={handlePause}
+        onStepForward={handleStepForward}
+        onStepBack={handleStepBack}
+        onReset={handleReset}
+        speed={speed}
+        onSpeedChange={setSpeed}
+        currentStep={currentStepIndex}
+        totalSteps={steps.length - 1}
+      />
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <div className="bg-muted/30 rounded-lg border border-border/50 p-6">
+            <div className="flex items-end justify-center gap-2 h-64">
+              {currentStep.array.map((value, index) => {
+                const isInWindow = index >= currentStep.windowStart && index <= currentStep.windowEnd;
+                const isWindowStart = index === currentStep.windowStart;
+                const isWindowEnd = index === currentStep.windowEnd;
+
+                return (
+                  <div
+                    key={index}
+                    className="flex flex-col items-center gap-2 flex-1 max-w-[60px] relative"
+                  >
+                    {isWindowStart && (
+                      <div className="absolute -top-8 text-xs font- text-primary">
+                        START
+                      </div>
+                    )}
+                    {isWindowEnd && (
+                      <div className="absolute -top-8 text-xs font- text-primary">
+                        END
+                      </div>
+                    )}
+                    <div
+                      className={`w-full rounded-t transition-all duration-300 relative ${isInWindow
+                        ? 'bg-primary shadow-lg shadow-primary/50 scale-105'
+                        : 'bg-gradient-to-t from-primary/60 to-primary/40'
+                        }`}
+                      style={{
+                        height: `${(value / getMaxValue()) * 100}%`,
+                        minHeight: '20px'
+                      }}
+                    >
+                      {isInWindow && (
+                        <div className="absolute inset-0 bg-primary/20 animate-pulse" />
+                      )}
+                    </div>
+                    <span
+                      className={`text-xs font-mono transition-colors ${isInWindow ? 'text-primary font- text-base' : 'text-muted-foreground'
+                        }`}
+                    >
+                      {value}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="bg-accent/50 rounded-lg border border-accent p-4">
+            <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
+          </div>
+
+          <div className=" rounded-lg border p-4">
+
+            <VariablePanel
+              variables={{
+                windowStart: currentStep.windowStart,
+                windowEnd: currentStep.windowEnd,
+                windowSize: currentStep.windowSize,
+                windowSum: currentStep.windowSum,
+                maxSum: currentStep.maxSum,
+                'window': currentStep.array.slice(currentStep.windowStart, currentStep.windowEnd + 1)
+              }}
+            />
+          </div>
+
+
+        </div>
+
+        <div className="space-y-4">
+
+          <CodeHighlighter
+            code={code}
+            highlightedLine={currentStep.lineNumber}
+            language="TypeScript"
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
