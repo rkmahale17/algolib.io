@@ -7,6 +7,8 @@ import { AlertCircle, Check, X, Edit2 } from 'lucide-react';
 import { TreeDiagram } from '../visualizations/TreeDiagram';
 import { isTreeType, serializeTree, parseTreeValue } from '@/utils/treeUtils';
 import { isListType, parseListValue } from '@/utils/listUtils';
+import { GraphDiagram } from '../visualizations/GraphDiagram';
+import { isGraphType } from '@/utils/graphUtils';
 
 interface InputField {
   name: string;
@@ -143,6 +145,26 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
     }
   };
 
+  const handleNodeClick = (index: number, nodeVal: number) => {
+    if (!isEditing) return;
+    const currentVal = editedInputs[index] || '';
+    const startRegex = /(start(?:Node)?\s*=\s*)(\d+)/i;
+    let newVal;
+    if (startRegex.test(currentVal)) {
+      newVal = currentVal.replace(startRegex, `$1${nodeVal}`);
+    } else {
+      const trimmed = currentVal.trim();
+      if (trimmed.startsWith('[')) {
+        newVal = `start = ${nodeVal}, data = ${trimmed}`;
+      } else if (trimmed === '') {
+        newVal = `start = ${nodeVal}`;
+      } else {
+        newVal = `${trimmed}, start = ${nodeVal}`;
+      }
+    }
+    handleInputChange(index, newVal);
+  };
+
   const hasErrors = Object.keys(errors).length > 0;
 
   return (
@@ -157,6 +179,8 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
           </Button>
         )}
       </div>
+
+      <h5 className="text-xs font-semibold text-muted-foreground  tracking-wider mt-4 mb-2">Input</h5>
 
       {inputSchema.map((field, index) => (
         <div key={field.name} className="space-y-1.5">
@@ -184,18 +208,27 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
           {errors[index] && (
             <p className="text-xs text-destructive">{errors[index]}</p>
           )}
-          {controls?.show_tree_visualization && isTreeType(field.type) && editedInputs[index] && !errors[index] && (
+          {(controls?.visualizations?.tree?.enabled ?? controls?.show_tree_visualization) && controls?.visualizations?.tree?.test_cases_input !== false && isTreeType(field.type) && editedInputs[index] && !errors[index] && (
             <div className="mt-2">
               <TreeDiagram data={editedInputs[index]} height={120} />
+            </div>
+          )}
+          {(isGraphType(field.type) || (controls?.visualizations?.graph?.enabled ?? controls?.show_graph_visualization)) && controls?.visualizations?.graph?.test_cases_input !== false && editedInputs[index] && (
+            <div className="mt-2">
+              <GraphDiagram
+                data={editedInputs[index]}
+                height={160}
+                onNodeClick={isEditing ? (val) => handleNodeClick(index, val) : undefined}
+              />
             </div>
           )}
         </div>
       ))}
 
-      <div className="space-y-1.5 pt-2 border-t mt-2">
-        <Label htmlFor="input-expected" className="text-xs font-medium">
-          Expected Output
-          <span className="text-muted-foreground ml-1">(JSON)</span>
+      <div className="space-y-1.5 pt-4 border-t mt-4">
+        <h5 className="text-xs font-semibold text-muted-foreground  tracking-wider mb-2">Expected Output</h5>
+        <Label htmlFor="input-expected" className="text-xs font-medium sr-only">
+          Expected Output (JSON)
         </Label>
         <div className="relative">
           <Input
@@ -218,9 +251,14 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
           <p className="text-xs text-destructive">{errors['expected']}</p>
         )}
         {/* We don't have an explicit type for 'expected' in inputSchema, but we can check if it's likely a tree */}
-        {controls?.show_tree_visualization && editedExpected && !errors['expected'] && (
+        {(controls?.visualizations?.tree?.enabled ?? controls?.show_tree_visualization) && controls?.visualizations?.tree?.test_cases_output !== false && editedExpected && !errors['expected'] && (
           <div className="mt-2">
             <TreeDiagram data={editedExpected} height={120} />
+          </div>
+        )}
+        {(isGraphType(inputSchema?.[0]?.type) || (controls?.visualizations?.graph?.enabled ?? controls?.show_graph_visualization)) && controls?.visualizations?.graph?.test_cases_output !== false && editedExpected && (
+          <div className="mt-2">
+            <GraphDiagram data={editedExpected} height={160} />
           </div>
         )}
       </div>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body, html, #editor-container {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+      }
+      body {
+        transition: background-color 0.2s;
+      }
+      #editor-container {
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+      #editor-container.ready {
+        opacity: 1;
+      }
+      /* Custom highlight styles */
+      .highlighted-line {
+        background-color: rgba(62, 114, 255, 0.2);
+        border-left: 3px solid #3e72ff;
+      }
+      .highlighted-line-glyph {
+        background-color: #3e72ff;
+        width: 4px !important;
+      }
+    </style>
+    <script>
+      // Apply theme background immediately to avoid white flash
+      // Only use documentElement here as body is not yet available in head
+      (function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const theme = urlParams.get('theme');
+        if (theme === 'vs-dark') {
+          document.documentElement.style.backgroundColor = '#1e1e1e';
+        } else {
+          document.documentElement.style.backgroundColor = '#ffffff';
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <script>
+      (function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const theme = urlParams.get('theme');
+        document.body.style.backgroundColor = theme === 'vs-dark' ? '#1e1e1e' : '#ffffff';
+      })();
+    </script>
+    <div id="editor-container"></div>
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.54.0/min/vs/loader.js"></script>
+    <script>
+      let editor;
+      let decorations = [];
+
+      require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.54.0/min/vs' } });
+      
+      function updateHighlights(lines) {
+        if (!editor) return;
+        const model = editor.getModel();
+        if (!model) return;
+        
+        const safeLines = (lines || [])
+          .map(l => Math.max(1, typeof l === 'number' ? l : parseInt(l)))
+          .filter(l => !isNaN(l));
+
+        const newDecs = safeLines.map(lineNumber => ({
+          range: new window.monaco.Range(lineNumber, 1, lineNumber, model.getLineMaxColumn(lineNumber)),
+          options: {
+            isWholeLine: true,
+            className: 'highlighted-line',
+            glyphMarginClassName: 'highlighted-line-glyph',
+          },
+        }));
+        decorations = editor.deltaDecorations(decorations, newDecs);
+        if (safeLines.length > 0) {
+          editor.revealLineInCenter(safeLines[0], 1);
+        }
+      }
+
+      window.addEventListener('message', (event) => {
+        const { type, data } = event.data;
+        
+        if (type === 'INIT_EDITOR') {
+          if (editor) return; // Already initialized
+
+          // Add common DSA class definitions
+          window.monaco.languages.typescript.typescriptDefaults.addExtraLib(`
+            class ListNode {
+                val: number;
+                next: ListNode | null;
+                constructor(val?: number, next?: ListNode | null);
+            }
+            class TreeNode {
+                val: number;
+                left: TreeNode | null;
+                right: TreeNode | null;
+                constructor(val?: number, left?: TreeNode | null, right?: TreeNode | null);
+            }
+            class Interval {
+                start: number;
+                end: number;
+                constructor(start: number, end: number);
+            }
+            class Node {
+                val: number;
+                neighbors: Node[];
+                constructor(val?: number, neighbors?: Node[]);
+            }
+            class TrieNode {
+                children: { [key: string]: TrieNode };
+                isEnd: boolean;
+                constructor();
+            }
+          `, 'filename/extra-libs.d.ts');
+
+          editor = window.monaco.editor.create(document.getElementById('editor-container'), {
+            value: data.code,
+            language: data.language,
+            theme: data.theme,
+            readOnly: data.readOnly,
+            minimap: { enabled: false },
+            scrollBeyondLastLine: false,
+            fontSize: data.fontSize || 14,
+            lineNumbers: 'on',
+            renderLineHighlight: 'none',
+            automaticLayout: true,
+            fontFamily: "'JetBrains Mono', 'Fira Code', Consolas, monospace",
+            ...data.options
+          });
+
+          document.body.style.background = data.theme === 'vs-dark' ? '#1e1e1e' : '#ffffff';
+
+          if (data.highlightedLines) {
+            updateHighlights(data.highlightedLines);
+          }
+
+          editor.onDidChangeModelContent(() => {
+            window.parent.postMessage({ type: 'CODE_CHANGED', data: { code: editor.getValue() } }, '*');
+          });
+
+          document.getElementById('editor-container').classList.add('ready');
+          window.parent.postMessage({ type: 'EDITOR_READY' }, '*');
+        } else if (!editor) {
+          return; // Wait for INIT_EDITOR
+        }
+
+        // Other messages
+        if (type === 'UPDATE_CODE') {
+          if (editor.getValue() !== data.code) {
+            editor.setValue(data.code);
+          }
+        } else if (type === 'UPDATE_LANGUAGE') {
+          window.monaco.editor.setModelLanguage(editor.getModel(), data.language);
+        } else if (type === 'UPDATE_THEME') {
+          window.monaco.editor.setTheme(data.theme);
+          document.body.style.background = data.theme === 'vs-dark' ? '#1e1e1e' : '#ffffff';
+        } else if (type === 'UPDATE_HIGHLIGHTS') {
+          updateHighlights(data.lines);
+        } else if (type === 'FORMAT_CODE') {
+          editor.getAction('editor.action.formatDocument').run();
+        } else if (type === 'SET_ERRORS') {
+          const markers = data.errors.map(e => ({
+            startLineNumber: e.line,
+            startColumn: e.column || 1,
+            endLineNumber: e.line,
+            endColumn: 1000,
+            message: e.message,
+            severity: window.monaco.MarkerSeverity.Error
+          }));
+          window.monaco.editor.setModelMarkers(editor.getModel(), "owner", markers);
+        } else if (type === 'TRIGGER_LAYOUT') {
+          editor.layout();
+        } else if (type === 'UPDATE_PRIMARY_COLOR') {
+          const styleId = 'dynamic-primary-color';
+          let style = document.getElementById(styleId);
+          if (!style) {
+            style = document.createElement('style');
+            style.id = styleId;
+            document.head.appendChild(style);
+          }
+          style.textContent = `
+            .highlighted-line {
+              background-color: ${data.color}33 !important;
+              border-left: 3px solid ${data.color} !important;
+            }
+            .highlighted-line-glyph {
+              background-color: ${data.color} !important;
+            }
+          `;
+        }
+      });
+
+      require(['vs/editor/editor.main'], function () {
+        window.parent.postMessage({ type: 'MONACO_LOADED' }, '*');
+      });
+    </script>
+  </body>
+</html>

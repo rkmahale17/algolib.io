@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import { CodeHighlighter } from "../shared/CodeHighlighter";
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from "../shared/StepControls";
 import { VariablePanel } from "../shared/VariablePanel";
 
@@ -257,9 +257,9 @@ export const EditDistanceVisualization: React.FC = () => {
           </div>
         </div>
 
-        <CodeHighlighter
+        <AnimatedCodeEditor
           code={code}
-          highlightedLine={currentStep.lineNumber}
+          highlightedLines={[currentStep.lineNumber]}
           language="typescript"
         />
       </div>

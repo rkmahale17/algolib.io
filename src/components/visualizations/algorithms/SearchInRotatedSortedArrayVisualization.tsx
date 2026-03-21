@@ -3,7 +3,7 @@ import { Card } from '@/components/ui/card';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 
 interface Step {
   array: number[];
@@ -159,9 +159,9 @@ export const SearchInRotatedSortedArrayVisualization = () => {
         </>
       }
       rightContent={
-        <CodeHighlighter
+        <AnimatedCodeEditor
           code={code}
-          highlightedLine={step.highlightedLine}
+          highlightedLines={[step.highlightedLine]}
           language="TypeScript"
         />
       }

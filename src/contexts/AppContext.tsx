@@ -14,6 +14,7 @@ interface Algorithm {
   category: string;
   difficulty: string;
   description: string;
+  serial_no?: number;
   metadata?: any;
   [key: string]: any;
 }
@@ -44,7 +45,7 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-const CACHE_KEY = 'rulcode_algorithms_cache';
+const CACHE_KEY = 'rulcode_algorithms_v2_cache';
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 
 interface CacheData {
@@ -81,7 +82,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         .maybeSingle();
 
       if (error) throw error;
-      setProfile(data as Profile);
+      setProfile(data as any as Profile);
     } catch (error) {
       console.error('Error fetching profile:', error);
     }
@@ -90,14 +91,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const hasPremiumAccess = React.useMemo(() => {
     if (!profile) return false;
 
-    if (profile.subscription_status === 'active') return true;
-
-    // Trial access temporarily disabled for testing payment workflow
-    /*
-    if (profile.subscription_status === 'trialing' && profile.trial_end_date) {
-      return new Date(profile.trial_end_date) > new Date();
+    if (profile.subscription_status === 'active') {
+      // Even if active, if we have an end date that passed, respect it
+      if (profile.current_period_end && new Date(profile.current_period_end) < new Date()) {
+        return false;
+      }
+      return true;
     }
-    */
+
+    // Handle Grace period for canceled subscriptions
+    if ((profile.subscription_status === 'canceled' || profile.cancel_at_period_end) && profile.current_period_end) {
+      return new Date(profile.current_period_end) > new Date();
+    }
+
     return false;
   }, [profile]);
 
@@ -127,7 +133,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Fetch algorithms from cache or database
+  // Fetch algorithms from database
   const fetchAlgorithms = async (forceRefresh = false) => {
     if (!supabase) {
       console.warn('Supabase not available, skipping algorithms fetch');
@@ -136,27 +142,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      // Check cache first
-      if (!forceRefresh) {
-        const cached = localStorage.getItem(CACHE_KEY);
-        if (cached) {
-          const cacheData: CacheData = JSON.parse(cached);
-          const age = Date.now() - cacheData.timestamp;
-
-          if (age < CACHE_DURATION) {
-            setAlgorithms(cacheData.algorithms);
-            setIsAlgorithmsLoading(false);
-            return;
-          }
-        }
-      }
-
-      // Fetch from database
+      // Fetch from database - SELECT ONLY NECESSARY COLUMNS FOR LIST VIEW
+      // Note: We no longer cache this list in localStorage to avoid QuotaExceededError
       setIsAlgorithmsLoading(true);
       const { data, error } = await supabase
         .from('algorithms')
-        .select('*')
-        .order('name');
+        .select('id, name, title, category, difficulty, description, serial_no, metadata, list_type, time_complexity, space_complexity')
+        .order('serial_no', { ascending: true, nullsFirst: false });
 
       if (error) throw error;
 
@@ -167,17 +159,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
           ...algo,
           ...metadataObj,
           metadata: algo.metadata,
+          // Map snake_case to camelCase for consistency with existing components
+          timeComplexity: (algo as any).time_complexity,
+          spaceComplexity: (algo as any).space_complexity,
+          listType: (algo as any).list_type,
         } as Algorithm;
       });
 
       setAlgorithms(transformedData);
 
-      // Update cache
-      const cacheData: CacheData = {
-        algorithms: transformedData,
-        timestamp: Date.now(),
-      };
-      localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+      // Cleanup old cache keys if they exist
+      try {
+        localStorage.removeItem('rulcode_algorithms_cache');
+        localStorage.removeItem('rulcode_algorithms_v2_cache');
+      } catch (e) {
+        // Ignore cleanup errors
+      }
     } catch (error) {
       console.error('Error fetching algorithms:', error);
     } finally {
@@ -185,106 +182,106 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Fetch user algorithm data
-  const fetchUserData = async () => {
-    if (!user) {
-      setUserAlgorithmData([]);
-      return;
-    }
+// Fetch user algorithm data
+const fetchUserData = async () => {
+  if (!user) {
+    setUserAlgorithmData([]);
+    return;
+  }
 
-    try {
-      setIsUserDataLoading(true);
-      const data = await getAllUserAlgorithmData(user.id);
-      setUserAlgorithmData(data);
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-    } finally {
-      setIsUserDataLoading(false);
-    }
-  };
+  try {
+    setIsUserDataLoading(true);
+    const data = await getAllUserAlgorithmData(user.id);
+    setUserAlgorithmData(data);
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+  } finally {
+    setIsUserDataLoading(false);
+  }
+};
 
-  // Initialize auth
-  useEffect(() => {
-    if (!supabase) {
-      console.warn('Supabase not available, skipping authentication');
-      setIsAuthLoading(false);
-      return;
-    }
+// Initialize auth
+useEffect(() => {
+  if (!supabase) {
+    console.warn('Supabase not available, skipping authentication');
+    setIsAuthLoading(false);
+    return;
+  }
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id);
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    setUser(session?.user ?? null);
+    if (session?.user) {
+      fetchProfile(session.user.id);
+    }
+    setIsAuthLoading(false);
+  });
+
+  const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    setUser(session?.user ?? null);
+    if (session?.user) {
+      fetchProfile(session.user.id);
+    } else {
+      setProfile(null);
+    }
+  });
+
+  return () => subscription.unsubscribe();
+}, []);
+
+// Fetch algorithms on mount
+useEffect(() => {
+  fetchAlgorithms();
+}, []);
+
+// Fetch user data when user changes
+// useEffect(() => {
+//   fetchUserData();
+// }, [user]);
+
+// Subscribe to user_algorithm_data changes
+useEffect(() => {
+  if (!user || !supabase) return;
+
+  const channel = supabase
+    .channel('user_algorithm_data_changes')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'user_algorithm_data',
+        filter: `user_id=eq.${user.id}`,
+      },
+      () => {
+        // Refetch user data when changes occur
+        fetchUserData();
       }
-      setIsAuthLoading(false);
-    });
+    )
+    .subscribe();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id);
-      } else {
-        setProfile(null);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  // Fetch algorithms on mount
-  useEffect(() => {
-    fetchAlgorithms();
-  }, []);
-
-  // Fetch user data when user changes
-  // useEffect(() => {
-  //   fetchUserData();
-  // }, [user]);
-
-  // Subscribe to user_algorithm_data changes
-  useEffect(() => {
-    if (!user || !supabase) return;
-
-    const channel = supabase
-      .channel('user_algorithm_data_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'user_algorithm_data',
-          filter: `user_id=eq.${user.id}`,
-        },
-        () => {
-          // Refetch user data when changes occur
-          fetchUserData();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user]);
-
-  const value: AppContextType = {
-    user,
-    profile,
-    isAuthLoading,
-    hasPremiumAccess,
-    algorithms,
-    isAlgorithmsLoading,
-    refreshAlgorithms: () => fetchAlgorithms(true),
-    userAlgorithmData,
-    isUserDataLoading,
-    refreshUserData: fetchUserData,
-    refreshProfile: useCallback(() => user ? fetchProfile(user.id) : Promise.resolve(), [user, fetchProfile]),
-    activateTrial,
-    activeListType,
-    setActiveListType: updateActiveListType,
+  return () => {
+    supabase.removeChannel(channel);
   };
+}, [user]);
 
-  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+const value: AppContextType = {
+  user,
+  profile,
+  isAuthLoading,
+  hasPremiumAccess,
+  algorithms,
+  isAlgorithmsLoading,
+  refreshAlgorithms: () => fetchAlgorithms(true),
+  userAlgorithmData,
+  isUserDataLoading,
+  refreshUserData: fetchUserData,
+  refreshProfile: useCallback(() => user ? fetchProfile(user.id) : Promise.resolve(), [user, fetchProfile]),
+  activateTrial,
+  activeListType,
+  setActiveListType: updateActiveListType,
+};
+
+return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
 
 export function useApp() {

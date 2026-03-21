@@ -1,236 +1,287 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { StepControls } from '../shared/StepControls';
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { useState, useMemo } from 'react';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
+import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Card } from '@/components/ui/card';
 
 interface Step {
-  array: number[];
+  nums: number[];
   mask: number;
-  binary: string;
-  subset: number[];
+  i: number;
+  bitSet: boolean;
+  currentSubset: number[];
   allSubsets: number[][];
-  message: string;
-  lineNumber: number;
+  explanation: string;
+  highlightedLines: number[];
+  variables: Record<string, any>;
 }
 
-export const SubsetBitsVisualization: React.FC = () => {
-  const [steps, setSteps] = useState<Step[]>([]);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1000);
-  const intervalRef = useRef<number | null>(null);
+export const SubsetBitsVisualization = () => {
+  const [currentStep, setCurrentStep] = useState(0);
+  const nums = [1, 2, 3];
 
-  const code = `function generateSubsets(arr: number[]): number[][] {
-  const n = arr.length;
-  const subsets: number[][] = [];
-  
-  // Iterate through all possible bitmasks
-  // 2^n combinations (0 to 2^n - 1)
-  for (let mask = 0; mask < (1 << n); mask++) {
-    const subset: number[] = [];
-    
-    // Check each bit position
-    for (let i = 0; i < n; i++) {
-      // If bit i is set, include arr[i]
-      if (mask & (1 << i)) {
-        subset.push(arr[i]);
-      }
-    }
-    
-    subsets.push(subset);
-  }
-  
-  return subsets;
-}`;
+  const steps: Step[] = useMemo(() => {
+    const s: Step[] = [];
+    const res: number[][] = [];
+    const n = nums.length;
 
-  const generateSteps = () => {
-    const arr = [1, 2, 3];
-    const n = arr.length;
-    const newSteps: Step[] = [];
-    const allSubsets: number[][] = [];
-
-    newSteps.push({
-      array: arr,
-      mask: 0,
-      binary: '000',
-      subset: [],
+    // Initialization
+    s.push({
+      nums,
+      mask: -1,
+      i: -1,
+      bitSet: false,
+      currentSubset: [],
       allSubsets: [],
-      message: `Generate all 2^${n} = ${1 << n} subsets using bit manipulation`,
-      lineNumber: 1
+      explanation: "Starting subset generation with nums = [1, 2, 3].",
+      highlightedLines: [1],
+      variables: { nums: "[1, 2, 3]", res: "[]" }
+    });
+
+    s.push({
+      nums,
+      mask: -1,
+      i: -1,
+      bitSet: false,
+      currentSubset: [],
+      allSubsets: [],
+      explanation: "Initialize an empty array to store results.",
+      highlightedLines: [2],
+      variables: { nums: "[1, 2, 3]", res: "[]" }
+    });
+
+    s.push({
+      nums,
+      mask: -1,
+      i: -1,
+      bitSet: false,
+      currentSubset: [],
+      allSubsets: [],
+      explanation: "Get the number of elements: n = 3.",
+      highlightedLines: [3],
+      variables: { nums: "[1, 2, 3]", res: "[]", n: 3 }
     });
 
     for (let mask = 0; mask < (1 << n); mask++) {
-      const subset: number[] = [];
       const binary = mask.toString(2).padStart(n, '0');
+      s.push({
+        nums,
+        mask,
+        i: -1,
+        bitSet: false,
+        currentSubset: [],
+        allSubsets: [...res.map(sub => [...sub])],
+        explanation: `Outer loop: mask = ${mask} (${binary} in binary).`,
+        highlightedLines: [5],
+        variables: { n: 3, mask: `${mask} (${binary})`, res: `size ${res.length}` }
+      });
+
+      const subset: number[] = [];
+      s.push({
+        nums,
+        mask,
+        i: -1,
+        bitSet: false,
+        currentSubset: [],
+        allSubsets: [...res.map(sub => [...sub])],
+        explanation: "Initialize an empty array for the current subset.",
+        highlightedLines: [6],
+        variables: { mask: `${mask} (${binary})`, subset: "[]" }
+      });
 
       for (let i = 0; i < n; i++) {
-        if (mask & (1 << i)) {
-          subset.push(arr[i]);
+        s.push({
+          nums,
+          mask,
+          i,
+          bitSet: (mask & (1 << i)) !== 0,
+          currentSubset: [...subset],
+          allSubsets: [...res.map(sub => [...sub])],
+          explanation: `Inner loop: checking bit i = ${i}.`,
+          highlightedLines: [8],
+          variables: { mask: `${mask} (${binary})`, i, subset: `[${subset.join(', ')}]` }
+        });
+
+        const bitIsSet = (mask & (1 << i)) !== 0;
+        s.push({
+          nums,
+          mask,
+          i,
+          bitSet: bitIsSet,
+          currentSubset: [...subset],
+          allSubsets: [...res.map(sub => [...sub])],
+          explanation: `Checking if bit ${i} is set: (mask & (1 << ${i})) is ${bitIsSet ? 'non-zero' : 'zero'}.`,
+          highlightedLines: [9],
+          variables: { mask: `${mask} (${binary})`, i, bitIsSet }
+        });
+
+        if (bitIsSet) {
+          subset.push(nums[i]);
+          s.push({
+            nums,
+            mask,
+            i,
+            bitSet: true,
+            currentSubset: [...subset],
+            allSubsets: [...res.map(sub => [...sub])],
+            explanation: `Bit ${i} is set. Adding nums[${i}] = ${nums[i]} to the subset.`,
+            highlightedLines: [10],
+            variables: { mask: `${mask} (${binary})`, i, subset: `[${subset.join(', ')}]` }
+          });
         }
       }
 
-      allSubsets.push([...subset]);
-
-      newSteps.push({
-        array: arr,
+      res.push([...subset]);
+      s.push({
+        nums,
         mask,
-        binary,
-        subset: [...subset],
-        allSubsets: allSubsets.map(s => [...s]),
-        message: `Mask ${mask} (${binary}): ${subset.length > 0 ? `include [${subset.join(', ')}]` : 'empty set'}`,
-        lineNumber: 10
+        i: -1,
+        bitSet: false,
+        currentSubset: [...subset],
+        allSubsets: [...res.map(sub => [...sub])],
+        explanation: `Finished building subset [${subset.join(', ')}]. Adding it to result res.`,
+        highlightedLines: [14],
+        variables: { mask: `${mask} (${binary})`, res: `size ${res.length}` }
       });
     }
 
-    newSteps.push({
-      array: arr,
-      mask: (1 << n) - 1,
-      binary: '111',
-      subset: arr,
-      allSubsets: allSubsets.map(s => [...s]),
-      message: `Generated all ${allSubsets.length} subsets!`,
-      lineNumber: 19
+    s.push({
+      nums,
+      mask: -1,
+      i: -1,
+      bitSet: false,
+      currentSubset: [],
+      allSubsets: [...res.map(sub => [...sub])],
+      explanation: "Algorithm complete. Returning all subsets.",
+      highlightedLines: [17],
+      variables: { totalSubsets: res.length }
     });
 
-    setSteps(newSteps);
-  };
+    return s;
+  }, [nums]);
 
-  useEffect(() => {
-    generateSteps();
-  }, []);
+  const code = `function subsets(nums: number[]): number[][] {
+    const res: number[][] = [];
+    const n = nums.length;
 
-  useEffect(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
+    for (let mask = 0; mask < (1 << n); mask++) {
+        const subset: number[] = [];
+
+        for (let i = 0; i < n; i++) {
+            if (mask & (1 << i)) {
+                subset.push(nums[i]);
+            }
+        }
+
+        res.push(subset);
     }
 
-    if (isPlaying && currentStepIndex < steps.length - 1) {
-      intervalRef.current = window.setInterval(() => {
-        setCurrentStepIndex((prev) => {
-          if (prev >= steps.length - 1) {
-            setIsPlaying(false);
-            return prev;
-          }
-          return prev + 1;
-        });
-      }, speed);
-    }
+    return res;
+}`;
 
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
-  }, [isPlaying, currentStepIndex, steps.length, speed]);
-
-  const handlePlay = () => setIsPlaying(true);
-  const handlePause = () => setIsPlaying(false);
-  const handleStepForward = () => {
-    if (currentStepIndex < steps.length - 1) setCurrentStepIndex(currentStepIndex + 1);
-  };
-  const handleStepBack = () => {
-    if (currentStepIndex > 0) setCurrentStepIndex(currentStepIndex - 1);
-  };
-  const handleReset = () => {
-    setCurrentStepIndex(0);
-    setIsPlaying(false);
-  };
-
-  if (steps.length === 0) return null;
-
-  const currentStep = steps[currentStepIndex];
+  const step = steps[currentStep];
 
   return (
-    <div className="space-y-6">
-      <StepControls
-        onPlay={handlePlay}
-        onPause={handlePause}
-        onStepForward={handleStepForward}
-        onStepBack={handleStepBack}
-        onReset={handleReset}
-        isPlaying={isPlaying}
-        currentStep={currentStepIndex}
-        totalSteps={steps.length}
-        speed={speed}
-        onSpeedChange={setSpeed}
-      />
+    <VisualizationLayout
+      leftContent={
+        <div className="space-y-6">
+          <Card className="p-6 bg-card/50 backdrop-blur-sm border-primary/20">
+            <h3 className="text-sm font-semibold mb-4 text-muted-foreground uppercase tracking-wider">Bitmask Status</h3>
+            <div className="flex flex-col gap-6">
+              <div className="flex items-center justify-between px-4 py-3 bg-muted/30 rounded-xl border">
+                <span className="text-sm font-medium">Current Mask (Decimal)</span>
+                <span className="text-2xl font-bold text-primary">{step.mask === -1 ? 'N/A' : step.mask}</span>
+              </div>
 
-      <div className="bg-card rounded-lg p-6 border">
-        <h3 className="text-lg font-semibold mb-4">Array</h3>
-        <div className="flex gap-2 mb-6">
-          {currentStep.array.map((val, idx) => {
-            const bitSet = (currentStep.mask & (1 << idx)) !== 0;
-            return (
-              <div key={idx} className="flex flex-col items-center gap-2">
-                <div
-                  className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font- transition-all ${bitSet ? 'bg-green-500/20 border-green-500' : 'bg-card border-border'
-                    }`}
-                >
-                  {val}
+              <div className="space-y-3">
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest px-1">Binary Representation (Bits for positions 0, 1, 2)</span>
+                <div className="flex gap-4 justify-center">
+                  {[0, 1, 2].map((bitIdx) => {
+                    const isBitActive = step.mask !== -1 && (step.mask & (1 << bitIdx)) !== 0;
+                    const isCurrentBitBeingChecked = step.i === bitIdx;
+                    return (
+                      <div key={bitIdx} className="flex flex-col items-center gap-2">
+                        <motion.div
+                          animate={{
+                            scale: isCurrentBitBeingChecked ? 1.1 : 1,
+                            backgroundColor: isCurrentBitBeingChecked
+                              ? "var(--accent)"
+                              : isBitActive ? "var(--primary)" : "var(--muted)",
+                          }}
+                          className={`w-14 h-14 rounded-xl flex items-center justify-center border-2 transition-colors ${isBitActive ? "border-primary text-primary-foreground shadow-[0_0_15px_rgba(var(--primary),0.3)]" : "border-border text-muted-foreground"
+                            }`}
+                        >
+                          <span className="text-2xl font-bold">{isBitActive ? '1' : '0'}</span>
+                        </motion.div>
+                        <span className="text-[10px] uppercase font-bold text-muted-foreground">Bit {bitIdx}</span>
+                      </div>
+                    );
+                  })}
                 </div>
-                <div className="text-xs text-muted-foreground">bit {idx}</div>
               </div>
-            );
-          })}
-        </div>
-
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="p-4 bg-muted rounded border">
-            <div className="text-sm text-muted-foreground mb-1">Mask (Decimal)</div>
-            <div className="text-2xl font-">{currentStep.mask}</div>
-          </div>
-          <div className="p-4 bg-muted rounded border">
-            <div className="text-sm text-muted-foreground mb-1">Mask (Binary)</div>
-            <div className="text-2xl font-mono font-">{currentStep.binary}</div>
-          </div>
-          <div className="p-4 bg-muted rounded border">
-            <div className="text-sm text-muted-foreground mb-1">Subset Size</div>
-            <div className="text-2xl font- text-primary">{currentStep.subset.length}</div>
-          </div>
-        </div>
-
-        <h3 className="text-lg font-semibold mb-4">Current Subset</h3>
-        <div className="flex gap-2 mb-6 min-h-[3rem]">
-          {currentStep.subset.length > 0 ? (
-            currentStep.subset.map((val, idx) => (
-              <div
-                key={idx}
-                className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-blue-500/20 border-blue-500 font-"
-              >
-                {val}
-              </div>
-            ))
-          ) : (
-            <div className="text-muted-foreground italic">Empty set (∅)</div>
-          )}
-        </div>
-
-        <h3 className="text-lg font-semibold mb-4">All Subsets ({currentStep.allSubsets.length})</h3>
-        <div className="flex flex-wrap gap-2">
-          {currentStep.allSubsets.map((subset, idx) => (
-            <div key={idx} className="px-3 py-1 bg-muted rounded border text-sm">
-              [{subset.join(', ') || '∅'}]
             </div>
-          ))}
+          </Card>
+
+          <Card className="p-6 bg-card/50 border-primary/20">
+            <h3 className="text-sm font-semibold mb-4 text-muted-foreground uppercase tracking-wider">Current Working Subset</h3>
+            <div className="flex flex-wrap gap-2 min-h-[64px] p-4 bg-muted/20 rounded-xl border border-dashed border-primary/30 items-center justify-center">
+              <AnimatePresence mode="popLayout">
+                {step.currentSubset.length === 0 ? (
+                  <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-muted-foreground italic text-sm">Empty Set (∅)</motion.span>
+                ) : (
+                  step.currentSubset.map((val) => (
+                    <motion.div
+                      key={val}
+                      layout
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      className="w-12 h-12 bg-primary/20 text-primary border-2 border-primary/50 rounded-lg flex items-center justify-center font-bold shadow-sm"
+                    >
+                      {val}
+                    </motion.div>
+                  ))
+                )}
+              </AnimatePresence>
+            </div>
+          </Card>
+
+          <Card className="p-4 bg-primary/5 border-primary/20">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Explanation</h4>
+            <p className="text-sm text-foreground leading-relaxed font-medium">{step.explanation}</p>
+          </Card>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card className="p-4 bg-card/50">
+              <h4 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-3">All Subsets Found ({step.allSubsets.length})</h4>
+              <div className="flex flex-wrap gap-1.5 max-h-[120px] overflow-y-auto pr-2 custom-scrollbar">
+                {step.allSubsets.map((sub, idx) => (
+                  <span key={idx} className="px-2 py-1 bg-muted text-[10px] rounded border border-border/50 font-mono">
+                    [{sub.join(', ') || '∅'}]
+                  </span>
+                ))}
+              </div>
+            </Card>
+            <VariablePanel variables={step.variables} />
+          </div>
         </div>
-
-        <div className="mt-4 p-4 bg-muted rounded">
-          <p className="text-sm">{currentStep.message}</p>
-        </div>
-      </div>
-
-      <VariablePanel
-        variables={{
-          'mask': currentStep.mask,
-          'binary': currentStep.binary,
-          'subset size': currentStep.subset.length,
-          'total subsets': currentStep.allSubsets.length
-        }}
-      />
-
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
-    </div>
+      }
+      rightContent={
+        <AnimatedCodeEditor
+          code={code}
+          language="typescript"
+          highlightedLines={step.highlightedLines}
+        />
+      }
+      controls={
+        <SimpleStepControls
+          currentStep={currentStep}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStep}
+        />
+      }
+    />
   );
 };

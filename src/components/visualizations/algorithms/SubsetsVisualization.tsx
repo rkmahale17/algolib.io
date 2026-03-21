@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import { CodeHighlighter } from "../shared/CodeHighlighter";
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from "../shared/StepControls";
 import { VariablePanel } from "../shared/VariablePanel";
 
 interface Step {
-  array: number[];
-  current: number[];
-  index: number;
-  allSubsets: number[][];
+  nums: number[];
+  subset: number[];
+  i: number;
+  res: number[][];
   message: string;
   lineNumber: number;
 }
@@ -21,66 +21,115 @@ export const SubsetsVisualization: React.FC = () => {
   const intervalRef = useRef<number | null>(null);
 
   const code = `function subsets(nums: number[]): number[][] {
-  const result: number[][] = [];
-  const current: number[] = [];
-  
-  function backtrack(start: number) {
-    result.push([...current]);
-    
-    for (let i = start; i < nums.length; i++) {
-      current.push(nums[i]);
-      backtrack(i + 1);
-      current.pop();
+    const res: number[][] = [];
+    const subset: number[] = [];
+
+    function dfs(i: number) {
+        if (i >= nums.length) {
+            res.push([...subset]);
+            return;
+        }
+
+        subset.push(nums[i]);
+        dfs(i + 1);
+
+        subset.pop();
+        dfs(i + 1);
     }
-  }
-  
-  backtrack(0);
-  return result;
+
+    dfs(0);
+    return res;
 }`;
 
   const generateSteps = () => {
-    const arr = [1, 2, 3];
+    const nums = [1, 2, 3];
     const newSteps: Step[] = [];
-    const result: number[][] = [];
-    const current: number[] = [];
+    const res: number[][] = [];
+    const subset: number[] = [];
 
-    function backtrack(start: number, line: number) {
-      result.push([...current]);
+    newSteps.push({
+      nums, subset: [...subset], i: 0, res: [...res],
+      message: 'Initialize res and subset arrays',
+      lineNumber: 2
+    });
+
+    function dfs(i: number) {
       newSteps.push({
-        array: arr,
-        current: [...current],
-        index: start,
-        allSubsets: result.map((s) => [...s]),
-        message: `Add subset [${current.join(", ")}] to result`,
-        lineNumber: line,
+        nums, subset: [...subset], i, res: res.map((s) => [...s]),
+        message: `dfs(${i}) called`,
+        lineNumber: 5
       });
 
-      for (let i = start; i < arr.length; i++) {
-        current.push(arr[i]);
+      newSteps.push({
+        nums, subset: [...subset], i, res: res.map((s) => [...s]),
+        message: `Check base case: i >= nums.length -> ${i} >= ${nums.length}`,
+        lineNumber: 6
+      });
+
+      if (i >= nums.length) {
+        res.push([...subset]);
         newSteps.push({
-          array: arr,
-          current: [...current],
-          index: i,
-          allSubsets: result.map((s) => [...s]),
-          message: `Include ${arr[i]} in current subset`,
-          lineNumber: 7,
+          nums, subset: [...subset], i, res: res.map((s) => [...s]),
+          message: `Base case met! Push copy of current subset [${subset.join(', ')}] to res`,
+          lineNumber: 7
         });
 
-        backtrack(i + 1, 8);
-
-        current.pop();
         newSteps.push({
-          array: arr,
-          current: [...current],
-          index: i,
-          allSubsets: result.map((s) => [...s]),
-          message: `Backtrack: Remove ${arr[i]} from current subset`,
-          lineNumber: 9,
+          nums, subset: [...subset], i, res: res.map((s) => [...s]),
+          message: `Return from dfs(${i})`,
+          lineNumber: 8
         });
+        return;
       }
+
+      subset.push(nums[i]);
+      newSteps.push({
+        nums, subset: [...subset], i, res: res.map((s) => [...s]),
+        message: `Include nums[${i}] (${nums[i]}) in subset. subset is now [${subset.join(', ')}]`,
+        lineNumber: 11
+      });
+
+      newSteps.push({
+        nums, subset: [...subset], i, res: res.map((s) => [...s]),
+        message: `Recursive call dfs(${i + 1}) to explore inclusion branch`,
+        lineNumber: 12
+      });
+      dfs(i + 1);
+
+      const popped = subset.pop();
+      newSteps.push({
+        nums, subset: [...subset], i, res: res.map((s) => [...s]),
+        message: `Backtrack: pop ${popped} from subset. subset is now [${subset.join(', ')}]`,
+        lineNumber: 14
+      });
+
+      newSteps.push({
+        nums, subset: [...subset], i, res: res.map((s) => [...s]),
+        message: `Recursive call dfs(${i + 1}) to explore exclusion branch`,
+        lineNumber: 15
+      });
+      dfs(i + 1);
+
+      newSteps.push({
+        nums, subset: [...subset], i, res: res.map((s) => [...s]),
+        message: `dfs(${i}) execution finished, returning to caller.`,
+        lineNumber: 16
+      });
     }
 
-    backtrack(0, 4);
+    newSteps.push({
+      nums, subset: [...subset], i: 0, res: [...res],
+      message: 'Start initial DFS call from index 0',
+      lineNumber: 18
+    });
+    dfs(0);
+
+    newSteps.push({
+      nums, subset: [...subset], i: 0, res: [...res],
+      message: 'DFS complete. Return final result.',
+      lineNumber: 19
+    });
+
     setSteps(newSteps);
   };
 
@@ -145,14 +194,14 @@ export const SubsetsVisualization: React.FC = () => {
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-card rounded-lg p-6 border">
-          <h3 className="text-lg font-semibold mb-4">Input Array</h3>
+        <div className="bg-card rounded-lg p-6 border shadow-sm">
+          <h3 className="text-lg font-semibold mb-4">Input Array (nums)</h3>
           <div className="flex gap-2 mb-6">
-            {currentStep.array.map((val, idx) => (
+            {currentStep.nums.map((val, idx) => (
               <div
                 key={idx}
-                className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font- transition-all ${idx === currentStep.index
-                  ? "bg-primary/20 border-primary"
+                className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${idx === currentStep.i
+                  ? "bg-primary/20 border-primary scale-110 z-10"
                   : "bg-card border-border"
                   }`}
               >
@@ -163,51 +212,51 @@ export const SubsetsVisualization: React.FC = () => {
 
           <h3 className="text-lg font-semibold mb-4">Current Subset</h3>
           <div className="flex gap-2 mb-6 min-h-[3rem]">
-            {currentStep.current.length > 0 ? (
-              currentStep.current.map((val, idx) => (
+            {currentStep.subset.length > 0 ? (
+              currentStep.subset.map((val, idx) => (
                 <div
                   key={idx}
-                  className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-blue-500/20 border-blue-500 font-"
+                  className="w-12 h-12 flex items-center justify-center text-primary-foreground font-bold rounded-lg border-2 bg-primary border-primary transition-all animate-in zoom-in"
                 >
                   {val}
                 </div>
               ))
             ) : (
-              <div className="text-muted-foreground italic">Empty subset</div>
+              <div className="text-muted-foreground italic flex items-center h-12 px-2">Empty []</div>
             )}
           </div>
 
           <h3 className="text-lg font-semibold mb-4">
-            All Subsets ({currentStep.allSubsets.length})
+            Result Array `res` ({currentStep.res.length})
           </h3>
-          <div className="flex flex-wrap gap-2">
-            {currentStep.allSubsets.map((subset, idx) => (
+          <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto w-full p-2 border rounded-lg bg-muted/20 min-h-[6rem]">
+            {currentStep.res.map((sub, idx) => (
               <div
                 key={idx}
-                className="px-3 py-1 bg-muted rounded border text-sm"
+                className="px-3 py-1 bg-green-500/10 text-green-700 dark:text-green-400 font-mono rounded border border-green-500 text-sm animate-in fade-in"
               >
-                [{subset.join(", ") || "empty"}]
+                [{sub.join(", ")}]
               </div>
             ))}
           </div>
 
-          <div className="mt-4 p-4 bg-muted rounded">
-            <p className="text-sm">{currentStep.message}</p>
+          <div className="mt-6 p-4 bg-muted/60 border rounded-lg shadow-inner">
+            <p className="text-sm font-medium">{currentStep.message}</p>
           </div>
-          <div className="rounded-lg">
+          <div className="rounded-lg mt-4">
             <VariablePanel
               variables={{
-                "start index": currentStep.index,
-                "current subset": `[${currentStep.current.join(", ")}]`,
-                "total subsets": currentStep.allSubsets.length,
+                "i (index)": currentStep.i,
+                "subset": `[${currentStep.subset.join(", ")}]`,
+                "res.length": currentStep.res.length,
               }}
             />
           </div>
         </div>
 
-        <CodeHighlighter
+        <AnimatedCodeEditor
           code={code}
-          highlightedLine={currentStep.lineNumber}
+          highlightedLines={[currentStep.lineNumber]}
           language="typescript"
         />
       </div>

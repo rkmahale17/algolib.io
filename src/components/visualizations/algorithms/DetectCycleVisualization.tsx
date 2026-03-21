@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
@@ -67,8 +67,8 @@ export const DetectCycleVisualization: React.FC = () => {
     };
 
     // Initialization
-    addStep(null, null, 'Initialize slow and fast pointers to null', 1, 'detection');
-    addStep(0, 0, 'Both pointers start at the head (index 0)', 3, 'detection', 'both');
+    addStep(null, null, 'Initialize slow and fast pointers to head', 4, 'detection');
+    addStep(0, 0, 'Both pointers start at the head (index 0)', 5, 'detection', 'both');
 
     let slow = 0;
     let fast = 0;
@@ -84,26 +84,26 @@ export const DetectCycleVisualization: React.FC = () => {
     };
 
     while (true) {
-      addStep(slow, fast, 'Check if fast and fast.next are non-null', 7, 'detection');
+      addStep(slow, fast, 'Check if fast and fast.next are non-null', 8, 'detection');
 
       // slow = slow.next
       const nextSlow = getNext(slow);
-      addStep(slow, fast, `Slow pointer moves from index ${slow} to ${nextSlow}`, 8, 'detection', 'slow');
+      addStep(slow, fast, `Slow pointer moves from index ${slow} to ${nextSlow}`, 9, 'detection', 'slow');
       slow = nextSlow;
 
       // fast = fast.next (first part)
       const fastMid = getNext(fast);
-      addStep(slow, fast, `Fast pointer moves from index ${fast} to ${fastMid} (first step)`, 9, 'detection', 'fast');
+      addStep(slow, fast, `Fast pointer moves from index ${fast} to ${fastMid} (first step)`, 10, 'detection', 'fast');
 
       // fast = fast.next (second part)
       const nextFast = getNext(fastMid);
-      addStep(slow, fastMid, `Fast pointer moves from index ${fastMid} to ${nextFast} (second step)`, 9, 'detection', 'fast');
+      addStep(slow, fastMid, `Fast pointer moves from index ${fastMid} to ${nextFast} (second step)`, 10, 'detection', 'fast');
       fast = nextFast;
 
-      addStep(slow, fast, `Check if slow (${slow}) === fast (${fast})`, 11, 'detection');
+      addStep(slow, fast, `Check if slow (${slow}) === fast (${fast})`, 12, 'detection');
 
       if (slow === fast) {
-        addStep(slow, fast, 'Pointers met! A cycle is confirmed', 11, 'detection', 'none');
+        addStep(slow, fast, 'Pointers met! A cycle is confirmed', 12, 'detection', 'none');
         metNode = slow;
         break;
       }
@@ -116,12 +116,12 @@ export const DetectCycleVisualization: React.FC = () => {
     }
 
     // Phase 2: Reset slow to head
-    addStep(slow, fast, 'Phase 2: Reset slow to head to find the cycle start', 17, 'finding-start', 'slow');
+    addStep(slow, fast, 'Phase 2: Reset slow to head to find the cycle start', 18, 'finding-start', 'slow');
     slow = 0;
-    addStep(slow, fast, 'Slow is now at head (index 0), fast remains at meeting point (index ' + fast + ')', 17, 'finding-start', 'none');
+    addStep(slow, fast, 'Slow is now at head (index 0), fast remains at meeting point (index ' + fast + ')', 18, 'finding-start', 'none');
 
     while (slow !== fast) {
-      addStep(slow, fast, `Check if slow (${slow}) !== fast (${fast})`, 18, 'finding-start');
+      addStep(slow, fast, `Check if slow (${slow}) !== fast (${fast})`, 19, 'finding-start');
 
       const nextSlow = getNext(slow);
       const nextFast = getNext(fast);
@@ -135,7 +135,7 @@ export const DetectCycleVisualization: React.FC = () => {
       }
     }
 
-    addStep(slow, fast, `Success! Pointers met at index ${slow}, which is the cycle start`, 23, 'finding-start', 'none', slow);
+    addStep(slow, fast, `Success! Pointers met at index ${slow}, which is the cycle start`, 24, 'finding-start', 'none', slow);
 
     setSteps(newSteps);
     setCurrentStepIndex(0);
@@ -287,7 +287,7 @@ export const DetectCycleVisualization: React.FC = () => {
             </div>
           </div>
 
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
+          <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="TypeScript" />
         </div>
       </div>
     </div>

@@ -1,8 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
+
+import { LayoutList, Hash } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface ListNode {
   val: number;
@@ -19,9 +22,11 @@ interface Step {
   isMeeting: boolean;
   result: boolean | null;
   movingPointer: 'slow' | 'fast' | 'both' | 'none';
+  hasCycle: boolean;
 }
 
 export const FastSlowPointersVisualization: React.FC = () => {
+  const [testCase, setTestCase] = useState<'with-cycle' | 'no-cycle'>('with-cycle');
   const [steps, setSteps] = useState<Step[]>([]);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -29,44 +34,31 @@ export const FastSlowPointersVisualization: React.FC = () => {
   const intervalRef = useRef<number | null>(null);
 
   const code = `function hasCycle(head: ListNode | null): boolean {
-
-  // Initialize two pointers:
-  // slow moves 1 step at a time
-  // fast moves 2 steps at a time
   let slow: ListNode | null = head;
   let fast: ListNode | null = head;
 
-  // Traverse the list
-  // We stop if fast reaches end (no cycle)
   while (fast !== null && fast.next !== null) {
-
-    // Move slow pointer by 1 step
     slow = slow!.next;
-
-    // Move fast pointer by 2 steps
     fast = fast.next.next;
 
-    // If at any point slow and fast meet,
-    // there must be a cycle
     if (slow === fast) {
       return true;
     }
   }
 
-  // If we exit the loop,
-  // fast reached null → no cycle
   return false;
 }`;
 
-  const generateSteps = () => {
-    const nodeValues = [3, 2, 0, -4]; // Cycle: -4 -> 2 (index 1)
+  const generateSteps = (currentTestCase: 'with-cycle' | 'no-cycle') => {
+    const hasCycle = currentTestCase === 'with-cycle';
+    const nodeValues = hasCycle ? [3, 2, 0, -4] : [1, 2, 3, 4, 5];
     const cycleStartIdx = 1;
     const newSteps: Step[] = [];
 
     const getNext = (curr: number) => {
       if (curr < 0) return -1; // null
       if (curr < nodeValues.length - 1) return curr + 1;
-      return cycleStartIdx; // Cycle back to index 1
+      return hasCycle ? cycleStartIdx : -1;
     };
 
     const addStep = (params: Partial<Step>) => {
@@ -76,120 +68,124 @@ export const FastSlowPointersVisualization: React.FC = () => {
         fast: null,
         fastIntermediate: null,
         message: '',
-        lineNumber: 1,
+        lineNumber: 1, // Default to function signature 
         isMeeting: false,
         result: null,
         movingPointer: 'none',
+        hasCycle,
         ...params
       });
     };
 
-    let slow = 0;
-    let fast = 0;
+    let slow: number | null = 0;
+    let fast: number | null = 0;
 
-    // Line 6: slow = head
+    // Line 2: let slow = head
     addStep({
       slow: 0,
       message: 'Initialize slow pointer at head (index 0)',
-      lineNumber: 6,
+      lineNumber: 2,
       movingPointer: 'slow'
     });
 
-    // Line 7: fast = head
+    // Line 3: let fast = head
     addStep({
       slow: 0,
       fast: 0,
       message: 'Initialize fast pointer at head (index 0)',
-      lineNumber: 7,
+      lineNumber: 3,
       movingPointer: 'fast'
     });
 
     while (true) {
-      // Line 11: while condition
+      // Line 5: while condition
       addStep({
         slow,
         fast,
         message: 'Checking loop condition: fast and fast.next are non-null',
-        lineNumber: 11
+        lineNumber: 5
       });
 
-      // Line 14: slow = slow.next
-      const nextSlow = getNext(slow);
+      if (fast === -1 || getNext(fast) === -1) {
+        // Loop exit condition met
+        addStep({
+          slow,
+          fast,
+          message: 'Loop ends because fast or fast.next reached null (end of list).',
+          lineNumber: 5
+        });
+        break;
+      }
+
+      // Line 6: slow = slow.next
+      slow = getNext(slow!);
       addStep({
         slow,
         fast,
-        message: `Moving slow pointer from node ${nodeValues[slow]} to ${nodeValues[nextSlow]}`,
-        lineNumber: 14,
+        message: `Slow pointer moves 1 step to node ${nodeValues[slow]}`,
+        lineNumber: 6,
         movingPointer: 'slow'
       });
-      slow = nextSlow;
-      addStep({
-        slow,
-        fast,
-        message: `Slow pointer is now at node ${nodeValues[slow]}`,
-        lineNumber: 14
-      });
 
-      // Line 17: fast = fast.next.next (Step 1)
-      const fastStep1 = getNext(fast);
+      // Line 7: fast = fast.next.next
+      const fastStep1 = getNext(fast!);
+      fast = fastStep1 === -1 ? -1 : getNext(fastStep1);
+
       addStep({
         slow,
         fast,
-        fastIntermediate: fastStep1,
-        message: `Moving fast pointer: first step to node ${nodeValues[fastStep1]}`,
-        lineNumber: 17,
+        message: fast === -1
+          ? 'Fast pointer moves 2 steps and reaches the end of the list'
+          : `Fast pointer moves 2 steps to node ${nodeValues[fast]}`,
+        lineNumber: 7,
         movingPointer: 'fast'
       });
 
-      // Line 17: fast = fast.next.next (Step 2)
-      const fastStep2 = getNext(fastStep1);
-      addStep({
-        slow,
-        fast: fastStep1,
-        fastIntermediate: fastStep2,
-        message: `Moving fast pointer: second step to node ${nodeValues[fastStep2]}`,
-        lineNumber: 17,
-        movingPointer: 'fast'
-      });
-      fast = fastStep2;
+      // Line 9: if (slow === fast)
       addStep({
         slow,
         fast,
-        message: `Fast pointer is now at node ${nodeValues[fast]}`,
-        lineNumber: 17
-      });
-
-      // Line 21: if (slow === fast)
-      addStep({
-        slow,
-        fast,
-        message: `Checking if slow (${nodeValues[slow]}) equals fast (${nodeValues[fast]})`,
-        lineNumber: 21
+        message: fast === -1
+          ? `Checking if slow (${nodeValues[slow]}) equals fast (null)`
+          : `Checking if slow (${nodeValues[slow]}) equals fast (${nodeValues[fast]})`,
+        lineNumber: 9
       });
 
       if (slow === fast) {
-        // Line 22: return true
+        // Line 10: return true
         addStep({
           slow,
           fast,
           isMeeting: true,
           message: 'Slow and fast pointers met! Cycle detected.',
-          lineNumber: 22,
+          lineNumber: 10,
           result: true
         });
         break;
       }
 
-      if (newSteps.length > 100) break; // Safety
+      if (newSteps.length > 100) break; // Safety against infinite loops
+    }
+
+    if (fast === -1 || getNext(fast) === -1) {
+      // Line 14: return false
+      addStep({
+        slow,
+        fast,
+        message: 'No cycle detected. Reached the end of the list.',
+        lineNumber: 14,
+        result: false
+      });
     }
 
     setSteps(newSteps);
     setCurrentStepIndex(0);
+    setIsPlaying(false);
   };
 
   useEffect(() => {
-    generateSteps();
-  }, []);
+    generateSteps(testCase);
+  }, [testCase]);
 
   useEffect(() => {
     if (isPlaying && currentStepIndex < steps.length - 1) {
@@ -239,18 +235,39 @@ export const FastSlowPointersVisualization: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <StepControls
-        onPlay={handlePlay}
-        onPause={handlePause}
-        onStepForward={handleStepForward}
-        onStepBack={handleStepBack}
-        onReset={handleReset}
-        isPlaying={isPlaying}
-        currentStep={currentStepIndex}
-        totalSteps={steps.length - 1}
-        speed={speed}
-        onSpeedChange={setSpeed}
-      />
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-muted/20 p-4 rounded-xl border border-border/50">
+        <StepControls
+          onPlay={handlePlay}
+          onPause={handlePause}
+          onStepForward={handleStepForward}
+          onStepBack={handleStepBack}
+          onReset={handleReset}
+          isPlaying={isPlaying}
+          currentStep={currentStepIndex}
+          totalSteps={steps.length - 1}
+          speed={speed}
+          onSpeedChange={setSpeed}
+        />
+
+        <div className="flex bg-muted/50 p-1 rounded-lg border border-border/50">
+          <Button
+            variant={testCase === 'with-cycle' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setTestCase('with-cycle')}
+            className="h-8 text-xs gap-2"
+          >
+            <Hash size={14} /> With Cycle
+          </Button>
+          <Button
+            variant={testCase === 'no-cycle' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setTestCase('no-cycle')}
+            className="h-8 text-xs gap-2"
+          >
+            <LayoutList size={14} /> No Cycle
+          </Button>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
@@ -267,17 +284,17 @@ export const FastSlowPointersVisualization: React.FC = () => {
               Fast & Slow Pointer Visualization
             </h3>
 
-            <div className="flex flex-wrap items-center justify-center gap-x-2 sm:gap-x-4 gap-y-16 pb-12 pt-16 px-2 no-scrollbar max-w-full">
+            <div className="flex flex-wrap items-center justify-center gap-x-1 sm:gap-x-2 gap-y-12 pb-10 pt-14 px-2 no-scrollbar max-w-full">
               {currentStep.nodes.map((val, idx) => (
                 <div key={idx} className="flex items-center">
                   <div className="relative group">
                     <div
-                      className={`w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center rounded-xl sm:rounded-2xl border-2 font-black text-base sm:text-xl transition-all duration-500 ${idx === currentStep.slow && idx === currentStep.fast
-                        ? 'bg-amber-500 text-white border-amber-600 shadow-[0_0_20px_rgba(245,158,11,0.4)] scale-110 z-10'
+                      className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg sm:rounded-xl border-2 font-black text-xs sm:text-sm transition-all duration-500 ${idx === currentStep.slow && idx === currentStep.fast
+                        ? 'bg-amber-500 text-white border-amber-600 shadow-[0_0_15px_rgba(245,158,11,0.4)] scale-110 z-10'
                         : idx === currentStep.slow
-                          ? 'bg-blue-500 text-white border-blue-600 shadow-[0_0_15px_rgba(59,130,246,0.3)]'
+                          ? 'bg-blue-500 text-white border-blue-600 shadow-[0_0_12px_rgba(59,130,246,0.3)]'
                           : idx === currentStep.fast || idx === currentStep.fastIntermediate
-                            ? 'bg-purple-500 text-white border-purple-600 shadow-[0_0_15px_rgba(168,85,247,0.3)]'
+                            ? 'bg-purple-500 text-white border-purple-600 shadow-[0_0_12px_rgba(168,85,247,0.3)]'
                             : 'bg-muted/30 border-border text-muted-foreground group-hover:border-primary/30'
                         }`}
                     >
@@ -285,7 +302,7 @@ export const FastSlowPointersVisualization: React.FC = () => {
                     </div>
 
                     {/* Pointer Labels */}
-                    <div className="absolute -top-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 w-20">
+                    <div className="absolute -top-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-0.5 w-20">
                       {idx === currentStep.slow && currentStep.slow !== null && (
                         <div className={`px-2 py-0.5 rounded-full text-[10px] font-black tracking-wider shadow-sm transition-all duration-300 ${currentStep.movingPointer === 'slow' || currentStep.movingPointer === 'both' ? 'bg-blue-600 text-white animate-bounce' : 'bg-blue-100 text-blue-700'}`}>
                           SLOW
@@ -299,16 +316,16 @@ export const FastSlowPointersVisualization: React.FC = () => {
                     </div>
 
                     {/* Index Label */}
-                    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] font- text-muted-foreground/60 uppercase tracking-tighter">
+                    <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[9px] font-medium text-muted-foreground/60 uppercase tracking-tighter">
                       Idx {idx}
                     </div>
                   </div>
 
                   {idx < currentStep.nodes.length - 1 ? (
-                    <div className="w-8 sm:w-12 h-[2px] bg-border mx-1 relative opacity-60">
-                      <div className="absolute right-0 -top-[5px] border-t-[6px] border-l-[10px] border-b-[6px] border-t-transparent border-b-transparent border-l-border"></div>
+                    <div className="w-4 sm:w-6 h-[2px] bg-border mx-0.5 relative opacity-60">
+                      <div className="absolute right-0 -top-[4px] border-t-[5px] border-l-[8px] border-b-[5px] border-t-transparent border-b-transparent border-l-border"></div>
                     </div>
-                  ) : (
+                  ) : currentStep.hasCycle ? (
                     <div className="ml-2 relative">
                       <svg width="40" height="60" viewBox="0 0 40 60" className="text-border/40">
                         <path d="M 0 30 Q 40 30 40 -10" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="4,2" />
@@ -316,7 +333,7 @@ export const FastSlowPointersVisualization: React.FC = () => {
                       </svg>
                       <span className="text-[9px] font-black text-muted-foreground/40 absolute -top-8 left-4 uppercase tracking-widest whitespace-nowrap">Cycle to Idx 1</span>
                     </div>
-                  )}
+                  ) : null}
                 </div>
               ))}
             </div>
@@ -339,7 +356,7 @@ export const FastSlowPointersVisualization: React.FC = () => {
         </div>
 
         <div className="w-full">
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
+          <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="TypeScript" />
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { VisualizationLayout } from '../shared/VisualizationLayout';
 
 export const SumOfTwoIntegersVisualization = () => {
@@ -214,10 +214,10 @@ export const SumOfTwoIntegersVisualization = () => {
 
   const rightContent = (
     <>
-      <CodeHighlighter
+      <AnimatedCodeEditor
         code={code}
         language="TypeScript"
-        highlightedLine={step.highlightedLine}
+        highlightedLines={[step.highlightedLine]}
       />
     </>
   );

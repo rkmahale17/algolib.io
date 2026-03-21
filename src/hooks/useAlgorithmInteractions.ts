@@ -36,6 +36,7 @@ export const useAlgorithmInteractions = ({
     const [codeCache, setCodeCache] = useState<Record<string, string>>({});
     const [isUserModified, setIsUserModified] = useState(false);
     const latestCodeRef = useRef(savedCode);
+    const currentLanguageRef = useRef(selectedLanguage);
 
     // Update ref whenever savedCode changes
     useEffect(() => {
@@ -65,19 +66,12 @@ export const useAlgorithmInteractions = ({
 
     // Handle language switch or algorithm change
     useEffect(() => {
-        // When algorithmId changes, we want to reset state first
-        // But codeCache might be from previous algo if userAlgoData hasn't updated yet?
-        // Actually, userAlgoData updates when algorithmId changes (via key in parent or refetch)
-        // Check effect above (line 42) - it depends on userAlgoData.
+        currentLanguageRef.current = selectedLanguage;
+        // Reset modification flag when switching languages to allow fresh load from cache/DB
+        setIsUserModified(false);
 
-        // This effect ensures that if we switch language, we load from cache.
-        // It also needs to handle the case where we just switched algorithm.
         const codeForLanguage = codeCache[selectedLanguage] || '';
         setSavedCode(codeForLanguage);
-
-        // IMPORTANT: We must NOT reset isUserModified to false blindly if we just typed,
-        // BUT if we switched algorithm, we start fresh.
-        // The safest way is to rely on userAlgoData effect to setInitial state.
     }, [selectedLanguage]); // Keeping this simple for language switch
 
     // Reset local state when algorithmId changes
@@ -125,6 +119,10 @@ export const useAlgorithmInteractions = ({
     }, [savedCode, user, algorithmId, selectedLanguage, isUserModified, isNaughtyCloud]);
 
     const handleCodeChange = useCallback((newCode: string) => {
+        // Guard: If the language in this closure doesn't match the current active language, 
+        // ignore the change to prevent "infecting" other language caches.
+        if (selectedLanguage !== currentLanguageRef.current) return;
+
         // Prevent setting modified if it's the same or if we are just initializing
         if (newCode === savedCode) return;
 
@@ -375,7 +373,15 @@ export const useAlgorithmInteractions = ({
         userVote,
         savedCode,
         selectedLanguage,
-        setSelectedLanguage,
+        setSelectedLanguage: (lang: string) => {
+            setSelectedLanguage(lang);
+            localStorage.setItem('preferredLanguage', lang);
+            // Sync savedCode immediately to avoid one-render lag for CodeRunner
+            const codeForLanguage = codeCache[lang] || '';
+            setSavedCode(codeForLanguage);
+            setIsUserModified(false);
+            currentLanguageRef.current = lang;
+        },
         isUserModified,
 
         // Actions

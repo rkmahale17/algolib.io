@@ -52,9 +52,9 @@ export default function PlatformPreview() {
                     className="bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 px-6 py-3 rounded-full shadow-xl border border-zinc-800 dark:border-zinc-200 flex items-center gap-3 whitespace-nowrap hover:bg-zinc-700 dark:hover:bg-zinc-100 transition-colors duration-200 group/btn"
                 >
                     <div className="flex gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#EAFF96] animate-pulse"></span>
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#EAFF96] animate-pulse [animation-delay:200ms]"></span>
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#EAFF96] animate-pulse [animation-delay:400ms]"></span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-primary dark:bg-primary animate-pulse"></span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-primary dark:bg-primary animate-pulse [animation-delay:200ms]"></span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-primary dark:bg-primary animate-pulse [animation-delay:400ms]"></span>
                     </div>
                     <p className="text-sm font-medium tracking-tight">Interactive Playground — Try editing the code</p>
                     <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover/btn:translate-x-1" />

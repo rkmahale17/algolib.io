@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useMemo } from "react";
+import React, { useCallback, useEffect, useState, useMemo, Suspense } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Code2, ArrowLeft, Eye, Lightbulb, Minimize2, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
@@ -42,6 +42,7 @@ import {
 } from "@/components/ui/sheet";
 import { ProblemSidebar } from "@/components/ProblemSidebar";
 import { useUserProgressMap } from "@/hooks/useAlgorithms";
+
 
 const ProblemDetail: React.FC = () => {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();

@@ -1,15 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
 interface Step {
   n: number;
-  board: number[][];
+  board: string[][];
   row: number;
   col: number;
-  allSolutions: number[][][];
+  colSet: number[];
+  posDiagSet: number[];
+  negDiagSet: number[];
+  allSolutions: string[][];
   message: string;
   lineNumber: number;
 }
@@ -22,118 +25,105 @@ export const NQueensVisualization: React.FC = () => {
   const intervalRef = useRef<number | null>(null);
 
   const code = `function solveNQueens(n: number): string[][] {
-  const result: string[][] = [];
-  const board: number[][] = Array(n).fill(0).map(() => Array(n).fill(0));
-  
-  function isSafe(row: number, col: number): boolean {
-    // Check column and diagonals
-    for (let i = 0; i < row; i++) {
-      if (board[i][col] === 1) return false;
-      if (col - (row - i) >= 0 && board[i][col - (row - i)] === 1) return false;
-      if (col + (row - i) < n && board[i][col + (row - i)] === 1) return false;
-    }
-    return true;
-  }
-  
-  function solve(row: number) {
-    if (row === n) {
-      result.push(board.map(r => r.map(c => c === 1 ? 'Q' : '.').join('')));
+  const col = new Set<number>();
+  const posDiag = new Set<number>();
+  const negDiag = new Set<number>();
+  const res: string[][] = [];
+  const board: string[][] = Array.from({ length: n }, () => Array(n).fill('.'));
+
+  function backtrack(r: number): void {
+    if (r === n) {
+      const copy = board.map(row => row.join(""));
+      res.push(copy);
       return;
     }
-    
-    for (let col = 0; col < n; col++) {
-      if (isSafe(row, col)) {
-        board[row][col] = 1;
-        solve(row + 1);
-        board[row][col] = 0;
+
+    for (let c = 0; c < n; c++) {
+      if (col.has(c) || posDiag.has(r + c) || negDiag.has(r - c)) {
+        continue;
       }
+
+      col.add(c);
+      posDiag.add(r + c);
+      negDiag.add(r - c);
+      board[r][c] = "Q";
+
+      backtrack(r + 1);
+
+      col.delete(c);
+      posDiag.delete(r + c);
+      negDiag.delete(r - c);
+      board[r][c] = ".";
     }
   }
-  
-  solve(0);
-  return result;
+
+  backtrack(0);
+  return res;
 }`;
 
   const generateSteps = () => {
     const n = 4;
     const newSteps: Step[] = [];
-    const result: number[][][] = [];
-    const board: number[][] = Array(n).fill(0).map(() => Array(n).fill(0));
+    const col = new Set<number>();
+    const posDiag = new Set<number>();
+    const negDiag = new Set<number>();
+    const res: string[][] = [];
+    const board: string[][] = Array.from({ length: n }, () => Array(n).fill('.'));
 
-    function isSafe(row: number, col: number): boolean {
-      for (let i = 0; i < row; i++) {
-        if (board[i][col] === 1) return false;
-        if (col - (row - i) >= 0 && board[i][col - (row - i)] === 1) return false;
-        if (col + (row - i) < n && board[i][col + (row - i)] === 1) return false;
-      }
-      return true;
-    }
+    const addStep = (row: number, c: number, message: string, line: number) => {
+      newSteps.push({
+        n,
+        board: board.map(r => [...r]),
+        row,
+        col: c,
+        colSet: Array.from(col),
+        posDiagSet: Array.from(posDiag),
+        negDiagSet: Array.from(negDiag),
+        allSolutions: [...res],
+        message,
+        lineNumber: line
+      });
+    };
 
-    function solve(row: number) {
-      if (row === n) {
-        result.push(board.map(r => [...r]));
-        newSteps.push({
-          n,
-          board: board.map(r => [...r]),
-          row: n,
-          col: -1,
-          allSolutions: result.map(s => s.map(r => [...r])),
-          message: `Found solution ${result.length}!`,
-          lineNumber: 14
-        });
+    function backtrack(r: number): void {
+      addStep(r, -1, `Checking row ${r}`, 9);
+      if (r === n) {
+        const copy = board.map(row => row.join(""));
+        res.push(copy);
+        addStep(r, -1, `Found a solution! Total solutions: ${res.length}`, 11);
         return;
       }
 
-      for (let col = 0; col < n; col++) {
-        newSteps.push({
-          n,
-          board: board.map(r => [...r]),
-          row,
-          col,
-          allSolutions: result.map(s => s.map(r => [...r])),
-          message: `Trying to place queen at row ${row}, col ${col}`,
-          lineNumber: 19
-        });
-
-        if (isSafe(row, col)) {
-          board[row][col] = 1;
-          newSteps.push({
-            n,
-            board: board.map(r => [...r]),
-            row,
-            col,
-            allSolutions: result.map(s => s.map(r => [...r])),
-            message: `Placed queen at (${row}, ${col})`,
-            lineNumber: 21
-          });
-
-          solve(row + 1);
-
-          board[row][col] = 0;
-          newSteps.push({
-            n,
-            board: board.map(r => [...r]),
-            row,
-            col,
-            allSolutions: result.map(s => s.map(r => [...r])),
-            message: `Backtrack: Remove queen from (${row}, ${col})`,
-            lineNumber: 23
-          });
-        } else {
-          newSteps.push({
-            n,
-            board: board.map(r => [...r]),
-            row,
-            col,
-            allSolutions: result.map(s => s.map(r => [...r])),
-            message: `Position (${row}, ${col}) is not safe`,
-            lineNumber: 20
-          });
+      for (let c = 0; c < n; c++) {
+        addStep(r, c, `Checking column ${c} in row ${r}`, 15);
+        addStep(r, c, `Checking if safety constraints are met at (${r}, ${c})`, 16);
+        if (col.has(c) || posDiag.has(r + c) || negDiag.has(r - c)) {
+          addStep(r, c, `Position (${r}, ${c}) is unsafe. Skipping column ${c}.`, 17);
+          continue;
         }
+
+        col.add(c);
+        posDiag.add(r + c);
+        negDiag.add(r - c);
+        board[r][c] = "Q";
+        addStep(r, c, `Placing queen at (${r}, ${c}) and updating sets`, 23);
+
+        addStep(r, c, `Moving to the next row (r=${r + 1})`, 25);
+        backtrack(r + 1);
+
+        col.delete(c);
+        posDiag.delete(r + c);
+        negDiag.delete(r - c);
+        board[r][c] = ".";
+        addStep(r, c, `Backtracking: Removing queen from (${r}, ${c}) and updating sets`, 30);
       }
     }
 
-    solve(0);
+    addStep(-1, -1, `Starting N-Queens algorithm for n=${n}`, 1);
+    addStep(-1, -1, `Initializing sets and empty board`, 6);
+    addStep(0, -1, `Calling backtrack(0)`, 34);
+    backtrack(0);
+    addStep(-1, -1, `Algorithm complete. Found ${res.length} solutions.`, 35);
     setSteps(newSteps);
   };
 
@@ -196,7 +186,6 @@ export const NQueensVisualization: React.FC = () => {
         onSpeedChange={setSpeed}
       />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
         <div className="bg-card rounded-lg p-6 border">
           <h3 className="text-lg font-semibold mb-4">{currentStep.n}-Queens Board</h3>
 
@@ -205,63 +194,89 @@ export const NQueensVisualization: React.FC = () => {
               row.map((cell, c) => (
                 <div
                   key={`${r}-${c}`}
-                  className={`aspect-square flex items-center justify-center rounded border-2 font- text-2xl transition-all ${r === currentStep.row && c === currentStep.col
-                    ? 'bg-primary/20 border-primary'
-                    : cell === 1
-                      ? 'bg-green-500/20 border-green-500'
+                  className={`aspect-square flex items-center justify-center rounded border-2 text-2xl transition-all ${r === currentStep.row && c === currentStep.col
+                    ? 'bg-primary/20 border-primary animate-pulse'
+                    : cell === 'Q'
+                      ? 'bg-green-500/20 border-green-500 shadow-[0_0_10px_rgba(34,197,94,0.3)]'
                       : (r + c) % 2 === 0
                         ? 'bg-muted/30 border-border'
                         : 'bg-card border-border'
                     }`}
                 >
-                  {cell === 1 ? '♛' : ''}
+                  {cell === 'Q' ? '♛' : ''}
                 </div>
               ))
             )}
           </div>
 
-          <h3 className="text-lg font-semibold mb-4">Solutions Found: {currentStep.allSolutions.length}</h3>
-          <div className="flex flex-wrap gap-4">
-            {currentStep.allSolutions.map((solution, idx) => (
-              <div key={idx} className="p-2 bg-muted rounded border">
-                <div className="text-xs mb-1">Solution {idx + 1}</div>
-                <div className="grid gap-0.5" style={{ gridTemplateColumns: `repeat(${currentStep.n}, minmax(0, 1fr))`, width: '80px' }}>
-                  {solution.map((row, r) =>
-                    row.map((cell, c) => (
-                      <div
-                        key={`${r}-${c}`}
-                        className={`aspect-square flex items-center justify-center text-xs ${cell === 1 ? 'bg-green-500/40' : (r + c) % 2 === 0 ? 'bg-muted' : 'bg-card'
-                          }`}
-                      >
-                        {cell === 1 ? '♛' : ''}
-                      </div>
-                    ))
-                  )}
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-sm font-medium mb-2">Occupied Sets</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <div className="p-2 bg-muted/50 rounded border text-xs">
+                  <span className="font-semibold block mb-1">col:</span>
+                  <div className="flex flex-wrap gap-1">
+                    {currentStep.colSet.length > 0 ? currentStep.colSet.map(v => <span key={v} className="px-1 bg-blue-500/20 rounded border border-blue-500/30">{v}</span>) : '-'}
+                  </div>
+                </div>
+                <div className="p-2 bg-muted/50 rounded border text-xs">
+                  <span className="font-semibold block mb-1">posDiag (r+c):</span>
+                  <div className="flex flex-wrap gap-1">
+                    {currentStep.posDiagSet.length > 0 ? currentStep.posDiagSet.map(v => <span key={v} className="px-1 bg-purple-500/20 rounded border border-purple-500/30">{v}</span>) : '-'}
+                  </div>
+                </div>
+                <div className="p-2 bg-muted/50 rounded border text-xs">
+                  <span className="font-semibold block mb-1">negDiag (r-c):</span>
+                  <div className="flex flex-wrap gap-1">
+                    {currentStep.negDiagSet.length > 0 ? currentStep.negDiagSet.map(v => <span key={v} className="px-1 bg-orange-500/20 rounded border border-orange-500/30">{v}</span>) : '-'}
+                  </div>
                 </div>
               </div>
-            ))}
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Solutions Found: {currentStep.allSolutions.length}</h3>
+              <div className="flex flex-wrap gap-4 max-h-48 overflow-y-auto p-2 border rounded bg-muted/20">
+                {currentStep.allSolutions.length === 0 && <p className="text-sm text-muted-foreground italic">No solutions found yet...</p>}
+                {currentStep.allSolutions.map((solution, idx) => (
+                  <div key={idx} className="p-2 bg-card rounded border shadow-sm">
+                    <div className="text-[10px] mb-1 font-medium">Solution {idx + 1}</div>
+                    <div className="grid gap-0.5" style={{ gridTemplateColumns: `repeat(${currentStep.n}, minmax(0, 1fr))`, width: '80px' }}>
+                      {solution.map((row, r) =>
+                        row.split('').map((cell, c) => (
+                          <div
+                            key={`${r}-${c}`}
+                            className={`aspect-square flex items-center justify-center text-[10px] ${cell === 'Q' ? 'bg-green-500/40' : (r + c) % 2 === 0 ? 'bg-muted' : 'bg-background'
+                              }`}
+                          >
+                            {cell === 'Q' ? '♛' : ''}
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
-          <div className="mt-4 p-4 bg-muted rounded">
-            <p className="text-sm">{currentStep.message}</p>
+          <div className="mt-4 p-4 bg-muted/50 border rounded-lg">
+            <p className="text-sm font-medium">{currentStep.message}</p>
           </div>
-          <div className="mt-4 p-4 bg-muted rounded">
+          <div className="mt-4">
             <VariablePanel
               variables={{
                 'n': currentStep.n,
-                'current row': currentStep.row,
-                'current col': currentStep.col,
-                'solutions found': currentStep.allSolutions.length
+                'currentRow': currentStep.row === -1 ? 'N/A' : currentStep.row,
+                'currentCol': currentStep.col === -1 ? 'N/A' : currentStep.col,
+                'colSetSize': currentStep.colSet.length,
+                'solutions': currentStep.allSolutions.length
               }}
             />
           </div>
         </div>
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
-
+        <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="typescript" />
       </div>
-
-
-
     </div>
   );
 };

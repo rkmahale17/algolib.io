@@ -108,7 +108,7 @@ export const SerializeDeserializeBinaryTreeVisualization = () => {
     // DESERIALIZE PHASE
     { phase: 'deserialize', currentNode: '-', result: ['1', '2', 'null', 'null', '3', 'null', 'null'], index: 0, message: "DESERIALIZE: Split string by comma", highlightedLines: [21], stackDepth: 0 },
     { phase: 'deserialize', currentNode: '-', result: ['1', '2', 'null', 'null', '3', 'null', 'null'], index: 0, message: "Initialize index = 0", highlightedLines: [22], stackDepth: 0 },
-    { phase: 'deserialize', currentNode: '-', result: ['1', '2', 'null', 'null', '3', 'null', 'null'], index: 0, message: "Call dfs() to rebuild tree", highlightedLines: [36], stackDepth: 0 },
+    { phase: 'deserialize', currentNode: '-', result: ['1', '2', 'null', 'null', '3', 'null', 'null'], index: 0, message: "Call dfs() to rebuild tree", highlightedLines: [37], stackDepth: 0 },
 
     { phase: 'deserialize', currentNode: '-', result: ['1', '2', 'null', 'null', '3', 'null', 'null'], index: 0, message: "Enter dfs(): values[0] = '1'", highlightedLines: [25], stackDepth: 1 },
     { phase: 'deserialize', currentNode: '-', result: ['1', '2', 'null', 'null', '3', 'null', 'null'], index: 0, message: "Not 'null', continue", highlightedLines: [25], stackDepth: 1 },
@@ -185,7 +185,7 @@ export const SerializeDeserializeBinaryTreeVisualization = () => {
         <div className="text-sm font-semibold text-center mb-2">
           {step.phase === 'serialize' ? 'Tree → Array' : 'Array → Tree'}
         </div>
-        <svg width="400" height="160" className="mx-auto">
+        <svg viewBox="0 0 400 160" className="w-full h-40">
           <line x1={200} y1={40} x2={120} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
           <line x1={200} y1={40} x2={280} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
 

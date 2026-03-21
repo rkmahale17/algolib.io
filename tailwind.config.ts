@@ -16,6 +16,7 @@ export default {
       screens: {
         'xxs': '230px',
         'xs': '360px',
+        'xl-listing': '1100px',
         '3xl': '1760px',
       },
       fontFamily: {

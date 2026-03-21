@@ -19,6 +19,7 @@ import {
   Send,
   Loader2,
   List as ListIcon,
+  Crown,
 } from "lucide-react";
 import { ListType, LIST_TYPE_LABELS } from "@/types/algorithm";
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FeatureGuard } from "@/components/FeatureGuard";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useApp } from "@/contexts/AppContext";
+import { Badge } from "@/components/ui/badge";
 import logo from "@/assets/logo.svg";
 
 interface AlgorithmHeaderProps {
@@ -78,7 +81,12 @@ interface AlgorithmHeaderProps {
   // List Context
   activeListType?: string;
   onToggleSidebar?: () => void;
+
+  // Preview Mode
+  hideUserMenu?: boolean;
 }
+
+import UserMenu from "@/components/UserMenu";
 
 export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
   user,
@@ -104,7 +112,9 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
   lastRunSuccess,
   activeListType,
   onToggleSidebar,
+  hideUserMenu = false,
 }) => {
+  const { hasPremiumAccess, profile } = useApp();
   const showCondensedMenu = windowWidth < 778;
 
   const listLabel = activeListType && activeListType !== 'all'
@@ -214,7 +224,7 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
                   <TooltipTrigger asChild>
                     <Button
                       onClick={onSubmit}
-                      disabled={isRunnerLoading || isRunnerSubmitting || !lastRunSuccess}
+                      disabled={isRunnerLoading || isRunnerSubmitting || !lastRunSuccess || (algorithm?.metadata?.is_pro && !hasPremiumAccess && !hideUserMenu)}
                       size="sm"
                       variant="default"
                       className={`h-8 px-4 text-xs rounded-l-none border ${lastRunSuccess
@@ -231,7 +241,9 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent side="bottom">
-                    {!lastRunSuccess && !isRunnerLoading && !isRunnerSubmitting ? (
+                    {algorithm?.metadata?.is_pro && !hasPremiumAccess && !hideUserMenu ? (
+                      <span className="text-orange-500 font-medium">Unlock Pro mode to submit this problem</span>
+                    ) : !lastRunSuccess && !isRunnerLoading && !isRunnerSubmitting ? (
                       <span className="text-orange-500 font-medium">Run all test cases successfully to enable submission</span>
                     ) : (
                       <>Submit Solution <kbd className="ml-2 pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100"><span className="text-xs">Ctrl</span> + Enter</kbd></>
@@ -274,7 +286,7 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
                 <span>Share</span>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/profile">
+                <Link to="/dashboard">
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile</span>
                 </Link>
@@ -410,58 +422,7 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
 
         <ThemeToggle />
 
-        {user ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="relative h-8 w-8 rounded-full"
-              >
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={user.user_metadata?.avatar_url} />
-                  <AvatarFallback>
-                    {user.email?.[0]?.toUpperCase() || "U"}
-                  </AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">
-                    {user.user_metadata?.full_name || "User"}
-                  </p>
-                  <p className="text-xs leading-none text-muted-foreground">
-                    {user.email}
-                  </p>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                {/* <Link to="/feedback">
-                  <MessageSquare className="mr-2 h-4 w-4" />
-                  <span>Feedback</span>
-                </Link> */}
-                <Link to="/profile">
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={handleSignOut}
-                className="text-destructive"
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Sign out</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ) : (
-          <Link to="/login">
-            <Button size="sm">Sign In</Button>
-          </Link>
-        )}
+        {!hideUserMenu && <UserMenu />}
       </div>
     </div>
   );

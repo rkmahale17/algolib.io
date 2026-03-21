@@ -50,7 +50,7 @@ const AdminSimulator = lazy(() => import("./pages/AdminSimulator"));
 const CompilerDocs = lazy(() => import("./pages/CompilerDocs"));
 const Pricing = lazy(() => import("./pages/Pricing"));
 const AdminMail = lazy(() => import("./pages/AdminMail"));
-const Roadmap = lazy(() => import("./pages/Roadmap"));
+
 import AdminViewToggle from "./components/AdminViewToggle";
 
 import { DodoPayments } from 'dodopayments-checkout';
@@ -59,6 +59,9 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { ProtectedAdminRoute } from "./components/ProtectedAdminRoute";
 import { FeatureProtectedRoute } from "./components/FeatureProtectedRoute";
 import { AppProvider, useApp } from "./contexts/AppContext";
+import { MotivationCenter } from "./components/MotivationCenter";
+import { FloatingFeedback } from "./components/FloatingFeedback";
+import { PromoBanner } from "./components/PromoBanner";
 // import ComplexityCard from "./components/complexity/ComplexityCard"; // Unused in routes currently, checking usage
 
 const queryClient = new QueryClient();
@@ -122,11 +125,13 @@ const AppContent = () => {
     <>
       {isMaintenanceActive ? (
         <>
+          <PromoBanner />
           <Navbar />
           <MaintenancePage />
         </>
       ) : (
         <>
+          <PromoBanner />
           <ConditionalNavbar />
           <Suspense fallback={<PremiumLoader text="Loading..." />}>
             <Routes>
@@ -153,7 +158,7 @@ const AppContent = () => {
               <Route path="/login" element={<Auth />} />
               <Route path="/feedback" element={<Feedback />} />
               <Route path="/about" element={<About />} />
-              <Route path="/roadmap" element={<Roadmap />} />
+
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<TermsOfService />} />
               <Route path="/content-rights" element={<ContentRights />} />
@@ -260,6 +265,14 @@ const AppContent = () => {
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
+
+            {!location.pathname.startsWith('/admin') && (
+              <>
+                {!location.pathname.startsWith('/problem/') && location.pathname !== '/feedback' && (
+                  <FloatingFeedback />
+                )}
+              </>
+            )}
             <AdminViewToggle />
           </Suspense>
         </>
@@ -286,17 +299,23 @@ const App = () => {
             <Toaster />
             <Sonner />
             <ErrorBoundary>
-              <BrowserRouter basename="/">
-                <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-                  <SidebarProvider defaultOpen={false}>
+              <BrowserRouter
+                basename="/"
+                future={{
+                  v7_startTransition: true,
+                  v7_relativeSplatPath: true,
+                }}
+              >
+                <SidebarProvider defaultOpen={false}>
+                  <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
                     <div className="flex min-h-screen w-full">
                       <AppSidebar />
                       <div className="flex-1">
                         <AppContent />
                       </div>
                     </div>
-                  </SidebarProvider>
-                </ThemeProvider>
+                  </ThemeProvider>
+                </SidebarProvider>
               </BrowserRouter>
             </ErrorBoundary>
           </TooltipProvider>

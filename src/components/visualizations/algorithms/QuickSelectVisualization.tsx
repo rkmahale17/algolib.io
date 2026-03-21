@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { VariablePanel } from '../shared/VariablePanel';
 import { StepControls } from '../shared/StepControls';
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 
 interface Step {
   array: number[];
@@ -141,7 +141,7 @@ export const QuickSelectVisualization = () => {
       pivotIndex: -1,
       k,
       message: `Find ${k + 1}th smallest element (0-indexed k=${k})`,
-      lineNumber: 0
+      lineNumber: 1
     });
 
     const arr = [...array];
@@ -227,14 +227,14 @@ export const QuickSelectVisualization = () => {
                     )}
                     <div
                       className={`w-full rounded-t transition-all duration-300 ${isK && isPivot
-                          ? 'bg-green-500 shadow-lg shadow-green-500/50 scale-110'
-                          : isPartition
-                            ? 'bg-blue-500 shadow-lg'
-                            : isPivot
-                              ? 'bg-primary shadow-lg shadow-primary/50 scale-105'
-                              : !isInRange
-                                ? 'bg-muted opacity-30'
-                                : 'bg-gradient-to-t from-primary/60 to-primary/40'
+                        ? 'bg-green-500 shadow-lg shadow-green-500/50 scale-110'
+                        : isPartition
+                          ? 'bg-blue-500 shadow-lg'
+                          : isPivot
+                            ? 'bg-primary shadow-lg shadow-primary/50 scale-105'
+                            : !isInRange
+                              ? 'bg-muted opacity-30'
+                              : 'bg-gradient-to-t from-primary/60 to-primary/40'
                         }`}
                       style={{ height: `${(value / getMaxValue()) * 100}%`, minHeight: '20px' }}
                     />
@@ -266,7 +266,7 @@ export const QuickSelectVisualization = () => {
               searchSpace: currentStep.right - currentStep.left + 1
             }}
           />
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
+          <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="TypeScript" />
         </div>
       </div>
     </div>

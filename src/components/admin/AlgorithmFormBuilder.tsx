@@ -206,6 +206,7 @@ export function AlgorithmFormBuilder({
         dislikes: prevMeta.dislikes !== undefined ? prevMeta.dislikes : (newMeta.dislikes || 0),
         timeComplexity: prevMeta.timeComplexity || newMeta.timeComplexity || "",
         spaceComplexity: prevMeta.spaceComplexity || newMeta.spaceComplexity || "",
+        is_pro: prevMeta.is_pro !== undefined ? prevMeta.is_pro : (newMeta.is_pro || false),
         // Preserve other keys from prev that might not be in new?
         // Usually we want new overview.
         overview: newMeta.overview || prevMeta.overview || "",
@@ -508,6 +509,7 @@ export function AlgorithmFormBuilder({
                 <TabsContent value="code" className="mt-4">
                   <CodeImplementationEditor
                     implementations={formData.implementations}
+                    algorithmName={formData.name || formData.title}
                     onChange={(implementations) =>
                       setFormData({ ...formData, implementations })
                     }

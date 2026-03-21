@@ -16,7 +16,7 @@ export const renderBlind75Visualization = (algoId: string): React.ReactNode | nu
     "prefix-sum": () => import("@/components/visualizations/algorithms/PrefixSumVisualization").then(m => ({ default: m.PrefixSumVisualization })),
     "binary-search": () => import("@/components/visualizations/algorithms/BinarySearchVisualization").then(m => ({ default: m.BinarySearchVisualization })),
     "maximum-subarray": () => import("@/components/visualizations/algorithms/MaximumSubarrayVisualization").then(m => ({ default: m.MaximumSubarrayVisualization })),
-    "kadanes-algorithm": () => import("@/components/visualizations/algorithms/KadanesVisualization").then(m => ({ default: m.KadanesVisualization })),
+    "kadanes-algorithm": () => import("@/components/visualizations/algorithms/MaximumSubarrayVisualization").then(m => ({ default: m.MaximumSubarrayVisualization })),
     "3sum": () => import("@/components/visualizations/algorithms/ThreeSumVisualization").then(m => ({ default: m.ThreeSumVisualization })),
     "find-minimum-in-rotated-sorted-array": () => import("@/components/visualizations/algorithms/FindMinimumInRotatedSortedArrayVisualization").then(m => ({ default: m.FindMinimumInRotatedSortedArrayVisualization })),
     "search-in-rotated-sorted-array": () => import("@/components/visualizations/algorithms/SearchInRotatedSortedArrayVisualization").then(m => ({ default: m.SearchInRotatedSortedArrayVisualization })),

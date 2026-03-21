@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
@@ -73,7 +73,7 @@ function reverse(nums, left, right) {
     };
 
     // Initial state
-    addStep(nums, `Initial array. Rotate by k=${k}`, 0);
+    addStep(nums, `Initial array. Rotate by k=${k}`, 1);
 
     // k = k % n
     addStep(nums, `Calculate k = ${k}%${n} = ${k % n}`, 2);
@@ -118,7 +118,7 @@ function reverse(nums, left, right) {
     // Step 3: Reverse remaining
     performReverse(currentArray, k, n - 1, 12, "Reverse Remaining Elements");
 
-    addStep(currentArray, "Rotation complete!", 13);
+    addStep(currentArray, "Rotation complete!", 14);
 
     setSteps(newSteps);
     setCurrentStepIndex(0);
@@ -232,7 +232,7 @@ function reverse(nums, left, right) {
           </div>
         </div>
 
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
+        <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="TypeScript" />
       </div>
     </div>
   );

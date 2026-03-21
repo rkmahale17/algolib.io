@@ -14,8 +14,12 @@ export interface Profile {
     is_public: boolean;
     subscription_status: 'trialing' | 'active' | 'canceled' | 'none' | null;
     subscription_id: string | null;
+    subscription_tier: 'free' | 'pro' | 'ultra' | null;
+    subscription_duration: string | null;
+    subscription_plan_id: string | null;
     trial_end_date: string | null;
     current_period_end: string | null;
+    cancel_at_period_end: boolean;
     created_at: string;
     updated_at: string;
 }
@@ -34,6 +38,10 @@ export interface ProfileUpdateData {
     is_public?: boolean;
     subscription_status?: 'trialing' | 'active' | 'canceled' | 'none' | null;
     subscription_id?: string | null;
+    subscription_tier?: 'free' | 'pro' | 'ultra' | null;
+    subscription_duration?: string | null;
+    subscription_plan_id?: string | null;
     trial_end_date?: string | null;
     current_period_end?: string | null;
+    cancel_at_period_end?: boolean;
 }

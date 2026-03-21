@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { VariablePanel } from '../shared/VariablePanel';
 import { StepControls } from '../shared/StepControls';
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 
 interface TreeNode {
   val: number;
@@ -119,7 +119,7 @@ export const DFSPreorderVisualization = () => {
         stack: [...stack],
         visited: [...visited],
         message: `Backtracking from node ${node.val}`,
-        lineNumber: 11
+        lineNumber: 12
       });
     };
 
@@ -130,7 +130,7 @@ export const DFSPreorderVisualization = () => {
       stack: [],
       visited: [...visited],
       message: `Complete! Preorder: [${visited.join(', ')}]`,
-      lineNumber: 11
+      lineNumber: 12
     });
 
     setSteps(newSteps);
@@ -279,7 +279,7 @@ export const DFSPreorderVisualization = () => {
               'preorder result': currentStep.visited.join(' → ')
             }}
           />
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
+          <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="TypeScript" />
         </div>
       </div>
     </div>

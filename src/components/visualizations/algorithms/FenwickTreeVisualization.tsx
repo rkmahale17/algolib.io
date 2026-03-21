@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import { CodeHighlighter } from "../shared/CodeHighlighter";
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from "../shared/StepControls";
 import { VariablePanel } from "../shared/VariablePanel";
 
@@ -8,11 +8,13 @@ interface Step {
   array: number[];
   tree: number[];
   operation: string;
-  index: number;
-  value: number;
-  result: number | null;
+  index: number | string;
+  value: number | string;
+  sum: number | string;
   message: string;
   lineNumber: number;
+  highlightedTreeIndex: number | null;
+  highlightedArrayIndex: number | null;
 }
 
 export const FenwickTreeVisualization: React.FC = () => {
@@ -22,133 +24,337 @@ export const FenwickTreeVisualization: React.FC = () => {
   const [speed, setSpeed] = useState(1000);
   const intervalRef = useRef<number | null>(null);
 
-  const code = `class FenwickTree {
-  tree: number[];
-  n: number;
-  
-  constructor(arr: number[]) {
-    this.n = arr.length;
-    this.tree = new Array(this.n + 1).fill(0);
-    for (let i = 0; i < this.n; i++) {
-      this.update(i, arr[i]);
+  const code = `function solution(nums: number[]): number {
+  const n = nums.length;
+  const tree = new Array<number>(n + 1).fill(0);
+
+  function update(index: number, value: number) {
+    index++;
+    while (index <= n) {
+      tree[index] += value;
+      index += index & -index;
     }
   }
-  
-  update(index: number, delta: number) {
-    index++; // 1-indexed
-    while (index <= this.n) {
-      this.tree[index] += delta;
-      index += index & (-index); // Add last set bit
-    }
-  }
-  
-  query(index: number): number {
-    index++; // 1-indexed
+
+  function query(index: number): number {
+    index++;
     let sum = 0;
     while (index > 0) {
-      sum += this.tree[index];
-      index -= index & (-index); // Remove last set bit
+      sum += tree[index];
+      index -= index & -index;
     }
     return sum;
   }
+
+  for (let i = 0; i < n; i++) {
+    update(i, nums[i]);
+  }
+
+  return query(n - 1);
 }`;
 
   const generateSteps = () => {
-    const arr = [3, 2, -1, 6, 5];
+    const nums = [3, 2, -1, 6, 5];
     const newSteps: Step[] = [];
-    const n = arr.length;
+    const n = nums.length;
     const tree: number[] = new Array(n + 1).fill(0);
 
+    // Initial state
     newSteps.push({
-      array: [...arr],
+      array: [...nums],
       tree: [...tree],
       operation: "init",
-      index: -1,
-      value: 0,
-      result: null,
-      message: "Initialize Fenwick Tree (Binary Indexed Tree)",
-      lineNumber: 5,
+      index: "none",
+      value: "none",
+      sum: "none",
+      message: "Initialize the Fenwick Tree process.",
+      lineNumber: 1,
+      highlightedTreeIndex: null,
+      highlightedArrayIndex: null,
     });
 
-    function update(index: number, delta: number) {
-      let idx = index + 1;
+    newSteps.push({
+      array: [...nums],
+      tree: [...tree],
+      operation: "init",
+      index: "none",
+      value: "none",
+      sum: "none",
+      message: `Set n = nums.length (${n}).`,
+      lineNumber: 2,
+      highlightedTreeIndex: null,
+      highlightedArrayIndex: null,
+    });
+
+    newSteps.push({
+      array: [...nums],
+      tree: [...tree],
+      operation: "init",
+      index: "none",
+      value: "none",
+      sum: "none",
+      message: "Initialize tree array with size n+1, filled with 0s.",
+      lineNumber: 3,
+      highlightedTreeIndex: null,
+      highlightedArrayIndex: null,
+    });
+
+    // Build phase
+    for (let i = 0; i < n; i++) {
       newSteps.push({
-        array: [...arr],
+        array: [...nums],
+        tree: [...tree],
+        operation: "build",
+        index: i,
+        value: nums[i],
+        sum: "none",
+        message: `Loop iteration i = ${i}. Preparing to update tree with nums[${i}] = ${nums[i]}.`,
+        lineNumber: 23,
+        highlightedTreeIndex: null,
+        highlightedArrayIndex: i,
+      });
+
+      newSteps.push({
+        array: [...nums],
+        tree: [...tree],
+        operation: "build",
+        index: i,
+        value: nums[i],
+        sum: "none",
+        message: `Call update(${i}, ${nums[i]}).`,
+        lineNumber: 24,
+        highlightedTreeIndex: null,
+        highlightedArrayIndex: i,
+      });
+
+      // Update function
+      let idx = i;
+      let val = nums[i];
+
+      newSteps.push({
+        array: [...nums],
         tree: [...tree],
         operation: "update",
-        index,
-        value: delta,
-        result: null,
-        message: `Update index ${index} with value ${delta}`,
-        lineNumber: 12,
+        index: idx,
+        value: val,
+        sum: "none",
+        message: `Inside update(index=${idx}, value=${val}).`,
+        lineNumber: 5,
+        highlightedTreeIndex: null,
+        highlightedArrayIndex: idx,
+      });
+
+      idx++;
+      newSteps.push({
+        array: [...nums],
+        tree: [...tree],
+        operation: "update",
+        index: idx,
+        value: val,
+        sum: "none",
+        message: `Increment index by 1 for 1-based indexing. index = ${idx}.`,
+        lineNumber: 6,
+        highlightedTreeIndex: idx,
+        highlightedArrayIndex: null,
       });
 
       while (idx <= n) {
-        tree[idx] += delta;
         newSteps.push({
-          array: [...arr],
+          array: [...nums],
           tree: [...tree],
           operation: "update",
-          index: idx - 1,
-          value: tree[idx],
-          result: null,
-          message: `tree[${idx}] += ${delta}, now = ${tree[idx]}`,
-          lineNumber: 14,
+          index: idx,
+          value: val,
+          sum: "none",
+          message: `Check if index (${idx}) <= n (${n}).`,
+          lineNumber: 7,
+          highlightedTreeIndex: idx,
+          highlightedArrayIndex: null,
         });
-        idx += idx & -idx;
-      }
-    }
 
-    // Build tree
-    for (let i = 0; i < n; i++) {
-      update(i, arr[i]);
-    }
-
-    // Perform prefix sum query
-    function query(index: number): number {
-      let idx = index + 1;
-      let sum = 0;
-      newSteps.push({
-        array: [...arr],
-        tree: [...tree],
-        operation: "query",
-        index,
-        value: 0,
-        result: null,
-        message: `Query prefix sum up to index ${index}`,
-        lineNumber: 19,
-      });
-
-      while (idx > 0) {
-        sum += tree[idx];
+        tree[idx] += val;
         newSteps.push({
-          array: [...arr],
+          array: [...nums],
           tree: [...tree],
-          operation: "query",
-          index: idx - 1,
-          value: tree[idx],
-          result: sum,
-          message: `sum += tree[${idx}] = ${tree[idx]}, total = ${sum}`,
-          lineNumber: 23,
+          operation: "update",
+          index: idx,
+          value: val,
+          sum: "none",
+          message: `Add value ${val} to tree[${idx}]. tree[${idx}] is now ${tree[idx]}.`,
+          lineNumber: 8,
+          highlightedTreeIndex: idx,
+          highlightedArrayIndex: null,
         });
-        idx -= idx & -idx;
+
+        const oldIdx = idx;
+        idx += idx & -idx;
+        newSteps.push({
+          array: [...nums],
+          tree: [...tree],
+          operation: "update",
+          index: idx,
+          value: val,
+          sum: "none",
+          message: `Update index: ${oldIdx} + (${oldIdx} & ${-oldIdx}) = ${idx}.`,
+          lineNumber: 9,
+          highlightedTreeIndex: idx <= n ? idx : null,
+          highlightedArrayIndex: null,
+        });
       }
 
       newSteps.push({
-        array: [...arr],
+        array: [...nums],
         tree: [...tree],
-        operation: "query",
-        index,
-        value: 0,
-        result: sum,
-        message: `Prefix sum result: ${sum}`,
-        lineNumber: 26,
+        operation: "update",
+        index: idx,
+        value: val,
+        sum: "none",
+        message: `index (${idx}) > n (${n}), loop terminates.`,
+        lineNumber: 7,
+        highlightedTreeIndex: null,
+        highlightedArrayIndex: null,
       });
-
-      return sum;
     }
 
-    query(3);
+    // Query phase
+    const queryIdx = n - 1;
+    newSteps.push({
+      array: [...nums],
+      tree: [...tree],
+      operation: "query",
+      index: queryIdx,
+      value: "none",
+      sum: "none",
+      message: `Finished building tree. Now query prefix sum up to index ${queryIdx}.`,
+      lineNumber: 27,
+      highlightedTreeIndex: null,
+      highlightedArrayIndex: queryIdx,
+    });
+
+    let qIdx = queryIdx;
+    newSteps.push({
+      array: [...nums],
+      tree: [...tree],
+      operation: "query",
+      index: qIdx,
+      value: "none",
+      sum: "none",
+      message: `Inside query(index=${qIdx}).`,
+      lineNumber: 13,
+      highlightedTreeIndex: null,
+      highlightedArrayIndex: null,
+    });
+
+    qIdx++;
+    newSteps.push({
+      array: [...nums],
+      tree: [...tree],
+      operation: "query",
+      index: qIdx,
+      value: "none",
+      sum: "none",
+      message: `Increment index by 1. index = ${qIdx}.`,
+      lineNumber: 14,
+      highlightedTreeIndex: qIdx,
+      highlightedArrayIndex: null,
+    });
+
+    let currentSum = 0;
+    newSteps.push({
+      array: [...nums],
+      tree: [...tree],
+      operation: "query",
+      index: qIdx,
+      value: "none",
+      sum: currentSum,
+      message: `Initialize sum = 0.`,
+      lineNumber: 15,
+      highlightedTreeIndex: qIdx,
+      highlightedArrayIndex: null,
+    });
+
+    while (qIdx > 0) {
+      newSteps.push({
+        array: [...nums],
+        tree: [...tree],
+        operation: "query",
+        index: qIdx,
+        value: "none",
+        sum: currentSum,
+        message: `Check if index (${qIdx}) > 0.`,
+        lineNumber: 16,
+        highlightedTreeIndex: qIdx,
+        highlightedArrayIndex: null,
+      });
+
+      currentSum += tree[qIdx];
+      newSteps.push({
+        array: [...nums],
+        tree: [...tree],
+        operation: "query",
+        index: qIdx,
+        value: "none",
+        sum: currentSum,
+        message: `Add tree[${qIdx}] (${tree[qIdx]}) to sum. sum = ${currentSum}.`,
+        lineNumber: 17,
+        highlightedTreeIndex: qIdx,
+        highlightedArrayIndex: null,
+      });
+
+      const oldQIdx = qIdx;
+      qIdx -= qIdx & -qIdx;
+      newSteps.push({
+        array: [...nums],
+        tree: [...tree],
+        operation: "query",
+        index: qIdx,
+        value: "none",
+        sum: currentSum,
+        message: `Update index: ${oldQIdx} - (${oldQIdx} & ${-oldQIdx}) = ${qIdx}.`,
+        lineNumber: 18,
+        highlightedTreeIndex: qIdx > 0 ? qIdx : null,
+        highlightedArrayIndex: null,
+      });
+    }
+
+    newSteps.push({
+      array: [...nums],
+      tree: [...tree],
+      operation: "query",
+      index: qIdx,
+      value: "none",
+      sum: currentSum,
+      message: `index is 0, loop terminates.`,
+      lineNumber: 16,
+      highlightedTreeIndex: null,
+      highlightedArrayIndex: null,
+    });
+
+    newSteps.push({
+      array: [...nums],
+      tree: [...tree],
+      operation: "query",
+      index: qIdx,
+      value: "none",
+      sum: currentSum,
+      message: `Return final sum: ${currentSum}.`,
+      lineNumber: 20,
+      highlightedTreeIndex: null,
+      highlightedArrayIndex: null,
+    });
+
+    newSteps.push({
+      array: [...nums],
+      tree: [...tree],
+      operation: "query",
+      index: queryIdx,
+      value: "none",
+      sum: currentSum,
+      message: `Prefix sum result for index ${queryIdx} is ${currentSum}.`,
+      lineNumber: 27,
+      highlightedTreeIndex: null,
+      highlightedArrayIndex: null,
+    });
 
     setSteps(newSteps);
   };
@@ -214,77 +420,73 @@ export const FenwickTreeVisualization: React.FC = () => {
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-card rounded-lg p-6 border space-y-4">
-          <h3 className="text-lg font-semibold">Fenwick Tree</h3>
-          <h3 className="text-lg font-semibold">Original Array</h3>
-          <div className="flex gap-2">
-            {currentStep.array.map((val, idx) => (
-              <div key={idx} className="flex flex-col items-center">
-                <div className="text-xs text-muted-foreground mb-1">
-                  [{idx}]
+        <div className="bg-card rounded-xl p-6 border shadow-sm space-y-6">
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Original Array</h3>
+            <div className="flex flex-wrap gap-2">
+              {currentStep.array.map((val, idx) => (
+                <div key={idx} className="flex flex-col items-center">
+                  <div className="text-xs text-muted-foreground mb-1">
+                    [{idx}]
+                  </div>
+                  <div
+                    className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-medium transition-all duration-300 ${idx === currentStep.highlightedArrayIndex
+                      ? "bg-primary/20 border-primary scale-110 shadow-md"
+                      : "bg-muted/30 border-border"
+                      }`}
+                  >
+                    {val}
+                  </div>
                 </div>
-                <div
-                  className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font- transition-all ${idx === currentStep.index
-                    ? "bg-primary/20 border-primary"
-                    : "bg-blue-500/20 border-blue-500"
-                    }`}
-                >
-                  {val}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <h3 className="text-lg font-semibold">Fenwick Tree (1-indexed)</h3>
-          <div className="flex gap-2">
-            {currentStep.tree.slice(1).map((val, idx) => (
-              <div key={idx} className="flex flex-col items-center">
-                <div className="text-xs text-muted-foreground mb-1">
-                  [{idx + 1}]
-                </div>
-                <div
-                  className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font- transition-all ${idx === currentStep.index &&
-                    currentStep.operation !== "init"
-                    ? "bg-green-500/20 border-green-500"
-                    : val !== 0
-                      ? "bg-blue-500/20 border-blue-500"
-                      : "bg-card border-border"
-                    }`}
-                >
-                  {val}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {currentStep.result !== null && (
-            <div className="p-4 bg-green-500/10 border border-green-500 rounded">
-              <p className="text-sm font-semibold">
-                Prefix Sum Result: {currentStep.result}
-              </p>
+              ))}
             </div>
-          )}
+          </div>
 
-          <div className="p-4 bg-muted rounded">
-            <p className="text-sm">{currentStep.message}</p>
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Fenwick Tree (1-indexed)</h3>
+            <div className="flex flex-wrap gap-2">
+              {currentStep.tree.slice(1).map((val, idx) => {
+                const treeIdx = idx + 1;
+                return (
+                  <div key={idx} className="flex flex-col items-center">
+                    <div className="text-xs text-muted-foreground mb-1">
+                      [{treeIdx}]
+                    </div>
+                    <div
+                      className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-medium transition-all duration-300 ${treeIdx === currentStep.highlightedTreeIndex
+                        ? "bg-green-500/20 border-green-500 scale-110 shadow-md"
+                        : val !== 0
+                          ? "bg-blue-500/10 border-blue-500/30"
+                          : "bg-muted/10 border-border/50"
+                        }`}
+                    >
+                      {val}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="p-4 bg-muted/50 rounded-lg border border-border">
+            <p className="text-sm leading-relaxed">{currentStep.message}</p>
           </div>
 
           <div className="rounded-lg">
             <VariablePanel
               variables={{
                 operation: currentStep.operation,
-                index: currentStep.index >= 0 ? currentStep.index : "none",
+                index: currentStep.index,
                 value: currentStep.value,
-                result:
-                  currentStep.result !== null ? currentStep.result : "pending",
+                currentSum: currentStep.sum,
               }}
             />
           </div>
         </div>
 
-        <CodeHighlighter
+        <AnimatedCodeEditor
           code={code}
-          highlightedLine={currentStep.lineNumber}
+          highlightedLines={[currentStep.lineNumber]}
           language="typescript"
         />
       </div>

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
@@ -168,7 +168,7 @@ export const PrefixSumVisualization = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 space-y-6">
+          <div className="bg-muted/50 rounded-lg border border-border/50 p-6 space-y-6">
             <div>
               <h4 className="text-sm font-semibold mb-3 text-muted-foreground">Original Array</h4>
               <div className="flex items-end justify-center gap-2 h-32">
@@ -181,6 +181,7 @@ export const PrefixSumVisualization = () => {
                           CURRENT
                         </div>
                       )}
+                      <div className="absolute inset-0 bottom-6 bg-muted/40 border border-dashed border-border rounded-t -z-10" />
                       <div
                         className={`w-full rounded-t transition-all duration-300 ${isActive ? 'bg-primary shadow-lg shadow-primary/50 scale-105' : 'bg-gradient-to-t from-accent/60 to-accent/40'
                           }`}
@@ -198,17 +199,20 @@ export const PrefixSumVisualization = () => {
             <div>
               <h4 className="text-sm font-semibold mb-3 text-muted-foreground">Prefix Sum Array</h4>
               <div className="flex items-end justify-center gap-2 h-32">
-                {currentStep.prefixArray.map((value, index) => {
+                {currentStep.originalArray.map((_, index) => {
+                  const value = currentStep.prefixArray[index];
+                  const hasValue = value !== undefined;
                   const isActive = index === currentStep.currentIndex;
                   return (
-                    <div key={index} className="flex flex-col items-center gap-2 flex-1 max-w-[60px]">
+                    <div key={index} className="flex flex-col items-center gap-2 flex-1 max-w-[60px] relative">
+                      <div className="absolute inset-0 bottom-6 bg-muted/40 border border-dashed border-border rounded-t -z-10" />
                       <div
-                        className={`w-full rounded-t transition-all duration-300 ${isActive ? 'bg-primary shadow-lg shadow-primary/50 scale-105' : 'bg-gradient-to-t from-primary/60 to-primary/40'
+                        className={`w-full rounded-t transition-all duration-300 ${isActive ? 'bg-primary shadow-lg shadow-primary/50 scale-105' : hasValue ? 'bg-gradient-to-t from-primary/60 to-primary/40' : 'opacity-0'
                           }`}
-                        style={{ height: `${(value / getMaxValue()) * 100}%`, minHeight: '20px' }}
+                        style={{ height: hasValue ? `${(value / getMaxValue()) * 100}%` : '0px', minHeight: hasValue ? '20px' : '0px' }}
                       />
                       <span className={`text-xs font-mono ${isActive ? 'text-primary font- text-base' : 'text-muted-foreground'}`}>
-                        {value}
+                        {hasValue ? value : ''}
                       </span>
                     </div>
                   );
@@ -237,7 +241,7 @@ export const PrefixSumVisualization = () => {
 
         <div className="space-y-4">
 
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
+          <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="TypeScript" />
         </div>
       </div>
     </div>

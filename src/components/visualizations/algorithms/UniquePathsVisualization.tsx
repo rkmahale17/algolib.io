@@ -15,214 +15,155 @@ interface Step {
   variables: Record<string, any>;
   explanation: string;
   highlightedLines: number[];
-  lineExecution: string;
 }
 
 export const UniquePathsVisualization = () => {
   const [currentStep, setCurrentStep] = useState(0);
-
   const m = 3;
   const n = 3;
 
   const steps: Step[] = [
     {
       grid: [[0, 0, 0], [0, 0, 0], [1, 1, 1]],
-      row: 2,
-      col: -1,
-      m,
-      n,
-      variables: { m: 3, n: 3, row: '[1,1,1]' },
-      explanation: "Initialize 'row' with 1s (representing the bottom row). There is only 1 way to reach the destination from any cell in the last row (move right).",
-      highlightedLines: [3],
-      lineExecution: "let row: number[] = new Array(n).fill(1);"
+      row: 2, col: -1, m, n,
+      variables: { m, n, row: '[1,1,1]' },
+      explanation: "Initialize the base row with 1s. From any cell in the last row, there is only 1 path to the destination (by moving right).",
+      highlightedLines: [2]
+    },
+    {
+      grid: [[0, 0, 0], [0, 0, 0], [1, 1, 1]],
+      row: -1, col: -1, m, n,
+      variables: { i: 0 },
+      explanation: "Start iterating through the rows from bottom to top.",
+      highlightedLines: [4]
     },
     {
       grid: [[0, 0, 0], [1, 1, 1], [1, 1, 1]],
-      row: 1,
-      col: -1,
-      m,
-      n,
+      row: 1, col: -1, m, n,
       variables: { i: 0, newRow: '[1,1,1]' },
-      explanation: "Start building upwards (i=0). Initialize 'newRow' with 1s (representing row m-2). The last column always has 1 path (move down).",
-      highlightedLines: [7],
-      lineExecution: "const newRow: number[] = new Array(n).fill(1);"
+      explanation: "Initialize the current row (newRow) with 1s. The last cell of every row always has 1 path (by moving down).",
+      highlightedLines: [5]
     },
     {
       grid: [[0, 0, 0], [1, 2, 1], [1, 1, 1]],
-      row: 1,
-      col: 1,
-      m,
-      n,
-      variables: { j: 1, i: 0, 'newRow[1]': 2, calc: '1 (right) + 1 (down)' },
-      explanation: "Calculate paths for cell (1,1). Sum of right neighbor (newRow[2]) and down neighbor (row[1]). 1 + 1 = 2.",
-      highlightedLines: [11],
-      lineExecution: "newRow[j] = newRow[j + 1] + row[j]; // 1 + 1 = 2"
+      row: 1, col: 1, m, n,
+      variables: { i: 0, j: 1, 'newRow[1]': 2, 'calc': 'newRow[2] + row[1] = 1 + 1' },
+      explanation: "Calculate paths for (1, 1): sum of paths from cell to the right and cell below.",
+      highlightedLines: [8]
     },
     {
       grid: [[0, 0, 0], [3, 2, 1], [1, 1, 1]],
-      row: 1,
-      col: 0,
-      m,
-      n,
-      variables: { j: 0, i: 0, 'newRow[0]': 3, calc: '2 (right) + 1 (down)' },
-      explanation: "Calculate paths for cell (1,0). Sum of right neighbor (newRow[1]) and down neighbor (row[0]). 2 + 1 = 3.",
-      highlightedLines: [11],
-      lineExecution: "newRow[j] = newRow[j + 1] + row[j]; // 2 + 1 = 3"
+      row: 1, col: 0, m, n,
+      variables: { i: 0, j: 0, 'newRow[0]': 3, 'calc': 'newRow[1] + row[0] = 2 + 1' },
+      explanation: "Calculate paths for (1, 0): sum of paths from cell to the right (2) and cell below (1).",
+      highlightedLines: [8]
     },
     {
       grid: [[0, 0, 0], [3, 2, 1], [1, 1, 1]],
-      row: 1,
-      col: -1,
-      m,
-      n,
+      row: 1, col: -1, m, n,
       variables: { row: '[3,2,1]' },
-      explanation: "Row complete. Update 'row' to be the newly calculated 'newRow'. We now move one step up.",
-      highlightedLines: [14],
-      lineExecution: "row = newRow; // [3, 2, 1]"
+      explanation: "Current row processed. Update 'row' for the next iteration.",
+      highlightedLines: [11]
     },
     {
       grid: [[1, 1, 1], [3, 2, 1], [1, 1, 1]],
-      row: 0,
-      col: -1,
-      m,
-      n,
+      row: 0, col: -1, m, n,
       variables: { i: 1, newRow: '[1,1,1]' },
-      explanation: "Next iteration (i=1). Initialize 'newRow' with 1s (representing row 0).",
-      highlightedLines: [7],
-      lineExecution: "const newRow: number[] = new Array(n).fill(1);"
+      explanation: "Start next row (i = 1).",
+      highlightedLines: [5]
     },
     {
-      grid: [[1, 2, 1], [3, 2, 1], [1, 1, 1]],
-      row: 0,
-      col: 1,
-      m,
-      n,
-      variables: { j: 1, i: 1, 'newRow[1]': 3, calc: '1 (right) + 2 (down)' },
-      explanation: "Calculate paths for cell (0,1). Right (newRow[2]=1) + Down (row[1]=2). 1 + 2 = 3.",
-      highlightedLines: [11],
-      lineExecution: "newRow[j] = newRow[j + 1] + row[j]; // 1 + 2 = 3"
+      grid: [[1, 3, 1], [3, 2, 1], [1, 1, 1]],
+      row: 0, col: 1, m, n,
+      variables: { i: 1, j: 1, 'newRow[1]': 3, 'calc': 'newRow[2] + row[1] = 1 + 2' },
+      explanation: "Calculate paths for (0, 1): 1 (right) + 2 (down) = 3.",
+      highlightedLines: [8]
     },
     {
-      grid: [[6, 2, 1], [3, 2, 1], [1, 1, 1]],
-      row: 0,
-      col: 0,
-      m,
-      n,
-      variables: { j: 0, i: 1, 'newRow[0]': 6, calc: '3 (right) + 3 (down)' },
-      explanation: "Calculate paths for cell (0,0). Right (newRow[1]=3) + Down (row[0]=3). 3 + 3 = 6.",
-      highlightedLines: [11],
-      lineExecution: "newRow[j] = newRow[j + 1] + row[j]; // 3 + 3 = 6"
+      grid: [[6, 3, 1], [3, 2, 1], [1, 1, 1]],
+      row: 0, col: 0, m, n,
+      variables: { i: 1, j: 0, 'newRow[0]': 6, 'calc': 'newRow[1] + row[0] = 3 + 3' },
+      explanation: "Calculate paths for (0, 0): 3 (right) + 3 (down) = 6.",
+      highlightedLines: [8]
     },
     {
-      grid: [[6, 2, 1], [3, 2, 1], [1, 1, 1]],
-      row: 0,
-      col: 0,
-      m,
-      n,
+      grid: [[6, 3, 1], [3, 2, 1], [1, 1, 1]],
+      row: 0, col: 0, m, n,
       variables: { result: 6 },
-      explanation: "All rows processed. The first element of the current 'row' contains the total unique paths starting from (0,0).",
-      highlightedLines: [17],
-      lineExecution: "return row[0]; // 6"
+      explanation: "Final result at row[0] is 6.",
+      highlightedLines: [14]
     }
   ];
 
   const code = `function uniquePaths(m: number, n: number): number {
-    // Last row has only one way to reach destination
-    let row: number[] = new Array(n).fill(1);
+  let row: number[] = new Array(n).fill(1);
 
-    // Build rows upward
-    for (let i = 0; i < m - 1; i++) {
-        const newRow: number[] = new Array(n).fill(1);
+  for (let i = 0; i < m - 1; i++) {
+    const newRow: number[] = new Array(n).fill(1);
 
-        // Fill from right to left
-        for (let j = n - 2; j >= 0; j--) {
-            newRow[j] = newRow[j + 1] + row[j];
-        }
-
-        row = newRow;
+    for (let j = n - 2; j >= 0; j--) {
+      newRow[j] = newRow[j + 1] + row[j];
     }
 
-    return row[0];
+    row = newRow;
+  }
+
+  return row[0];
 }`;
 
-  const step = steps[currentStep];
+  const step = steps[currentStep] || steps[0];
 
   return (
     <VisualizationLayout
       leftContent={
-        <>
-          <motion.div
-            key={`grid-${currentStep}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Card className="p-4">
-              <h3 className="text-sm font-semibold mb-3">Grid (Values propagate Up & Left)</h3>
-              {step.grid.length > 0 && (
-                <>
-                  <div className="inline-block border-2 border-border rounded">
-                    {step.grid.map((row, i) => (
-                      <div key={i} className="flex">
-                        {row.map((val, j) => (
-                          <div
-                            key={j}
-                            className={`w-20 h-20 border border-border flex items-center justify-center text-2xl font- ${
-                              // Highlight logic
-                              i === step.row && j === step.col
-                                ? 'bg-primary text-primary-foreground scale-105 transition-transform' // Current target
-                                : (i === step.row && j === step.col + 1) || (i === step.row + 1 && j === step.col)
-                                  ? 'bg-secondary border-primary/50' // Dependencies
-                                  : val > 0 && i >= step.row // Filled/Active rows
-                                    ? 'bg-muted'
-                                    : 'opacity-40' // Unvisited/Irrelevant
-                              }`}
-                          >
-                            {val > 0 ? val : ''}
-                          </div>
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
-                    <p>We only store 'row' (bottom) and 'newRow' (current) in implementation.</p>
-                  </div>
-                </>
-              )}
-            </Card>
-          </motion.div>
+        <div className="space-y-6">
+          <Card className="p-6 bg-card/50 backdrop-blur-sm border-primary/20 relative overflow-hidden">
+            <h3 className="text-sm font-semibold mb-8 text-muted-foreground uppercase tracking-widest text-center">Path Propagation Grid</h3>
 
-          {/* Execution & Variables Panels */}
-          <motion.div
-            key={`execution-${currentStep}`}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-            className="mt-4"
-          >
-            <Card className="p-4 bg-muted/50">
-              <div className="space-y-2">
-                <div className="text-sm font-semibold text-primary">Current Execution:</div>
-                <div className="text-sm font-mono bg-background/50 p-2 rounded">
-                  {step.lineExecution}
-                </div>
-                <div className="text-sm text-muted-foreground pt-2">
-                  {step.explanation}
-                </div>
-              </div>
-            </Card>
-          </motion.div>
+            <div className="flex flex-col items-center gap-1">
+              {step.grid.map((rowArr, i) => (
+                <div key={i} className="flex gap-1">
+                  {rowArr.map((val, j) => {
+                    const isCurrent = i === step.row && j === step.col;
+                    const isDep = (i === step.row && j === step.col + 1) || (i === step.row + 1 && j === step.col);
+                    const isFilled = val > 0;
+                    const isProcessed = i > step.row || (i === step.row && j > step.col);
 
-          <motion.div
-            key={`variables-${currentStep}`}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3, delay: 0.4 }}
-            className="mt-4"
-          >
-            <VariablePanel variables={step.variables} />
-          </motion.div>
-        </>
+                    return (
+                      <motion.div
+                        key={j}
+                        animate={{
+                          backgroundColor: isCurrent ? '#84cc16' : isDep ? 'rgba(132,204,22,0.15)' : isFilled ? 'rgba(255,255,255,0.03)' : 'transparent',
+                          borderColor: isCurrent ? '#84cc16' : isDep ? 'rgba(132,204,22,0.5)' : '#333',
+                          scale: isCurrent ? 1.05 : 1,
+                          opacity: isProcessed || isCurrent || isDep ? 1 : 0.4
+                        }}
+                        className="w-16 h-16 border-2 rounded-xl flex items-center justify-center text-xl font-black transition-all"
+                        style={{ color: isCurrent ? '#000' : '#eee' }}
+                      >
+                        {val > 0 ? val : ''}
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+
+            <div className="flex justify-center gap-4 mt-8 text-[10px] text-muted-foreground">
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#84cc16]" /> Current</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full border border-primary/50 bg-[#84cc1622]" /> Dependent</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full border border-[#444]" /> Processed</span>
+            </div>
+          </Card>
+
+          <Card className="p-4 bg-primary/5 border-primary/20 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
+            <h4 className="text-[10px] font-bold uppercase tracking-widest text-primary mb-2">Step Explanation</h4>
+            <p className="text-sm font-medium leading-relaxed">{step.explanation}</p>
+          </Card>
+
+          <VariablePanel variables={step.variables} />
+        </div>
       }
       rightContent={
         <AnimatedCodeEditor

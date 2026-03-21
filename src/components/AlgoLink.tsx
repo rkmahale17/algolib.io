@@ -12,10 +12,10 @@ interface AlgoLinkProps {
   hideIcon?: boolean;
 }
 
-export const AlgoLink: React.FC<AlgoLinkProps> = ({ 
-  url, 
-  label, 
-  className, 
+export const AlgoLink: React.FC<AlgoLinkProps> = ({
+  url,
+  label,
+  className,
   children,
   iconClassName,
   hideIcon = false
@@ -32,14 +32,14 @@ export const AlgoLink: React.FC<AlgoLinkProps> = ({
   const isMail = safeUrl.startsWith('mailto:');
   const isHash = safeUrl.startsWith('#');
   const isExternal = safeUrl.startsWith('http') || safeUrl.startsWith('https') || safeUrl.startsWith('//');
-  
+
   // Icon Size and Style
   const iconBaseClass = cn("inline-block ml-1.5 w-4 h-4", iconClassName);
 
   if (isMail) {
     return (
-      <a 
-        href={url} 
+      <a
+        href={url}
         className={cn("inline-flex items-center hover:underline text-primary", className)}
       >
         {content}
@@ -50,10 +50,10 @@ export const AlgoLink: React.FC<AlgoLinkProps> = ({
 
   if (isExternal) {
     return (
-      <a 
-        href={url} 
-        target="_blank" 
-        rel="noopener noreferrer" 
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
         className={cn("inline-flex items-center hover:underline text-primary", className)}
       >
         {content}
@@ -64,7 +64,7 @@ export const AlgoLink: React.FC<AlgoLinkProps> = ({
 
   if (isHash) {
     return (
-      <a 
+      <a
         href={url}
         className={cn("inline-flex items-center hover:underline text-primary", className)}
       >
@@ -76,8 +76,8 @@ export const AlgoLink: React.FC<AlgoLinkProps> = ({
 
   // Internal Link
   return (
-    <Link 
-      to={url} 
+    <Link
+      to={url}
       className={cn("inline-flex items-center hover:underline text-primary", className)}
     >
       {content}

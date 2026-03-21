@@ -10,6 +10,7 @@ interface AuthGuardProps {
   children: ReactNode;
   fallbackTitle?: string;
   fallbackDescription?: string;
+  disabled?: boolean;
 }
 
 /**
@@ -20,6 +21,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
   children,
   fallbackTitle = "Sign in required",
   fallbackDescription = "Please sign in to access this feature.",
+  disabled = false,
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -43,6 +45,10 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
 
     return () => subscription.unsubscribe();
   }, []);
+
+  if (disabled) {
+    return <>{children}</>;
+  }
 
   if (loading) {
     return (

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { StepControls } from '../shared/StepControls';
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { VariablePanel } from '../shared/VariablePanel';
 
 interface Step {
@@ -26,34 +26,39 @@ export const NumIslandsVisualization = () => {
   const [speed, setSpeed] = useState(1000);
   const [steps, setSteps] = useState<Step[]>([]);
 
-  const code = `def numIslands(grid):
-    if not grid:
-        return 0
+  const code = `function numIslands(grid: string[][]): number {
+    if (!grid || grid.length === 0) return 0;
     
-    rows, cols = len(grid), len(grid[0])
-    islands = 0
+    const rows = grid.length;
+    const cols = grid[0].length;
+    let islands = 0;
     
-    def dfs(r, c):
-        if (r < 0 or r >= rows or 
-            c < 0 or c >= cols or 
-            grid[r][c] != '1'):
-            return
+    function dfs(r: number, c: number) {
+        if (r < 0 || r >= rows || 
+            c < 0 || c >= cols || 
+            grid[r][c] !== '1') {
+            return;
+        }
         
-        grid[r][c] = '0'  # Mark visited
+        grid[r][c] = '0'; // Mark as visited
         
-        # Visit all 4 directions
-        dfs(r+1, c)
-        dfs(r-1, c)
-        dfs(r, c+1)
-        dfs(r, c-1)
+        dfs(r + 1, c);
+        dfs(r - 1, c);
+        dfs(r, c + 1);
+        dfs(r, c - 1);
+    }
     
-    for r in range(rows):
-        for c in range(cols):
-            if grid[r][c] == '1':
-                islands += 1
-                dfs(r, c)
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            if (grid[r][c] === '1') {
+                islands++;
+                dfs(r, c);
+            }
+        }
+    }
     
-    return islands`;
+    return islands;
+}`;
 
   useEffect(() => {
     generateSteps();
@@ -210,10 +215,10 @@ export const NumIslandsVisualization = () => {
       </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <CodeHighlighter
+        <AnimatedCodeEditor
           code={code}
-          highlightedLine={step.highlightedLine}
-          language="Python"
+          highlightedLines={[step.highlightedLine]}
+          language="typescript"
         />
         <VariablePanel
           variables={{

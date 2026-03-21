@@ -1,391 +1,338 @@
-import { useEffect, useRef, useState } from 'react';
-
-import { CodeHighlighter } from '../shared/CodeHighlighter';
-import { StepControls } from '../shared/StepControls';
+import { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
+import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
+import { Card } from '@/components/ui/card';
 
 interface Step {
   heights: number[];
   stack: number[];
   currentIndex: number;
-  maxArea: number;
-  currentArea: number;
-  width: number;
   topIndex: number;
+  width: number;
+  area: number;
+  maxArea: number;
   activeRange: [number, number] | null;
-  message: string;
-  lineNumber: number;
+  explanation: string;
+  highlightedLines: number[];
+  variables: Record<string, any>;
 }
 
 export const MonotonicStackVisualization = () => {
-  const [steps, setSteps] = useState<Step[]>([]);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [currentStep, setCurrentStep] = useState(0);
+  const heights = [2, 1, 5, 6, 2, 3];
 
-  const code = `function largestRectangleArea(heights: number[]): number {
-  let maxArea = 0;
-  const stack: number[] = [];
-
-  for (let i = 0; i <= heights.length; i++) {
-    while (
-      stack.length > 0 &&
-      (i === heights.length || heights[stack[stack.length - 1]] >= heights[i])
-    ) {
-      const top = stack.pop()!;
-      const width = stack.length === 0 
-        ? i 
-        : i - stack[stack.length - 1] - 1;
-      
-      const area = heights[top] * width;
-      maxArea = Math.max(maxArea, area);
-    }
-    stack.push(i);
-  }
-  return maxArea;
-}`;
-
-  const generateSteps = () => {
-    const heights = [2, 1, 5, 6, 2, 3];
-    const newSteps: Step[] = [];
+  const steps = useMemo(() => {
+    const s: Step[] = [];
     const stack: number[] = [];
     let maxArea = 0;
 
-    // Line 1: Function entry
-    newSteps.push({
-      heights: [...heights],
+    // Initial state
+    s.push({
+      heights,
       stack: [],
       currentIndex: -1,
-      maxArea: 0,
-      currentArea: 0,
-      width: 0,
       topIndex: -1,
-      activeRange: null,
-      message: 'Starting Largest Rectangle in Histogram calculation.',
-      lineNumber: 1
-    });
-
-    // Line 2: Initialize maxArea
-    newSteps.push({
-      heights: [...heights],
-      stack: [],
-      currentIndex: -1,
-      maxArea: 0,
-      currentArea: 0,
       width: 0,
-      topIndex: -1,
+      area: 0,
+      maxArea: 0,
       activeRange: null,
-      message: 'Initialize maxArea to 0.',
-      lineNumber: 2
+      explanation: "Initialize maxArea to 0 and an empty stack to store indices.",
+      highlightedLines: [1, 2, 3],
+      variables: { maxArea: 0, stack: '[]' }
     });
 
     for (let i = 0; i <= heights.length; i++) {
-      // Line 5: For loop
-      newSteps.push({
-        heights: [...heights],
+      const currentHeight = i === heights.length ? 0 : heights[i];
+
+      s.push({
+        heights,
         stack: [...stack],
         currentIndex: i,
-        maxArea,
-        currentArea: 0,
-        width: 0,
         topIndex: -1,
+        width: 0,
+        area: 0,
+        maxArea,
         activeRange: null,
-        message: i === heights.length
-          ? 'Reached the end. Processing remaining bars in stack.'
-          : `Processing bar at index ${i} with height ${heights[i]}.`,
-        lineNumber: 5
+        explanation: i === heights.length
+          ? "Reached the end of the histogram. Let's process the remaining bars in the stack by treating the end as a bar of height 0."
+          : `Processing bar at index ${i} with height ${currentHeight}. We check if this bar breaks our increasing (monotonic) property in the stack.`,
+        highlightedLines: [5, 6, 7],
+        variables: { i, currentHeight, stack: `[${stack.join(', ')}]`, maxArea }
       });
 
-      while (
-        stack.length > 0 &&
-        (i === heights.length || heights[stack[stack.length - 1]] >= heights[i])
-      ) {
-        // Line 6-9: While condition check
-        const top = stack[stack.length - 1];
-        newSteps.push({
-          heights: [...heights],
-          stack: [...stack],
-          currentIndex: i,
-          maxArea,
-          currentArea: 0,
-          width: 0,
-          topIndex: top,
-          activeRange: null,
-          message: i === heights.length
-            ? 'Stack is not empty at end. Flushing...'
-            : `Bar at index ${i} (${heights[i]}) is shorter than or equal to bar at index ${top} (${heights[top]}). Breaking increasing pattern.`,
-          lineNumber: 6
-        });
-
-        // Line 10: Pop top
-        stack.pop();
-        newSteps.push({
-          heights: [...heights],
-          stack: [...stack],
-          currentIndex: i,
-          maxArea,
-          currentArea: 0,
-          width: 0,
-          topIndex: top,
-          activeRange: null,
-          message: `Pop index ${top} from stack. This will be the height of our rectangle.`,
-          lineNumber: 10
-        });
-
-        // Line 11-13: Calculate width
-        const width = stack.length === 0 ? i : i - stack[stack.length - 1] - 1;
+      while (stack.length > 0 && (i === heights.length || heights[stack[stack.length - 1]] >= heights[i])) {
+        const topIndex = stack.pop()!;
+        const h = heights[topIndex];
+        const w = stack.length === 0 ? i : i - stack[stack.length - 1] - 1;
+        const area = h * w;
         const leftBoundary = stack.length === 0 ? 0 : stack[stack.length - 1] + 1;
         const rightBoundary = i - 1;
 
-        newSteps.push({
-          heights: [...heights],
-          stack: [...stack],
+        s.push({
+          heights,
+          stack: [...stack, topIndex], // Show it's about to be popped
           currentIndex: i,
+          topIndex: topIndex,
+          width: 0,
+          area: 0,
           maxArea,
-          currentArea: 0,
-          width,
-          topIndex: top,
-          activeRange: [leftBoundary, rightBoundary],
-          message: stack.length === 0
-            ? `Stack is empty. Width = i = ${i}. Rectangle spans from index 0 to ${i - 1}.`
-            : `New stack top is ${stack[stack.length - 1]}. Width = i - stackTop - 1 = ${i} - ${stack[stack.length - 1]} - 1 = ${width}.`,
-          lineNumber: 11
+          activeRange: null,
+          explanation: `The bar at index ${i} (height ${currentHeight}) is shorter than or equal to the bar at the top of our stack (index ${topIndex}, height ${h}). This means index ${topIndex} cannot extend its rectangle any further to the right.`,
+          highlightedLines: [6, 7, 8],
+          variables: { i, currentHeight, top: topIndex, topHeight: h, stack: `[${[...stack, topIndex].join(', ')}]` }
         });
 
-        // Line 15: Calculate area
-        const area = heights[top] * width;
-        newSteps.push({
-          heights: [...heights],
+        s.push({
+          heights,
           stack: [...stack],
           currentIndex: i,
+          topIndex: topIndex,
+          width: w,
+          area: area,
           maxArea,
-          currentArea: area,
-          width,
-          topIndex: top,
           activeRange: [leftBoundary, rightBoundary],
-          message: `Calculate area: height (${heights[top]}) * width (${width}) = ${area}.`,
-          lineNumber: 15
+          explanation: `We pop ${topIndex} and calculate the area. The height is ${h}. The width is ${w} (from index ${leftBoundary} to ${rightBoundary}). The area is ${h} * ${w} = ${area}.`,
+          highlightedLines: [9, 10, 11, 12, 13, 14],
+          variables: { height: h, width: w, area, currentStack: `[${stack.join(', ')}]` }
         });
 
-        // Line 16: Update maxArea
-        const oldMax = maxArea;
+        const prevMax = maxArea;
         maxArea = Math.max(maxArea, area);
-        newSteps.push({
-          heights: [...heights],
+        s.push({
+          heights,
           stack: [...stack],
           currentIndex: i,
+          topIndex: topIndex,
+          width: w,
+          area: area,
           maxArea,
-          currentArea: area,
-          width,
-          topIndex: top,
           activeRange: [leftBoundary, rightBoundary],
-          message: area > oldMax
-            ? `New max area found! ${area} > ${oldMax}.`
-            : `Max area remains ${maxArea}.`,
-          lineNumber: 16
+          explanation: area > prevMax
+            ? `New maximum area found! ${area} is greater than ${prevMax}.`
+            : `The current area ${area} is not greater than our maximum ${prevMax}. maxArea remains ${maxArea}.`,
+          highlightedLines: [15],
+          variables: { area, maxArea }
         });
       }
 
       if (i < heights.length) {
-        // Line 18: Push i
         stack.push(i);
-        newSteps.push({
-          heights: [...heights],
+        s.push({
+          heights,
           stack: [...stack],
           currentIndex: i,
-          maxArea,
-          currentArea: 0,
-          width: 0,
           topIndex: -1,
+          width: 0,
+          area: 0,
+          maxArea,
           activeRange: null,
-          message: `Push index ${i} to stack. Maintains increasing height order.`,
-          lineNumber: 18
+          explanation: `Now that all bars taller than ${heights[i]} are processed, we push index ${i} onto the stack. This maintains our non-decreasing property.`,
+          highlightedLines: [17],
+          variables: { pushed: i, stack: `[${stack.join(', ')}]` }
         });
       }
     }
 
-    // Line 21: Return
-    newSteps.push({
-      heights: [...heights],
-      stack: [...stack],
+    s.push({
+      heights,
+      stack: [],
       currentIndex: heights.length,
-      maxArea,
-      currentArea: 0,
-      width: 0,
       topIndex: -1,
+      width: 0,
+      area: 0,
+      maxArea,
       activeRange: null,
-      message: `Final maximum rectangle area is ${maxArea}.`,
-      lineNumber: 21
+      explanation: `Algorithm finished. The largest rectangular area found in the histogram is ${maxArea}.`,
+      highlightedLines: [19],
+      variables: { maxArea }
     });
 
-    setSteps(newSteps);
-    setCurrentStepIndex(0);
-  };
-
-  useEffect(() => {
-    generateSteps();
+    return s;
   }, []);
 
-  useEffect(() => {
-    if (isPlaying && currentStepIndex < steps.length - 1) {
-      intervalRef.current = setInterval(() => {
-        setCurrentStepIndex(prev => {
-          if (prev >= steps.length - 1) {
-            setIsPlaying(false);
-            return prev;
-          }
-          return prev + 1;
-        });
-      }, 1000 / speed);
-    } else {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+  const code = `function largestRectangleArea(heights: number[]): number {
+    let maxArea = 0;
+    const stack: number[] = [];
+
+    for (let i = 0; i <= heights.length; i++) {
+        const h = i === heights.length ? 0 : heights[i];
+        while (stack.length > 0 && heights[stack[stack.length - 1]] >= h) {
+            const top = stack.pop()!;
+            const width = stack.length === 0 
+                ? i 
+                : i - stack[stack.length - 1] - 1;
+            
+            const area = heights[top] * width;
+            maxArea = Math.max(maxArea, area);
+        }
+        stack.push(i);
     }
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [isPlaying, currentStepIndex, steps.length, speed]);
+    return maxArea;
+}`;
 
-  const handlePlay = () => setIsPlaying(true);
-  const handlePause = () => setIsPlaying(false);
-  const handleStepForward = () => currentStepIndex < steps.length - 1 && setCurrentStepIndex(prev => prev + 1);
-  const handleStepBack = () => currentStepIndex > 0 && setCurrentStepIndex(prev => prev - 1);
-  const handleReset = () => {
-    setCurrentStepIndex(0);
-    setIsPlaying(false);
-    generateSteps();
-  };
-
-  if (steps.length === 0) return null;
-
-  const currentStep = steps[currentStepIndex];
-  const maxVal = Math.max(...currentStep.heights);
+  const step = steps[currentStep];
+  const maxH = Math.max(...heights);
 
   return (
-    <div className="space-y-6">
-      <StepControls
-        isPlaying={isPlaying}
-        onPlay={handlePlay}
-        onPause={handlePause}
-        onStepForward={handleStepForward}
-        onStepBack={handleStepBack}
-        onReset={handleReset}
-        speed={speed}
-        onSpeedChange={setSpeed}
-        currentStep={currentStepIndex}
-        totalSteps={steps.length - 1}
-      />
+    <VisualizationLayout
+      leftContent={
+        <div className="space-y-6">
+          <Card className="p-8 bg-card/50 backdrop-blur-sm border-primary/20 relative overflow-hidden">
+            <h3 className="text-sm font-semibold mb-12 text-muted-foreground uppercase tracking-widest text-center">Largest Rectangle in Histogram</h3>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 space-y-8">
-            <div className="relative pt-12">
-              <h4 className="text-sm font-semibold mb-6 text-muted-foreground">Histogram</h4>
-              <div className="flex items-end justify-center gap-1 h-48">
-                {currentStep.heights.map((h, idx) => {
-                  const isCurrent = idx === currentStep.currentIndex;
-                  const isInStack = currentStep.stack.includes(idx);
-                  const isTop = idx === currentStep.topIndex;
-                  const isActiveRange = currentStep.activeRange &&
-                    idx >= currentStep.activeRange[0] &&
-                    idx <= currentStep.activeRange[1];
+            <div className="relative flex items-end justify-center h-64 mb-16 px-4">
+              {/* Histogram Bars */}
+              <div className="flex items-end w-full h-full relative">
+                {heights.map((h, idx) => {
+                  const isCurrent = idx === step.currentIndex;
+                  const isInStack = step.stack.includes(idx);
+                  const isTop = idx === step.topIndex;
+                  const isActiveRange = step.activeRange && idx >= step.activeRange[0] && idx <= step.activeRange[1];
 
                   return (
-                    <div key={idx} className="flex flex-col items-center gap-1 flex-1 max-w-[40px] relative">
-                      {isCurrent && (
-                        <div className="absolute -top-8 text-xs font- text-primary animate-bounce">CURR</div>
-                      )}
-                      {isTop && (
-                        <div className="absolute -top-12 text-xs font- text-orange-500">HEIGHT</div>
-                      )}
-                      <div
-                        className={`w-full rounded-t transition-all duration-300 ${isTop
-                          ? 'bg-orange-500 ring-2 ring-orange-500 shadow-lg scale-105'
-                          : isActiveRange
-                            ? 'bg-primary/80 ring-1 ring-primary'
-                            : isCurrent
-                              ? 'bg-primary/40'
+                    <div key={idx} className="flex-1 relative h-full flex items-end group">
+                      <motion.div
+                        animate={{
+                          height: `${(h / maxH) * 100}%`,
+                          backgroundColor: isTop
+                            ? "rgba(249, 115, 22, 0.4)" // Orange highlight for height provider
+                            : isActiveRange
+                              ? "rgba(var(--primary), 0.1)"
                               : isInStack
-                                ? 'bg-yellow-500/80 shadow-sm'
-                                : 'bg-muted/40'
-                          }`}
-                        style={{ height: `${(h / maxVal) * 100}%`, minHeight: '4px' }}
-                      />
-                      <span className={`text-[10px] font-mono ${isTop ? 'text-orange-500 font-' : 'text-muted-foreground'}`}>
-                        {h}
-                      </span>
+                                ? "rgba(var(--primary), 0.2)"
+                                : "rgba(var(--primary), 0.05)",
+                          borderColor: isTop
+                            ? "rgb(249, 115, 22)"
+                            : isCurrent
+                              ? "rgb(var(--primary))"
+                              : "rgba(var(--primary), 0.2)"
+                        }}
+                        className={`w-full border-x border-t-2 transition-colors relative z-10 
+                          ${isTop ? 'border-orange-500' : ''}
+                          ${isCurrent ? 'border-primary ring-2 ring-primary/20' : ''}
+                        `}
+                      >
+                        <div className="absolute inset-x-0 -top-5 text-center text-[10px] font-bold text-muted-foreground/80">
+                          {h}
+                        </div>
+                        {isCurrent && (
+                          <motion.div
+                            initial={{ y: -20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            className="absolute -top-10 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-2 py-0.5 rounded text-[10px] font-bold"
+                          >
+                            i:{idx}
+                          </motion.div>
+                        )}
+                      </motion.div>
                     </div>
                   );
                 })}
+
+                {/* Rectangle Overlay */}
+                <AnimatePresence>
+                  {step.activeRange && (
+                    <motion.div
+                      initial={{ opacity: 0, scaleY: 0 }}
+                      animate={{ opacity: 1, scaleY: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="absolute bottom-0 bg-primary/40 border-2 border-primary z-20 shadow-[0_0_20px_rgba(var(--primary),0.3)] rounded-sm"
+                      style={{
+                        left: `${(step.activeRange[0] / heights.length) * 100}%`,
+                        width: `${((step.activeRange[1] - step.activeRange[0] + 1) / heights.length) * 100}%`,
+                        height: `${(heights[step.topIndex] / maxH) * 100}%`,
+                        transformOrigin: 'bottom'
+                      }}
+                    >
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-xs font-black text-primary-foreground drop-shadow-md">
+                          Area: {step.area}
+                        </span>
+                      </div>
+                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                        <span className="text-[10px] font-bold bg-primary text-primary-foreground px-2 rounded-full">
+                          w: {step.width} × h: {heights[step.topIndex]}
+                        </span>
+                        <div className="w-0.5 h-2 bg-primary" />
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-              {currentStep.activeRange && (
-                <div className="absolute bottom-[24px] flex justify-center w-full pointer-events-none">
-                  <div className="bg-primary/20 border-x-2 border-t-2 border-primary/40 h-[170px]"
-                    style={{
-                      marginLeft: `${((currentStep.activeRange[0] - (currentStep.heights.length - currentStep.width) / 2) / currentStep.heights.length) * 0}%`, // Simplified centering logic
-                      position: 'absolute',
-                      left: `${(currentStep.activeRange[0] / currentStep.heights.length) * 100}%`,
-                      width: `${((currentStep.activeRange[1] - currentStep.activeRange[0] + 1) / currentStep.heights.length) * 100}%`
-                    }}>
-                    <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font- text-primary bg-background px-1">
-                      WIDTH: {currentStep.width}
-                    </div>
+
+              {/* X-Axis Labels */}
+              <div className="absolute -bottom-8 left-0 right-0 flex">
+                {heights.map((_, idx) => (
+                  <div key={idx} className="flex-1 text-center text-[10px] font-mono text-muted-foreground">
+                    {idx}
                   </div>
-                </div>
-              )}
+                ))}
+              </div>
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex gap-8 items-start">
               <div className="flex-1">
-                <h4 className="text-sm font-semibold mb-3 text-muted-foreground">Stack (indices)</h4>
-                <div className="flex flex-row gap-1 h-12 items-end">
-                  {currentStep.stack.length > 0 ? (
-                    currentStep.stack.map((idx, i) => (
-                      <div
-                        key={i}
-                        className="bg-yellow-500 text-white rounded text-[10px] w-8 h-8 flex items-center justify-center font-mono font- animate-in slide-in-from-bottom"
+                <h4 className="text-[10px] font-bold text-muted-foreground uppercase mb-4 tracking-tighter">Monotonic Stack (Indices)</h4>
+                <div className="flex gap-2 min-h-[50px] p-4 bg-muted/20 border-2 border-dashed border-border rounded-xl items-center flex-wrap">
+                  <AnimatePresence>
+                    {step.stack.map((idx, sIdx) => (
+                      <motion.div
+                        key={`${idx}-${sIdx}`}
+                        initial={{ scale: 0, y: 10 }}
+                        animate={{ scale: 1, y: 0 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black shadow-sm
+                          ${idx === step.topIndex
+                            ? 'bg-orange-500 text-white ring-4 ring-orange-500/20'
+                            : 'bg-primary/20 text-primary border border-primary/20'}
+                        `}
                       >
                         {idx}
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-xs text-muted-foreground italic">empty</div>
-                  )}
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                  {step.stack.length === 0 && <span className="text-xs text-muted-foreground italic">Stack is empty</span>}
                 </div>
               </div>
-              <div className="flex-1 border-l pl-4">
-                <h4 className="text-sm font-semibold mb-1 text-muted-foreground">Current Check</h4>
-                <div className="space-y-1">
-                  <div className="text-xs">Max Area: <span className="font- text-green-600">{currentStep.maxArea}</span></div>
-                  {currentStep.currentArea > 0 && (
-                    <div className="text-xs font-medium text-primary animate-pulse">Rect: {currentStep.currentArea}</div>
-                  )}
+
+              <div className="w-40 text-right">
+                <h4 className="text-[10px] font-bold text-muted-foreground uppercase mb-4 tracking-tighter">Global Max</h4>
+                <div className="text-4xl font-black text-primary tracking-tighter">
+                  {step.maxArea}
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
 
-          <div className="bg-accent/50 rounded-lg border border-accent p-4 min-h-[80px]">
-            <p className="text-sm text-foreground font-medium leading-relaxed">{currentStep.message}</p>
-          </div>
+          <Card className="p-4 bg-primary/5 border-primary/20 relative overflow-hidden transition-all duration-500">
+            <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
+            <h4 className="text-[10px] font-bold uppercase tracking-widest text-primary mb-2">Algorithm Insights</h4>
+            <p className="text-sm font-medium leading-relaxed min-h-[3rem] animate-in fade-in slide-in-from-left-1">
+              {step.explanation}
+            </p>
+          </Card>
         </div>
-
+      }
+      rightContent={
         <div className="space-y-4">
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
-
-          <VariablePanel
-            variables={{
-              i: currentStep.currentIndex <= currentStep.heights.length ? currentStep.currentIndex : 'done',
-              maxArea: currentStep.maxArea,
-              stack: `[${currentStep.stack.join(', ')}]`,
-              height: currentStep.topIndex >= 0 ? currentStep.heights[currentStep.topIndex] : 'N/A',
-              width: currentStep.width > 0 ? currentStep.width : 'N/A',
-              area: currentStep.currentArea > 0 ? currentStep.currentArea : 'N/A'
-            }}
+          <AnimatedCodeEditor
+            code={code}
+            language="typescript"
+            highlightedLines={step.highlightedLines}
           />
+          <VariablePanel variables={step.variables} />
         </div>
-      </div>
-    </div>
+      }
+      controls={
+        <SimpleStepControls
+          currentStep={currentStep}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStep}
+        />
+      }
+    />
   );
 };
-

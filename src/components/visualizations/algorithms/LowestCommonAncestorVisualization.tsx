@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
@@ -91,7 +91,7 @@ export const LowestCommonAncestorVisualization = () => {
         foundQ: false,
         lca: foundLCA,
         message: `Checking node ${node?.val}`,
-        lineNumber: 1
+        lineNumber: 2 // if (!root || root === p || root === q)
       });
 
       if (node.val === p || node.val === q) {
@@ -103,7 +103,7 @@ export const LowestCommonAncestorVisualization = () => {
           foundQ: node.val === q,
           lca: foundLCA,
           message: `Found target node ${node.val}`,
-          lineNumber: 2
+          lineNumber: 3 // return root;
         });
         return true;
       }
@@ -121,7 +121,7 @@ export const LowestCommonAncestorVisualization = () => {
           foundQ: rightFound,
           lca: foundLCA,
           message: `LCA found! Both ${p} and ${q} are in different subtrees of ${node.val}`,
-          lineNumber: 9
+          lineNumber: 10 // return root; // LCA found
         });
       }
 
@@ -136,7 +136,7 @@ export const LowestCommonAncestorVisualization = () => {
       foundQ: false,
       lca: null,
       message: `Find LCA of nodes ${p} and ${q}`,
-      lineNumber: 0
+      lineNumber: 1 // function start
     });
 
     findLCA(root);
@@ -149,7 +149,7 @@ export const LowestCommonAncestorVisualization = () => {
       foundQ: true,
       lca: foundLCA,
       message: `Complete! LCA is ${foundLCA}`,
-      lineNumber: 13
+      lineNumber: 14 // function end or return left || right
     });
 
     setSteps(newSteps);
@@ -209,12 +209,12 @@ export const LowestCommonAncestorVisualization = () => {
           cy={node.y}
           r="24"
           className={`transition-all duration-300 ${node.val === currentStep.lca
-              ? 'fill-green-500 stroke-green-500'
-              : node.val === currentStep.p || node.val === currentStep.q
-                ? 'fill-blue-500 stroke-blue-500'
-                : currentStep.current === node.val
-                  ? 'fill-primary stroke-primary'
-                  : 'fill-muted stroke-border'
+            ? 'fill-green-500 stroke-green-500'
+            : node.val === currentStep.p || node.val === currentStep.q
+              ? 'fill-blue-500 stroke-blue-500'
+              : currentStep.current === node.val
+                ? 'fill-primary stroke-primary'
+                : 'fill-muted stroke-border'
             }`}
           strokeWidth="2"
         />
@@ -224,8 +224,8 @@ export const LowestCommonAncestorVisualization = () => {
           textAnchor="middle"
           dy=".3em"
           className={`font- ${node.val === currentStep.lca || node.val === currentStep.p || node.val === currentStep.q || currentStep.current === node.val
-              ? 'fill-white'
-              : 'fill-foreground'
+            ? 'fill-white'
+            : 'fill-foreground'
             }`}
         >
           {node.val}
@@ -253,8 +253,8 @@ export const LowestCommonAncestorVisualization = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 overflow-x-auto">
-            <svg width="400" height="250" className="mx-auto">
+          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 pb-4">
+            <svg viewBox="0 0 400 250" className="w-full h-64">
               {renderTree(tree)}
             </svg>
           </div>
@@ -291,7 +291,7 @@ export const LowestCommonAncestorVisualization = () => {
 
         <div className="space-y-4">
 
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
+          <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="TypeScript" />
         </div>
       </div>
     </div>

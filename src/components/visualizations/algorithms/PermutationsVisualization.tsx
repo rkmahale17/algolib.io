@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
 interface Step {
-  array: number[];
-  current: number[];
-  used: boolean[];
-  allPerms: number[][];
+  nums: number[];
+  n: number | null;
+  perms: number[][];
+  result: number[][];
   message: string;
   lineNumber: number;
 }
@@ -21,82 +21,140 @@ export const PermutationsVisualization: React.FC = () => {
   const intervalRef = useRef<number | null>(null);
 
   const code = `function permute(nums: number[]): number[][] {
-  const result: number[][] = [];
-  const current: number[] = [];
-  const used: boolean[] = new Array(nums.length).fill(false);
-  
-  function backtrack() {
-    if (current.length === nums.length) {
-      result.push([...current]);
-      return;
+    const result: number[][] = [];
+
+    if (nums.length === 1) {
+        return [nums.slice()];
     }
-    
+
     for (let i = 0; i < nums.length; i++) {
-      if (used[i]) continue;
-      
-      current.push(nums[i]);
-      used[i] = true;
-      backtrack();
-      current.pop();
-      used[i] = false;
+        const n = nums.shift()!;
+
+        const perms = permute(nums);
+
+        for (const perm of perms) {
+            perm.push(n);
+        }
+
+        result.push(...perms);
+
+        nums.push(n);
     }
-  }
-  
-  backtrack();
-  return result;
+
+    return result;
 }`;
 
   const generateSteps = () => {
-    const arr = [1, 2, 3];
+    const originalArr = [1, 2, 3];
     const newSteps: Step[] = [];
-    const result: number[][] = [];
-    const current: number[] = [];
-    const used: boolean[] = new Array(arr.length).fill(false);
 
-    function backtrack(line: number) {
-      if (current.length === arr.length) {
-        result.push([...current]);
+    function runPermute(numsRef: number[]) {
+      function simulatePermute(currentNums: number[]): number[][] {
+        const result: number[][] = [];
+
         newSteps.push({
-          array: arr,
-          current: [...current],
-          used: [...used],
-          allPerms: result.map(p => [...p]),
-          message: `Complete permutation found: [${current.join(', ')}]`,
-          lineNumber: 7
+          nums: [...currentNums], n: null, perms: [], result: [...result],
+          message: `Call permute([${currentNums.join(', ')}])`,
+          lineNumber: 1
         });
-        return;
+
+        newSteps.push({
+          nums: [...currentNums], n: null, perms: [], result: [...result],
+          message: `Initialize frame result array`,
+          lineNumber: 2
+        });
+
+        if (currentNums.length === 1) {
+          newSteps.push({
+            nums: [...currentNums], n: null, perms: [], result: [...result],
+            message: `Base case: nums.length === 1`,
+            lineNumber: 4
+          });
+
+          const baseReturn = [currentNums.slice()];
+          newSteps.push({
+            nums: [...currentNums], n: null, perms: [], result: [...result],
+            message: `Return base copy: [[${currentNums[0]}]]`,
+            lineNumber: 5
+          });
+          return baseReturn;
+        }
+
+        const initialLen = currentNums.length;
+        for (let i = 0; i < initialLen; i++) {
+          newSteps.push({
+            nums: [...currentNums], n: null, perms: [], result: [...result],
+            message: `Iterate i=${i} / ${initialLen} over nums`,
+            lineNumber: 8
+          });
+
+          const n = currentNums.shift()!;
+          newSteps.push({
+            nums: [...currentNums], n, perms: [], result: [...result],
+            message: `Shift out head element n=${n}. nums is now: [${currentNums.join(', ')}]`,
+            lineNumber: 9
+          });
+
+          newSteps.push({
+            nums: [...currentNums], n, perms: [], result: [...result],
+            message: `Recursively calculate perms for remaining [${currentNums.join(', ')}]`,
+            lineNumber: 11
+          });
+
+          const perms = simulatePermute(currentNums);
+
+          newSteps.push({
+            nums: [...currentNums], n, perms: perms.map(p => [...p]), result: [...result],
+            message: `Received child perms. Appending n=${n} to each.`,
+            lineNumber: 13
+          });
+
+          for (const perm of perms) {
+            perm.push(n);
+          }
+
+          newSteps.push({
+            nums: [...currentNums], n, perms: perms.map(p => [...p]), result: [...result],
+            message: `Appended n=${n} to permutations.`,
+            lineNumber: 14
+          });
+
+          result.push(...perms);
+          newSteps.push({
+            nums: [...currentNums], n, perms: perms.map(p => [...p]), result: [...result],
+            message: `Pushed merged perms into current frame result array.`,
+            lineNumber: 17
+          });
+
+          currentNums.push(n);
+          newSteps.push({
+            nums: [...currentNums], n: null, perms: [], result: [...result],
+            message: `Restore n=${n} back to tail of nums array: [${currentNums.join(', ')}]`,
+            lineNumber: 19
+          });
+        }
+
+        newSteps.push({
+          nums: [...currentNums], n: null, perms: [], result: [...result],
+          message: `Frame loop complete, returning result matrix.`,
+          lineNumber: 22
+        });
+        return result;
       }
 
-      for (let i = 0; i < arr.length; i++) {
-        if (used[i]) continue;
-
-        current.push(arr[i]);
-        used[i] = true;
-        newSteps.push({
-          array: arr,
-          current: [...current],
-          used: [...used],
-          allPerms: result.map(p => [...p]),
-          message: `Add ${arr[i]} to current permutation`,
-          lineNumber: 14
-        });
-
-        backtrack(16);
-
-        current.pop();
-        used[i] = false;
-        newSteps.push({
-          array: arr,
-          current: [...current],
-          used: [...used],
-          allPerms: result.map(p => [...p]),
-          message: `Backtrack: Remove ${arr[i]}`,
-          lineNumber: 17
-        });
-      }
+      simulatePermute(numsRef);
     }
 
-    backtrack(5);
+    runPermute(originalArr);
+
+    // Final cap step
+    const lastStep = newSteps[newSteps.length - 1];
+    newSteps.push({
+      ...lastStep,
+      message: 'Algorithm Complete!',
+      lineNumber: 1,
+    });
+
     setSteps(newSteps);
   };
 
@@ -160,59 +218,58 @@ export const PermutationsVisualization: React.FC = () => {
       />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-        <div className="bg-card rounded-lg p-6 border">
-          <h3 className="text-lg font-semibold mb-4">Input Array</h3>
-          <div className="flex gap-2 mb-6">
-            {currentStep.array.map((val, idx) => (
-              <div
-                key={idx}
-                className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font- transition-all ${currentStep.used[idx] ? 'bg-green-500/20 border-green-500' : 'bg-card border-border'
-                  }`}
-              >
-                {val}
-              </div>
-            ))}
-          </div>
-
-          <h3 className="text-lg font-semibold mb-4">Current Permutation</h3>
+        <div className="bg-card rounded-lg p-6 border shadow-sm">
+          <h3 className="text-lg font-semibold mb-4">Frame nums</h3>
           <div className="flex gap-2 mb-6 min-h-[3rem]">
-            {currentStep.current.length > 0 ? (
-              currentStep.current.map((val, idx) => (
+            {currentStep.nums.length > 0 ? (
+              currentStep.nums.map((val, idx) => (
                 <div
                   key={idx}
-                  className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-blue-500/20 border-blue-500 font-"
+                  className="w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold bg-card border-border transition-all animate-in zoom-in"
                 >
                   {val}
                 </div>
               ))
             ) : (
-              <div className="text-muted-foreground italic">Empty</div>
+              <div className="text-muted-foreground italic flex items-center px-2">Empty Array</div>
             )}
           </div>
 
-          <h3 className="text-lg font-semibold mb-4">All Permutations ({currentStep.allPerms.length})</h3>
-          <div className="flex flex-wrap gap-2">
-            {currentStep.allPerms.map((perm, idx) => (
-              <div key={idx} className="px-3 py-1 bg-muted rounded border text-sm">
+          <h3 className="text-lg font-semibold mb-4">Extracted 'n'</h3>
+          <div className="flex gap-2 mb-6 min-h-[3rem]">
+            {currentStep.n !== null ? (
+              <div className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-accent/20 border-accent font-bold text-accent-foreground transition-all animate-in slide-in-from-left">
+                {currentStep.n}
+              </div>
+            ) : (
+              <div className="text-muted-foreground italic flex items-center px-2">None</div>
+            )}
+          </div>
+
+          <h3 className="text-lg font-semibold mb-4">Frame Result ({currentStep.result.length})</h3>
+          <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto w-full p-2 border rounded-lg bg-muted/20 min-h-[6rem]">
+            {currentStep.result.map((perm, idx) => (
+              <div key={idx} className="px-3 py-1 bg-green-500/10 text-green-700 dark:text-green-400 font-mono rounded border border-green-500 text-sm animate-in fade-in">
                 [{perm.join(', ')}]
               </div>
             ))}
           </div>
 
-          <div className="mt-4 p-4 bg-muted rounded">
-            <p className="text-sm">{currentStep.message}</p>
+          <div className="mt-6 p-4 bg-muted/60 border rounded-lg shadow-inner">
+            <p className="text-sm font-medium">{currentStep.message}</p>
           </div>
-          <div className="mt-4 p-4 bg-muted rounded">
+          <div className="rounded-lg mt-4">
             <VariablePanel
               variables={{
-                'current length': currentStep.current.length,
-                'used count': currentStep.used.filter(u => u).length,
-                'total perms': currentStep.allPerms.length
+                'nums.length': currentStep.nums.length,
+                'n value': currentStep.n !== null ? currentStep.n : 'null',
+                'child perms': currentStep.perms.length,
+                'result.length': currentStep.result.length
               }}
             />
           </div>
         </div>
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+        <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="typescript" />
 
       </div>
 

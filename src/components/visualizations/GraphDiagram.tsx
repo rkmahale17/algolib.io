@@ -9,6 +9,7 @@ interface GraphDiagramProps {
     highlightNodes?: Set<number>;
     highlightEdges?: Set<string>; // "u-v"
     currentNode?: number | null;
+    onNodeClick?: (nodeVal: number) => void;
 }
 
 export const GraphDiagram: React.FC<GraphDiagramProps> = ({
@@ -18,7 +19,8 @@ export const GraphDiagram: React.FC<GraphDiagramProps> = ({
     height = 250,
     highlightNodes,
     highlightEdges,
-    currentNode
+    currentNode,
+    onNodeClick
 }) => {
     const { nodes, edges } = useMemo(() => {
         const graphData = parseGraphValue(data);
@@ -36,12 +38,11 @@ export const GraphDiagram: React.FC<GraphDiagramProps> = ({
     }
 
     return (
-        <div className={`relative bg-background/50 border rounded-lg p-2 overflow-auto no-scrollbar ${className}`}>
+        <div className={`relative bg-background/50 border rounded-lg p-2 overflow-hidden ${className}`}>
             <svg
-                width={width}
-                height={height}
-                className="mx-auto overflow-visible"
+                className="w-full h-full mx-auto overflow-visible"
                 viewBox={`0 0 ${width} ${height}`}
+                preserveAspectRatio="xMidYMid meet"
             >
                 {/* Render Edges */}
                 {edges.map((edge, i) => {
@@ -68,21 +69,38 @@ export const GraphDiagram: React.FC<GraphDiagramProps> = ({
                 {nodes.map((node) => {
                     const isVisited = highlightNodes?.has(node.val);
                     const isCurrent = currentNode === node.val;
+                    const isStart = node.isStart;
 
                     return (
-                        <g key={node.id} className="transition-all duration-300">
+                        <g
+                            key={node.id}
+                            className={`transition-all duration-300 ${onNodeClick ? 'cursor-pointer hover:scale-110 active:scale-95 group' : ''}`}
+                            onClick={() => onNodeClick?.(node.val)}
+                        >
                             <circle
                                 cx={node.x}
                                 cy={node.y}
                                 r="16"
                                 className={`transition-all duration-300 ${isCurrent
                                     ? "fill-primary/20 stroke-primary stroke-[3] animate-pulse"
-                                    : isVisited
-                                        ? "fill-green-500/20 stroke-green-500"
-                                        : "fill-card stroke-primary/50"
+                                    : isStart
+                                        ? "fill-amber-500/20 stroke-amber-500 stroke-[2]"
+                                        : isVisited
+                                            ? "fill-green-500/20 stroke-green-500"
+                                            : "fill-card stroke-primary/50"
                                     }`}
                                 strokeWidth="1.5"
                             />
+                            {isStart && !isCurrent && (
+                                <text
+                                    x={node.x}
+                                    y={node.y - 20}
+                                    textAnchor="middle"
+                                    className="fill-amber-500 text-[8px] font-bold uppercase"
+                                >
+                                    Start
+                                </text>
+                            )}
                             <text
                                 x={node.x}
                                 y={node.y + 1}
@@ -93,6 +111,9 @@ export const GraphDiagram: React.FC<GraphDiagramProps> = ({
                             >
                                 {node.val}
                             </text>
+                            {onNodeClick && (
+                                <title>Click to set Node {node.val} as start</title>
+                            )}
                         </g>
                     );
                 })}

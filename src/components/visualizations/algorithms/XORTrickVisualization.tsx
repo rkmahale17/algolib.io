@@ -1,14 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import { CodeHighlighter } from "../shared/CodeHighlighter";
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from "../shared/StepControls";
 import { VariablePanel } from "../shared/VariablePanel";
 
 interface Step {
-  array: number[];
-  index: number;
-  xorResult: number;
-  binary: string;
+  nums: number[];
+  i: number;
+  result: number;
+  prevResult: number;
+  currentValue: number;
+  binaryResult: string;
+  binaryValue: string;
   message: string;
   lineNumber: number;
 }
@@ -20,57 +23,98 @@ export const XORTrickVisualization: React.FC = () => {
   const [speed, setSpeed] = useState(1000);
   const intervalRef = useRef<number | null>(null);
 
-  const code = `function findSingleNumber(nums: number[]): number {
+  const code = `function singleNumber(nums: number[]): number {
   let result = 0;
-  
-  // XOR all numbers
-  // Duplicates cancel out (a ^ a = 0)
-  // Single number remains (a ^ 0 = a)
-  for (const num of nums) {
-    result ^= num;
+
+  for (let i = 0; i < nums.length; i++) {
+    result ^= nums[i];
   }
-  
+
   return result;
 }`;
 
   const generateSteps = () => {
-    const arr = [4, 2, 4, 5, 2];
+    const nums = [4, 2, 4, 5, 2];
     const newSteps: Step[] = [];
-    let xorResult = 0;
+    let result = 0;
+
+    const toBinary = (n: number) => n.toString(2).padStart(4, "0");
 
     newSteps.push({
-      array: arr,
-      index: -1,
-      xorResult: 0,
-      binary: "0000",
-      message: "Initialize result = 0. XOR property: a ^ a = 0, a ^ 0 = a",
+      nums,
+      i: -1,
+      result: 0,
+      prevResult: 0,
+      currentValue: 0,
+      binaryResult: toBinary(0),
+      binaryValue: "0000",
+      message: "Starting the singleNumber function.",
       lineNumber: 1,
     });
 
-    for (let i = 0; i < arr.length; i++) {
-      const num = arr[i];
-      const prevXor = xorResult;
-      xorResult ^= num;
+    newSteps.push({
+      nums,
+      i: -1,
+      result: 0,
+      prevResult: 0,
+      currentValue: 0,
+      binaryResult: toBinary(0),
+      binaryValue: "0000",
+      message: "Initializing result = 0. XOR identity property: 0 ^ x = x.",
+      lineNumber: 2,
+    });
+
+    for (let i = 0; i < nums.length; i++) {
+      newSteps.push({
+        nums,
+        i,
+        result,
+        prevResult: result,
+        currentValue: nums[i],
+        binaryResult: toBinary(result),
+        binaryValue: toBinary(nums[i]),
+        message: `Loop iteration i = ${i}. Checking loop condition i < nums.length.`,
+        lineNumber: 4,
+      });
+
+      const prevResult = result;
+      result ^= nums[i];
 
       newSteps.push({
-        array: arr,
-        index: i,
-        xorResult,
-        binary: xorResult.toString(2).padStart(4, "0"),
-        message: `${prevXor} ^ ${num} = ${xorResult} (binary: ${prevXor.toString(
-          2
-        )} ^ ${num.toString(2)} = ${xorResult.toString(2)})`,
-        lineNumber: 7,
+        nums,
+        i,
+        result,
+        prevResult,
+        currentValue: nums[i],
+        binaryResult: toBinary(result),
+        binaryValue: toBinary(nums[i]),
+        message: `XORing result (${prevResult}) with nums[${i}] (${nums[i]}). Result is now ${result}.`,
+        lineNumber: 5,
       });
     }
 
     newSteps.push({
-      array: arr,
-      index: -1,
-      xorResult,
-      binary: xorResult.toString(2).padStart(4, "0"),
-      message: `Result: ${xorResult} (the single number that appears once)`,
-      lineNumber: 10,
+      nums,
+      i: nums.length,
+      result,
+      prevResult: result,
+      currentValue: 0,
+      binaryResult: toBinary(result),
+      binaryValue: "0000",
+      message: "Loop finished. All numbers have been XORed.",
+      lineNumber: 4,
+    });
+
+    newSteps.push({
+      nums,
+      i: -1,
+      result,
+      prevResult: result,
+      currentValue: 0,
+      binaryResult: toBinary(result),
+      binaryValue: "0000",
+      message: `Returning the final result: ${result}. This is the number that appeared only once.`,
+      lineNumber: 8,
     });
 
     setSteps(newSteps);
@@ -137,59 +181,88 @@ export const XORTrickVisualization: React.FC = () => {
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-card rounded-lg p-6 border">
-          <h3 className="text-lg font-semibold mb-4">
-            Array (Find Single Number)
-          </h3>
-          <div className="flex gap-2 mb-6">
-            {currentStep.array.map((val, idx) => (
-              <div
-                key={idx}
-                className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font- transition-all ${idx === currentStep.index
-                  ? "bg-primary/20 border-primary"
-                  : "bg-card border-border"
-                  }`}
-              >
-                {val}
-              </div>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <div className="p-4 bg-muted rounded border">
-              <div className="text-sm text-muted-foreground mb-1">
-                XOR Result (Decimal)
-              </div>
-              <div className="text-2xl font-">{currentStep.xorResult}</div>
-            </div>
-            <div className="p-4 bg-muted rounded border">
-              <div className="text-sm text-muted-foreground mb-1">
-                XOR Result (Binary)
-              </div>
-              <div className="text-2xl font-mono font-">
-                {currentStep.binary}
-              </div>
+        <div className="bg-card rounded-xl p-6 border shadow-sm flex flex-col gap-6">
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Input Array (nums)</h3>
+            <div className="flex flex-wrap gap-3">
+              {currentStep.nums.map((val, idx) => (
+                <div
+                  key={idx}
+                  className={`w-14 h-14 flex flex-col items-center justify-center rounded-xl border-2 font-bold transition-all relative ${idx === currentStep.i
+                      ? "bg-primary text-primary-foreground border-primary scale-110 shadow-lg z-10"
+                      : "bg-muted/50 border-border text-foreground"
+                    }`}
+                >
+                  <span className="text-xl">{val}</span>
+                  <span className="text-[10px] absolute -bottom-1 opacity-50 uppercase font-medium">
+                    idx:{idx}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
 
-          <div className="mt-4 p-4 bg-muted rounded">
-            <p className="text-sm">{currentStep.message}</p>
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Bitwise XOR Operation</h3>
+            <div className="bg-muted/30 rounded-xl p-6 border border-border/50 space-y-4">
+              <div className="flex items-center justify-between font-mono text-sm">
+                <span className="text-muted-foreground">Previous Result:</span>
+                <div className="flex flex-col items-end">
+                  <span className="text-lg font-bold">{currentStep.prevResult}</span>
+                  <span className="text-primary tracking-widest">{currentStep.binaryResult}</span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between font-mono text-sm">
+                <div className="flex items-center gap-2 text-muted-foreground uppercase tracking-widest text-xs font-bold">
+                  <span className="w-5 h-5 flex items-center justify-center bg-primary/20 text-primary rounded-full">
+                    ^
+                  </span>
+                  nums[{currentStep.i === -1 || currentStep.i >= currentStep.nums.length ? "x" : currentStep.i}]:
+                </div>
+                <div className="flex flex-col items-end">
+                  <span className="text-lg font-bold">
+                    {currentStep.i === -1 || currentStep.i >= currentStep.nums.length ? "0" : currentStep.currentValue}
+                  </span>
+                  <span className="text-accent tracking-widest">
+                    {currentStep.i === -1 || currentStep.i >= currentStep.nums.length ? "0000" : currentStep.binaryValue}
+                  </span>
+                </div>
+              </div>
+
+              <div className="border-t border-border pt-4 flex items-center justify-between font-mono text-sm">
+                <span className="text-muted-foreground font-bold uppercase tracking-widest text-xs">New Result:</span>
+                <div className="flex flex-col items-end">
+                  <span className="text-2xl font-black text-primary">
+                    {currentStep.result}
+                  </span>
+                  <span className="text-primary font-bold tracking-[0.2em]">
+                    {currentStep.binaryResult}
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="rounded-lg">
-            <VariablePanel
-              variables={{
-                "current index":
-                  currentStep.index >= 0 ? currentStep.index : "done",
-                "xor result": currentStep.xorResult,
-                binary: currentStep.binary,
-              }}
-            />
+
+          <div className="p-4 bg-primary/5 border border-primary/20 rounded-xl">
+            <p className="text-sm font-medium text-foreground leading-relaxed">
+              {currentStep.message}
+            </p>
           </div>
+
+          <VariablePanel
+            variables={{
+              i: currentStep.i === -1 ? "N/A" : currentStep.i,
+              result: currentStep.result,
+              "nums[i]": currentStep.i >= 0 && currentStep.i < currentStep.nums.length ? currentStep.nums[currentStep.i] : "N/A",
+              binary: currentStep.binaryResult,
+            }}
+          />
         </div>
 
-        <CodeHighlighter
+        <AnimatedCodeEditor
           code={code}
-          highlightedLine={currentStep.lineNumber}
+          highlightedLines={[currentStep.lineNumber]}
           language="typescript"
         />
       </div>

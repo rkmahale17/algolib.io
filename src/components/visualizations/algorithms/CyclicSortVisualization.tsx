@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
@@ -55,34 +55,34 @@ export const CyclicSortVisualization = () => {
       });
     };
 
-    addStep(nums, 'Start cyclic sort: place each number at its correct index (value - 1)', 0, 0, -1);
+    addStep(nums, 'Start cyclic sort: place each number at its correct index (value - 1)', 1, 0, -1);
 
     while (i < nums.length) {
       const val = nums[i];
       const correctIndex = val - 1;
 
       // Calculate correctIndex
-      addStep(nums, `Index i=${i}, value=${val}. Should be at index ${val}-1 = ${correctIndex}`, 4, i, correctIndex, [i]);
+      addStep(nums, `Index i=${i}, value=${val}. Should be at index ${val}-1 = ${correctIndex}`, 5, i, correctIndex, [i]);
 
       // Highlight both for comparison
-      addStep(nums, `Checking if nums[i] (${val}) is at its correct position nums[${correctIndex}] (${nums[correctIndex]})`, 6, i, correctIndex, [i, correctIndex]);
+      addStep(nums, `Checking if nums[i] (${val}) is at its correct position nums[${correctIndex}] (${nums[correctIndex]})`, 7, i, correctIndex, [i, correctIndex]);
 
       if (nums[i] !== nums[correctIndex]) {
         // Prepare for swap
-        addStep(nums, `Mismatch found! Swapping ${nums[i]} with ${nums[correctIndex]}`, 8, i, correctIndex, [i, correctIndex], true);
+        addStep(nums, `Mismatch found! Swapping ${nums[i]} with ${nums[correctIndex]}`, 9, i, correctIndex, [i, correctIndex], true);
 
         // Finalize swap
         [nums[i], nums[correctIndex]] = [nums[correctIndex], nums[i]];
-        addStep(nums, `Swapped elements. Now nums[${correctIndex}] = ${nums[correctIndex]}`, 8, i, correctIndex, [i, correctIndex]);
+        addStep(nums, `Swapped elements. Now nums[${correctIndex}] = ${nums[correctIndex]}`, 9, i, correctIndex, [i, correctIndex]);
       } else {
         // Increment i
-        addStep(nums, `${val} is already at index ${i}. Move to next index`, 10, i, correctIndex, [i]);
+        addStep(nums, `${val} is already at index ${i}. Move to next index`, 11, i, correctIndex, [i]);
         i++;
-        addStep(nums, `Incrementing i to ${i}`, 10, i, -1);
+        addStep(nums, `Incrementing i to ${i}`, 11, i, -1);
       }
     }
 
-    addStep(nums, 'Complete! All elements are at their correct indices', 14, i, -1);
+    addStep(nums, 'Complete! All elements are at their correct indices', 15, i, -1);
 
     setSteps(newSteps);
     setCurrentStepIndex(0);
@@ -142,12 +142,12 @@ export const CyclicSortVisualization = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg border border-border/50 p-8 shadow-inner">
-            <div className="flex items-center justify-center gap-4 flex-wrap">
+          <div className="bg-muted/30 rounded-lg border border-border/50 p-4 shadow-inner">
+            <div className="flex items-center justify-center gap-2 flex-wrap">
               {currentStep.array.map((value, index) => (
-                <div key={index} className="flex flex-col items-center gap-3">
+                <div key={index} className="flex flex-col items-center gap-1.5">
                   <div
-                    className={`w-16 h-16 rounded-xl flex items-center justify-center font- text-xl transition-all duration-300 border-2 ${currentStep.isSwap && currentStep.comparingIndices.includes(index)
+                    className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-base transition-all duration-300 border-2 ${currentStep.isSwap && currentStep.comparingIndices.includes(index)
                       ? 'bg-yellow-500 text-white border-yellow-600 shadow-lg scale-110 rotate-3'
                       : currentStep.comparingIndices.includes(index)
                         ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105'
@@ -160,14 +160,14 @@ export const CyclicSortVisualization = () => {
                   >
                     {value}
                   </div>
-                  <div className="flex flex-col items-center min-h-[3rem]">
-                    <span className="text-[10px] uppercase font- text-muted-foreground tracking-tighter">Idx {index}</span>
-                    <div className="flex flex-col gap-0.5 mt-1">
+                  <div className="flex flex-col items-center min-h-[2.2rem]">
+                    <span className="text-[8px] uppercase font-bold text-muted-foreground/70 tracking-tighter">Idx {index}</span>
+                    <div className="flex flex-col gap-0.5 mt-0.5">
                       {index === currentStep.i && (
-                        <span className="px-1.5 py-0.5 bg-blue-500 text-white text-[10px] font-black rounded uppercase">i</span>
+                        <span className="px-1 py-0.5 bg-blue-500 text-white text-[8px] font-black rounded uppercase leading-none">i</span>
                       )}
                       {index === currentStep.correctIndex && (
-                        <span className="px-1.5 py-0.5 bg-green-600 text-white text-[10px] font-black rounded uppercase">target</span>
+                        <span className="px-1 py-0.5 bg-green-600 text-white text-[8px] font-black rounded uppercase leading-none">target</span>
                       )}
                     </div>
                   </div>
@@ -193,7 +193,7 @@ export const CyclicSortVisualization = () => {
           </div>
         </div>
 
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
+        <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="TypeScript" />
       </div>
     </div>
   );

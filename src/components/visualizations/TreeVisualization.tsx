@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Play, Pause, StepForward, StepBack, RotateCcw } from 'lucide-react';
 
 interface TreeNode {
   value: number;
@@ -21,103 +22,126 @@ export const TreeVisualization = ({ algorithmId }: TreeVisualizationProps) => {
     { value: 7, left: null, right: null }  // 6
   ];
 
-  const [visitedNodes, setVisitedNodes] = useState<number[]>([]);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [visitedSequence, setVisitedSequence] = useState<number[]>([]);
+  const [currentStepIndex, setCurrentStepIndex] = useState(-1);
+  const [isPlaying, setIsPlaying] = useState(false);
 
-  const preorderTraversal = async (nodeIndex: number | null) => {
-    if (nodeIndex === null) return;
+  // Pre-compute sequences
+  useEffect(() => {
+    const getPreorderSequence = () => {
+      const seq: number[] = [];
+      const traverse = (nodeIndex: number | null) => {
+        if (nodeIndex === null) return;
+        seq.push(nodeIndex);
+        traverse(tree[nodeIndex].left);
+        traverse(tree[nodeIndex].right);
+      };
+      traverse(0);
+      return seq;
+    };
 
-    setVisitedNodes(prev => [...prev, nodeIndex]);
-    await new Promise(resolve => setTimeout(resolve, 600));
+    const getInorderSequence = () => {
+      const seq: number[] = [];
+      const traverse = (nodeIndex: number | null) => {
+        if (nodeIndex === null) return;
+        traverse(tree[nodeIndex].left);
+        seq.push(nodeIndex);
+        traverse(tree[nodeIndex].right);
+      };
+      traverse(0);
+      return seq;
+    };
 
-    if (tree[nodeIndex].left !== null) {
-      await preorderTraversal(tree[nodeIndex].left);
-    }
-    if (tree[nodeIndex].right !== null) {
-      await preorderTraversal(tree[nodeIndex].right);
-    }
-  };
+    const getPostorderSequence = () => {
+      const seq: number[] = [];
+      const traverse = (nodeIndex: number | null) => {
+        if (nodeIndex === null) return;
+        traverse(tree[nodeIndex].left);
+        traverse(tree[nodeIndex].right);
+        seq.push(nodeIndex);
+      };
+      traverse(0);
+      return seq;
+    };
 
-  const inorderTraversal = async (nodeIndex: number | null) => {
-    if (nodeIndex === null) return;
-
-    if (tree[nodeIndex].left !== null) {
-      await inorderTraversal(tree[nodeIndex].left);
-    }
-
-    setVisitedNodes(prev => [...prev, nodeIndex]);
-    await new Promise(resolve => setTimeout(resolve, 600));
-
-    if (tree[nodeIndex].right !== null) {
-      await inorderTraversal(tree[nodeIndex].right);
-    }
-  };
-
-  const postorderTraversal = async (nodeIndex: number | null) => {
-    if (nodeIndex === null) return;
-
-    if (tree[nodeIndex].left !== null) {
-      await postorderTraversal(tree[nodeIndex].left);
-    }
-    if (tree[nodeIndex].right !== null) {
-      await postorderTraversal(tree[nodeIndex].right);
-    }
-
-    setVisitedNodes(prev => [...prev, nodeIndex]);
-    await new Promise(resolve => setTimeout(resolve, 600));
-  };
-
-  const bfsTraversal = async () => {
-    const queue = [0];
-
-    while (queue.length > 0) {
-      const nodeIndex = queue.shift()!;
-      setVisitedNodes(prev => [...prev, nodeIndex]);
-      await new Promise(resolve => setTimeout(resolve, 600));
-
-      if (tree[nodeIndex].left !== null) {
-        queue.push(tree[nodeIndex].left!);
+    const getBfsSequence = () => {
+      const seq: number[] = [];
+      const queue = [0];
+      while (queue.length > 0) {
+        const nodeIndex = queue.shift()!;
+        seq.push(nodeIndex);
+        if (tree[nodeIndex].left !== null) queue.push(tree[nodeIndex].left!);
+        if (tree[nodeIndex].right !== null) queue.push(tree[nodeIndex].right!);
       }
-      if (tree[nodeIndex].right !== null) {
-        queue.push(tree[nodeIndex].right!);
-      }
-    }
-  };
+      return seq;
+    };
 
-  const startAnimation = async () => {
-    if (isAnimating) return;
-    setIsAnimating(true);
-    setVisitedNodes([]);
-
+    let sequence: number[] = [];
     switch (algorithmId) {
-      case 'dfs-preorder':
-        await preorderTraversal(0);
-        break;
-      case 'dfs-inorder':
-        await inorderTraversal(0);
-        break;
-      case 'dfs-postorder':
-        await postorderTraversal(0);
-        break;
-      case 'bfs-level-order':
-        await bfsTraversal();
-        break;
-      default:
-        await preorderTraversal(0);
+      case 'dfs-preorder': sequence = getPreorderSequence(); break;
+      case 'dfs-inorder': sequence = getInorderSequence(); break;
+      case 'dfs-postorder': sequence = getPostorderSequence(); break;
+      case 'bfs-level-order': sequence = getBfsSequence(); break;
+      default: sequence = getPreorderSequence();
     }
+    setVisitedSequence(sequence);
+    setCurrentStepIndex(-1);
+    setIsPlaying(false);
+  }, [algorithmId]);
 
-    setIsAnimating(false);
+  // Handle playback interval
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isPlaying && currentStepIndex < visitedSequence.length - 1) {
+      interval = setInterval(() => {
+        setCurrentStepIndex(prev => {
+          if (prev >= visitedSequence.length - 1) {
+            setIsPlaying(false);
+            return prev;
+          }
+          return prev + 1;
+        });
+      }, 600);
+    } else if (currentStepIndex >= visitedSequence.length - 1) {
+      setIsPlaying(false);
+    }
+    return () => clearInterval(interval);
+  }, [isPlaying, currentStepIndex, visitedSequence.length]);
+
+  const handlePlayPause = () => {
+    if (currentStepIndex >= visitedSequence.length - 1) {
+      setCurrentStepIndex(-1);
+      setIsPlaying(true);
+    } else {
+      setIsPlaying(!isPlaying);
+    }
   };
 
-  const reset = () => {
-    setVisitedNodes([]);
-    setIsAnimating(false);
+  const handleStepForward = () => {
+    setIsPlaying(false);
+    if (currentStepIndex < visitedSequence.length - 1) {
+      setCurrentStepIndex(prev => prev + 1);
+    }
   };
+
+  const handleStepBackward = () => {
+    setIsPlaying(false);
+    if (currentStepIndex > -1) {
+      setCurrentStepIndex(prev => prev - 1);
+    }
+  };
+
+  const handleReset = () => {
+    setIsPlaying(false);
+    setCurrentStepIndex(-1);
+  };
+
+  const currentVisitedNodes = visitedSequence.slice(0, currentStepIndex + 1);
 
   const renderNode = (index: number, x: number, y: number, offset: number) => {
     const node = tree[index];
-    const isVisited = visitedNodes.includes(index);
-    const visitOrder = visitedNodes.indexOf(index);
+    const isVisited = currentVisitedNodes.includes(index);
+    const visitOrder = currentVisitedNodes.indexOf(index);
 
     return (
       <g key={index}>
@@ -200,32 +224,66 @@ export const TreeVisualization = ({ algorithmId }: TreeVisualizationProps) => {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex gap-2">
+    <div className="space-y-6">
+      {/* 1. Input Section */}
+      <div className="space-y-2">
+        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">1. Input Tree</h3>
+        <div className="p-4 bg-muted/30 rounded-lg border border-border/50">
+          {renderTree()}
+        </div>
+      </div>
+
+      {/* Controls */}
+      <div className="flex flex-wrap items-center gap-2 justify-center p-3 bg-muted/20 border rounded-lg">
         <button
-          onClick={startAnimation}
-          disabled={isAnimating}
-          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
+          onClick={handleStepBackward}
+          disabled={currentStepIndex === -1}
+          className="p-2 rounded-lg hover:bg-muted disabled:opacity-50 text-foreground transition-all"
+          title="Step Backward"
         >
-          {isAnimating ? 'Animating...' : 'Start Animation'}
+          <StepBack className="w-5 h-5" />
         </button>
+
         <button
-          onClick={reset}
-          disabled={isAnimating}
-          className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 disabled:opacity-50 transition-colors"
+          onClick={handlePlayPause}
+          className="flex items-center gap-2 px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors shadow-sm"
         >
-          Reset
+          {isPlaying ? (
+            <><Pause className="w-4 h-4" /> Pause</>
+          ) : (
+            <><Play className="w-4 h-4" /> {currentStepIndex >= visitedSequence.length - 1 ? 'Replay' : 'Play'}</>
+          )}
+        </button>
+
+        <button
+          onClick={handleStepForward}
+          disabled={currentStepIndex >= visitedSequence.length - 1}
+          className="p-2 rounded-lg hover:bg-muted disabled:opacity-50 text-foreground transition-all"
+          title="Step Forward"
+        >
+          <StepForward className="w-5 h-5" />
+        </button>
+
+        <button
+          onClick={handleReset}
+          disabled={currentStepIndex === -1 && !isPlaying}
+          className="p-2 rounded-lg hover:bg-muted disabled:opacity-50 ml-2 text-muted-foreground hover:text-foreground transition-all"
+          title="Reset"
+        >
+          <RotateCcw className="w-5 h-5" />
         </button>
       </div>
 
-      <div className="p-4 bg-muted/30 rounded-lg border border-border/50">
-        {renderTree()}
-      </div>
-
-      <div className="text-sm text-muted-foreground text-center">
-        {visitedNodes.length > 0 && (
-          <p>Visit order: {visitedNodes.map(i => tree[i].value).join(' → ')}</p>
-        )}
+      {/* 2. Output Section */}
+      <div className="space-y-2">
+        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">2. Output Order</h3>
+        <div className="p-4 bg-card rounded-lg border border-border/50 min-h-[60px] flex items-center justify-center">
+          <p className="font-mono text-sm">
+            {currentStepIndex >= 0
+              ? currentVisitedNodes.map(i => tree[i].value).join(' → ')
+              : <span className="text-muted-foreground">Press Play or Step Forward to see sequence</span>}
+          </p>
+        </div>
       </div>
     </div>
   );

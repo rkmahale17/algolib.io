@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
@@ -53,7 +53,7 @@ export const MergeSortedListsVisualization = () => {
       p1: 0,
       p2: 0,
       message: 'Merge two sorted lists using two pointers',
-      lineNumber: 0
+      lineNumber: 1
     });
 
     while (p1 < list1.length && p2 < list2.length) {
@@ -245,7 +245,7 @@ export const MergeSortedListsVisualization = () => {
 
         <div className="space-y-4">
 
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
+          <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="TypeScript" />
         </div>
       </div>
     </div>

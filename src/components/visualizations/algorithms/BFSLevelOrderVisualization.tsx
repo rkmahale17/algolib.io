@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
@@ -96,7 +96,7 @@ export const BFSLevelOrderVisualization = () => {
       current: null,
       currentLevel: 0,
       message: 'Start BFS Level Order: Use queue to traverse level by level',
-      lineNumber: 0
+      lineNumber: 5
     });
 
     let level = 0;
@@ -113,7 +113,7 @@ export const BFSLevelOrderVisualization = () => {
           current: node.val,
           currentLevel: level,
           message: `Process node ${node.val} at level ${level}`,
-          lineNumber: 11
+          lineNumber: 13
         });
 
         if (node.left) {
@@ -124,7 +124,7 @@ export const BFSLevelOrderVisualization = () => {
             current: node.val,
             currentLevel: level,
             message: `Add left child ${node.left.val} to queue`,
-            lineNumber: 14
+            lineNumber: 16
           });
         }
 
@@ -136,7 +136,7 @@ export const BFSLevelOrderVisualization = () => {
             current: node.val,
             currentLevel: level,
             message: `Add right child ${node.right.val} to queue`,
-            lineNumber: 15
+            lineNumber: 17
           });
         }
       }
@@ -150,7 +150,7 @@ export const BFSLevelOrderVisualization = () => {
       current: null,
       currentLevel: level,
       message: `Complete! Visited: [${visited.join(', ')}]`,
-      lineNumber: 21
+      lineNumber: 23
     });
 
     setSteps(newSteps);
@@ -210,12 +210,12 @@ export const BFSLevelOrderVisualization = () => {
           cy={node.y}
           r="24"
           className={`transition-all duration-300 ${currentStep.current === node.val
-              ? 'fill-primary stroke-primary'
-              : currentStep.visited.includes(node.val)
-                ? 'fill-green-500 stroke-green-500'
-                : currentStep.queue.includes(node.val)
-                  ? 'fill-blue-500 stroke-blue-500'
-                  : 'fill-muted stroke-border'
+            ? 'fill-primary stroke-primary'
+            : currentStep.visited.includes(node.val)
+              ? 'fill-green-500 stroke-green-500'
+              : currentStep.queue.includes(node.val)
+                ? 'fill-blue-500 stroke-blue-500'
+                : 'fill-muted stroke-border'
             }`}
           strokeWidth="2"
         />
@@ -225,8 +225,8 @@ export const BFSLevelOrderVisualization = () => {
           textAnchor="middle"
           dy=".3em"
           className={`font- ${currentStep.visited.includes(node.val) || currentStep.current === node.val || currentStep.queue.includes(node.val)
-              ? 'fill-white'
-              : 'fill-foreground'
+            ? 'fill-white'
+            : 'fill-foreground'
             }`}
         >
           {node.val}
@@ -254,8 +254,8 @@ export const BFSLevelOrderVisualization = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 overflow-x-auto">
-            <svg width="400" height="250" className="mx-auto">
+          <div className="bg-muted/30 rounded-lg border border-border/50 p-6">
+            <svg viewBox="0 0 400 250" className="w-full h-64">
               {renderTree(tree)}
             </svg>
           </div>
@@ -304,7 +304,7 @@ export const BFSLevelOrderVisualization = () => {
 
         <div className="space-y-4">
 
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
+          <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="TypeScript" />
         </div>
       </div>
     </div>

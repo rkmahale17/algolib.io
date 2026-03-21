@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Info, LayoutList, Hash } from 'lucide-react';
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 import { Button } from '@/components/ui/button';
@@ -79,35 +79,45 @@ export const MiddleNodeVisualization: React.FC = () => {
     };
 
     // Initial State
-    addStep(`Find the middle of a linked list with ${vals.length} nodes (${type} length)`, 0, null, null);
+    addStep(`Find the middle of a linked list with ${vals.length} nodes (${type} length)`, 1, null, null);
 
     // let slow = head;
     let slowId: string | null = headId;
-    addStep('Initialize slow pointer at head', 1, slowId, null);
+    addStep('Initialize slow pointer at head', 2, slowId, null);
 
     // let fast = head;
     let fastId: string | null = headId;
-    addStep('Initialize fast pointer at head', 2, slowId, fastId);
+    addStep('Initialize fast pointer at head', 3, slowId, fastId);
 
     // while (fast && fast.next)
     while (fastId && allNodes[fastId]?.nextId) {
-      addStep('Check loop condition: fast and fast.next are not null', 4, slowId, fastId, { highlightNodes: [fastId, allNodes[fastId].nextId] });
+      addStep('Check loop condition: fast and fast.next are both not null', 5, slowId, fastId, {
+        highlightNodes: [fastId, allNodes[fastId].nextId].filter(Boolean)
+      });
 
       // slow = slow.next;
       slowId = allNodes[slowId!].nextId;
-      addStep('Move slow pointer forward by one node', 5, slowId, fastId, { highlightNodes: [slowId] });
+      addStep('Move slow pointer forward by one node', 6, slowId, fastId, { highlightNodes: [slowId] });
 
       // fast = fast.next.next;
       const nextId = allNodes[fastId!].nextId;
       fastId = nextId ? allNodes[nextId].nextId : null;
-      addStep('Move fast pointer forward by two nodes', 6, slowId, fastId, { highlightNodes: [fastId].filter(Boolean) });
+      addStep('Move fast pointer forward by two nodes (jump to next.next)', 7, slowId, fastId, {
+        highlightNodes: [fastId].filter(Boolean)
+      });
     }
 
     // Loop end
-    addStep(`Loop finished: fast is ${fastId ? allNodes[fastId].val : 'null'}${!fastId ? '' : ` and fast.next is null`}.`, 4, slowId, fastId);
+    const endMsg = !fastId
+      ? 'Loop finished: fast pointer reached null'
+      : 'Loop finished: fast.next is null';
+    addStep(endMsg, 5, slowId, fastId);
 
     // return slow;
-    addStep(`Middle node found! Value is ${allNodes[slowId!].val}.`, 9, slowId, fastId, { isComplete: true, highlightNodes: [slowId] });
+    addStep(`Middle node found! Returning node with value ${allNodes[slowId!].val}.`, 10, slowId, fastId, {
+      isComplete: true,
+      highlightNodes: [slowId]
+    });
 
     setSteps(newSteps);
     setCurrentStepIndex(0);
@@ -202,7 +212,7 @@ export const MiddleNodeVisualization: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-6">
           <div className="bg-card rounded-xl border border-border p-8 min-h-[300px] flex flex-col justify-center relative overflow-hidden">
-            <div className="flex items-center justify-center gap-2 flex-wrap relative z-10">
+            <div className="flex items-center justify-center gap-1 flex-wrap relative z-10">
               <AnimatePresence mode="popLayout">
                 {allNodeIds.map((id, index) => {
                   const node = currentStep.allNodes[id];
@@ -221,24 +231,26 @@ export const MiddleNodeVisualization: React.FC = () => {
                     >
                       <div className="flex flex-col items-center relative">
                         {/* Pointers Container */}
-                        <div className="h-10 flex flex-col justify-end gap-1 mb-2">
+                        <div className="h-8 flex flex-col justify-end gap-0.5 mb-1.5">
                           <AnimatePresence>
                             {isFast && (
                               <motion.div
+                                key="fast-pointer"
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
-                                className="bg-secondary text-secondary-foreground text-[10px] px-2 py-0.5 rounded-full font- shadow-sm"
+                                className="bg-secondary text-secondary-foreground text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm"
                               >
                                 FAST
                               </motion.div>
                             )}
                             {isSlow && (
                               <motion.div
+                                key="slow-pointer"
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
-                                className="bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded-full font- shadow-sm"
+                                className="bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm"
                               >
                                 SLOW
                               </motion.div>
@@ -252,7 +264,7 @@ export const MiddleNodeVisualization: React.FC = () => {
                             scale: isHighlighted ? 1.15 : 1,
                             borderColor: isMiddle ? 'var(--primary)' : isHighlighted ? 'var(--primary)' : 'var(--border)',
                           }}
-                          className={`w-14 h-14 rounded-full border-2 flex items-center justify-center font- text-lg transition-colors relative ${isMiddle ? 'bg-primary/20 ring-4 ring-primary/20' :
+                          className={`w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold text-xs transition-colors relative ${isMiddle ? 'bg-primary/20 ring-2 ring-primary/20' :
                             isHighlighted ? 'bg-primary/10' : 'bg-card'
                             }`}
                         >
@@ -271,10 +283,10 @@ export const MiddleNodeVisualization: React.FC = () => {
 
                       {/* Arrow */}
                       {node.nextId && (
-                        <div className={`mx-1 mt-10 transition-colors duration-300 ${currentStep.highlightNodes.includes(id) && currentStep.highlightNodes.includes(node.nextId)
+                        <div className={`mx-0.5 mt-8 transition-colors duration-300 ${currentStep.highlightNodes.includes(id) && currentStep.highlightNodes.includes(node.nextId)
                           ? 'text-primary' : 'text-muted-foreground/30'
                           }`}>
-                          <ArrowRight size={24} />
+                          <ArrowRight size={16} />
                         </div>
                       )}
                     </motion.div>
@@ -312,7 +324,7 @@ export const MiddleNodeVisualization: React.FC = () => {
         </div>
 
         <div className="space-y-4">
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
+          <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="TypeScript" />
 
           <div className="bg-card rounded-xl border border-border p-6 shadow-sm">
             <h4 className="text-xs font- uppercase tracking-wider text-muted-foreground mb-4 flex items-center gap-2">

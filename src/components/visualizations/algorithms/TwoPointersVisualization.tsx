@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
@@ -323,9 +323,9 @@ export const TwoPointersVisualization = () => {
 
         <div className="space-y-4">
 
-          <CodeHighlighter
+          <AnimatedCodeEditor
             code={code}
-            highlightedLine={currentStep.lineNumber}
+            highlightedLines={[currentStep.lineNumber]}
             language="TypeScript"
           />
         </div>

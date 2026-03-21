@@ -47,6 +47,8 @@ import { TreeDiagram } from "../visualizations/TreeDiagram";
 import { GraphDiagram } from "../visualizations/GraphDiagram";
 import { isTreeType } from "@/utils/treeUtils";
 import { AlgoLink } from "../AlgoLink";
+import { useApp } from "@/contexts/AppContext";
+import { ProOverlay } from "@/components/ProOverlay";
 
 interface ProblemDescriptionPanelProps {
   algorithm: any;
@@ -68,6 +70,7 @@ interface ProblemDescriptionPanelProps {
   isVisualizationMaximized: boolean;
   setIsVisualizationMaximized: (val: boolean) => void;
   handleRichTextClick: (e: React.MouseEvent<HTMLDivElement>) => void;
+  isPlatformPreview?: boolean;
 }
 
 export const ProblemDescriptionPanel = React.memo(({
@@ -86,7 +89,9 @@ export const ProblemDescriptionPanel = React.memo(({
   isVisualizationMaximized,
   setIsVisualizationMaximized,
   handleRichTextClick,
+  isPlatformPreview = false,
 }: ProblemDescriptionPanelProps) => {
+  const { hasPremiumAccess } = useApp();
   const containerRef = useRef<HTMLDivElement>(null);
   const [isCompact, setIsCompact] = useState(false);
   const [isUltraCompact, setIsUltraCompact] = useState(false);
@@ -235,7 +240,16 @@ export const ProblemDescriptionPanel = React.memo(({
                 {/* Title & Progress */}
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <h1 className="text-2xl font- mb-3">{algorithm.name}</h1>
+                    <div className="flex items-center gap-3 mb-3">
+                      <h1 className="text-2xl font-">
+                        {algorithm.serial_no ? `${algorithm.serial_no}. ` : ''}{algorithm.name}
+                      </h1>
+                      {algorithm?.list_type && algorithm.list_type !== 'core' && algorithm.list_type !== 'core+blind75' && (
+                        <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
+                          PRO
+                        </Badge>
+                      )}
+                    </div>
 
                     {/* Difficulty and Company Tags */}
                     <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -298,11 +312,14 @@ export const ProblemDescriptionPanel = React.memo(({
                 </div>
                 <section className="max-w-[800px] ">
                   {algorithm.explanation.problemStatement && (!algorithm?.controls || algorithm.controls?.description?.problem_statement !== false) && (
-                    <RichText
-                      content={algorithm.explanation.problemStatement}
-                      className="text-base leading-relaxed pr-4 dark:text-muted-foreground"
-                      onClick={handleRichTextClick}
-                    ></RichText>
+                    <div className="space-y-4">
+                      <RichText
+                        content={algorithm.explanation.problemStatement}
+                        className="text-base leading-relaxed pr-4 dark:text-muted-foreground"
+                        onClick={handleRichTextClick}
+                      ></RichText>
+
+                    </div>
                   )}
                 </section>
 
@@ -325,10 +342,10 @@ export const ProblemDescriptionPanel = React.memo(({
                               {example.inputAfterHtml && (
                                 <RichText content={example.inputAfterHtml} className="mt-2" />
                               )}
-                              {algorithm?.controls?.show_tree_visualization && (
+                              {(algorithm?.controls?.visualizations?.tree?.enabled ?? algorithm?.controls?.show_tree_visualization) && algorithm?.controls?.visualizations?.tree?.examples_input !== false && (
                                 <TreeDiagram data={example.input} height={120} />
                               )}
-                              {algorithm?.controls?.show_graph_visualization && (
+                              {(algorithm?.controls?.visualizations?.graph?.enabled ?? algorithm?.controls?.show_graph_visualization) && algorithm?.controls?.visualizations?.graph?.examples_input !== false && (
                                 <GraphDiagram data={example.input} height={120} />
                               )}
                             </div>
@@ -345,10 +362,10 @@ export const ProblemDescriptionPanel = React.memo(({
                               {example.outputAfterHtml && (
                                 <RichText content={example.outputAfterHtml} className="mt-2" />
                               )}
-                              {algorithm?.controls?.show_tree_visualization && (
+                              {(algorithm?.controls?.visualizations?.tree?.enabled ?? algorithm?.controls?.show_tree_visualization) && algorithm?.controls?.visualizations?.tree?.examples_output !== false && (
                                 <TreeDiagram data={example.output} height={120} />
                               )}
-                              {algorithm?.controls?.show_graph_visualization && (
+                              {(algorithm?.controls?.visualizations?.graph?.enabled ?? algorithm?.controls?.show_graph_visualization) && algorithm?.controls?.visualizations?.graph?.examples_output !== false && (
                                 <GraphDiagram data={example.output} height={120} />
                               )}
                             </div>
@@ -502,11 +519,15 @@ export const ProblemDescriptionPanel = React.memo(({
                                         </TooltipProvider>
                                       </TabsList>
 
-                                      <div className="p-1">
-                                        <TabsContent value="steps" className="mt-4">
-                                          <div className="text-sm text-muted-foreground">
-                                            <RichText content={algorithm.explanation.steps} />
-                                          </div>
+                                      <div className="p-1 min-h-[150px] relative">
+                                        <TabsContent value="steps" className="mt-4 h-full">
+                                          {algorithm?.metadata?.is_pro && !hasPremiumAccess && !isPlatformPreview ? (
+                                            <ProOverlay className="rounded-none border-0 py-12" />
+                                          ) : (
+                                            <div className="text-sm text-muted-foreground">
+                                              <RichText content={algorithm.explanation.steps} />
+                                            </div>
+                                          )}
                                         </TabsContent>
 
                                         <TabsContent value="usecase" className="mt-4">
@@ -516,10 +537,14 @@ export const ProblemDescriptionPanel = React.memo(({
                                           />
                                         </TabsContent>
 
-                                        <TabsContent value="tips" className="mt-4">
-                                          <div className="text-sm text-muted-foreground">
-                                            <RichText content={algorithm.explanation.tips} />
-                                          </div>
+                                        <TabsContent value="tips" className="mt-4 h-full">
+                                          {algorithm?.metadata?.is_pro && !hasPremiumAccess && !isPlatformPreview ? (
+                                            <ProOverlay className="rounded-none border-0 py-12" />
+                                          ) : (
+                                            <div className="text-sm text-muted-foreground">
+                                              <RichText content={algorithm.explanation.tips} />
+                                            </div>
+                                          )}
                                         </TabsContent>
                                       </div>
                                     </Tabs>
@@ -627,6 +652,7 @@ export const ProblemDescriptionPanel = React.memo(({
               <AuthGuard
                 fallbackTitle="Sign in to view Visualizations"
                 fallbackDescription="Create an account or sign in to access interactive algorithm visualizations."
+                disabled={isPlatformPreview}
               >
                 <div className="flex-1 flex flex-col border rounded-lg overflow-hidden bg-muted/10 m-4">
                   <div className="flex items-center justify-between px-4 py-2 border-b bg-background/50 backdrop-blur-sm shrink-0">
@@ -644,8 +670,12 @@ export const ProblemDescriptionPanel = React.memo(({
                       <Maximize2 className="w-4 h-4" />
                     </Button>
                   </div>
-                  <div className="flex-1 overflow-auto p-6 no-scrollbar relative">
-                    {renderVisualization()}
+                  <div className={`flex-1 overflow-auto no-scrollbar relative flex flex-col ${algorithm?.metadata?.is_pro && !hasPremiumAccess && !isPlatformPreview ? 'p-0' : 'p-6'}`}>
+                    {algorithm?.metadata?.is_pro && !hasPremiumAccess && !isPlatformPreview ? (
+                      <ProOverlay className="rounded-none border-0 flex-1 h-full" />
+                    ) : (
+                      renderVisualization()
+                    )}
                   </div>
                 </div>
               </AuthGuard>
@@ -655,8 +685,12 @@ export const ProblemDescriptionPanel = React.memo(({
           <TabsContent value="solutions" className="h-full m-0 data-[state=inactive]:hidden">
             {algorithm?.controls?.tabs?.solutions === false ? (
               <TabWarning message="Detailed solutions are not available for this problem yet." />
+            ) : algorithm?.metadata?.is_pro && !hasPremiumAccess && !isPlatformPreview ? (
+              <div className="h-full flex flex-col">
+                <ProOverlay className="rounded-none border-0 flex-1" />
+              </div>
             ) : (
-              <ScrollArea className="h-full">
+              <ScrollArea className="h-full relative">
                 <div className="p-4 space-y-4 pb-20">
                   {algorithm?.implementations ? (
                     <SolutionViewer
@@ -674,9 +708,9 @@ export const ProblemDescriptionPanel = React.memo(({
             )}
           </TabsContent>
 
-          {/* Bottom Action Bar - Floating & Centered (Visible across all tabs) */}
-          <div className="absolute bottom-6 left-0 right-0 z-10 flex justify-center pointer-events-none">
-            <div className="pointer-events-auto flex items-center gap-1 p-1.5 bg-background/60 backdrop-blur-xl border shadow-lg rounded-full animate-in fade-in slide-in-from-bottom-4 duration-300">
+          {/* Bottom Action Bar - Ultra Slim Capsule (Visible across all tabs) */}
+          <div className="absolute bottom-[2px] left-0 right-0 z-10 flex justify-center pointer-events-none px-4">
+            <div className="pointer-events-auto max-w-full overflow-x-auto no-scrollbar flex items-center gap-1 p-0.5 bg-background/60 backdrop-blur-xl border border-border/50 shadow-lg rounded-full animate-in fade-in slide-in-from-bottom-4 duration-300">
 
               {/* Like Button */}
               {(!algorithm?.controls || algorithm.controls?.social?.voting !== false) && (
@@ -688,10 +722,10 @@ export const ProblemDescriptionPanel = React.memo(({
                           variant={userVote === 'like' ? "secondary" : "ghost"}
                           size="sm"
                           onClick={() => handleVote('like')}
-                          className={`gap-1.5 h-8 px-3 rounded-full transition-all ${userVote === 'like' ? 'bg-primary/10 text-primary hover:bg-primary/20' : 'hover:bg-muted'}`}
+                          className={`gap-1.5 h-7 px-2.5 rounded-full transition-all ${userVote === 'like' ? 'bg-primary/10 text-primary hover:bg-primary/20' : 'hover:bg-muted'}`}
                         >
-                          <ThumbsUp className={`h-3.5 w-3.5 ${userVote === 'like' ? 'fill-current' : ''}`} />
-                          <span className="text-xs font-medium">{likes}</span>
+                          <ThumbsUp className={`h-3 w-3 ${userVote === 'like' ? 'fill-current' : ''}`} />
+                          <span className="text-[11px] font-medium">{likes}</span>
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent side="top">Like</TooltipContent>
@@ -704,10 +738,10 @@ export const ProblemDescriptionPanel = React.memo(({
                           variant={userVote === 'dislike' ? "secondary" : "ghost"}
                           size="sm"
                           onClick={() => handleVote('dislike')}
-                          className={`gap-1.5 h-8 px-3 rounded-full transition-all ${userVote === 'dislike' ? 'bg-destructive/10 text-destructive hover:bg-destructive/20' : 'hover:bg-muted'}`}
+                          className={`gap-1.5 h-7 px-2.5 rounded-full transition-all ${userVote === 'dislike' ? 'bg-destructive/10 text-destructive hover:bg-destructive/20' : 'hover:bg-muted'}`}
                         >
-                          <ThumbsDown className={`h-3.5 w-3.5 ${userVote === 'dislike' ? 'fill-current' : ''}`} />
-                          {dislikes > 0 && <span className="text-xs font-medium">{dislikes}</span>}
+                          <ThumbsDown className={`h-3 w-3 ${userVote === 'dislike' ? 'fill-current' : ''}`} />
+                          {dislikes > 0 && <span className="text-[11px] font-medium">{dislikes}</span>}
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent side="top">Dislike</TooltipContent>
@@ -717,7 +751,7 @@ export const ProblemDescriptionPanel = React.memo(({
               )}
 
               {(!algorithm?.controls || (algorithm.controls?.social?.voting !== false && algorithm.controls?.social?.favorite !== false)) && (
-                <div className="w-px h-4 bg-border mx-1" />
+                <div className="w-px h-3 bg-border mx-0.5" />
               )}
 
               {/* Favorite Button */}
@@ -729,9 +763,9 @@ export const ProblemDescriptionPanel = React.memo(({
                         variant="ghost"
                         size="icon"
                         onClick={toggleFavorite}
-                        className={`h-8 w-8 rounded-full transition-all ${isFavorite ? 'text-yellow-500 hover:text-yellow-600 hover:bg-yellow-500/10' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}
+                        className={`h-7 w-7 rounded-full transition-all ${isFavorite ? 'text-yellow-500 hover:text-yellow-600 hover:bg-yellow-500/10' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}
                       >
-                        <Star className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
+                        <Star className={`h-3.5 w-3.5 ${isFavorite ? 'fill-current' : ''}`} />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent side="top">{isFavorite ? "Unfavorite" : "Favorite"}</TooltipContent>
@@ -740,33 +774,35 @@ export const ProblemDescriptionPanel = React.memo(({
               )}
             </div>
           </div>
-        </div>
-      </Tabs>
+        </div >
+      </Tabs >
 
       {/* Maximized Visualization Portal */}
-      {isVisualizationMaximized && createPortal(
-        <div className="fixed inset-0 z-[100] bg-background flex flex-col w-screen h-screen">
-          <div className="flex items-center justify-between px-4 py-2 border-b bg-background shrink-0 h-14">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              <Eye className="w-5 h-5 text-primary" />
-              Visualization
-            </h2>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsVisualizationMaximized(false)}
-              className="gap-2"
-            >
-              <Minimize2 className="w-4 h-4" />
-              Exit Fullscreen
-            </Button>
-          </div>
-          <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 relative">
-            {renderVisualization()}
-          </div>
-        </div>,
-        document.body
-      )}
-    </div>
+      {
+        isVisualizationMaximized && createPortal(
+          <div className="fixed inset-0 z-[100] bg-background flex flex-col w-screen h-screen">
+            <div className="flex items-center justify-between px-4 py-2 border-b bg-background shrink-0 h-14">
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                <Eye className="w-5 h-5 text-primary" />
+                Visualization
+              </h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsVisualizationMaximized(false)}
+                className="gap-2"
+              >
+                <Minimize2 className="w-4 h-4" />
+                Exit Fullscreen
+              </Button>
+            </div>
+            <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 relative">
+              {renderVisualization()}
+            </div>
+          </div>,
+          document.body
+        )
+      }
+    </div >
   );
 });

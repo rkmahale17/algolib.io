@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { VariablePanel } from '../shared/VariablePanel';
 import { StepControls } from '../shared/StepControls';
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 
 interface Step {
   heights: number[];
@@ -248,7 +248,7 @@ export const TrappingRainWaterVisualization = () => {
               totalWater: currentStep.totalWater
             }}
           />
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
+          <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="TypeScript" />
         </div>
       </div>
     </div>

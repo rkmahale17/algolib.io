@@ -6,37 +6,33 @@ export const pricingData = {
         title: "Elevate Your Coding Skills",
         subtitle: "Master algorithm patterns with high-quality interactive visualizations and expert problem-solving strategies."
     },
-    lifetimePlan: {
-        id: "lifetime",
-        title: "Lifetime plan",
-        badge: "Offer ending soon",
-        originalPrice: "₹17,000",
-        discountText: "(53% off)",
-        price: "$399",
-        period: "paid once",
-        periodSubLabel: "paid once",
-        buttonText: "Buy now",
-        productId: "pdt_lifetime",
-        features: [
-            "Unlock all premium interviews content",
-            "Join our exclusive private Discord channel with real-time support and a helpful community"
-        ],
-        // includedForFree: {
-        //     title: "FAANG Tech Leads Software Engineer Resume References and Handbook",
-        //     value: "28 USD"
-        // }
-    },
+    // lifetimePlan: {
+    //     id: "lifetime",
+    //     title: "Lifetime plan",
+    //     badge: "Offer ending soon",
+    //     originalPrice: "₹17,000",
+    //     discountText: "(53% off)",
+    //     price: "$399",
+    //     period: "paid once",
+    //     periodSubLabel: "paid once",
+    //     buttonText: "Buy now",
+    //     productId: "lifetime",
+    //     features: [
+    //         "Unlock all premium interviews content",
+    //         "Join our exclusive private Discord channel with real-time support and a helpful community"
+    //     ],
+    // },
     subscriptionPlans: [
         {
             id: "3month",
             title: "3 Month plan",
-            originalPrice: "₹3,300/month",
-            discountText: "(53% off)",
-            price: "$50",
+            originalPrice: "$10.40/month",
+            discountText: "(4% off)",
+            price: "$30",
             period: "/3 months",
             periodSubLabel: "Billed every 3 months",
             buttonText: "Buy now",
-            productId: "pdt_3month",
+            productId: "3monthly",
             features: [
                 "Unlock all premium interviews content",
                 "Access to updates while subscription is active",
@@ -46,13 +42,13 @@ export const pricingData = {
         {
             id: "6month",
             title: "6 Month plan",
-            originalPrice: "₹2,400/month",
-            discountText: "(53% off)",
-            price: "$89",
+            originalPrice: "$10.42/month",
+            discountText: "(4% off)",
+            price: "$60",
             period: "/6 months",
             periodSubLabel: "Billed every 6 months",
             buttonText: "Buy now",
-            productId: "pdt_6month",
+            productId: "6monthly",
             features: [
                 "Unlock all premium interviews content",
                 "Access to updates while subscription is active",
@@ -64,21 +60,17 @@ export const pricingData = {
             title: "Annual plan",
             badge: "RECOMMENDED",
             originalPrice: "₹920/month",
-            discountText: "(53% off)",
-            price: "$149",
+            discountText: "(4% off)",
+            price: "$90",
             period: "/year",
-            periodSubLabel: "Billed yearly ($149)",
+            periodSubLabel: "Billed yearly ($90)",
             buttonText: "Buy now",
-            productId: "pdt_annual",
+            productId: "yearly",
             features: [
                 "Unlock all premium interviews content",
                 "Access to updates while subscription is active",
                 "Join our exclusive private Discord channel with real-time support and a helpful community"
             ],
-            // includedForFree: {
-            //     title: "FAANG Tech Leads Software Engineer Resume References and Handbook",
-            //     value: "28 USD"
-            // }
         }
     ],
     featuresSection: {
@@ -96,8 +88,8 @@ export const pricingData = {
             },
             {
                 icon: CheckSquare,
-                title: "Interactive Roadmap",
-                description: "Follow a structured path designed to build your problem-solving intuition from scratch."
+                title: "Structured Learning Path",
+                description: "Master algorithm patterns systematically with our curated collection of interview questions."
             },
             {
                 icon: Building2,

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
@@ -84,11 +84,20 @@ export const DFSPostorderVisualization = () => {
         visited: [...visited],
         current: node.val,
         stack: [...stack],
-        message: `Visit node ${node.val}, process children first`,
-        lineNumber: 6
+        message: `Visit node ${node.val}, go left first`,
+        lineNumber: 7 // traverse(node.left)
       });
 
       traverse(node.left);
+
+      newSteps.push({
+        visited: [...visited],
+        current: node.val,
+        stack: [...stack],
+        message: `Traverse right for node ${node.val}`,
+        lineNumber: 8 // traverse(node.right)
+      });
+
       traverse(node.right);
 
       visited.push(node.val);
@@ -97,10 +106,18 @@ export const DFSPostorderVisualization = () => {
         current: node.val,
         stack: [...stack],
         message: `Process node ${node.val} (both children done)`,
-        lineNumber: 8
+        lineNumber: 9 // result.push(node.val)
       });
 
       stack.pop();
+
+      newSteps.push({
+        visited: [...visited],
+        current: node.val,
+        stack: [...stack],
+        message: `Node ${node.val} complete (added to result)`,
+        lineNumber: 10 // end of traverse function
+      });
     };
 
     newSteps.push({
@@ -108,7 +125,7 @@ export const DFSPostorderVisualization = () => {
       current: null,
       stack: [],
       message: 'Start DFS Postorder: Left → Right → Root',
-      lineNumber: 0
+      lineNumber: 12 // traverse(root)
     });
 
     traverse(root);
@@ -118,7 +135,7 @@ export const DFSPostorderVisualization = () => {
       current: null,
       stack: [],
       message: `Complete! Postorder: [${visited.join(', ')}]`,
-      lineNumber: 12
+      lineNumber: 13 // return result
     });
 
     setSteps(newSteps);
@@ -178,10 +195,10 @@ export const DFSPostorderVisualization = () => {
           cy={node.y}
           r="24"
           className={`transition-all duration-300 ${currentStep.current === node.val
-              ? 'fill-primary stroke-primary'
-              : currentStep.visited.includes(node.val)
-                ? 'fill-green-500 stroke-green-500'
-                : 'fill-muted stroke-border'
+            ? 'fill-primary stroke-primary'
+            : currentStep.visited.includes(node.val)
+              ? 'fill-green-500 stroke-green-500'
+              : 'fill-muted stroke-border'
             }`}
           strokeWidth="2"
         />
@@ -217,8 +234,8 @@ export const DFSPostorderVisualization = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 overflow-x-auto">
-            <svg width="400" height="250" className="mx-auto">
+          <div className="bg-muted/30 rounded-lg border border-border/50 p-6">
+            <svg viewBox="0 0 400 250" className="w-full h-64">
               {renderTree(tree)}
             </svg>
           </div>
@@ -227,11 +244,11 @@ export const DFSPostorderVisualization = () => {
             <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
           </div>
 
-          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
-            <p className="text-xs text-muted-foreground mb-2">Visited Order:</p>
-            <div className="flex gap-2 flex-wrap">
+          <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3">
+            <h4 className="text-sm font-semibold mb-2">Visited</h4>
+            <div className="flex flex-wrap gap-1">
               {currentStep.visited.map((val, idx) => (
-                <div key={idx} className="w-10 h-10 rounded bg-green-500 text-white flex items-center justify-center font-">
+                <div key={idx} className="bg-green-500 text-white rounded px-2 py-1 font-mono text-sm">
                   {val}
                 </div>
               ))}
@@ -248,7 +265,7 @@ export const DFSPostorderVisualization = () => {
               visited: currentStep.visited
             }}
           />
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
+          <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="TypeScript" />
         </div>
       </div>
     </div>

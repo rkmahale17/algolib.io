@@ -678,29 +678,77 @@ export function ControlsEditor({ controls, onChange, implementations, onImplemen
         <Card className="border-primary/20 bg-primary/5">
           <CardHeader className="pb-3">
             <CardTitle className="text-base font-medium flex items-center gap-2">
-              Visualization Controls
+              Visualization Controls (Granular)
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <ConfirmSwitch
-              id="vis-tree"
-              itemLabel="Show Tree Visualization"
-              checked={localControls.show_tree_visualization === true}
-              onCheckedChange={(c) => updateNested(['show_tree_visualization'], c)}
-            />
-            <p className="text-xs text-muted-foreground">
-              Enable this only for Tree or BST related problems. It will show a graphical tree representation for array-based tree inputs/outputs.
-            </p>
+          <CardContent className="space-y-6">
+            {/* Tree */}
+            <div className="space-y-3">
+              <ConfirmSwitch
+                id="vis-tree-main"
+                itemLabel="Enable Tree Visualization"
+                checked={localControls.visualizations?.tree?.enabled ?? localControls.show_tree_visualization === true}
+                onCheckedChange={(c) => {
+                  updateNested(['visualizations', 'tree', 'enabled'], c);
+                  updateNested(['show_tree_visualization'], c); // Legacy fallback sync
+                }}
+              />
+              <p className="text-xs text-muted-foreground">
+                Enable this only for Tree or BST related problems. Custom settings below:
+              </p>
+
+              <div className="pl-4 border-l-2 ml-2 space-y-3 pt-2">
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Show on Inputs</h4>
+                    <ConfirmSwitch id="tree-ex-in" itemLabel="Examples" checked={localControls.visualizations?.tree?.examples_input !== false} onCheckedChange={(c) => updateNested(['visualizations', 'tree', 'examples_input'], c)} />
+                    <ConfirmSwitch id="tree-tc-in" itemLabel="Test Cases" checked={localControls.visualizations?.tree?.test_cases_input !== false} onCheckedChange={(c) => updateNested(['visualizations', 'tree', 'test_cases_input'], c)} />
+                    <ConfirmSwitch id="tree-res-in" itemLabel="Results" checked={localControls.visualizations?.tree?.results_input !== false} onCheckedChange={(c) => updateNested(['visualizations', 'tree', 'results_input'], c)} />
+                  </div>
+                  <div className="space-y-3">
+                    <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Show on Outputs</h4>
+                    <ConfirmSwitch id="tree-ex-out" itemLabel="Examples" checked={localControls.visualizations?.tree?.examples_output !== false} onCheckedChange={(c) => updateNested(['visualizations', 'tree', 'examples_output'], c)} />
+                    <ConfirmSwitch id="tree-tc-out" itemLabel="Test Cases" checked={localControls.visualizations?.tree?.test_cases_output !== false} onCheckedChange={(c) => updateNested(['visualizations', 'tree', 'test_cases_output'], c)} />
+                    <ConfirmSwitch id="tree-res-out" itemLabel="Results" checked={localControls.visualizations?.tree?.results_output !== false} onCheckedChange={(c) => updateNested(['visualizations', 'tree', 'results_output'], c)} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <Separator className="my-2" />
-            <ConfirmSwitch
-              id="vis-graph"
-              itemLabel="Show Graph Visualization"
-              checked={localControls.show_graph_visualization === true}
-              onCheckedChange={(c) => updateNested(['show_graph_visualization'], c)}
-            />
-            <p className="text-xs text-muted-foreground">
-              Enable this for Graph related problems (Adjacency List or Node based). It will show a graphical graph representation.
-            </p>
+
+            {/* Graph */}
+            <div className="space-y-3">
+              <ConfirmSwitch
+                id="vis-graph-main"
+                itemLabel="Enable Graph Visualization"
+                checked={localControls.visualizations?.graph?.enabled ?? localControls.show_graph_visualization === true}
+                onCheckedChange={(c) => {
+                  updateNested(['visualizations', 'graph', 'enabled'], c);
+                  updateNested(['show_graph_visualization'], c); // Legacy fallback sync
+                }}
+              />
+              <p className="text-xs text-muted-foreground">
+                Enable this for Graph related problems. Custom settings below:
+              </p>
+
+              <div className="pl-4 border-l-2 ml-2 space-y-3 pt-2">
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Show on Inputs</h4>
+                    <ConfirmSwitch id="graph-ex-in" itemLabel="Examples" checked={localControls.visualizations?.graph?.examples_input !== false} onCheckedChange={(c) => updateNested(['visualizations', 'graph', 'examples_input'], c)} />
+                    <ConfirmSwitch id="graph-tc-in" itemLabel="Test Cases" checked={localControls.visualizations?.graph?.test_cases_input !== false} onCheckedChange={(c) => updateNested(['visualizations', 'graph', 'test_cases_input'], c)} />
+                    <ConfirmSwitch id="graph-res-in" itemLabel="Results" checked={localControls.visualizations?.graph?.results_input !== false} onCheckedChange={(c) => updateNested(['visualizations', 'graph', 'results_input'], c)} />
+                  </div>
+                  <div className="space-y-3">
+                    <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Show on Outputs</h4>
+                    <ConfirmSwitch id="graph-ex-out" itemLabel="Examples" checked={localControls.visualizations?.graph?.examples_output !== false} onCheckedChange={(c) => updateNested(['visualizations', 'graph', 'examples_output'], c)} />
+                    <ConfirmSwitch id="graph-tc-out" itemLabel="Test Cases" checked={localControls.visualizations?.graph?.test_cases_output !== false} onCheckedChange={(c) => updateNested(['visualizations', 'graph', 'test_cases_output'], c)} />
+                    <ConfirmSwitch id="graph-res-out" itemLabel="Results" checked={localControls.visualizations?.graph?.results_output !== false} onCheckedChange={(c) => updateNested(['visualizations', 'graph', 'results_output'], c)} />
+                  </div>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>

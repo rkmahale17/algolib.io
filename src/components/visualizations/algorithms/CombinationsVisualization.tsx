@@ -1,15 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
 interface Step {
   n: number;
   k: number;
-  current: number[];
-  start: number;
-  allCombinations: number[][];
+  comb: number[];
+  i: number | null;
+  res: number[][];
   message: string;
   lineNumber: number;
 }
@@ -22,76 +22,103 @@ export const CombinationsVisualization: React.FC = () => {
   const intervalRef = useRef<number | null>(null);
 
   const code = `function combine(n: number, k: number): number[][] {
-  const result: number[][] = [];
-  const current: number[] = [];
-  
-  function backtrack(start: number) {
-    if (current.length === k) {
-      result.push([...current]);
+  const res: number[][] = [];
+
+  function backtrack(start: number, comb: number[]) {
+    if (comb.length === k) {
+      res.push([...comb]);
       return;
     }
-    
+
     for (let i = start; i <= n; i++) {
-      current.push(i);
-      backtrack(i + 1);
-      current.pop();
+      comb.push(i);
+      backtrack(i + 1, comb);
+      comb.pop();
     }
   }
-  
-  backtrack(1);
-  return result;
+
+  backtrack(1, []);
+  return res;
 }`;
 
   const generateSteps = () => {
     const n = 4;
     const k = 2;
     const newSteps: Step[] = [];
-    const result: number[][] = [];
-    const current: number[] = [];
+    const res: number[][] = [];
 
-    function backtrack(start: number, line: number) {
-      if (current.length === k) {
-        result.push([...current]);
+    newSteps.push({
+      n, k, comb: [], i: null, res: [],
+      message: "Initialize result array res = []",
+      lineNumber: 2
+    });
+
+    function backtrack(start: number, comb: number[]) {
+      newSteps.push({
+        n, k, comb: [...comb], i: null, res: res.map(r => [...r]),
+        message: `Calling backtrack(start=${start}, comb=[${comb.join(", ")}])`,
+        lineNumber: 5
+      });
+
+      newSteps.push({
+        n, k, comb: [...comb], i: null, res: res.map(r => [...r]),
+        message: `Condition check: comb.length === k (${comb.length} === ${k})`,
+        lineNumber: 8
+      });
+
+      if (comb.length === k) {
+        res.push([...comb]);
         newSteps.push({
-          n,
-          k,
-          current: [...current],
-          start,
-          allCombinations: result.map(c => [...c]),
-          message: `Found combination: [${current.join(', ')}]`,
-          lineNumber: 6
+          n, k, comb: [...comb], i: null, res: res.map(r => [...r]),
+          message: `Base case reached. Added [${comb.join(", ")}] to result.`,
+          lineNumber: 9
+        });
+        newSteps.push({
+          n, k, comb: [...comb], i: null, res: res.map(r => [...r]),
+          message: "Return from recursive call",
+          lineNumber: 10
         });
         return;
       }
 
       for (let i = start; i <= n; i++) {
-        current.push(i);
         newSteps.push({
-          n,
-          k,
-          current: [...current],
-          start: i,
-          allCombinations: result.map(c => [...c]),
-          message: `Add ${i} to current combination`,
-          lineNumber: 11
+          n, k, comb: [...comb], i: i, res: res.map(r => [...r]),
+          message: `Iterating: i = ${i}`,
+          lineNumber: 15
         });
 
-        backtrack(i + 1, 12);
-
-        current.pop();
+        comb.push(i);
         newSteps.push({
-          n,
-          k,
-          current: [...current],
-          start: i,
-          allCombinations: result.map(c => [...c]),
-          message: `Backtrack: Remove ${i}`,
-          lineNumber: 13
+          n, k, comb: [...comb], i: i, res: res.map(r => [...r]),
+          message: `Included ${i} in current combination`,
+          lineNumber: 17
+        });
+
+        backtrack(i + 1, comb);
+
+        const popped = comb.pop();
+        newSteps.push({
+          n, k, comb: [...comb], i: i, res: res.map(r => [...r]),
+          message: `Backtracked: Removed ${popped} from current combination`,
+          lineNumber: 23
         });
       }
     }
 
-    backtrack(1, 4);
+    newSteps.push({
+      n, k, comb: [], i: null, res: [],
+      message: "Initiate backtracking from 1",
+      lineNumber: 27
+    });
+    backtrack(1, []);
+
+    newSteps.push({
+      n, k, comb: [], i: null, res: res.map(r => [...r]),
+      message: "End backtracking. Return all combinations.",
+      lineNumber: 28
+    });
+
     setSteps(newSteps);
   };
 
@@ -156,14 +183,14 @@ export const CombinationsVisualization: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         <div className="bg-card rounded-lg p-6 border">
-          <h3 className="text-lg font-semibold mb-4">Range: 1 to {currentStep.n}, Choose {currentStep.k}</h3>
-          <div className="flex gap-2 mb-6">
+          <h3 className="text-lg font-semibold mb-4">Numbers: 1 to {currentStep.n}, Select {currentStep.k}</h3>
+          <div className="flex gap-2 mb-6 flex-wrap">
             {Array.from({ length: currentStep.n }, (_, i) => i + 1).map((val) => (
               <div
                 key={val}
-                className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font- transition-all ${val === currentStep.start ? 'bg-primary/20 border-primary' :
-                  currentStep.current.includes(val) ? 'bg-green-500/20 border-green-500' :
-                    'bg-card border-border'
+                className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${val === currentStep.i ? 'bg-primary/20 border-primary scale-110' :
+                    currentStep.comb.includes(val) ? 'bg-green-500/20 border-green-500' :
+                      'bg-card border-border'
                   }`}
               >
                 {val}
@@ -171,46 +198,52 @@ export const CombinationsVisualization: React.FC = () => {
             ))}
           </div>
 
-          <h3 className="text-lg font-semibold mb-4">Current Combination ({currentStep.current.length}/{currentStep.k})</h3>
-          <div className="flex gap-2 mb-6 min-h-[3rem]">
-            {currentStep.current.length > 0 ? (
-              currentStep.current.map((val, idx) => (
+          <h3 className="text-lg font-semibold mb-4">Current Combination ({currentStep.comb.length}/{currentStep.k})</h3>
+          <div className="flex gap-2 mb-6 min-h-[3rem] flex-wrap">
+            {currentStep.comb.length > 0 ? (
+              currentStep.comb.map((val, idx) => (
                 <div
                   key={idx}
-                  className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-blue-500/20 border-blue-500 font-"
+                  className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-blue-500/20 border-blue-500 font-bold animate-in zoom-in"
                 >
                   {val}
                 </div>
               ))
             ) : (
-              <div className="text-muted-foreground italic">Empty</div>
+              <div className="text-muted-foreground italic h-12 flex items-center">Empty</div>
             )}
           </div>
 
-          <h3 className="text-lg font-semibold mb-4">All Combinations ({currentStep.allCombinations.length})</h3>
-          <div className="flex flex-wrap gap-2">
-            {currentStep.allCombinations.map((comb, idx) => (
-              <div key={idx} className="px-3 py-1 bg-muted rounded border text-sm">
-                [{comb.join(', ')}]
-              </div>
-            ))}
+          <h3 className="text-lg font-semibold mb-4">Result (res) - Total: {currentStep.res.length}</h3>
+          <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto p-2 border rounded-lg bg-muted/20">
+            {currentStep.res.length > 0 ? (
+              currentStep.res.map((comb, idx) => (
+                <div key={idx} className="px-3 py-1 bg-muted rounded border text-sm animate-in fade-in slide-in-from-bottom-1">
+                  [{comb.join(', ')}]
+                </div>
+              ))
+            ) : (
+              <div className="text-muted-foreground italic text-sm">No combinations found yet.</div>
+            )}
           </div>
 
-          <div className="mt-4 p-4 bg-muted rounded">
-            <p className="text-sm">{currentStep.message}</p>
+          <div className="mt-6 p-4 bg-muted/50 rounded-lg border border-border">
+            <p className="text-sm font-medium text-foreground leading-relaxed italic">{currentStep.message}</p>
           </div>
-          <div className="mt-4 p-4 bg-muted rounded">
+
+          <div className="mt-4">
             <VariablePanel
               variables={{
                 'n': currentStep.n,
                 'k': currentStep.k,
-                'current size': currentStep.current.length,
-                'total combinations': currentStep.allCombinations.length
+                'i': currentStep.i ?? 'null',
+                'comb': `[${currentStep.comb.join(', ')}]`,
+                'res.length': currentStep.res.length
               }}
             />
           </div>
         </div>
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+        <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="typescript" />
 
       </div>
     </div>

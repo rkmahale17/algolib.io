@@ -18,6 +18,7 @@ interface MetadataData {
   dislikes?: number;
   unordered?: boolean;
   multi_expected?: boolean;
+  is_pro?: boolean;
 }
 
 interface MetadataEditorProps {
@@ -105,6 +106,32 @@ export function MetadataEditor({ data, onChange }: MetadataEditorProps) {
             <p className="text-xs text-muted-foreground">
               If enabled, "expectedOutput" should be an array of valid results. Code passes if actual matches ANY variant.
             </p>
+          </div>
+        </CardContent>
+      </Card>
+      {/* Pro Content Toggle */}
+      <Card className="border-orange-500/20 bg-orange-500/5">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-orange-700 dark:text-orange-400 flex items-center gap-2">
+            Premium Features
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <Label htmlFor="pro-toggle" className="text-base font-semibold text-orange-800 dark:text-orange-300">
+                Mark as Pro Problem
+              </Label>
+              <p className="text-sm text-orange-600/80 dark:text-orange-400/80">
+                Pro problems restrict Solutions, Visualizations, and Scratchpad for non-subscribers.
+              </p>
+            </div>
+            <Switch
+              id="pro-toggle"
+              checked={data.is_pro || false}
+              onCheckedChange={(val) => updateField("is_pro", val)}
+              className="data-[state=checked]:bg-orange-500"
+            />
           </div>
         </CardContent>
       </Card>

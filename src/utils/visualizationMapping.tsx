@@ -15,6 +15,7 @@ export const visualizationMap: Record<string, React.LazyExoticComponent<React.Co
   'maximum-subarray': React.lazy(() => import('@/components/visualizations/algorithms/MaximumSubarrayVisualization').then(m => ({ default: m.MaximumSubarrayVisualization }))),
   'dutch-national-flag': React.lazy(() => import('@/components/visualizations/algorithms/DutchNationalFlagVisualization').then(m => ({ default: m.DutchNationalFlagVisualization }))),
   'merge-intervals': React.lazy(() => import('@/components/visualizations/algorithms/MergeIntervalsVisualization').then(m => ({ default: m.MergeIntervalsVisualization }))),
+  'interval-scheduling': React.lazy(() => import('@/components/visualizations/algorithms/InsertIntervalVisualization').then(m => ({ default: m.InsertIntervalVisualization }))),
   'monotonic-stack': React.lazy(() => import('@/components/visualizations/algorithms/MonotonicStackVisualization').then(m => ({ default: m.MonotonicStackVisualization }))),
   'quick-select': React.lazy(() => import('@/components/visualizations/algorithms/QuickSelectVisualization').then(m => ({ default: m.QuickSelectVisualization }))),
   'container-with-most-water': React.lazy(() => import('@/components/visualizations/algorithms/ContainerWithMostWaterVisualization').then(m => ({ default: m.ContainerWithMostWaterVisualization }))),
@@ -29,6 +30,7 @@ export const visualizationMap: Record<string, React.LazyExoticComponent<React.Co
   'bfs-level-order': React.lazy(() => import('@/components/visualizations/algorithms/BFSLevelOrderVisualization').then(m => ({ default: m.BFSLevelOrderVisualization }))),
   'bst-insert': React.lazy(() => import('@/components/visualizations/algorithms/BSTInsertVisualization').then(m => ({ default: m.BSTInsertVisualization }))),
   'lca': React.lazy(() => import('@/components/visualizations/algorithms/LowestCommonAncestorBSTVisualization').then(m => ({ default: m.LowestCommonAncestorBSTVisualization }))),
+  'lowest-common-ancestor-of-bst': React.lazy(() => import('@/components/visualizations/algorithms/LowestCommonAncestorBSTVisualization').then(m => ({ default: m.LowestCommonAncestorBSTVisualization }))),
   'serialize-tree': React.lazy(() => import('@/components/visualizations/algorithms/SerializeTreeVisualization').then(m => ({ default: m.SerializeTreeVisualization }))),
   'recover-bst': React.lazy(() => import('@/components/visualizations/algorithms/RecoverBSTVisualization').then(m => ({ default: m.RecoverBSTVisualization }))),
   'trie': React.lazy(() => import('@/components/visualizations/algorithms/TrieVisualization').then(m => ({ default: m.TrieVisualization }))),
@@ -49,6 +51,9 @@ export const visualizationMap: Record<string, React.LazyExoticComponent<React.Co
   'graph-bfs': React.lazy(() => import('@/components/visualizations/algorithms/GraphBFSVisualization').then(m => ({ default: m.GraphBFSVisualization }))),
   'topological-sort': React.lazy(() => import('@/components/visualizations/algorithms/TopologicalSortVisualization').then(m => ({ default: m.TopologicalSortVisualization }))),
   'union-find': React.lazy(() => import('@/components/visualizations/algorithms/UnionFindVisualization').then(m => ({ default: m.UnionFindVisualization }))),
+  'union-find-by-rank': React.lazy(() => import('@/components/visualizations/algorithms/UnionFindByRankVisualization').then(m => ({ default: m.UnionFindByRankVisualization }))),
+  'union-by-rank': React.lazy(() => import('@/components/visualizations/algorithms/UnionFindByRankVisualization').then(m => ({ default: m.UnionFindByRankVisualization }))),
+  'tarjans': React.lazy(() => import('@/components/visualizations/algorithms/TarjansVisualization').then(m => ({ default: m.TarjansVisualization }))),
   'kruskals': React.lazy(() => import('@/components/visualizations/algorithms/KruskalsVisualization').then(m => ({ default: m.KruskalsVisualization }))),
   'prims': React.lazy(() => import('@/components/visualizations/algorithms/PrimsVisualization').then(m => ({ default: m.PrimsVisualization }))),
   'dijkstras': React.lazy(() => import('@/components/visualizations/algorithms/DijkstrasVisualization').then(m => ({ default: m.DijkstrasVisualization }))),
@@ -81,18 +86,25 @@ export const visualizationMap: Record<string, React.LazyExoticComponent<React.Co
   // Advanced Data Structures
   'segment-tree': React.lazy(() => import('@/components/visualizations/algorithms/SegmentTreeVisualization').then(m => ({ default: m.SegmentTreeVisualization }))),
   'fenwick-tree': React.lazy(() => import('@/components/visualizations/algorithms/FenwickTreeVisualization').then(m => ({ default: m.FenwickTreeVisualization }))),
+  'sparse-table': React.lazy(() => import('@/components/visualizations/algorithms/SparseTableVisualization').then(m => ({ default: m.SparseTableVisualization }))),
+  'binary-lifting': React.lazy(() => import('@/components/visualizations/algorithms/BinaryLiftingVisualization').then(m => ({ default: m.BinaryLiftingVisualization }))),
+  // 'lca': React.lazy(() => import('@/components/visualizations/algorithms/BinaryLiftingVisualization').then(m => ({ default: m.BinaryLiftingVisualization }))),
+  'lowest-common-ancestor': React.lazy(() => import('@/components/visualizations/algorithms/BinaryLiftingVisualization').then(m => ({ default: m.BinaryLiftingVisualization }))),
 
   // String Algorithms
   'kmp': React.lazy(() => import('@/components/visualizations/algorithms/KMPVisualization').then(m => ({ default: m.KMPVisualization }))),
   'kmp-string-matching': React.lazy(() => import('@/components/visualizations/algorithms/KMPVisualization').then(m => ({ default: m.KMPVisualization }))),
+  'manachers': React.lazy(() => import('@/components/visualizations/algorithms/ManachersVisualization').then(m => ({ default: m.ManachersVisualization }))),
   'rabin-karp': React.lazy(() => import('@/components/visualizations/algorithms/RabinKarpVisualization').then(m => ({ default: m.RabinKarpVisualization }))),
+  'robin-knp': React.lazy(() => import('@/components/visualizations/algorithms/RabinKarpVisualization').then(m => ({ default: m.RabinKarpVisualization }))),
 
   // Greedy Algorithms
   'activity-selection': React.lazy(() => import('@/components/visualizations/algorithms/ActivitySelectionVisualization').then(m => ({ default: m.ActivitySelectionVisualization }))),
+  'gas-station': React.lazy(() => import('@/components/visualizations/algorithms/GasStationVisualization').then(m => ({ default: m.GasStationVisualization }))),
 
   // Bit Manipulation
   'xor-trick': React.lazy(() => import('@/components/visualizations/algorithms/XORTrickVisualization').then(m => ({ default: m.XORTrickVisualization }))),
-  'count-bits': React.lazy(() => import('@/components/visualizations/algorithms/CountBitsVisualization').then(m => ({ default: m.CountBitsVisualization }))),
+  'count-bits': React.lazy(() => import('@/components/visualizations/algorithms/CountingBitsVisualization').then(m => ({ default: m.CountingBitsVisualization }))),
   'subset-generation-bits': React.lazy(() => import('@/components/visualizations/algorithms/SubsetBitsVisualization').then(m => ({ default: m.SubsetBitsVisualization }))),
 
   // Heap/Priority Queue
@@ -107,8 +119,11 @@ export const visualizationMap: Record<string, React.LazyExoticComponent<React.Co
   // Math Algorithms
   'gcd-euclidean': React.lazy(() => import('@/components/visualizations/algorithms/GCDVisualization').then(m => ({ default: m.GCDVisualization }))),
   'gcd': React.lazy(() => import('@/components/visualizations/algorithms/GCDVisualization').then(m => ({ default: m.GCDVisualization }))),
-  'sieve-eratosthenes': React.lazy(() => import('@/components/visualizations/algorithms/SieveVisualization').then(m => ({ default: m.SieveVisualization }))),
-  'sieve-of-eratosthenes': React.lazy(() => import('@/components/visualizations/algorithms/SieveVisualization').then(m => ({ default: m.SieveVisualization }))),
+  'modular-exponentiation': React.lazy(() => import('@/components/visualizations/algorithms/ModularExponentiationVisualization').then(m => ({ default: m.ModularExponentiationVisualization }))),
+  'sieve-eratosthenes': React.lazy(() => import('@/components/visualizations/algorithms/SieveOfEratosthenesVisualization').then(m => ({ default: m.SieveOfEratosthenesVisualization }))),
+  'sieve-of-eratosthenes': React.lazy(() => import('@/components/visualizations/algorithms/SieveOfEratosthenesVisualization').then(m => ({ default: m.SieveOfEratosthenesVisualization }))),
+  'karatsuba': React.lazy(() => import('@/components/visualizations/algorithms/KaratsubaVisualization').then(m => ({ default: m.KaratsubaVisualization }))),
+  'karatsuba-multiplication': React.lazy(() => import('@/components/visualizations/algorithms/KaratsubaVisualization').then(m => ({ default: m.KaratsubaVisualization }))),
 };
 
 /**

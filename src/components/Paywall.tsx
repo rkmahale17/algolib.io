@@ -17,10 +17,12 @@ export const Paywall: React.FC<PaywallProps> = ({ onUpgrade }) => {
   const handleUpgrade = async () => {
     try {
       setIsUpgrading(true);
+      console.log('Starting upgrade for user:', user?.id, user?.email);
+
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         body: {
-          productId: 'pdt_0NV36FeTxOWDylUeDQQQS',
-          customerEmail: user?.email || '',
+          email: user?.email,
+          userId: user?.id,
           returnUrl: window.location.href,
         }
       });

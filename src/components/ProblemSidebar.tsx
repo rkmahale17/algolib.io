@@ -129,8 +129,8 @@ export const ProblemSidebar = ({
                             className={cn(
                                 "group flex items-center gap-3 px-4 py-3 transition-colors",
                                 isActive
-                                    ? "bg-primary/80 dark:bg-primary/80 text-background"
-                                    : (index % 2 !== 0 ? "bg-muted/5 hover:bg-muted/20 border-foreground/10" : "bg-transparent hover:bg-muted/10")
+                                    ? "bg-primary/50 dark:bg-primary/20 text-background text-foreground "
+                                    : (index % 2 !== 0 ? "bg-muted/5 border-foreground/10" : "bg-transparent")
                             )}
                         >
                             {/* Solve Status Icon (Tick) */}
@@ -140,7 +140,7 @@ export const ProblemSidebar = ({
                                     ? (isActive ? "border-background text-background   " : "border-primary text-primary")
                                     : (isActive ? "border-background/30 text-background/30 " : "border-border text-transparent")
                             )}>
-                                <Check className="w-3.5 h-3.5 stroke-[3] " />
+                                {isSolved && <Check className="w-3.5 h-3.5 stroke-[3] " />}
                             </div>
 
                             {/* Problem Info */}
@@ -160,7 +160,7 @@ export const ProblemSidebar = ({
                                 )}
                                 <span className={cn(
                                     "text-[10px] font- uppercase tracking-wider w-[35px] text-left",
-                                    isActive ? "text-background/70" : (
+                                    false ? "text-background/70" : (
                                         difficulty.toLowerCase() === 'easy' ? "text-green-500" :
                                             difficulty.toLowerCase() === 'hard' ? "text-red-500" :
                                                 "text-yellow-500"

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
@@ -18,6 +18,7 @@ interface Step {
   insertValue: number;
   message: string;
   lineNumber: number;
+  variables: Record<string, any>;
 }
 
 export const BSTInsertVisualization = () => {
@@ -27,16 +28,28 @@ export const BSTInsertVisualization = () => {
   const [speed, setSpeed] = useState(1);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const code = `function insertIntoBST(root, val) {
-  if (!root) return new TreeNode(val);
-  
-  if (val < root.val) {
-    root.left = insertIntoBST(root.left, val);
-  } else {
-    root.right = insertIntoBST(root.right, val);
+  const code = `function insertIntoBST(root: TreeNode | null, val: number): TreeNode | null {
+  if (!root) {
+    return new TreeNode(val);
   }
-  
-  return root;
+
+  let cur: TreeNode = root;
+
+  while (true) {
+    if (val > cur.val) {
+      if (!cur.right) {
+        cur.right = new TreeNode(val);
+        return root;
+      }
+      cur = cur.right;
+    } else {
+      if (!cur.left) {
+        cur.left = new TreeNode(val);
+        return root;
+      }
+      cur = cur.left;
+    }
+  }
 }`;
 
   const deepClone = (node: TreeNode | null): TreeNode | null => {
@@ -73,78 +86,167 @@ export const BSTInsertVisualization = () => {
       }
     };
 
-    const insertValue = 5;
+    const val = 5;
     const newSteps: Step[] = [];
+    const tree = deepClone(initialTree);
+    calculatePositions(tree, 200, 40, 80);
 
-    const insert = (node: TreeNode | null, val: number, tree: TreeNode): TreeNode | null => {
-      if (!node) {
-        const newNode = { val, left: null, right: null };
-        calculatePositions(tree, 200, 50, 80);
-        newSteps.push({
-          tree: deepClone(tree),
-          current: null,
-          insertValue: val,
-          message: `Found empty spot! Insert ${val} here`,
-          lineNumber: 1
-        });
-        return newNode;
-      }
+    // Step 1: Function entry
+    newSteps.push({
+      tree: deepClone(tree),
+      current: null,
+      insertValue: val,
+      message: `Starting insertion of value ${val} into BST.`,
+      lineNumber: 1,
+      variables: { val, root: 'TreeNode' }
+    });
 
-      calculatePositions(tree, 200, 50, 80);
+    // Step 2: Check if !root
+    newSteps.push({
+      tree: deepClone(tree),
+      current: null,
+      insertValue: val,
+      message: `Checking if the tree is empty.`,
+      lineNumber: 2,
+      variables: { val, root: tree ? 'TreeNode' : 'null' }
+    });
+
+    if (!tree) {
+      // (This case won't be hit with our initialTree but for completeness)
+      newSteps.push({
+        tree: { val, left: null, right: null, x: 200, y: 40 },
+        current: val,
+        insertValue: val,
+        message: `Tree is empty. Creating new root with value ${val}.`,
+        lineNumber: 3,
+        variables: { val }
+      });
+      setSteps(newSteps);
+      return;
+    }
+
+    // Step 6: Initialize cur
+    let cur = tree;
+    newSteps.push({
+      tree: deepClone(tree),
+      current: cur.val,
+      insertValue: val,
+      message: `Initialize 'cur' pointer to the root (${cur.val}).`,
+      lineNumber: 6,
+      variables: { val, 'cur.val': cur.val }
+    });
+
+    while (true) {
+      // Step 8: While(true)
       newSteps.push({
         tree: deepClone(tree),
-        current: node.val,
+        current: cur.val,
         insertValue: val,
-        message: `At node ${node.val}. Compare ${val} with ${node.val}`,
-        lineNumber: 3
+        message: `Starting tree traversal from node ${cur.val}.`,
+        lineNumber: 8,
+        variables: { val, 'cur.val': cur.val }
       });
 
-      if (val < node.val) {
-        calculatePositions(tree, 200, 50, 80);
+      // Step 9: Check val > cur.val
+      newSteps.push({
+        tree: deepClone(tree),
+        current: cur.val,
+        insertValue: val,
+        message: `Comparing ${val} with current node value ${cur.val}.`,
+        lineNumber: 9,
+        variables: { val, 'cur.val': cur.val, condition: `${val} > ${cur.val}` }
+      });
+
+      if (val > cur.val) {
+        // Step 10: Check !cur.right
         newSteps.push({
           tree: deepClone(tree),
-          current: node.val,
+          current: cur.val,
           insertValue: val,
-          message: `${val} < ${node.val}. Go left`,
-          lineNumber: 4
+          message: `Check if node ${cur.val} has a right child.`,
+          lineNumber: 10,
+          variables: { val, 'cur.val': cur.val, 'cur.right': cur.right ? cur.right.val : 'null' }
         });
-        node.left = insert(node.left, val, tree);
+
+        if (!cur.right) {
+          // Step 11: Insert right
+          cur.right = { val, left: null, right: null };
+          calculatePositions(tree, 200, 40, 80);
+          newSteps.push({
+            tree: deepClone(tree),
+            current: cur.val,
+            insertValue: val,
+            message: `Right child is null. Inserting ${val} as right child of ${cur.val}.`,
+            lineNumber: 11,
+            variables: { val, 'cur.val': cur.val, 'new node': val }
+          });
+          // Step 12: Return root
+          newSteps.push({
+            tree: deepClone(tree),
+            current: null,
+            insertValue: val,
+            message: `Insertion complete. Returning root.`,
+            lineNumber: 12,
+            variables: { val }
+          });
+          break;
+        }
+        // Step 14: cur = cur.right
+        cur = cur.right;
+        newSteps.push({
+          tree: deepClone(tree),
+          current: cur.val,
+          insertValue: val,
+          message: `${val} > previous node value. Moving to right child (${cur.val}).`,
+          lineNumber: 14,
+          variables: { val, 'cur.val': cur.val }
+        });
       } else {
-        calculatePositions(tree, 200, 50, 80);
+        // Step 16: Check !cur.left
         newSteps.push({
           tree: deepClone(tree),
-          current: node.val,
+          current: cur.val,
           insertValue: val,
-          message: `${val} ≥ ${node.val}. Go right`,
-          lineNumber: 6
+          message: `Check if node ${cur.val} has a left child.`,
+          lineNumber: 16,
+          variables: { val, 'cur.val': cur.val, 'cur.left': cur.left ? cur.left.val : 'null' }
         });
-        node.right = insert(node.right, val, tree);
+
+        if (!cur.left) {
+          // Step 17: Insert left
+          cur.left = { val, left: null, right: null };
+          calculatePositions(tree, 200, 40, 80);
+          newSteps.push({
+            tree: deepClone(tree),
+            current: cur.val,
+            insertValue: val,
+            message: `Left child is null. Inserting ${val} as left child of ${cur.val}.`,
+            lineNumber: 17,
+            variables: { val, 'cur.val': cur.val, 'new node': val }
+          });
+          // Step 18: Return root
+          newSteps.push({
+            tree: deepClone(tree),
+            current: null,
+            insertValue: val,
+            message: `Insertion complete. Returning root.`,
+            lineNumber: 18,
+            variables: { val }
+          });
+          break;
+        }
+        // Step 20: cur = cur.left
+        cur = cur.left;
+        newSteps.push({
+          tree: deepClone(tree),
+          current: cur.val,
+          insertValue: val,
+          message: `${val} <= previous node value. Moving to left child (${cur.val}).`,
+          lineNumber: 20,
+          variables: { val, 'cur.val': cur.val }
+        });
       }
-
-      return node;
-    };
-
-    const tree = deepClone(initialTree);
-    calculatePositions(tree, 200, 50, 80);
-
-    newSteps.push({
-      tree: deepClone(tree),
-      current: null,
-      insertValue,
-      message: `Insert ${insertValue} into BST`,
-      lineNumber: 0
-    });
-
-    insert(tree, insertValue, tree);
-    calculatePositions(tree, 200, 50, 80);
-
-    newSteps.push({
-      tree: deepClone(tree),
-      current: null,
-      insertValue,
-      message: `Complete! ${insertValue} inserted successfully`,
-      lineNumber: 10
-    });
+    }
 
     setSteps(newSteps);
     setCurrentStepIndex(0);
@@ -200,20 +302,36 @@ export const BSTInsertVisualization = () => {
     return (
       <g key={`${node.val}-${node.x}-${node.y}`}>
         {node.left && node.left.x !== undefined && node.left.y !== undefined && (
-          <line x1={node.x} y1={node.y} x2={node.left.x} y2={node.left.y} stroke="currentColor" strokeWidth="2" className="text-border" />
+          <line
+            x1={node.x}
+            y1={node.y}
+            x2={node.left.x}
+            y2={node.left.y}
+            stroke="currentColor"
+            strokeWidth="2"
+            className="text-border transition-all duration-300"
+          />
         )}
         {node.right && node.right.x !== undefined && node.right.y !== undefined && (
-          <line x1={node.x} y1={node.y} x2={node.right.x} y2={node.right.y} stroke="currentColor" strokeWidth="2" className="text-border" />
+          <line
+            x1={node.x}
+            y1={node.y}
+            x2={node.right.x}
+            y2={node.right.y}
+            stroke="currentColor"
+            strokeWidth="2"
+            className="text-border transition-all duration-300"
+          />
         )}
         <circle
           cx={node.x}
           cy={node.y}
           r="24"
           className={`transition-all duration-300 ${currentStep.current === node.val
-              ? 'fill-primary stroke-primary'
-              : node.val === currentStep.insertValue
-                ? 'fill-green-500 stroke-green-500'
-                : 'fill-muted stroke-border'
+            ? 'fill-primary stroke-primary'
+            : node.val === currentStep.insertValue
+              ? 'fill-green-500 stroke-green-500 shadow-lg'
+              : 'fill-card stroke-border'
             }`}
           strokeWidth="2"
         />
@@ -222,7 +340,9 @@ export const BSTInsertVisualization = () => {
           y={node.y}
           textAnchor="middle"
           dy=".3em"
-          className={`font- ${currentStep.current === node.val || node.val === currentStep.insertValue ? 'fill-white' : 'fill-foreground'
+          className={`font-medium transition-colors duration-300 ${currentStep.current === node.val || node.val === currentStep.insertValue
+            ? 'fill-primary-foreground'
+            : 'fill-foreground'
             }`}
         >
           {node.val}
@@ -250,30 +370,28 @@ export const BSTInsertVisualization = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg border border-border/50 p-6">
-            <svg width="400" height="250" className="mx-auto">
+          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 pb-4">
+            <svg viewBox="0 0 400 250" className="w-full h-64 overflow-visible">
               {currentStep.tree && renderTree(currentStep.tree)}
             </svg>
           </div>
 
-          <div className="bg-accent/50 rounded-lg border border-accent p-4">
+          <div className={`rounded-lg border p-4 transition-colors duration-300 ${currentStep.lineNumber === 12 || currentStep.lineNumber === 18
+            ? 'bg-green-500/10 border-green-500/50'
+            : 'bg-accent/50 border-accent'
+            }`}>
             <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
           </div>
 
-          <div className='rounded-lg '>
-
+          <div className='rounded-lg border bg-card'>
             <VariablePanel
-              variables={{
-                insertValue: currentStep.insertValue,
-                current: currentStep.current || 'null'
-              }}
+              variables={currentStep.variables}
             />
           </div>
         </div>
 
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
+        <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="TypeScript" />
       </div>
-
     </div>
   );
 };

@@ -150,11 +150,7 @@ const Home = () => {
                 </div>
 
                 <div className="flex items-center gap-4 border-l border-gray-100 dark:border-zinc-800 pl-8">
-                  <div className="avatar-stack scale-110">
-                    <img src="https://i.pravatar.cc/150?u=1" className="avatar-item" alt="User" />
-                    <img src="https://i.pravatar.cc/150?u=2" className="avatar-item" alt="User" />
-                    <img src="https://i.pravatar.cc/150?u=3" className="avatar-item" alt="User" />
-                  </div>
+
                   <div className="text-sm">
                     <div className="font-black text-black dark:text-white text-lg leading-tight tracking-tight font-medium">1k+ users</div>
                     <div className="text-gray-500 flex items-center gap-1 font-">
@@ -187,7 +183,7 @@ const Home = () => {
         {/* Crafting Section */}
         <div className="py-32 bg-white dark:bg-black border-y border-gray-100 dark:border-zinc-900">
           <div className="container mx-auto px-4 text-center max-w-5xl">
-            <h2 className="text-2xl md:text-xl font-medium font-black mb-20 text-gray-900 dark:text-white leading-[1.1] tracking-tight">
+            <h2 className="text-3xl md:text-3xl font-medium font-black mb-20 text-gray-900 dark:text-white leading-[1.1] tracking-tight">
               We're crafting <span className="inline-block px-4 py-1 bg-[#EAFF96] text-black">rulcode.com</span> with<br />passion, precision and quality.
             </h2>
 
@@ -217,7 +213,7 @@ const Home = () => {
           <div className="container mx-auto px-4 max-w-6xl">
             <div className="mb-16">
               <h2 className="text-4xl md:text-5xl font-medium tracking-tight mb-6 text-gray-900 dark:text-white max-w-2xl">
-                Master algorithms with an interactive roadmap
+                Master algorithms with visual patterns
               </h2>
               <p className="text-gray-500 dark:text-gray-400 text-lg max-w-2xl font-medium">
                 Our platform is designed to take you from basic data structures to advanced algorithmic patterns, with every step visualized for maximum clarity.

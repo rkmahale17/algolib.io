@@ -287,8 +287,8 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
       }
 
       // 3. Initialize Code
-      // If we have valid initialCode (user saved code), prioritize it!
-      if (initialCode && initialCode.trim().length > 0) {
+      // Priority 1: User-saved code (initialCode) - only if it has content
+      if (typeof initialCode === 'string' && initialCode.trim().length > 0) {
         setCode(initialCode);
         return;
       }
@@ -329,17 +329,13 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
       }
 
     } else {
-      if (!initialCode) {
+      if (typeof initialCode === 'string' && initialCode.trim().length > 0) {
+        setCode(initialCode);
+      } else {
         setCode(DEFAULT_CODE[language]);
       }
     }
-  }, [activeAlgorithm, language, algorithmId]);
-
-  useEffect(() => {
-    if (initialCode && initialCode !== code) {
-      setCode(initialCode);
-    }
-  }, [initialCode]);
+  }, [activeAlgorithm, language, algorithmId, initialCode]);
 
   const handleLanguageChange = (newLang: Language) => {
     if (onLanguageChange) {

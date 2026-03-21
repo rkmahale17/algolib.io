@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
@@ -85,7 +85,7 @@ export const DFSInorderVisualization = () => {
         current: node.val,
         stack: [...stack],
         message: `Visit node ${node.val}, go left first`,
-        lineNumber: 6
+        lineNumber: 7 // traverse(node.left)
       });
 
       traverse(node.left);
@@ -96,9 +96,16 @@ export const DFSInorderVisualization = () => {
         current: node.val,
         stack: [...stack],
         message: `Process node ${node.val} (left done, process root)`,
-        lineNumber: 7
+        lineNumber: 8 // result.push(node.val)
       });
 
+      newSteps.push({
+        visited: [...visited],
+        current: node.val,
+        stack: [...stack],
+        message: `Traverse right for node ${node.val}`,
+        lineNumber: 9 // traverse(node.right)
+      });
       traverse(node.right);
 
       stack.pop();
@@ -106,8 +113,8 @@ export const DFSInorderVisualization = () => {
         visited: [...visited],
         current: node.val,
         stack: [...stack],
-        message: `Node ${node.val} complete (right done)`,
-        lineNumber: 8
+        message: `Node ${node.val} complete`,
+        lineNumber: 10 // function end
       });
     };
 
@@ -116,7 +123,7 @@ export const DFSInorderVisualization = () => {
       current: null,
       stack: [],
       message: 'Start DFS Inorder: Left → Root → Right',
-      lineNumber: 0
+      lineNumber: 12 // traverse(root)
     });
 
     traverse(root);
@@ -126,7 +133,7 @@ export const DFSInorderVisualization = () => {
       current: null,
       stack: [],
       message: `Complete! Inorder: [${visited.join(', ')}]`,
-      lineNumber: 12
+      lineNumber: 13 // return result
     });
 
     setSteps(newSteps);
@@ -186,10 +193,10 @@ export const DFSInorderVisualization = () => {
           cy={node.y}
           r="24"
           className={`transition-all duration-300 ${currentStep.current === node.val
-              ? 'fill-primary stroke-primary'
-              : currentStep.visited.includes(node.val)
-                ? 'fill-green-500 stroke-green-500'
-                : 'fill-muted stroke-border'
+            ? 'fill-primary stroke-primary'
+            : currentStep.visited.includes(node.val)
+              ? 'fill-green-500 stroke-green-500'
+              : 'fill-muted stroke-border'
             }`}
           strokeWidth="2"
         />
@@ -225,8 +232,8 @@ export const DFSInorderVisualization = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4 ">
-          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 overflow-x-auto">
-            <svg width="400" height="250" className="mx-auto">
+          <div className="bg-muted/30 rounded-lg border border-border/50 p-6">
+            <svg viewBox="0 0 400 250" className="w-full h-64">
               {renderTree(tree)}
             </svg>
           </div>
@@ -256,7 +263,7 @@ export const DFSInorderVisualization = () => {
               visited: currentStep.visited
             }}
           />
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
+          <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="TypeScript" />
         </div>
       </div>
     </div>

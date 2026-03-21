@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
@@ -268,27 +268,28 @@ export const BinarySearchVisualization = () => {
                 return (
                   <div key={index} className="flex flex-col items-center gap-2 flex-1 max-w-[60px] relative">
                     {index === currentStep.left && (
-                      <div className="absolute -top-8 text-xs font- text-blue-500">L</div>
+                      <div className="absolute -top-6 text-xs font-bold text-blue-500">L</div>
                     )}
                     {index === currentStep.right && (
-                      <div className="absolute -top-8 text-xs font- text-blue-500">R</div>
+                      <div className="absolute -top-10 text-xs font-bold text-blue-500">R</div>
                     )}
                     {isMid && (
-                      <div className="absolute -top-8 text-xs font- text-primary animate-bounce">MID</div>
+                      <div className="absolute -top-14 text-xs font-bold text-primary animate-bounce">MID</div>
                     )}
+                    <div className="absolute inset-0 bg-primary/10 rounded-t -z-10" />
                     <div
                       className={`w-full rounded-t transition-all duration-300 ${isMid && currentStep.found
                         ? 'bg-green-500 shadow-lg shadow-green-500/50 scale-110'
                         : isMid
                           ? 'bg-primary shadow-lg shadow-primary/50 scale-105'
                           : isOutOfRange
-                            ? 'bg-muted opacity-30'
+                            ? 'bg-muted/80'
                             : 'bg-gradient-to-t from-primary/60 to-primary/40'
                         }`}
                       style={{ height: `${(value / getMaxValue()) * 100}%`, minHeight: '20px' }}
                     />
                     <span
-                      className={`text-xs font-mono ${isMid ? 'text-primary font- text-base' : isOutOfRange ? 'text-muted-foreground opacity-30' : 'text-muted-foreground'
+                      className={`text-xs font-mono ${isMid ? 'text-primary font-bold text-base' : isOutOfRange ? 'text-muted-foreground opacity-60' : 'text-muted-foreground'
                         }`}
                     >
                       {value}
@@ -317,7 +318,7 @@ export const BinarySearchVisualization = () => {
           </div>
         </div>
 
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
+        <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="TypeScript" />
       </div>
 
 

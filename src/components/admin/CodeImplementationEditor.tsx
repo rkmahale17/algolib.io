@@ -47,6 +47,7 @@ interface CodeImplementation {
 
 interface CodeImplementationEditorProps {
   implementations: CodeImplementation[];
+  algorithmName?: string;
   onChange: (implementations: CodeImplementation[]) => void;
 }
 
@@ -59,6 +60,7 @@ const LANGUAGES = [
 
 export function CodeImplementationEditor({
   implementations,
+  algorithmName,
   onChange,
 }: CodeImplementationEditorProps) {
   // Normalize legacy keys
@@ -385,15 +387,23 @@ export function CodeImplementationEditor({
     setIsEnhancing(true);
 
     try {
-      // Find all implementations for the CURRENT codeType across all languages
-      const relevantImpls = implementations.map(impl => ({
-        lang: impl.lang,
-        code: impl.code.filter(c => c.codeType === activeCodeType)
-      })).filter(impl => impl.code.length > 0);
+      // Find the SPECIFIC implementation and block for the active language/approach
+      const relevantImpls = implementations
+        .filter(impl => impl.lang === activeLanguage)
+        .map(impl => ({
+          lang: impl.lang,
+          code: impl.code.filter(c => c.codeType === activeCodeType)
+        }))
+        .filter(impl => impl.code.length > 0);
+
+      if (relevantImpls.length === 0) {
+        toast.error("No implementation found for the active language and approach");
+        return;
+      }
 
       const { data, error } = await supabase.functions.invoke("generate-algorithm", {
         body: {
-          topic: activeCodeType, // Best we have for context here if title isn't passed
+          topic: algorithmName || activeCodeType,
           target: "enhance_comments",
           implementations: relevantImpls
         },

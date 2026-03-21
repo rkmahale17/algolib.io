@@ -150,54 +150,56 @@ export const BinaryTreeLevelOrderVisualization = () => {
     return (
       <div className="space-y-4">
         <div className="text-sm font-semibold text-center mb-2">Level Order Traversal</div>
-        <svg width="400" height="220" className="mx-auto">
-          <line x1={200} y1={40} x2={120} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
-          <line x1={200} y1={40} x2={280} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
-          <line x1={280} y1={100} x2={240} y2={160} stroke="currentColor" className="text-border" strokeWidth="2" />
-          <line x1={280} y1={100} x2={320} y2={160} stroke="currentColor" className="text-border" strokeWidth="2" />
+        <div className="w-full pb-4">
+          <svg viewBox="0 0 400 220" className="w-full h-64">
+            <line x1={200} y1={40} x2={120} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
+            <line x1={200} y1={40} x2={280} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
+            <line x1={280} y1={100} x2={240} y2={160} stroke="currentColor" className="text-border" strokeWidth="2" />
+            <line x1={280} y1={100} x2={320} y2={160} stroke="currentColor" className="text-border" strokeWidth="2" />
 
-          {positions.map((pos, i) => {
-            const isCurrent = step.currentNode === pos.value;
-            const isInQueue = step.queue.includes(pos.value);
-            const isVisited = step.result.flat().includes(pos.value);
+            {positions.map((pos, i) => {
+              const isCurrent = step.currentNode === pos.value;
+              const isInQueue = step.queue.includes(pos.value);
+              const isVisited = step.result.flat().includes(pos.value);
 
-            return (
-              <g key={i}>
-                <circle
-                  cx={pos.x}
-                  cy={pos.y}
-                  r="24"
-                  className={`transition-all duration-300 ${isCurrent
-                    ? 'fill-yellow-500'
-                    : isVisited
-                      ? 'fill-green-500'
-                      : isInQueue
-                        ? 'fill-blue-500'
-                        : 'fill-card'
-                    }`}
-                  stroke="currentColor"
-                  strokeWidth="2"
-                />
-                <text
-                  x={pos.x}
-                  y={pos.y + 6}
-                  textAnchor="middle"
-                  className="text-sm font- fill-foreground"
-                >
-                  {pos.value}
-                </text>
-                <text
-                  x={pos.x}
-                  y={pos.y + 45}
-                  textAnchor="middle"
-                  className="text-xs fill-muted-foreground font-"
-                >
-                  L{pos.level}
-                </text>
-              </g>
-            );
-          })}
-        </svg>
+              return (
+                <g key={i}>
+                  <circle
+                    cx={pos.x}
+                    cy={pos.y}
+                    r="24"
+                    className={`transition-all duration-300 ${isCurrent
+                      ? 'fill-yellow-500'
+                      : isVisited
+                        ? 'fill-green-500'
+                        : isInQueue
+                          ? 'fill-blue-500'
+                          : 'fill-card'
+                      }`}
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  />
+                  <text
+                    x={pos.x}
+                    y={pos.y + 6}
+                    textAnchor="middle"
+                    className="text-sm font- fill-foreground"
+                  >
+                    {pos.value}
+                  </text>
+                  <text
+                    x={pos.x}
+                    y={pos.y + 45}
+                    textAnchor="middle"
+                    className="text-xs fill-muted-foreground font-"
+                  >
+                    L{pos.level}
+                  </text>
+                </g>
+              );
+            })}
+          </svg>
+        </div>
         <div className="text-center text-xs text-muted-foreground">
           Queue: [{step.queue.join(', ') || 'empty'}]
         </div>

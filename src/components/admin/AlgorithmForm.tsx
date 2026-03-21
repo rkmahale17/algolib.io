@@ -342,6 +342,15 @@ export function AlgorithmForm({
                   </SelectContent>
                 </Select>
               </div>
+
+              <div className="flex items-center space-x-2 pt-8">
+                <Switch
+                  id="premium-toggle"
+                  checked={watch("is_premium")}
+                  onCheckedChange={(checked) => setValue("is_premium", checked)}
+                />
+                <Label htmlFor="premium-toggle" className="font-semibold cursor-pointer">Mark as Premium (Pro)</Label>
+              </div>
             </div>
 
             <div className="space-y-2">

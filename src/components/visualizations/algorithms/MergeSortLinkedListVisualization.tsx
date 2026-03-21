@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Info } from 'lucide-react';
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
@@ -108,56 +108,56 @@ export const MergeSortLinkedListVisualization = () => {
         };
 
         // Initial State
-        addStep('Start with two sorted linked lists', 0);
+        addStep('Start with two sorted linked lists', 1);
 
         // const dummy = new ListNode();
         const dummyId = 'dummy';
         allNodes[dummyId] = { id: dummyId, val: 0, nextId: null };
         let tailId = dummyId;
-        addStep('Create a dummy node to simplify merging', 1, { dummyId, tailId });
+        addStep('Create a dummy node to simplify merging', 2, { dummyId, tailId });
 
         // let tail = dummy;
-        addStep('Initialize tail pointer to dummy node', 2, { dummyId, tailId });
+        addStep('Initialize tail pointer to dummy node', 3, { dummyId, tailId });
 
         while (list1 && list2) {
-            addStep(`Compare list1 (${allNodes[list1].val}) and list2 (${allNodes[list2].val})`, 4, { dummyId, tailId, highlightNodes: [list1, list2] });
+            addStep(`Compare list1 (${allNodes[list1].val}) and list2 (${allNodes[list2].val})`, 5, { dummyId, tailId, highlightNodes: [list1, list2] });
 
             if (allNodes[list1].val < allNodes[list2].val) {
                 // tail.next = list1;
                 const currentL1 = list1;
                 allNodes[tailId].nextId = currentL1;
-                addStep(`${allNodes[list1].val} < ${allNodes[list2].val}, point tail.next to list1 node`, 6, { dummyId, tailId, highlightNodes: [currentL1] });
+                addStep(`${allNodes[list1].val} < ${allNodes[list2].val}, point tail.next to list1 node`, 7, { dummyId, tailId, highlightNodes: [currentL1] });
 
                 // list1 = list1.next;
                 list1 = allNodes[list1].nextId;
-                addStep('Advance list1 pointer', 7, { dummyId, tailId });
+                addStep('Advance list1 pointer', 8, { dummyId, tailId });
             } else {
                 // tail.next = list2;
                 const currentL2 = list2;
                 allNodes[tailId].nextId = currentL2;
-                addStep(`${allNodes[list2].val} <= ${allNodes[list1].val}, point tail.next to list2 node`, 9, { dummyId, tailId, highlightNodes: [currentL2] });
+                addStep(`${allNodes[list2].val} <= ${allNodes[list1].val}, point tail.next to list2 node`, 10, { dummyId, tailId, highlightNodes: [currentL2] });
 
                 // list2 = list2.next;
                 list2 = allNodes[list2].nextId;
-                addStep('Advance list2 pointer', 10, { dummyId, tailId });
+                addStep('Advance list2 pointer', 11, { dummyId, tailId });
             }
 
             // tail = tail.next;
             tailId = allNodes[tailId].nextId!;
-            addStep('Advance tail pointer to the newly added node', 12, { dummyId, tailId });
+            addStep('Advance tail pointer to the newly added node', 13, { dummyId, tailId });
         }
 
         if (list1) {
             // tail.next = list1;
             allNodes[tailId].nextId = list1;
-            addStep('list2 is exhausted, attach remaining list1 nodes', 16, { dummyId, tailId, highlightNodes: [list1] });
+            addStep('list2 is exhausted, attach remaining list1 nodes', 17, { dummyId, tailId, highlightNodes: [list1] });
         } else if (list2) {
             // tail.next = list2;
             allNodes[tailId].nextId = list2;
-            addStep('list1 is exhausted, attach remaining list2 nodes', 18, { dummyId, tailId, highlightNodes: [list2] });
+            addStep('list1 is exhausted, attach remaining list2 nodes', 19, { dummyId, tailId, highlightNodes: [list2] });
         }
 
-        addStep('Merge complete! Return dummy.next as the new head', 21, { dummyId, tailId });
+        addStep('Merge complete! Return dummy.next as the new head', 22, { dummyId, tailId });
 
         setSteps(newSteps);
         setCurrentStepIndex(0);
@@ -281,7 +281,7 @@ export const MergeSortLinkedListVisualization = () => {
                         {/* List 1 */}
                         <div className="space-y-2">
                             <div className="flex items-center gap-2">
-                                <span className="text-sm font-semibold text-primary">List 1</span>
+                                <span className="text-sm font-semibold text-primary">Lists</span>
                                 {currentStep.list1HeadId === null && <span className="text-xs text-muted-foreground italic">(null)</span>}
                             </div>
                             <div className="flex items-center gap-1 flex-wrap min-h-[60px]">
@@ -332,7 +332,7 @@ export const MergeSortLinkedListVisualization = () => {
                 </div>
 
                 <div className="space-y-4">
-                    <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
+                    <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="TypeScript" />
 
                     <div className="bg-card rounded-lg border border-border p-4">
                         <h4 className="text-xs font- uppercase tracking-wider text-muted-foreground mb-3">Algorithm Logic</h4>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { StepControls } from '../shared/StepControls';
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { VariablePanel } from '../shared/VariablePanel';
 
 interface HuffmanNode {
@@ -249,7 +249,7 @@ export const HuffmanVisualization: React.FC = () => {
         }}
       />
 
-      <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+      <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="typescript" />
     </div>
   );
 };

@@ -6,6 +6,7 @@ import { Copy, Check, Maximize2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { RichText } from '@/components/RichText';
 import { IsolatedSolutionEditor } from "./algorithm/IsolatedSolutionEditor";
+const LANGUAGE_ORDER = ['python', 'cpp', 'java', 'typescript'];
 
 interface CodeBlock {
   codeType: string;
@@ -70,7 +71,7 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
     return () => observer.disconnect();
   }, []);
 
-  const effectiveTheme = isAppDark ? 'night-owl' : 'light';
+  const effectiveTheme = isAppDark ? 'vs-dark' : 'light';
 
   const handleCopy = async (code: string, tabName: string) => {
     try {
@@ -244,8 +245,19 @@ const SolutionApproach: React.FC<{
   getLanguageForMonaco,
   getFileExtension,
 }) => {
-    // Local state for the active tab to ensure Copy button works and persistence
-    const [activeLang, setActiveLang] = useState(langImplementations[0]?.lang || 'typescript');
+    // Sort implementations based on the specified order
+    const sortedImplementations = [...langImplementations].sort((a, b) => {
+      const indexA = LANGUAGE_ORDER.indexOf(a.lang.toLowerCase());
+      const indexB = LANGUAGE_ORDER.indexOf(b.lang.toLowerCase());
+      if (indexA === -1 && indexB === -1) return 0;
+      if (indexA === -1) return 1;
+      if (indexB === -1) return -1;
+      return indexA - indexB;
+    });
+
+    // Local state for the active tab, defaulting to typescript if available, otherwise the first sorted one
+    const defaultLang = sortedImplementations.find(i => i.lang.toLowerCase() === 'typescript')?.lang || sortedImplementations[0]?.lang || 'typescript';
+    const [activeLang, setActiveLang] = useState(defaultLang);
     const [isNarrow, setIsNarrow] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
     const [monacoLoaded, setMonacoLoaded] = useState(false);
@@ -266,9 +278,9 @@ const SolutionApproach: React.FC<{
     }, []);
 
     // Find current code based on activeLang
-    const activeImpl = langImplementations.find(i => i.lang === activeLang) || langImplementations[0];
-    const explanationBefore = langImplementations[0]?.explanationBefore;
-    const explanationAfter = langImplementations[0]?.explanationAfter;
+    const activeImpl = sortedImplementations.find(i => i.lang === activeLang) || sortedImplementations[0];
+    const explanationBefore = sortedImplementations[0]?.explanationBefore;
+    const explanationAfter = sortedImplementations[0]?.explanationAfter;
 
     const showPre = activeImpl.showExplanationBefore !== false;
     const showPost = activeImpl.showExplanationAfter !== false;
@@ -304,7 +316,7 @@ const SolutionApproach: React.FC<{
                 {(controls?.languages !== false && langImplementations.length > 1) && !isNarrow && (
                   <div className="overflow-hidden">
                     <TabsList className="flex p-0 bg-transparent gap-0 rounded-none w-full justify-start overflow-x-auto no-scrollbar">
-                      {langImplementations.map((impl) => (
+                      {sortedImplementations.map((impl) => (
                         <TabsTrigger
                           key={impl.lang}
                           value={impl.lang}
@@ -325,7 +337,7 @@ const SolutionApproach: React.FC<{
                         <SelectValue placeholder="Language" />
                       </SelectTrigger>
                       <SelectContent>
-                        {langImplementations.map((impl) => (
+                        {sortedImplementations.map((impl) => (
                           <SelectItem key={impl.lang} value={impl.lang}>
                             {getLanguageDisplayName(impl.lang)}
                           </SelectItem>
@@ -372,7 +384,7 @@ const SolutionApproach: React.FC<{
                 <Maximize2 className="w-3 h-3 text-muted-foreground/50" />
               </div>
 
-              {langImplementations.map(langImpl => (
+              {sortedImplementations.map(langImpl => (
                 langImpl.lang === activeLang && (
                   <TabsContent key={langImpl.lang} value={langImpl.lang} className="absolute inset-0 mt-0">
                     <IsolatedSolutionEditor

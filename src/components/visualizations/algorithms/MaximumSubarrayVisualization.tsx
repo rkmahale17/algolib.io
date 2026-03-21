@@ -1,8 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
-
-import { CodeHighlighter } from '../shared/CodeHighlighter';
-import { StepControls } from '../shared/StepControls';
+import { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
+import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
+import { Card } from '@/components/ui/card';
 
 interface Step {
   array: number[];
@@ -11,231 +13,323 @@ interface Step {
   curSum: number;
   message: string;
   lineNumber: number;
-  highlightIndices: number[];
+  curRange: [number, number]; // [start, end]
+  bestRange: [number, number]; // [start, end]
+  phase: 'init' | 'loop' | 'check' | 'update' | 'done';
+  isMaxUpdate: boolean;
 }
 
 export const MaximumSubarrayVisualization = () => {
-  const [steps, setSteps] = useState<Step[]>([]);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const code = `function maxSubArray(nums: number[]): number {
-  // Initialize maxSub with the first element
   let maxSub = nums[0];
-
-  // Current subarray sum
   let curSum = 0;
 
-  for (const n of nums) {
-    // If current sum becomes negative,
-    // reset it because it won't help future sums
+  for (let i = 0; i < nums.length; i++) {
+    const n = nums[i];
+    
+    // If current sum becomes negative, reset it
     if (curSum < 0) {
       curSum = 0;
     }
 
-    // Add current number to current sum
     curSum += n;
-
-    // Update maximum subarray sum
     maxSub = Math.max(maxSub, curSum);
   }
 
   return maxSub;
 }`;
 
-  const generateSteps = () => {
-    const nums = [-2, 1, -3, 4, -1, 2, 1, -5, 4];
-    const newSteps: Step[] = [];
+  const steps: Step[] = useMemo(() => {
+    const nums = [2, -1, 3, -4, 2];
+    const s: Step[] = [];
 
-    // Initial state
     let maxSub = nums[0];
     let curSum = 0;
+    let curStart = 0;
+    let bestStart = 0;
+    let bestEnd = 0;
 
-    newSteps.push({
+    // Phase: Initialization
+    s.push({
       array: [...nums],
       i: -1,
       maxSub,
       curSum,
-      message: `Initialize maxSub = ${maxSub}, curSum = 0`,
-      lineNumber: 3,
-      highlightIndices: []
+      message: `Step 1: Initialization. We set maxSub to the first element (${nums[0]}) and initialize curSum to 0. The goal is to find a contiguous range with the highest sum.`,
+      lineNumber: 1,
+      curRange: [-1, -1],
+      bestRange: [0, 0],
+      phase: 'init',
+      isMaxUpdate: false
     });
 
     for (let i = 0; i < nums.length; i++) {
       const n = nums[i];
 
-      // Start of loop iteration
-      newSteps.push({
+      // Phase: Loop Start
+      s.push({
         array: [...nums],
         i,
         maxSub,
         curSum,
-        message: `Processing number: ${n}`,
-        lineNumber: 8,
-        highlightIndices: [i]
+        message: `Iteration i = ${i}: Examining the element ${n}. We need to decide whether to include this element in our current subarray or start a new one.`,
+        lineNumber: 5,
+        curRange: curSum < 0 ? [-1, -1] : [curStart, i - 1],
+        bestRange: [bestStart, bestEnd],
+        phase: 'loop',
+        isMaxUpdate: false
       });
 
-      // Check if curSum < 0
+      // Phase: Check curSum
       if (curSum < 0) {
-        newSteps.push({
-          array: [...nums],
-          i,
-          maxSub,
-          curSum,
-          message: `curSum (${curSum}) is negative. Resetting to 0.`,
-          lineNumber: 11,
-          highlightIndices: [i]
-        });
-
+        const oldStart = curStart;
         curSum = 0;
-
-        newSteps.push({
+        curStart = i;
+        s.push({
           array: [...nums],
           i,
           maxSub,
           curSum,
-          message: `curSum reset to 0`,
-          lineNumber: 12,
-          highlightIndices: [i]
+          message: `Decision Point: The previous curSum was negative. Since any sum plus a negative value is worse than the sum itself, we "reset" the current subarray and start fresh from index ${i}.`,
+          lineNumber: 10,
+          curRange: [curStart, i - 1],
+          bestRange: [bestStart, bestEnd],
+          phase: 'check',
+          isMaxUpdate: false
         });
       }
 
-      // Add current number
-      const oldSum = curSum;
+      // Phase: Add n
       curSum += n;
-
-      newSteps.push({
+      s.push({
         array: [...nums],
         i,
         maxSub,
         curSum,
-        message: `Add ${n} to curSum: ${oldSum} + ${n} = ${curSum}`,
-        lineNumber: 16,
-        highlightIndices: [i]
+        message: `Action: We add the current number ${n} to our running sum. curSum becomes ${curSum}. This range [${curStart}...${i}] is now our "candidate" for the maximum sum.`,
+        lineNumber: 13,
+        curRange: [curStart, i],
+        bestRange: [bestStart, bestEnd],
+        phase: 'update',
+        isMaxUpdate: false
       });
 
-      // Update maxSub
-      const oldMax = maxSub;
-      maxSub = Math.max(maxSub, curSum);
-
-      newSteps.push({
-        array: [...nums],
-        i,
-        maxSub,
-        curSum,
-        message: `Update maxSub: max(${oldMax}, ${curSum}) = ${maxSub}`,
-        lineNumber: 19,
-        highlightIndices: [i]
-      });
+      // Phase: Update maxSub
+      if (curSum > maxSub) {
+        const oldMax = maxSub;
+        maxSub = curSum;
+        bestStart = curStart;
+        bestEnd = i;
+        s.push({
+          array: [...nums],
+          i,
+          maxSub,
+          curSum,
+          message: `🔥 Breakthrough! The current sum (${curSum}) is greater than our previous maxSub (${oldMax}). We update the "Best So Far" record and store this range: [${bestStart}...${bestEnd}].`,
+          lineNumber: 14,
+          curRange: [curStart, i],
+          bestRange: [bestStart, bestEnd],
+          phase: 'update',
+          isMaxUpdate: true
+        });
+      } else {
+        s.push({
+          array: [...nums],
+          i,
+          maxSub,
+          curSum,
+          message: `Note: The current sum (${curSum}) did not exceed our record (${maxSub}). We keep searching but remember that ${maxSub} is the highest sum we've seen so far.`,
+          lineNumber: 14,
+          curRange: [curStart, i],
+          bestRange: [bestStart, bestEnd],
+          phase: 'update',
+          isMaxUpdate: false
+        });
+      }
     }
 
-    // Final result
-    newSteps.push({
+    // Phase: Done
+    s.push({
       array: [...nums],
       i: nums.length,
       maxSub,
       curSum,
-      message: `Finished! Maximum Subarray Sum is ${maxSub}`,
-      lineNumber: 22,
-      highlightIndices: []
+      message: `Final Conclusion: We've scanned the entire array. The algorithm guarantees that the subsegment from index ${bestStart} to ${bestEnd} yields the maximum possible sum of ${maxSub}.`,
+      lineNumber: 17,
+      curRange: [-1, -1],
+      bestRange: [bestStart, bestEnd],
+      phase: 'done',
+      isMaxUpdate: false
     });
 
-    setSteps(newSteps);
-    setCurrentStepIndex(0);
-  };
-
-  useEffect(() => {
-    generateSteps();
+    return s;
   }, []);
 
-  useEffect(() => {
-    if (isPlaying && currentStepIndex < steps.length - 1) {
-      intervalRef.current = setInterval(() => {
-        setCurrentStepIndex(prev => {
-          if (prev >= steps.length - 1) {
-            setIsPlaying(false);
-            return prev;
-          }
-          return prev + 1;
-        });
-      }, 1000 / speed);
-    } else {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    }
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [isPlaying, currentStepIndex, steps.length, speed]);
-
-  const handlePlay = () => setIsPlaying(true);
-  const handlePause = () => setIsPlaying(false);
-  const handleStepForward = () => currentStepIndex < steps.length - 1 && setCurrentStepIndex(prev => prev + 1);
-  const handleStepBack = () => currentStepIndex > 0 && setCurrentStepIndex(prev => prev - 1);
-  const handleReset = () => {
-    setCurrentStepIndex(0);
-    setIsPlaying(false);
-    generateSteps();
-  };
-
-  if (steps.length === 0) return null;
-
-  const currentStep = steps[currentStepIndex];
+  const currentStep = steps[currentStepIndex] || steps[0];
 
   return (
-    <div className="space-y-6">
-      <StepControls
-        isPlaying={isPlaying}
-        onPlay={handlePlay}
-        onPause={handlePause}
-        onStepForward={handleStepForward}
-        onStepBack={handleStepBack}
-        onReset={handleReset}
-        speed={speed}
-        onSpeedChange={setSpeed}
-        currentStep={currentStepIndex}
-        totalSteps={steps.length - 1}
-      />
+    <VisualizationLayout
+      leftContent={
+        <div className="space-y-6">
+          <Card className="p-8 bg-card/50 backdrop-blur-sm border-primary/20 relative overflow-hidden min-h-[400px]">
+            <h3 className="text-xs font-semibold mb-8 text-muted-foreground uppercase tracking-widest">
+              Visualizing Subarray Sum Growth
+            </h3>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg border border-border/50 p-6">
-            <div className="flex items-center justify-center gap-2 overflow-x-auto">
-              {currentStep.array.map((value, index) => (
-                <div key={index} className="flex flex-col items-center gap-2">
-                  <div
-                    className={`w-12 h-12 md:w-16 md:h-16 rounded flex items-center justify-center font- text-lg transition-all duration-300 ${index === currentStep.i
-                        ? 'bg-primary text-primary-foreground shadow-lg scale-110'
-                        : 'bg-muted text-foreground'
-                      }`}
+            <div className="flex justify-center items-end gap-3 h-48 mb-16 relative">
+              <AnimatePresence mode="popLayout">
+                {currentStep.array.map((value, index) => {
+                  const isCurrent = index === currentStep.i;
+                  const isInCurRange = index >= currentStep.curRange[0] && index <= currentStep.curRange[1];
+                  const isInBestRange = index >= currentStep.bestRange[0] && index <= currentStep.bestRange[1];
+
+                  return (
+                    <div key={index} className="flex flex-col items-center gap-2 relative">
+                      {/* Bar visualization */}
+                      <motion.div
+                        className={`w-12 rounded-t-lg transition-all duration-300 ${value < 0 ? 'bg-red-500/30' : 'bg-blue-500/30'
+                          } ${isCurrent ? 'ring-4 ring-primary/40 ring-offset-2 ring-offset-background' : ''}`}
+                        initial={{ height: 0 }}
+                        animate={{
+                          height: Math.abs(value) * 20 + 30,
+                          backgroundColor: isCurrent
+                            ? 'var(--primary)'
+                            : (value < 0 ? 'rgba(239, 68, 68, 0.3)' : 'rgba(59, 130, 246, 0.3)')
+                        }}
+                        transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+                      />
+
+                      {/* Value Box */}
+                      <motion.div
+                        className={`w-12 h-12 rounded-lg flex items-center justify-center font-bold text-lg border-2 transition-all duration-300 ${isCurrent
+                            ? 'bg-primary text-primary-foreground border-primary scale-110 shadow-xl shadow-primary/30'
+                            : 'bg-muted/50 border-border text-foreground hover:bg-muted'
+                          }`}
+                        animate={{
+                          scale: isCurrent ? 1.15 : 1,
+                          borderColor: isInBestRange ? 'var(--primary)' : 'rgba(148, 163, 184, 0.3)'
+                        }}
+                      >
+                        {value}
+                      </motion.div>
+
+                      {/* Index Label */}
+                      <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-tighter">idx {index}</span>
+
+                      {/* Best Range Marker (Bottom) */}
+                      {isInBestRange && (
+                        <motion.div
+                          layoutId="best-marker"
+                          className="absolute -bottom-8 w-full h-1.5 bg-primary rounded-full"
+                          initial={{ opacity: 0, scaleX: 0 }}
+                          animate={{ opacity: 1, scaleX: 1 }}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+              </AnimatePresence>
+
+              {/* Current Subarray Overlay with more visible colors */}
+              {currentStep.curRange[0] !== -1 && (
+                <motion.div
+                  layoutId="current-subarray-frame"
+                  className="absolute bottom-[66px] h-16 border-2 border-dashed border-indigo-500 bg-indigo-500/5 rounded-xl pointer-events-none"
+                  initial={false}
+                  animate={{
+                    left: `${currentStep.curRange[0] * 60 + (currentStep.array.length === 5 ? -2 : 0)}px`,
+                    width: `${(currentStep.curRange[1] - currentStep.curRange[0] + 1) * 60 - 8}px`,
+                  }}
+                  transition={{ type: 'spring', stiffness: 150, damping: 20 }}
+                >
+                  <motion.div
+                    className="absolute -top-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-indigo-500 text-[10px] font-bold text-white shadow-sm whitespace-nowrap"
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
                   >
-                    {value}
-                  </div>
-                  <span className="text-xs text-muted-foreground">{index}</span>
-                  {index === currentStep.i && <span className="text-xs font- text-primary">n</span>}
-                </div>
-              ))}
+                    Sum: {currentStep.curSum}
+                  </motion.div>
+                </motion.div>
+              )}
             </div>
-          </div>
 
-          <div className="bg-accent/50 rounded-lg border border-accent p-4">
-            <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
-          </div>
+            {/* Legend and Stats */}
+            <div className="grid grid-cols-2 gap-4 mt-8 pt-6 border-t border-border/50">
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 text-xs">
+                  <div className="w-4 h-4 bg-primary rounded-sm" />
+                  <span className="text-muted-foreground font-medium">Best Subarray Found (Overall Max)</span>
+                </div>
+                <div className="flex items-center gap-3 text-xs">
+                  <div className="w-4 h-4 border-2 border-dashed border-indigo-500 bg-indigo-500/10 rounded-sm" />
+                  <span className="text-muted-foreground font-medium">Current Subarray (Running Total)</span>
+                </div>
+              </div>
 
-          <div className="rounded-lg border p-4">
-            <VariablePanel
-              variables={{
-                maxSub: currentStep.maxSub,
-                curSum: currentStep.curSum,
-                n: currentStep.i >= 0 && currentStep.i < currentStep.array.length ? currentStep.array[currentStep.i] : 'N/A'
-              }}
-            />
-          </div>
+              <div className="flex flex-col justify-center items-end gap-2">
+                <motion.div
+                  className={`px-4 py-2 rounded-xl border-2 flex flex-col items-end transition-colors ${currentStep.isMaxUpdate
+                      ? 'border-primary bg-primary/10'
+                      : 'border-border bg-muted/30'
+                    }`}
+                  animate={currentStep.isMaxUpdate ? { scale: [1, 1.1, 1] } : {}}
+                >
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase">Record Max SubSum</span>
+                  <span className={`text-2xl font-black ${currentStep.isMaxUpdate ? 'text-primary' : 'text-foreground'}`}>
+                    {currentStep.maxSub}
+                  </span>
+                </motion.div>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6 bg-accent border-primary/20 relative overflow-hidden transition-all duration-300 shadow-sm">
+            <div className="absolute top-0 left-0 w-2 h-full bg-primary" />
+            <div className="flex items-start gap-4">
+              <div className="p-2 bg-primary/20 rounded-lg text-primary">
+                <motion.div
+                  animate={currentStep.isMaxUpdate ? { rotate: [0, 20, -20, 0] } : {}}
+                >
+                  {currentStep.isMaxUpdate ? '🚀' : '💡'}
+                </motion.div>
+              </div>
+              <div className="space-y-1">
+                <h4 className="text-[11px] font-bold uppercase tracking-widest text-primary/70">Algorithm commentary</h4>
+                <p className="text-[15px] font-medium leading-[1.6] text-foreground/90">
+                  {currentStep.message}
+                </p>
+              </div>
+            </div>
+          </Card>
         </div>
-
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
-      </div>
-    </div>
+      }
+      rightContent={
+        <div className="space-y-4">
+          <AnimatedCodeEditor
+            code={code}
+            language="typescript"
+            highlightedLines={[currentStep.lineNumber]}
+          />
+          <VariablePanel
+            variables={{
+              index_i: currentStep.i === -1 || currentStep.i >= currentStep.array.length ? 'N/A' : currentStep.i,
+              value_n: currentStep.i === -1 || currentStep.i >= currentStep.array.length ? 'N/A' : currentStep.array[currentStep.i],
+              curSum: currentStep.curSum,
+              bestMax: currentStep.maxSub,
+              bestRange: `[${currentStep.bestRange[0]}, ${currentStep.bestRange[1]}]`
+            }}
+          />
+        </div>
+      }
+      controls={
+        <SimpleStepControls
+          currentStep={currentStepIndex}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStepIndex}
+        />
+      }
+    />
   );
 };

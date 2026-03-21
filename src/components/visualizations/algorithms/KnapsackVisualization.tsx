@@ -1,12 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import { CodeHighlighter } from "../shared/CodeHighlighter";
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from "../shared/StepControls";
 import { VariablePanel } from "../shared/VariablePanel";
 
 interface Step {
   dp: number[][];
+  rowLabels: string[];
   i: number;
+  coinValue: number;
   w: number;
   value: number;
   message: string;
@@ -20,87 +22,127 @@ export const KnapsackVisualization: React.FC = () => {
   const [speed, setSpeed] = useState(1000);
   const intervalRef = useRef<number | null>(null);
 
-  const code = `function knapsack(weights, values, capacity) {
-  const n = weights.length;
-  const dp = Array(n + 1).fill(0)
-    .map(() => Array(capacity + 1).fill(0));
-  
-  for (let i = 1; i <= n; i++) {
-    for (let w = 0; w <= capacity; w++) {
-      if (weights[i-1] <= w) {
-        dp[i][w] = Math.max(
-          values[i-1] + dp[i-1][w - weights[i-1]],
-          dp[i-1][w]
-        );
-      } else {
-        dp[i][w] = dp[i-1][w];
+  const code = `function change(amount: number, coins: number[]): number {
+  let dp: number[] = new Array(amount + 1).fill(0);
+  dp[0] = 1;
+
+  for (let i = coins.length - 1; i >= 0; i--) {
+    const nextDP: number[] = new Array(amount + 1).fill(0);
+    nextDP[0] = 1;
+
+    for (let a = 1; a <= amount; a++) {
+      nextDP[a] = dp[a];
+
+      if (a - coins[i] >= 0) {
+        nextDP[a] += nextDP[a - coins[i]];
       }
     }
+    dp = nextDP;
   }
-  
-  return dp[n][capacity];
+  return dp[amount];
 }`;
 
   const generateSteps = () => {
-    const weights = [2, 3, 4];
-    const values = [3, 4, 5];
-    const capacity = 5;
-    const n = weights.length;
+    const coins = [1, 2, 5];
+    const amount = 5;
+    const n = coins.length;
 
-    const dp = Array(n + 1)
-      .fill(0)
-      .map(() => Array(capacity + 1).fill(0));
+    let historicalDP: number[][] = [];
+    let rowLabels: string[] = ["Init"];
     const newSteps: Step[] = [];
 
+    let currentDP: number[] = new Array(amount + 1).fill(0);
+    currentDP[0] = 1;
+    historicalDP.push([...currentDP]);
+
     newSteps.push({
-      dp: dp.map((row) => [...row]),
-      i: 0,
+      dp: historicalDP.map((row) => [...row]),
+      rowLabels: [...rowLabels],
+      i: -1,
+      coinValue: 0,
       w: 0,
-      value: 0,
-      message: "Initialize DP table with zeros",
+      value: currentDP[0],
+      message: "Initialize dp array. Base case: 1 way to make amount 0.",
       lineNumber: 3,
     });
 
-    for (let i = 1; i <= n; i++) {
-      for (let w = 0; w <= capacity; w++) {
-        if (weights[i - 1] <= w) {
-          const include = values[i - 1] + dp[i - 1][w - weights[i - 1]];
-          const exclude = dp[i - 1][w];
-          dp[i][w] = Math.max(include, exclude);
+    for (let i = n - 1; i >= 0; i--) {
+      const coin = coins[i];
+      const nextDP: number[] = new Array(amount + 1).fill(0);
+      nextDP[0] = 1;
+
+      historicalDP.push([...nextDP]);
+      rowLabels.push(`Coin ${coin}`);
+
+      newSteps.push({
+        dp: historicalDP.map((row) => [...row]),
+        rowLabels: [...rowLabels],
+        i,
+        coinValue: coin,
+        w: 0,
+        value: nextDP[0],
+        message: `Processing coin ${coin}: Initialize nextDP base case for 0 amount.`,
+        lineNumber: 7,
+      });
+
+      for (let a = 1; a <= amount; a++) {
+        nextDP[a] = currentDP[a];
+        historicalDP[historicalDP.length - 1][a] = nextDP[a];
+
+        newSteps.push({
+          dp: historicalDP.map((row) => [...row]),
+          rowLabels: [...rowLabels],
+          i,
+          coinValue: coin,
+          w: a,
+          value: nextDP[a],
+          message: `Amount ${a}: Exclude coin ${coin}, inherit ${currentDP[a]} ways from prev DP row.`,
+          lineNumber: 10,
+        });
+
+        if (a - coin >= 0) {
+          nextDP[a] += nextDP[a - coin];
+          historicalDP[historicalDP.length - 1][a] = nextDP[a];
 
           newSteps.push({
-            dp: dp.map((row) => [...row]),
+            dp: historicalDP.map((row) => [...row]),
+            rowLabels: [...rowLabels],
             i,
-            w,
-            value: dp[i][w],
-            message: `Item ${i - 1} (wt=${weights[i - 1]}, val=${values[i - 1]
-              }): Include(${include}) vs Exclude(${exclude}) = ${dp[i][w]}`,
-            lineNumber: 9,
-          });
-        } else {
-          dp[i][w] = dp[i - 1][w];
-          newSteps.push({
-            dp: dp.map((row) => [...row]),
-            i,
-            w,
-            value: dp[i][w],
-            message: `Item ${i - 1} too heavy for capacity ${w}, skip`,
-            lineNumber: 14,
+            coinValue: coin,
+            w: a,
+            value: nextDP[a],
+            message: `Amount ${a}: Include coin ${coin}, adding ${nextDP[a - coin]} ways -> Total: ${nextDP[a]}`,
+            lineNumber: 13,
           });
         }
       }
+
+      currentDP = [...nextDP];
+      newSteps.push({
+        dp: historicalDP.map((row) => [...row]),
+        rowLabels: [...rowLabels],
+        i,
+        coinValue: coin,
+        w: amount,
+        value: currentDP[amount],
+        message: `Finished passes for coin ${coin}, dp = nextDP.`,
+        lineNumber: 16,
+      });
     }
 
     newSteps.push({
-      dp: dp.map((row) => [...row]),
-      i: n,
-      w: capacity,
-      value: dp[n][capacity],
-      message: `Maximum value: ${dp[n][capacity]}`,
-      lineNumber: 19,
+      dp: historicalDP.map((row) => [...row]),
+      rowLabels: [...rowLabels],
+      i: -1,
+      coinValue: 0,
+      w: amount,
+      value: currentDP[amount],
+      message: `Finished computations. Total ways to make ${amount} is ${currentDP[amount]}.`,
+      lineNumber: 18,
     });
 
     setSteps(newSteps);
+    setCurrentStepIndex(0);
   };
 
   useEffect(() => {
@@ -168,62 +210,68 @@ export const KnapsackVisualization: React.FC = () => {
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-card rounded-lg p-6 border overflow-x-auto">
-          <h3 className="text-lg font-semibold mb-4">DP Table</h3>
-          <div className="inline-block min-w-full">
-            <table className="w-full text-sm">
-              <thead>
-                <tr>
-                  <th className="border border-border p-2 bg-muted">i/w</th>
-                  {currentStep.dp[0].map((_, w) => (
-                    <th key={w} className="border border-border p-2 bg-muted">
-                      {w}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {currentStep.dp.map((row, i) => (
-                  <tr key={i}>
-                    <td className="border border-border p-2 bg-muted font-semibold">
-                      {i}
-                    </td>
-                    {row.map((val, w) => (
-                      <td
-                        key={w}
-                        className={`border border-border p-2 text-center transition-all ${i === currentStep.i && w === currentStep.w
-                          ? "bg-primary/20 font-"
-                          : val > 0
-                            ? "bg-green-500/10"
-                            : ""
-                          }`}
-                      >
-                        {val}
-                      </td>
+        <div className="bg-card rounded-lg p-6 border overflow-hidden flex justify-center w-full">
+          <div className="w-full">
+            <h3 className="text-lg font-semibold mb-4 text-center">Ways DP Table</h3>
+            <div className="inline-block min-w-full overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr>
+                    <th className="border border-border p-2 bg-muted">Coins \ Amt</th>
+                    {currentStep.dp[0].map((_, w) => (
+                      <th key={w} className="border border-border p-2 bg-muted">
+                        {w}
+                      </th>
                     ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {currentStep.dp.map((row, rowIdx) => (
+                    <tr key={rowIdx}>
+                      <td className="border border-border p-2 bg-muted font-semibold whitespace-nowrap">
+                        {currentStep.rowLabels[rowIdx]}
+                      </td>
+                      {row.map((val, a) => (
+                        <td
+                          key={a}
+                          className={`border border - border p - 2 text - center transition - all ${rowIdx === currentStep.dp.length - 1 && a === currentStep.w
+                              ? "bg-primary/20 font-bold"
+                              : rowIdx === currentStep.dp.length - 2 && a === currentStep.w
+                                ? "bg-blue-500/10 italic text-muted-foreground"
+                                : rowIdx === currentStep.dp.length - 1 && currentStep.coinValue > 0 && a === currentStep.w - currentStep.coinValue
+                                  ? "bg-green-500/20 font-bold text-green-500"
+                                  : val > 0
+                                    ? "bg-green-500/5"
+                                    : ""
+                            } `}
+                        >
+                          {val}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
-          <div className="mt-4 p-4 bg-muted rounded">
-            <p className="text-sm">{currentStep.message}</p>
-          </div>
-          <div className="rounded-lg">
-            <VariablePanel
-              variables={{
-                item: currentStep.i - 1,
-                capacity: currentStep.w,
-                maxValue: currentStep.value,
-              }}
-            />
+            <div className="mt-4 p-4 bg-muted rounded">
+              <p className="text-sm">{currentStep.message}</p>
+            </div>
+            <div className="rounded-lg mt-4">
+              <VariablePanel
+                variables={{
+                  "Current Coin": currentStep.coinValue,
+                  "Target Amount (a)": currentStep.w,
+                  "Total Ways NextDP[a]": currentStep.value,
+                }}
+              />
+            </div>
           </div>
         </div>
 
-        <CodeHighlighter
+        <AnimatedCodeEditor
           code={code}
-          highlightedLine={currentStep.lineNumber}
+          highlightedLines={[currentStep.lineNumber]}
           language="typescript"
         />
       </div>

@@ -187,6 +187,7 @@ export function AlgorithmList() {
                 <TableHead onClick={() => handleSort('difficulty')} className="cursor-pointer hover:bg-muted/50">Difficulty</TableHead>
                 <TableHead onClick={() => handleSort('serial_no')} className="cursor-pointer hover:bg-muted/50 font- text-primary">Serial No</TableHead>
                 <TableHead onClick={() => handleSort('list_type')} className="cursor-pointer hover:bg-muted/50">List Type</TableHead>
+                <TableHead className="w-[80px]">Pro</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -222,6 +223,11 @@ export function AlgorithmList() {
                     <TableCell className="font-mono text-sm">{algo.serial_no || '-'}</TableCell>
                     <TableCell>
                       <Badge variant="outline">{algo.list_type || 'core'}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center justify-center">
+                        <div className={`w-3 h-3 rounded-full ${algo.metadata?.is_pro ? 'bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.5)]' : 'bg-muted'}`} />
+                      </div>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">

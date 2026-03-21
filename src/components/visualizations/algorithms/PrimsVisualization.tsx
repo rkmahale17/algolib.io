@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import { CodeHighlighter } from "../shared/CodeHighlighter";
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from "../shared/StepControls";
 import { VariablePanel } from "../shared/VariablePanel";
 
@@ -28,51 +28,66 @@ export const PrimsVisualization = () => {
 
   const code = `function minCostConnectPoints(points: number[][]): number {
   const N = points.length;
+
   const adj: Map<number, [number, number][]> = new Map();
-  for (let i = 0; i < N; i++) adj.set(i, []);
+
+  for (let i = 0; i < N; i++) {
+    adj.set(i, []);
+  }
 
   for (let i = 0; i < N; i++) {
     const [x1, y1] = points[i];
+
     for (let j = i + 1; j < N; j++) {
       const [x2, y2] = points[j];
+
       const dist = Math.abs(x1 - x2) + Math.abs(y1 - y2);
+
       adj.get(i)!.push([dist, j]);
       adj.get(j)!.push([dist, i]);
     }
   }
 
   let result = 0;
-  const mst = [];
   const visit = new Set<number>();
-  const minHeap: [number, number, number | null][] = [[0, 0, null]]; // [cost, node, parent]
+
+  const minHeap: [number, number][] = [[0, 0]];
 
   while (visit.size < N) {
     minHeap.sort((a, b) => a[0] - b[0]);
-    const [cost, node, parent] = minHeap.shift()!;
+    const [cost, node] = minHeap.shift()!;
 
     if (visit.has(node)) continue;
 
     result += cost;
     visit.add(node);
-    if (parent !== null) mst.push({ from: parent, to: node, weight: cost });
 
     for (const [neiCost, nei] of adj.get(node)!) {
       if (!visit.has(nei)) {
-        minHeap.push([neiCost, nei, node]);
+        minHeap.push([neiCost, nei]);
       }
     }
   }
+
   return result;
-}`;
+}
+`;
 
   const generateSteps = () => {
-    const points = [[0, 0], [2, 2], [3, 10], [5, 2], [7, 0]];
+    const points = [
+      [0, 0],
+      [2, 2],
+      [3, 10],
+      [5, 2],
+      [7, 0],
+    ];
     const N = points.length;
     const newSteps: Step[] = [];
 
-    // Adjacency list: node -> [cost, neighbor]
     const adj: Map<number, [number, number][]> = new Map();
-    for (let i = 0; i < N; i++) adj.set(i, []);
+    for (let i = 0; i < N; i++) {
+      adj.set(i, []);
+    }
 
     newSteps.push({
       visited: Array(N).fill(false),
@@ -80,10 +95,9 @@ export const PrimsVisualization = () => {
       mstEdges: [],
       currentNode: null,
       message: "Initialize adjacency list",
-      lineNumber: 3
+      lineNumber: 6,
     });
 
-    // Build graph (Manhattan distance)
     const allEdges: Edge[] = [];
     for (let i = 0; i < N; i++) {
       const [x1, y1] = points[i];
@@ -102,12 +116,12 @@ export const PrimsVisualization = () => {
       mstEdges: [],
       currentNode: null,
       message: "Graph built with Manhattan distances",
-      lineNumber: 6
+      lineNumber: 19,
     });
 
     let result = 0;
     const visit = new Set<number>();
-    const minHeap: [number, number, number | null][] = [[0, 0, null]]; // [cost, node, parent]
+    const minHeap: [number, number, number | null][] = [[0, 0, null]]; // internally keep parent
     const mstEdges: Edge[] = [];
 
     newSteps.push({
@@ -116,30 +130,45 @@ export const PrimsVisualization = () => {
       mstEdges: [],
       currentNode: 0,
       message: "Start Prim's from node 0 (cost 0)",
-      lineNumber: 19
+      lineNumber: 25,
     });
 
     while (visit.size < N && minHeap.length > 0) {
+      newSteps.push({
+        visited: Array(N)
+          .fill(false)
+          .map((_, i) => visit.has(i)),
+        edges: [...allEdges],
+        mstEdges: [...mstEdges],
+        currentNode: null,
+        message: "Check if all nodes are visited",
+        lineNumber: 27,
+      });
+
       minHeap.sort((a, b) => a[0] - b[0]);
       const [cost, node, parent] = minHeap.shift()!;
 
       newSteps.push({
-        visited: Array(N).fill(false).map((_, i) => visit.has(i)),
+        visited: Array(N)
+          .fill(false)
+          .map((_, i) => visit.has(i)),
         edges: [...allEdges],
         mstEdges: [...mstEdges],
         currentNode: node,
-        message: `Extract minimum: node ${node} with cost ${cost} from parent ${parent ?? 'none'}`,
-        lineNumber: 22
+        message: `Extract minimum: node ${node} with cost ${cost}`,
+        lineNumber: 29,
       });
 
       if (visit.has(node)) {
         newSteps.push({
-          visited: Array(N).fill(false).map((_, i) => visit.has(i)),
+          visited: Array(N)
+            .fill(false)
+            .map((_, i) => visit.has(i)),
           edges: [...allEdges],
           mstEdges: [...mstEdges],
           currentNode: node,
           message: `Node ${node} already visited, skipping`,
-          lineNumber: 25
+          lineNumber: 31,
         });
         continue;
       }
@@ -151,36 +180,42 @@ export const PrimsVisualization = () => {
       visit.add(node);
 
       newSteps.push({
-        visited: Array(N).fill(false).map((_, i) => visit.has(i)),
+        visited: Array(N)
+          .fill(false)
+          .map((_, i) => visit.has(i)),
         edges: [...allEdges],
         mstEdges: [...mstEdges],
         currentNode: node,
         message: `Add node ${node} to MST (total cost: ${result})`,
-        lineNumber: 27
+        lineNumber: 34,
       });
 
       for (const [neiCost, nei] of adj.get(node)!) {
         if (!visit.has(nei)) {
           minHeap.push([neiCost, nei, node]);
           newSteps.push({
-            visited: Array(N).fill(false).map((_, i) => visit.has(i)),
+            visited: Array(N)
+              .fill(false)
+              .map((_, i) => visit.has(i)),
             edges: [...allEdges],
             mstEdges: [...mstEdges],
             currentNode: nei,
             message: `Push neighbor ${nei} with cost ${neiCost} to min-heap`,
-            lineNumber: 33
+            lineNumber: 38,
           });
         }
       }
     }
 
     newSteps.push({
-      visited: Array(N).fill(false).map((_, i) => visit.has(i)),
+      visited: Array(N)
+        .fill(false)
+        .map((_, i) => visit.has(i)),
       edges: [...allEdges],
       mstEdges: [...mstEdges],
       currentNode: null,
       message: `Minimum Spanning Tree complete! Total cost: ${result}`,
-      lineNumber: 37
+      lineNumber: 43,
     });
 
     setSteps(newSteps);
@@ -230,11 +265,11 @@ export const PrimsVisualization = () => {
   // Points mapped to SVG coordinates for visualization
   // points = [[0,0], [2,2], [3,10], [5,2], [7,0]]
   const nodePositions = [
-    { x: 50, y: 230 },   // [0,0]
-    { x: 150, y: 190 },  // [2,2]
-    { x: 200, y: 30 },   // [3,10]
-    { x: 300, y: 190 },  // [5,2]
-    { x: 350, y: 230 },  // [7,0]
+    { x: 50, y: 230 }, // [0,0]
+    { x: 150, y: 190 }, // [2,2]
+    { x: 200, y: 30 }, // [3,10]
+    { x: 300, y: 190 }, // [5,2]
+    { x: 350, y: 230 }, // [7,0]
   ];
 
   return (
@@ -254,15 +289,19 @@ export const PrimsVisualization = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 overflow-x-auto">
-            <svg width="400" height="280" className="mx-auto">
+          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 overflow-hidden flex justify-center w-full">
+            <svg
+              viewBox="0 0 400 280"
+              preserveAspectRatio="xMidYMid meet"
+              className="w-full h-auto max-w-[400px] mx-auto"
+            >
               {currentStep.edges.map((edge, idx) => {
                 const from = nodePositions[edge.from];
                 const to = nodePositions[edge.to];
                 const inMST = currentStep.mstEdges.some(
                   (e) =>
                     (e.from === edge.from && e.to === edge.to) ||
-                    (e.from === edge.to && e.to === edge.from)
+                    (e.from === edge.to && e.to === edge.from),
                 );
 
                 return (
@@ -272,7 +311,7 @@ export const PrimsVisualization = () => {
                       y1={from.y}
                       x2={to.x}
                       y2={to.y}
-                      className={`transition-all duration-300 ${inMST ? "stroke-green-500" : "stroke-border/30"
+                      className={`transition-all duration-300 ${inMST ? "stroke-green-500" : "stroke-muted-foreground/50"
                         }`}
                       strokeWidth={inMST ? 3 : 1}
                       strokeDasharray={inMST ? "0" : "4"}
@@ -324,7 +363,15 @@ export const PrimsVisualization = () => {
                     textAnchor="middle"
                     className="fill-muted-foreground text-[8px]"
                   >
-                    ({[[0, 0], [2, 2], [3, 10], [5, 2], [7, 0]][idx].join(",")})
+                    (
+                    {[
+                      [0, 0],
+                      [2, 2],
+                      [3, 10],
+                      [5, 2],
+                      [7, 0],
+                    ][idx].join(",")}
+                    )
                   </text>
                 </g>
               ))}
@@ -343,7 +390,7 @@ export const PrimsVisualization = () => {
                 "MST Edges": currentStep.mstEdges.length,
                 "Total Weight": currentStep.mstEdges.reduce(
                   (sum, e) => sum + e.weight,
-                  0
+                  0,
                 ),
               }}
             />
@@ -351,14 +398,13 @@ export const PrimsVisualization = () => {
         </div>
 
         <div className="space-y-4">
-          <CodeHighlighter
+          <AnimatedCodeEditor
             code={code}
-            highlightedLine={currentStep.lineNumber}
+            highlightedLines={[currentStep.lineNumber]}
             language="typescript"
           />
         </div>
       </div>
     </div>
-
   );
 };

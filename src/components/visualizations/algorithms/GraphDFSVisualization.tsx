@@ -1,17 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 import { GraphDiagram } from '../GraphDiagram';
 
 interface Step {
   currentNode: number | null;
+  neighbor: number | null;
   visited: number[];
   recursionStack: number[];
   message: string;
   lineNumber: number;
-  type: 'init' | 'enter' | 'visited' | 'neighbor' | 'neighbor-check' | 'recurse' | 'backtrack' | 'done';
 }
 
 export const GraphDFSVisualization: React.FC = () => {
@@ -19,7 +19,7 @@ export const GraphDFSVisualization: React.FC = () => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(1000);
-  const intervalRef = useRef<number | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const code = `function dfs(graph: number[][], start: number): number[] {
   const visited = new Set<number>();
@@ -55,106 +55,68 @@ export const GraphDFSVisualization: React.FC = () => {
     const result: number[] = [];
     const recursionStack: number[] = [];
 
-    newSteps.push({
-      currentNode: null,
-      visited: [],
-      recursionStack: [],
-      message: 'Initialize DFS: visited set and result array',
-      lineNumber: 1,
-      type: 'init'
-    });
+    const pushStep = (msg: string, line: number, current: number | null, neighbor: number | null = null) => {
+      newSteps.push({
+        currentNode: current,
+        neighbor,
+        visited: Array.from(visited),
+        recursionStack: [...recursionStack],
+        message: msg,
+        lineNumber: line
+      });
+    };
+
+    // Initialize
+    pushStep('Initialize visited set and result array.', 2, null);
 
     const explore = (node: number) => {
       recursionStack.push(node);
 
-      newSteps.push({
-        currentNode: node,
-        visited: Array.from(visited),
-        recursionStack: [...recursionStack],
-        message: `Enter explore(${node})`,
-        lineNumber: 5,
-        type: 'enter'
-      });
+      // Line 5: Enter explore
+      pushStep(`Entering explore function for node ${node}.`, 5, node);
 
+      // Line 6: visited.add
       visited.add(node);
+      pushStep(`Marking node ${node} as visited.`, 6, node);
+
+      // Line 7: result.push
       result.push(node);
+      pushStep(`Adding node ${node} to the result traversal.`, 7, node);
 
-      newSteps.push({
-        currentNode: node,
-        visited: Array.from(visited),
-        recursionStack: [...recursionStack],
-        message: `Mark node ${node} as visited and add to result`,
-        lineNumber: 6,
-        type: 'visited'
-      });
-
+      // Line 9: for loop
       const neighbors = graph[node] || [];
+      pushStep(`Iterating over neighbors of node ${node}: [${neighbors.join(', ')}].`, 9, node);
+
       for (const neighbor of neighbors) {
-        newSteps.push({
-          currentNode: node,
-          visited: Array.from(visited),
-          recursionStack: [...recursionStack],
-          message: `Check neighbor ${neighbor} of node ${node}`,
-          lineNumber: 9,
-          type: 'neighbor-check'
-        });
+        // Line 10: if (!visited.has)
+        pushStep(`Checking if neighbor ${neighbor} is visited.`, 10, node, neighbor);
 
         if (!visited.has(neighbor)) {
-          newSteps.push({
-            currentNode: node,
-            visited: Array.from(visited),
-            recursionStack: [...recursionStack],
-            message: `Neighbor ${neighbor} is not visited, recursing...`,
-            lineNumber: 10,
-            type: 'neighbor'
-          });
-
+          // Line 11: explore(neighbor)
+          pushStep(`Neighbor ${neighbor} not visited. Recursing into explore(${neighbor}).`, 11, node, neighbor);
           explore(neighbor);
 
-          newSteps.push({
-            currentNode: node,
-            visited: Array.from(visited),
-            recursionStack: [...recursionStack],
-            message: `Returned from explore(${neighbor}) back to node ${node}`,
-            lineNumber: 9,
-            type: 'backtrack'
-          });
+          // Line 12: End of if (returned from recursion)
+          pushStep(`Returned from explore(${neighbor}) to node ${node}.`, 12, node);
         } else {
-          newSteps.push({
-            currentNode: node,
-            visited: Array.from(visited),
-            recursionStack: [...recursionStack],
-            message: `Neighbor ${neighbor} is already visited, skipping.`,
-            lineNumber: 9,
-            type: 'neighbor-check'
-          });
+          pushStep(`Neighbor ${neighbor} already visited. Skipping.`, 10, node, neighbor);
         }
       }
 
-      newSteps.push({
-        currentNode: node,
-        visited: Array.from(visited),
-        recursionStack: [...recursionStack],
-        message: `Finished exploring all neighbors of node ${node}, backtracking...`,
-        lineNumber: 5,
-        type: 'backtrack'
-      });
-
+      // Line 14: End of explore
+      pushStep(`Finished exploring node ${node}. Backtracking...`, 14, node);
       recursionStack.pop();
     };
 
+    // Line 16: explore(start)
+    pushStep("Starting DFS traversal from initial node 0.", 16, null);
     explore(0);
 
-    newSteps.push({
-      currentNode: null,
-      visited: Array.from(visited),
-      recursionStack: [],
-      message: `DFS complete! Order of visit: ${result.join(', ')}`,
-      lineNumber: 17,
-      type: 'done'
-    });
+    // Line 17: return result
+    pushStep(`DFS complete! Final visit order: ${result.join(', ')}.`, 17, null);
 
     setSteps(newSteps);
+    setCurrentStepIndex(0);
   };
 
   useEffect(() => {
@@ -163,7 +125,7 @@ export const GraphDFSVisualization: React.FC = () => {
 
   useEffect(() => {
     if (isPlaying && currentStepIndex < steps.length - 1) {
-      intervalRef.current = window.setInterval(() => {
+      intervalRef.current = setInterval(() => {
         setCurrentStepIndex((prev) => {
           if (prev >= steps.length - 1) {
             setIsPlaying(false);
@@ -171,35 +133,23 @@ export const GraphDFSVisualization: React.FC = () => {
           }
           return prev + 1;
         });
-      }, speed);
+      }, 1000 / (speed / 1000)); // speed is likely mapped differently in StepControls, but I'll maintain responsiveness
     } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
+      if (intervalRef.current) clearInterval(intervalRef.current);
     }
-
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
+      if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [isPlaying, currentStepIndex, steps.length, speed]);
 
   const handlePlay = () => setIsPlaying(true);
   const handlePause = () => setIsPlaying(false);
-  const handleStepForward = () => {
-    if (currentStepIndex < steps.length - 1) {
-      setCurrentStepIndex(currentStepIndex + 1);
-    }
-  };
-  const handleStepBack = () => {
-    if (currentStepIndex > 0) {
-      setCurrentStepIndex(currentStepIndex - 1);
-    }
-  };
+  const handleStepForward = () => currentStepIndex < steps.length - 1 && setCurrentStepIndex(prev => prev + 1);
+  const handleStepBack = () => currentStepIndex > 0 && setCurrentStepIndex(prev => prev - 1);
   const handleReset = () => {
     setCurrentStepIndex(0);
     setIsPlaying(false);
+    generateSteps();
   };
 
   if (steps.length === 0) return null;
@@ -209,62 +159,64 @@ export const GraphDFSVisualization: React.FC = () => {
   return (
     <div className="space-y-6">
       <StepControls
+        isPlaying={isPlaying}
         onPlay={handlePlay}
         onPause={handlePause}
         onStepForward={handleStepForward}
         onStepBack={handleStepBack}
         onReset={handleReset}
-        isPlaying={isPlaying}
+        speed={speed / 1000}
+        onSpeedChange={(s) => setSpeed(s * 1000)}
         currentStep={currentStepIndex}
-        totalSteps={steps.length}
-        speed={speed}
-        onSpeedChange={setSpeed}
+        totalSteps={steps.length - 1}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-card rounded-lg p-6 border border-border shadow-sm space-y-4">
-          <h3 className="text-lg font-semibold border-b pb-2">Graph Visualization</h3>
-          <GraphDiagram
-            data={[[1, 2], [0, 3, 4], [0, 5], [1], [1], [2]]}
-            currentNode={currentStep.currentNode}
-            highlightNodes={new Set(currentStep.visited)}
-            className="h-[300px]"
-          />
+        <div className="space-y-4">
+          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 pb-4 overflow-hidden">
+            <GraphDiagram
+              data={[[1, 2], [0, 3, 4], [0, 5], [1], [1], [2]]}
+              currentNode={currentStep.currentNode}
+              highlightNodes={new Set(currentStep.visited)}
+              className="h-[300px]"
+            />
 
-          <div className="flex gap-4 text-xs justify-center flex-wrap pt-2">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-primary/20 border-2 border-primary animate-pulse"></div>
-              <span>Current Node</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-green-500/20 border-2 border-green-500"></div>
-              <span>Visited</span>
+            <div className="flex gap-4 text-xs justify-center pt-4">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-primary border-2 border-primary"></div>
+                <span>Current Node</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-green-500/20 border-2 border-green-500"></div>
+                <span>Visited</span>
+              </div>
             </div>
           </div>
 
-          <div className="p-3 bg-muted/30 border rounded min-h-[60px] flex items-center">
-            <p className="text-sm font-medium leading-relaxed italic">"{currentStep.message}"</p>
+          <div className={`rounded-lg border p-4 transition-all duration-300 ${currentStep.lineNumber === 17 ? 'bg-green-500/10 border-green-500' : 'bg-accent/50 border-accent'}`}>
+            <p className="text-sm text-foreground font-medium italic">"{currentStep.message}"</p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <h4 className="text-xs font- uppercase tracking-wider text-muted-foreground">Local Variables</h4>
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Local Variables</h4>
               <VariablePanel
                 variables={{
                   node: currentStep.currentNode !== null ? currentStep.currentNode : 'undefined',
-                  visited: Array.from(currentStep.visited).join(', ') || '{}',
+                  neighbor: currentStep.neighbor !== null ? currentStep.neighbor : 'none',
+                  visited: `{${currentStep.visited.join(', ')}}`,
                 }}
               />
             </div>
             <div className="space-y-2">
-              <h4 className="text-xs font- uppercase tracking-wider text-muted-foreground">Recursion Stack</h4>
-              <div className="bg-muted/30 rounded border p-2 min-h-[80px]">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Recursion Stack</h4>
+              <div className="bg-card rounded-lg border p-2 min-h-[80px]">
                 {currentStep.recursionStack.length === 0 ? (
-                  <p className="text-xs text-muted-foreground italic">Empty stack</p>
+                  <p className="text-xs text-muted-foreground italic p-2 text-center">Stack empty</p>
                 ) : (
                   <div className="flex flex-col-reverse gap-1">
                     {currentStep.recursionStack.map((node, i) => (
-                      <div key={i} className={`text-xs p-1 rounded border ${i === currentStep.recursionStack.length - 1 ? 'bg-primary/20 border-primary font-' : 'bg-background border-border text-muted-foreground'}`}>
+                      <div key={i} className={`text-xs p-1.5 rounded border transition-colors ${i === currentStep.recursionStack.length - 1 ? 'bg-primary/10 border-primary text-primary font-medium' : 'bg-muted/50 border-border text-muted-foreground opacity-70'}`}>
                         explore({node})
                       </div>
                     ))}
@@ -275,13 +227,11 @@ export const GraphDFSVisualization: React.FC = () => {
           </div>
         </div>
 
-        <div className="space-y-4">
-          <CodeHighlighter
-            code={code}
-            highlightedLine={currentStep.lineNumber}
-            language="typescript"
-          />
-        </div>
+        <AnimatedCodeEditor
+          code={code}
+          highlightedLines={[currentStep.lineNumber]}
+          language="typescript"
+        />
       </div>
     </div>
   );

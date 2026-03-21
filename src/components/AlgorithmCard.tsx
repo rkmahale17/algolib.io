@@ -10,6 +10,8 @@ interface AlgorithmCardProps {
     isPremium?: boolean;
     index?: number;
     isSidebar?: boolean;
+    hasPremiumAccess?: boolean;
+    isPaywallEnabled?: boolean;
 }
 
 const difficultyColors: Record<string, string> = {
@@ -18,14 +20,14 @@ const difficultyColors: Record<string, string> = {
     'Hard': 'text-red-500 bg-red-500/10 border-red-500/20',
 };
 
-export const AlgorithmCard = ({ algorithm, status, isPremium, index, isSidebar }: AlgorithmCardProps) => {
+export const AlgorithmCard = ({ algorithm, status, isPremium, index, isSidebar, hasPremiumAccess, isPaywallEnabled }: AlgorithmCardProps) => {
     const displayTitle = algorithm.title || algorithm.name || '';
     const serialNo = algorithm.serial_no || (index !== undefined ? index + 1 : null);
 
     return (
         <Link
             to={algorithm.slug ? `/problem/${algorithm.slug}` : `/problem/${algorithm.id}`}
-            className="group block relative max-w-[800px] m-auto border border-gray-100 dark:border-gray-800 -mb-px first:rounded-tl-xl first:rounded-tr-xl last:rounded-bl-xl last:rounded-br-xl last:mb-0 overflow-hidden transition-colors hover:bg-muted/30"
+            className="group block relative max-w-[800px] m-auto border border-gray-100 dark:border-gray-800 -mb-px first:rounded-tl-xl first:rounded-tr-xl last:rounded-bl-xl last:rounded-br-xl last:mb-0 overflow-hidden transition-colors hover:bg-muted/20"
         >
             <div className={cn(
                 "flex items-center gap-4 justify-between",
@@ -42,7 +44,7 @@ export const AlgorithmCard = ({ algorithm, status, isPremium, index, isSidebar }
                             <Circle className={cn("fill-orange-400", isSidebar ? "w-4 h-4" : "w-5 h-5")} />
                         </div>
                     ) : (
-                        <div className={cn("rounded-full border-2 border-border/60 flex items-center justify-center text-muted-foreground/10 group-hover:border-primary/20 transition-colors", isSidebar ? "w-6 h-6" : "w-8 h-8")}>
+                        <div className={cn("rounded-full border-2 border-border/60 flex items-center justify-center text-muted-foreground/10 transition-colors", isSidebar ? "w-6 h-6" : "w-8 h-8")}>
                             <Check className={cn("stroke-[3]", isSidebar ? "w-4 h-4" : "w-5 h-5")} />
                         </div>
                     )}
@@ -52,14 +54,14 @@ export const AlgorithmCard = ({ algorithm, status, isPremium, index, isSidebar }
                 <div className="flex-1 min-w-0 space-y-1.5 md:space-y-2">
                     <div className="flex items-center flex-wrap gap-2">
                         <h3 className={cn("font-medium tracking-tight transition-colors truncate", isSidebar ? "text-sm" : "text-md")}>
-                            {displayTitle}
+                            {serialNo ? `${serialNo}. ` : ''}{displayTitle}
                         </h3>
 
 
                         {isPremium && (
-                            <Badge variant="secondary" className={cn("bg-yellow-500/20 text-yellow-700 dark:text-yellow-500 border-none px-2 py-0 rounded-full font- text-[9px] flex items-center gap-1", isSidebar ? "scale-90" : "")}>
-                                {isSidebar ? <Lock className="w-2.5 h-2.5" /> : <Zap className="w-2.5 h-2.5 fill-current" />}
-                                {isSidebar ? "PR" : "PREMIUM"}
+                            <Badge variant="secondary" className={cn("bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 px-2 py-0.5 rounded text-[9px] font-bold flex items-center gap-1", isSidebar ? "scale-90" : "")}>
+                                {isPaywallEnabled && !hasPremiumAccess && <Lock className="w-2.5 h-2.5" />}
+                                PRO
                             </Badge>
                         )}
                     </div>

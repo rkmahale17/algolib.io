@@ -1,265 +1,291 @@
-import React, { useEffect, useRef, useState } from 'react';
-
-import { CodeHighlighter } from '../shared/CodeHighlighter';
-import { StepControls } from '../shared/StepControls';
+import { useState, useMemo } from 'react';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
+import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
+import { Card } from '@/components/ui/card';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Step {
-  array: number[];
-  table: number[][];
-  building: boolean;
-  queryL: number;
-  queryR: number;
-  result: number | null;
-  message: string;
-  lineNumber: number;
+  nums: number[];
+  st: number[][]; // [i][j]
+  k: number;
+  n: number;
+  highlightedLines: number[];
+  explanation: string;
+  variables: Record<string, any>;
+  activeIndices: number[]; // indices in nums currently being processed
+  activeSTCells: [number, number][]; // [i, j] cells in st currently being processed/updated
+  queryRange: [number, number] | null;
+  overlappingRanges: [[number, number], [number, number]] | null;
 }
 
-export const SparseTableVisualization: React.FC = () => {
-  const [steps, setSteps] = useState<Step[]>([]);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1000);
-  const intervalRef = useRef<number | null>(null);
+export const SparseTableVisualization = () => {
+  const [currentStep, setCurrentStep] = useState(0);
 
-  const code = `class SparseTable {
-  table: number[][];
-  n: number;
-  
-  constructor(arr: number[]) {
-    this.n = arr.length;
-    const logN = Math.floor(Math.log2(this.n)) + 1;
-    this.table = Array(this.n).fill(0).map(() => Array(logN).fill(0));
-    
-    // Base case: intervals of length 1
-    for (let i = 0; i < this.n; i++) {
-      this.table[i][0] = arr[i];
-    }
-    
-    // Build table for intervals of length 2^j
-    for (let j = 1; j < logN; j++) {
-      for (let i = 0; i + (1 << j) <= this.n; i++) {
-        this.table[i][j] = Math.min(
-          this.table[i][j - 1],
-          this.table[i + (1 << (j - 1))][j - 1]
-        );
-      }
-    }
-  }
-  
-  query(l: number, r: number): number {
-    const j = Math.floor(Math.log2(r - l + 1));
-    return Math.min(this.table[l][j], this.table[r - (1 << j) + 1][j]);
-  }
-}`;
+  const nums = [7, 2, 3, 0, 5, 10, 3, 12, 18];
+  const L = 1;
+  const R = 6;
 
-  const generateSteps = () => {
-    const arr = [2, 4, 3, 1, 6, 7, 8, 9];
-    const newSteps: Step[] = [];
-    const n = arr.length;
-    const logN = Math.floor(Math.log2(n)) + 1;
-    const table: number[][] = Array(n).fill(0).map(() => Array(logN).fill(0));
+  const steps: Step[] = useMemo(() => {
+    const s: Step[] = [];
+    const n = nums.length;
+    const log2 = (x: number) => Math.log(x) / Math.log(2);
+    const k = Math.floor(log2(n));
+    const st: number[][] = Array.from({ length: n }, () => new Array(k + 1).fill(null as any));
 
-    newSteps.push({
-      array: arr,
-      table: table.map(row => [...row]),
-      building: true,
-      queryL: -1,
-      queryR: -1,
-      result: null,
-      message: 'Building Sparse Table for range minimum queries',
-      lineNumber: 5
+    s.push({
+      nums, st: st.map(row => [...row]), k, n,
+      highlightedLines: [1, 2, 3],
+      explanation: "Helper function to calculate base-2 logarithm.",
+      variables: {},
+      activeIndices: [], activeSTCells: [], queryRange: null, overlappingRanges: null
     });
 
-    // Base case
+    s.push({
+      nums, st: st.map(row => [...row]), k, n,
+      highlightedLines: [5],
+      explanation: `Starting solution with nums=[${nums.join(', ')}], L=${L}, R=${R}.`,
+      variables: { nums, L, R },
+      activeIndices: [], activeSTCells: [], queryRange: null, overlappingRanges: null
+    });
+
+    s.push({
+      nums, st: st.map(row => [...row]), k, n,
+      highlightedLines: [6],
+      explanation: `Set n = nums.length = ${n}.`,
+      variables: { n, L, R },
+      activeIndices: [], activeSTCells: [], queryRange: null, overlappingRanges: null
+    });
+
+    s.push({
+      nums, st: st.map(row => [...row]), k, n,
+      highlightedLines: [7],
+      explanation: `Calculate k = floor(log2(${n})) = ${k}. Sparse table will have ${k + 1} columns.`,
+      variables: { n, k, L, R },
+      activeIndices: [], activeSTCells: [], queryRange: null, overlappingRanges: null
+    });
+
+    s.push({
+      nums, st: st.map(row => [...row]), k, n,
+      highlightedLines: [8],
+      explanation: `Initialize sparse table 'st' with size ${n} x ${k + 1}.`,
+      variables: { n, k, L, R },
+      activeIndices: [], activeSTCells: [], queryRange: null, overlappingRanges: null
+    });
+
     for (let i = 0; i < n; i++) {
-      table[i][0] = arr[i];
-    }
-
-    newSteps.push({
-      array: arr,
-      table: table.map(row => [...row]),
-      building: true,
-      queryL: -1,
-      queryR: -1,
-      result: null,
-      message: 'Base case: intervals of length 1',
-      lineNumber: 11
-    });
-
-    // Build table
-    for (let j = 1; j < logN; j++) {
-      for (let i = 0; i + (1 << j) <= n; i++) {
-        table[i][j] = Math.min(
-          table[i][j - 1],
-          table[i + (1 << (j - 1))][j - 1]
-        );
-      }
-      newSteps.push({
-        array: arr,
-        table: table.map(row => [...row]),
-        building: true,
-        queryL: -1,
-        queryR: -1,
-        result: null,
-        message: `Built intervals of length ${1 << j}`,
-        lineNumber: 17
+      st[i][0] = nums[i];
+      s.push({
+        nums, st: st.map(row => [...row]), k, n,
+        highlightedLines: [10, 11, 12],
+        explanation: `Base case: st[${i}][0] = nums[${i}] = ${nums[i]}. Level 0 represents ranges of length 2^0 = 1.`,
+        variables: { i, n, k },
+        activeIndices: [i], activeSTCells: [[i, 0]], queryRange: null, overlappingRanges: null
       });
     }
 
-    // Perform a query
-    const l = 2, r = 5;
-    const j = Math.floor(Math.log2(r - l + 1));
-    const result = Math.min(table[l][j], table[r - (1 << j) + 1][j]);
+    for (let j = 1; j <= k; j++) {
+      for (let i = 0; i + (1 << j) <= n; i++) {
+        const leftIdx = i;
+        const rightIdx = i + (1 << (j - 1));
+        st[i][j] = Math.min(st[leftIdx][j - 1], st[rightIdx][j - 1]);
 
-    newSteps.push({
-      array: arr,
-      table: table.map(row => [...row]),
-      building: false,
-      queryL: l,
-      queryR: r,
-      result,
-      message: `Query min in range [${l}, ${r}]: result = ${result}`,
-      lineNumber: 27
-    });
-
-    setSteps(newSteps);
-  };
-
-  useEffect(() => {
-    generateSteps();
-  }, []);
-
-  useEffect(() => {
-    if (isPlaying && currentStepIndex < steps.length - 1) {
-      intervalRef.current = window.setInterval(() => {
-        setCurrentStepIndex((prev) => {
-          if (prev >= steps.length - 1) {
-            setIsPlaying(false);
-            return prev;
-          }
-          return prev + 1;
+        s.push({
+          nums, st: st.map(row => [...row]), k, n,
+          highlightedLines: [14, 15, 16],
+          explanation: `Level ${j} (length 2^${j}=${1 << j}): st[${i}][${j}] = min(st[${leftIdx}][${j - 1}], st[${rightIdx}][${j - 1}]) = min(${st[leftIdx][j - 1]}, ${st[rightIdx][j - 1]}) = ${st[i][j]}.`,
+          variables: { i, j, '2^j': 1 << j, '2^(j-1)': 1 << (j - 1) },
+          activeIndices: Array.from({ length: 1 << j }, (_, idx) => i + idx),
+          activeSTCells: [[leftIdx, j - 1], [rightIdx, j - 1], [i, j]],
+          queryRange: null, overlappingRanges: null
         });
-      }, speed);
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
       }
     }
 
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [isPlaying, currentStepIndex, steps.length, speed]);
+    const len = R - L + 1;
+    s.push({
+      nums, st: st.map(row => [...row]), k, n,
+      highlightedLines: [20],
+      explanation: `Query length = R - L + 1 = ${R} - ${L} + 1 = ${len}.`,
+      variables: { L, R, len },
+      activeIndices: [], activeSTCells: [], queryRange: [L, R], overlappingRanges: null
+    });
 
-  const handlePlay = () => setIsPlaying(true);
-  const handlePause = () => setIsPlaying(false);
-  const handleStepForward = () => {
-    if (currentStepIndex < steps.length - 1) setCurrentStepIndex(currentStepIndex + 1);
-  };
-  const handleStepBack = () => {
-    if (currentStepIndex > 0) setCurrentStepIndex(currentStepIndex - 1);
-  };
-  const handleReset = () => {
-    setCurrentStepIndex(0);
-    setIsPlaying(false);
-  };
+    const queryJ = Math.floor(log2(len));
+    s.push({
+      nums, st: st.map(row => [...row]), k, n,
+      highlightedLines: [21],
+      explanation: `Largest power of 2 <= length: j = floor(log2(${len})) = ${queryJ}.`,
+      variables: { L, R, len, j: queryJ },
+      activeIndices: [], activeSTCells: [], queryRange: [L, R], overlappingRanges: null
+    });
 
-  if (steps.length === 0) return null;
+    const result = Math.min(st[L][queryJ], st[R - (1 << queryJ) + 1][queryJ]);
+    const overlap1: [number, number] = [L, L + (1 << queryJ) - 1];
+    const overlap2: [number, number] = [R - (1 << queryJ) + 1, R];
 
-  const currentStep = steps[currentStepIndex];
+    s.push({
+      nums, st: st.map(row => [...row]), k, n,
+      highlightedLines: [23],
+      explanation: `Range [${L}, ${R}] is covered by two overlapping segments of length 2^${queryJ}=${1 << queryJ}: [${overlap1[0]}, ${overlap1[1]}] (st[${L}][${queryJ}]) and [${overlap2[0]}, ${overlap2[1]}] (st[${overlap2[0]}][${queryJ}]). Minimum is ${result}.`,
+      variables: { L, R, j: queryJ, result },
+      activeIndices: [],
+      activeSTCells: [[L, queryJ], [overlap2[0], queryJ]],
+      queryRange: [L, R],
+      overlappingRanges: [overlap1, overlap2]
+    });
+
+    return s;
+  }, [nums, L, R]);
+
+  const code = `function log2(x: number): number {
+  return Math.log(x) / Math.log(2);
+}
+
+function solution(nums: number[], L: number, R: number): number {
+  const n = nums.length;
+  const k = Math.floor(log2(n));
+  const st: number[][] = Array.from({ length: n }, () => new Array(k + 1).fill(0));
+
+  for (let i = 0; i < n; i++) {
+    st[i][0] = nums[i];
+  }
+
+  for (let j = 1; j <= k; j++) {
+    for (let i = 0; i + (1 << j) <= n; i++) {
+      st[i][j] = Math.min(st[i][j - 1], st[i + (1 << (j - 1))][j - 1]);
+    }
+  }
+
+  const len = R - L + 1;
+  const j = Math.floor(log2(len));
+
+  return Math.min(st[L][j], st[R - (1 << j) + 1][j]);
+}`;
+
+  const step = steps[currentStep];
 
   return (
-    <div className="space-y-6">
-      <StepControls
-        onPlay={handlePlay}
-        onPause={handlePause}
-        onStepForward={handleStepForward}
-        onStepBack={handleStepBack}
-        onReset={handleReset}
-        isPlaying={isPlaying}
-        currentStep={currentStepIndex}
-        totalSteps={steps.length}
-        speed={speed}
-        onSpeedChange={setSpeed}
-      />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <VisualizationLayout
+      leftContent={
+        <div className="space-y-6">
+          <Card className="p-6 bg-card/50 backdrop-blur-sm border-primary/20 overflow-hidden">
+            <h3 className="text-sm font-semibold mb-6 text-muted-foreground uppercase tracking-wider">Sparse Table (Range Minimum Query)</h3>
 
-        <div className="bg-card rounded-lg p-6 border">
-          <h3 className="text-lg font-semibold mb-4">Array</h3>
-          <div className="flex gap-2 mb-6">
-            {currentStep.array.map((val, idx) => (
-              <div
-                key={idx}
-                className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font- transition-all ${idx >= currentStep.queryL && idx <= currentStep.queryR && currentStep.queryL >= 0
-                  ? 'bg-primary/20 border-primary'
-                  : 'bg-card border-border'
-                  }`}
-              >
-                {val}
+            <div className="mb-8">
+              <div className="text-[10px] font-bold text-muted-foreground uppercase mb-2">Input Array (nums)</div>
+              <div className="flex flex-wrap gap-2">
+                {nums.map((val, idx) => {
+                  const isActive = step.activeIndices.includes(idx);
+                  const isQuery = step.queryRange && idx >= step.queryRange[0] && idx <= step.queryRange[1];
+                  const inOverlap1 = step.overlappingRanges && idx >= step.overlappingRanges[0][0] && idx <= step.overlappingRanges[0][1];
+                  const inOverlap2 = step.overlappingRanges && idx >= step.overlappingRanges[1][0] && idx <= step.overlappingRanges[1][1];
+
+                  return (
+                    <div
+                      key={idx}
+                      className={`relative w-10 h-10 flex flex-col items-center justify-center rounded-lg border-2 font-mono text-sm transition-all duration-300
+                        ${isActive ? 'bg-primary border-primary text-primary-foreground scale-110 z-10' :
+                          isQuery ? 'bg-blue-500/20 border-blue-500 text-foreground' :
+                            'bg-muted/30 border-border text-muted-foreground opacity-60'}
+                      `}
+                    >
+                      <span className="text-[10px] absolute -top-4 text-muted-foreground">{idx}</span>
+                      {val}
+                      <AnimatePresence>
+                        {inOverlap1 && (
+                          <motion.div
+                            initial={{ height: 0 }} animate={{ height: '4px' }}
+                            className="absolute -bottom-1 left-0 right-0 bg-orange-500 rounded-full"
+                          />
+                        )}
+                        {inOverlap2 && (
+                          <motion.div
+                            initial={{ height: 0 }} animate={{ height: '4px' }}
+                            className="absolute -bottom-2 left-0 right-0 bg-green-500 rounded-full"
+                          />
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  );
+                })}
               </div>
-            ))}
-          </div>
+            </div>
 
-          <h3 className="text-lg font-semibold mb-4">Sparse Table (2D: [index][power])</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-sm">
-              <thead>
-                <tr>
-                  <th className="border p-2 bg-muted">i\j</th>
-                  {currentStep.table[0].map((_, j) => (
-                    <th key={j} className="border p-2 bg-muted">2^{j}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {currentStep.table.map((row, i) => (
-                  <tr key={i}>
-                    <td className="border p-2 bg-muted font-">{i}</td>
-                    {row.map((val, j) => (
-                      <td
-                        key={j}
-                        className={`border p-2 text-center ${val !== 0 ? 'bg-blue-500/10 font-' : ''
-                          }`}
-                      >
-                        {val !== 0 ? val : '-'}
-                      </td>
+            <div className="overflow-x-auto custom-scrollbar">
+              <div className="text-[10px] font-bold text-muted-foreground uppercase mb-2">Dynamic Programming Table (st[i][j])</div>
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr>
+                    <th className="p-1 border border-border text-[10px] text-muted-foreground bg-muted/20">i \ j</th>
+                    {Array.from({ length: step.k + 1 }).map((_, j) => (
+                      <th key={j} className="p-1 border border-border text-[10px] text-muted-foreground bg-muted/20">
+                        2<sup>{j}</sup>
+                      </th>
                     ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {step.st.map((row, i) => (
+                    <tr key={i}>
+                      <td className="p-1 border border-border text-center font-mono text-[10px] bg-muted/10 font-bold">{i}</td>
+                      {row.map((val, j) => {
+                        const isActive = step.activeSTCells.some(([ci, cj]) => ci === i && cj === j);
+                        const isUpdate = isActive && step.activeSTCells[step.activeSTCells.length - 1][0] === i && step.activeSTCells[step.activeSTCells.length - 1][1] === j;
 
-          {currentStep.result !== null && (
-            <div className="mt-4 p-4 bg-green-500/10 border border-green-500 rounded">
-              <p className="text-sm font-semibold">
-                Query [{currentStep.queryL}, {currentStep.queryR}]: Minimum = {currentStep.result}
-              </p>
+                        return (
+                          <td
+                            key={j}
+                            className={`p-1 border border-border text-center font-mono text-[10px] transition-colors duration-300
+                              ${val === null ? 'text-transparent' : 'text-foreground'}
+                              ${isUpdate ? 'bg-green-500/30 font-black' : isActive ? 'bg-primary/20' : 'bg-transparent'}
+                            `}
+                          >
+                            {val ?? '-'}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          )}
 
-          <div className="mt-4 p-4 bg-muted rounded">
-            <p className="text-sm">{currentStep.message}</p>
-          </div>
+            <div className="mt-6 flex gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                <span className="text-[10px] uppercase font-bold text-muted-foreground">Range 1</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-[10px] uppercase font-bold text-muted-foreground">Range 2</span>
+              </div>
+            </div>
+          </Card>
 
-          <div className="mt-4 p-4 bg-muted rounded">
-            <VariablePanel
-              variables={{
-                'array size': currentStep.array.length,
-                'query range': currentStep.queryL >= 0 ? `[${currentStep.queryL}, ${currentStep.queryR}]` : 'none',
-                'result': currentStep.result !== null ? currentStep.result : 'building'
-              }}
-            />
-          </div>
+          <Card className="p-4 bg-primary/5 border-primary/20">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Step Explanation</h4>
+            <p className="text-sm text-foreground leading-relaxed font-medium">{step.explanation}</p>
+          </Card>
 
+          <VariablePanel variables={step.variables} />
         </div>
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
-
-      </div>
-
-
-    </div>
+      }
+      rightContent={
+        <AnimatedCodeEditor
+          code={code}
+          language="typescript"
+          highlightedLines={step.highlightedLines}
+        />
+      }
+      controls={
+        <SimpleStepControls
+          currentStep={currentStep}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStep}
+        />
+      }
+    />
   );
 };

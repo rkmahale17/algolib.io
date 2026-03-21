@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
-import Editor from '@monaco-editor/react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useTheme } from 'next-themes';
+import { IsolatedCodeEditor } from './IsolatedCodeEditor';
 
 interface AnimatedCodeEditorProps {
   code: string;
@@ -16,111 +16,59 @@ export const AnimatedCodeEditor = ({
   highlightedLines = [],
   className = ''
 }: AnimatedCodeEditorProps) => {
-  const editorRef = useRef<any>(null);
   const { theme, resolvedTheme } = useTheme();
-  const [decorations, setDecorations] = useState<string[]>([]);
+  const colorRef = useRef<HTMLDivElement>(null);
+  const [primaryColor, setPrimaryColor] = useState('#84CC16'); // Fallback to the green from index.css
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    if (!editorRef.current) return;
-
-    const editor = editorRef.current;
-    const model = editor.getModel();
-    if (!model) return;
-
-    // Clear previous decorations
-    const newDecorations = decorations.length > 0
-      ? editor.deltaDecorations(decorations, [])
-      : [];
-
-    // Add new decorations for highlighted lines
-    if (highlightedLines.length > 0) {
-      const newDecs = highlightedLines.map(lineNumber => ({
-        range: {
-          startLineNumber: lineNumber,
-          startColumn: 1,
-          endLineNumber: lineNumber,
-          endColumn: model.getLineMaxColumn(lineNumber),
-        },
-        options: {
-          isWholeLine: true,
-          className: 'highlighted-line',
-          glyphMarginClassName: 'highlighted-line-glyph',
-        },
-      }));
-
-      const ids = editor.deltaDecorations(newDecorations, newDecs);
-      setDecorations(ids);
-
-      // Scroll to highlighted line smoothly
-      if (highlightedLines.length > 0) {
-        editor.revealLineInCenter(highlightedLines[0], 1);
+    // Small delay to ensure styles are applied and we get the correct primary color
+    const timer = setTimeout(() => {
+      if (colorRef.current) {
+        const style = window.getComputedStyle(colorRef.current);
+        const color = style.backgroundColor;
+        if (color && color !== 'rgba(0, 0, 0, 0)' && color !== 'transparent') {
+          setPrimaryColor(color);
+        }
       }
-    } else {
-      setDecorations([]);
-    }
-  }, [highlightedLines]);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [resolvedTheme]);
 
-  const handleEditorDidMount = (editor: any) => {
-    editorRef.current = editor;
-  };
+  const isDark = (resolvedTheme || theme) === 'dark';
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className={`rounded-lg border border-border overflow-hidden ${className}`}
+      className={`rounded-lg border border-border overflow-hidden bg-card ${className}`}
     >
-      <div className="bg-muted px-4 py-2 border-b border-border">
+      <div ref={colorRef} className="bg-primary hidden" />
+      <div className="bg-muted px-4 py-2 border-b border-border flex justify-between items-center">
         <span className="text-xs font-semibold text-foreground">{language}</span>
+        {!isReady && (
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+            <span className="text-[10px] text-muted-foreground animate-pulse">Initializing...</span>
+          </div>
+        )}
       </div>
-      <Editor
-        height="500px"
-        language={language.toLowerCase()}
-        value={code}
-        theme={(resolvedTheme || theme) === 'dark' ? 'vs-dark' : 'light'}
-        onMount={handleEditorDidMount}
-        options={{
-          readOnly: true,
-          minimap: { enabled: false },
-          scrollBeyondLastLine: false,
-          fontSize: 14,
-          lineNumbers: 'on',
-          renderLineHighlight: 'none',
-          scrollbar: {
-            vertical: 'visible',
-            horizontal: 'visible',
-          },
-          overviewRulerLanes: 0,
-          hideCursorInOverviewRuler: true,
-          overviewRulerBorder: false,
-          folding: false,
-          lineDecorationsWidth: 10,
-          lineNumbersMinChars: 3,
-          smoothScrolling: true,
-        }}
-      />
-      <style>{`
-        .highlighted-line {
-          background-color: hsl(var(--primary) / 0.2) !important;
-          border-left: 3px solid hsl(var(--primary)) !important;
-          animation: highlightPulse 0.5s ease-out;
-        }
-        
-        .highlighted-line-glyph {
-          background-color: hsl(var(--primary)) !important;
-          width: 4px !important;
-        }
-
-        @keyframes highlightPulse {
-          0% {
-            background-color: hsl(var(--primary) / 0.4);
-          }
-          100% {
-            background-color: hsl(var(--primary) / 0.2);
-          }
-        }
-      `}</style>
+      <div className="h-[500px] relative">
+        {!isReady && (
+          <div className={`absolute inset-0 z-10 animate-shimmer ${isDark ? 'bg-[#1e1e1e]' : 'bg-white'}`} />
+        )}
+        <IsolatedCodeEditor
+          code={code}
+          language={language.toLowerCase()}
+          theme={isDark ? 'vs-dark' : 'light'}
+          highlightedLines={(highlightedLines || []).map(l => Math.max(1, l))}
+          readOnly={true}
+          height="500px"
+          primaryColor={primaryColor}
+          onReady={() => setIsReady(true)}
+        />
+      </div>
     </motion.div>
   );
 };

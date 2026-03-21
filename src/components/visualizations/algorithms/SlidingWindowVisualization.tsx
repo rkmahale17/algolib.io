@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
@@ -284,7 +284,7 @@ export const SlidingWindowVisualization = () => {
                     className="flex flex-col items-center gap-2 flex-1 max-w-[60px] relative"
                   >
                     {isWindowStart && (
-                      <div className="absolute -top-8 text-xs font- text-primary">
+                      <div className="absolute -top-12 text-xs font- text-primary">
                         START
                       </div>
                     )}
@@ -342,9 +342,9 @@ export const SlidingWindowVisualization = () => {
 
         <div className="space-y-4">
 
-          <CodeHighlighter
+          <AnimatedCodeEditor
             code={code}
-            highlightedLine={currentStep.lineNumber}
+            highlightedLines={[currentStep.lineNumber]}
             language="TypeScript"
           />
         </div>

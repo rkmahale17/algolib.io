@@ -1,252 +1,284 @@
-import React, { useEffect, useRef, useState } from 'react';
-
-import { CodeHighlighter } from '../shared/CodeHighlighter';
-import { StepControls } from '../shared/StepControls';
+import { useState, useMemo } from 'react';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
+import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Card } from '@/components/ui/card';
 
 interface Step {
-  array: number[];
+  nums: number[];
   k: number;
-  windowStart: number;
-  deque: number[];
-  result: number[];
-  message: string;
-  lineNumber: number;
+  l: number;
+  r: number;
+  q: number[];
+  output: number[];
+  explanation: string;
+  highlightedLines: number[];
+  variables: Record<string, any>;
+  phase: 'init' | 'pop' | 'push' | 'shift' | 'result' | 'done';
 }
 
-export const SlidingWindowMaxVisualization: React.FC = () => {
-  const [steps, setSteps] = useState<Step[]>([]);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1000);
-  const intervalRef = useRef<number | null>(null);
+export const SlidingWindowMaxVisualization = () => {
+  const [currentStep, setCurrentStep] = useState(0);
+  const nums = [1, 3, -1, -3, 5, 3, 6, 7, 2, 4, 1, 6];
+  const k = 3;
 
-  const code = `function maxSlidingWindow(nums: number[], k: number): number[] {
-  const result: number[] = [];
-  const deque: number[] = []; // Store indices
-  
-  for (let i = 0; i < nums.length; i++) {
-    // Remove indices outside window
-    while (deque.length && deque[0] < i - k + 1) {
-      deque.shift();
-    }
-    
-    // Remove smaller elements
-    while (deque.length && nums[deque[deque.length - 1]] < nums[i]) {
-      deque.pop();
-    }
-    
-    deque.push(i);
-    
-    // Add to result when window is full
-    if (i >= k - 1) {
-      result.push(nums[deque[0]]);
-    }
-  }
-  
-  return result;
-}`;
+  const steps: Step[] = useMemo(() => {
+    const s: Step[] = [];
+    const output: number[] = [];
+    let q: number[] = [];
+    let l = 0;
+    let r = 0;
 
-  const generateSteps = () => {
-    const arr = [1, 3, -1, -3, 5, 3, 6, 7];
-    const k = 3;
-    const newSteps: Step[] = [];
-    const result: number[] = [];
-    const deque: number[] = [];
-
-    newSteps.push({
-      array: arr,
-      k,
-      windowStart: 0,
-      deque: [],
-      result: [],
-      message: `Find max in each sliding window of size ${k}`,
-      lineNumber: 1
+    s.push({
+      nums, k, l, r, q: [], output: [],
+      explanation: "Initialize output array and double-ended queue (deque).",
+      highlightedLines: [1, 2, 3],
+      variables: { nums: `[${nums.join(',')}]`, k },
+      phase: 'init'
     });
 
-    for (let i = 0; i < arr.length; i++) {
-      // Remove indices outside window
-      while (deque.length && deque[0] < i - k + 1) {
-        deque.shift();
-      }
+    s.push({
+      nums, k, l, r, q: [], output: [],
+      explanation: "Initialize left and right pointers to 0.",
+      highlightedLines: [5, 6],
+      variables: { l, r },
+      phase: 'init'
+    });
 
-      // Remove smaller elements
-      while (deque.length && arr[deque[deque.length - 1]] < arr[i]) {
-        deque.pop();
-      }
-
-      deque.push(i);
-
-      const windowStart = Math.max(0, i - k + 1);
-
-      newSteps.push({
-        array: arr,
-        k,
-        windowStart,
-        deque: [...deque],
-        result: [...result],
-        message: `Process arr[${i}] = ${arr[i]}, deque contains indices of potential maximums`,
-        lineNumber: 11
+    while (r < nums.length) {
+      s.push({
+        nums, k, l, r, q: [...q], output: [...output],
+        explanation: `Start iteration for r = ${r} (val = ${nums[r]}).`,
+        highlightedLines: [8],
+        variables: { l, r, val: nums[r], q: `[${q.join(',')}]` },
+        phase: 'init'
       });
 
-      if (i >= k - 1) {
-        result.push(arr[deque[0]]);
-        newSteps.push({
-          array: arr,
-          k,
-          windowStart,
-          deque: [...deque],
-          result: [...result],
-          message: `Window complete. Max = ${arr[deque[0]]} at index ${deque[0]}`,
-          lineNumber: 18
+      // Monotonic deque: remove smaller values from back
+      while (q.length && nums[q[q.length - 1]] < nums[r]) {
+        const poppedIdx = q[q.length - 1];
+        s.push({
+          nums, k, l, r, q: [...q], output: [...output],
+          explanation: `nums[${poppedIdx}] (${nums[poppedIdx]}) < nums[${r}] (${nums[r]}). Removing index from back of deque.`,
+          highlightedLines: [10, 11],
+          variables: { backVal: nums[poppedIdx], currentVal: nums[r] },
+          phase: 'pop'
+        });
+        q.pop();
+      }
+
+      q.push(r);
+      s.push({
+        nums, k, l, r, q: [...q], output: [...output],
+        explanation: `Pushed current index ${r} to deque.`,
+        highlightedLines: [13],
+        variables: { q: `[${q.join(',')}]` },
+        phase: 'push'
+      });
+
+      // Remove left value from window if it's out of current window
+      if (l > q[0]) {
+        s.push({
+          nums, k, l, r, q: [...q], output: [...output],
+          explanation: `Index ${q[0]} is outside the current window [${l}, ${r}]. Shifting deque.`,
+          highlightedLines: [16, 17],
+          variables: { l, outOfWindow: q[0] },
+          phase: 'shift'
+        });
+        q.shift();
+      } else if (r >= 0) {
+        s.push({
+          nums, k, l, r, q: [...q], output: [...output],
+          explanation: `Check if front index ${q[0]} is out of window bounds. It is valid.`,
+          highlightedLines: [15],
+          variables: { l, windowStart: l, frontIdx: q[0] },
+          phase: 'init'
+        });
+      }
+
+      // Check if window has reached size k
+      if ((r + 1) >= k) {
+        s.push({
+          nums, k, l, r, q: [...q], output: [...output],
+          explanation: `Window size is ${k}. Front of deque (${nums[q[0]]}) is the maximum.`,
+          highlightedLines: [20, 21],
+          variables: { max: nums[q[0]], window: `[${l}, ${r}]` },
+          phase: 'result'
+        });
+        output.push(nums[q[0]]);
+
+        l += 1;
+        s.push({
+          nums, k, l, r, q: [...q], output: [...output],
+          explanation: `Moving left pointer to ${l}.`,
+          highlightedLines: [22],
+          variables: { l },
+          phase: 'result'
+        });
+      }
+
+      r += 1;
+      if (r < nums.length) {
+        s.push({
+          nums, k, l, r, q: [...q], output: [...output],
+          explanation: `Moving right pointer to ${r}.`,
+          highlightedLines: [25],
+          variables: { r },
+          phase: 'init'
         });
       }
     }
 
-    newSteps.push({
-      array: arr,
-      k,
-      windowStart: arr.length - k,
-      deque: [...deque],
-      result: [...result],
-      message: 'All windows processed',
-      lineNumber: 22
+    s.push({
+      nums, k, l, r: nums.length - 1, q: [...q], output: [...output],
+      explanation: "Process complete. Returning all window maximums.",
+      highlightedLines: [28],
+      variables: { output: `[${output.join(',')}]` },
+      phase: 'done'
     });
 
-    setSteps(newSteps);
-  };
-
-  useEffect(() => {
-    generateSteps();
+    return s;
   }, []);
 
-  useEffect(() => {
-    if (isPlaying && currentStepIndex < steps.length - 1) {
-      intervalRef.current = window.setInterval(() => {
-        setCurrentStepIndex((prev) => {
-          if (prev >= steps.length - 1) {
-            setIsPlaying(false);
-            return prev;
-          }
-          return prev + 1;
-        });
-      }, speed);
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
+  const code = `function maxSlidingWindow(nums: number[], k: number): number[] {
+    const output: number[] = [];
+    const q: number[] = [];
+
+    let l = 0;
+    let r = 0;
+
+    while (r < nums.length) {
+        while (q.length && nums[q[q.length - 1]] < nums[r]) {
+            q.pop();
+        }
+
+        q.push(r);
+
+        if (l > q[0]) {
+            q.shift();
+        }
+
+        if ((r + 1) >= k) {
+            output.push(nums[q[0]]);
+            l += 1;
+        }
+
+        r += 1;
     }
 
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [isPlaying, currentStepIndex, steps.length, speed]);
+    return output;
+}`;
 
-  const handlePlay = () => setIsPlaying(true);
-  const handlePause = () => setIsPlaying(false);
-  const handleStepForward = () => {
-    if (currentStepIndex < steps.length - 1) setCurrentStepIndex(currentStepIndex + 1);
-  };
-  const handleStepBack = () => {
-    if (currentStepIndex > 0) setCurrentStepIndex(currentStepIndex - 1);
-  };
-  const handleReset = () => {
-    setCurrentStepIndex(0);
-    setIsPlaying(false);
-  };
-
-  if (steps.length === 0) return null;
-
-  const currentStep = steps[currentStepIndex];
+  const step = steps[currentStep];
 
   return (
-    <div className="space-y-6">
-      <StepControls
-        onPlay={handlePlay}
-        onPause={handlePause}
-        onStepForward={handleStepForward}
-        onStepBack={handleStepBack}
-        onReset={handleReset}
-        isPlaying={isPlaying}
-        currentStep={currentStepIndex}
-        totalSteps={steps.length}
-        speed={speed}
-        onSpeedChange={setSpeed}
-      />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <VisualizationLayout
+      leftContent={
+        <div className="space-y-6">
+          <Card className="p-6 bg-card/50 backdrop-blur-sm border-primary/20 relative">
+            <h3 className="text-sm font-semibold mb-8 text-muted-foreground uppercase tracking-widest">Sliding Window</h3>
 
-        <div className="bg-card rounded-lg p-6 border">
-          <h3 className="text-lg font-semibold mb-4">Array (Window Size = {currentStep.k})</h3>
-          <div className="flex gap-2 mb-6">
-            {currentStep.array.map((val, idx) => (
-              <div
-                key={idx}
-                className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font- transition-all ${idx >= currentStep.windowStart && idx < currentStep.windowStart + currentStep.k
-                  ? currentStep.deque[0] === idx
-                    ? 'bg-green-500/20 border-green-500 scale-110'
-                    : 'bg-primary/20 border-primary'
-                  : 'bg-card border-border'
-                  }`}
-              >
-                {val}
+            <div className="flex flex-wrap gap-4 gap-y-12 justify-center mb-12">
+              {nums.map((num, idx) => {
+                const isInWindow = idx >= step.l && idx <= step.r;
+                const isL = idx === step.l;
+                const isR = idx === step.r;
+                const isMax = step.q[0] === idx && (step.r + 1) >= k;
+
+                return (
+                  <div key={idx} className="relative flex flex-col items-center">
+                    <motion.div
+                      animate={{
+                        scale: isMax ? 1.1 : 1,
+                        backgroundColor: isMax ? "var(--primary)" : (isInWindow ? "rgba(var(--primary), 0.1)" : "transparent"),
+                        borderColor: isMax ? "var(--primary)" : (isInWindow ? "var(--primary)" : "var(--border)")
+                      }}
+                      className={`w-12 h-12 border-2 rounded-xl flex items-center justify-center text-sm font-bold transition-all
+                        ${isMax ? '  shadow-[0_0_15px_rgba(var(--primary),0.4)] bg-primary text-primary' : ''}
+                      `}
+                    >
+                      {num}
+                    </motion.div>
+
+                    <div className="absolute -bottom-6 flex gap-1">
+                      {isL && <span className="text-[10px] font-black text-primary uppercase">L</span>}
+                      {isR && <span className="text-[10px] font-black text-blue-500 uppercase">R</span>}
+                    </div>
+
+                    <div className="absolute -top-6">
+                      <span className="text-[10px] text-muted-foreground font-mono">{idx}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="mt-8">
+              <h4 className="text-[10px] font-bold text-muted-foreground uppercase mb-4 tracking-tighter">Monotonic Deque (Indices/Values)</h4>
+              <div className="flex flex-wrap gap-3 min-h-[60px] p-4 bg-muted/20 border-2 border-dashed border-border rounded-2xl items-center">
+                <AnimatePresence>
+                  {step.q.map((idx, qIdx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ scale: 0, x: 20 }}
+                      animate={{ scale: 1, x: 0 }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      className={`px-4 py-2 border-2 rounded-lg flex flex-col items-center
+                        ${qIdx === 0 ? 'bg-primary/20 border-primary text-primary' : 'bg-muted border-border text-muted-foreground'}
+                      `}
+                    >
+                      <span className="text-[10px] font-bold opacity-60">i:{idx}</span>
+                      <span className="text-sm font-black">{nums[idx]}</span>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+                {step.q.length === 0 && <span className="text-xs text-muted-foreground italic">Deque is empty</span>}
               </div>
-            ))}
-          </div>
+            </div>
+          </Card>
 
-          <h3 className="text-lg font-semibold mb-4">Deque (Indices)</h3>
-          <div className="flex gap-2 mb-6 min-h-[3rem]">
-            {currentStep.deque.length > 0 ? (
-              currentStep.deque.map((idx, i) => (
-                <div
-                  key={i}
-                  className={`w-16 h-12 flex flex-col items-center justify-center rounded-lg border-2 font- transition-all ${i === 0 ? 'bg-green-500/20 border-green-500' : 'bg-blue-500/20 border-blue-500'
-                    }`}
+          <Card className="p-6 border-primary/20">
+            <h4 className="text-[10px] font-bold text-muted-foreground uppercase mb-4 tracking-tighter">Output Maximums</h4>
+            <div className="flex flex-wrap gap-2 min-h-[48px]">
+              {step.output.map((val, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="w-10 h-10 bg-primary/20 border-2 border-primary/40 rounded-lg flex items-center justify-center font-bold text-primary text-sm"
                 >
-                  <div className="text-xs text-muted-foreground">idx:{idx}</div>
-                  <div>{currentStep.array[idx]}</div>
-                </div>
-              ))
-            ) : (
-              <div className="text-muted-foreground italic">Empty deque</div>
-            )}
-          </div>
+                  {val}
+                </motion.div>
+              ))}
+              {step.output.length === 0 && <span className="text-xs text-muted-foreground italic leading-10">Waiting for window size {k}...</span>}
+            </div>
+          </Card>
 
-          <h3 className="text-lg font-semibold mb-4">Result (Window Maximums)</h3>
-          <div className="flex gap-2 flex-wrap mb-6">
-            {currentStep.result.map((val, idx) => (
-              <div
-                key={idx}
-                className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-green-500/20 border-green-500 font-"
-              >
-                {val}
-              </div>
-            ))}
-            {currentStep.result.length === 0 && (
-              <div className="text-muted-foreground italic">No windows completed yet</div>
-            )}
-          </div>
+          <Card className="p-4 bg-primary/5 border-primary/20 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
+            <h4 className="text-[10px] font-bold uppercase tracking-widest text-primary mb-2">Algorithm Step</h4>
+            <p className="text-sm font-medium leading-relaxed">{step.explanation}</p>
+          </Card>
 
-          <div className="mt-4 p-4 bg-muted rounded">
-            <p className="text-sm">{currentStep.message}</p>
-          </div>
-          <div className="mt-4 p-4 bg-muted rounded">
-            <VariablePanel
-              variables={{
-                'window start': currentStep.windowStart,
-                'k': currentStep.k,
-                'deque size': currentStep.deque.length,
-                'results': currentStep.result.length
-              }}
-            />
-          </div>
-
-
-
+          <VariablePanel variables={step.variables} />
         </div>
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
-
-      </div>
-    </div>
+      }
+      rightContent={
+        <AnimatedCodeEditor
+          code={code}
+          language="typescript"
+          highlightedLines={step.highlightedLines}
+        />
+      }
+      controls={
+        <SimpleStepControls
+          currentStep={currentStep}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStep}
+        />
+      }
+    />
   );
 };

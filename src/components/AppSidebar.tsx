@@ -41,7 +41,7 @@ const sidebarConfig = {
                 hasCaret: false,
             },
             {
-                title: "Practice questions",
+                title: "DSA",
                 url: "/problems",
                 icon: ListTodo,
                 hasCaret: true,
@@ -91,9 +91,27 @@ const sidebarConfig = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const location = useLocation()
-    const { toggleSidebar, state, isMobile } = useSidebar()
+    const { toggleSidebar, state, isMobile, setOpen } = useSidebar()
     const { theme, setTheme } = useTheme()
     const [user, setUser] = React.useState<any>(null);
+
+    const sidebarRoutes = ['/problems', '/blind75', '/core-patterns'];
+    const isSidebarRoute = sidebarRoutes.some(route => location.pathname.startsWith(route));
+    const lastPathRef = React.useRef(location.pathname);
+
+    React.useEffect(() => {
+        const isCurrentlyListing = sidebarRoutes.some(route => location.pathname.startsWith(route));
+        const wasListing = sidebarRoutes.some(route => lastPathRef.current.startsWith(route));
+
+        // If we just entered a listing route from somewhere else, or switched between listing routes
+        if (isCurrentlyListing && (!wasListing || lastPathRef.current !== location.pathname)) {
+            if (!isMobile && state === "collapsed") {
+                setOpen(true);
+            }
+        }
+
+        lastPathRef.current = location.pathname;
+    }, [location.pathname, isMobile, state, setOpen]);
 
     React.useEffect(() => {
         if (!supabase) return;
@@ -115,9 +133,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
     const isCollapsed = state === "collapsed";
 
-    const sidebarRoutes = ['/dashboard', '/problems', '/blind75', '/core-patterns'];
-    const isSidebarRoute = sidebarRoutes.some(route => location.pathname.startsWith(route));
-
     // On desktop, only show if it's a sidebar route
     if (!isMobile && !isSidebarRoute) {
         return null;
@@ -130,8 +145,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarHeader className="p-4 border-b border-border/50 h-14 flex items-center justify-center">
                 <div className="flex items-center gap-3 w-full">
                     <Link to="/" className="flex items-center gap-2 shrink-0 group-data-[collapsible=icon]:mx-auto">
-                        <img src={logo} alt="RulCode Logo" className="w-5 h-5 grayscale hover:grayscale-0 transition-all" />
-                        <span className="font-bold text-[15px] tracking-tight text-foreground group-data-[collapsible=icon]:hidden">rulcode</span>
+                        <img src={logo} alt="RulCode Logo" className="w-5 h-5 transition-all" />
+                        <span className="font-bold text-[15px] tracking-tight group-data-[collapsible=icon]:hidden">rulcode</span>
                     </Link>
                     <div className="h-4 w-[1px] bg-border/80 group-data-[collapsible=icon]:hidden"></div>
                     <span className="flex items-center gap-1 text-[13px] text-muted-foreground group-data-[collapsible=icon]:hidden">
@@ -225,8 +240,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
             <SidebarFooter className="p-4 mt-auto border-t border-border/50 flex flex-col gap-4">
                 {/* Promotional cards - Hidden when collapsed completely */}
+                {/* 
                 <div className="flex flex-col gap-4 group-data-[collapsible=icon]:hidden">
-                    {/* Sponsored Card */}
                     <Link to="#" className="group flex items-start gap-3 rounded-lg bg-transparent transition-colors">
                         <div className="w-12 h-12 rounded-md bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0">
                             <CodeIcon className="w-6 h-6 text-white" />
@@ -239,7 +254,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         </div>
                     </Link>
 
-                    {/* 20% off Simple Card */}
                     <Link to="#" className="group flex items-start gap-3 rounded-lg overflow-hidden border border-border bg-card hover:bg-muted/50 transition-colors p-3">
                         <div className="w-12 shrink-0 flex items-center justify-center font-bold text-sm bg-transparent border-0">
                             20% off
@@ -251,11 +265,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         </div>
                     </Link>
                 </div>
+                */}
 
                 {/* Showing a simple 20% badge instead of large cards when collapsed */}
+                {/* 
                 <div className="hidden group-data-[collapsible=icon]:flex items-center justify-center w-full my-2">
                     <Badge variant="outline" className="text-[9px] px-1 py-0 shadow-none border-border">20%</Badge>
                 </div>
+                */}
 
                 {/* Bottom Action Row */}
                 <div className="flex items-center justify-between w-full">
@@ -327,7 +344,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 {user ? (
                                     <>
                                         <DropdownMenuSeparator />
-                                        <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive cursor-pointer text-xs">
+                                        <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive cursor-pointer text-xs dark:text-foreground">
                                             <LogOut className="mr-2 h-4 w-4" />
                                             <span>Sign out</span>
                                         </DropdownMenuItem>

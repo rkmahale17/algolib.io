@@ -161,6 +161,7 @@ export function AlgorithmPreview({ algorithm, initialCode = "", isPlatformPrevie
                 handlePreviousProblem={() => { }}
                 handleShare={() => { }}
                 handleSignOut={() => { }}
+                hideUserMenu={true}
               />
             </div>
             <div className="flex-1 overflow-hidden relative">
@@ -191,6 +192,7 @@ export function AlgorithmPreview({ algorithm, initialCode = "", isPlatformPrevie
                     setIsVisualizationMaximized={setIsVisualizationMaximized}
                     isVisualizationMaximized={isVisualizationMaximized}
                     handleRichTextClick={() => { }}
+                    isPlatformPreview={isPlatformPreview}
                   />
                 </ResizablePanel>
 
@@ -218,6 +220,7 @@ export function AlgorithmPreview({ algorithm, initialCode = "", isPlatformPrevie
                     isCodeRunnerMaximized={isCodeRunnerMaximized}
                     setIsCodeRunnerMaximized={setIsCodeRunnerMaximized}
                     submissions={[]}
+                    isPlatformPreview={isPlatformPreview}
                   />
                 </ResizablePanel>
               </ResizablePanelGroup>
@@ -266,6 +269,7 @@ export function AlgorithmPreview({ algorithm, initialCode = "", isPlatformPrevie
               handlePreviousProblem={() => { }}
               handleShare={() => { }}
               handleSignOut={() => { }}
+              hideUserMenu={true}
             />
           </div>
 
@@ -297,6 +301,7 @@ export function AlgorithmPreview({ algorithm, initialCode = "", isPlatformPrevie
                   setIsVisualizationMaximized={setIsVisualizationMaximized}
                   isVisualizationMaximized={isVisualizationMaximized}
                   handleRichTextClick={() => { }}
+                  isPlatformPreview={isPlatformPreview}
                 />
               </ResizablePanel>
 
@@ -324,6 +329,7 @@ export function AlgorithmPreview({ algorithm, initialCode = "", isPlatformPrevie
                   isCodeRunnerMaximized={isCodeRunnerMaximized}
                   setIsCodeRunnerMaximized={setIsCodeRunnerMaximized}
                   submissions={[]}
+                  isPlatformPreview={isPlatformPreview}
                 />
               </ResizablePanel>
             </ResizablePanelGroup>

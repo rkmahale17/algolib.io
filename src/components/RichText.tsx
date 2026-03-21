@@ -3,6 +3,7 @@ import parse, { DOMNode, Element, domToReact, HTMLReactParserOptions } from 'htm
 import { AlgoLink } from './AlgoLink';
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { ResponsiveTableContainer } from './ResponsiveTableContainer';
+import { Tips } from '@/components/ui/Tips';
 
 interface RichTextProps {
   content: string | string[];
@@ -23,9 +24,13 @@ export const RichText: React.FC<RichTextProps> = ({ content, className = '', onC
     } else {
       text = content || '';
     }
-    
+
     // Auto-fix: Convert JSX 'className' to HTML 'class' to support copy-pasting from React
-    return text.replace(/\bclassName=(["'])/g, 'class=$1');
+    text = text.replace(/\bclassName=(["'])/g, 'class=$1');
+
+    // Auto-fix: Remove document-level tags (html, head, body) that cause React nesting warnings
+    // We strip the tags but keep their inner content
+    return text.replace(/<\/?(html|head|body)[\s\S]*?>/gi, '');
   }, [content]);
 
   const options: HTMLReactParserOptions = useMemo(() => ({
@@ -45,39 +50,50 @@ export const RichText: React.FC<RichTextProps> = ({ content, className = '', onC
 
         // Handle <ScrollArea> tags
         if (domNode.name === 'scrollarea') {
-           const { class: className, ...rest } = domNode.attribs;
-           const children = domToReact(domNode.children as DOMNode[], options);
-           return (
-             <ScrollArea className={className} {...rest}>
-               {children}
-             </ScrollArea>
-           );
+          const { class: className, ...rest } = domNode.attribs;
+          const children = domToReact(domNode.children as DOMNode[], options);
+          return (
+            <ScrollArea className={className} {...rest}>
+              {children}
+            </ScrollArea>
+          );
         }
-        
+
         // Handle <ScrollBar> tags
         if (domNode.name === 'scrollbar') {
-           const { class: className, orientation, ...rest } = domNode.attribs;
-           return (
-             <ScrollBar 
-                className={className} 
-                orientation={orientation as "horizontal" | "vertical"} 
-                {...rest} 
-             />
-           );
+          const { class: className, orientation, ...rest } = domNode.attribs;
+          return (
+            <ScrollBar
+              className={className}
+              orientation={orientation as "horizontal" | "vertical"}
+              {...rest}
+            />
+          );
+        }
+
+        // Handle <Tips> or <tips> tags
+        if (domNode.name === 'tips') {
+          const { heading } = domNode.attribs;
+          const children = domToReact(domNode.children as DOMNode[], options);
+          return (
+            <Tips heading={heading}>
+              {children}
+            </Tips>
+          );
         }
 
         // Handle <table> tags to automatically wrap them in responsive container
         if (domNode.name === 'table') {
           const { class: className, style: _style, ...rest } = domNode.attribs;
           const children = domToReact(domNode.children as DOMNode[], options);
-          
+
           const combinedClass = (`${className || ''} comparison-table`).trim();
 
           return (
             <ResponsiveTableContainer>
-               <table className={combinedClass} {...rest}>
-                 {children}
-               </table>
+              <table className={combinedClass} {...rest}>
+                {children}
+              </table>
             </ResponsiveTableContainer>
           );
         }

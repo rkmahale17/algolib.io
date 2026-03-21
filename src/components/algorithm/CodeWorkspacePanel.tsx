@@ -15,6 +15,8 @@ import { AuthGuard } from "@/components/AuthGuard";
 import { TabWarning } from "@/components/TabWarning";
 import { CodeRunner } from "@/components/CodeRunner/CodeRunner";
 import { BrainstormSection } from "@/components/brainstorm/BrainstormSection";
+import { useApp } from "@/contexts/AppContext";
+import { ProOverlay } from "@/components/ProOverlay";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Submission } from "@/types/userAlgorithmData";
 
@@ -36,6 +38,7 @@ interface CodeWorkspacePanelProps {
   codeRunnerRef?: React.RefObject<any>;
   onRunnerStateChange?: (state: any) => void;
   isLoading?: boolean;
+  isPlatformPreview?: boolean;
 }
 
 export const CodeWorkspacePanel = React.memo(({
@@ -55,8 +58,10 @@ export const CodeWorkspacePanel = React.memo(({
   isInterviewMode,
   codeRunnerRef,
   onRunnerStateChange,
-  isLoading = false
+  isLoading = false,
+  isPlatformPreview = false,
 }: CodeWorkspacePanelProps) => {
+  const { hasPremiumAccess } = useApp();
   const containerRef = useRef<HTMLDivElement>(null);
   const [isCompact, setIsCompact] = useState(false);
 
@@ -147,6 +152,7 @@ export const CodeWorkspacePanel = React.memo(({
               <AuthGuard
                 fallbackTitle="Sign in to use Code Runner"
                 fallbackDescription="Create an account or sign in to run and test your code solutions."
+                disabled={isPlatformPreview}
               >
                 {algorithmId && algorithm && (
                   <CodeRunner
@@ -177,7 +183,7 @@ export const CodeWorkspacePanel = React.memo(({
             )}
           </TabsContent>
 
-          <TabsContent value="brainstorm" className="flex-1 m-0 overflow-hidden data-[state=inactive]:hidden m-4 card border-2 border-grey-500">
+          <TabsContent value="brainstorm" className="flex-1 flex flex-col border rounded-lg overflow-hidden bg-muted/10 m-4 data-[state=inactive]:hidden">
             {(algorithm?.controls?.tabs?.brainstorm === false || algorithm?.controls?.brainstorm === false || !isBrainstormGlobalEnabled) ? (
               <TabWarning message={!isBrainstormGlobalEnabled ? "Brainstorming is currently disabled globally." : "Brainstorming tools are disabled for this session."} />
             ) : (
@@ -185,12 +191,19 @@ export const CodeWorkspacePanel = React.memo(({
                 <AuthGuard
                   fallbackTitle="Sign in to Brainstorm"
                   fallbackDescription="Create an account or sign in to access whiteboard and notes."
+                  disabled={isPlatformPreview}
                 >
-                  <BrainstormSection
-                    algorithmId={algorithmId || ""}
-                    algorithmTitle={algorithm?.title || ""}
-                    controls={algorithm?.controls?.brainstorm}
-                  />
+                  <div className="relative h-full">
+                    {algorithm?.metadata?.is_pro && !hasPremiumAccess && !isPlatformPreview ? (
+                      <ProOverlay className="rounded-none border-0 h-full" />
+                    ) : (
+                      <BrainstormSection
+                        algorithmId={algorithmId || ""}
+                        algorithmTitle={algorithm?.title || ""}
+                        controls={algorithm?.controls?.brainstorm}
+                      />
+                    )}
+                  </div>
                 </AuthGuard>
               </div>
             )}

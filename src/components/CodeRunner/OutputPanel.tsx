@@ -364,9 +364,9 @@ export const OutputPanel = ({
                             <TabsTrigger
                               key={index}
                               value={`result-${index}`}
-                              className={`text-xs px-3 h-7 whitespace-nowrap gap-2 shadow-none transition-colors ${result.status === 'pass'
-                                ? 'bg-green-500/10 text-green-600 hover:bg-green-500/20 data-[state=active]:bg-green-500/20 data-[state=active]:text-green-700'
-                                : 'bg-red-500/10 text-red-600 hover:bg-red-500/20 data-[state=active]:bg-red-500/20 data-[state=active]:text-red-700'
+                              className={`text-xs px-3 h-7 rounded-md whitespace-nowrap gap-2 shadow-none transition-all border ${result.status === 'pass'
+                                ? 'bg-green-500/10 text-green-700 dark:text-green-500 border-transparent hover:bg-green-500/20 data-[state=active]:bg-green-500/20 data-[state=active]:border-green-500/50 data-[state=active]:text-green-800 dark:data-[state=active]:text-green-400 data-[state=active]:shadow-sm font-medium'
+                                : 'bg-red-500/10 text-red-700 dark:text-red-500 border-transparent hover:bg-red-500/20 data-[state=active]:bg-red-500/20 data-[state=active]:border-red-500/50 data-[state=active]:text-red-800 dark:data-[state=active]:text-red-400 data-[state=active]:shadow-sm font-medium'
                                 }`}
                             >
                               {result.status === 'pass' ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
@@ -399,7 +399,7 @@ export const OutputPanel = ({
                           <TabsContent key={index} value={`result-${index}`} className="m-0 space-y-6">
                             {/* Input */}
                             <div className="space-y-2">
-                              <div className="text-xs font-medium text-muted-foreground">Input</div>
+                              <div className="text-xs font-semibold text-muted-foreground  tracking-wider">Input</div>
                               <div className="p-3 rounded-md bg-muted/30 border font-mono text-sm">
                                 {(() => {
                                   const tc = executedTestCases ? executedTestCases[index] : allTestCases[index];
@@ -431,12 +431,12 @@ export const OutputPanel = ({
                                                 return typeof val === 'string' ? val : JSON.stringify(val);
                                               })()}</span>
                                             </div>
-                                            {algorithmMeta?.controls?.show_tree_visualization && isTreeType(field.type) && (
+                                            {(algorithmMeta?.controls?.visualizations?.tree?.enabled ?? algorithmMeta?.controls?.show_tree_visualization) && algorithmMeta?.controls?.visualizations?.tree?.results_input !== false && isTreeType(field.type) && (
                                               <div className="mt-1">
                                                 <TreeDiagram data={inputData[i]} height={120} />
                                               </div>
                                             )}
-                                            {algorithmMeta?.controls?.show_graph_visualization && isGraphType(field.type) && (
+                                            {(isGraphType(field.type) || (algorithmMeta?.controls?.visualizations?.graph?.enabled ?? algorithmMeta?.controls?.show_graph_visualization)) && algorithmMeta?.controls?.visualizations?.graph?.results_input !== false && (
                                               <div className="mt-1">
                                                 <GraphDiagram data={inputData[i]} height={120} />
                                               </div>
@@ -463,7 +463,7 @@ export const OutputPanel = ({
 
                             {/* Output */}
                             <div className="space-y-2">
-                              <div className="text-xs font-medium text-muted-foreground">Output</div>
+                              <div className="text-xs font-semibold text-muted-foreground  tracking-wider">Output</div>
                               <div className="p-3 rounded-md bg-muted/30 border font-mono text-sm">
                                 {(() => {
                                   const tc = executedTestCases ? executedTestCases[index] : allTestCases[index];
@@ -474,10 +474,10 @@ export const OutputPanel = ({
                                   return (
                                     <div className="space-y-3">
                                       <div>{content}</div>
-                                      {algorithmMeta?.controls?.show_tree_visualization && actual !== undefined && actual !== null && (
+                                      {(algorithmMeta?.controls?.visualizations?.tree?.enabled ?? algorithmMeta?.controls?.show_tree_visualization) && algorithmMeta?.controls?.visualizations?.tree?.results_output !== false && actual !== undefined && actual !== null && (
                                         <TreeDiagram data={actual} height={120} />
                                       )}
-                                      {algorithmMeta?.controls?.show_graph_visualization && actual !== undefined && actual !== null && (
+                                      {(isGraphType(inputSchema?.[0]?.type) || (algorithmMeta?.controls?.visualizations?.graph?.enabled ?? algorithmMeta?.controls?.show_graph_visualization)) && algorithmMeta?.controls?.visualizations?.graph?.results_output !== false && actual !== undefined && actual !== null && (
                                         <GraphDiagram data={actual} height={120} />
                                       )}
                                     </div>
@@ -489,7 +489,7 @@ export const OutputPanel = ({
                             {/* Expected */}
                             {result.expected !== undefined && (
                               <div className="space-y-2">
-                                <div className="text-xs font-medium text-muted-foreground">Expected</div>
+                                <div className="text-xs font-semibold text-muted-foreground  tracking-wider">Expected Output</div>
                                 <div className="p-3 rounded-md bg-muted/30 border font-mono text-sm">
                                   {(() => {
                                     const listArr = result.expected !== undefined ? parseListValue(result.expected) : null;
@@ -497,10 +497,10 @@ export const OutputPanel = ({
                                     return (
                                       <div className="space-y-3">
                                         <div>{content}</div>
-                                        {algorithmMeta?.controls?.show_tree_visualization && (
+                                        {(algorithmMeta?.controls?.visualizations?.tree?.enabled ?? algorithmMeta?.controls?.show_tree_visualization) && algorithmMeta?.controls?.visualizations?.tree?.results_output !== false && (
                                           <TreeDiagram data={result.expected} height={120} />
                                         )}
-                                        {algorithmMeta?.controls?.show_graph_visualization && (
+                                        {(isGraphType(inputSchema?.[0]?.type) || (algorithmMeta?.controls?.visualizations?.graph?.enabled ?? algorithmMeta?.controls?.show_graph_visualization)) && algorithmMeta?.controls?.visualizations?.graph?.results_output !== false && (
                                           <GraphDiagram data={result.expected} height={120} />
                                         )}
                                       </div>

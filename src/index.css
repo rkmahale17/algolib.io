@@ -190,13 +190,7 @@
     @apply inline-block h-10 w-10 rounded-full ring-2 ring-white dark:ring-black object-cover;
   }
 
-  .roadmap-card {
-    @apply p-4 bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm hover:shadow-md transition-all duration-300;
-  }
 
-  .roadmap-node {
-    @apply px-4 py-2 bg-white dark:bg-zinc-900 rounded-lg border border-gray-200 dark:border-zinc-800 text-sm font-medium shadow-sm flex items-center gap-2;
-  }
 }
 
 @keyframes shimmer {
@@ -575,11 +569,22 @@
 }
 
 /* Links */
+
+
 .prose a {
   color: hsl(var(--primary));
   text-decoration: underline;
+
   text-underline-offset: 2px;
   transition: color 0.2s;
+}
+
+.light .prose a {
+  color: rgb(24, 22, 22);
+}
+
+.light .prose a:hover {
+  color: black
 }
 
 .prose a:hover {

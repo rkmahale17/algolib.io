@@ -226,9 +226,13 @@ Deno.serve(async (req) => {
 
         **CRITICAL JSON FORMATTING RULES**:
         1. **Escape Control Characters**: Use \\\\n for newlines, \\\\" for quotes.
-        2. **Function Only**: No classes. Return standalone function.
+        2. **Stand-alone Functions**: For **TypeScript** and **Python**, use standalone functions.
         3. **Helpers**: Place helpers ABOVE main function.
         4. **All Languages**: Must implement in TS, Python, Java, C++.
+        5. **Strict Wrapping (Java/C++)**:
+           - For **Java**: You MUST wrap everything in \`public static class Solution { ... }\`.
+           - For **C++**: You MUST wrap everything in \`class Solution { public: ... };\`.
+           - NO main function, NO example calls, NO extra boilerplates outside the class.
 
         JSON Structure:
         {
@@ -255,13 +259,17 @@ Deno.serve(async (req) => {
     const enhanceCommentsPrompt = (impls: any[]) => `
         ${BASE_SYSTEM_PROMPT}
 
-        TASK: ENHANCE COMMENTS for the provided code implementations.
+        TASK: ENHANCE COMMENTS for the provided code implementation.
         
         RULES:
-        1. **NO CODE CHANGE**: Do NOT change any logic, variables, names, or structure.
-        2. **Educational Comments**: Add professional, well-formatted comments explaining the logic, considering a new developer reading the code.
-        3. **Formatting**: Ensure proper indentation and formatting.
-        4. **Return Exact Structure**: Return the same implementation array but with commented code.
+        1. **NO CODE CHANGE**: Do NOT change any logic, variables, names, or structure. Return the EXACT SAME code but with comments added. Logic preservation does NOT mean ignoring the wrapping requirement. Always ensure the 'Solution' class wrapper is present for Java and C++.
+        2. **Educational Comments**: Add professional, well-formatted comments explaining the logic step-by-step.
+        3. **Targeted**: You are provided with a specific language and approach. Return only that.
+        4. **Formatting**: Ensure proper indentation and formatting of the code.
+        5. **Return Exact Structure**: Return the input structure with only the 'code' field updated.
+        6. **Strict Wrapping (Java/C++)**: 
+           - For **Java**: If the source is not already wrapped, you MUST wrap everything in \`public static class Solution { ... }\`.
+           - For **C++**: If the source is not already wrapped, you MUST wrap everything in \`class Solution { public: ... };\`.
 
         INPUT CODE:
         ${JSON.stringify(impls)}
@@ -270,13 +278,13 @@ Deno.serve(async (req) => {
         {
           "implementations": [
             {
-              "lang": "TypeScript",
+              "lang": "Language (e.g. Python, Java, C++, TypeScript)",
               "code": [
                 {
                   "codeType": "...", 
                   "code": "CODE WITH COMMENTS",
-                  "explanationBefore": "Keep existing or slightly improve",
-                  "explanationAfter": "Keep existing or slightly improve"
+                  "explanationBefore": "Keep existing",
+                  "explanationAfter": "Keep existing"
                 }
               ]
             }
@@ -302,6 +310,7 @@ Deno.serve(async (req) => {
            - For **Java**: You MUST wrap everything in \`public static class Solution { ... }\`.
            - For **C++**: You MUST wrap everything in \`class Solution { public: ... };\`.
            - NO main function, NO example calls, NO extra boilerplates outside the class.
+        6. **Python Rule**: Do NOT use a class-based approach for Python. Use standalone functions.
 
         JSON Structure:
         {

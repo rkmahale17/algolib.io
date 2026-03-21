@@ -1,16 +1,11 @@
+import { useState, useMemo, useEffect } from 'react';
 import { Trophy } from 'lucide-react';
-import { Footer } from '@/components/Footer';
 import { Helmet } from 'react-helmet-async';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { ProblemList } from '@/components/ProblemList';
-import { PremiumLoader } from '@/components/PremiumLoader';
 import { ListType, DIFFICULTY_MAP } from "@/types/algorithm";
-import { useAlgorithms } from "@/hooks/useAlgorithms";
+import { useAlgorithms, useUserProgressMap } from "@/hooks/useAlgorithms";
+import { ListingLayout } from "@/components/listing/ListingLayout";
+import { PremiumProblemCard } from "@/components/listing/PremiumProblemCard";
+import { supabase } from "@/integrations/supabase/client";
 import { SidebarLayout } from '@/components/SidebarLayout';
 
 
@@ -34,147 +29,118 @@ const faqItems = [
 ];
 
 const Blind75 = () => {
-  // Fetch algorithms using the shared hook to utilize cache
   const { data, isLoading } = useAlgorithms();
-  const allAlgorithms = data?.algorithms ?? [];
+  const [userId, setUserId] = useState<string | undefined>(undefined);
+  const { data: progressMap } = useUserProgressMap(userId);
 
-  // Filter for Blind 75 algorithms
-  const algorithms = allAlgorithms.filter(algo =>
-    algo.listType === ListType.Blind75 || algo.listType === ListType.CoreAndBlind75
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('serial-asc');
+  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUserId(session?.user?.id);
+    });
+  }, []);
+
+  const allAlgorithms = data?.algorithms ?? [];
+  const blind75Algorithms = useMemo(() =>
+    allAlgorithms.filter(algo => algo.listType === ListType.Blind75 || algo.listType === ListType.CoreAndBlind75),
+    [allAlgorithms]
   );
 
-  // Stats derived from filtered algorithms
-  const stats = {
-    total: algorithms.length,
-    easy: algorithms.filter(p => DIFFICULTY_MAP[p.difficulty?.toLowerCase()] === 'Easy').length,
-    medium: algorithms.filter(p => DIFFICULTY_MAP[p.difficulty?.toLowerCase()] === 'Medium').length,
-    hard: algorithms.filter(p => DIFFICULTY_MAP[p.difficulty?.toLowerCase()] === 'Hard').length,
+  const filteredAndSortedAlgorithms = useMemo(() => {
+    let result = blind75Algorithms.map(algo => ({
+      ...algo,
+      mappedDifficulty: DIFFICULTY_MAP[algo.difficulty?.toLowerCase()] || 'Medium',
+      displayTitle: algo.title || algo.name || ''
+    }));
+
+    if (searchQuery) {
+      result = result.filter(algo =>
+        algo.displayTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        algo.description.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    if (selectedTopics.length > 0) {
+      result = result.filter(algo => selectedTopics.includes(algo.category));
+    }
+
+    const rank: any = { 'Easy': 1, 'Medium': 2, 'Hard': 3 };
+    if (sortBy === 'name-asc') result.sort((a, b) => a.displayTitle.localeCompare(b.displayTitle));
+    else if (sortBy === 'name-desc') result.sort((a, b) => b.displayTitle.localeCompare(a.displayTitle));
+    else if (sortBy === 'difficulty-asc') result.sort((a, b) => rank[a.mappedDifficulty] - rank[b.mappedDifficulty]);
+    else if (sortBy === 'difficulty-desc') result.sort((a, b) => rank[b.mappedDifficulty] - rank[a.mappedDifficulty]);
+    else if (sortBy === 'serial-asc') result.sort((a, b) => (a.serial_no || 999999) - (b.serial_no || 999999));
+    else if (sortBy === 'serial-desc') result.sort((a, b) => (b.serial_no || 0) - (a.serial_no || 0));
+
+    return result;
+  }, [blind75Algorithms, searchQuery, sortBy, selectedTopics]);
+
+  const handleTopicToggle = (topic: string) => {
+    if (topic === 'CLEAR_ALL') {
+      setSelectedTopics([]);
+      return;
+    }
+    setSelectedTopics(prev => prev.includes(topic) ? prev.filter(t => t !== topic) : [...prev, topic]);
   };
 
-  if (isLoading) {
-    // Return with isLoading prop tailored for ProblemList instead of blocking
-  }
+  const allTopics = useMemo(() => {
+    const categories = blind75Algorithms.map(algo => algo.category).filter(Boolean);
+    return Array.from(new Set(categories)).sort();
+  }, [blind75Algorithms]);
+
+  const totalHours = useMemo(() => {
+    const mins = filteredAndSortedAlgorithms.reduce((acc, algo) => {
+      const diff = algo.mappedDifficulty.toLowerCase();
+      if (diff === 'easy') return acc + 45;
+      if (diff === 'medium') return acc + 60;
+      if (diff === 'hard') return acc + 90;
+      return acc + 60;
+    }, 0);
+    return Math.round(mins / 60);
+  }, [filteredAndSortedAlgorithms]);
 
   return (
-    <SidebarLayout>
+    <ListingLayout
+      title="Blind 75 Problems"
+      description="Master the 75 most important coding interview problems. Curated by top engineers at FAANG companies."
+      searchQuery={searchQuery}
+      onSearchChange={setSearchQuery}
+      sortBy={sortBy}
+      onSortChange={setSortBy}
+      selectedTopics={selectedTopics}
+      onTopicToggle={handleTopicToggle}
+      topics={allTopics}
+      showRecommendation={false}
+      stats={{ count: filteredAndSortedAlgorithms.length, hours: totalHours }}
+    >
       <Helmet>
-        <title>Blind 75 LeetCode Problems - Rulcode.com | FAANG Interview Preparation Guide</title>
-        <meta
-          name="description"
-          content="Master the Blind 75 - curated list of 75 essential LeetCode problems for coding interviews. Complete solutions in Python, Java, C++, TypeScript with detailed explanations and visualizations."
-        />
-        <meta
-          name="keywords"
-          content="blind 75, leetcode, coding interview, interview preparation, leetcode problems, algorithm interview, FAANG interview, technical interview, coding practice"
-        />
-        <meta name="author" content="Rulcode.com" />
-        <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
-        <link rel="canonical" href="https://rulcode.com/blind75" />
-
-        {/* Open Graph */}
-        <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="Rulcode.com" />
-        <meta property="og:title" content="Blind 75 LeetCode Problems - Complete Interview Guide" />
-        <meta property="og:description" content="Master the 75 most important LeetCode problems for coding interviews with detailed solutions and visualizations" />
-        <meta property="og:url" content="https://rulcode.com/blind75" />
-        <meta property="og:image" content="https://rulcode.com/og-image.png" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta property="og:locale" content="en_US" />
-
-        {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@rulcode_io" />
-        <meta name="twitter:creator" content="@rulcode_io" />
-        <meta name="twitter:title" content="Blind 75 LeetCode Problems - Complete Interview Guide" />
-        <meta name="twitter:description" content="Master the 75 most important LeetCode problems for coding interviews with detailed solutions and visualizations" />
-        <meta name="twitter:image" content="https://rulcode.com/og-image.png" />
+        <title>Blind 75 LeetCode Problems - Rulcode.com</title>
       </Helmet>
 
-      <div className="min-h-screen bg-background">
-        {/* Hero Section */}
-        <div className="relative overflow-hidden bg-gradient-to-b from-background via-primary/5 to-background border-b border-border/50">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
-
-          <div className="container mx-auto px-4 py-16 relative">
-            <div className="text-center max-w-4xl mx-auto space-y-6">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
-                <Trophy className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium text-primary">Ace Your Interviews</span>
-              </div>
-
-              <h1 className="text-5xl md:text-6xl font- tracking-tight">
-                <span className="gradient-text">Blind 75</span>
-                <br /> Problems
-              </h1>
-
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Master the 75 most important coding interview problems. Curated by top engineers at FAANG companies.
-              </p>
-
-              {/* Stats */}
-              <div className="flex items-center justify-center gap-8 pt-8">
-                <div className="text-center">
-                  <div className="text-3xl font- text-primary">{stats.total}</div>
-                  <div className="text-sm text-muted-foreground">Problems</div>
-                </div>
-                <div className="h-12 w-px bg-border" />
-                <div className="text-center">
-                  <div className="text-3xl font- text-green-500">{stats.easy}</div>
-                  <div className="text-sm text-muted-foreground">Easy</div>
-                </div>
-                <div className="h-12 w-px bg-border" />
-                <div className="text-center">
-                  <div className="text-3xl font- text-yellow-500">{stats.medium}</div>
-                  <div className="text-sm text-muted-foreground">Medium</div>
-                </div>
-                <div className="h-12 w-px bg-border" />
-                <div className="text-center">
-                  <div className="text-3xl font- text-red-500">{stats.hard}</div>
-                  <div className="text-sm text-muted-foreground">Hard</div>
-                </div>
-              </div>
-            </div>
-          </div>
+      {isLoading ? (
+        <div className="p-8 space-y-4">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="h-32 bg-muted/20 animate-pulse rounded-xl" />
+          ))}
         </div>
-
-        {/* Algorithm List with Filters */}
-        <div className="container mx-auto px-4 py-8">
-          <ProblemList
-            algorithms={algorithms}
-            isLoading={isLoading}
-            emptyMessage="No Blind 75 problems found."
-            defaultListType={ListType.Blind75}
-            availableListTypes={[ListType.Blind75, ListType.CoreAndBlind75]}
-            hideListSelection={true}
-          />
+      ) : (
+        <div>
+          {filteredAndSortedAlgorithms.map((algo, index) => (
+            <PremiumProblemCard
+              key={algo.id}
+              algorithm={algo}
+              status={(progressMap?.[algo.id] || 'none') as any}
+              index={index}
+              isFirst={index === 0}
+              isLast={index === filteredAndSortedAlgorithms.length - 1}
+            />
+          ))}
         </div>
-
-        {/* FAQ Section */}
-        <div className="container mx-auto px-4 py-16">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font- text-center mb-2">Frequently Asked Questions</h2>
-            <p className="text-center text-muted-foreground mb-8">
-              Everything you need to know about the Blind 75 list
-            </p>
-            <Accordion type="single" collapsible className="w-full">
-              {faqItems.map((faq, index) => (
-                <AccordionItem key={index} value={`item-${index}`}>
-                  <AccordionTrigger className="text-left">
-                    {faq.question}
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground">
-                    {faq.answer}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </div>
-        </div>
-
-        <Footer />
-      </div>
-    </SidebarLayout>
+      )}
+    </ListingLayout>
   );
 };
 

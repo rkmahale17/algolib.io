@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
@@ -204,7 +204,7 @@ function deserialize(data: string): TreeNode | null {
       vals: [],
       i: 0,
       message: `Serialization complete: "${finalSerialized}"`,
-      lineNumber: 22,
+      lineNumber: 23,
       visitedNodes: new Set(visitedNodes),
       builtNodes: new Set()
     });
@@ -223,7 +223,7 @@ function deserialize(data: string): TreeNode | null {
           vals: [...vals],
           i: i,
           message: `vals[${i}] is "N", represents null node`,
-          lineNumber: 34,
+          lineNumber: 33,
           visitedNodes: new Set(visitedNodes),
           builtNodes: new Set(builtNodes)
         });
@@ -241,7 +241,7 @@ function deserialize(data: string): TreeNode | null {
         vals: [...vals],
         i: i,
         message: `Create node with current value ${nodeVal}`,
-        lineNumber: 40,
+        lineNumber: 39,
         visitedNodes: new Set(visitedNodes),
         builtNodes: new Set(builtNodes)
       });
@@ -256,7 +256,7 @@ function deserialize(data: string): TreeNode | null {
         vals: [...vals],
         i: i,
         message: `Recursively build left subtree for node ${nodeVal}`,
-        lineNumber: 44,
+        lineNumber: 43,
         visitedNodes: new Set(visitedNodes),
         builtNodes: new Set(builtNodes)
       });
@@ -269,7 +269,7 @@ function deserialize(data: string): TreeNode | null {
         vals: [...vals],
         i: i,
         message: `Recursively build right subtree for node ${nodeVal}`,
-        lineNumber: 47,
+        lineNumber: 46,
         visitedNodes: new Set(visitedNodes),
         builtNodes: new Set(builtNodes)
       });
@@ -428,8 +428,8 @@ function deserialize(data: string): TreeNode | null {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 overflow-hidden relative">
-            <svg width="400" height="280" className="mx-auto overflow-visible">
+          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 relative">
+            <svg viewBox="0 0 400 280" className="w-full h-72 overflow-visible">
               {renderTree(tree)}
             </svg>
 
@@ -498,9 +498,9 @@ function deserialize(data: string): TreeNode | null {
 
         <div className="space-y-4">
           <div className="rounded-lg overflow-hidden border border-border shadow-md">
-            <CodeHighlighter
+            <AnimatedCodeEditor
               code={code}
-              highlightedLine={currentStep.lineNumber}
+              highlightedLines={[currentStep.lineNumber]}
               language="TypeScript"
             />
           </div>

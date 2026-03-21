@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { CodeHighlighter } from '../shared/CodeHighlighter';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
@@ -56,7 +56,9 @@ export const RecoverBSTVisualization = () => {
     return {
       val: node.val,
       left: deepClone(node.left),
-      right: deepClone(node.right)
+      right: deepClone(node.right),
+      x: node.x,
+      y: node.y
     };
   };
 
@@ -69,13 +71,12 @@ export const RecoverBSTVisualization = () => {
   };
 
   const generateSteps = () => {
-    // Create BST with two swapped nodes (3 and 2)
     const tree: TreeNode = {
-      val: 3, // Should be 2
+      val: 3,
       left: { val: 1, left: null, right: null },
       right: {
         val: 4,
-        left: { val: 2, left: null, right: null }, // Should be 3
+        left: { val: 2, left: null, right: null },
         right: null
       }
     };
@@ -85,93 +86,59 @@ export const RecoverBSTVisualization = () => {
     let second: TreeNode | null = null;
     let prev: TreeNode | null = null;
 
-    const inorder = (node: TreeNode | null) => {
-      if (!node) return;
-
-      inorder(node.left);
-
+    // Helper to push positioned steps
+    const pushStep = (msg: string, line: number, current: number | null) => {
       const currentTree = deepClone(tree);
       calculatePositions(currentTree, 200, 50, 80);
-
       newSteps.push({
         tree: currentTree,
-        current: node.val,
+        current,
         first: first?.val || null,
         second: second?.val || null,
         prev: prev?.val || null,
-        message: `Visit node ${node.val}${prev ? `. Compare with prev=${prev.val}` : ''}`,
-        lineNumber: 8
+        message: msg,
+        lineNumber: line
       });
+    };
 
+    const inorder = (node: TreeNode | null) => {
+      if (!node) return;
+
+      pushStep(`Going left from node ${node.val}.`, 8, node.val);
+      inorder(node.left);
+
+      pushStep(`Visiting node ${node.val}.${prev ? ` Comparing with prev (${prev.val}).` : ''}`, 10, node.val);
       if (prev && prev.val > node.val) {
         if (!first) {
           first = prev;
-          newSteps.push({
-            tree: deepClone(currentTree),
-            current: node.val,
-            first: first.val,
-            second: second?.val || null,
-            prev: prev.val,
-            message: `Found violation: ${prev.val} > ${node.val}. Mark first=${first.val}`,
-            lineNumber: 10
-          });
+          pushStep(`Violation found: prev(${prev.val}) > current(${node.val}). Marking first as ${first.val}.`, 11, node.val);
         }
         second = node;
-        newSteps.push({
-          tree: deepClone(currentTree),
-          current: node.val,
-          first: first?.val || null,
-          second: second.val,
-          prev: prev.val,
-          message: `Update second=${second.val}`,
-          lineNumber: 11
-        });
+        pushStep(`Marking second as current node (${second.val}).`, 12, node.val);
       }
 
       prev = node;
+      pushStep(`Updating prev to ${prev.val}.`, 14, node.val);
+
+      pushStep(`Going right from node ${node.val}.`, 16, node.val);
       inorder(node.right);
     };
 
-    const currentTree = deepClone(tree);
-    calculatePositions(currentTree, 200, 50, 80);
-
-    newSteps.push({
-      tree: currentTree,
-      current: null,
-      first: null,
-      second: null,
-      prev: null,
-      message: 'Recover BST: Find two swapped nodes via inorder traversal',
-      lineNumber: 0
-    });
+    pushStep("Initializing tracking variables.", 2, null);
+    pushStep("Starting inorder traversal.", 19, null);
 
     inorder(tree);
 
-    // Swap the values
     if (first && second) {
-      [first.val, second.val] = [second.val, first.val];
-      const finalTree = deepClone(tree);
-      calculatePositions(finalTree, 200, 50, 80);
+      pushStep(`Identifying nodes to swap: ${first.val} and ${second.val}.`, 20, null);
 
-      newSteps.push({
-        tree: finalTree,
-        current: null,
-        first: second.val,
-        second: first.val,
-        prev: null,
-        message: `Swap values: ${second.val} ↔ ${first.val}`,
-        lineNumber: 19
-      });
+      const val1 = first.val;
+      const val2 = second.val;
+      first.val = val2;
+      second.val = val1;
 
-      newSteps.push({
-        tree: finalTree,
-        current: null,
-        first: null,
-        second: null,
-        prev: null,
-        message: 'Complete! BST recovered',
-        lineNumber: 20
-      });
+      pushStep(`Swapping values: ${val1} ↔ ${val2}.`, 20, null);
+      pushStep("BST recovery complete!", 21, null);
     }
 
     setSteps(newSteps);
@@ -221,20 +188,20 @@ export const RecoverBSTVisualization = () => {
     return (
       <g key={`${node.val}-${node.x}-${node.y}`}>
         {node.left && node.left.x !== undefined && node.left.y !== undefined && (
-          <line x1={node.x} y1={node.y} x2={node.left.x} y2={node.left.y} stroke="currentColor" strokeWidth="2" className="text-border" />
+          <line x1={node.x} y1={node.y} x2={node.left.x} y2={node.left.y} stroke="currentColor" strokeWidth="2" className="text-border transition-all duration-300" />
         )}
         {node.right && node.right.x !== undefined && node.right.y !== undefined && (
-          <line x1={node.x} y1={node.y} x2={node.right.x} y2={node.right.y} stroke="currentColor" strokeWidth="2" className="text-border" />
+          <line x1={node.x} y1={node.y} x2={node.right.x} y2={node.right.y} stroke="currentColor" strokeWidth="2" className="text-border transition-all duration-300" />
         )}
         <circle
           cx={node.x}
           cy={node.y}
           r="24"
           className={`transition-all duration-300 ${node.val === currentStep.first || node.val === currentStep.second
-              ? 'fill-red-500 stroke-red-500'
-              : currentStep.current === node.val
-                ? 'fill-primary stroke-primary'
-                : 'fill-muted stroke-border'
+            ? 'fill-red-500 stroke-red-600 shadow-lg shadow-red-500/50'
+            : currentStep.current === node.val
+              ? 'fill-primary stroke-primary'
+              : 'fill-card stroke-border'
             }`}
           strokeWidth="2"
         />
@@ -243,9 +210,9 @@ export const RecoverBSTVisualization = () => {
           y={node.y}
           textAnchor="middle"
           dy=".3em"
-          className={`font- ${node.val === currentStep.first || node.val === currentStep.second || currentStep.current === node.val
-              ? 'fill-white'
-              : 'fill-foreground'
+          className={`text-sm font-medium transition-colors duration-300 ${node.val === currentStep.first || node.val === currentStep.second || currentStep.current === node.val
+            ? 'fill-white'
+            : 'fill-foreground'
             }`}
         >
           {node.val}
@@ -273,47 +240,29 @@ export const RecoverBSTVisualization = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 overflow-x-auto">
-            <svg width="400" height="250" className="mx-auto">
+          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 pb-4 overflow-hidden">
+            <svg viewBox="0 0 400 250" className="w-full h-64 overflow-visible">
               {currentStep.tree && renderTree(currentStep.tree)}
             </svg>
           </div>
 
-          <div className="bg-accent/50 rounded-lg border border-accent p-4">
+          <div className={`rounded-lg border p-4 transition-all duration-300 ${currentStep.lineNumber === 20 ? 'bg-green-500/10 border-green-500' : 'bg-accent/50 border-accent'}`}>
             <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 text-xs">
-            <div className="bg-red-500/10 border border-red-500/30 rounded p-2 text-center">
-              <div className="text-muted-foreground">First</div>
-              <div className="font- text-red-500">{currentStep.first || 'null'}</div>
-            </div>
-            <div className="bg-red-500/10 border border-red-500/30 rounded p-2 text-center">
-              <div className="text-muted-foreground">Second</div>
-              <div className="font- text-red-500">{currentStep.second || 'null'}</div>
-            </div>
-            <div className="bg-blue-500/10 border border-blue-500/30 rounded p-2 text-center">
-              <div className="text-muted-foreground">Prev</div>
-              <div className="font- text-blue-500">{currentStep.prev || 'null'}</div>
-            </div>
-          </div>
-
-          <div className="rounded-lg ">
+          <div className="rounded-lg border bg-card p-2">
             <VariablePanel
               variables={{
-                current: currentStep.current || 'null',
-                first: currentStep.first || 'null',
-                second: currentStep.second || 'null',
-                prev: currentStep.prev || 'null'
+                current: currentStep.current ?? 'null',
+                prev: currentStep.prev ?? 'null',
+                first: currentStep.first ?? 'null',
+                second: currentStep.second ?? 'null'
               }}
             />
           </div>
         </div>
 
-        <div className="space-y-4">
-
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="TypeScript" />
-        </div>
+        <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="TypeScript" />
       </div>
     </div>
   );

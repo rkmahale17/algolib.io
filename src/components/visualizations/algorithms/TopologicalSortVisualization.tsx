@@ -1,8 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 
-import { CodeHighlighter } from '../shared/CodeHighlighter';
-import { StepControls } from '../shared/StepControls';
+import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
+import { Card } from '@/components/ui/card';
+import { motion } from 'framer-motion';
 
 interface Step {
   currentNode: number | null;
@@ -16,45 +19,49 @@ interface Step {
 export const TopologicalSortVisualization: React.FC = () => {
   const [steps, setSteps] = useState<Step[]>([]);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1000);
-  const intervalRef = useRef<number | null>(null);
 
-  const code = `function topologicalSort(graph, numNodes) {
-  const inDegree = Array(numNodes).fill(0);
-  
-  // Calculate in-degrees
-  for (let node in graph) {
-    for (let neighbor of graph[node]) {
-      inDegree[neighbor]++;
+
+  const code = `function topologicalSort(graph: Map<number, number[]>): number[] {
+  const indegrees: number[] = new Array(graph.size).fill(0);
+
+  for (const node of graph.keys()) {
+    for (const neighbor of graph.get(node) || []) {
+      indegrees[neighbor]++;
     }
   }
-  
-  // Add nodes with 0 in-degree to queue
-  const queue = [];
-  for (let i = 0; i < numNodes; i++) {
-    if (inDegree[i] === 0) queue.push(i);
+
+  const queue: number[] = [];
+
+  for (let i = 0; i < graph.size; i++) {
+    if (indegrees[i] === 0) {
+      queue.push(i);
+    }
   }
-  
-  const result = [];
+
+  const result: number[] = [];
+
   while (queue.length > 0) {
-    const node = queue.shift();
+    const node: number = queue.shift()!;
     result.push(node);
-    
-    // Reduce in-degree for neighbors
-    for (let neighbor of graph[node] || []) {
-      inDegree[neighbor]--;
-      if (inDegree[neighbor] === 0) {
+
+    for (const neighbor of graph.get(node) || []) {
+      indegrees[neighbor]--;
+
+      if (indegrees[neighbor] === 0) {
         queue.push(neighbor);
       }
     }
   }
-  
+
+  if (result.length !== graph.size) {
+    return [];
+  }
+
   return result;
 }`;
 
   const generateSteps = () => {
-    const graph: Record<number, number[]> = {
+    const graphValues: Record<number, number[]> = {
       0: [2, 3],
       1: [3, 4],
       2: [3],
@@ -62,64 +69,113 @@ export const TopologicalSortVisualization: React.FC = () => {
       4: []
     };
     const numNodes = 5;
-
-    const inDegree = Array(numNodes).fill(0);
-    for (let node in graph) {
-      for (let neighbor of graph[node]) {
-        inDegree[neighbor]++;
-      }
+    const graph = new Map<number, number[]>();
+    for (const key in graphValues) {
+      graph.set(Number(key), graphValues[key]);
     }
 
     const newSteps: Step[] = [];
 
+    const indegrees: number[] = new Array(numNodes).fill(0);
     newSteps.push({
       currentNode: null,
-      inDegree: [...inDegree],
+      inDegree: [...indegrees],
       queue: [],
       result: [],
-      message: `Calculated in-degrees: [${inDegree.join(', ')}]`,
-      lineNumber: 4
+      message: "Initialize in-degrees to 0",
+      lineNumber: 2
     });
 
-    const queue: number[] = [];
-    for (let i = 0; i < numNodes; i++) {
-      if (inDegree[i] === 0) queue.push(i);
+    for (const [node, neighbors] of graph.entries()) {
+      for (const neighbor of neighbors) {
+        indegrees[neighbor]++;
+      }
     }
 
     newSteps.push({
       currentNode: null,
-      inDegree: [...inDegree],
-      queue: [...queue],
+      inDegree: [...indegrees],
+      queue: [],
       result: [],
-      message: `Initial queue (in-degree 0): [${queue.join(', ')}]`,
-      lineNumber: 12
+      message: `Calculated in-degrees: [${indegrees.join(', ')}]`,
+      lineNumber: 4
     });
 
+    const queue: number[] = [];
+    newSteps.push({
+      currentNode: null,
+      inDegree: [...indegrees],
+      queue: [...queue],
+      result: [],
+      message: "Initialize empty queue",
+      lineNumber: 10
+    });
+
+    for (let i = 0; i < numNodes; i++) {
+      if (indegrees[i] === 0) {
+        queue.push(i);
+        newSteps.push({
+          currentNode: null,
+          inDegree: [...indegrees],
+          queue: [...queue],
+          result: [],
+          message: `Node ${i} has in-degree 0, adding to queue`,
+          lineNumber: 14
+        });
+      }
+    }
+
     const result: number[] = [];
+    newSteps.push({
+      currentNode: null,
+      inDegree: [...indegrees],
+      queue: [...queue],
+      result: [...result],
+      message: "Initialize empty result list",
+      lineNumber: 18
+    });
+
     while (queue.length > 0) {
       const node = queue.shift()!;
-      result.push(node);
-
       newSteps.push({
         currentNode: node,
-        inDegree: [...inDegree],
+        inDegree: [...indegrees],
         queue: [...queue],
         result: [...result],
-        message: `Process node ${node}`,
-        lineNumber: 18
+        message: `Dequeued node ${node}`,
+        lineNumber: 21
       });
 
-      for (let neighbor of graph[node] || []) {
-        inDegree[neighbor]--;
-        if (inDegree[neighbor] === 0) {
+      result.push(node);
+      newSteps.push({
+        currentNode: node,
+        inDegree: [...indegrees],
+        queue: [...queue],
+        result: [...result],
+        message: `Added node ${node} to result`,
+        lineNumber: 22
+      });
+
+      for (const neighbor of graph.get(node) || []) {
+        indegrees[neighbor]--;
+        newSteps.push({
+          currentNode: node,
+          inDegree: [...indegrees],
+          queue: [...queue],
+          result: [...result],
+          message: `Decremented in-degree of neighbor ${neighbor} to ${indegrees[neighbor]}`,
+          lineNumber: 25
+        });
+
+        if (indegrees[neighbor] === 0) {
           queue.push(neighbor);
           newSteps.push({
             currentNode: node,
-            inDegree: [...inDegree],
+            inDegree: [...indegrees],
             queue: [...queue],
             result: [...result],
-            message: `Node ${neighbor} in-degree became 0, added to queue`,
-            lineNumber: 24
+            message: `Neighbor ${neighbor} in-degree reached 0, adding to queue`,
+            lineNumber: 28
           });
         }
       }
@@ -127,11 +183,11 @@ export const TopologicalSortVisualization: React.FC = () => {
 
     newSteps.push({
       currentNode: null,
-      inDegree: [...inDegree],
-      queue: [],
+      inDegree: [...indegrees],
+      queue: [...queue],
       result: [...result],
-      message: `Topological order: [${result.join(' → ')}]`,
-      lineNumber: 30
+      message: "Final topological order computed",
+      lineNumber: 37
     });
 
     setSteps(newSteps);
@@ -141,123 +197,83 @@ export const TopologicalSortVisualization: React.FC = () => {
     generateSteps();
   }, []);
 
-  useEffect(() => {
-    if (isPlaying && currentStepIndex < steps.length - 1) {
-      intervalRef.current = window.setInterval(() => {
-        setCurrentStepIndex((prev) => {
-          if (prev >= steps.length - 1) {
-            setIsPlaying(false);
-            return prev;
-          }
-          return prev + 1;
-        });
-      }, speed);
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    }
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [isPlaying, currentStepIndex, steps.length, speed]);
-
-  const handlePlay = () => setIsPlaying(true);
-  const handlePause = () => setIsPlaying(false);
-  const handleStepForward = () => {
-    if (currentStepIndex < steps.length - 1) {
-      setCurrentStepIndex(currentStepIndex + 1);
-    }
-  };
-  const handleStepBack = () => {
-    if (currentStepIndex > 0) {
-      setCurrentStepIndex(currentStepIndex - 1);
-    }
-  };
-  const handleReset = () => {
-    setCurrentStepIndex(0);
-    setIsPlaying(false);
-  };
-
-  if (steps.length === 0) return null;
-
   const currentStep = steps[currentStepIndex];
+  if (!currentStep) return null;
 
   return (
-    <div className="space-y-6">
-      <StepControls
-        onPlay={handlePlay}
-        onPause={handlePause}
-        onStepForward={handleStepForward}
-        onStepBack={handleStepBack}
-        onReset={handleReset}
-        isPlaying={isPlaying}
-        currentStep={currentStepIndex}
-        totalSteps={steps.length}
-        speed={speed}
-        onSpeedChange={setSpeed}
-      />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <VisualizationLayout
+      leftContent={
+        <div className="space-y-6">
+          <Card className="p-6 bg-card/50 backdrop-blur-sm border-primary/20">
+            <h3 className="text-xs font-semibold mb-6 text-muted-foreground uppercase tracking-widest">
+              Topological Sort Visualization
+            </h3>
 
-        <div className="bg-card rounded-lg p-6 border">
-          <h3 className="text-lg font-semibold mb-4">Topological Sort (Kahn's Algorithm)</h3>
+            <div className="grid grid-cols-5 gap-4 mb-6">
+              {currentStep.inDegree.map((degree, idx) => (
+                <div key={idx} className="flex flex-col items-center gap-2">
+                  <motion.div
+                    animate={{ scale: currentStep.currentNode === idx ? 1.1 : 1 }}
+                    className={`w-12 h-12 rounded-full border-2 flex items-center justify-center font-medium text-base transition-all ${currentStep.currentNode === idx
+                      ? 'bg-primary/20 border-primary text-primary'
+                      : currentStep.result.includes(idx)
+                        ? 'bg-green-500/20 border-green-500 text-green-500'
+                        : currentStep.queue.includes(idx)
+                          ? 'bg-blue-500/20 border-blue-500 text-blue-500'
+                          : 'bg-card border-border'
+                      }`}
+                  >
+                    {idx}
+                  </motion.div>
+                  <div className="text-[10px] text-muted-foreground font-mono">
+                    IN:{degree}
+                  </div>
+                </div>
+              ))}
+            </div>
 
-          <div className="grid grid-cols-5 gap-4 mb-6">
-            {currentStep.inDegree.map((degree, idx) => (
-              <div key={idx} className="flex flex-col items-center gap-2">
-                <div
-                  className={`w-16 h-16 rounded-full border-2 flex items-center justify-center font- text-lg transition-all ${currentStep.currentNode === idx
-                    ? 'bg-primary/20 border-primary text-primary scale-110'
-                    : currentStep.result.includes(idx)
-                      ? 'bg-green-500/20 border-green-500 text-green-500'
-                      : currentStep.queue.includes(idx)
-                        ? 'bg-blue-500/20 border-blue-500 text-blue-500'
-                        : 'bg-card border-border'
-                    }`}
-                >
-                  {idx}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  In-degree: {degree}
-                </div>
+            <div className="space-y-3">
+              <div className="p-3 bg-blue-500/10 rounded-md border border-blue-500/20">
+                <span className="text-xs font-semibold text-blue-500 uppercase tracking-wider">Queue: </span>
+                <span className="text-sm font-mono">[{currentStep.queue.join(', ')}]</span>
               </div>
-            ))}
-          </div>
-
-          <div className="mt-4 space-y-2">
-            <div className="p-3 bg-blue-500/10 rounded">
-              <span className="text-sm font-semibold">Queue: </span>
-              <span className="text-sm">[{currentStep.queue.join(', ')}]</span>
+              <div className="p-3 bg-green-500/10 rounded-md border border-green-500/20">
+                <span className="text-xs font-semibold text-green-500 uppercase tracking-wider">Result: </span>
+                <span className="text-sm font-mono">[{currentStep.result.join(' → ')}]</span>
+              </div>
             </div>
-            <div className="p-3 bg-green-500/10 rounded">
-              <span className="text-sm font-semibold">Result: </span>
-              <span className="text-sm">[{currentStep.result.join(' → ')}]</span>
-            </div>
-          </div>
+          </Card>
 
-          <div className="mt-4 p-4 bg-muted rounded">
-            <p className="text-sm">{currentStep.message}</p>
-          </div>
-          <div className="mt-4 p-4 bg-muted rounded">
-            <VariablePanel
-              variables={{
-                currentNode: currentStep.currentNode !== null ? currentStep.currentNode : 'none',
-                queueSize: currentStep.queue.length,
-                resultLength: currentStep.result.length
-              }}
-            />
-          </div>
+          <Card className="p-4 bg-primary/5 border-primary/20 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
+            <h4 className="text-[10px] font-bold uppercase tracking-widest text-primary mb-2">Step Explanation</h4>
+            <p className="text-sm font-medium leading-relaxed">{currentStep.message}</p>
+          </Card>
         </div>
-
-
-        <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
-
-      </div>
-
-
-    </div>
+      }
+      rightContent={
+        <div className="space-y-4">
+          <AnimatedCodeEditor
+            code={code}
+            language="typescript"
+            highlightedLines={[currentStep.lineNumber]}
+          />
+          <VariablePanel
+            variables={{
+              currentNode: currentStep.currentNode !== null ? currentStep.currentNode : 'none',
+              queueSize: currentStep.queue.length,
+              resultLength: currentStep.result.length
+            }}
+          />
+        </div>
+      }
+      controls={
+        <SimpleStepControls
+          currentStep={currentStepIndex}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStepIndex}
+        />
+      }
+    />
   );
 };

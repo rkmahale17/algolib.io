@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
-import { CodeHighlighter } from '../shared/CodeHighlighter';
-import { StepControls } from '../shared/StepControls';
-import { VariablePanel } from '../shared/VariablePanel';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
+import { StepControls } from "../shared/StepControls";
+import { VariablePanel } from "../shared/VariablePanel";
 
 interface Cell {
   x: number;
@@ -29,136 +29,231 @@ export const AStarVisualization = () => {
   const [speed, setSpeed] = useState(1);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const code = `function aStar(grid, start, goal) {
-  const openSet = [start];
-  const closedSet = [];
-  
-  while (openSet.length > 0) {
-    const current = openSet.reduce((min, node) => 
-      node.f < min.f ? node : min
-    );
-    
-    if (current === goal) return reconstructPath();
-    
-    openSet.remove(current);
-    closedSet.add(current);
-    
-    for (const neighbor of getNeighbors(current)) {
-      if (closedSet.has(neighbor)) continue;
-      
-      const tentativeG = current.g + 1;
-      if (!openSet.has(neighbor) || tentativeG < neighbor.g) {
-        neighbor.g = tentativeG;
-        neighbor.h = heuristic(neighbor, goal);
-        neighbor.f = neighbor.g + neighbor.h;
-        if (!openSet.has(neighbor)) openSet.add(neighbor);
+  const code = `function aStar(grid: number[][], start: [number, number], goal: [number, number]): [number, number][] {
+  const rows = grid.length
+  const cols = grid[0].length
+
+  const heuristic = (x: number, y: number) =>
+    Math.abs(x - goal[0]) + Math.abs(y - goal[1])
+
+  const dirs = [[0,1],[1,0],[0,-1],[-1,0]]
+
+  const openSet: [number, number, number][] = [[heuristic(...start), start[0], start[1]]]
+
+  const cameFrom = new Map<number, number>()
+  const gScore = new Map<number, number>()
+  const closedSet = new Set<number>()
+
+  const startKey = start[0]*cols + start[1]
+  gScore.set(startKey, 0)
+
+  while(openSet.length) {
+    openSet.sort((a,b)=>a[0]-b[0])
+    const [, x, y] = openSet.shift()!
+
+    const key = x*cols + y
+
+    if(closedSet.has(key)) continue
+    closedSet.add(key)
+
+    if(x === goal[0] && y === goal[1]) {
+      const path: [number,number][] = []
+      let curr = key
+
+      while(curr !== startKey) {
+        const cx = Math.floor(curr/cols)
+        const cy = curr%cols
+        path.unshift([cx,cy])
+        curr = cameFrom.get(curr)!
+      }
+
+      path.unshift(start)
+      return path
+    }
+
+    for(const [dx,dy] of dirs) {
+      const nx = x+dx
+      const ny = y+dy
+
+      if(nx<0 || ny<0 || nx>=rows || ny>=cols || grid[nx][ny]===1) continue
+
+      const neighborKey = nx*cols+ny
+      const tentative = gScore.get(key)! + 1
+
+      if(!gScore.has(neighborKey) || tentative < gScore.get(neighborKey)!) {
+        cameFrom.set(neighborKey, key)
+        gScore.set(neighborKey, tentative)
+
+        const f = tentative + heuristic(nx,ny)
+        openSet.push([f,nx,ny])
       }
     }
   }
+
+  return []
 }`;
 
   const generateSteps = () => {
     const rows = 6;
     const cols = 8;
-    const grid = Array(rows).fill(0).map(() => Array(cols).fill('.'));
+    const grid = Array(rows)
+      .fill(0)
+      .map(() => Array(cols).fill("."));
 
-    // Add obstacles
-    grid[2][3] = '#';
-    grid[2][4] = '#';
-    grid[3][4] = '#';
+    // Add obstacles matching the '1' representation in user's TS code.
+    // In our visually mapped logic, "#" translates to obstacle in UI rendering block.
+    grid[2][3] = "#";
+    grid[2][4] = "#";
+    grid[3][4] = "#";
 
-    const start = { x: 0, y: 0, f: 0, g: 0, h: 0 };
-    const goal = { x: 7, y: 5, f: 0, g: 0, h: 0 };
+    const start: [number, number] = [0, 0];
+    const goal: [number, number] = [5, 7];
 
-    const heuristic = (a: Cell, b: Cell) => Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+    const heuristic = (x: number, y: number) =>
+      Math.abs(x - goal[0]) + Math.abs(y - goal[1]);
+
+    const dirs = [[0, 1], [1, 0], [0, -1], [-1, 0]];
 
     const newSteps: Step[] = [];
-    const openSet: Cell[] = [{ ...start, h: heuristic(start, goal), f: heuristic(start, goal) }];
-    const closedSet: Cell[] = [];
-    const cameFrom = new Map<string, Cell>();
+    const openSet: [number, number, number][] = [
+      [heuristic(start[0], start[1]), start[0], start[1]],
+    ];
+
+    // We preserve Cell structure for UI mappings 
+    const openSetCells = new Map<number, Cell>();
+    openSetCells.set(start[0] * cols + start[1], { x: start[0], y: start[1], f: heuristic(start[0], start[1]), g: 0, h: heuristic(start[0], start[1]) });
+
+    const closedSet = new Set<number>();
+    const cameFrom = new Map<number, number>();
+    const gScore = new Map<number, number>();
+
+    const startKey = start[0] * cols + start[1];
+    gScore.set(startKey, 0);
 
     newSteps.push({
-      grid: grid.map(row => [...row]),
-      openSet: [...openSet],
+      grid: grid.map((row) => [...row]),
+      openSet: Array.from(openSetCells.values()),
       closedSet: [],
       current: null,
       path: [],
-      message: 'Initialize A* from start to goal',
-      lineNumber: 1
+      message: "Initialize A* structures: start, open set, closed set, scores",
+      lineNumber: 17,
     });
 
     while (openSet.length > 0) {
-      openSet.sort((a, b) => a.f - b.f);
-      const current = openSet.shift()!;
-      closedSet.push(current);
-
       newSteps.push({
-        grid: grid.map(row => [...row]),
-        openSet: [...openSet],
-        closedSet: [...closedSet],
-        current,
+        grid: grid.map((row) => [...row]),
+        openSet: Array.from(openSetCells.values()),
+        closedSet: Array.from(closedSet).map(k => ({ x: Math.floor(k / cols), y: k % cols, f: 0, g: 0, h: 0 })),
+        current: null,
         path: [],
-        message: `Explore cell (${current.x}, ${current.y}) with f=${current.f}`,
-        lineNumber: 6
+        message: "Sort openSet by lowest f-score",
+        lineNumber: 20,
       });
 
-      if (current.x === goal.x && current.y === goal.y) {
+      openSet.sort((a, b) => a[0] - b[0]);
+      const [fScore, x, y] = openSet.shift()!;
+
+      const key = x * cols + y;
+      const currentCell = openSetCells.get(key) || { x, y, f: fScore, g: gScore.get(key) || 0, h: heuristic(x, y) };
+      openSetCells.delete(key);
+
+      newSteps.push({
+        grid: grid.map((row) => [...row]),
+        openSet: Array.from(openSetCells.values()),
+        closedSet: Array.from(closedSet).map(k => ({ x: Math.floor(k / cols), y: k % cols, f: 0, g: 0, h: 0 })),
+        current: currentCell,
+        path: [],
+        message: `Current node (${x}, ${y}) with f=${currentCell.f}`,
+        lineNumber: 21,
+      });
+
+      if (closedSet.has(key)) {
+        newSteps.push({
+          grid: grid.map((row) => [...row]),
+          openSet: Array.from(openSetCells.values()),
+          closedSet: Array.from(closedSet).map(k => ({ x: Math.floor(k / cols), y: k % cols, f: 0, g: 0, h: 0 })),
+          current: currentCell,
+          path: [],
+          message: `Node (${x}, ${y}) already evaluated (closed), skipping`,
+          lineNumber: 25,
+        });
+        continue;
+      }
+
+      closedSet.add(key);
+      newSteps.push({
+        grid: grid.map((row) => [...row]),
+        openSet: Array.from(openSetCells.values()),
+        closedSet: Array.from(closedSet).map(k => ({ x: Math.floor(k / cols), y: k % cols, f: 0, g: 0, h: 0 })),
+        current: currentCell,
+        path: [],
+        message: `Marking node (${x}, ${y}) as evaluated (added to closed set)`,
+        lineNumber: 26,
+      });
+
+      if (x === goal[0] && y === goal[1]) {
         const path: Cell[] = [];
-        let curr: Cell | undefined = current;
-        while (curr) {
-          path.unshift(curr);
-          curr = cameFrom.get(`${curr.x},${curr.y}`);
+        let curr = key;
+        while (curr !== startKey) {
+          const cx = Math.floor(curr / cols);
+          const cy = curr % cols;
+          path.unshift({ x: cx, y: cy, f: 0, g: 0, h: 0 });
+          curr = cameFrom.get(curr)!;
         }
+        path.unshift({ x: start[0], y: start[1], f: 0, g: 0, h: 0 });
 
         newSteps.push({
-          grid: grid.map(row => [...row]),
-          openSet: [],
-          closedSet: [...closedSet],
-          current,
+          grid: grid.map((row) => [...row]),
+          openSet: Array.from(openSetCells.values()),
+          closedSet: Array.from(closedSet).map(k => ({ x: Math.floor(k / cols), y: k % cols, f: 0, g: 0, h: 0 })),
+          current: currentCell,
           path,
-          message: 'Goal reached! Path found',
-          lineNumber: 9
+          message: "Goal reached! Reconstructed path by backtracking via cameFrom",
+          lineNumber: 28,
         });
         break;
       }
 
-      const neighbors: { x: number; y: number }[] = [
-        { x: current.x + 1, y: current.y },
-        { x: current.x - 1, y: current.y },
-        { x: current.x, y: current.y + 1 },
-        { x: current.x, y: current.y - 1 }
-      ];
+      for (const [dx, dy] of dirs) {
+        const nx = x + dx;
+        const ny = y + dy;
 
-      for (const neighbor of neighbors) {
-        if (neighbor.x < 0 || neighbor.x >= cols || neighbor.y < 0 || neighbor.y >= rows) continue;
-        if (grid[neighbor.y][neighbor.x] === '#') continue;
-        if (closedSet.some(c => c.x === neighbor.x && c.y === neighbor.y)) continue;
+        // Skip bounds and obstacles 
+        if (nx < 0 || ny < 0 || nx >= rows || ny >= cols || grid[nx][ny] === "#") {
+          continue;
+        }
 
-        const tentativeG = current.g + 1;
-        const existingOpen = openSet.find(c => c.x === neighbor.x && c.y === neighbor.y);
+        newSteps.push({
+          grid: grid.map((row) => [...row]),
+          openSet: Array.from(openSetCells.values()),
+          closedSet: Array.from(closedSet).map(k => ({ x: Math.floor(k / cols), y: k % cols, f: 0, g: 0, h: 0 })),
+          current: currentCell,
+          path: [],
+          message: `Checking neighbor (${nx}, ${ny})`,
+          lineNumber: 43,
+        });
 
-        if (!existingOpen || tentativeG < existingOpen.g) {
-          const neighborCell: Cell = { x: neighbor.x, y: neighbor.y, g: tentativeG, h: 0, f: 0 };
-          const h = heuristic(neighborCell, goal);
-          neighborCell.h = h;
-          neighborCell.f = tentativeG + h;
+        const neighborKey = nx * cols + ny;
+        const tentative = gScore.get(key)! + 1;
 
-          cameFrom.set(`${neighbor.x},${neighbor.y}`, current);
+        if (!gScore.has(neighborKey) || tentative < gScore.get(neighborKey)!) {
+          cameFrom.set(neighborKey, key);
+          gScore.set(neighborKey, tentative);
 
-          if (!existingOpen) {
-            openSet.push(neighborCell);
-          } else {
-            Object.assign(existingOpen, neighborCell);
-          }
+          const f = tentative + heuristic(nx, ny);
+          openSet.push([f, nx, ny]);
+
+          openSetCells.set(neighborKey, { x: nx, y: ny, g: tentative, h: heuristic(nx, ny), f });
 
           newSteps.push({
-            grid: grid.map(row => [...row]),
-            openSet: [...openSet],
-            closedSet: [...closedSet],
-            current,
+            grid: grid.map((row) => [...row]),
+            openSet: Array.from(openSetCells.values()),
+            closedSet: Array.from(closedSet).map(k => ({ x: Math.floor(k / cols), y: k % cols, f: 0, g: 0, h: 0 })),
+            current: currentCell,
             path: [],
-            message: `Add neighbor (${neighbor.x}, ${neighbor.y}) with g=${tentativeG}, h=${h}`,
-            lineNumber: 19
+            message: `Updated better path to neighbor (${nx}, ${ny}): g=${tentative}, h=${heuristic(nx, ny)}, f=${f}`,
+            lineNumber: 57,
           });
         }
       }
@@ -175,7 +270,7 @@ export const AStarVisualization = () => {
   useEffect(() => {
     if (isPlaying && currentStepIndex < steps.length - 1) {
       intervalRef.current = setInterval(() => {
-        setCurrentStepIndex(prev => {
+        setCurrentStepIndex((prev) => {
           if (prev >= steps.length - 1) {
             setIsPlaying(false);
             return prev;
@@ -193,8 +288,11 @@ export const AStarVisualization = () => {
 
   const handlePlay = () => setIsPlaying(true);
   const handlePause = () => setIsPlaying(false);
-  const handleStepForward = () => currentStepIndex < steps.length - 1 && setCurrentStepIndex(prev => prev + 1);
-  const handleStepBack = () => currentStepIndex > 0 && setCurrentStepIndex(prev => prev - 1);
+  const handleStepForward = () =>
+    currentStepIndex < steps.length - 1 &&
+    setCurrentStepIndex((prev) => prev + 1);
+  const handleStepBack = () =>
+    currentStepIndex > 0 && setCurrentStepIndex((prev) => prev - 1);
   const handleReset = () => {
     setCurrentStepIndex(0);
     setIsPlaying(false);
@@ -222,39 +320,47 @@ export const AStarVisualization = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 overflow-x-auto">
-            <div className="inline-block ">
-              {currentStep.grid.map((row, y) => (
-                <div key={y} className="flex">
-                  {row.map((cell, x) => {
-                    const isStart = x === 0 && y === 0;
-                    const isGoal = x === 7 && y === 5;
-                    const isCurrent = currentStep.current?.x === x && currentStep.current?.y === y;
-                    const inPath = currentStep.path.some(p => p.x === x && p.y === y);
-                    const inOpen = currentStep.openSet.some(c => c.x === x && c.y === y);
-                    const inClosed = currentStep.closedSet.some(c => c.x === x && c.y === y);
+          <div className="bg-muted/30 rounded-lg border border-border/50 p-6 overflow-hidden flex justify-center w-full">
+            <div className="inline-block max-w-[400px]">
+              {currentStep.grid.map((row, rowIdx) => (
+                <div key={rowIdx} className="flex">
+                  {row.map((cell, colIdx) => {
+                    const isStart = rowIdx === 0 && colIdx === 0;
+                    const isGoal = rowIdx === 5 && colIdx === 7;
+                    const isCurrent =
+                      currentStep.current?.x === rowIdx &&
+                      currentStep.current?.y === colIdx;
+                    const inPath = currentStep.path.some(
+                      (p) => p.x === rowIdx && p.y === colIdx,
+                    );
+                    const inOpen = currentStep.openSet.some(
+                      (c) => c.x === rowIdx && c.y === colIdx,
+                    );
+                    const inClosed = currentStep.closedSet.some(
+                      (c) => c.x === rowIdx && c.y === colIdx,
+                    );
 
                     return (
                       <div
-                        key={x}
-                        className={`w-10 h-10 border border-border flex items-center justify-center text-xs font- transition-all duration-300 ${cell === '#'
-                            ? 'bg-gray-800'
-                            : inPath
-                              ? 'bg-green-500 text-white'
-                              : isCurrent
-                                ? 'bg-primary text-white'
-                                : isStart
-                                  ? 'bg-blue-500 text-white'
-                                  : isGoal
-                                    ? 'bg-red-500 text-white'
-                                    : inOpen
-                                      ? 'bg-yellow-500/30'
-                                      : inClosed
-                                        ? 'bg-gray-500/30'
-                                        : 'bg-muted/20'
+                        key={colIdx}
+                        className={`w-8 h-8 md:w-10 md:h-10 border border-border flex items-center justify-center text-xs font-semibold transition-all duration-300 ${cell === "#"
+                          ? "bg-slate-700 text-transparent"
+                          : inPath
+                            ? "bg-green-500 text-white"
+                            : isCurrent
+                              ? "bg-primary text-white"
+                              : isStart
+                                ? "bg-blue-500 text-white"
+                                : isGoal
+                                  ? "bg-red-500 text-white"
+                                  : inOpen
+                                    ? "bg-yellow-500/30"
+                                    : inClosed
+                                      ? "bg-gray-500/30"
+                                      : "bg-muted/20"
                           }`}
                       >
-                        {cell === '#' ? '#' : isStart ? 'S' : isGoal ? 'G' : ''}
+                        {cell === "#" ? "" : isStart ? "S" : isGoal ? "G" : ""}
                       </div>
                     );
                   })}
@@ -264,22 +370,27 @@ export const AStarVisualization = () => {
           </div>
 
           <div className="bg-accent/50 rounded-lg border border-accent p-4">
-            <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
+            <p className="text-sm text-foreground font-medium">
+              {currentStep.message}
+            </p>
           </div>
           <div className="rounded-lg">
             <VariablePanel
               variables={{
-                'Open Set': currentStep.openSet.length,
-                'Closed Set': currentStep.closedSet.length,
-                'Path Length': currentStep.path.length
+                "Open Set": currentStep.openSet.length,
+                "Closed Set": currentStep.closedSet.length,
+                "Path Length": currentStep.path.length,
               }}
             />
           </div>
         </div>
 
         <div className="space-y-4">
-
-          <CodeHighlighter code={code} highlightedLine={currentStep.lineNumber} language="typescript" />
+          <AnimatedCodeEditor
+            code={code}
+            highlightedLines={[currentStep.lineNumber]}
+            language="typescript"
+          />
         </div>
       </div>
     </div>
