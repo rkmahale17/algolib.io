@@ -19,67 +19,95 @@ export const TwoSumVisualization = () => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const code = `function twoSum(nums: number[], target: number): number[] {
-  const map = new Map<number, number>();
-  
-  for (let i = 0; i < nums.length; i++) {
-    const complement = target - nums[i];
-    
-    if (map.has(complement)) {
-      return [map.get(complement)!, i];
+    const seen = new Map<number, number>();
+    for (let i = 0; i < nums.length; i++) {
+        const complement = target - nums[i];
+        if (seen.has(complement)) {
+            return [seen.get(complement)!, i];
+        }
+        seen.set(nums[i], i);
     }
-    
-    map.set(nums[i], i);
-  }
-  
-  return [];
+    return [-1,-1];
 }`;
 
   const generateSteps = () => {
     const nums = [2, 7, 10, 9, 11];
     const target = 18;
     const newSteps: Step[] = [];
-    const map = new Map<number, number>();
+    const seen = new Map<number, number>();
 
+    // Line 2: const seen = new Map<number, number>();
     newSteps.push({
       array: [...nums],
       highlights: [],
-      variables: { target, map: '{}', i: '-', complement: '-' },
-      explanation: `Initialize: Looking for two numbers that sum to ${target}. Create empty hash map.`,
-      lineNumber: 1
+      variables: { target, seen: '{}', i: '-', complement: '-' },
+      explanation: `Initialize an empty hash map 'seen' to store numbers and their indices. Target is ${target}.`,
+      lineNumber: 2
     });
 
     for (let i = 0; i < nums.length; i++) {
-      const complement = target - nums[i];
-
+      // Line 3: for (let i = 0; i < nums.length; i++) {
       newSteps.push({
         array: [...nums],
         highlights: [i],
-        variables: { target, i, 'nums[i]': nums[i], complement, map: JSON.stringify(Object.fromEntries(map)) },
-        explanation: `i=${i}: Check nums[${i}]=${nums[i]}. Calculate complement = ${target} - ${nums[i]} = ${complement}`,
+        variables: { target, seen: JSON.stringify(Object.fromEntries(seen)), i, 'nums[i]': nums[i], complement: '-' },
+        explanation: `Iteration i=${i}: Process nums[${i}] = ${nums[i]}.`,
+        lineNumber: 3
+      });
+
+      const complement = target - nums[i];
+
+      // Line 4: const complement = target - nums[i];
+      newSteps.push({
+        array: [...nums],
+        highlights: [i],
+        variables: { target, seen: JSON.stringify(Object.fromEntries(seen)), i, 'nums[i]': nums[i], complement },
+        explanation: `Calculate complement: ${target} - ${nums[i]} = ${complement}. This is the number we need to find in 'seen'.`,
         lineNumber: 4
       });
 
-      if (map.has(complement)) {
-        const j = map.get(complement)!;
-        newSteps.push({
-          array: [...nums],
-          highlights: [j, i],
-          variables: { target, i, j, 'nums[i]': nums[i], 'nums[j]': nums[j], result: `[${j}, ${i}]` },
-          explanation: `Found! nums[${j}]=${nums[j]} + nums[${i}]=${nums[i]} = ${target}. Return [${j}, ${i}]`,
-          lineNumber: 7
-        });
-        break;
-      }
-
+      // Line 5: if (seen.has(complement)) {
       newSteps.push({
         array: [...nums],
         highlights: [i],
-        variables: { target, i, 'nums[i]': nums[i], action: `map.set(${nums[i]}, ${i})` },
-        explanation: `Complement ${complement} not in map. Store nums[${i}]=${nums[i]} with index ${i} in map.`,
-        lineNumber: 10
+        variables: { target, seen: JSON.stringify(Object.fromEntries(seen)), i, 'nums[i]': nums[i], complement },
+        explanation: `Check if 'seen' has the complement (${complement}).`,
+        lineNumber: 5
       });
 
-      map.set(nums[i], i);
+      if (seen.has(complement)) {
+        const j = seen.get(complement)!;
+        // Line 6: return [seen.get(complement)!, i];
+        newSteps.push({
+          array: [...nums],
+          highlights: [j, i],
+          variables: { target, seen: JSON.stringify(Object.fromEntries(seen)), i, j, 'nums[i]': nums[i], 'nums[j]': nums[j], result: `[${j}, ${i}]` },
+          explanation: `Found ${complement} at index ${j}! The numbers at indices ${j} and ${i} add up to ${target}. Return [${j}, ${i}].`,
+          lineNumber: 6
+        });
+        break; // Stop generator here as we return
+      } else {
+        // Line 8: seen.set(nums[i], i);
+        newSteps.push({
+          array: [...nums],
+          highlights: [i],
+          variables: { target, seen: JSON.stringify(Object.fromEntries(seen)), i, 'nums[i]': nums[i], complement, action: `seen.set(${nums[i]}, ${i})` },
+          explanation: `${complement} is not in 'seen'. Add current number ${nums[i]} to 'seen' with its index ${i}.`,
+          lineNumber: 8
+        });
+        seen.set(nums[i], i);
+      }
+    }
+
+    if (!newSteps[newSteps.length - 1]?.variables.result) {
+        // Line 10: return [-1,-1];
+        newSteps.push({
+          array: [...nums],
+          highlights: [],
+          variables: { target, seen: JSON.stringify(Object.fromEntries(seen)), i: '-', complement: '-' },
+          explanation: `Loop completed and no sum was found. Return [-1, -1].`,
+          lineNumber: 10
+        });
     }
 
     setSteps(newSteps);
@@ -145,12 +173,12 @@ export const TwoSumVisualization = () => {
               {currentStep.array.map((value, idx) => (
                 <div key={idx} className="flex flex-col items-center gap-1 sm:gap-2">
                   <div
-                    className={`w-10 h-10 sm:w-16 sm:h-16 rounded-lg flex items-center justify-center border-2 transition-all duration-300 ${currentStep.highlights.includes(idx)
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center border-2 transition-all duration-300 ${currentStep.highlights.includes(idx)
                       ? 'bg-primary border-primary scale-110 shadow-lg'
                       : 'bg-muted/50 border-border'
                       }`}
                   >
-                    <span className="font- text-sm sm:text-lg">{value}</span>
+                    <span className="font-semibold text-sm sm:text-base">{value}</span>
                   </div>
                   <span className="text-[10px] sm:text-xs text-muted-foreground">[{idx}]</span>
                 </div>
