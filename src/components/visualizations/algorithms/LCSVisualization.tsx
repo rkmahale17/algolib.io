@@ -29,30 +29,20 @@ export const LCSVisualization: React.FC = () => {
     const m = text1.length;
     const n = text2.length;
 
-    // Create a DP table with dimensions (m+1) x (n+1) and initialize all values to 0.
-    // dp[i][j] will store the length of the longest common subsequence of text1[i:] and text2[j:].
     const dp: number[][] = Array.from({ length: m + 1 }, () =>
         new Array(n + 1).fill(0)
     );
 
-    // Iterate through the strings in reverse order.
     for (let i = m - 1; i >= 0; i--) {
         for (let j = n - 1; j >= 0; j--) {
-            // If the characters at the current positions in both strings match,
-            // it means that this character is part of the LCS. Therefore, we
-            // increment the length of LCS found so far (dp[i+1][j+1]) by 1.
             if (text1[i] === text2[j]) {
                 dp[i][j] = 1 + dp[i + 1][j + 1];
             } else {
-                // If the characters do not match, it means that the LCS will be the maximum of
-                // the LCS found by either excluding the current character from text1 (dp[i+1][j])
-                // or excluding the current character from text2 (dp[i][j+1]).
                 dp[i][j] = Math.max(dp[i][j + 1], dp[i + 1][j]);
             }
         }
     }
 
-    // The length of the LCS of text1 and text2 is stored in dp[0][0].
     return dp[0][0];
 }`;
 
@@ -77,13 +67,11 @@ export const LCSVisualization: React.FC = () => {
       text2,
       lcs: "",
       message: "Initialize DP table with 0s. dp[i][j] stores LCS length of text1[i:] and text2[j:]",
-      lineNumber: 7,
+      lineNumber: 5,
     });
 
-    // Step 2: Loops
     for (let i = m - 1; i >= 0; i--) {
       for (let j = n - 1; j >= 0; j--) {
-        // Highlighting the if check
         newSteps.push({
           dp: dp.map((row) => [...row]),
           i,
@@ -91,8 +79,8 @@ export const LCSVisualization: React.FC = () => {
           text1,
           text2,
           lcs: "",
-          message: `Comparing text1[${i}] ('${text1[i]}') and text2[${j}] ('${text2[j]}')`,
-          lineNumber: 16,
+          message: `Checking current positions: i=${i}, j=${j} ('${text1[i]}', '${text2[j]}')`,
+          lineNumber: 11,
           highlightI: i,
           highlightJ: j
         });
@@ -106,8 +94,8 @@ export const LCSVisualization: React.FC = () => {
             text1,
             text2,
             lcs: "",
-            message: `Match! '${text1[i]}' == '${text2[j]}'. Incrementing LCS length: dp[${i}][${j}] = 1 + dp[${i + 1}][${j + 1}] = ${dp[i][j]}`,
-            lineNumber: 17,
+            message: `Match found! '${text1[i]}' == '${text2[j]}'. dp[${i}][${j}] = 1 + dp[${i + 1}][${j + 1}] = ${dp[i][j]}`,
+            lineNumber: 12,
           });
         } else {
           dp[i][j] = Math.max(dp[i][j + 1], dp[i + 1][j]);
@@ -118,14 +106,13 @@ export const LCSVisualization: React.FC = () => {
             text1,
             text2,
             lcs: "",
-            message: `Symbols do not match. Taking max: dp[${i}][${j}] = max(dp[${i}][${j + 1}], dp[${i + 1}][${j}]) = ${dp[i][j]}`,
-            lineNumber: 21,
+            message: `No match. dp[${i}][${j}] = max(dp[${i}][${j + 1}], dp[${i + 1}][${j}]) = ${dp[i][j]}`,
+            lineNumber: 14,
           });
         }
       }
     }
 
-    // Step 3: Result
     newSteps.push({
       dp: dp.map((row) => [...row]),
       i: 0,
@@ -134,7 +121,7 @@ export const LCSVisualization: React.FC = () => {
       text2,
       lcs: "",
       message: `The Longest Common Subsequence length is stored in dp[0][0] = ${dp[0][0]}`,
-      lineNumber: 27,
+      lineNumber: 19,
     });
 
     setSteps(newSteps);
@@ -295,7 +282,7 @@ export const LCSVisualization: React.FC = () => {
         <AnimatedCodeEditor
           code={code}
           highlightedLines={[currentStep.lineNumber]}
-          language="typescript"
+          language="TypeScript"
         />
       </div>
     </div>

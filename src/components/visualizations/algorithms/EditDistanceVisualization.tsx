@@ -22,31 +22,39 @@ export const EditDistanceVisualization: React.FC = () => {
   const [speed, setSpeed] = useState(1000);
   const intervalRef = useRef<number | null>(null);
 
-  const code = `function minDistance(word1, word2) {
-  const m = word1.length;
-  const n = word2.length;
-  const dp = Array(m + 1).fill(0)
-    .map(() => Array(n + 1).fill(0));
-  
-  // Initialize base cases
-  for (let i = 0; i <= m; i++) dp[i][0] = i;
-  for (let j = 0; j <= n; j++) dp[0][j] = j;
-  
-  for (let i = 1; i <= m; i++) {
-    for (let j = 1; j <= n; j++) {
-      if (word1[i-1] === word2[j-1]) {
-        dp[i][j] = dp[i-1][j-1];
-      } else {
-        dp[i][j] = 1 + Math.min(
-          dp[i-1][j],    // delete
-          dp[i][j-1],    // insert
-          dp[i-1][j-1]   // replace
-        );
-      }
+  const code = `function minDistance(word1: string, word2: string): number {
+    const m = word1.length;
+    const n = word2.length;
+
+    const cache: number[][] = Array.from({ length: m + 1 }, () =>
+        new Array(n + 1).fill(Infinity)
+    );
+
+    for (let j = 0; j <= n; j++) {
+        cache[m][j] = n - j;
     }
-  }
-  
-  return dp[m][n];
+
+    for (let i = 0; i <= m; i++) {
+        cache[i][n] = m - i;
+    }
+
+    for (let i = m - 1; i >= 0; i--) {
+        for (let j = n - 1; j >= 0; j--) {
+            if (word1[i] === word2[j]) {
+                cache[i][j] = cache[i + 1][j + 1];
+            } else {
+                cache[i][j] =
+                    1 +
+                    Math.min(
+                        cache[i + 1][j],
+                        cache[i][j + 1],
+                        cache[i + 1][j + 1]
+                    );
+            }
+        }
+    }
+
+    return cache[0][0];
 }`;
 
   const generateSteps = () => {
@@ -55,80 +63,96 @@ export const EditDistanceVisualization: React.FC = () => {
     const m = word1.length;
     const n = word2.length;
 
-    const dp = Array(m + 1)
-      .fill(0)
-      .map(() => Array(n + 1).fill(0));
+    const cache = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
     const newSteps: Step[] = [];
 
-    // Initialize
-    for (let i = 0; i <= m; i++) dp[i][0] = i;
-    for (let j = 0; j <= n; j++) dp[0][j] = j;
-
+    // Base cases
+    for (let j = 0; j <= n; j++) {
+      cache[m][j] = n - j;
+    }
     newSteps.push({
-      dp: dp.map((row) => [...row]),
-      i: 0,
-      j: 0,
+      dp: cache.map((row) => [...row]),
+      i: m,
+      j: -1,
       word1,
       word2,
       operation: "init",
-      message: "Initialize base cases: empty string transformations",
-      lineNumber: 8,
+      message: "Base case: if first word is empty, we must insert all characters of second word",
+      lineNumber: 10,
     });
 
-    for (let i = 1; i <= m; i++) {
-      for (let j = 1; j <= n; j++) {
-        if (word1[i - 1] === word2[j - 1]) {
-          dp[i][j] = dp[i - 1][j - 1];
+    for (let i = 0; i <= m; i++) {
+      cache[i][n] = m - i;
+    }
+    newSteps.push({
+      dp: cache.map((row) => [...row]),
+      i: -1,
+      j: n,
+      word1,
+      word2,
+      operation: "init",
+      message: "Base case: if second word is empty, we must delete all characters of first word",
+      lineNumber: 14,
+    });
+
+    // Main DP
+    for (let i = m - 1; i >= 0; i--) {
+      for (let j = n - 1; j >= 0; j--) {
+        newSteps.push({
+          dp: cache.map((row) => [...row]),
+          i,
+          j,
+          word1,
+          word2,
+          operation: "compare",
+          message: `Comparing '${word1[i]}' with '${word2[j]}'`,
+          lineNumber: 19,
+        });
+
+        if (word1[i] === word2[j]) {
+          cache[i][j] = cache[i + 1][j + 1];
           newSteps.push({
-            dp: dp.map((row) => [...row]),
+            dp: cache.map((row) => [...row]),
             i,
             j,
             word1,
             word2,
             operation: "match",
-            message: `Match! '${word1[i - 1]}' === '${word2[j - 1]
-              }': No operation needed`,
-            lineNumber: 14,
+            message: `Match! '${word1[i]}' === '${word2[j]}'. Edit distance is cache[${i + 1}][${j + 1}] = ${cache[i][j]}`,
+            lineNumber: 20,
           });
         } else {
-          const deleteOp = dp[i - 1][j];
-          const insertOp = dp[i][j - 1];
-          const replaceOp = dp[i - 1][j - 1];
-          dp[i][j] = 1 + Math.min(deleteOp, insertOp, replaceOp);
+          const deleteOp = cache[i + 1][j];
+          const insertOp = cache[i][j + 1];
+          const replaceOp = cache[i + 1][j + 1];
+          cache[i][j] = 1 + Math.min(deleteOp, insertOp, replaceOp);
 
           const minOp = Math.min(deleteOp, insertOp, replaceOp);
-          const operation =
-            minOp === deleteOp
-              ? "delete"
-              : minOp === insertOp
-                ? "insert"
-                : "replace";
+          const opName = minOp === deleteOp ? "delete" : minOp === insertOp ? "insert" : "replace";
 
           newSteps.push({
-            dp: dp.map((row) => [...row]),
+            dp: cache.map((row) => [...row]),
             i,
             j,
             word1,
             word2,
-            operation,
-            message: `'${word1[i - 1]}' ≠ '${word2[j - 1]
-              }': ${operation} (del=${deleteOp}, ins=${insertOp}, rep=${replaceOp}) → ${dp[i][j]
-              }`,
-            lineNumber: 16,
+            operation: opName,
+            message: `'${word1[i]}' !== '${word2[j]}'. Min(del=${deleteOp}, ins=${insertOp}, rep=${replaceOp}) + 1 = ${cache[i][j]}`,
+            lineNumber: 22,
           });
         }
       }
     }
 
     newSteps.push({
-      dp: dp.map((row) => [...row]),
-      i: m,
-      j: n,
+      dp: cache.map((row) => [...row]),
+      i: 0,
+      j: 0,
       word1,
       word2,
       operation: "complete",
-      message: `Minimum edit distance: ${dp[m][n]}`,
-      lineNumber: 25,
+      message: `Minimum edit distance: ${cache[0][0]}`,
+      lineNumber: 33,
     });
 
     setSteps(newSteps);
@@ -206,31 +230,40 @@ export const EditDistanceVisualization: React.FC = () => {
               <thead>
                 <tr>
                   <th className="border border-border p-2 bg-muted"></th>
-                  <th className="border border-border p-2 bg-muted">∅</th>
                   {currentStep.word2.split("").map((char, idx) => (
-                    <th key={idx} className="border border-border p-2 bg-muted">
+                    <th key={idx} className="border border-border p-2 bg-muted text-center font-mono">
                       {char}
+                      <div className="text-[10px] text-muted-foreground font-normal">{idx}</div>
                     </th>
                   ))}
+                  <th className="border border-border p-2 bg-muted text-center text-muted-foreground">
+                    ∅
+                    <div className="text-[10px] font-normal">{currentStep.word2.length}</div>
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {currentStep.dp.map((row, i) => (
                   <tr key={i}>
-                    <td className="border border-border p-2 bg-muted font-semibold">
-                      {i === 0 ? "∅" : currentStep.word1[i - 1]}
+                    <td className="border border-border p-2 bg-muted font-semibold text-center font-mono">
+                      {i < currentStep.word1.length ? (
+                        <>
+                          {currentStep.word1[i]}
+                          <div className="text-[10px] text-muted-foreground font-normal">{i}</div>
+                        </>
+                      ) : "∅"}
                     </td>
                     {row.map((val, j) => (
                       <td
                         key={j}
-                        className={`border border-border p-2 text-center transition-all ${i === currentStep.i && j === currentStep.j
-                          ? "bg-primary/20 font-"
-                          : val > 0
-                            ? "bg-green-500/10"
+                        className={`border border-border p-2 text-center transition-all min-w-[40px] ${i === currentStep.i && j === currentStep.j
+                          ? "bg-primary/20 ring-2 ring-primary ring-inset font-bold text-primary"
+                          : val !== Infinity && val >= 0
+                            ? "bg-green-500/5 text-green-600"
                             : ""
                           }`}
                       >
-                        {val}
+                        {val === Infinity ? "∞" : val}
                       </td>
                     ))}
                   </tr>
@@ -242,25 +275,22 @@ export const EditDistanceVisualization: React.FC = () => {
           <div className="p-4 bg-muted rounded">
             <p className="text-sm">{currentStep.message}</p>
           </div>
-          <div className="rounded-lg">
-            <VariablePanel
-              variables={{
-                i: currentStep.i,
-                j: currentStep.j,
-                operation: currentStep.operation,
-                minDistance:
-                  currentStep.dp[currentStep.dp.length - 1][
-                  currentStep.dp[0].length - 1
-                  ],
-              }}
-            />
-          </div>
+          <VariablePanel
+            variables={{
+              i: currentStep.i !== -1 ? currentStep.i : "done",
+              j: currentStep.j !== -1 ? currentStep.j : "done",
+              operation: currentStep.operation,
+              "word1[i]": currentStep.i >= 0 && currentStep.i < currentStep.word1.length ? currentStep.word1[currentStep.i] : "-",
+              "word2[j]": currentStep.j >= 0 && currentStep.j < currentStep.word2.length ? currentStep.word2[currentStep.j] : "-",
+              result: currentStep.dp[0][0],
+            }}
+          />
         </div>
 
         <AnimatedCodeEditor
           code={code}
           highlightedLines={[currentStep.lineNumber]}
-          language="typescript"
+          language="TypeScript"
         />
       </div>
     </div>

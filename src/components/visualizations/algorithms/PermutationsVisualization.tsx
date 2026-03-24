@@ -152,7 +152,7 @@ export const PermutationsVisualization: React.FC = () => {
     newSteps.push({
       ...lastStep,
       message: 'Algorithm Complete!',
-      lineNumber: 1,
+      lineNumber: 22,
     });
 
     setSteps(newSteps);

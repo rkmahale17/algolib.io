@@ -23,173 +23,109 @@ export const PartitionEqualSubsetVisualization = () => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const code = `function canPartition(nums: number[]): boolean {
-  const total = nums.reduce((a, b) => a + b, 0);
-  if (total % 2 !== 0) return false;
+    const sum = nums.reduce((a, b) => a + b, 0);
+    if (sum % 2 !== 0) return false;
+    const target = sum / 2;
 
-  let dp = new Set<number>();
-  dp.add(0);
+    const dp: boolean[] = new Array(target + 1).fill(false);
+    dp[0] = true;
 
-  const target = total / 2;
-
-  for (let i = nums.length - 1; i >= 0; i--) {
-    const nextDP = new Set<number>();
-
-    for (const t of dp) {
-      if (t + nums[i] === target) {
-        return true;
-      }
-
-      nextDP.add(t + nums[i]);
-      nextDP.add(t);
+    for (const num of nums) {
+        for (let i = target; i >= num; i--) {
+            if (dp[i - num]) {
+                dp[i] = true;
+            }
+        }
     }
 
-    dp = nextDP;
-  }
-
-  return dp.has(target);
+    return dp[target];
 }`;
 
   const generateSteps = () => {
     const nums = [1, 5, 11, 5];
-    const total = nums.reduce((a, b) => a + b, 0);
-
+    const sum = nums.reduce((a, b) => a + b, 0);
     const newSteps: Step[] = [];
 
-    if (total % 2 !== 0) {
+    if (sum % 2 !== 0) {
       newSteps.push({
         dp: [],
         nextDP: [],
         nums,
         i: -1,
         t: null,
-        target: total,
-        message: `Sum is ${total} (odd), impossible to partition.`,
+        target: sum / 2,
+        message: `Sum is ${sum} (odd), impossible to partition equally.`,
         lineNumber: 3,
       });
       setSteps(newSteps);
-      setCurrentStepIndex(0);
       return;
     }
 
-    let dp = new Set<number>();
-    dp.add(0);
-
-    const target = total / 2;
+    const target = sum / 2;
+    const dp = new Array(target + 1).fill(false);
+    dp[0] = true;
 
     newSteps.push({
-      dp: Array.from(dp),
+      dp: [...dp.map(v => v ? 1 : 0)],
       nextDP: [],
       nums,
       i: -1,
-      t: null,
+      t: 0,
       target,
-      message: `Initialize DP set with {0} and set target to ${target}.`,
-      lineNumber: 6,
+      message: `Total sum is ${sum}, target sum is ${target}. Initialize dp[0] = true.`,
+      lineNumber: 7,
     });
 
-    for (let i = nums.length - 1; i >= 0; i--) {
+    for (let idx = 0; idx < nums.length; idx++) {
+      const num = nums[idx];
       newSteps.push({
-        dp: Array.from(dp),
+        dp: [...dp.map(v => v ? 1 : 0)],
         nextDP: [],
         nums,
-        i,
+        i: idx,
         t: null,
         target,
-        message: `Starting outer loop for index i = ${i} (value: ${nums[i]}).`,
-        lineNumber: 10,
+        message: `Considering number: ${num}`,
+        lineNumber: 9,
       });
 
-      const nextDP = new Set<number>();
-
-      newSteps.push({
-        dp: Array.from(dp),
-        nextDP: Array.from(nextDP),
-        nums,
-        i,
-        t: null,
-        target,
-        message: `Initialize empty nextDP set for this iteration.`,
-        lineNumber: 11,
-      });
-
-      for (const t of Array.from(dp)) {
+      for (let i = target; i >= num; i--) {
         newSteps.push({
-          dp: Array.from(dp),
-          nextDP: Array.from(nextDP),
+          dp: [...dp.map(v => v ? 1 : 0)],
+          nextDP: [],
           nums,
-          i,
-          t,
+          i: idx,
+          t: i,
           target,
-          message: `Check sum t=${t} from dp. Adding nums[i] (${nums[i]}) gives ${t + nums[i]}. Is it equal to target (${target})?`,
-          lineNumber: 14,
+          message: `Checking if sum ${i} is reachable: checking if dp[i - ${num}] (dp[${i - num}]) is true.`,
+          lineNumber: 11,
         });
 
-        if (t + nums[i] === target) {
+        if (dp[i - num]) {
+          dp[i] = true;
           newSteps.push({
-            dp: Array.from(dp),
-            nextDP: Array.from(nextDP),
+            dp: [...dp.map(v => v ? 1 : 0)],
+            nextDP: [],
             nums,
-            i,
-            t,
+            i: idx,
+            t: i,
             target,
-            message: `Found partition! ${t} + ${nums[i]} == ${target}. Returning true!`,
-            lineNumber: 15,
+            message: `Reachable! dp[${i - num}] is true, so dp[${i}] becomes true.`,
+            lineNumber: 12,
           });
-          setSteps(newSteps);
-          setCurrentStepIndex(0);
-          return;
         }
-
-        nextDP.add(t + nums[i]);
-
-        newSteps.push({
-          dp: Array.from(dp),
-          nextDP: Array.from(nextDP),
-          nums,
-          i,
-          t,
-          target,
-          message: `It is not the target. Add t + nums[i] = ${t + nums[i]} to nextDP (include current number).`,
-          lineNumber: 18,
-        });
-
-        nextDP.add(t);
-
-        newSteps.push({
-          dp: Array.from(dp),
-          nextDP: Array.from(nextDP),
-          nums,
-          i,
-          t,
-          target,
-          message: `Also add the existing t = ${t} to nextDP (exclude current number).`,
-          lineNumber: 19,
-        });
       }
-
-      dp = nextDP;
-
-      newSteps.push({
-        dp: Array.from(dp),
-        nextDP: [],
-        nums,
-        i,
-        t: null,
-        target,
-        message: `Inner loop complete. Update dp set to be nextDP.`,
-        lineNumber: 22,
-      });
     }
 
     newSteps.push({
-      dp: Array.from(dp),
+      dp: [...dp.map(v => v ? 1 : 0)],
       nextDP: [],
       nums,
       i: -1,
       t: null,
       target,
-      message: `Loop completed. Does final dp set contain target ${target}? ${dp.has(target)}.`,
-      lineNumber: 25,
+      message: `Done! dp[target] (dp[${target}]) is ${dp[target]}. Result: ${dp[target]}`,
+      lineNumber: 17,
     });
 
     setSteps(newSteps);
@@ -233,7 +169,6 @@ export const PartitionEqualSubsetVisualization = () => {
   };
 
   if (steps.length === 0) return null;
-
   const currentStep = steps[currentStepIndex];
 
   return (
@@ -255,63 +190,55 @@ export const PartitionEqualSubsetVisualization = () => {
         <div className="space-y-4">
           <div className="bg-muted/30 rounded-lg border border-border/50 p-6 overflow-hidden flex justify-center w-full">
             <div className="space-y-6 w-full">
-              <div className="bg-card w-full p-4 rounded-md shadow-sm border border-border/40">
-                <h4 className="text-sm font-semibold mb-3">dp (Set)</h4>
-                <div className="flex flex-wrap gap-2 min-h-[40px] items-center">
-                  {currentStep.dp.length === 0 && <span className="text-xs italic text-muted-foreground">Empty Set</span>}
-                  {currentStep.dp.map((s) => (
-                    <div
-                      key={s}
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium border-2 transition-all ${s === currentStep.t
-                        ? 'bg-primary border-primary text-primary-foreground scale-110 shadow-md'
-                        : 'bg-secondary/50 border-secondary text-foreground'
-                        }`}
-                    >
-                      {s}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="bg-card w-full p-4 rounded-md shadow-sm border border-border/40">
-                <h4 className="text-sm font-semibold mb-3">nextDP (Set)</h4>
-                <div className="flex flex-wrap gap-2 min-h-[40px] items-center">
-                  {currentStep.nextDP.length === 0 && <span className="text-xs italic text-muted-foreground">Empty Set</span>}
-                  {currentStep.nextDP.map((s) => {
-                    const isNew = currentStep.t !== null && (s === currentStep.t || s === currentStep.t + currentStep.nums[currentStep.i]);
+              <div className="bg-card w-full p-6 rounded-md shadow-sm border border-border/40">
+                <h4 className="text-sm font-semibold mb-4 flex justify-between items-center">
+                  Reachable Sums (DP Array)
+                  <span className="text-xs font-normal text-muted-foreground">Target: {currentStep.target}</span>
+                </h4>
+                <div className="grid grid-cols-6 sm:grid-cols-12 gap-2">
+                  {currentStep.dp.map((reachable, idx) => {
+                    const isCurrent = currentStep.t === idx;
+                    const isDependency = currentStep.i !== -1 && currentStep.t !== null && idx === currentStep.t - currentStep.nums[currentStep.i];
                     return (
                       <div
-                        key={s}
-                        className={`px-3 py-1.5 rounded-full text-xs font-medium border-2 transition-all ${isNew
-                          ? 'bg-green-500/20 border-green-500 text-green-700 dark:text-green-400 scale-105 shadow-sm'
-                          : 'bg-secondary/50 border-secondary text-foreground'
-                          }`}
+                        key={idx}
+                        className={`flex flex-col items-center gap-1 p-1 rounded transition-all ${isCurrent ? 'ring-2 ring-primary ring-offset-2' : ''}`}
                       >
-                        {s}
+                        <div className="text-[8px] text-muted-foreground font-mono">{idx}</div>
+                        <div
+                          className={`w-6 h-6 rounded flex items-center justify-center text-[10px] font-bold border-2 transition-all ${reachable
+                            ? 'bg-green-500 border-green-500 text-white'
+                            : isDependency
+                              ? 'bg-primary/20 border-primary text-primary animate-pulse'
+                              : 'bg-muted border-border text-muted-foreground'
+                            }`}
+                        >
+                          {reachable ? 'T' : 'F'}
+                        </div>
                       </div>
                     );
                   })}
                 </div>
               </div>
+
+              <div className="bg-accent/50 rounded-lg border border-accent p-4">
+                <p className="text-sm text-foreground leading-relaxed">
+                  {currentStep.message}
+                </p>
+              </div>
+
+              <div className="rounded-lg mt-4">
+                <VariablePanel
+                  variables={{
+                    nums: `[${currentStep.nums.join(', ')}]`,
+                    "target sum": currentStep.target,
+                    "current index (i)": currentStep.i >= 0 ? currentStep.i : "N/A",
+                    "current num (nums[i])": currentStep.i >= 0 ? currentStep.nums[currentStep.i] : "N/A",
+                    "current subset sum (t)": currentStep.t !== null ? currentStep.t : "N/A",
+                  }}
+                />
+              </div>
             </div>
-          </div>
-
-          <div className="bg-accent/50 rounded-lg border border-accent p-4">
-            <p className="text-sm text-foreground font-medium">
-              {currentStep.message}
-            </p>
-          </div>
-
-          <div className="rounded-lg mt-4">
-            <VariablePanel
-              variables={{
-                nums: `[${currentStep.nums.join(', ')}]`,
-                "target sum": currentStep.target,
-                "current index (i)": currentStep.i >= 0 ? currentStep.i : "N/A",
-                "current num (nums[i])": currentStep.i >= 0 ? currentStep.nums[currentStep.i] : "N/A",
-                "current subset sum (t)": currentStep.t !== null ? currentStep.t : "N/A",
-              }}
-            />
           </div>
         </div>
 
@@ -319,7 +246,7 @@ export const PartitionEqualSubsetVisualization = () => {
           <AnimatedCodeEditor
             code={code}
             highlightedLines={[currentStep.lineNumber]}
-            language="typescript"
+            language="TypeScript"
           />
         </div>
       </div>

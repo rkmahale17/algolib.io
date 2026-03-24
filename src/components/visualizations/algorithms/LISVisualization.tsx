@@ -22,28 +22,18 @@ export const LISVisualization: React.FC = () => {
   const intervalRef = useRef<number | null>(null);
 
   const code = `function lengthOfLIS(nums: number[]): number {
-    // Edge case: empty array
-    if (nums.length === 0) {
-        return 0;
-    }
+    const n = nums.length;
 
-    // LIS[i] will store the length of the longest
-    // increasing subsequence starting at index i
-    const LIS: number[] = new Array(nums.length).fill(1);
+    const LIS: number[] = new Array(n).fill(1);
 
-    // Traverse the array from right to left
-    for (let i = nums.length - 1; i >= 0; i--) {
-        // Compare nums[i] with all elements to its right
-        for (let j = i + 1; j < nums.length; j++) {
-            // If current element is smaller, it can extend the subsequence
+    for (let i = n - 1; i >= 0; i--) {
+        for (let j = i + 1; j < n; j++) {
             if (nums[i] < nums[j]) {
-                // Update LIS[i] using LIS[j]
                 LIS[i] = Math.max(LIS[i], 1 + LIS[j]);
             }
         }
     }
 
-    // The answer is the maximum value in LIS array
     return Math.max(...LIS);
 }`;
 
@@ -53,28 +43,25 @@ export const LISVisualization: React.FC = () => {
     const LIS = new Array(n).fill(1);
     const newSteps: Step[] = [];
 
-    // Step 1: Initialization
     newSteps.push({
       array: [...nums],
       dp: [...LIS],
       currentIndex: -1,
       maxLength: 1,
-      message: "Initialize LIS array with 1s. Each element is a subsequence of length 1.",
-      lineNumber: 9,
+      message: "Initialize LIS array with 1s. Each element is an LIS of length 1 by itself.",
+      lineNumber: 4,
     });
 
-    // Step 2: Outer Loop
     for (let i = n - 1; i >= 0; i--) {
       newSteps.push({
         array: [...nums],
         dp: [...LIS],
         currentIndex: i,
         maxLength: Math.max(...LIS),
-        message: `Starting outer loop at index i = ${i} (value: ${nums[i]})`,
-        lineNumber: 12,
+        message: `Outer loop: i = ${i} (value: ${nums[i]})`,
+        lineNumber: 6,
       });
 
-      // Inner Loop
       for (let j = i + 1; j < n; j++) {
         newSteps.push({
           array: [...nums],
@@ -83,46 +70,33 @@ export const LISVisualization: React.FC = () => {
           compareIndex: j,
           maxLength: Math.max(...LIS),
           message: `Compare nums[${i}] (${nums[i]}) with nums[${j}] (${nums[j]})`,
-          lineNumber: 14,
+          lineNumber: 8,
         });
 
         if (nums[i] < nums[j]) {
+          const oldVal = LIS[i];
+          LIS[i] = Math.max(LIS[i], 1 + LIS[j]);
+
           newSteps.push({
             array: [...nums],
             dp: [...LIS],
             currentIndex: i,
             compareIndex: j,
             maxLength: Math.max(...LIS),
-            message: `${nums[i]} < ${nums[j]}: Can extend! LIS[${i}] = max(${LIS[i]}, 1 + LIS[${j}])`,
-            lineNumber: 16,
+            message: `${nums[i]} < ${nums[j]}: Update LIS[${i}] = max(${oldVal}, 1 + LIS[${j}]) = ${LIS[i]}`,
+            lineNumber: 9,
           });
-
-          const oldVal = LIS[i];
-          LIS[i] = Math.max(LIS[i], 1 + LIS[j]);
-
-          if (LIS[i] !== oldVal) {
-            newSteps.push({
-              array: [...nums],
-              dp: [...LIS],
-              currentIndex: i,
-              compareIndex: j,
-              maxLength: Math.max(...LIS),
-              message: `Updated LIS[${i}] to ${LIS[i]}`,
-              lineNumber: 16,
-            });
-          }
         }
       }
     }
 
-    // Final Step
     newSteps.push({
       array: [...nums],
       dp: [...LIS],
       currentIndex: -1,
       maxLength: Math.max(...LIS),
-      message: `Finished! Maximum value in LIS array is ${Math.max(...LIS)}`,
-      lineNumber: 23,
+      message: `Return maximum value in LIS array: ${Math.max(...LIS)}`,
+      lineNumber: 14,
     });
 
     setSteps(newSteps);
@@ -275,7 +249,7 @@ export const LISVisualization: React.FC = () => {
         <AnimatedCodeEditor
           code={code}
           highlightedLines={[currentStep.lineNumber]}
-          language="typescript"
+          language="TypeScript"
         />
       </div>
     </div>

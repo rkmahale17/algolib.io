@@ -33,53 +33,61 @@ export const MatrixPathVisualization: React.FC = () => {
 
   const generateSteps = () => {
     const m = 3;
-    const n = 4;
-    const displayGrid = Array(m).fill(0).map(() => Array(n).fill(0));
+    const n = 7;
+    const displayGrid = Array.from({ length: m }, () => Array(n).fill(0));
     const newSteps: Step[] = [];
 
-    let row = new Array(n).fill(1);
+    let rowValues = new Array(n).fill(1);
     for (let c = 0; c < n; c++) displayGrid[m - 1][c] = 1;
 
     newSteps.push({
       dp: displayGrid.map(r => [...r]),
       i: m - 1,
       j: -1,
-      message: "Initialize 'row' with 1s. Representing the paths across the bottommost conceptual row.",
+      message: "Initialize 'row' with 1s. This represents the paths starting from each cell in the final row to reach the target.",
       lineNumber: 2,
     });
 
     for (let i = 0; i < m - 1; i++) {
-      const visualRowIdx = m - 2 - i;
-      const newRow = new Array(n).fill(1);
-      displayGrid[visualRowIdx][n - 1] = 1;
+      const currentRowIdx = m - 2 - i;
+      const newRowValues = new Array(n).fill(1);
+      displayGrid[currentRowIdx][n - 1] = 1;
 
       newSteps.push({
         dp: displayGrid.map(r => [...r]),
-        i: visualRowIdx,
+        i: currentRowIdx,
         j: n - 1,
-        message: `Row iteration ${i + 1}: Initialize 'newRow' with 1s. Rightmost column always has 1 conceptual path.`,
+        message: `Outer Loop (i=${i}): Initialize 'newRow' for current row index ${currentRowIdx}. Rightmost cell is always 1.`,
         lineNumber: 4,
       });
 
       for (let j = n - 2; j >= 0; j--) {
-        newRow[j] = newRow[j + 1] + row[j];
-        displayGrid[visualRowIdx][j] = newRow[j];
+        newSteps.push({
+          dp: displayGrid.map(r => [...r]),
+          i: currentRowIdx,
+          j,
+          message: `Calculating newRow[${j}]: sum of paths from right (newRow[${j + 1}]=${newRowValues[j + 1]}) and bottom (row[${j}]=${rowValues[j]})`,
+          lineNumber: 6,
+        });
+
+        newRowValues[j] = newRowValues[j + 1] + rowValues[j];
+        displayGrid[currentRowIdx][j] = newRowValues[j];
 
         newSteps.push({
           dp: displayGrid.map(r => [...r]),
-          i: visualRowIdx,
+          i: currentRowIdx,
           j,
-          message: `newRow[${j}] = newRow[${j + 1}] (${newRow[j + 1]}) + row[${j}] (${row[j]}) = ${newRow[j]}`,
+          message: `newRow[${j}] = ${newRowValues[j + 1]} + ${rowValues[j]} = ${newRowValues[j]}`,
           lineNumber: 6,
         });
       }
 
-      row = [...newRow];
+      rowValues = [...newRowValues];
       newSteps.push({
         dp: displayGrid.map(r => [...r]),
-        i: visualRowIdx,
+        i: currentRowIdx,
         j: -1,
-        message: "Update 'row' to be 'newRow' for the next upwards iteration.",
+        message: "Iteration complete. Update 'row' to be 'newRow' for the next row above.",
         lineNumber: 8,
       });
     }
@@ -88,7 +96,7 @@ export const MatrixPathVisualization: React.FC = () => {
       dp: displayGrid.map(r => [...r]),
       i: 0,
       j: 0,
-      message: `Total unique paths: ${row[0]}`,
+      message: `Finished! The total unique paths from (0,0) is stored in row[0] = ${rowValues[0]}`,
       lineNumber: 10,
     });
 
@@ -162,7 +170,7 @@ export const MatrixPathVisualization: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-card rounded-lg p-6 border">
-          <h3 className="text-lg font-semibold mb-4">Unique Paths in Matrix</h3>
+          <h3 className="text-lg font-semibold mb-4">Unique Paths (Bottom-Up DP)</h3>
 
           <div className="inline-block">
             <div
@@ -176,7 +184,7 @@ export const MatrixPathVisualization: React.FC = () => {
                   {row.map((val, j) => {
                     const isCurrent = i === currentStep.i && j === currentStep.j;
                     let isDependency = false;
-                    if (currentStep.j !== -1 && !isCurrent) {
+                    if (currentStep.j !== -1 && !isCurrent && currentStep.lineNumber === 6) {
                       if ((i === currentStep.i && j === currentStep.j + 1) ||
                         (i === currentStep.i + 1 && j === currentStep.j)) {
                         isDependency = true;
@@ -186,15 +194,27 @@ export const MatrixPathVisualization: React.FC = () => {
                     return (
                       <div
                         key={`${i}-${j}`}
-                        className={`w-16 h-16 border-2 flex items-center justify-center font-bold text-lg transition-all ${isCurrent
-                            ? "bg-primary text-primary-foreground scale-110 border-primary"
-                            : isDependency
-                              ? "bg-secondary border-primary/50 text-secondary-foreground"
-                              : val > 0
-                                ? "bg-green-500/20 border-green-500 text-green-500"
-                                : "bg-card border-border"
+                        className={`w-8 h-8 border flex flex-col items-center justify-center font-bold text-[10px] transition-all relative ${isCurrent
+                          ? "bg-primary text-primary-foreground scale-110 border-primary z-10"
+                          : isDependency
+                            ? "bg-secondary border-primary/50 text-secondary-foreground"
+                            : val > 0
+                              ? "bg-green-500/20 border-green-500 text-green-500"
+                              : "bg-card border-border"
                           }`}
                       >
+                        {i === 0 && j === 0 && (
+                          <div className="absolute -top-6 left-0 flex flex-col items-center">
+                            <span className="text-[10px] font-bold text-primary uppercase tracking-wider">Start</span>
+                            <div className="w-px h-2 bg-primary/50"></div>
+                          </div>
+                        )}
+                        {i === currentStep.dp.length - 1 && j === currentStep.dp[0].length - 1 && (
+                          <div className="absolute -bottom-6 right-0 flex flex-col items-center">
+                            <div className="w-px h-2 bg-primary/50"></div>
+                            <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider">End</span>
+                          </div>
+                        )}
                         {val > 0 ? val : ""}
                       </div>
                     );
@@ -222,10 +242,13 @@ export const MatrixPathVisualization: React.FC = () => {
           <div className="rounded-lg mt-4">
             <VariablePanel
               variables={{
-                row: "array tracking the row below",
-                newRow: "array tracking the current computed row",
-                j: currentStep.j !== -1 ? currentStep.j : "completed iteration",
-                currentCellValue: currentStep.j !== -1 ? currentStep.dp[currentStep.i][currentStep.j] : "N/A"
+                m: 3,
+                n: 7,
+                i: currentStep.i,
+                j: currentStep.j !== -1 ? currentStep.j : "completed",
+                "newRow[j+1]": currentStep.i !== -1 && currentStep.j < 6 && currentStep.j !== -1 ? currentStep.dp[currentStep.i][currentStep.j + 1] : "N/A",
+                "row[j]": currentStep.i < 2 && currentStep.j !== -1 ? currentStep.dp[currentStep.i + 1][currentStep.j] : "N/A",
+                currentPaths: currentStep.j !== -1 ? currentStep.dp[currentStep.i][currentStep.j] : "N/A"
               }}
             />
           </div>
@@ -234,7 +257,7 @@ export const MatrixPathVisualization: React.FC = () => {
         <AnimatedCodeEditor
           code={code}
           highlightedLines={[currentStep.lineNumber]}
-          language="typescript"
+          language="TypeScript"
         />
       </div>
     </div>

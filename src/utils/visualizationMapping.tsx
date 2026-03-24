@@ -97,6 +97,11 @@ export const visualizationMap: Record<string, React.LazyExoticComponent<React.Co
   'manachers': React.lazy(() => import('@/components/visualizations/algorithms/ManachersVisualization').then(m => ({ default: m.ManachersVisualization }))),
   'rabin-karp': React.lazy(() => import('@/components/visualizations/algorithms/RabinKarpVisualization').then(m => ({ default: m.RabinKarpVisualization }))),
   'robin-knp': React.lazy(() => import('@/components/visualizations/algorithms/RabinKarpVisualization').then(m => ({ default: m.RabinKarpVisualization }))),
+  'huffman-coding': React.lazy(() => import('@/components/visualizations/algorithms/HuffmanCodingVisualization').then(m => ({ default: m.HuffmanCodingVisualization }))),
+  'huffman-encoding': React.lazy(() => import('@/components/visualizations/algorithms/HuffmanCodingVisualization').then(m => ({ default: m.HuffmanCodingVisualization }))),
+  'huffman-algorithm': React.lazy(() => import('@/components/visualizations/algorithms/HuffmanCodingVisualization').then(m => ({ default: m.HuffmanCodingVisualization }))),
+  'huffman': React.lazy(() => import('@/components/visualizations/algorithms/HuffmanCodingVisualization').then(m => ({ default: m.HuffmanCodingVisualization }))),
+  'huffman-tree': React.lazy(() => import('@/components/visualizations/algorithms/HuffmanCodingVisualization').then(m => ({ default: m.HuffmanCodingVisualization }))),
 
   // Greedy Algorithms
   'activity-selection': React.lazy(() => import('@/components/visualizations/algorithms/ActivitySelectionVisualization').then(m => ({ default: m.ActivitySelectionVisualization }))),

@@ -57,13 +57,13 @@ export const CombinationsVisualization: React.FC = () => {
       newSteps.push({
         n, k, comb: [...comb], i: null, res: res.map(r => [...r]),
         message: `Calling backtrack(start=${start}, comb=[${comb.join(", ")}])`,
-        lineNumber: 5
+        lineNumber: 4
       });
 
       newSteps.push({
         n, k, comb: [...comb], i: null, res: res.map(r => [...r]),
         message: `Condition check: comb.length === k (${comb.length} === ${k})`,
-        lineNumber: 8
+        lineNumber: 5
       });
 
       if (comb.length === k) {
@@ -71,12 +71,12 @@ export const CombinationsVisualization: React.FC = () => {
         newSteps.push({
           n, k, comb: [...comb], i: null, res: res.map(r => [...r]),
           message: `Base case reached. Added [${comb.join(", ")}] to result.`,
-          lineNumber: 9
+          lineNumber: 6
         });
         newSteps.push({
           n, k, comb: [...comb], i: null, res: res.map(r => [...r]),
           message: "Return from recursive call",
-          lineNumber: 10
+          lineNumber: 7
         });
         return;
       }
@@ -85,14 +85,14 @@ export const CombinationsVisualization: React.FC = () => {
         newSteps.push({
           n, k, comb: [...comb], i: i, res: res.map(r => [...r]),
           message: `Iterating: i = ${i}`,
-          lineNumber: 15
+          lineNumber: 10
         });
 
         comb.push(i);
         newSteps.push({
           n, k, comb: [...comb], i: i, res: res.map(r => [...r]),
           message: `Included ${i} in current combination`,
-          lineNumber: 17
+          lineNumber: 11
         });
 
         backtrack(i + 1, comb);
@@ -101,7 +101,7 @@ export const CombinationsVisualization: React.FC = () => {
         newSteps.push({
           n, k, comb: [...comb], i: i, res: res.map(r => [...r]),
           message: `Backtracked: Removed ${popped} from current combination`,
-          lineNumber: 23
+          lineNumber: 13
         });
       }
     }
@@ -109,14 +109,14 @@ export const CombinationsVisualization: React.FC = () => {
     newSteps.push({
       n, k, comb: [], i: null, res: [],
       message: "Initiate backtracking from 1",
-      lineNumber: 27
+      lineNumber: 17
     });
     backtrack(1, []);
 
     newSteps.push({
       n, k, comb: [], i: null, res: res.map(r => [...r]),
       message: "End backtracking. Return all combinations.",
-      lineNumber: 28
+      lineNumber: 18
     });
 
     setSteps(newSteps);
@@ -189,8 +189,8 @@ export const CombinationsVisualization: React.FC = () => {
               <div
                 key={val}
                 className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${val === currentStep.i ? 'bg-primary/20 border-primary scale-110' :
-                    currentStep.comb.includes(val) ? 'bg-green-500/20 border-green-500' :
-                      'bg-card border-border'
+                  currentStep.comb.includes(val) ? 'bg-green-500/20 border-green-500' :
+                    'bg-card border-border'
                   }`}
               >
                 {val}

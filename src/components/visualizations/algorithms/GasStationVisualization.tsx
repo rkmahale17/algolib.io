@@ -355,7 +355,7 @@ export const GasStationVisualization: React.FC = () => {
           </div>
         </div>
 
-        <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="typescript" />
+        <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="TypeScript" />
       </div>
 
       <VariablePanel

@@ -257,7 +257,7 @@ export const SubsetsVisualization: React.FC = () => {
         <AnimatedCodeEditor
           code={code}
           highlightedLines={[currentStep.lineNumber]}
-          language="typescript"
+          language="TypeScript"
         />
       </div>
     </div>

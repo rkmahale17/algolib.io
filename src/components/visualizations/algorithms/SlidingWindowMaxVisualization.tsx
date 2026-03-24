@@ -33,7 +33,7 @@ export const SlidingWindowMaxVisualization = () => {
 
     s.push({
       nums, k, l, r, q: [], output: [],
-      explanation: "Initialize output array and double-ended queue (deque).",
+      explanation: "Initialize output array and monotonic deque (stores indices of elements).",
       highlightedLines: [1, 2, 3],
       variables: { nums: `[${nums.join(',')}]`, k },
       phase: 'init'
@@ -41,7 +41,7 @@ export const SlidingWindowMaxVisualization = () => {
 
     s.push({
       nums, k, l, r, q: [], output: [],
-      explanation: "Initialize left and right pointers to 0.",
+      explanation: "Initialize pointers 'l' (left) and 'r' (right).",
       highlightedLines: [5, 6],
       variables: { l, r },
       phase: 'init'
@@ -50,19 +50,19 @@ export const SlidingWindowMaxVisualization = () => {
     while (r < nums.length) {
       s.push({
         nums, k, l, r, q: [...q], output: [...output],
-        explanation: `Start iteration for r = ${r} (val = ${nums[r]}).`,
+        explanation: `Checking window ending at index ${r} (value = ${nums[r]}).`,
         highlightedLines: [8],
-        variables: { l, r, val: nums[r], q: `[${q.join(',')}]` },
+        variables: { l, r, currentVal: nums[r] },
         phase: 'init'
       });
 
-      // Monotonic deque: remove smaller values from back
+      // Monotonic deque: remove indices of smaller values from back
       while (q.length && nums[q[q.length - 1]] < nums[r]) {
         const poppedIdx = q[q.length - 1];
         s.push({
           nums, k, l, r, q: [...q], output: [...output],
-          explanation: `nums[${poppedIdx}] (${nums[poppedIdx]}) < nums[${r}] (${nums[r]}). Removing index from back of deque.`,
-          highlightedLines: [10, 11],
+          explanation: `Value at back (${nums[poppedIdx]}) < current value (${nums[r]}). Popping smaller element.`,
+          highlightedLines: [9, 10],
           variables: { backVal: nums[poppedIdx], currentVal: nums[r] },
           phase: 'pop'
         });
@@ -72,38 +72,30 @@ export const SlidingWindowMaxVisualization = () => {
       q.push(r);
       s.push({
         nums, k, l, r, q: [...q], output: [...output],
-        explanation: `Pushed current index ${r} to deque.`,
+        explanation: `Push index ${r} to deque. Deque always stores elements in decreasing order.`,
         highlightedLines: [13],
         variables: { q: `[${q.join(',')}]` },
         phase: 'push'
       });
 
-      // Remove left value from window if it's out of current window
+      // Remove index if it's out of window bounds
       if (l > q[0]) {
         s.push({
           nums, k, l, r, q: [...q], output: [...output],
-          explanation: `Index ${q[0]} is outside the current window [${l}, ${r}]. Shifting deque.`,
-          highlightedLines: [16, 17],
+          explanation: `Index ${q[0]} is outside the current window window [${l}, ${r}]. Removing from front.`,
+          highlightedLines: [15, 16],
           variables: { l, outOfWindow: q[0] },
           phase: 'shift'
         });
         q.shift();
-      } else if (r >= 0) {
-        s.push({
-          nums, k, l, r, q: [...q], output: [...output],
-          explanation: `Check if front index ${q[0]} is out of window bounds. It is valid.`,
-          highlightedLines: [15],
-          variables: { l, windowStart: l, frontIdx: q[0] },
-          phase: 'init'
-        });
       }
 
       // Check if window has reached size k
       if ((r + 1) >= k) {
         s.push({
           nums, k, l, r, q: [...q], output: [...output],
-          explanation: `Window size is ${k}. Front of deque (${nums[q[0]]}) is the maximum.`,
-          highlightedLines: [20, 21],
+          explanation: `Window size is ${k}. Maximum element is at front of deque: nums[${q[0]}] = ${nums[q[0]]}.`,
+          highlightedLines: [19, 20],
           variables: { max: nums[q[0]], window: `[${l}, ${r}]` },
           phase: 'result'
         });
@@ -112,9 +104,9 @@ export const SlidingWindowMaxVisualization = () => {
         l += 1;
         s.push({
           nums, k, l, r, q: [...q], output: [...output],
-          explanation: `Moving left pointer to ${l}.`,
-          highlightedLines: [22],
-          variables: { l },
+          explanation: `Record the max and slide 'l' forward to prepare for next window.`,
+          highlightedLines: [21],
+          variables: { l, output: `[${output.join(',')}]` },
           phase: 'result'
         });
       }
@@ -123,8 +115,8 @@ export const SlidingWindowMaxVisualization = () => {
       if (r < nums.length) {
         s.push({
           nums, k, l, r, q: [...q], output: [...output],
-          explanation: `Moving right pointer to ${r}.`,
-          highlightedLines: [25],
+          explanation: `Slide 'r' forward.`,
+          highlightedLines: [24],
           variables: { r },
           phase: 'init'
         });
@@ -133,9 +125,9 @@ export const SlidingWindowMaxVisualization = () => {
 
     s.push({
       nums, k, l, r: nums.length - 1, q: [...q], output: [...output],
-      explanation: "Process complete. Returning all window maximums.",
-      highlightedLines: [28],
-      variables: { output: `[${output.join(',')}]` },
+      explanation: "Process finished. Returning all window maximums.",
+      highlightedLines: [27],
+      variables: { result: `[${output.join(',')}]` },
       phase: 'done'
     });
 
@@ -180,35 +172,82 @@ export const SlidingWindowMaxVisualization = () => {
           <Card className="p-6 bg-card/50 backdrop-blur-sm border-primary/20 relative">
             <h3 className="text-sm font-semibold mb-8 text-muted-foreground uppercase tracking-widest">Sliding Window</h3>
 
-            <div className="flex flex-wrap gap-4 gap-y-12 justify-center mb-12">
+            <div className="flex flex-wrap justify-center mb-12 relative p-4 min-h-[140px] items-center gap-y-10">
               {nums.map((num, idx) => {
                 const isInWindow = idx >= step.l && idx <= step.r;
                 const isL = idx === step.l;
                 const isR = idx === step.r;
                 const isMax = step.q[0] === idx && (step.r + 1) >= k;
+                const nextIsInWindow = (idx + 1) >= step.l && (idx + 1) <= step.r;
 
                 return (
-                  <div key={idx} className="relative flex flex-col items-center">
+                  <div
+                    key={idx}
+                    className={`relative flex flex-col items-center z-10 w-10 shrink-0 mb-4
+                      ${isInWindow && nextIsInWindow && !isR ? '' : 'mr-2'}
+                    `}
+                  >
+                    {/* Window Label over L */}
+                    {isL && (
+                      <div className="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap text-[8px] font-black text-primary uppercase tracking-[0.2em] bg-background px-2 py-0.5 rounded-full border-2 border-primary/20 shadow-sm z-30">
+                        Window
+                      </div>
+                    )}
+
                     <motion.div
                       animate={{
-                        scale: isMax ? 1.1 : 1,
-                        backgroundColor: isMax ? "var(--primary)" : (isInWindow ? "rgba(var(--primary), 0.1)" : "transparent"),
-                        borderColor: isMax ? "var(--primary)" : (isInWindow ? "var(--primary)" : "var(--border)")
+                        scale: isMax ? 1.15 : 1,
+                        backgroundColor: isMax
+                          ? "var(--primary)"
+                          : (isInWindow ? "rgba(var(--primary), 0.15)" : "rgba(var(--muted), 0.3)"),
+                        borderColor: isMax
+                          ? "var(--primary)"
+                          : (isInWindow ? "var(--primary)" : "var(--border)"),
+                        color: isMax ? "var(--primary-foreground)" : "var(--foreground)",
+                        boxShadow: isMax ? "0 10px 25px -5px rgba(var(--primary), 0.4)" : "none",
+                        borderRadius: isMax
+                          ? "10px"
+                          : (isL ? "10px 0 0 10px" : (isR ? "0 10px 10px 0" : (isInWindow ? "0px" : "10px")))
                       }}
-                      className={`w-12 h-12 border-2 rounded-xl flex items-center justify-center text-sm font-bold transition-all
-                        ${isMax ? '  shadow-[0_0_15px_rgba(var(--primary),0.4)] bg-primary text-primary' : ''}
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                      className={`w-10 h-10 border-2 flex items-center justify-center text-sm font-black transition-all
+                        ${isInWindow && !isL && !isR ? 'border-x-0' : ''}
+                        ${isInWindow && isL && !isR ? 'border-r-0' : ''}
+                        ${isInWindow && isR && !isL ? 'border-l-0' : ''}
                       `}
                     >
                       {num}
                     </motion.div>
 
-                    <div className="absolute -bottom-6 flex gap-1">
-                      {isL && <span className="text-[10px] font-black text-primary uppercase">L</span>}
-                      {isR && <span className="text-[10px] font-black text-blue-500 uppercase">R</span>}
+                    <div className="absolute -bottom-8 flex flex-col items-center gap-0.5">
+                      <AnimatePresence mode="wait">
+                        {isL && (
+                          <motion.span
+                            key="l-ptr"
+                            initial={{ y: 5, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: -5, opacity: 0 }}
+                            className="text-[10px] font-black text-primary uppercase"
+                          >
+                            L
+                          </motion.span>
+                        )}
+                        {isR && (
+                          <motion.span
+                            key="r-ptr"
+                            initial={{ y: 5, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: -5, opacity: 0 }}
+                            className="text-[10px] font-black text-blue-500 uppercase"
+                          >
+                            R
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
                     </div>
 
                     <div className="absolute -top-6">
-                      <span className="text-[10px] text-muted-foreground font-mono">{idx}</span>
+                      <span className="text-[10px] text-muted-foreground font-mono opacity-50">{idx}</span>
                     </div>
                   </div>
                 );
@@ -225,12 +264,12 @@ export const SlidingWindowMaxVisualization = () => {
                       initial={{ scale: 0, x: 20 }}
                       animate={{ scale: 1, x: 0 }}
                       exit={{ scale: 0, opacity: 0 }}
-                      className={`px-4 py-2 border-2 rounded-lg flex flex-col items-center
+                      className={`w-10 h-10 border-2 rounded-lg flex flex-col items-center justify-center shrink-0
                         ${qIdx === 0 ? 'bg-primary/20 border-primary text-primary' : 'bg-muted border-border text-muted-foreground'}
                       `}
                     >
-                      <span className="text-[10px] font-bold opacity-60">i:{idx}</span>
-                      <span className="text-sm font-black">{nums[idx]}</span>
+                      <span className="text-[8px] font-bold opacity-60 leading-none">i:{idx}</span>
+                      <span className="text-xs font-black leading-none">{nums[idx]}</span>
                     </motion.div>
                   ))}
                 </AnimatePresence>
@@ -247,7 +286,7 @@ export const SlidingWindowMaxVisualization = () => {
                   key={idx}
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="w-10 h-10 bg-primary/20 border-2 border-primary/40 rounded-lg flex items-center justify-center font-bold text-primary text-sm"
+                  className="w-8 h-8 bg-primary/20 border-2 border-primary/40 rounded-lg flex items-center justify-center font-bold text-primary text-xs"
                 >
                   {val}
                 </motion.div>

@@ -1,10 +1,11 @@
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card } from '@/components/ui/card';
+import { ArrowRight } from 'lucide-react';
 
 interface ListNode {
   val: number;
@@ -38,7 +39,7 @@ export const MergeKSortedListsVisualization = () => {
       allLists: lists.map(l => [...l]),
       l1: null, l2: null, mergedBuilder: [],
       phase: 'global',
-      explanation: "Starting mergeKLists with 3 sorted linked lists.",
+      explanation: "Starting mergeKLists with sorted linked lists.",
       highlightedLines: [1],
       variables: { totalLists: lists.length }
     });
@@ -47,7 +48,7 @@ export const MergeKSortedListsVisualization = () => {
       allLists: lists.map(l => [...l]),
       l1: null, l2: null, mergedBuilder: [],
       phase: 'global',
-      explanation: "Check if lists array is empty.",
+      explanation: "Check for base case: if lists array is empty or null.",
       highlightedLines: [2],
       variables: { totalLists: lists.length }
     });
@@ -57,9 +58,9 @@ export const MergeKSortedListsVisualization = () => {
         allLists: lists.map(l => [...l]),
         l1: null, l2: null, mergedBuilder: [],
         phase: 'global',
-        explanation: `Outer loop: lists.length = ${lists.length} > 1. Start a new round of pairing.`,
+        explanation: `Main loop: lists.length = ${lists.length} > 1. Start a new round of pairwise merging. This Divide & Conquer strategy reduces the number of lists logarithmically.`,
         highlightedLines: [6],
-        variables: { lists: lists.length }
+        variables: { currentListsCount: lists.length }
       });
 
       const mergedLists: number[][] = [];
@@ -67,9 +68,9 @@ export const MergeKSortedListsVisualization = () => {
         allLists: lists.map(l => [...l]),
         l1: null, l2: null, mergedBuilder: [],
         phase: 'global',
-        explanation: "Initialize an empty array for this round's merged lists.",
+        explanation: "Initialize an empty array to store the results of this round's merges.",
         highlightedLines: [7],
-        variables: { mergedLists: "[]" }
+        variables: { mergedProgress: "[]" }
       });
 
       for (let i = 0; i < lists.length; i += 2) {
@@ -80,9 +81,9 @@ export const MergeKSortedListsVisualization = () => {
           allLists: lists.map(l => [...l]),
           l1, l2, mergedBuilder: [],
           phase: 'merging',
-          explanation: `Pairing lists at index ${i} and ${i + 1}.`,
+          explanation: `Pick two adjacent lists (at index ${i} and ${i + 1}) to merge into a single sorted list.`,
           highlightedLines: [9, 10, 11],
-          variables: { i, l1: l1 ? `[${l1.join(',')}]` : 'null', l2: l2 ? `[${l2.join(',')}]` : 'null' }
+          variables: { i, l1Size: l1?.length || 0, l2Size: l2?.length || 0 }
         });
 
         // Simulating mergeTwoLists
@@ -95,9 +96,9 @@ export const MergeKSortedListsVisualization = () => {
             allLists: lists.map(l => [...l]),
             l1, l2, mergedBuilder: [],
             phase: 'merging',
-            explanation: "Initialize mergeTwoLists with a dummy node.",
-            highlightedLines: [19, 20, 21],
-            variables: { l1: `[${l1.join(',')}]`, l2: `[${l2.join(',')}]`, merged: "[]" }
+            explanation: "Call mergeTwoLists. Create a dummy node to act as a placeholder for the head of the new merged list.",
+            highlightedLines: [20, 21],
+            variables: { l1: `[${l1.join(',')}]`, l2: `[${l2.join(',')}]`, dummy: "initialized" }
           });
 
           while (ptr1 < l1.length && ptr2 < l2.length) {
@@ -105,45 +106,78 @@ export const MergeKSortedListsVisualization = () => {
               allLists: lists.map(l => [...l]),
               l1: l1.slice(ptr1), l2: l2.slice(ptr2), mergedBuilder: [...merged],
               phase: 'merging',
-              explanation: `Comparing ${l1[ptr1]} and ${l2[ptr2]}.`,
+              explanation: `Iteration check: both lists still have nodes. Compare current values: ${l1[ptr1]} and ${l2[ptr2]}.`,
               highlightedLines: [23, 24],
               variables: { val1: l1[ptr1], val2: l2[ptr2] }
             });
 
             if (l1[ptr1] < l2[ptr2]) {
-              merged.push(l1[ptr1]);
+              const val = l1[ptr1];
+              s.push({
+                allLists: lists.map(l => [...l]),
+                l1: l1.slice(ptr1), l2: l2.slice(ptr2), mergedBuilder: [...merged],
+                phase: 'merging',
+                explanation: `${val} is smaller than ${l2[ptr2]}. Point tail.next to the node from list 1.`,
+                highlightedLines: [25],
+                variables: { chosen: val }
+              });
+
+              merged.push(val);
               ptr1++;
               s.push({
                 allLists: lists.map(l => [...l]),
                 l1: l1.slice(ptr1), l2: l2.slice(ptr2), mergedBuilder: [...merged],
                 phase: 'merging',
-                explanation: `l1 value is smaller. Append to merged list and move l1 pointer.`,
-                highlightedLines: [25, 26],
-                variables: { added: merged[merged.length - 1], ptr1 }
+                explanation: `Shift list 1 pointer to the next node and advance the tail.`,
+                highlightedLines: [26, 31],
+                variables: { ptr1, mergedSize: merged.length }
               });
             } else {
-              merged.push(l2[ptr2]);
+              const val = l2[ptr2];
+              s.push({
+                allLists: lists.map(l => [...l]),
+                l1: l1.slice(ptr1), l2: l2.slice(ptr2), mergedBuilder: [...merged],
+                phase: 'merging',
+                explanation: `${val} is smaller than or equal to ${l1[ptr1]}. Point tail.next to the node from list 2.`,
+                highlightedLines: [28],
+                variables: { chosen: val }
+              });
+
+              merged.push(val);
               ptr2++;
               s.push({
                 allLists: lists.map(l => [...l]),
                 l1: l1.slice(ptr1), l2: l2.slice(ptr2), mergedBuilder: [...merged],
                 phase: 'merging',
-                explanation: `l2 value is smaller/equal. Append to merged list and move l2 pointer.`,
-                highlightedLines: [28, 29, 31],
-                variables: { added: merged[merged.length - 1], ptr2 }
+                explanation: `Shift list 2 pointer to the next node and advance the tail.`,
+                highlightedLines: [29, 31],
+                variables: { ptr2, mergedSize: merged.length }
               });
             }
           }
 
-          const remaining = (ptr1 < l1.length) ? l1.slice(ptr1) : l2.slice(ptr2);
-          merged.push(...remaining);
+          if (ptr1 < l1.length || ptr2 < l2.length) {
+            const remaining = (ptr1 < l1.length) ? l1.slice(ptr1) : l2.slice(ptr2);
+            s.push({
+              allLists: lists.map(l => [...l]),
+              l1: ptr1 < l1.length ? l1.slice(ptr1) : null,
+              l2: ptr2 < l2.length ? l2.slice(ptr2) : null,
+              mergedBuilder: [...merged],
+              phase: 'merging',
+              explanation: "One list is empty. Attach all remaining nodes from the other list in O(1) time by re-linking the next pointer.",
+              highlightedLines: [34],
+              variables: { remainingSize: remaining.length }
+            });
+            merged.push(...remaining);
+          }
+
           s.push({
             allLists: lists.map(l => [...l]),
             l1: null, l2: null, mergedBuilder: [...merged],
             phase: 'merging',
-            explanation: `One list exhausted. Append remaining nodes: [${remaining.join(',')}]`,
-            highlightedLines: [34, 35],
-            variables: { merged: `[${merged.join(',')}]` }
+            explanation: "Merge pair complete. Return dummy.next to get the new head.",
+            highlightedLines: [35],
+            variables: { mergedList: `[${merged.join(',')}]` }
           });
         } else {
           // If l2 is null, just push l1
@@ -152,7 +186,7 @@ export const MergeKSortedListsVisualization = () => {
             allLists: lists.map(l => [...l]),
             l1: null, l2: null, mergedBuilder: [...merged],
             phase: 'merging',
-            explanation: "Only one list available in this pair. Pass it through.",
+            explanation: "Only one list left in this round (odd number of lists). No merge needed, just pass it to the next round.",
             highlightedLines: [12],
             variables: { merged: `[${merged.join(',')}]` }
           });
@@ -163,7 +197,7 @@ export const MergeKSortedListsVisualization = () => {
           allLists: lists.map(l => [...l]),
           l1: null, l2: null, mergedBuilder: [],
           phase: 'global',
-          explanation: `Pushed merged pair result [${merged.join(',')}] to round's list.`,
+          explanation: `Store the result of the merge back into our pool of sorted lists. Current pool size: ${mergedLists.length}`,
           highlightedLines: [12],
           variables: { mergedListsSize: mergedLists.length }
         });
@@ -174,9 +208,9 @@ export const MergeKSortedListsVisualization = () => {
         allLists: lists.map(l => [...l]),
         l1: null, l2: null, mergedBuilder: [],
         phase: 'global',
-        explanation: "Round complete. Update global lists array for the next pass.",
+        explanation: "Round complete. We've replaced the original lists with their merged results, effectively halving the number of lists.",
         highlightedLines: [14],
-        variables: { currentLists: lists.length }
+        variables: { remainingLists: lists.length }
       });
     }
 
@@ -184,9 +218,9 @@ export const MergeKSortedListsVisualization = () => {
       allLists: lists.map(l => [...l]),
       l1: null, l2: null, mergedBuilder: [],
       phase: 'complete',
-      explanation: "Only one list remains. Returning the final merged result.",
+      explanation: "Process complete! All lists have been merged into a single sorted linked list. Return the final head.",
       highlightedLines: [17],
-      variables: { resultSize: lists[0].length }
+      variables: { finalSize: lists[0]?.length || 0 }
     });
 
     return s;
@@ -244,18 +278,24 @@ export const MergeKSortedListsVisualization = () => {
                   <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold">
                     {idx}
                   </div>
-                  <div className="flex gap-2 flex-wrap">
-                    {list.map((val, nodeIdx) => (
-                      <div key={nodeIdx} className="flex items-center">
-                        <motion.div
-                          layout
-                          className="w-10 h-10 bg-accent/10 border-2 border-accent/30 rounded-lg flex items-center justify-center font-bold text-sm"
-                        >
-                          {val}
-                        </motion.div>
-                        {nodeIdx < list.length - 1 && <span className="text-muted-foreground mx-1">→</span>}
-                      </div>
-                    ))}
+                  <div className="flex gap-2 flex-wrap items-center">
+                    {list.length === 0 ? (
+                      <span className="text-[10px] text-muted-foreground italic">empty</span>
+                    ) : (
+                      list.map((val, nodeIdx) => (
+                        <div key={nodeIdx} className="flex items-center">
+                          <motion.div
+                            layout
+                            className="w-10 h-10 bg-accent/10 border-2 border-accent/30 rounded-lg flex items-center justify-center font-bold text-sm text-accent-foreground"
+                          >
+                            {val}
+                          </motion.div>
+                          {nodeIdx < list.length - 1 && (
+                            <ArrowRight size={14} className="text-muted-foreground/40 mx-0.5" />
+                          )}
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
               ))}
@@ -293,18 +333,35 @@ export const MergeKSortedListsVisualization = () => {
                     </div>
 
                     <div className="pt-4 border-t border-primary/20">
-                      <span className="text-[10px] uppercase font-bold text-primary block mb-2">Merged Progress</span>
-                      <div className="flex flex-wrap gap-2">
+                      <span className="text-[10px] uppercase font-bold text-primary block mb-3">Merged Progress (Linked List)</span>
+                      <div className="flex flex-wrap gap-2 items-center min-h-[40px]">
+                        <div className="w-8 h-8 rounded bg-muted/50 border border-dashed border-muted-foreground/50 flex items-center justify-center text-[10px] text-muted-foreground shrink-0">
+                          D
+                        </div>
+                        {step.mergedBuilder.length > 0 && <ArrowRight size={12} className="text-muted-foreground/30" />}
                         {step.mergedBuilder.map((v, i) => (
-                          <motion.div
-                            key={`${i}-${v}`}
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            className="w-8 h-8 bg-primary/20 border-2 border-primary/50 text-primary rounded flex items-center justify-center text-xs font-black shadow-sm"
-                          >
-                            {v}
-                          </motion.div>
+                          <React.Fragment key={`${i}-${v}`}>
+                            <motion.div
+                              layout
+                              initial={{ scale: 0, x: -10 }}
+                              animate={{ scale: 1, x: 0 }}
+                              className="w-8 h-8 bg-primary/20 border-2 border-primary/50 text-primary rounded flex items-center justify-center text-xs font-black shadow-sm shrink-0"
+                            >
+                              {v}
+                            </motion.div>
+                            {i < step.mergedBuilder.length - 1 && (
+                              <ArrowRight size={12} className="text-primary/30" />
+                            )}
+                          </React.Fragment>
                         ))}
+                        {(step.l1?.length || 0 > 0 || step.l2?.length || 0 > 0) && step.mergedBuilder.length > 0 && (
+                          <motion.div
+                            animate={{ opacity: [0.3, 0.6, 0.3] }}
+                            transition={{ repeat: Infinity, duration: 1.5 }}
+                          >
+                            <ArrowRight size={12} className="text-muted-foreground/20" />
+                          </motion.div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -314,8 +371,23 @@ export const MergeKSortedListsVisualization = () => {
           </AnimatePresence>
 
           <Card className="p-4 bg-muted/30 border-border">
-            <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-2">Explanation</h4>
-            <p className="text-sm leading-relaxed">{step.explanation}</p>
+            <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3 flex items-center gap-2">
+              <span className="w-1 h-3 bg-primary rounded-full" />
+              Educational Insight
+            </h4>
+            <div className="space-y-3">
+              <p className="text-xs leading-relaxed text-foreground/80 font-medium">
+                {step.explanation}
+              </p>
+              <div className="pt-3 border-t border-border/50">
+                <h5 className="text-[10px] font-bold text-muted-foreground uppercase mb-2">Why Divide & Conquer?</h5>
+                <ul className="text-[10px] space-y-1.5 text-muted-foreground list-disc pl-3">
+                  <li><strong>Time Complexity:</strong> O(N log k) where N is total nodes and k is number of lists.</li>
+                  <li><strong>Space Complexity:</strong> O(1) in this iterative version as we reuse pointers.</li>
+                  <li><strong>Mechanism:</strong> Instead of merging 1st into 2nd, then 2nd into 3rd (O(N*k)), we merge in pairs (O(N log k)).</li>
+                </ul>
+              </div>
+            </div>
           </Card>
 
           <VariablePanel variables={step.variables} />

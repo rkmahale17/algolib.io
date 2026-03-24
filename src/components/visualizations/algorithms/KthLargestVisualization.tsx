@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
@@ -12,7 +12,6 @@ interface Step {
   r: number;
   p: number;
   i: number;
-  k: number;
   pivot: number | null;
   explanation: string;
   highlightedLines: number[];
@@ -21,85 +20,139 @@ interface Step {
 
 export const KthLargestVisualization = () => {
   const [currentStep, setCurrentStep] = useState(0);
+  const [steps, setSteps] = useState<Step[]>([]);
   const initialNums = [3, 2, 1, 5, 6, 4];
   const targetK = 2;
 
-  const steps: Step[] = useMemo(() => {
+  const code = `function findKthLargest(nums: number[], k: number): number {
+  k = nums.length - k;
+
+  function quickSelect(l: number, r: number): number {
+    const pivot = nums[r];
+    let p = l;
+
+    for (let i = l; i < r; i++) {
+      if (nums[i] <= pivot) {
+        [nums[p], nums[i]] = [nums[i], nums[p]];
+        p++;
+      }
+    }
+
+    [nums[p], nums[r]] = [nums[r], nums[p]];
+
+    if (p > k) {
+      return quickSelect(l, p - 1);
+    } else if (p < k) {
+      return quickSelect(p + 1, r);
+    } else {
+      return nums[p];
+    }
+  }
+
+  return quickSelect(0, nums.length - 1);
+}`;
+
+  const generateSteps = () => {
     const s: Step[] = [];
     const nums = [...initialNums];
     const n = nums.length;
     let k = n - targetK;
 
+    // Step 1: Function Entry
     s.push({
       nums: [...nums],
-      l: -1, r: -1, p: -1, i: -1, k: targetK, pivot: null,
+      l: -1, r: -1, p: -1, i: -1, pivot: null,
       explanation: `Starting findKthLargest with k = ${targetK}.`,
       highlightedLines: [1],
       variables: { nums: `[${nums.join(', ')}]`, k: targetK }
     });
 
+    // Step 2: Transform k
     s.push({
       nums: [...nums],
-      l: -1, r: -1, p: -1, i: -1, k: targetK, pivot: null,
+      l: -1, r: -1, p: -1, i: -1, pivot: null,
       explanation: `Transform k to index: k = ${n} - ${targetK} = ${k}. We need the element at index ${k} in a sorted array.`,
       highlightedLines: [2],
-      variables: { nums: `[${nums.join(', ')}]`, targetIndex: k }
+      variables: { targetIndex: k }
+    });
+
+    // Step 3: Return quickSelect call
+    s.push({
+      nums: [...nums],
+      l: -1, r: -1, p: -1, i: -1, pivot: null,
+      explanation: `Calling quickSelect(0, ${n - 1}) to find the element at index ${k}.`,
+      highlightedLines: [26],
+      variables: { l: 0, r: n - 1, targetIndex: k }
     });
 
     const quickSelect = (l: number, r: number) => {
+      // Step: QuickSelect Entry
       s.push({
         nums: [...nums],
-        l, r, p: -1, i: -1, k, pivot: null,
-        explanation: `Calling quickSelect(l=${l}, r=${r}).`,
-        highlightedLines: [4, 26],
+        l, r, p: -1, i: -1, pivot: null,
+        explanation: `Entering quickSelect(l=${l}, r=${r}).`,
+        highlightedLines: [4],
         variables: { l, r, targetIndex: k }
       });
 
       const pivot = nums[r];
-      let p = l;
-
+      // Step: Choose Pivot
       s.push({
         nums: [...nums],
-        l, r, p: -1, i: -1, k, pivot,
-        explanation: `Chosen pivot: nums[r] = ${pivot}. Initializing partition pointer p = ${l}.`,
-        highlightedLines: [5, 6],
-        variables: { l, r, pivot, p }
+        l, r, p: -1, i: -1, pivot,
+        explanation: `Chosen pivot: nums[r] = ${pivot}.`,
+        highlightedLines: [5],
+        variables: { pivot, r }
+      });
+
+      let p = l;
+      // Step: Init p
+      s.push({
+        nums: [...nums],
+        l, r, p, i: -1, pivot,
+        explanation: `Initializing partition pointer p = ${l}.`,
+        highlightedLines: [6],
+        variables: { p, l }
       });
 
       for (let i = l; i < r; i++) {
+        // Step: Loop Condition
         s.push({
           nums: [...nums],
-          l, r, p, i, k, pivot,
+          l, r, p, i, pivot,
           explanation: `Checking loop condition: i = ${i} < r = ${r}.`,
           highlightedLines: [8],
-          variables: { i, p, pivot }
+          variables: { i, r, p }
         });
 
+        // Step: If condition
         s.push({
           nums: [...nums],
-          l, r, p, i, k, pivot,
+          l, r, p, i, pivot,
           explanation: `Is nums[i] (${nums[i]}) <= pivot (${pivot})?`,
           highlightedLines: [9],
-          variables: { i, "nums[i]": nums[i], pivot }
+          variables: { "nums[i]": nums[i], pivot }
         });
 
         if (nums[i] <= pivot) {
-          const temp = nums[p];
-          nums[p] = nums[i];
-          nums[i] = temp;
+          const valI = nums[i];
+          const valP = nums[p];
+          [nums[p], nums[i]] = [nums[i], nums[p]];
 
+          // Step: Swap
           s.push({
             nums: [...nums],
-            l, r, p, i, k, pivot,
-            explanation: `Yes, swap nums[p] and nums[i].`,
+            l, r, p, i, pivot,
+            explanation: `Yes, swap nums[p] (${valP}) and nums[i] (${valI}).`,
             highlightedLines: [10],
-            variables: { i, p, swapped: `(${nums[p]}, ${nums[i]})` }
+            variables: { p, i, "nums[p]": valI, "nums[i]": valP }
           });
 
           p++;
+          // Step: Increment p
           s.push({
             nums: [...nums],
-            l, r, p, i, k, pivot,
+            l, r, p, i, pivot,
             explanation: `Increment p to ${p}.`,
             highlightedLines: [11],
             variables: { p }
@@ -107,31 +160,32 @@ export const KthLargestVisualization = () => {
         }
       }
 
-      const temp = nums[p];
-      nums[p] = nums[r];
-      nums[r] = temp;
-
+      // Step: Final Swap
+      const valP = nums[p];
+      const valR = nums[r];
+      [nums[p], nums[r]] = [nums[r], nums[p]];
       s.push({
         nums: [...nums],
-        l, r, p, i: r, k, pivot,
-        explanation: `Loop end. Swap pivot nums[r] with nums[p]. Pivot ${pivot} is now at index ${p}.`,
+        l, r, p, i: -1, pivot,
+        explanation: `Loop end. Swap pivot nums[r] (${valR}) with nums[p] (${valP}). Pivot is now at index ${p}.`,
         highlightedLines: [15],
-        variables: { p, pivotPlacement: `nums[${p}] = ${pivot}` }
+        variables: { p, r, pivotPlacement: `nums[${p}] = ${valR}` }
       });
 
+      // Step: Check Branches
       s.push({
         nums: [...nums],
-        l, r, p, i: -1, k, pivot,
-        explanation: `Is pivot index p (${p}) equal to target index k (${k})?`,
-        highlightedLines: [17, 19, 21],
+        l, r, p, i: -1, pivot,
+        explanation: `Comparing pivot index p (${p}) with target k (${k}).`,
+        highlightedLines: [17],
         variables: { p, k }
       });
 
       if (p > k) {
         s.push({
           nums: [...nums],
-          l, r, p, i: -1, k, pivot,
-          explanation: `p (${p}) > k (${k}). Searching in the left subarray.`,
+          l, r, p, i: -1, pivot,
+          explanation: `p (${p}) > k (${k}). Element is in the left subarray.`,
           highlightedLines: [18],
           variables: { nextRange: `[${l}, ${p - 1}]` }
         });
@@ -139,8 +193,8 @@ export const KthLargestVisualization = () => {
       } else if (p < k) {
         s.push({
           nums: [...nums],
-          l, r, p, i: -1, k, pivot,
-          explanation: `p (${p}) < k (${k}). Searching in the right subarray.`,
+          l, r, p, i: -1, pivot,
+          explanation: `p (${p}) < k (${k}). Element is in the right subarray.`,
           highlightedLines: [20],
           variables: { nextRange: `[${p + 1}, ${r}]` }
         });
@@ -148,8 +202,8 @@ export const KthLargestVisualization = () => {
       } else {
         s.push({
           nums: [...nums],
-          l, r, p, i: -1, k, pivot,
-          explanation: `p (${p}) === k (${k}). We found the element!`,
+          l, r, p, i: -1, pivot,
+          explanation: `p (${p}) === k (${k}). Found the element!`,
           highlightedLines: [22],
           variables: { result: nums[p] }
         });
@@ -157,38 +211,14 @@ export const KthLargestVisualization = () => {
     };
 
     quickSelect(0, n - 1);
+    setSteps(s);
+  };
 
-    return s;
-  }, [initialNums, targetK]);
+  useEffect(() => {
+    generateSteps();
+  }, []);
 
-  const code = `function findKthLargest(nums: number[], k: number): number {
-    k = nums.length - k;
-
-    function quickSelect(l: number, r: number): number {
-        const pivot = nums[r];
-        let p = l;
-
-        for (let i = l; i < r; i++) {
-            if (nums[i] <= pivot) {
-                [nums[p], nums[i]] = [nums[i], nums[p]];
-                p++;
-            }
-        }
-
-        [nums[p], nums[r]] = [nums[r], nums[p]];
-
-        if (p > k) {
-            return quickSelect(l, p - 1);
-        } else if (p < k) {
-            return quickSelect(p + 1, r);
-        } else {
-            return nums[p];
-        }
-    }
-
-    return quickSelect(0, nums.length - 1);
-}`;
-
+  if (steps.length === 0) return null;
   const step = steps[currentStep];
 
   return (
