@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
@@ -7,8 +7,6 @@ import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 
 interface Step {
   array: number[];
-  prefix: number[];
-  suffix: number[];
   result: number[];
   highlights: number[];
   variables: Record<string, any>;
@@ -17,135 +15,143 @@ interface Step {
 }
 
 export const ProductOfArrayExceptSelfVisualization = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-
-  const array = [1, 2, 3, 4];
-
-  const steps: Step[] = [
-    {
-      array,
-      prefix: [0, 0, 0, 0],
-      suffix: [0, 0, 0, 0],
-      result: [1, 1, 1, 1],
-      highlights: [],
-      variables: { i: -1, leftProduct: 1, rightProduct: 1 },
-      explanation: "Initialize result array with 1s. We'll do two passes: left products, then right products.",
-      highlightedLine: 2
-    },
-    {
-      array,
-      prefix: [1, 0, 0, 0],
-      suffix: [0, 0, 0, 0],
-      result: [1, 1, 1, 1],
-      highlights: [0],
-      variables: { i: 0, leftProduct: 1, rightProduct: 1 },
-      explanation: "Pass 1, i=0: result[0]=leftProduct=1 (no elements to left). Then leftProduct *= nums[0] = 1*1 = 1.",
-      highlightedLine: 7
-    },
-    {
-      array,
-      prefix: [1, 1, 0, 0],
-      suffix: [0, 0, 0, 0],
-      result: [1, 1, 1, 1],
-      highlights: [1],
-      variables: { i: 1, leftProduct: 1, rightProduct: 1 },
-      explanation: "i=1: result[1]=leftProduct=1 (only 1 to the left). Then leftProduct *= nums[1] = 1*2 = 2.",
-      highlightedLine: 8
-    },
-    {
-      array,
-      prefix: [1, 1, 2, 0],
-      suffix: [0, 0, 0, 0],
-      result: [1, 1, 2, 1],
-      highlights: [2],
-      variables: { i: 2, leftProduct: 2, rightProduct: 1 },
-      explanation: "i=2: result[2]=leftProduct=2 (1*2). Then leftProduct *= nums[2] = 2*3 = 6.",
-      highlightedLine: 8
-    },
-    {
-      array,
-      prefix: [1, 1, 2, 6],
-      suffix: [0, 0, 0, 0],
-      result: [1, 1, 2, 6],
-      highlights: [3],
-      variables: { i: 3, leftProduct: 6, rightProduct: 1 },
-      explanation: "i=3: result[3]=leftProduct=6 (1*2*3). Then leftProduct *= nums[3] = 6*4 = 24. Left pass done.",
-      highlightedLine: 8
-    },
-    {
-      array,
-      prefix: [1, 1, 2, 6],
-      suffix: [0, 0, 0, 1],
-      result: [1, 1, 2, 6],
-      highlights: [3],
-      variables: { i: 3, leftProduct: 24, rightProduct: 1 },
-      explanation: "Pass 2 (right to left), i=3: result[3] *= rightProduct. 6*1=6. Then rightProduct *= nums[3] = 1*4 = 4.",
-      highlightedLine: 14
-    },
-    {
-      array,
-      prefix: [1, 1, 2, 6],
-      suffix: [0, 0, 4, 1],
-      result: [1, 1, 8, 6],
-      highlights: [2],
-      variables: { i: 2, leftProduct: 24, rightProduct: 4 },
-      explanation: "i=2: result[2] *= rightProduct. 2*4=8. Then rightProduct *= nums[2] = 4*3 = 12.",
-      highlightedLine: 15
-    },
-    {
-      array,
-      prefix: [1, 1, 2, 6],
-      suffix: [0, 12, 4, 1],
-      result: [1, 12, 8, 6],
-      highlights: [1],
-      variables: { i: 1, leftProduct: 24, rightProduct: 12 },
-      explanation: "i=1: result[1] *= rightProduct. 1*12=12. Then rightProduct *= nums[1] = 12*2 = 24.",
-      highlightedLine: 15
-    },
-    {
-      array,
-      prefix: [1, 1, 2, 6],
-      suffix: [24, 12, 4, 1],
-      result: [24, 12, 8, 6],
-      highlights: [0],
-      variables: { i: 0, leftProduct: 24, rightProduct: 24 },
-      explanation: "i=0: result[0] *= rightProduct. 1*24=24. Right pass complete!",
-      highlightedLine: 15
-    },
-    {
-      array,
-      prefix: [1, 1, 2, 6],
-      suffix: [24, 12, 4, 1],
-      result: [24, 12, 8, 6],
-      highlights: [],
-      variables: { i: 0, leftProduct: 24, rightProduct: 24 },
-      explanation: "Complete! Result: [24,12,8,6]. Time: O(n), Space: O(1) excluding output.",
-      highlightedLine: 18
-    }
-  ];
+  const [steps, setSteps] = useState<Step[]>([]);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
   const code = `function productExceptSelf(nums: number[]): number[] {
   const n = nums.length;
   const result = new Array(n).fill(1);
-  
-  // Calculate left products
   let leftProduct = 1;
   for (let i = 0; i < n; i++) {
     result[i] = leftProduct;
     leftProduct *= nums[i];
   }
-  
-  // Calculate right products and multiply with left
   let rightProduct = 1;
   for (let i = n - 1; i >= 0; i--) {
     result[i] *= rightProduct;
     rightProduct *= nums[i];
   }
-  
   return result;
 }`;
 
-  const step = steps[currentStep];
+  const generateSteps = () => {
+    const array = [1, 2, 3, 4];
+    const n = array.length;
+    const newSteps: Step[] = [];
+
+    let result = [1, 1, 1, 1];
+    let leftProduct = 1;
+    let rightProduct = 1;
+
+    // Line 2
+    newSteps.push({
+      array, result: [...result],
+      highlights: [], variables: { i: '-', leftProduct: '-', rightProduct: '-' },
+      explanation: `Get length of array: n = ${n}`,
+      highlightedLine: 2
+    });
+
+    // Line 3
+    newSteps.push({
+      array, result: [...result],
+      highlights: [], variables: { i: '-', leftProduct: '-', rightProduct: '-' },
+      explanation: `Initialize result array of size ${n} with 1s.`,
+      highlightedLine: 3
+    });
+
+    // Line 4
+    newSteps.push({
+      array, result: [...result],
+      highlights: [], variables: { i: '-', leftProduct, rightProduct: '-' },
+      explanation: `Initialize leftProduct to 1.`,
+      highlightedLine: 4
+    });
+
+    for (let i = 0; i < n; i++) {
+        // Line 5
+        newSteps.push({
+          array, result: [...result],
+          highlights: [i], variables: { i, leftProduct, rightProduct: '-' },
+          explanation: `Left Pass (i=${i}): Check loop condition.`,
+          highlightedLine: 5
+        });
+
+        // Line 6
+        result = [...result];
+        result[i] = leftProduct;
+        newSteps.push({
+          array, result: [...result],
+          highlights: [i], variables: { i, leftProduct, rightProduct: '-' },
+          explanation: `Store current leftProduct in result[${i}]. result[${i}] = ${leftProduct}.`,
+          highlightedLine: 6
+        });
+
+        // Line 7
+        leftProduct *= array[i];
+        newSteps.push({
+          array, result: [...result],
+          highlights: [i], variables: { i, leftProduct, rightProduct: '-' },
+          explanation: `Update leftProduct by multiplying with nums[${i}]. leftProduct = ${leftProduct}.`,
+          highlightedLine: 7
+        });
+    }
+
+    // Line 9
+    newSteps.push({
+      array, result: [...result],
+      highlights: [], variables: { i: '-', leftProduct, rightProduct },
+      explanation: `Initialize rightProduct to 1.`,
+      highlightedLine: 9
+    });
+
+    for (let i = n - 1; i >= 0; i--) {
+        // Line 10
+        newSteps.push({
+          array, result: [...result],
+          highlights: [i], variables: { i, leftProduct, rightProduct },
+          explanation: `Right Pass (i=${i}): Check loop condition.`,
+          highlightedLine: 10
+        });
+
+        // Line 11
+        result = [...result];
+        result[i] *= rightProduct;
+        newSteps.push({
+          array, result: [...result],
+          highlights: [i], variables: { i, leftProduct, rightProduct },
+          explanation: `Multiply result[${i}] by rightProduct. result[${i}] = ${result[i]}.`,
+          highlightedLine: 11
+        });
+
+        // Line 12
+        rightProduct *= array[i];
+        newSteps.push({
+          array, result: [...result],
+          highlights: [i], variables: { i, leftProduct, rightProduct },
+          explanation: `Update rightProduct by multiplying with nums[${i}]. rightProduct = ${rightProduct}.`,
+          highlightedLine: 12
+        });
+    }
+
+    // Line 14
+    newSteps.push({
+      array, result: [...result],
+      highlights: [], variables: { i: '-', leftProduct, rightProduct },
+      explanation: `Return the final result array: [${result.join(', ')}].`,
+      highlightedLine: 14
+    });
+
+    setSteps(newSteps);
+    setCurrentStepIndex(0);
+  };
+
+  useEffect(() => {
+    generateSteps();
+  }, []);
+
+  if (steps.length === 0) return null;
+
+  const currentStep = steps[currentStepIndex];
 
   return (
     <VisualizationLayout
@@ -158,13 +164,13 @@ export const ProductOfArrayExceptSelfVisualization = () => {
               <div className="space-y-2">
                 <div className="text-xs font-semibold text-center">Original Array</div>
                 <div className="flex items-center justify-center gap-2 flex-wrap">
-                  {step.array.map((value, index) => (
+                  {currentStep.array.map((value, index) => (
                     <div key={index} className="flex flex-col items-center gap-1">
-                      <div className={`w-12 h-12 rounded flex items-center justify-center font- text-sm ${step.highlights.includes(index) ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-semibold text-sm border-2 transition-all duration-300 ${currentStep.highlights.includes(index) ? 'bg-primary border-primary text-primary-foreground scale-110 shadow-lg' : 'bg-muted/50 border-border'
                         }`}>
                         {value}
                       </div>
-                      <span className="text-xs text-muted-foreground">[{index}]</span>
+                      <span className="text-[10px] sm:text-xs text-muted-foreground">[{index}]</span>
                     </div>
                   ))}
                 </div>
@@ -173,9 +179,9 @@ export const ProductOfArrayExceptSelfVisualization = () => {
               <div className="space-y-2">
                 <div className="text-xs font-semibold text-center">Result Array</div>
                 <div className="flex items-center justify-center gap-2 flex-wrap">
-                  {step.result.map((value, index) => (
+                  {currentStep.result.map((value, index) => (
                     <div key={index} className="flex flex-col items-center gap-1">
-                      <div className={`w-12 h-12 rounded flex items-center justify-center font- text-sm ${step.highlights.includes(index) ? 'bg-primary text-primary-foreground' : 'bg-muted/50'
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-semibold text-sm border-2 transition-all duration-300 ${currentStep.highlights.includes(index) ? 'bg-primary border-primary text-primary-foreground scale-110 shadow-lg' : 'bg-muted/50 border-border'
                         }`}>
                         {value}
                       </div>
@@ -184,26 +190,26 @@ export const ProductOfArrayExceptSelfVisualization = () => {
                 </div>
               </div>
 
-              <div className="text-sm text-center p-4 bg-muted/50 rounded">
-                {step.explanation}
+              <div className="text-sm font-medium text-center p-4 bg-accent/50 border border-accent rounded-lg">
+                {currentStep.explanation}
               </div>
             </div>
           </Card>
-          <VariablePanel variables={step.variables} />
+          <VariablePanel variables={currentStep.variables} />
         </>
       }
       rightContent={
         <AnimatedCodeEditor
           code={code}
-          highlightedLines={[step.highlightedLine]}
-          language="TypeScript"
+          highlightedLines={[currentStep.highlightedLine]}
+          language="typescript"
         />
       }
       controls={
         <SimpleStepControls
-          currentStep={currentStep}
+          currentStep={currentStepIndex}
           totalSteps={steps.length}
-          onStepChange={setCurrentStep}
+          onStepChange={setCurrentStepIndex}
         />
       }
     />

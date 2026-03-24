@@ -44,15 +44,34 @@ export const BestTimeToBuyAndSellStockVisualization = () => {
     let r = 1;
     let maxProfit = 0;
 
-    // Initialization step
+    newSteps.push({
+      array: [...prices],
+      highlights: [l],
+      minIndex: l,
+      currentIndex: -1,
+      variables: { l, r: '-', maxProfit: '-' },
+      explanation: 'Initialize left pointer l to 0',
+      lineNumber: 2
+    });
+
     newSteps.push({
       array: [...prices],
       highlights: [l, r],
-      minIndex: l, // reusing minIndex for l for rendering convenience if needed, but we'll use specific l/r checks
+      minIndex: l,
+      currentIndex: r,
+      variables: { l, r, maxProfit: '-' },
+      explanation: 'Initialize right pointer r to 1',
+      lineNumber: 3
+    });
+
+    newSteps.push({
+      array: [...prices],
+      highlights: [l, r],
+      minIndex: l,
       currentIndex: r,
       variables: { l, r, maxProfit },
-      explanation: 'Initialize pointers: l = 0, r = 1, maxProfit = 0',
-      lineNumber: 2
+      explanation: 'Initialize maxProfit to 0',
+      lineNumber: 4
     });
 
     while (r < prices.length) {
@@ -61,9 +80,19 @@ export const BestTimeToBuyAndSellStockVisualization = () => {
         highlights: [l, r],
         minIndex: l,
         currentIndex: r,
+        variables: { l, r, maxProfit },
+        explanation: `Check loop condition: r (${r}) < prices.length (${prices.length})`,
+        lineNumber: 6
+      });
+
+      newSteps.push({
+        array: [...prices],
+        highlights: [l, r],
+        minIndex: l,
+        currentIndex: r,
         variables: { l, r, maxProfit, 'prices[l]': prices[l], 'prices[r]': prices[r] },
         explanation: `Check if prices[l] (${prices[l]}) < prices[r] (${prices[r]})`,
-        lineNumber: 6
+        lineNumber: 7
       });
 
       if (prices[l] < prices[r]) {
@@ -77,7 +106,7 @@ export const BestTimeToBuyAndSellStockVisualization = () => {
           minIndex: l,
           currentIndex: r,
           variables: { l, r, maxProfit, profit },
-          explanation: `prices[l] < prices[r], so calculate profit: ${prices[r]} - ${prices[l]} = ${profit}. Update maxProfit = max(${oldMaxProfit}, ${profit}) = ${maxProfit}`,
+          explanation: `prices[l] < prices[r], profit = ${profit}. Update maxProfit = max(${oldMaxProfit}, ${profit}) = ${maxProfit}`,
           lineNumber: 8
         });
       } else {
@@ -88,24 +117,32 @@ export const BestTimeToBuyAndSellStockVisualization = () => {
           minIndex: l,
           currentIndex: r,
           variables: { l, r, maxProfit },
-          explanation: `prices[l] >= prices[r], so move left pointer l to r (${r})`,
-          lineNumber: 11
+          explanation: `prices[l] >= prices[r], move left pointer l to r (${r})`,
+          lineNumber: 10
         });
       }
 
+      newSteps.push({
+        array: [...prices],
+        highlights: [l, r],
+        minIndex: l,
+        currentIndex: r,
+        variables: { l, r, maxProfit },
+        explanation: `Increment r to ${r + 1}`,
+        lineNumber: 12
+      });
       r = r + 1;
-      if (r < prices.length) {
-        newSteps.push({
-          array: [...prices],
-          highlights: [l, r],
-          minIndex: l,
-          currentIndex: r,
-          variables: { l, r, maxProfit },
-          explanation: `Increment r to ${r}`,
-          lineNumber: 14
-        });
-      }
     }
+
+    newSteps.push({
+      array: [...prices],
+      highlights: [l],
+      minIndex: l,
+      currentIndex: r,
+      variables: { l, r, maxProfit },
+      explanation: `Check loop condition: r (${r}) < prices.length (${prices.length}). False, loop ends.`,
+      lineNumber: 6
+    });
 
     newSteps.push({
       array: [...prices],
@@ -113,8 +150,8 @@ export const BestTimeToBuyAndSellStockVisualization = () => {
       minIndex: -1,
       currentIndex: -1,
       variables: { maxProfit },
-      explanation: `Loop finished. Return maxProfit = ${maxProfit}`,
-      lineNumber: 17
+      explanation: `Return maxProfit = ${maxProfit}`,
+      lineNumber: 14
     });
 
     setSteps(newSteps);

@@ -242,7 +242,6 @@ export const MaximumProductSubarrayVisualization = () => {
   const leftContent = (
     <>
       <motion.div
-        key={currentStep}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
@@ -255,7 +254,6 @@ export const MaximumProductSubarrayVisualization = () => {
       </motion.div>
 
       <motion.div
-        key={`explanation-${currentStep}`}
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.4, delay: 0.1 }}
@@ -288,7 +286,6 @@ export const MaximumProductSubarrayVisualization = () => {
       </motion.div>
 
       <motion.div
-        key={`variables-${currentStep}`}
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.3, delay: 0.3 }}

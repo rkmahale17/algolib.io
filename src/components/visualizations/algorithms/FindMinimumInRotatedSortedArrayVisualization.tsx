@@ -97,25 +97,25 @@ export const FindMinimumInRotatedSortedArrayVisualization = () => {
         });
 
         if (nums[mid] > nums[right]) {
-          left = mid + 1;
           newSteps.push({
             array: [...nums],
             highlights: [left, right],
             variables: { left, right, mid },
-            explanation: `Since ${nums[mid]} > ${nums[right]}, minimum is to the right. New left = mid + 1 = ${left}.`,
+            explanation: `Since ${nums[mid]} > ${nums[right]}, minimum is strictly to the right. New left = mid + 1 = ${mid + 1}.`,
             highlightedLines: [8],
             lineExecution: "left = mid + 1;"
           });
+          left = mid + 1;
         } else {
-          right = mid;
           newSteps.push({
             array: [...nums],
             highlights: [left, right],
             variables: { left, right, mid },
-            explanation: `Since ${nums[mid]} <= ${nums[right]}, minimum is to the left (or is mid). New right = mid = ${right}.`,
+            explanation: `Since ${nums[mid]} <= ${nums[right]}, minimum is to the left (or is mid). New right = mid = ${mid}.`,
             highlightedLines: [10],
             lineExecution: "right = mid;"
           });
+          right = mid;
         }
       }
 
@@ -135,7 +135,7 @@ export const FindMinimumInRotatedSortedArrayVisualization = () => {
         highlights: [left],
         variables: { left, right, mid, result: nums[left] },
         explanation: `Return nums[left] = nums[${left}] = ${nums[left]}. Found minimum!`,
-        highlightedLines: [13],
+        highlightedLines: [14],
         lineExecution: "return nums[left];"
       });
 
@@ -154,37 +154,46 @@ export const FindMinimumInRotatedSortedArrayVisualization = () => {
       leftContent={
         <>
           <motion.div
-            key={`array-${currentStep}`}
             transition={{ duration: 0.5 }}
           >
             <Card className="p-6">
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-center">Find Minimum in Rotated Sorted Array</h3>
-                <div className="flex items-center justify-center gap-2 min-h-[200px] flex-wrap">
-                  {step.array.map((value, index) => (
-                    <motion.div
-                      key={index}
-                      transition={{ delay: index * 0.05 }}
-                      className="flex flex-col items-center gap-2"
-                    >
-                      <div
-                        className={`w-14 h-14 rounded flex items-center justify-center font- transition-all duration-300 ${step.highlights.includes(index)
-                          ? 'bg-primary text-primary-foreground scale-110'
-                          : 'bg-muted text-foreground'
-                          }`}
-                      >
-                        {value}
+                <div className="flex items-center justify-center gap-2 min-h-[100px] flex-wrap mt-8">
+                  {step.array.map((value, index) => {
+                    const l = step.variables.left;
+                    const r = step.variables.right;
+                    const m = step.variables.mid;
+                    
+                    const isL = index === l;
+                    const isR = index === r;
+                    const isM = index === m;
+                    
+                    return (
+                      <div key={index} className="flex flex-col items-center gap-1 sm:gap-2 relative">
+                        <div className="absolute -top-8 flex flex-col text-[10px] font-bold">
+                          {isL && <span className="text-green-500 text-center">L</span>}
+                          {isM && <span className="text-purple-500 text-center">M</span>}
+                          {isR && <span className="text-blue-500 text-center">R</span>}
+                        </div>
+                        <div
+                          className={`w-8 h-8 rounded-lg flex items-center justify-center font-semibold text-sm sm:text-base border-2 transition-all duration-300 ${step.highlights.includes(index)
+                            ? 'bg-primary border-primary text-primary-foreground scale-110 shadow-lg'
+                            : 'bg-muted/50 border-border text-foreground'
+                            }`}
+                        >
+                          {value}
+                        </div>
+                        <span className="text-[10px] sm:text-xs text-muted-foreground">[{index}]</span>
                       </div>
-                      <span className="text-xs text-muted-foreground">[{index}]</span>
-                    </motion.div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </Card>
           </motion.div>
 
           <motion.div
-            key={`explanation-${currentStep}`}
             transition={{ duration: 0.4, delay: 0.2 }}
           >
             <Card className="p-4 bg-muted/50">
@@ -201,7 +210,6 @@ export const FindMinimumInRotatedSortedArrayVisualization = () => {
           </motion.div>
 
           <motion.div
-            key={`variables-${currentStep}`}
             transition={{ duration: 0.3, delay: 0.3 }}
           >
             <VariablePanel variables={step.variables} />

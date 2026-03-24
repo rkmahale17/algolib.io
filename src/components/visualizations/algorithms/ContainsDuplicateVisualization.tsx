@@ -36,51 +36,65 @@ export const ContainsDuplicateVisualization = () => {
     const newSteps: Step[] = [];
     const seen = new Set<number>();
 
+    // Line 2
     newSteps.push({
       array: [...nums],
       highlights: [],
       variables: { seen: '{}', i: '-' },
-      explanation: 'Initialize: Create empty set to track seen numbers',
-      lineNumber: 1
+      explanation: 'Initialize an empty hash set to track seen numbers.',
+      lineNumber: 2
     });
 
     for (let i = 0; i < nums.length; i++) {
+      // Line 4
       newSteps.push({
         array: [...nums],
         highlights: [i],
         variables: { i, 'nums[i]': nums[i], seen: `{${Array.from(seen).join(', ')}}` },
-        explanation: `i=${i}: Check if nums[${i}]=${nums[i]} is in set`,
+        explanation: `Iteration i=${i}: Process nums[${i}] = ${nums[i]}.`,
         lineNumber: 4
       });
 
+      // Line 5
+      newSteps.push({
+        array: [...nums],
+        highlights: [i],
+        variables: { i, 'nums[i]': nums[i], seen: `{${Array.from(seen).join(', ')}}` },
+        explanation: `Check if 'seen' set already contains ${nums[i]}.`,
+        lineNumber: 5
+      });
+
       if (seen.has(nums[i])) {
+        // Line 6
         newSteps.push({
           array: [...nums],
           highlights: [i],
-          variables: { i, 'nums[i]': nums[i], result: true },
-          explanation: `Found duplicate! nums[${i}]=${nums[i]} already seen. Return true.`,
-          lineNumber: 5
+          variables: { i, 'nums[i]': nums[i], result: 'true', seen: `{${Array.from(seen).join(', ')}}` },
+          explanation: `Found duplicate! ${nums[i]} is already seen. Return true.`,
+          lineNumber: 6
         });
         break;
       }
 
       seen.add(nums[i]);
+      // Line 8
       newSteps.push({
         array: [...nums],
         highlights: [i],
         variables: { i, action: `seen.add(${nums[i]})`, seen: `{${Array.from(seen).join(', ')}}` },
-        explanation: `nums[${i}]=${nums[i]} not seen before. Add to set.`,
-        lineNumber: 7
+        explanation: `${nums[i]} not seen before. Add to set.`,
+        lineNumber: 8
       });
     }
 
     if (!seen.has(nums[nums.length - 1]) || seen.size === nums.length) {
+      // Line 11
       newSteps.push({
         array: [...nums],
         highlights: [],
-        variables: { result: false },
-        explanation: 'No duplicates found. Return false.',
-        lineNumber: 10
+        variables: { result: 'false', seen: `{${Array.from(seen).join(', ')}}` },
+        explanation: 'Loop completed, no duplicates found. Return false.',
+        lineNumber: 11
       });
     }
 
@@ -147,14 +161,14 @@ export const ContainsDuplicateVisualization = () => {
               {currentStep.array.map((value, idx) => (
                 <div key={idx} className="flex flex-col items-center gap-2">
                   <div
-                    className={`w-10 h-10 sm:w-16 sm:h-16 rounded-lg flex items-center justify-center border-2 transition-all duration-300 ${currentStep.highlights.includes(idx)
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center border-2 transition-all duration-300 ${currentStep.highlights.includes(idx)
                       ? 'bg-primary border-primary scale-110 shadow-lg'
                       : 'bg-muted/50 border-border'
                       }`}
                   >
-                    <span className="font- text-lg">{value}</span>
+                    <span className="font-semibold text-sm sm:text-base">{value}</span>
                   </div>
-                  <span className="text-xs text-muted-foreground">[{idx}]</span>
+                  <span className="text-[10px] sm:text-xs text-muted-foreground">[{idx}]</span>
                 </div>
               ))}
             </div>
