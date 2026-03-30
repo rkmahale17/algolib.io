@@ -76,12 +76,32 @@ const ProblemDetail: React.FC = () => {
 
   const { data: progressMap } = useUserProgressMap(user?.id);
 
+  const filteredAlgorithms = useMemo(() => {
+    if (!allAlgorithms) return [];
+    if (!activeListType || activeListType === 'all') return allAlgorithms;
+    
+    return allAlgorithms.filter(algo => {
+      const algoListType = (algo.list_type || (algo as any).listType || 'core').toLowerCase();
+      const currentListType = activeListType.toLowerCase();
+
+      if (currentListType === 'core') {
+        return algoListType === 'core' || algoListType === 'core+blind75';
+      } else if (currentListType === 'blind75') {
+        return algoListType === 'blind75' || algoListType === 'core+blind75';
+      } else if (currentListType === 'core+blind75') {
+        return algoListType === 'core+blind75';
+      }
+      return true;
+    });
+  }, [allAlgorithms, activeListType]);
+
   const interactions = useAlgorithmInteractions({
     user,
     algorithmId: algorithmIdOrSlug,
     algorithm,
     userAlgoData,
     refetchUserData,
+    filteredAlgorithms,
   });
 
   const submissions = useMemo(() => userAlgoData?.submissions || [], [userAlgoData?.submissions]);
@@ -390,7 +410,7 @@ const ProblemDetail: React.FC = () => {
           </div>
           <div className="flex-1 overflow-hidden">
             <ProblemSidebar
-              algorithms={allAlgorithms as any}
+              algorithms={filteredAlgorithms as any}
               progressMap={progressMap || {}}
               isPaywallEnabled={isPaywallEnabled}
               hasPremiumAccess={hasPremiumAccess}

@@ -12,6 +12,7 @@ interface UseAlgorithmInteractionsProps {
     algorithm: any;
     userAlgoData: any;
     refetchUserData: () => void;
+    filteredAlgorithms?: any[];
 }
 
 export const useAlgorithmInteractions = ({
@@ -19,7 +20,8 @@ export const useAlgorithmInteractions = ({
     algorithmId,
     algorithm,
     userAlgoData,
-    refetchUserData
+    refetchUserData,
+    filteredAlgorithms
 }: UseAlgorithmInteractionsProps) => {
     const navigate = useNavigate();
     const [isCompleted, setIsCompleted] = useState(false);
@@ -302,6 +304,18 @@ export const useAlgorithmInteractions = ({
         if (!algorithm || !supabase) return;
 
         try {
+            if (filteredAlgorithms && filteredAlgorithms.length > 0) {
+                const currentIndex = filteredAlgorithms.findIndex(a => a.id === algorithm.id || a.slug === algorithm.slug || a.id === algorithmId);
+                if (currentIndex > 0) {
+                    const prevAlgo = filteredAlgorithms[currentIndex - 1];
+                    navigate(`/problem/${prevAlgo.slug || prevAlgo.id}`);
+                    return;
+                } else if (currentIndex === 0) {
+                    toast.info("No previous problem found. You are at the start!");
+                    return;
+                }
+            }
+
             if (typeof algorithm.serial_no === 'number') {
                 const { data: prevAlgo } = await supabase
                     .from('algorithms')
@@ -321,12 +335,24 @@ export const useAlgorithmInteractions = ({
         } catch (error) {
             console.error("Error navigating previous:", error);
         }
-    }, [algorithm, navigate]);
+    }, [algorithm, algorithmId, navigate, filteredAlgorithms]);
 
     const handleNextProblem = useCallback(async () => {
         if (!algorithm || !supabase) return;
 
         try {
+            if (filteredAlgorithms && filteredAlgorithms.length > 0) {
+                const currentIndex = filteredAlgorithms.findIndex(a => a.id === algorithm.id || a.slug === algorithm.slug || a.id === algorithmId);
+                if (currentIndex >= 0 && currentIndex < filteredAlgorithms.length - 1) {
+                    const nextAlgo = filteredAlgorithms[currentIndex + 1];
+                    navigate(`/problem/${nextAlgo.slug || nextAlgo.id}`);
+                    return;
+                } else if (currentIndex === filteredAlgorithms.length - 1) {
+                    toast.info("You have reached the end of the list!");
+                    return;
+                }
+            }
+
             // New Logic: Find next by serial_no
             if (typeof algorithm.serial_no === 'number') {
                 const { data: nextAlgo } = await supabase
@@ -353,7 +379,7 @@ export const useAlgorithmInteractions = ({
             handleRandomProblem();
         }
 
-    }, [algorithm, handleRandomProblem, navigate]);
+    }, [algorithm, algorithmId, handleRandomProblem, navigate, filteredAlgorithms]);
 
     const handleShare = useCallback(async () => {
         try {

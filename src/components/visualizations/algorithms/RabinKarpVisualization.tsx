@@ -314,7 +314,7 @@ export const RabinKarpVisualization = () => {
               {/* Text Row */}
               <div>
                 <h4 className="text-[10px] font-bold text-muted-foreground uppercase mb-4 tracking-widest">Text</h4>
-                <div className="flex flex-wrap gap-1 justify-center">
+                <div className="flex flex-wrap gap-x-1 gap-y-6 justify-center pb-4">
                   {step.text.split('').map((char, idx) => {
                     const isI = idx === step.i && (step.phase === 'search' || step.phase === 'match' || step.phase === 'mismatch');
                     const isMatched = step.result.some((start) => idx >= start && idx < start + step.pattern.length);
@@ -324,9 +324,7 @@ export const RabinKarpVisualization = () => {
 
                     return (
                       <div key={idx} className="relative flex flex-col items-center">
-                        <div className="absolute -top-5">
-                          <span className="text-[9px] text-muted-foreground font-mono">{idx}</span>
-                        </div>
+                        <span className="text-[9px] text-muted-foreground font-mono mb-1">{idx}</span>
                         <motion.div
                           animate={{
                             backgroundColor: isMatched
@@ -359,7 +357,7 @@ export const RabinKarpVisualization = () => {
               {/* Pattern Row */}
               <div className="pt-4">
                 <h4 className="text-[10px] font-bold text-muted-foreground uppercase mb-4 tracking-widest">Pattern</h4>
-                <div className="flex flex-wrap gap-1 justify-center">
+                <div className="flex flex-wrap gap-x-1 gap-y-6 justify-center pb-4">
                   {step.pattern.split('').map((char, idx) => {
                     const isJ = idx === step.j && (step.phase === 'search' || step.phase === 'match' || step.phase === 'mismatch');
                     const isLpsI = step.phase === 'lps' && idx === step.lps_i;
@@ -367,9 +365,7 @@ export const RabinKarpVisualization = () => {
 
                     return (
                       <div key={idx} className="relative flex flex-col items-center">
-                        <div className="absolute -top-5">
-                          <span className="text-[9px] text-muted-foreground font-mono">{idx}</span>
-                        </div>
+                        <span className="text-[9px] text-muted-foreground font-mono mb-1">{idx}</span>
                         <motion.div
                           animate={{
                             backgroundColor: isLpsI || isLpsLen

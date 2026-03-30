@@ -88,29 +88,29 @@ export const TarjansVisualization = () => {
       });
     };
 
-    snap(-1, null, 'Initialize: n, disc, low, onStack, stack, sccs, time = 0.', [1, 2, 3, 4, 5, 6, 7], { n }, 'init');
+    snap(-1, null, 'Initialize: n, disc, low, onStack, stack, sccs, time = 0.', [2, 3, 4, 5, 6, 7, 8], { n }, 'init');
 
     function dfs(u: number) {
       disc[u] = low[u] = time++;
-      snap(u, null, `dfs(${u}): disc[${u}] = low[${u}] = ${disc[u]}, time → ${time}.`, [10], { [`disc[${u}]`]: disc[u], [`low[${u}]`]: low[u], time }, 'visit');
+      snap(u, null, `dfs(${u}): disc[${u}] = low[${u}] = ${disc[u]}, time → ${time}.`, [11], { [`disc[${u}]`]: disc[u], [`low[${u}]`]: low[u], time }, 'visit');
 
       stack.push(u);
       onStack[u] = true;
-      snap(u, null, `Push ${u} onto stack. onStack[${u}] = true.`, [11, 12], { stack: `[${stack.join(',')}]`, [`onStack[${u}]`]: true }, 'visit');
+      snap(u, null, `Push ${u} onto stack. onStack[${u}] = true.`, [12, 13], { stack: `[${stack.join(',')}]`, [`onStack[${u}]`]: true }, 'visit');
 
       for (const v of graph[u]) {
-        snap(u, [u, v], `Check neighbor v = ${v} of u = ${u}.`, [14], { u, v, [`disc[${v}]`]: disc[v] }, 'recurse');
+        snap(u, [u, v], `Check neighbor v = ${v} of u = ${u}.`, [15], { u, v, [`disc[${v}]`]: disc[v] }, 'recurse');
 
         if (disc[v] === -1) {
-          snap(u, [u, v], `disc[${v}] === -1: recurse dfs(${v}).`, [15, 16], { u, v }, 'recurse');
+          snap(u, [u, v], `disc[${v}] === -1: recurse dfs(${v}).`, [16, 17], { u, v }, 'recurse');
           dfs(v);
           low[u] = Math.min(low[u], low[v]);
-          snap(u, [u, v], `Backtrack to ${u}: low[${u}] = min(low[${u}], low[${v}]) = ${low[u]}.`, [17], { [`low[${u}]`]: low[u], [`low[${v}]`]: low[v] }, 'backtrack');
+          snap(u, [u, v], `Backtrack to ${u}: low[${u}] = min(low[${u}], low[${v}]) = ${low[u]}.`, [18], { [`low[${u}]`]: low[u], [`low[${v}]`]: low[v] }, 'backtrack');
         } else if (onStack[v]) {
           low[u] = Math.min(low[u], disc[v]);
           snap(u, [u, v], `v = ${v} is on stack (back edge). low[${u}] = min(low[${u}], disc[${v}]) = ${low[u]}.`, [19, 20], { [`low[${u}]`]: low[u], [`disc[${v}]`]: disc[v] }, 'backedge');
         } else {
-          snap(u, [u, v], `v = ${v} already visited and not on stack. Skip.`, [18], { v, onStack: false }, 'recurse');
+          snap(u, [u, v], `v = ${v} already visited and not on stack. Skip.`, [19], { v, onStack: false }, 'recurse');
         }
       }
 
@@ -123,23 +123,23 @@ export const TarjansVisualization = () => {
           w = stack.pop()!;
           onStack[w] = false;
           scc.push(w);
-          snap(u, null, `Pop ${w} from stack → add to SCC.`, [26, 27, 28, 29], { w, stack: `[${stack.join(',')}]` }, 'scc');
+          snap(u, null, `Pop ${w} from stack → add to SCC.`, [28, 29, 30], { w, stack: `[${stack.join(',')}]` }, 'scc');
         } while (w !== u);
         sccs.push(scc);
-        snap(u, null, `SCC complete: [${scc.join(', ')}]. Total SCCs: ${sccs.length}.`, [30, 31], { scc: `[${scc.join(',')}]`, totalSCCs: sccs.length }, 'scc');
+        snap(u, null, `SCC complete: [${scc.join(', ')}]. Total SCCs: ${sccs.length}.`, [32], { scc: `[${scc.join(',')}]`, totalSCCs: sccs.length }, 'scc');
       }
     }
 
-    snap(-1, null, 'Outer loop: iterate over all vertices.', [34], { i: 0, n }, 'init');
+    snap(-1, null, 'Outer loop: iterate over all vertices.', [36], { i: 0, n }, 'init');
 
     for (let i = 0; i < n; i++) {
-      snap(i, null, `i = ${i}: disc[${i}] === -1? ${disc[i] === -1 ? 'YES — call dfs(' + i + ').' : 'NO — skip.'}`, [35, 36], { i, [`disc[${i}]`]: disc[i] }, 'init');
+      snap(i, null, `i = ${i}: disc[${i}] === -1? ${disc[i] === -1 ? 'YES — call dfs(' + i + ').' : 'NO — skip.'}`, [36, 37], { i, [`disc[${i}]`]: disc[i] }, 'init');
       if (disc[i] === -1) {
         dfs(i);
       }
     }
 
-    snap(-1, null, `Done! Returning ${sccs.length} SCCs: ${sccs.map(c => '[' + c.join(',') + ']').join(', ')}.`, [40], { sccs: sccs.length }, 'done');
+    snap(-1, null, `Done! Returning ${sccs.length} SCCs: ${sccs.map(c => '[' + c.join(',') + ']').join(', ')}.`, [42], { sccs: sccs.length }, 'done');
 
     return s;
   }, []);

@@ -46,7 +46,7 @@ export const ManachersVisualization = () => {
     s_steps.push({
       processed, radius: [...radius], i: -1, center, right, mirror: -1, maxLen,
       explanation: `Preprocess: insert '#' between chars. processed = "${processed}"`,
-      highlightedLines: [5],
+      highlightedLines: [4, 5],
       variables: { processed, n },
       phase: 'preprocess'
     });
@@ -54,7 +54,7 @@ export const ManachersVisualization = () => {
     s_steps.push({
       processed, radius: [...radius], i: -1, center, right, mirror: -1, maxLen,
       explanation: 'Initialize radius array, center = 0, right = 0, maxLen = 0.',
-      highlightedLines: [7, 8, 9, 10],
+      highlightedLines: [7, 9, 10, 11],
       variables: { center, right, maxLen },
       phase: 'preprocess'
     });
@@ -98,7 +98,7 @@ export const ManachersVisualization = () => {
         s_steps.push({
           processed, radius: [...radius], i, center, right, mirror, maxLen,
           explanation: `Match: processed[${i - radius[i]}]="${processed[i - radius[i]]}" == processed[${i + radius[i]}]="${processed[i + radius[i]]}". Expand radius to ${radius[i]}.`,
-          highlightedLines: [24],
+          highlightedLines: [25],
           variables: { i, 'radius[i]': radius[i], left: i - radius[i], rightEdge: i + radius[i] },
           phase: 'expand'
         });
@@ -110,7 +110,7 @@ export const ManachersVisualization = () => {
         s_steps.push({
           processed, radius: [...radius], i, center, right, mirror, maxLen,
           explanation: `i + radius[i] = ${i + radius[i]} > right. Update center=${center}, right=${right}.`,
-          highlightedLines: [27, 28, 29],
+          highlightedLines: [28, 29, 30],
           variables: { center, right },
           phase: 'update_boundary'
         });
@@ -120,7 +120,7 @@ export const ManachersVisualization = () => {
       s_steps.push({
         processed, radius: [...radius], i, center, right, mirror, maxLen,
         explanation: `Update maxLen = max(${maxLen}, ${radius[i]}) = ${maxLen}.`,
-        highlightedLines: [32],
+        highlightedLines: [33],
         variables: { maxLen, 'radius[i]': radius[i] },
         phase: 'update_max'
       });
@@ -129,7 +129,7 @@ export const ManachersVisualization = () => {
     s_steps.push({
       processed, radius: [...radius], i: -1, center, right, mirror: -1, maxLen,
       explanation: `Done! Longest palindrome length = maxLen = ${maxLen}.`,
-      highlightedLines: [35],
+      highlightedLines: [36],
       variables: { maxLen, result: maxLen },
       phase: 'done'
     });
@@ -197,11 +197,12 @@ export const ManachersVisualization = () => {
             <div className="space-y-10">
               <div>
                 <h4 className="text-[10px] font-bold text-muted-foreground uppercase mb-4 tracking-tighter">Processed String</h4>
-                <div className="flex flex-wrap gap-[3px] justify-center">
+                <div className="flex flex-wrap gap-x-[3px] gap-y-7 justify-center pb-6">
                   {step.processed.split('').map((char, idx) => {
                     const color = getCharColor(idx);
                     return (
                       <div key={idx} className="relative flex flex-col items-center">
+                        <span style={{ fontSize: '9px', color: '#666', fontFamily: 'monospace', marginBottom: '4px' }}>{idx}</span>
                         <motion.div
                           animate={{
                             backgroundColor:
@@ -213,17 +214,14 @@ export const ManachersVisualization = () => {
                               color === 'current' ? '#84cc16' :
                                 color === 'mirror' ? '#fbbf24' :
                                   color === 'inPalin' ? 'rgba(132,204,22,0.5)' :
-                                    '#333',
+                                    'var(--border)',
                             scale: color === 'current' ? 1.1 : 1,
                           }}
                           className="w-8 h-8 border-2 rounded-md flex items-center justify-center text-xs font-bold"
-                          style={{ color: color === 'current' ? '#000' : '#e5e5e5' }}
+                          style={{ color: color === 'current' ? '#000' : undefined }}
                         >
                           {char}
                         </motion.div>
-                        <div className="absolute -top-5">
-                          <span style={{ fontSize: '9px', color: '#666', fontFamily: 'monospace' }}>{idx}</span>
-                        </div>
                         {idx === step.i && step.i !== -1 && (
                           <div className="absolute -bottom-5">
                             <span style={{ fontSize: '9px', fontWeight: 'bold', color: '#84cc16' }}>i</span>
@@ -240,9 +238,9 @@ export const ManachersVisualization = () => {
                 </div>
               </div>
 
-              <div>
+              <div className="pt-2">
                 <h4 className="text-[10px] font-bold text-muted-foreground uppercase mb-4 tracking-tighter">Radius Array</h4>
-                <div className="flex flex-wrap gap-[3px] justify-center">
+                <div className="flex flex-wrap gap-[3px] gap-y-3 justify-center">
                   {step.processed.split('').map((_, idx) => {
                     const val = step.radius[idx] ?? 0;
                     const isActive = idx === step.i;
@@ -252,11 +250,10 @@ export const ManachersVisualization = () => {
                         <motion.div
                           animate={{
                             backgroundColor: isActive ? 'rgba(132,204,22,0.25)' : isMax ? 'rgba(132,204,22,0.12)' : 'transparent',
-                            borderColor: isActive ? '#84cc16' : isMax ? 'rgba(132,204,22,0.5)' : '#333',
+                            borderColor: isActive ? '#84cc16' : isMax ? 'rgba(132,204,22,0.5)' : 'var(--border)',
                             scale: isActive ? 1.1 : 1,
                           }}
                           className="w-8 h-8 flex items-center justify-center rounded-md border-2 text-xs font-bold"
-                          style={{ color: '#ccc' }}
                         >
                           {val}
                         </motion.div>

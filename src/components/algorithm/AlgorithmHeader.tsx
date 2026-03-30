@@ -204,8 +204,8 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
                       onClick={onRun}
                       disabled={isRunnerLoading || isRunnerSubmitting}
                       size="sm"
-                      variant="default"
-                      className="h-8 px-4 text-xs rounded-r-none border border-r-0 bg-white text-black dark:bg-black dark:text-white hover:bg-primary/90 hover:dark:bg-primary/90 border-primary/20  font-medium transition-colors"
+                      variant="secondary"
+                      className="h-8 px-4 text-xs rounded-r-none border border-r-0 border-border font-medium transition-colors hover:bg-secondary/80"
                     >
                       {isRunnerLoading ? (
                         <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />

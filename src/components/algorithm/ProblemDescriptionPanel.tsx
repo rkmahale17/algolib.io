@@ -236,13 +236,13 @@ export const ProblemDescriptionPanel = React.memo(({
         <div className="flex-1 overflow-hidden relative">
           <TabsContent value="description" className="h-full m-0 data-[state=inactive]:hidden">
             <ScrollArea className="h-full">
-              <div className="p-4 space-y-6 pb-20">
+              <div className="p-4 space-y-2">
                 {/* Title & Progress */}
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-3 mb-3">
-                      <h1 className="text-2xl font-">
-                        {algorithm.serial_no ? `${algorithm.serial_no}. ` : ''}{algorithm.name}
+                      <h1 className="text-xl font-medium">
+                        {<span className="font-medium text-md mr-1">{algorithm.serial_no ? `${algorithm.serial_no}. ` : ''}</span>}{algorithm.name}
                       </h1>
                       {algorithm?.list_type && algorithm.list_type !== 'core' && algorithm.list_type !== 'core+blind75' && (
                         <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
@@ -312,14 +312,12 @@ export const ProblemDescriptionPanel = React.memo(({
                 </div>
                 <section className="max-w-[800px] ">
                   {algorithm.explanation.problemStatement && (!algorithm?.controls || algorithm.controls?.description?.problem_statement !== false) && (
-                    <div className="space-y-4">
-                      <RichText
-                        content={algorithm.explanation.problemStatement}
-                        className="text-base leading-relaxed pr-4 dark:text-muted-foreground"
-                        onClick={handleRichTextClick}
-                      ></RichText>
+                    <RichText
+                      content={algorithm.explanation.problemStatement}
+                      className="text-base leading-relaxed pr-4 dark:text-muted-foreground"
+                      onClick={handleRichTextClick}
+                    ></RichText>
 
-                    </div>
                   )}
                 </section>
 
@@ -392,7 +390,7 @@ export const ProblemDescriptionPanel = React.memo(({
                           <span className="text-muted-foreground mt-0.5">•</span>
                           <RichText
                             content={constraint}
-                            className="text-base leading-relaxed pr-4"
+                            className="text-base leading-relaxed pr-4 text-sm "
                             onClick={handleRichTextClick}
                           ></RichText>
                         </li>

@@ -325,7 +325,7 @@ export const UnionFindByRankVisualization = () => {
             }
         }
 
-        const rootNodes = Array.from({ length: N }, (_, i) => i).filter(i => step.parent[i] === i);
+        const rootNodes = Array.from({ length: N }, (_, i) => i).filter(i => step.parent[i] === i || step.parent[i] === undefined);
         const pos: { x: number; y: number }[] = new Array(N).fill(null).map(() => ({ x: 0, y: 0 }));
         const svgW = 520;
         const colW = svgW / (rootNodes.length + 1);
@@ -364,9 +364,9 @@ export const UnionFindByRankVisualization = () => {
     }, [step.parent]);
 
     const getNodeStyle = (i: number) => {
-        if (step.activeNodes.includes(i)) return { fill: '#84cc1622', stroke: '#84cc16', text: '#84cc16' };
-        if (step.parent[i] === i) return { fill: '#34d39922', stroke: '#34d399', text: '#34d399' };
-        return { fill: '#1e293b', stroke: '#475569', text: '#94a3b8' };
+        if (step.activeNodes.includes(i)) return { isDefault: false, fill: '#84cc1622', stroke: '#84cc16', text: '#84cc16' };
+        if (step.parent[i] === i) return { isDefault: false, fill: '#34d39922', stroke: '#34d399', text: '#34d399' };
+        return { isDefault: true, fill: '', stroke: '', text: '' };
     };
 
     return (
@@ -388,7 +388,8 @@ export const UnionFindByRankVisualization = () => {
                                         key={idx}
                                         x1={fpos.x} y1={fpos.y}
                                         x2={tpos.x} y2={tpos.y}
-                                        stroke={active ? '#84cc16' : '#334155'}
+                                        stroke={active ? '#84cc16' : undefined}
+                                        className={active ? "" : "stroke-border"}
                                         strokeWidth={active ? 2.5 : 1.5}
                                     />
                                 );
@@ -396,7 +397,7 @@ export const UnionFindByRankVisualization = () => {
 
                             {Array.from({ length: N }, (_, i) => i).map((i) => {
                                 const pos = computePositions[i];
-                                const { fill, stroke, text } = getNodeStyle(i);
+                                const { isDefault, fill, stroke, text } = getNodeStyle(i);
                                 const isActive = step.activeNodes.includes(i);
                                 const isRoot = step.parent[i] === i;
                                 const r = isActive ? 22 : 18;
@@ -407,11 +408,11 @@ export const UnionFindByRankVisualization = () => {
                                                 ROOT
                                             </text>
                                         )}
-                                        <circle cx={pos.x} cy={pos.y} r={r} fill={fill} stroke={stroke} strokeWidth={isActive ? 3 : 2} />
-                                        <text x={pos.x} y={pos.y + 1} textAnchor="middle" dominantBaseline="middle" fill={text} fontSize={isActive ? 14 : 13} fontWeight="bold">
+                                        <circle cx={pos.x} cy={pos.y} r={r} fill={isDefault ? undefined : fill} stroke={isDefault ? undefined : stroke} strokeWidth={isActive ? 3 : 2} className={isDefault ? "fill-muted stroke-border" : ""} />
+                                        <text x={pos.x} y={pos.y + 1} textAnchor="middle" dominantBaseline="middle" fill={isDefault ? undefined : text} fontSize={isActive ? 14 : 13} fontWeight="bold" className={isDefault ? "fill-muted-foreground" : ""}>
                                             {i}
                                         </text>
-                                        <text x={pos.x} y={pos.y + r + 12} textAnchor="middle" fill="#64748b" fontSize={9}>
+                                        <text x={pos.x} y={pos.y + r + 12} textAnchor="middle" fill="#64748b" fontSize={9} className="opacity-70">
                                             rank:{step.rank[i]}
                                         </text>
                                     </g>
@@ -429,8 +430,8 @@ export const UnionFindByRankVisualization = () => {
                                 Active
                             </span>
                             <span className="flex items-center gap-1.5">
-                                <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ background: '#1e293b', border: '1px solid #475569' }} />
-                                Child
+                                <span className="w-2.5 h-2.5 rounded-full inline-block bg-muted border border-border" />
+                                Node
                             </span>
                         </div>
                     </Card>
@@ -445,12 +446,12 @@ export const UnionFindByRankVisualization = () => {
                                     <motion.div
                                         key={i}
                                         animate={{ scale: isActive ? 1.1 : 1 }}
-                                        className="flex flex-col items-center gap-0.5 px-3 py-2 rounded-lg border-2 text-xs font-mono transition-all"
-                                        style={{
-                                            background: isActive ? 'rgba(132,204,22,0.12)' : isRoot ? 'rgba(52,211,153,0.12)' : 'rgba(30,41,59,0.5)',
-                                            borderColor: isActive ? '#84cc16' : isRoot ? '#34d399' : '#334155',
-                                            color: isActive ? '#84cc16' : isRoot ? '#34d399' : '#94a3b8'
-                                        }}
+                                        className={`flex flex-col items-center gap-0.5 px-3 py-2 rounded-lg border-2 text-xs font-mono transition-all ${!isActive && !isRoot ? 'bg-muted border-border text-muted-foreground' : ''}`}
+                                        style={isActive || isRoot ? {
+                                            background: isActive ? 'rgba(132,204,22,0.12)' : 'rgba(52,211,153,0.12)',
+                                            borderColor: isActive ? '#84cc16' : '#34d399',
+                                            color: isActive ? '#84cc16' : '#34d399'
+                                        } : {}}
                                     >
                                         <span style={{ fontSize: '9px', opacity: 0.6 }}>node {i}</span>
                                         <span className="font-bold">p:{step.parent[i] !== undefined ? step.parent[i] : '?'}</span>
