@@ -67,8 +67,7 @@ const Navbar = () => {
           <div className="hidden md:flex items-center gap-6 lg:gap-8 ml-6 flex-1 text-sm font-medium">
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-1 hover:text-primary transition-colors outline-none relative font-normal">
-                <span className="hidden lg:inline">Interviews</span>
-                <Languages className="w-4 h-4 lg:hidden" />
+                <span>Interviews</span>
                 <span className="absolute -top-1 -right-2 w-1.5 h-1.5 bg-red-500 rounded-full"></span>
                 <ChevronDown className="w-3.5 h-3.5 text-muted-foreground ml-1" />
               </DropdownMenuTrigger>
@@ -96,8 +95,7 @@ const Navbar = () => {
 
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-1 hover:text-primary transition-colors outline-none font-normal">
-                <span className="hidden lg:inline">Prepare</span>
-                <PenTool className="w-4 h-4 lg:hidden" />
+                <span>Prepare</span>
                 <ChevronDown className="w-3.5 h-3.5 text-muted-foreground ml-1" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-[700px] p-0 flex flex-row overflow-hidden border-border mt-2 rounded-xl shadow-2xl bg-background">

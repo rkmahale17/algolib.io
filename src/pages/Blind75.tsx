@@ -7,6 +7,7 @@ import { ListingLayout } from "@/components/listing/ListingLayout";
 import { PremiumProblemCard } from "@/components/listing/PremiumProblemCard";
 import { supabase } from "@/integrations/supabase/client";
 import { SidebarLayout } from '@/components/SidebarLayout';
+import { useApp } from '@/contexts/AppContext';
 
 
 const faqItems = [
@@ -32,6 +33,7 @@ const Blind75 = () => {
   const { data, isLoading } = useAlgorithms();
   const [userId, setUserId] = useState<string | undefined>(undefined);
   const { data: progressMap } = useUserProgressMap(userId);
+  const { activeListType, setActiveListType } = useApp();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('serial-asc');
@@ -42,6 +44,13 @@ const Blind75 = () => {
       setUserId(session?.user?.id);
     });
   }, []);
+
+  // Sync global list context
+  useEffect(() => {
+    if (activeListType !== 'blind75') {
+      setActiveListType('blind75');
+    }
+  }, [activeListType, setActiveListType]);
 
   const allAlgorithms = data?.algorithms ?? [];
   const blind75Algorithms = useMemo(() =>

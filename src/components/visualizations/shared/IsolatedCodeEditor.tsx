@@ -118,7 +118,7 @@ export const IsolatedCodeEditor = React.forwardRef<any, IsolatedCodeEditorProps>
       title="Isolated Monaco Editor"
       className={`w-full h-full border-0 ${className}`}
       style={{ height }}
-      sandbox="allow-scripts allow-popups allow-forms"
+      sandbox="allow-scripts allow-popups allow-forms allow-same-origin"
     />
   );
 });

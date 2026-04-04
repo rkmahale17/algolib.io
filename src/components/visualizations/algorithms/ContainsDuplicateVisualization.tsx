@@ -177,6 +177,7 @@ export const ContainsDuplicateVisualization = () => {
           <div className="bg-accent/50 rounded-lg border border-accent p-4">
             <p className="text-sm font-medium">{currentStep.explanation}</p>
           </div>
+          <VariablePanel variables={currentStep.variables} />
 
           <div className="bg-muted/50 rounded-lg border p-4">
             <h3 className="font-semibold mb-2 text-sm">Hash Set Strategy:</h3>
@@ -188,7 +189,6 @@ export const ContainsDuplicateVisualization = () => {
             </div>
           </div>
 
-          <VariablePanel variables={currentStep.variables} />
         </div>
 
         <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="typescript" />

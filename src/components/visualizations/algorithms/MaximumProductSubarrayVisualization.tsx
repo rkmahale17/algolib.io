@@ -1,321 +1,316 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { SimpleArrayVisualization } from '../shared/SimpleArrayVisualization';
+import { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
+import { Card } from '@/components/ui/card';
+import { Zap, Info, Hash, Target } from 'lucide-react';
+
+interface Step {
+  array: number[];
+  i: number;
+  maxProduct: number;
+  currentMax: number;
+  currentMin: number;
+  tempMax?: number;
+  message: string;
+  lineNumber: number;
+  curMaxRange: [number, number]; // [start, end]
+  bestRange: [number, number]; // [start, end]
+  phase: 'init' | 'prep' | 'update-max' | 'update-min' | 'update-global' | 'done';
+  isRecordUpdate: boolean;
+}
 
 export const MaximumProductSubarrayVisualization = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const nums = [2, 3, -2, 4];
-
-  // Line-by-line execution steps - like a real debugger
-  const steps = [
-    {
-      array: nums,
-      highlighting: [],
-      variables: {},
-      explanation: "🎬 Starting execution: Input array [2, 3, -2, 4]",
-      highlightedLines: [1],
-      lineExecution: "function maxProduct(nums: number[])"
-    },
-    {
-      array: nums,
-      highlighting: [],
-      variables: { 'nums.length': 4 },
-      explanation: "✅ Check if array is empty: nums.length = 4 (not empty, continue)",
-      highlightedLines: [2],
-      lineExecution: "if (nums.length === 0) return 0;"
-    },
-    {
-      array: nums,
-      highlighting: [0],
-      variables: { maxProduct: 2, 'nums[0]': 2 },
-      explanation: "📝 Initialize maxProduct = nums[0] = 2",
-      highlightedLines: [4],
-      lineExecution: "let maxProduct = nums[0];"
-    },
-    {
-      array: nums,
-      highlighting: [0],
-      variables: { maxProduct: 2, currentMax: 2, 'nums[0]': 2 },
-      explanation: "📝 Initialize currentMax = nums[0] = 2 (tracks max product ending here)",
-      highlightedLines: [5],
-      lineExecution: "let currentMax = nums[0];"
-    },
-    {
-      array: nums,
-      highlighting: [0],
-      variables: { maxProduct: 2, currentMax: 2, currentMin: 2, 'nums[0]': 2 },
-      explanation: "📝 Initialize currentMin = nums[0] = 2 (tracks min product ending here)",
-      highlightedLines: [6],
-      lineExecution: "let currentMin = nums[0];"
-    },
-    // Loop iteration 1: i=1, num=3
-    {
-      array: nums,
-      highlighting: [0],
-      variables: { maxProduct: 2, currentMax: 2, currentMin: 2, i: 1 },
-      explanation: "🔄 Loop: Start iteration with i = 1",
-      highlightedLines: [8],
-      lineExecution: "for (let i = 1; i < nums.length; i++)"
-    },
-    {
-      array: nums,
-      highlighting: [0, 1],
-      variables: { maxProduct: 2, currentMax: 2, currentMin: 2, i: 1, num: 3, 'nums[1]': 3 },
-      explanation: "📥 Get current number: num = nums[1] = 3",
-      highlightedLines: [9],
-      lineExecution: "const num = nums[i];"
-    },
-    {
-      array: nums,
-      highlighting: [0, 1],
-      variables: { maxProduct: 2, currentMax: 2, currentMin: 2, i: 1, num: 3, tempMax: 2 },
-      explanation: "💾 Save currentMax before updating: tempMax = 2",
-      highlightedLines: [11],
-      lineExecution: "const tempMax = currentMax;"
-    },
-    {
-      array: nums,
-      highlighting: [0, 1],
-      variables: { maxProduct: 2, currentMax: 6, currentMin: 2, i: 1, num: 3, tempMax: 2 },
-      explanation: "🔢 Calculate currentMax = max(3, 3×2, 3×2) = max(3, 6, 6) = 6",
-      highlightedLines: [13],
-      lineExecution: "currentMax = Math.max(num, num * currentMax, num * currentMin);"
-    },
-    {
-      array: nums,
-      highlighting: [0, 1],
-      variables: { maxProduct: 2, currentMax: 6, currentMin: 3, i: 1, num: 3, tempMax: 2 },
-      explanation: "🔢 Calculate currentMin = min(3, 3×2, 3×2) = min(3, 6, 6) = 3",
-      highlightedLines: [14],
-      lineExecution: "currentMin = Math.min(num, num * tempMax, num * currentMin);"
-    },
-    {
-      array: nums,
-      highlighting: [0, 1],
-      variables: { maxProduct: 6, currentMax: 6, currentMin: 3, i: 1, num: 3 },
-      explanation: "✨ Update global max: maxProduct = max(2, 6) = 6",
-      highlightedLines: [16],
-      lineExecution: "maxProduct = Math.max(maxProduct, currentMax);"
-    },
-    // Loop iteration 2: i=2, num=-2
-    {
-      array: nums,
-      highlighting: [0, 1],
-      variables: { maxProduct: 6, currentMax: 6, currentMin: 3, i: 2 },
-      explanation: "🔄 Loop: Continue with i = 2",
-      highlightedLines: [8],
-      lineExecution: "for (let i = 1; i < nums.length; i++)"
-    },
-    {
-      array: nums,
-      highlighting: [0, 1, 2],
-      variables: { maxProduct: 6, currentMax: 6, currentMin: 3, i: 2, num: -2, 'nums[2]': -2 },
-      explanation: "📥 Get current number: num = nums[2] = -2 ⚠️ NEGATIVE!",
-      highlightedLines: [9],
-      lineExecution: "const num = nums[i];"
-    },
-    {
-      array: nums,
-      highlighting: [0, 1, 2],
-      variables: { maxProduct: 6, currentMax: 6, currentMin: 3, i: 2, num: -2, tempMax: 6 },
-      explanation: "💾 Save currentMax before updating: tempMax = 6",
-      highlightedLines: [11],
-      lineExecution: "const tempMax = currentMax;"
-    },
-    {
-      array: nums,
-      highlighting: [0, 1, 2],
-      variables: { maxProduct: 6, currentMax: -2, currentMin: 3, i: 2, num: -2, tempMax: 6 },
-      explanation: "🔢 Calculate currentMax = max(-2, -2×6, -2×3) = max(-2, -12, -6) = -2",
-      highlightedLines: [13],
-      lineExecution: "currentMax = Math.max(num, num * currentMax, num * currentMin);"
-    },
-    {
-      array: nums,
-      highlighting: [0, 1, 2],
-      variables: { maxProduct: 6, currentMax: -2, currentMin: -12, i: 2, num: -2, tempMax: 6 },
-      explanation: "🔢 Calculate currentMin = min(-2, -2×6, -2×3) = min(-2, -12, -6) = -12 (negative flipped it!)",
-      highlightedLines: [14],
-      lineExecution: "currentMin = Math.min(num, num * tempMax, num * currentMin);"
-    },
-    {
-      array: nums,
-      highlighting: [0, 1, 2],
-      variables: { maxProduct: 6, currentMax: -2, currentMin: -12, i: 2, num: -2 },
-      explanation: "✨ Update global max: maxProduct = max(6, -2) = 6 (stays 6)",
-      highlightedLines: [16],
-      lineExecution: "maxProduct = Math.max(maxProduct, currentMax);"
-    },
-    // Loop iteration 3: i=3, num=4
-    {
-      array: nums,
-      highlighting: [0, 1, 2],
-      variables: { maxProduct: 6, currentMax: -2, currentMin: -12, i: 3 },
-      explanation: "🔄 Loop: Continue with i = 3",
-      highlightedLines: [8],
-      lineExecution: "for (let i = 1; i < nums.length; i++)"
-    },
-    {
-      array: nums,
-      highlighting: [0, 1, 2, 3],
-      variables: { maxProduct: 6, currentMax: -2, currentMin: -12, i: 3, num: 4, 'nums[3]': 4 },
-      explanation: "📥 Get current number: num = nums[3] = 4",
-      highlightedLines: [9],
-      lineExecution: "const num = nums[i];"
-    },
-    {
-      array: nums,
-      highlighting: [0, 1, 2, 3],
-      variables: { maxProduct: 6, currentMax: -2, currentMin: -12, i: 3, num: 4, tempMax: -2 },
-      explanation: "💾 Save currentMax before updating: tempMax = -2",
-      highlightedLines: [11],
-      lineExecution: "const tempMax = currentMax;"
-    },
-    {
-      array: nums,
-      highlighting: [0, 1, 2, 3],
-      variables: { maxProduct: 6, currentMax: 4, currentMin: -12, i: 3, num: 4, tempMax: -2 },
-      explanation: "🔢 Calculate currentMax = max(4, 4×(-2), 4×(-12)) = max(4, -8, -48) = 4",
-      highlightedLines: [13],
-      lineExecution: "currentMax = Math.max(num, num * currentMax, num * currentMin);"
-    },
-    {
-      array: nums,
-      highlighting: [0, 1, 2, 3],
-      variables: { maxProduct: 6, currentMax: 4, currentMin: -48, i: 3, num: 4, tempMax: -2 },
-      explanation: "🔢 Calculate currentMin = min(4, 4×(-2), 4×(-12)) = min(4, -8, -48) = -48",
-      highlightedLines: [14],
-      lineExecution: "currentMin = Math.min(num, num * tempMax, num * currentMin);"
-    },
-    {
-      array: nums,
-      highlighting: [0, 1, 2, 3],
-      variables: { maxProduct: 6, currentMax: 4, currentMin: -48, i: 3, num: 4 },
-      explanation: "✨ Update global max: maxProduct = max(6, 4) = 6 (stays 6)",
-      highlightedLines: [16],
-      lineExecution: "maxProduct = Math.max(maxProduct, currentMax);"
-    },
-    // Loop end
-    {
-      array: nums,
-      highlighting: [0, 1],
-      variables: { maxProduct: 6, currentMax: 4, currentMin: -48, i: 4 },
-      explanation: "🔄 Loop: i = 4, condition (i < 4) is false, exit loop",
-      highlightedLines: [8],
-      lineExecution: "for (let i = 1; i < nums.length; i++)"
-    },
-    {
-      array: nums,
-      highlighting: [0, 1],
-      variables: { result: 6 },
-      explanation: "🎉 Return result: maxProduct = 6. Best subarray is [2,3] with product 6!",
-      highlightedLines: [19],
-      lineExecution: "return maxProduct;"
-    }
-  ];
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
   const code = `function maxProduct(nums: number[]): number {
   if (nums.length === 0) return 0;
-  
   let maxProduct = nums[0];
   let currentMax = nums[0];
   let currentMin = nums[0];
-  
+
   for (let i = 1; i < nums.length; i++) {
     const num = nums[i];
-    
     const tempMax = currentMax;
-    
+
     currentMax = Math.max(num, num * currentMax, num * currentMin);
     currentMin = Math.min(num, num * tempMax, num * currentMin);
-    
+
     maxProduct = Math.max(maxProduct, currentMax);
   }
-  
+
   return maxProduct;
 }`;
 
-  const leftContent = (
-    <>
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        <SimpleArrayVisualization
-          array={steps[currentStep].array}
-          highlights={steps[currentStep].highlighting}
-          label="Array"
-        />
-      </motion.div>
+  const steps: Step[] = useMemo(() => {
+    const nums = [2, 3, -2, 4, -1];
+    const s: Step[] = [];
 
-      <motion.div
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.4, delay: 0.1 }}
-        className="p-4 bg-primary/20 rounded-lg border border-primary/30"
-      >
-        <p className="text-sm font-medium">{steps[currentStep].explanation}</p>
-      </motion.div>
+    let maxProduct = nums[0];
+    let currentMax = nums[0];
+    let currentMin = nums[0];
+    let curMaxStart = 0;
+    let curMinStartActual = 0;
+    let bestStart = 0;
+    let bestEnd = 0;
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3, delay: 0.2 }}
-        className="p-3 bg-muted/50 rounded-lg border"
-      >
-        <div className="text-xs font-mono text-muted-foreground">
-          <span className="text-primary font-semibold">Line {steps[currentStep].highlightedLines[0]}:</span>{' '}
-          {steps[currentStep].lineExecution}
-        </div>
-      </motion.div>
+    s.push({
+      array: [...nums],
+      i: 0,
+      maxProduct,
+      currentMax,
+      currentMin,
+      message: `Step 1: Initialization. We start with the first element (${nums[0]}) as our initial max product, current max, and current min.`,
+      lineNumber: 3,
+      curMaxRange: [0, 0],
+      bestRange: [0, 0],
+      phase: 'init',
+      isRecordUpdate: false
+    });
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3, delay: 0.25 }}
-        className="p-3 bg-accent/50 rounded-lg border border-accent"
-      >
-        <p className="text-xs text-muted-foreground">
-          💡 <strong>Key Insight:</strong> Tracking both max and min is crucial! A negative number can flip the smallest product into the largest.
-        </p>
-      </motion.div>
+    for (let i = 1; i < nums.length; i++) {
+        const num = nums[i];
+        const tempMax = currentMax;
 
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.3, delay: 0.3 }}
-      >
-        <VariablePanel variables={steps[currentStep].variables} />
-      </motion.div>
-    </>
-  );
+        s.push({
+          array: [...nums],
+          i,
+          maxProduct,
+          currentMax,
+          currentMin,
+          tempMax,
+          message: `i = ${i}: We pick ${num} and store our currentMax (${tempMax}) in 'tempMax'.`,
+          lineNumber: 9,
+          curMaxRange: [curMaxStart, i - 1],
+          bestRange: [bestStart, bestEnd],
+          phase: 'prep',
+          isRecordUpdate: false
+        });
 
-  const rightContent = (
-    <AnimatedCodeEditor
-      code={code}
-      language="TypeScript"
-      highlightedLines={steps[currentStep].highlightedLines}
-    />
-  );
+        const oldMax = currentMax;
+        const oldMin = currentMin;
+        currentMax = Math.max(num, num * oldMax, num * oldMin);
+        
+        if (currentMax === num) curMaxStart = i;
+        else if (currentMax === num * oldMin) curMaxStart = curMinStartActual;
 
-  const controls = (
-    <SimpleStepControls
-      currentStep={currentStep}
-      totalSteps={steps.length}
-      onStepChange={setCurrentStep}
-    />
-  );
+        s.push({
+          array: [...nums],
+          i,
+          maxProduct,
+          currentMax,
+          currentMin: oldMin,
+          tempMax,
+          message: `Update currentMax: max(num, num * currentMax, num * currentMin) = ${currentMax}.`,
+          lineNumber: 11,
+          curMaxRange: [curMaxStart, i],
+          bestRange: [bestStart, bestEnd],
+          phase: 'update-max',
+          isRecordUpdate: false
+        });
+
+        currentMin = Math.min(num, num * tempMax, num * oldMin);
+        if (currentMin === num) curMinStartActual = i;
+        else if (currentMin === num * tempMax) curMinStartActual = curMaxStart; 
+        
+        s.push({
+          array: [...nums],
+          i,
+          maxProduct,
+          currentMax,
+          currentMin,
+          tempMax,
+          message: `Update currentMin: min(num, num * tempMax, num * currentMin) = ${currentMin}.`,
+          lineNumber: 12,
+          curMaxRange: [curMaxStart, i],
+          bestRange: [bestStart, bestEnd],
+          phase: 'update-min',
+          isRecordUpdate: false
+        });
+
+        if (currentMax > maxProduct) {
+          maxProduct = currentMax;
+          bestStart = curMaxStart;
+          bestEnd = i;
+          s.push({
+            array: [...nums],
+            i,
+            maxProduct,
+            currentMax,
+            currentMin,
+            tempMax,
+            message: `🔥 New global maximum found! Updating maxProduct to ${maxProduct}.`,
+            lineNumber: 14,
+            curMaxRange: [curMaxStart, i],
+            bestRange: [bestStart, bestEnd],
+            phase: 'update-global',
+            isRecordUpdate: true
+          });
+        }
+    }
+
+    s.push({
+      array: [...nums],
+      i: nums.length,
+      maxProduct,
+      currentMax,
+      currentMin,
+      message: `Final result: The maximum product found is ${maxProduct}.`,
+      lineNumber: 17,
+      curMaxRange: [-1, -1],
+      bestRange: [bestStart, bestEnd],
+      phase: 'done',
+      isRecordUpdate: false
+    });
+
+    return s;
+  }, []);
+
+  const currentStep = steps[currentStepIndex] || steps[0];
 
   return (
     <VisualizationLayout
-      leftContent={leftContent}
-      rightContent={rightContent}
-      controls={controls}
+      leftContent={
+        <div className="space-y-8">
+          <Card className="p-8 bg-card/50 backdrop-blur-sm border-primary/20 relative overflow-hidden min-h-[480px] flex flex-col shadow-lg shadow-primary/5">
+            <div className="flex justify-between items-center mb-12">
+               <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                <Zap className="w-3 h-3 text-primary" />
+                Visualizing Product Extremes
+              </h3>
+            </div>
+
+            <div className="flex-1 flex justify-center items-center pb-12">
+               <div className="relative flex justify-center items-center gap-4">
+                  <div className="flex items-center gap-4 relative z-10">
+                    <AnimatePresence mode="popLayout">
+                      {currentStep.array.map((value, index) => {
+                        const isCurrent = index === currentStep.i;
+                        const isInBestRange = index >= currentStep.bestRange[0] && index <= currentStep.bestRange[1];
+                        const maxVal = Math.max(...currentStep.array.map(Math.abs), 1);
+                        const normalizedHeight = (Math.abs(value) / maxVal) * 60 + 20;
+
+                        return (
+                          <div key={index} className="flex flex-col items-center w-12 relative group">
+                            <div className="h-20 flex items-end justify-center mb-2">
+                               {value >= 0 && (
+                                  <motion.div
+                                    className={`w-8 rounded-t-lg transition-colors duration-300 ${isCurrent ? 'bg-primary' : 'bg-blue-500/20'}`}
+                                    animate={{ height: normalizedHeight }}
+                                    transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+                                  />
+                               )}
+                            </div>
+                            <motion.div
+                              className={`w-12 h-12 rounded-lg flex items-center justify-center font-bold text-lg border-2 z-30 transition-all duration-300 ${
+                                isCurrent
+                                  ? 'bg-primary text-primary-foreground border-primary scale-110 shadow-xl shadow-primary/30'
+                                  : 'bg-muted/50 border-border text-foreground hover:bg-muted'
+                              }`}
+                              animate={{
+                                scale: isCurrent ? 1.1 : 1,
+                                borderColor: isInBestRange ? 'var(--primary)' : 'rgba(148, 163, 184, 0.3)'
+                              }}
+                            >
+                              {value}
+                            </motion.div>
+                            <div className="h-20 flex items-start justify-center mt-2">
+                               {value < 0 && (
+                                  <motion.div
+                                    className={`w-8 rounded-b-lg transition-colors duration-300 ${isCurrent ? 'bg-primary' : 'bg-red-500/20'}`}
+                                    animate={{ height: normalizedHeight }}
+                                    transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+                                  />
+                               )}
+                            </div>
+                            <div className="mt-4 text-[9px] font-mono font-bold text-muted-foreground uppercase tracking-widest opacity-60">
+                              IDX {index}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </AnimatePresence>
+                  </div>
+               </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-6 mt-auto pt-8 border-t border-border/40">
+              <div className="flex flex-col items-center p-3 rounded-xl bg-blue-500/5 border border-blue-500/10">
+                <span className="text-[10px] font-bold text-blue-600 uppercase mb-1">currentMax</span>
+                <span className="text-xl font-black text-blue-600 font-mono">{currentStep.currentMax}</span>
+              </div>
+              <div className="flex flex-col items-center p-3 rounded-xl bg-orange-500/5 border border-orange-500/10">
+                <span className="text-[10px] font-bold text-orange-600 uppercase mb-1">currentMin</span>
+                <span className="text-xl font-black text-orange-600 font-mono">{currentStep.currentMin}</span>
+              </div>
+              <motion.div 
+                className={`flex flex-col items-center p-3 rounded-xl border-2 ${currentStep.isRecordUpdate ? 'bg-primary/10 border-primary' : 'bg-primary/5 border-primary/20'}`}
+              >
+                <span className="text-[10px] font-bold text-primary uppercase mb-1 flex items-center gap-1">
+                   <Hash className="w-2 h-2" /> Global Best
+                </span>
+                <span className="text-xl font-black font-mono text-primary">
+                  {currentStep.maxProduct}
+                </span>
+              </motion.div>
+            </div>
+          </Card>
+
+          <Card className="p-6 bg-accent/30 border-l-4 border-primary relative overflow-hidden transition-all duration-300 shadow-sm flex items-center">
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-primary/10 rounded-2xl text-primary shrink-0">
+                <motion.div
+                  animate={currentStep.isRecordUpdate ? { rotate: [0, 15, -15, 0], scale: [1, 1.1, 1] } : {}}
+                >
+                  {currentStep.isRecordUpdate ? '🚀' : (currentStep.phase === 'prep' ? '🔍' : '💡')}
+                </motion.div>
+              </div>
+              <div className="space-y-1">
+                <h4 className="text-[10px] font-bold uppercase tracking-[0.15em] text-primary/80">
+                  Step Insight
+                </h4>
+                <p className="text-[15px] font-medium leading-relaxed text-foreground/90">
+                  {currentStep.message}
+                </p>
+              </div>
+            </div>
+          </Card>
+        </div>
+      }
+      rightContent={
+        <div className="space-y-4">
+          <AnimatedCodeEditor
+            code={code}
+            language="typescript"
+            highlightedLines={[currentStep.lineNumber]}
+          />
+          <VariablePanel
+            variables={{
+              index_i: currentStep.i >= currentStep.array.length ? 'N/A' : currentStep.i,
+              value_n: currentStep.i >= currentStep.array.length ? 'N/A' : currentStep.array[currentStep.i],
+              maxProd: currentStep.maxProduct,
+              'tempMax': currentStep.tempMax ?? 'N/A',
+              curMax: currentStep.currentMax,
+              curMin: currentStep.currentMin,
+            }}
+          />
+          <div className="p-4 rounded-xl bg-muted/30 border border-border/50 flex gap-3">
+            <Info className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+            <p className="text-[11px] text-muted-foreground leading-relaxed italic">
+              <strong>The Negative insight:</strong> A negative number multiplied by a large negative value can suddenly become our new maximum.
+            </p>
+          </div>
+        </div>
+      }
+      controls={
+        <SimpleStepControls
+          currentStep={currentStepIndex}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStepIndex}
+        />
+      }
     />
   );
 };

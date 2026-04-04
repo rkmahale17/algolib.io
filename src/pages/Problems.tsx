@@ -5,11 +5,13 @@ import { ListType, DIFFICULTY_MAP } from "@/types/algorithm";
 import { ListingLayout } from "@/components/listing/ListingLayout";
 import { PremiumProblemCard } from "@/components/listing/PremiumProblemCard";
 import { supabase } from "@/integrations/supabase/client";
+import { useApp } from "@/contexts/AppContext";
 
 const Problems = () => {
   const { data, isLoading } = useAlgorithms();
   const [userId, setUserId] = useState<string | undefined>(undefined);
   const { data: progressMap } = useUserProgressMap(userId);
+  const { activeListType, setActiveListType } = useApp();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('serial-asc');
@@ -20,6 +22,13 @@ const Problems = () => {
       setUserId(session?.user?.id);
     });
   }, []);
+
+  // Sync global list context
+  useEffect(() => {
+    if (activeListType !== 'all') {
+      setActiveListType('all');
+    }
+  }, [activeListType, setActiveListType]);
 
   const allAlgorithms = data?.algorithms ?? [];
 

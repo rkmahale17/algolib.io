@@ -6,11 +6,13 @@ import { useAlgorithms, useUserProgressMap } from "@/hooks/useAlgorithms";
 import { ListingLayout } from "@/components/listing/ListingLayout";
 import { PremiumProblemCard } from "@/components/listing/PremiumProblemCard";
 import { supabase } from "@/integrations/supabase/client";
+import { useApp } from '@/contexts/AppContext';
 
 const CorePatterns = () => {
   const { data, isLoading } = useAlgorithms();
   const [userId, setUserId] = useState<string | undefined>(undefined);
   const { data: progressMap } = useUserProgressMap(userId);
+  const { activeListType, setActiveListType } = useApp();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('serial-asc');
@@ -21,6 +23,13 @@ const CorePatterns = () => {
       setUserId(session?.user?.id);
     });
   }, []);
+
+  // Sync global list context
+  useEffect(() => {
+    if (activeListType !== 'core') {
+      setActiveListType('core');
+    }
+  }, [activeListType, setActiveListType]);
 
   const allAlgorithms = data?.algorithms ?? [];
   const coreAlgorithms = useMemo(() =>
