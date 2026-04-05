@@ -20,258 +20,281 @@ export const ClimbingStairsVisualization = () => {
 
   const steps: Step[] = [
     {
-      array: [],
+      array: [1], // Stair 0
       variables: { n: 5 },
-      explanation: "Starting with n = 5. We need to find the number of ways to climb 5 stairs.",
+      explanation: "Starting with n = 5. We need to find the number of ways to climb 5 stairs. At step 0 (ground), there is mathematically 1 way to be there.",
       highlightedLines: [1],
       lineExecution: "function climbStairs(n: number): number {",
-      highlighting: []
+      highlighting: [0]
     },
     {
-      array: [1, 1],
+      array: [1, 1], // Stair 0, Stair 1
       variables: { n: 5, one: 1, two: 1 },
-      explanation: "Initialize one = 1 and two = 1. 'one' tracks ways to reach previous step, 'two' tracks steps before that.",
-      highlightedLines: [4, 5],
-      lineExecution: "let one = 1; let two = 1;",
+      explanation: "Initialize one = 1 and two = 1.\n'one' tracks ways to reach the current top step, 'two' tracks ways for the step before it.",
+      highlightedLines: [2, 3],
+      lineExecution: "let one = 1;\nlet two = 1;",
       highlighting: [0, 1]
     },
     // i = 0
     {
       array: [1, 1],
       variables: { n: 5, one: 1, two: 1, i: 0 },
-      explanation: "Start loop from i = 0 to n - 1 (4). Iteration 1 starts.",
-      highlightedLines: [8],
+      explanation: "Start loop from i = 0 to n - 1 (which is 4).",
+      highlightedLines: [4],
       lineExecution: "for (let i = 0; i < n - 1; i++)",
-      highlighting: []
+      highlighting: [1]
     },
     {
       array: [1, 1],
       variables: { n: 5, one: 1, two: 1, i: 0, temp: 1 },
       explanation: "Store current value of 'one' in 'temp'.",
-      highlightedLines: [9],
+      highlightedLines: [5],
       lineExecution: "const temp = one;",
-      highlighting: []
+      highlighting: [1]
     },
     {
       array: [1, 1, 2],
       variables: { n: 5, one: 2, two: 1, i: 0, temp: 1 },
-      explanation: "Update 'one' to sum of previous two (1 + 1 = 2). This is ways to reach step 2.",
-      highlightedLines: [10],
+      explanation: "Calculate ways to reach step 2.\nIt is the sum of ways to reach step 1 + ways to reach step 0 (1 + 1 = 2).",
+      highlightedLines: [6],
       lineExecution: "one = one + two;",
       highlighting: [2]
     },
     {
       array: [1, 1, 2],
       variables: { n: 5, one: 2, two: 1, i: 0, temp: 1 },
-      explanation: "Shift 'two' forward to 'temp' (old 'one').",
-      highlightedLines: [11],
+      explanation: "Shift 'two' forward to 'temp' (the old step 1).",
+      highlightedLines: [7],
       lineExecution: "two = temp;",
-      highlighting: []
+      highlighting: [2]
     },
     // i = 1
     {
       array: [1, 1, 2],
       variables: { n: 5, one: 2, two: 1, i: 1 },
-      explanation: "Loop iteration i = 1.",
-      highlightedLines: [8],
+      explanation: "Loop iteration i = 1 (Targeting step 3).",
+      highlightedLines: [4],
       lineExecution: "for (let i = 0; i < n - 1; i++)",
-      highlighting: []
+      highlighting: [2]
     },
     {
       array: [1, 1, 2],
       variables: { n: 5, one: 2, two: 1, i: 1, temp: 2 },
       explanation: "Store 'one' (2) in 'temp'.",
-      highlightedLines: [9],
+      highlightedLines: [5],
       lineExecution: "const temp = one;",
-      highlighting: []
+      highlighting: [2]
     },
     {
       array: [1, 1, 2, 3],
       variables: { n: 5, one: 3, two: 1, i: 1, temp: 2 },
-      explanation: "Update 'one' = 2 + 1 = 3. Ways to reach step 3.",
-      highlightedLines: [10],
+      explanation: "Calculate ways to reach step 3.\nIt is the sum of ways to reach step 2 + ways to reach step 1 (2 + 1 = 3).",
+      highlightedLines: [6],
       lineExecution: "one = one + two;",
       highlighting: [3]
     },
     {
       array: [1, 1, 2, 3],
       variables: { n: 5, one: 3, two: 2, i: 1, temp: 2 },
-      explanation: "Update 'two' = 2.",
-      highlightedLines: [11],
+      explanation: "Shift 'two' forward to 'temp' (the old step 2).",
+      highlightedLines: [7],
       lineExecution: "two = temp;",
-      highlighting: []
+      highlighting: [3]
     },
     // i = 2
     {
       array: [1, 1, 2, 3],
       variables: { n: 5, one: 3, two: 2, i: 2 },
-      explanation: "Loop iteration i = 2.",
-      highlightedLines: [8],
+      explanation: "Loop iteration i = 2 (Targeting step 4).",
+      highlightedLines: [4],
       lineExecution: "for (let i = 0; i < n - 1; i++)",
-      highlighting: []
+      highlighting: [3]
     },
     {
       array: [1, 1, 2, 3],
       variables: { n: 5, one: 3, two: 2, i: 2, temp: 3 },
       explanation: "Store 'one' (3) in 'temp'.",
-      highlightedLines: [9],
+      highlightedLines: [5],
       lineExecution: "const temp = one;",
-      highlighting: []
+      highlighting: [3]
     },
     {
       array: [1, 1, 2, 3, 5],
       variables: { n: 5, one: 5, two: 2, i: 2, temp: 3 },
-      explanation: "Update 'one' = 3 + 2 = 5. Ways to reach step 4.",
-      highlightedLines: [10],
+      explanation: "Calculate ways to reach step 4.\nIt is the sum of ways to reach step 3 + ways to reach step 2 (3 + 2 = 5).",
+      highlightedLines: [6],
       lineExecution: "one = one + two;",
       highlighting: [4]
     },
     {
       array: [1, 1, 2, 3, 5],
       variables: { n: 5, one: 5, two: 3, i: 2, temp: 3 },
-      explanation: "Update 'two' = 3.",
-      highlightedLines: [11],
+      explanation: "Shift 'two' forward to 'temp' (the old step 3).",
+      highlightedLines: [7],
       lineExecution: "two = temp;",
-      highlighting: []
+      highlighting: [4]
     },
     // i = 3
     {
       array: [1, 1, 2, 3, 5],
       variables: { n: 5, one: 5, two: 3, i: 3 },
-      explanation: "Loop iteration i = 3 (Final execution for n=5).",
-      highlightedLines: [8],
+      explanation: "Loop iteration i = 3 (Final calculation targeting step 5).",
+      highlightedLines: [4],
       lineExecution: "for (let i = 0; i < n - 1; i++)",
-      highlighting: []
+      highlighting: [4]
     },
     {
       array: [1, 1, 2, 3, 5],
       variables: { n: 5, one: 5, two: 3, i: 3, temp: 5 },
       explanation: "Store 'one' (5) in 'temp'.",
-      highlightedLines: [9],
+      highlightedLines: [5],
       lineExecution: "const temp = one;",
-      highlighting: []
+      highlighting: [4]
     },
     {
       array: [1, 1, 2, 3, 5, 8],
       variables: { n: 5, one: 8, two: 3, i: 3, temp: 5 },
-      explanation: "Update 'one' = 5 + 3 = 8. Ways to reach step 5.",
-      highlightedLines: [10],
+      explanation: "Calculate ways to reach step 5.\nIt is the sum of ways to reach step 4 + ways to reach step 3 (5 + 3 = 8).",
+      highlightedLines: [6],
       lineExecution: "one = one + two;",
       highlighting: [5]
     },
     {
       array: [1, 1, 2, 3, 5, 8],
       variables: { n: 5, one: 8, two: 5, i: 3, temp: 5 },
-      explanation: "Update 'two' = 5.",
-      highlightedLines: [11],
+      explanation: "Shift 'two' forward to 'temp'.",
+      highlightedLines: [7],
       lineExecution: "two = temp;",
-      highlighting: []
+      highlighting: [5]
     },
     // End
     {
       array: [1, 1, 2, 3, 5, 8],
       variables: { n: 5, one: 8, two: 5, i: 4 },
-      explanation: "Loop condition i < n - 1 (4 < 4) is false. Exit loop.",
-      highlightedLines: [8],
+      explanation: "Loop condition i < n - 1 is false. Loop completes.",
+      highlightedLines: [4],
       lineExecution: "i < n - 1 -> false",
-      highlighting: []
+      highlighting: [5]
     },
     {
       array: [1, 1, 2, 3, 5, 8],
       variables: { n: 5, one: 8 },
-      explanation: "Return 'one', which is 8. There are 8 ways to climb 5 stairs.",
-      highlightedLines: [14],
+      explanation: "Return 'one', which is 8.\nThere are 8 distinct ways to climb 5 stairs.",
+      highlightedLines: [9],
       lineExecution: "return one;",
       highlighting: [5]
     }
   ];
 
   const code = `function climbStairs(n: number): number {
-    // one: ways to reach the previous step
-    // two: ways to reach two steps before
-    let one = 1;
-    let two = 1;
-
-    // Loop n - 1 times
-    for (let i = 0; i < n - 1; i++) {
-        const temp = one;    // Store current value
-        one = one + two;     // Sum of previous two
-        two = temp;          // Shift forward
-    }
-
-    return one;
+  let one = 1;
+  let two = 1;
+  for (let i = 0; i < n - 1; i++) {
+    const temp = one;
+    one = one + two;
+    two = temp;
+  }
+  return one;
 }`;
 
   const step = steps[currentStep];
+  
+  // Total stairs is n=5, plus step 0 (ground).
+  const maxStairsCount = 6; 
 
   return (
     <VisualizationLayout
       leftContent={
-        <>
-          <motion.div
-            key={`stairs-${currentStep}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Card className="p-6">
-              <h3 className="text-sm font-semibold mb-3 text-center">Climbing Stairs (n=5)</h3>
-              <div className="flex justify-center gap-2 flex-wrap">
-                {step.array.map((val, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: idx * 0.1 }}
-                    className="flex flex-col items-center"
-                  >
-                    <div className={`w-14 h-14 rounded-lg flex items-center justify-center border-2 transition-all duration-300 ${step.highlighting.includes(idx)
-                      ? 'bg-primary text-primary-foreground border-primary scale-110'
-                      : 'bg-primary/20 border-primary'
-                      }`}>
-                      <span className="font- text-lg">{val}</span>
-                    </div>
-                  </motion.div>
-                ))}
+        <div className="space-y-6 flex flex-col h-full">
+          {/* Staircase Visual */}
+          <div>
+            <Card className="p-8 bg-card/40 border-border/50 relative overflow-hidden flex flex-col items-center min-h-[300px]">
+              <h3 className="text-[10px] font-black uppercase tracking-widest text-primary mb-12 border-b-2 border-primary/20 pb-2">
+                Climbing Stairs (n = 5)
+              </h3>
+              
+              <div className="relative w-full max-w-sm flex items-end justify-start h-[160px] pl-4">
+                 {Array.from({ length: maxStairsCount }).map((_, idx) => {
+                    const isCalculated = idx < step.array.length;
+                    const val = isCalculated ? step.array[idx] : "?";
+                    const isCurrent = step.highlighting.includes(idx);
+                    
+                    return (
+                      <div key={idx} className="relative flex flex-col items-center">
+                        {/* The Person Climber */}
+                        {isCurrent && (
+                          <div className="absolute -top-12 z-20 text-orange-500 scale-[2.5]">
+                            <div className="-scale-x-100">🚶</div>
+                          </div>
+                        )}
+                        
+                        {/* Ways Value Tag */}
+                        <div className={`absolute -top-6 text-[10px] font-black ${isCurrent ? 'text-orange-500' : isCalculated ? 'text-primary' : 'text-muted-foreground/30'}`}>
+                           {val}
+                        </div>
+
+                        {/* The Stair Block */}
+                        <div 
+                          className={`w-[45px] border-l-2 border-t-2 relative flex items-center justify-center ${
+                            isCurrent 
+                              ? 'bg-orange-500/10 border-orange-500 shadow-[inset_0_0_12px_rgba(249,115,22,0.2)]' 
+                              : isCalculated 
+                                ? 'bg-primary/5 border-primary/50' 
+                                : 'bg-muted/10 border-border/40 dashed opacity-50'
+                          }`}
+                          style={{
+                            height: `${(idx * 20) + 16}px`
+                          }}
+                        >
+                           <div className="absolute bottom-2 text-[8px] font-mono text-muted-foreground/40 font-black">
+                             S{idx}
+                           </div>
+                        </div>
+                      </div>
+                    );
+                 })}
               </div>
             </Card>
-          </motion.div>
+          </div>
 
-          <motion.div
-            key={`execution-${currentStep}`}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-          >
-            <Card className="p-4 bg-muted/50">
-              <div className="space-y-2">
-                <div className="text-sm font-semibold text-primary">Current Execution:</div>
-                <div className="text-sm font-mono bg-background/50 p-2 rounded">
-                  {step.lineExecution}
+          <div>
+            <Card className="p-5 border-l-4 border-primary bg-primary/5 relative shadow-sm">
+              <div className="space-y-4">
+                <div>
+                   <h4 className="text-[10px] font-bold uppercase tracking-[0.1em] text-primary/80 mb-2">
+                     Current Execution
+                   </h4>
+                   <div className="text-sm font-mono bg-background/80 p-2.5 rounded-lg border border-border/50 shadow-sm inline-block">
+                     {step.lineExecution}
+                   </div>
                 </div>
-                <div className="text-sm text-muted-foreground pt-2">
-                  {step.explanation}
+                <div>
+                   <h4 className="text-[10px] font-bold uppercase tracking-[0.1em] text-primary/80 mb-1">
+                     Commentary
+                   </h4>
+                   <p className="text-[14px] font-medium leading-relaxed text-foreground/90 whitespace-pre-wrap">
+                     {step.explanation}
+                   </p>
                 </div>
               </div>
             </Card>
-          </motion.div>
+          </div>
 
-          <motion.div
-            key={`variables-${currentStep}`}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3, delay: 0.4 }}
-          >
-            <VariablePanel variables={step.variables} />
-          </motion.div>
-        </>
+        </div>
       }
       rightContent={
-        <AnimatedCodeEditor
-          code={code}
-          language="typescript"
-          highlightedLines={step.highlightedLines}
-        />
+        <div className="space-y-6 h-full flex flex-col">
+          <div className="flex-1 overflow-hidden min-h-[400px]">
+            <AnimatedCodeEditor
+              code={code}
+              language="typescript"
+              highlightedLines={step.highlightedLines}
+            />
+          </div>
+          <div className="p-1">
+            <VariablePanel variables={step.variables} />
+          </div>
+        </div>
       }
       controls={
         <SimpleStepControls

@@ -43,7 +43,7 @@ const blind75Map: Record<string, React.LazyExoticComponent<React.ComponentType<a
   "house-robber": React.lazy(() => import("@/components/visualizations/algorithms/HouseRobberVisualization").then(m => ({ default: m.HouseRobberVisualization }))),
   "house-robber-ii": React.lazy(() => import("@/components/visualizations/algorithms/HouseRobberIIVisualization").then(m => ({ default: m.HouseRobberIIVisualization }))),
   "decode-ways": React.lazy(() => import("@/components/visualizations/algorithms/DecodeWaysVisualization").then(m => ({ default: m.DecodeWaysVisualization }))),
-  "unique-paths": React.lazy(() => import("@/components/visualizations/algorithms/UniquePathsVisualization").then(m => ({ default: m.UniquePathsVisualization }))),
+  'unique-paths': React.lazy(() => import('@/components/visualizations/algorithms/MatrixPathVisualization').then(m => ({ default: m.MatrixPathVisualization }))),
   "jump-game": React.lazy(() => import("@/components/visualizations/algorithms/JumpGameVisualization").then(m => ({ default: m.JumpGameVisualization }))),
   "clone-graph": React.lazy(() => import("@/components/visualizations/algorithms/CloneGraphVisualization").then(m => ({ default: m.CloneGraphVisualization }))),
   "course-schedule": React.lazy(() => import("@/components/visualizations/algorithms/CourseScheduleVisualization").then(m => ({ default: m.CourseScheduleVisualization }))),
