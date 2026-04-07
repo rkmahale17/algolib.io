@@ -1,250 +1,236 @@
-import { useState, useEffect, useRef } from 'react';
-import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
-import { StepControls } from '../shared/StepControls';
+import { useState, useMemo } from 'react';
+import { Card } from '@/components/ui/card';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
+import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
+import { CheckCircle2, Info, ArrowRight } from 'lucide-react';
 
 interface Step {
   list: number[];
-  dummy: boolean;
-  slow: number | null;
-  fast: number | null;
-  toRemove: number | null;
-  removed: boolean;
+  left: number | null; // index mapping relative to `list` (-1 means dummy)
+  right: number | null; // index mapping relative to `list`
+  nVar: number;
   message: string;
   lineNumber: number;
+  isMatch?: boolean;
+  toRemove: number | null;
+  removed: boolean;
 }
 
 export const RemoveNthNodeVisualization = () => {
-  const [steps, setSteps] = useState<Step[]>([]);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1000);
-  const intervalRef = useRef<number | null>(null);
 
   const code = `function removeNthFromEnd(head: ListNode | null, n: number): ListNode | null {
   const dummy = new ListNode(0, head);
-  let slow = dummy;
-  let fast = dummy;
-  
-  // Move fast pointer n+1 steps ahead
-  for (let i = 0; i <= n; i++) {
-    fast = fast.next;
+  let left: ListNode | null = dummy;
+  let right: ListNode | null = head;
+
+  while (n > 0 && right !== null) {
+    right = right.next;
+    n -= 1;
   }
-  
-  // Move both pointers until fast reaches end
-  while (fast !== null) {
-    slow = slow.next;
-    fast = fast.next;
+
+  while (right !== null) {
+    left = left!.next;
+    right = right.next;
   }
-  
-  // Remove the nth node
-  slow.next = slow.next.next;
-  
+
+  left!.next = left!.next!.next;
   return dummy.next;
 }`;
 
-  const generateSteps = () => {
+  const steps: Step[] = useMemo(() => {
+    const s: Step[] = [];
     const list = [1, 2, 3, 4, 5];
-    const n = 2;
-    const newSteps: Step[] = [];
-
-    newSteps.push({
-      list: [...list],
-      dummy: true,
-      slow: -1,
-      fast: -1,
-      toRemove: null,
-      removed: false,
-      message: `Remove ${n}th node from end. Create dummy node and initialize pointers`,
-      lineNumber: 1
-    });
-
-    // Move fast n+1 steps ahead
-    for (let i = 0; i <= n; i++) {
-      newSteps.push({
-        list: [...list],
-        dummy: true,
-        slow: -1,
-        fast: i - 1,
-        toRemove: null,
-        removed: false,
-        message: `Move fast pointer ${i}/${n + 1} steps ahead`,
-        lineNumber: 6
+    const targetN = 2;
+    
+    let nVar = targetN;
+    let left: number | null = null;
+    let right: number | null = null;
+    
+    const snap = (msg: string, line: number, isMatch: boolean = false, toRemove: number | null = null, removed: boolean = false, overrideList?: number[]) => {
+      s.push({
+        list: overrideList ? [...overrideList] : [...list],
+        left,
+        right: right !== null && right >= list.length ? null : right,
+        nVar,
+        message: msg,
+        lineNumber: line,
+        isMatch,
+        toRemove,
+        removed
       });
+    };
+
+    snap(`Execution starts.`, 1, false);
+
+    snap(`Initialize dummy node to handle potential head removals natively.`, 2, false);
+    
+    left = -1;
+    snap(`Set left pointer anchoring securely to the initialized dummy Node.`, 3, false);
+
+    right = 0;
+    snap(`Initialize right pointer bounds matching the core head of the list.`, 4, false);
+
+    while (true) {
+        snap(`Verifying span constraints. Processing while loop requirement: n (${nVar}) > 0 AND right is valid.`, 6, false);
+        if (nVar > 0 && right !== null && right < list.length) {
+            right += 1;
+            snap(`Evaluated true. Shifted right pointer forward 1 span segment.`, 7, false);
+            nVar -= 1;
+            snap(`Decremented spacing constraint 'n' tracking variable to ${nVar}.`, 8, true);
+        } else {
+            snap(`Evaluated false. Distance constraint span requirement safely established! Breaking span loop.`, 6, false);
+            break;
+        }
+    }
+    
+    while (true) {
+        snap(`Verifying dual sweep conditions: Does right limit pointer exist?`, 11, false);
+        if (right !== null && right < list.length) {
+            left += 1;
+            snap(`Sweep evaluated true. Progressing left pointer.`, 12, false);
+            right += 1;
+            snap(`Progressing right pointer synchronously maintaining exact constraint gap!`, 13, true);
+        } else {
+            snap(`Sweep evaluated false! Right pointer breached final null bounding box. Processing halted.`, 11, false);
+            break;
+        }
     }
 
-    // Move both until fast reaches end
-    let slow = -1;
-    let fast = n;
-    while (fast < list.length) {
-      slow++;
-      fast++;
-      newSteps.push({
-        list: [...list],
-        dummy: true,
-        slow,
-        fast: fast < list.length ? fast : null,
-        toRemove: null,
-        removed: false,
-        message: `Move both pointers. Slow at ${slow >= 0 ? list[slow] : 'dummy'}, Fast at ${fast < list.length ? list[fast] : 'end'}`,
-        lineNumber: 11
-      });
-    }
-
-    // Remove the node
-    const removeIdx = slow + 1;
-    newSteps.push({
-      list: [...list],
-      dummy: true,
-      slow,
-      fast: null,
-      toRemove: removeIdx,
-      removed: false,
-      message: `Slow.next points to node to remove (${list[removeIdx]})`,
-      lineNumber: 16
-    });
+    const toRemoveTarget = left! + 1;
+    snap(`Left pointer arrived prior to the deletion target safely. Processing next chain mapping detatch.`, 16, true, toRemoveTarget, false);
 
     const resultList = [...list];
-    resultList.splice(removeIdx, 1);
-    newSteps.push({
-      list: resultList,
-      dummy: true,
-      slow,
-      fast: null,
-      toRemove: null,
-      removed: true,
-      message: `Removed node ${list[removeIdx]}. Result: [${resultList.join(', ')}]`,
-      lineNumber: 17
-    });
+    resultList.splice(toRemoveTarget, 1);
+    
+    snap(`Node detached perfectly. Return resulting dummy chained bounds!`, 17, true, null, true, resultList);
 
-    setSteps(newSteps);
-  };
-
-  useEffect(() => {
-    generateSteps();
+    return s;
   }, []);
 
-  useEffect(() => {
-    if (isPlaying && currentStepIndex < steps.length - 1) {
-      intervalRef.current = window.setInterval(() => {
-        setCurrentStepIndex((prev) => {
-          if (prev >= steps.length - 1) {
-            setIsPlaying(false);
-            return prev;
-          }
-          return prev + 1;
-        });
-      }, speed);
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    }
-
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [isPlaying, currentStepIndex, steps.length, speed]);
-
-  const handlePlay = () => setIsPlaying(true);
-  const handlePause = () => setIsPlaying(false);
-  const handleStepForward = () => {
-    if (currentStepIndex < steps.length - 1) setCurrentStepIndex(currentStepIndex + 1);
-  };
-  const handleStepBack = () => {
-    if (currentStepIndex > 0) setCurrentStepIndex(currentStepIndex - 1);
-  };
-  const handleReset = () => {
-    setCurrentStepIndex(0);
-    setIsPlaying(false);
-  };
-
-  if (steps.length === 0) return null;
-
-  const currentStep = steps[currentStepIndex];
+  const step = steps[currentStepIndex];
 
   return (
-    <div className="space-y-6">
-      <StepControls
-        onPlay={handlePlay}
-        onPause={handlePause}
-        onStepForward={handleStepForward}
-        onStepBack={handleStepBack}
-        onReset={handleReset}
-        isPlaying={isPlaying}
-        currentStep={currentStepIndex}
-        totalSteps={steps.length}
-        speed={speed}
-        onSpeedChange={setSpeed}
-      />
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <VisualizationLayout
+      leftContent={
         <div className="space-y-4">
-          <div className="bg-card rounded-lg p-6 border">
-            <h3 className="text-lg font-semibold mb-4">Linked List</h3>
-            <div className="flex items-center gap-2 overflow-x-auto pb-2">
-              {currentStep.dummy && (
-                <div className="flex items-center">
-                  <div className="w-14 h-14 flex items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground bg-muted/30 font- text-sm">
-                    D
+          <Card className="p-5 bg-card/50 backdrop-blur-sm border-primary/20 shadow-lg shadow-primary/5">
+            <h3 className="text-xs font-semibold mb-3 text-muted-foreground uppercase tracking-widest text-center">
+              Pointers Topology Reference
+            </h3>
+            <div className="flex flex-col gap-6 p-4">
+              <div className="flex items-center gap-2 overflow-x-auto pb-4 justify-center pt-6">
+                  <div className="relative flex items-center justify-center">
+                    <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-muted-foreground uppercase">{step.left === -1 ? 'L' : ''}</span>
+                    <div className={`w-8 h-8 flex items-center justify-center rounded border-2 border-dashed font-bold text-xs transition-all shadow-sm ${step.left === -1 ? 'bg-primary/20 border-primary text-primary shadow-primary/20 scale-110' : 'bg-muted/30 border-muted-foreground text-muted-foreground opacity-50'}`}>
+                      D
+                    </div>
                   </div>
-                  <div className="text-xl mx-1 text-muted-foreground">→</div>
-                </div>
-              )}
-              {currentStep.list.map((val, idx) => (
-                <div key={idx} className="flex items-center">
-                  <div
-                    className={`w-14 h-14 flex items-center justify-center rounded-lg border-2 font- text-lg transition-all ${currentStep.toRemove === idx
-                      ? 'bg-destructive/20 border-destructive text-destructive scale-110'
-                      : currentStep.slow === idx
-                        ? 'bg-primary/20 border-primary text-primary'
-                        : currentStep.fast === idx
-                          ? 'bg-secondary/20 border-secondary text-secondary-foreground'
-                          : 'bg-card border-border text-foreground'
-                      }`}
-                  >
-                    {val}
+                  <ArrowRight className="w-3 h-3 mx-1 text-muted-foreground opacity-50" />
+                  
+                  {step.list.map((val, idx) => {
+                    const isLeft = step.left === (step.removed && idx >= step.toRemove! ? idx + 1 : idx);
+                    const isRight = step.right === (step.removed && idx >= step.toRemove! ? idx + 1 : idx);
+                    const isRemovedTarget = step.toRemove === idx && !step.removed;
+
+                    return (
+                        <div key={idx} className="flex items-center">
+                        <div className="relative flex items-center justify-center">
+                            <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[9px] font-bold text-muted-foreground uppercase w-10 text-center overflow-visible whitespace-nowrap">
+                                {isLeft && isRight ? 'L,R' : isLeft ? 'L' : isRight ? 'R' : ''}
+                            </span>
+                            <div
+                            className={`w-8 h-8 flex items-center justify-center rounded border-2 font-bold text-sm transition-all shadow-sm ${
+                                isRemovedTarget
+                                ? 'bg-destructive/20 border-destructive text-destructive scale-110 shadow-destructive/20'
+                                : isLeft && isRight
+                                ? 'bg-gradient-to-br from-primary/30 to-secondary/30 border-primary text-primary shadow-primary/20'
+                                : isLeft
+                                ? 'bg-primary/20 border-primary text-primary shadow-primary/20 scale-110'
+                                : isRight
+                                ? 'bg-secondary/20 border-secondary text-secondary-foreground shadow-secondary/20 scale-110'
+                                : 'bg-card border-border text-foreground'
+                            }`}
+                            >
+                            {val}
+                            </div>
+                        </div>
+                        {idx < step.list.length - 1 && (
+                            <ArrowRight className={`w-3 h-3 mx-1 transition-all ${step.removed && step.toRemove === idx ? 'text-destructive scale-125' : 'text-muted-foreground opacity-50'}`} />
+                        )}
+                        </div>
+                    );
+                  })}
+                  
+                  <ArrowRight className="w-3 h-3 mx-1 text-muted-foreground opacity-50" />
+                  <div className="relative flex items-center justify-center">
+                    <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[9px] font-bold text-muted-foreground uppercase">{step.right === null && step.left !== null ? 'R' : ''}</span>
+                    <div className={`w-8 h-8 px-1 flex items-center justify-center rounded border-2 border-dashed font-bold text-[10px] transition-all shadow-sm ${step.right === null && step.left !== null ? 'bg-secondary/20 border-secondary text-secondary-foreground shadow-secondary/20 scale-110' : 'bg-muted/30 border-muted-foreground text-muted-foreground opacity-30'}`}>
+                      NUL
+                    </div>
                   </div>
-                  {idx < currentStep.list.length - 1 && (
-                    <div className="text-xl mx-1 text-muted-foreground">→</div>
-                  )}
+              </div>
+
+              <div className="flex gap-4 text-xs font-mono justify-center items-center flex-wrap pt-4 border-t border-border/50">
+                <div className="flex items-center gap-2 px-2 py-1 rounded bg-primary/10 border border-primary/20">
+                    <div className="w-2.5 h-2.5 rounded-full bg-primary"></div>
+                    <span className="text-primary font-bold text-[10px] uppercase tracking-wider">Left Pointer</span>
                 </div>
-              ))}
+                <div className="flex items-center gap-2 px-2 py-1 rounded bg-secondary/10 border border-secondary/20">
+                    <div className="w-2.5 h-2.5 rounded-full bg-secondary"></div>
+                    <span className="text-secondary-foreground font-bold text-[10px] uppercase tracking-wider">Right Pointer</span>
+                </div>
+                <div className="flex items-center gap-2 px-2 py-1 rounded bg-destructive/10 border border-destructive/20">
+                    <div className="w-2.5 h-2.5 rounded-full bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.5)]"></div>
+                    <span className="text-destructive font-bold text-[10px] uppercase tracking-wider">To Remove</span>
+                </div>
+              </div>
             </div>
+          </Card>
 
-            <div className="mt-4 flex gap-4 text-sm flex-wrap">
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded bg-primary/20 border-2 border-primary"></div>
-                <span>Slow Pointer</span>
+          <Card className={`p-4 border-l-4 relative overflow-hidden transition-all duration-300 shadow-sm flex items-center ${step?.isMatch ? 'bg-primary/10 border-primary' : 'bg-accent/30 border-primary'}`}>
+            <div className="flex items-start gap-4">
+              <div className={`p-2.5 rounded-xl shrink-0 ${step?.isMatch ? 'bg-primary text-primary-foreground' : 'bg-primary/10 text-primary'}`}>
+                {step?.isMatch ? <CheckCircle2 className="w-5 h-5" /> : <Info className="w-5 h-5" />}
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded bg-secondary/20 border-2 border-secondary"></div>
-                <span>Fast Pointer</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded bg-destructive/20 border-2 border-destructive"></div>
-                <span>To Remove</span>
+              <div className="space-y-1">
+                <h4 className="text-[9px] font-bold uppercase tracking-[0.12em] text-primary/80">
+                  Execution Detail Tracker
+                </h4>
+                <p className="text-xs font-medium leading-relaxed text-foreground/90 leading-tight">
+                  {step?.message || ''}
+                </p>
               </div>
             </div>
-
-            <div className="mt-4 p-4 bg-muted rounded">
-              <p className="text-sm">{currentStep.message}</p>
-            </div>
-          </div>
+          </Card>
 
           <VariablePanel
             variables={{
-              n: 2,
-              slow: currentStep.slow === -1 ? 'dummy' : currentStep.slow !== null ? `node ${currentStep.slow}` : 'null',
-              fast: currentStep.fast === -1 ? 'dummy' : currentStep.fast !== null ? `node ${currentStep.fast}` : 'end',
-              toRemove: currentStep.toRemove !== null ? currentStep.list[currentStep.toRemove] : 'none'
+              "n": step.nVar,
+              "left": step.left === -1 ? 'dummy node [val: 0]' : step.left !== null ? `node[${step.left}] -> ${step.list[step.left]}` : 'null',
+              "right": step.right !== null ? `node[${step.right}] -> ${step.list[step.right]}` : 'null',
             }}
           />
         </div>
-
-        <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="typescript" />
-      </div>
-    </div>
+      }
+      rightContent={
+        <div className="space-y-4 h-full flex flex-col">
+          <AnimatedCodeEditor
+            code={code}
+            highlightedLines={[step?.lineNumber || 1]}
+            language="typescript"
+          />
+        </div>
+      }
+      controls={
+        <SimpleStepControls
+          currentStep={currentStepIndex}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStepIndex}
+        />
+      }
+    />
   );
 };

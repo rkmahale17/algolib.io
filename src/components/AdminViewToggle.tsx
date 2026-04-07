@@ -27,10 +27,8 @@ const AdminViewToggle = () => {
 
     const currentMode = isAdminProblemPage ? 'admin' : 'user';
 
-    const toggleMode = (mode: 'admin' | 'user') => {
-        if (mode === currentMode) return;
-
-        if (mode === 'admin') {
+    const toggleMode = () => {
+        if (currentMode === 'user') {
             navigate(`/admin/problem/${problemId}`);
         } else {
             navigate(`/problem/${problemId}`);
@@ -38,37 +36,20 @@ const AdminViewToggle = () => {
     };
 
     return (
-        <div className="fixed bottom-6 left-1/4 -translate-x-1/2 z-[100] animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex items-center gap-1 p-1 bg-background/80 backdrop-blur-md border border-border rounded-full shadow-2xl">
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => toggleMode('user')}
-                    className={cn(
-                        "rounded-full px-4 py-1.5 h-auto gap-2 transition-all",
-                        currentMode === 'user'
-                            ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
-                            : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                    )}
-                >
-                    <User className="w-4 h-4" />
-                    <span className="text-xs font-semibold">User View</span>
-                </Button>
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => toggleMode('admin')}
-                    className={cn(
-                        "rounded-full px-4 py-1.5 h-auto gap-2 transition-all",
-                        currentMode === 'admin'
-                            ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
-                            : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                    )}
-                >
-                    <Edit3 className="w-4 h-4" />
-                    <span className="text-xs font-semibold">Admin View</span>
-                </Button>
-            </div>
+        <div className="fixed bottom-6 left-6 z-[100] animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <Button
+                variant="outline"
+                size="icon"
+                onClick={toggleMode}
+                className="w-10 h-10 rounded-full shadow-2xl bg-background/80 backdrop-blur-md border border-border hover:bg-accent transition-all"
+                title={currentMode === 'user' ? "Switch to Admin View" : "Switch to User View"}
+            >
+                {currentMode === 'user' ? (
+                    <Edit3 className="w-4 h-4 text-primary" />
+                ) : (
+                    <User className="w-4 h-4 text-primary" />
+                )}
+            </Button>
         </div>
     );
 };
