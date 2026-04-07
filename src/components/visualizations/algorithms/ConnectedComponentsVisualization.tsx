@@ -1,371 +1,260 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
-import { motion } from 'framer-motion';
+import { CheckCircle2, Info, ArrowRight } from 'lucide-react';
 
 interface Step {
   n: number;
-  edges: [number, number][];
-  visited: Set<number>;
+  edges: number[][];
+  graph: Record<number, number[]>;
+  visited: number[];
+  count: number;
   currentNode: number | null;
-  componentCount: number;
-  currentComponent: Set<number>;
-  variables: Record<string, any>;
-  explanation: string;
-  highlightedLines: number[];
-  lineExecution: string;
+  neighbor: number | null;
+  u: number | null;
+  v: number | null;
+  outerLoopIndex: number | null;
+  message: string;
+  lineNumber: number;
+  isMatch?: boolean;
 }
 
 export const ConnectedComponentsVisualization = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-
-  const n = 5;
-  const edges: [number, number][] = [[0, 1], [1, 2], [3, 4]];
-
-  const steps: Step[] = [
-    {
-      n,
-      edges,
-      visited: new Set(),
-      currentNode: null,
-      componentCount: 0,
-      currentComponent: new Set(),
-      variables: { n: 5, edges: '[[0,1],[1,2],[3,4]]' },
-      explanation: "Count connected components in undirected graph with 5 nodes. Edges: 0↔1, 1↔2, 3↔4.",
-      highlightedLines: [1],
-      lineExecution: "function countComponents(n: number, edges: number[][]): number"
-    },
-    {
-      n,
-      edges,
-      visited: new Set(),
-      currentNode: null,
-      componentCount: 0,
-      currentComponent: new Set(),
-      variables: { graph: 'Map()' },
-      explanation: "Build adjacency list from edges. Each node stores list of neighbors.",
-      highlightedLines: [3, 4, 5, 6, 7, 8, 9],
-      lineExecution: "const graph = new Map(); for edges: graph[u].push(v), graph[v].push(u)"
-    },
-    {
-      n,
-      edges,
-      visited: new Set(),
-      currentNode: null,
-      componentCount: 0,
-      currentComponent: new Set(),
-      variables: { visited: 'Set()', count: 0 },
-      explanation: "Initialize visited set and component counter.",
-      highlightedLines: [12, 13],
-      lineExecution: "const visited = new Set(); let count = 0;"
-    },
-    {
-      n,
-      edges,
-      visited: new Set(),
-      currentNode: 0,
-      componentCount: 0,
-      currentComponent: new Set(),
-      variables: { i: 0, 'visited.has(0)': false },
-      explanation: "Check node 0: not visited. Start DFS for new component.",
-      highlightedLines: [25, 26],
-      lineExecution: "for (let i = 0; i < n; i++) if (!visited.has(i)) // i=0"
-    },
-    {
-      n,
-      edges,
-      visited: new Set([0]),
-      currentNode: 0,
-      componentCount: 0,
-      currentComponent: new Set([0]),
-      variables: { node: 0, visited: '{0}' },
-      explanation: "DFS visits node 0. Mark as visited. Check neighbors: [1].",
-      highlightedLines: [16, 17],
-      lineExecution: "function dfs(node: number) visited.add(node); // visited = {0}"
-    },
-    {
-      n,
-      edges,
-      visited: new Set([0, 1]),
-      currentNode: 1,
-      componentCount: 0,
-      currentComponent: new Set([0, 1]),
-      variables: { node: 1, neighbor: 1 },
-      explanation: "Visit neighbor 1. Mark as visited. Node 1's neighbors: [0, 2].",
-      highlightedLines: [18, 19, 20, 21],
-      lineExecution: "for (neighbor of graph[0]) if (!visited.has(1)) dfs(1)"
-    },
-    {
-      n,
-      edges,
-      visited: new Set([0, 1, 2]),
-      currentNode: 2,
-      componentCount: 0,
-      currentComponent: new Set([0, 1, 2]),
-      variables: { node: 2, component: '{0,1,2}' },
-      explanation: "Visit neighbor 2. Mark as visited. Node 2's neighbor: [1] (already visited). Component: {0,1,2}.",
-      highlightedLines: [18, 19, 20, 21],
-      lineExecution: "for (neighbor of graph[1]) if (!visited.has(2)) dfs(2)"
-    },
-    {
-      n,
-      edges,
-      visited: new Set([0, 1, 2]),
-      currentNode: null,
-      componentCount: 1,
-      currentComponent: new Set([0, 1, 2]),
-      variables: { count: 1 },
-      explanation: "Component {0,1,2} complete. Increment count = 1.",
-      highlightedLines: [27, 28],
-      lineExecution: "dfs(i); count++; // count = 1"
-    },
-    {
-      n,
-      edges,
-      visited: new Set([0, 1, 2]),
-      currentNode: 3,
-      componentCount: 1,
-      currentComponent: new Set(),
-      variables: { i: 3, 'visited.has(3)': false },
-      explanation: "Check node 3: not visited. Start DFS for second component.",
-      highlightedLines: [25, 26],
-      lineExecution: "for (let i = 3; i < n; i++) if (!visited.has(i)) // i=3"
-    },
-    {
-      n,
-      edges,
-      visited: new Set([0, 1, 2, 3]),
-      currentNode: 3,
-      componentCount: 1,
-      currentComponent: new Set([3]),
-      variables: { node: 3, visited: '{0,1,2,3}' },
-      explanation: "Visit node 3. Mark as visited. Check neighbors: [4].",
-      highlightedLines: [16, 17],
-      lineExecution: "dfs(3); visited.add(3);"
-    },
-    {
-      n,
-      edges,
-      visited: new Set([0, 1, 2, 3, 4]),
-      currentNode: 4,
-      componentCount: 1,
-      currentComponent: new Set([3, 4]),
-      variables: { node: 4, component: '{3,4}' },
-      explanation: "Visit neighbor 4. Mark as visited. Component: {3,4}.",
-      highlightedLines: [18, 19, 20, 21],
-      lineExecution: "for (neighbor of graph[3]) if (!visited.has(4)) dfs(4)"
-    },
-    {
-      n,
-      edges,
-      visited: new Set([0, 1, 2, 3, 4]),
-      currentNode: null,
-      componentCount: 2,
-      currentComponent: new Set([3, 4]),
-      variables: { count: 2 },
-      explanation: "Component {3,4} complete. Increment count = 2.",
-      highlightedLines: [27, 28],
-      lineExecution: "dfs(i); count++; // count = 2"
-    },
-    {
-      n,
-      edges,
-      visited: new Set([0, 1, 2, 3, 4]),
-      currentNode: null,
-      componentCount: 2,
-      currentComponent: new Set(),
-      variables: { i: 5, n: 5 },
-      explanation: "Check: i (5) < n (5)? No. All nodes visited. Exit loop.",
-      highlightedLines: [25],
-      lineExecution: "for (let i = 5; i < n; i++) // 5 < 5 -> false"
-    },
-    {
-      n,
-      edges,
-      visited: new Set([0, 1, 2, 3, 4]),
-      currentNode: null,
-      componentCount: 2,
-      currentComponent: new Set(),
-      variables: { result: 2 },
-      explanation: "Return count = 2. Found components: {0,1,2} and {3,4}.",
-      highlightedLines: [31],
-      lineExecution: "return count; // 2"
-    },
-    {
-      n,
-      edges,
-      visited: new Set([0, 1, 2, 3, 4]),
-      currentNode: null,
-      componentCount: 2,
-      currentComponent: new Set(),
-      variables: { components: 2, complexity: 'O(V+E)' },
-      explanation: "Algorithm complete! DFS to explore each component. Time: O(V+E), Space: O(V).",
-      highlightedLines: [31],
-      lineExecution: "Result: 2 connected components"
-    }
-  ];
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
   const code = `function countComponents(n: number, edges: number[][]): number {
-  const graph = new Map<number, number[]>();
+  const adj = new Map<number, number[]>();
   for (let i = 0; i < n; i++) {
-    graph.set(i, []);
+    adj.set(i, []);
   }
+
   for (const [u, v] of edges) {
-    graph.get(u)!.push(v);
-    graph.get(v)!.push(u);
+    adj.get(u)!.push(v);
+    adj.get(v)!.push(u);
   }
-  
+
   const visited = new Set<number>();
   let count = 0;
-  
-  function dfs(node: number): void {
+
+  function dfs(node: number) {
     visited.add(node);
-    
-    for (const neighbor of graph.get(node)!) {
+    for (const neighbor of adj.get(node)!) {
       if (!visited.has(neighbor)) {
         dfs(neighbor);
       }
     }
   }
-  
+
   for (let i = 0; i < n; i++) {
     if (!visited.has(i)) {
-      dfs(i);
       count++;
+      dfs(i);
     }
   }
-  
+
   return count;
 }`;
 
-  const step = steps[currentStep];
+  const steps: Step[] = useMemo(() => {
+    const s: Step[] = [];
+    const n = 5;
+    const edges = [[0, 1], [1, 2], [3, 4]];
+    
+    const adjMap: Map<number, number[]> = new Map();
+    const visitedSet: Set<number> = new Set();
+    let compCount = 0;
+    
+    const snap = (
+      msg: string, line: number, isMatch: boolean = false,
+      currentNode: number | null = null, neighbor: number | null = null,
+      outerLoopIndex: number | null = null, u: number | null = null, v: number | null = null
+    ) => {
+      s.push({
+        n,
+        edges,
+        graph: Object.fromEntries(Array.from(adjMap.entries()).map(([k, v]) => [k, [...v]])),
+        visited: Array.from(visitedSet),
+        count: compCount,
+        currentNode, neighbor, u, v, outerLoopIndex,
+        message: msg,
+        lineNumber: line,
+        isMatch
+      });
+    };
 
-  const getNodeColor = (nodeIdx: number) => {
-    if (nodeIdx === step.currentNode) {
-      return 'bg-primary text-primary-foreground';
+    snap(`Begin counting isolated connected components. Creating Empty Mapping.`, 2, false);
+
+    snap(`Initializing Adjacency Mapping Arrays.`, 3, false);
+    for (let i = 0; i < n; i++) {
+      adjMap.set(i, []);
+      snap(`Initialized mapped bucket for node ${i}.`, 4, false);
     }
-    if (step.currentComponent.has(nodeIdx)) {
-      return 'bg-accent text-accent-foreground border-2 border-accent';
+
+    snap(`Binding raw edge arrays into a bilateral indexed map.`, 7, false);
+    for (const [u, v] of edges) {
+      adjMap.get(u)!.push(v);
+      adjMap.get(v)!.push(u);
+      snap(`Bounded isolated two-way edge ${u} <-> ${v}`, 9, false, null, null, null, u, v);
     }
-    if (step.visited.has(nodeIdx)) {
-      return 'bg-green-500/20 border-2 border-green-500';
+
+    snap(`Initialized isolated visited memory. Start component counter at 0.`, 12, false);
+
+    function dfsSim(node: number) {
+      snap(`Invoked deep search on Node [${node}] traversing entire local component bounds.`, 15, false, node);
+      
+      visitedSet.add(node);
+      snap(`Node [${node}] added to globally accessible visited Set.`, 16, true, node);
+
+      const neighbors = adjMap.get(node)!;
+      for (let numIdx = 0; numIdx < neighbors.length; numIdx++) {
+        const neighbor = neighbors[numIdx];
+        snap(`Analyzing outbound edge to Node [${neighbor}] from Node [${node}].`, 17, false, node, neighbor);
+        
+        if (!visitedSet.has(neighbor)) {
+          snap(`Node ${neighbor} is unvisited! Branching recursive deep search.`, 18, true, node, neighbor);
+          dfsSim(neighbor);
+        } else {
+          snap(`Node ${neighbor} has already been touched. Returning to prevent infinite looping.`, 17, false, node, neighbor);
+        }
+      }
+      
+      snap(`Exhausted adjacent boundaries for Node [${node}].`, 21, true, node);
     }
-    return 'bg-muted';
-  };
+
+    snap(`Beginning complete outer sweep. Linearly checking Node indices 0 -> ${n - 1}.`, 24, false);
+    for (let i = 0; i < n; i++) {
+      snap(`Outer Sweep Node Check: Evaluated base condition on Node [${i}]`, 25, false, null, null, i);
+      if (!visitedSet.has(i)) {
+        compCount++;
+        snap(`Node [${i}] is previously untouched! This constitutes the founding of a new Connected Component bounds! Incremented counter to ${compCount}.`, 26, true, null, null, i);
+        dfsSim(i);
+        snap(`Successfully mapped all edges in Component limits. Resuming outer sweep scan.`, 28, false, null, null, i);
+      } else {
+         snap(`Node [${i}] was previously consumed by an existing mapping cluster. Ignoring outer sweep.`, 25, false, null, null, i);
+      }
+    }
+
+    snap(`Sweep terminated. Total isolated connected components analyzed statically: ${compCount}.`, 31, true);
+
+    return s;
+  }, []);
+
+  const step = steps[currentStepIndex];
 
   return (
     <VisualizationLayout
       leftContent={
-        <>
-          <motion.div
-            key={`nodes-${currentStep}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Card className="p-4">
-              <h3 className="text-sm font-semibold mb-3">Nodes (n={step.n})</h3>
-              <div className="flex gap-2 flex-wrap">
-                {Array.from({ length: step.n }, (_, i) => (
-                  <div
-                    key={i}
-                    className={`w-12 h-12 rounded-full flex items-center justify-center font- text-lg ${getNodeColor(
-                      i
-                    )}`}
-                  >
-                    {i}
-                  </div>
-                ))}
-              </div>
-              <div className="flex gap-4 mt-3 text-xs">
-                <div className="flex items-center gap-1">
-                  <div className="w-4 h-4 bg-accent text-accent-foreground border-2 border-accent rounded-full"></div>{' '}
-                  Current Component
+        <div className="space-y-4">
+          <Card className="p-5 bg-card/50 backdrop-blur-sm border-primary/20 shadow-lg shadow-primary/5">
+            <h3 className="text-xs font-semibold mb-3 text-muted-foreground uppercase tracking-widest text-center">
+              Graph Analysis Mapping
+            </h3>
+            <div className="flex gap-4">
+                <div className="flex flex-col gap-2 w-1/3 border-r pr-4">
+                    <span className="text-[10px] font-bold text-center uppercase text-primary/70 mb-1 tracking-widest border-b pb-1">Traversal History</span>
+                    <div className="flex flex-wrap gap-2 justify-center p-2 rounded bg-muted/30">
+                        {Array.from({ length: step.n }).map((_, i) => {
+                            const isVisited = step.visited.includes(i);
+                            const isOuterChecking = step.outerLoopIndex === i;
+                            return (
+                                <div key={i} className={`w-8 h-8 flex items-center justify-center font-bold font-mono rounded transition-colors duration-300 ${isVisited ? 'bg-green-500/20 text-green-500 border border-green-500/50' : isOuterChecking ? 'bg-primary/20 text-primary border border-primary/50' : 'bg-background text-muted-foreground border border-border'}`}>
+                                    {i}
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-4 h-4 bg-green-500/20 border-2 border-green-500 rounded-full"></div>{' '}
-                  Visited
+
+                <div className="flex flex-col w-2/3">
+                    <span className="text-[10px] font-bold text-center uppercase text-primary/70 mb-2 tracking-widest border-b pb-1">Undirected Adjacency Array (Adj)</span>
+                    <div className="flex flex-col gap-2 p-1 overflow-y-auto max-h-[160px] custom-scrollbar">
+                        {Object.entries(step.graph).map(([nodeStr, neighbors]) => {
+                            const node = parseInt(nodeStr);
+                            const isActiveNode = step.currentNode === node;
+                            return (
+                                <div key={node} className={`flex items-center gap-2 p-1 rounded transition-colors ${isActiveNode ? 'bg-primary/10' : ''}`}>
+                                    <div className={`w-6 h-6 flex items-center justify-center font-bold text-xs rounded transition-all ${isActiveNode ? 'bg-primary text-primary-foreground scale-110' : 'bg-muted border border-border text-foreground/80'}`}>
+                                        {node}
+                                    </div>
+                                    <ArrowRight className="w-3 h-3 text-muted-foreground" />
+                                    <div className="flex flex-wrap gap-1">
+                                        {neighbors.length === 0 && <span className="text-[10px] italic text-muted-foreground mt-1">Empty</span>}
+                                        {neighbors.map((n, idx) => {
+                                            const isTargetNeighbor = isActiveNode && step.neighbor === n;
+                                            return (
+                                                <div key={idx} className={`w-6 h-6 flex items-center justify-center text-xs font-bold font-mono rounded transition-colors ${isTargetNeighbor ? 'bg-blue-500/20 text-blue-500 border border-blue-500/50 scale-110' : 'bg-background border border-border text-muted-foreground'}`}>
+                                                    {n}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
-              </div>
-            </Card>
-          </motion.div>
+            </div>
+          </Card>
 
-          <motion.div
-            key={`edges-${currentStep}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            <Card className="p-4">
-              <h3 className="text-sm font-semibold mb-3">Edges</h3>
-              <div className="space-y-1 text-sm font-mono">
-                {step.edges.map(([u, v], idx) => (
-                  <div key={idx}>
-                    {u} ↔ {v}
-                  </div>
-                ))}
-              </div>
-            </Card>
-          </motion.div>
-
-          {step.componentCount > 0 && (
-            <motion.div
-              key={`count-${currentStep}`}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3, delay: 0.2 }}
-            >
-              <Card className="p-4">
-                <div className="text-sm font-semibold mb-2">Components Found</div>
-                <div className="text-3xl font- text-primary">{step.componentCount}</div>
-              </Card>
-            </motion.div>
-          )}
-
-          <motion.div
-            key={`execution-${currentStep}`}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.4, delay: 0.3 }}
-          >
-            <Card className="p-4 bg-muted/50">
-              <div className="space-y-2">
-                <div className="text-sm font-semibold text-primary">Current Execution:</div>
-                <div className="text-sm font-mono bg-background/50 p-2 rounded">
-                  {step.lineExecution}
+          <Card className="p-4 bg-card/50 border-primary/20 shadow-lg flex items-center">
+             <div className="w-full">
+                <span className="text-[10px] font-bold uppercase text-primary/70 tracking-widest block text-center mb-3">BiDirectional Edges Processing</span>
+                <div className="flex flex-wrap gap-2 justify-center">
+                    {step.edges.map(([u, v], idx) => {
+                        const isCurrentPair = step.u === u && step.v === v;
+                        return (
+                            <div key={idx} className={`font-mono text-xs px-2 py-1 rounded transition-colors border ${isCurrentPair ? "bg-primary/20 text-primary border-primary/50" : "bg-muted/30 text-muted-foreground border-border"}`}>
+                                [{u},{v}]
+                            </div>
+                        )
+                    })}
                 </div>
-                <div className="text-sm text-muted-foreground pt-2">
-                  {step.explanation}
-                </div>
-              </div>
-            </Card>
-          </motion.div>
+             </div>
+          </Card>
 
-          <motion.div
-            key={`variables-${currentStep}`}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3, delay: 0.4 }}
-          >
-            <VariablePanel variables={step.variables} />
-          </motion.div>
-        </>
+          <Card className={`p-4 border-l-4 relative overflow-hidden transition-all duration-300 shadow-sm flex items-center ${step?.isMatch ? 'bg-primary/10 border-primary' : 'bg-accent/30 border-primary'}`}>
+            <div className="flex items-start gap-4">
+              <div className={`p-2.5 rounded-xl shrink-0 ${step?.isMatch ? 'bg-primary text-primary-foreground' : 'bg-primary/10 text-primary'}`}>
+                {step?.isMatch ? <CheckCircle2 className="w-5 h-5" /> : <Info className="w-5 h-5" />}
+              </div>
+              <div className="space-y-1">
+                <h4 className="text-[9px] font-bold uppercase tracking-[0.12em] text-primary/80">
+                  Execution Detail Tracker
+                </h4>
+                <p className="text-xs font-medium leading-relaxed text-foreground/90 leading-tight">
+                  {step?.message || ''}
+                </p>
+              </div>
+            </div>
+          </Card>
+        </div>
       }
       rightContent={
-        <AnimatedCodeEditor
-          code={code}
-          language="typescript"
-          highlightedLines={step.highlightedLines}
-        />
+        <div className="space-y-4 h-full flex flex-col">
+          <AnimatedCodeEditor
+            code={code}
+            highlightedLines={[step?.lineNumber || 1]}
+            language="typescript"
+          />
+          <VariablePanel
+            variables={{
+              "Current Context": step.currentNode !== null ? `Traversing connected node=${step.currentNode}` : step.outerLoopIndex !== null ? `Checking unconnected outer sweep node=${step.outerLoopIndex}` : 'Global Graph Build',
+              Target_Neighbor: step.neighbor !== null ? `Examining [${step.neighbor}]` : 'N/A',
+              Edges_Total: step.edges.length,
+              Visited_Memory_Size: step.visited.length,
+              count: step.count
+            }}
+          />
+        </div>
       }
       controls={
         <SimpleStepControls
-          currentStep={currentStep}
+          currentStep={currentStepIndex}
           totalSteps={steps.length}
-          onStepChange={setCurrentStep}
+          onStepChange={setCurrentStepIndex}
         />
       }
     />

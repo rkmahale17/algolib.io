@@ -1233,11 +1233,13 @@ const generateCppRunner = (
         }).join('\n            ');
 
         const args = tc.input.map((_, i) => `arg${i}`).join(', ');
-        const expectedType = deduceCppType(tc.expectedOutput);
         let expectedDecl = "";
-        if (options?.multiExpected && Array.isArray(tc.expectedOutput)) {
-            expectedDecl = `vector<${expectedType}> expected_variants = ${formatCppLiteral(tc.expectedOutput)};`;
+        if (options?.multiExpected) {
+            const variants = Array.isArray(tc.expectedOutput) ? tc.expectedOutput : [tc.expectedOutput];
+            const baseType = deduceCppType(variants[0]);
+            expectedDecl = `vector<${baseType}> expected_variants = ${formatCppLiteral(variants)};`;
         } else {
+            const expectedType = deduceCppType(tc.expectedOutput);
             expectedDecl = `${expectedType} expected = ${formatCppLiteral(tc.expectedOutput)};`;
         }
 
@@ -1332,6 +1334,7 @@ const generateCppRunner = (
 #include <variant>
 #include <climits>
 #include <set>
+#include <bitset>
 using namespace std;
 
 

@@ -41,6 +41,7 @@ const AdminSimulator: React.FC = () => {
   const [simulationStats, setSimulationStats] = useState<SimulationStats>({ total: 0, passed: 0, failed: 0, skipped: 0 });
   const [searchTerm, setSearchTerm] = useState("");
   const [approachFilter, setApproachFilter] = useState("optimize"); // Default to 'optimize'
+  const [languageFilter, setLanguageFilter] = useState("all");
   const [listTypeFilter, setListTypeFilter] = useState<string>("all");
 
   // LocalStorage Persistence
@@ -485,6 +486,8 @@ const AdminSimulator: React.FC = () => {
           if (stopRequested.current) break;
           const lang = (impl.lang as string).toLowerCase() as Language;
           if (!LANGUAGE_IDS[lang]) continue;
+          
+          if (languageFilter !== "all" && lang !== languageFilter) continue;
 
           // FILTER LOGIC
           const codeBlocks = impl.code.filter((c: any) => {
@@ -726,6 +729,18 @@ const AdminSimulator: React.FC = () => {
 
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2 bg-background p-1 rounded-md border">
+                  <select
+                    className="h-7 w-24 text-xs border-r border-0 bg-transparent focus:ring-0 cursor-pointer text-primary font-semibold"
+                    value={languageFilter}
+                    onChange={(e) => setLanguageFilter(e.target.value)}
+                  >
+                    <option value="all">All Lang</option>
+                    <option value="typescript">TS</option>
+                    <option value="javascript">JS</option>
+                    <option value="python">Python</option>
+                    <option value="cpp">C++</option>
+                    <option value="java">Java</option>
+                  </select>
                   <select
                     className="h-7 w-32 text-xs border-0 bg-transparent focus:ring-0 cursor-pointer"
                     value={approachFilter}

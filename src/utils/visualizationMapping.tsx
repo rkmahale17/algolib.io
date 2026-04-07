@@ -49,6 +49,9 @@ export const visualizationMap: Record<string, React.LazyExoticComponent<React.Co
   // Graph Algorithms
   'graph-dfs': React.lazy(() => import('@/components/visualizations/algorithms/GraphDFSVisualization').then(m => ({ default: m.GraphDFSVisualization }))),
   'graph-bfs': React.lazy(() => import('@/components/visualizations/algorithms/GraphBFSVisualization').then(m => ({ default: m.GraphBFSVisualization }))),
+  'number-of-connected-components-in-an-undirected-graph': React.lazy(() => import('@/components/visualizations/algorithms/ConnectedComponentsVisualization').then(m => ({ default: m.ConnectedComponentsVisualization }))),
+  'pacific-atlantic-water-flow': React.lazy(() => import('@/components/visualizations/algorithms/PacificAtlanticVisualization').then(m => ({ default: m.PacificAtlanticVisualization }))),
+  'alien-dictionary': React.lazy(() => import('@/components/visualizations/algorithms/AlienDictionaryVisualization').then(m => ({ default: m.AlienDictionaryVisualization }))),
   'topological-sort': React.lazy(() => import('@/components/visualizations/algorithms/TopologicalSortVisualization').then(m => ({ default: m.TopologicalSortVisualization }))),
   'union-find': React.lazy(() => import('@/components/visualizations/algorithms/UnionFindVisualization').then(m => ({ default: m.UnionFindVisualization }))),
   'union-find-by-rank': React.lazy(() => import('@/components/visualizations/algorithms/UnionFindByRankVisualization').then(m => ({ default: m.UnionFindByRankVisualization }))),

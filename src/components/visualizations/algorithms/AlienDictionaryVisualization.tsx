@@ -1,377 +1,330 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
-import { VisualizationLayout } from '../shared/VisualizationLayout';
-import { motion } from 'framer-motion';
+import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
+import { Info, CheckCircle2, ArrowRight } from 'lucide-react';
 
 interface Step {
   words: string[];
-  graph: Map<string, Set<string>>;
-  inDegree: Map<string, number>;
+  adj: Record<string, string[]>;
+  inDegree: Record<string, number>;
   queue: string[];
-  result: string[];
-  currentPair: [string, string] | null;
-  variables: Record<string, any>;
-  explanation: string;
-  highlightedLines: number[];
-  lineExecution: string;
+  result: string;
+  count: number;
+  i: number | null;
+  j: number | null;
+  word1: string | null;
+  word2: string | null;
+  currentChar: string | null;
+  currentLoop: string;
+  message: string;
+  lineNumber: number;
+  isMatch?: boolean;
 }
 
 export const AlienDictionaryVisualization = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-
-  const words = ['wrt', 'wrf', 'er', 'ett', 'rftt'];
-
-  const steps: Step[] = [
-    {
-      words,
-      graph: new Map(),
-      inDegree: new Map(),
-      queue: [],
-      result: [],
-      currentPair: null,
-      variables: { words: "['wrt','wrf','er','ett','rftt']" },
-      explanation: "Given words in alien dictionary order. Find character ordering using topological sort.",
-      highlightedLines: [1],
-      lineExecution: "function alienOrder(words: string[]): string"
-    },
-    {
-      words,
-      graph: new Map(),
-      inDegree: new Map(),
-      queue: [],
-      result: [],
-      currentPair: null,
-      variables: { graph: 'Map()', inDegree: 'Map()' },
-      explanation: "Initialize graph (adjacency list) and inDegree map for topological sort.",
-      highlightedLines: [3, 4],
-      lineExecution: "const graph = new Map(); const inDegree = new Map();"
-    },
-    {
-      words,
-      graph: new Map([['w', new Set()], ['r', new Set()], ['t', new Set()], ['f', new Set()], ['e', new Set()]]),
-      inDegree: new Map([['w', 0], ['r', 0], ['t', 0], ['f', 0], ['e', 0]]),
-      queue: [],
-      result: [],
-      currentPair: null,
-      variables: { chars: '{w,r,t,f,e}' },
-      explanation: "Extract all unique characters from words. Initialize graph and inDegree for each char.",
-      highlightedLines: [7, 8, 9, 10, 11],
-      lineExecution: "for word in words: for char in word: graph[char] = Set(), inDegree[char] = 0"
-    },
-    {
-      words,
-      graph: new Map([['w', new Set()], ['r', new Set()], ['t', new Set()], ['f', new Set()], ['e', new Set()]]),
-      inDegree: new Map([['w', 0], ['r', 0], ['t', 0], ['f', 0], ['e', 0]]),
-      queue: [],
-      result: [],
-      currentPair: ['wrt', 'wrf'],
-      variables: { i: 0, w1: 'wrt', w2: 'wrf' },
-      explanation: "Compare adjacent words: 'wrt' vs 'wrf'. Find first differing character.",
-      highlightedLines: [15, 16],
-      lineExecution: "for i=0: w1='wrt', w2='wrf'"
-    },
-    {
-      words,
-      graph: new Map([['w', new Set()], ['r', new Set()], ['t', new Set(['f'])], ['f', new Set()], ['e', new Set()]]),
-      inDegree: new Map([['w', 0], ['r', 0], ['t', 0], ['f', 1], ['e', 0]]),
-      queue: [],
-      result: [],
-      currentPair: ['wrt', 'wrf'],
-      variables: { diff: "t vs f", edge: 't→f' },
-      explanation: "Found difference at position 2: 't' vs 'f'. In alien order: t comes before f. Add edge t→f.",
-      highlightedLines: [20, 21, 22, 23],
-      lineExecution: "if (w1[j] !== w2[j]) graph[t].add(f); inDegree[f]++;"
-    },
-    {
-      words,
-      graph: new Map([['w', new Set(['e'])], ['r', new Set()], ['t', new Set(['f'])], ['f', new Set()], ['e', new Set(['r'])]]),
-      inDegree: new Map([['w', 0], ['r', 1], ['t', 0], ['f', 1], ['e', 1]]),
-      queue: [],
-      result: [],
-      currentPair: null,
-      variables: { edges: '{w→e, e→r, t→f}' },
-      explanation: "Continue comparing all adjacent word pairs. Build graph: w→e, e→r, t→f.",
-      highlightedLines: [15, 16, 17, 18, 19, 20, 21, 22, 23, 24],
-      lineExecution: "Compare all pairs, build edges based on first difference"
-    },
-    {
-      words,
-      graph: new Map([['w', new Set(['e'])], ['r', new Set()], ['t', new Set(['f'])], ['f', new Set()], ['e', new Set(['r'])]]),
-      inDegree: new Map([['w', 0], ['r', 1], ['t', 0], ['f', 1], ['e', 1]]),
-      queue: ['w', 't'],
-      result: [],
-      currentPair: null,
-      variables: { queue: '[w,t]', inDegree0: '{w,t}' },
-      explanation: "Topological sort: start with chars having inDegree 0. Queue: [w, t].",
-      highlightedLines: [29, 30, 31],
-      lineExecution: "const queue = []; for (char, degree) if (degree === 0) queue.push(char)"
-    },
-    {
-      words,
-      graph: new Map([['w', new Set(['e'])], ['r', new Set()], ['t', new Set(['f'])], ['f', new Set()], ['e', new Set(['r'])]]),
-      inDegree: new Map([['w', 0], ['r', 1], ['t', 0], ['f', 1], ['e', 0]]),
-      queue: ['t'],
-      result: ['w'],
-      currentPair: null,
-      variables: { char: 'w', result: 'w' },
-      explanation: "Process 'w' from queue. Add to result: 'w'. Update neighbors: e's inDegree: 1→0.",
-      highlightedLines: [35, 36, 37, 38, 39, 40],
-      lineExecution: "char = queue.shift(); result.push(char); for neighbor: inDegree[e]--"
-    },
-    {
-      words,
-      graph: new Map([['w', new Set(['e'])], ['r', new Set()], ['t', new Set(['f'])], ['f', new Set()], ['e', new Set(['r'])]]),
-      inDegree: new Map([['w', 0], ['r', 1], ['t', 0], ['f', 0], ['e', 0]]),
-      queue: ['t', 'e'],
-      result: ['w'],
-      currentPair: null,
-      variables: { queue: '[t,e]' },
-      explanation: "e's inDegree now 0. Add to queue: [t, e].",
-      highlightedLines: [40, 41, 42],
-      lineExecution: "if (inDegree[neighbor] === 0) queue.push(neighbor);"
-    },
-    {
-      words,
-      graph: new Map([['w', new Set(['e'])], ['r', new Set()], ['t', new Set(['f'])], ['f', new Set()], ['e', new Set(['r'])]]),
-      inDegree: new Map([['w', 0], ['r', 1], ['t', 0], ['f', 0], ['e', 0]]),
-      queue: ['e', 'f'],
-      result: ['w', 't'],
-      currentPair: null,
-      variables: { char: 't', result: 'wt' },
-      explanation: "Process 't'. Result: 'wt'. Update neighbors: f's inDegree: 1→0. Add f to queue.",
-      highlightedLines: [35, 36, 37, 38, 39, 40, 41, 42],
-      lineExecution: "char = queue.shift(); result.push('t'); inDegree[f]--; queue.push('f')"
-    },
-    {
-      words,
-      graph: new Map([['w', new Set(['e'])], ['r', new Set()], ['t', new Set(['f'])], ['f', new Set()], ['e', new Set(['r'])]]),
-      inDegree: new Map([['w', 0], ['r', 0], ['t', 0], ['f', 0], ['e', 0]]),
-      queue: ['f', 'r'],
-      result: ['w', 't', 'e'],
-      currentPair: null,
-      variables: { char: 'e', result: 'wte' },
-      explanation: "Process 'e'. Result: 'wte'. Update neighbors: r's inDegree: 1→0. Add r to queue.",
-      highlightedLines: [35, 36, 37, 38, 39, 40, 41, 42],
-      lineExecution: "char = queue.shift(); result.push('e'); inDegree[r]--; queue.push('r')"
-    },
-    {
-      words,
-      graph: new Map([['w', new Set(['e'])], ['r', new Set()], ['t', new Set(['f'])], ['f', new Set()], ['e', new Set(['r'])]]),
-      inDegree: new Map([['w', 0], ['r', 0], ['t', 0], ['f', 0], ['e', 0]]),
-      queue: ['r'],
-      result: ['w', 't', 'e', 'f'],
-      currentPair: null,
-      variables: { char: 'f', result: 'wtef' },
-      explanation: "Process 'f'. Result: 'wtef'. f has no neighbors.",
-      highlightedLines: [35, 36, 37],
-      lineExecution: "char = queue.shift(); result.push('f');"
-    },
-    {
-      words,
-      graph: new Map([['w', new Set(['e'])], ['r', new Set()], ['t', new Set(['f'])], ['f', new Set()], ['e', new Set(['r'])]]),
-      inDegree: new Map([['w', 0], ['r', 0], ['t', 0], ['f', 0], ['e', 0]]),
-      queue: [],
-      result: ['w', 't', 'e', 'f', 'r'],
-      currentPair: null,
-      variables: { char: 'r', result: 'wtefr' },
-      explanation: "Process 'r'. Result: 'wtefr'. Queue empty, all chars processed.",
-      highlightedLines: [35, 36, 37],
-      lineExecution: "char = queue.shift(); result.push('r'); // queue empty"
-    },
-    {
-      words,
-      graph: new Map([['w', new Set(['e'])], ['r', new Set()], ['t', new Set(['f'])], ['f', new Set()], ['e', new Set(['r'])]]),
-      inDegree: new Map([['w', 0], ['r', 0], ['t', 0], ['f', 0], ['e', 0]]),
-      queue: [],
-      result: ['w', 't', 'e', 'f', 'r'],
-      currentPair: null,
-      variables: { 'result.length': 5, 'inDegree.size': 5 },
-      explanation: "Check validity: result.length (5) === inDegree.size (5)? Yes! Valid ordering.",
-      highlightedLines: [46],
-      lineExecution: "return result.length === inDegree.size ? result.join('') : ''; // true"
-    },
-    {
-      words,
-      graph: new Map([['w', new Set(['e'])], ['r', new Set()], ['t', new Set(['f'])], ['f', new Set()], ['e', new Set(['r'])]]),
-      inDegree: new Map([['w', 0], ['r', 0], ['t', 0], ['f', 0], ['e', 0]]),
-      queue: [],
-      result: ['w', 't', 'e', 'f', 'r'],
-      currentPair: null,
-      variables: { order: 'wtefr' },
-      explanation: "Return 'wtefr'. Alien alphabet order found!",
-      highlightedLines: [46],
-      lineExecution: "return 'wtefr';"
-    },
-    {
-      words,
-      graph: new Map([['w', new Set(['e'])], ['r', new Set()], ['t', new Set(['f'])], ['f', new Set()], ['e', new Set(['r'])]]),
-      inDegree: new Map([['w', 0], ['r', 0], ['t', 0], ['f', 0], ['e', 0]]),
-      queue: [],
-      result: ['w', 't', 'e', 'f', 'r'],
-      currentPair: null,
-      variables: { order: 'wtefr', complexity: 'O(C)' },
-      explanation: "Algorithm complete! Build graph from word pairs, topological sort. Time: O(C) where C=total chars, Space: O(1) (max 26 chars).",
-      highlightedLines: [46],
-      lineExecution: "Result: 'wtefr'"
-    }
-  ];
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
   const code = `function alienOrder(words: string[]): string {
-  const graph = new Map<string, Set<string>>();
-  const inDegree = new Map<string, number>();
-  
+  const adj: Map<string, string[]> = new Map();
+  const inDegree: Map<string, number> = new Map();
+
   for (const word of words) {
     for (const char of word) {
-      graph.set(char, new Set());
       inDegree.set(char, 0);
     }
   }
-  
+
   for (let i = 0; i < words.length - 1; i++) {
-    const w1 = words[i], w2 = words[i + 1];
-    const minLen = Math.min(w1.length, w2.length);
-    
-    for (let j = 0; j < minLen; j++) {
-      if (w1[j] !== w2[j]) {
-        if (!graph.get(w1[j])!.has(w2[j])) {
-          graph.get(w1[j])!.add(w2[j]);
-          inDegree.set(w2[j], inDegree.get(w2[j])! + 1);
+    const word1 = words[i];
+    const word2 = words[i + 1];
+    const minLength = Math.min(word1.length, word2.length);
+
+    for (let j = 0; j < minLength; j++) {
+      if (word1[j] !== word2[j]) {
+        if (!adj.has(word1[j])) {
+          adj.set(word1[j], []);
+        }
+
+        if (!adj.get(word1[j])!.includes(word2[j])) {
+          adj.get(word1[j])!.push(word2[j]);
+          inDegree.set(word2[j], inDegree.get(word2[j])! + 1);
         }
         break;
       }
-    }
-  }
-  
-  const queue: string[] = [];
-  for (const [char, degree] of inDegree) {
-    if (degree === 0) queue.push(char);
-  }
-  
-  const result: string[] = [];
-  while (queue.length > 0) {
-    const char = queue.shift()!;
-    result.push(char);
-    
-    for (const neighbor of graph.get(char)!) {
-      inDegree.set(neighbor, inDegree.get(neighbor)! - 1);
-      if (inDegree.get(neighbor) === 0) {
-        queue.push(neighbor);
+      if (j === minLength - 1 && word1.length > word2.length) {
+        return "";
       }
     }
   }
-  
-  return result.length === inDegree.size ? result.join('') : '';
+
+  const queue: string[] = [];
+  for (const [char, degree] of inDegree) {
+    if (degree === 0) {
+      queue.push(char);
+    }
+  }
+
+  let result = "";
+  let count = 0;
+
+  while (queue.length > 0) {
+    const char = queue.shift()!;
+    result += char;
+    count++;
+
+    if (adj.has(char)) {
+      for (const neighbor of adj.get(char)!) {
+        inDegree.set(neighbor, inDegree.get(neighbor)! - 1);
+        if (inDegree.get(neighbor) === 0) {
+          queue.push(neighbor);
+        }
+      }
+    }
+  }
+
+  if (count !== inDegree.size) {
+    return "";
+  }
+
+  return result;
 }`;
 
-  const step = steps[currentStep];
+  const steps: Step[] = useMemo(() => {
+    const s: Step[] = [];
+    const words = ["wrt", "wrf", "er", "ett", "rftt"];
+    
+    const adj: Map<string, string[]> = new Map();
+    const inDegree: Map<string, number> = new Map();
+    const queue: string[] = [];
+    let result = "";
+    let count = 0;
+
+    const snap = (
+      msg: string, line: number, isMatch: boolean = false, 
+      i: number | null = null, j: number | null = null, 
+      word1: string | null = null, word2: string | null = null,
+      currentChar: string | null = null, currentLoop: string = ""
+    ) => {
+      s.push({
+        words: [...words],
+        adj: Object.fromEntries(adj),
+        inDegree: Object.fromEntries(inDegree),
+        queue: [...queue],
+        result,
+        count,
+        i, j, word1, word2, currentChar, currentLoop,
+        message: msg,
+        lineNumber: line,
+        isMatch
+      });
+    };
+
+    snap("Initialize adjacency list (adj) and inDegree Map.", 2, false);
+
+    snap("Iterate over all words to initialize unique characters in inDegree Map to 0.", 5, false, null, null, null, null, null, "init");
+    for (const word of words) {
+      for (const char of word) {
+        if (!inDegree.has(char)) {
+            inDegree.set(char, 0);
+        }
+      }
+      snap(`Setup tracking for unique letters found in word "${word}".`, 7, false, null, null, null, null, null, "init");
+    }
+
+    snap("Start comparing adjacent words to construct the directed graph edges.", 11, false, null, null, null, null, null, "build");
+    for (let i = 0; i < words.length - 1; i++) {
+        const word1 = words[i];
+        const word2 = words[i + 1];
+        const minLength = Math.min(word1.length, word2.length);
+        
+        snap(`Comparing adjacent words: "${word1}" and "${word2}"`, 12, false, i, null, word1, word2, null, "build");
+
+        for (let j = 0; j < minLength; j++) {
+            snap(`Compare characters at index ${j}: '${word1[j]}' vs '${word2[j]}'`, 16, false, i, j, word1, word2, null, "build");
+            
+            if (word1[j] !== word2[j]) {
+                const c1 = word1[j];
+                const c2 = word2[j];
+                
+                if (!adj.has(c1)) {
+                    adj.set(c1, []);
+                    snap(`First time seeing '${c1}' as a source. Initializing its adjacency row.`, 19, false, i, j, word1, word2, c1, "build");
+                }
+                
+                if (!adj.get(c1)!.includes(c2)) {
+                    adj.get(c1)!.push(c2);
+                    inDegree.set(c2, inDegree.get(c2)! + 1);
+                    snap(`Found a difference! Add directed edge ${c1} -> ${c2} to Graph and increment inDegree for ${c2}.`, 24, true, i, j, word1, word2, c1, "build");
+                } else {
+                    snap(`Mismatch ${c1} != ${c2} found, but edge ${c1} -> ${c2} already exists! Skipping edge.`, 22, false, i, j, word1, word2, c1, "build");
+                }
+                
+                snap(`Words resolved. Break character loop and proceed to next adjacent word pair.`, 26, false, i, j, word1, word2, null, "build");
+                break;
+            }
+        }
+    }
+
+    snap("Identify characters completely ready with NO dependencies (InDegree === 0).", 34, false, null, null, null, null, null, "bfs");
+    for (const [char, degree] of inDegree.entries()) {
+        if (degree === 0) {
+            queue.push(char);
+            snap(`Character '${char}' has inDegree 0. Pushing to roots Queue.`, 37, true, null, null, null, null, char, "bfs");
+        }
+    }
+
+    snap("Commence Topological Sort using BFS processing roots.", 41, false, null, null, null, null, null, "bfs");
+
+    while (queue.length > 0) {
+        snap(`Queue has elements: [${queue.join(', ')}]`, 44, false, null, null, null, null, queue[0], "bfs");
+        
+        const char = queue.shift()!;
+        result += char;
+        count++;
+        
+        snap(`Shifted '${char}' from queue. Appended to Result.`, 46, true, null, null, null, null, char, "bfs");
+        
+        if (adj.has(char)) {
+            const neighbors = adj.get(char)!;
+            snap(`Fetching downstream edges starting from '${char}': [${neighbors.join(', ')}]`, 49, false, null, null, null, null, char, "bfs");
+            for (const neighbor of neighbors) {
+                inDegree.set(neighbor, inDegree.get(neighbor)! - 1);
+                snap(`Decremented InDegree constraint on '${neighbor}'. Remaining: ${inDegree.get(neighbor)}`, 51, true, null, null, null, null, neighbor, "bfs");
+                
+                if (inDegree.get(neighbor) === 0) {
+                    queue.push(neighbor);
+                    snap(`Constraint removed! In-Degree of '${neighbor}' reached 0. Enqueue '${neighbor}'.`, 53, true, null, null, null, null, neighbor, "bfs");
+                }
+            }
+        }
+    }
+
+    snap(`Topological sort complete! Validated count ${count} nodes against size ${inDegree.size}.`, 59, false, null, null, null, null, null, "bfs");
+    snap(`Successfully verified full Alien lexical order mapping: "${result}"`, 63, true, null, null, null, null, null, "bfs");
+
+    return s;
+  }, []);
+
+  const step = steps[currentStepIndex];
 
   return (
     <VisualizationLayout
       leftContent={
-        <>
-          <motion.div
-            key={`words-${currentStep}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Card className="p-4">
-              <h3 className="text-sm font-semibold mb-3">Words</h3>
-              <div className="space-y-1">
-                {step.words.map((word, idx) => (
-                  <div
-                    key={idx}
-                    className={`px-3 py-1 rounded font-mono text-sm ${step.currentPair &&
-                      (word === step.currentPair[0] || word === step.currentPair[1])
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted'
-                      }`}
-                  >
-                    {word}
-                  </div>
-                ))}
-              </div>
-            </Card>
-          </motion.div>
+        <div className="space-y-4">
+          <Card className="p-5 bg-card/50 backdrop-blur-sm border-primary/20 shadow-lg shadow-primary/5">
+            <h3 className="text-xs font-semibold mb-4 text-muted-foreground uppercase tracking-widest text-center">
+              Dictionary Analysis
+            </h3>
+            <div className="flex flex-col gap-1 w-full max-w-[200px] mx-auto border-l-2 border-primary/20 pl-4 py-2 relative">
+                {step?.words.map((word, wIdx) => {
+                    const isActivePair = step.i !== null && (wIdx === step.i || wIdx === step.i + 1);
+                    return (
+                        <div key={wIdx} className={`font-mono text-sm px-2 py-1 rounded transition-colors flex gap-1 ${isActivePair ? "bg-primary/20 text-primary" : "text-muted-foreground"}`}>
+                            {word.split('').map((ch, charIdx) => {
+                                const isComparing = isActivePair && step.j === charIdx;
+                                const isMismatch = isComparing && step.isMatch;
+                                return (
+                                    <div key={charIdx} className={`w-6 h-6 flex items-center justify-center rounded border ${isMismatch ? 'bg-red-500/20 border-red-500/50 text-red-500 font-bold scale-110' : isComparing ? 'bg-blue-500/20 border-blue-500/50 text-blue-500 scale-110' : 'border-transparent'}`}>
+                                        {ch}
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    );
+                })}
+                {step?.i !== null && (
+                    <div 
+                        className="absolute left-[-4px] w-2.5 h-12 border-l-2 border-primary/50 transition-all duration-300"
+                        style={{ top: `${(step.i * 32) + 12}px` }}
+                    />
+                )}
+            </div>
+          </Card>
 
-          {step.graph.size > 0 && (
-            <motion.div
-              key={`graph-${currentStep}`}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-            >
-              <Card className="p-4">
-                <h3 className="text-sm font-semibold mb-3">Graph (edges)</h3>
-                <div className="space-y-1 text-sm">
-                  {Array.from(step.graph.entries()).map(([char, neighbors]) => (
-                    <div key={char} className="font-mono">
-                      {char} → {neighbors.size > 0 ? Array.from(neighbors).join(', ') : '∅'}
+          <Card className="p-5 bg-card/50 backdrop-blur-sm border-primary/20 shadow-lg shadow-primary/5 min-h-[160px]">
+            <div className="grid grid-cols-2 gap-4 h-full">
+                <div className="space-y-4">
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest text-center">
+                    InDegree
+                    </h3>
+                    <div className="flex flex-wrap gap-2 justify-center">
+                    {step?.inDegree && Object.entries(step.inDegree).map(([char, degree]) => (
+                        <div key={char} className="flex flex-col items-center">
+                            <div className={`w-8 h-8 rounded flex items-center justify-center font-bold font-mono transition-all duration-300 ${step.currentChar === char ? 'scale-110 ring-2 ring-primary ring-offset-2 ring-offset-background z-10' : ''} ${degree === 0 ? 'bg-green-500/20 text-green-500 border border-green-500/50' : 'bg-muted/50 border border-border text-foreground/70'}`}>
+                                {char}
+                            </div>
+                            <span className={`text-[10px] mt-1 font-mono font-bold ${degree === 0 ? 'text-green-500' : 'text-muted-foreground'}`}>{degree}</span>
+                        </div>
+                    ))}
                     </div>
-                  ))}
                 </div>
-              </Card>
-            </motion.div>
-          )}
+                <div className="space-y-4">
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest text-center border-l pl-4">
+                    Graph (Adj)
+                    </h3>
+                    <div className="flex flex-col gap-2 border-l pl-4 pb-2 text-sm justify-center">
+                    {step?.adj && Object.entries(step.adj).map(([char, neighbors]) => (
+                        <div key={char} className="flex items-center gap-2">
+                            <div className="w-6 h-6 rounded flex items-center justify-center font-bold bg-primary/20 text-primary border border-primary/30">
+                                {char}
+                            </div>
+                            <ArrowRight className="w-3 h-3 text-muted-foreground" />
+                            <div className="flex gap-1">
+                                {neighbors.length === 0 && <span className="text-muted-foreground text-[10px] italic pt-1">none</span>}
+                                {neighbors.map((n, idx) => (
+                                    <div key={idx} className="w-6 h-6 rounded flex items-center justify-center font-bold bg-accent text-accent-foreground border border-border">
+                                        {n}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                    </div>
+                </div>
+            </div>
+          </Card>
 
-          {step.result.length > 0 && (
-            <motion.div
-              key={`result-${currentStep}`}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3, delay: 0.2 }}
-            >
-              <Card className="p-4">
-                <h3 className="text-sm font-semibold mb-3">Alien Order</h3>
-                <div className="text-2xl font- text-green-500">{step.result.join('')}</div>
-              </Card>
-            </motion.div>
-          )}
-
-          <motion.div
-            key={`execution-${currentStep}`}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.4, delay: 0.3 }}
-          >
-            <Card className="p-4 bg-muted/50">
-              <div className="space-y-2">
-                <div className="text-sm font-semibold text-primary">Current Execution:</div>
-                <div className="text-sm font-mono bg-background/50 p-2 rounded">
-                  {step.lineExecution}
-                </div>
-                <div className="text-sm text-muted-foreground pt-2">
-                  {step.explanation}
-                </div>
+          <Card className={`p-4 border-l-4 relative overflow-hidden transition-all duration-300 shadow-sm flex items-center ${step?.isMatch ? 'bg-primary/10 border-primary' : 'bg-accent/30 border-primary'}`}>
+            <div className="flex items-start gap-4">
+              <div className={`p-2.5 rounded-xl shrink-0 ${step?.isMatch ? 'bg-primary text-primary-foreground' : 'bg-primary/10 text-primary'}`}>
+                {step?.isMatch ? <CheckCircle2 className="w-5 h-5" /> : <Info className="w-5 h-5" />}
               </div>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            key={`variables-${currentStep}`}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3, delay: 0.4 }}
-          >
-            <VariablePanel variables={step.variables} />
-          </motion.div>
-        </>
+              <div className="space-y-1">
+                <h4 className="text-[9px] font-bold uppercase tracking-[0.12em] text-primary/80">
+                  Step Logic
+                </h4>
+                <p className="text-xs font-medium leading-relaxed text-foreground/90 leading-tight">
+                  {step?.message || ''}
+                </p>
+              </div>
+            </div>
+          </Card>
+        </div>
       }
       rightContent={
-        <AnimatedCodeEditor
-          code={code}
-          language="typescript"
-          highlightedLines={step.highlightedLines}
-        />
+        <div className="space-y-4 h-full flex flex-col">
+          <AnimatedCodeEditor
+            code={code}
+            highlightedLines={[step?.lineNumber || 1]}
+            language="typescript"
+          />
+          <VariablePanel
+            variables={{
+              queue: step?.queue ? `[${step.queue.join(', ')}]` : '[]',
+              result: step?.result || '""',
+              count: step?.count || 0
+            }}
+          />
+        </div>
       }
       controls={
         <SimpleStepControls
-          currentStep={currentStep}
+          currentStep={currentStepIndex}
           totalSteps={steps.length}
-          onStepChange={setCurrentStep}
+          onStepChange={setCurrentStepIndex}
         />
       }
     />
