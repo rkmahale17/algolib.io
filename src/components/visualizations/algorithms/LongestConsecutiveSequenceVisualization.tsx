@@ -33,7 +33,7 @@ export const LongestConsecutiveSequenceVisualization = () => {
       longestStreak: 0,
       currentStreak: 0,
       variables: { nums: '[100,4,200,1,3,2]' },
-      explanation: "Given unsorted array [100,4,200,1,3,2]. Find longest consecutive sequence (e.g., 1→2→3→4).",
+      explanation: "Given an unsorted array of integers nums, return the length of the longest consecutive elements sequence.",
       highlightedLines: [1],
       lineExecution: "function longestConsecutive(nums: number[]): number"
     },
@@ -57,7 +57,7 @@ export const LongestConsecutiveSequenceVisualization = () => {
       longestStreak: 0,
       currentStreak: 0,
       variables: { numSet: '{1,2,3,4,100,200}' },
-      explanation: "Create set for O(1) lookups: {1,2,3,4,100,200}. Sorted for display.",
+      explanation: "Create a Set from the array. This allows us to check if a number exists in O(1) time, which is key to maintaining O(n) overall complexity.",
       highlightedLines: [4],
       lineExecution: "const numSet = new Set(nums);"
     },
@@ -81,7 +81,7 @@ export const LongestConsecutiveSequenceVisualization = () => {
       longestStreak: 0,
       currentStreak: 0,
       variables: { num: 1, 'num-1': 0 },
-      explanation: "Check num=1. Does 0 exist in set? No! So 1 starts a sequence.",
+      explanation: "We only start counting a sequence from its smallest element. Since 0 is not in the set, 1 must be the start of a potential sequence.",
       highlightedLines: [7, 8],
       lineExecution: "for (const num of numSet) if (!numSet.has(num - 1)) // !has(0) -> true"
     },
@@ -105,7 +105,7 @@ export const LongestConsecutiveSequenceVisualization = () => {
       longestStreak: 0,
       currentStreak: 2,
       variables: { 'checking': 2, found: true },
-      explanation: "Check: does 2 exist? Yes! Increment: currentNum=2, currentStreak=2.",
+      explanation: "Check the set for the next consecutive number (2). It exists! We increment the current streak to 2.",
       highlightedLines: [12, 13, 14],
       lineExecution: "while (numSet.has(currentNum + 1)) currentNum++; // 2 exists"
     },
@@ -141,7 +141,7 @@ export const LongestConsecutiveSequenceVisualization = () => {
       longestStreak: 0,
       currentStreak: 4,
       variables: { 'checking': 5, found: false },
-      explanation: "Check: does 5 exist? No! Sequence [1,2,3,4] ends. Length = 4.",
+      explanation: "Check for 5. It's not in the set, so the current sequence [1, 2, 3, 4] is complete with a length of 4.",
       highlightedLines: [12],
       lineExecution: "while (numSet.has(4 + 1)) // false, exit loop"
     },
@@ -165,7 +165,7 @@ export const LongestConsecutiveSequenceVisualization = () => {
       longestStreak: 4,
       currentStreak: 0,
       variables: { num: 2, 'num-1': 1 },
-      explanation: "Check num=2. Does 1 exist? Yes! So 2 is NOT a sequence start. Skip.",
+      explanation: "Check num=2. Since 1 is in the set, 2 is already part of a sequence we've either processed or will process from its start. Skip it to avoid redundant work.",
       highlightedLines: [7, 8],
       lineExecution: "if (!numSet.has(num - 1)) // !has(1) -> false, skip"
     },
@@ -177,7 +177,7 @@ export const LongestConsecutiveSequenceVisualization = () => {
       longestStreak: 4,
       currentStreak: 0,
       variables: { num: 3 },
-      explanation: "Check num=3. Does 2 exist? Yes! Skip (not sequence start).",
+      explanation: "Checking 3. Since 2 is in the set, we know 3 is part of a sequence that starts at a number smaller than 3. We skip it, knowing we've already counted it when we processed its sequence starting from 1.",
       highlightedLines: [7, 8],
       lineExecution: "if (!numSet.has(2)) // false, skip"
     },
@@ -189,7 +189,7 @@ export const LongestConsecutiveSequenceVisualization = () => {
       longestStreak: 4,
       currentStreak: 0,
       variables: { num: 4 },
-      explanation: "Check num=4. Does 3 exist? Yes! Skip (not sequence start).",
+      explanation: "Checking 4. Since 3 is in the set, 4 is not the start of a sequence. Skipping to maintain O(n) complexity, ensuring each number is only part of one while-loop iteration.",
       highlightedLines: [7, 8],
       lineExecution: "if (!numSet.has(3)) // false, skip"
     },
@@ -201,7 +201,7 @@ export const LongestConsecutiveSequenceVisualization = () => {
       longestStreak: 4,
       currentStreak: 1,
       variables: { num: 100 },
-      explanation: "Check num=100. Does 99 exist? No! 100 starts sequence. Check 101: No. Length = 1.",
+      explanation: "Checking 100. 99 is not in the set, so 100 starts a sequence. We check for 101, which isn't there, so this sequence has length 1.",
       highlightedLines: [7, 8, 9, 10, 12],
       lineExecution: "!numSet.has(99) -> true; !numSet.has(101) -> exit; streak = 1"
     },
@@ -213,7 +213,7 @@ export const LongestConsecutiveSequenceVisualization = () => {
       longestStreak: 4,
       currentStreak: 1,
       variables: { num: 200 },
-      explanation: "Check num=200. Does 199 exist? No! 200 starts sequence. Check 201: No. Length = 1.",
+      explanation: "Checking 200. Since 199 is not in the set, 200 starts its own sequence. We check for 201, find it's also missing, so this sequence length is 1.",
       highlightedLines: [7, 8, 9, 10, 12],
       lineExecution: "!numSet.has(199) -> true; !numSet.has(201) -> exit; streak = 1"
     },
@@ -225,7 +225,7 @@ export const LongestConsecutiveSequenceVisualization = () => {
       longestStreak: 4,
       currentStreak: 0,
       variables: { result: 4, sequence: '[1,2,3,4]' },
-      explanation: "Return longestStreak = 4. Longest consecutive sequence: [1,2,3,4].",
+      explanation: "All numbers in the set have been checked. The longest consecutive sequence found was [1, 2, 3, 4] with a length of 4.",
       highlightedLines: [21],
       lineExecution: "return longestStreak; // 4"
     },
@@ -237,9 +237,9 @@ export const LongestConsecutiveSequenceVisualization = () => {
       longestStreak: 4,
       currentStreak: 0,
       variables: { length: 4, complexity: 'O(n)' },
-      explanation: "Algorithm complete! Only check sequence starts (when num-1 doesn't exist). Time: O(n), Space: O(n).",
+      explanation: "Visualization complete. By only starting sequences from elements with no predecessor, we ensure each element is visited at most twice (once in the main loop, once in a while loop), achieving O(n) time complexity.",
       highlightedLines: [21],
-      lineExecution: "Result: 4 (sequence [1,2,3,4])"
+      lineExecution: "Result: 4"
     }
   ];
 
@@ -272,11 +272,8 @@ export const LongestConsecutiveSequenceVisualization = () => {
     <VisualizationLayout
       leftContent={
         <>
-          <motion.div
+          <div
             key={`array-${currentStep}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
           >
             <Card className="p-4">
               <h3 className="text-sm font-semibold mb-3">Original Array</h3>
@@ -284,7 +281,7 @@ export const LongestConsecutiveSequenceVisualization = () => {
                 {step.nums.map((num, idx) => (
                   <div
                     key={idx}
-                    className={`w-14 h-14 rounded flex items-center justify-center font-mono text-sm font- ${num === step.currentNum
+                    className={`w-14 h-14 rounded flex items-center justify-center font-mono text-sm ${num === step.currentNum
                       ? 'bg-primary text-primary-foreground'
                       : num === step.checking
                         ? 'bg-accent text-accent-foreground'
@@ -296,14 +293,11 @@ export const LongestConsecutiveSequenceVisualization = () => {
                 ))}
               </div>
             </Card>
-          </motion.div>
+          </div>
 
           {step.numSet.size > 0 && (
-            <motion.div
+            <div
               key={`set-${currentStep}`}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
             >
               <Card className="p-4">
                 <h3 className="text-sm font-semibold mb-3">Number Set (O(1) lookup)</h3>
@@ -313,7 +307,7 @@ export const LongestConsecutiveSequenceVisualization = () => {
                     .map((num, idx) => (
                       <div
                         key={idx}
-                        className={`w-14 h-14 rounded flex items-center justify-center font-mono text-sm font- ${num === step.currentNum
+                        className={`w-14 h-14 rounded flex items-center justify-center font-mono text-sm ${num === step.currentNum
                           ? 'bg-primary text-primary-foreground'
                           : num === step.checking
                             ? 'bg-accent text-accent-foreground'
@@ -325,15 +319,12 @@ export const LongestConsecutiveSequenceVisualization = () => {
                     ))}
                 </div>
               </Card>
-            </motion.div>
+            </div>
           )}
 
           {step.longestStreak > 0 && (
-            <motion.div
+            <div
               key={`streak-${currentStep}`}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
             >
               <Card className="p-4">
                 <div className="space-y-2">
@@ -347,14 +338,11 @@ export const LongestConsecutiveSequenceVisualization = () => {
                   )}
                 </div>
               </Card>
-            </motion.div>
+            </div>
           )}
 
-          <motion.div
+          <div
             key={`execution-${currentStep}`}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.4, delay: 0.3 }}
           >
             <Card className="p-4 bg-muted/50">
               <div className="space-y-2">
@@ -367,16 +355,13 @@ export const LongestConsecutiveSequenceVisualization = () => {
                 </div>
               </div>
             </Card>
-          </motion.div>
+          </div>
 
-          <motion.div
+          <div
             key={`variables-${currentStep}`}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3, delay: 0.4 }}
           >
             <VariablePanel variables={step.variables} />
-          </motion.div>
+          </div>
         </>
       }
       rightContent={
