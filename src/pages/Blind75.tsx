@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { usePostHog } from '@posthog/react';
 import {
   Accordion,
   AccordionContent,
@@ -18,6 +19,7 @@ import {
 } from "@/components/ui/accordion";
 
 const Blind75 = () => {
+  const posthog = usePostHog();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
@@ -320,7 +322,7 @@ const Blind75 = () => {
         <div className="container mx-auto px-4 pb-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredProblems.map((problem, index) => (
-              <Link key={problem.id} to={`/problem/${problem.slug}`}  rel="noopener noreferrer">
+              <Link key={problem.id} to={`/problem/${problem.slug}`} rel="noopener noreferrer" onClick={() => posthog?.capture('blind75_problem_clicked', { problem_id: problem.id, problem_title: problem.title, difficulty: problem.difficulty, category: problem.category })}>
                 <Card 
                   className="p-6 hover-lift cursor-pointer glass-card group h-full"
                   style={{ animationDelay: `${index * 50}ms` }}

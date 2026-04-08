@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { usePostHog } from '@posthog/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -11,6 +12,7 @@ import { Loader2, Mail, Lock, User, Sparkles } from 'lucide-react';
 
 const Auth = () => {
   const navigate = useNavigate();
+  const posthog = usePostHog();
   const [isLoading, setIsLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
@@ -55,6 +57,8 @@ const Auth = () => {
         });
 
         if (error) throw error;
+        posthog?.identify(email, { email, full_name: fullName });
+        posthog?.capture('user_signed_up', { method: 'email' });
         toast.success('Account created! You can now sign in.');
         setIsSignUp(false);
       } else {
@@ -64,6 +68,8 @@ const Auth = () => {
         });
 
         if (error) throw error;
+        posthog?.identify(email, { email });
+        posthog?.capture('user_signed_in', { method: 'email' });
         toast.success('Welcome back!');
       }
     } catch (error: any) {

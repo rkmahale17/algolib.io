@@ -24,9 +24,11 @@ import logo_text from "@/assets/logo_test_2.svg";
 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { usePostHog } from "@posthog/react";
 
 const Navbar = () => {
   const [user, setUser] = useState<any>(null);
+  const posthog = usePostHog();
   const location = useLocation();
   const isAuthPage = location.pathname === "/auth";
 
@@ -53,6 +55,8 @@ const Navbar = () => {
     if (error) {
       toast.error("Failed to sign out");
     } else {
+      posthog?.capture('user_signed_out');
+      posthog?.reset();
       toast.success("Signed out successfully");
     }
   };
