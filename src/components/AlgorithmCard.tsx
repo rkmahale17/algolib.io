@@ -59,7 +59,7 @@ export const AlgorithmCard = ({ algorithm, status, isPremium, index, isSidebar, 
 
 
                         {isPremium && (
-                            <Badge variant="secondary" className={cn("bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 px-2 py-0.5 rounded text-[9px] font-bold flex items-center gap-1", isSidebar ? "scale-90" : "")}>
+                            <Badge variant="secondary" className={cn("bg-amber-500/10 text-amber-600 dark:text-amber-300 border-amber-500/20 px-2 py-0.5 rounded text-[9px] font-bold flex items-center gap-1", isSidebar ? "scale-90" : "")}>
                                 {isPaywallEnabled && !hasPremiumAccess && <Lock className="w-2.5 h-2.5" />}
                                 PRO
                             </Badge>

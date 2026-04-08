@@ -245,7 +245,7 @@ export const ProblemDescriptionPanel = React.memo(({
                         {<span className="font-medium text-md mr-1">{algorithm.serial_no ? `${algorithm.serial_no}. ` : ''}</span>}{algorithm.name}
                       </h1>
                       {algorithm?.list_type && algorithm.list_type !== 'core' && algorithm.list_type !== 'core+blind75' && (
-                        <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
+                        <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-300 border-amber-500/20 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
                           PRO
                         </Badge>
                       )}

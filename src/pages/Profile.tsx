@@ -102,7 +102,7 @@ const ProfileEdit = () => {
                       <span className={cn(
                         "px-3 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider border",
                         profile.cancel_at_period_end
-                          ? "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                          ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
                           : "bg-green-500/10 text-green-600 border-green-500/20"
                       )}>
                         {profile.subscription_tier || 'Pro'}
@@ -112,7 +112,7 @@ const ProfileEdit = () => {
                       <span className="font-medium text-muted-foreground tracking-tight">Status: </span>
                       <span className={cn(
                         "font-semibold",
-                        profile.cancel_at_period_end ? "text-amber-600" : "text-green-500"
+                        profile.cancel_at_period_end ? "text-amber-600 dark:text-amber-400" : "text-green-500"
                       )}>
                         {profile.cancel_at_period_end ? 'CANCELLED (Active until end)' : 'ACTIVE'}
                       </span>

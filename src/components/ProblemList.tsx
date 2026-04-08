@@ -333,7 +333,7 @@ export const ProblemList = ({
                             <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">
                               <span>ALGO-{(algo.serial_no || index + 1).toString().padStart(2, '0')}</span>
                               {(algo.listType !== 'core' && algo.listType !== 'core+blind75') && (
-                                <div className="flex items-center gap-0.5 bg-amber-500/10 text-amber-600 px-1.5 py-0.5 rounded text-[9px] font-bold">
+                                <div className="flex items-center gap-0.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold">
                                   {isPaywallEnabled && !hasPremiumAccess && <Lock className="w-2.5 h-2.5" />}
                                   PRO
                                 </div>
