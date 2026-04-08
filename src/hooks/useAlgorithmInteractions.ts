@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { updateProgress, updateSocial, updateCode } from '@/utils/userAlgorithmDataHelpers';
 import { useFeatureFlag } from '@/contexts/FeatureFlagContext';
 import confetti from 'canvas-confetti';
+import { usePostHog } from '@posthog/react';
 
 interface UseAlgorithmInteractionsProps {
     user: any;
@@ -24,6 +25,7 @@ export const useAlgorithmInteractions = ({
     filteredAlgorithms
 }: UseAlgorithmInteractionsProps) => {
     const navigate = useNavigate();
+    const posthog = usePostHog();
     const [isCompleted, setIsCompleted] = useState(false);
     const [isFavorite, setIsFavorite] = useState(false);
     const [likes, setLikes] = useState(0);
@@ -177,6 +179,11 @@ export const useAlgorithmInteractions = ({
 
                 if (success) {
                     setIsCompleted(true);
+                    posthog?.capture('problem_completed', {
+                        algorithm_id: algorithmId,
+                        algorithm_name: algorithm?.title,
+                        language: selectedLanguage,
+                    });
                     toast.success("Algorithm completed! Keep it up!", {
                         description: "Marked as completed automatically."
                     });
@@ -188,7 +195,7 @@ export const useAlgorithmInteractions = ({
         } else if (!user) {
             toast.success("Great job! Sign in to track your progress.");
         }
-    }, [user, algorithmId, isCompleted, refetchUserData]);
+    }, [user, algorithmId, isCompleted, refetchUserData, posthog, algorithm, selectedLanguage]);
 
     const toggleFavorite = useCallback(async () => {
         if (!user || !algorithmId) {
@@ -204,12 +211,17 @@ export const useAlgorithmInteractions = ({
 
             if (!success) throw new Error('Failed to update');
             setIsFavorite(newStatus);
+            posthog?.capture('problem_favorited', {
+                algorithm_id: algorithmId,
+                algorithm_name: algorithm?.title,
+                favorited: newStatus,
+            });
             toast.success(newStatus ? "Added to favorites" : "Removed from favorites");
             refetchUserData();
         } catch (error) {
             toast.error("Failed to update favorites");
         }
-    }, [user, algorithmId, isFavorite, refetchUserData]);
+    }, [user, algorithmId, isFavorite, refetchUserData, posthog, algorithm]);
 
     const handleVote = useCallback(async (vote: 'like' | 'dislike') => {
         if (!user) {
@@ -385,11 +397,15 @@ export const useAlgorithmInteractions = ({
         try {
             const url = window.location.href;
             await navigator.clipboard.writeText(url);
+            posthog?.capture('problem_shared', {
+                algorithm_id: algorithmId,
+                algorithm_name: algorithm?.title,
+            });
             toast.success("Link copied to clipboard!");
         } catch (error) {
             toast.error("Failed to copy link");
         }
-    }, []);
+    }, [posthog, algorithmId, algorithm?.title]);
 
     return {
         isCompleted,

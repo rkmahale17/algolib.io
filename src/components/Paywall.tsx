@@ -5,6 +5,7 @@ import { useApp } from '@/contexts/AppContext';
 import { DodoPayments } from 'dodopayments-checkout';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { usePostHog } from '@posthog/react';
 
 interface PaywallProps {
   onUpgrade?: () => void;
@@ -12,9 +13,15 @@ interface PaywallProps {
 
 export const Paywall: React.FC<PaywallProps> = ({ onUpgrade }) => {
   const { user } = useApp();
+  const posthog = usePostHog();
   const [isUpgrading, setIsUpgrading] = React.useState(false);
 
+  React.useEffect(() => {
+    posthog?.capture('paywall_viewed');
+  }, [posthog]);
+
   const handleUpgrade = async () => {
+    posthog?.capture('paywall_upgrade_clicked');
     try {
       setIsUpgrading(true);
       console.log('Starting upgrade for user:', user?.id, user?.email);

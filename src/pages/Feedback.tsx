@@ -8,6 +8,7 @@ import { FeedbackCard } from '@/components/feedback/FeedbackCard';
 import { FeedbackFilters } from '@/components/feedback/FeedbackFilters';
 import { FeedbackSubmissionSidebar } from '@/components/feedback/FeedbackSubmissionSidebar';
 import { FeedbackDetailModal } from '@/components/feedback/FeedbackDetailModal';
+import { usePostHog } from '@posthog/react';
 
 interface FeedbackItem {
   id: string;
@@ -28,6 +29,7 @@ interface FeedbackItem {
 }
 
 const Feedback = () => {
+  const posthog = usePostHog();
   const [items, setItems] = useState<FeedbackItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -202,6 +204,7 @@ const Feedback = () => {
 
       if (error) throw error;
 
+      posthog?.capture('feedback_submitted', { type: data.type, is_anonymous: data.is_anonymous });
       toast.success('Feedback submitted successfully!');
       fetchFeedback();
     } catch (error) {

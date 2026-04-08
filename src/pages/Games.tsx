@@ -3,9 +3,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Trophy, Brain, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Helmet } from "react-helmet-async";
+import { usePostHog } from "@posthog/react";
 
 const Games = () => {
   const navigate = useNavigate();
+  const posthog = usePostHog();
 
   const games = [
     {
@@ -128,7 +130,7 @@ const Games = () => {
             {games.map((game) => {
               const Icon = game.icon;
               return (
-                <Link key={game.id} to={`/games/${game.id}`}>
+                <Link key={game.id} to={`/games/${game.id}`} onClick={() => posthog?.capture('game_started', { game_id: game.id, game_name: game.name, category: game.category })}>
                   <Card className="hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer">
                     <CardHeader>
                       <div className="flex items-center gap-3 mb-2">

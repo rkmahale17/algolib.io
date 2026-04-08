@@ -10,10 +10,12 @@ import { cn } from '@/lib/utils';
 import { pricingData } from '@/data/pricing-data';
 
 import { useNavigate } from 'react-router-dom';
+import { usePostHog } from '@posthog/react';
 
 const Pricing: React.FC = () => {
   const { profile, user } = useApp();
   const navigate = useNavigate();
+  const posthog = usePostHog();
   const [isUpgrading, setIsUpgrading] = useState(false);
   const [activePlanId, setActivePlanId] = useState<string | null>(null);
 
@@ -24,6 +26,7 @@ const Pricing: React.FC = () => {
       return;
     }
 
+    posthog?.capture('checkout_initiated', { plan_type: planType });
     try {
       setIsUpgrading(true);
       setActivePlanId(planType);
@@ -60,6 +63,7 @@ const Pricing: React.FC = () => {
 
   const handleCancel = async () => {
     if (!confirm('Are you sure you want to cancel your subscription? You will lose access to premium features at the end of the current period.')) return;
+    posthog?.capture('subscription_cancelled');
     try {
       setIsUpgrading(true);
       const { error } = await supabase.functions.invoke('cancel-subscription', {

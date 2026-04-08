@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { usePostHog } from '@posthog/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -12,6 +13,7 @@ import Logo from '@/assets/logo.svg';
 
 const Auth = () => {
   const navigate = useNavigate();
+  const posthog = usePostHog();
   const [isLoading, setIsLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
@@ -68,6 +70,8 @@ const Auth = () => {
 
         if (error) throw error;
 
+        posthog?.identify(email, { email, name: fullName });
+        posthog?.capture('user_signed_up', { method: 'email' });
         setShowVerificationMessage(true);
         toast.success('Account created! Please check your email to verify your account.');
       } else {
@@ -77,6 +81,8 @@ const Auth = () => {
         });
 
         if (error) throw error;
+        posthog?.identify(email, { email });
+        posthog?.capture('user_logged_in', { method: 'email' });
         toast.success('Welcome back!');
       }
     } catch (error: any) {
@@ -138,6 +144,7 @@ const Auth = () => {
       });
 
       if (error) throw error;
+      posthog?.capture('user_logged_in_google');
     } catch (error: any) {
       toast.error(error.message || 'Google sign in failed');
       setIsLoading(false);
