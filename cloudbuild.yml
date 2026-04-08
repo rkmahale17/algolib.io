@@ -18,6 +18,10 @@ steps:
       - 'JUDGE0_API_HOST=${_JUDGE0_API_HOST}'
       - '--build-arg'
       - 'JUDGE0_API_URL=${_JUDGE0_API_URL}'
+      - '--build-arg'
+      - 'VITE_PUBLIC_POSTHOG_TOKEN=${_VITE_PUBLIC_POSTHOG_TOKEN}'
+      - '--build-arg'
+      - 'VITE_PUBLIC_POSTHOG_HOST=${_VITE_PUBLIC_POSTHOG_HOST}'
       - '.'
 
 images:
@@ -33,4 +37,6 @@ substitutions:
   _JUDGE0_API_KEY: ''
   _JUDGE0_API_HOST: ''
   _JUDGE0_API_URL: ''
+  _VITE_PUBLIC_POSTHOG_TOKEN: ''
+  _VITE_PUBLIC_POSTHOG_HOST: ''
   _BUILD_ID: ''
