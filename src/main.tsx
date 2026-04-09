@@ -6,10 +6,19 @@ import { createRoot } from "react-dom/client";
 import posthog from "posthog-js";
 import { PostHogErrorBoundary, PostHogProvider } from "@posthog/react";
 
-posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_TOKEN, {
-  api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
-  defaults: "2026-01-30",
-});
+// Only initialize PostHog on production domain (rulcode.com)
+const isProduction =
+  window.location.hostname === "rulcode.com" ||
+  window.location.hostname === "www.rulcode.com";
+
+if (isProduction) {
+  posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_TOKEN, {
+    api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
+    defaults: "2026-01-30",
+  });
+} else {
+  console.warn("PostHog not initialized on non-production domain");
+}
 
 // 🔧 Runtime URL validation: Fix any malformed URLs in production
 if (import.meta.env.PROD) {
