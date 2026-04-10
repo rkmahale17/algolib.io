@@ -283,19 +283,24 @@ export const SetMatrixZeroesVisualization = () => {
             <div className="mb-4 text-xs font-mono text-muted-foreground uppercase tracking-widest">
               Phase: <span className="text-primary font-bold">{currentStep.phase}</span>
             </div>
-            <div className="grid gap-2 bg-slate-100 p-6 rounded-xl border-4 border-slate-200 shadow-inner">
-              {currentStep.matrix.map((row, rowIdx) => (
-                <div key={rowIdx} className="flex gap-2">
-                  {row.map((cell, colIdx) => (
+            <div className="bg-slate-100 p-6 rounded-xl border-4 border-slate-200 shadow-inner w-full max-w-sm">
+              <div 
+                className="grid gap-2"
+                style={{ 
+                  gridTemplateColumns: `repeat(${currentStep.matrix[0].length}, minmax(0, 1fr))` 
+                }}
+              >
+                {currentStep.matrix.map((row, rowIdx) => (
+                  row.map((cell, colIdx) => (
                     <div
                       key={`${rowIdx}-${colIdx}`}
-                      className={`w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center text-sm sm:text-lg font-bold rounded-lg border-2 transition-all duration-200 shadow-sm ${getCellColor(rowIdx, colIdx)}`}
+                      className={`aspect-square flex items-center justify-center text-sm sm:text-lg font-bold rounded-lg border-2 transition-all duration-200 shadow-sm ${getCellColor(rowIdx, colIdx)}`}
                     >
                       {cell}
                     </div>
-                  ))}
-                </div>
-              ))}
+                  ))
+                ))}
+              </div>
             </div>
           </div>
 

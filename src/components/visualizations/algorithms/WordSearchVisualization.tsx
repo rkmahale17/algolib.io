@@ -241,36 +241,39 @@ export const WordSearchVisualization: React.FC = () => {
 
           <div className="flex flex-col gap-8">
             <div className="flex flex-col items-center gap-6">
-              <div className="p-4 bg-primary/5 rounded-2xl border-2 border-primary/20 shadow-lg">
-                <div className="flex flex-col gap-2">
+              <div className="p-4 bg-primary/5 rounded-2xl border-2 border-primary/20 shadow-lg w-full max-w-md mx-auto">
+                <div 
+                  className="grid gap-2"
+                  style={{ 
+                    gridTemplateColumns: `repeat(${currentStep.board[0].length}, minmax(0, 1fr))` 
+                  }}
+                >
                   {currentStep.board.map((row, rIdx) => (
-                    <div key={rIdx} className="flex gap-2">
-                      {row.map((char, cIdx) => {
-                        const isInPath = isCellInPath(rIdx, cIdx);
-                        const isCurrent = currentStep.r === rIdx && currentStep.c === cIdx;
-                        
-                        return (
-                          <div
-                            key={`${rIdx}-${cIdx}`}
-                            className={`w-12 h-12 flex items-center justify-center rounded-xl border-2 font-bold text-lg transition-colors duration-200
-                              ${isInPath ? 'bg-green-500/20 border-green-500/50 text-black dark:text-gray-100' : 
-                                isCurrent ? 'bg-primary/20 border-primary text-black dark:text-gray-100' : 
-                                'bg-card border-border text-black dark:text-gray-100'}
-                              ${isCurrent ? 'ring-4 ring-primary/20 z-10 scale-105' : ''}
-                            `}
-                          >
-                            {char}
-                          </div>
-                        );
-                      })}
-                    </div>
+                    row.map((char, cIdx) => {
+                      const isInPath = isCellInPath(rIdx, cIdx);
+                      const isCurrent = currentStep.r === rIdx && currentStep.c === cIdx;
+                      
+                      return (
+                        <div
+                          key={`${rIdx}-${cIdx}`}
+                          className={`aspect-square flex items-center justify-center rounded-xl border-2 font-bold text-lg transition-colors duration-200
+                            ${isInPath ? 'bg-green-500/20 border-green-500/50 text-black dark:text-gray-100' : 
+                              isCurrent ? 'bg-primary/20 border-primary text-black dark:text-gray-100' : 
+                              'bg-card border-border text-black dark:text-gray-100'}
+                            ${isCurrent ? 'ring-4 ring-primary/20 z-10 scale-105' : ''}
+                          `}
+                        >
+                          {char}
+                        </div>
+                      );
+                    })
                   ))}
                 </div>
               </div>
 
-              <div className="flex flex-col items-center gap-3">
+              <div className="flex flex-col items-center gap-3 w-full">
                 <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Target String</span>
-                <div className="flex gap-1.5">
+                <div className="flex flex-wrap justify-center gap-1.5">
                   {currentStep.word.split('').map((char, idx) => {
                     const isFound = idx < currentStep.i;
                     const isCurrent = idx === currentStep.i;
@@ -278,7 +281,7 @@ export const WordSearchVisualization: React.FC = () => {
                     return (
                       <div
                         key={idx}
-                        className={`w-9 h-9 flex items-center justify-center rounded-lg border-2 font-bold text-base transition-all duration-200
+                        className={`w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-lg border-2 font-bold text-sm sm:text-base transition-all duration-200
                           ${isFound ? 'bg-primary border-primary text-primary-foreground' : 
                             isCurrent ? 'bg-accent border-accent text-accent-foreground scale-110 shadow-md' : 
                             'bg-muted border-border text-muted-foreground'}

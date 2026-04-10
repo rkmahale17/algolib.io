@@ -376,12 +376,12 @@ export const SpiralMatrixVisualization = () => {
   const getCellColor = (row: number, col: number) => {
     if (!currentStep?.matrix || !currentStep?.visited?.[row]) return 'bg-muted text-muted-foreground border-border';
     if (row === currentStep.currentRow && col === currentStep.currentCol) {
-      return 'bg-primary text-black border-primary shadow-lg';
+      return 'bg-primary text-primary-foreground border-primary shadow-lg';
     }
     if (currentStep.visited[row][col]) {
-      return 'bg-secondary/60 text-black border-secondary';
+      return 'bg-secondary/60 text-secondary-foreground border-secondary';
     }
-    return 'bg-muted text-black border-border';
+    return 'bg-muted text-foreground border-border';
   };
 
   const getDirectionArrow = (direction: string) => {
@@ -419,19 +419,24 @@ export const SpiralMatrixVisualization = () => {
                   {getDirectionArrow(currentStep.direction)} {currentStep.direction.toUpperCase()}
                 </span>
               </div>
-              <div className="inline-block bg-card p-4 rounded-lg border">
-                {currentStep.matrix.map((row, rowIdx) => (
-                  <div key={rowIdx} className="flex gap-1">
-                    {row.map((cell, colIdx) => (
+              <div className="inline-block bg-card p-4 rounded-lg border w-full max-w-sm mx-auto">
+                <div 
+                  className="grid gap-1"
+                  style={{ 
+                    gridTemplateColumns: `repeat(${currentStep.matrix[0].length}, minmax(0, 1fr))` 
+                  }}
+                >
+                  {currentStep.matrix.map((row, rowIdx) => (
+                    row.map((cell, colIdx) => (
                       <div
                         key={`${rowIdx}-${colIdx}`}
-                        className={`w-12 h-12 flex items-center justify-center font-mono text-lg rounded border-2 ${getCellColor(rowIdx, colIdx)}`}
+                        className={`aspect-square flex items-center justify-center font-mono text-lg rounded border-2 ${getCellColor(rowIdx, colIdx)}`}
                       >
                         {cell}
                       </div>
-                    ))}
-                  </div>
-                ))}
+                    ))
+                  ))}
+                </div>
               </div>
             </motion.div>
 
@@ -447,7 +452,7 @@ export const SpiralMatrixVisualization = () => {
                 {currentStep.result.map((num, idx) => (
                   <div
                     key={idx}
-                    className="w-10 h-10 flex items-center justify-center font-mono bg-primary text-black rounded"
+                    className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center font-mono bg-primary text-primary-foreground rounded text-sm sm:text-base"
                   >
                     {num}
                   </div>

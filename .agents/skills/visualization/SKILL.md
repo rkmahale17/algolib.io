@@ -25,7 +25,7 @@ When creating or updating the visualization, rigidly follow these rules:
 5. **Instantaneous Transitions (No Click Animations):** Disable all click-based animations to ensure stable, professional, and instant visual transitions when navigating between steps.
 6. **Standardized UI/UX Layout:** Maintain consistent placement of variable panels and use intuitive geometric representations for data structures. The layout should typically be a two-column grid on large screens.
 7. **No Array Index Labels:** Do not add "idx" labels (or similar index markings) to array visual elements. Keep the array representations clean.
-8. **Text Color:** Ensure the color of the text used in visualizations is black for maximum clarity and contrast.
+8. **Text Color:** Ensure the color of the text used in visualizations has high contrast with its background and respects dark mode by using theme-aware classes (e.g., `text-foreground`, `text-primary-foreground`).
 9. **Top-Aligned Controls:** The `SimpleStepControls` component MUST be placed at the top of the visualization, above the main content grid, to ensure immediate user access to navigation.
 10. **Use AnimatedCodeEditor:** Always use the `AnimatedCodeEditor` component when an implementation code block is required within the visualization.
 11. **Minimal Code Editor Container:** Do NOT include a redundant `div` wrapper, "Implementation" heading, or extra layout containers (like `flex-1 overflow-auto`) within the `Card` that encloses the `AnimatedCodeEditor`. The editor should be the primary child of its container card.

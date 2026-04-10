@@ -403,7 +403,7 @@ export const ReorderListVisualization = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
           <div className="bg-card rounded-lg p-6 border shadow-sm flex flex-col min-h-[450px]">
-            <h3 className="text-lg font-semibold mb-6 flex items-center gap-2 text-black">
+            <h3 className="text-lg font-semibold mb-6 flex items-center gap-2 text-foreground">
               {currentStep.phase === 'find-middle' && <span className="w-2 h-2 rounded-full bg-blue-500" />}
               {currentStep.phase === 'reverse' && <span className="w-2 h-2 rounded-full bg-purple-500" />}
               {currentStep.phase === 'merge' && <span className="w-2 h-2 rounded-full bg-green-500" />}
@@ -422,11 +422,11 @@ export const ReorderListVisualization = () => {
                       const nextIdx = currentStep.connections[idx];
                       return (
                         <div key={idx} className="relative flex items-center">
-                          <div className={`w-8 h-8 flex items-center justify-center rounded-md border-2 font-bold text-xs bg-muted border-border text-black`}>
+                          <div className={`w-8 h-8 flex items-center justify-center rounded-md border-2 font-bold text-xs bg-muted border-border text-foreground`}>
                             {currentStep.list[idx]}
                           </div>
                           {nextIdx !== null && nextIdx !== undefined && nextIdx > idx && (
-                            <div className="flex items-center justify-center w-6 text-black font-black">→</div>
+                            <div className="flex items-center justify-center w-6 text-foreground font-black">→</div>
                           )}
                         </div>
                       );
@@ -457,23 +457,23 @@ export const ReorderListVisualization = () => {
                           ))}
 
                           {nextIdx !== null && nextIdx !== undefined && nextIdx < idx && (
-                            <div className="flex items-center justify-center w-6 text-black font-black -mr-6 z-0">
+                            <div className="flex items-center justify-center w-6 text-foreground font-black -mr-6 z-0">
                                <span className="rotate-180 -translate-y-4">→</span>
                             </div>
                           )}
 
                           <div
                             className={`w-8 h-8 flex items-center justify-center rounded-md border-2 font-bold text-xs transition-all duration-300 ${
-                              isCurrent ? 'bg-blue-500/20 border-blue-500 text-black scale-110 shadow-md z-10' :
-                              isPrev ? 'bg-orange-500/20 border-orange-500 text-black scale-110 shadow-md z-10' :
-                              'bg-muted border-border text-black'
+                              isCurrent ? 'bg-blue-500/20 border-blue-500 text-foreground scale-110 shadow-md z-10' :
+                              isPrev ? 'bg-orange-500/20 border-orange-500 text-foreground scale-110 shadow-md z-10' :
+                              'bg-muted border-border text-foreground'
                             }`}
                           >
                             {currentStep.list[idx]}
                           </div>
 
                           {nextIdx !== null && nextIdx !== undefined && nextIdx > idx && (
-                            <div className="flex items-center justify-center w-6 text-black font-black">→</div>
+                            <div className="flex items-center justify-center w-6 text-foreground font-black">→</div>
                           )}
                         </div>
                       );
@@ -516,17 +516,17 @@ export const ReorderListVisualization = () => {
 
                         <div
                           className={`w-8 h-8 flex items-center justify-center rounded-md border-2 font-bold text-xs transition-all duration-300 ${
-                            isSlow || isFirst || isCurrent ? 'bg-blue-500/20 border-blue-500 text-black scale-110 shadow-md z-10' :
-                            isFast ? 'bg-purple-500/20 border-purple-500 text-black scale-110 shadow-md z-10' :
-                            isSecond ? 'bg-green-500/20 border-green-500 text-black scale-110 shadow-md z-10' :
-                            'bg-muted border-border text-black'
+                            isSlow || isFirst || isCurrent ? 'bg-blue-500/20 border-blue-500 text-foreground scale-110 shadow-md z-10' :
+                            isFast ? 'bg-purple-500/20 border-purple-500 text-foreground scale-110 shadow-md z-10' :
+                            isSecond ? 'bg-green-500/20 border-green-500 text-foreground scale-110 shadow-md z-10' :
+                            'bg-muted border-border text-foreground'
                           }`}
                         >
                           {val}
                         </div>
 
                         {nextIdx !== null && nextIdx !== undefined && (
-                          <div className={`flex items-center justify-center w-6 text-black font-black ${!isLogicalNext ? 'opacity-20' : ''}`}>
+                          <div className={`flex items-center justify-center w-6 text-foreground font-black ${!isLogicalNext ? 'opacity-20' : ''}`}>
                             →
                           </div>
                         )}
@@ -538,7 +538,7 @@ export const ReorderListVisualization = () => {
             </div>
 
             <div className="mt-8 p-4 bg-muted/40 rounded-lg border border-border/50">
-              <p className="text-sm font-medium leading-relaxed text-black">{currentStep.message}</p>
+              <p className="text-sm font-medium leading-relaxed text-foreground">{currentStep.message}</p>
             </div>
           </div>
 

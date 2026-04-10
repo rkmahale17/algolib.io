@@ -1,449 +1,436 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { SkipBack, SkipForward, RotateCcw } from 'lucide-react';
-import Editor from '@monaco-editor/react';
-import { motion } from 'framer-motion';
 import { VariablePanel } from '../shared/VariablePanel';
-import type { editor as MonacoEditor } from 'monaco-editor';
+import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { StepControls } from '../shared/StepControls';
+import { Button } from '@/components/ui/button';
 
 interface Step {
   s: string;
   t: string;
-  left: number;
-  right: number;
-  tCount: Record<string, number>;
-  windowCount: Record<string, number>;
+  l: number;
+  r: number;
   have: number;
   need: number;
-  result: string;
-  resultIndices: [number, number];
+  res: [number, number];
+  resLen: number;
+  countT: Record<string, number>;
+  window: Record<string, number>;
   message: string;
   highlightedLines: number[];
+  variables: Record<string, any>;
 }
 
+const USE_CASES = [
+  {
+    id: 'standard',
+    label: 'Case 1: Standard',
+    s: "ADOBECODEBANC",
+    t: "ABC",
+  },
+  {
+    id: 'no-solution',
+    label: 'Case 2: No Solution',
+    s: "ADOBE",
+    t: "XYZ",
+  },
+  {
+    id: 'already-min',
+    label: 'Case 3: Already Minimum',
+    s: "ABC",
+    t: "ABC",
+  }
+];
+
 export const MinimumWindowSubstringVisualization = () => {
+  const [useCaseIdx, setUseCaseIdx] = useState(0);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [speed, setSpeed] = useState(1);
+
+  const currentCase = USE_CASES[useCaseIdx];
+
+  const steps = useMemo(() => {
+    const s = currentCase.s;
+    const t = currentCase.t;
+    const steps: Step[] = [];
+
+    // Signature
+    steps.push({
+      s, t, l: 0, r: -1, have: 0, need: 0, res: [-1, -1], resLen: Infinity,
+      countT: {}, window: {},
+      message: "Initialize the minWindow algorithm search.",
+      highlightedLines: [1],
+      variables: { s, t }
+    });
+
+    // Line 2: if (t === "") return "";
+    steps.push({
+      s, t, l: 0, r: -1, have: 0, need: 0, res: [-1, -1], resLen: Infinity,
+      countT: {}, window: {},
+      message: `Check if target string t is empty. t = "${t}"`,
+      highlightedLines: [2],
+      variables: { t }
+    });
+
+    if (t === "") {
+      steps.push({
+        s, t, l: 0, r: -1, have: 0, need: 0, res: [-1, -1], resLen: Infinity,
+        countT: {}, window: {},
+        message: "Target string is empty, returning empty string.",
+        highlightedLines: [2],
+        variables: { return: "" }
+      });
+      return steps;
+    }
+
+    const countT: Record<string, number> = {};
+    const window: Record<string, number> = {};
+
+    // Lines 3-4: Init records
+    steps.push({
+      s, t, l: 0, r: -1, have: 0, need: 0, res: [-1, -1], resLen: Infinity,
+      countT: { ...countT }, window: { ...window },
+      message: "Initialize frequency maps for target characters and current window.",
+      highlightedLines: [3, 4],
+      variables: { countT: {}, window: {} }
+    });
+
+    // Lines 5-7: Populate countT
+    for (const c of t) {
+      countT[c] = (countT[c] || 0) + 1;
+      steps.push({
+        s, t, l: 0, r: -1, have: 0, need: 0, res: [-1, -1], resLen: Infinity,
+        countT: { ...countT }, window: { ...window },
+        message: `Counting character '${c}' in target string t.`,
+        highlightedLines: [5, 6],
+        variables: { countT: { ...countT } }
+      });
+    }
+
+    // Lines 8-9: have, need
+    let have = 0;
+    const need = Object.keys(countT).length;
+    steps.push({
+      s, t, l: 0, r: -1, have, need, res: [-1, -1], resLen: Infinity,
+      countT: { ...countT }, window: { ...window },
+      message: `Initialize 'have' to 0. Number of unique characters needed: ${need}.`,
+      highlightedLines: [8, 9],
+      variables: { have, need }
+    });
+
+    // Lines 10-12: res, resLen, l
+    let res: [number, number] = [-1, -1];
+    let resLen = Infinity;
+    let l = 0;
+    steps.push({
+      s, t, l, r: -1, have, need, res, resLen,
+      countT: { ...countT }, window: { ...window },
+      message: "Initialize tracking variables and the left pointer 'l'.",
+      highlightedLines: [10, 11, 12],
+      variables: { res, resLen, l }
+    });
+
+    // Loop
+    for (let r = 0; r < s.length; r++) {
+      const c = s[r];
+      window[c] = (window[c] || 0) + 1;
+
+      steps.push({
+        s, t, l, r, have, need, res, resLen,
+        countT: { ...countT }, window: { ...window },
+        message: `Expand window by moving right pointer to index ${r} ('${c}').`,
+        highlightedLines: [13, 14, 15],
+        variables: { r, c, "window[c]": window[c] }
+      });
+
+      if (c in countT && window[c] === countT[c]) {
+        have++;
+        steps.push({
+          s, t, l, r, have, need, res, resLen,
+          countT: { ...countT }, window: { ...window },
+          message: `Character '${c}' count matches target frequency! Increment 'have'.`,
+          highlightedLines: [16, 17],
+          variables: { have, need }
+        });
+      }
+
+      while (have === need) {
+        steps.push({
+          s, t, l, r, have, need, res, resLen,
+          countT: { ...countT }, window: { ...window },
+          message: `All required characters found (${have}/${need}). Checking if current window is smaller.`,
+          highlightedLines: [19],
+          variables: { have, need, currentSize: r - l + 1, resLen }
+        });
+
+        if ((r - l + 1) < resLen) {
+          res = [l, r];
+          resLen = r - l + 1;
+          steps.push({
+            s, t, l, r, have, need, res, resLen,
+            countT: { ...countT }, window: { ...window },
+            message: `Found smaller window! New minimum length: ${resLen}. Substring: "${s.slice(l, r + 1)}"`,
+            highlightedLines: [20, 21, 22],
+            variables: { res, resLen }
+          });
+        }
+
+        const leftChar = s[l];
+        window[leftChar]--;
+        
+        steps.push({
+          s, t, l, r, have, need, res, resLen,
+          countT: { ...countT }, window: { ...window },
+          message: `Shrinking window by removing '${leftChar}' from index ${l}.`,
+          highlightedLines: [24, 25],
+          variables: { l, leftChar, "window[leftChar]": window[leftChar] }
+        });
+
+        if (leftChar in countT && window[leftChar] < countT[leftChar]) {
+          have--;
+          steps.push({
+            s, t, l, r, have, need, res, resLen,
+            countT: { ...countT }, window: { ...window },
+            message: `Window no longer contains enough '${leftChar}'. Decrement 'have'.`,
+            highlightedLines: [26, 27],
+            variables: { have, need }
+          });
+        }
+
+        l++;
+        steps.push({
+          s, t, l, r, have, need, res, resLen,
+          countT: { ...countT }, window: { ...window },
+          message: "Moving left pointer to search for a potentially smaller valid window.",
+          highlightedLines: [29],
+          variables: { l }
+        });
+      }
+    }
+
+    // Final Lines
+    steps.push({
+      s, t, l, r: s.length - 1, have, need, res, resLen,
+      countT: { ...countT }, window: { ...window },
+      message: "Finished iterating through the string. Preparing final result.",
+      highlightedLines: [32],
+      variables: { res }
+    });
+
+    const resultStr = resLen !== Infinity ? s.slice(res[0], res[1] + 1) : "";
+    steps.push({
+      s, t, l, r: s.length - 1, have, need, res, resLen,
+      countT: { ...countT }, window: { ...window },
+      message: `Final result: "${resultStr}"`,
+      highlightedLines: [33],
+      variables: { return: resultStr }
+    });
+
+    return steps;
+  }, [currentCase]);
+
+  const currentStep = steps[currentStepIndex] || steps[steps.length - 1];
+
   const code = `function minWindow(s: string, t: string): string {
   if (t === "") return "";
-  
-  const tCount: Record<string, number> = {};
+  const countT: Record<string, number> = {};
   const window: Record<string, number> = {};
-  
   for (const c of t) {
-    tCount[c] = (tCount[c] || 0) + 1;
+    countT[c] = (countT[c] || 0) + 1;
   }
-  
   let have = 0;
-  const need = Object.keys(tCount).length;
-  let result = [-1, -1];
-  let resultLen = Infinity;
-  let left = 0;
-  
-  for (let right = 0; right < s.length; right++) {
-    const c = s[right];
+  const need = Object.keys(countT).length;
+  let res: [number, number] = [-1, -1];
+  let resLen = Infinity;
+  let l = 0;
+  for (let r = 0; r < s.length; r++) {
+    const c = s[r];
     window[c] = (window[c] || 0) + 1;
-    
-    if (c in tCount && window[c] === tCount[c]) {
+    if (c in countT && window[c] === countT[c]) {
       have++;
     }
-    
     while (have === need) {
-      if (right - left + 1 < resultLen) {
-        result = [left, right];
-        resultLen = right - left + 1;
+      if ((r - l + 1) < resLen) {
+        res = [l, r];
+        resLen = r - l + 1;
       }
-      
-      window[s[left]]--;
-      if (s[left] in tCount && window[s[left]] < tCount[s[left]]) {
+      const leftChar = s[l];
+      window[leftChar]--;
+      if (leftChar in countT && window[leftChar] < countT[leftChar]) {
         have--;
       }
-      left++;
+      l++;
     }
   }
-  
-  return resultLen === Infinity ? "" : s.substring(result[0], result[1] + 1);
+  const [start, end] = res;
+  return resLen !== Infinity ? s.slice(start, end + 1) : "";
 }`;
 
-  const steps: Step[] = [
-    {
-      s: "ADOBECODEBANC",
-      t: "ABC",
-      left: 0,
-      right: -1,
-      tCount: { A: 1, B: 1, C: 1 },
-      windowCount: {},
-      have: 0,
-      need: 3,
-      result: "",
-      resultIndices: [-1, -1],
-      message: "Initialize: Build target char count {A:1, B:1, C:1}, need=3 unique chars",
-      highlightedLines: [4]
-    },
-    {
-      s: "ADOBECODEBANC",
-      t: "ABC",
-      left: 0,
-      right: 0,
-      tCount: { A: 1, B: 1, C: 1 },
-      windowCount: { A: 1 },
-      have: 1,
-      need: 3,
-      result: "",
-      resultIndices: [-1, -1],
-      message: "right=0: Add 'A' to window, window['A']=1 matches tCount['A']=1, have=1/3",
-      highlightedLines: [19]
-    },
-    {
-      s: "ADOBECODEBANC",
-      t: "ABC",
-      left: 0,
-      right: 1,
-      tCount: { A: 1, B: 1, C: 1 },
-      windowCount: { A: 1, D: 1 },
-      have: 1,
-      need: 3,
-      result: "",
-      resultIndices: [-1, -1],
-      message: "right=1: Add 'D' to window (not in target), have=1/3",
-      highlightedLines: [19]
-    },
-    {
-      s: "ADOBECODEBANC",
-      t: "ABC",
-      left: 0,
-      right: 3,
-      tCount: { A: 1, B: 1, C: 1 },
-      windowCount: { A: 1, D: 1, O: 1, B: 1 },
-      have: 2,
-      need: 3,
-      result: "",
-      resultIndices: [-1, -1],
-      message: "right=3: Add 'B' to window, window['B']=1 matches tCount['B']=1, have=2/3",
-      highlightedLines: [22]
-    },
-    {
-      s: "ADOBECODEBANC",
-      t: "ABC",
-      left: 0,
-      right: 5,
-      tCount: { A: 1, B: 1, C: 1 },
-      windowCount: { A: 1, D: 1, O: 1, B: 1, E: 1, C: 1 },
-      have: 3,
-      need: 3,
-      result: "",
-      resultIndices: [-1, -1],
-      message: "right=5: Add 'C' to window, window['C']=1 matches tCount['C']=1, have=3/3! Valid window found",
-      highlightedLines: [22]
-    },
-    {
-      s: "ADOBECODEBANC",
-      t: "ABC",
-      left: 0,
-      right: 5,
-      tCount: { A: 1, B: 1, C: 1 },
-      windowCount: { A: 1, D: 1, O: 1, B: 1, E: 1, C: 1 },
-      have: 3,
-      need: 3,
-      result: "ADOBEC",
-      resultIndices: [0, 5],
-      message: "Valid window 'ADOBEC' (length=6), save as current result",
-      highlightedLines: [26]
-    },
-    {
-      s: "ADOBECODEBANC",
-      t: "ABC",
-      left: 1,
-      right: 5,
-      tCount: { A: 1, B: 1, C: 1 },
-      windowCount: { A: 0, D: 1, O: 1, B: 1, E: 1, C: 1 },
-      have: 2,
-      need: 3,
-      result: "ADOBEC",
-      resultIndices: [0, 5],
-      message: "Shrink: Remove 'A' from left, window['A']=0 < tCount['A']=1, have=2/3, invalid now",
-      highlightedLines: [32]
-    },
-    {
-      s: "ADOBECODEBANC",
-      t: "ABC",
-      left: 1,
-      right: 9,
-      tCount: { A: 1, B: 1, C: 1 },
-      windowCount: { D: 2, O: 2, B: 1, E: 2, C: 1, A: 1 },
-      have: 3,
-      need: 3,
-      result: "ADOBEC",
-      resultIndices: [0, 5],
-      message: "Expand to right=9. Found 'A' again. have=3/3, window='DOBECODE' (too long)",
-      highlightedLines: [19]
-    },
-    {
-      s: "ADOBECODEBANC",
-      t: "ABC",
-      left: 4,
-      right: 9,
-      tCount: { A: 1, B: 1, C: 1 },
-      windowCount: { B: 1, E: 2, C: 1, O: 1, D: 1, A: 1 },
-      have: 3,
-      need: 3,
-      result: "ADOBEC",
-      resultIndices: [0, 5],
-      message: "Shrink from left: Remove 'D', 'O', 'B', 'E'. Still have=3/3 at left=4",
-      highlightedLines: [34]
-    },
-    {
-      s: "ADOBECODEBANC",
-      t: "ABC",
-      left: 5,
-      right: 10,
-      tCount: { A: 1, B: 1, C: 1 },
-      windowCount: { C: 1, O: 1, D: 1, E: 1, B: 1, A: 1 },
-      have: 3,
-      need: 3,
-      result: "ADOBEC",
-      resultIndices: [0, 5],
-      message: "right=10: Add 'B' to window. have=3/3. Window 'CODEAB' length=6",
-      highlightedLines: [19]
-    },
-    {
-      s: "ADOBECODEBANC",
-      t: "ABC",
-      left: 8,
-      right: 12,
-      tCount: { A: 1, B: 1, C: 1 },
-      windowCount: { A: 2, B: 1, C: 1 },
-      have: 3,
-      need: 3,
-      result: "ADOBEC",
-      resultIndices: [0, 5],
-      message: "right=12: Add 'C' to window. have=3/3! Window='EBANC' (length=5)",
-      highlightedLines: [19]
-    },
-    {
-      s: "ADOBECODEBANC",
-      t: "ABC",
-      left: 8,
-      right: 12,
-      tCount: { A: 1, B: 1, C: 1 },
-      windowCount: { E: 1, B: 1, A: 2, N: 1, C: 1 },
-      have: 3,
-      need: 3,
-      result: "EBANC",
-      resultIndices: [8, 12],
-      message: "Update result! 'EBANC' (length=5 < 6) is the new minimum",
-      highlightedLines: [26, 27, 28]
-    },
-    {
-      s: "ADOBECODEBANC",
-      t: "ABC",
-      left: 9,
-      right: 12,
-      tCount: { A: 1, B: 1, C: 1 },
-      windowCount: { B: 1, A: 2, N: 1, C: 1 },
-      have: 3,
-      need: 3,
-      result: "EBANC",
-      resultIndices: [8, 12],
-      message: "Shrink: Remove 'E' from left, still have=3/3. Window='BANC' (length=4)",
-      highlightedLines: [30, 34]
-    },
-    {
-      s: "ADOBECODEBANC",
-      t: "ABC",
-      left: 9,
-      right: 12,
-      tCount: { A: 1, B: 1, C: 1 },
-      windowCount: { B: 1, A: 2, N: 1, C: 1 },
-      have: 3,
-      need: 3,
-      result: "BANC",
-      resultIndices: [9, 12],
-      message: "Update result again! 'BANC' (length=4) is now the minimum",
-      highlightedLines: [26, 27, 28]
-    },
-    {
-      s: "ADOBECODEBANC",
-      t: "ABC",
-      left: 10,
-      right: 12,
-      tCount: { A: 1, B: 1, C: 1 },
-      windowCount: { A: 1, N: 1, C: 1 },
-      have: 2,
-      need: 3,
-      result: "BANC",
-      resultIndices: [9, 12],
-      message: "Shrink: Remove 'B' from left, window['B']=0 < tCount['B']=1, have=2/3",
-      highlightedLines: [32]
-    },
-    {
-      s: "ADOBECODEBANC",
-      t: "ABC",
-      left: 10,
-      right: 12,
-      tCount: { A: 1, B: 1, C: 1 },
-      windowCount: { A: 1, N: 1, C: 1 },
-      have: 2,
-      need: 3,
-      result: "BANC",
-      resultIndices: [9, 12],
-      message: "Complete! Return 'BANC' (length=4) as the minimum window substring",
-      highlightedLines: [38]
-    }
-  ];
-
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const currentStep = steps[Math.min(currentStepIndex, steps.length - 1)];
-  const editorRef = useRef<MonacoEditor.IStandaloneCodeEditor | null>(null);
-  const monacoRef = useRef<typeof import('monaco-editor') | null>(null);
-
   useEffect(() => {
-    if (editorRef.current && monacoRef.current) {
-      const decorations = currentStep.highlightedLines.map(line => ({
-        range: new monacoRef.current!.Range(line, 1, line, 1),
-        options: {
-          isWholeLine: true,
-          className: 'highlighted-line',
-        }
-      }));
-      editorRef.current.createDecorationsCollection(decorations);
+    let timer: NodeJS.Timeout;
+    if (isPlaying && currentStepIndex < steps.length - 1) {
+      timer = setTimeout(() => {
+        setCurrentStepIndex(prev => prev + 1);
+      }, 1000 / speed);
+    } else {
+      setIsPlaying(false);
     }
-  }, [currentStepIndex, currentStep.highlightedLines]);
+    return () => clearTimeout(timer);
+  }, [isPlaying, currentStepIndex, steps.length, speed]);
+
+  const handleUseCaseChange = (idx: number) => {
+    setUseCaseIdx(idx);
+    setCurrentStepIndex(0);
+    setIsPlaying(false);
+  };
+
+  const getCharStyle = (idx: number) => {
+    const isCurrentR = idx === currentStep.variables.r;
+    const isCurrentL = idx === currentStep.l;
+    const isInWindow = idx >= currentStep.l && idx <= currentStep.r && currentStep.r !== -1;
+    const isInResult = currentStep.res[0] !== -1 && idx >= currentStep.res[0] && idx <= currentStep.res[1];
+
+    if (isCurrentR || isCurrentL) {
+      return "bg-primary text-primary-foreground border-primary scale-110 z-10 shadow-md";
+    }
+    if (isInWindow) {
+      return "bg-primary/20 text-foreground border-primary/30";
+    }
+    if (isInResult) {
+      return "bg-green-500/20 text-foreground border-green-500/30";
+    }
+    return "bg-muted/50 text-foreground border-border";
+  };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <Button onClick={() => setCurrentStepIndex(0)} variant="outline" size="sm">
-            <RotateCcw className="h-4 w-4" />
-          </Button>
-          <Button onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))} disabled={currentStepIndex === 0} variant="outline" size="sm">
-            <SkipBack className="h-4 w-4" />
-          </Button>
-          <Button onClick={() => setCurrentStepIndex(Math.min(steps.length - 1, currentStepIndex + 1))} disabled={currentStepIndex === steps.length - 1} variant="outline" size="sm">
-            <SkipForward className="h-4 w-4" />
-          </Button>
+      <div className="flex flex-col gap-6 bg-card p-6 rounded-xl border-2 border-primary/10 shadow-sm overflow-x-auto">
+        <div className="flex flex-wrap gap-2">
+          {USE_CASES.map((uc, idx) => (
+            <Button
+              key={uc.id}
+              variant={useCaseIdx === idx ? "default" : "outline"}
+              size="sm"
+              onClick={() => handleUseCaseChange(idx)}
+              className={`text-xs h-8 px-4 rounded-full transition-all duration-200 ${useCaseIdx === idx ? "shadow-md scale-105" : "hover:bg-muted"}`}
+            >
+              {uc.label}
+            </Button>
+          ))}
         </div>
-        <span className="text-sm text-muted-foreground">Step {currentStepIndex + 1} of {steps.length}</span>
+        <div className="w-full pt-4 border-t border-border/50">
+          <StepControls
+            currentStep={currentStepIndex}
+            totalSteps={steps.length - 1}
+            onStepForward={() => setCurrentStepIndex(prev => Math.min(steps.length - 1, prev + 1))}
+            onStepBack={() => setCurrentStepIndex(prev => Math.max(0, prev - 1))}
+            isPlaying={isPlaying}
+            onPlay={() => setIsPlaying(true)}
+            onPause={() => setIsPlaying(false)}
+            onReset={() => {
+              setCurrentStepIndex(0);
+              setIsPlaying(false);
+            }}
+            speed={speed}
+            onSpeedChange={setSpeed}
+          />
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Target: "{currentStep.t}"</h3>
-            <div className="flex gap-2 mb-6">
-              {currentStep.t.split('').map((char, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ scale: 0.8 }}
-                  animate={{ scale: 1 }}
-                  className="w-10 h-10 flex items-center justify-center rounded bg-primary/20 border-2 border-primary font-mono font-"
-                >
-                  {char}
-                </motion.div>
-              ))}
-            </div>
-
-            <h3 className="text-lg font-semibold mb-4">String: "{currentStep.s}"</h3>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {currentStep.s.split('').map((char, idx) => {
-                const isInWindow = idx >= currentStep.left && idx <= currentStep.right && currentStep.right >= 0;
-                const isResult = idx >= currentStep.resultIndices[0] && idx <= currentStep.resultIndices[1] && currentStep.resultIndices[0] >= 0;
-                return (
-                  <motion.div
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <Card className="p-6 flex flex-col gap-6 overflow-hidden border-2 border-primary/5 shadow-lg bg-card/50 backdrop-blur-sm">
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Target Characters (t)</span>
+              <div className="flex gap-2">
+                {currentCase.t.split('').map((char, idx) => (
+                  <div
                     key={idx}
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 0.3, delay: idx * 0.02 }}
-                    className={`w-10 h-10 flex items-center justify-center rounded font-mono font- border-2 ${isInWindow
-                      ? 'bg-primary/20 border-primary text-primary'
-                      : isResult
-                        ? 'bg-green-500/20 border-green-500 text-green-600'
-                        : 'bg-muted/50 border-border text-muted-foreground'
-                      }`}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg border-2 bg-secondary/30 border-secondary text-foreground font-mono font-bold text-xs"
                   >
                     {char}
-                  </motion.div>
-                );
-              })}
-            </div>
-
-            {currentStep.result && (
-              <motion.div
-                initial={{ y: -10, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                className="p-3 bg-green-500/10 border border-green-500/20 rounded mb-4"
-              >
-                <p className="text-sm font-semibold text-green-600">Current Best: "{currentStep.result}"</p>
-              </motion.div>
-            )}
-
-            <div className="mb-4">
-              <h4 className="text-sm font-semibold mb-2">Window Character Counts:</h4>
-              <div className="grid grid-cols-2 gap-2">
-                {Object.entries(currentStep.tCount).map(([char]) => (
-                  <div key={char} className="flex justify-between items-center p-2 bg-muted/50 rounded">
-                    <span className="font-mono font-">{char}</span>
-                    <span className="font-mono text-sm">
-                      {currentStep.windowCount[char] || 0} / {currentStep.tCount[char]}
-                    </span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <VariablePanel
-              variables={{
-                left: currentStep.left,
-                right: currentStep.right,
-                have: currentStep.have,
-                need: currentStep.need,
-                windowSize: currentStep.right >= 0 ? currentStep.right - currentStep.left + 1 : 0
-              }}
-            />
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Source String (s)</span>
+                <div className="flex gap-3 text-[10px] font-mono text-muted-foreground">
+                  <span>L: {currentStep.l}</span>
+                  <span>R: {currentStep.variables.r !== undefined ? currentStep.variables.r : '-'}</span>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {currentStep.s.split('').map((char, idx) => (
+                  <div
+                    key={idx}
+                    className={`w-8 h-8 flex items-center justify-center rounded-lg border-2 font-mono font-bold text-xs transition-all duration-200 ${getCharStyle(idx)}`}
+                  >
+                    {char}
+                  </div>
+                ))}
+              </div>
+            </div>
 
-            <Card className="p-4 mt-4 bg-primary/5 border-primary/20">
-              <p className="text-sm text-foreground">{currentStep.message}</p>
-            </Card>
-          </Card>
-        </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Character Frequencies</span>
+                <div className="space-y-1">
+                  {Object.entries(currentStep.countT).map(([char, count]) => (
+                    <div key={char} className="flex justify-between items-center p-2 bg-muted/30 rounded-md border border-border/50">
+                      <span className="font-mono text-xs font-bold text-foreground">{char}</span>
+                      <span className={`font-mono text-xs font-bold ${ (currentStep.window[char] || 0) >= count ? 'text-green-600 dark:text-green-400' : 'text-foreground'}`}>
+                        {currentStep.window[char] || 0} / {count}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-        <Card className="p-4 overflow-hidden">
-          <div className="h-[700px]">
-            <Editor
-              height="100%"
-              defaultLanguage="typescript"
-              value={code}
-              theme="vs-dark"
-              options={{
-                readOnly: true,
-                minimap: { enabled: false },
-                scrollBeyondLastLine: false,
-                fontSize: 13,
-                lineNumbers: 'on',
-              }}
-              onMount={(editor, monaco) => {
-                editorRef.current = editor;
-                monacoRef.current = monaco;
-                const decorations = currentStep.highlightedLines.map(line => ({
-                  range: new monaco.Range(line, 1, line, 1),
-                  options: {
-                    isWholeLine: true,
-                    className: 'highlighted-line',
-                  }
-                }));
-                editor.createDecorationsCollection(decorations);
-              }}
-            />
+              <div className="space-y-2">
+                <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Current Best Window</span>
+                <div className="p-3 bg-secondary/20 rounded-lg border border-secondary/50 flex flex-col items-center justify-center min-h-[60px]">
+                  {currentStep.resLen === Infinity ? (
+                    <span className="text-xs text-muted-foreground italic">No window found yet</span>
+                  ) : (
+                    <>
+                      <span className="text-sm font-bold text-foreground font-mono">
+                        "{currentStep.s.slice(currentStep.res[0], currentStep.res[1] + 1)}"
+                      </span>
+                      <span className="text-[10px] text-muted-foreground">Length: {currentStep.resLen}</span>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex-1" />
+
+          <div className="p-4 bg-primary/5 rounded-xl border border-primary/20 shadow-inner">
+            <div className="flex items-center gap-2 mb-2 text-primary font-bold text-[10px] uppercase tracking-widest">
+              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              Commentary
+            </div>
+            <p className="text-sm leading-relaxed text-foreground font-medium">
+              {currentStep.message}
+            </p>
+          </div>
+
+          <div className="pt-2">
+            <VariablePanel variables={currentStep.variables} />
           </div>
         </Card>
-      </div>
 
-      <style>{`
-        .highlighted-line {
-          background: rgba(59, 130, 246, 0.15);
-          border-left: 3px solid rgb(59, 130, 246);
-        }
-      `}</style>
+        <AnimatedCodeEditor
+          code={code}
+          language="typescript"
+          highlightedLines={currentStep.highlightedLines}
+        />
+      </div>
     </div>
   );
 };

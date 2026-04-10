@@ -474,7 +474,7 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
         <Card className="p-6">
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold mb-4 text-black">Input String: "{s}" (k={k})</h3>
+              <h3 className="text-lg font-semibold mb-4 text-foreground">Input String: "{s}" (k={k})</h3>
               <div className="flex flex-wrap gap-2">
                 {s.split('').map((char, idx) => {
                   const isInWindow = idx >= currentStep.l && idx <= currentStep.r;
@@ -488,7 +488,7 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
                           borderColor: isInWindow ? '#84CC16' : '#e2e8f0',
                           scale: isInWindow ? 1.05 : 1,
                         }}
-                        className="w-8 h-8 flex items-center justify-center rounded border-2 font-mono font-bold text-black"
+                        className="w-8 h-8 flex items-center justify-center rounded border-2 font-mono font-bold text-foreground"
                       >
                         {char}
                       </motion.div>
@@ -515,7 +515,7 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
             />
 
             <Card className="p-4 bg-primary/5 border-primary/20">
-              <p className="text-sm text-black leading-relaxed">{currentStep.message}</p>
+              <p className="text-sm text-foreground leading-relaxed">{currentStep.message}</p>
             </Card>
           </div>
         </Card>
