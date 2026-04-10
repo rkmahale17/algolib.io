@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { VariablePanel } from '../shared/VariablePanel';
 import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
@@ -16,7 +16,6 @@ interface Step {
   found: boolean;
   message: string;
   lineNumber: number;
-  phase: 'init' | 'loop' | 'dfs' | 'backtrack' | 'result';
 }
 
 export const WordSearchVisualization: React.FC = () => {
@@ -85,36 +84,36 @@ export const WordSearchVisualization: React.FC = () => {
 
     newSteps.push({
       board, word, r: -1, c: -1, i: 0, path: new Set(), found: false,
-      message: "Initialize ROWS, COLS and empty path Set.",
-      lineNumber: 1, phase: 'init'
+      message: "Initialize dimensions and the path tracker for word search.",
+      lineNumber: 1
     });
 
     function dfs(r: number, c: number, i: number): boolean {
       newSteps.push({
         board, word, r, c, i, path: new Set(path), found: false,
-        message: `dfs(r=${r}, c=${c}, i=${i}) called. ${i < word.length ? `Checking word[${i}] = '${word[i]}'` : 'All characters found!'}`,
-        lineNumber: 6, phase: 'dfs'
+        message: `Visiting [${r}, ${c}]. Checking if board character matches target word index ${i}.`,
+        lineNumber: 6
       });
 
       newSteps.push({
         board, word, r, c, i, path: new Set(path), found: false,
-        message: `Check base case: All characters found? (i === word.length)`,
-        lineNumber: 7, phase: 'dfs'
+        message: `Base case check: If index ${i} equals word length, we've found the entire word.`,
+        lineNumber: 7
       });
 
       if (i === word.length) {
         newSteps.push({
           board, word, r, c, i, path: new Set(path), found: true,
-          message: "Full word found!",
-          lineNumber: 8, phase: 'result'
+          message: "Success! Every character in the word has been found in sequence.",
+          lineNumber: 8
         });
         return true;
       }
 
       newSteps.push({
         board, word, r, c, i, path: new Set(path), found: false,
-        message: "Verify bounds, character match, and cycle check.",
-        lineNumber: 11, phase: 'dfs'
+        message: "Verifying current cell: checking boundaries, matching character, and avoiding revisited cells.",
+        lineNumber: 11
       });
 
       if (
@@ -122,14 +121,14 @@ export const WordSearchVisualization: React.FC = () => {
         board[r][c] !== word[i] || path.has(`${r},${c}`)
       ) {
         let reason = "";
-        if (r < 0 || c < 0 || r >= ROWS || c >= COLS) reason = "Out of bounds.";
-        else if (board[r][c] !== word[i]) reason = `Character '${board[r][c]}' does not match '${word[i]}'.`;
-        else if (path.has(`${r},${c}`)) reason = "Cell already in current path.";
+        if (r < 0 || c < 0 || r >= ROWS || c >= COLS) reason = "out of bounds";
+        else if (board[r][c] !== word[i]) reason = `character '${board[r][c]}' does not match '${word[i]}'`;
+        else if (path.has(`${r},${c}`)) reason = "cell already used in current path";
 
         newSteps.push({
           board, word, r, c, i, path: new Set(path), found: false,
-          message: `Check failed: ${reason}`,
-          lineNumber: 19, phase: 'backtrack'
+          message: `Backtrack: current path is invalid because ${reason}.`,
+          lineNumber: 19
         });
         return false;
       }
@@ -137,14 +136,14 @@ export const WordSearchVisualization: React.FC = () => {
       path.add(`${r},${c}`);
       newSteps.push({
         board, word, r, c, i, path: new Set(path), found: false,
-        message: `Match! Added [${r}, ${c}] to path. Current path: ${Array.from(path).join(' -> ')}`,
-        lineNumber: 22, phase: 'dfs'
+        message: `Character match found! Adding [${r}, ${c}] to the visited path and exploring neighbors.`,
+        lineNumber: 22
       });
 
       newSteps.push({
         board, word, r, c, i, path: new Set(path), found: false,
-        message: "Explore neighbors: Down, Up, Right, Left",
-        lineNumber: 24, phase: 'dfs'
+        message: "Initiating recursive search in all 4 adjacent directions (Down, Up, Right, Left).",
+        lineNumber: 24
       });
 
       const res =
@@ -158,29 +157,27 @@ export const WordSearchVisualization: React.FC = () => {
       path.delete(`${r},${c}`);
       newSteps.push({
         board, word, r, c, i, path: new Set(path), found: false,
-        message: `No path found from [${r}, ${c}]. Removing from path (backtrack).`,
-        lineNumber: 30, phase: 'backtrack'
+        message: `Cleaning up: All neighbors failed from [${r}, ${c}]. Removing cell from path (backtracking).`,
+        lineNumber: 30
       });
 
       newSteps.push({
         board, word, r, c, i, path: new Set(path), found: false,
-        message: "Return result from this DFS branch.",
-        lineNumber: 32, phase: 'backtrack'
+        message: "Returning from this recursive call to try other options.",
+        lineNumber: 32
       });
 
       return res;
     }
 
-    // To keep visualization short, we might skip some unsuccessful start points
-    // But for full accuracy, we'll try to follow the loop.
     let found = false;
     for (let r = 0; r < ROWS; r++) {
       for (let c = 0; c < COLS; c++) {
         if (found) break;
         newSteps.push({
           board, word, r, c, i: 0, path: new Set(), found: false,
-          message: `Trying starting cell [${r}, ${c}]`,
-          lineNumber: 35, phase: 'loop'
+          message: `Starting a new DFS traversal from starting board cell [${r}, ${c}].`,
+          lineNumber: 37
         });
         if (dfs(r, c, 0)) {
           found = true;
@@ -192,8 +189,8 @@ export const WordSearchVisualization: React.FC = () => {
     if (!found) {
       newSteps.push({
         board, word, r: -1, c: -1, i: 0, path: new Set(), found: false,
-        message: "Word not found in the board.",
-        lineNumber: 43, phase: 'result'
+        message: "Traversal complete. The word was not found anywhere on the board.",
+        lineNumber: 43
       });
     }
 
@@ -221,7 +218,7 @@ export const WordSearchVisualization: React.FC = () => {
   const isCellInPath = (r: number, c: number) => currentStep.path.has(`${r},${c}`);
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <StepControls
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
@@ -235,95 +232,94 @@ export const WordSearchVisualization: React.FC = () => {
         onSpeedChange={setSpeed}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-        <Card className="p-3 sm:p-6 border-2">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="p-6 border-2">
           <div className="flex items-center gap-2 mb-6">
             <Search className="w-5 h-5 text-primary" />
-            <h3 className="text-lg font-semibold tracking-tight">Word Search Board</h3>
+            <h3 className="text-lg font-semibold tracking-tight">Word Search Visualizer</h3>
           </div>
 
-          <div className="space-y-4 sm:space-y-6">
-            <div className="flex flex-col items-center gap-4 w-full">
-              <div className="p-2 sm:p-4 bg-primary/20 rounded-xl border border-border shadow-inner overflow-x-auto max-w-full">
-                {currentStep.board.map((row, rIdx) => (
-                  <div key={rIdx} className="flex gap-2 mb-2 last:mb-0">
-                    {row.map((char, cIdx) => (
-                      <motion.div
-                        key={`${rIdx}-${cIdx}`}
-                        animate={{
-                          scale: (currentStep.r === rIdx && currentStep.c === cIdx) ? 1.15 : 1,
-                          backgroundColor: isCellInPath(rIdx, cIdx)
-                            ? "green"
-                            : (currentStep.r === rIdx && currentStep.c === cIdx)
-                              ? "var(--accent)"
-                              : "var(--card)",
-                          borderColor: isCellInPath(rIdx, cIdx) ? "var(--primary)" : "var(--border)"
-                        }}
-                        className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 flex items-center justify-center rounded-lg border-2 font-bold text-base sm:text-lg md:text-xl transition-all shadow-md
-                          ${isCellInPath(rIdx, cIdx) ? 'text-primary-foreground' : 'text-foreground'}
-                          ${(currentStep.r === rIdx && currentStep.c === cIdx) ? 'border-primary ring-4 ring-primary/30 z-10' : ''}
+          <div className="flex flex-col gap-8">
+            <div className="flex flex-col items-center gap-6">
+              <div className="p-4 bg-primary/5 rounded-2xl border-2 border-primary/20 shadow-lg">
+                <div className="flex flex-col gap-2">
+                  {currentStep.board.map((row, rIdx) => (
+                    <div key={rIdx} className="flex gap-2">
+                      {row.map((char, cIdx) => {
+                        const isInPath = isCellInPath(rIdx, cIdx);
+                        const isCurrent = currentStep.r === rIdx && currentStep.c === cIdx;
+                        
+                        return (
+                          <div
+                            key={`${rIdx}-${cIdx}`}
+                            className={`w-12 h-12 flex items-center justify-center rounded-xl border-2 font-bold text-lg transition-colors duration-200
+                              ${isInPath ? 'bg-green-500/20 border-green-500/50 text-black dark:text-gray-100' : 
+                                isCurrent ? 'bg-primary/20 border-primary text-black dark:text-gray-100' : 
+                                'bg-card border-border text-black dark:text-gray-100'}
+                              ${isCurrent ? 'ring-4 ring-primary/20 z-10 scale-105' : ''}
+                            `}
+                          >
+                            {char}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center gap-3">
+                <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Target String</span>
+                <div className="flex gap-1.5">
+                  {currentStep.word.split('').map((char, idx) => {
+                    const isFound = idx < currentStep.i;
+                    const isCurrent = idx === currentStep.i;
+                    
+                    return (
+                      <div
+                        key={idx}
+                        className={`w-9 h-9 flex items-center justify-center rounded-lg border-2 font-bold text-base transition-all duration-200
+                          ${isFound ? 'bg-primary border-primary text-primary-foreground' : 
+                            isCurrent ? 'bg-accent border-accent text-accent-foreground scale-110 shadow-md' : 
+                            'bg-muted border-border text-muted-foreground'}
                         `}
                       >
                         {char}
-                      </motion.div>
-                    ))}
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex flex-col items-center gap-2 ">
-                <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Target Word</span>
-                <div className="flex gap-1">
-                  {currentStep.word.split('').map((char, idx) => (
-                    <motion.div
-                      key={idx}
-                      animate={{
-                        opacity: 1,
-                        scale: idx === currentStep.i ? 1.2 : 1,
-                        y: idx === currentStep.i ? -4 : 0,
-                        backgroundColor: idx < currentStep.i ? "var(--primary)" :
-                          idx === currentStep.i ? "var(--accent)" : "var(--muted)",
-                        color: idx < currentStep.i ? "var(--primary-foreground)" :
-                          idx === currentStep.i ? "var(--accent-foreground)" : "var(--muted-foreground)"
-                      }}
-                      className={`w-7 h-7 sm:w-9 sm:h-9 md:w-10 md:h-10 flex items-center justify-center rounded-md border-2 font-bold text-sm sm:text-base md:text-lg shadow-sm
-                        ${idx === currentStep.i ? 'border-accent' : idx < currentStep.i ? 'border-primary' : 'border-border'}
-                      `}
-                    >
-                      {char}
-                    </motion.div>
-                  ))}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
 
-            <div className="space-y-4">
-              <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-                <p className="text-sm font-medium leading-relaxed">{currentStep.message}</p>
+            <div className="flex flex-col gap-4">
+              <div className="p-4 bg-primary/5 rounded-xl border border-primary/10 min-h-[80px] flex items-center">
+                <p className="text-sm font-medium leading-relaxed text-foreground/90">
+                  {currentStep.message}
+                </p>
               </div>
 
               <VariablePanel
                 variables={{
-                  'r': currentStep.r,
-                  'c': currentStep.c,
-                  'i (index)': currentStep.i,
+                  'row': currentStep.r !== -1 ? currentStep.r : 'none',
+                  'col': currentStep.c !== -1 ? currentStep.c : 'none',
+                  'index': currentStep.i,
                   'char': currentStep.board[currentStep.r]?.[currentStep.c] || 'N/A',
                   'target': currentStep.word[currentStep.i] || 'DONE',
-                  'path size': currentStep.path.size,
-                  'found': currentStep.found.toString()
+                  'path length': currentStep.path.size
                 }}
               />
             </div>
           </div>
         </Card>
 
-        <div className="flex flex-col gap-4 overflow-hidden">
+        <Card className="border-2 overflow-hidden bg-card">
           <AnimatedCodeEditor
             code={code}
             highlightedLines={[currentStep.lineNumber]}
             language="typescript"
           />
-        </div>
+        </Card>
       </div>
     </div>
   );
