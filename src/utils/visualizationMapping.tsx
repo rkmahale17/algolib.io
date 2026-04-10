@@ -39,7 +39,7 @@ export const visualizationMap: Record<string, React.LazyExoticComponent<React.Co
   'fast-slow-pointers': React.lazy(() => import('@/components/visualizations/algorithms/FastSlowPointersVisualization').then(m => ({ default: m.FastSlowPointersVisualization }))),
   'reverse-linked-list': React.lazy(() => import('@/components/visualizations/algorithms/ReverseLinkedListVisualization').then(m => ({ default: m.ReverseLinkedListVisualization }))),
   'detect-cycle': React.lazy(() => import('@/components/visualizations/algorithms/DetectCycleVisualization').then(m => ({ default: m.DetectCycleVisualization }))),
-  'detect-cycle-in-a-linked-list': React.lazy(() => import('@/components/visualizations/algorithms/DetectCycleVisualization').then(m => ({ default: m.DetectCycleVisualization }))),
+  'detect-cycle-in-a-linked-list': React.lazy(() => import('@/components/visualizations/algorithms/FastSlowPointersVisualization').then(m => ({ default: m.FastSlowPointersVisualization }))),
   'middle-node': React.lazy(() => import('@/components/visualizations/algorithms/MiddleNodeVisualization').then(m => ({ default: m.MiddleNodeVisualization }))),
   'merge-sorted-lists': React.lazy(() => import('@/components/visualizations/algorithms/MergeSortLinkedListVisualization').then(m => ({ default: m.MergeSortLinkedListVisualization }))),
   'merge-two-sorted-lists': React.lazy(() => import('@/components/visualizations/algorithms/MergeSortLinkedListVisualization').then(m => ({ default: m.MergeSortLinkedListVisualization }))),

@@ -102,7 +102,7 @@ export const MeetingRoomsVisualization = () => {
         previous: i - 1,
         hasOverlap: false,
         isSorted: true,
-        message: `Loop iteration i = ${i}. Comparing meeting ${i} with meeting ${i-1}.`,
+        message: `Loop iteration i = ${i}. Comparing meeting ${i} with meeting ${i - 1}.`,
         highlightedLines: [6],
         variables: { "i": i, "intervals.length": sortedIntervals.length }
       });
@@ -212,23 +212,24 @@ export const MeetingRoomsVisualization = () => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col gap-4 p-4 text-black">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-muted/30 p-4 rounded-lg border border-border">
-        <div className="flex gap-2">
+    <div className="space-y-6">
+      <div className="flex flex-col gap-6 bg-muted/30 p-6 rounded-xl border border-border shadow-sm">
+        <div className="flex flex-wrap gap-2">
           {USE_CASES.map((uc, idx) => (
             <Button
               key={uc.id}
               variant={useCaseIdx === idx ? "default" : "outline"}
               size="sm"
               onClick={() => handleUseCaseChange(idx)}
-              className="text-xs h-8"
+              className={`text-xs h-8 px-4 rounded-full transition-all duration-200 ${useCaseIdx === idx ? "shadow-md scale-105" : "hover:bg-muted"
+                }`}
             >
               {uc.label}
             </Button>
           ))}
         </div>
-        
-        <div className="w-full md:w-auto flex-1">
+
+        <div className="w-full pt-4 border-t border-border/50">
           <StepControls
             currentStep={currentStepIndex}
             totalSteps={steps.length - 1}
@@ -247,25 +248,24 @@ export const MeetingRoomsVisualization = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 min-h-0 pt-2">
-        <Card className="p-6 flex flex-col gap-6 overflow-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 pt-2">
+        <Card className="p-6 flex flex-col gap-6 overflow-hidden">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-black">Timeline Visualization</h3>
             <div className="flex items-center gap-4 text-xs">
               <div className="flex items-center gap-1">
                 <div className="w-3 h-3 rounded bg-primary/20 border border-primary"></div>
-                <span className="text-black">Normal</span>
+                <span className="text-foreground">Normal</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-3 h-3 rounded bg-destructive/20 border border-destructive"></div>
-                <span className="text-black">Conflict</span>
+                <span className="text-foreground">Conflict</span>
               </div>
             </div>
           </div>
 
           <div className="relative pt-8 pb-4 px-2 min-h-[300px]">
             <div className="absolute top-0 left-0 right-0 flex justify-between text-[10px] text-muted-foreground border-b pb-1">
-              {[0, 5, 10, 15, 20, 25, 30].map(t => <span key={t} className="text-black">{t}</span>)}
+              {[0, 5, 10, 15, 20, 25, 30].map(t => <span key={t} className="text-muted-foreground">{t}</span>)}
             </div>
 
             <div className="space-y-4 mt-4">
@@ -276,22 +276,21 @@ export const MeetingRoomsVisualization = () => {
 
                 return (
                   <div key={`${useCaseIdx}-${idx}`} className="relative h-8 flex items-center">
-                    <span className="w-8 text-[10px] font-mono text-black">M{idx}</span>
+                    <span className="w-8 text-[10px] font-mono text-muted-foreground">M{idx}</span>
                     <div className="flex-1 relative h-full bg-muted/20 rounded-sm">
                       <div
-                        className={`absolute inset-y-1 rounded border shadow-sm flex items-center justify-center text-[10px] font-bold transition-all duration-300 ${
-                          isConflicting
-                            ? "bg-destructive/20 border-destructive text-destructive z-20 scale-[1.05]"
-                            : isCurrent || isPrevious
+                        className={`absolute inset-y-1 rounded border shadow-sm flex items-center justify-center text-[10px] font-bold transition-all duration-300 ${isConflicting
+                          ? "bg-destructive/20 border-destructive text-destructive z-20 scale-[1.05]"
+                          : isCurrent || isPrevious
                             ? "bg-primary/20 border-primary text-primary z-10 scale-[1.02]"
-                            : "bg-secondary border-border text-black opacity-60"
-                        }`}
+                            : "bg-secondary border-border text-foreground opacity-60"
+                          }`}
                         style={{
                           left: `${(interval.start / 30) * 100}%`,
                           width: `${((interval.end - interval.start) / 30) * 100}%`,
                         }}
                       >
-                        <span className="truncate px-1 text-black">{interval.start}-{interval.end}</span>
+                        <span className="truncate px-1 text-foreground">{interval.start}-{interval.end}</span>
                       </div>
                     </div>
                   </div>
@@ -300,38 +299,33 @@ export const MeetingRoomsVisualization = () => {
             </div>
 
             {currentStep.previous !== -1 && currentStep.current !== -1 && (
-              <div 
-                className={`absolute top-0 bottom-0 border-l-2 border-dashed transition-all duration-500 z-30 ${
-                  currentStep.hasOverlap ? 'border-destructive' : 'border-primary/50'
-                }`}
-                style={{ 
-                  left: `calc(32px + ${(currentStep.intervals[currentStep.previous].end / 30) * (100 - (32 / 400 * 100))}%` 
+              <div
+                className={`absolute top-0 bottom-0 border-l-2 border-dashed transition-all duration-500 z-30 ${currentStep.hasOverlap ? 'border-destructive' : 'border-primary/50'
+                  }`}
+                style={{
+                  left: `calc(32px + ${(currentStep.intervals[currentStep.previous].end / 30) * (100 - (32 / 400 * 100))}%`
                 }}
               >
-                <div className={`text-[8px] font-bold px-1 rounded-sm -ml-2 mb-1 ${
-                  currentStep.hasOverlap ? 'bg-destructive text-white' : 'bg-primary text-white'
-                }`}>
+                <div className={`text-[8px] font-bold px-1 rounded-sm -ml-2 mb-1 ${currentStep.hasOverlap ? 'bg-destructive text-white' : 'bg-primary text-white'
+                  }`}>
                   End: {currentStep.intervals[currentStep.previous].end}
                 </div>
               </div>
             )}
           </div>
 
-          <div className="p-4 bg-muted/50 rounded-lg text-sm leading-relaxed text-black border border-border/50">
+          <div className="p-4 bg-muted/50 rounded-lg text-sm leading-relaxed text-foreground border border-border/50">
             {currentStep.message}
           </div>
 
           <VariablePanel variables={currentStep.variables} />
         </Card>
 
-        <Card className="p-6 overflow-auto">
-          <h3 className="text-lg font-semibold mb-4 text-black">Implementation</h3>
-          <AnimatedCodeEditor
-            code={code}
-            language="typescript"
-            highlightedLines={currentStep.highlightedLines}
-          />
-        </Card>
+        <AnimatedCodeEditor
+          code={code}
+          language="typescript"
+          highlightedLines={currentStep.highlightedLines}
+        />
       </div>
     </div>
   );

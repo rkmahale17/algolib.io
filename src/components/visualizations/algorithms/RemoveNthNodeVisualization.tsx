@@ -121,7 +121,7 @@ export const RemoveNthNodeVisualization = () => {
               Pointers Topology Reference
             </h3>
             <div className="flex flex-col gap-6 p-4">
-              <div className="flex items-center gap-2 overflow-x-auto pb-4 justify-center pt-6">
+              <div className="flex flex-wrap items-center justify-center gap-x-1 gap-y-8 pb-4 pt-6">
                   <div className="relative flex items-center justify-center">
                     <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-muted-foreground uppercase">{step.left === -1 ? 'L' : ''}</span>
                     <div className={`w-8 h-8 flex items-center justify-center rounded border-2 border-dashed font-bold text-xs transition-all shadow-sm ${step.left === -1 ? 'bg-primary/20 border-primary text-primary shadow-primary/20 scale-110' : 'bg-muted/30 border-muted-foreground text-muted-foreground opacity-50'}`}>

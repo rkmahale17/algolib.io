@@ -151,10 +151,20 @@ export const MergeSortLinkedListVisualization = () => {
             // tail.next = list1;
             allNodes[tailId].nextId = list1;
             addStep('list2 is exhausted, attach remaining list1 nodes', 17, { dummyId, tailId, highlightNodes: [list1] });
+            
+            // Advance tail to end for visualization
+            let curr = list1;
+            while (allNodes[curr].nextId) curr = allNodes[curr].nextId!;
+            tailId = curr;
         } else if (list2) {
             // tail.next = list2;
             allNodes[tailId].nextId = list2;
             addStep('list1 is exhausted, attach remaining list2 nodes', 19, { dummyId, tailId, highlightNodes: [list2] });
+
+            // Advance tail to end for visualization
+            let curr = list2;
+            while (allNodes[curr].nextId) curr = allNodes[curr].nextId!;
+            tailId = curr;
         }
 
         addStep('Merge complete! Return dummy.next as the new head', 22, { dummyId, tailId });
@@ -215,29 +225,37 @@ export const MergeSortLinkedListVisualization = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
                 key={nodeId}
-                className="flex items-center"
+                className="flex items-start"
             >
                 <div className="flex flex-col items-center">
-                    {label && <span className="text-[10px] font-mono text-muted-foreground mb-1 uppercase">{label}</span>}
-                    <div
-                        className={`w-12 h-12 rounded-lg border-2 flex items-center justify-center font- transition-all duration-300 relative ${isDummy ? 'bg-muted/50 border-dashed border-muted-foreground' :
-                            isHighlighted ? 'bg-primary/20 border-primary text-primary scale-110 shadow-lg shadow-primary/20' :
-                                'bg-card border-border text-card-foreground'
-                            } ${isTail ? 'ring-2 ring-offset-2 ring-primary ring-offset-background' : ''}`}
-                    >
-                        {isDummy ? 'D' : node.val}
-                        {isTail && (
-                            <div className="absolute -top-6 bg-primary text-primary-foreground text-[10px] px-1 rounded font-">
-                                TAIL
+                    <div className="h-4 flex items-center justify-center w-8">
+                        {label && (
+                            <span className="text-[9px] font-mono text-muted-foreground uppercase whitespace-nowrap">
+                                {label}
+                            </span>
+                        )}
+                    </div>
+                    <div className="flex items-center">
+                        <div
+                            className={`w-8 h-8 rounded-md border-2 flex items-center justify-center text-xs transition-all duration-300 relative ${isDummy ? 'bg-muted/50 border-dashed border-muted-foreground' :
+                                isHighlighted ? 'bg-primary/20 border-primary text-primary scale-110 shadow-lg shadow-primary/20' :
+                                    'bg-card border-border text-card-foreground'
+                                } ${isTail ? 'ring-2 ring-offset-1 ring-primary ring-offset-background' : ''}`}
+                        >
+                            {isDummy ? 'D' : node.val}
+                            {isTail && (
+                                <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[8px] px-1 rounded-sm z-10">
+                                    TAIL
+                                </div>
+                            )}
+                        </div>
+                        {node.nextId && (
+                            <div className="text-muted-foreground px-0">
+                                <ArrowRight size={14} />
                             </div>
                         )}
                     </div>
                 </div>
-                {node.nextId && (
-                    <motion.div layout className="mx-2 text-muted-foreground">
-                        <ArrowRight size={20} />
-                    </motion.div>
-                )}
             </motion.div>
         );
     };
@@ -284,7 +302,7 @@ export const MergeSortLinkedListVisualization = () => {
                                 <span className="text-sm font-semibold text-primary">Lists</span>
                                 {currentStep.list1HeadId === null && <span className="text-xs text-muted-foreground italic">(null)</span>}
                             </div>
-                            <div className="flex items-center gap-1 flex-wrap min-h-[60px]">
+                            <div className="flex items-center gap-0 flex-wrap min-h-[48px]">
                                 <AnimatePresence mode="popLayout">
                                     {list1Nodes.map((id, index) => renderNode(id, index === 0 ? 'list1' : undefined))}
                                 </AnimatePresence>
@@ -297,7 +315,7 @@ export const MergeSortLinkedListVisualization = () => {
                                 <span className="text-sm font-semibold text-secondary">List 2</span>
                                 {currentStep.list2HeadId === null && <span className="text-xs text-muted-foreground italic">(null)</span>}
                             </div>
-                            <div className="flex items-center gap-1 flex-wrap min-h-[60px]">
+                            <div className="flex items-center gap-0 flex-wrap min-h-[48px]">
                                 <AnimatePresence mode="popLayout">
                                     {list2Nodes.map((id, index) => renderNode(id, index === 0 ? 'list2' : undefined))}
                                 </AnimatePresence>
@@ -310,7 +328,7 @@ export const MergeSortLinkedListVisualization = () => {
                                 <span className="text-sm font-semibold text-foreground">Merged (via tail)</span>
                                 {mergedNodes.length === 0 && <span className="text-xs text-muted-foreground italic">(initializing...)</span>}
                             </div>
-                            <div className="flex items-center gap-1 flex-wrap min-h-[60px]">
+                            <div className="flex items-center gap-0 flex-wrap min-h-[48px]">
                                 <AnimatePresence mode="popLayout">
                                     {mergedNodes.map((id) => renderNode(id))}
                                 </AnimatePresence>

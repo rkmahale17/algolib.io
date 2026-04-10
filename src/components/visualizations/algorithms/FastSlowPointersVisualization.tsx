@@ -235,7 +235,7 @@ export const FastSlowPointersVisualization: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-muted/20 p-4 rounded-xl border border-border/50">
+      <div className="bg-muted/20 p-4 rounded-xl border border-border/50">
         <StepControls
           onPlay={handlePlay}
           onPause={handlePause}
@@ -248,7 +248,9 @@ export const FastSlowPointersVisualization: React.FC = () => {
           speed={speed}
           onSpeedChange={setSpeed}
         />
+      </div>
 
+      <div className="flex justify-center">
         <div className="flex bg-muted/50 p-1 rounded-lg border border-border/50">
           <Button
             variant={testCase === 'with-cycle' ? 'default' : 'ghost'}
@@ -279,23 +281,20 @@ export const FastSlowPointersVisualization: React.FC = () => {
               </svg>
             </div>
 
-            <h3 className="text-base sm:text-lg font- mb-8 flex items-center gap-2">
-              <span className={`w-3 h-3 rounded-full bg-blue-500 animate-pulse`}></span>
-              Fast & Slow Pointer Visualization
-            </h3>
 
-            <div className="flex flex-wrap items-center justify-center gap-x-1 sm:gap-x-2 gap-y-12 pb-10 pt-14 px-2 no-scrollbar max-w-full">
+
+            <div className="flex flex-wrap items-center justify-center gap-x-0 gap-y-12 pb-10 pt-14 px-2 overflow-x-auto no-scrollbar max-w-full">
               {currentStep.nodes.map((val, idx) => (
                 <div key={idx} className="flex items-center">
                   <div className="relative group">
                     <div
-                      className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg sm:rounded-xl border-2 font-black text-xs sm:text-sm transition-all duration-500 ${idx === currentStep.slow && idx === currentStep.fast
+                      className={`w-8 h-8 flex items-center justify-center rounded-lg border-2 font-black text-xs transition-all duration-500 ${idx === currentStep.slow && idx === currentStep.fast
                         ? 'bg-amber-500 text-white border-amber-600 shadow-[0_0_15px_rgba(245,158,11,0.4)] scale-110 z-10'
                         : idx === currentStep.slow
                           ? 'bg-blue-500 text-white border-blue-600 shadow-[0_0_12px_rgba(59,130,246,0.3)]'
                           : idx === currentStep.fast || idx === currentStep.fastIntermediate
                             ? 'bg-purple-500 text-white border-purple-600 shadow-[0_0_12px_rgba(168,85,247,0.3)]'
-                            : 'bg-muted/30 border-border text-muted-foreground group-hover:border-primary/30'
+                            : 'bg-muted/30 border-border text-foreground group-hover:border-primary/30'
                         }`}
                     >
                       {val}
@@ -315,23 +314,19 @@ export const FastSlowPointersVisualization: React.FC = () => {
                       )}
                     </div>
 
-                    {/* Index Label */}
-                    <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[9px] font-medium text-muted-foreground/60 uppercase tracking-tighter">
-                      Idx {idx}
-                    </div>
                   </div>
 
                   {idx < currentStep.nodes.length - 1 ? (
-                    <div className="w-4 sm:w-6 h-[2px] bg-border mx-0.5 relative opacity-60">
+                    <div className="w-3 sm:w-4 h-[2px] bg-border relative opacity-60">
                       <div className="absolute right-0 -top-[4px] border-t-[5px] border-l-[8px] border-b-[5px] border-t-transparent border-b-transparent border-l-border"></div>
                     </div>
                   ) : currentStep.hasCycle ? (
-                    <div className="ml-2 relative">
+                    <div className="ml-1 relative">
                       <svg width="40" height="60" viewBox="0 0 40 60" className="text-border/40">
                         <path d="M 0 30 Q 40 30 40 -10" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="4,2" />
                         <path d="M 35 -5 L 40 -15 L 45 -5" fill="none" stroke="currentColor" strokeWidth="2" />
                       </svg>
-                      <span className="text-[9px] font-black text-muted-foreground/40 absolute -top-8 left-4 uppercase tracking-widest whitespace-nowrap">Cycle to Idx 1</span>
+                      <span className="text-[9px] font-black text-muted-foreground/40 absolute -top-8 left-4 uppercase tracking-widest whitespace-nowrap">Cycle Connected</span>
                     </div>
                   ) : null}
                 </div>
@@ -339,7 +334,7 @@ export const FastSlowPointersVisualization: React.FC = () => {
             </div>
 
             <div className="mt-12 p-5 bg-muted/40 backdrop-blur-sm rounded-2xl border border-border/50 min-h-[5rem] flex items-center transition-all duration-300 hover:bg-muted/60">
-              <p className="text-sm font-semibold text-foreground/90 leading-relaxed italic">
+              <p className="text-sm font-semibold text-foreground leading-relaxed italic">
                 {currentStep.message}
               </p>
             </div>
@@ -347,8 +342,8 @@ export const FastSlowPointersVisualization: React.FC = () => {
 
           <VariablePanel
             variables={{
-              slow: currentStep.slow !== null ? `Node ${currentStep.nodes[currentStep.slow]} (Idx ${currentStep.slow})` : 'null',
-              fast: currentStep.fast !== null ? `Node ${currentStep.nodes[currentStep.fast]} (Idx ${currentStep.fast})` : 'null',
+              slow: currentStep.slow !== null ? `Node ${currentStep.nodes[currentStep.slow]}` : 'null',
+              fast: currentStep.fast !== null ? `Node ${currentStep.nodes[currentStep.fast]}` : 'null',
               'slow === fast': currentStep.slow === currentStep.fast ? 'TRUE' : 'FALSE',
               result: currentStep.result === null ? 'in progress...' : currentStep.result ? 'TRUE (Cycle Found)' : 'FALSE (No Cycle)'
             }}
