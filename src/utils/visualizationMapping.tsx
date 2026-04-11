@@ -118,6 +118,7 @@ export const visualizationMap: Record<string, React.LazyExoticComponent<React.Co
   // Heap/Priority Queue
   'kth-largest': React.lazy(() => import('@/components/visualizations/algorithms/KthLargestVisualization').then(m => ({ default: m.KthLargestVisualization }))),
   'kth-largest-element': React.lazy(() => import('@/components/visualizations/algorithms/KthLargestVisualization').then(m => ({ default: m.KthLargestVisualization }))),
+  'top-k-frequent-elements': React.lazy(() => import('@/components/visualizations/algorithms/TopKFrequentElementsVisualization').then(m => ({ default: m.TopKFrequentElementsVisualization }))),
   'sliding-window-maximum': React.lazy(() => import('@/components/visualizations/algorithms/SlidingWindowMaxVisualization').then(m => ({ default: m.SlidingWindowMaxVisualization }))),
 
   // Cache Algorithms

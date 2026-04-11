@@ -1,138 +1,368 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { SkipBack, SkipForward, RotateCcw } from 'lucide-react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { motion, AnimatePresence } from 'framer-motion';
+import { VariablePanel } from '../shared/VariablePanel';
+import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
+import { Layers, Hash, ListOrdered } from 'lucide-react';
 
 interface Step {
   nums: number[];
   k: number;
-  freqMap: [number, number][];
-  heap: number[];
-  result: number[];
+  i: number | null; // index in nums or freq
+  currentNum: number | null;
+  count: Record<number, number>;
+  freq: number[][];
+  res: number[];
   message: string;
-  lineNumber: number;
+  highlightedLines: number[];
+  phase: 'counting' | 'bucketing' | 'collecting' | 'done';
 }
+
+const DEFAULT_NUMS = [1, 1, 1, 2, 2, 3];
+const DEFAULT_K = 2;
 
 export const TopKFrequentElementsVisualization = () => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
-  const steps: Step[] = [
-    { nums: [1, 1, 1, 2, 2, 3], k: 2, freqMap: [], heap: [], result: [], message: "Find top 2 frequent elements. Strategy: Count frequencies, use heap/bucket", lineNumber: 1 },
-    { nums: [1, 1, 1, 2, 2, 3], k: 2, freqMap: [[1, 3], [2, 2], [3, 1]], heap: [], result: [], message: "Count frequencies: 1→3, 2→2, 3→1. Build frequency map", lineNumber: 3 },
-    { nums: [1, 1, 1, 2, 2, 3], k: 2, freqMap: [[1, 3], [2, 2], [3, 1]], heap: [3, 2, 1], result: [], message: "Use max heap or bucket sort. Order by frequency: [3,2,1]", lineNumber: 8 },
-    { nums: [1, 1, 1, 2, 2, 3], k: 2, freqMap: [[1, 3], [2, 2], [3, 1]], heap: [3, 2], result: [1], message: "Pop top: freq=3 → element=1. Result: [1]", lineNumber: 11 },
-    { nums: [1, 1, 1, 2, 2, 3], k: 2, freqMap: [[1, 3], [2, 2], [3, 1]], heap: [2], result: [1, 2], message: "Pop next: freq=2 → element=2. Result: [1,2]. k=2 done!", lineNumber: 11 },
-    { nums: [1, 1, 1, 2, 2, 3], k: 2, freqMap: [[1, 3], [2, 2], [3, 1]], heap: [], result: [1, 2], message: "Complete! Top 2 frequent: [1,2]. Time: O(n log k) heap or O(n) bucket", lineNumber: 14 }
-  ];
-
   const code = `function topKFrequent(nums: number[], k: number): number[] {
-  const freqMap = new Map<number, number>();
-  for (const num of nums) {
-    freqMap.set(num, (freqMap.get(num) || 0) + 1);
-  }
-  
-  // Bucket sort approach (O(n))
-  const buckets: number[][] = Array(nums.length + 1).fill(null).map(() => []);
-  for (const [num, freq] of freqMap) {
-    buckets[freq].push(num);
-  }
-  
-  const result: number[] = [];
-  for (let i = buckets.length - 1; i >= 0 && result.length < k; i--) {
-    result.push(...buckets[i]);
-  }
-  
-  return result.slice(0, k);
-}`;
+    const count: Map<number, number> = new Map();
+    const freq: number[][] = Array.from({ length: nums.length + 1 }, () => []);
+
+    for (const n of nums) {
+        count.set(n, (count.get(n) || 0) + 1);
+    }
+
+    for (const [n, c] of count.entries()) {
+        freq[c].push(n);
+    }
+
+    const res: number[] = [];
+    for (let i = freq.length - 1; i > 0; i--) {
+        for (const n of freq[i]) {
+            res.push(n);
+            if (res.length === k) {
+                return res;
+            }
+        }
+    }
+    return res;
+};`;
+
+  const steps = useMemo(() => {
+    const s: Step[] = [];
+    const count: Record<number, number> = {};
+    const freq: number[][] = Array.from({ length: DEFAULT_NUMS.length + 1 }, () => []);
+    const res: number[] = [];
+
+    // Initial state
+    s.push({
+      nums: DEFAULT_NUMS,
+      k: DEFAULT_K,
+      i: null,
+      currentNum: null,
+      count: { ...count },
+      freq: freq.map(f => [...f]),
+      res: [...res],
+      message: "Initialize count map and frequency buckets array.",
+      highlightedLines: [2, 3],
+      phase: 'counting'
+    });
+
+    // Phase 1: Counting
+    for (let i = 0; i < DEFAULT_NUMS.length; i++) {
+      const n = DEFAULT_NUMS[i];
+      count[n] = (count[n] || 0) + 1;
+      s.push({
+        nums: DEFAULT_NUMS,
+        k: DEFAULT_K,
+        i,
+        currentNum: n,
+        count: { ...count },
+        freq: freq.map(f => [...f]),
+        res: [...res],
+        message: `Counting frequency: found ${n}, current count is ${count[n]}.`,
+        highlightedLines: [5, 6],
+        phase: 'counting'
+      });
+    }
+
+    // Phase 2: Bucketing
+    const countEntries = Object.entries(count);
+    for (let i = 0; i < countEntries.length; i++) {
+        const [n, c] = countEntries[i].map(Number);
+        freq[c].push(n);
+        s.push({
+            nums: DEFAULT_NUMS,
+            k: DEFAULT_K,
+            i,
+            currentNum: n,
+            count: { ...count },
+            freq: freq.map(f => [...f]),
+            res: [...res],
+            message: `Placing ${n} into bucket for frequency ${c}.`,
+            highlightedLines: [9, 10],
+            phase: 'bucketing'
+        });
+    }
+
+    // Phase 3: Collecting
+    s.push({
+        nums: DEFAULT_NUMS,
+        k: DEFAULT_K,
+        i: freq.length,
+        currentNum: null,
+        count: { ...count },
+        freq: freq.map(f => [...f]),
+        res: [...res],
+        message: "Start collecting top K elements from the highest frequency buckets.",
+        highlightedLines: [13, 14],
+        phase: 'collecting'
+    });
+
+    for (let i = freq.length - 1; i > 0; i--) {
+        if (freq[i].length > 0) {
+            s.push({
+                nums: DEFAULT_NUMS,
+                k: DEFAULT_K,
+                i,
+                currentNum: null,
+                count: { ...count },
+                freq: freq.map(f => [...f]),
+                res: [...res],
+                message: `Checking bucket for frequency ${i}. Found elements: [${freq[i].join(', ')}].`,
+                highlightedLines: [15],
+                phase: 'collecting'
+            });
+
+            for (const n of freq[i]) {
+                res.push(n);
+                const isKReached = res.length === DEFAULT_K;
+                s.push({
+                    nums: DEFAULT_NUMS,
+                    k: DEFAULT_K,
+                    i,
+                    currentNum: n,
+                    count: { ...count },
+                    freq: freq.map(f => [...f]),
+                    res: [...res],
+                    message: `Adding ${n} to result. ${isKReached ? 'K elements reached!' : `Still need ${DEFAULT_K - res.length} more.`}`,
+                    highlightedLines: [16, 17, 18],
+                    phase: 'collecting'
+                });
+                if (isKReached) {
+                    s.push({
+                        nums: DEFAULT_NUMS,
+                        k: DEFAULT_K,
+                        i,
+                        currentNum: n,
+                        count: { ...count },
+                        freq: freq.map(f => [...f]),
+                        res: [...res],
+                        message: `Successfully found the top ${DEFAULT_K} frequent elements: [${res.join(', ')}].`,
+                        highlightedLines: [18],
+                        phase: 'done'
+                    });
+                    return s;
+                }
+            }
+        } else {
+            s.push({
+                nums: DEFAULT_NUMS,
+                k: DEFAULT_K,
+                i,
+                currentNum: null,
+                count: { ...count },
+                freq: freq.map(f => [...f]),
+                res: [...res],
+                message: `Bucket for frequency ${i} is empty. Moving to next bucket.`,
+                highlightedLines: [14],
+                phase: 'collecting'
+            });
+        }
+    }
+
+    return s;
+  }, []);
 
   const currentStep = steps[currentStepIndex];
 
-  return (
-    <div className="w-full h-full flex flex-col gap-4 p-4">
-      <Card className="p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex gap-2">
-            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(0)} disabled={currentStepIndex === 0}><RotateCcw className="h-4 w-4" /></Button>
-            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))} disabled={currentStepIndex === 0}><SkipBack className="h-4 w-4" /></Button>
-            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(Math.min(steps.length - 1, currentStepIndex + 1))} disabled={currentStepIndex === steps.length - 1}><SkipForward className="h-4 w-4" /></Button>
-          </div>
-          <div className="text-sm">Step {currentStepIndex + 1} / {steps.length}</div>
+  const variables = useMemo(() => ({
+    'current num': currentStep.currentNum ?? 'None',
+    'counts': Object.keys(currentStep.count).length > 0
+      ? Object.entries(currentStep.count).map(([n, c]) => `${n}: ${c}`).join(', ')
+      : 'Empty',
+    'k': currentStep.k,
+    'res length': currentStep.res.length
+  }), [currentStep]);
+
+  const renderVisuals = () => {
+    return (
+      <div className="space-y-8 w-full">
+        {/* Nums Input Hook */}
+        <div className="space-y-2">
+            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <Hash className="w-3 h-3" /> Input Numbers
+            </h4>
+            <div className="flex flex-wrap gap-2">
+                {currentStep.nums.map((n, idx) => (
+                    <motion.div
+                        key={idx}
+                        animate={{
+                            scale: currentStep.phase === 'counting' && currentStep.i === idx ? 1.1 : 1,
+                            backgroundColor: currentStep.phase === 'counting' && currentStep.i === idx ? 'hsl(var(--primary))' : 'hsl(var(--secondary))',
+                            color: currentStep.phase === 'counting' && currentStep.i === idx ? 'hsl(var(--primary-foreground))' : 'hsl(var(--secondary-foreground))'
+                        }}
+                        className="w-8 h-8 rounded-lg flex items-center justify-center font-bold shadow-sm text-sm"
+                    >
+                        {n}
+                    </motion.div>
+                ))}
+            </div>
         </div>
-      </Card>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1">
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Top K Frequent Elements</h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Counts Map */}
+            <div className="space-y-2">
+                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                    <Layers className="w-3 h-3" /> Frequencies
+                </h4>
+                <div className="grid grid-cols-2 gap-2">
+                    {Object.entries(currentStep.count).map(([n, c]) => {
+                        const isBucketSelected = currentStep.phase === 'bucketing' && currentStep.currentNum === Number(n);
+                        return (
+                            <motion.div
+                                key={n}
+                                animate={{
+                                    scale: isBucketSelected ? 1.05 : 1,
+                                    borderColor: isBucketSelected ? 'hsl(var(--primary))' : 'hsl(var(--border))'
+                                }}
+                                className="flex items-center justify-between p-2 rounded-lg border-2 bg-card"
+                            >
+                                <span className="font-bold text-base">{n}</span>
+                                <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-primary/10 text-primary">
+                                    {c}x
+                                </span>
+                            </motion.div>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Frequency Buckets */}
+            <div className="space-y-2">
+                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                    <ListOrdered className="w-3 h-3" /> Frequency Buckets
+                </h4>
+                <div className="space-y-2 max-h-[200px] overflow-auto pr-2 custom-scrollbar">
+                    {currentStep.freq.map((bucket, freq) => {
+                        if (freq === 0) return null;
+                        const isCurrentBucket = currentStep.phase === 'collecting' && currentStep.i === freq;
+                        return (
+                            <motion.div
+                                key={freq}
+                                animate={{
+                                    opacity: freq > currentStep.nums.length ? 0.3 : 1,
+                                    borderColor: isCurrentBucket ? 'hsl(var(--primary))' : 'hsl(var(--border))'
+                                }}
+                                className={`flex items-start gap-3 p-1.5 rounded-lg border-2 bg-card/50 ${isCurrentBucket ? 'ring-2 ring-primary/20' : ''}`}
+                            >
+                                <div className="min-w-[45px] text-[10px] font-bold text-muted-foreground flex items-center h-full">
+                                    Freq {freq}
+                                </div>
+                                <div className="flex flex-wrap gap-1">
+                                    {bucket.length === 0 ? (
+                                        <span className="text-[10px] italic text-muted-foreground/50">empty</span>
+                                    ) : (
+                                        bucket.map((n, idx) => (
+                                            <motion.div
+                                                key={idx}
+                                                initial={{ scale: 0 }}
+                                                animate={{ scale: 1 }}
+                                                className="px-1.5 py-0.5 rounded bg-primary/10 text-primary font-bold text-[10px]"
+                                            >
+                                                {n}
+                                            </motion.div>
+                                        ))
+                                    )}
+                                </div>
+                            </motion.div>
+                        );
+                    }).reverse()}
+                </div>
+            </div>
+        </div>
+
+        {/* Result Area */}
+        <div className="pt-4 border-t space-y-2">
+            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider text-center">Top {DEFAULT_K} Frequent Elements</h4>
+            <div className="flex gap-3 min-h-[48px] p-2 rounded-xl bg-primary/5 border-2 border-dashed border-primary/20 items-center justify-center">
+                <AnimatePresence>
+                    {currentStep.res.map((n, idx) => (
+                        <motion.div
+                            key={idx}
+                            initial={{ opacity: 0, y: 10, scale: 0.8 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold text-base shadow-lg ring-4 ring-primary/20"
+                        >
+                            {n}
+                        </motion.div>
+                    ))}
+                    {currentStep.res.length === 0 && (
+                        <span className="text-muted-foreground/50 italic text-sm">Searching...</span>
+                    )}
+                </AnimatePresence>
+            </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="space-y-6">
+      <SimpleStepControls
+        currentStep={currentStepIndex}
+        totalSteps={steps.length}
+        onStepChange={setCurrentStepIndex}
+      />
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="space-y-6">
+          <Card className="p-6 bg-card/50 backdrop-blur-sm border-2 border-primary/5 shadow-lg overflow-hidden min-h-[400px] flex flex-col justify-center">
+            {renderVisuals()}
+          </Card>
+
           <div className="space-y-4">
-            <div>
-              <div className="text-sm font-medium mb-2">Input Array (k={currentStep.k}):</div>
-              <div className="flex gap-1 flex-wrap">
-                {currentStep.nums.map((num, idx) => (
-                  <div key={idx} className="px-3 py-2 rounded font-mono bg-secondary">
-                    {num}
-                  </div>
-                ))}
+            <Card className="p-4 bg-primary/5 border-2 border-primary/20 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
+              <div className="flex items-start gap-3">
+                <div className="mt-1 w-1.5 h-1.5 rounded-full bg-primary animate-pulse flex-shrink-0" />
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={currentStepIndex}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    className="text-sm font-medium leading-relaxed"
+                  >
+                    {currentStep.message}
+                  </motion.p>
+                </AnimatePresence>
               </div>
-            </div>
-            {currentStep.freqMap.length > 0 && (
-              <div>
-                <div className="text-sm font-medium mb-2">Frequency Map:</div>
-                <div className="space-y-2">
-                  {currentStep.freqMap.map(([num, freq], idx) => (
-                    <div key={idx} className="flex items-center gap-2">
-                      <div className="px-3 py-2 rounded font-mono bg-primary/20 text-primary font-">
-                        {num}
-                      </div>
-                      <span>→</span>
-                      <div className="px-3 py-2 rounded font-mono bg-secondary">
-                        {freq} times
-                      </div>
-                      <div className="flex-1 bg-muted rounded-full h-2 overflow-hidden">
-                        <div
-                          className="bg-primary h-full transition-all"
-                          style={{ width: `${(freq / Math.max(...currentStep.freqMap.map(f => f[1]))) * 100}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            {currentStep.heap.length > 0 && (
-              <div>
-                <div className="text-sm font-medium mb-2">Heap (by frequency):</div>
-                <div className="flex gap-2 flex-wrap">
-                  {currentStep.heap.map((freq, idx) => (
-                    <div key={idx} className="px-4 py-3 rounded font-mono bg-blue-500/20 text-blue-700 font-">
-                      freq={freq}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            <div>
-              <div className="text-sm font-medium mb-2">Result (Top {currentStep.k}):</div>
-              <div className="flex gap-2 flex-wrap">
-                {currentStep.result.map((num, idx) => (
-                  <div key={idx} className="px-4 py-3 rounded font-mono bg-green-500/30 text-green-700 font-">
-                    {num}
-                  </div>
-                ))}
-                {currentStep.result.length === 0 && <span className="text-muted-foreground text-sm">—</span>}
-              </div>
-            </div>
-            <div className="p-4 bg-muted/50 rounded text-sm">{currentStep.message}</div>
+            </Card>
+
+            <VariablePanel variables={variables} />
           </div>
-        </Card>
-        <Card className="p-6 overflow-hidden flex flex-col">
-          <h3 className="text-lg font-semibold mb-4">TypeScript</h3>
-          <div className="flex-1 overflow-auto">
-            <SyntaxHighlighter language="typescript" style={vscDarkPlus} showLineNumbers lineProps={(lineNumber) => ({ style: { backgroundColor: lineNumber === currentStep.lineNumber ? 'rgba(255, 255, 0, 0.2)' : 'transparent', display: 'block' } })}>
-              {code}
-            </SyntaxHighlighter>
-          </div>
-        </Card>
+        </div>
+
+        <div className="lg:h-[calc(100vh-200px)] min-h-[500px]">
+          <AnimatedCodeEditor
+            code={code}
+            language="typescript"
+            highlightedLines={currentStep.highlightedLines}
+            className="h-full"
+          />
+        </div>
       </div>
     </div>
   );
