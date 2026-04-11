@@ -21,6 +21,7 @@ import {
   Lightbulb,
   Zap,
   ListChecks,
+  Lock,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -40,8 +41,11 @@ import { TabWarning } from "@/components/TabWarning";
 import { FeatureGuard } from "@/components/FeatureGuard";
 import { SolutionViewer } from "@/components/SolutionViewer";
 import { RichText } from "@/components/RichText";
+import ContentRights from "@/pages/ContentRights"; // just adjusting imports slightly
 import { renderBlind75Visualization } from "@/utils/blind75Visualizations";
 import { renderVisualization as renderVizFromMapping, hasVisualization } from "@/utils/visualizationMapping";
+import { TOP_COMPANIES } from "@/constants/companies";
+import { CompanyIcon } from "@/components/CompanyIcon";
 import { DIFFICULTY_MAP } from "@/types/algorithm";
 import { TreeDiagram } from "../visualizations/TreeDiagram";
 import { GraphDiagram } from "../visualizations/GraphDiagram";
@@ -273,22 +277,48 @@ export const ProblemDescriptionPanel = React.memo(({
                         <>
                           <span className="text-muted-foreground text-sm">•</span>
                           <div className="flex flex-wrap items-center gap-1.5">
-                            {algorithm.metadata.companies.slice(0, 5).map((company: string, index: number) => (
-                              <Badge
-                                key={index}
-                                variant="secondary"
-                                className="bg-primary/5 text-primary border-primary/20 text-xs px-2 py-0.5"
-                              >
-                                {company}
-                              </Badge>
-                            ))}
-                            {algorithm.metadata.companies.length > 5 && (
-                              <Badge
-                                variant="secondary"
-                                className="bg-muted text-muted-foreground text-xs px-2 py-0.5"
-                              >
-                                +{algorithm.metadata.companies.length - 5} more
-                              </Badge>
+                            {hasPremiumAccess || isPlatformPreview ? (
+                              <>
+                                {algorithm.metadata.companies.slice(0, 5).map((company: string, index: number) => {
+                                  const compConfig = TOP_COMPANIES.find(c => c.name.toLowerCase() === company.toLowerCase() || c.id === company);
+                                  return (
+                                    <Badge
+                                      key={index}
+                                      variant="secondary"
+                                      className="bg-primary/5 text-primary border-primary/20 text-xs px-2 py-0.5"
+                                    >
+                                      <CompanyIcon company={company} className="w-3 h-3 mr-1.5 opacity-80" />
+                                      {company}
+                                    </Badge>
+                                  );
+                                })}
+                                {algorithm.metadata.companies.length > 5 && (
+                                  <Badge
+                                    variant="secondary"
+                                    className="bg-muted text-muted-foreground text-xs px-2 py-0.5"
+                                  >
+                                    +{algorithm.metadata.companies.length - 5} more
+                                  </Badge>
+                                )}
+                              </>
+                            ) : (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Badge
+                                      variant="secondary"
+                                      className="bg-amber-500/10 text-amber-600 dark:text-amber-500 border-amber-500/20 text-xs px-2 py-0.5 cursor-pointer hover:bg-amber-500/20 transition-colors"
+                                      onClick={() => window.location.href = '/pricing'}
+                                    >
+                                      <Lock className="w-3 h-3 mr-1.5" />
+                                      Unlock Companies
+                                    </Badge>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Available for PRO users</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
                             )}
                           </div>
                         </>

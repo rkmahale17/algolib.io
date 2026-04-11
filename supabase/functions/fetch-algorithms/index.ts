@@ -34,7 +34,8 @@ Deno.serve(async (req) => {
         description,
         time_complexity,
         space_complexity,
-        serial_no
+        serial_no,
+        metadata
       `);
 
     // Apply filters
@@ -70,6 +71,7 @@ Deno.serve(async (req) => {
       slug: algo.id,
       listType: algo.list_type,
       serial_no: algo.serial_no,
+      metadata: algo.metadata,
     }));
 
     return new Response(JSON.stringify({ algorithms, totalCount: algorithms.length }), {

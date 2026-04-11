@@ -50,6 +50,7 @@ const AdminSimulator = lazy(() => import("./pages/AdminSimulator"));
 const CompilerDocs = lazy(() => import("./pages/CompilerDocs"));
 const Pricing = lazy(() => import("./pages/Pricing"));
 const AdminMail = lazy(() => import("./pages/AdminMail"));
+const AdminTaggingUpdate = lazy(() => import("./pages/AdminTaggingUpdate"));
 
 import AdminViewToggle from "./components/AdminViewToggle";
 
@@ -250,6 +251,12 @@ const AppContent = () => {
               <Route path="/admin/mail" element={
                 <ProtectedAdminRoute>
                   <AdminMail />
+                </ProtectedAdminRoute>
+              } />
+
+              <Route path="/admin/tagging-update" element={
+                <ProtectedAdminRoute>
+                  <AdminTaggingUpdate />
                 </ProtectedAdminRoute>
               } />
 

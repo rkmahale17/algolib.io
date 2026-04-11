@@ -18,6 +18,9 @@ interface ListingLayoutProps {
     selectedTopics: string[];
     onTopicToggle: (topic: string) => void;
     topics?: string[];
+    selectedCompanies: string[];
+    onCompanyToggle: (company: string) => void;
+    companies?: string[];
     showRecommendation?: boolean;
     children: ReactNode;
     stats?: {
@@ -36,6 +39,9 @@ export const ListingLayout = ({
     selectedTopics,
     onTopicToggle,
     topics,
+    selectedCompanies,
+    onCompanyToggle,
+    companies,
     showRecommendation,
     children,
     stats
@@ -53,6 +59,9 @@ export const ListingLayout = ({
                 selectedTopics={selectedTopics}
                 onTopicToggle={onTopicToggle}
                 topics={topics}
+                selectedCompanies={selectedCompanies}
+                onCompanyToggle={onCompanyToggle}
+                companies={companies}
             />
         </div>
     );
@@ -101,6 +110,7 @@ export const ListingLayout = ({
                                                             className="flex-1 rounded-xl h-11 font-medium border-border/60 hover:bg-muted/50"
                                                             onClick={() => {
                                                                 onTopicToggle('CLEAR_ALL');
+                                                                onCompanyToggle('CLEAR_ALL');
                                                             }}
                                                         >
                                                             Clear all
