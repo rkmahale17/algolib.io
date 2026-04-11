@@ -8,6 +8,16 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
 import { pricingData } from '@/data/pricing-data';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 import { useNavigate } from 'react-router-dom';
 import { usePostHog } from '@posthog/react';
@@ -18,6 +28,7 @@ const Pricing: React.FC = () => {
   const posthog = usePostHog();
   const [isUpgrading, setIsUpgrading] = useState(false);
   const [activePlanId, setActivePlanId] = useState<string | null>(null);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   const handleUpgrade = async (planType: string) => {
     if (!user) {
@@ -62,7 +73,6 @@ const Pricing: React.FC = () => {
   const isCancelled = profile?.cancel_at_period_end;
 
   const handleCancel = async () => {
-    if (!confirm('Are you sure you want to cancel your subscription? You will lose access to premium features at the end of the current period.')) return;
     posthog?.capture('subscription_cancelled');
     try {
       setIsUpgrading(true);
@@ -136,7 +146,7 @@ const Pricing: React.FC = () => {
                 variant="outline"
                 size="sm"
                 className="border-red-500/20 text-red-500 hover:bg-red-500/10 hover:border-red-500 rounded-full h-9 px-6"
-                onClick={handleCancel}
+                onClick={() => setShowCancelConfirm(true)}
                 disabled={isUpgrading}
               >
                 {isUpgrading ? 'Processing...' : 'Unsubscribe'}
@@ -271,6 +281,26 @@ const Pricing: React.FC = () => {
         </div>
 
       </div>
+
+      <AlertDialog open={showCancelConfirm} onOpenChange={setShowCancelConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to cancel your subscription?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You will lose access to premium features at the end of the current period.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Go Back</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleCancel}
+              className="bg-red-500 hover:bg-red-600 text-white"
+            >
+              Cancel Subscription
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

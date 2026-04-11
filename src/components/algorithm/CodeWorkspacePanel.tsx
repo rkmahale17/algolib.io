@@ -194,7 +194,7 @@ export const CodeWorkspacePanel = React.memo(({
                   disabled={isPlatformPreview}
                 >
                   <div className="relative h-full">
-                    {algorithm?.metadata?.is_pro && !hasPremiumAccess && !isPlatformPreview ? (
+                    {(algorithm?.is_premium || algorithm?.metadata?.is_pro) && !hasPremiumAccess && !isPlatformPreview ? (
                       <ProOverlay className="rounded-none border-0 h-full" />
                     ) : (
                       <BrainstormSection

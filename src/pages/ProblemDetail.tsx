@@ -58,10 +58,9 @@ const ProblemDetail: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const isPremiumAlgorithm = useMemo(() => {
-    if (!algorithm?.list_type) return false;
-    const type = algorithm.list_type.toLowerCase();
-    return type !== 'core' && type !== 'core+blind75';
-  }, [algorithm?.list_type]);
+    const algo = algorithm as any;
+    return !!(algo?.is_premium || algo?.is_pro || algo?.metadata?.is_pro);
+  }, [algorithm]);
 
   // -- Hooks --
   const layout = useAlgorithmLayout();

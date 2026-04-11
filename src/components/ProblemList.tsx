@@ -293,7 +293,7 @@ export const ProblemList = ({
               <div className="divide-y divide-border/10">
                 {filteredAndSortedAlgorithms.map((algo, index) => {
                   const status = progressMap?.[algo.id] || 'none';
-                  const isPremium = algo.listType !== 'core' && algo.listType !== 'core+blind75';
+                  const isPremium = algo.is_premium || algo.is_pro || (algo.metadata as any)?.is_pro;
 
                   return (
                     <AlgorithmCard
@@ -332,7 +332,7 @@ export const ProblemList = ({
                           <div className="flex-1 min-w-0 space-y-1">
                             <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">
                               <span>ALGO-{(algo.serial_no || index + 1).toString().padStart(2, '0')}</span>
-                              {(algo.listType !== 'core' && algo.listType !== 'core+blind75') && (
+                              {(algo.is_premium || algo.is_pro || (algo.metadata as any)?.is_pro) && (
                                 <div className="flex items-center gap-0.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold">
                                   {isPaywallEnabled && !hasPremiumAccess && <Lock className="w-2.5 h-2.5" />}
                                   PRO

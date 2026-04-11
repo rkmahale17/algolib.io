@@ -142,6 +142,7 @@ const Blind75 = () => {
               key={algo.id}
               algorithm={algo}
               status={(progressMap?.[algo.id] || 'none') as any}
+              isPremium={algo.is_premium}
               index={index}
               isFirst={index === 0}
               isLast={index === filteredAndSortedAlgorithms.length - 1}

@@ -1,346 +1,234 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { SkipBack, SkipForward, RotateCcw } from 'lucide-react';
-import Editor from '@monaco-editor/react';
-import { motion } from 'framer-motion';
+import { CheckCircle2, XCircle } from 'lucide-react';
 import { VariablePanel } from '../shared/VariablePanel';
-import type { editor as MonacoEditor } from 'monaco-editor';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
+import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
 
 interface Step {
   s: string;
-  cleaned: string;
-  left: number;
-  right: number;
-  leftChar?: string;
-  rightChar?: string;
-  isPalindrome?: boolean;
-  message: string;
+  l: number;
+  r: number;
+  currentCharL?: string;
+  currentCharR?: string;
+  comment: string;
   highlightedLines: number[];
+  isValid?: boolean;
 }
 
 export const ValidPalindromeVisualization = () => {
   const code = `function isPalindrome(s: string): boolean {
-  const cleaned = s.toLowerCase().replace(/[^a-z0-9]/g, '');
-  
-  let left = 0;
-  let right = cleaned.length - 1;
-  
-  while (left < right) {
-    if (cleaned[left] !== cleaned[right]) {
+  let l = 0;
+  let r = s.length - 1;
+
+  while (l < r) {
+    while (l < r && !alphaNum(s[l])) {
+      l++;
+    }
+    while (r > l && !alphaNum(s[r])) {
+      r--;
+    }
+    if (s[l].toLowerCase() !== s[r].toLowerCase()) {
       return false;
     }
-    left++;
-    right--;
+    l++;
+    r--;
   }
-  
   return true;
+}
+
+function alphaNum(c: string): boolean {
+  const code = c.charCodeAt(0);
+  return (
+    (code >= 65 && code <= 90) ||
+    (code >= 97 && code <= 122) ||
+    (code >= 48 && code <= 57)
+  );
 }`;
 
-  const steps: Step[] = [
-    {
-      s: "A man, a plan, a canal: Panama",
-      cleaned: "",
-      left: 0,
-      right: 0,
-      message: "Original string: 'A man, a plan, a canal: Panama'",
-      highlightedLines: [1]
+  const cases = {
+    valid: {
+      steps: [
+        { s: "race car", l: 0, r: 7, comment: "Initialize pointers at the start (l=0) and end (r=7).", highlightedLines: [2, 3] },
+        { s: "race car", l: 0, r: 7, comment: "Check main loop condition: 0 < 7 is true.", highlightedLines: [5] },
+        { s: "race car", l: 0, r: 7, currentCharL: 'r', comment: "Left pointer check: 'r' is alphanumeric, so we skip the l-skip loop.", highlightedLines: [6] },
+        { s: "race car", l: 0, r: 7, currentCharR: 'r', comment: "Right pointer check: 'r' is alphanumeric, so we skip the r-skip loop.", highlightedLines: [9] },
+        { s: "race car", l: 0, r: 7, currentCharL: 'r', currentCharR: 'r', comment: "Compare 'r' and 'r' (case-insensitive). They match!", highlightedLines: [12] },
+        { s: "race car", l: 1, r: 6, comment: "Matching characters found! Increment left and decrement right.", highlightedLines: [15, 16] },
+        { s: "race car", l: 1, r: 6, comment: "Next iteration: 1 < 6 is true.", highlightedLines: [5] },
+        { s: "race car", l: 1, r: 6, currentCharL: 'a', comment: "Left pointer at 'a' is alphanumeric.", highlightedLines: [6] },
+        { s: "race car", l: 1, r: 6, currentCharR: 'a', comment: "Right pointer at 'a' is alphanumeric.", highlightedLines: [9] },
+        { s: "race car", l: 1, r: 6, currentCharL: 'a', currentCharR: 'a', comment: "Characters 'a' and 'a' match.", highlightedLines: [12] },
+        { s: "race car", l: 2, r: 5, comment: "Increment l, decrement r.", highlightedLines: [15, 16] },
+        { s: "race car", l: 2, r: 5, comment: "Next iteration: 2 < 5 is true.", highlightedLines: [5] },
+        { s: "race car", l: 2, r: 5, currentCharL: 'c', comment: "Left pointer at 'c' is alphanumeric.", highlightedLines: [6] },
+        { s: "race car", l: 2, r: 5, currentCharR: 'c', comment: "Right pointer at 'c' is alphanumeric.", highlightedLines: [9] },
+        { s: "race car", l: 2, r: 5, currentCharL: 'c', currentCharR: 'c', comment: "Characters 'c' and 'c' match.", highlightedLines: [12] },
+        { s: "race car", l: 3, r: 4, comment: "Increment l, decrement r.", highlightedLines: [15, 16] },
+        { s: "race car", l: 3, r: 4, comment: "Next iteration: 3 < 4 is true.", highlightedLines: [5] },
+        { s: "race car", l: 3, r: 4, currentCharL: 'e', comment: "Left pointer at 'e' is alphanumeric.", highlightedLines: [6] },
+        { s: "race car", l: 3, r: 4, currentCharR: ' ', comment: "Right pointer check: space (' ') is NOT alphanumeric.", highlightedLines: [9] },
+        { s: "race car", l: 3, r: 3, currentCharR: ' ', comment: "Decrement right pointer to skip the space.", highlightedLines: [10] },
+        { s: "race car", l: 3, r: 3, comment: "End of r-skip loop: r is no longer greater than l.", highlightedLines: [9] },
+        { s: "race car", l: 3, r: 3, currentCharL: 'e', currentCharR: 'e', comment: "Compare 'e' and 'e'. Match!", highlightedLines: [12] },
+        { s: "race car", l: 4, r: 2, comment: "Increment l, decrement r.", highlightedLines: [15, 16] },
+        { s: "race car", l: 4, r: 2, comment: "Check main loop: 4 < 2 is false. Pointers have crossed.", highlightedLines: [5] },
+        { s: "race car", l: 4, r: 2, isValid: true, comment: "The string is a valid palindrome!", highlightedLines: [18] }
+      ]
     },
-    {
-      s: "A man, a plan, a canal: Panama",
-      cleaned: "amanaplanacanalpanama",
-      left: 0,
-      right: 0,
-      message: "Clean string: lowercase + remove non-alphanumeric → 'amanaplanacanalpanama'",
-      highlightedLines: [2]
-    },
-    {
-      s: "A man, a plan, a canal: Panama",
-      cleaned: "amanaplanacanalpanama",
-      left: 0,
-      right: 20,
-      message: "Initialize: left=0, right=20 (last index)",
-      highlightedLines: [4]
-    },
-    {
-      s: "A man, a plan, a canal: Panama",
-      cleaned: "amanaplanacanalpanama",
-      left: 0,
-      right: 20,
-      leftChar: 'a',
-      rightChar: 'a',
-      message: "Compare: cleaned[0]='a' vs cleaned[20]='a' → Match ✓",
-      highlightedLines: [8]
-    },
-    {
-      s: "A man, a plan, a canal: Panama",
-      cleaned: "amanaplanacanalpanama",
-      left: 1,
-      right: 19,
-      message: "Move pointers: left++, right-- → left=1, right=19",
-      highlightedLines: [11]
-    },
-    {
-      s: "A man, a plan, a canal: Panama",
-      cleaned: "amanaplanacanalpanama",
-      left: 1,
-      right: 19,
-      leftChar: 'm',
-      rightChar: 'm',
-      message: "Compare: cleaned[1]='m' vs cleaned[19]='m' → Match ✓",
-      highlightedLines: [8]
-    },
-    {
-      s: "A man, a plan, a canal: Panama",
-      cleaned: "amanaplanacanalpanama",
-      left: 2,
-      right: 18,
-      leftChar: 'a',
-      rightChar: 'a',
-      message: "Compare: cleaned[2]='a' vs cleaned[18]='a' → Match ✓",
-      highlightedLines: [8]
-    },
-    {
-      s: "A man, a plan, a canal: Panama",
-      cleaned: "amanaplanacanalpanama",
-      left: 3,
-      right: 17,
-      leftChar: 'n',
-      rightChar: 'n',
-      message: "Compare: cleaned[3]='n' vs cleaned[17]='n' → Match ✓",
-      highlightedLines: [8]
-    },
-    {
-      s: "A man, a plan, a canal: Panama",
-      cleaned: "amanaplanacanalpanama",
-      left: 4,
-      right: 16,
-      leftChar: 'a',
-      rightChar: 'a',
-      message: "Compare: cleaned[4]='a' vs cleaned[16]='a' → Match ✓",
-      highlightedLines: [8]
-    },
-    {
-      s: "A man, a plan, a canal: Panama",
-      cleaned: "amanaplanacanalpanama",
-      left: 5,
-      right: 15,
-      leftChar: 'p',
-      rightChar: 'p',
-      message: "Compare: cleaned[5]='p' vs cleaned[15]='p' → Match ✓",
-      highlightedLines: [8]
-    },
-    {
-      s: "A man, a plan, a canal: Panama",
-      cleaned: "amanaplanacanalpanama",
-      left: 6,
-      right: 14,
-      leftChar: 'l',
-      rightChar: 'l',
-      message: "Compare: cleaned[6]='l' vs cleaned[14]='l' → Match ✓",
-      highlightedLines: [8]
-    },
-    {
-      s: "A man, a plan, a canal: Panama",
-      cleaned: "amanaplanacanalpanama",
-      left: 7,
-      right: 13,
-      leftChar: 'a',
-      rightChar: 'a',
-      message: "Compare: cleaned[7]='a' vs cleaned[13]='a' → Match ✓",
-      highlightedLines: [8]
-    },
-    {
-      s: "A man, a plan, a canal: Panama",
-      cleaned: "amanaplanacanalpanama",
-      left: 8,
-      right: 12,
-      leftChar: 'n',
-      rightChar: 'n',
-      message: "Compare: cleaned[8]='n' vs cleaned[12]='n' → Match ✓",
-      highlightedLines: [8]
-    },
-    {
-      s: "A man, a plan, a canal: Panama",
-      cleaned: "amanaplanacanalpanama",
-      left: 9,
-      right: 11,
-      leftChar: 'a',
-      rightChar: 'a',
-      message: "Compare: cleaned[9]='a' vs cleaned[11]='a' → Match ✓",
-      highlightedLines: [8]
-    },
-    {
-      s: "A man, a plan, a canal: Panama",
-      cleaned: "amanaplanacanalpanama",
-      left: 10,
-      right: 10,
-      message: "Pointers meet: left=10, right=10. Loop exits (left < right is false)",
-      highlightedLines: [7]
-    },
-    {
-      s: "A man, a plan, a canal: Panama",
-      cleaned: "amanaplanacanalpanama",
-      left: 10,
-      right: 10,
-      isPalindrome: true,
-      message: "All characters matched! Return true ✓",
-      highlightedLines: [15]
+    invalid: {
+      steps: [
+        { s: "race a car", l: 0, r: 9, comment: "Initialize pointers: l=0, r=9.", highlightedLines: [2, 3] },
+        { s: "race a car", l: 0, r: 9, comment: "0 < 9 is true.", highlightedLines: [5] },
+        { s: "race a car", l: 0, r: 9, currentCharL: 'r', currentCharR: 'r', comment: "Match 'r' at ends.", highlightedLines: [12] },
+        { s: "race a car", l: 1, r: 8, comment: "Move pointers center-ward.", highlightedLines: [15, 16] },
+        { s: "race a car", l: 1, r: 8, comment: "Next iteration: 1 < 8.", highlightedLines: [5] },
+        { s: "race a car", l: 1, r: 8, currentCharL: 'a', currentCharR: 'a', comment: "Match 'a' at next position.", highlightedLines: [12] },
+        { s: "race a car", l: 2, r: 7, comment: "Move pointers.", highlightedLines: [15, 16] },
+        { s: "race a car", l: 2, r: 7, comment: "Next iteration: 2 < 7.", highlightedLines: [5] },
+        { s: "race a car", l: 2, r: 7, currentCharL: 'c', currentCharR: 'c', comment: "Match 'c'.", highlightedLines: [12] },
+        { s: "race a car", l: 3, r: 6, comment: "Move pointers.", highlightedLines: [15, 16] },
+        { s: "race a car", l: 3, r: 6, comment: "Next iteration: 3 < 6.", highlightedLines: [5] },
+        { s: "race a car", l: 3, r: 6, currentCharL: 'e', currentCharR: 'a', comment: "Compare 'e' and 'a'. No match!", highlightedLines: [12] },
+        { s: "race a car", l: 3, r: 6, isValid: false, comment: "Found a mismatch. Return false.", highlightedLines: [13] }
+      ]
     }
-  ];
+  };
 
+  const [caseId, setCaseId] = useState<'valid' | 'invalid'>('valid');
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const currentStep = steps[Math.min(currentStepIndex, steps.length - 1)];
-  const editorRef = useRef<MonacoEditor.IStandaloneCodeEditor | null>(null);
-  const monacoRef = useRef<typeof import('monaco-editor') | null>(null);
 
-  useEffect(() => {
-    if (editorRef.current && monacoRef.current) {
-      const decorations = currentStep.highlightedLines.map(line => ({
-        range: new monacoRef.current!.Range(line, 1, line, 1),
-        options: {
-          isWholeLine: true,
-          className: 'highlighted-line',
-        }
-      }));
-      editorRef.current.createDecorationsCollection(decorations);
-    }
-  }, [currentStepIndex, currentStep.highlightedLines]);
+  const steps = cases[caseId].steps;
+  const currentStep = steps[Math.min(currentStepIndex, steps.length - 1)];
+
+  const handleCaseChange = (newCase: 'valid' | 'invalid') => {
+    setCaseId(newCase);
+    setCurrentStepIndex(0);
+  };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <Button onClick={() => setCurrentStepIndex(0)} variant="outline" size="sm">
-            <RotateCcw className="h-4 w-4" />
-          </Button>
-          <Button onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))} disabled={currentStepIndex === 0} variant="outline" size="sm">
-            <SkipBack className="h-4 w-4" />
-          </Button>
-          <Button onClick={() => setCurrentStepIndex(Math.min(steps.length - 1, currentStepIndex + 1))} disabled={currentStepIndex === steps.length - 1} variant="outline" size="sm">
-            <SkipForward className="h-4 w-4" />
-          </Button>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <SimpleStepControls
+          currentStep={currentStepIndex}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStepIndex}
+        />
+        
+        <div className="flex p-1 bg-muted rounded-xl border border-border w-fit backdrop-blur-sm shadow-inner">
+          <button
+            onClick={() => handleCaseChange('valid')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+              caseId === 'valid' 
+              ? 'bg-card text-primary shadow-sm ring-1 ring-border/50' 
+              : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <CheckCircle2 className={`h-4 w-4 ${caseId === 'valid' ? 'text-primary' : 'text-muted-foreground'}`} />
+            Valid Case
+          </button>
+          <button
+            onClick={() => handleCaseChange('invalid')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+              caseId === 'invalid' 
+              ? 'bg-card text-destructive shadow-sm ring-1 ring-border/50' 
+              : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <XCircle className={`h-4 w-4 ${caseId === 'invalid' ? 'text-destructive' : 'text-muted-foreground'}`} />
+            Invalid Case
+          </button>
         </div>
-        <span className="text-sm text-muted-foreground">Step {currentStepIndex + 1} of {steps.length}</span>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-4">
+        <div className="space-y-6">
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Original String</h3>
-            <p className="font-mono text-lg mb-6 p-3 bg-muted/50 rounded">"{currentStep.s}"</p>
-
-            {currentStep.cleaned && (
-              <>
-                <h3 className="text-lg font-semibold mb-4">Cleaned String</h3>
-                <div className="flex flex-wrap gap-1 mb-4">
-                  {currentStep.cleaned.split('').map((char, idx) => {
-                    const isLeft = idx === currentStep.left;
-                    const isRight = idx === currentStep.right;
-                    const isChecked = idx < currentStep.left || idx > currentStep.right;
-
-                    return (
-                      <motion.div
-                        key={idx}
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ duration: 0.3, delay: idx * 0.02 }}
-                        className={`w-9 h-9 flex items-center justify-center rounded font-mono font- text-sm border-2 ${isLeft
-                          ? 'bg-primary/20 border-primary text-primary ring-2 ring-primary'
+            <div className="mb-8">
+              <h3 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wider">String Inspection</h3>
+              <div className="flex flex-wrap gap-2">
+                {currentStep.s.split('').map((char, idx) => {
+                  const isLeft = idx === currentStep.l;
+                  const isRight = idx === currentStep.r;
+                  return (
+                    <div
+                      key={idx}
+                      className={`w-10 h-10 flex items-center justify-center rounded-md font-mono text-lg border-2 transition-all duration-200 ${
+                        isLeft && isRight
+                        ? 'bg-purple-500/20 border-purple-500 text-purple-600 shadow-[0_0_10px_purple]'
+                        : isLeft
+                          ? 'bg-primary/20 border-primary text-primary shadow-[0_0_10px_rgba(var(--primary),0.3)]'
                           : isRight
-                            ? 'bg-secondary/20 border-secondary text-secondary-foreground ring-2 ring-secondary'
-                            : isChecked
-                              ? 'bg-green-500/10 border-green-500/30 text-green-600'
-                              : 'bg-muted/50 border-border text-foreground'
-                          }`}
-                      >
-                        {char}
-                      </motion.div>
-                    );
-                  })}
+                            ? 'bg-secondary/20 border-secondary text-secondary-foreground shadow-[0_0_10px_secondary]'
+                            : idx < currentStep.l || idx > currentStep.r
+                              ? 'bg-muted border-transparent text-muted-foreground opacity-50'
+                              : 'bg-card border-border text-foreground'
+                        }`}
+                    >
+                      {char}
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="mt-4 flex gap-4 text-xs font-mono">
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded bg-primary/20 border border-primary" />
+                  <span>Left Pointer</span>
                 </div>
-
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div className="p-3 bg-primary/10 rounded border border-primary/20">
-                    <p className="text-xs text-muted-foreground mb-1">Left Pointer</p>
-                    <p className="font-mono font- text-primary">
-                      {currentStep.left} {currentStep.leftChar && `→ '${currentStep.leftChar}'`}
-                    </p>
-                  </div>
-                  <div className="p-3 bg-secondary/10 rounded border border-secondary/20">
-                    <p className="text-xs text-muted-foreground mb-1">Right Pointer</p>
-                    <p className="font-mono font- text-secondary-foreground">
-                      {currentStep.right} {currentStep.rightChar && `→ '${currentStep.rightChar}'`}
-                    </p>
-                  </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded bg-secondary/20 border border-secondary" />
+                  <span>Right Pointer</span>
                 </div>
-              </>
-            )}
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded bg-purple-500/20 border border-purple-500" />
+                  <span>Meeting Point</span>
+                </div>
+              </div>
+            </div>
 
-            <VariablePanel
-              variables={{
-                left: currentStep.left,
-                right: currentStep.right,
-                stringLength: currentStep.cleaned.length,
-                remaining: Math.max(0, currentStep.right - currentStep.left + 1)
-              }}
-            />
-
-            {currentStep.isPalindrome !== undefined && (
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className={`p-4 rounded mt-4 ${currentStep.isPalindrome ? 'bg-green-500/10 border border-green-500/20' : 'bg-red-500/10 border border-red-500/20'}`}
-              >
-                <p className={`text-lg font- ${currentStep.isPalindrome ? 'text-green-600' : 'text-red-600'}`}>
-                  {currentStep.isPalindrome ? '✓ Valid Palindrome' : '✗ Not a Palindrome'}
+            <div className="space-y-4">
+              <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 min-h-[80px] flex items-center">
+                <p className="text-sm leading-relaxed text-foreground">
+                  <span className="font-bold text-primary mr-2">Step {currentStepIndex}:</span>
+                  {currentStep.comment}
                 </p>
-              </motion.div>
-            )}
+              </div>
 
-            <Card className="p-4 mt-4 bg-primary/5 border-primary/20">
-              <p className="text-sm text-foreground">{currentStep.message}</p>
-            </Card>
+              <VariablePanel
+                variables={{
+                  left: currentStep.l,
+                  right: currentStep.r,
+                  leftChar: currentStep.currentCharL === ' ' ? 'Space' : (currentStep.currentCharL || 'None'),
+                  rightChar: currentStep.currentCharR === ' ' ? 'Space' : (currentStep.currentCharR || 'None'),
+                  status: currentStep.isValid === undefined ? 'Comparing' : (currentStep.isValid ? 'Valid' : 'Invalid')
+                }}
+              />
+
+              {currentStep.isValid !== undefined && (
+                <div className={`p-4 rounded-lg border flex items-center justify-center gap-3 ${
+                  currentStep.isValid
+                  ? 'bg-green-500/10 border-green-500/20 text-green-600 dark:text-green-400'
+                  : 'bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-400'
+                }`}>
+                  <span className="text-xl font-bold">
+                    {currentStep.isValid ? '✓ Valid Palindrome' : '✗ Not a Palindrome'}
+                  </span>
+                </div>
+              )}
+            </div>
           </Card>
         </div>
 
-        <Card className="p-4 overflow-hidden">
-          <div className="h-[700px]">
-            <Editor
-              height="100%"
-              defaultLanguage="typescript"
-              value={code}
-              theme="vs-dark"
-              options={{
-                readOnly: true,
-                minimap: { enabled: false },
-                scrollBeyondLastLine: false,
-                fontSize: 13,
-                lineNumbers: 'on',
-              }}
-              onMount={(editor, monaco) => {
-                editorRef.current = editor;
-                monacoRef.current = monaco;
-                const decorations = currentStep.highlightedLines.map(line => ({
-                  range: new monaco.Range(line, 1, line, 1),
-                  options: {
-                    isWholeLine: true,
-                    className: 'highlighted-line',
-                  }
-                }));
-                editor.createDecorationsCollection(decorations);
-              }}
-            />
-          </div>
-        </Card>
+        <div className="lg:h-[calc(100vh-250px)] min-h-[500px]">
+          <AnimatedCodeEditor
+            code={code}
+            language="typescript"
+            highlightedLines={currentStep.highlightedLines}
+          />
+        </div>
       </div>
-
-      <style>{`
-        .highlighted-line {
-          background: rgba(59, 130, 246, 0.15);
-          border-left: 3px solid rgb(59, 130, 246);
-        }
-      `}</style>
     </div>
   );
 };
+
+

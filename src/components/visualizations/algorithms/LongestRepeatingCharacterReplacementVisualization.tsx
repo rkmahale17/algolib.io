@@ -474,8 +474,8 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
         <Card className="p-6">
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold mb-4 text-foreground">Input String: "{s}" (k={k})</h3>
-              <div className="flex flex-wrap gap-2">
+              <h3 className="text-sm font-semibold mb-6 text-foreground">Input String: "{s}" (k={k})</h3>
+              <div className="flex flex-wrap gap-4 py-12">
                 {s.split('').map((char, idx) => {
                   const isInWindow = idx >= currentStep.l && idx <= currentStep.r;
                   const isLeft = idx === currentStep.l;
@@ -493,10 +493,16 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
                         {char}
                       </motion.div>
                       {isLeft && (
-                        <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-blue-600">l</div>
+                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                          <div className="bg-blue-600 text-white text-[10px] px-1.5 py-0.5 rounded font-bold shadow-sm">l</div>
+                          <div className="w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[4px] border-t-blue-600"></div>
+                        </div>
                       )}
                       {isRight && (
-                        <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-red-600">r</div>
+                        <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                          <div className="w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-b-[4px] border-b-red-600"></div>
+                          <div className="bg-red-600 text-white text-[10px] px-1.5 py-0.5 rounded font-bold shadow-sm">r</div>
+                        </div>
                       )}
                     </div>
                   );

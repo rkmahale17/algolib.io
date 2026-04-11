@@ -1,386 +1,409 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { SkipBack, SkipForward, RotateCcw } from 'lucide-react';
-import Editor from '@monaco-editor/react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { StepControls } from '../shared/StepControls';
+import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
 import { VariablePanel } from '../shared/VariablePanel';
-import type { editor as MonacoEditor } from 'monaco-editor';
+import { Button } from '@/components/ui/button';
+import { Layers, ListFilter } from 'lucide-react';
 
 interface Step {
   strs: string[];
-  currentWord?: string;
+  currentStr?: string;
   currentIndex?: number;
-  sortedKey?: string;
+  count?: number[];
+  key?: string;
   map: Record<string, string[]>;
-  result: string[][];
+  result?: string[][];
   message: string;
   highlightedLines: number[];
 }
 
 export const GroupAnagramsVisualization = () => {
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [speed, setSpeed] = useState(1000);
+  const intervalRef = useRef<number | null>(null);
+
+  const cases = [
+    { name: "Default Case", strs: ["eat", "tea", "tan", "ate", "nat", "bat"], icon: <Layers className="w-4 h-4" /> },
+    { name: "Empty Strings", strs: ["", "", ""], icon: <ListFilter className="w-4 h-4" /> }
+  ];
+  const [selectedCaseIndex, setSelectedCaseIndex] = useState(0);
+
   const code = `function groupAnagrams(strs: string[]): string[][] {
-  const map: Record<string, string[]> = {};
-  
-  for (const str of strs) {
-    const sortedStr = str.split('').sort().join('');
-    
-    if (!map[sortedStr]) {
-      map[sortedStr] = [];
+  const map = new Map<string, string[]>();
+
+  for (const s of strs) {
+    const count = new Array(26).fill(0);
+
+    for (const c of s) {
+      const index = c.charCodeAt(0) - 'a'.charCodeAt(0);
+      count[index]++;
     }
-    
-    map[sortedStr].push(str);
+
+    let key = "";
+    for (const num of count) {
+      key += num + "#";
+    }
+
+    if (!map.has(key)) {
+      map.set(key, []);
+    }
+    map.get(key)!.push(s);
   }
-  
-  return Object.values(map);
+
+  return Array.from(map.values());
 }`;
 
-  const steps: Step[] = [
-    {
-      strs: ["eat", "tea", "tan", "ate", "nat", "bat"],
-      map: {},
-      result: [],
-      message: "Initialize: Create empty hashmap to group anagrams by sorted key",
-      highlightedLines: [2]
-    },
-    {
-      strs: ["eat", "tea", "tan", "ate", "nat", "bat"],
-      currentWord: "eat",
-      currentIndex: 0,
-      map: {},
-      result: [],
-      message: "Process str[0]='eat': Split into ['e','a','t']",
-      highlightedLines: [5]
-    },
-    {
-      strs: ["eat", "tea", "tan", "ate", "nat", "bat"],
-      currentWord: "eat",
-      currentIndex: 0,
-      sortedKey: "aet",
-      map: {},
-      result: [],
-      message: "Sort ['e','a','t'] → ['a','e','t'] → key='aet'",
-      highlightedLines: [5]
-    },
-    {
-      strs: ["eat", "tea", "tan", "ate", "nat", "bat"],
-      currentWord: "eat",
-      currentIndex: 0,
-      sortedKey: "aet",
-      map: { aet: [] },
-      result: [],
-      message: "Key 'aet' not in map, create new array: map['aet']=[]",
-      highlightedLines: [7]
-    },
-    {
-      strs: ["eat", "tea", "tan", "ate", "nat", "bat"],
-      currentWord: "eat",
-      currentIndex: 0,
-      sortedKey: "aet",
-      map: { aet: ["eat"] },
-      result: [],
-      message: "Add 'eat' to map['aet'] → map['aet']=['eat']",
-      highlightedLines: [11]
-    },
-    {
-      strs: ["eat", "tea", "tan", "ate", "nat", "bat"],
-      currentWord: "tea",
-      currentIndex: 1,
-      map: { aet: ["eat"] },
-      result: [],
-      message: "Process str[1]='tea': Sort → 'aet' (same key as 'eat'!)",
-      highlightedLines: [5]
-    },
-    {
-      strs: ["eat", "tea", "tan", "ate", "nat", "bat"],
-      currentWord: "tea",
-      currentIndex: 1,
-      sortedKey: "aet",
-      map: { aet: ["eat", "tea"] },
-      result: [],
-      message: "Key 'aet' exists, add 'tea' → map['aet']=['eat','tea']",
-      highlightedLines: [11]
-    },
-    {
-      strs: ["eat", "tea", "tan", "ate", "nat", "bat"],
-      currentWord: "tan",
-      currentIndex: 2,
-      map: { aet: ["eat", "tea"] },
-      result: [],
-      message: "Process str[2]='tan': Sort → 'ant'",
-      highlightedLines: [5]
-    },
-    {
-      strs: ["eat", "tea", "tan", "ate", "nat", "bat"],
-      currentWord: "tan",
-      currentIndex: 2,
-      sortedKey: "ant",
-      map: { aet: ["eat", "tea"], ant: [] },
-      result: [],
-      message: "New key 'ant', create map['ant']=[]",
-      highlightedLines: [7]
-    },
-    {
-      strs: ["eat", "tea", "tan", "ate", "nat", "bat"],
-      currentWord: "tan",
-      currentIndex: 2,
-      sortedKey: "ant",
-      map: { aet: ["eat", "tea"], ant: ["tan"] },
-      result: [],
-      message: "Add 'tan' → map['ant']=['tan']",
-      highlightedLines: [11]
-    },
-    {
-      strs: ["eat", "tea", "tan", "ate", "nat", "bat"],
-      currentWord: "ate",
-      currentIndex: 3,
-      sortedKey: "aet",
-      map: { aet: ["eat", "tea"], ant: ["tan"] },
-      result: [],
-      message: "Process str[3]='ate': Sort → 'aet' (matches 'eat','tea')",
-      highlightedLines: [5]
-    },
-    {
-      strs: ["eat", "tea", "tan", "ate", "nat", "bat"],
-      currentWord: "ate",
-      currentIndex: 3,
-      sortedKey: "aet",
-      map: { aet: ["eat", "tea", "ate"], ant: ["tan"] },
-      result: [],
-      message: "Add 'ate' → map['aet']=['eat','tea','ate']",
-      highlightedLines: [11]
-    },
-    {
-      strs: ["eat", "tea", "tan", "ate", "nat", "bat"],
-      currentWord: "nat",
-      currentIndex: 4,
-      sortedKey: "ant",
-      map: { aet: ["eat", "tea", "ate"], ant: ["tan"] },
-      result: [],
-      message: "Process str[4]='nat': Sort → 'ant' (matches 'tan')",
-      highlightedLines: [5]
-    },
-    {
-      strs: ["eat", "tea", "tan", "ate", "nat", "bat"],
-      currentWord: "nat",
-      currentIndex: 4,
-      sortedKey: "ant",
-      map: { aet: ["eat", "tea", "ate"], ant: ["tan", "nat"] },
-      result: [],
-      message: "Add 'nat' → map['ant']=['tan','nat']",
-      highlightedLines: [11]
-    },
-    {
-      strs: ["eat", "tea", "tan", "ate", "nat", "bat"],
-      currentWord: "bat",
-      currentIndex: 5,
-      sortedKey: "abt",
-      map: { aet: ["eat", "tea", "ate"], ant: ["tan", "nat"] },
-      result: [],
-      message: "Process str[5]='bat': Sort → 'abt' (new key)",
-      highlightedLines: [5]
-    },
-    {
-      strs: ["eat", "tea", "tan", "ate", "nat", "bat"],
-      currentWord: "bat",
-      currentIndex: 5,
-      sortedKey: "abt",
-      map: { aet: ["eat", "tea", "ate"], ant: ["tan", "nat"], abt: [] },
-      result: [],
-      message: "Create map['abt']=[]",
-      highlightedLines: [7]
-    },
-    {
-      strs: ["eat", "tea", "tan", "ate", "nat", "bat"],
-      currentWord: "bat",
-      currentIndex: 5,
-      sortedKey: "abt",
-      map: { aet: ["eat", "tea", "ate"], ant: ["tan", "nat"], abt: ["bat"] },
-      result: [],
-      message: "Add 'bat' → map['abt']=['bat']",
-      highlightedLines: [11]
-    },
-    {
-      strs: ["eat", "tea", "tan", "ate", "nat", "bat"],
-      map: { aet: ["eat", "tea", "ate"], ant: ["tan", "nat"], abt: ["bat"] },
-      result: [["eat", "tea", "ate"], ["tan", "nat"], ["bat"]],
-      message: "Return Object.values(map) → [['eat','tea','ate'], ['tan','nat'], ['bat']]",
-      highlightedLines: [14]
-    }
-  ];
+  const generateSteps = (strs: string[]) => {
+    const steps: Step[] = [];
+    const map: Record<string, string[]> = {};
 
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const currentStep = steps[Math.min(currentStepIndex, steps.length - 1)];
-  const editorRef = useRef<MonacoEditor.IStandaloneCodeEditor | null>(null);
-  const monacoRef = useRef<typeof import('monaco-editor') | null>(null);
+    steps.push({
+      strs,
+      map: { ...map },
+      message: "Initialize an empty Map to store anagram groups.",
+      highlightedLines: [2]
+    });
+
+    for (let i = 0; i < strs.length; i++) {
+      const s = strs[i];
+      const count = new Array(26).fill(0);
+
+      steps.push({
+        strs,
+        currentStr: s,
+        currentIndex: i,
+        map: { ...map },
+        message: `Process string: '${s}' at index ${i}.`,
+        highlightedLines: [4]
+      });
+
+      steps.push({
+        strs,
+        currentStr: s,
+        currentIndex: i,
+        count: [...count],
+        map: { ...map },
+        message: "Initialize frequency array with 26 zeros.",
+        highlightedLines: [5]
+      });
+
+      steps.push({
+        strs,
+        currentStr: s,
+        currentIndex: i,
+        count: [...count],
+        map: { ...map },
+        message: `Iterate through characters in '${s}'.`,
+        highlightedLines: [7]
+      });
+
+      for (const c of s) {
+        const charIdx = c.charCodeAt(0) - 'a'.charCodeAt(0);
+        count[charIdx]++;
+        steps.push({
+          strs,
+          currentStr: s,
+          currentIndex: i,
+          count: [...count],
+          map: { ...map },
+          message: `Update count for '${c}' at index ${charIdx}.`,
+          highlightedLines: [8, 9]
+        });
+      }
+
+      let key = "";
+      steps.push({
+        strs,
+        currentStr: s,
+        currentIndex: i,
+        count: [...count],
+        key: "",
+        map: { ...map },
+        message: "Initialize an empty key string.",
+        highlightedLines: [12]
+      });
+
+      for (const num of count) {
+        key += num + "#";
+      }
+
+      steps.push({
+        strs,
+        currentStr: s,
+        currentIndex: i,
+        count: [...count],
+        key,
+        map: { ...map },
+        message: `Constructed key signature: '${key.substring(0, 15)}...'`,
+        highlightedLines: [13, 14, 15]
+      });
+
+      steps.push({
+        strs,
+        currentStr: s,
+        currentIndex: i,
+        key,
+        map: { ...map },
+        message: `Check if map contains key: '${key.substring(0, 10)}...'`,
+        highlightedLines: [17]
+      });
+
+      if (!map[key]) {
+        map[key] = [];
+        steps.push({
+          strs,
+          currentStr: s,
+          currentIndex: i,
+          key,
+          map: JSON.parse(JSON.stringify(map)),
+          message: "Key not found. Create a new entry.",
+          highlightedLines: [18]
+        });
+      }
+
+      map[key].push(s);
+      steps.push({
+        strs,
+        currentStr: s,
+        currentIndex: i,
+        key,
+        map: JSON.parse(JSON.stringify(map)),
+        message: `Add '${s}' to the group.`,
+        highlightedLines: [20]
+      });
+    }
+
+    steps.push({
+      strs,
+      map: JSON.parse(JSON.stringify(map)),
+      result: Object.values(map),
+      message: "Return all anagram groups as an array of arrays.",
+      highlightedLines: [23]
+    });
+
+    return steps;
+  };
+
+  const [steps, setSteps] = useState<Step[]>([]);
 
   useEffect(() => {
-    if (editorRef.current && monacoRef.current) {
-      const decorations = currentStep.highlightedLines.map(line => ({
-        range: new monacoRef.current!.Range(line, 1, line, 1),
-        options: {
-          isWholeLine: true,
-          className: 'highlighted-line',
-        }
-      }));
-      editorRef.current.createDecorationsCollection(decorations);
+    setSteps(generateSteps(cases[selectedCaseIndex].strs));
+    setCurrentStepIndex(0);
+    setIsPlaying(false);
+  }, [selectedCaseIndex]);
+
+  useEffect(() => {
+    if (isPlaying && currentStepIndex < steps.length - 1) {
+      intervalRef.current = window.setInterval(() => {
+        setCurrentStepIndex((prev) => {
+          if (prev >= steps.length - 1) {
+            setIsPlaying(false);
+            return prev;
+          }
+          return prev + 1;
+        });
+      }, speed);
+    } else if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
     }
-  }, [currentStepIndex, currentStep.highlightedLines]);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [isPlaying, currentStepIndex, steps.length, speed]);
+
+  const handleCaseChange = (index: number) => {
+    if (index === selectedCaseIndex) return;
+    setSelectedCaseIndex(index);
+  };
+
+  if (steps.length === 0) return null;
+  const step = steps[currentStepIndex];
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <Button onClick={() => setCurrentStepIndex(0)} variant="outline" size="sm">
-            <RotateCcw className="h-4 w-4" />
-          </Button>
-          <Button onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))} disabled={currentStepIndex === 0} variant="outline" size="sm">
-            <SkipBack className="h-4 w-4" />
-          </Button>
-          <Button onClick={() => setCurrentStepIndex(Math.min(steps.length - 1, currentStepIndex + 1))} disabled={currentStepIndex === steps.length - 1} variant="outline" size="sm">
-            <SkipForward className="h-4 w-4" />
-          </Button>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <StepControls
+          currentStep={currentStepIndex}
+          totalSteps={steps.length - 1}
+          isPlaying={isPlaying}
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
+          onStepForward={() => setCurrentStepIndex(prev => Math.min(steps.length - 1, prev + 1))}
+          onStepBack={() => setCurrentStepIndex(prev => Math.max(0, prev - 1))}
+          onReset={() => { setCurrentStepIndex(0); setIsPlaying(false); }}
+          speed={speed}
+          onSpeedChange={setSpeed}
+        />
+
+        <div className="flex p-1 bg-muted/50 rounded-xl border border-border/50 backdrop-blur-sm self-start sm:self-center">
+          {cases.map((testCase, idx) => (
+            <button
+              key={idx}
+              onClick={() => handleCaseChange(idx)}
+              className={`relative px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-300 flex items-center gap-2 ${
+                selectedCaseIndex === idx 
+                  ? 'text-primary' 
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {selectedCaseIndex === idx && (
+                <motion.div
+                  layoutId="activeCaseGroup"
+                  className="absolute inset-0 bg-background shadow-sm border border-border/50 rounded-lg"
+                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                />
+              )}
+              <span className="relative z-10 flex items-center gap-2">
+                {testCase.icon}
+                {testCase.name}
+              </span>
+            </button>
+          ))}
         </div>
-        <span className="text-sm text-muted-foreground">Step {currentStepIndex + 1} of {steps.length}</span>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Input Array</h3>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {currentStep.strs.map((word, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.3, delay: idx * 0.1 }}
-                  className={`px-4 py-2 rounded font-mono font- border-2 ${idx === currentStep.currentIndex
-                    ? 'bg-primary/20 border-primary text-primary'
-                    : 'bg-muted/50 border-border text-foreground'
+        <div className="space-y-6">
+          <Card className="p-6 border shadow-sm space-y-8">
+            {/* Input Array */}
+            <div>
+              <h3 className="text-sm font-semibold mb-3 text-muted-foreground uppercase tracking-wider">Input Strings</h3>
+              <div className="flex flex-wrap gap-2">
+                {step.strs.map((s, idx) => (
+                  <motion.div
+                    key={idx}
+                    className={`px-3 py-1.5 rounded-md font-mono text-sm border-2 transition-colors duration-200 ${
+                      step.currentIndex === idx
+                        ? 'bg-primary/20 border-primary text-primary font-bold'
+                        : 'bg-muted/50 border-transparent text-muted-foreground'
                     }`}
-                >
-                  "{word}"
-                </motion.div>
-              ))}
-            </div>
-
-            {currentStep.currentWord && (
-              <motion.div
-                initial={{ y: -10, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                className="p-3 bg-primary/10 rounded mb-4"
-              >
-                <p className="text-sm">
-                  <span className="font-semibold">Current:</span> "{currentStep.currentWord}"
-                  {currentStep.sortedKey && (
-                    <span className="ml-4">
-                      <span className="font-semibold">Sorted Key:</span> "{currentStep.sortedKey}"
-                    </span>
-                  )}
-                </p>
-              </motion.div>
-            )}
-
-            <div className="mb-4">
-              <h4 className="text-sm font-semibold mb-3">Anagram Map (by sorted key)</h4>
-              <div className="space-y-3">
-                {Object.entries(currentStep.map).length > 0 ? (
-                  Object.entries(currentStep.map).map(([key, words]) => (
-                    <motion.div
-                      key={key}
-                      initial={{ y: -10, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      className={`p-3 rounded border ${key === currentStep.sortedKey
-                        ? 'bg-primary/10 border-primary'
-                        : 'bg-muted/50 border-border'
-                        }`}
-                    >
-                      <div className="flex items-start gap-3">
-                        <span className="font-mono font- text-primary shrink-0">"{key}":</span>
-                        <div className="flex flex-wrap gap-2">
-                          {words.map((word, idx) => (
-                            <span key={idx} className="px-2 py-1 bg-background rounded font-mono text-sm">
-                              "{word}"
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))
-                ) : (
-                  <p className="text-sm text-muted-foreground">Empty map</p>
-                )}
+                    animate={step.currentIndex === idx ? { scale: 1.05 } : { scale: 1 }}
+                  >
+                    "{s}"
+                  </motion.div>
+                ))}
               </div>
             </div>
 
-            {currentStep.result.length > 0 && (
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="p-4 bg-green-500/10 border border-green-500/20 rounded"
-              >
-                <h4 className="text-sm font-semibold mb-3 text-green-600">Result</h4>
-                <div className="space-y-2">
-                  {currentStep.result.map((group, idx) => (
-                    <div key={idx} className="flex gap-2 items-center">
-                      <span className="text-sm text-muted-foreground">[{idx}]</span>
-                      <div className="flex flex-wrap gap-2">
-                        {group.map((word, wIdx) => (
-                          <span key={wIdx} className="px-3 py-1 bg-green-500/20 rounded font-mono text-sm">
-                            "{word}"
+            {/* Count Array */}
+            <AnimatePresence mode="wait">
+              {step.count && (
+                <motion.div
+                  key="count-viz"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                >
+                  <h3 className="text-sm font-semibold mb-3 text-muted-foreground uppercase tracking-wider">
+                    Frequency Count for "{step.currentStr}"
+                  </h3>
+                  <div className="flex flex-wrap gap-1">
+                    {step.count.map((count, idx) => {
+                      const char = String.fromCharCode(97 + idx);
+                      if (count === 0 && !['a', 'e', 't', 'n', 'b'].includes(char)) return null;
+                      return (
+                        <div
+                          key={idx}
+                          className={`flex flex-col items-center p-1.5 min-w-[36px] rounded-lg border-2 transition-all duration-200 ${
+                            count > 0 ? 'bg-primary/10 border-primary/30' : 'bg-muted/30 border-transparent'
+                          }`}
+                        >
+                          <span className="text-[10px] uppercase font-bold text-muted-foreground">{char}</span>
+                          <span className={`text-sm font-black ${count > 0 ? 'text-primary' : 'text-muted-foreground/50'}`}>
+                            {count}
                           </span>
-                        ))}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Map Visualization */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Anagram Map</h3>
+              <div className="space-y-3">
+                <AnimatePresence initial={false}>
+                  {Object.keys(step.map).length === 0 ? (
+                    <p className="text-sm text-muted-foreground italic pl-2">Initializing map...</p>
+                  ) : (
+                    Object.entries(step.map).map(([key, group], idx) => (
+                      <motion.div
+                        key={key}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="flex items-center gap-4 p-3 rounded-xl bg-muted/30 border border-border/50 group hover:border-primary/30 transition-colors"
+                      >
+                        <div className="text-[10px] font-mono font-bold text-muted-foreground bg-background px-2 py-1 rounded-md border border-border shadow-sm shrink-0 truncate max-w-[120px]">
+                          {key.substring(0, 8)}...
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {group.map((s, sIdx) => (
+                            <span key={sIdx} className="px-2.5 py-1 bg-primary/10 text-primary text-xs rounded-lg font-bold border border-primary/20">
+                              "{s}"
+                            </span>
+                          ))}
+                        </div>
+                      </motion.div>
+                    ))
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+
+            {/* Final Result */}
+            {step.result && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-5 rounded-2xl bg-primary/5 border-2 border-primary/20 shadow-[0_0_20px_rgba(var(--primary),0.05)]"
+              >
+                <h3 className="text-sm font-black mb-4 text-primary uppercase tracking-widest flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                  Final Result
+                </h3>
+                <div className="space-y-3">
+                  {step.result.map((group, idx) => (
+                    <div key={idx} className="flex items-center gap-3">
+                      <span className="text-[10px] font-bold text-muted-foreground/50 w-4">#{idx + 1}</span>
+                      <div className="flex flex-wrap gap-2 p-2 bg-background/50 rounded-lg border border-border/50 w-full text-sm font-mono font-bold">
+                        [{group.map(s => `"${s}"`).join(', ')}]
                       </div>
                     </div>
                   ))}
                 </div>
               </motion.div>
             )}
-
-            <Card className="p-4 mt-4 bg-primary/5 border-primary/20">
-              <p className="text-sm text-foreground">{currentStep.message}</p>
-            </Card>
           </Card>
+
+          {/* Commentary Above VariablePanel */}
+          <div className="p-5 bg-accent/30 rounded-2xl border border-accent/20 shadow-sm min-h-[70px] flex items-center">
+            <p className="text-sm font-semibold leading-relaxed text-foreground">
+              {step.message}
+            </p>
+          </div>
+
+          <VariablePanel
+            variables={{
+              "Current String": step.currentStr || "None",
+              "Index": step.currentIndex ?? "N/A",
+              "Map Groups": Object.keys(step.map).length,
+              "Status": step.result ? "Complete ✓" : "Processing..."
+            }}
+          />
         </div>
 
-        <Card className="p-4 overflow-hidden">
-          <div className="h-[700px]">
-            <Editor
-              height="100%"
-              defaultLanguage="typescript"
-              value={code}
-              theme="vs-dark"
-              options={{
-                readOnly: true,
-                minimap: { enabled: false },
-                scrollBeyondLastLine: false,
-                fontSize: 13,
-                lineNumbers: 'on',
-              }}
-              onMount={(editor, monaco) => {
-                editorRef.current = editor;
-                monacoRef.current = monaco;
-                const decorations = currentStep.highlightedLines.map(line => ({
-                  range: new monaco.Range(line, 1, line, 1),
-                  options: {
-                    isWholeLine: true,
-                    className: 'highlighted-line',
-                  }
-                }));
-                editor.createDecorationsCollection(decorations);
-              }}
-            />
-          </div>
-        </Card>
+        <AnimatedCodeEditor
+          code={code}
+          language="typescript"
+          highlightedLines={step.highlightedLines}
+        />
       </div>
-
-      <style>{`
-        .highlighted-line {
-          background: rgba(59, 130, 246, 0.15);
-          border-left: 3px solid rgb(59, 130, 246);
-        }
-      `}</style>
     </div>
   );
 };

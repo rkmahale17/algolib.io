@@ -224,7 +224,7 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
                   <TooltipTrigger asChild>
                     <Button
                       onClick={onSubmit}
-                      disabled={isRunnerLoading || isRunnerSubmitting || !lastRunSuccess || (algorithm?.metadata?.is_pro && !hasPremiumAccess && !hideUserMenu)}
+                      disabled={isRunnerLoading || isRunnerSubmitting || !lastRunSuccess || ((algorithm?.is_premium || algorithm?.metadata?.is_pro) && !hasPremiumAccess && !hideUserMenu)}
                       size="sm"
                       variant="default"
                       className={`h-8 px-4 text-xs rounded-l-none border ${lastRunSuccess
@@ -241,7 +241,7 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent side="bottom">
-                    {algorithm?.metadata?.is_pro && !hasPremiumAccess && !hideUserMenu ? (
+                    {(algorithm?.is_premium || algorithm?.metadata?.is_pro) && !hasPremiumAccess && !hideUserMenu ? (
                       <span className="text-orange-500 font-medium">Unlock Pro mode to submit this problem</span>
                     ) : !lastRunSuccess && !isRunnerLoading && !isRunnerSubmitting ? (
                       <span className="text-orange-500 font-medium">Run all test cases successfully to enable submission</span>

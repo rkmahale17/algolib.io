@@ -131,7 +131,7 @@ const Problems = () => {
               algorithm={algo}
               status={(progressMap?.[algo.id] || 'none') as any}
               index={index}
-              isPremium={algo.is_premium || (algo.listType !== ListType.Core && algo.listType !== ListType.CoreAndBlind75)}
+              isPremium={algo.is_premium}
               isFirst={index === 0}
               isLast={index === filteredAndSortedAlgorithms.length - 1}
             />

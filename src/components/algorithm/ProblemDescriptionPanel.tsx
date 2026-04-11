@@ -244,7 +244,7 @@ export const ProblemDescriptionPanel = React.memo(({
                       <h1 className="text-xl font-medium">
                         {<span className="font-medium text-md mr-1">{algorithm.serial_no ? `${algorithm.serial_no}. ` : ''}</span>}{algorithm.name}
                       </h1>
-                      {algorithm?.list_type && algorithm.list_type !== 'core' && algorithm.list_type !== 'core+blind75' && (
+                      {(algorithm?.is_premium || algorithm?.is_pro || algorithm?.metadata?.is_pro) && (
                         <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-300 border-amber-500/20 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
                           PRO
                         </Badge>
@@ -519,7 +519,7 @@ export const ProblemDescriptionPanel = React.memo(({
 
                                       <div className="p-1 min-h-[150px] relative">
                                         <TabsContent value="steps" className="mt-4 h-full">
-                                          {algorithm?.metadata?.is_pro && !hasPremiumAccess && !isPlatformPreview ? (
+                                          {(algorithm?.is_premium || algorithm?.is_pro || algorithm?.metadata?.is_pro) && !hasPremiumAccess && !isPlatformPreview ? (
                                             <ProOverlay className="rounded-none border-0 py-12" />
                                           ) : (
                                             <div className="text-sm text-muted-foreground">
@@ -536,7 +536,7 @@ export const ProblemDescriptionPanel = React.memo(({
                                         </TabsContent>
 
                                         <TabsContent value="tips" className="mt-4 h-full">
-                                          {algorithm?.metadata?.is_pro && !hasPremiumAccess && !isPlatformPreview ? (
+                                          {(algorithm?.is_premium || algorithm?.is_pro || algorithm?.metadata?.is_pro) && !hasPremiumAccess && !isPlatformPreview ? (
                                             <ProOverlay className="rounded-none border-0 py-12" />
                                           ) : (
                                             <div className="text-sm text-muted-foreground">
@@ -668,8 +668,8 @@ export const ProblemDescriptionPanel = React.memo(({
                       <Maximize2 className="w-4 h-4" />
                     </Button>
                   </div>
-                  <div className={`flex-1 overflow-auto no-scrollbar relative flex flex-col ${algorithm?.metadata?.is_pro && !hasPremiumAccess && !isPlatformPreview ? 'p-0' : 'p-6'}`}>
-                    {algorithm?.metadata?.is_pro && !hasPremiumAccess && !isPlatformPreview ? (
+                  <div className={`flex-1 overflow-auto no-scrollbar relative flex flex-col ${(algorithm?.is_premium || algorithm?.is_pro || algorithm?.metadata?.is_pro) && !hasPremiumAccess && !isPlatformPreview ? 'p-0' : 'p-6'}`}>
+                    {(algorithm?.is_premium || algorithm?.is_pro || algorithm?.metadata?.is_pro) && !hasPremiumAccess && !isPlatformPreview ? (
                       <ProOverlay className="rounded-none border-0 flex-1 h-full" />
                     ) : (
                       renderVisualization()
@@ -683,7 +683,7 @@ export const ProblemDescriptionPanel = React.memo(({
           <TabsContent value="solutions" className="h-full m-0 data-[state=inactive]:hidden">
             {algorithm?.controls?.tabs?.solutions === false ? (
               <TabWarning message="Detailed solutions are not available for this problem yet." />
-            ) : algorithm?.metadata?.is_pro && !hasPremiumAccess && !isPlatformPreview ? (
+            ) : (algorithm?.is_premium || algorithm?.is_pro || algorithm?.metadata?.is_pro) && !hasPremiumAccess && !isPlatformPreview ? (
               <div className="h-full flex flex-col">
                 <ProOverlay className="rounded-none border-0 flex-1" />
               </div>

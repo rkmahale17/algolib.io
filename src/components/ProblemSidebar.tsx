@@ -113,7 +113,7 @@ export const ProblemSidebar = ({
                     const status = progressMap[algo.id] || 'none';
                     const isSolved = status === 'solved';
                     const isActive = algo.id === currentIdOrSlug || algo.slug === currentIdOrSlug;
-                    const isPremium = isPaywallEnabled && algo.listType !== 'core' && algo.listType !== 'core+blind75' && !hasPremiumAccess;
+                    const isPremium = isPaywallEnabled && (algo.is_premium || algo.is_pro || algo.metadata?.is_pro) && !hasPremiumAccess;
 
                     // Properly format difficulty for display
                     const difficulty = algo.difficulty || 'Medium';

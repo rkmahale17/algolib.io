@@ -1,262 +1,240 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { SkipBack, SkipForward, RotateCcw } from 'lucide-react';
-import Editor from '@monaco-editor/react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ListFilter, FileText } from 'lucide-react';
 import { VariablePanel } from '../shared/VariablePanel';
-import type { editor as MonacoEditor } from 'monaco-editor';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
+import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
 
 interface Step {
   strs: string[];
   encoded: string;
   decoded: string[];
-  phase: string;
+  phase: 'init' | 'encode' | 'decode' | 'result';
   currentIdx: number;
   currentStr: string;
   i: number;
   j: number;
   length: number;
-  message: string;
+  comment: string;
   highlightedLines: number[];
 }
 
 export const EncodeDecodeStringsVisualization = () => {
-  const code = `function encode(strs: string[]): string {
-  let result = '';
-  for (const str of strs) {
-    result += str.length + '#' + str;
+  const code = `function Solution(strs: string[]): string[] {
+  function encode(strs: string[]): string {
+    let res = "";
+    for (const s of strs) {
+      res += s.length + "#" + s;
+    }
+    return res;
   }
-  return result;
-}
 
-function decode(s: string): string[] {
-  const result: string[] = [];
-  let i = 0;
-  
-  while (i < s.length) {
-    let j = i;
-    while (s[j] !== '#') j++;
-    const length = parseInt(s.substring(i, j));
-    const str = s.substring(j + 1, j + 1 + length);
-    result.push(str);
-    i = j + 1 + length;
+  function decode(str: string): string[] {
+    const res: string[] = [];
+    let i = 0;
+    while (i < str.length) {
+      let j = i;
+      while (str[j] !== "#") {
+        j++;
+      }
+      const length = parseInt(str.substring(i, j));
+      const word = str.substring(j + 1, j + 1 + length);
+      res.push(word);
+      i = j + 1 + length;
+    }
+    return res;
   }
-  
-  return result;
+
+  const encoded = encode(strs);
+  return decode(encoded);
 }`;
 
-  const steps: Step[] = [
-    { strs: ["hello", "world"], encoded: "", decoded: [], phase: "encode-start", currentIdx: -1, currentStr: "", i: -1, j: -1, length: 0, message: "ENCODE: Start with input array", highlightedLines: [2] },
-
-    { strs: ["hello", "world"], encoded: "", decoded: [], phase: "encode-process", currentIdx: 0, currentStr: "hello", i: -1, j: -1, length: 5, message: "Processing str[0]: 'hello' (length=5)", highlightedLines: [3] },
-    { strs: ["hello", "world"], encoded: "5", decoded: [], phase: "encode-len", currentIdx: 0, currentStr: "hello", i: -1, j: -1, length: 5, message: "Add length: '5'", highlightedLines: [4] },
-    { strs: ["hello", "world"], encoded: "5#", decoded: [], phase: "encode-delim", currentIdx: 0, currentStr: "hello", i: -1, j: -1, length: 5, message: "Add delimiter: '#'", highlightedLines: [4] },
-    { strs: ["hello", "world"], encoded: "5#hello", decoded: [], phase: "encode-str", currentIdx: 0, currentStr: "hello", i: -1, j: -1, length: 5, message: "Add string: 'hello'", highlightedLines: [4] },
-
-    { strs: ["hello", "world"], encoded: "5#hello", decoded: [], phase: "encode-process", currentIdx: 1, currentStr: "world", i: -1, j: -1, length: 5, message: "Processing str[1]: 'world' (length=5)", highlightedLines: [3] },
-    { strs: ["hello", "world"], encoded: "5#hello5", decoded: [], phase: "encode-len", currentIdx: 1, currentStr: "world", i: -1, j: -1, length: 5, message: "Add length: '5'", highlightedLines: [4] },
-    { strs: ["hello", "world"], encoded: "5#hello5#", decoded: [], phase: "encode-delim", currentIdx: 1, currentStr: "world", i: -1, j: -1, length: 5, message: "Add delimiter: '#'", highlightedLines: [4] },
-    { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: [], phase: "encode-str", currentIdx: 1, currentStr: "world", i: -1, j: -1, length: 5, message: "Add string: 'world'", highlightedLines: [4] },
-    { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: [], phase: "encode-done", currentIdx: -1, currentStr: "", i: -1, j: -1, length: 0, message: "Encoding complete! Result: '5#hello5#world'", highlightedLines: [6] },
-
-    { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: [], phase: "decode-start", currentIdx: -1, currentStr: "", i: 0, j: -1, length: 0, message: "DECODE: Start parsing encoded string", highlightedLines: [10] },
-    { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: [], phase: "decode-init", currentIdx: -1, currentStr: "", i: 0, j: -1, length: 0, message: "Initialize: i=0, result=[]", highlightedLines: [11] },
-
-    { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: [], phase: "decode-loop", currentIdx: 0, currentStr: "", i: 0, j: 0, length: 0, message: "Loop iteration 1: i=0, j=0", highlightedLines: [13] },
-    { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: [], phase: "decode-find", currentIdx: 0, currentStr: "", i: 0, j: 0, length: 0, message: "Find delimiter: s[0]='5' != '#'", highlightedLines: [15] },
-    { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: [], phase: "decode-find", currentIdx: 0, currentStr: "", i: 0, j: 1, length: 0, message: "s[1]='#' found! j=1", highlightedLines: [15] },
-    { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: [], phase: "decode-length", currentIdx: 0, currentStr: "", i: 0, j: 1, length: 5, message: "Parse length: substring(0,1)='5' → length=5", highlightedLines: [16] },
-    { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: [], phase: "decode-extract", currentIdx: 0, currentStr: "hello", i: 0, j: 1, length: 5, message: "Extract string: substring(2,7)='hello'", highlightedLines: [17] },
-    { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: ["hello"], phase: "decode-push", currentIdx: 0, currentStr: "hello", i: 0, j: 1, length: 5, message: "Push 'hello' to result array", highlightedLines: [18] },
-    { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: ["hello"], phase: "decode-advance", currentIdx: 0, currentStr: "", i: 7, j: 1, length: 5, message: "Advance pointer: i = 1 + 1 + 5 = 7", highlightedLines: [19] },
-
-    { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: ["hello"], phase: "decode-loop", currentIdx: 1, currentStr: "", i: 7, j: 7, length: 0, message: "Loop iteration 2: i=7, j=7", highlightedLines: [13] },
-    { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: ["hello"], phase: "decode-find", currentIdx: 1, currentStr: "", i: 7, j: 7, length: 0, message: "Find delimiter: s[7]='5' != '#'", highlightedLines: [15] },
-    { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: ["hello"], phase: "decode-find", currentIdx: 1, currentStr: "", i: 7, j: 8, length: 0, message: "s[8]='#' found! j=8", highlightedLines: [15] },
-    { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: ["hello"], phase: "decode-length", currentIdx: 1, currentStr: "", i: 7, j: 8, length: 5, message: "Parse length: substring(7,8)='5' → length=5", highlightedLines: [16] },
-    { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: ["hello"], phase: "decode-extract", currentIdx: 1, currentStr: "world", i: 7, j: 8, length: 5, message: "Extract string: substring(9,14)='world'", highlightedLines: [17] },
-    { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: ["hello", "world"], phase: "decode-push", currentIdx: 1, currentStr: "world", i: 7, j: 8, length: 5, message: "Push 'world' to result array", highlightedLines: [18] },
-    { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: ["hello", "world"], phase: "decode-advance", currentIdx: 1, currentStr: "", i: 14, j: 8, length: 5, message: "Advance pointer: i = 8 + 1 + 5 = 14", highlightedLines: [19] },
-
-    { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: ["hello", "world"], phase: "decode-check", currentIdx: -1, currentStr: "", i: 14, j: -1, length: 0, message: "Check loop: i=14 >= s.length=14, exit loop", highlightedLines: [13] },
-    { strs: ["hello", "world"], encoded: "5#hello5#world", decoded: ["hello", "world"], phase: "decode-done", currentIdx: -1, currentStr: "", i: -1, j: -1, length: 0, message: "Decoding complete! Return ['hello', 'world'] ✓", highlightedLines: [22] }
-  ];
-
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const currentStep = steps[Math.min(currentStepIndex, steps.length - 1)];
-  const editorRef = useRef<MonacoEditor.IStandaloneCodeEditor | null>(null);
-  const monacoRef = useRef<typeof import('monaco-editor') | null>(null);
-
-  useEffect(() => {
-    if (editorRef.current && monacoRef.current) {
-      const decorations = currentStep.highlightedLines.map(line => ({
-        range: new monacoRef.current!.Range(line, 1, line, 1),
-        options: {
-          isWholeLine: true,
-          className: 'highlighted-line'
-        }
-      }));
-      editorRef.current.createDecorationsCollection(decorations);
+  const cases = {
+    "standard": {
+      strs: ["hello", "word"],
+      steps: [
+        { strs: ["hello", "word"], encoded: "", decoded: [], phase: 'init', currentIdx: -1, currentStr: "", i: -1, j: -1, length: 0, comment: "Starting the Encode and Decode process for ['hello', 'word'].", highlightedLines: [1] },
+        { strs: ["hello", "word"], encoded: "", decoded: [], phase: 'encode', currentIdx: -1, currentStr: "", i: -1, j: -1, length: 0, comment: "Calling `encode(strs)`. Initializing `res` to an empty string.", highlightedLines: [2, 3, 26] },
+        { strs: ["hello", "word"], encoded: "", decoded: [], phase: 'encode', currentIdx: 0, currentStr: "hello", i: -1, j: -1, length: 0, comment: "Iteration 1: Processing the first string 'hello'.", highlightedLines: [4] },
+        { strs: ["hello", "word"], encoded: "5#hello", decoded: [], phase: 'encode', currentIdx: 0, currentStr: "hello", i: -1, j: -1, length: 0, comment: "Append '5#hello' (length + '#' + string) to `res`.", highlightedLines: [5] },
+        { strs: ["hello", "word"], encoded: "5#hello", decoded: [], phase: 'encode', currentIdx: 1, currentStr: "word", i: -1, j: -1, length: 0, comment: "Iteration 2: Processing the string 'word'.", highlightedLines: [4] },
+        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: [], phase: 'encode', currentIdx: 1, currentStr: "word", i: -1, j: -1, length: 0, comment: "Append '4#word' to `res`.", highlightedLines: [5] },
+        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: [], phase: 'encode', currentIdx: -1, currentStr: "", i: -1, j: -1, length: 0, comment: "Encoding finished. Resulting string: '5#hello4#word'.", highlightedLines: [7, 26] },
+        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: [], phase: 'decode', currentIdx: -1, currentStr: "", i: -1, j: -1, length: 0, comment: "Calling `decode(encoded)`. Initializing `res` array and pointer `i = 0`.", highlightedLines: [10, 11, 12, 27] },
+        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: [], phase: 'decode', currentIdx: -1, currentStr: "", i: 0, j: 0, length: 0, comment: "While i (0) < 13: Search for '#' starting from j = i (0).", highlightedLines: [13, 14, 15] },
+        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: [], phase: 'decode', currentIdx: -1, currentStr: "", i: 0, j: 1, length: 0, comment: "Found '#' at index j = 1.", highlightedLines: [15, 16] },
+        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: [], phase: 'decode', currentIdx: -1, currentStr: "", i: 0, j: 1, length: 5, comment: "Parse length between i and j: str.substring(0, 1) = '5'.", highlightedLines: [18] },
+        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: [], phase: 'decode', currentIdx: -1, currentStr: "hello", i: 0, j: 1, length: 5, comment: "Extract word using parsed length 5: str.substring(2, 7) = 'hello'.", highlightedLines: [19] },
+        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: ["hello"], phase: 'decode', currentIdx: -1, currentStr: "hello", i: 0, j: 1, length: 5, comment: "Add 'hello' to decoded array.", highlightedLines: [20] },
+        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: ["hello"], phase: 'decode', currentIdx: -1, currentStr: "", i: 7, j: 1, length: 5, comment: "Advance `i` to j + 1 + length (1 + 1 + 5 = 7).", highlightedLines: [21] },
+        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: ["hello"], phase: 'decode', currentIdx: -1, currentStr: "", i: 7, j: 7, length: 0, comment: "Next iteration: Find next '#' starting from j = 7.", highlightedLines: [13, 14, 15] },
+        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: ["hello"], phase: 'decode', currentIdx: -1, currentStr: "", i: 7, j: 8, length: 0, comment: "Found '#' at index j = 8.", highlightedLines: [15, 16] },
+        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: ["hello"], phase: 'decode', currentIdx: -1, currentStr: "", i: 7, j: 8, length: 4, comment: "Parse length: str.substring(7, 8) = '4'.", highlightedLines: [18] },
+        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: ["hello"], phase: 'decode', currentIdx: -1, currentStr: "word", i: 7, j: 8, length: 4, comment: "Extract word of length 4: 'word'.", highlightedLines: [19] },
+        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: ["hello", "word"], phase: 'decode', currentIdx: -1, currentStr: "word", i: 7, j: 8, length: 4, comment: "Add 'word' to result.", highlightedLines: [20] },
+        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: ["hello", "word"], phase: 'decode', currentIdx: -1, currentStr: "", i: 13, j: 8, length: 4, comment: "Advance `i` to 8 + 1 + 4 = 13.", highlightedLines: [21] },
+        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: ["hello", "word"], phase: 'result', currentIdx: -1, currentStr: "", i: -1, j: -1, length: 0, comment: "Decoding complete. Final array restored!", highlightedLines: [23, 27] }
+      ]
+    },
+    "empty": {
+      strs: ["", "a"],
+      steps: [
+        { strs: ["", "a"], encoded: "", decoded: [], phase: 'init', currentIdx: -1, currentStr: "", i: -1, j: -1, length: 0, comment: "Checking edge case with an empty string.", highlightedLines: [1] },
+        { strs: ["", "a"], encoded: "0#", decoded: [], phase: 'encode', currentIdx: 0, currentStr: "", i: -1, j: -1, length: 0, comment: "Encoding empty string: length 0 + '#'.", highlightedLines: [5] },
+        { strs: ["", "a"], encoded: "0#1#a", decoded: [], phase: 'encode', currentIdx: 1, currentStr: "a", i: -1, j: -1, length: 0, comment: "Encoding 'a': length 1 + '#'.", highlightedLines: [5] },
+        { strs: ["", "a"], encoded: "0#1#a", decoded: [], phase: 'decode', currentIdx: -1, currentStr: "", i: 0, j: 1, length: 0, comment: "Length 0 found at index 1.", highlightedLines: [18] },
+        { strs: ["", "a"], encoded: "0#1#a", decoded: [""], phase: 'decode', currentIdx: -1, currentStr: "", i: 2, j: 1, length: 0, comment: "Extracted empty string.", highlightedLines: [20] },
+        { strs: ["", "a"], encoded: "0#1#a", decoded: ["", "a"], phase: 'result', currentIdx: -1, currentStr: "", i: -1, j: -1, length: 0, comment: "Correctly restored ['', 'a'].", highlightedLines: [23] }
+      ]
     }
-  }, [currentStepIndex]);
+  };
+
+  const [activeCase, setActiveCase] = useState<'standard' | 'empty'>('standard');
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+
+  const steps = cases[activeCase].steps;
+  const currentStep = steps[Math.min(currentStepIndex, steps.length - 1)];
+
+  const handleCaseChange = (newCase: 'standard' | 'empty') => {
+    setActiveCase(newCase);
+    setCurrentStepIndex(0);
+  };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex gap-2">
-          <Button onClick={() => setCurrentStepIndex(0)} variant="outline" size="sm">
-            <RotateCcw className="h-4 w-4" />
-          </Button>
-          <Button
-            onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))}
-            disabled={currentStepIndex === 0}
-            variant="outline"
-            size="sm"
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <SimpleStepControls
+          currentStep={currentStepIndex}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStepIndex}
+        />
+        
+        <div className="flex p-1 bg-muted rounded-xl border border-border w-fit backdrop-blur-sm shadow-inner">
+          <button
+            onClick={() => handleCaseChange('standard')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+              activeCase === 'standard' 
+              ? 'bg-card text-primary shadow-sm ring-1 ring-border/50' 
+              : 'text-muted-foreground hover:text-foreground'
+            }`}
           >
-            <SkipBack className="h-4 w-4" />
-          </Button>
-          <Button
-            onClick={() => setCurrentStepIndex(Math.min(steps.length - 1, currentStepIndex + 1))}
-            disabled={currentStepIndex === steps.length - 1}
-            variant="outline"
-            size="sm"
+            <ListFilter className="h-4 w-4" />
+            Standard (hello)
+          </button>
+          <button
+            onClick={() => handleCaseChange('empty')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+              activeCase === 'empty' 
+              ? 'bg-card text-primary shadow-sm ring-1 ring-border/50' 
+              : 'text-muted-foreground hover:text-foreground'
+            }`}
           >
-            <SkipForward className="h-4 w-4" />
-          </Button>
+            <FileText className={activeCase === 'empty' ? 'text-primary h-4 w-4' : 'text-muted-foreground h-4 w-4'} />
+            Edge Case ("", a)
+          </button>
         </div>
-        <span className="text-sm text-muted-foreground">
-          Step {currentStepIndex + 1} of {steps.length}
-        </span>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className={`px-3 py-1 rounded text-xs font-semibold ${currentStep.phase.startsWith('encode') ? 'bg-blue-500/20 text-blue-600' :
-                currentStep.phase.startsWith('decode') ? 'bg-green-500/20 text-green-600' :
-                  'bg-muted text-muted-foreground'
-                }`}
-            >
-              {currentStep.phase.startsWith('encode') ? 'ENCODE' : 'DECODE'}
-            </motion.div>
-          </div>
-
-          <div className="mb-4">
-            <p className="text-xs text-muted-foreground mb-2">Input Array:</p>
-            <div className="flex gap-2">
-              {currentStep.strs.map((str, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ scale: 0.95 }}
-                  animate={{ scale: idx === currentStep.currentIdx ? 1.05 : 1 }}
-                  transition={{ duration: 0.2 }}
-                  className={`px-3 py-2 rounded border-2 font-mono text-sm ${idx === currentStep.currentIdx ? 'bg-yellow-500/20 border-yellow-500' : 'bg-muted/50 border-border'
-                    }`}
-                >
-                  "{str}"
-                </motion.div>
-              ))}
-            </div>
-          </div>
-
-          {currentStep.encoded && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="p-4 bg-blue-500/10 rounded border border-blue-500/30 mb-4"
-            >
-              <p className="text-xs text-muted-foreground mb-1">Encoded String:</p>
-              <div className="font-mono text-sm break-all">
-                {currentStep.encoded.split('').map((char, idx) => (
-                  <span
+        <div className="space-y-6">
+          <Card className="p-6">
+            <div className="mb-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider italic">Input Strings</h3>
+              </div>
+              <div className="flex gap-2 flex-wrap">
+                {currentStep.strs.map((str, idx) => (
+                  <div
                     key={idx}
-                    className={`${(currentStep.phase.includes('decode') && idx >= currentStep.i && idx <= currentStep.j) ||
-                      (currentStep.phase === 'encode-len' && idx === currentStep.encoded.length - 1) ||
-                      (currentStep.phase === 'encode-delim' && idx === currentStep.encoded.length - 1) ||
-                      (currentStep.phase === 'encode-str' && idx >= currentStep.encoded.length - currentStep.currentStr.length)
-                      ? 'bg-yellow-500/30 px-0.5'
-                      : ''
-                      }`}
+                    className={`px-3 py-1 rounded font-mono text-sm border-2 transition-all duration-200 ${
+                      idx === currentStep.currentIdx 
+                      ? 'bg-blue-500/20 border-blue-500 text-blue-600' 
+                      : 'bg-muted/50 border-border text-muted-foreground'
+                    }`}
                   >
-                    {char}
-                  </span>
+                    "{str}"
+                  </div>
                 ))}
               </div>
-            </motion.div>
-          )}
+            </div>
 
-          {currentStep.decoded.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-4"
-            >
-              <p className="text-xs text-muted-foreground mb-2">Decoded Array:</p>
-              <div className="flex gap-2 flex-wrap">
-                <AnimatePresence>
-                  {currentStep.decoded.map((str, idx) => (
-                    <motion.div
-                      key={idx}
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 0.3 }}
-                      className="px-3 py-2 rounded font-mono text-sm bg-green-500/20 border-2 border-green-500/30"
-                    >
-                      "{str}"
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
+            <div className="mb-6">
+              <p className="text-xs text-muted-foreground mb-2 uppercase italic">Intermediary Encoded Representation</p>
+              <div className="p-4 bg-muted/30 rounded-lg border border-border font-mono text-lg break-all flex flex-wrap gap-1">
+                {currentStep.encoded ? (
+                  currentStep.encoded.split('').map((char, idx) => {
+                    const isFocus = (currentStep.phase === 'decode' && idx >= currentStep.i && idx <= currentStep.j);
+                    const isLengthMatch = (currentStep.phase === 'decode' && char !== '#' && idx >= currentStep.j + 1 && idx <= currentStep.j + currentStep.length);
+                    
+                    return (
+                      <motion.span
+                        key={idx}
+                        className={`inline-block px-1 rounded transition-colors ${
+                          isFocus ? 'bg-yellow-500 text-yellow-950 font-bold' :
+                          isLengthMatch ? 'bg-primary/20 text-primary' :
+                          'text-muted-foreground'
+                        }`}
+                      >
+                        {char}
+                      </motion.span>
+                    );
+                  })
+                ) : (
+                  <span className="text-muted-foreground italic text-sm">Waiting for encoding...</span>
+                )}
               </div>
-            </motion.div>
-          )}
+            </div>
 
-          <VariablePanel
-            variables={{
-              currentIdx: currentStep.currentIdx,
-              i: currentStep.i,
-              j: currentStep.j,
-              length: currentStep.length
-            }}
-          />
+            {currentStep.decoded.length > 0 && (
+              <div className="mb-6">
+                <p className="text-xs text-muted-foreground mb-2 uppercase italic">Decoded Strings (Restored)</p>
+                <div className="flex gap-2 flex-wrap">
+                  <AnimatePresence>
+                    {currentStep.decoded.map((str, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="px-3 py-1 rounded bg-green-500/10 border-2 border-green-500/30 text-green-600 font-mono text-sm"
+                      >
+                        "{str}"
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              </div>
+            )}
 
-          <Card className="p-4 mt-4 bg-primary/5 border-primary/20">
-            <p className="text-sm">{currentStep.message}</p>
+            <div className="space-y-4">
+              <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 min-h-[80px]">
+                <p className="text-sm leading-relaxed text-foreground">
+                  <span className="font-bold text-primary mr-2 uppercase tracking-tighter">[{currentStep.phase.toUpperCase()}]</span>
+                  {currentStep.comment}
+                </p>
+              </div>
+
+              <VariablePanel
+                variables={{
+                  phase: currentStep.phase.toUpperCase(),
+                  pointer_i: currentStep.i === -1 ? 'N/A' : currentStep.i,
+                  pointer_j: currentStep.j === -1 ? 'N/A' : currentStep.j,
+                  parsedLen: currentStep.length || '0',
+                  extracted: currentStep.currentStr || 'None'
+                }}
+              />
+            </div>
           </Card>
-        </Card>
+        </div>
 
-        <Card className="p-4">
-          <div className="h-[700px]">
-            <Editor
-              height="100%"
-              defaultLanguage="typescript"
-              value={code}
-              theme="vs-dark"
-              options={{
-                readOnly: true,
-                minimap: { enabled: false },
-                fontSize: 13,
-                lineNumbers: 'on',
-                scrollBeyondLastLine: false
-              }}
-              onMount={(editor, monaco) => {
-                editorRef.current = editor;
-                monacoRef.current = monaco;
-              }}
-            />
-          </div>
-        </Card>
+        <div className="lg:h-[calc(100vh-250px)] min-h-[500px]">
+          <AnimatedCodeEditor
+            code={code}
+            language="typescript"
+            highlightedLines={currentStep.highlightedLines}
+          />
+        </div>
       </div>
-
-      <style>{`
-        .highlighted-line {
-          background: rgba(59, 130, 246, 0.15);
-          border-left: 3px solid rgb(59, 130, 246);
-        }
-      `}</style>
     </div>
   );
 };
