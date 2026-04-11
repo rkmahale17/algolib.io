@@ -51,6 +51,7 @@ export interface AlgorithmListItem {
     listType?: string;
     is_premium?: boolean;
     serial_no?: number;
+    metadata?: any;
     [key: string]: any;
 }
 

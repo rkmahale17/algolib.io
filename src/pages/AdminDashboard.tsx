@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Code2, MessageSquare, Database, ArrowRight, Activity, ShieldCheck, Users, Mail } from "lucide-react";
 import { motion } from "framer-motion";
+import { useAlgorithms } from "@/hooks/useAlgorithms";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -58,8 +59,24 @@ export default function AdminDashboard() {
       color: "text-orange-500",
       bgColor: "bg-orange-500/10",
       gradient: "from-orange-500/20 to-red-500/20"
+    },
+    {
+      title: "Tagging & Pro Management",
+      description: "Batch assign Pro status and Tech company identifiers natively to multiple algorithms.",
+      icon: Database,
+      path: "/admin/tagging-update",
+      color: "text-amber-500",
+      bgColor: "bg-amber-500/10",
+      gradient: "from-amber-500/20 to-yellow-500/20"
     }
   ];
+
+  const { data, isLoading } = useAlgorithms('', '');
+  const algorithms = data?.algorithms || [];
+  
+  const totalAlgorithms = algorithms.length;
+  const proCount = algorithms.filter(a => a.metadata?.is_pro).length;
+  const taggedCount = algorithms.filter(a => a.metadata?.companies && a.metadata.companies.length > 0).length;
 
   return (
     <div className="min-h-screen bg-background p-8">
@@ -101,28 +118,28 @@ export default function AdminDashboard() {
               <Code2 className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-">--</div>
+              <div className="text-2xl font-bold">{isLoading ? '--' : totalAlgorithms}</div>
               <p className="text-xs text-muted-foreground">Active problems</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pending Feedback</CardTitle>
-              <MessageSquare className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Tagging & Premium</CardTitle>
+              <ShieldCheck className="h-4 w-4 text-amber-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-">--</div>
-              <p className="text-xs text-muted-foreground">Requires attention</p>
+              <div className="text-2xl font-bold">{isLoading ? '--' : proCount}</div>
+              <p className="text-xs text-muted-foreground">PRO locked algorithms</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Users</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Tagged Questions</CardTitle>
+              <Database className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-">--</div>
-              <p className="text-xs text-muted-foreground">+12% from last month</p>
+              <div className="text-2xl font-bold">{isLoading ? '--' : taggedCount}</div>
+              <p className="text-xs text-muted-foreground">Active tracked companies</p>
             </CardContent>
           </Card>
         </motion.div>

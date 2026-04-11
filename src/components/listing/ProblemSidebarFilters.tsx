@@ -3,6 +3,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { TOP_COMPANIES } from "@/constants/companies";
+import { CompanyIcon } from "@/components/CompanyIcon";
 
 const TOPICS = [
     "OOP", "Accessibility", "React Hooks", "Networking", "Array", "Async",
@@ -43,9 +45,15 @@ const FilterSection = ({ title, items, selectedItems, onToggle, columns = 2, has
                             id={item}
                             checked={selectedItems.includes(item)}
                             onCheckedChange={() => onToggle(item)}
-                            className="w-5 h-5 rounded-md border-border/50 bg-background shadow-none data-[state=checked]:bg-[#dfff5e] data-[state=checked]:border-[#dfff5e] data-[state=checked]:text-black"
+                            className="w-5 h-5 rounded-md border-foreground/30 border-2 bg-background shadow-none data-[state=checked]:bg-[#dfff5e] data-[state=checked]:border-[#dfff5e] data-[state=checked]:text-black"
                         />
                         <div className="flex items-center gap-2.5 flex-1 cursor-pointer">
+                            {title === "Companies" && (
+                                <CompanyIcon 
+                                    company={item}
+                                    className="w-3.5 h-3.5 opacity-80"
+                                />
+                            )}
                             <Label
                                 htmlFor={item}
                                 className="text-[14px] font-medium leading-none text-muted-foreground/90 group-hover/item:text-foreground transition-colors cursor-pointer"
@@ -64,18 +72,25 @@ interface ProblemSidebarFiltersProps {
     selectedTopics: string[];
     onTopicToggle: (topic: string) => void;
     topics?: string[];
+    selectedCompanies: string[];
+    onCompanyToggle: (company: string) => void;
+    companies?: string[];
 }
 
 export const ProblemSidebarFilters = ({
     selectedTopics,
     onTopicToggle,
-    topics
+    topics,
+    selectedCompanies,
+    onCompanyToggle,
+    companies
 }: ProblemSidebarFiltersProps) => {
     const displayTopics = topics && topics.length > 0 ? topics : TOPICS;
+    const displayCompanies = companies && companies.length > 0 ? companies : [];
 
     return (
         <div className="w-full space-y-2">
-            <Accordion type="multiple" defaultValue={["topics", "difficulty"]} className="divide-y divide-border/40">
+            <Accordion type="multiple" defaultValue={["topics", "companies", "difficulty"]} className="divide-y divide-border/40">
                 <FilterSection
                     title="Topics"
                     items={displayTopics}
@@ -83,6 +98,16 @@ export const ProblemSidebarFilters = ({
                     onToggle={onTopicToggle}
                     columns={2}
                 />
+
+                {displayCompanies.length > 0 && (
+                    <FilterSection
+                        title="Companies"
+                        items={displayCompanies}
+                        selectedItems={selectedCompanies}
+                        onToggle={onCompanyToggle}
+                        columns={2}
+                    />
+                )}
 
                 <AccordionItem value="difficulty" className="border-none">
                     <AccordionTrigger className="hover:no-underline py-4 group [&>svg]:hidden">
@@ -98,7 +123,7 @@ export const ProblemSidebarFilters = ({
                                 <div key={diff} className="flex items-center space-x-3 group cursor-pointer group/item">
                                     <Checkbox
                                         id={diff}
-                                        className="w-5 h-5 rounded-md border-border/50 bg-background shadow-none data-[state=checked]:bg-[#dfff5e] data-[state=checked]:border-[#dfff5e] data-[state=checked]:text-black"
+                                        className="w-5 h-5 rounded-md border-foreground/30 border-2 bg-background shadow-none data-[state=checked]:bg-[#dfff5e] data-[state=checked]:border-[#dfff5e] data-[state=checked]:text-black"
                                     />
                                     <Label
                                         htmlFor={diff}

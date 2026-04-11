@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useAlgorithms, useCategories, useDeleteAlgorithm } from '@/hooks/useAlgorithms';
+import { TOP_COMPANIES } from '@/constants/companies';
+import { CompanyIcon } from '@/components/CompanyIcon';
 import { ListType, LIST_TYPE_LABELS, LIST_TYPE_OPTIONS, LIST_TYPE_OPTIONS_ADMIN } from '@/types/algorithm';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -187,7 +189,7 @@ export function AlgorithmList() {
                 <TableHead onClick={() => handleSort('difficulty')} className="cursor-pointer hover:bg-muted/50">Difficulty</TableHead>
                 <TableHead onClick={() => handleSort('serial_no')} className="cursor-pointer hover:bg-muted/50 font- text-primary">Serial No</TableHead>
                 <TableHead onClick={() => handleSort('list_type')} className="cursor-pointer hover:bg-muted/50">List Type</TableHead>
-                <TableHead className="w-[80px]">Pro</TableHead>
+                <TableHead className="w-[120px] text-center">Tags & Pro</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -225,8 +227,14 @@ export function AlgorithmList() {
                       <Badge variant="outline">{algo.list_type || 'core'}</Badge>
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center justify-center">
-                        <div className={`w-3 h-3 rounded-full ${algo.metadata?.is_pro ? 'bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.5)]' : 'bg-muted'}`} />
+                      <div className="flex items-center justify-center gap-2">
+                        {algo.metadata?.companies?.slice(0, 3).map((c: string) => (
+                           <CompanyIcon key={c} company={c} className="w-3.5 h-3.5 opacity-80" />
+                        ))}
+                        {algo.metadata?.companies?.length > 3 && (
+                           <span className="text-[10px] text-muted-foreground">+{algo.metadata.companies.length - 3}</span>
+                        )}
+                        <div className={`w-3 h-3 rounded-full ${algo.metadata?.is_pro ? 'bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.5)]' : 'bg-muted/30'}`} title={algo.metadata?.is_pro ? 'PRO' : 'Free'} />
                       </div>
                     </TableCell>
                     <TableCell className="text-right">

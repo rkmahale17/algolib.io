@@ -12,32 +12,54 @@ export interface PaginatedAlgorithmsResult {
 }
 
 export const fetchAlgorithms = async (search?: string, category?: string): Promise<PaginatedAlgorithmsResult> => {
-    // Build query params for edge function
-    const params = new URLSearchParams();
-    if (search) params.append('search', search);
-    if (category && category !== 'all') params.append('category', category);
+    let query = supabase.from("algorithms").select(`
+        id,
+        name,
+        title,
+        difficulty,
+        category,
+        list_type,
+        description,
+        time_complexity,
+        space_complexity,
+        serial_no,
+        metadata
+    `);
 
-    // Call edge function via fetch (GET with query params)
-    const response = await fetch(
-        `https://dkebbjneobjtmuzzrsdo.supabase.co/functions/v1/fetch-algorithms?${params.toString()}`,
-        {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        }
-    );
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch algorithms');
+    if (search) {
+        query = query.or(`title.ilike.%${search}%,name.ilike.%${search}%`);
     }
 
-    const result = await response.json();
+    if (category && category !== 'all') {
+        query = query.eq('category', category);
+    }
+
+    query = query.order("serial_no", { ascending: true, nullsFirst: false });
+
+    const { data, error } = await query;
+
+    if (error) {
+        throw new Error(error.message || 'Failed to fetch algorithms');
+    }
+
+    const algorithms = (data || []).map((algo: any) => ({
+        id: algo.id,
+        title: algo.title || algo.name,
+        name: algo.name,
+        category: algo.category,
+        difficulty: algo.difficulty,
+        description: algo.description,
+        timeComplexity: algo.time_complexity,
+        spaceComplexity: algo.space_complexity,
+        slug: algo.id,
+        listType: algo.list_type,
+        serial_no: algo.serial_no,
+        metadata: algo.metadata,
+    }));
 
     return {
-        algorithms: result.algorithms || [],
-        totalCount: result.totalCount || 0,
+        algorithms,
+        totalCount: algorithms.length,
         hasMore: false,
         currentPage: 1,
         totalPages: 1
@@ -149,6 +171,107 @@ export const useUpdateAlgorithm = () => {
             queryClient.invalidateQueries({ queryKey: ["algorithms"] });
             queryClient.invalidateQueries({ queryKey: ["algorithm", variables.id] });
             queryClient.invalidateQueries({ queryKey: ["categories"] });
+        },
+    });
+};
+
+export const useBulkUpdateAlgorithms = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ ids, is_pro, companies }: { ids: string[]; is_pro?: boolean; companies?: string[] }) => {
+            // First precisely query active algorithms resolving complex JSONB metadata scopes dynamically
+            const { data, error: fetchError } = await supabase
+                .from("algorithms")
+                .select("id, metadata")
+                .in("id", ids);
+
+            if (fetchError) throw fetchError;
+            
+            // Iterate synchronously sequentially applying exact overwrites explicitly keeping JSON states perfectly nested.
+            const promises = data.map(async (algo) => {
+                const updates: any = {};
+                
+                // Track metadata payload cleanly handling potential null state explicitly
+                let patchedMetadata = typeof algo.metadata === 'string' 
+                    ? JSON.parse(algo.metadata) 
+                    : (algo.metadata || {});
+                
+                let metadataChanged = false;
+
+                if (companies !== undefined) {
+                    patchedMetadata.companies = companies;
+                    metadataChanged = true;
+                }
+                
+                if (is_pro !== undefined) {
+                    patchedMetadata.is_pro = is_pro;
+                    metadataChanged = true;
+                }
+                
+                if (metadataChanged) {
+                    updates.metadata = patchedMetadata;
+                }
+                
+                // Execute only if we accumulated actual changes targeting explicit algorithm.
+                if (Object.keys(updates).length > 0) {
+                    const { error } = await supabase.from('algorithms').update(updates).eq('id', algo.id);
+                    if (error) throw error;
+                }
+            });
+
+            await Promise.all(promises);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["algorithms"] });
+        },
+    });
+};
+
+export const useBatchStagedUpdates = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (stagedUpdates: { id: string; is_pro?: boolean; companies?: string[] }[]) => {
+            if (stagedUpdates.length === 0) return;
+            const ids = stagedUpdates.map(u => u.id);
+            const { data, error: fetchError } = await supabase
+                .from("algorithms")
+                .select("id, metadata")
+                .in("id", ids);
+
+            if (fetchError) throw fetchError;
+            
+            const promises = stagedUpdates.map(async (updateState) => {
+                const algo = data.find(d => d.id === updateState.id);
+                if (!algo) return;
+
+                const updates: any = {};
+                let patchedMetadata = typeof algo.metadata === 'string' 
+                    ? JSON.parse(algo.metadata) 
+                    : (algo.metadata || {});
+                
+                let metadataChanged = false;
+
+                if (updateState.companies !== undefined) {
+                    patchedMetadata.companies = updateState.companies;
+                    metadataChanged = true;
+                }
+                
+                if (updateState.is_pro !== undefined) {
+                    patchedMetadata.is_pro = updateState.is_pro;
+                    metadataChanged = true;
+                }
+                
+                if (metadataChanged) {
+                    updates.metadata = patchedMetadata;
+                    const { error } = await supabase.from('algorithms').update(updates).eq('id', algo.id);
+                    if (error) throw error;
+                }
+            });
+
+            await Promise.all(promises);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["algorithms"] });
         },
     });
 };

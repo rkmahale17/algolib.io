@@ -38,6 +38,7 @@ const Blind75 = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('serial-asc');
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+  const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -76,6 +77,14 @@ const Blind75 = () => {
       result = result.filter(algo => selectedTopics.includes(algo.category));
     }
 
+    if (selectedCompanies.length > 0) {
+      result = result.filter(algo => {
+        const c = algo.metadata?.companies;
+        if (!Array.isArray(c)) return false;
+        return c.some((comp: string) => selectedCompanies.includes(comp));
+      });
+    }
+
     const rank: any = { 'Easy': 1, 'Medium': 2, 'Hard': 3 };
     if (sortBy === 'name-asc') result.sort((a, b) => a.displayTitle.localeCompare(b.displayTitle));
     else if (sortBy === 'name-desc') result.sort((a, b) => b.displayTitle.localeCompare(a.displayTitle));
@@ -85,7 +94,7 @@ const Blind75 = () => {
     else if (sortBy === 'serial-desc') result.sort((a, b) => (b.serial_no || 0) - (a.serial_no || 0));
 
     return result;
-  }, [blind75Algorithms, searchQuery, sortBy, selectedTopics]);
+  }, [blind75Algorithms, searchQuery, sortBy, selectedTopics, selectedCompanies]);
 
   const handleTopicToggle = (topic: string) => {
     if (topic === 'CLEAR_ALL') {
@@ -95,9 +104,28 @@ const Blind75 = () => {
     setSelectedTopics(prev => prev.includes(topic) ? prev.filter(t => t !== topic) : [...prev, topic]);
   };
 
+  const handleCompanyToggle = (company: string) => {
+    if (company === 'CLEAR_ALL') {
+      setSelectedCompanies([]);
+      return;
+    }
+    setSelectedCompanies(prev => prev.includes(company) ? prev.filter(c => c !== company) : [...prev, company]);
+  };
+
   const allTopics = useMemo(() => {
     const categories = blind75Algorithms.map(algo => algo.category).filter(Boolean);
     return Array.from(new Set(categories)).sort();
+  }, [blind75Algorithms]);
+
+  const allCompanies = useMemo(() => {
+    const comps = new Set<string>();
+    blind75Algorithms.forEach(algo => {
+      const c = algo.metadata?.companies;
+      if (Array.isArray(c)) {
+        c.forEach(comp => comps.add(comp));
+      }
+    });
+    return Array.from(comps).sort();
   }, [blind75Algorithms]);
 
   const totalHours = useMemo(() => {
@@ -122,6 +150,9 @@ const Blind75 = () => {
       selectedTopics={selectedTopics}
       onTopicToggle={handleTopicToggle}
       topics={allTopics}
+      selectedCompanies={selectedCompanies}
+      onCompanyToggle={handleCompanyToggle}
+      companies={allCompanies}
       showRecommendation={false}
       stats={{ count: filteredAndSortedAlgorithms.length, hours: totalHours }}
     >

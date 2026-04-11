@@ -16,6 +16,7 @@ const Problems = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('serial-asc');
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+  const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -52,6 +53,15 @@ const Problems = () => {
       result = result.filter(algo => selectedTopics.includes(algo.category));
     }
 
+    // Company Filter
+    if (selectedCompanies.length > 0) {
+      result = result.filter(algo => {
+        const c = algo.metadata?.companies;
+        if (!Array.isArray(c)) return false;
+        return c.some((comp: string) => selectedCompanies.includes(comp));
+      });
+    }
+
     // Sort
     if (sortBy === 'name-asc') {
       result.sort((a, b) => a.displayTitle.localeCompare(b.displayTitle));
@@ -70,7 +80,7 @@ const Problems = () => {
     }
 
     return result;
-  }, [allAlgorithms, searchQuery, sortBy, selectedTopics]);
+  }, [allAlgorithms, searchQuery, sortBy, selectedTopics, selectedCompanies]);
 
   const handleTopicToggle = (topic: string) => {
     if (topic === 'CLEAR_ALL') {
@@ -82,9 +92,30 @@ const Problems = () => {
     );
   };
 
+  const handleCompanyToggle = (company: string) => {
+    if (company === 'CLEAR_ALL') {
+      setSelectedCompanies([]);
+      return;
+    }
+    setSelectedCompanies(prev =>
+      prev.includes(company) ? prev.filter(c => c !== company) : [...prev, company]
+    );
+  };
+
   const allTopics = useMemo(() => {
     const categories = allAlgorithms.map(algo => algo.category).filter(Boolean);
     return Array.from(new Set(categories)).sort();
+  }, [allAlgorithms]);
+
+  const allCompanies = useMemo(() => {
+    const comps = new Set<string>();
+    allAlgorithms.forEach(algo => {
+      const c = algo.metadata?.companies;
+      if (Array.isArray(c)) {
+        c.forEach(comp => comps.add(comp));
+      }
+    });
+    return Array.from(comps).sort();
   }, [allAlgorithms]);
 
   const totalHours = useMemo(() => {
@@ -109,6 +140,9 @@ const Problems = () => {
       selectedTopics={selectedTopics}
       onTopicToggle={handleTopicToggle}
       topics={allTopics}
+      selectedCompanies={selectedCompanies}
+      onCompanyToggle={handleCompanyToggle}
+      companies={allCompanies}
       showRecommendation={true}
       stats={{ count: filteredAndSortedAlgorithms.length, hours: totalHours }}
     >
