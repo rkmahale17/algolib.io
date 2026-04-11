@@ -1,148 +1,443 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
+import { VariablePanel } from '../shared/VariablePanel';
+import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { SkipBack, SkipForward, RotateCcw } from 'lucide-react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { ArrowDown, ArrowUp, Info } from 'lucide-react';
 
 interface Step {
-  operation: string;
+  small: number[];
+  large: number[];
   num: number | null;
-  maxHeap: number[];
-  minHeap: number[];
   median: number | null;
-  message: string;
-  lineNumber: number;
+  explanation: string;
+  highlightedLines: number[];
+  variables: Record<string, any>;
 }
 
 export const FindMedianFromDataStreamVisualization = () => {
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [steps, setSteps] = useState<Step[]>([]);
 
-  const steps: Step[] = [
-    { operation: "init", num: null, maxHeap: [], minHeap: [], median: null, message: "MedianFinder: Use 2 heaps. MaxHeap (left half) ≤ MinHeap (right half)", lineNumber: 1 },
-    { operation: "addNum", num: 1, maxHeap: [1], minHeap: [], median: null, message: "Add 1: Insert to maxHeap (left). Balance: maxHeap=[1], minHeap=[]", lineNumber: 7 },
-    { operation: "findMedian", num: null, maxHeap: [1], minHeap: [], median: 1, message: "Median: Only maxHeap has 1. Return 1.0", lineNumber: 22 },
-    { operation: "addNum", num: 2, maxHeap: [1], minHeap: [2], median: null, message: "Add 2: 2 > max(maxHeap). Add to minHeap. Balance: [1] | [2]", lineNumber: 13 },
-    { operation: "findMedian", num: null, maxHeap: [1], minHeap: [2], median: 1.5, message: "Median: Even count. (max(maxHeap) + min(minHeap))/2 = (1+2)/2 = 1.5", lineNumber: 24 },
-    { operation: "addNum", num: 3, maxHeap: [1], minHeap: [2, 3], median: null, message: "Add 3: 3 > 1. Add to minHeap. Balance: [1] | [2,3]", lineNumber: 13 },
-    { operation: "findMedian", num: null, maxHeap: [2], minHeap: [3], median: 2, message: "Rebalance: Move 2 to maxHeap. Median = 2. Time: O(log n), Space: O(n)", lineNumber: 22 }
-  ];
+  const code = `class Heap {
+  private data: number[] = [];
+  private comparator: (a: number, b: number) => boolean;
 
-  const code = `class MedianFinder {
-  maxHeap: number[] = []; // left half (max at top)
-  minHeap: number[] = []; // right half (min at top)
-  
-  addNum(num: number): void {
-    // Add to maxHeap first
-    this.maxHeap.push(num);
-    this.maxHeapifyUp(this.maxHeap.length - 1);
-    
-    // Balance: move max of maxHeap to minHeap if needed
-    if (this.maxHeap.length > 0 && this.minHeap.length > 0 &&
-        this.maxHeap[0] > this.minHeap[0]) {
-      const val = this.extractMax(this.maxHeap);
-      this.minHeap.push(val);
-      this.minHeapifyUp(this.minHeap.length - 1);
+  constructor(comparator: (a: number, b: number) => boolean) {
+    this.comparator = comparator;
+  }
+
+  size(): number {
+    return this.data.length;
+  }
+
+  peek(): number {
+    return this.data[0];
+  }
+
+  push(val: number): void {
+    this.data.push(val);
+    this.heapifyUp();
+  }
+
+  pop(): number {
+    const top = this.data[0];
+    const last = this.data.pop()!;
+    if (this.data.length > 0) {
+      this.data[0] = last;
+      this.heapifyDown();
     }
-    
-    // Ensure maxHeap.size >= minHeap.size
-    if (this.minHeap.length > this.maxHeap.length) {
-      const val = this.extractMin(this.minHeap);
-      this.maxHeap.push(val);
-      this.maxHeapifyUp(this.maxHeap.length - 1);
+    return top;
+  }
+
+  private heapifyUp(): void {
+    let i = this.data.length - 1;
+    while (i > 0) {
+      const parent = Math.floor((i - 1) / 2);
+      if (this.comparator(this.data[i], this.data[parent])) {
+        [this.data[i], this.data[parent]] = [this.data[parent], this.data[i]];
+        i = parent;
+      } else break;
     }
   }
-  
-  findMedian(): number {
-    if (this.maxHeap.length > this.minHeap.length) {
-      return this.maxHeap[0];
+
+  private heapifyDown(): void {
+    let i = 0;
+    const n = this.data.length;
+
+    while (true) {
+      let left = 2 * i + 1;
+      let right = 2 * i + 2;
+      let best = i;
+
+      if (left < n && this.comparator(this.data[left], this.data[best])) {
+        best = left;
+      }
+      if (right < n && this.comparator(this.data[right], this.data[best])) {
+        best = right;
+      }
+
+      if (best !== i) {
+        [this.data[i], this.data[best]] = [this.data[best], this.data[i]];
+        i = best;
+      } else break;
     }
-    return (this.maxHeap[0] + this.minHeap[0]) / 2;
+  }
+}
+
+class MedianFinder {
+  private small: Heap;
+  private large: Heap;
+
+  constructor() {
+    this.small = new Heap((a, b) => a > b);
+    this.large = new Heap((a, b) => a < b);
+  }
+
+  addNum(num: number): void {
+    this.small.push(num);
+
+    if (this.small.size() && this.large.size() &&
+        this.small.peek() > this.large.peek()) {
+      this.large.push(this.small.pop());
+    }
+
+    if (this.small.size() > this.large.size() + 1) {
+      this.large.push(this.small.pop());
+    }
+
+    if (this.large.size() > this.small.size() + 1) {
+      this.small.push(this.large.pop());
+    }
+  }
+
+  findMedian(): number {
+    if (this.small.size() > this.large.size()) {
+      return this.small.peek();
+    }
+
+    if (this.large.size() > this.small.size()) {
+      return this.large.peek();
+    }
+
+    return (this.small.peek() + this.large.peek()) / 2;
   }
 }`;
 
-  const currentStep = steps[currentStepIndex];
+  const generateSteps = () => {
+    const s: Step[] = [];
+    const inputs = [5, 10, 2, 8, 3, 7];
+    let smallHeap: number[] = [];
+    let largeHeap: number[] = [];
+
+    const getMedian = (sH: number[], lH: number[]) => {
+      if (sH.length > lH.length) return sH[0];
+      if (lH.length > sH.length) return lH[0];
+      if (sH.length === 0) return null;
+      return (sH[0] + lH[0]) / 2;
+    };
+
+    // Initial state
+    s.push({
+      small: [],
+      large: [],
+      num: null,
+      median: null,
+      explanation: "Initialize two heaps: Max-Heap (small) and Min-Heap (large).",
+      highlightedLines: [71, 72, 73, 74],
+      variables: { smallSize: 0, largeSize: 0 }
+    });
+
+    inputs.forEach((num) => {
+      // Step: Start addNum
+      s.push({
+        small: [...smallHeap],
+        large: [...largeHeap],
+        num,
+        median: getMedian(smallHeap, largeHeap),
+        explanation: `Calling addNum(${num}).`,
+        highlightedLines: [76],
+        variables: { num, smallSize: smallHeap.length, largeSize: largeHeap.length }
+      });
+
+      // Step: Push to small
+      smallHeap.push(num);
+      smallHeap.sort((a, b) => b - a); // Simulate max heap
+      s.push({
+        small: [...smallHeap],
+        large: [...largeHeap],
+        num,
+        median: getMedian(smallHeap, largeHeap),
+        explanation: `Push ${num} to the small (max) heap.`,
+        highlightedLines: [77],
+        variables: { num, small: `[${smallHeap.join(', ')}]`, smallSize: smallHeap.length }
+      });
+
+      // Step: Check ordering
+      s.push({
+        small: [...smallHeap],
+        large: [...largeHeap],
+        num,
+        median: getMedian(smallHeap, largeHeap),
+        explanation: "Check if max element of small heap is greater than min element of large heap.",
+        highlightedLines: [79, 80],
+        variables: { smallMax: smallHeap[0], largeMin: largeHeap[0] || 'N/A' }
+      });
+
+      if (smallHeap.length && largeHeap.length && smallHeap[0] > largeHeap[0]) {
+        const val = smallHeap.shift()!;
+        largeHeap.push(val);
+        largeHeap.sort((a, b) => a - b); // Simulate min heap
+        s.push({
+          small: [...smallHeap],
+          large: [...largeHeap],
+          num,
+          median: getMedian(smallHeap, largeHeap),
+          explanation: `Max of small (${val}) > min of large. Move ${val} to large heap to maintain ordering.`,
+          highlightedLines: [81],
+          variables: { small: `[${smallHeap.join(', ')}]`, large: `[${largeHeap.join(', ')}]` }
+        });
+      }
+
+      // Step: Balance sizes (small too big)
+      s.push({
+        small: [...smallHeap],
+        large: [...largeHeap],
+        num,
+        median: getMedian(smallHeap, largeHeap),
+        explanation: "Check if small heap size > large heap size + 1.",
+        highlightedLines: [84],
+        variables: { smallSize: smallHeap.length, largeSize: largeHeap.length }
+      });
+
+      if (smallHeap.length > largeHeap.length + 1) {
+        const val = smallHeap.shift()!;
+        largeHeap.push(val);
+        largeHeap.sort((a, b) => a - b);
+        s.push({
+          small: [...smallHeap],
+          large: [...largeHeap],
+          num,
+          median: getMedian(smallHeap, largeHeap),
+          explanation: `Small heap is too large. Move max element (${val}) to large heap.`,
+          highlightedLines: [85],
+          variables: { small: `[${smallHeap.join(', ')}]`, large: `[${largeHeap.join(', ')}]` }
+        });
+      }
+
+      // Step: Balance sizes (large too big)
+      s.push({
+        small: [...smallHeap],
+        large: [...largeHeap],
+        num,
+        median: getMedian(smallHeap, largeHeap),
+        explanation: "Check if large heap size > small heap size + 1.",
+        highlightedLines: [88],
+        variables: { smallSize: smallHeap.length, largeSize: largeHeap.length }
+      });
+
+      if (largeHeap.length > smallHeap.length + 1) {
+        const val = largeHeap.shift()!;
+        smallHeap.push(val);
+        smallHeap.sort((a, b) => b - a);
+        s.push({
+          small: [...smallHeap],
+          large: [...largeHeap],
+          num,
+          median: getMedian(smallHeap, largeHeap),
+          explanation: `Large heap is too large. Move min element (${val}) to small heap.`,
+          highlightedLines: [89],
+          variables: { small: `[${smallHeap.join(', ')}]`, large: `[${largeHeap.join(', ')}]` }
+        });
+      }
+
+      // Step: findMedian Call
+      const finalMedian = getMedian(smallHeap, largeHeap);
+      s.push({
+        small: [...smallHeap],
+        large: [...largeHeap],
+        num: null,
+        median: finalMedian,
+        explanation: `Calling findMedian(). Heaps are balanced and ordered.`,
+        highlightedLines: [93],
+        variables: { smallSize: smallHeap.length, largeSize: largeHeap.length }
+      });
+
+      s.push({
+        small: [...smallHeap],
+        large: [...largeHeap],
+        num: null,
+        median: finalMedian,
+        explanation: `Median is ${finalMedian}.`,
+        highlightedLines: smallHeap.length > largeHeap.length ? [95] : (largeHeap.length > smallHeap.length ? [99] : [102]),
+        variables: { median: finalMedian }
+      });
+    });
+
+    setSteps(s);
+  };
+
+  useEffect(() => {
+    generateSteps();
+  }, []);
+
+  if (steps.length === 0) return null;
+  const step = steps[currentStep];
 
   return (
-    <div className="w-full h-full flex flex-col gap-4 p-4">
-      <Card className="p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex gap-2">
-            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(0)} disabled={currentStepIndex === 0}><RotateCcw className="h-4 w-4" /></Button>
-            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))} disabled={currentStepIndex === 0}><SkipBack className="h-4 w-4" /></Button>
-            <Button variant="outline" size="icon" onClick={() => setCurrentStepIndex(Math.min(steps.length - 1, currentStepIndex + 1))} disabled={currentStepIndex === steps.length - 1}><SkipForward className="h-4 w-4" /></Button>
-          </div>
-          <div className="text-sm">Step {currentStepIndex + 1} / {steps.length}</div>
+    <VisualizationLayout
+      leftContent={
+        <div className="space-y-6">
+          <Card className="p-6 bg-card/50 backdrop-blur-sm border-primary/20">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Two Heaps Strategy</h3>
+            </div>
+
+            <div className="grid grid-cols-2 gap-8 relative">
+              {/* Small Heap (Max Heap) */}
+              <div className="flex flex-col items-center gap-4">
+                <div className="flex items-center gap-2 text-blue-500 font-bold text-xs uppercase">
+                  <span>Small Heap</span>
+                  <ArrowUp className="w-3 h-3" />
+                </div>
+                <div className="flex flex-col-reverse items-center gap-2 min-h-[160px] w-full border-2 border-dashed border-blue-500/20 rounded-xl p-4 bg-blue-500/5">
+                  <AnimatePresence mode="popLayout">
+                    {step.small.map((val, idx) => (
+                      <motion.div
+                        key={`small-${val}-${idx}`}
+                        layout
+                        initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                        animate={{
+                          opacity: 1,
+                          scale: idx === 0 ? 1.1 : 1,
+                          y: 0,
+                          backgroundColor: idx === 0 ? "rgba(59, 130, 246, 0.2)" : "var(--card)",
+                          borderColor: idx === 0 ? "rgb(59, 130, 246)" : "var(--border)"
+                        }}
+                        exit={{ opacity: 0, scale: 0.5, y: -20 }}
+                        className={`w-10 h-10 rounded-lg flex items-center justify-center border-2 font-bold shadow-sm ${
+                          idx === 0 ? "z-10 shadow-blue-500/20" : ""
+                        }`}
+                      >
+                        {val}
+                        {idx === 0 && (
+                          <div className="absolute -top-6 text-[8px] font-black text-blue-500 uppercase bg-blue-500/10 px-1 rounded">
+                            Max
+                          </div>
+                        )}
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                  {step.small.length === 0 && (
+                    <span className="text-[10px] text-muted-foreground uppercase absolute top-1/2 left-1/4 -translate-y-1/2 -translate-x-1/2 rotate-90 origin-center opacity-30 select-none">
+                      Empty Max-Heap
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Center Divider/Property */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+                <div className="bg-background border-2 border-primary/20 rounded-full p-2 shadow-xl">
+                  <span className="text-xs font-black text-primary">≤</span>
+                </div>
+              </div>
+
+              {/* Large Heap (Min Heap) */}
+              <div className="flex flex-col items-center gap-4">
+                <div className="flex items-center gap-2 text-green-500 font-bold text-xs uppercase">
+                  <ArrowDown className="w-3 h-3" />
+                  <span>Large Heap</span>
+                </div>
+                <div className="flex flex-col items-center gap-2 min-h-[160px] w-full border-2 border-dashed border-green-500/20 rounded-xl p-4 bg-green-500/5">
+                  <AnimatePresence mode="popLayout">
+                    {step.large.map((val, idx) => (
+                      <motion.div
+                        key={`large-${val}-${idx}`}
+                        layout
+                        initial={{ opacity: 0, scale: 0.8, y: -20 }}
+                        animate={{
+                          opacity: 1,
+                          scale: idx === 0 ? 1.1 : 1,
+                          y: 0,
+                          backgroundColor: idx === 0 ? "rgba(34, 197, 94, 0.2)" : "var(--card)",
+                          borderColor: idx === 0 ? "rgb(34, 197, 94)" : "var(--border)"
+                        }}
+                        exit={{ opacity: 0, scale: 0.5, y: 20 }}
+                        className={`w-10 h-10 rounded-lg flex items-center justify-center border-2 font-bold shadow-sm ${
+                          idx === 0 ? "z-10 shadow-green-500/20" : ""
+                        }`}
+                      >
+                        {val}
+                        {idx === 0 && (
+                          <div className="absolute -bottom-6 text-[8px] font-black text-green-500 uppercase bg-green-500/10 px-1 rounded">
+                            Min
+                          </div>
+                        )}
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                  {step.large.length === 0 && (
+                    <span className="text-[10px] text-muted-foreground uppercase absolute top-1/2 right-1/4 -translate-y-1/2 translate-x-1/2 rotate-90 origin-center opacity-30 select-none">
+                      Empty Min-Heap
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 p-4 bg-muted/20 border rounded-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase">Current Median</span>
+                  <span className="text-2xl font-black text-primary">
+                    {step.median !== null ? step.median : '-'}
+                  </span>
+                </div>
+                <div className={`p-2 rounded-full ${step.num ? 'bg-primary/10 animate-pulse' : 'bg-muted'}`}>
+                  {step.num ? (
+                    <span className="text-xs font-bold text-primary px-2">Adding: {step.num}</span>
+                  ) : (
+                    <span className="text-xs font-bold text-muted-foreground px-2">Ready</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-4 bg-primary/5 border-primary/20">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2 flex items-center gap-2">
+              <Info className="w-3 h-3" />
+              Algorithm Logic
+            </h4>
+            <p className="text-sm text-foreground leading-relaxed font-medium">{step.explanation}</p>
+          </Card>
+
+          <VariablePanel variables={step.variables} />
+
+          <Card className="p-4 bg-muted/20 border-dashed border-border text-[10px] text-muted-foreground">
+            <p>• <span className="text-blue-500 font-bold">Small Heap</span>: Rebalance by pushing/popping from top (Max).</p>
+            <p>• <span className="text-green-500 font-bold">Large Heap</span>: Stores the larger half (Min on top).</p>
+            <p>• <span className="text-primary font-bold">Median</span>: Top of either heap (if unequal sizes) or average of tops.</p>
+          </Card>
         </div>
-      </Card>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1">
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Find Median from Data Stream</h3>
-          <div className="space-y-4">
-            <div className="p-3 bg-primary/10 rounded">
-              <div className="text-sm"><strong>Operation:</strong> {currentStep.operation}{currentStep.num !== null ? `(${currentStep.num})` : '()'}</div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <div className="text-sm font-medium mb-2">MaxHeap (Left Half):</div>
-                <div className="p-4 bg-blue-500/10 rounded min-h-[80px]">
-                  <div className="flex flex-col gap-1">
-                    {currentStep.maxHeap.map((val, idx) => (
-                      <div key={idx} className={`px-3 py-2 rounded font-mono bg-blue-500/20 text-blue-700 font- ${idx === 0 ? 'ring-2 ring-blue-500' : ''
-                        }`}>
-                        {val}
-                      </div>
-                    ))}
-                    {currentStep.maxHeap.length === 0 && <span className="text-muted-foreground text-sm">Empty</span>}
-                  </div>
-                  {currentStep.maxHeap.length > 0 && (
-                    <div className="text-xs text-muted-foreground mt-2">
-                      Top: {currentStep.maxHeap[0]} (max)
-                    </div>
-                  )}
-                </div>
-              </div>
-              <div>
-                <div className="text-sm font-medium mb-2">MinHeap (Right Half):</div>
-                <div className="p-4 bg-blue-500/10 rounded min-h-[80px]">
-                  <div className="flex flex-col gap-1">
-                    {currentStep.minHeap.map((val, idx) => (
-                      <div key={idx} className={`px-3 py-2 rounded font-mono bg-blue-500/20 text-blue-700 font- ${idx === 0 ? 'ring-2 ring-green-500' : ''
-                        }`}>
-                        {val}
-                      </div>
-                    ))}
-                    {currentStep.minHeap.length === 0 && <span className="text-muted-foreground text-sm">Empty</span>}
-                  </div>
-                  {currentStep.minHeap.length > 0 && (
-                    <div className="text-xs text-muted-foreground mt-2">
-                      Top: {currentStep.minHeap[0]} (min)
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-            {currentStep.median !== null && (
-              <div className="p-4 bg-green-500/20 rounded text-center">
-                <div className="text-sm text-muted-foreground mb-1">Current Median</div>
-                <div className="text-3xl font- text-green-600">{currentStep.median}</div>
-              </div>
-            )}
-            <div className="p-4 bg-muted/50 rounded text-sm">{currentStep.message}</div>
-            <div className="p-3 bg-blue-500/10 rounded text-xs">
-              <strong>Key:</strong> MaxHeap stores smaller half (max on top), MinHeap stores larger half (min on top). Median is middle element(s).
-            </div>
-          </div>
-        </Card>
-        <Card className="p-6 overflow-hidden flex flex-col">
-          <h3 className="text-lg font-semibold mb-4">TypeScript</h3>
-          <div className="flex-1 overflow-auto">
-            <SyntaxHighlighter language="typescript" style={vscDarkPlus} showLineNumbers lineProps={(lineNumber) => ({ style: { backgroundColor: lineNumber === currentStep.lineNumber ? 'rgba(255, 255, 0, 0.2)' : 'transparent', display: 'block' } })}>
-              {code}
-            </SyntaxHighlighter>
-          </div>
-        </Card>
-      </div>
-    </div>
+      }
+      rightContent={
+        <AnimatedCodeEditor
+          code={code}
+          language="typescript"
+          highlightedLines={step.highlightedLines}
+        />
+      }
+      controls={
+        <SimpleStepControls
+          currentStep={currentStep}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStep}
+        />
+      }
+    />
   );
 };

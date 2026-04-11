@@ -119,6 +119,7 @@ export const visualizationMap: Record<string, React.LazyExoticComponent<React.Co
   'kth-largest': React.lazy(() => import('@/components/visualizations/algorithms/KthLargestVisualization').then(m => ({ default: m.KthLargestVisualization }))),
   'kth-largest-element': React.lazy(() => import('@/components/visualizations/algorithms/KthLargestVisualization').then(m => ({ default: m.KthLargestVisualization }))),
   'sliding-window-maximum': React.lazy(() => import('@/components/visualizations/algorithms/SlidingWindowMaxVisualization').then(m => ({ default: m.SlidingWindowMaxVisualization }))),
+  'find-median-from-data-stream': React.lazy(() => import('@/components/visualizations/algorithms/FindMedianFromDataStreamVisualization').then(m => ({ default: m.FindMedianFromDataStreamVisualization }))),
 
   // Cache Algorithms
   'lru-cache': React.lazy(() => import('@/components/visualizations/algorithms/LRUCacheVisualization').then(m => ({ default: m.LRUCacheVisualization }))),

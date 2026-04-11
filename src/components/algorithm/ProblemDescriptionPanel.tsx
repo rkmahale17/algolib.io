@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { AuthGuard } from "@/components/AuthGuard";
 import { TabWarning } from "@/components/TabWarning";
 import { FeatureGuard } from "@/components/FeatureGuard";
@@ -293,12 +294,33 @@ export const ProblemDescriptionPanel = React.memo(({
                                   );
                                 })}
                                 {algorithm.metadata.companies.length > 5 && (
-                                  <Badge
-                                    variant="secondary"
-                                    className="bg-muted text-muted-foreground text-xs px-2 py-0.5"
-                                  >
-                                    +{algorithm.metadata.companies.length - 5} more
-                                  </Badge>
+                                  <Popover>
+                                    <PopoverTrigger>
+                                      <Badge
+                                        variant="secondary"
+                                        className="bg-muted text-muted-foreground text-xs px-2 py-0.5 cursor-pointer hover:bg-muted/80 transition-colors pointer-events-none"
+                                      >
+                                        +{algorithm.metadata.companies.length - 5} more
+                                      </Badge>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-64 p-3" align="start">
+                                      <div className="space-y-3">
+                                        <h4 className="text-sm font-semibold leading-none">All Companies</h4>
+                                        <div className="flex flex-wrap gap-2">
+                                          {algorithm.metadata.companies.map((company: string, index: number) => (
+                                            <Badge
+                                              key={index}
+                                              variant="secondary"
+                                              className="bg-primary/5 text-primary border-primary/20 text-xs px-2 py-0.5"
+                                            >
+                                              <CompanyIcon company={company} className="w-3 h-3 mr-1.5 opacity-80" />
+                                              {company}
+                                            </Badge>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    </PopoverContent>
+                                  </Popover>
                                 )}
                               </>
                             ) : (
