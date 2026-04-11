@@ -212,7 +212,7 @@ export const ValidAnagramVisualization: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col gap-4">
         <StepControls
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
@@ -226,7 +226,7 @@ export const ValidAnagramVisualization: React.FC = () => {
           onSpeedChange={setSpeed}
         />
         
-        <div className="flex p-1 bg-muted/50 rounded-xl border border-border/50 backdrop-blur-sm self-start sm:self-center">
+        <div className="flex p-1 bg-muted rounded-xl border border-border w-fit backdrop-blur-sm shadow-inner">
           {cases.map((testCase, idx) => (
             <button
               key={idx}

@@ -1,279 +1,300 @@
-import { useState, useEffect, useRef } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { SkipBack, SkipForward, RotateCcw, Play, Pause } from 'lucide-react';
-import Editor from '@monaco-editor/react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Card } from '@/components/ui/card';
+import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 
+interface TreeNode {
+  val: number;
+  left: TreeNode | null;
+  right: TreeNode | null;
+  id: string;
+  x?: number;
+  y?: number;
+}
+
 interface Step {
-  preorder: number[];
-  inorder: number[];
-  preStart: number;
-  preEnd: number;
-  inStart: number;
-  inEnd: number;
-  rootVal: number | null;
-  rootIndex: number | null;
-  builtNodes: number[];
   message: string;
   highlightedLines: number[];
   variables: Record<string, any>;
+  builtNodes: Set<string>;
+  currentNodeId: string | null;
+  preorderRange: [number, number];
+  inorderRange: [number, number];
+  tree: TreeNode | null;
 }
 
 export const ConstructBinaryTreeVisualization = () => {
   const code = `function buildTree(preorder: number[], inorder: number[]): TreeNode | null {
-  if (preorder.length === 0) return null;
-  
-  const rootVal = preorder[0];
-  const root = new TreeNode(rootVal);
-  const mid = inorder.indexOf(rootVal);
-  
-  root.left = buildTree(
-    preorder.slice(1, mid + 1),
-    inorder.slice(0, mid)
-  );
-  root.right = buildTree(
-    preorder.slice(mid + 1),
-    inorder.slice(mid + 1)
-  );
-  
-  return root;
+    if (!preorder.length || !inorder.length) return null;
+
+    const rootVal = preorder[0];
+    const root = new TreeNode(rootVal);
+    const mid = inorder.indexOf(rootVal);
+
+    root.left = buildTree(
+        preorder.slice(1, mid + 1), 
+        inorder.slice(0, mid)
+    );
+    root.right = buildTree(
+        preorder.slice(mid + 1), 
+        inorder.slice(mid + 1)
+    );
+
+    return root;
 }`;
 
-  const steps: Step[] = [
-    { preorder: [3, 9, 20, 15, 7], inorder: [9, 3, 15, 20, 7], preStart: 0, preEnd: 4, inStart: 0, inEnd: 4, rootVal: null, rootIndex: null, builtNodes: [], message: "Start: Build tree from arrays", highlightedLines: [1], variables: { preorder: '[3,9,20,15,7]', inorder: '[9,3,15,20,7]' } },
-    { preorder: [3, 9, 20, 15, 7], inorder: [9, 3, 15, 20, 7], preStart: 0, preEnd: 4, inStart: 0, inEnd: 4, rootVal: null, rootIndex: null, builtNodes: [], message: "Check if preorder is empty", highlightedLines: [2], variables: { 'preorder.length': 5 } },
-    { preorder: [3, 9, 20, 15, 7], inorder: [9, 3, 15, 20, 7], preStart: 0, preEnd: 4, inStart: 0, inEnd: 4, rootVal: null, rootIndex: null, builtNodes: [], message: "Not empty, continue", highlightedLines: [2], variables: { 'preorder.length': 5 } },
-    { preorder: [3, 9, 20, 15, 7], inorder: [9, 3, 15, 20, 7], preStart: 0, preEnd: 4, inStart: 0, inEnd: 4, rootVal: 3, rootIndex: null, builtNodes: [], message: "Root value is first element in preorder: 3", highlightedLines: [4], variables: { rootVal: 3, preorder: '[3,9,20,15,7]' } },
-    { preorder: [3, 9, 20, 15, 7], inorder: [9, 3, 15, 20, 7], preStart: 0, preEnd: 4, inStart: 0, inEnd: 4, rootVal: 3, rootIndex: null, builtNodes: [3], message: "Create root node with value 3", highlightedLines: [5], variables: { root: '3', rootVal: 3 } },
-    { preorder: [3, 9, 20, 15, 7], inorder: [9, 3, 15, 20, 7], preStart: 0, preEnd: 4, inStart: 0, inEnd: 4, rootVal: 3, rootIndex: 1, builtNodes: [3], message: "Find root in inorder: index 1", highlightedLines: [6], variables: { mid: 1, rootVal: 3, inorder: '[9,3,15,20,7]' } },
-    { preorder: [3, 9, 20, 15, 7], inorder: [9, 3, 15, 20, 7], preStart: 0, preEnd: 4, inStart: 0, inEnd: 4, rootVal: 3, rootIndex: 1, builtNodes: [3], message: "Elements before index 1 go to left subtree", highlightedLines: [8], variables: { mid: 1, 'left elements': 1 } },
-    { preorder: [9], inorder: [9], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 3, rootIndex: 1, builtNodes: [3], message: "Build left subtree: preorder=[9], inorder=[9]", highlightedLines: [1], variables: { preorder: '[9]', inorder: '[9]' } },
-    { preorder: [9], inorder: [9], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 3, rootIndex: 1, builtNodes: [3], message: "Check if preorder is empty", highlightedLines: [2], variables: { 'preorder.length': 1 } },
-    { preorder: [9], inorder: [9], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 9, rootIndex: 1, builtNodes: [3], message: "Root value for left subtree: 9", highlightedLines: [4], variables: { rootVal: 9, preorder: '[9]' } },
-    { preorder: [9], inorder: [9], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 9, rootIndex: 1, builtNodes: [3, 9], message: "Create node 9 as left child of 3", highlightedLines: [5], variables: { root: '9', parent: '3' } },
-    { preorder: [9], inorder: [9], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 9, rootIndex: 0, builtNodes: [3, 9], message: "Find 9 in inorder: index 0", highlightedLines: [6], variables: { mid: 0, rootVal: 9 } },
-    { preorder: [9], inorder: [9], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 9, rootIndex: 0, builtNodes: [3, 9], message: "Build left subtree of 9: empty", highlightedLines: [8], variables: { preorder: '[]', inorder: '[]' } },
-    { preorder: [], inorder: [], preStart: 0, preEnd: -1, inStart: 0, inEnd: -1, rootVal: 9, rootIndex: 0, builtNodes: [3, 9], message: "Empty array, return null", highlightedLines: [2], variables: { 'preorder.length': 0 } },
-    { preorder: [9], inorder: [9], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 9, rootIndex: 0, builtNodes: [3, 9], message: "Left of 9 is null, build right", highlightedLines: [12], variables: { 'root.left': 'null' } },
-    { preorder: [], inorder: [], preStart: 0, preEnd: -1, inStart: 0, inEnd: -1, rootVal: 9, rootIndex: 0, builtNodes: [3, 9], message: "Empty array, return null", highlightedLines: [2], variables: { 'preorder.length': 0 } },
-    { preorder: [9], inorder: [9], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 9, rootIndex: 0, builtNodes: [3, 9], message: "Right of 9 is null, node 9 complete", highlightedLines: [17], variables: { root: '9', 'root.left': 'null', 'root.right': 'null' } },
-    { preorder: [3, 9, 20, 15, 7], inorder: [9, 3, 15, 20, 7], preStart: 0, preEnd: 4, inStart: 0, inEnd: 4, rootVal: 3, rootIndex: 1, builtNodes: [3, 9], message: "Left subtree complete, build right subtree", highlightedLines: [12], variables: { mid: 1, 'elements after': 3 } },
-    { preorder: [20, 15, 7], inorder: [15, 20, 7], preStart: 0, preEnd: 2, inStart: 0, inEnd: 2, rootVal: 3, rootIndex: 1, builtNodes: [3, 9], message: "Build right subtree: preorder=[20,15,7]", highlightedLines: [1], variables: { preorder: '[20,15,7]', inorder: '[15,20,7]' } },
-    { preorder: [20, 15, 7], inorder: [15, 20, 7], preStart: 0, preEnd: 2, inStart: 0, inEnd: 2, rootVal: 3, rootIndex: 1, builtNodes: [3, 9], message: "Check if preorder is empty", highlightedLines: [2], variables: { 'preorder.length': 3 } },
-    { preorder: [20, 15, 7], inorder: [15, 20, 7], preStart: 0, preEnd: 2, inStart: 0, inEnd: 2, rootVal: 20, rootIndex: 1, builtNodes: [3, 9], message: "Root value for right subtree: 20", highlightedLines: [4], variables: { rootVal: 20, preorder: '[20,15,7]' } },
-    { preorder: [20, 15, 7], inorder: [15, 20, 7], preStart: 0, preEnd: 2, inStart: 0, inEnd: 2, rootVal: 20, rootIndex: 1, builtNodes: [3, 9, 20], message: "Create node 20 as right child of 3", highlightedLines: [5], variables: { root: '20', parent: '3' } },
-    { preorder: [20, 15, 7], inorder: [15, 20, 7], preStart: 0, preEnd: 2, inStart: 0, inEnd: 2, rootVal: 20, rootIndex: 1, builtNodes: [3, 9, 20], message: "Find 20 in inorder: index 1", highlightedLines: [6], variables: { mid: 1, rootVal: 20, inorder: '[15,20,7]' } },
-    { preorder: [20, 15, 7], inorder: [15, 20, 7], preStart: 0, preEnd: 2, inStart: 0, inEnd: 2, rootVal: 20, rootIndex: 1, builtNodes: [3, 9, 20], message: "Build left subtree of 20", highlightedLines: [8], variables: { preorder: '[15]', inorder: '[15]' } },
-    { preorder: [15], inorder: [15], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 20, rootIndex: 1, builtNodes: [3, 9, 20], message: "Build node 15", highlightedLines: [1], variables: { preorder: '[15]', inorder: '[15]' } },
-    { preorder: [15], inorder: [15], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 20, rootIndex: 1, builtNodes: [3, 9, 20], message: "Check if preorder is empty", highlightedLines: [2], variables: { 'preorder.length': 1 } },
-    { preorder: [15], inorder: [15], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 15, rootIndex: 1, builtNodes: [3, 9, 20], message: "Root value: 15", highlightedLines: [4], variables: { rootVal: 15 } },
-    { preorder: [15], inorder: [15], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 15, rootIndex: 1, builtNodes: [3, 9, 20, 15], message: "Create node 15 as left child of 20", highlightedLines: [5], variables: { root: '15', parent: '20' } },
-    { preorder: [15], inorder: [15], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 15, rootIndex: 0, builtNodes: [3, 9, 20, 15], message: "Find 15 in inorder: index 0", highlightedLines: [6], variables: { mid: 0 } },
-    { preorder: [15], inorder: [15], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 15, rootIndex: 0, builtNodes: [3, 9, 20, 15], message: "Build left of 15: empty", highlightedLines: [8], variables: { preorder: '[]' } },
-    { preorder: [], inorder: [], preStart: 0, preEnd: -1, inStart: 0, inEnd: -1, rootVal: 15, rootIndex: 0, builtNodes: [3, 9, 20, 15], message: "Empty, return null", highlightedLines: [2], variables: { 'preorder.length': 0 } },
-    { preorder: [15], inorder: [15], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 15, rootIndex: 0, builtNodes: [3, 9, 20, 15], message: "Build right of 15: empty", highlightedLines: [12], variables: { preorder: '[]' } },
-    { preorder: [], inorder: [], preStart: 0, preEnd: -1, inStart: 0, inEnd: -1, rootVal: 15, rootIndex: 0, builtNodes: [3, 9, 20, 15], message: "Empty, return null", highlightedLines: [2], variables: { 'preorder.length': 0 } },
-    { preorder: [15], inorder: [15], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 15, rootIndex: 0, builtNodes: [3, 9, 20, 15], message: "Node 15 complete (leaf)", highlightedLines: [17], variables: { root: '15' } },
-    { preorder: [20, 15, 7], inorder: [15, 20, 7], preStart: 0, preEnd: 2, inStart: 0, inEnd: 2, rootVal: 20, rootIndex: 1, builtNodes: [3, 9, 20, 15], message: "Left of 20 complete, build right", highlightedLines: [12], variables: { preorder: '[7]', inorder: '[7]' } },
-    { preorder: [7], inorder: [7], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 20, rootIndex: 1, builtNodes: [3, 9, 20, 15], message: "Build node 7", highlightedLines: [1], variables: { preorder: '[7]', inorder: '[7]' } },
-    { preorder: [7], inorder: [7], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 20, rootIndex: 1, builtNodes: [3, 9, 20, 15], message: "Check if preorder is empty", highlightedLines: [2], variables: { 'preorder.length': 1 } },
-    { preorder: [7], inorder: [7], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 7, rootIndex: 1, builtNodes: [3, 9, 20, 15], message: "Root value: 7", highlightedLines: [4], variables: { rootVal: 7 } },
-    { preorder: [7], inorder: [7], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 7, rootIndex: 1, builtNodes: [3, 9, 20, 15, 7], message: "Create node 7 as right child of 20", highlightedLines: [5], variables: { root: '7', parent: '20' } },
-    { preorder: [7], inorder: [7], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 7, rootIndex: 0, builtNodes: [3, 9, 20, 15, 7], message: "Find 7 in inorder: index 0", highlightedLines: [6], variables: { mid: 0 } },
-    { preorder: [7], inorder: [7], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 7, rootIndex: 0, builtNodes: [3, 9, 20, 15, 7], message: "Build left of 7: empty", highlightedLines: [8], variables: { preorder: '[]' } },
-    { preorder: [], inorder: [], preStart: 0, preEnd: -1, inStart: 0, inEnd: -1, rootVal: 7, rootIndex: 0, builtNodes: [3, 9, 20, 15, 7], message: "Empty, return null", highlightedLines: [2], variables: { 'preorder.length': 0 } },
-    { preorder: [7], inorder: [7], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 7, rootIndex: 0, builtNodes: [3, 9, 20, 15, 7], message: "Build right of 7: empty", highlightedLines: [12], variables: { preorder: '[]' } },
-    { preorder: [], inorder: [], preStart: 0, preEnd: -1, inStart: 0, inEnd: -1, rootVal: 7, rootIndex: 0, builtNodes: [3, 9, 20, 15, 7], message: "Empty, return null", highlightedLines: [2], variables: { 'preorder.length': 0 } },
-    { preorder: [7], inorder: [7], preStart: 0, preEnd: 0, inStart: 0, inEnd: 0, rootVal: 7, rootIndex: 0, builtNodes: [3, 9, 20, 15, 7], message: "Node 7 complete (leaf)", highlightedLines: [17], variables: { root: '7' } },
-    { preorder: [20, 15, 7], inorder: [15, 20, 7], preStart: 0, preEnd: 2, inStart: 0, inEnd: 2, rootVal: 20, rootIndex: 1, builtNodes: [3, 9, 20, 15, 7], message: "Node 20 complete with children 15 and 7", highlightedLines: [17], variables: { root: '20' } },
-    { preorder: [3, 9, 20, 15, 7], inorder: [9, 3, 15, 20, 7], preStart: 0, preEnd: 4, inStart: 0, inEnd: 4, rootVal: 3, rootIndex: 1, builtNodes: [3, 9, 20, 15, 7], message: "Complete! Tree built successfully ✓", highlightedLines: [17], variables: { root: '3', nodes: '[3,9,20,15,7]' } }
-  ];
+  const steps = useMemo(() => {
+    const preorder = [3, 9, 20, 15, 7];
+    const inorder = [9, 3, 15, 20, 7];
+    const generatedSteps: Step[] = [];
+    const builtNodes = new Set<string>();
+    let idCounter = 0;
 
-  const [idx, setIdx] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const step = steps[idx];
-  const editorRef = useRef<any>(null);
-  const monacoRef = useRef<any>(null);
-  const intervalRef = useRef<any>(null);
+    function build(pre: number[], ino: number[]): TreeNode | null {
+      const preStr = `[${pre.join(',')}]`;
+      const inoStr = `[${ino.join(',')}]`;
 
-  useEffect(() => {
-    if (editorRef.current && monacoRef.current) {
-      const decorations = step.highlightedLines.map(lineNum => ({
-        range: new monacoRef.current.Range(lineNum, 1, lineNum, 1),
-        options: {
-          isWholeLine: true,
-          className: 'highlighted-line-blue'
-        }
-      }));
-      editorRef.current.createDecorationsCollection(decorations);
-    }
-  }, [idx, step.highlightedLines]);
+      generatedSteps.push({
+        message: `Calling buildTree with preorder=${preStr} and inorder=${inoStr}`,
+        highlightedLines: [1],
+        variables: { preorder: preStr, inorder: inoStr },
+        builtNodes: new Set(builtNodes),
+        currentNodeId: null,
+        preorderRange: [0, pre.length],
+        inorderRange: [0, ino.length],
+        tree: null // Tree will be updated later
+      });
 
-  useEffect(() => {
-    if (isPlaying) {
-      intervalRef.current = setInterval(() => {
-        setIdx(prev => {
-          if (prev >= steps.length - 1) {
-            setIsPlaying(false);
-            return prev;
-          }
-          return prev + 1;
+      if (!pre.length || !ino.length) {
+        generatedSteps.push({
+          message: "Check if arrays are empty. They are!",
+          highlightedLines: [2],
+          variables: { 'pre.length': pre.length, 'ino.length': ino.length },
+          builtNodes: new Set(builtNodes),
+          currentNodeId: null,
+          preorderRange: [0, pre.length],
+          inorderRange: [0, ino.length],
+          tree: null
         });
-      }, 1000);
-    }
-    return () => clearInterval(intervalRef.current);
-  }, [isPlaying]);
+        return null;
+      }
 
-  const renderTree = () => {
-    const positions = [
-      { x: 200, y: 40, offset: 80, value: 3 },
-      { x: 120, y: 100, offset: 40, value: 9 },
-      { x: 280, y: 100, offset: 40, value: 20 },
-      { x: 240, y: 160, offset: 0, value: 15 },
-      { x: 320, y: 160, offset: 0, value: 7 }
-    ];
+      generatedSteps.push({
+        message: "Arrays not empty, continuing with construction.",
+        highlightedLines: [2],
+        variables: { 'pre.length': pre.length, 'ino.length': ino.length },
+        builtNodes: new Set(builtNodes),
+        currentNodeId: null,
+        preorderRange: [0, pre.length],
+        inorderRange: [0, ino.length],
+        tree: null
+      });
+
+      const rootVal = pre[0];
+      const nodeId = `node-${idCounter++}`;
+
+      generatedSteps.push({
+        message: `Root value is the first element of preorder: ${rootVal}`,
+        highlightedLines: [4],
+        variables: { rootVal, preorder: preStr },
+        builtNodes: new Set(builtNodes),
+        currentNodeId: nodeId,
+        preorderRange: [0, pre.length],
+        inorderRange: [0, ino.length],
+        tree: null
+      });
+
+      const root: TreeNode = { val: rootVal, left: null, right: null, id: nodeId };
+      builtNodes.add(nodeId);
+
+      generatedSteps.push({
+        message: `Create new TreeNode with value ${rootVal}`,
+        highlightedLines: [5],
+        variables: { rootVal, root: `Node(${rootVal})` },
+        builtNodes: new Set(builtNodes),
+        currentNodeId: nodeId,
+        preorderRange: [0, pre.length],
+        inorderRange: [0, ino.length],
+        tree: null
+      });
+
+      const mid = ino.indexOf(rootVal);
+      generatedSteps.push({
+        message: `Find ${rootVal} in inorder to partition left and right subtrees. Found at index ${mid}.`,
+        highlightedLines: [6],
+        variables: { rootVal, mid, inorder: inoStr },
+        builtNodes: new Set(builtNodes),
+        currentNodeId: nodeId,
+        preorderRange: [0, pre.length],
+        inorderRange: [0, ino.length],
+        tree: null
+      });
+
+      generatedSteps.push({
+        message: `Recursively build the left subtree.`,
+        highlightedLines: [8, 9, 10, 11],
+        variables: {
+          'leftPreorder': `[${pre.slice(1, mid + 1).join(',')}]`,
+          'leftInorder': `[${ino.slice(0, mid).join(',')}]`
+        },
+        builtNodes: new Set(builtNodes),
+        currentNodeId: nodeId,
+        preorderRange: [0, pre.length],
+        inorderRange: [0, ino.length],
+        tree: null
+      });
+
+      root.left = build(pre.slice(1, mid + 1), ino.slice(0, mid));
+
+      generatedSteps.push({
+        message: `Left subtree for node ${rootVal} is built. Now building current node's right subtree.`,
+        highlightedLines: [12, 13, 14, 15],
+        variables: {
+          rootVal,
+          'rightPreorder': `[${pre.slice(mid + 1).join(',')}]`,
+          'rightInorder': `[${ino.slice(mid + 1).join(',')}]`
+        },
+        builtNodes: new Set(builtNodes),
+        currentNodeId: nodeId,
+        preorderRange: [0, pre.length],
+        inorderRange: [0, ino.length],
+        tree: null
+      });
+
+      root.right = build(pre.slice(mid + 1), ino.slice(mid + 1));
+
+      generatedSteps.push({
+        message: `Successfully constructed tree rooted at ${rootVal}. Returning node.`,
+        highlightedLines: [17],
+        variables: { rootVal, 'root.left': root.left?.val ?? 'null', 'root.right': root.right?.val ?? 'null' },
+        builtNodes: new Set(builtNodes),
+        currentNodeId: nodeId,
+        preorderRange: [0, pre.length],
+        inorderRange: [0, ino.length],
+        tree: null
+      });
+
+      return root;
+    }
+
+    const finalTree = build(preorder, inorder);
+
+    // Patch steps with the partial tree state for better visualization
+    // In a real implementation, we'd build the tree incrementally and capture state.
+    // For this visualization, we'll use the final tree structure but dim nodes not yet built.
+    const calculatePositions = (node: TreeNode | null, x: number, y: number, spacing: number) => {
+      if (!node) return;
+      node.x = x;
+      node.y = y;
+      calculatePositions(node.left, x - spacing, y + 60, spacing / 2);
+      calculatePositions(node.right, x + spacing, y + 60, spacing / 2);
+    };
+    calculatePositions(finalTree, 200, 40, 100);
+
+    return generatedSteps.map(s => ({ ...s, tree: finalTree }));
+  }, []);
+
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const currentStep = steps[currentStepIndex];
+
+  const renderTree = (node: TreeNode | null): JSX.Element | null => {
+    if (!node || node.x === undefined || node.y === undefined) return null;
+
+    const isBuilt = currentStep.builtNodes.has(node.id);
+    const isActive = currentStep.currentNodeId === node.id;
 
     return (
-      <div className="space-y-4">
-        <div className="text-sm font-semibold text-center mb-2">Tree Construction Progress</div>
-        <svg width="400" height="220" className="mx-auto">
-          <line x1={200} y1={40} x2={120} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
-          <line x1={200} y1={40} x2={280} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
-          <line x1={280} y1={100} x2={240} y2={160} stroke="currentColor" className="text-border" strokeWidth="2" />
-          <line x1={280} y1={100} x2={320} y2={160} stroke="currentColor" className="text-border" strokeWidth="2" />
-
-          {positions.map((pos, i) => {
-            const isBuilt = step.builtNodes.includes(pos.value);
-            const isCurrent = step.rootVal === pos.value;
-
-            return (
-              <g key={i}>
-                <circle
-                  cx={pos.x}
-                  cy={pos.y}
-                  r="24"
-                  className={`transition-all duration-300 ${isCurrent
-                    ? 'fill-yellow-500'
-                    : isBuilt
-                      ? 'fill-green-500'
-                      : 'fill-muted/30'
-                    }`}
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeDasharray={isBuilt ? '0' : '4'}
-                />
-                <text
-                  x={pos.x}
-                  y={pos.y + 6}
-                  textAnchor="middle"
-                  className={`text-sm font- ${isBuilt ? 'fill-foreground' : 'fill-muted-foreground'
-                    }`}
-                >
-                  {pos.value}
-                </text>
-              </g>
-            );
-          })}
-        </svg>
-        <div className="text-center text-xs text-muted-foreground">
-          Nodes Built: {step.builtNodes.join(', ') || 'None'}
-        </div>
-      </div>
+      <g key={node.id}>
+        {node.left && node.left.x !== undefined && node.left.y !== undefined && (
+          <line
+            x1={node.x}
+            y1={node.y}
+            x2={node.left.x}
+            y2={node.left.y}
+            stroke="currentColor"
+            strokeWidth="2"
+            className={`transition-all duration-300 ${isBuilt && currentStep.builtNodes.has(node.left.id) ? 'text-primary' : 'text-border opacity-20'}`}
+          />
+        )}
+        {node.right && node.right.x !== undefined && node.right.y !== undefined && (
+          <line
+            x1={node.x}
+            y1={node.y}
+            x2={node.right.x}
+            y2={node.right.y}
+            stroke="currentColor"
+            strokeWidth="2"
+            className={`transition-all duration-300 ${isBuilt && currentStep.builtNodes.has(node.right.id) ? 'text-primary' : 'text-border opacity-20'}`}
+          />
+        )}
+        <circle
+          cx={node.x}
+          cy={node.y}
+          r="20"
+          className={`transition-all duration-300 ${isActive ? 'fill-primary stroke-primary scale-110 shadow-lg' : isBuilt ? 'fill-primary/20 stroke-primary' : 'fill-muted/20 stroke-border opacity-20'}`}
+          strokeWidth="2"
+        />
+        <text
+          x={node.x}
+          y={node.y}
+          textAnchor="middle"
+          dy=".3em"
+          className={`text-xs font-medium transition-all duration-300 ${isBuilt || isActive ? 'fill-foreground' : 'fill-muted-foreground opacity-20'}`}
+        >
+          {node.val}
+        </text>
+        {renderTree(node.left)}
+        {renderTree(node.right)}
+      </g>
     );
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div className="flex gap-2">
-          <Button onClick={() => setIdx(0)} variant="outline" size="sm">
-            <RotateCcw className="h-4 w-4" />
-          </Button>
-          <Button onClick={() => setIsPlaying(!isPlaying)} variant="outline" size="sm">
-            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-          </Button>
-          <Button onClick={() => setIdx(Math.max(0, idx - 1))} disabled={idx === 0} variant="outline" size="sm">
-            <SkipBack className="h-4 w-4" />
-          </Button>
-          <Button onClick={() => setIdx(Math.min(steps.length - 1, idx + 1))} disabled={idx === steps.length - 1} variant="outline" size="sm">
-            <SkipForward className="h-4 w-4" />
-          </Button>
-        </div>
-        <span className="text-sm text-muted-foreground">Step {idx + 1} / {steps.length}</span>
-      </div>
+      <SimpleStepControls
+        currentStep={currentStepIndex}
+        totalSteps={steps.length}
+        onStepChange={setCurrentStepIndex}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left Column: Visualization & Details */}
         <div className="space-y-4">
-          <Card className="p-4">
-            {renderTree()}
+          <Card className="p-6 bg-muted/30">
+            <svg viewBox="0 0 400 240" className="w-full h-auto overflow-visible">
+              {renderTree(currentStep.tree)}
+            </svg>
           </Card>
 
           <AnimatePresence mode="wait">
             <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 20 }}
+              key={currentStepIndex}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+              className="bg-primary/5 border border-primary/20 rounded-lg p-4 shadow-sm"
             >
-              <VariablePanel variables={step.variables} />
+              <p className="text-sm font-medium text-foreground">
+                {currentStep.message}
+              </p>
             </motion.div>
           </AnimatePresence>
 
-          <Card className="p-4 bg-primary/5 border-primary/20">
-            <motion.p
-              key={`msg-${idx}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-sm font-medium"
-            >
-              {step.message}
-            </motion.p>
-          </Card>
-
-          {step.builtNodes.length === 5 && idx === steps.length - 1 && (
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg"
-            >
-              <p className="text-green-600 dark:text-green-400 font-semibold">✓ Tree Construction Complete!</p>
-            </motion.div>
-          )}
+          <VariablePanel variables={currentStep.variables} />
         </div>
 
-        <Card className="p-4">
-          <div className="h-[700px]">
-            <Editor
-              height="100%"
-              defaultLanguage="typescript"
-              value={code}
-              theme="vs-dark"
-              options={{
-                readOnly: true,
-                minimap: { enabled: false },
-                fontSize: 13,
-                lineNumbers: 'on',
-                scrollBeyondLastLine: false,
-                automaticLayout: true
-              }}
-              onMount={(editor, monaco) => {
-                editorRef.current = editor;
-                monacoRef.current = monaco;
-              }}
-            />
-          </div>
+        {/* Right Column: Code Editor */}
+        <Card className="overflow-hidden border-none shadow-none">
+          <AnimatedCodeEditor
+            code={code}
+            highlightedLines={currentStep.highlightedLines}
+            language="typescript"
+          />
         </Card>
       </div>
-
-      <style>{`
-        .highlighted-line-blue {
-          background: rgba(37, 99, 235, 0.15);
-          border-left: 3px solid rgb(37, 99, 235);
-        }
-      `}</style>
     </div>
   );
 };

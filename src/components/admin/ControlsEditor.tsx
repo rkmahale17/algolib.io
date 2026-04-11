@@ -321,14 +321,20 @@ export function ControlsEditor({ controls, onChange, implementations, onImplemen
   // Ensure we have all default keys if some are missing (backward compatibility)
   const localControls = { ...DEFAULT_CONTROLS, ...controls };
 
-  const updateNested = (path: string[], value: boolean) => {
+  const updateNested = (path: string[], value: any) => {
+    updateNestedPaths([{ path, value }]);
+  };
+
+  const updateNestedPaths = (updates: { path: string[], value: any }[]) => {
     const newControls = JSON.parse(JSON.stringify(localControls));
-    let current = newControls;
-    for (let i = 0; i < path.length - 1; i++) {
-      if (!current[path[i]] || typeof current[path[i]] !== 'object') current[path[i]] = {};
-      current = current[path[i]];
-    }
-    current[path[path.length - 1]] = value;
+    updates.forEach(({ path, value }) => {
+      let current = newControls;
+      for (let i = 0; i < path.length - 1; i++) {
+        if (!current[path[i]] || typeof current[path[i]] !== 'object') current[path[i]] = {};
+        current = current[path[i]];
+      }
+      current[path[path.length - 1]] = value;
+    });
     onChange(newControls);
   };
 
@@ -710,8 +716,10 @@ export function ControlsEditor({ controls, onChange, implementations, onImplemen
                 itemLabel="Enable Tree Visualization"
                 checked={localControls.visualizations?.tree?.enabled ?? localControls.show_tree_visualization === true}
                 onCheckedChange={(c) => {
-                  updateNested(['visualizations', 'tree', 'enabled'], c);
-                  updateNested(['show_tree_visualization'], c); // Legacy fallback sync
+                  updateNestedPaths([
+                    { path: ['visualizations', 'tree', 'enabled'], value: c },
+                    { path: ['show_tree_visualization'], value: c }
+                  ]);
                 }}
               />
               <div className="flex items-center justify-between pl-4">
@@ -754,8 +762,10 @@ export function ControlsEditor({ controls, onChange, implementations, onImplemen
                 itemLabel="Enable Graph Visualization"
                 checked={localControls.visualizations?.graph?.enabled ?? localControls.show_graph_visualization === true}
                 onCheckedChange={(c) => {
-                  updateNested(['visualizations', 'graph', 'enabled'], c);
-                  updateNested(['show_graph_visualization'], c); // Legacy fallback sync
+                  updateNestedPaths([
+                    { path: ['visualizations', 'graph', 'enabled'], value: c },
+                    { path: ['show_graph_visualization'], value: c }
+                  ]);
                 }}
               />
               <p className="text-xs text-muted-foreground">

@@ -79,14 +79,14 @@ const blind75Map: Record<string, React.LazyExoticComponent<React.ComponentType<a
   "same-tree": React.lazy(() => import("@/components/visualizations/algorithms/SameTreeVisualization").then(m => ({ default: m.SameTreeVisualization }))),
   "invert-binary-tree": React.lazy(() => import("@/components/visualizations/algorithms/InvertBinaryTreeVisualization").then(m => ({ default: m.InvertBinaryTreeVisualization }))),
   "binary-tree-maximum-path-sum": React.lazy(() => import("@/components/visualizations/algorithms/BinaryTreeMaximumPathSumVisualization").then(m => ({ default: m.BinaryTreeMaximumPathSumVisualization }))),
-  "serialize-and-deserialize-binary-tree": React.lazy(() => import("@/components/visualizations/algorithms/SerializeDeserializeBinaryTreeVisualization").then(m => ({ default: m.SerializeDeserializeBinaryTreeVisualization }))),
+  "serialize-and-deserialize-binary-tree": React.lazy(() => import("@/components/visualizations/algorithms/SerializeTreeVisualization").then(m => ({ default: m.SerializeTreeVisualization }))),
   "subtree-of-another-tree": React.lazy(() => import("@/components/visualizations/algorithms/SubtreeOfAnotherTreeVisualization").then(m => ({ default: m.SubtreeOfAnotherTreeVisualization }))),
   "construct-binary-tree-from-preorder-and-inorder-traversal": React.lazy(() => import("@/components/visualizations/algorithms/ConstructBinaryTreeVisualization").then(m => ({ default: m.ConstructBinaryTreeVisualization }))),
   "validate-binary-search-tree": React.lazy(() => import("@/components/visualizations/algorithms/ValidateBSTVisualization").then(m => ({ default: m.ValidateBSTVisualization }))),
   "kth-smallest-element-in-a-bst": React.lazy(() => import("@/components/visualizations/algorithms/KthSmallestInBSTVisualization").then(m => ({ default: m.KthSmallestInBSTVisualization }))),
   "lowest-common-ancestor-of-a-binary-search-tree": React.lazy(() => import("@/components/visualizations/algorithms/LowestCommonAncestorBSTVisualization").then(m => ({ default: m.LowestCommonAncestorBSTVisualization }))),
-  "implement-trie-prefix-tree": React.lazy(() => import("@/components/visualizations/algorithms/ImplementTrieVisualization").then(m => ({ default: m.ImplementTrieVisualization }))),
-  "add-and-search-word": React.lazy(() => import("@/components/visualizations/algorithms/AddAndSearchWordVisualization").then(m => ({ default: m.AddAndSearchWordVisualization }))),
+  "implement-trie-prefix-tree": React.lazy(() => import("@/components/visualizations/algorithms/ImplementTrieVisualization").then(m => ({ default: m.ImplementTrieVisualization }))), "add-and-search-word": React.lazy(() => import("@/components/visualizations/algorithms/AddAndSearchWordVisualization").then(m => ({ default: m.AddAndSearchWordVisualization }))),
+  'binary-tree-level-order-traversal': React.lazy(() => import('@/components/visualizations/algorithms/BFSLevelOrderVisualization').then(m => ({ default: m.BFSLevelOrderVisualization }))),
   "word-search-ii": React.lazy(() => import("@/components/visualizations/algorithms/WordSearchIIVisualization").then(m => ({ default: m.WordSearchIIVisualization }))),
 };
 

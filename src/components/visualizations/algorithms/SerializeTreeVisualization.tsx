@@ -384,7 +384,7 @@ function deserialize(data: string): TreeNode | null {
           className={`transition-all duration-500 ${isActive ? 'fill-primary stroke-primary scale-110 shadow-lg' :
             (currentStep.phase === 'serialize' && isVisited) ? 'fill-primary/20 stroke-primary' :
               isBuilt ? 'fill-green-500/20 stroke-green-500' :
-                'fill-muted/20 stroke-border opacity-30'
+                'fill-background stroke-black'
             }`}
           strokeWidth="2"
         />
@@ -393,9 +393,9 @@ function deserialize(data: string): TreeNode | null {
           y={node.y}
           textAnchor="middle"
           dy=".3em"
-          className={`font- transition-all duration-300 ${isActive ? 'fill-white' :
+          className={`font-bold transition-all duration-300 ${isActive ? 'fill-white' :
             (currentStep.phase === 'serialize' && isVisited) || isBuilt ? 'fill-foreground' :
-              'fill-foreground/20'
+              'fill-black'
             }`}
         >
           {node.val}
@@ -408,23 +408,19 @@ function deserialize(data: string): TreeNode | null {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-        <h2 className="text-xl font- text-foreground">
-          {currentStep.phase === 'serialize' ? 'Phase 1: Serialize' : 'Phase 2: Deserialize'}
-        </h2>
-        <StepControls
-          isPlaying={isPlaying}
-          onPlay={handlePlay}
-          onPause={handlePause}
-          onStepForward={handleStepForward}
-          onStepBack={handleStepBack}
-          onReset={handleReset}
-          speed={speed}
-          onSpeedChange={setSpeed}
-          currentStep={currentStepIndex}
-          totalSteps={steps.length - 1}
-        />
-      </div>
+
+      <StepControls
+        isPlaying={isPlaying}
+        onPlay={handlePlay}
+        onPause={handlePause}
+        onStepForward={handleStepForward}
+        onStepBack={handleStepBack}
+        onReset={handleReset}
+        speed={speed}
+        onSpeedChange={setSpeed}
+        currentStep={currentStepIndex}
+        totalSteps={steps.length - 1}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">

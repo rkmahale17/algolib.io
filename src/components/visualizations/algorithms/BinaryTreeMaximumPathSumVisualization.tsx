@@ -1,262 +1,304 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { SkipBack, SkipForward, RotateCcw } from 'lucide-react';
-import Editor from '@monaco-editor/react';
-import { motion } from 'framer-motion';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import type { editor as MonacoEditor } from 'monaco-editor';
+import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { motion, AnimatePresence } from 'framer-motion';
+
+interface TreeNode {
+  val: number;
+  left: TreeNode | null;
+  right: TreeNode | null;
+  id: number;
+}
 
 interface Step {
-  currentNode: number | string;
-  leftGain: number | string;
-  rightGain: number | string;
-  currentSum: number | string;
-  maxSum: number | string;
-  returnValue: number | string;
-  message: string;
-  highlightedLines: number[];
-  stackDepth: number;
-  phase: string;
+  line: number;
+  vars: {
+    node: string;
+    leftMax: string;
+    rightMax: string;
+    res: string;
+    returnVal: string;
+  };
+  msg: string;
+  activeNodeId: number | null;
+  highlightedPath: number[];
+  completedNodes: Set<number>;
 }
 
 export const BinaryTreeMaximumPathSumVisualization = () => {
   const code = `function maxPathSum(root: TreeNode | null): number {
-  let maxSum = -Infinity;
-  
+  let res = -Infinity;
+
   function dfs(node: TreeNode | null): number {
-    if (node === null) return 0;
-    
-    const leftGain = Math.max(dfs(node.left), 0);
-    const rightGain = Math.max(dfs(node.right), 0);
-    
-    const currentSum = node.val + leftGain + rightGain;
-    maxSum = Math.max(maxSum, currentSum);
-    
-    return node.val + Math.max(leftGain, rightGain);
+    if (!node) return 0;
+
+    let leftMax = dfs(node.left);
+    let rightMax = dfs(node.right);
+
+    leftMax = Math.max(leftMax, 0);
+    rightMax = Math.max(rightMax, 0);
+
+    res = Math.max(res, node.val + leftMax + rightMax);
+
+    return node.val + Math.max(leftMax, rightMax);
   }
-  
+
   dfs(root);
-  return maxSum;
+  return res;
 }`;
 
-  const steps: Step[] = [
-    { currentNode: '-', leftGain: '-', rightGain: '-', currentSum: '-', maxSum: '-Infinity', returnValue: '-', message: "Initialize: maxSum = -Infinity", highlightedLines: [2], stackDepth: 0, phase: "init" },
-    { currentNode: '-', leftGain: '-', rightGain: '-', currentSum: '-', maxSum: '-Infinity', returnValue: '-', message: "Call dfs(root) with node -10", highlightedLines: [16], stackDepth: 0, phase: "call" },
+  // Define a demo tree
+  //      -10(0)
+  //      /    \
+  //    9(1)  20(2)
+  //          /   \
+  //        15(3) 7(4)
+  const tree: TreeNode = {
+    val: -10,
+    id: 0,
+    left: { val: 9, id: 1, left: null, right: null },
+    right: {
+      val: 20,
+      id: 2,
+      left: { val: 15, id: 3, left: null, right: null },
+      right: { val: 7, id: 4, left: null, right: null },
+    },
+  };
 
-    { currentNode: -10, leftGain: '-', rightGain: '-', currentSum: '-', maxSum: '-Infinity', returnValue: '-', message: "Enter dfs(-10): Check if null", highlightedLines: [5], stackDepth: 1, phase: "enter" },
-    { currentNode: -10, leftGain: '-', rightGain: '-', currentSum: '-', maxSum: '-Infinity', returnValue: '-', message: "Not null, compute leftGain = max(dfs(left), 0)", highlightedLines: [7], stackDepth: 1, phase: "compute_left" },
-    { currentNode: -10, leftGain: '-', rightGain: '-', currentSum: '-', maxSum: '-Infinity', returnValue: '-', message: "Call dfs(node.left) → dfs(9)", highlightedLines: [7], stackDepth: 1, phase: "call_left" },
+  const steps = useMemo<Step[]>(() => {
+    const s: Step[] = [];
+    let res = -Infinity;
+    const completedNodes = new Set<number>();
 
-    { currentNode: 9, leftGain: '-', rightGain: '-', currentSum: '-', maxSum: '-Infinity', returnValue: '-', message: "Enter dfs(9): Check if null", highlightedLines: [5], stackDepth: 2, phase: "enter" },
-    { currentNode: 9, leftGain: '-', rightGain: '-', currentSum: '-', maxSum: '-Infinity', returnValue: '-', message: "Not null, compute leftGain for node 9", highlightedLines: [7], stackDepth: 2, phase: "compute_left" },
-    { currentNode: 9, leftGain: '-', rightGain: '-', currentSum: '-', maxSum: '-Infinity', returnValue: '-', message: "Call dfs(node.left) → dfs(null)", highlightedLines: [7], stackDepth: 2, phase: "call_left" },
+    function addStep(line: number, node: TreeNode | null, leftMax: any, rightMax: any, currRes: any, returnVal: any, msg: string, activeNodeId: number | null = null, path: number[] = []) {
+      s.push({
+        line,
+        vars: {
+          node: node ? `${node.val}` : (node === null ? 'null' : '-'),
+          leftMax: leftMax !== undefined ? `${leftMax}` : '-',
+          rightMax: rightMax !== undefined ? `${rightMax}` : '-',
+          res: currRes === -Infinity ? '-∞' : `${currRes}`,
+          returnVal: returnVal !== undefined ? `${returnVal}` : '-',
+        },
+        msg,
+        activeNodeId: activeNodeId ?? (node ? node.id : null),
+        highlightedPath: path,
+        completedNodes: new Set(completedNodes),
+      });
+    }
 
-    { currentNode: 'null', leftGain: '-', rightGain: '-', currentSum: '-', maxSum: '-Infinity', returnValue: 0, message: "dfs(null): Return 0", highlightedLines: [5], stackDepth: 3, phase: "return_null" },
+    addStep(2, null, undefined, undefined, res, undefined, "Initialize result res = -Infinity");
+    addStep(18, tree, undefined, undefined, res, undefined, "Start DFS from the root node (-10)");
 
-    { currentNode: 9, leftGain: 0, rightGain: '-', currentSum: '-', maxSum: '-Infinity', returnValue: '-', message: "Back to node 9: leftGain = max(0, 0) = 0", highlightedLines: [7], stackDepth: 2, phase: "got_left" },
-    { currentNode: 9, leftGain: 0, rightGain: '-', currentSum: '-', maxSum: '-Infinity', returnValue: '-', message: "Compute rightGain for node 9", highlightedLines: [8], stackDepth: 2, phase: "compute_right" },
-    { currentNode: 9, leftGain: 0, rightGain: '-', currentSum: '-', maxSum: '-Infinity', returnValue: '-', message: "Call dfs(node.right) → dfs(null)", highlightedLines: [8], stackDepth: 2, phase: "call_right" },
+    function dfs(node: TreeNode | null): number {
+      const nodeId = node ? node.id : -1;
+      
+      if (!node) {
+        addStep(5, null, undefined, undefined, res, 0, "Base case: Node is null, return 0");
+        return 0;
+      }
 
-    { currentNode: 'null', leftGain: '-', rightGain: '-', currentSum: '-', maxSum: '-Infinity', returnValue: 0, message: "dfs(null): Return 0", highlightedLines: [5], stackDepth: 3, phase: "return_null" },
+      addStep(5, node, undefined, undefined, res, undefined, `Enter DFS for node ${node.val}`);
+      
+      addStep(7, node, undefined, undefined, res, undefined, `Visit left child of ${node.val}`);
+      const leftRaw = dfs(node.left);
+      let leftMax = leftRaw;
+      addStep(7, node, leftMax, undefined, res, undefined, `Left child returned ${leftMax}`);
 
-    { currentNode: 9, leftGain: 0, rightGain: 0, currentSum: '-', maxSum: '-Infinity', returnValue: '-', message: "Back to node 9: rightGain = max(0, 0) = 0", highlightedLines: [8], stackDepth: 2, phase: "got_right" },
-    { currentNode: 9, leftGain: 0, rightGain: 0, currentSum: 9, maxSum: '-Infinity', returnValue: '-', message: "currentSum = 9 + 0 + 0 = 9", highlightedLines: [10], stackDepth: 2, phase: "compute_sum" },
-    { currentNode: 9, leftGain: 0, rightGain: 0, currentSum: 9, maxSum: 9, returnValue: '-', message: "maxSum = max(-∞, 9) = 9", highlightedLines: [11], stackDepth: 2, phase: "update_max" },
-    { currentNode: 9, leftGain: 0, rightGain: 0, currentSum: 9, maxSum: 9, returnValue: 9, message: "Return 9 + max(0, 0) = 9", highlightedLines: [13], stackDepth: 2, phase: "return" },
+      addStep(8, node, leftMax, undefined, res, undefined, `Visit right child of ${node.val}`);
+      const rightRaw = dfs(node.right);
+      let rightMax = rightRaw;
+      addStep(8, node, leftMax, rightMax, res, undefined, `Right child returned ${rightMax}`);
 
-    { currentNode: -10, leftGain: 9, rightGain: '-', currentSum: '-', maxSum: 9, returnValue: '-', message: "Back to node -10: leftGain = max(9, 0) = 9", highlightedLines: [7], stackDepth: 1, phase: "got_left" },
-    { currentNode: -10, leftGain: 9, rightGain: '-', currentSum: '-', maxSum: 9, returnValue: '-', message: "Compute rightGain for node -10", highlightedLines: [8], stackDepth: 1, phase: "compute_right" },
-    { currentNode: -10, leftGain: 9, rightGain: '-', currentSum: '-', maxSum: 9, returnValue: '-', message: "Call dfs(node.right) → dfs(20)", highlightedLines: [8], stackDepth: 1, phase: "call_right" },
+      leftMax = Math.max(leftMax, 0);
+      addStep(10, node, leftMax, rightMax, res, undefined, `Adjust leftMax: max(${leftRaw}, 0) = ${leftMax}`);
 
-    { currentNode: 20, leftGain: '-', rightGain: '-', currentSum: '-', maxSum: 9, returnValue: '-', message: "Enter dfs(20): Check if null", highlightedLines: [5], stackDepth: 2, phase: "enter" },
-    { currentNode: 20, leftGain: '-', rightGain: '-', currentSum: '-', maxSum: 9, returnValue: '-', message: "Not null, compute leftGain for node 20", highlightedLines: [7], stackDepth: 2, phase: "compute_left" },
-    { currentNode: 20, leftGain: '-', rightGain: '-', currentSum: '-', maxSum: 9, returnValue: '-', message: "Call dfs(node.left) → dfs(15)", highlightedLines: [7], stackDepth: 2, phase: "call_left" },
+      rightMax = Math.max(rightMax, 0);
+      addStep(11, node, leftMax, rightMax, res, undefined, `Adjust rightMax: max(${rightRaw}, 0) = ${rightMax}`);
 
-    { currentNode: 15, leftGain: '-', rightGain: '-', currentSum: '-', maxSum: 9, returnValue: '-', message: "Enter dfs(15): Check if null", highlightedLines: [5], stackDepth: 3, phase: "enter" },
-    { currentNode: 15, leftGain: '-', rightGain: '-', currentSum: '-', maxSum: 9, returnValue: '-', message: "Not null, compute leftGain for node 15", highlightedLines: [7], stackDepth: 3, phase: "compute_left" },
-    { currentNode: 15, leftGain: '-', rightGain: '-', currentSum: '-', maxSum: 9, returnValue: '-', message: "Call dfs(node.left) → dfs(null)", highlightedLines: [7], stackDepth: 3, phase: "call_left" },
-    { currentNode: 'null', leftGain: '-', rightGain: '-', currentSum: '-', maxSum: 9, returnValue: 0, message: "dfs(null): Return 0", highlightedLines: [5], stackDepth: 4, phase: "return_null" },
+      const currentSum = node.val + leftMax + rightMax;
+      const oldRes = res;
+      res = Math.max(res, currentSum);
+      
+      let path: number[] = [];
+      if (res === 42 && node.id === 2) {
+         path = [3, 2, 4]; // 15 -> 20 -> 7
+      }
 
-    { currentNode: 15, leftGain: 0, rightGain: '-', currentSum: '-', maxSum: 9, returnValue: '-', message: "Back to node 15: leftGain = max(0, 0) = 0", highlightedLines: [7], stackDepth: 3, phase: "got_left" },
-    { currentNode: 15, leftGain: 0, rightGain: '-', currentSum: '-', maxSum: 9, returnValue: '-', message: "Compute rightGain for node 15", highlightedLines: [8], stackDepth: 3, phase: "compute_right" },
-    { currentNode: 15, leftGain: 0, rightGain: '-', currentSum: '-', maxSum: 9, returnValue: '-', message: "Call dfs(node.right) → dfs(null)", highlightedLines: [8], stackDepth: 3, phase: "call_right" },
-    { currentNode: 'null', leftGain: '-', rightGain: '-', currentSum: '-', maxSum: 9, returnValue: 0, message: "dfs(null): Return 0", highlightedLines: [5], stackDepth: 4, phase: "return_null" },
+      const resMsg = res > oldRes 
+        ? `New global maximum found! max(${oldRes === -Infinity ? '-∞' : oldRes}, ${node.val} + ${leftMax} + ${rightMax}) = ${res}`
+        : `Global maximum stays ${res}. currentSum at this node = ${currentSum}`;
+      
+      addStep(13, node, leftMax, rightMax, res, undefined, resMsg, node.id, path);
 
-    { currentNode: 15, leftGain: 0, rightGain: 0, currentSum: '-', maxSum: 9, returnValue: '-', message: "Back to node 15: rightGain = max(0, 0) = 0", highlightedLines: [8], stackDepth: 3, phase: "got_right" },
-    { currentNode: 15, leftGain: 0, rightGain: 0, currentSum: 15, maxSum: 9, returnValue: '-', message: "currentSum = 15 + 0 + 0 = 15", highlightedLines: [10], stackDepth: 3, phase: "compute_sum" },
-    { currentNode: 15, leftGain: 0, rightGain: 0, currentSum: 15, maxSum: 15, returnValue: '-', message: "maxSum = max(9, 15) = 15 (new max!)", highlightedLines: [11], stackDepth: 3, phase: "update_max" },
-    { currentNode: 15, leftGain: 0, rightGain: 0, currentSum: 15, maxSum: 15, returnValue: 15, message: "Return 15 + max(0, 0) = 15", highlightedLines: [13], stackDepth: 3, phase: "return" },
+      const returnVal = node.val + Math.max(leftMax, rightMax);
+      addStep(15, node, leftMax, rightMax, res, returnVal, `Return max path through this node without split: ${node.val} + max(${leftMax}, ${rightMax}) = ${returnVal}`);
+      
+      completedNodes.add(node.id);
+      return returnVal;
+    }
 
-    { currentNode: 20, leftGain: 15, rightGain: '-', currentSum: '-', maxSum: 15, returnValue: '-', message: "Back to node 20: leftGain = max(15, 0) = 15", highlightedLines: [7], stackDepth: 2, phase: "got_left" },
-    { currentNode: 20, leftGain: 15, rightGain: '-', currentSum: '-', maxSum: 15, returnValue: '-', message: "Compute rightGain for node 20", highlightedLines: [8], stackDepth: 2, phase: "compute_right" },
-    { currentNode: 20, leftGain: 15, rightGain: '-', currentSum: '-', maxSum: 15, returnValue: '-', message: "Call dfs(node.right) → dfs(7)", highlightedLines: [8], stackDepth: 2, phase: "call_right" },
+    dfs(tree);
+    addStep(19, null, undefined, undefined, res, res, `Final result: ${res}`);
 
-    { currentNode: 7, leftGain: '-', rightGain: '-', currentSum: '-', maxSum: 15, returnValue: '-', message: "Enter dfs(7): Check if null", highlightedLines: [5], stackDepth: 3, phase: "enter" },
-    { currentNode: 7, leftGain: '-', rightGain: '-', currentSum: '-', maxSum: 15, returnValue: '-', message: "Not null, compute leftGain for node 7", highlightedLines: [7], stackDepth: 3, phase: "compute_left" },
-    { currentNode: 7, leftGain: '-', rightGain: '-', currentSum: '-', maxSum: 15, returnValue: '-', message: "Call dfs(node.left) → dfs(null)", highlightedLines: [7], stackDepth: 3, phase: "call_left" },
-    { currentNode: 'null', leftGain: '-', rightGain: '-', currentSum: '-', maxSum: 15, returnValue: 0, message: "dfs(null): Return 0", highlightedLines: [5], stackDepth: 4, phase: "return_null" },
+    return s;
+  }, []);
 
-    { currentNode: 7, leftGain: 0, rightGain: '-', currentSum: '-', maxSum: 15, returnValue: '-', message: "Back to node 7: leftGain = max(0, 0) = 0", highlightedLines: [7], stackDepth: 3, phase: "got_left" },
-    { currentNode: 7, leftGain: 0, rightGain: '-', currentSum: '-', maxSum: 15, returnValue: '-', message: "Compute rightGain for node 7", highlightedLines: [8], stackDepth: 3, phase: "compute_right" },
-    { currentNode: 7, leftGain: 0, rightGain: '-', currentSum: '-', maxSum: 15, returnValue: '-', message: "Call dfs(node.right) → dfs(null)", highlightedLines: [8], stackDepth: 3, phase: "call_right" },
-    { currentNode: 'null', leftGain: '-', rightGain: '-', currentSum: '-', maxSum: 15, returnValue: 0, message: "dfs(null): Return 0", highlightedLines: [5], stackDepth: 4, phase: "return_null" },
+  const [currentStepIdx, setCurrentStepIdx] = useState(0);
+  const step = steps[currentStepIdx];
 
-    { currentNode: 7, leftGain: 0, rightGain: 0, currentSum: '-', maxSum: 15, returnValue: '-', message: "Back to node 7: rightGain = max(0, 0) = 0", highlightedLines: [8], stackDepth: 3, phase: "got_right" },
-    { currentNode: 7, leftGain: 0, rightGain: 0, currentSum: 7, maxSum: 15, returnValue: '-', message: "currentSum = 7 + 0 + 0 = 7", highlightedLines: [10], stackDepth: 3, phase: "compute_sum" },
-    { currentNode: 7, leftGain: 0, rightGain: 0, currentSum: 7, maxSum: 15, returnValue: '-', message: "maxSum stays 15 (7 < 15)", highlightedLines: [11], stackDepth: 3, phase: "update_max" },
-    { currentNode: 7, leftGain: 0, rightGain: 0, currentSum: 7, maxSum: 15, returnValue: 7, message: "Return 7 + max(0, 0) = 7", highlightedLines: [13], stackDepth: 3, phase: "return" },
+  const nodePositions: Record<number, { x: number; y: number }> = {
+    0: { x: 50, y: 15 },
+    1: { x: 25, y: 45 },
+    2: { x: 75, y: 45 },
+    3: { x: 65, y: 75 },
+    4: { x: 85, y: 75 },
+  };
 
-    { currentNode: 20, leftGain: 15, rightGain: 7, currentSum: '-', maxSum: 15, returnValue: '-', message: "Back to node 20: rightGain = max(7, 0) = 7", highlightedLines: [8], stackDepth: 2, phase: "got_right" },
-    { currentNode: 20, leftGain: 15, rightGain: 7, currentSum: 42, maxSum: 15, returnValue: '-', message: "currentSum = 20 + 15 + 7 = 42 🔥", highlightedLines: [10], stackDepth: 2, phase: "compute_sum" },
-    { currentNode: 20, leftGain: 15, rightGain: 7, currentSum: 42, maxSum: 42, returnValue: '-', message: "maxSum = max(15, 42) = 42 (NEW MAX!)", highlightedLines: [11], stackDepth: 2, phase: "update_max" },
-    { currentNode: 20, leftGain: 15, rightGain: 7, currentSum: 42, maxSum: 42, returnValue: 35, message: "Return 20 + max(15, 7) = 35", highlightedLines: [13], stackDepth: 2, phase: "return" },
+  const renderEdges = (node: TreeNode | null, parentX?: number, parentY?: number): JSX.Element[] => {
+    if (!node) return [];
+    const pos = nodePositions[node.id];
+    let edges: JSX.Element[] = [];
 
-    { currentNode: -10, leftGain: 9, rightGain: 35, currentSum: '-', maxSum: 42, returnValue: '-', message: "Back to node -10: rightGain = max(35, 0) = 35", highlightedLines: [8], stackDepth: 1, phase: "got_right" },
-    { currentNode: -10, leftGain: 9, rightGain: 35, currentSum: 34, maxSum: 42, returnValue: '-', message: "currentSum = -10 + 9 + 35 = 34", highlightedLines: [10], stackDepth: 1, phase: "compute_sum" },
-    { currentNode: -10, leftGain: 9, rightGain: 35, currentSum: 34, maxSum: 42, returnValue: '-', message: "maxSum stays 42 (34 < 42)", highlightedLines: [11], stackDepth: 1, phase: "update_max" },
-    { currentNode: -10, leftGain: 9, rightGain: 35, currentSum: 34, maxSum: 42, returnValue: 25, message: "Return -10 + max(9, 35) = 25", highlightedLines: [13], stackDepth: 1, phase: "return" },
+    if (parentX !== undefined && parentY !== undefined) {
+      const isInPath = step.highlightedPath.includes(node.id) && step.highlightedPath.includes(node.id === 1 ? 0 : node.id === 2 ? 0 : node.id === 3 ? 2 : 2);
+      // Simplified path logic for demo tree
+      const isActuallyInPath = (node.id === 3 && step.highlightedPath.includes(3) && step.highlightedPath.includes(2)) ||
+                               (node.id === 4 && step.highlightedPath.includes(4) && step.highlightedPath.includes(2)) ||
+                               (node.id === 1 && step.highlightedPath.includes(1) && step.highlightedPath.includes(0)) ||
+                               (node.id === 2 && step.highlightedPath.includes(2) && step.highlightedPath.includes(0));
 
-    { currentNode: '-', leftGain: '-', rightGain: '-', currentSum: '-', maxSum: 42, returnValue: 42, message: "Complete! Return maxSum = 42 ✓", highlightedLines: [17], stackDepth: 0, phase: "final" }
-  ];
-
-  const [idx, setIdx] = useState(0);
-  const step = steps[idx];
-  const ref = useRef<any>(null);
-  const monaco = useRef<any>(null);
-
-  useEffect(() => {
-    if (ref.current && monaco.current) {
-      ref.current.createDecorationsCollection(
-        step.highlightedLines.map(l => ({
-          range: new monaco.current!.Range(l, 1, l, 1),
-          options: { isWholeLine: true, className: 'highlighted-line-blue' }
-        }))
+      edges.push(
+        <motion.line
+          key={`edge-${node.id}`}
+          x1={parentX}
+          y1={parentY}
+          x2={pos.x}
+          y2={pos.y}
+          stroke="currentColor"
+          strokeWidth="2"
+          className={isActuallyInPath ? "text-green-500" : "text-slate-300 dark:text-slate-700"}
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+        />
       );
     }
-  }, [idx]);
 
-  const renderTree = () => {
-    const positions = [
-      { x: 200, y: 40, value: -10 },
-      { x: 120, y: 100, value: 9 },
-      { x: 280, y: 100, value: 20 },
-      { x: 240, y: 160, value: 15 },
-      { x: 320, y: 160, value: 7 }
+    return [
+      ...edges,
+      ...renderEdges(node.left, pos.x, pos.y),
+      ...renderEdges(node.right, pos.x, pos.y),
     ];
+  };
 
-    return (
-      <div className="space-y-4">
-        <div className="text-sm font-semibold text-center mb-2">Maximum Path Sum</div>
-        <svg width="400" height="220" className="mx-auto">
-          <line x1={200} y1={40} x2={120} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
-          <line x1={200} y1={40} x2={280} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
-          <line x1={280} y1={100} x2={240} y2={160} stroke="currentColor" className="text-border" strokeWidth="2" />
-          <line x1={280} y1={100} x2={320} y2={160} stroke="currentColor" className="text-border" strokeWidth="2" />
+  const renderNodes = (node: TreeNode | null): JSX.Element[] => {
+    if (!node) return [];
+    const pos = nodePositions[node.id];
+    const isActive = step.activeNodeId === node.id;
+    const isCompleted = step.completedNodes.has(node.id);
+    const isInPath = step.highlightedPath.includes(node.id);
 
-          {positions.map((pos, i) => {
-            const isCurrent = step.currentNode === pos.value;
-            const isInPath = (step.maxSum === 42 && [15, 20, 7].includes(pos.value));
-
-            return (
-              <g key={i}>
-                <circle
-                  cx={pos.x}
-                  cy={pos.y}
-                  r="24"
-                  className={`transition-all duration-300 ${isInPath
-                    ? 'fill-green-500'
-                    : isCurrent
-                      ? 'fill-yellow-500'
-                      : 'fill-card'
-                    }`}
-                  stroke="currentColor"
-                  strokeWidth="2"
-                />
-                <text
-                  x={pos.x}
-                  y={pos.y + 6}
-                  textAnchor="middle"
-                  className="text-sm font- fill-foreground"
-                >
-                  {pos.value}
-                </text>
-              </g>
-            );
-          })}
-        </svg>
-        <div className="text-center text-xs text-muted-foreground">
-          Max Path: 15 → 20 → 7 = 42
-        </div>
-      </div>
-    );
+    return [
+      <motion.g
+        key={`node-${node.id}`}
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ type: 'spring', damping: 12, stiffness: 200 }}
+      >
+        <circle
+          cx={pos.x}
+          cy={pos.y}
+          r="8"
+          className={`transition-colors duration-300 fill-card stroke-2 ${
+            isInPath
+              ? "stroke-green-500 fill-green-500/10"
+              : isActive
+              ? "stroke-yellow-500 fill-yellow-500/10"
+              : isCompleted
+              ? "stroke-blue-500 fill-blue-500/5"
+              : "stroke-slate-300 dark:stroke-slate-700"
+          }`}
+        />
+        <text
+          x={pos.x}
+          y={pos.y}
+          dy="0.32em"
+          textAnchor="middle"
+          className={`text-[4px] font-bold ${
+            isInPath ? "fill-green-600 dark:fill-green-400" : "fill-foreground"
+          }`}
+        >
+          {node.val}
+        </text>
+      </motion.g>,
+      ...renderNodes(node.left),
+      ...renderNodes(node.right),
+    ];
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between">
-        <div className="flex gap-2">
-          <Button onClick={() => setIdx(0)} variant="outline" size="sm">
-            <RotateCcw className="h-4 w-4" />
-          </Button>
-          <Button onClick={() => setIdx(Math.max(0, idx - 1))} disabled={idx === 0} variant="outline" size="sm">
-            <SkipBack className="h-4 w-4" />
-          </Button>
-          <Button onClick={() => setIdx(Math.min(steps.length - 1, idx + 1))} disabled={idx === steps.length - 1} variant="outline" size="sm">
-            <SkipForward className="h-4 w-4" />
-          </Button>
-        </div>
-        <span className="text-sm text-muted-foreground">Step {idx + 1} / {steps.length}</span>
-      </div>
+    <div className="flex flex-col gap-6">
+      <SimpleStepControls
+        currentStep={currentStepIdx}
+        totalSteps={steps.length}
+        onStepChange={setCurrentStepIdx}
+      />
 
-      <div className="grid grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <Card className="p-4">
-            {renderTree()}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="flex flex-col gap-6">
+          <Card className="p-6 flex flex-col items-center justify-center min-h-[300px] bg-slate-50/50 dark:bg-slate-900/50 relative overflow-hidden">
+            <div className="absolute top-2 left-4 text-xs font-medium text-slate-400 uppercase tracking-wider">
+              Tree Visualization
+            </div>
+            <svg viewBox="0 0 100 80" className="w-full h-[300px]" preserveAspectRatio="xMidYMin meet">
+              {renderEdges(tree)}
+              {renderNodes(tree)}
+            </svg>
+            <div className="mt-4 flex gap-4 text-xs">
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded-full border-2 border-yellow-500 bg-yellow-500/10" />
+                <span>Current</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded-full border-2 border-blue-500 bg-blue-500/5" />
+                <span>Processed</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded-full border-2 border-green-500 bg-green-500/10" />
+                <span>Max Path</span>
+              </div>
+            </div>
           </Card>
-          <Card className="p-6">
-            <motion.div key={step.maxSum} className="p-4 bg-green-500/10 rounded mb-4">
-              <p className="text-2xl font- text-green-600 text-center">Max: {step.maxSum}</p>
-            </motion.div>
-            <VariablePanel variables={{
-              node: step.currentNode,
-              leftGain: step.leftGain,
-              rightGain: step.rightGain,
-              currentSum: step.currentSum,
-              maxSum: step.maxSum,
-              return: step.returnValue,
-              depth: step.stackDepth
-            }} />
-            <Card className="p-4 mt-4 bg-primary/5">
-              <p className="text-sm">{step.message}</p>
+
+          <div className="flex flex-col gap-4">
+            <Card className="p-4 bg-primary/5 border-primary/10 min-h-[80px] flex items-center">
+              <p className="text-sm leading-relaxed text-foreground/90 font-medium">
+                {step.msg}
+              </p>
             </Card>
-          </Card>
-        </div>
 
-        <Card className="p-4">
-          <div className="h-[700px]">
-            <Editor
-              height="100%"
-              defaultLanguage="typescript"
-              value={code}
-              theme="vs-dark"
-              options={{
-                readOnly: true,
-                minimap: { enabled: false },
-                fontSize: 13,
-                lineNumbers: 'on',
-                scrollBeyondLastLine: false
-              }}
-              onMount={(e, m) => {
-                ref.current = e;
-                monaco.current = m;
+            <VariablePanel
+              variables={{
+                "Node": step.vars.node,
+                "Left Max Path": step.vars.leftMax,
+                "Right Max Path": step.vars.rightMax,
+                "Global Max (res)": step.vars.res,
+                "Return Value": step.vars.returnVal,
               }}
             />
           </div>
+        </div>
+
+        <Card className="overflow-hidden border-slate-200 dark:border-slate-800">
+          <AnimatedCodeEditor
+            code={code}
+            language="typescript"
+            highlightedLines={[step.line]}
+          />
         </Card>
       </div>
-
-      <style>{`.highlighted-line-blue { background: rgba(37, 99, 235, 0.15); border-left: 3px solid rgb(37, 99, 235); }`}</style>
     </div>
   );
 };

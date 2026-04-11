@@ -1,273 +1,208 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { SkipBack, SkipForward, RotateCcw, Play, Pause } from 'lucide-react';
-import Editor from '@monaco-editor/react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { VariablePanel } from '../shared/VariablePanel';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
+import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Step {
-  currentNode: number | null;
+  cur: number | null;
+  stack: number[];
+  n: number;
   k: number;
-  count: number;
-  visited: number[];
-  found: boolean;
-  result: number | null;
+  visitedNodes: number[];
+  foundNode: number | null;
   message: string;
   highlightedLines: number[];
-  variables: Record<string, any>;
 }
 
 export const KthSmallestInBSTVisualization = () => {
   const code = `function kthSmallest(root: TreeNode | null, k: number): number {
-  let count = 0;
-  let result = 0;
-  
-  function inorder(node: TreeNode | null): void {
-    if (!node) return;
-    
-    inorder(node.left);
-    
-    count++;
-    if (count === k) {
-      result = node.val;
-      return;
+    let n = 0
+    const stack: TreeNode[] = []
+    let cur: TreeNode | null = root
+
+    while (cur !== null || stack.length > 0) {
+        while (cur !== null) {
+            stack.push(cur)
+            cur = cur.left
+        }
+
+        cur = stack.pop()!
+        n++
+
+        if (n === k) {
+            return cur.val
+        }
+
+        cur = cur.right
     }
-    
-    inorder(node.right);
-  }
-  
-  inorder(root);
-  return result;
+    return -1
 }`;
 
   const steps: Step[] = [
-    { currentNode: null, k: 3, count: 0, visited: [], found: false, result: null, message: "Start: Find 3rd smallest in BST", highlightedLines: [1], variables: { root: '3', k: 3, count: 0 } },
-    { currentNode: null, k: 3, count: 0, visited: [], found: false, result: null, message: "Initialize count = 0, result = 0", highlightedLines: [2, 3], variables: { count: 0, result: 0, k: 3 } },
-    { currentNode: 3, k: 3, count: 0, visited: [], found: false, result: null, message: "Call inorder(root=3)", highlightedLines: [19], variables: { node: '3', k: 3 } },
-    { currentNode: 3, k: 3, count: 0, visited: [], found: false, result: null, message: "Check if node 3 is null", highlightedLines: [6], variables: { node: '3', 'node === null': false } },
-    { currentNode: 3, k: 3, count: 0, visited: [], found: false, result: null, message: "Not null, traverse left subtree first", highlightedLines: [8], variables: { node: '3', direction: 'left' } },
-    { currentNode: 1, k: 3, count: 0, visited: [], found: false, result: null, message: "Call inorder(left=1)", highlightedLines: [5], variables: { node: '1', k: 3 } },
-    { currentNode: 1, k: 3, count: 0, visited: [], found: false, result: null, message: "Check if node 1 is null", highlightedLines: [6], variables: { node: '1', 'node === null': false } },
-    { currentNode: 1, k: 3, count: 0, visited: [], found: false, result: null, message: "Not null, traverse left of 1", highlightedLines: [8], variables: { node: '1', direction: 'left' } },
-    { currentNode: null, k: 3, count: 0, visited: [], found: false, result: null, message: "Call inorder(left=null)", highlightedLines: [5], variables: { node: 'null' } },
-    { currentNode: null, k: 3, count: 0, visited: [], found: false, result: null, message: "Node is null, return", highlightedLines: [6], variables: { node: 'null', action: 'return' } },
-    { currentNode: 1, k: 3, count: 0, visited: [], found: false, result: null, message: "Back to node 1, left done", highlightedLines: [8], variables: { node: '1' } },
-    { currentNode: 1, k: 3, count: 0, visited: [1], found: false, result: null, message: "Visit node 1, increment count", highlightedLines: [10], variables: { node: '1', count: 1, k: 3 } },
-    { currentNode: 1, k: 3, count: 1, visited: [1], found: false, result: null, message: "Check if count === k", highlightedLines: [11], variables: { count: 1, k: 3, 'count === k': false } },
-    { currentNode: 1, k: 3, count: 1, visited: [1], found: false, result: null, message: "Not yet, traverse right of 1", highlightedLines: [16], variables: { node: '1', direction: 'right' } },
-    { currentNode: null, k: 3, count: 1, visited: [1], found: false, result: null, message: "Call inorder(right=null)", highlightedLines: [5], variables: { node: 'null' } },
-    { currentNode: null, k: 3, count: 1, visited: [1], found: false, result: null, message: "Node is null, return", highlightedLines: [6], variables: { node: 'null', action: 'return' } },
-    { currentNode: 1, k: 3, count: 1, visited: [1], found: false, result: null, message: "Node 1 complete, return to parent", highlightedLines: [16], variables: { node: '1', status: 'complete' } },
-    { currentNode: 3, k: 3, count: 1, visited: [1], found: false, result: null, message: "Back to node 3, left subtree done", highlightedLines: [8], variables: { node: '3' } },
-    { currentNode: 3, k: 3, count: 1, visited: [1, 3], found: false, result: null, message: "Visit node 3, increment count", highlightedLines: [10], variables: { node: '3', count: 2, k: 3 } },
-    { currentNode: 3, k: 3, count: 2, visited: [1, 3], found: false, result: null, message: "Check if count === k", highlightedLines: [11], variables: { count: 2, k: 3, 'count === k': false } },
-    { currentNode: 3, k: 3, count: 2, visited: [1, 3], found: false, result: null, message: "Not yet, traverse right of 3", highlightedLines: [16], variables: { node: '3', direction: 'right' } },
-    { currentNode: 4, k: 3, count: 2, visited: [1, 3], found: false, result: null, message: "Call inorder(right=4)", highlightedLines: [5], variables: { node: '4', k: 3 } },
-    { currentNode: 4, k: 3, count: 2, visited: [1, 3], found: false, result: null, message: "Check if node 4 is null", highlightedLines: [6], variables: { node: '4', 'node === null': false } },
-    { currentNode: 4, k: 3, count: 2, visited: [1, 3], found: false, result: null, message: "Not null, traverse left of 4", highlightedLines: [8], variables: { node: '4', direction: 'left' } },
-    { currentNode: null, k: 3, count: 2, visited: [1, 3], found: false, result: null, message: "Call inorder(left=null)", highlightedLines: [5], variables: { node: 'null' } },
-    { currentNode: null, k: 3, count: 2, visited: [1, 3], found: false, result: null, message: "Node is null, return", highlightedLines: [6], variables: { node: 'null', action: 'return' } },
-    { currentNode: 4, k: 3, count: 2, visited: [1, 3], found: false, result: null, message: "Back to node 4, left done", highlightedLines: [8], variables: { node: '4' } },
-    { currentNode: 4, k: 3, count: 2, visited: [1, 3, 4], found: false, result: null, message: "Visit node 4, increment count", highlightedLines: [10], variables: { node: '4', count: 3, k: 3 } },
-    { currentNode: 4, k: 3, count: 3, visited: [1, 3, 4], found: false, result: null, message: "Check if count === k", highlightedLines: [11], variables: { count: 3, k: 3, 'count === k': true } },
-    { currentNode: 4, k: 3, count: 3, visited: [1, 3, 4], found: true, result: 4, message: "Found! 3rd smallest element is 4 ✓", highlightedLines: [12], variables: { count: 3, k: 3, result: 4 } },
-    { currentNode: 4, k: 3, count: 3, visited: [1, 3, 4], found: true, result: 4, message: "Set result = 4 and return early", highlightedLines: [13], variables: { result: 4, action: 'return' } },
-    { currentNode: null, k: 3, count: 3, visited: [1, 3, 4], found: true, result: 4, message: "Return result: 4", highlightedLines: [20], variables: { result: 4 } },
-    { currentNode: null, k: 3, count: 3, visited: [1, 3, 4], found: true, result: 4, message: "Complete! Kth smallest = 4 ✓", highlightedLines: [20], variables: { k: 3, result: 4, visited: '[1,3,4]' } }
+    { cur: 3, stack: [], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "Initialize. n = 0, k = 3, cur = root (3).", highlightedLines: [1, 2, 3, 4] },
+    { cur: 3, stack: [], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "Enter loop: cur is not null or stack is not empty.", highlightedLines: [6] },
+    { cur: 3, stack: [], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "cur (3) is not null, entering inner loop to find leftmost node.", highlightedLines: [7] },
+    { cur: 3, stack: [3], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "Push current node 3 onto the stack.", highlightedLines: [8] },
+    { cur: 1, stack: [3], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "Move to the left child of 3 (node 1).", highlightedLines: [9] },
+    { cur: 1, stack: [3], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "cur (1) is not null, continue inner loop.", highlightedLines: [7] },
+    { cur: 1, stack: [3, 1], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "Push current node 1 onto the stack.", highlightedLines: [8] },
+    { cur: null, stack: [3, 1], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "Move to the left child of 1 (null).", highlightedLines: [9] },
+    { cur: null, stack: [3, 1], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "cur is null, exit inner loop.", highlightedLines: [7] },
+    { cur: 1, stack: [3], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "Pop from stack: node 1 is the smallest in this subtree.", highlightedLines: [12] },
+    { cur: 1, stack: [3], n: 1, k: 3, visitedNodes: [1], foundNode: null, message: "Increment counter n to 1.", highlightedLines: [13] },
+    { cur: 1, stack: [3], n: 1, k: 3, visitedNodes: [1], foundNode: null, message: "Check if n (1) is equal to k (3). Not yet.", highlightedLines: [15] },
+    { cur: 2, stack: [3], n: 1, k: 3, visitedNodes: [1], foundNode: null, message: "Move to the right child of 1 (node 2).", highlightedLines: [19] },
+    { cur: 2, stack: [3], n: 1, k: 3, visitedNodes: [1], foundNode: null, message: "Next iteration: cur (2) is not null.", highlightedLines: [6] },
+    { cur: 2, stack: [3], n: 1, k: 3, visitedNodes: [1], foundNode: null, message: "cur (2) is not null, enter inner loop.", highlightedLines: [7] },
+    { cur: 2, stack: [3, 2], n: 1, k: 3, visitedNodes: [1], foundNode: null, message: "Push node 2 onto the stack.", highlightedLines: [8] },
+    { cur: null, stack: [3, 2], n: 1, k: 3, visitedNodes: [1], foundNode: null, message: "Move to the left child of 2 (null).", highlightedLines: [9] },
+    { cur: null, stack: [3, 2], n: 1, k: 3, visitedNodes: [1], foundNode: null, message: "cur is null, exit inner loop.", highlightedLines: [7] },
+    { cur: 2, stack: [3], n: 1, k: 3, visitedNodes: [1], foundNode: null, message: "Pop from stack: node 2 is next in order.", highlightedLines: [12] },
+    { cur: 2, stack: [3], n: 2, k: 3, visitedNodes: [1, 2], foundNode: null, message: "Increment counter n to 2.", highlightedLines: [13] },
+    { cur: 2, stack: [3], n: 2, k: 3, visitedNodes: [1, 2], foundNode: null, message: "Check if n (2) is equal to k (3). Not yet.", highlightedLines: [15] },
+    { cur: null, stack: [3], n: 2, k: 3, visitedNodes: [1, 2], foundNode: null, message: "Move to the right child of 2 (null).", highlightedLines: [19] },
+    { cur: null, stack: [3], n: 2, k: 3, visitedNodes: [1, 2], foundNode: null, message: "Next iteration: stack is not empty.", highlightedLines: [6] },
+    { cur: null, stack: [3], n: 2, k: 3, visitedNodes: [1, 2], foundNode: null, message: "cur is null, skip inner loop.", highlightedLines: [7] },
+    { cur: 3, stack: [], n: 2, k: 3, visitedNodes: [1, 2], foundNode: null, message: "Pop from stack: node 3 is next in order.", highlightedLines: [12] },
+    { cur: 3, stack: [], n: 3, k: 3, visitedNodes: [1, 2, 3], foundNode: null, message: "Increment counter n to 3.", highlightedLines: [13] },
+    { cur: 3, stack: [], n: 3, k: 3, visitedNodes: [1, 2, 3], foundNode: 3, message: "n (3) is equal to k (3)! Found the 3rd smallest element.", highlightedLines: [15, 16] },
+    { cur: 3, stack: [], n: 3, k: 3, visitedNodes: [1, 2, 3], foundNode: 3, message: "3rd smallest element in the BST is 3.", highlightedLines: [16] }
   ];
 
-  const [idx, setIdx] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const step = steps[idx];
-  const editorRef = useRef<any>(null);
-  const monacoRef = useRef<any>(null);
-  const intervalRef = useRef<any>(null);
+  const [currentStep, setCurrentStep] = useState(0);
+  const step = steps[currentStep];
 
-  useEffect(() => {
-    if (editorRef.current && monacoRef.current) {
-      const decorations = step.highlightedLines.map(lineNum => ({
-        range: new monacoRef.current.Range(lineNum, 1, lineNum, 1),
-        options: {
-          isWholeLine: true,
-          className: 'highlighted-line-blue'
-        }
-      }));
-      editorRef.current.createDecorationsCollection(decorations);
-    }
-  }, [idx, step.highlightedLines]);
-
-  useEffect(() => {
-    if (isPlaying) {
-      intervalRef.current = setInterval(() => {
-        setIdx(prev => {
-          if (prev >= steps.length - 1) {
-            setIsPlaying(false);
-            return prev;
-          }
-          return prev + 1;
-        });
-      }, 900);
-    }
-    return () => clearInterval(intervalRef.current);
-  }, [isPlaying]);
+  const treeData = [
+    { id: 3, x: 200, y: 50, left: 1, right: 4 },
+    { id: 1, x: 120, y: 120, right: 2 },
+    { id: 4, x: 280, y: 120 },
+    { id: 2, x: 180, y: 190 }
+  ];
 
   const renderTree = () => {
-    const positions = [
-      { x: 200, y: 40, offset: 80, value: 3 },
-      { x: 120, y: 100, offset: 40, value: 1 },
-      { x: 280, y: 100, offset: 40, value: 4 }
-    ];
-
     return (
-      <div className="space-y-4">
-        <div className="text-sm font-semibold text-center mb-2">Inorder Traversal (k={step.k})</div>
-        <svg width="400" height="180" className="mx-auto">
-          <line x1={200} y1={40} x2={120} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
-          <line x1={200} y1={40} x2={280} y2={100} stroke="currentColor" className="text-border" strokeWidth="2" />
+      <svg viewBox="0 0 400 250" className="w-full h-auto max-w-[400px] mx-auto">
+        {/* Connections */}
+        <line x1="200" y1="50" x2="120" y2="120" stroke="currentColor" className="text-muted-foreground/30" strokeWidth="2" />
+        <line x1="200" y1="50" x2="280" y2="120" stroke="currentColor" className="text-muted-foreground/30" strokeWidth="2" />
+        <line x1="120" y1="120" x2="180" y2="190" stroke="currentColor" className="text-muted-foreground/30" strokeWidth="2" />
 
-          {positions.map((pos, i) => {
-            const isCurrent = step.currentNode === pos.value;
-            const isVisited = step.visited.includes(pos.value);
-            const isResult = step.found && step.result === pos.value;
-            const visitOrder = step.visited.indexOf(pos.value) + 1;
+        {treeData.map((node) => {
+          const isCurrent = step.cur === node.id;
+          const isVisited = step.visitedNodes.includes(node.id);
+          const isFound = step.foundNode === node.id;
+          const inStack = step.stack.includes(node.id);
 
-            return (
-              <g key={i}>
-                <circle
-                  cx={pos.x}
-                  cy={pos.y}
-                  r="24"
-                  className={`transition-all duration-300 ${isResult
-                    ? 'fill-green-500'
-                    : isCurrent
-                      ? 'fill-yellow-500'
-                      : isVisited
-                        ? 'fill-blue-500'
-                        : 'fill-card'
-                    }`}
-                  stroke="currentColor"
-                  strokeWidth="2"
-                />
+          return (
+            <g key={node.id}>
+              <motion.circle
+                cx={node.x}
+                cy={node.y}
+                r="22"
+                initial={false}
+                animate={{
+                  fill: isFound ? "#22c55e" : isCurrent ? "#eab308" : inStack ? "#3b82f6" : isVisited ? "#94a3b8" : "transparent",
+                  stroke: isFound ? "#22c55e" : isCurrent ? "#eab308" : inStack ? "#3b82f6" : "#94a3b8",
+                  strokeWidth: isCurrent || isFound || inStack ? 3 : 2
+                }}
+                transition={{ duration: 0 }}
+              />
+              <text
+                x={node.x}
+                y={node.y + 6}
+                textAnchor="middle"
+                className={`text-sm font-bold ${isCurrent || isFound || inStack ? "fill-white" : "fill-foreground"}`}
+              >
+                {node.id}
+              </text>
+              {isVisited && (
                 <text
-                  x={pos.x}
-                  y={pos.y + 6}
+                  x={node.x}
+                  y={node.y - 30}
                   textAnchor="middle"
-                  className="text-sm font- fill-foreground"
+                  className="text-xs font-bold fill-primary"
                 >
-                  {pos.value}
+                  #{step.visitedNodes.indexOf(node.id) + 1}
                 </text>
-                {isVisited && visitOrder > 0 && (
-                  <text
-                    x={pos.x}
-                    y={pos.y + 45}
-                    textAnchor="middle"
-                    className="text-xs fill-primary font-"
-                  >
-                    #{visitOrder}
-                  </text>
-                )}
-              </g>
-            );
-          })}
-        </svg>
-        <div className="text-center text-xs text-muted-foreground">
-          Visit Order: {step.visited.join(' → ') || 'None'}
-        </div>
-      </div>
+              )}
+            </g>
+          );
+        })}
+      </svg>
     );
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div className="flex gap-2">
-          <Button onClick={() => setIdx(0)} variant="outline" size="sm">
-            <RotateCcw className="h-4 w-4" />
-          </Button>
-          <Button onClick={() => setIsPlaying(!isPlaying)} variant="outline" size="sm">
-            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-          </Button>
-          <Button onClick={() => setIdx(Math.max(0, idx - 1))} disabled={idx === 0} variant="outline" size="sm">
-            <SkipBack className="h-4 w-4" />
-          </Button>
-          <Button onClick={() => setIdx(Math.min(steps.length - 1, idx + 1))} disabled={idx === steps.length - 1} variant="outline" size="sm">
-            <SkipForward className="h-4 w-4" />
-          </Button>
-        </div>
-        <span className="text-sm text-muted-foreground">Step {idx + 1} / {steps.length}</span>
-      </div>
+    <div className="flex flex-col gap-6">
+      <SimpleStepControls
+        currentStep={currentStep}
+        totalSteps={steps.length}
+        onStepChange={setCurrentStep}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <Card className="p-4">
+        <div className="space-y-6">
+          <Card className="p-6 relative overflow-hidden">
+            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Tree Visualization</div>
             {renderTree()}
+            <div className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs">
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                <span>Current</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-blue-500" />
+                <span>In Stack</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-slate-400" />
+                <span>Visited</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-green-500" />
+                <span>Found</span>
+              </div>
+            </div>
           </Card>
 
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              <VariablePanel variables={step.variables} />
-            </motion.div>
-          </AnimatePresence>
+          <div className="space-y-4">
+            <Card className="p-4 bg-primary/5 border-primary/10">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentStep}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  transition={{ duration: 0 }}
+                  className="text-sm leading-relaxed"
+                >
+                  {step.message}
+                </motion.div>
+              </AnimatePresence>
+            </Card>
 
-          <Card className="p-4 bg-primary/5 border-primary/20">
-            <motion.p
-              key={`msg-${idx}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-sm font-medium"
-            >
-              {step.message}
-            </motion.p>
-          </Card>
-
-          {step.found && (
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg"
-            >
-              <p className="text-green-600 dark:text-green-400 font-semibold">✓ Found: {step.result}</p>
-            </motion.div>
-          )}
-        </div>
-
-        <Card className="p-4">
-          <div className="h-[700px]">
-            <Editor
-              height="100%"
-              defaultLanguage="typescript"
-              value={code}
-              theme="vs-dark"
-              options={{
-                readOnly: true,
-                minimap: { enabled: false },
-                fontSize: 13,
-                lineNumbers: 'on',
-                scrollBeyondLastLine: false,
-                automaticLayout: true
-              }}
-              onMount={(editor, monaco) => {
-                editorRef.current = editor;
-                monacoRef.current = monaco;
+            <VariablePanel
+              variables={{
+                k: step.k,
+                n: step.n,
+                stack: `[${step.stack.join(', ')}]`,
+                cur: step.cur === null ? "null" : step.cur,
+                visited: `[${step.visitedNodes.join(', ')}]`
               }}
             />
           </div>
+        </div>
+
+        <Card className="overflow-hidden border-none shadow-none bg-transparent">
+          <AnimatedCodeEditor
+            code={code}
+            language="typescript"
+            highlightedLines={step.highlightedLines}
+          />
         </Card>
       </div>
-
-      <style>{`
-        .highlighted-line-blue {
-          background: rgba(37, 99, 235, 0.15);
-          border-left: 3px solid rgb(37, 99, 235);
-        }
-      `}</style>
     </div>
   );
 };

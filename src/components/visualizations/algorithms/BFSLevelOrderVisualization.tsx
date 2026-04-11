@@ -288,24 +288,26 @@ export const BFSLevelOrderVisualization = () => {
 
 
             </div>
-            <div className=" rounded-lg p-4">
 
-              <VariablePanel
-                variables={{
-                  current: currentStep.current || 'null',
-                  level: currentStep.currentLevel,
-                  'queue.length': currentStep.queue.length,
-                  'visited.length': currentStep.visited.length
-                }}
-              />
-            </div>
           </div>
         </div>
 
         <div className="space-y-4">
 
           <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="TypeScript" />
+          <div className=" rounded-lg p-4">
+
+            <VariablePanel
+              variables={{
+                current: currentStep.current || 'null',
+                level: currentStep.currentLevel,
+                'queue.length': currentStep.queue.length,
+                'visited.length': currentStep.visited.length
+              }}
+            />
+          </div>
         </div>
+
       </div>
     </div>
   );

@@ -397,7 +397,7 @@ export const SameTreeVisualization = () => {
               </AnimatePresence>
             </div>
 
-            <div className="grid grid-cols-2 gap-8 mb-8">
+            <div className="flex flex-col gap-6 mb-8">
               <TreeDisplay 
                 data={pTreeData} 
                 activeNodeId={currentStep.pNodeId} 
@@ -416,26 +416,28 @@ export const SameTreeVisualization = () => {
                   {currentStep.message}
                 </p>
               </Card>
-
-              <VariablePanel
-                variables={{
-                  'p.val': currentStep.pVal,
-                  'q.val': currentStep.qVal,
-                  'checking': currentStep.checking,
-                  'step': `${currentStepIndex + 1} / ${steps.length}`
-                }}
-              />
             </div>
           </Card>
         </div>
 
-        <Card className="h-full border-primary/10 shadow-xl overflow-hidden bg-[#1e1e1e]">
-          <AnimatedCodeEditor
-            code={code}
-            language="typescript"
-            highlightedLines={currentStep.highlightedLines}
+        <div className="flex flex-col gap-6">
+          <div className="max-h-[400px] overflow-hidden rounded-xl border border-primary/10 shadow-xl">
+            <AnimatedCodeEditor
+              code={code}
+              language="typescript"
+              highlightedLines={currentStep.highlightedLines}
+            />
+          </div>
+
+          <VariablePanel
+            variables={{
+              'p.val': currentStep.pVal,
+              'q.val': currentStep.qVal,
+              'checking': currentStep.checking,
+              'step': `${currentStepIndex + 1} / ${steps.length}`
+            }}
           />
-        </Card>
+        </div>
       </div>
     </div>
   );
