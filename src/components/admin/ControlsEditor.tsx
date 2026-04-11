@@ -78,6 +78,27 @@ export const DEFAULT_CONTROLS = {
   },
   show_tree_visualization: false,
   show_graph_visualization: false,
+  visualizations: {
+    tree: {
+      enabled: false,
+      multiple: false,
+      examples_input: true,
+      test_cases_input: true,
+      results_input: true,
+      examples_output: true,
+      test_cases_output: true,
+      results_output: true,
+    },
+    graph: {
+      enabled: false,
+      examples_input: true,
+      test_cases_input: true,
+      results_input: true,
+      examples_output: true,
+      test_cases_output: true,
+      results_output: true,
+    }
+  }
 };
 
 
@@ -693,6 +714,15 @@ export function ControlsEditor({ controls, onChange, implementations, onImplemen
                   updateNested(['show_tree_visualization'], c); // Legacy fallback sync
                 }}
               />
+              <div className="flex items-center justify-between pl-4">
+                <Label htmlFor="vis-tree-multiple" className="text-xs">Support Multiple Diagrams (e.g. p & q)</Label>
+                <Switch
+                  id="vis-tree-multiple"
+                  checked={localControls.visualizations?.tree?.multiple === true}
+                  onCheckedChange={(c) => updateNested(['visualizations', 'tree', 'multiple'], c)}
+                  className="scale-90"
+                />
+              </div>
               <p className="text-xs text-muted-foreground">
                 Enable this only for Tree or BST related problems. Custom settings below:
               </p>

@@ -136,8 +136,13 @@ export function calculateTreePositions(
 export function isTreeType(type?: string, value?: any): boolean {
     if (type === 'TreeNode' || type === 'binary-tree') return true;
 
-    // Heuristic: Array with numbers and nulls might be a tree if it appears in a tree problem context
-    // But we mostly rely on the explicit 'TreeNode' type from the input schema.
+    // Also check if the value contains multiple tree definitions (e.g., p = [...], q = [...])
+    if (typeof value === 'string') {
+        const hasMultiple = (value.match(/p\s*=/g) || []).length > 0 && (value.match(/q\s*=/g) || []).length > 0;
+        const hasArrays = (value.match(/\[[\s\d,null\-]*\]/g) || []).length >= 2;
+        if (hasMultiple || hasArrays) return true;
+    }
+
     return false;
 }
 
@@ -153,31 +158,83 @@ export function parseTreeValue(value: any): (number | null)[] | null {
     }
 
     if (typeof value === 'string') {
-        // Clean up strings like "root = [1,2,null,3]" or "input: [1,2]"
-        let cleaned = value.trim();
-        const match = cleaned.match(/[\[\s]([\[\s\d,null\-\.]+)[\]\s]/); // Very basic attempt to hunt for the array part
-
-        // Better: just find the first '[' and last ']'
-        const start = cleaned.indexOf('[');
-        const end = cleaned.lastIndexOf(']');
-
-        if (start !== -1 && end !== -1 && end > start) {
-            cleaned = cleaned.substring(start, end + 1);
-        }
-
-        try {
-            const parsed = JSON.parse(cleaned);
-            if (Array.isArray(parsed)) return parsed;
-        } catch {
-            // If it's not a valid JSON array, it might be a TreeNode object string
-            try {
-                const parsed = JSON.parse(value);
-                if (typeof parsed === 'object' && parsed !== null && 'val' in parsed) {
-                    return convertTreeNodeToArray(parsed);
-                }
-            } catch { }
-            return null;
-        }
+        const trees = parseAllTreeValues(value);
+        return trees.length > 0 ? trees[0].data : null;
     }
     return null;
+}
+
+/**
+ * Parses all tree arrays from a string, optionally prefixed with variable names.
+ * Example: "root = [1,2], p = [1], q = [2]" -> [{label: 'root', data: [1,2]}, {label: 'p', data: [1]}, {label: 'q', data: [2]}]
+ */
+export function parseAllTreeValues(value: any): { label?: string, data: (number | null)[] }[] {
+    if (Array.isArray(value)) return [{ data: value }];
+
+    if (typeof value === 'object' && value !== null) {
+        if ('val' in value) {
+            const arr = convertTreeNodeToArray(value);
+            return arr ? [{ data: arr }] : [];
+        }
+        return [];
+    }
+
+    if (typeof value === 'string') {
+        const results: { label?: string, data: (number | null)[] }[] = [];
+        
+        // Pattern to find variable assignment: label = [ ... ]
+        // The [ ... ] part is captured and parsed as JSON
+        const assignmentRegex = /([a-zA-Z0-9_]+)\s*=\s*(\[[^\]]*\])/g;
+        let match;
+        const seenIndices = new Set<number>();
+
+        while ((match = assignmentRegex.exec(value)) !== null) {
+            try {
+                const label = match[1];
+                const arrayStr = match[2];
+                const data = JSON.parse(arrayStr);
+                if (Array.isArray(data)) {
+                    results.push({ label, data });
+                    // Mark this range as seen
+                    for (let i = match.index; i < assignmentRegex.lastIndex; i++) {
+                        seenIndices.add(i);
+                    }
+                }
+            } catch {
+                // Ignore invalid matches
+            }
+        }
+
+        // Also look for standalone arrays that weren't part of an assignment
+        const standaloneRegex = /\[[\s\d,null\-.]+\]/g;
+        while ((match = standaloneRegex.exec(value)) !== null) {
+            // Skip if this is part of an already captured assignment
+            if (seenIndices.has(match.index)) continue;
+
+            try {
+                const data = JSON.parse(match[0]);
+                if (Array.isArray(data)) {
+                    results.push({ data });
+                }
+            } catch {
+                // Ignore invalid matches
+            }
+        }
+
+        if (results.length > 0) return results;
+
+        // Fallback for very basic strings if no arrays were found
+        let cleaned = value.trim();
+        const start = cleaned.indexOf('[');
+        const end = cleaned.lastIndexOf(']');
+        if (start !== -1 && end !== -1 && end > start) {
+            cleaned = cleaned.substring(start, end + 1);
+            try {
+                const parsed = JSON.parse(cleaned);
+                if (Array.isArray(parsed)) return [{ data: parsed }];
+            } catch {}
+        }
+    }
+
+    return [];
 }

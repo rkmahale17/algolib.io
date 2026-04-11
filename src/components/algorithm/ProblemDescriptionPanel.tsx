@@ -341,7 +341,7 @@ export const ProblemDescriptionPanel = React.memo(({
                                 <RichText content={example.inputAfterHtml} className="mt-2" />
                               )}
                               {(algorithm?.controls?.visualizations?.tree?.enabled ?? algorithm?.controls?.show_tree_visualization) && algorithm?.controls?.visualizations?.tree?.examples_input !== false && (
-                                <TreeDiagram data={example.input} height={120} />
+                                <TreeDiagram data={example.input} height={120} multiple={algorithm?.controls?.visualizations?.tree?.multiple} />
                               )}
                               {(algorithm?.controls?.visualizations?.graph?.enabled ?? algorithm?.controls?.show_graph_visualization) && algorithm?.controls?.visualizations?.graph?.examples_input !== false && (
                                 <GraphDiagram data={example.input} height={120} />
@@ -361,7 +361,7 @@ export const ProblemDescriptionPanel = React.memo(({
                                 <RichText content={example.outputAfterHtml} className="mt-2" />
                               )}
                               {(algorithm?.controls?.visualizations?.tree?.enabled ?? algorithm?.controls?.show_tree_visualization) && algorithm?.controls?.visualizations?.tree?.examples_output !== false && (
-                                <TreeDiagram data={example.output} height={120} />
+                                <TreeDiagram data={example.output} height={120} multiple={algorithm?.controls?.visualizations?.tree?.multiple} />
                               )}
                               {(algorithm?.controls?.visualizations?.graph?.enabled ?? algorithm?.controls?.show_graph_visualization) && algorithm?.controls?.visualizations?.graph?.examples_output !== false && (
                                 <GraphDiagram data={example.output} height={120} />

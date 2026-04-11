@@ -208,9 +208,9 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
           {errors[index] && (
             <p className="text-xs text-destructive">{errors[index]}</p>
           )}
-          {(controls?.visualizations?.tree?.enabled ?? controls?.show_tree_visualization) && controls?.visualizations?.tree?.test_cases_input !== false && isTreeType(field.type) && editedInputs[index] && !errors[index] && (
+          {(controls?.visualizations?.tree?.enabled ?? controls?.show_tree_visualization) && controls?.visualizations?.tree?.test_cases_input !== false && isTreeType(field.type, editedInputs[index]) && editedInputs[index] && !errors[index] && (
             <div className="mt-2">
-              <TreeDiagram data={editedInputs[index]} height={120} />
+              <TreeDiagram data={editedInputs[index]} height={120} multiple={controls?.visualizations?.tree?.multiple} />
             </div>
           )}
           {(isGraphType(field.type) || (controls?.visualizations?.graph?.enabled ?? controls?.show_graph_visualization)) && controls?.visualizations?.graph?.test_cases_input !== false && editedInputs[index] && (
@@ -253,7 +253,7 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
         {/* We don't have an explicit type for 'expected' in inputSchema, but we can check if it's likely a tree */}
         {(controls?.visualizations?.tree?.enabled ?? controls?.show_tree_visualization) && controls?.visualizations?.tree?.test_cases_output !== false && editedExpected && !errors['expected'] && (
           <div className="mt-2">
-            <TreeDiagram data={editedExpected} height={120} />
+            <TreeDiagram data={editedExpected} height={120} multiple={controls?.visualizations?.tree?.multiple} />
           </div>
         )}
         {(isGraphType(inputSchema?.[0]?.type) || (controls?.visualizations?.graph?.enabled ?? controls?.show_graph_visualization)) && controls?.visualizations?.graph?.test_cases_output !== false && editedExpected && (

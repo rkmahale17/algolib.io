@@ -433,7 +433,11 @@ export const OutputPanel = ({
                                             </div>
                                             {(algorithmMeta?.controls?.visualizations?.tree?.enabled ?? algorithmMeta?.controls?.show_tree_visualization) && algorithmMeta?.controls?.visualizations?.tree?.results_input !== false && isTreeType(field.type) && (
                                               <div className="mt-1">
-                                                <TreeDiagram data={inputData[i]} height={120} />
+                                                <TreeDiagram 
+                                                  data={inputData[i]} 
+                                                  height={120} 
+                                                  multiple={algorithmMeta?.controls?.visualizations?.tree?.multiple} 
+                                                />
                                               </div>
                                             )}
                                             {(isGraphType(field.type) || (algorithmMeta?.controls?.visualizations?.graph?.enabled ?? algorithmMeta?.controls?.show_graph_visualization)) && algorithmMeta?.controls?.visualizations?.graph?.results_input !== false && (
@@ -475,7 +479,11 @@ export const OutputPanel = ({
                                     <div className="space-y-3">
                                       <div>{content}</div>
                                       {(algorithmMeta?.controls?.visualizations?.tree?.enabled ?? algorithmMeta?.controls?.show_tree_visualization) && algorithmMeta?.controls?.visualizations?.tree?.results_output !== false && actual !== undefined && actual !== null && (
-                                        <TreeDiagram data={actual} height={120} />
+                                        <TreeDiagram 
+                                          data={actual} 
+                                          height={120} 
+                                          multiple={algorithmMeta?.controls?.visualizations?.tree?.multiple} 
+                                        />
                                       )}
                                       {(isGraphType(inputSchema?.[0]?.type) || (algorithmMeta?.controls?.visualizations?.graph?.enabled ?? algorithmMeta?.controls?.show_graph_visualization)) && algorithmMeta?.controls?.visualizations?.graph?.results_output !== false && actual !== undefined && actual !== null && (
                                         <GraphDiagram data={actual} height={120} />
@@ -498,7 +506,11 @@ export const OutputPanel = ({
                                       <div className="space-y-3">
                                         <div>{content}</div>
                                         {(algorithmMeta?.controls?.visualizations?.tree?.enabled ?? algorithmMeta?.controls?.show_tree_visualization) && algorithmMeta?.controls?.visualizations?.tree?.results_output !== false && (
-                                          <TreeDiagram data={result.expected} height={120} />
+                                          <TreeDiagram 
+                                            data={result.expected} 
+                                            height={120} 
+                                            multiple={algorithmMeta?.controls?.visualizations?.tree?.multiple} 
+                                          />
                                         )}
                                         {(isGraphType(inputSchema?.[0]?.type) || (algorithmMeta?.controls?.visualizations?.graph?.enabled ?? algorithmMeta?.controls?.show_graph_visualization)) && algorithmMeta?.controls?.visualizations?.graph?.results_output !== false && (
                                           <GraphDiagram data={result.expected} height={120} />
