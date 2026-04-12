@@ -12,13 +12,18 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
 // Initialize Supabase client
-const supabase = createClient(
-  process.env.VITE_SUPABASE_URL,
-  process.env.VITE_SUPABASE_PUBLISHABLE_KEY
-);
+let supabase;
+if (process.env.VITE_SUPABASE_URL && process.env.VITE_SUPABASE_PUBLISHABLE_KEY) {
+  supabase = createClient(
+    process.env.VITE_SUPABASE_URL,
+    process.env.VITE_SUPABASE_PUBLISHABLE_KEY
+  );
+} else {
+  console.warn('WARNING: Supabase environment variables are missing. Authentication and specific proxy features will be disabled.');
+}
 
 app.use(cors());
 app.use(express.json());
@@ -37,6 +42,10 @@ const verifyToken = async (req, res, next) => {
   const token = authHeader.split(' ')[1];
 
   try {
+    if (!supabase) {
+      console.error('Supabase client not initialized');
+      return res.status(500).json({ error: 'Internal server error: Auth service unavailable' });
+    }
     // Let Supabase verify the token (handles ES256/HS256 automatically)
     const { data: { user }, error } = await supabase.auth.getUser(token);
 

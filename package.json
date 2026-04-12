@@ -85,11 +85,11 @@
     "tldraw": "^3.9.0",
     "vaul": "^0.9.9",
     "vite-plugin-compression": "^0.5.1",
-    "zod": "^3.25.76"
+    "zod": "^3.25.76",
+    "@supabase/supabase-js": "^2.87.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
-    "@supabase/supabase-js": "^2.87.1",
     "@tailwindcss/typography": "^0.5.16",
     "@types/node": "^22.16.5",
     "@types/react": "^18.3.23",
