@@ -27,9 +27,7 @@ interface AppContextType {
   hasPremiumAccess: boolean;
 
   // Algorithms
-  algorithms: Algorithm[];
   isAlgorithmsLoading: boolean;
-  refreshAlgorithms: () => Promise<void>;
 
   // User Data
   userAlgorithmData: UserAlgorithmData[];
@@ -61,8 +59,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // Track in-flight profile fetch to avoid redundant calls
   const profileFetchInProgress = React.useRef<string | null>(null);
 
-  const [algorithms, setAlgorithms] = useState<Algorithm[]>([]);
-  const [isAlgorithmsLoading, setIsAlgorithmsLoading] = useState(true);
+  const [isAlgorithmsLoading, setIsAlgorithmsLoading] = useState(false);
 
   const [userAlgorithmData, setUserAlgorithmData] = useState<UserAlgorithmData[]>([]);
   const [isUserDataLoading, setIsUserDataLoading] = useState(false);
@@ -146,53 +143,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Fetch algorithms from database
-  const fetchAlgorithms = async (forceRefresh = false) => {
-    if (!supabase) {
-      console.warn('Supabase not available, skipping algorithms fetch');
-      setIsAlgorithmsLoading(false);
-      return;
-    }
-
-    try {
-      // Fetch from database - SELECT ONLY NECESSARY COLUMNS FOR LIST VIEW
-      // Note: We no longer cache this list in localStorage to avoid QuotaExceededError
-      setIsAlgorithmsLoading(true);
-      const { data, error } = await supabase
-        .from('algorithms')
-        .select('id, name, title, category, difficulty, description, serial_no, metadata, list_type, time_complexity, space_complexity')
-        .order('serial_no', { ascending: true, nullsFirst: false });
-
-      if (error) throw error;
-
-      const transformedData = (data || []).map(algo => {
-        const metadata = algo.metadata || {};
-        const metadataObj = typeof metadata === 'object' && metadata !== null ? metadata : {};
-        return {
-          ...algo,
-          ...metadataObj,
-          metadata: algo.metadata,
-          // Map snake_case to camelCase for consistency with existing components
-          timeComplexity: (algo as any).time_complexity,
-          spaceComplexity: (algo as any).space_complexity,
-          listType: (algo as any).list_type,
-        } as Algorithm;
-      });
-
-      setAlgorithms(transformedData);
-
-      // Cleanup old cache keys if they exist
-      try {
-        localStorage.removeItem('rulcode_algorithms_cache');
-        localStorage.removeItem('rulcode_algorithms_v2_cache');
-      } catch (e) {
-        // Ignore cleanup errors
-      }
-    } catch (error) {
-      console.error('Error fetching algorithms:', error);
-    } finally {
-      setIsAlgorithmsLoading(false);
-    }
+  // Fetch algorithms from database - Logic moved to useAlgorithms hook
+  const fetchAlgorithms = async () => {
+    // This is now a stub to avoid breaking anything that might still reference it internally
+    // though we are removing it from the public context
+    setIsAlgorithmsLoading(false);
   };
 
 // Fetch user algorithm data
@@ -301,9 +256,7 @@ const value: AppContextType = {
   profile,
   isAuthLoading,
   hasPremiumAccess,
-  algorithms,
   isAlgorithmsLoading,
-  refreshAlgorithms: () => fetchAlgorithms(true),
   userAlgorithmData,
   isUserDataLoading,
   refreshUserData: fetchUserData,

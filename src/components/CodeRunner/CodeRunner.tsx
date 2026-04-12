@@ -553,11 +553,17 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
         );
       }
 
+      const { data: { session } } = await supabase.auth.getSession();
+
       const response = await axios.post('/api/execute', {
         language_id: LANGUAGE_IDS[language],
         source_code: fullCode,
         stdin: "",
         compiler_options: language === 'typescript' ? "--target ES2020 --downlevelIteration" : undefined
+      }, {
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`
+        }
       });
 
       const endTime = performance.now();

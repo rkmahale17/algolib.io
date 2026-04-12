@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import axios from 'axios';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createClient } from '@supabase/supabase-js';
 
 dotenv.config();
 
@@ -13,14 +14,47 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Initialize Supabase client
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL,
+  process.env.VITE_SUPABASE_PUBLISHABLE_KEY
+);
+
 app.use(cors());
 app.use(express.json());
 
 // Serve static files from the dist directory
 app.use(express.static(path.join(__dirname, 'dist')));
 
-// Judge0 API Proxy
-app.post('/api/execute', async (req, res) => {
+// Middleware to verify Supabase JWT using the official client
+const verifyToken = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized: Missing or invalid token' });
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    // Let Supabase verify the token (handles ES256/HS256 automatically)
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+
+    if (error || !user) {
+      console.warn('Invalid token attempt:', error?.message);
+      return res.status(401).json({ error: 'Unauthorized: Invalid token' });
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    console.error('Auth check error:', error.message);
+    return res.status(500).json({ error: 'Internal server error during auth' });
+  }
+};
+
+// Judge0 API Proxy - Secured with verifyToken
+app.post('/api/execute', verifyToken, async (req, res) => {
   try {
     const { language_id, source_code, stdin, compiler_options } = req.body;
     
@@ -51,7 +85,7 @@ app.post('/api/execute', async (req, res) => {
       }
     };
 
-    console.log(`Submitting code to Judge0... Language: ${language_id}`);
+    console.log(`Submitting code to Judge0... Language: ${language_id} (User: ${req.user.email})`);
     const response = await axios.request(options);
     const token = response.data.token;
 
@@ -116,3 +150,4 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+

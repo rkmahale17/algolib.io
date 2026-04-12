@@ -41,7 +41,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { ProblemSidebar } from "@/components/ProblemSidebar";
-import { useUserProgressMap } from "@/hooks/useAlgorithms";
+import { useUserProgressMap, useAlgorithms } from "@/hooks/useAlgorithms";
 
 
 const ProblemDetail: React.FC = () => {
@@ -52,7 +52,9 @@ const ProblemDetail: React.FC = () => {
 
   // -- Data Fetching State --
   const { data: algorithm, isLoading: isLoadingAlgorithm } = useAlgorithm(algorithmIdOrSlug);
-  const { user, hasPremiumAccess, activeListType, algorithms: allAlgorithms, isAlgorithmsLoading } = useApp();
+  const { user, hasPremiumAccess, activeListType } = useApp();
+  const { data: algorithmsData, isLoading: isAlgorithmsLoading } = useAlgorithms();
+  const allAlgorithms = algorithmsData?.algorithms || [];
   const isPaywallEnabled = useFeatureFlag('paywall_enabled');
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
