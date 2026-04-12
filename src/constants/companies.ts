@@ -24,7 +24,7 @@ export const TOP_COMPANIES: CompanyTag[] = [
   { id: "stripe", name: "Stripe", iconSlug: "stripe", svglSlug: "stripe" },
   { id: "goldman_sachs", name: "Goldman Sachs", iconSlug: "goldmansachs", svglSlug: "goldman-sachs" },
   { id: "morgan_stanley", name: "Morgan Stanley", iconSlug: "morganstanley", svglSlug: "morgan-stanley" },
-  { id: "jpmorgan", name: "JPMorgan", iconSlug: "jpmorgan", svglSlug: "jpmorgan-chase" },
+  { id: "jpmorgan", name: "JPMorgan", iconSlug: "chase", svglSlug: "jpmorgan-chase" },
   { id: "spotify", name: "Spotify", iconSlug: "spotify", svglSlug: "spotify" },
   { id: "twitter", name: "Twitter / X", iconSlug: "x", svglSlug: "x" },
   { id: "snapchat", name: "Snapchat", iconSlug: "snapchat", svglSlug: "snapchat" },

@@ -38,6 +38,9 @@ export const useAlgorithm = (algorithmIdOrSlug: string | undefined) => {
             return transformedData;
         },
         enabled: !!algorithmIdOrSlug,
-        // Fetch fresh data every time to support immediate updates from Admin panel
+        // Cache algorithm details for 12 hours (same as the list) but allow it to be 
+        // considered fresh for 10 minutes to avoid redundant fetches on navigation.
+        staleTime: 1000 * 60 * 10, // 10 minutes
+        gcTime: 1000 * 60 * 60 * 12, // 12 hours
     });
 };

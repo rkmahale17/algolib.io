@@ -28,6 +28,7 @@ import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
 import { Badge } from "./ui/badge"
 import { Button } from "./ui/button"
+import { useApp } from "@/contexts/AppContext"
 
 // Defined Products Configuration
 const sidebarConfig = {
@@ -93,7 +94,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const location = useLocation()
     const { toggleSidebar, state, isMobile, setOpen } = useSidebar()
     const { theme, setTheme } = useTheme()
-    const [user, setUser] = React.useState<any>(null);
 
     const sidebarRoutes = ['/problems', '/blind75', '/core-patterns'];
     const isSidebarRoute = sidebarRoutes.some(route => location.pathname.startsWith(route));
@@ -113,16 +113,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         lastPathRef.current = location.pathname;
     }, [location.pathname, isMobile, state, setOpen]);
 
-    React.useEffect(() => {
-        if (!supabase) return;
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setUser(session?.user ?? null);
-        });
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setUser(session?.user ?? null);
-        });
-        return () => subscription.unsubscribe();
-    }, []);
+    const { user } = useApp();
 
     const handleSignOut = async () => {
         if (!supabase) return;

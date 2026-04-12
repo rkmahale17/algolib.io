@@ -275,12 +275,12 @@ export const ProblemDescriptionPanel = React.memo(({
 
                       {/* Company Tags */}
                       {(!algorithm?.controls || algorithm.controls?.metadata?.companies !== false) && algorithm.metadata?.companies && algorithm.metadata.companies.length > 0 && (
-                        <>
-                          <span className="text-muted-foreground text-sm">•</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-muted-foreground text-sm hidden sm:inline">•</span>
                           <div className="flex flex-wrap items-center gap-1.5">
                             {hasPremiumAccess || isPlatformPreview ? (
                               <>
-                                {algorithm.metadata.companies.slice(0, 5).map((company: string, index: number) => {
+                                {algorithm.metadata.companies.slice(0, 4).map((company: string, index: number) => {
                                   const compConfig = TOP_COMPANIES.find(c => c.name.toLowerCase() === company.toLowerCase() || c.id === company);
                                   return (
                                     <Badge
@@ -293,21 +293,21 @@ export const ProblemDescriptionPanel = React.memo(({
                                     </Badge>
                                   );
                                 })}
-                                {algorithm.metadata.companies.length > 5 && (
+                                {algorithm.metadata.companies.length > 4 && (
                                   <Popover>
                                     <PopoverTrigger>
                                       <Badge
                                         variant="secondary"
-                                        className="bg-muted text-muted-foreground text-xs px-2 py-0.5 cursor-pointer hover:bg-muted/80 transition-colors pointer-events-none"
+                                        className="bg-muted text-muted-foreground text-xs px-2 py-0.5 cursor-pointer hover:bg-muted/80 transition-colors pointer-events-auto"
                                       >
-                                        +{algorithm.metadata.companies.length - 5} more
+                                        +{algorithm.metadata.companies.length - 4} more
                                       </Badge>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-64 p-3" align="start">
                                       <div className="space-y-3">
-                                        <h4 className="text-sm font-semibold leading-none">All Companies</h4>
+                                        <h4 className="text-sm font-semibold leading-none">Other Companies</h4>
                                         <div className="flex flex-wrap gap-2">
-                                          {algorithm.metadata.companies.map((company: string, index: number) => (
+                                          {algorithm.metadata.companies.slice(4).map((company: string, index: number) => (
                                             <Badge
                                               key={index}
                                               variant="secondary"
@@ -343,7 +343,7 @@ export const ProblemDescriptionPanel = React.memo(({
                               </TooltipProvider>
                             )}
                           </div>
-                        </>
+                        </div>
                       )}
                     </div>
 

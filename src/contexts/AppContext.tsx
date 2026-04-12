@@ -57,6 +57,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
+  
+  // Track in-flight profile fetch to avoid redundant calls
+  const profileFetchInProgress = React.useRef<string | null>(null);
 
   const [algorithms, setAlgorithms] = useState<Algorithm[]>([]);
   const [isAlgorithmsLoading, setIsAlgorithmsLoading] = useState(true);
@@ -74,10 +77,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const fetchProfile = useCallback(async (userId: string) => {
+    if (!userId) return;
+    
+    // Check if we already have the profile for this user and it's being fetched
+    if (profileFetchInProgress.current === userId) {
+      return;
+    }
+
     try {
+      profileFetchInProgress.current = userId;
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, email, full_name, avatar_url, subscription_status, subscription_tier, trial_end_date, current_period_end, cancel_at_period_end')
         .eq('id', userId)
         .maybeSingle();
 
@@ -85,6 +96,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setProfile(data as any as Profile);
     } catch (error) {
       console.error('Error fetching profile:', error);
+    } finally {
+      profileFetchInProgress.current = null;
     }
   }, []);
 
@@ -208,30 +221,49 @@ useEffect(() => {
     return;
   }
 
-  supabase.auth.getSession().then(({ data: { session } }) => {
-    setUser(session?.user ?? null);
-    if (session?.user) {
-      fetchProfile(session.user.id);
-    }
-    setIsAuthLoading(false);
-  });
+  let mounted = true;
 
-  const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-    setUser(session?.user ?? null);
-    if (session?.user) {
-      fetchProfile(session.user.id);
+  const initSession = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (mounted) {
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+      if (currentUser) {
+        fetchProfile(currentUser.id);
+      }
+      setIsAuthLoading(false);
+    }
+  };
+
+  initSession();
+
+  const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    if (!mounted) return;
+    
+    const currentUser = session?.user ?? null;
+    setUser(currentUser);
+    
+    if (currentUser) {
+      // Only fetch profile on specific events to avoid redundant calls at boot
+      // SIGNED_IN covers INITIAL_SESSION usually, but we also handle it in initSession
+      if (event === 'SIGNED_IN' || event === 'USER_UPDATED' || event === 'TOKEN_REFRESHED') {
+        fetchProfile(currentUser.id);
+      }
     } else {
       setProfile(null);
     }
   });
 
-  return () => subscription.unsubscribe();
-}, []);
+  return () => {
+    mounted = false;
+    subscription.unsubscribe();
+  };
+}, [fetchProfile]);
 
-// Fetch algorithms on mount
-useEffect(() => {
-  fetchAlgorithms();
-}, []);
+// Fetch algorithms on mount (Removed to avoid redundancy with React Query prefetch in App.tsx)
+// useEffect(() => {
+//   fetchAlgorithms();
+// }, []);
 
 // Fetch user data when user changes
 // useEffect(() => {

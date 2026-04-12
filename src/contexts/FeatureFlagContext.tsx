@@ -25,7 +25,7 @@ export const FeatureFlagProvider = ({ children }: { children: ReactNode }) => {
       // @ts-ignore - feature_flags table is new and types are not regenerated yet
       const { data, error } = await supabase
         .from('feature_flags')
-        .select('*');
+        .select('key, is_enabled');
       
       if (error) throw error;
 

@@ -28,7 +28,7 @@ export async function getUserAlgorithmData(
 
     const { data, error } = await supabase
         .from('user_algorithm_data')
-        .select('*')
+        .select('id, user_id, algorithm_id, completed, code, submissions, notes, updated_at')
         .eq('user_id', userId)
         .eq('algorithm_id', algorithmId)
         .maybeSingle();
@@ -338,7 +338,7 @@ export async function getAllUserAlgorithmData(
 
     const { data, error } = await supabase
         .from('user_algorithm_data')
-        .select('*')
+        .select('algorithm_id, completed, submissions')
         .eq('user_id', userId);
 
     if (error) {

@@ -15,11 +15,23 @@ interface CompanyIconProps {
 export const CompanyIcon: React.FC<CompanyIconProps> = ({ company, className, forceLoad = false }) => {
   const [shouldRender, setShouldRender] = useState(forceLoad);
 
+  const compConfig = TOP_COMPANIES.find(
+    (c) => c.name.toLowerCase() === company.toLowerCase() || c.id === company.toLowerCase()
+  );
+
+  const iconSlug = compConfig?.iconSlug || company.toLowerCase().replace(/\s+/g, '');
+  const svglSlug = compConfig?.svglSlug || compConfig?.iconSlug || company.toLowerCase().replace(/\s+/g, '-');
+
+  const localSrc = `/icons/companies/${iconSlug}.svg`;
+  const svglSrc = `https://api.svgl.app/static/icons/${svglSlug}.svg`;
+  const simpleiconSrc = `https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/${iconSlug}.svg`;
+
+  const [imgSrc, setImgSrc] = useState(localSrc);
+  const [hasError, setHasError] = useState(false);
+
   useEffect(() => {
     if (forceLoad) return;
     
-    // Defer loading to ensure it doesn't block initial page render or data fetching.
-    // This addresses the requirement that icons should load after algorithm fetch.
     const timer = setTimeout(() => {
       setShouldRender(true);
     }, 400); 
@@ -27,33 +39,33 @@ export const CompanyIcon: React.FC<CompanyIconProps> = ({ company, className, fo
     return () => clearTimeout(timer);
   }, [forceLoad]);
 
+  useEffect(() => {
+    setImgSrc(localSrc);
+    setHasError(false);
+  }, [localSrc]);
+
   if (!shouldRender) {
     return <div className={cn("shrink-0 bg-muted/10 rounded-sm", className)} />;
   }
 
-  const compConfig = TOP_COMPANIES.find(
-    (c) => c.name.toLowerCase() === company.toLowerCase() || c.id === company.toLowerCase()
-  );
-
-  const svglSlug = compConfig?.svglSlug || compConfig?.iconSlug || company.toLowerCase().replace(/\s+/g, '-');
-  const simpleiconSlug = compConfig?.iconSlug || company.toLowerCase().replace(/\s+/g, '');
-
-  const svglSrc = `https://api.svgl.app/static/icons/${svglSlug}.svg`;
-  const simpleiconSrc = `https://cdn.simpleicons.org/${simpleiconSlug}`;
-
   return (
     <img
-      src={svglSrc}
+      src={imgSrc}
       alt={company}
-      className={cn("object-contain", className)}
+      className={cn("object-contain dark:invert dark:hue-rotate-180 dark:brightness-[1.2]", className)}
       loading="lazy"
-      onError={(e) => {
-        // Fallback to simpleicons if svgl fails
-        const img = e.target as HTMLImageElement;
-        if (img.src !== simpleiconSrc) {
-          img.src = simpleiconSrc;
+      onError={() => {
+        if (imgSrc === localSrc) {
+          // Fallback 1: svgl.app
+          setImgSrc(svglSrc);
+        } else if (imgSrc === svglSrc) {
+          // Fallback 2: simpleicons
+          setImgSrc(simpleiconSrc);
+        } else {
+          setHasError(true);
         }
       }}
+      style={{ display: hasError ? 'none' : 'block' }}
     />
   );
 };

@@ -20,10 +20,6 @@ export function useUserAlgorithmData({
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
-    // Reset data when algorithmId changes to show loading state specifically for new algo
-    useEffect(() => {
-        setData(null);
-    }, [algorithmId]);
 
     // Fetch data
     useEffect(() => {
