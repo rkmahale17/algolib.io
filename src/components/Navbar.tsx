@@ -7,21 +7,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Github,
-  LogOut,
-  Menu as MenuIcon,
-  MessageSquare,
-} from "lucide-react";
+import { Github, LogOut, Menu as MenuIcon, MessageSquare } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./ThemeToggle";
 import logo from "@/assets/logo.svg";
-import logo_text from "@/assets/logo_test_2.svg";
-
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -46,8 +38,6 @@ const Navbar = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-
-
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -63,12 +53,12 @@ const Navbar = () => {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-4">
- <Link
+            <Link
               to="/"
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
             >
               <img src={logo} alt="RulCode Logo" className="w-8 h-8" />
-              <img src={logo_text} alt="RulCode Logo Text" className="hidden md:block sm:hidden h-6" />
+              Rulcode
             </Link>
           </div>
 
