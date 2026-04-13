@@ -127,82 +127,30 @@
       }
     </script>
 
-    <!-- Google tag (gtag.js) -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-B2KTX1L5TF"
-    ></script>
+ <script>
+      const hostname = window.location.hostname;
+      if (hostname === 'rulcode.com' || hostname === 'www.rulcode.com') {
+        // Defer GTM loading
+        const loadGTM = () => {
+          console.log('✅ GTM loading for production domain:', hostname);
+          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer','GTM-T5ZJTVN4');
+        };
 
-    <script
-      async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7476369512681084"
-      crossorigin="anonymous"
-    ></script>
-    <script>
-      // Only initialize Google Analytics on production domain (rulcode.com)
-      (function () {
-        const hostname = window.location.hostname;
-        const isProduction =
-          hostname === "rulcode.com" || hostname === "www.rulcode.com" || 
-            hostname === "rulcode.com" || hostname === "www.rulcode.com";
-
-        if (isProduction) { 
-          window.dataLayer = window.dataLayer || [];
-          function gtag() {
-            dataLayer.push(arguments);
-          }
-          gtag("js", new Date());
-          gtag("config", "G-B2KTX1L5TF", { anonymize_ip: true });
-          console.log(
-            "✅ Google Analytics initialized for production domain:",
-            hostname
-          );
+        // Use requestIdleCallback if available, otherwise setTimeout
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(loadGTM, { timeout: 3000 });
         } else {
-          console.log(
-            "🚫 Google Analytics disabled for non-production domain:",
-            hostname
-          );
+          setTimeout(loadGTM, 2500); 
         }
-      })();
+      } else {
+        console.log('🚫 GTM disabled for non-production domain:', hostname);
+      }
     </script>
-
-    <!-- Hotjar -->
-    <script>
-      // Only initialize Hotjar on production domain (rulcode.com)
-      (function () {
-        const hostname = window.location.hostname;
-        const isProduction =
-               hostname === "rulcode.com" || hostname === "www.rulcode.com" || 
-            hostname === "rulcode.com" || hostname === "www.rulcode.com";
-
-        if (isProduction) {
-          (function (h, o, t, j, a, r) {
-            h.hj =
-              h.hj ||
-              function () {
-                (h.hj.q = h.hj.q || []).push(arguments);
-              };
-            h._hjSettings = { hjid: 6540515, hjsv: 6 };
-            a = o.getElementsByTagName("head")[0];
-            r = o.createElement("script");
-            r.async = 1;
-            r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
-            a.appendChild(r);
-          })(
-            window,
-            document,
-            "https://static.hotjar.com/c/hotjar-",
-            ".js?sv="
-          );
-          console.log("✅ Hotjar initialized for production domain:", hostname);
-        } else {
-          console.log(
-            "🚫 Hotjar disabled for non-production domain:",
-            hostname
-          );
-        }
-      })();
-    </script>
+   
 
     <!-- Accessibility -->
     <meta name="apple-mobile-web-app-title" content="Rulcode" />
@@ -221,6 +169,10 @@
   </head>
 
   <body>
+        <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T5ZJTVN4"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
     <base href="/" />
     <div id="root"><!--app-html--></div>
     <script type="module" src="/src/main.tsx"></script>
