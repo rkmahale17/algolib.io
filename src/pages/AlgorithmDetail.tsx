@@ -30,14 +30,16 @@ import { YouTubePlayer } from "@/components/YouTubePlayer";
 import { algorithms } from "@/data/algorithms";
 import { getAlgorithmImplementation } from "@/data/algorithmImplementations";
 import { supabase } from "@/integrations/supabase/client";
+import { usePostHog } from "@posthog/react";
 
 const AlgorithmDetail: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
-  
+  const posthog = usePostHog();
+
   // Find algorithm by ID
   const algorithm = algorithms.find((a) => a.id === id);
-  
+
   const implementation = getAlgorithmImplementation(id || "");
   const [showBreadcrumb, setShowBreadcrumb] = useState(true);
   const [user, setUser] = useState<any>(null);
@@ -62,6 +64,15 @@ const AlgorithmDetail: React.FC = () => {
   // Scroll to top on mount/route change
   React.useEffect(() => {
     window.scrollTo(0, 0);
+    if (algorithm) {
+      posthog?.capture('algorithm_viewed', {
+        algorithm_id: algorithm.id,
+        algorithm_name: algorithm.name,
+        category: algorithm.category,
+        difficulty: algorithm.difficulty,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   React.useEffect(() => {

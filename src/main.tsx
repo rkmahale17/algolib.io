@@ -3,6 +3,13 @@ import "./index.css";
 import App from "./App.tsx";
 import { HelmetProvider } from "react-helmet-async";
 import { createRoot } from "react-dom/client";
+import posthog from "posthog-js";
+import { PostHogErrorBoundary, PostHogProvider } from "@posthog/react";
+
+posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_TOKEN, {
+  api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
+  defaults: "2026-01-30",
+});
 
 // 🔧 Runtime URL validation: Fix any malformed URLs in production
 if (import.meta.env.PROD) {
@@ -42,7 +49,11 @@ if (import.meta.env.PROD) {
 }
 
 createRoot(document.getElementById("root")!).render(
-  <HelmetProvider>
-    <App />
-  </HelmetProvider>
+  <PostHogProvider client={posthog}>
+    <PostHogErrorBoundary>
+      <HelmetProvider>
+        <App />
+      </HelmetProvider>
+    </PostHogErrorBoundary>
+  </PostHogProvider>
 );

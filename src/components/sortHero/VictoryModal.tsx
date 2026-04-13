@@ -2,6 +2,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Trophy, ArrowRight, Home, Gamepad2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { usePostHog } from "@posthog/react";
+import { useEffect } from "react";
 
 interface VictoryModalProps {
   isOpen: boolean;
@@ -13,16 +15,24 @@ interface VictoryModalProps {
   onBackToMenu: () => void;
 }
 
-export const VictoryModal = ({ 
+export const VictoryModal = ({
   isOpen,
-  score, 
-  moves, 
-  errors, 
-  grade, 
-  onNextLevel, 
-  onBackToMenu 
+  score,
+  moves,
+  errors,
+  grade,
+  onNextLevel,
+  onBackToMenu
 }: VictoryModalProps) => {
   const navigate = useNavigate();
+  const posthog = usePostHog();
+
+  useEffect(() => {
+    if (isOpen) {
+      posthog?.capture('sort_hero_level_completed', { score, moves, errors, grade });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onBackToMenu()}>

@@ -9,8 +9,10 @@ import { toast } from 'sonner';
 import { useState } from 'react';
 import { Footer } from '@/components/Footer';
 import { Helmet } from 'react-helmet-async';
+import { usePostHog } from '@posthog/react';
 
 const Feedback = () => {
+  const posthog = usePostHog();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,7 +35,7 @@ const Feedback = () => {
       
       // Open in new tab
       window.open(githubIssueUrl, '_blank');
-      
+      posthog?.capture('feedback_submitted', { title });
       toast.success('Opening GitHub to submit your feedback!');
       setTitle('');
       setDescription('');
