@@ -22,6 +22,9 @@ interface ListingLayoutProps {
     onCompanyToggle: (company: string) => void;
     companies?: string[];
     showRecommendation?: boolean;
+    showCategoryToggle?: boolean;
+    isCategoryWise?: boolean;
+    onCategoryWiseChange?: (value: boolean) => void;
     children: ReactNode;
     stats?: {
         count: number;
@@ -43,6 +46,9 @@ export const ListingLayout = ({
     onCompanyToggle,
     companies,
     showRecommendation,
+    showCategoryToggle,
+    isCategoryWise,
+    onCategoryWiseChange,
     children,
     stats
 }: ListingLayoutProps) => {
@@ -68,7 +74,7 @@ export const ListingLayout = ({
 
     return (
         <SidebarLayout>
-            <div className="min-h-screen bg-background flex flex-col">
+            <div className="min-h-screen bg-background flex flex-col min-w-0">
                 <main className="flex-1 w-full max-w-7xl mx-auto px-2 sm:px-4 py-8 md:py-12">
                     <div className="flex flex-col xl-listing:flex-row gap-8 xl-listing:gap-12">
                         {/* Main Content */}
@@ -85,6 +91,9 @@ export const ListingLayout = ({
                                     onSearchChange={onSearchChange}
                                     sortBy={sortBy}
                                     onSortChange={onSortChange}
+                                    showCategoryToggle={showCategoryToggle}
+                                    isCategoryWise={isCategoryWise}
+                                    onCategoryWiseChange={onCategoryWiseChange}
                                     filterTrigger={
                                         <div className="xl-listing:hidden flex items-center">
                                             <Sheet open={isFilterSheetOpen} onOpenChange={setIsFilterSheetOpen}>
@@ -141,7 +150,7 @@ export const ListingLayout = ({
                                     </div>
                                 )}
 
-                                <div className="flex flex-col gap-0">
+                                <div className="flex flex-col gap-0 min-w-0">
                                     {children}
                                 </div>
                             </div>

@@ -6,6 +6,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
+import { usePostHog } from "@posthog/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -156,6 +157,7 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
   isMobile,
   isLoading: isLoadingProp
 }, ref) => {
+  const posthog = usePostHog();
   const isLimitExceeded = useFeatureFlag("todays_limit_exceed");
   const [internalLanguage, setInternalLanguage] = useState<Language>('typescript');
   const language = controlledLanguage || internalLanguage;
@@ -660,6 +662,17 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
 
 
       setOutput(result);
+
+      // PostHog Tracking for Run Code (Not Submission)
+      if (!isSubmission) {
+        posthog?.capture('run_code', {
+          problemId: algorithmId,
+          language: language,
+          status: result.status?.id === 3 ? (allPassed ? 'pass' : 'fail') : 'error',
+          executionTimeMs: execTime
+        });
+      }
+
       return { result, allPassed, execTime };
 
     } catch (err: any) {
@@ -746,18 +759,37 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
     } else {
       toast.error("Submission Failed. Check the results.");
     }
+
+    // PostHog Tracking for Submit Code
+    posthog?.capture('submit_code', {
+      problemId: algorithmId,
+      language: language,
+      status: allPassed ? 'pass' : (result?.status?.id === 3 ? 'fail' : 'error'),
+      executionTimeMs: execTime
+    });
   };
 
   const handleSelectSubmission = (submission: Submission) => {
     setViewingSubmission(submission);
     setActiveEditorTab("submission");
     setIsOutputExpanded(false);
+
+    posthog?.capture('code_view_switched', {
+      problemId: algorithmId,
+      view: 'submission',
+      submissionId: submission.id
+    });
   };
 
   const handleCloseSubmission = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     setViewingSubmission(null);
     setActiveEditorTab("current");
+
+    posthog?.capture('code_view_switched', {
+      problemId: algorithmId,
+      view: 'current'
+    });
   };
 
   const handleCopySubmission = () => {

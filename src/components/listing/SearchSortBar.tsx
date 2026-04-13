@@ -8,6 +8,7 @@ import {
     SelectTrigger,
     SelectValue
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 
 interface SearchSortBarProps {
     searchQuery: string;
@@ -15,6 +16,9 @@ interface SearchSortBarProps {
     sortBy: string;
     onSortChange: (value: string) => void;
     filterTrigger?: ReactNode;
+    showCategoryToggle?: boolean;
+    isCategoryWise?: boolean;
+    onCategoryWiseChange?: (value: boolean) => void;
 }
 
 export const SearchSortBar = ({
@@ -22,7 +26,10 @@ export const SearchSortBar = ({
     onSearchChange,
     sortBy,
     onSortChange,
-    filterTrigger
+    filterTrigger,
+    showCategoryToggle,
+    isCategoryWise,
+    onCategoryWiseChange
 }: SearchSortBarProps) => {
     return (
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center py-4 md:py-6">
@@ -54,6 +61,21 @@ export const SearchSortBar = ({
                         <SelectItem value="difficulty-desc">Hard → Easy</SelectItem>
                     </SelectContent>
                 </Select>
+
+                {showCategoryToggle && (
+                    <div className="flex items-center gap-2 bg-background border border-border/60 rounded-xl px-3 h-11 sm:h-12 shadow-sm transition-all hover:border-primary/40">
+                         <div className="flex items-center space-x-2">
+                            <label htmlFor="category-mode" className="text-xs sm:text-sm font-medium text-muted-foreground whitespace-nowrap cursor-pointer select-none">
+                                Category-wise
+                            </label>
+                            <Switch
+                                id="category-mode"
+                                checked={isCategoryWise}
+                                onCheckedChange={onCategoryWiseChange}
+                            />
+                        </div>
+                    </div>
+                )}
 
                 {filterTrigger}
             </div>

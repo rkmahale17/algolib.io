@@ -125,7 +125,22 @@ const Navbar = () => {
                 <div className="flex-1 p-8 flex flex-col gap-8 bg-background overflow-y-auto max-h-[500px]">
                   {activePrepareTab === 'dsa_practice' && (
                     <div className="flex flex-col gap-8">
-                      <Link to="/problems" className="group flex items-start gap-5 relative">
+                      <Link to="/dsa/get-started" className="group flex items-start gap-5 relative">
+                        <div className="p-3 bg-muted/50 rounded-xl group-hover:bg-primary/10 transition-colors border border-border/50 shrink-0">
+                          <Trophy className="w-5 h-5 text-foreground group-hover:text-primary" />
+                        </div>
+                        <div className="flex-1 pr-8">
+                          <h4 className="text-[15px] font-semibold mb-1.5 text-foreground group-hover:text-primary transition-colors tracking-tight">Get Started</h4>
+                          <p className="text-[13px] text-muted-foreground mb-3 leading-relaxed max-w-[320px]">Master DSA with our curated roadmaps and guided paths</p>
+                          <div className="flex flex-wrap gap-2">
+                            <Badge variant="secondary" className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5">Guided</Badge>
+                            <Badge variant="secondary" className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5">Roadmap</Badge>
+                          </div>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-muted-foreground/30 absolute right-0 top-1/2 -translate-y-1/2 group-hover:translate-x-1 group-hover:text-primary transition-all" />
+                      </Link>
+
+                      <Link to="/dsa/problems" className="group flex items-start gap-5 relative">
                         <div className="p-3 bg-muted/50 rounded-xl group-hover:bg-primary/10 transition-colors border border-border/50 shrink-0">
                           <ListTodo className="w-5 h-5 text-foreground group-hover:text-primary" />
                         </div>
@@ -141,7 +156,7 @@ const Navbar = () => {
                         <ChevronRight className="w-5 h-5 text-muted-foreground/30 absolute right-0 top-1/2 -translate-y-1/2 group-hover:translate-x-1 group-hover:text-primary transition-all" />
                       </Link>
 
-                      <Link to="/core-patterns" className="group flex items-start gap-5 relative">
+                      <Link to="/dsa/core" className="group flex items-start gap-5 relative">
                         <div className="p-3 bg-muted/50 rounded-xl group-hover:bg-primary/10 transition-colors border border-border/50 shrink-0">
                           <BookOpen className="w-5 h-5 text-foreground group-hover:text-primary" />
                         </div>
@@ -157,7 +172,7 @@ const Navbar = () => {
                         <ChevronRight className="w-5 h-5 text-muted-foreground/30 absolute right-0 top-1/2 -translate-y-1/2 group-hover:translate-x-1 group-hover:text-primary transition-all" />
                       </Link>
 
-                      <Link to="/blind75" className="group flex items-start gap-5 relative">
+                      <Link to="/dsa/blind-75" className="group flex items-start gap-5 relative">
                         <div className="p-3 bg-primary/5 rounded-xl group-hover:bg-primary/10 transition-colors border border-primary/10 shrink-0 text-primary">
                           <Trophy className="w-5 h-5" />
                         </div>
@@ -174,7 +189,7 @@ const Navbar = () => {
                   )}
 
                   {activePrepareTab === 'dsa_strategy' && (
-                    <Link to="/blind75" className="group flex items-start gap-5 relative">
+                    <Link to="/dsa/blind-75" className="group flex items-start gap-5 relative">
                       <div className="p-3 bg-muted/50 rounded-xl group-hover:bg-primary/10 transition-colors border border-border/50 shrink-0">
                         <Code2 className="w-5 h-5 text-foreground group-hover:text-primary" />
                       </div>

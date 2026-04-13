@@ -43,26 +43,32 @@ const sidebarConfig = {
             },
             {
                 title: "DSA",
-                url: "/problems",
+                url: "/dsa/problems",
                 icon: ListTodo,
                 hasCaret: true,
                 isGroup: true,
                 items: [
                     {
+                        title: "Get started",
+                        url: "/dsa/get-started",
+                        icon: Rocket,
+                        description: "Your personalized roadmap to mastering DSA."
+                    },
+                    {
                         title: "All practice",
-                        url: "/problems",
+                        url: "/dsa/problems",
                         icon: ListTodo,
                         description: "Browse and filter the entire coding question bank."
                     },
                     {
                         title: "Core patterns",
-                        url: "/core-patterns",
+                        url: "/dsa/core",
                         icon: BookOpen,
                         description: "Master the essential recurring algorithm patterns."
                     },
                     {
                         title: "Blind 75",
-                        url: "/blind75",
+                        url: "/dsa/blind-75",
                         icon: Code,
                         description: "The curated list of top 75 must-do questions."
                     },
@@ -95,7 +101,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { toggleSidebar, state, isMobile, setOpen } = useSidebar()
     const { theme, setTheme } = useTheme()
 
-    const sidebarRoutes = ['/problems', '/blind75', '/core-patterns'];
+    const sidebarRoutes = ['/dsa/problems', '/problems', '/dsa/get-started', '/dsa/blind-75', '/dsa/core'];
     const isSidebarRoute = sidebarRoutes.some(route => location.pathname.startsWith(route));
     const lastPathRef = React.useRef(location.pathname);
 
@@ -133,7 +139,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
     return (
         <Sidebar collapsible="icon" className="border-r border-border bg-background" {...props}>
-            <SidebarHeader className="p-4 border-b border-border/50 h-14 flex items-center justify-center">
+            <SidebarHeader className="p-4 border-b border-border/50 h-12 flex items-center justify-center">
+
                 <div className="flex items-center gap-3 w-full">
                     <Link to="/" className="flex items-center gap-2 shrink-0 group-data-[collapsible=icon]:mx-auto">
                         <img src={logo} alt="RulCode Logo" className="w-5 h-5 transition-all" />

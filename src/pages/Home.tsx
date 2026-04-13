@@ -121,7 +121,7 @@ const Home = () => {
               <div className="flex flex-wrap items-center gap-6 mb-8">
                 <div className="flex flex-col gap-4">
                   <Button className=" text-black rounded-full bg-primary hover:bg-primary/80 transition-colors " asChild>
-                    <Link to="/problems">
+                    <Link to="/dsa/get-started">
                       Get started now <ArrowRight className="ml-2 w-6 h-6" />
                     </Link>
                   </Button>

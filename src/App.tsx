@@ -23,6 +23,7 @@ const ProblemDetail = lazy(() => import('@/pages/ProblemDetail'));
 const Blind75 = lazy(() => import("./pages/Blind75"));
 const CorePatterns = lazy(() => import("./pages/CorePatterns"));
 const Problems = lazy(() => import("./pages/Problems"));
+const GetStarted = lazy(() => import("./pages/GetStarted"));
 const Auth = lazy(() => import("./pages/Auth"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Feedback = lazy(() => import("./pages/Feedback"));
@@ -73,9 +74,7 @@ const ConditionalNavbar = () => {
   // Hide navbar on algorithm detail pages and blind75 detail pages
   const hideNavbar = location.pathname.startsWith('/problem/') && location.pathname !== '/problem' ||
     location.pathname.startsWith('/admin') ||
-    location.pathname === '/problems' ||
-    location.pathname === '/blind75' ||
-    location.pathname === '/core-patterns' ||
+    location.pathname.startsWith('/dsa/') ||
     location.pathname === '/dashboard';
 
   if (hideNavbar) return null;
@@ -139,7 +138,7 @@ const AppContent = () => {
               <Route path="/" element={<Home />} />
               <Route path="/problem/:id" element={<ProblemDetail />} />
 
-              <Route path="/blind75" element={
+              <Route path="/dsa/blind-75" element={
                 <FeatureProtectedRoute flag="blind_75">
                   <ProtectedRoute><Blind75 /></ProtectedRoute>
                 </FeatureProtectedRoute>
@@ -149,12 +148,15 @@ const AppContent = () => {
                   <ProtectedRoute><ProblemDetail /></ProtectedRoute>
                 </FeatureProtectedRoute>
               } />
-              <Route path="/core-patterns" element={
+              <Route path="/dsa/core" element={
                 <FeatureProtectedRoute flag="core_algo">
                   <CorePatterns />
                 </FeatureProtectedRoute>
               } />
+              <Route path="/dsa/problems" element={<Problems />} />
+              <Route path="/dsa/all-problems" element={<Problems />} />
               <Route path="/problems" element={<Problems />} />
+              <Route path="/dsa/get-started" element={<GetStarted />} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/login" element={<Auth />} />
               <Route path="/feedback" element={<Feedback />} />
@@ -317,7 +319,7 @@ const App = () => {
                   <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
                     <div className="flex min-h-screen w-full">
                       <AppSidebar />
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <AppContent />
                       </div>
                     </div>

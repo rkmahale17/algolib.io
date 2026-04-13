@@ -53,7 +53,7 @@ export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp
                 isFirst && "rounded-t-xl",
                 isLast && "rounded-b-xl border-b",
                 !isFirst && !isLast && "rounded-none",
-                "shadow-sm hover:shadow-md z-0 hover:z-10 relative"
+                "shadow-sm hover:shadow-md z-0 hover:z-10 relative overflow-hidden"
             )}>
                 {/* Status Indicator */}
                 <div className="shrink-0 scale-90 sm:scale-100">
@@ -62,7 +62,7 @@ export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp
 
                 {/* Content */}
                 <div className="flex-1 min-w-0 space-y-1 sm:space-y-2">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 min-w-0">
                         <h3 className="text-[15px] sm:text-[17px] font-normal text-foreground transition-colors truncate">
                             {algorithm.serial_no || index + 1}. {algorithm.title || algorithm.name}
                         </h3>
@@ -81,7 +81,7 @@ export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp
                         </div>
                     </div>
 
-                    <p className="text-[13px] sm:text-[14px] text-muted-foreground/80 line-clamp-1 max-w-3xl leading-relaxed font-normal">
+                    <p className="text-[13px] sm:text-[14px] text-muted-foreground/80 line-clamp-1 max-w-2xl leading-relaxed font-normal">
                         {algorithm.description}
                     </p>
 

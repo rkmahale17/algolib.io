@@ -579,7 +579,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: 'cta',
         content: 'Explore Blind 75  Rulcode.com',
-        link: '/blind75'
+        link: '/dsa/blind-75'
       }
     ]
   },

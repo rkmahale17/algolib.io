@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
+import { usePostHog } from "@posthog/react";
 import {
   Book,
   Code,
@@ -61,6 +62,7 @@ export const CodeWorkspacePanel = React.memo(({
   isLoading = false,
   isPlatformPreview = false,
 }: CodeWorkspacePanelProps) => {
+  const posthog = usePostHog();
   const { hasPremiumAccess } = useApp();
   const containerRef = useRef<HTMLDivElement>(null);
   const [isCompact, setIsCompact] = useState(false);
@@ -84,7 +86,17 @@ export const CodeWorkspacePanel = React.memo(({
   return (
     <div ref={containerRef} className={`h-full flex flex-col bg-card/30 backdrop-blur-sm ${className || ''}`}>
       <div className="flex-1 overflow-hidden p-0">
-        <Tabs defaultValue="code" className="h-full flex flex-col">
+        <Tabs 
+          defaultValue="code" 
+          className="h-full flex flex-col"
+          onValueChange={(value) => {
+            posthog?.capture('problem_tab_switched', {
+              problemId: algorithmId,
+              tabName: value,
+              panel: 'right'
+            });
+          }}
+        >
           <div className="flex items-stretch border-b shrink-0">
             {!isMobile && (
               <Button

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState, useMemo, Suspense } from "reac
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Code2, ArrowLeft, Eye, Lightbulb, Minimize2, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
+import { usePostHog } from "@posthog/react";
 import { supabase } from "@/integrations/supabase/client";
 
 // Components
@@ -49,6 +50,7 @@ const ProblemDetail: React.FC = () => {
   // Unified route: /problem/:id (supports both core patterns and Blind 75)
   const algorithmIdOrSlug = id || slug;
   const navigate = useNavigate();
+  const posthog = usePostHog();
 
   // -- Data Fetching State --
   const { data: algorithm, isLoading: isLoadingAlgorithm } = useAlgorithm(algorithmIdOrSlug);
@@ -139,6 +141,29 @@ const ProblemDetail: React.FC = () => {
       interactions.setDislikes((meta.dislikes as number) || 0);
     }
   }, [algorithm]);
+
+  // 3. Track Problem Opened
+  useEffect(() => {
+    if (algorithm) {
+      posthog?.capture('problem_opened', {
+        problemId: algorithmIdOrSlug,
+        problemName: algorithm.name,
+        difficulty: algorithm.difficulty,
+        listType: activeListType
+      });
+    }
+  }, [algorithm, algorithmIdOrSlug, posthog, activeListType]);
+
+  // 4. Track Tab Switch
+  useEffect(() => {
+    if (algorithm) {
+      posthog?.capture('problem_tab_switched', {
+        problemId: algorithmIdOrSlug,
+        tabName: layout.activeTab,
+        panel: 'left'
+      });
+    }
+  }, [layout.activeTab, algorithmIdOrSlug, posthog, algorithm]);
 
   // -- Handlers --
   const handleSignOut = async () => {

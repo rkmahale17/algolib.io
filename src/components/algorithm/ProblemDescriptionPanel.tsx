@@ -475,7 +475,7 @@ export const ProblemDescriptionPanel = React.memo(({
                       <Accordion type="single" collapsible defaultValue="details" className="w-full">
                         <AccordionItem value="details" className="border-none">
                           <AccordionTrigger className="px-4 sm:px-6 py-4 hover:no-underline">
-                            <div className="flex items-center gap-2 text-lg font-semibold">
+                            <div className="flex items-center gap-2 text-lg font-medium">
                               <BookOpen className="w-5 h-5 text-primary" />
                               Algorithm Overview
                             </div>
