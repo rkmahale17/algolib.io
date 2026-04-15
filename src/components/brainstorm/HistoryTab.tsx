@@ -1,14 +1,13 @@
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Loader2, FileText, Palette, Eye, Pencil } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import ReactMarkdown from 'react-markdown';
+import { useApp } from '@/contexts/AppContext';
 
 interface HistoryTabProps {
   algorithmId: string;
@@ -20,25 +19,14 @@ export const HistoryTab = ({ algorithmId, onRestoreWhiteboard, onRestoreNote }: 
   const [viewingNote, setViewingNote] = useState<any>(null);
 
   // Fetch current user algorithm data (consolidated table)
-  const { data: userAlgoData, isLoading } = useQuery({
-    queryKey: ['user-algorithm-data-history', algorithmId],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+  const { userAlgorithmData, isUserDataLoading: isLoading } = useApp();
 
-      const { data, error } = await supabase
-        .from('user_algorithm_data')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('algorithm_id', algorithmId)
-        .maybeSingle();
+  const userAlgoData = useMemo(() => 
+    userAlgorithmData?.find(item => item.algorithm_id === algorithmId),
+    [userAlgorithmData, algorithmId]
+  );
 
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  if (isLoading) {
+  if (isLoading && !userAlgoData) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />

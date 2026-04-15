@@ -1,11 +1,15 @@
 // Global application context for state management and caching
 
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
 import type { User } from '@supabase/supabase-js';
 import type { UserAlgorithmData } from '@/types/userAlgorithmData';
 import type { Profile } from '@/types/profile';
 import { getAllUserAlgorithmData } from '@/utils/userAlgorithmDataHelpers';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { setUser, setProfile, setAuthLoading } from '@/store/slices/authSlice';
+import { setProgressData, updateProgressItem, removeProgressItem } from '@/store/slices/userProgressSlice';
 
 interface Algorithm {
   id: string;
@@ -18,6 +22,8 @@ interface Algorithm {
   metadata?: any;
   [key: string]: any;
 }
+
+export type ProgressStatus = 'solved' | 'attempted' | 'none';
 
 interface AppContextType {
   // Auth & Profile
@@ -39,6 +45,7 @@ interface AppContextType {
   // List Context
   activeListType: string;
   setActiveListType: (type: string) => void;
+  progressMap: Record<string, ProgressStatus>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -52,17 +59,21 @@ interface CacheData {
 }
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(state => state.auth.user);
+  const profile = useAppSelector(state => state.auth.profile);
+  const isAuthLoading = useAppSelector(state => state.auth.isAuthLoading);
+  const hasPremiumAccess = useAppSelector(state => state.auth.hasPremiumAccess);
+  const userAlgorithmData = useAppSelector(state => state.userProgress.data);
+  const isUserDataLoading = useAppSelector(state => state.userProgress.isLoading);
+  const progressMap = useAppSelector(state => state.userProgress.progressMap);
+
+  const queryClient = useQueryClient();
   
   // Track in-flight profile fetch to avoid redundant calls
   const profileFetchInProgress = React.useRef<string | null>(null);
 
   const [isAlgorithmsLoading, setIsAlgorithmsLoading] = useState(false);
-
-  const [userAlgorithmData, setUserAlgorithmData] = useState<UserAlgorithmData[]>([]);
-  const [isUserDataLoading, setIsUserDataLoading] = useState(false);
 
   const [activeListType, setActiveListType] = useState<string>(() => {
     return localStorage.getItem('rulcode_active_list_type') || 'all';
@@ -90,32 +101,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
         .maybeSingle();
 
       if (error) throw error;
-      setProfile(data as any as Profile);
+      dispatch(setProfile(data as any as Profile));
     } catch (error) {
       console.error('Error fetching profile:', error);
     } finally {
       profileFetchInProgress.current = null;
     }
-  }, []);
+  }, [dispatch]);
 
-  const hasPremiumAccess = React.useMemo(() => {
-    if (!profile) return false;
-
-    if (profile.subscription_status === 'active') {
-      // Even if active, if we have an end date that passed, respect it
-      if (profile.current_period_end && new Date(profile.current_period_end) < new Date()) {
-        return false;
-      }
-      return true;
-    }
-
-    // Handle Grace period for canceled subscriptions
-    if ((profile.subscription_status === 'canceled' || profile.cancel_at_period_end) && profile.current_period_end) {
-      return new Date(profile.current_period_end) > new Date();
-    }
-
-    return false;
-  }, [profile]);
+  // hasPremiumAccess and progressMap are now computed in Redux slices
 
   const activateTrial = async () => {
     if (!user || !profile) return;
@@ -151,22 +145,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
 // Fetch user algorithm data
-const fetchUserData = async () => {
+const fetchUserData = useCallback(async () => {
   if (!user) {
-    setUserAlgorithmData([]);
+    dispatch(setProgressData([]));
     return;
   }
 
   try {
-    setIsUserDataLoading(true);
     const data = await getAllUserAlgorithmData(user.id);
-    setUserAlgorithmData(data);
+    dispatch(setProgressData(data));
   } catch (error) {
     console.error('Error fetching user data:', error);
-  } finally {
-    setIsUserDataLoading(false);
   }
-};
+}, [user, dispatch]);
 
 // Initialize auth
 useEffect(() => {
@@ -182,11 +173,11 @@ useEffect(() => {
     const { data: { session } } = await supabase.auth.getSession();
     if (mounted) {
       const currentUser = session?.user ?? null;
-      setUser(currentUser);
+      dispatch(setUser(currentUser));
       if (currentUser) {
         fetchProfile(currentUser.id);
       }
-      setIsAuthLoading(false);
+      dispatch(setAuthLoading(false));
     }
   };
 
@@ -196,16 +187,14 @@ useEffect(() => {
     if (!mounted) return;
     
     const currentUser = session?.user ?? null;
-    setUser(currentUser);
+    dispatch(setUser(currentUser));
     
     if (currentUser) {
-      // Only fetch profile on specific events to avoid redundant calls at boot
-      // SIGNED_IN covers INITIAL_SESSION usually, but we also handle it in initSession
       if (event === 'SIGNED_IN' || event === 'USER_UPDATED' || event === 'TOKEN_REFRESHED') {
         fetchProfile(currentUser.id);
       }
     } else {
-      setProfile(null);
+      dispatch(setProfile(null));
     }
   });
 
@@ -213,7 +202,7 @@ useEffect(() => {
     mounted = false;
     subscription.unsubscribe();
   };
-}, [fetchProfile]);
+}, [fetchProfile, dispatch]);
 
 // Fetch algorithms on mount (Removed to avoid redundancy with React Query prefetch in App.tsx)
 // useEffect(() => {
@@ -221,9 +210,9 @@ useEffect(() => {
 // }, []);
 
 // Fetch user data when user changes
-// useEffect(() => {
-//   fetchUserData();
-// }, [user]);
+useEffect(() => {
+  fetchUserData();
+}, [user, fetchUserData]);
 
 // Subscribe to user_algorithm_data changes
 useEffect(() => {
@@ -239,9 +228,13 @@ useEffect(() => {
         table: 'user_algorithm_data',
         filter: `user_id=eq.${user.id}`,
       },
-      () => {
-        // Refetch user data when changes occur
-        fetchUserData();
+      (payload: any) => {
+        // Optimistically/Reactively update user data without a full re-fetch
+        if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+          dispatch(updateProgressItem(payload.new as UserAlgorithmData));
+        } else if (payload.eventType === 'DELETE') {
+          dispatch(removeProgressItem(payload.old.algorithm_id));
+        }
       }
     )
     .subscribe();
@@ -264,6 +257,7 @@ const value: AppContextType = {
   activateTrial,
   activeListType,
   setActiveListType: updateActiveListType,
+  progressMap,
 };
 
 return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

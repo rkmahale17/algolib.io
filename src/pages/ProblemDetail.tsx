@@ -42,7 +42,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { ProblemSidebar } from "@/components/ProblemSidebar";
-import { useUserProgressMap, useAlgorithms } from "@/hooks/useAlgorithms";
+import { useAlgorithms } from "@/hooks/useAlgorithms";
 
 
 const ProblemDetail: React.FC = () => {
@@ -54,7 +54,7 @@ const ProblemDetail: React.FC = () => {
 
   // -- Data Fetching State --
   const { data: algorithm, isLoading: isLoadingAlgorithm } = useAlgorithm(algorithmIdOrSlug);
-  const { user, hasPremiumAccess, activeListType } = useApp();
+  const { user, hasPremiumAccess, activeListType, progressMap } = useApp();
   const { data: algorithmsData, isLoading: isAlgorithmsLoading } = useAlgorithms();
   const allAlgorithms = algorithmsData?.algorithms || [];
   const isPaywallEnabled = useFeatureFlag('paywall_enabled');
@@ -77,7 +77,6 @@ const ProblemDetail: React.FC = () => {
     enabled: !!user && !!algorithmIdOrSlug,
   });
 
-  const { data: progressMap } = useUserProgressMap(user?.id);
 
   const filteredAlgorithms = useMemo(() => {
     if (!allAlgorithms) return [];

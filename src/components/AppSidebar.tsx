@@ -144,7 +144,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <div className="flex items-center gap-3 w-full">
                     <Link to="/" className="flex items-center gap-2 shrink-0 group-data-[collapsible=icon]:mx-auto">
                         <img src={logo} alt="RulCode Logo" className="w-5 h-5 transition-all" />
-                        <span className="font-bold text-[15px] tracking-tight group-data-[collapsible=icon]:hidden">rulcode</span>
+                        <span className="font-medium text-[15px] tracking-tight group-data-[collapsible=icon]:hidden">rulcode</span>
                     </Link>
                     <div className="h-4 w-[1px] bg-border/80 group-data-[collapsible=icon]:hidden"></div>
                     <span className="flex items-center gap-1 text-[13px] text-muted-foreground group-data-[collapsible=icon]:hidden">
@@ -183,7 +183,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                                         </SidebarMenuButton>
                                                     </HoverCardTrigger>
                                                     <HoverCardContent side="right" align="start" sideOffset={15} className="w-[260px] flex flex-col rounded-xl border border-border bg-popover text-popover-foreground shadow-lg p-1.5 py-2 z-[100]">
-                                                        <div className="text-xs font-semibold px-3 py-1 text-foreground border-b border-border/40 mb-1">{item.title}</div>
+                                                        <div className="text-xs font-medium px-3 py-1 text-foreground border-b border-border/40 mb-1">{item.title}</div>
                                                         {item.items?.map((subItem) => (
                                                             <Link key={subItem.title} to={subItem.url} className="flex items-center justify-between gap-3 cursor-pointer rounded-md p-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors group/sub">
                                                                 <div className="flex flex-col gap-0.5">
@@ -245,7 +245,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             <CodeIcon className="w-6 h-6 text-white" />
                         </div>
                         <div className="flex flex-col mt-0.5">
-                            <span className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider mb-0.5">Sponsored</span>
+                            <span className="text-[10px] uppercase font-medium text-muted-foreground tracking-wider mb-0.5">Sponsored</span>
                             <span className="text-xs font-medium leading-tight text-foreground group-hover:underline decoration-border underline-offset-2">
                                 30% off the fastest way to learn front end skills &rarr;
                             </span>
@@ -253,7 +253,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     </Link>
 
                     <Link to="#" className="group flex items-start gap-3 rounded-lg overflow-hidden border border-border bg-card hover:bg-muted/50 transition-colors p-3">
-                        <div className="w-12 shrink-0 flex items-center justify-center font-bold text-sm bg-transparent border-0">
+                        <div className="w-12 shrink-0 flex items-center justify-center font-medium text-sm bg-transparent border-0">
                             20% off
                         </div>
                         <div className="flex flex-col mt-0.5 border-l border-border/50 pl-3">

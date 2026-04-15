@@ -9,7 +9,7 @@ interface CompanyIconProps {
 }
 
 /**
- * CompanyIcon component that loads brand icons from svgl.app with a fallback to simpleicons.org.
+ * CompanyIcon component that loads brand icons locally.
  * Implements deferred loading to ensure icons do not affect initial page load times.
  */
 export const CompanyIcon: React.FC<CompanyIconProps> = ({ company, className, forceLoad = false }) => {
@@ -20,13 +20,8 @@ export const CompanyIcon: React.FC<CompanyIconProps> = ({ company, className, fo
   );
 
   const iconSlug = compConfig?.iconSlug || company.toLowerCase().replace(/\s+/g, '');
-  const svglSlug = compConfig?.svglSlug || compConfig?.iconSlug || company.toLowerCase().replace(/\s+/g, '-');
-
   const localSrc = `/icons/companies/${iconSlug}.svg`;
-  const svglSrc = `https://api.svgl.app/static/icons/${svglSlug}.svg`;
-  const simpleiconSrc = `https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/${iconSlug}.svg`;
 
-  const [imgSrc, setImgSrc] = useState(localSrc);
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
@@ -40,7 +35,6 @@ export const CompanyIcon: React.FC<CompanyIconProps> = ({ company, className, fo
   }, [forceLoad]);
 
   useEffect(() => {
-    setImgSrc(localSrc);
     setHasError(false);
   }, [localSrc]);
 
@@ -48,22 +42,16 @@ export const CompanyIcon: React.FC<CompanyIconProps> = ({ company, className, fo
     return <div className={cn("shrink-0 bg-muted/10 rounded-sm", className)} />;
   }
 
+  if (hasError) return null;
+
   return (
     <img
-      src={imgSrc}
+      src={localSrc}
       alt={company}
       className={cn("object-contain dark:invert dark:hue-rotate-180 dark:brightness-[1.2]", className)}
       loading="lazy"
       onError={() => {
-        if (imgSrc === localSrc) {
-          // Fallback 1: svgl.app
-          setImgSrc(svglSrc);
-        } else if (imgSrc === svglSrc) {
-          // Fallback 2: simpleicons
-          setImgSrc(simpleiconSrc);
-        } else {
-          setHasError(true);
-        }
+        setHasError(true);
       }}
       style={{ display: hasError ? 'none' : 'block' }}
     />

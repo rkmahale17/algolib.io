@@ -265,6 +265,29 @@
   }
 }
 
+@keyframes shutter {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.shutter-click {
+  transition: transform 0.1s ease-in-out;
+}
+
+.shutter-click:active {
+  animation: shutter 0.2s ease-in-out;
+}
+
 /* Thin scrollbar styling */
 .scrollbar-thin::-webkit-scrollbar {
   width: 6px;
@@ -345,7 +368,7 @@
   margin-top: 1rem;
   margin-bottom: 1rem;
   line-height: 1.75;
-  font-size: 0.9rem;
+  font-size: 0.9375rem;
 }
 
 /* Paragraph after heading - reduce top margin */

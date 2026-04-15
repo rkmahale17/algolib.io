@@ -338,7 +338,7 @@ export async function getAllUserAlgorithmData(
 
     const { data, error } = await supabase
         .from('user_algorithm_data')
-        .select('algorithm_id, completed, submissions')
+        .select('id, algorithm_id, completed, submissions')
         .eq('user_id', userId);
 
     if (error) {

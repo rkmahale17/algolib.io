@@ -3,6 +3,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { AlgorithmListItem } from "@/types/algorithm";
 import { getAllUserAlgorithmData } from "@/utils/userAlgorithmDataHelpers";
 
+import { useMemo } from 'react';
+import { useAppSelector } from '@/store/hooks';
+
 export interface PaginatedAlgorithmsResult {
     algorithms: AlgorithmListItem[];
     totalCount: number;
@@ -11,76 +14,47 @@ export interface PaginatedAlgorithmsResult {
     totalPages: number;
 }
 
-export const fetchAlgorithms = async (search?: string, category?: string): Promise<PaginatedAlgorithmsResult> => {
-    let query = supabase.from("algorithms").select(`
-        id,
-        name,
-        title,
-        difficulty,
-        category,
-        list_type,
-        description,
-        time_complexity,
-        space_complexity,
-        serial_no,
-        metadata
-    `);
-
-    if (search) {
-        query = query.or(`title.ilike.%${search}%,name.ilike.%${search}%`);
-    }
-
-    if (category && category !== 'all') {
-        query = query.eq('category', category);
-    }
-
-    query = query.order("serial_no", { ascending: true, nullsFirst: false });
-
-    const { data, error } = await query;
-
-    if (error) {
-        throw new Error(error.message || 'Failed to fetch algorithms');
-    }
-
-    const algorithms = (data || []).map((algo: any) => ({
-        id: algo.id,
-        title: algo.title || algo.name,
-        name: algo.name,
-        category: algo.category,
-        difficulty: algo.difficulty,
-        description: algo.description,
-        timeComplexity: algo.time_complexity,
-        spaceComplexity: algo.space_complexity,
-        slug: algo.id,
-        listType: algo.list_type,
-        serial_no: algo.serial_no,
-        metadata: algo.metadata,
-    }));
-
-    return {
-        algorithms,
-        totalCount: algorithms.length,
-        hasMore: false,
-        currentPage: 1,
-        totalPages: 1
-    };
-};
-
 export const useAlgorithms = (
     search?: string,
     category?: string,
     page: number = 1,
     pageSize: number = 20
 ) => {
-    return useQuery({
-        queryKey: ["algorithms", search, category],
-        queryFn: () => fetchAlgorithms(search, category),
-        staleTime: 1000 * 60 * 60 * 12, // 12 hours
-        gcTime: 1000 * 60 * 60 * 12, // 12 hours
-        refetchOnWindowFocus: false,
-        placeholderData: (previousData) => previousData,
-    });
+    const { items, isLoading, error } = useAppSelector(state => state.algorithms);
+
+    const data = useMemo(() => {
+        if (!items || items.length === 0) return null;
+
+        let filtered = items;
+        
+        if (search) {
+            const lowerSearch = search.toLowerCase();
+            filtered = filtered.filter(item => 
+                item.title.toLowerCase().includes(lowerSearch) || 
+                item.name.toLowerCase().includes(lowerSearch)
+            );
+        }
+
+        if (category && category !== 'all') {
+            filtered = filtered.filter(item => item.category === category);
+        }
+
+        return {
+            algorithms: filtered,
+            totalCount: filtered.length,
+            hasMore: false,
+            currentPage: 1,
+            totalPages: 1
+        };
+    }, [items, search, category]);
+
+    return {
+        data,
+        isLoading,
+        error
+    };
 };
+
 
 export const useCategories = () => {
     return useQuery({
@@ -102,31 +76,6 @@ export const useCategories = () => {
 
 export type ProgressStatus = 'solved' | 'attempted' | 'none';
 
-export const useUserProgressMap = (userId?: string) => {
-    return useQuery({
-        queryKey: ["userProgressMap", userId],
-        queryFn: async (): Promise<Record<string, ProgressStatus>> => {
-            if (!userId) return {};
-
-            const data = await getAllUserAlgorithmData(userId);
-            const map: Record<string, ProgressStatus> = {};
-
-            data.forEach(item => {
-                if (item.completed) {
-                    map[item.algorithm_id] = 'solved';
-                } else if (item.submissions && Array.isArray(item.submissions) && item.submissions.length > 0) {
-                    map[item.algorithm_id] = 'attempted';
-                } else {
-                    map[item.algorithm_id] = 'none';
-                }
-            });
-
-            return map;
-        },
-        enabled: !!userId,
-        staleTime: 1000 * 60 * 5, // 5 minutes
-    });
-};
 
 
 

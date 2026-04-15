@@ -4,6 +4,8 @@ import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { UserAlgorithmData } from '@/types/userAlgorithmData';
 import { getUserAlgorithmData } from '@/utils/userAlgorithmDataHelpers';
+import { useAppDispatch } from '@/store/hooks';
+import { updateProgressItem, removeProgressItem } from '@/store/slices/userProgressSlice';
 
 interface UseUserAlgorithmDataOptions {
     userId: string | undefined;
@@ -19,7 +21,7 @@ export function useUserAlgorithmData({
     const [data, setData] = useState<UserAlgorithmData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
-
+    const dispatch = useAppDispatch();
 
     // Fetch data
     useEffect(() => {
@@ -32,15 +34,16 @@ export function useUserAlgorithmData({
 
         const fetchData = async () => {
             try {
-                // Reset data to null immediately when re-fetching to avoid stale state
-                // setData(null); 
                 setLoading(true);
-                // console.log(`[useUserAlgorithmData] Fetching data for algo: ${algorithmId} user: ${userId}`);
                 const result = await getUserAlgorithmData(userId, algorithmId);
 
                 if (isMounted) {
                     setData(result);
                     setError(null);
+                    // Sync into global Redux store
+                    if (result) {
+                        dispatch(updateProgressItem(result));
+                    }
                 }
             } catch (err) {
                 if (isMounted) {
@@ -58,7 +61,7 @@ export function useUserAlgorithmData({
         return () => {
             isMounted = false;
         };
-    }, [userId, algorithmId, enabled]);
+    }, [userId, algorithmId, enabled, dispatch]);
 
     // Set up real-time subscription
     useEffect(() => {
@@ -78,9 +81,13 @@ export function useUserAlgorithmData({
                 },
                 (payload) => {
                     if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
-                        setData(payload.new as UserAlgorithmData);
+                        const newData = payload.new as UserAlgorithmData;
+                        setData(newData);
+                        // 🔑 Dispatch to global Redux store so all list pages update immediately
+                        dispatch(updateProgressItem(newData));
                     } else if (payload.eventType === 'DELETE') {
                         setData(null);
+                        dispatch(removeProgressItem(algorithmId));
                     }
                 }
             )
@@ -89,21 +96,24 @@ export function useUserAlgorithmData({
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [userId, algorithmId, enabled]);
+    }, [userId, algorithmId, enabled, dispatch]);
 
     // Refetch function
     const refetch = useCallback(async () => {
         if (!userId) return;
 
         try {
-            // Don't set loading to true for background refetches to avoid UI flicker
             const result = await getUserAlgorithmData(userId, algorithmId);
             setData(result);
             setError(null);
+            // Sync into global Redux store on manual refetch too
+            if (result) {
+                dispatch(updateProgressItem(result));
+            }
         } catch (err) {
             setError(err as Error);
         }
-    }, [userId, algorithmId]);
+    }, [userId, algorithmId, dispatch]);
 
     return {
         data,
@@ -112,3 +122,5 @@ export function useUserAlgorithmData({
         refetch,
     };
 }
+
+

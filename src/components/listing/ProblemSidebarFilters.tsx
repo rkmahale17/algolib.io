@@ -8,15 +8,6 @@ import { useApp } from "@/contexts/AppContext";
 import { TOP_COMPANIES } from "@/constants/companies";
 import { CompanyIcon } from "@/components/CompanyIcon";
 
-const TOPICS = [
-    "OOP", "Accessibility", "React Hooks", "Networking", "Array", "Async",
-    "Breadth-first search", "Binary", "Binary search", "Binary search tree",
-    "Binary tree", "Closure", "Depth-first search", "Dynamic programming",
-    "Graph", "Greedy", "Heap", "Intervals", "Linked list", "Matrix",
-    "Queue", "Recursion", "Sorting", "Stack", "String", "Topological sort",
-    "Tree", "Trie", "Web APIs"
-];
-
 interface FilterSectionProps {
     title: string;
     items: string[];
@@ -39,7 +30,7 @@ const FilterSection = ({ title, items, selectedItems, onToggle, columns = 2, has
                     {hasInfo && <HelpCircle className="w-3.5 h-3.5 text-muted-foreground/40" />}
                 </div>
                 {isPremium && (
-                    <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide flex items-center gap-1">
+                    <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 text-[10px] font-medium px-2 py-0.5 uppercase tracking-wide flex items-center gap-1">
                         <Lock className="w-2.5 h-2.5" />
                         Pro
                     </Badge>
@@ -65,7 +56,7 @@ const FilterSection = ({ title, items, selectedItems, onToggle, columns = 2, has
                             id={item}
                             checked={selectedItems.includes(item)}
                             onCheckedChange={() => onToggle(item)}
-                            className="w-5 h-5 rounded-md border-foreground/30 border-2 bg-background shadow-none data-[state=checked]:bg-[#dfff5e] data-[state=checked]:border-[#dfff5e] data-[state=checked]:text-black"
+                            className="w-3.5 h-3.5 rounded-none border-foreground/30 border bg-background shadow-none data-[state=checked]:bg-[#dfff5e] data-[state=checked]:border-[#dfff5e] data-[state=checked]:text-black"
                         />
                         <div className="flex items-center gap-2.5 flex-1 cursor-pointer">
                             {title === "Companies" && (
@@ -76,7 +67,7 @@ const FilterSection = ({ title, items, selectedItems, onToggle, columns = 2, has
                             )}
                             <Label
                                 htmlFor={item}
-                                className="text-[14px] font-medium leading-none text-muted-foreground/90 group-hover/item:text-foreground transition-colors cursor-pointer"
+                                className="text-xs font-normal leading-none text-muted-foreground/90 group-hover/item:text-foreground transition-colors cursor-pointer"
                             >
                                 {item}
                             </Label>
@@ -106,7 +97,7 @@ export const ProblemSidebarFilters = ({
     companies
 }: ProblemSidebarFiltersProps) => {
     const { hasPremiumAccess } = useApp();
-    const displayTopics = topics && topics.length > 0 ? topics : TOPICS;
+    const displayTopics = topics || [];
     const displayCompanies = companies && companies.length > 0 ? companies : [];
 
     return (
@@ -146,11 +137,11 @@ export const ProblemSidebarFilters = ({
                                 <div key={diff} className="flex items-center space-x-3 group cursor-pointer group/item">
                                     <Checkbox
                                         id={diff}
-                                        className="w-5 h-5 rounded-md border-foreground/30 border-2 bg-background shadow-none data-[state=checked]:bg-[#dfff5e] data-[state=checked]:border-[#dfff5e] data-[state=checked]:text-black"
+                                        className="w-3.5 h-3.5 rounded-none border-foreground/30 border bg-background shadow-none data-[state=checked]:bg-[#dfff5e] data-[state=checked]:border-[#dfff5e] data-[state=checked]:text-black"
                                     />
                                     <Label
                                         htmlFor={diff}
-                                        className="text-[14px] font-medium leading-none text-muted-foreground/90 group-hover/item:text-foreground transition-colors cursor-pointer"
+                                        className="text-xs font-normal leading-none text-muted-foreground/90 group-hover/item:text-foreground transition-colors cursor-pointer"
                                     >
                                         {diff}
                                     </Label>

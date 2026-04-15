@@ -46,12 +46,12 @@ export const ProblemFilterPopup = ({ filters, setFilters, trigger, topics = [] }
                 <Checkbox
                     id={id}
                     checked={value !== 'all'}
-                    className="h-4 w-4 border-muted-foreground/30 data-[state=checked]:bg-foreground data-[state=checked]:text-background"
+                    className="h-3.5 w-3.5 rounded-none border border-muted-foreground/30 data-[state=checked]:bg-foreground data-[state=checked]:text-background"
                 />
                 <div className="text-muted-foreground/60 group-hover:text-foreground transition-colors">
                     {icon}
                 </div>
-                <label htmlFor={id} className="text-[11px] font-semibold text-muted-foreground/80 group-hover:text-foreground cursor-pointer whitespace-nowrap uppercase tracking-wider">
+                <label htmlFor={id} className="text-[11px] font-normal text-muted-foreground/80 group-hover:text-foreground cursor-pointer whitespace-nowrap uppercase tracking-wider">
                     {label}
                 </label>
             </div>

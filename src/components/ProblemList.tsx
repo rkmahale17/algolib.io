@@ -9,8 +9,6 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ListType, LIST_TYPE_LABELS, DIFFICULTY_MAP, AlgorithmListItem } from '@/types/algorithm';
-import { useUserProgressMap } from '@/hooks/useAlgorithms';
-import { supabase } from '@/integrations/supabase/client';
 import { useApp } from '@/contexts/AppContext';
 import { useFeatureFlag } from '@/contexts/FeatureFlagContext';
 import { cn } from '@/lib/utils';
@@ -73,30 +71,16 @@ export const ProblemList = ({
     const savedMode = localStorage.getItem('problem-list-view-mode');
     return (savedMode === 'list' || savedMode === 'grid') ? savedMode : 'grid';
   });
-  const [userId, setUserId] = useState<string | undefined>(undefined);
-
-  const { hasPremiumAccess } = useApp();
+  const { hasPremiumAccess, activeListType, setActiveListType, progressMap, user } = useApp();
   const isPaywallEnabled = useFeatureFlag('paywall_enabled');
 
-  // Get current user for progress tracking
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUserId(session?.user?.id);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUserId(session?.user?.id);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+  // userId state and effect no longer needed, using user.id from AppContext
+  const userId = user?.id;
 
   // Persist view mode to localStorage
   useEffect(() => {
     localStorage.setItem('problem-list-view-mode', viewMode);
   }, [viewMode]);
-
-  const { activeListType, setActiveListType } = useApp();
 
   // Sync global list context when this component is the primary list for a page
   useEffect(() => {
@@ -105,8 +89,6 @@ export const ProblemList = ({
       setActiveListType(listTypeToSet);
     }
   }, [defaultListType, activeListType, setActiveListType, hideListSelection]);
-
-  const { data: progressMap } = useUserProgressMap(userId);
 
   // Extract unique categories
   const categories = useMemo(() => {

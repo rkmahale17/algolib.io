@@ -5,6 +5,8 @@ import { HelmetProvider } from "react-helmet-async";
 import { createRoot } from "react-dom/client";
 import posthog from "posthog-js";
 import { PostHogErrorBoundary, PostHogProvider } from "@posthog/react";
+import { Provider } from 'react-redux';
+import { store } from './store';
 
 // Only initialize PostHog on production domain (rulcode.com)
 const isProduction =
@@ -61,7 +63,9 @@ createRoot(document.getElementById("root")!).render(
   <PostHogProvider client={posthog}>
     <PostHogErrorBoundary>
       <HelmetProvider>
-        <App />
+        <Provider store={store}>
+          <App />
+        </Provider>
       </HelmetProvider>
     </PostHogErrorBoundary>
   </PostHogProvider>

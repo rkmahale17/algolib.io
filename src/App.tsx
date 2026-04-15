@@ -8,7 +8,6 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { PremiumLoader } from "@/components/PremiumLoader";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { useEffect } from "react";
-import { fetchAlgorithms } from "@/hooks/useAlgorithms";
 
 // Eager load Home for best LCP
 import Home from "./pages/Home";
@@ -63,8 +62,10 @@ import { FeatureProtectedRoute } from "./components/FeatureProtectedRoute";
 import { AppProvider, useApp } from "./contexts/AppContext";
 import { MotivationCenter } from "./components/MotivationCenter";
 import { FloatingFeedback } from "./components/FloatingFeedback";
-import { PromoBanner } from "./components/PromoBanner";
 // import ComplexityCard from "./components/complexity/ComplexityCard"; // Unused in routes currently, checking usage
+
+import { useAppDispatch } from "./store/hooks";
+import { fetchAllAlgorithms } from "./store/slices/algorithmsSlice";
 
 const queryClient = new QueryClient();
 
@@ -91,19 +92,14 @@ const AppContent = () => {
   const { refreshProfile, user } = useApp();
   const isMaintenanceMode = flags['maintenance_mode'] ?? false;
   const location = useLocation();
-  const queryClient = useQueryClient();
+  const dispatch = useAppDispatch();
 
   // Background pre-fetch algorithms (non-blocking)
   // We wait for flags to load first as requested
   useEffect(() => {
     if (isLoadingFlags) return;
-
-    queryClient.prefetchQuery({
-      queryKey: ["algorithms", undefined, undefined],
-      queryFn: () => fetchAlgorithms(),
-      staleTime: 1000 * 60 * 60 * 12, // 12 hours
-    });
-  }, [queryClient, isLoadingFlags]);
+    dispatch(fetchAllAlgorithms());
+  }, [dispatch, isLoadingFlags]);
 
   // Initialize Dodo Payments
   useEffect(() => {
@@ -125,13 +121,11 @@ const AppContent = () => {
     <>
       {isMaintenanceActive ? (
         <>
-          <PromoBanner />
           <Navbar />
           <MaintenancePage />
         </>
       ) : (
         <>
-          <PromoBanner />
           <ConditionalNavbar />
           <Suspense fallback={<PremiumLoader text="Loading..." />}>
             <Routes>
@@ -140,7 +134,7 @@ const AppContent = () => {
 
               <Route path="/dsa/blind-75" element={
                 <FeatureProtectedRoute flag="blind_75">
-                  <ProtectedRoute><Blind75 /></ProtectedRoute>
+                  <Blind75 />
                 </FeatureProtectedRoute>
               } />
               <Route path="/problem/:slug" element={

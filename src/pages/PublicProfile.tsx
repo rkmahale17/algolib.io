@@ -418,6 +418,7 @@ const PublicProfile = () => {
                     easySolved={stats.easySolved} easyTotal={stats.easyTotal}
                     mediumSolved={stats.mediumSolved} mediumTotal={stats.mediumTotal}
                     hardSolved={stats.hardSolved} hardTotal={stats.hardTotal}
+                    variant="vertical"
                   />
                 </div>
               </div>

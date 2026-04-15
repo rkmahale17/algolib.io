@@ -32,6 +32,19 @@ import { Link } from "react-router-dom";
 import { FAQ } from "@/components/FAQ";
 import { FeaturedSection } from "@/components/FeaturedSection";
 import { Footer } from "@/components/Footer";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Helmet } from "react-helmet-async";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
@@ -101,7 +114,7 @@ const Home = () => {
         {/* Hero Section */}
         <div className="relative pt-20 pb-4 lg:pt-32 lg:pb-8 overflow-hidden">
           <div className="container mx-auto px-4 relative z-10">
-            <div className="max-w-4xl animate-in fade-in slide-in-from-bottom duration-1000">
+            <div className="md:max-w-[80%] mx-auto animate-in fade-in slide-in-from-bottom duration-1000">
               {/* Removed pill-badge as requested */}
 
               <h1 className="hero-title mb-8">
@@ -151,7 +164,7 @@ const Home = () => {
           <Suspense
             fallback={
               <div className="container mx-auto px-4">
-                <div className="w-full lg:w-[70%] mx-auto h-[600px] bg-gray-50 dark:bg-[#0A0A0A] border border-gray-100 dark:border-zinc-800 flex items-center justify-center">
+                <div className="w-full md:w-[80%] mx-auto h-[600px] bg-gray-50 dark:bg-[#0A0A0A] border border-gray-100 dark:border-zinc-800 flex items-center justify-center">
                   <Loader2 className="w-8 h-8 animate-spin text-primary" />
                 </div>
               </div>
@@ -159,6 +172,102 @@ const Home = () => {
           >
             <PlatformPreview />
           </Suspense>
+        </section>
+
+        {/* Interviews Section */}
+        <section className="py-24 relative overflow-hidden">
+          {/* Background Pattern */}
+          <div className="absolute inset-0 z-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none" 
+               style={{ 
+                 backgroundImage: 'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)', 
+                 backgroundSize: '40px 40px' 
+               }}></div>
+          
+          <div className="container mx-auto px-4 relative z-10">
+            <Tabs defaultValue="interviews" className="w-full">
+              <div className="flex justify-center mb-12">
+                <TabsList className="bg-gray-100/50 dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 p-1 rounded-full h-12">
+                  <TabsTrigger value="interviews" className="rounded-full px-8 text-base font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:shadow-md transition-all">
+                    Interviews
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+
+              <TabsContent value="interviews" className="mt-0 focus-visible:ring-0">
+                <div className="max-w-6xl mx-auto">
+                  <div className="text-center mb-16">
+                    <h2 className="text-4xl md:text-5xl font-medium tracking-tight mb-4 text-gray-900 dark:text-white">
+                      DSA
+                    </h2>
+                    <p className="text-gray-500 dark:text-gray-400 text-lg max-w-2xl mx-auto font-medium">
+                      Master Data Structures & Algorithms with our curated learning paths designed for modern technical interviews.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                    {/* Core Problems Card */}
+                    <Link to="/dsa/core-patterns" className="group">
+                      <Card className="h-full bg-white dark:bg-zinc-900/50 border-gray-100 dark:border-zinc-800 hover:border-primary/30 transition-all duration-300 group-hover:shadow-2xl group-hover:shadow-primary/5 group-hover:-translate-y-1 overflow-hidden">
+                        <CardHeader className="pb-4">
+                          <div className="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center mb-4 border border-orange-500/20 group-hover:bg-orange-500 group-hover:text-white transition-colors duration-300">
+                            <Layers className="w-6 h-6" />
+                          </div>
+                          <CardTitle className="text-2xl font-medium group-hover:text-orange-500 transition-colors">Core Problems</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <CardDescription className="text-base text-gray-500 dark:text-gray-400 leading-relaxed">
+                            Master the 15 essential patterns that form the foundation of almost every technical interview.
+                          </CardDescription>
+                        </CardContent>
+                      </Card>
+                    </Link>
+
+                    {/* Blind 75 Card */}
+                    <Link to="/dsa/blind-75" className="group">
+                      <Card className="h-full bg-white dark:bg-zinc-900/50 border-gray-100 dark:border-zinc-800 hover:border-primary/30 transition-all duration-300 group-hover:shadow-2xl group-hover:shadow-primary/5 group-hover:-translate-y-1 overflow-hidden">
+                        <CardHeader className="pb-4">
+                          <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center mb-4 border border-blue-500/20 group-hover:bg-blue-500 group-hover:text-white transition-colors duration-300">
+                            <Trophy className="w-6 h-6" />
+                          </div>
+                          <CardTitle className="text-2xl font-medium group-hover:text-blue-500 transition-colors">Blind 75</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <CardDescription className="text-base text-gray-500 dark:text-gray-400 leading-relaxed">
+                            The definitive list of 75 most essential problems curated for top-tier FAANG preparation.
+                          </CardDescription>
+                        </CardContent>
+                      </Card>
+                    </Link>
+
+                    {/* All Problems Card */}
+                    <Link to="/dsa/problems" className="group">
+                      <Card className="h-full bg-white dark:bg-zinc-900/50 border-gray-100 dark:border-zinc-800 hover:border-primary/30 transition-all duration-300 group-hover:shadow-2xl group-hover:shadow-primary/5 group-hover:-translate-y-1 overflow-hidden">
+                        <CardHeader className="pb-4">
+                          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 border border-primary/20 group-hover:bg-primary group-hover:text-black transition-colors duration-300">
+                            <Globe className="w-6 h-6" />
+                          </div>
+                          <CardTitle className="text-2xl font-medium group-hover:text-primary transition-colors">All Problems</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <CardDescription className="text-base text-gray-500 dark:text-gray-400 leading-relaxed">
+                            Explore our comprehensive library of 140+ algorithmic challenges with multi-language support.
+                          </CardDescription>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  </div>
+
+                  <div className="flex justify-center">
+                    <Button size="lg" className="rounded-full px-8 py-6 text-base bg-primary hover:bg-primary/90 text-black transition-all hover:scale-105 active:scale-95 shadow-xl shadow-primary/20" asChild>
+                      <Link to="/dsa/get-started">
+                        Get Started <ArrowRight className="ml-2 w-5 h-5" />
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
         </section>
 
         {/* Crafting Section */}

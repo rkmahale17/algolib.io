@@ -30,6 +30,8 @@ interface ListingLayoutProps {
         count: number;
         hours?: number;
     };
+    progressWidget?: ReactNode;
+    icon?: any;
 }
 
 export const ListingLayout = ({
@@ -50,15 +52,17 @@ export const ListingLayout = ({
     isCategoryWise,
     onCategoryWiseChange,
     children,
-    stats
+    stats,
+    progressWidget,
+    icon
 }: ListingLayoutProps) => {
     const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
 
     const FilterContent = () => (
         <div className="space-y-8 h-fit pb-12">
             <div className="space-y-1 xl-listing:block hidden">
-                <h2 className="text-lg font-bold">Filters</h2>
-                <p className="text-xs text-muted-foreground">Narrow down by topic or difficulty</p>
+                <h2 className="text-lg font-medium">Filters</h2>
+                <p className="text-md text-muted-foreground">Narrow down by topic or difficulty</p>
             </div>
 
             <ProblemSidebarFilters
@@ -83,9 +87,16 @@ export const ListingLayout = ({
                                 title={title}
                                 description={description}
                                 showRecommendation={showRecommendation}
+                                icon={icon}
                             />
 
                             <div className="space-y-6">
+                                {progressWidget && (
+                                    <div className="w-full max-w-[300px]">
+                                        {progressWidget}
+                                    </div>
+                                )}
+
                                 <SearchSortBar
                                     searchQuery={searchQuery}
                                     onSearchChange={onSearchChange}
@@ -104,7 +115,7 @@ export const ListingLayout = ({
                                                 </SheetTrigger>
                                                 <SheetContent side="right" className="w-full sm:w-[540px] p-0 flex flex-col h-full border-l border-border/40 shadow-2xl">
                                                     <SheetHeader className="p-6 border-b border-border/50 shrink-0">
-                                                        <SheetTitle className="text-2xl font-bold tracking-tight">Filters</SheetTitle>
+                                                        <SheetTitle className="text-xl font-medium tracking-tight">Filters</SheetTitle>
                                                     </SheetHeader>
 
                                                     <ScrollArea className="flex-1">

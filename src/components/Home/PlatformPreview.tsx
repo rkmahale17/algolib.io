@@ -31,7 +31,7 @@ export default function PlatformPreview() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+            className="w-full md:max-w-[80%] mx-auto px-4 sm:px-6 lg:px-8"
         >
             <div className="relative group">
                 {/* Glow effect background */}

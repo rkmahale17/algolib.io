@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 interface ProblemHeroProps {
     title: string;
     description: string;
+    icon?: any;
     benefits?: { icon: any; text: string }[];
     showRecommendation?: boolean;
 }
@@ -11,6 +12,7 @@ interface ProblemHeroProps {
 export const ProblemHero = ({
     title,
     description,
+    icon: PageIcon,
     benefits = [
         { icon: BadgeCheck, text: "Questions and solutions by ex-interviewers" },
         { icon: Beaker, text: "Comprehensive test cases" },
@@ -21,10 +23,15 @@ export const ProblemHero = ({
     return (
         <div className="mb-8 md:mb-12 space-y-6 md:space-y-8 animate-in fade-in slide-in-from-top-4 duration-700 w-full break-words">
             <div className="space-y-3 md:space-y-4">
-                <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-foreground break-words">
+                <h1 className="text-xl md:text-xl font-medium tracking-tight text-foreground break-words flex items-center gap-3">
+                    {PageIcon && (
+                        <div className="p-2 rounded-xl bg-primary/5 text-primary border border-primary/10">
+                            <PageIcon className="w-5 h-5" strokeWidth={2.5} />
+                        </div>
+                    )}
                     {title}
                 </h1>
-                <p className="text-base md:text-lg text-muted-foreground max-w-2xl leading-relaxed break-words">
+                <p className="text-md text-muted-foreground max-w-2xl leading-relaxed break-words">
                     {description}
                 </p>
             </div>
@@ -43,7 +50,7 @@ export const ProblemHero = ({
                 })}
             </div>
 
-            <div className="space-y-3 md:space-y-4 text-[14px] md:text-base text-muted-foreground/90 leading-relaxed">
+            <div className="space-y-3 md:space-y-4 text-md text-muted-foreground/90 leading-relaxed">
                 <p>
                     Master the foundational and advanced data structures and algorithms. Practice 150+ curated questions, each with high quality visualizations, multiple language solutions, and optimized complexity analysis.
                 </p>

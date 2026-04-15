@@ -39,6 +39,12 @@ export const CATEGORY_MAP: Record<string, string> = {
   "Interval": "Intervals"
 };
 
+export const normalizeCategory = (cat: string | null | undefined): string => {
+  if (!cat) return 'Other';
+  const trimmed = cat.trim();
+  return CATEGORY_MAP[trimmed] || trimmed;
+};
+
 export const getGroupedByCategory = (algos: any[], searchQuery?: string) => {
     const groups: Record<string, any[]> = {};
     
