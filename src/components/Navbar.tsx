@@ -23,6 +23,10 @@ import {
   BookOpen,
   Code2,
   ListTodo,
+  Rocket,
+  Layers,
+  Target,
+  Brain,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
@@ -208,7 +212,7 @@ const Navbar = () => {
                           onClick={closeMenus}
                         >
                           <div className="p-3 bg-muted/50 rounded-xl group-hover:bg-primary/10 transition-colors border border-border/50 shrink-0">
-                            <Trophy className="w-5 h-5 text-foreground group-hover:text-primary" />
+                            <Rocket className="w-5 h-5 text-foreground group-hover:text-primary" />
                           </div>
                           <div className="flex-1 pr-8">
                             <h4 className="text-[15px] font-semibold mb-1.5 text-foreground group-hover:text-primary transition-colors tracking-tight">Get Started</h4>
@@ -227,7 +231,7 @@ const Navbar = () => {
                           onClick={closeMenus}
                         >
                           <div className="p-3 bg-muted/50 rounded-xl group-hover:bg-primary/10 transition-colors border border-border/50 shrink-0">
-                            <ListTodo className="w-5 h-5 text-foreground group-hover:text-primary" />
+                            <Layers className="w-5 h-5 text-foreground group-hover:text-primary" />
                           </div>
                           <div className="flex-1 pr-8">
                             <h4 className="text-[15px] font-semibold mb-1.5 text-foreground group-hover:text-primary transition-colors tracking-tight">All practice questions</h4>
@@ -247,7 +251,7 @@ const Navbar = () => {
                           onClick={closeMenus}
                         >
                           <div className="p-3 bg-muted/50 rounded-xl group-hover:bg-primary/10 transition-colors border border-border/50 shrink-0">
-                            <BookOpen className="w-5 h-5 text-foreground group-hover:text-primary" />
+                            <Target className="w-5 h-5 text-foreground group-hover:text-primary" />
                           </div>
                           <div className="flex-1 pr-8">
                             <h4 className="text-[15px] font-semibold mb-1.5 text-foreground group-hover:text-primary transition-colors tracking-tight">Core patterns</h4>
@@ -267,7 +271,7 @@ const Navbar = () => {
                           onClick={closeMenus}
                         >
                           <div className="p-3 bg-primary/5 rounded-xl group-hover:bg-primary/10 transition-colors border border-primary/10 shrink-0 text-primary">
-                            <Trophy className="w-5 h-5" />
+                            <Brain className="w-5 h-5" />
                           </div>
                           <div className="flex-1 pr-8">
                             <div className="flex items-center gap-2 mb-1.5">

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useAlgorithms } from "@/hooks/useAlgorithms";
 import { ListType } from "@/types/algorithm";
-import { Rocket, Layers, ChevronRight } from "lucide-react";
+import { Rocket, Layers, ChevronRight, Target, Brain } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ProblemsList } from "@/components/listing/ProblemsList";
 
@@ -52,7 +52,7 @@ const GetStarted = () => {
       <ProblemsList
         algorithms={coreAlgorithms}
         title="DSA Roadmap"
-        description="Master the fundamentals with curated core patterns and problems."
+        description="Kickstart your DSA journey with a structured roadmap. Learn to break down complex problems into recurring patterns, systematically building the intuition needed to tackle any interview with confidence."
         listType="core"
         progressTitle="Your Roadmap Progress"
         isLoading={isLoading}
@@ -72,13 +72,14 @@ const GetStarted = () => {
             <ListCard
               title="Core Patterns"
               description="Learn essential recurring logic patterns."
-              icon={Rocket}
+              icon={Target}
               link="/dsa/core"
               color="bg-purple-500/10 text-purple-500"
             />
             <ListCard
               title="Blind 75"
               description="The curated list of must-do FAANG questions."
+              icon={Brain}
               badge="75"
               link="/dsa/blind-75"
               color="bg-amber-500/10 text-amber-500"

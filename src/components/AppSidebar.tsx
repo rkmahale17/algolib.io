@@ -1,5 +1,5 @@
 import * as React from "react"
-import { ListTodo, BookOpen, Code2, Play, Search, Folder, MoreHorizontal, LayoutDashboard, Compass, Rocket, ChevronRight, Eye, Code, FileText, PanelLeftClose, PanelLeftOpen, Github, Linkedin, MonitorSmartphone, LogOut, Code as CodeIcon, ThumbsUp, Clock } from "lucide-react"
+import { ListTodo, BookOpen, Code2, Play, Search, Folder, MoreHorizontal, LayoutDashboard, Compass, Rocket, ChevronRight, Eye, Code, FileText, PanelLeftClose, PanelLeftOpen, Github, Linkedin, MonitorSmartphone, LogOut, Code as CodeIcon, ThumbsUp, Clock, Layers, Target, Brain } from "lucide-react"
 
 import {
     Sidebar,
@@ -57,19 +57,19 @@ const sidebarConfig = {
                     {
                         title: "All practice",
                         url: "/dsa/problems",
-                        icon: ListTodo,
+                        icon: Layers,
                         description: "Browse and filter the entire coding question bank."
                     },
                     {
                         title: "Core patterns",
                         url: "/dsa/core",
-                        icon: BookOpen,
+                        icon: Target,
                         description: "Master the essential recurring algorithm patterns."
                     },
                     {
                         title: "Blind 75",
                         url: "/dsa/blind-75",
-                        icon: Code,
+                        icon: Brain,
                         description: "The curated list of top 75 must-do questions."
                     },
                 ],

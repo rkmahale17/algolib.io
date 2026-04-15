@@ -10,6 +10,7 @@ interface PremiumProblemCardProps {
     index: number;
     isFirst?: boolean;
     isLast?: boolean;
+    disableRounding?: boolean;
 }
 
 const difficultyColors: Record<string, string> = {
@@ -36,7 +37,7 @@ const StatusIcon = ({ status, isPremium }: { status: string; isPremium?: boolean
     );
 };
 
-export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp, index, isFirst, isLast }: PremiumProblemCardProps) => {
+export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp, index, isFirst, isLast, disableRounding }: PremiumProblemCardProps) => {
     const isPremium = isPremiumProp ?? (algorithm.is_premium || algorithm.is_pro || algorithm.metadata?.is_pro);
     const difficulty = algorithm.difficulty?.charAt(0).toUpperCase() + algorithm.difficulty?.slice(1).toLowerCase() || 'Medium';
     const displayDifficulty = ['Easy', 'Medium', 'Hard'].includes(difficulty) ? difficulty : 'Medium';
@@ -50,9 +51,10 @@ export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp
                 "flex items-center gap-3 sm:gap-6 p-4 sm:p-6 transition-all duration-300",
                 "bg-card hover:bg-muted/15",
                 "border-x border-t border-border/40",
-                isFirst && "rounded-t-xl",
-                isLast && "rounded-b-xl border-b",
-                !isFirst && !isLast && "rounded-none",
+                !disableRounding && isFirst && "rounded-t-xl",
+                !disableRounding && isLast && "rounded-b-xl border-b",
+                (disableRounding || (!isFirst && !isLast)) && "rounded-none",
+                disableRounding && isLast && "border-b",
                 "shadow-sm hover:shadow-md z-0 hover:z-10 relative overflow-hidden"
             )}>
                 {/* Status Indicator */}
@@ -67,11 +69,6 @@ export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp
                             {algorithm.serial_no || index + 1}. {algorithm.title || algorithm.name}
                         </h3>
                         <div className="flex flex-wrap gap-2">
-                            {index === 0 && (
-                                <div className="px-2 sm:px-3 py-0.5 rounded-full border border-orange-200 bg-orange-50/50 text-orange-500 text-[9px] sm:text-[10px] uppercase tracking-wider dark:border-orange-200 dark:bg-white dark:text-orange-500">
-                                    Warm up
-                                </div>
-                            )}
                             {isPremium && (
                                 <div className="px-2 sm:px-3 py-0.5 rounded-full border border-yellow-200 bg-yellow-50/50 text-yellow-600 text-[9px] sm:text-[10px] uppercase tracking-wider flex items-center gap-1 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-400">
                                     <Lock className="w-2.5 sm:w-3.5 h-2.5 sm:h-3.5" />

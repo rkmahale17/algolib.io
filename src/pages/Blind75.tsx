@@ -23,7 +23,7 @@ const Blind75 = () => {
       <ProblemsList
         algorithms={blind75Algorithms}
         title="Blind 75 Problems"
-        description="Master the 75 most important coding interview problems. Curated by top engineers at FAANG companies."
+        description="The definitive list of 75 essential problems designed to maximize your preparation in minimal time. Focus on the most frequent FAANG interview questions to ensure you're ready for the highest-level technical assessments."
         listType="blind75"
         progressTitle="Blind 75 Progress"
         isLoading={isLoading}

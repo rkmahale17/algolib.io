@@ -5,7 +5,7 @@ import { PremiumProblemCard } from "@/components/listing/PremiumProblemCard";
 import { useApp } from '@/contexts/AppContext';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { getGroupedByCategory, normalizeCategory } from "@/constants/categories";
-import { Code, Rocket } from "lucide-react";
+import { Brain, Target } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { ProgressStats } from "@/components/profile/ProgressStats";
 import { cn } from "@/lib/utils";
@@ -32,7 +32,7 @@ export const ProblemsList = ({
   listType,
   showRecommendation = false,
   showCategoryToggle = true,
-  initialCategoryWise = false,
+  initialCategoryWise = true,
   headerSlot,
   footerSlot,
   progressTitle = "Progress",
@@ -137,9 +137,10 @@ export const ProblemsList = ({
   }, [filteredAndSortedAlgorithms, progressMap]);
 
   const getProgressBarColor = (percentage: number) => {
-    if (percentage < 33) return 'bg-red-500';
-    if (percentage < 66) return 'bg-yellow-500';
-    return 'bg-green-500';
+    if (percentage === 0) return 'bg-transparent';
+    if (percentage < 33) return 'bg-gradient-to-r from-red-500 to-red-400';
+    if (percentage < 66) return 'bg-gradient-to-r from-yellow-500 to-yellow-400';
+    return 'bg-gradient-to-r from-green-500 to-green-400';
   };
 
   const handleTopicToggle = (topic: string) => {
@@ -246,42 +247,58 @@ export const ProblemsList = ({
           )}
         </div>
       ) : (
-        <div className="w-full max-w-[700px] mx-auto space-y-6">
+        <div className="w-full max-w-[700px] mx-auto">
           {currentGroupedAlgos.length > 0 ? (
-            <Accordion type="multiple" className="space-y-6" defaultValue={currentGroupedAlgos.map(([cat]) => cat)}>
-              {currentGroupedAlgos.map(([category, algos]) => (
+            <Accordion 
+              type="multiple" 
+              className="border border-border/40 rounded-xl bg-card overflow-hidden shadow-sm" 
+            >
+              {currentGroupedAlgos.map(([category, algos], index) => (
                 <AccordionItem
                   key={category}
                   value={category}
-                  className="border border-border/40 rounded-xl bg-card overflow-hidden shadow-sm"
+                  className={cn(
+                    "border-border/40",
+                    index === currentGroupedAlgos.length - 1 && "border-b-0"
+                  )}
                 >
-                  <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-muted/5 group">
-                    <div className="flex items-center justify-between w-full pr-4">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-lg bg-primary/5 flex items-center justify-center border border-primary/10">
-                          {listType === 'core' ? <Rocket className="w-5 h-5 text-primary/60" /> : <Code className="w-5 h-5 text-primary/60" />}
+                  <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-muted/5 group data-[state=open]:bg-muted/20 data-[state=open]:border-b border-border/10">
+                    <div className="flex items-center justify-between w-full pr-4 gap-6">
+                      <div className="flex items-center gap-4 flex-1">
+                        <div className="w-10 h-10 rounded-lg bg-primary/5 flex items-center justify-center border border-primary/10 shrink-0">
+                          {listType === 'core' ? <Target className="w-5 h-5 text-primary/60" /> : <Brain className="w-5 h-5 text-primary/60" />}
                         </div>
-                        <div className="text-left flex-1">
-                          <h3 className="font-medium text-[16px] leading-tight mb-2">
-                            {category} ({statsByCategory[category].solved} / {statsByCategory[category].total})
+                        <div className="text-left">
+                          <h3 className="font-medium text-[16px] leading-tight mb-1">
+                            {category}
                           </h3>
-                          <div className="h-1.5 w-full bg-muted/50 rounded-full overflow-hidden mb-1">
-                            <div 
-                              className={cn(
-                                "h-full rounded-full transition-all duration-1000",
-                                getProgressBarColor((statsByCategory[category].solved / statsByCategory[category].total) * 100)
-                              )}
-                              style={{ width: `${(statsByCategory[category].solved / statsByCategory[category].total) * 100 || 0}%` }} 
-                            />
-                          </div>
                           <p className="text-[11px] text-muted-foreground font-normal">
                             {algos.length} essential problems
                           </p>
                         </div>
                       </div>
+                      
+                      <div className="flex flex-col items-end gap-2 shrink-0">
+                        <div className="flex items-center gap-2 text-[11px] font-medium text-muted-foreground/60 uppercase tracking-wider">
+                          <span className="text-foreground/90">{statsByCategory[category].solved}</span>
+                          <span className="text-muted-foreground/30">/</span>
+                          <span>{statsByCategory[category].total}</span>
+                          <span className="ml-1 text-[9px] opacity-70">Solved</span>
+                        </div>
+                        <div className="h-1.5 w-24 sm:w-32 bg-muted/40 rounded-full overflow-hidden border border-border/10 shadow-inner">
+                          <div 
+                            className={cn(
+                              "h-full rounded-full transition-all duration-1000",
+                              (statsByCategory[category].solved / statsByCategory[category].total) > 0 && "border-r border-black/10 dark:border-white/10 shadow-[0_0_8px_rgba(0,0,0,0.1)]",
+                              getProgressBarColor((statsByCategory[category].solved / statsByCategory[category].total) * 100)
+                            )}
+                            style={{ width: `${(statsByCategory[category].solved / statsByCategory[category].total) * 100 || 0}%` }} 
+                          />
+                        </div>
+                      </div>
                     </div>
                   </AccordionTrigger>
-                  <AccordionContent className="px-0 pb-0 border-t border-border/20 bg-muted/5">
+                  <AccordionContent className="px-0 pb-0 bg-muted/5">
                     <div className="flex flex-col">
                       {algos.map((algo, index) => (
                         <PremiumProblemCard
@@ -292,6 +309,7 @@ export const ProblemsList = ({
                           isPremium={algo.is_premium}
                           isFirst={index === 0}
                           isLast={index === algos.length - 1}
+                          disableRounding={true}
                         />
                       ))}
                     </div>

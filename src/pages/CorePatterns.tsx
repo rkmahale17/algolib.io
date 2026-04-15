@@ -23,7 +23,7 @@ const CorePatterns = () => {
       <ProblemsList
         algorithms={coreAlgorithms}
         title="Core Patterns Library"
-        description="Step-by-step visualizations of essential patterns. Build a rock-solid foundation for interviews and software engineering."
+        description="Master the 20% of patterns that solve 80% of interview questions. Focus on high-impact techniques like Sliding Window, Two Pointers, and Backtracking to develop a deep, pattern-based intuition for problem-solving."
         listType="core"
         progressTitle="Pattern Mastery Progress"
         isLoading={isLoading}

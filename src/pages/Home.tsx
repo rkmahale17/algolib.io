@@ -206,7 +206,7 @@ const Home = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
                     {/* Core Problems Card */}
-                    <Link to="/dsa/core-patterns" className="group">
+                    <Link to="/dsa/core" className="group">
                       <Card className="h-full bg-white dark:bg-zinc-900/50 border-gray-100 dark:border-zinc-800 hover:border-primary/30 transition-all duration-300 group-hover:shadow-2xl group-hover:shadow-primary/5 group-hover:-translate-y-1 overflow-hidden">
                         <CardHeader className="pb-4">
                           <div className="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center mb-4 border border-orange-500/20 group-hover:bg-orange-500 group-hover:text-white transition-colors duration-300">
@@ -223,7 +223,7 @@ const Home = () => {
                     </Link>
 
                     {/* Blind 75 Card */}
-                    <Link to="/dsa/blind-75" className="group">
+                    <Link to="/dsa/blind75" className="group">
                       <Card className="h-full bg-white dark:bg-zinc-900/50 border-gray-100 dark:border-zinc-800 hover:border-primary/30 transition-all duration-300 group-hover:shadow-2xl group-hover:shadow-primary/5 group-hover:-translate-y-1 overflow-hidden">
                         <CardHeader className="pb-4">
                           <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center mb-4 border border-blue-500/20 group-hover:bg-blue-500 group-hover:text-white transition-colors duration-300">

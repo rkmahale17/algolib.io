@@ -5,7 +5,7 @@ import { useAlgorithms } from "@/hooks/useAlgorithms";
 import { ListType } from "@/types/algorithm";
 import { ProblemsList } from "@/components/listing/ProblemsList";
 import { Button } from "@/components/ui/button";
-import { Rocket, Code, Terminal } from "lucide-react";
+import { Rocket, Target, Brain, Layers } from "lucide-react";
 
 const Problems = () => {
   const { data, isLoading } = useAlgorithms();
@@ -37,9 +37,9 @@ const Problems = () => {
   };
 
   const getDescription = () => {
-    if (listMode === 'core') return "Master the fundamentals with curated core patterns and problems.";
-    if (listMode === 'blind') return "The curated list of must-do FAANG questions.";
-    return "The largest question bank of 150+ DSA interview practice questions";
+    if (listMode === 'core') return "Master the 20% of patterns that solve 80% of interview questions. Focus on high-impact techniques like Sliding Window, Two Pointers, and Backtracking to develop a deep, pattern-based intuition for problem-solving.";
+    if (listMode === 'blind') return "The definitive list of 75 essential problems designed to maximize your preparation in minimal time. Focus on the most frequent FAANG interview questions to ensure you're ready for the highest-level technical assessments.";
+    return "Explore our comprehensive collection of 150+ problems covering all major data structures and algorithms. Master everything from basic arrays to advanced dynamic programming through hands-on practice and step-by-step visualizations.";
   };
 
   const getProgressTitle = () => {
@@ -63,7 +63,7 @@ const Problems = () => {
         progressTitle={getProgressTitle()}
         isLoading={isLoading}
         showRecommendation={listMode === 'all'}
-        icon={Terminal}
+        icon={Layers}
         headerSlot={
           <div className="flex flex-wrap items-center gap-3 mb-8">
             <Button
@@ -78,7 +78,7 @@ const Problems = () => {
               onClick={() => setSearchParams({ mode: 'core' })}
               className="rounded-xl h-10 font-medium transition-all"
             >
-              <Rocket className="w-4 h-4 mr-2" />
+              <Target className="w-4 h-4 mr-2" />
               Core
             </Button>
             <Button
@@ -86,7 +86,7 @@ const Problems = () => {
               onClick={() => setSearchParams({ mode: 'blind' })}
               className="rounded-xl h-10 font-medium transition-all"
             >
-              <Code className="w-4 h-4 mr-2" />
+              <Brain className="w-4 h-4 mr-2" />
               Blind
             </Button>
           </div>

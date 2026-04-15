@@ -137,6 +137,11 @@ const AppContent = () => {
                   <Blind75 />
                 </FeatureProtectedRoute>
               } />
+              <Route path="/dsa/blind75" element={
+                <FeatureProtectedRoute flag="blind_75">
+                  <Blind75 />
+                </FeatureProtectedRoute>
+              } />
               <Route path="/problem/:slug" element={
                 <FeatureProtectedRoute flag="blind_75">
                   <ProtectedRoute><ProblemDetail /></ProtectedRoute>
