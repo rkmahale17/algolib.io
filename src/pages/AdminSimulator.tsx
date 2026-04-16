@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2, Play, Terminal, Trash2, StopCircle, Settings } from "lucide-react";
 import { toast } from "sonner";
 import axios from 'axios';
-import { generateTestRunner } from '@/utils/testRunnerGenerator';
+import { generateTestRunner, generateClassTestRunner } from '@/utils/testRunnerGenerator';
 import { LANGUAGE_IDS } from '@/components/CodeRunner/constants';
 import { Language } from '@/components/CodeRunner/LanguageSelector';
 
@@ -169,31 +169,39 @@ const AdminSimulator: React.FC = () => {
 
   const executeCode = async (code: string, language: Language, testCases: any[], schema: any[], algo: any) => {
     try {
-      const entryFunctionName = algo.function_name || algo.metadata?.function_name;
-
       // Ensure metadata is an object (it might be a string from DB)
       const metadata = typeof algo.metadata === 'string'
         ? JSON.parse(algo.metadata)
         : (algo.metadata || {});
 
-      // Check if any input field has inplace flag set
-      const inputSchema = schema || [];
-      const inplaceFieldIndex = inputSchema.findIndex((field: any) => field.inplace === true);
-      const hasInplaceField = inplaceFieldIndex !== -1;
+      let fullCode: string;
 
-      const fullCode = generateTestRunner(
-        code,
-        language,
-        testCases,
-        inputSchema,
-        entryFunctionName,
-        {
-          unordered: metadata.unordered || algo.unordered,
-          multiExpected: metadata.multi_expected || algo.multi_expected,
-          returnModifiedInput: hasInplaceField || metadata.return_modified_input || metadata.inplace || algo.return_modified_input,
-          modifiedInputIndex: hasInplaceField ? inplaceFieldIndex : (metadata.modified_input_index !== undefined ? metadata.modified_input_index : (algo.modified_input_index !== undefined ? algo.modified_input_index : 0))
-        }
-      );
+      // CLASS MODE: Multi-function execution (e.g., LRU Cache)
+      if (metadata.class_mode) {
+        fullCode = generateClassTestRunner(code, language, testCases);
+      } else {
+        // STANDARD MODE: Single function execution
+        const entryFunctionName = algo.function_name || algo.metadata?.function_name;
+
+        // Check if any input field has inplace flag set
+        const inputSchema = schema || [];
+        const inplaceFieldIndex = inputSchema.findIndex((field: any) => field.inplace === true);
+        const hasInplaceField = inplaceFieldIndex !== -1;
+
+        fullCode = generateTestRunner(
+          code,
+          language,
+          testCases,
+          inputSchema,
+          entryFunctionName,
+          {
+            unordered: metadata.unordered || algo.unordered,
+            multiExpected: metadata.multi_expected || algo.multi_expected,
+            returnModifiedInput: hasInplaceField || metadata.return_modified_input || metadata.inplace || algo.return_modified_input,
+            modifiedInputIndex: hasInplaceField ? inplaceFieldIndex : (metadata.modified_input_index !== undefined ? metadata.modified_input_index : (algo.modified_input_index !== undefined ? algo.modified_input_index : 0))
+          }
+        );
+      }
 
       const { data: { session } } = await supabase.auth.getSession();
 

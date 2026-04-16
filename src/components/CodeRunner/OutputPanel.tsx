@@ -410,6 +410,30 @@ export const OutputPanel = ({
 
                                   // Fallback to original test case input if result input is missing
                                   const inputData = result.input !== undefined ? result.input : tc?.input;
+ 
+                                  const metadata = typeof algorithmMeta?.metadata === 'string' 
+                                    ? JSON.parse(algorithmMeta.metadata) 
+                                    : (algorithmMeta?.metadata || {});
+                                  const isClassMode = !!metadata.class_mode;
+
+                                  if (isClassMode && Array.isArray(inputData)) {
+                                    return (
+                                      <div className="space-y-2">
+                                        <div className="flex flex-col gap-1">
+                                          <div className="flex gap-2 text-[11px]">
+                                            <span className="text-muted-foreground font-bold select-none shrink-0 tracking-tighter">METHODS</span>
+                                            <span className="text-blue-600 dark:text-blue-400 break-all">{JSON.stringify(inputData[0])}</span>
+                                          </div>
+                                        </div>
+                                        <div className="flex flex-col gap-1 border-t pt-1">
+                                          <div className="flex gap-2 text-[11px]">
+                                            <span className="text-muted-foreground font-bold select-none shrink-0 tracking-tighter">ARGS</span>
+                                            <span className="text-orange-600 dark:text-orange-400 break-all">{JSON.stringify(inputData[1])}</span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  }
 
                                   if (inputSchema && inputSchema.length > 0 && Array.isArray(inputData)) {
                                     return (
@@ -472,6 +496,25 @@ export const OutputPanel = ({
                                 {(() => {
                                   const tc = executedTestCases ? executedTestCases[index] : allTestCases[index];
                                   const actual = result.actual;
+
+                                  const metadata = typeof algorithmMeta?.metadata === 'string' 
+                                    ? JSON.parse(algorithmMeta.metadata) 
+                                    : (algorithmMeta?.metadata || {});
+                                  const isClassMode = !!metadata.class_mode;
+
+                                  if (isClassMode && Array.isArray(actual)) {
+                                    return (
+                                      <div className="space-y-1 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                                        {actual.map((val, i) => (
+                                          <div key={i} className="flex gap-2 text-[11px] leading-tight">
+                                            <span className="text-muted-foreground w-4 shrink-0 text-right">{i}:</span>
+                                            <span className="text-foreground break-all">{val === null ? "null" : JSON.stringify(val)}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    );
+                                  }
+
                                   const treeArr = actual !== undefined ? parseTreeValue(actual) : null;
                                   const listArr = actual !== undefined ? parseListValue(actual) : null;
                                   const content = actual === undefined ? "void / undefined" : JSON.stringify(treeArr || listArr || actual, null, 2);
@@ -500,6 +543,24 @@ export const OutputPanel = ({
                                 <div className="text-xs font-semibold text-muted-foreground  tracking-wider">Expected Output</div>
                                 <div className="p-3 rounded-md bg-muted/30 border font-mono text-sm">
                                   {(() => {
+                                    const metadata = typeof algorithmMeta?.metadata === 'string' 
+                                      ? JSON.parse(algorithmMeta.metadata) 
+                                      : (algorithmMeta?.metadata || {});
+                                    const isClassMode = !!metadata.class_mode;
+
+                                    if (isClassMode && Array.isArray(result.expected)) {
+                                      return (
+                                        <div className="space-y-1 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                                          {result.expected.map((val: any, i: number) => (
+                                            <div key={i} className="flex gap-2 text-[11px] leading-tight">
+                                              <span className="text-muted-foreground w-4 shrink-0 text-right">{i}:</span>
+                                              <span className="text-foreground break-all">{val === null ? "null" : JSON.stringify(val)}</span>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      );
+                                    }
+
                                     const listArr = result.expected !== undefined ? parseListValue(result.expected) : null;
                                     const content = JSON.stringify(parseTreeValue(result.expected) || listArr || result.expected, null, 2);
                                     return (

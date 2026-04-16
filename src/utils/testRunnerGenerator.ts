@@ -1430,3 +1430,463 @@ int main() {
 }
 `;
 };
+
+
+// ============================================================
+// CLASS-BASED MULTI-FUNCTION TEST RUNNER
+// ============================================================
+// For problems like LRU Cache, MinStack, MedianFinder, etc.
+// where a class is instantiated and multiple methods are called
+// in sequence.
+//
+// Test case format:
+//   input[0] = ["ClassName", "method1", "method2", ...]
+//   input[1] = [[constructorArgs], [method1Args], [method2Args], ...]
+//   expectedOutput = [null, returnVal1, returnVal2, ...]
+// ============================================================
+
+interface ClassTestCase {
+    input: [string[], any[][]];
+    expectedOutput: any[];
+}
+
+/** Converts a JS value to a C++ literal expression (for codegen) */
+const toCppLiteralValue = (val: any): string => {
+    if (val === null || val === undefined) return "nullptr";
+    if (typeof val === 'boolean') return val ? "true" : "false";
+    if (typeof val === 'number') {
+        if (Number.isInteger(val)) return String(val);
+        return String(val); // doubles
+    }
+    if (typeof val === 'string') return JSON.stringify(val);
+    if (Array.isArray(val)) {
+        if (val.length === 0) return "{}";
+        const items = val.map(v => toCppLiteralValue(v)).join(', ');
+        return `{${items}}`;
+    }
+    return String(val);
+};
+
+/** Infers C++ types and signatures from test cases */
+const inferCppSignatures = (testCases: ClassTestCase[]) => {
+    const methods: Record<string, { argTypes: string[], returnType: string }> = {};
+    testCases.forEach(tc => {
+        const mNames = tc.input[0];
+        const mArgs = tc.input[1];
+        const expected = tc.expectedOutput;
+        mNames.forEach((name, i) => {
+            const args = mArgs[i] || [];
+            const ret = expected[i];
+            if (!methods[name]) methods[name] = { argTypes: [], returnType: 'void' };
+            args.forEach((arg, j) => {
+                let type = 'int';
+                if (typeof arg === 'string') type = 'string';
+                else if (typeof arg === 'boolean') type = 'bool';
+                else if (Array.isArray(arg)) {
+                    if (arg.length > 0 && typeof arg[0] === 'string') type = 'vector<string>';
+                    else type = 'vector<int>';
+                }
+                if (!methods[name].argTypes[j]) methods[name].argTypes[j] = type;
+            });
+            if (ret !== null && ret !== undefined) {
+                let type = 'int';
+                if (typeof ret === 'string') type = 'string';
+                else if (typeof ret === 'boolean') type = 'bool';
+                else if (Array.isArray(ret)) {
+                     if (ret.length > 0 && typeof ret[0] === 'string') type = 'vector<string>';
+                     else type = 'vector<int>';
+                }
+                methods[name].returnType = type;
+            }
+        });
+    });
+    return methods;
+};
+
+// --- C++ Class Runner ---
+
+const generateCppClassRunner = (
+    userCode: string,
+    testCases: ClassTestCase[]
+): string => {
+    const signatures = inferCppSignatures(testCases);
+    const className = testCases[0]?.input[0][0] || "Solution";
+
+    const testCalls = testCases.map((tc, tcIndex) => {
+        const methods = tc.input[0];
+        const args = tc.input[1];
+        const expected = tc.expectedOutput;
+
+        const calls = methods.map((name, i) => {
+            const methodArgs = args[i] || [];
+            if (i === 0) {
+                return `
+                    ${className}* obj = new ${className}(${methodArgs.map(a => toCppLiteralValue(a)).join(', ')});
+                    results.push_back("null");`;
+            } else {
+                const sig = signatures[name];
+                const callArgs = methodArgs.map((a, j) => {
+                    const type = sig.argTypes[j] || 'int';
+                    if (type === 'string') return `std::string(${toCppLiteralValue(a)})`;
+                    return toCppLiteralValue(a);
+                }).join(', ');
+
+                if (sig.returnType === 'void') {
+                    return `
+                    obj->${name}(${callArgs});
+                    results.push_back("null");`;
+                } else {
+                    return `
+                    results.push_back(toJson(obj->${name}(${callArgs})));`;
+                }
+            }
+        }).join('\n');
+
+        return `
+        {
+            if (!first) std::cout << ",";
+            first = false;
+            std::vector<std::string> results;
+            try {
+                ${calls}
+                std::cout << "{\\"status\\":\\"pass\\",\\"input\\":[" << R"JSON(${JSON.stringify(methods)})JSON" << "," << R"JSON(${JSON.stringify(args)})JSON" << "],\\"expected\\":" << R"JSON(${JSON.stringify(expected)})JSON" << ",\\"actual\\":" << toJson(results) << "}";
+            } catch (...) {
+                std::cout << "{\\"status\\":\\"error\\",\\"error\\":\\"Execution Error\\"}";
+            }
+        }`;
+    }).join('\n');
+
+    return `
+#include <iostream>
+#include <vector>
+#include <string>
+#include <sstream>
+#include <algorithm>
+#include <map>
+#include <unordered_map>
+
+using namespace std;
+
+// Json Helpers
+template<typename T> std::string toJson(const T& val) { 
+    std::stringstream ss; 
+    if constexpr (std::is_same_v<T, std::string>) { ss << "\\"" << val << "\\""; }
+    else if constexpr (std::is_same_v<T, bool>) { ss << (val ? "true" : "false"); }
+    else { ss << val; }
+    return ss.str(); 
+}
+
+template<typename T> std::string toJson(const std::vector<T>& vec) {
+    std::stringstream ss;
+    ss << "[";
+    for (size_t i = 0; i < vec.size(); ++i) {
+        ss << toJson(vec[i]);
+        if (i < vec.size() - 1) ss << ",";
+    }
+    ss << "]";
+    return ss.str();
+}
+
+std::string toJson(const std::vector<std::string>& vec) {
+    std::stringstream ss;
+    ss << "[";
+    for (size_t i = 0; i < vec.size(); ++i) {
+        ss << vec[i]; 
+        if (i < vec.size() - 1) ss << ",";
+    }
+    ss << "]";
+    return ss.str();
+}
+
+std::string toJson(std::nullptr_t) { return "null"; }
+std::string toJsonString(const std::string& s) { return s; }
+
+${userCode}
+
+int main() {
+    std::cout << "___TEST_RESULTS_START___" << std::endl;
+    std::cout << "[";
+    bool first = true;
+    ${testCalls}
+    std::cout << "]" << std::endl;
+    std::cout << "___TEST_RESULTS_END___" << std::endl;
+    return 0;
+}
+`;
+};
+
+/** Converts a JS value to a Java literal expression (for codegen) */
+const toJavaLiteralValue = (val: any): string => {
+    if (val === null || val === undefined) return "null";
+    if (typeof val === 'boolean') return val ? "true" : "false";
+    if (typeof val === 'number') {
+        if (Number.isInteger(val)) return String(val);
+        return String(val); 
+    }
+    if (typeof val === 'string') return JSON.stringify(val);
+    if (Array.isArray(val)) {
+        if (val.length === 0) return "new Object[]{}";
+        const allInts = val.every(v => typeof v === 'number' && Number.isInteger(v));
+        const allStrings = val.every(v => typeof v === 'string');
+        if (val.some(v => Array.isArray(v))) {
+            const items = val.map(v => toJavaLiteralValue(v)).join(', ');
+            return `new Object[]{${items}}`;
+        }
+        if (val.some(v => v === null || v === undefined)) {
+            const items = val.map(v => toJavaBoxedValue(v)).join(', ');
+            return `Arrays.asList(${items})`;
+        }
+        if (allInts) {
+            const items = val.map(v => toJavaBoxedValue(v)).join(', ');
+            return `Arrays.asList(${items})`;
+        }
+        if (allStrings) {
+            const items = val.map(v => toJavaLiteralValue(v)).join(', ');
+            return `new String[]{${items}}`;
+        }
+        const items = val.map(v => toJavaBoxedValue(v)).join(', ');
+        return `Arrays.asList(${items})`;
+    }
+    return String(val);
+};
+
+/** Converts a JS value to a Java boxed value (Integer instead of int, etc.) */
+const toJavaBoxedValue = (val: any): string => {
+    if (val === null || val === undefined) return "(Object) null";
+    if (typeof val === 'boolean') return val ? "Boolean.TRUE" : "Boolean.FALSE";
+    if (typeof val === 'number') {
+        if (Number.isInteger(val)) return `Integer.valueOf(${val})`;
+        return `Double.valueOf(${val})`;
+    }
+    if (typeof val === 'string') return JSON.stringify(val);
+    if (Array.isArray(val)) return toJavaLiteralValue(val);
+    return String(val);
+};
+
+// --- Java Class Runner ---
+
+const generateJavaClassRunner = (
+    userCode: string,
+    testCases: ClassTestCase[]
+): string => {
+    const testCalls = testCases.map((tc, tcIndex) => {
+        const methods = tc.input[0];
+        const args = tc.input[1];
+        const expected = tc.expectedOutput;
+        const className = methods[0];
+        const methodCalls = methods.map((methodName, i) => {
+            const methodArgs = args[i] || [];
+            if (i === 0) {
+                const constructorArgs = methodArgs.map(a => toJavaLiteralValue(a)).join(', ');
+                return `
+                    ${className} instance = new ${className}(${constructorArgs});
+                    actualOutputs.add(null);`;
+            } else {
+                const callArgs = methodArgs.map(a => toJavaLiteralValue(a)).join(', ');
+                return `
+                    {
+                        Object __r = null;
+                        try {
+                            __r = callMethod(instance, "${methodName}", new Object[]{${methodArgs.map(a => toJavaBoxedValue(a)).join(', ')}});
+                        } catch (Exception methodEx) {
+                            errMsg = methodEx.toString();
+                            break;
+                        }
+                        actualOutputs.add(__r);
+                    }`;
+            }
+        }).join('\n');
+
+        return `
+        {
+            if (!first) System.out.print(",");
+            first = false;
+            try {
+                java.util.List<Object> actualOutputs = new java.util.ArrayList<>();
+                String errMsg = null;
+                long start = System.nanoTime();
+                do { ${methodCalls} } while (false);
+                long end = System.nanoTime();
+                if (errMsg != null) {
+                    System.out.print("{\\"status\\":\\"error\\",\\"error\\":\\"" + errMsg.replace("\\\\", "\\\\\\\\").replace("\\"", "\\\\\\"") + "\\",\\"input\\":" + toJson(new Object[]{${toJavaLiteralValue(methods)}, ${toJavaLiteralValue(args)}}) + ",\\"expected\\":" + toJson(${toJavaLiteralValue(expected)}) + "}");
+                } else {
+                    Object expectedArr = ${toJavaLiteralValue(expected)};
+                    boolean passed = toJson(actualOutputs).equals(toJson(expectedArr));
+                    System.out.print("{\\"status\\":\\"" + (passed ? "pass" : "fail") + "\\",\\"input\\":" + toJson(new Object[]{${toJavaLiteralValue(methods)}, ${toJavaLiteralValue(args)}}) + ",\\"expected\\":" + toJson(expectedArr) + ",\\"actual\\":" + toJson(actualOutputs) + ",\\"time\\":" + ((end - start) / 1000000.0) + "}");
+                }
+            } catch (Exception e) {
+                System.out.print("{\\"status\\":\\"error\\",\\"error\\":\\"" + e.toString().replace("\\\\", "\\\\\\\\").replace("\\"", "\\\\\\"") + "\\"}");
+            }
+        }`;
+    }).join('\n');
+
+    return `
+import java.util.*;
+import java.lang.reflect.*;
+${userCode}
+public class Main {
+    private static Object callMethod(Object instance, String methodName, Object[] args) throws Exception {
+        Method[] methods = instance.getClass().getMethods();
+        for (Method m : methods) {
+            if (m.getName().equals(methodName) && m.getParameterCount() == args.length) {
+                m.setAccessible(true);
+                Object result = m.invoke(instance, args);
+                if (m.getReturnType() == void.class) return null;
+                return result;
+            }
+        }
+        throw new NoSuchMethodException("Method " + methodName + " with " + args.length + " args not found");
+    }
+    private static String toJson(Object obj) {
+        if (obj == null) return "null";
+        if (obj instanceof String) return "\\"" + ((String) obj).replace("\\\\", "\\\\\\\\").replace("\\"", "\\\\\\"") + "\\"";
+        if (obj instanceof Character) return "\\"" + obj + "\\"";
+        if (obj instanceof Boolean || obj instanceof Number) return String.valueOf(obj);
+        if (obj instanceof int[]) {
+            int[] arr = (int[]) obj;
+            StringBuilder sb = new StringBuilder("[");
+            for (int i = 0; i < arr.length; i++) { sb.append(arr[i]); if (i < arr.length - 1) sb.append(","); }
+            return sb.append("]").toString();
+        }
+        if (obj instanceof Object[]) {
+            Object[] arr = (Object[]) obj;
+            StringBuilder sb = new StringBuilder("[");
+            for (int i = 0; i < arr.length; i++) { sb.append(toJson(arr[i])); if (i < arr.length - 1) sb.append(","); }
+            return sb.append("]").toString();
+        }
+        if (obj instanceof List) {
+            List<?> list = (List<?>) obj;
+            StringBuilder sb = new StringBuilder("[");
+            for (int i = 0; i < list.size(); i++) { sb.append(toJson(list.get(i))); if (i < list.size() - 1) sb.append(","); }
+            return sb.append("]").toString();
+        }
+        return "\\"" + String.valueOf(obj).replace("\\\\", "\\\\\\\\").replace("\\"", "\\\\\\"") + "\\"";
+    }
+    public static void main(String[] args) {
+        System.out.println("___TEST_RESULTS_START___");
+        System.out.print("[");
+        boolean first = true;
+        ${testCalls}
+        System.out.print("]");
+        System.out.println();
+        System.out.println("___TEST_RESULTS_END___");
+    }
+}
+`;
+};
+
+// --- TypeScript Class Runner ---
+
+const generateTypeScriptClassRunner = (
+    userCode: string,
+    testCases: ClassTestCase[]
+): string => {
+    const testCasesStr = testCases.map(tc => {
+        return `{ methods: ${JSON.stringify(tc.input[0])}, args: ${JSON.stringify(tc.input[1])}, expected: ${JSON.stringify(tc.expectedOutput)} }`;
+    }).join(',\n  ');
+
+    return `
+export {};
+/// <reference lib="esnext" />
+${userCode}
+const __classMap: Record<string, any> = {};
+${testCases.map(tc => {
+        const className = tc.input[0][0];
+        return `try { __classMap["${className}"] = ${className}; } catch(e) {}`;
+    }).filter((v, i, a) => a.indexOf(v) === i).join('\n')}
+const testCases = [${testCasesStr}];
+const safeStringify = (obj: any) => { try { return JSON.stringify(obj); } catch(e) { return String(obj); } };
+const results = testCases.map((tc) => {
+  const logs: string[] = [];
+  const originalLog = console.log;
+  console.log = (...args) => {
+      logs.push(args.map(a => {
+          try { return typeof a === 'object' ? safeStringify(a) : String(a); }
+          catch(e) { return String(a); }
+      }).join(' '));
+  };
+  try {
+    const start = Date.now();
+    const ClassName = __classMap[tc.methods[0]];
+    if (!ClassName) throw new Error("Class " + tc.methods[0] + " not found");
+    const instance = new ClassName(...tc.args[0]);
+    const actualOutputs: any[] = [null];
+    for (let i = 1; i < tc.methods.length; i++) {
+      const methodName = tc.methods[i];
+      const methodArgs = tc.args[i] || [];
+      const result = instance[methodName](...methodArgs);
+      actualOutputs.push(result === undefined ? null : result);
+    }
+    const end = Date.now();
+    const passed = JSON.stringify(actualOutputs) === JSON.stringify(tc.expected);
+    return { status: passed ? 'pass' : 'fail', input: [tc.methods, tc.args], expected: tc.expected, actual: actualOutputs, time: end - start, logs };
+  } catch (e) {
+    return { status: 'error', input: [tc.methods, tc.args], error: (e as any).message || String(e), logs };
+  } finally { console.log = originalLog; }
+});
+console.log('___TEST_RESULTS_START___');
+console.log(JSON.stringify(results));
+console.log('___TEST_RESULTS_END___');
+`;
+};
+
+// --- Python Class Runner ---
+
+const generatePythonClassRunner = (
+    userCode: string,
+    testCases: ClassTestCase[]
+): string => {
+    const testCasesStr = testCases.map(tc => {
+        return `{"methods": ${JSON.stringify(tc.input[0])}, "args": ${jsonToPython(tc.input[1])}, "expected": ${jsonToPython(tc.expectedOutput)}}`;
+    }).join(',\n    ');
+    const classNames = [...new Set(testCases.map(tc => tc.input[0][0]))];
+    return `
+import json, time, sys, io
+${userCode}
+__class_map = {${classNames.map(cn => `"${cn}": ${cn}`).join(', ')}}
+test_cases = [${testCasesStr}]
+def to_json_serializable(val):
+    if val is None: return None
+    if val is True: return True
+    if val is False: return False
+    if isinstance(val, (int, float, str)): return val
+    if isinstance(val, list): return [to_json_serializable(x) for x in val]
+    if isinstance(val, dict): return {str(k): to_json_serializable(v) for k, v in val.items()}
+    return str(val)
+results = []
+for tc in test_cases:
+    captured_output = io.StringIO(); original_stdout = sys.stdout; sys.stdout = captured_output
+    try:
+        start = time.time(); class_name = tc['methods'][0]; cls = __class_map.get(class_name)
+        if cls is None: raise Exception(f"Class {class_name} not found")
+        instance = cls(*tc['args'][0]); actual_outputs = [None]
+        for i in range(1, len(tc['methods'])):
+            method_name = tc['methods'][i]; method_args = tc['args'][i]; method = getattr(instance, method_name); result = method(*method_args)
+            actual_outputs.append(result if result is not None else None)
+        end = time.time(); sys.stdout = original_stdout; logs = captured_output.getvalue()
+        passed = to_json_serializable(actual_outputs) == to_json_serializable(tc['expected'])
+        results.append({ "status": "pass" if passed else "fail", "input": [tc['methods'], to_json_serializable(tc['args'])], "expected": to_json_serializable(tc['expected']), "actual": to_json_serializable(actual_outputs), "time": (end - start) * 1000, "logs": logs.split('\\n') if logs else [] })
+    except Exception as e:
+        sys.stdout = original_stdout; logs = captured_output.getvalue()
+        results.append({ "status": "error", "input": [tc['methods'], to_json_serializable(tc['args'])], "error": str(e), "logs": logs.split('\\n') if logs else [] })
+print('___TEST_RESULTS_START___'); print(json.dumps(results)); print('___TEST_RESULTS_END___')
+`;
+};
+
+/**
+ * Generates a test runner for class-based multi-function problems.
+ * Auto-detects the class name from the first method in each test case.
+ */
+export const generateClassTestRunner = (
+    userCode: string,
+    language: Language,
+    testCases: ClassTestCase[]
+): string => {
+    switch (language) {
+        case 'typescript': return generateTypeScriptClassRunner(userCode, testCases);
+        case 'python': return generatePythonClassRunner(userCode, testCases);
+        case 'java': return generateJavaClassRunner(userCode, testCases);
+        case 'cpp': return generateCppClassRunner(userCode, testCases);
+        default: return userCode;
+    }
+};

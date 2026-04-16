@@ -10,7 +10,8 @@ import { usePostHog } from "@posthog/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Play, RotateCcw, Loader2, Maximize2, Minimize2, Settings, AlignLeft, Info, Send, Copy, X, Clock, Terminal } from "lucide-react";
+import { Play, RotateCcw, Loader2, Maximize2, Minimize2, Settings, AlignLeft, Info, Send, Copy, X, Clock, Terminal, Book, PanelRightClose, Code } from "lucide-react";
+import { BrainstormSection } from "../brainstorm/BrainstormSection";
 import { FeatureGuard } from "@/components/FeatureGuard";
 import { toast } from "sonner";
 import axios from 'axios';
@@ -69,11 +70,18 @@ interface CodeRunnerProps {
   onStateChange?: (state: { isLoading: boolean; isSubmitting: boolean; lastRunSuccess: boolean }) => void;
   isMobile?: boolean;
   isLoading?: boolean;
+  onToggleRightPanel?: () => void;
+  brainstormProps?: {
+    algorithmId: string;
+    algorithmTitle: string;
+    controls?: any;
+  };
 }
 
 export interface CodeRunnerRef {
   run: () => void;
   submit: () => void;
+  openThinkpad: () => void;
 }
 
 interface EditorSettings {
@@ -155,7 +163,9 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
   isInterviewMode,
   onStateChange,
   isMobile,
-  isLoading: isLoadingProp
+  isLoading: isLoadingProp,
+  onToggleRightPanel,
+  brainstormProps
 }, ref) => {
   const posthog = usePostHog();
   const isLimitExceeded = useFeatureFlag("todays_limit_exceed");
@@ -186,7 +196,8 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
   const [lastRunSuccess, setLastRunSuccess] = useState(false);
 
   const [viewingSubmission, setViewingSubmission] = useState<Submission | null>(null);
-  const [activeEditorTab, setActiveEditorTab] = useState<"current" | "submission">("current");
+  const [activeEditorTab, setActiveEditorTab] = useState<"current" | "submission" | "scratchpad">("current");
+  const [isScratchpadOpen, setIsScratchpadOpen] = useState(false);
 
   // Settings state
   const [settings, setSettings] = useState<EditorSettings>(DEFAULT_SETTINGS);
@@ -408,7 +419,11 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
   // Expose Run and Submit methods
   React.useImperativeHandle(ref, () => ({
     run: () => handleRun(),
-    submit: () => handleSubmit()
+    submit: () => handleSubmit(),
+    openThinkpad: () => {
+      setIsScratchpadOpen(true);
+      setActiveEditorTab("scratchpad");
+    }
   }));
 
   // Report state changes to parent
@@ -517,42 +532,49 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
       }));
 
       if (algo && preparedTestCases.length > 0) {
-        const { generateTestRunner } = await import('@/utils/testRunnerGenerator');
-
-        // Use specified function name or derive from ID
-        const entryFunctionName = algo.function_name || algo.metadata?.function_name;
-
         // Ensure metadata is an object (it might be a string from DB)
         const metadata = typeof algo.metadata === 'string'
           ? JSON.parse(algo.metadata)
           : (algo.metadata || {});
 
-        // Check if any input field has inplace flag set
-        const inputSchema = algo.input_schema || [];
-        const inplaceFieldIndex = inputSchema.findIndex((field: any) => field.inplace === true || String(field.inplace) === 'true');
-        const hasInplaceField = inplaceFieldIndex !== -1;
+        // CLASS MODE: Multi-function execution (e.g., LRU Cache)
+        if (metadata.class_mode) {
+          const { generateClassTestRunner } = await import('@/utils/testRunnerGenerator');
+          fullCode = generateClassTestRunner(code, language, preparedTestCases);
+        } else {
+          // STANDARD MODE: Single function execution
+          const { generateTestRunner } = await import('@/utils/testRunnerGenerator');
 
-        console.log("DEBUG: Inplace detection", {
-          hasInplaceField,
-          inplaceFieldIndex,
-          metadataInplace: metadata.inplace,
-          metadataReturnModified: metadata.return_modified_input,
-          algoReturnModified: algo.return_modified_input
-        });
+          // Use specified function name or derive from ID
+          const entryFunctionName = algo.function_name || algo.metadata?.function_name;
 
-        fullCode = generateTestRunner(
-          code,
-          language,
-          preparedTestCases,
-          inputSchema,
-          entryFunctionName,
-          {
-            unordered: metadata.unordered || algo.unordered,
-            multiExpected: metadata.multi_expected || algo.multi_expected,
-            returnModifiedInput: hasInplaceField || metadata.return_modified_input === true || String(metadata.return_modified_input) === 'true' || metadata.inplace === true || String(metadata.inplace) === 'true' || algo.return_modified_input === true || String(algo.return_modified_input) === 'true',
-            modifiedInputIndex: hasInplaceField ? inplaceFieldIndex : (metadata.modified_input_index !== undefined ? Number(metadata.modified_input_index) : (algo.modified_input_index !== undefined ? Number(algo.modified_input_index) : 0))
-          }
-        );
+          // Check if any input field has inplace flag set
+          const inputSchema = algo.input_schema || [];
+          const inplaceFieldIndex = inputSchema.findIndex((field: any) => field.inplace === true || String(field.inplace) === 'true');
+          const hasInplaceField = inplaceFieldIndex !== -1;
+
+          console.log("DEBUG: Inplace detection", {
+            hasInplaceField,
+            inplaceFieldIndex,
+            metadataInplace: metadata.inplace,
+            metadataReturnModified: metadata.return_modified_input,
+            algoReturnModified: algo.return_modified_input
+          });
+
+          fullCode = generateTestRunner(
+            code,
+            language,
+            preparedTestCases,
+            inputSchema,
+            entryFunctionName,
+            {
+              unordered: metadata.unordered || algo.unordered,
+              multiExpected: metadata.multi_expected || algo.multi_expected,
+              returnModifiedInput: hasInplaceField || metadata.return_modified_input === true || String(metadata.return_modified_input) === 'true' || metadata.inplace === true || String(metadata.inplace) === 'true' || algo.return_modified_input === true || String(algo.return_modified_input) === 'true',
+              modifiedInputIndex: hasInplaceField ? inplaceFieldIndex : (metadata.modified_input_index !== undefined ? Number(metadata.modified_input_index) : (algo.modified_input_index !== undefined ? Number(algo.modified_input_index) : 0))
+            }
+          );
+        }
       }
 
       const { data: { session } } = await supabase.auth.getSession();
@@ -834,55 +856,23 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
       onValueChange={(v) => setActiveEditorTab(v as any)}
       className="h-full flex flex-col"
     >
-      {/* Only show tab list if we have a submission to view */}
-      {viewingSubmission && (
-        <div className="flex items-center px-1 bg-muted/20 border-b">
-          <TabsList className="bg-transparent h-9 p-0 gap-1 w-full justify-start">
-            <TabsTrigger
-              value="current"
-              className="data-[state=active]:bg-background data-[state=active]:shadow-none rounded-t-md rounded-b-none border-b-2 border-transparent data-[state=active]:border-primary h-9 px-4 rounded-none"
+      {/* Top Toolbar Integrated with Tabs */}
+      <div className="flex items-center justify-between px-3 border-b bg-muted/40 h-10 shrink-0 gap-2">
+        <div className="flex items-center gap-0 overflow-x-auto no-scrollbar mask-linear-fade shrink-0 h-full">
+          {!isMobile && onToggleRightPanel && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onToggleRightPanel}
+              title="Collapse Panel"
+              className="h-10 w-10 p-0 rounded-none border-r border-border/50 hover:bg-primary/10 hover:text-primary shrink-0 mr-2"
             >
-              Current Code
-            </TabsTrigger>
-            <TabsTrigger
-              value="submission"
-              className="data-[state=active]:bg-background data-[state=active]:shadow-none rounded-t-md rounded-b-none border-b-2 border-transparent data-[state=active]:border-primary h-9 px-4 gap-3 rounded-none group items-center"
-            >
-              <div className="flex items-center gap-2 text-xs">
-                <span className={`font-semibold ${viewingSubmission?.status === 'passed' ? 'text-green-600' : 'text-destructive'}`}>
-                  {viewingSubmission?.status === 'passed' ? 'Accepted' : (viewingSubmission?.status === 'error' ? 'Runtime Error' : 'Wrong Answer')}
-                </span>
-                <span className="text-muted-foreground">|</span>
-                <span className="uppercase font-medium text-foreground">{viewingSubmission?.language}</span>
-                {/* Time & Memory if available */}
-                {viewingSubmission?.test_results?.execution_time_ms && (
-                  <>
-                    <span className="text-muted-foreground">|</span>
-                    <div className="flex items-center gap-1 text-muted-foreground">
-                      <Clock className="w-3 h-3" />
-                      {viewingSubmission.test_results.execution_time_ms}ms
-                    </div>
-                  </>
-                )}
-              </div>
+              <PanelRightClose className="w-4 h-4" />
+            </Button>
+          )}
 
-              <div
-                role="button"
-                className="opacity-60 group-hover:opacity-100 hover:bg-muted rounded-full p-0.5 ml-2"
-                onClick={handleCloseSubmission}
-              >
-                <X className="w-3 h-3" />
-              </div>
-            </TabsTrigger>
-          </TabsList>
-        </div>
-      )}
-
-      <TabsContent value="current" className="flex-1 flex flex-col min-h-0 m-0 data-[state=inactive]:hidden h-full">
-        <div className={`h-full flex flex-col ${viewingSubmission ? '' : 'border-t-0'}`}>
-          <div className="flex items-center justify-between px-3 pl-9  border-b bg-muted/30 h-10 shrink-0 gap-2">
-            {/* Left Group: Language Selector */}
-            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar mask-linear-fade shrink-0">
+          {activeEditorTab === 'current' && (
+            <div className="flex items-center gap-2 mr-4">
               <LanguageSelector
                 language={language}
                 onLanguageChange={handleLanguageChange}
@@ -890,172 +880,241 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
                 availableLanguages={availableLanguages}
               />
             </div>
+          )}
 
-            {/* Middle Spacer */}
-            <div className="flex-1" />
+          {(isScratchpadOpen || viewingSubmission) && (
+            <TabsList className="bg-transparent h-10 p-0 gap-0 w-auto justify-start rounded-none">
+              <TabsTrigger
+                value="current"
+                className="data-[state=active]:bg-background data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary h-10 px-4 rounded-none gap-2"
+              >
+                <Code className="w-4 h-4" />
+                {!isMobile && "Code"}
+              </TabsTrigger>
 
-            {/* Right Group: Actions (Reset, Format, Settings) */}
-            <div className="flex items-center gap-1 shrink-0">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7"
-                    onClick={handleReset}
-                    disabled={isLoading || isSubmitting}
+              {brainstormProps && isScratchpadOpen && (
+                <TabsTrigger
+                  value="scratchpad"
+                  className="data-[state=active]:bg-background data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary h-10 px-4 rounded-none gap-2 items-center group"
+                >
+                  <Book className="w-4 h-4" />
+                  {!isMobile && "Thinkpad"}
+                  <div
+                    role="button"
+                    className="opacity-60 hover:opacity-100 hover:bg-muted rounded-full p-0.5 ml-1 transition-all"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsScratchpadOpen(false);
+                      if (activeEditorTab === 'scratchpad') {
+                        setActiveEditorTab('current');
+                      }
+                    }}
                   >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="top">Reset to starter code</TooltipContent>
-              </Tooltip>
+                    <X className="w-3 h-3" />
+                  </div>
+                </TabsTrigger>
+              )}
 
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7"
-                    onClick={handleFormatCode}
+              {viewingSubmission && (
+                <TabsTrigger
+                  value="submission"
+                  className="data-[state=active]:bg-background data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary h-10 px-4 gap-3 rounded-none group items-center"
+                >
+                  <div className="flex items-center gap-2 text-xs">
+                    <span className={`font-semibold ${viewingSubmission?.status === 'passed' ? 'text-green-600' : 'text-destructive'}`}>
+                      {viewingSubmission?.status === 'passed' ? 'Accepted' : (viewingSubmission?.status === 'error' ? 'Runtime Error' : 'Wrong Answer')}
+                    </span>
+                    {!isMobile && (
+                      <>
+                        <span className="text-muted-foreground">|</span>
+                        <span className="uppercase font-medium text-foreground">{viewingSubmission?.language}</span>
+                      </>
+                    )}
+                  </div>
+
+                  <div
+                    role="button"
+                    className="opacity-60 group-hover:opacity-100 hover:bg-muted rounded-full p-0.5 ml-1"
+                    onClick={handleCloseSubmission}
                   >
-                    <AlignLeft className="w-3.5 h-3.5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="top">Format code</TooltipContent>
-              </Tooltip>
+                    <X className="w-3 h-3" />
+                  </div>
+                </TabsTrigger>
+              )}
+            </TabsList>
+          )}
+        </div>
 
-              <Popover>
+        {/* Right Group: Actions (Reset, Format, Settings) */}
+        <div className="flex items-center gap-1 shrink-0">
+          {activeEditorTab === 'current' && (
+            <>
+              <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7"
-                      >
-                        <Settings className="w-3.5 h-3.5" />
-                      </Button>
-                    </PopoverTrigger>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={handleReset}
+                      disabled={isLoading || isSubmitting}
+                    >
+                      <RotateCcw className="w-4 h-4" />
+                    </Button>
                   </TooltipTrigger>
-                  <TooltipContent side="top">Settings</TooltipContent>
+                  <TooltipContent side="bottom">Reset to starter code</TooltipContent>
                 </Tooltip>
-                <PopoverContent className="w-80" align="end">
-                  <div className="grid gap-4">
-                    <div className="space-y-2">
-                      <h4 className="font-medium leading-none">Editor Settings</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Customize your coding experience.
-                      </p>
-                    </div>
-                    <div className="grid gap-4">
-                      <div className="grid grid-cols-3 items-center gap-4">
-                        <Label htmlFor="theme">Theme</Label>
-                        <Select
-                          value={settings.theme === 'system' ? 'light' : settings.theme}
-                          onValueChange={(val: any) => updateSetting('theme', val)}
-                        >
-                          <SelectTrigger className="w-full col-span-2 h-8">
-                            <SelectValue placeholder="Theme" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="light">Light</SelectItem>
-                            <SelectItem value="dark">Dark</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
 
-                      <div className="grid grid-cols-3 items-center gap-4">
-                        <Label htmlFor="fontSize">Font Size</Label>
-                        <div className="col-span-2 flex items-center gap-2">
-                          <Slider
-                            id="fontSize"
-                            value={[settings.fontSize]}
-                            min={10}
-                            max={24}
-                            step={1}
-                            onValueChange={([val]) => updateSetting('fontSize', val)}
-                            className="w-full"
-                          />
-                          <span className="w-8 text-xs text-right">{settings.fontSize}px</span>
-                        </div>
-                      </div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={handleFormatCode}
+                    >
+                      <AlignLeft className="w-4 h-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Format code</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </>
+          )}
 
-                      <div className="grid grid-cols-3 items-center gap-4">
-                        <Label htmlFor="tabSize">Tab Size</Label>
-                        <Select
-                          value={settings.tabSize.toString()}
-                          onValueChange={(val) => updateSetting('tabSize', parseInt(val))}
-                        >
-                          <SelectTrigger className="w-full col-span-2 h-8">
-                            <SelectValue placeholder="Tab Size" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="2">2 spaces</SelectItem>
-                            <SelectItem value="4">4 spaces</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+          <Popover>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                    >
+                      <Settings className="w-4 h-4" />
+                    </Button>
+                  </PopoverTrigger>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Settings</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <PopoverContent className="w-80" align="end">
+              {/* Settings content remains the same */}
+              <div className="grid gap-4">
+                <div className="space-y-2">
+                  <h4 className="font-medium leading-none">Editor Settings</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Customize your coding experience.
+                  </p>
+                </div>
+                <div className="grid gap-4">
+                  <div className="grid grid-cols-3 items-center gap-4">
+                    <Label htmlFor="theme">Theme</Label>
+                    <Select
+                      value={settings.theme === 'system' ? 'light' : settings.theme}
+                      onValueChange={(val: any) => updateSetting('theme', val)}
+                    >
+                      <SelectTrigger className="w-full col-span-2 h-8">
+                        <SelectValue placeholder="Theme" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="light">Light</SelectItem>
+                        <SelectItem value="dark">Dark</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="wordWrap">Word Wrap</Label>
-                        <Switch
-                          id="wordWrap"
-                          checked={settings.wordWrap === 'on'}
-                          onCheckedChange={(checked) => updateSetting('wordWrap', checked ? 'on' : 'off')}
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="minimap">Minimap</Label>
-                        <Switch
-                          id="minimap"
-                          checked={settings.minimap}
-                          onCheckedChange={(checked) => updateSetting('minimap', checked)}
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="lineNumbers">Line Numbers</Label>
-                        <Switch
-                          id="lineNumbers"
-                          checked={settings.lineNumbers === 'on'}
-                          onCheckedChange={(checked) => updateSetting('lineNumbers', checked ? 'on' : 'off')}
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="autocomplete">Autocomplete</Label>
-                        <Switch
-                          id="autocomplete"
-                          checked={settings.autocomplete}
-                          onCheckedChange={(checked) => updateSetting('autocomplete', checked)}
-                        />
-                      </div>
+                  <div className="grid grid-cols-3 items-center gap-4">
+                    <Label htmlFor="fontSize">Font Size</Label>
+                    <div className="col-span-2 flex items-center gap-2">
+                      <Slider
+                        id="fontSize"
+                        value={[settings.fontSize]}
+                        min={10}
+                        max={24}
+                        step={1}
+                        onValueChange={([val]) => updateSetting('fontSize', val)}
+                        className="w-full"
+                      />
+                      <span className="w-8 text-xs text-right">{settings.fontSize}px</span>
                     </div>
                   </div>
-                </PopoverContent>
-              </Popover>
-            </div>
 
-            {/* Separator and Expand Actions */}
-            <div className="flex items-center gap-1 shrink-0 pl-2 border-l shadow-sm">
+                  <div className="grid grid-cols-3 items-center gap-4">
+                    <Label htmlFor="tabSize">Tab Size</Label>
+                    <Select
+                      value={settings.tabSize.toString()}
+                      onValueChange={(val) => updateSetting('tabSize', parseInt(val))}
+                    >
+                      <SelectTrigger className="w-full col-span-2 h-8">
+                        <SelectValue placeholder="Tab Size" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="2">2 spaces</SelectItem>
+                        <SelectItem value="4">4 spaces</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7"
-                onClick={toggleFullscreen}
-                title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
-              >
-                {isFullscreen ? (
-                  <Minimize2 className="w-3.5 h-3.5" />
-                ) : (
-                  <Maximize2 className="w-3.5 h-3.5" />
-                )}
-              </Button>
-            </div>
-          </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="wordWrap">Word Wrap</Label>
+                    <Switch
+                      id="wordWrap"
+                      checked={settings.wordWrap === 'on'}
+                      onCheckedChange={(checked) => updateSetting('wordWrap', checked ? 'on' : 'off')}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="minimap">Minimap</Label>
+                    <Switch
+                      id="minimap"
+                      checked={settings.minimap}
+                      onCheckedChange={(checked) => updateSetting('minimap', checked)}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="lineNumbers">Line Numbers</Label>
+                    <Switch
+                      id="lineNumbers"
+                      checked={settings.lineNumbers === 'on'}
+                      onCheckedChange={(checked) => updateSetting('lineNumbers', checked ? 'on' : 'off')}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="autocomplete">Autocomplete</Label>
+                    <Switch
+                      id="autocomplete"
+                      checked={settings.autocomplete}
+                      onCheckedChange={(checked) => updateSetting('autocomplete', checked)}
+                    />
+                  </div>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={toggleFullscreen}
+            title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+          >
+            {isFullscreen ? (
+              <Minimize2 className="w-4 h-4" />
+            ) : (
+              <Maximize2 className="w-4 h-4" />
+            )}
+          </Button>
+        </div>
+      </div>
+
+      <TabsContent value="current" className="flex-1 flex flex-col min-h-0 m-0 data-[state=inactive]:hidden h-full">
+        <div className={`h-full flex flex-col ${viewingSubmission ? '' : 'border-t-0'}`}>
           <div className="flex-1 relative min-h-[300px]">
             {isLoadingProp ? (
               <CodeEditorSkeleton />
@@ -1201,6 +1260,16 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
             />
           </div>
         </div>
+      </TabsContent>
+
+      <TabsContent value="scratchpad" className="flex-1 flex flex-col min-h-0 m-0 data-[state=inactive]:hidden h-full bg-background">
+        {brainstormProps && (
+          <BrainstormSection
+            algorithmId={brainstormProps.algorithmId}
+            algorithmTitle={brainstormProps.algorithmTitle}
+            controls={brainstormProps.controls}
+          />
+        )}
       </TabsContent>
     </Tabs>
   );

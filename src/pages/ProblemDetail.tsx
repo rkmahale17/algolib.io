@@ -285,6 +285,7 @@ const ProblemDetail: React.FC = () => {
           // Runner Controls
           onRun={handleRun}
           onSubmit={handleSubmit}
+          onThinkpad={() => runnerRef.current?.openThinkpad()}
           isRunnerLoading={runnerState.isLoading}
           isRunnerSubmitting={runnerState.isSubmitting}
           lastRunSuccess={runnerState.lastRunSuccess}

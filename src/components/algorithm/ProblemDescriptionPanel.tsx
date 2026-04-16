@@ -375,10 +375,10 @@ export const ProblemDescriptionPanel = React.memo(({
 
                 {/* Examples Section */}
                 {algorithm.explanation.io && algorithm.explanation.io.length > 0 && (!algorithm?.controls || algorithm.controls?.description?.examples !== false) && (
-                  <div className="space-y-4 max-w-[600px] ">
+                  <div className="space-y-4 max-w-[600px] pt-4">
                     {algorithm.explanation.io.map((example: any, index: number) => (
-                      <div key={index} className="border rounded-lg p-4 bg-muted/20">
-                        <h4 className="font-semibold mb-3">Example {index + 1}:</h4>
+                      <Card key={index} className="glass-card p-4 overflow-hidden">
+                        <h4 className="font-medium mb-3">Example {index + 1}:</h4>
                         <div className="space-y-2 font-mono text-sm">
                           {example.inputBeforeHtml && (
                             <RichText content={example.inputBeforeHtml} className="mb-2" />
@@ -386,7 +386,7 @@ export const ProblemDescriptionPanel = React.memo(({
                           {example.input && (
                             <div className="space-y-2">
                               <div>
-                                <span className="font-semibold">Input:</span>{' '}
+                                <span className="font-medium">Input:</span>{' '}
                                 <code className="bg-muted px-2 py-0.5 rounded">{example.input}</code>
                               </div>
                               {example.inputAfterHtml && (
@@ -406,7 +406,7 @@ export const ProblemDescriptionPanel = React.memo(({
                           {example.output && (
                             <div className="space-y-2">
                               <div>
-                                <span className="font-semibold">Output:</span>{' '}
+                                <span className="font-medium">Output:</span>{' '}
                                 <code className="bg-muted px-2 py-0.5 rounded">{example.output}</code>
                               </div>
                               {example.outputAfterHtml && (
@@ -422,20 +422,20 @@ export const ProblemDescriptionPanel = React.memo(({
                           )}
                           {example.explanation && (
                             <div className="mt-2">
-                              <span className="font-semibold">Explanation:</span>{' '}
+                              <span className="font-medium">Explanation:</span>{' '}
                               <span className="text-muted-foreground whitespace-pre-line">{example.explanation}</span>
                             </div>
                           )}
                         </div>
-                      </div>
+                      </Card>
                     ))}
                   </div>
                 )}
 
                 {/* Constraints Section */}
                 {algorithm.explanation.constraints && algorithm.explanation.constraints.length > 0 && (!algorithm?.controls || algorithm.controls?.description?.constraints !== false) && (
-                  <div className="border rounded-lg max-w-[500px] p-4 bg-muted/20">
-                    <h4 className="font-semibold mb-3">Constraints:</h4>
+                  <Card className="glass-card max-w-[500px] p-4 overflow-hidden">
+                    <h4 className="font-medium mb-3">Constraints:</h4>
                     <ul className="space-y-1.5 font-mono text-sm">
                       {algorithm.explanation.constraints.map((constraint: string, index: number) => (
                         <li key={index} className="flex items-start gap-2">
@@ -448,7 +448,7 @@ export const ProblemDescriptionPanel = React.memo(({
                         </li>
                       ))}
                     </ul>
-                  </div>
+                  </Card>
                 )}
 
                 {/* Note Section */}

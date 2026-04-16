@@ -20,6 +20,7 @@ import {
   Loader2,
   List as ListIcon,
   Crown,
+  Lightbulb,
 } from "lucide-react";
 import { ListType, LIST_TYPE_LABELS } from "@/types/algorithm";
 import { Button } from "@/components/ui/button";
@@ -84,6 +85,7 @@ interface AlgorithmHeaderProps {
 
   // Preview Mode
   hideUserMenu?: boolean;
+  onThinkpad?: () => void;
 }
 
 import UserMenu from "@/components/UserMenu";
@@ -113,6 +115,7 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
   activeListType,
   onToggleSidebar,
   hideUserMenu = false,
+  onThinkpad,
 }) => {
   const { hasPremiumAccess, profile } = useApp();
   const showCondensedMenu = windowWidth < 778;
@@ -252,6 +255,25 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
                 </Tooltip>
               </FeatureGuard>
             </div>
+
+            {onThinkpad && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={onThinkpad}
+                      className="h-8 gap-2 ml-3 text-xs text-orange-500 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-950/20"
+                    >
+                      <Lightbulb className="w-3.5 h-3.5 fill-current" />
+                      Thinkpad
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Open Thinkpad (Workspace Notes)</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
           </TooltipProvider>
         </div>
       )}

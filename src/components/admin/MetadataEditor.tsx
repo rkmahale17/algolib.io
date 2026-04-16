@@ -19,6 +19,8 @@ interface MetadataData {
   unordered?: boolean;
   multi_expected?: boolean;
   is_pro?: boolean;
+  class_mode?: boolean;
+  class_name?: string;
 }
 
 interface MetadataEditorProps {
@@ -74,38 +76,73 @@ export function MetadataEditor({ data, onChange }: MetadataEditorProps) {
         </CardContent>
       </Card>
 
-      {/* Test Comparison Options */}
+      {/* Test Comparison & Execution Options */}
       <Card>
         <CardHeader>
-          <CardTitle>Test Comparison Options</CardTitle>
+          <CardTitle>Execution & Comparison Options</CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-2 gap-6">
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="unordered-toggle" className="font-semibold">Unordered Comparison</Label>
-              <Switch
-                id="unordered-toggle"
-                checked={data.unordered || false}
-                onCheckedChange={(val) => updateField("unordered", val)}
-              />
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-2 gap-6">
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="unordered-toggle" className="font-semibold">Unordered Comparison</Label>
+                <Switch
+                  id="unordered-toggle"
+                  checked={data.unordered || false}
+                  onCheckedChange={(val) => updateField("unordered", val)}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                If enabled, array results will be sorted before comparison. Useful for problems like "Find All Subsets" where order doesn't matter.
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground">
-              If enabled, array results will be sorted before comparison. Useful for problems like "Find All Subsets" where order doesn't matter.
-            </p>
+
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="multi-expected-toggle" className="font-semibold">Multiple Valid Outputs</Label>
+                <Switch
+                  id="multi-expected-toggle"
+                  checked={data.multi_expected || false}
+                  onCheckedChange={(val) => updateField("multi_expected", val)}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                If enabled, "expectedOutput" should be an array of valid results. Code passes if actual matches ANY variant.
+              </p>
+            </div>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="multi-expected-toggle" className="font-semibold">Multiple Valid Outputs</Label>
-              <Switch
-                id="multi-expected-toggle"
-                checked={data.multi_expected || false}
-                onCheckedChange={(val) => updateField("multi_expected", val)}
-              />
+          <div className="border-t pt-6">
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="class-mode-toggle" className="text-base font-semibold">Class-Based Execution (Multi-Function)</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Enable this for problems like LRU Cache that require a sequence of method calls on a class instance.
+                  </p>
+                </div>
+                <Switch
+                  id="class-mode-toggle"
+                  checked={data.class_mode || false}
+                  onCheckedChange={(val) => updateField("class_mode", val)}
+                />
+              </div>
+              
+              {data.class_mode && (
+                <div className="mt-4 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <Label htmlFor="class-name-input">Class Name (Optional)</Label>
+                  <Input
+                    id="class-name-input"
+                    value={data.class_name || ""}
+                    onChange={(e) => updateField("class_name", e.target.value)}
+                    placeholder="e.g., LRUCache (auto-detected if empty)"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    The name of the class to instantiate. If left blank, it will be auto-detected from the first element of the test case method array.
+                  </p>
+                </div>
+              )}
             </div>
-            <p className="text-xs text-muted-foreground">
-              If enabled, "expectedOutput" should be an array of valid results. Code passes if actual matches ANY variant.
-            </p>
           </div>
         </CardContent>
       </Card>

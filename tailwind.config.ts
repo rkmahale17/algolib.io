@@ -19,9 +19,7 @@ export default {
         'xl-listing': '1100px',
         '3xl': '1760px',
       },
-      fontSize: {
-        'md': '0.9375rem', 
-      },
+
       fontFamily: {
         roboto: ['Roboto', 'sans-serif'],
       },

@@ -84,6 +84,8 @@ export function AlgorithmFormBuilder({
       visualizationUrl: "",
       likes: 0,
       dislikes: 0,
+      class_mode: false,
+      class_name: "",
     },
     problems_to_solve: {
       internal: [],
@@ -558,6 +560,49 @@ export function AlgorithmFormBuilder({
                       <p className="text-xs text-muted-foreground">
                         If enabled, "expectedOutput" should be an array of valid results. Code passes if actual matches ANY variant.
                       </p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 border rounded-lg bg-orange-500/5 border-orange-500/20">
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <Label htmlFor="class-mode-toggle" className="text-lg font-semibold text-orange-800 dark:text-orange-300">
+                            Class-Based Execution (Multi-Function)
+                          </Label>
+                          <p className="text-sm text-orange-600/80 dark:text-orange-400/80">
+                            Enable this for problems like LRU Cache that require a sequence of method calls on a class instance.
+                          </p>
+                        </div>
+                        <Switch
+                          id="class-mode-toggle"
+                          checked={formData.metadata?.class_mode || false}
+                          onCheckedChange={(val) => setFormData({
+                            ...formData,
+                            metadata: { ...formData.metadata, class_mode: val }
+                          })}
+                          className="data-[state=checked]:bg-orange-500"
+                        />
+                      </div>
+
+                      {formData.metadata?.class_mode && (
+                        <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                          <Label htmlFor="class-name-input">Class Name (Optional)</Label>
+                          <Input
+                            id="class-name-input"
+                            value={formData.metadata?.class_name || ""}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              metadata: { ...formData.metadata, class_name: e.target.value }
+                            })}
+                            placeholder="e.g., LRUCache (auto-detected if empty)"
+                            className="bg-background"
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            The name of the class to instantiate. If left blank, it will be auto-detected from the first element of the test case method array.
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
 
