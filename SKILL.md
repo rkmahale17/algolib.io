@@ -1,152 +1,44 @@
-# RulCode
-
-**Master Technical Interviews with Confidence**
-
-RulCode is a platform designed to help developers prepare for technical interviews through structured practice, clean explanations, and real-world coding challenges.
-
-Inspired by the clean learning experience of modern developer platforms and the structured problem-solving approach of competitive coding sites, RulCode aims to make interview preparation simple, focused, and effective.
-
+---
+name: rulcode-development
+description: "Develop and extend the RulCode technical interview preparation platform built with React, Vite, TypeScript, and Supabase. Use when adding new algorithm problems, building visualization components, implementing DSA topic pages, updating the problem editor, or modifying the interview preparation UI."
 ---
 
-## 🚀 Vision
+# RulCode Development
 
-Technical interviews should not feel overwhelming.
+Build and extend the RulCode platform — a React/Vite/TypeScript application for technical interview preparation covering DSA, system design, and frontend concepts.
 
-RulCode is built to help developers:
+## Workflow
 
-* Practice consistently
-* Learn concepts clearly
-* Build confidence for interviews
-* Master problem-solving skills step by step
+### 1. Understand the request
 
-Our goal is to create a **complete interview preparation ecosystem**.
+Identify which area of the platform the change targets:
 
----
+- **Algorithm problems**: Adding or editing problems in `src/` covering arrays, strings, hashing, two pointers, sliding window, recursion, backtracking, trees, graphs, dynamic programming, and greedy algorithms
+- **Visualizations**: Step-by-step algorithm animations (see `.agents/skills/visualization/SKILL.md`)
+- **UI components**: React components using Tailwind CSS and shadcn/ui (`components.json`)
+- **Backend/data**: Supabase integration in `supabase/`
 
-## ✨ Current Features
+### 2. Set up the development environment
 
-### 📚 Data Structures & Algorithms (DSA)
+```bash
+npm install
+npm run dev
+```
 
-Practice common interview problems with:
+The project uses Vite (`vite.config.ts`) with TypeScript (`tsconfig.json`) and Tailwind CSS (`tailwind.config.ts`).
 
-* Multiple difficulty levels
-* Clear explanations
-* Optimized solutions
-* Multiple language support
-* Real interview-style problems
+### 3. Implement the change
 
-Topics include:
+- Follow existing patterns in `src/` for component structure and naming
+- Use TypeScript strict mode conventions from `tsconfig.app.json`
+- Lint with ESLint (`eslint.config.js`)
+- Problems support multiple difficulty levels and multiple language implementations
 
-* Arrays
-* Strings
-* Hashing
-* Two Pointers
-* Sliding Window
-* Recursion
-* Backtracking
-* Trees
-* Graphs
-* Dynamic Programming
-* Greedy Algorithms
+### 4. Verify
 
----
+```bash
+npm run build
+npm run lint
+```
 
-## 🧠 What Makes RulCode Different
-
-* **Clean and distraction-free UI**
-* **Structured interview preparation**
-* **Concept-first learning**
-* **Real coding practice**
-* **Beginner → Advanced roadmap**
-
-We focus on helping developers **understand the thinking process**, not just memorize solutions.
-
----
-
-## 🔮 Upcoming Features
-
-RulCode will expand beyond DSA to cover the complete interview journey.
-
-### 🏗 System Design
-
-* High-level architecture
-* Scalability concepts
-* Real-world system design interviews
-
-### 🎨 Frontend Interview Preparation
-
-* JavaScript interview questions
-* DOM & browser concepts
-* React interview questions
-* Angular interview questions
-* UI architecture problems
-
-### ⚙️ Real Interview Simulations
-
-* Timed coding challenges
-* Mock interview environments
-* Company-specific questions
-
-### 📈 Progress Tracking
-
-* Skill progress dashboard
-* Topic mastery tracking
-* Interview readiness score
-
----
-
-## 🎯 Who Is This For?
-
-RulCode is designed for:
-
-* Developers preparing for **product-based companies**
-* Frontend engineers preparing for **React / Angular interviews**
-* Engineers strengthening their **DSA fundamentals**
-* Developers who want **structured interview preparation**
-
----
-
-## 💻 Tech Philosophy
-
-RulCode focuses on:
-
-* Simplicity
-* Performance
-* Clean UI
-* Structured learning
-* Developer-first experience
-
----
-
-## 🌍 Future Goal
-
-To build one of the **best platforms for technical interview preparation**, combining:
-
-* Coding practice
-* System design
-* Frontend architecture
-* Real interview experiences
-
-All in **one clean and powerful platform**.
-
----
-
-## 🔗 Website
-
-**Coming Soon**
-
-https://rulcode.com
-
----
-
-## ⭐ Contribute
-
-Contributions, ideas, and feedback are welcome.
-
-Together we can build a platform that helps developers succeed in technical interviews.
-
----
-
-## 📌 Tagline
-
-**"Prepare Smart. Code Better. Crack Interviews."**
+Check that the dev server renders the change correctly at the target route.
