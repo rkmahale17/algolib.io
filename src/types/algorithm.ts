@@ -4,10 +4,11 @@ export enum ListType {
     CoreAndBlind75 = 'core+blind75',
 }
 
-export const LIST_TYPE_LABELS: Record<ListType, string> = {
+export const LIST_TYPE_LABELS: Record<string, string> = {
     [ListType.Core]: 'Core Patterns',
     [ListType.Blind75]: 'Blind 75',
     [ListType.CoreAndBlind75]: 'Core + Blind 75',
+    'all': 'All Problems'
 };
 
 export const LIST_TYPE_OPTIONS = [

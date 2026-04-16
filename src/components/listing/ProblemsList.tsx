@@ -23,6 +23,8 @@ interface ProblemsListProps {
   progressTitle?: string;
   isLoading?: boolean;
   icon?: any;
+  initialSelectedTopics?: string[];
+  initialSelectedCompanies?: string[];
 }
 
 export const ProblemsList = ({
@@ -37,14 +39,16 @@ export const ProblemsList = ({
   footerSlot,
   progressTitle = "Progress",
   isLoading = false,
-  icon
+  icon,
+  initialSelectedTopics = [],
+  initialSelectedCompanies = []
 }: ProblemsListProps) => {
   const { activeListType, setActiveListType, progressMap } = useApp();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('serial-asc');
-  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
-  const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
+  const [selectedTopics, setSelectedTopics] = useState<string[]>(initialSelectedTopics);
+  const [selectedCompanies, setSelectedCompanies] = useState<string[]>(initialSelectedCompanies);
   const [isCategoryWise, setIsCategoryWise] = useState(initialCategoryWise);
 
   // Sync global list context if listType is provided

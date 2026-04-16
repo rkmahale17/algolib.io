@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   Book,
   Eye,
@@ -22,6 +22,8 @@ import {
   Zap,
   ListChecks,
   Lock,
+  Tag,
+  Building2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -54,6 +56,7 @@ import { isTreeType } from "@/utils/treeUtils";
 import { AlgoLink } from "../AlgoLink";
 import { useApp } from "@/contexts/AppContext";
 import { ProOverlay } from "@/components/ProOverlay";
+import { VideoTutorialCard } from "./VideoTutorialCard";
 
 interface ProblemDescriptionPanelProps {
   algorithm: any;
@@ -98,8 +101,17 @@ export const ProblemDescriptionPanel = React.memo(({
 }: ProblemDescriptionPanelProps) => {
   const { hasPremiumAccess } = useApp();
   const containerRef = useRef<HTMLDivElement>(null);
+  const topicsRef = useRef<HTMLDivElement>(null);
+  const companiesRef = useRef<HTMLDivElement>(null);
+  const hintsRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+  const { id, slug } = useParams<{ id?: string; slug?: string }>();
   const [isCompact, setIsCompact] = useState(false);
   const [isUltraCompact, setIsUltraCompact] = useState(false);
+
+  const scrollToSection = (ref: React.RefObject<HTMLDivElement>) => {
+    ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -241,7 +253,7 @@ export const ProblemDescriptionPanel = React.memo(({
         <div className="flex-1 overflow-hidden relative">
           <TabsContent value="description" className="h-full m-0 data-[state=inactive]:hidden">
             <ScrollArea className="h-full">
-              <div className="p-4 space-y-2">
+              <div className="p-4 space-y-6">
                 {/* Title & Progress */}
                 <div className="flex items-start justify-between gap-4">
                   <div>
@@ -250,7 +262,7 @@ export const ProblemDescriptionPanel = React.memo(({
                         {<span className="font-medium text-md mr-1">{algorithm.serial_no ? `${algorithm.serial_no}. ` : ''}</span>}{algorithm.name}
                       </h1>
                       {(algorithm?.is_premium || algorithm?.is_pro || algorithm?.metadata?.is_pro) && (
-                        <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-300 border-amber-500/20 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
+                        <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-300 border-amber-500/20 text-[10px] sm:text-xs font-bold px-3 py-1 uppercase tracking-wide h-7 rounded-full">
                           PRO
                         </Badge>
                       )}
@@ -266,85 +278,64 @@ export const ProblemDescriptionPanel = React.memo(({
                               ${DIFFICULTY_MAP[algorithm.difficulty?.toLowerCase()] === 'Easy' ? 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/30' : ''}
                               ${DIFFICULTY_MAP[algorithm.difficulty?.toLowerCase()] === 'Medium' ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/30' : ''}
                               ${DIFFICULTY_MAP[algorithm.difficulty?.toLowerCase()] === 'Hard' ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30' : ''}
-                              font-semibold px-3 py-1
+                              font-semibold px-3 py-1 h-7 rounded-full text-[10px] sm:text-xs
                             `}
                         >
                           {DIFFICULTY_MAP[algorithm.difficulty?.toLowerCase()] || algorithm.difficulty}
                         </Badge>
                       )}
 
-                      {/* Company Tags */}
-                      {(!algorithm?.controls || algorithm.controls?.metadata?.companies !== false) && algorithm.metadata?.companies && algorithm.metadata.companies.length > 0 && (
-                        <div className="flex items-center gap-2">
-                          <span className="text-muted-foreground text-sm hidden sm:inline">•</span>
-                          <div className="flex flex-wrap items-center gap-1.5">
+                      {/* Metadata Badges (Topics, Companies, Hint) */}
+                      <div className="flex flex-wrap items-center gap-2">
+                        {/* Topics Badge */}
+                        {algorithm.category && (
+                          <Badge
+                            variant="outline"
+                            className="bg-transparent text-foreground border-border text-[10px] sm:text-xs px-3 py-1 cursor-pointer hover:bg-muted/50 transition-all flex items-center h-7 rounded-full gap-1.5"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              scrollToSection(topicsRef);
+                            }}
+                          >
+                            <Tag className="w-3.5 h-3.5 text-primary" />
+                            Topics
+                          </Badge>
+                        )}
+
+                        {/* Companies Badge */}
+                        {algorithm.metadata?.companies && algorithm.metadata.companies.length > 0 && (
+                          <Badge
+                            variant="outline"
+                            className="bg-transparent text-foreground border-border text-[10px] sm:text-xs px-3 py-1 cursor-pointer hover:bg-muted/50 transition-all flex items-center h-7 rounded-full gap-1.5"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              scrollToSection(companiesRef);
+                            }}
+                          >
                             {hasPremiumAccess || isPlatformPreview ? (
-                              <>
-                                {algorithm.metadata.companies.slice(0, 4).map((company: string, index: number) => {
-                                  const compConfig = TOP_COMPANIES.find(c => c.name.toLowerCase() === company.toLowerCase() || c.id === company);
-                                  return (
-                                    <Badge
-                                      key={index}
-                                      variant="secondary"
-                                      className="bg-primary/5 text-primary border-primary/20 text-xs px-2 py-0.5"
-                                    >
-                                      <CompanyIcon company={company} className="w-3 h-3 mr-1.5 opacity-80" />
-                                      {company}
-                                    </Badge>
-                                  );
-                                })}
-                                {algorithm.metadata.companies.length > 4 && (
-                                  <Popover>
-                                    <PopoverTrigger>
-                                      <Badge
-                                        variant="secondary"
-                                        className="bg-muted text-muted-foreground text-xs px-2 py-0.5 cursor-pointer hover:bg-muted/80 transition-colors pointer-events-auto"
-                                      >
-                                        +{algorithm.metadata.companies.length - 4} more
-                                      </Badge>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-64 p-3" align="start">
-                                      <div className="space-y-3">
-                                        <h4 className="text-sm font-semibold leading-none">Other Companies</h4>
-                                        <div className="flex flex-wrap gap-2">
-                                          {algorithm.metadata.companies.slice(4).map((company: string, index: number) => (
-                                            <Badge
-                                              key={index}
-                                              variant="secondary"
-                                              className="bg-primary/5 text-primary border-primary/20 text-xs px-2 py-0.5"
-                                            >
-                                              <CompanyIcon company={company} className="w-3 h-3 mr-1.5 opacity-80" />
-                                              {company}
-                                            </Badge>
-                                          ))}
-                                        </div>
-                                      </div>
-                                    </PopoverContent>
-                                  </Popover>
-                                )}
-                              </>
+                              <Building2 className="w-3.5 h-3.5 text-primary" />
                             ) : (
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <Badge
-                                      variant="secondary"
-                                      className="bg-amber-500/10 text-amber-600 dark:text-amber-500 border-amber-500/20 text-xs px-2 py-0.5 cursor-pointer hover:bg-amber-500/20 transition-colors"
-                                      onClick={() => window.location.href = '/pricing'}
-                                    >
-                                      <Lock className="w-3 h-3 mr-1.5" />
-                                      Unlock Companies
-                                    </Badge>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p>Available for PRO users</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
+                              <Lock className="w-3.5 h-3.5 text-amber-500" />
                             )}
-                          </div>
-                        </div>
-                      )}
+                            Companies
+                          </Badge>
+                        )}
+
+                        {/* Hint Badge */}
+                        {algorithm.metadata?.hints && algorithm.metadata.hints.length > 0 && (
+                          <Badge
+                            variant="outline"
+                            className="bg-transparent text-foreground border-border text-[10px] sm:text-xs px-3 py-1 cursor-pointer hover:bg-muted/50 transition-all flex items-center h-7 rounded-full gap-1.5"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              scrollToSection(hintsRef);
+                            }}
+                          >
+                            <Lightbulb className="w-3.5 h-3.5 text-primary" />
+                            Hints
+                          </Badge>
+                        )}
+                      </div>
                     </div>
 
 
@@ -353,10 +344,9 @@ export const ProblemDescriptionPanel = React.memo(({
                     {(!algorithm?.controls || algorithm.controls?.metadata?.attempted_badge !== false) && isCompleted && (
                       <Badge
                         variant="outline"
-                        className="bg-green-500/10 text-green-500 border-green-500/20 px-3 py-1.5 hover:bg-green-500/20 transition-colors cursor-default"
+                        className="bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20 px-3 py-1 hover:bg-green-500/20 transition-colors cursor-default flex items-center h-7 rounded-full text-[10px] sm:text-xs"
                       >
-
-                        <CheckCircle2 className="w-4 h-4 mr-2" />
+                        <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" />
                         Solved
                       </Badge>
                     )}
@@ -375,61 +365,64 @@ export const ProblemDescriptionPanel = React.memo(({
 
                 {/* Examples Section */}
                 {algorithm.explanation.io && algorithm.explanation.io.length > 0 && (!algorithm?.controls || algorithm.controls?.description?.examples !== false) && (
-                  <div className="space-y-4 max-w-[600px] pt-4">
+                  <Card className="glass-card max-w-[600px] overflow-hidden">
                     {algorithm.explanation.io.map((example: any, index: number) => (
-                      <Card key={index} className="glass-card p-4 overflow-hidden">
-                        <h4 className="font-medium mb-3">Example {index + 1}:</h4>
-                        <div className="space-y-2 font-mono text-sm">
-                          {example.inputBeforeHtml && (
-                            <RichText content={example.inputBeforeHtml} className="mb-2" />
-                          )}
-                          {example.input && (
-                            <div className="space-y-2">
-                              <div>
-                                <span className="font-medium">Input:</span>{' '}
-                                <code className="bg-muted px-2 py-0.5 rounded">{example.input}</code>
+                      <React.Fragment key={index}>
+                        <div className="p-4">
+                          <h4 className="font-medium mb-3">Example {index + 1}:</h4>
+                          <div className="space-y-2 font-mono text-sm">
+                            {example.inputBeforeHtml && (
+                              <RichText content={example.inputBeforeHtml} className="mb-2" />
+                            )}
+                            {example.input && (
+                              <div className="space-y-2">
+                                <div>
+                                  <span className="font-medium">Input:</span>{' '}
+                                  <code className="bg-muted px-2 py-0.5 rounded">{example.input}</code>
+                                </div>
+                                {example.inputAfterHtml && (
+                                  <RichText content={example.inputAfterHtml} className="mt-2" />
+                                )}
+                                {(algorithm?.controls?.visualizations?.tree?.enabled ?? algorithm?.controls?.show_tree_visualization) && algorithm?.controls?.visualizations?.tree?.examples_input !== false && (
+                                  <TreeDiagram data={example.input} height={120} multiple={algorithm?.controls?.visualizations?.tree?.multiple} />
+                                )}
+                                {(algorithm?.controls?.visualizations?.graph?.enabled ?? algorithm?.controls?.show_graph_visualization) && algorithm?.controls?.visualizations?.graph?.examples_input !== false && (
+                                  <GraphDiagram data={example.input} height={120} />
+                                )}
                               </div>
-                              {example.inputAfterHtml && (
-                                <RichText content={example.inputAfterHtml} className="mt-2" />
-                              )}
-                              {(algorithm?.controls?.visualizations?.tree?.enabled ?? algorithm?.controls?.show_tree_visualization) && algorithm?.controls?.visualizations?.tree?.examples_input !== false && (
-                                <TreeDiagram data={example.input} height={120} multiple={algorithm?.controls?.visualizations?.tree?.multiple} />
-                              )}
-                              {(algorithm?.controls?.visualizations?.graph?.enabled ?? algorithm?.controls?.show_graph_visualization) && algorithm?.controls?.visualizations?.graph?.examples_input !== false && (
-                                <GraphDiagram data={example.input} height={120} />
-                              )}
-                            </div>
-                          )}
-                          {example.outputBeforeHtml && (
-                            <RichText content={example.outputBeforeHtml} className="mb-2" />
-                          )}
-                          {example.output && (
-                            <div className="space-y-2">
-                              <div>
-                                <span className="font-medium">Output:</span>{' '}
-                                <code className="bg-muted px-2 py-0.5 rounded">{example.output}</code>
+                            )}
+                            {example.outputBeforeHtml && (
+                              <RichText content={example.outputBeforeHtml} className="mb-2" />
+                            )}
+                            {example.output && (
+                              <div className="space-y-2">
+                                <div>
+                                  <span className="font-medium">Output:</span>{' '}
+                                  <code className="bg-muted px-2 py-0.5 rounded">{example.output}</code>
+                                </div>
+                                {example.outputAfterHtml && (
+                                  <RichText content={example.outputAfterHtml} className="mt-2" />
+                                )}
+                                {(algorithm?.controls?.visualizations?.tree?.enabled ?? algorithm?.controls?.show_tree_visualization) && algorithm?.controls?.visualizations?.tree?.examples_output !== false && (
+                                  <TreeDiagram data={example.output} height={120} multiple={algorithm?.controls?.visualizations?.tree?.multiple} />
+                                )}
+                                {(algorithm?.controls?.visualizations?.graph?.enabled ?? algorithm?.controls?.show_graph_visualization) && algorithm?.controls?.visualizations?.graph?.examples_output !== false && (
+                                  <GraphDiagram data={example.output} height={120} />
+                                )}
                               </div>
-                              {example.outputAfterHtml && (
-                                <RichText content={example.outputAfterHtml} className="mt-2" />
-                              )}
-                              {(algorithm?.controls?.visualizations?.tree?.enabled ?? algorithm?.controls?.show_tree_visualization) && algorithm?.controls?.visualizations?.tree?.examples_output !== false && (
-                                <TreeDiagram data={example.output} height={120} multiple={algorithm?.controls?.visualizations?.tree?.multiple} />
-                              )}
-                              {(algorithm?.controls?.visualizations?.graph?.enabled ?? algorithm?.controls?.show_graph_visualization) && algorithm?.controls?.visualizations?.graph?.examples_output !== false && (
-                                <GraphDiagram data={example.output} height={120} />
-                              )}
-                            </div>
-                          )}
-                          {example.explanation && (
-                            <div className="mt-2">
-                              <span className="font-medium">Explanation:</span>{' '}
-                              <span className="text-muted-foreground whitespace-pre-line">{example.explanation}</span>
-                            </div>
-                          )}
+                            )}
+                            {example.explanation && (
+                              <div className="mt-2">
+                                <span className="font-medium">Explanation:</span>{' '}
+                                <span className="text-muted-foreground whitespace-pre-line">{example.explanation}</span>
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </Card>
+                        {index < algorithm.explanation.io.length - 1 && <Separator className="bg-border/50 mx-5 w-auto" />}
+                      </React.Fragment>
                     ))}
-                  </div>
+                  </Card>
                 )}
 
                 {/* Constraints Section */}
@@ -609,45 +602,111 @@ export const ProblemDescriptionPanel = React.memo(({
                   );
                 })()}
 
+                {/* Metadata Accordions (Topics, Companies, Hints) */}
+                <div className="space-y-0 max-w-5xl mx-auto w-full">
+                  <Accordion type="multiple" className="w-full space-y-4">
+                    {/* Topics Item */}
+                    {algorithm.category && (
+                      <AccordionItem value="topics" className="border rounded-lg glass-card shadow-sm border-border/50" ref={topicsRef}>
+                        <AccordionTrigger className="px-4 sm:px-6 py-4 hover:no-underline group">
+                          <div className="flex items-center gap-2 text-base font-medium transition-colors text-foreground">
+                            <Tag className="w-5 h-5 text-primary" />
+                            Topics
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-4 sm:px-6 pb-6 pt-0">
+                          <Separator className="mb-4 bg-border/40" />
+                          <div className="flex flex-wrap gap-2">
+                            {(algorithm.category.includes(',') ? algorithm.category.split(',').map((c: string) => c.trim()) : [algorithm.category]).map((tag: string, i: number) => (
+                              <Badge 
+                                key={i} 
+                                variant="secondary" 
+                                className="bg-muted hover:bg-muted/80 text-foreground border-border font-normal cursor-pointer flex items-center gap-1.5"
+                                onClick={() => navigate(`/dsa/query?topic=${tag}`)}
+                              >
+                                <Tag className="w-3 h-3 text-primary/70" />
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    )}
+
+                    {/* Companies Item */}
+                    {algorithm.metadata?.companies && algorithm.metadata.companies.length > 0 && (
+                      <AccordionItem value="companies" className="border rounded-lg glass-card shadow-sm border-border/50" ref={companiesRef}>
+                        <AccordionTrigger className="px-4 sm:px-6 py-4 hover:no-underline group">
+                          <div className="flex items-center gap-2 text-base font-medium transition-colors text-foreground">
+                            {hasPremiumAccess || isPlatformPreview ? (
+                              <Building2 className="w-5 h-5 text-primary" />
+                            ) : (
+                              <Lock className="w-5 h-5 text-amber-500" />
+                            )}
+                            Companies
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-4 sm:px-6 pb-6 pt-0">
+                          <Separator className="mb-4 bg-border/40" />
+                          {hasPremiumAccess || isPlatformPreview ? (
+                            <div className="flex flex-wrap gap-2">
+                              {algorithm.metadata.companies.map((company: string, index: number) => (
+                                <Badge
+                                  key={index}
+                                  variant="secondary"
+                                  className="bg-muted hover:bg-muted/80 text-foreground border-border text-xs px-2 py-1 flex items-center gap-1.5 font-normal cursor-pointer"
+                                  onClick={() => navigate(`/dsa/query?company=${company}`)}
+                                >
+                                  <CompanyIcon company={company} className="w-3.5 h-3.5 opacity-80" />
+                                  {company}
+                                </Badge>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="relative overflow-hidden rounded-lg">
+                              <div className="flex flex-wrap gap-2 filter blur-[3px] select-none pointer-events-none opacity-50">
+                                {algorithm.metadata.companies.slice(0, 5).map((company: string, index: number) => (
+                                  <Badge key={index} variant="secondary" className="px-2 py-1">
+                                    {company}
+                                  </Badge>
+                                ))}
+                              </div>
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <ProOverlay className="rounded-none border-0 h-full p-2" />
+                              </div>
+                            </div>
+                          )}
+                        </AccordionContent>
+                      </AccordionItem>
+                    )}
+
+                    {/* Hints Item */}
+                    {algorithm.metadata?.hints && algorithm.metadata.hints.length > 0 && (
+                      <AccordionItem value="hints" className="border rounded-lg glass-card shadow-sm border-border/50" ref={hintsRef}>
+                        <AccordionTrigger className="px-4 sm:px-6 py-4 hover:no-underline group">
+                          <div className="flex items-center gap-2 text-base font-medium transition-colors text-foreground">
+                            <Lightbulb className="w-5 h-5 text-primary" />
+                            Hints
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-4 sm:px-6 pb-6 pt-0 space-y-3">
+                          <Separator className="mb-4 bg-border/40" />
+                          {algorithm.metadata.hints.map((hint: string, i: number) => (
+                            <div key={i} className="flex gap-3 text-sm text-muted-foreground p-3 rounded-lg bg-muted/20 border border-border/30">
+                              <span className="font-semibold text-amber-500 shrink-0">Hint {i + 1}:</span>
+                              <RichText content={hint} />
+                            </div>
+                          ))}
+                        </AccordionContent>
+                      </AccordionItem>
+                    )}
+                  </Accordion>
+                </div>
+
                 {/* Video Tutorial Card */}
                 <FeatureGuard flag="youtube_video">
                   {algorithm.tutorials?.[0]?.url && (!algorithm?.controls || algorithm.controls?.content?.youtube_tutorial !== false) && (
-                    <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-5xl mx-auto">
-                      <div className="space-y-6">
-                        <div className="space-y-4">
-                          <div className="flex items-center gap-2">
-                            <Youtube className="w-5 h-5 text-red-500" />
-                            <h3 className="font-semibold">Video Tutorial</h3>
-                          </div>
-                          {algorithm.tutorials?.[0]?.moreInfo && (
-
-                            <RichText
-                              content={algorithm.tutorials?.[0]?.moreInfo}
-
-                            />
-
-
-                          )}
-                          <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-                            <iframe
-                              className="absolute top-0 left-0 w-full h-full rounded-lg"
-                              src={`https://www.youtube.com/embed/${algorithm.tutorials[0].url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)?.[1] ||
-                                algorithm.tutorials[0].url
-                                }`}
-                              title={`${algorithm.name} Tutorial`}
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                              allowFullScreen
-                            />
-                          </div>
-                          <div className="pt-2 border-t border-border/50">
-                            <p className="text-xs text-muted-foreground">
-                              <strong>Credits:</strong> Video tutorial by NeetCode (used with permission). All written
-                              explanations, code examples, and additional insights provided by Rulcode.com.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
+                    <VideoTutorialCard tutorial={algorithm.tutorials[0]} title={`${algorithm.name} Tutorial`} />
                   )}
                 </FeatureGuard>
 
@@ -747,6 +806,8 @@ export const ProblemDescriptionPanel = React.memo(({
                       implementations={algorithm.implementations}
                       approachName="Optimal Solution"
                       controls={algorithm?.controls?.solutions}
+                      tutorial={algorithm.tutorials?.[0]}
+                      problemName={algorithm.name}
                     />
                   ) : (
                     <div className="text-center py-12 text-muted-foreground border rounded-lg border-dashed">

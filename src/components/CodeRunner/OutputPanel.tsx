@@ -163,12 +163,12 @@ export const OutputPanel = ({
       {/* Top Bar / Tabs */}
       <div className="flex items-center justify-between border-b shrink-0">
         {/* Scrollable Tabs Area */}
-        <div className="flex-1 flex items-center gap-1 p-1 overflow-x-auto scrollbar-thin mask-image-linear-gradient-to-r">
+        <div className="flex-1 flex items-center gap-1 px-1 overflow-x-auto scrollbar-thin mask-image-linear-gradient-to-r">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => onTabChange("testcase")}
-            className={`h-10 text-xs gap-2 shrink-0 rounded-none transition-all ${activeTab === "testcase" ? "text-foreground bg-muted/50" : "text-muted-foreground"}`}
+            className={`h-9 text-xs gap-2 shrink-0 rounded-none transition-all ${activeTab === "testcase" ? "text-foreground bg-muted/50" : "text-muted-foreground"}`}
           >
             <FlaskConical className="w-3.5 h-3.5" />
             Testcase
@@ -178,7 +178,7 @@ export const OutputPanel = ({
             variant="ghost"
             size="sm"
             onClick={() => onTabChange("result")}
-            className={`h-10 text-xs gap-2 shrink-0 rounded-none transition-all ${activeTab === "result" ? "text-foreground bg-muted/50" : "text-muted-foreground"}`}
+            className={`h-9 text-xs gap-2 shrink-0 rounded-none transition-all ${activeTab === "result" ? "text-foreground bg-muted/50" : "text-muted-foreground"}`}
             disabled={!output}
           >
             <Terminal className="w-3.5 h-3.5" />
@@ -189,7 +189,7 @@ export const OutputPanel = ({
             variant="ghost"
             size="sm"
             onClick={() => onTabChange("submissions")}
-            className={`h-10 text-xs gap-2 shrink-0 rounded-none transition-all ${activeTab === "submissions" ? "text-foreground bg-muted/50" : "text-muted-foreground"}`}
+            className={`h-9 text-xs gap-2 shrink-0 rounded-none transition-all ${activeTab === "submissions" ? "text-foreground bg-muted/50" : "text-muted-foreground"}`}
           >
             <History className="w-3.5 h-3.5" />
             Submissions
@@ -224,8 +224,8 @@ export const OutputPanel = ({
             >
               <div className="flex items-center justify-between border-b bg-background/50 shrink-0">
                 {/* Scrollable Tabs List */}
-                <div className="flex-1 overflow-x-auto scrollbar-thin mask-image-linear-gradient-to-r pb-1">
-                  <TabsList className="h-9 bg-transparent p-0 gap-1 flex-nowrap w-max justify-start mb-1">
+                <div className="flex-1 overflow-x-auto scrollbar-thin mask-image-linear-gradient-to-r">
+                  <TabsList className="h-8 bg-transparent p-0 gap-1 flex-nowrap w-max justify-start">
                     {allTestCases.filter(tc => !tc.isSubmission).map((tc, index) => (
                       <TabsTrigger
                         key={tc.id}
@@ -358,8 +358,8 @@ export const OutputPanel = ({
                 <div className="h-full flex flex-col min-h-0">
                   <Tabs value={activeResultTab} onValueChange={setActiveResultTab} className="flex-1 flex flex-col min-h-0">
                     <div className="flex border-b bg-background/50 shrink-0 sticky top-0 z-10 overflow-x-auto overflow-y-hidden">
-                      <div className="flex-1 overflow-x-auto scrollbar-thin mask-image-linear-gradient-to-r px-4 pb-1">
-                        <TabsList className="h-9 bg-transparent p-0 gap-2 flex-nowrap w-max justify-start mb-1">
+                      <div className="flex-1 overflow-x-auto scrollbar-thin mask-image-linear-gradient-to-r px-4">
+                        <TabsList className="h-8 bg-transparent p-0 gap-2 flex-nowrap w-max justify-start">
                           {output.testResults.map((result: any, index: number) => (
                             <TabsTrigger
                               key={index}

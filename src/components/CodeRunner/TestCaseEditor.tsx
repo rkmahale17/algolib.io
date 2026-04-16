@@ -168,19 +168,16 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
   const hasErrors = Object.keys(errors).length > 0;
 
   return (
-    <div className="space-y-3 p-4">
-      <div className="flex items-center justify-between mb-2">
-        <h4 className="text-sm font-semibold">
-          {isEditing ? 'Edit Test Case' : 'Test Case Details'}
-        </h4>
-        {!isEditing && canEdit && (
+    <div className="space-y-3">
+      {!isEditing && canEdit && (
+        <div className="flex justify-end mb-2">
           <Button variant="ghost" size="icon" className="h-6 w-6" onClick={onEdit}>
             <Edit2 className="h-3 w-3" />
           </Button>
-        )}
-      </div>
+        </div>
+      )}
 
-      <h5 className="text-xs font-semibold text-muted-foreground  tracking-wider mt-4 mb-2">Input</h5>
+
 
       {inputSchema.map((field, index) => (
         <div key={field.name} className="space-y-1.5">

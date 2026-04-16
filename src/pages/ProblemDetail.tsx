@@ -38,11 +38,17 @@ const scrollToCode = () => {
 import {
   Sheet,
   SheetContent,
-  SheetHeader,
-  SheetTitle,
 } from "@/components/ui/sheet";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
 import { ProblemSidebar } from "@/components/ProblemSidebar";
 import { useAlgorithms } from "@/hooks/useAlgorithms";
+import { ListType, LIST_TYPE_LABELS } from "@/types/algorithm";
 
 
 const ProblemDetail: React.FC = () => {
@@ -54,7 +60,7 @@ const ProblemDetail: React.FC = () => {
 
   // -- Data Fetching State --
   const { data: algorithm, isLoading: isLoadingAlgorithm } = useAlgorithm(algorithmIdOrSlug);
-  const { user, hasPremiumAccess, activeListType, progressMap } = useApp();
+  const { user, hasPremiumAccess, activeListType, setActiveListType, progressMap } = useApp();
   const { data: algorithmsData, isLoading: isAlgorithmsLoading } = useAlgorithms();
   const allAlgorithms = algorithmsData?.algorithms || [];
   const isPaywallEnabled = useFeatureFlag('paywall_enabled');
@@ -429,10 +435,25 @@ const ProblemDetail: React.FC = () => {
         </div>
 
         <SheetContent side="left" className="w-full sm:max-w-[600px] p-0 border-r border-border shadow-2xl flex flex-col">
-          <div className="flex items-center justify-between p-4 border-b border-border bg-background">
-            <SheetTitle className="text-sm font- tracking-tight uppercase">
-              {activeListType === 'core' ? 'Core Patterns' : activeListType === 'blind75' ? 'Blind 75' : 'Problem List'}
-            </SheetTitle>
+          <div className="flex items-center justify-between p-3 border-b border-border bg-background">
+            <Select 
+              value={activeListType || "all"} 
+              onValueChange={(val) => setActiveListType(val as any)}
+            >
+              <SelectTrigger className="border-none bg-transparent hover:bg-muted/50 focus:ring-0 px-2 h-9 text-sm font-medium w-fit min-w-[140px] gap-2 transition-colors">
+                <SelectValue>
+                  {LIST_TYPE_LABELS[activeListType as any] || 'Problem List'}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Problems</SelectItem>
+                {Object.entries(LIST_TYPE_LABELS)
+                  .filter(([key]) => key !== 'all')
+                  .map(([value, label]) => (
+                    <SelectItem key={value} value={value}>{label}</SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="flex-1 overflow-hidden">
             <ProblemSidebar

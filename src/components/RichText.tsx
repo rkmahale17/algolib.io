@@ -4,12 +4,44 @@ import { AlgoLink } from './AlgoLink';
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { ResponsiveTableContainer } from './ResponsiveTableContainer';
 import { Tips } from '@/components/ui/Tips';
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface RichTextProps {
   content: string | string[];
   className?: string;
   onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
+
+/**
+ * Image wrapper with skeleton loading state
+ */
+const ImageWithSkeleton = ({ src, alt, className, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) => {
+  const [loaded, setLoaded] = React.useState(false);
+  const [error, setError] = React.useState(false);
+
+  return (
+    <div className="relative w-full my-4">
+      {!loaded && !error && (
+        <Skeleton className="w-full aspect-video rounded-lg animate-pulse bg-muted" />
+      )}
+      <img
+        src={src}
+        alt={alt}
+        onLoad={() => setLoaded(true)}
+        onError={() => setError(true)}
+        className={`${className || ''} transition-opacity duration-300 ${loaded ? 'opacity-100' : 'opacity-0 absolute inset-0'
+          }`}
+        style={{ maxWidth: '100%', height: 'auto', borderRadius: '0.5rem' }}
+        {...props}
+      />
+      {error && (
+        <div className="flex items-center justify-center p-4 bg-muted/50 rounded-lg text-xs text-muted-foreground italic">
+          Failed to load image
+        </div>
+      )}
+    </div>
+  );
+};
 
 /**
  * RichText component for rendering HTML content from database
@@ -95,6 +127,19 @@ export const RichText: React.FC<RichTextProps> = ({ content, className = '', onC
                 {children}
               </table>
             </ResponsiveTableContainer>
+          );
+        }
+
+        // Handle <img> tags
+        if (domNode.name === 'img') {
+          const { src, alt, class: className, ...rest } = domNode.attribs;
+          return (
+            <ImageWithSkeleton
+              src={src}
+              alt={alt}
+              className={className}
+              {...rest}
+            />
           );
         }
       }

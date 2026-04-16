@@ -6,6 +6,7 @@ import { Copy, Check, Maximize2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { RichText } from '@/components/RichText';
 import { IsolatedSolutionEditor } from "./algorithm/IsolatedSolutionEditor";
+import { VideoTutorialCard } from "./algorithm/VideoTutorialCard";
 const LANGUAGE_ORDER = ['python', 'cpp', 'java', 'typescript'];
 
 interface CodeBlock {
@@ -41,6 +42,11 @@ interface SolutionViewerProps {
     explanation_before?: boolean;
     explanation_after?: boolean;
   };
+  tutorial?: {
+    url: string;
+    moreInfo?: string;
+  };
+  problemName?: string;
 }
 
 export const SolutionViewer: React.FC<SolutionViewerProps> = ({
@@ -49,6 +55,8 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
   explanation,
   complexityExplanation,
   controls,
+  tutorial,
+  problemName,
 }) => {
   const [copiedTab, setCopiedTab] = useState<string | null>(null);
   const [isAppDark, setIsAppDark] = useState(false);
@@ -191,6 +199,9 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
 
         return (
           <div className="space-y-12">
+            {tutorial && (
+              <VideoTutorialCard tutorial={tutorial} title={`${problemName || 'Problem'} Tutorial`} />
+            )}
             {filteredApproaches.map(([codeType, langImplementations], approachIndex) => (
               <SolutionApproach
                 key={codeType}

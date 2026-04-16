@@ -27,6 +27,8 @@ import {
   Layers,
   Target,
   Brain,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
@@ -46,7 +48,7 @@ import UserMenu from "./UserMenu";
 
 const Navbar = () => {
   const { profile, user } = useApp();
-  const { setOpenMobile } = useSidebar();
+  const { setOpenMobile, toggleSidebar, state } = useSidebar();
   const location = useLocation();
   const isAuthPage = location.pathname === "/login";
 
@@ -93,6 +95,19 @@ const Navbar = () => {
         <div className="flex h-12 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-4">
+            {/* Desktop Sidebar Toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="hidden md:flex h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all rounded-full"
+              onClick={toggleSidebar}
+            >
+              {state === "collapsed" ? (
+                <PanelLeftOpen className="w-4 h-4" />
+              ) : (
+                <PanelLeftClose className="w-4 h-4" />
+              )}
+            </Button>
             <Link
               to="/"
               className="flex items-center gap-2 hover:opacity-80 transition-opacity shutter-click"

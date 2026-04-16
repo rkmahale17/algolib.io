@@ -75,7 +75,6 @@ const ConditionalNavbar = () => {
   // Hide navbar on algorithm detail pages and blind75 detail pages
   const hideNavbar = location.pathname.startsWith('/problem/') && location.pathname !== '/problem' ||
     location.pathname.startsWith('/admin') ||
-    location.pathname.startsWith('/dsa/') ||
     location.pathname === '/dashboard';
 
   if (hideNavbar) return null;
@@ -154,6 +153,7 @@ const AppContent = () => {
               } />
               <Route path="/dsa/problems" element={<Problems />} />
               <Route path="/dsa/all-problems" element={<Problems />} />
+              <Route path="/dsa/query" element={<Problems />} />
               <Route path="/problems" element={<Problems />} />
               <Route path="/dsa/get-started" element={<GetStarted />} />
               <Route path="/pricing" element={<Pricing />} />
