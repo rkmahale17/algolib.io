@@ -7,7 +7,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Next.js
+# Next.js ignore
 .next/
 out/
 build/
