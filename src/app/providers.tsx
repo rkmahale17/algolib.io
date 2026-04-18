@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import { store } from '@/store';
 import posthog from 'posthog-js';
 import { PostHogProvider } from '@posthog/react';
+import { HelmetProvider } from 'react-helmet-async';
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -33,29 +34,31 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <PostHogProvider client={posthog}>
-      <Provider store={store}>
-        <QueryClientProvider client={queryClient}>
-          <AppProvider>
-            <FeatureFlagProvider>
-              <TooltipProvider>
-                <SidebarProvider defaultOpen={false}>
-                  <ThemeProvider
-                    attribute="class"
-                    defaultTheme="system"
-                    enableSystem
-                    disableTransitionOnChange
-                  >
-                    {children}
-                    <Toaster />
-                    <Sonner />
-                  </ThemeProvider>
-                </SidebarProvider>
-              </TooltipProvider>
-            </FeatureFlagProvider>
-          </AppProvider>
-        </QueryClientProvider>
-      </Provider>
-    </PostHogProvider>
+    <HelmetProvider>
+      <PostHogProvider client={posthog}>
+        <Provider store={store}>
+          <QueryClientProvider client={queryClient}>
+            <AppProvider>
+              <FeatureFlagProvider>
+                <TooltipProvider>
+                  <SidebarProvider defaultOpen={false}>
+                    <ThemeProvider
+                      attribute="class"
+                      defaultTheme="system"
+                      enableSystem
+                      disableTransitionOnChange
+                    >
+                      {children}
+                      <Toaster />
+                      <Sonner />
+                    </ThemeProvider>
+                  </SidebarProvider>
+                </TooltipProvider>
+              </FeatureFlagProvider>
+            </AppProvider>
+          </QueryClientProvider>
+        </Provider>
+      </PostHogProvider>
+    </HelmetProvider>
   );
 }
