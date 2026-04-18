@@ -1,26 +1,19 @@
 import { Helmet } from "react-helmet-async";
-import { useParams } from "react-router-dom";
+import Script from "next/script";
 
 // Helper utilities
 const siteBase = "https://rulcode.com";
 const defaultOg = `${siteBase}/og-image.png`;
 
-function escapeHtml(s: string) {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/"/g, "&quot;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+function capitalize(s: string) {
+  if (!s) return s;
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 function buildTitle(algo: any) {
   return `${algo.name} – RulCode | ${algo.category} | ${capitalize(
     algo.difficulty
   )}`;
-}
-function capitalize(s: string) {
-  if (!s) return s;
-  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 // === React component to inject meta tags dynamically ===
@@ -51,7 +44,7 @@ export function AlgoMetaHead({ algorithm }: { algorithm?: any }) {
     : "algorithms, open source, free, competitive programming, algorithm library, rulcode";
 
   const pageUrl = algo ? `${siteBase}/problem/${algo.id}` : siteBase;
-  const ogImage = `${siteBase}/og-image.png`; // Use default OG image for all pages
+  const ogImage = `${siteBase}/og-image.png`;
 
   // Build JSON-LD structured data
   const jsonLd = algo
@@ -145,70 +138,78 @@ export function AlgoMetaHead({ algorithm }: { algorithm?: any }) {
       };
 
   return (
-    <Helmet>
-      <title>{title}</title>
-      <meta name="description" content={description} />
-      <meta name="keywords" content={keywords} />
-      <meta name="robots" content="index, follow" />
+    <>
+      <Helmet>
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <meta name="keywords" content={keywords} />
+        <meta name="robots" content="index, follow" />
 
-      {/* Open Graph */}
-      <meta property="og:title" content={title} />
-      <meta property="og:description" content={description} />
-      <meta property="og:type" content={algo ? "article" : "website"} />
-      <meta property="og:url" content={pageUrl} />
-      <meta property="og:image" content={ogImage || defaultOg} />
+        {/* Open Graph */}
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content={algo ? "article" : "website"} />
+        <meta property="og:url" content={pageUrl} />
+        <meta property="og:image" content={ogImage || defaultOg} />
 
-      {/* Twitter */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:site" content="@rulcode" />
-      <meta name="twitter:title" content={title} />
-      <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={ogImage || defaultOg} />
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@rulcode" />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={ogImage || defaultOg} />
 
-      {/* Canonical */}
-      <link rel="canonical" href={pageUrl} />
+        {/* Canonical */}
+        <link rel="canonical" href={pageUrl} />
+      </Helmet>
 
-      {/* JSON-LD - TechArticle or WebSite */}
-      <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+      <Script
+        id={`algo-json-ld-${algo?.id || 'default'}`}
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
 
-      {/* JSON-LD - BreadcrumbList for algorithm pages */}
       {algo && (
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            itemListElement: [
-              {
-                "@type": "ListItem",
-                position: 1,
-                item: {
-                  "@id": siteBase,
-                  name: "Home",
+        <Script
+          id={`algo-breadcrumb-json-ld-${algo.id}`}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                {
+                  "@type": "ListItem",
+                  position: 1,
+                  item: {
+                    "@id": siteBase,
+                    name: "Home",
+                  },
                 },
-              },
-              {
-                "@type": "ListItem",
-                position: 2,
-                item: {
-                  "@id": `${siteBase}/?category=${encodeURIComponent(
-                    algo.category
-                  )}`,
-                  name: algo.category,
+                {
+                  "@type": "ListItem",
+                  position: 2,
+                  item: {
+                    "@id": `${siteBase}/?category=${encodeURIComponent(
+                      algo.category
+                    )}`,
+                    name: algo.category,
+                  },
                 },
-              },
-              {
-                "@type": "ListItem",
-                position: 3,
-                item: {
-                  "@id": `${siteBase}/problem/${algo.id}`,
-                  name: algo.name,
+                {
+                  "@type": "ListItem",
+                  position: 3,
+                  item: {
+                    "@id": `${siteBase}/problem/${algo.id}`,
+                    name: algo.name,
+                  },
                 },
-              },
-            ],
-          })}
-        </script>
+              ],
+            })
+          }}
+        />
       )}
-    </Helmet>
+    </>
   );
 }
 

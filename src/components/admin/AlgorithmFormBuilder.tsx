@@ -33,7 +33,7 @@ import { ProblemsEditor } from "./ProblemsEditor";
 import { AlgorithmPreview } from "./AlgorithmPreview";
 import { TutorialsEditor } from "./TutorialsEditor";
 import { ControlsEditor, DEFAULT_CONTROLS } from "./ControlsEditor";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { SmartFillDialog } from "./SmartFillDialog";
 
 interface AlgorithmFormBuilderProps {
@@ -49,7 +49,7 @@ export function AlgorithmFormBuilder({
 }: AlgorithmFormBuilderProps) {
   const [activeTab, setActiveTab] = useState("basic");
   const [listType, setListType] = useState("coreAlgo");
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const createMutation = useCreateAlgorithm();
   const updateMutation = useUpdateAlgorithm();
@@ -335,7 +335,7 @@ export function AlgorithmFormBuilder({
             <div className="mb-1">
               <Button
                 variant="ghost"
-                onClick={() => navigate('/admin/problems')}
+                onClick={() => router.push('/admin/problems')}
                 className="gap-2 pl-0 hover:pl-2 transition-all"
               >
                 <ArrowLeft className="h-4 w-4" />

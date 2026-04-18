@@ -4,7 +4,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { AlgorithmListItem } from '@/types/algorithm';
-import { Link, useParams } from 'react-router-dom';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { ProblemFilterPopup } from './ProblemFilterPopup';
 
 interface ProblemSidebarProps {
@@ -24,7 +25,9 @@ export const ProblemSidebar = ({
     className,
     onItemClick
 }: ProblemSidebarProps) => {
-    const { id, slug } = useParams<{ id?: string; slug?: string }>();
+    const params = useParams();
+    const id = params?.id as string;
+    const slug = params?.slug as string;
     const currentIdOrSlug = id || slug;
 
     const [searchQuery, setSearchQuery] = useState('');
@@ -124,7 +127,7 @@ export const ProblemSidebar = ({
                     return (
                         <Link
                             key={algo.id}
-                            to={algo.slug ? `/problem/${algo.slug}` : `/problem/${algo.id}`}
+                            href={algo.slug ? `/problem/${algo.slug}` : `/problem/${algo.id}`}
                             onClick={onItemClick}
                             className={cn(
                                 "group flex items-center gap-3 px-4 py-3 transition-colors",

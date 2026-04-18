@@ -2,14 +2,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { DPMode } from "@/hooks/useDPGame";
 import { Brain, Grid3x3, Type, Coins, ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 
 interface DPModeSelectionProps {
   onSelectMode: (mode: DPMode) => void;
 }
 
 export const DPModeSelection = ({ onSelectMode }: DPModeSelectionProps) => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const modes = [
     {
       id: "fibonacci" as DPMode,
@@ -54,7 +54,7 @@ export const DPModeSelection = ({ onSelectMode }: DPModeSelectionProps) => {
       <div className="mb-6">
         <Button
           variant="ghost"
-          onClick={() => navigate('/games')}
+          onClick={() => router.push('/games')}
           className="gap-2"
         >
           <ArrowLeft className="w-4 h-4" />

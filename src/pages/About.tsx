@@ -1,3 +1,4 @@
+"use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Code2, Github, Heart, Users, ExternalLink, Layers, BarChart, Database } from "lucide-react";
@@ -38,9 +39,13 @@ export default function About() {
         <meta property="og:title" content="About RulCode - Free Algorithm Learning Platform" />
         <meta property="og:description" content="100% free and open-source platform for learning algorithms with interactive visualizations" />
         <meta property="og:url" content="https://rulcode.com/about" />
+      </Helmet>
 
-        <script type="application/ld+json">
-          {JSON.stringify({
+      <Script
+        id="about-json-ld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "AboutPage",
             "name": "About RulCode",
@@ -52,9 +57,9 @@ export default function About() {
               "description": "Free and open-source algorithm library for competitive programming and coding interviews",
               "url": "https://rulcode.com"
             }
-          })}
-        </script>
-      </Helmet>
+          })
+        }}
+      />
 
       <div className="min-h-screen bg-background relative overflow-hidden">
         {/* Background Gradients */}

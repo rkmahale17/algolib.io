@@ -1,3 +1,4 @@
+"use client";
 import { useMemo } from "react";
 import { useSearchParams, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";

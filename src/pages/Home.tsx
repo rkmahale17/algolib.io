@@ -1,3 +1,4 @@
+"use client";
 import {
   Sparkles,
   Zap,
@@ -50,6 +51,7 @@ import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useApp } from "@/contexts/AppContext";
 import { Loader2 } from "lucide-react";
+import Script from "next/script";
 
 const PlatformPreview = lazy(() => import("@/components/Home/PlatformPreview"));
 
@@ -97,18 +99,21 @@ const Home = () => {
           content="Free interactive algorithm visualizations and integrated code runner for FAANG interview preparation."
         />
         <meta name="twitter:image" content="https://rulcode.com/og-image.png" />
+      </Helmet>
 
-        {/* Structured Data */}
-        <script type="application/ld+json">
-          {JSON.stringify({
+      <Script
+        id="legacy-home-json-ld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebSite",
             name: "RulCode",
             url: "https://rulcode.com",
             description: "Interactive competitive coding and algorithm visualization platform",
-          })}
-        </script>
-      </Helmet>
+          })
+        }}
+      />
 
       <div className="min-h-screen bg-white dark:bg-black text-[#1A1A1A] dark:text-white">
         {/* Hero Section */}

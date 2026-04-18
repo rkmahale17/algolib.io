@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { updateProgress, updateSocial, updateCode } from '@/utils/userAlgorithmDataHelpers';
@@ -24,7 +24,7 @@ export const useAlgorithmInteractions = ({
     refetchUserData,
     filteredAlgorithms
 }: UseAlgorithmInteractionsProps) => {
-    const navigate = useNavigate();
+    const router = useRouter();
     const posthog = usePostHog();
     const [isCompleted, setIsCompleted] = useState(false);
     const [isFavorite, setIsFavorite] = useState(false);
@@ -308,9 +308,9 @@ export const useAlgorithmInteractions = ({
         const { data } = await supabase.from('algorithms').select('id');
         if (data && data.length > 0) {
             const random = data[Math.floor(Math.random() * data.length)];
-            navigate(`/problem/${random.id}`);
+            router.push(`/problem/${random.id}`);
         }
-    }, [navigate]);
+    }, [router]);
 
     const handlePreviousProblem = useCallback(async () => {
         if (!algorithm || !supabase) return;
@@ -320,7 +320,7 @@ export const useAlgorithmInteractions = ({
                 const currentIndex = filteredAlgorithms.findIndex(a => a.id === algorithm.id || a.slug === algorithm.slug || a.id === algorithmId);
                 if (currentIndex > 0) {
                     const prevAlgo = filteredAlgorithms[currentIndex - 1];
-                    navigate(`/problem/${prevAlgo.slug || prevAlgo.id}`);
+                    router.push(`/problem/${prevAlgo.slug || prevAlgo.id}`);
                     return;
                 } else if (currentIndex === 0) {
                     toast.info("No previous problem found. You are at the start!");
@@ -338,7 +338,7 @@ export const useAlgorithmInteractions = ({
                     .maybeSingle();
 
                 if (prevAlgo) {
-                    navigate(`/problem/${prevAlgo.id}`);
+                    router.push(`/problem/${prevAlgo.id}`);
                     return;
                 }
             }
@@ -347,7 +347,7 @@ export const useAlgorithmInteractions = ({
         } catch (error) {
             console.error("Error navigating previous:", error);
         }
-    }, [algorithm, algorithmId, navigate, filteredAlgorithms]);
+    }, [algorithm, algorithmId, router, filteredAlgorithms]);
 
     const handleNextProblem = useCallback(async () => {
         if (!algorithm || !supabase) return;
@@ -357,7 +357,7 @@ export const useAlgorithmInteractions = ({
                 const currentIndex = filteredAlgorithms.findIndex(a => a.id === algorithm.id || a.slug === algorithm.slug || a.id === algorithmId);
                 if (currentIndex >= 0 && currentIndex < filteredAlgorithms.length - 1) {
                     const nextAlgo = filteredAlgorithms[currentIndex + 1];
-                    navigate(`/problem/${nextAlgo.slug || nextAlgo.id}`);
+                    router.push(`/problem/${nextAlgo.slug || nextAlgo.id}`);
                     return;
                 } else if (currentIndex === filteredAlgorithms.length - 1) {
                     toast.info("You have reached the end of the list!");
@@ -376,7 +376,7 @@ export const useAlgorithmInteractions = ({
                     .maybeSingle(); // Use maybeSingle() as we expect at most one, or null if none
 
                 if (nextAlgo) {
-                    navigate(`/problem/${nextAlgo.id}`);
+                    router.push(`/problem/${nextAlgo.id}`);
                     return;
                 }
             }
@@ -391,7 +391,7 @@ export const useAlgorithmInteractions = ({
             handleRandomProblem();
         }
 
-    }, [algorithm, algorithmId, handleRandomProblem, navigate, filteredAlgorithms]);
+    }, [algorithm, algorithmId, handleRandomProblem, router, filteredAlgorithms]);
 
     const handleShare = useCallback(async () => {
         try {

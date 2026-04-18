@@ -41,13 +41,13 @@ const blogRoutes = blogPosts.map((post) => `/blog/${post.slug}`);
 async function generateSitemap() {
   console.log('Fetching algorithms from Supabase...');
 
-  const supabaseUrl = process.env.VITE_SUPABASE_URL;
-  const supabaseKey = process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
   console.log('Environment Debug:', {
     hasUrl: !!supabaseUrl,
     hasKey: !!supabaseKey,
-    allKeys: Object.keys(process.env).filter(k => k.startsWith('VITE_'))
+    allKeys: Object.keys(process.env).filter(k => k.startsWith('VITE_') || k.startsWith('NEXT_PUBLIC_'))
   });
 
   if (!supabaseUrl || !supabaseKey) {

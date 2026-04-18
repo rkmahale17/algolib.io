@@ -1,3 +1,5 @@
+"use client";
+
 import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
 import { ReactNode } from "react";
 

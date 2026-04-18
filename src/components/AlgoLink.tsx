@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Mail, ExternalLink, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -77,7 +77,7 @@ export const AlgoLink: React.FC<AlgoLinkProps> = ({
   // Internal Link
   return (
     <Link
-      to={url}
+      href={url}
       className={cn("inline-flex items-center hover:underline text-primary", className)}
     >
       {content}

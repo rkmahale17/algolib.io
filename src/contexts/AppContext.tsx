@@ -1,3 +1,5 @@
+"use client";
+
 // Global application context for state management and caching
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from 'react';
@@ -10,6 +12,7 @@ import { getAllUserAlgorithmData } from '@/utils/userAlgorithmDataHelpers';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setUser, setProfile, setAuthLoading } from '@/store/slices/authSlice';
 import { setProgressData, updateProgressItem, removeProgressItem } from '@/store/slices/userProgressSlice';
+import { fetchAllAlgorithms } from '@/store/slices/algorithmsSlice';
 
 interface Algorithm {
   id: string;
@@ -73,15 +76,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // Track in-flight profile fetch to avoid redundant calls
   const profileFetchInProgress = React.useRef<string | null>(null);
 
-  const [isAlgorithmsLoading, setIsAlgorithmsLoading] = useState(false);
+  const isAlgorithmsLoading = useAppSelector(state => state.algorithms.isLoading);
 
-  const [activeListType, setActiveListType] = useState<string>(() => {
-    return localStorage.getItem('rulcode_active_list_type') || 'all';
-  });
+  const [activeListType, setActiveListType] = useState<string>('all');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('rulcode_active_list_type');
+      if (saved) setActiveListType(saved);
+    }
+  }, []);
 
   const updateActiveListType = (type: string) => {
     setActiveListType(type);
-    localStorage.setItem('rulcode_active_list_type', type);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('rulcode_active_list_type', type);
+    }
   };
 
   const fetchProfile = useCallback(async (userId: string) => {
@@ -138,11 +148,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   // Fetch algorithms from database - Logic moved to useAlgorithms hook
-  const fetchAlgorithms = async () => {
-    // This is now a stub to avoid breaking anything that might still reference it internally
-    // though we are removing it from the public context
-    setIsAlgorithmsLoading(false);
-  };
+  const fetchAlgorithms = useCallback(async () => {
+    dispatch(fetchAllAlgorithms());
+  }, [dispatch]);
 
 // Fetch user algorithm data
 const fetchUserData = useCallback(async () => {
@@ -204,10 +212,10 @@ useEffect(() => {
   };
 }, [fetchProfile, dispatch]);
 
-// Fetch algorithms on mount (Removed to avoid redundancy with React Query prefetch in App.tsx)
-// useEffect(() => {
-//   fetchAlgorithms();
-// }, []);
+// Fetch algorithms on mount
+useEffect(() => {
+  fetchAlgorithms();
+}, [fetchAlgorithms]);
 
 // Fetch user data when user changes
 useEffect(() => {

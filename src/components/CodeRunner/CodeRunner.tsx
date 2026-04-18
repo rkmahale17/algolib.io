@@ -41,6 +41,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { generateStub } from '@/utils/stubGenerator';
 import { addSubmission, updateProgress, getUserAlgorithmData } from '@/utils/userAlgorithmDataHelpers';
 import { Submission } from '@/types/userAlgorithmData';
+import env from '@/config/env';
 
 interface CodeRunnerProps {
   algorithmId?: string;
@@ -578,8 +579,8 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
       }
 
       const { data: { session } } = await supabase.auth.getSession();
-
-      const response = await axios.post('/api/execute', {
+      const apiUrl = env.apiUrl;
+      const response = await axios.post(`${apiUrl}/api/execute`, {
         language_id: LANGUAGE_IDS[language],
         source_code: fullCode,
         stdin: "",

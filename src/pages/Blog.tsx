@@ -1,3 +1,4 @@
+"use client";
 import { Card, CardContent } from "@/components/ui/card";
 
 import { BlogCard } from "@/components/blog/BlogCard";
@@ -5,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { blogPosts } from "@/data/blogPosts";
+import Script from "next/script";
 
 const Blog = () => {
   const categories = Array.from(
@@ -34,10 +36,13 @@ const Blog = () => {
         <meta name="twitter:title" content="Rulcode Blog - Algorithm Tutorials" />
         <meta name="twitter:description" content="Master algorithms through interactive tutorials and guides." />
         <meta name="twitter:image" content="https://rulcode.com/og-image.png" />
+      </Helmet>
 
-        {/* JSON-LD Structured Data */}
-        <script type="application/ld+json">
-          {JSON.stringify({
+      <Script
+        id="blog-json-ld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Blog",
             "name": "Rulcode Blog",
@@ -51,9 +56,9 @@ const Blog = () => {
                 "url": "https://rulcode.com/android-chrome-512x512.png"
               }
             }
-          })}
-        </script>
-      </Helmet>
+          })
+        }}
+      />
 
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 py-12 px-4">
         <div className="container mx-auto max-w-7xl">

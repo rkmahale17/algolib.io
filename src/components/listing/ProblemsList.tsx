@@ -226,13 +226,13 @@ export const ProblemsList = ({
       {headerSlot}
 
       {isLoading ? (
-        <div className="p-8 space-y-4 max-w-[700px] mx-auto">
+        <div className="p-8 space-y-4 max-w-[1000px] mx-auto">
           {[...Array(5)].map((_, i) => (
             <div key={i} className="h-32 bg-muted/20 animate-pulse rounded-xl" />
           ))}
         </div>
       ) : !isCategoryWise ? (
-        <div className="w-full max-w-[700px] mx-auto">
+        <div className="w-full max-w-[1000px] mx-auto">
           {filteredAndSortedAlgorithms.map((algo, index) => (
             <PremiumProblemCard
               key={algo.id}
@@ -251,7 +251,7 @@ export const ProblemsList = ({
           )}
         </div>
       ) : (
-        <div className="w-full max-w-[700px] mx-auto">
+        <div className="w-full max-w-[1000px] mx-auto">
           {currentGroupedAlgos.length > 0 ? (
             <Accordion 
               type="multiple" 

@@ -32,10 +32,10 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Pencil, Trash2, Plus, Search, ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 
 export function AlgorithmList() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [listTypeFilter, setListTypeFilter] = useState<string>('all');
@@ -117,7 +117,7 @@ export function AlgorithmList() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate('/admin')}
+            onClick={() => router.push('/admin')}
             className="mr-2"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -129,7 +129,7 @@ export function AlgorithmList() {
             </span>
           )}
         </div>
-        <Button onClick={() => navigate('/admin/problem/new')} className="gap-2">
+        <Button onClick={() => router.push('/admin/problem/new')} className="gap-2">
           <Plus className="h-4 w-4" />
           Add Problem
         </Button>
@@ -242,7 +242,7 @@ export function AlgorithmList() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => navigate(`/admin/problem/${algo.id}`)}
+                          onClick={() => router.push(`/admin/problem/${algo.id}`)}
                           className="gap-2"
                         >
                           Edit

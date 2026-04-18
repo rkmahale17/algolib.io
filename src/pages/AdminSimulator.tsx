@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +17,7 @@ import axios from 'axios';
 import { generateTestRunner, generateClassTestRunner } from '@/utils/testRunnerGenerator';
 import { LANGUAGE_IDS } from '@/components/CodeRunner/constants';
 import { Language } from '@/components/CodeRunner/LanguageSelector';
+import env from '@/config/env';
 
 // Types
 interface LogEntry {
@@ -205,7 +207,8 @@ const AdminSimulator: React.FC = () => {
 
       const { data: { session } } = await supabase.auth.getSession();
 
-      const response = await axios.post('/api/execute', {
+      const apiUrl = env.apiUrl;
+      const response = await axios.post(`${apiUrl}/api/execute`, {
         language_id: LANGUAGE_IDS[language],
         source_code: fullCode,
         stdin: "",

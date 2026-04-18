@@ -1,3 +1,4 @@
+"use client";
 import { Badge } from "@/components/ui/badge";
 import { Footer } from "@/components/Footer";
 import { Helmet } from "react-helmet-async";

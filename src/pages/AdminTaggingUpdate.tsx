@@ -1,3 +1,4 @@
+"use client";
 import { useState, useMemo } from 'react';
 import { useAlgorithms, useBulkUpdateAlgorithms, useBatchStagedUpdates } from '@/hooks/useAlgorithms';
 import { TOP_COMPANIES, CompanyTag } from '@/constants/companies';

@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Search, TrendingUp, BookOpen, Check, Circle, MoreVertical, Timer, Database, ExternalLink, Lock, LayoutGrid, List } from 'lucide-react';
 
 import { Skeleton } from '@/components/ui/skeleton';
@@ -301,7 +301,7 @@ export const ProblemList = ({
                   return (
                     <Link
                       key={algo.id}
-                      to={algo.slug ? `/problem/${algo.slug}` : `/problem/${algo.id}`}
+                      href={algo.slug ? `/problem/${algo.slug}` : `/problem/${algo.id}`}
                       className="group relative flex flex-col h-full"
                     >
                       <div className={`

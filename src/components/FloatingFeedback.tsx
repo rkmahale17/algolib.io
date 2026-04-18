@@ -1,7 +1,7 @@
 import React from 'react';
 import { MessageSquarePlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import {
     Tooltip,
     TooltipContent,
@@ -16,7 +16,7 @@ export const FloatingFeedback: React.FC = () => {
                 <Tooltip>
                     <TooltipTrigger asChild>
 
-                        <Button variant="outline" size="sm" asChild><Link to="/feedback">
+                        <Button variant="outline" size="sm" asChild><Link href="/feedback">
                             Feedback
                         </Link></Button>
                     </TooltipTrigger>

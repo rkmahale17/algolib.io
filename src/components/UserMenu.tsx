@@ -1,3 +1,5 @@
+"use client";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
     DropdownMenu,
@@ -14,7 +16,8 @@ import {
     User,
     CreditCard,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -22,8 +25,9 @@ import { useApp } from "@/contexts/AppContext";
 import { FeatureGuard } from "./FeatureGuard";
 
 const UserMenu = () => {
+    const router = useRouter();
     const { user, profile } = useApp();
-    const adminId = import.meta.env.VITE_ADMIN_USER_ID;
+    const adminId = process.env.NEXT_PUBLIC_ADMIN_USER_ID;
     const isAdmin = user && adminId && user.id === adminId;
 
     const handleSignOut = async () => {
@@ -36,12 +40,14 @@ const UserMenu = () => {
             toast.error("Failed to sign out");
         } else {
             toast.success("Signed out successfully");
+            router.refresh();
+            router.push("/");
         }
     };
 
     if (!user) {
         return (
-            <Link to="/login">
+            <Link href="/login">
                 <Button variant="ghost" size="sm" className="h-8 px-4 font-medium transition-colors">
                     Sign In
                 </Button>
@@ -80,13 +86,13 @@ const UserMenu = () => {
 
                     <FeatureGuard flag="profiles">
                         <DropdownMenuItem asChild className="cursor-pointer">
-                            <Link to="/dashboard" className="w-full flex items-center">
+                            <Link href="/dashboard" className="w-full flex items-center">
                                 <User className="mr-2 h-4 w-4" />
                                 <span>Dashboard</span>
                             </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild className="cursor-pointer">
-                            <Link to="/pricing" className="w-full flex items-center">
+                            <Link href="/pricing" className="w-full flex items-center">
                                 <CreditCard className="mr-2 h-4 w-4" />
                                 <span>Billing</span>
                             </Link>
@@ -94,7 +100,7 @@ const UserMenu = () => {
                     </FeatureGuard>
 
                     <DropdownMenuItem asChild className="cursor-pointer">
-                        <Link to="/feedback" className="w-full flex items-center">
+                        <Link href="/feedback" className="w-full flex items-center">
                             <MessageSquare className="mr-2 h-4 w-4" />
                             <span>Feedback</span>
                         </Link>
@@ -102,7 +108,7 @@ const UserMenu = () => {
 
                     {isAdmin && (
                         <DropdownMenuItem asChild className="cursor-pointer">
-                            <Link to="/admin" className="w-full flex items-center">
+                            <Link href="/admin" className="w-full flex items-center">
                                 <ShieldCheck className="mr-2 h-4 w-4 text-emerald-500" />
                                 <span className="text-emerald-500 font-medium">Admin Dashboard</span>
                             </Link>
@@ -124,3 +130,4 @@ const UserMenu = () => {
 };
 
 export default UserMenu;
+

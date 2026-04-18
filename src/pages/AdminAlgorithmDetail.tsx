@@ -1,3 +1,4 @@
+"use client";
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAlgorithm } from '@/hooks/useAlgorithm';
 import { AlgorithmFormBuilder } from '@/components/admin/AlgorithmFormBuilder';

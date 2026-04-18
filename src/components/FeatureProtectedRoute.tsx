@@ -1,7 +1,9 @@
-import { Navigate, useLocation } from "react-router-dom";
+'use client';
+
+import { useRouter } from "next/navigation";
 import { useFeatureFlags } from "@/contexts/FeatureFlagContext";
-import { FeatureFlag } from "@/types/featureFlags";
 import { PremiumLoader } from "@/components/PremiumLoader";
+import { useEffect } from "react";
 
 interface FeatureProtectedRouteProps {
   children: React.ReactNode;
@@ -15,17 +17,21 @@ export const FeatureProtectedRoute = ({
   redirectTo = "/" 
 }: FeatureProtectedRouteProps) => {
   const { flags, isLoading } = useFeatureFlags();
-  const location = useLocation();
+  const router = useRouter();
   const isEnabled = flags[flag] ?? false;
+
+  useEffect(() => {
+    if (!isLoading && !isEnabled) {
+      router.replace(redirectTo);
+    }
+  }, [isLoading, isEnabled, redirectTo, router]);
 
   if (isLoading) {
     return <PremiumLoader text="Initializing features..." />;
   }
 
   if (!isEnabled) {
-    // Optionally we could show a "Feature Disabled" page instead of redirecting
-    // For now, redirect to home
-    return <Navigate to={redirectTo} replace state={{ from: location }} />;
+    return null; // Redirection handled by useEffect
   }
 
   return <>{children}</>;

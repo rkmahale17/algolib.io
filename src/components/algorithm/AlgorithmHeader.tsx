@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import {
   ChevronRight,
   ChevronLeft,
@@ -12,8 +12,6 @@ import {
   Pause,
   Play,
   RotateCcw,
-  MessageSquare,
-  LogOut,
   MoreHorizontal,
   User,
   Send,
@@ -49,6 +47,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { useApp } from "@/contexts/AppContext";
 import { Badge } from "@/components/ui/badge";
 import logo from "@/assets/logo.svg";
+import UserMenu from "@/components/UserMenu";
 
 interface AlgorithmHeaderProps {
   user: any;
@@ -87,8 +86,6 @@ interface AlgorithmHeaderProps {
   hideUserMenu?: boolean;
   onThinkpad?: () => void;
 }
-
-import UserMenu from "@/components/UserMenu";
 
 export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
   user,
@@ -129,11 +126,10 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
       {/* Left Side: Logo + Navigation */}
       <div className="flex items-center gap-3">
         <Link
-          to="/"
+          href="/"
           className="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
-          <img src={logo} alt="RulCode Logo" className="w-8 h-8" />
-          {/* <span className="text-xl font-mono">RulCode</span> */}
+          <img src={typeof logo === 'string' ? logo : (logo as any).src} alt="RulCode Logo" className="w-8 h-8" />
         </Link>
 
         <div className="h-4 w-px bg-border" />
@@ -191,11 +187,6 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
       </div>
 
       {/* Middle: Run / Submit Buttons */}
-      {/* Show on md+ screens, assuming md ~768px matches the user intent roughly, or use custom class if needed. 
-          The user wanted "always visible" which implies desktop. "Mobile buttons with coderrunner" implies hidden on mobile.
-          The `!showCondensedMenu` checks window width < 778. Let's start by using that for consistent logic, 
-          but change the styling to be more contrasted.
-       */}
       {!showCondensedMenu && onRun && onSubmit && (
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
           <TooltipProvider>
@@ -308,15 +299,11 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
                 <span>Share</span>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/dashboard">
+                <Link href="/dashboard">
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile</span>
                 </Link>
               </DropdownMenuItem>
-              {/* <DropdownMenuItem onClick={() => window.open("/feedback", "_blank")}>
-                  <Bug className="mr-2 h-4 w-4" />
-                  <span>Report Issue</span>
-                </DropdownMenuItem> */}
               <DropdownMenuSeparator />
               {/* Interview Mode - Hidden for now */}
               <FeatureGuard flag="interview_mode">
@@ -405,41 +392,6 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
           </TooltipProvider>
         )}
 
-        {/* Interview Mode - Show only if NOT condensed menu */}
-        {!showCondensedMenu && false && (!algorithm?.controls || algorithm.controls?.header?.interview_mode !== false) && (
-          <TooltipProvider>
-            <FeatureGuard flag="interview_mode">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handlePreviousProblem}
-                    className="h-9 w-9 text-muted-foreground hover:text-foreground"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Previous Problem</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleNextProblem}
-                    className="h-9 w-9 text-muted-foreground hover:text-foreground"
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Next Problem</TooltipContent>
-              </Tooltip>
-            </FeatureGuard>
-          </TooltipProvider>
-        )}
-
         <div className="h-4 w-px bg-border mx-1" />
 
         <ThemeToggle />
@@ -449,3 +401,4 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
     </div>
   );
 };
+

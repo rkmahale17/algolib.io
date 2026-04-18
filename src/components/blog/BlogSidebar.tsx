@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Gamepad2, Trophy, Brain, Zap } from "lucide-react";
@@ -42,7 +42,7 @@ export const BlogSidebar = ({ category }: BlogSidebarProps) => {
   const getRelatedLinks = () => {
     const baseLinks = [
       { title: "All Algorithms", link: "/", description: "Explore all algorithm visualizations" },
-      { title: "Blind 75", link: "/blind75", description: "Top 75 LeetCode problems" }
+      { title: "Blind 75", link: "/dsa/blind-75", description: "Top 75 LeetCode problems" }
     ];
 
     if (category?.toLowerCase().includes("dynamic")) {
@@ -92,7 +92,7 @@ export const BlogSidebar = ({ category }: BlogSidebarProps) => {
             return (
               <Link
                 key={game.link}
-                to={game.link}
+                href={game.link}
                 className="block group"
               >
                 <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-accent/50 transition-colors">
@@ -106,7 +106,7 @@ export const BlogSidebar = ({ category }: BlogSidebarProps) => {
               </Link>
             );
           })}
-          <Link to="/games">
+          <Link href="/games">
             <Button variant="outline" size="sm" className="w-full gap-2 h-8 text-xs mt-2">
               View All Games
               <ArrowRight className="w-3 h-3" />
@@ -127,7 +127,7 @@ export const BlogSidebar = ({ category }: BlogSidebarProps) => {
           {relatedLinks.map((link) => (
             <Link
               key={link.link}
-              to={link.link}
+              href={link.link}
               className="block group p-2 rounded-lg hover:bg-accent/50 transition-colors"
             >
               <div className="flex items-center justify-between gap-2">

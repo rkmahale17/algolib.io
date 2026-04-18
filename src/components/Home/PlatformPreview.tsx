@@ -2,7 +2,7 @@ import React from "react";
 import { AlgorithmPreview } from "../admin/AlgorithmPreview";
 import { platformPreviewData } from "../../data/platformPreviewData";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 const INITIAL_CODE = `function twoSum(nums: number[], target: number): number[] {
@@ -48,7 +48,7 @@ export default function PlatformPreview() {
             {/* CTA button — links to the Two Sum problem */}
             <div className="mt-8 flex justify-center">
                 <Link
-                    to="/problem/two-sum"
+                    href="/problem/two-sum"
                     className="bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 px-6 py-3 rounded-full shadow-xl border border-zinc-800 dark:border-zinc-200 flex items-center gap-3 whitespace-nowrap hover:bg-zinc-700 dark:hover:bg-zinc-100 transition-colors duration-200 group/btn"
                 >
                     <div className="flex gap-1">
@@ -63,3 +63,4 @@ export default function PlatformPreview() {
         </motion.div>
     );
 }
+

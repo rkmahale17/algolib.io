@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { GraphModeSelection } from "@/components/graphExplorer/GraphModeSelection";

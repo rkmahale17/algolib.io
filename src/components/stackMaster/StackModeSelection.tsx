@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Zap, Layers, Code, Gauge, ArrowLeft } from "lucide-react";
 import { StackMode } from "@/hooks/useStackGame";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 
 interface StackModeSelectionProps {
   onSelectMode: (mode: StackMode) => void;
@@ -52,14 +52,14 @@ const modes = [
 ];
 
 export const StackModeSelection = ({ onSelectMode }: StackModeSelectionProps) => {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   return (
     <div className="space-y-6">
       <div className="mb-6">
         <Button
           variant="ghost"
-          onClick={() => navigate('/games')}
+          onClick={() => router.push('/games')}
           className="gap-2"
         >
           <ArrowLeft className="w-4 h-4" />

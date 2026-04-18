@@ -1,8 +1,16 @@
-import { Link } from "react-router-dom";
+"use client";
+
+import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Github, Heart, ExternalLink } from "lucide-react";
 import { Button } from "./ui/button";
 
 export function Footer() {
+  const [year, setYear] = useState(2025);
+
+  useEffect(() => {
+    setYear(new Date().getFullYear());
+  }, []);
   return (
     <footer className="border-t bg-background">
       <div className="container mx-auto px-4 py-8">
@@ -24,17 +32,17 @@ export function Footer() {
             <h3 className="font-semibold text-foreground">Resources</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   About
                 </Link>
               </li>
               <li>
-                <Link to="/docs" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/docs" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Documentation
                 </Link>
               </li>
               <li>
-                <Link to="/feedback" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/feedback" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Feedback
                 </Link>
               </li>
@@ -94,17 +102,17 @@ export function Footer() {
             <h3 className="font-semibold text-foreground">Legal</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link to="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Terms of Service
                 </Link>
               </li>
               <li>
-                <Link to="/content-rights" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/content-rights" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Content Rights
                 </Link>
               </li>
@@ -117,7 +125,7 @@ export function Footer() {
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="flex flex-col items-center sm:items-start gap-2">
               <p className="text-sm text-muted-foreground text-center sm:text-left">
-                © {new Date().getFullYear()} RulCode. Open source and free forever.
+                © {year || '2025'} RulCode. Open source and free forever.
               </p>
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-3 text-xs text-muted-foreground">
                 <a

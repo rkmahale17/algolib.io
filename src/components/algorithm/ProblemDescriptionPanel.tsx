@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import Link from "next/link";
+import { useRouter, useParams } from "next/navigation";
 import {
   Book,
   Eye,
@@ -104,8 +105,10 @@ export const ProblemDescriptionPanel = React.memo(({
   const topicsRef = useRef<HTMLDivElement>(null);
   const companiesRef = useRef<HTMLDivElement>(null);
   const hintsRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
-  const { id, slug } = useParams<{ id?: string; slug?: string }>();
+  const router = useRouter();
+  const params = useParams();
+  const id = params?.id as string;
+  const slug = params?.slug as string;
   const [isCompact, setIsCompact] = useState(false);
   const [isUltraCompact, setIsUltraCompact] = useState(false);
 
@@ -622,7 +625,7 @@ export const ProblemDescriptionPanel = React.memo(({
                                 key={i} 
                                 variant="secondary" 
                                 className="bg-muted hover:bg-muted/80 text-foreground border-border font-normal cursor-pointer flex items-center gap-1.5"
-                                onClick={() => navigate(`/dsa/query?topic=${tag}`)}
+                                onClick={() => router.push(`/dsa/query?topic=${tag}`)}
                               >
                                 <Tag className="w-3 h-3 text-primary/70" />
                                 {tag}
@@ -655,7 +658,7 @@ export const ProblemDescriptionPanel = React.memo(({
                                   key={index}
                                   variant="secondary"
                                   className="bg-muted hover:bg-muted/80 text-foreground border-border text-xs px-2 py-1 flex items-center gap-1.5 font-normal cursor-pointer"
-                                  onClick={() => navigate(`/dsa/query?company=${company}`)}
+                                  onClick={() => router.push(`/dsa/query?company=${company}`)}
                                 >
                                   <CompanyIcon company={company} className="w-3.5 h-3.5 opacity-80" />
                                   {company}
@@ -720,7 +723,7 @@ export const ProblemDescriptionPanel = React.memo(({
                         {algorithm.problems_to_solve.internal.map((problem: any, i: number) => (
                           <Link
                             key={`internal-${i}`}
-                            to={`/problem/${problem.url}`}
+                            href={`/problem/${problem.url}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"

@@ -1,17 +1,15 @@
 import {
   ArrowRight,
   BookOpen,
-  Code2,
-  Gamepad2,
-  ListChecks,
   Layers,
+  Gamepad2,
   Lock,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import React from 'react';
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { FeatureGuard } from "./FeatureGuard";
 import { useApp } from "@/contexts/AppContext";
 import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
@@ -90,7 +88,7 @@ export const FeaturedSection = () => {
             const cardContent = (
               <Link
                 key={feature.id}
-                to={feature.link}
+                href={feature.link}
                 className="group block h-full mx-auto w-full max-w-[300px]"
               >
                 <Card className="h-full overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg bg-card flex flex-col">
@@ -154,3 +152,4 @@ export const FeaturedSection = () => {
     </section>
   );
 };
+

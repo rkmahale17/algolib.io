@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { TwoPointerModeSelection } from "@/components/twoPointer/TwoPointerModeSelection";

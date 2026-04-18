@@ -1,3 +1,4 @@
+"use client";
 import { useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ListType } from "@/types/algorithm";

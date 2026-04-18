@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Lock, LogIn } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import type { User } from '@supabase/supabase-js';
 
 interface AuthGuardProps {
@@ -41,6 +41,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -71,7 +72,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Link to="/login">
+          <Link href="/login">
             <Button className="gap-2">
               <LogIn className="w-4 h-4" />
               Sign In

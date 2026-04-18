@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { format } from 'date-fns';

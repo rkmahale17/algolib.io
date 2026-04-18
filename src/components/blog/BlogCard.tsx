@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -51,7 +51,7 @@ export const BlogCard = ({ slug, title, description, date, readTime, category, t
           </div>
         </div>
         <Button asChild variant="outline" className="w-full">
-          <Link to={`/blog/${slug}`}>
+          <Link href={`/blog/${slug}`}>
             Read more
           </Link>
         </Button>

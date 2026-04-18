@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -22,7 +22,7 @@ export const ProOverlay: React.FC<ProOverlayProps> = ({ className = "" }) => {
                 Get access to premium solutions, interactive visualizations, and advanced brainstorming tools.
             </p>
 
-            <Link to="/pricing">
+            <Link href="/pricing">
                 <Button
                     className="bg-orange-600 hover:bg-orange-700 text-white border-none shadow-lg shadow-orange-600/20 rounded-full px-8 font-semibold transition-all active:scale-95"
                 >

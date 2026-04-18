@@ -1,37 +1,38 @@
 import React from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { usePathname, useRouter, useParams } from 'next/navigation';
 import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Layout, Edit3, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const AdminViewToggle = () => {
-    const location = useLocation();
-    const navigate = useNavigate();
-    const { id, slug } = useParams();
+    const pathname = usePathname();
+    const router = useRouter();
+    const params = useParams();
+    const { id, slug } = params as { id?: string; slug?: string };
     const { user } = useApp();
 
-    const adminId = import.meta.env.VITE_ADMIN_USER_ID;
+    const adminId = process.env.NEXT_PUBLIC_ADMIN_USER_ID;
     const isAdmin = adminId && user?.id === adminId;
 
     // We only show this toggle on problem detail pages or admin problem detail pages
-    const isProblemPage = location.pathname.startsWith('/problem/');
-    const isAdminProblemPage = location.pathname.startsWith('/admin/problem/');
+    const isProblemPage = pathname.startsWith('/problem/');
+    const isAdminProblemPage = pathname.startsWith('/admin/problem/');
 
     if (!isAdmin || (!isProblemPage && !isAdminProblemPage)) {
         return null;
     }
 
-    const problemId = id || slug || location.pathname.split('/').pop();
+    const problemId = id || slug || pathname.split('/').pop();
     if (!problemId || problemId === 'new') return null;
 
     const currentMode = isAdminProblemPage ? 'admin' : 'user';
 
     const toggleMode = () => {
         if (currentMode === 'user') {
-            navigate(`/admin/problem/${problemId}`);
+            router.push(`/admin/problem/${problemId}`);
         } else {
-            navigate(`/problem/${problemId}`);
+            router.push(`/problem/${problemId}`);
         }
     };
 

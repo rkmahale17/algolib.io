@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Layers, GitBranch, ArrowRight, ArrowLeft } from "lucide-react";
 import { GraphMode } from "@/hooks/useGraphGame";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 
 interface GraphModeSelectionProps {
   onSelectMode: (mode: GraphMode) => void;
@@ -30,14 +30,14 @@ const modes = [
 ];
 
 export const GraphModeSelection = ({ onSelectMode }: GraphModeSelectionProps) => {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   return (
     <div className="space-y-6">
       <div className="mb-6">
         <Button
           variant="ghost"
-          onClick={() => navigate('/games')}
+          onClick={() => router.push('/games')}
           className="gap-2"
         >
           <ArrowLeft className="w-4 h-4" />

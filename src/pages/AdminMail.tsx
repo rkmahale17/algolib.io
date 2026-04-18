@@ -1,3 +1,4 @@
+"use client";
 import { MailSender } from "@/components/admin/MailSender";
 
 export default function AdminMail() {

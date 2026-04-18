@@ -23,8 +23,8 @@ export function prerenderPlugin(): Plugin {
 
             // --- Fetch Algorithms from Supabase ---
             console.log('Fetching algorithms from Supabase for prerender...');
-            const supabaseUrl = process.env.VITE_SUPABASE_URL;
-            const supabaseKey = process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+            const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+            const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
             let algorithms: any[] = [];
 
             if (supabaseUrl && supabaseKey) {

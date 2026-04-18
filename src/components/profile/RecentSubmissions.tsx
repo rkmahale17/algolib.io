@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from 'date-fns';
 import { CheckCircle2, XCircle, Clock } from "lucide-react";
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 
 interface RecentSubmission {
   id: string;
@@ -39,7 +39,7 @@ export const RecentSubmissions = ({ submissions }: RecentSubmissionsProps) => {
                     <Clock className="w-4 h-4 text-yellow-500" />
                 )}
                 <div>
-                    <Link to={`/problem/${sub.algorithmId}`} className="font-medium text-sm hover:underline block text-foreground">
+                    <Link href={`/problem/${sub.algorithmId}`} className="font-medium text-sm hover:underline block text-foreground">
                         {sub.algorithmName}
                     </Link>
                     <div className="text-[10px] text-muted-foreground flex gap-2 items-center mt-0.5">

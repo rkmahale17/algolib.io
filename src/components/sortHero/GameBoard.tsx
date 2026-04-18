@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, RotateCcw, Undo2, Lightbulb } from "lucide-react";
-import { SortMode } from "@/pages/SortHero";
+import { SortMode } from "@/types/games";
 import { useSortGame } from "@/hooks/useSortGame";
 import { NumberTile } from "./NumberTile";
 import { VictoryModal } from "./VictoryModal";

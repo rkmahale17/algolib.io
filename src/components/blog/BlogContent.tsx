@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { BlogContent as BlogContentType } from "@/data/blogPosts";
 import { Button } from "../ui/button";
 import { CodeHighlighter } from "@/components/visualizations/shared/CodeHighlighter";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 interface BlogContentProps {
   content: BlogContentType[];
@@ -102,7 +102,7 @@ export const BlogContent = ({ content }: BlogContentProps) => {
               // </div>
               <Link
                 key={index}
-                to={block.link}
+                href={block.link || '#'}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group block border-b-0"

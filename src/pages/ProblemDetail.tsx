@@ -1,3 +1,4 @@
+"use client";
 import React, { useCallback, useEffect, useState, useMemo, Suspense } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Code2, ArrowLeft, Eye, Lightbulb, Minimize2, ArrowDown } from "lucide-react";

@@ -2,14 +2,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { PointerMode } from "@/hooks/useTwoPointerGame";
 import { Plus, Minus, X, ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 
 interface TwoPointerModeSelectionProps {
   onSelectMode: (mode: PointerMode) => void;
 }
 
 export const TwoPointerModeSelection = ({ onSelectMode }: TwoPointerModeSelectionProps) => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const modes = [
     {
       id: "sum" as PointerMode,
@@ -45,7 +45,7 @@ export const TwoPointerModeSelection = ({ onSelectMode }: TwoPointerModeSelectio
       <div className="mb-6">
         <Button
           variant="ghost"
-          onClick={() => navigate('/games')}
+          onClick={() => router.push('/games')}
           className="gap-2"
         >
           <ArrowLeft className="w-4 h-4" />

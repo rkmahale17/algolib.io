@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Copy, Check, Twitter, Linkedin } from "lucide-react";
 import { toast } from "sonner";
@@ -13,7 +13,11 @@ interface ShareableProfileLinkProps {
 export const ShareableProfileLink = ({ username, className }: ShareableProfileLinkProps) => {
   const [copied, setCopied] = useState(false);
   const [imageError, setImageError] = useState(false);
-  const profileUrl = `${window.location.origin}/profile/${username}`;
+  const [profileUrl, setProfileUrl] = useState("");
+
+  useEffect(() => {
+    setProfileUrl(`${window.location.origin}/profile/${username}`);
+  }, [username]);
 
   const handleCopy = async () => {
     try {

@@ -1,5 +1,5 @@
 import { Check, Circle, Lock, ArrowRight, Timer, Database, Zap, BookOpen } from "lucide-react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { AlgorithmListItem } from "@/types/algorithm";
 import { cn } from "@/lib/utils";
@@ -26,7 +26,7 @@ export const AlgorithmCard = ({ algorithm, status, isPremium, index, isSidebar, 
 
     return (
         <Link
-            to={algorithm.slug ? `/problem/${algorithm.slug}` : `/problem/${algorithm.id}`}
+            href={algorithm.slug ? `/problem/${algorithm.slug}` : `/problem/${algorithm.id}`}
             className="group block relative max-w-[800px] m-auto border border-gray-100 dark:border-gray-800 -mb-px first:rounded-tl-xl first:rounded-tr-xl last:rounded-bl-xl last:rounded-br-xl last:mb-0 overflow-hidden transition-colors hover:bg-muted/20"
         >
             <div className={cn(

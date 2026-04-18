@@ -1,5 +1,5 @@
 import { BadgeCheck, Beaker, Code2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 interface ProblemHeroProps {
     title: string;
@@ -56,7 +56,7 @@ export const ProblemHero = ({
                 </p>
                 {showRecommendation && (
                     <p>
-                        Short on time? If your interview is in 2 weeks, we highly recommend starting with the <Link to="/dsa/blind75" className="font-semibold text-foreground underline decoration-primary/30 underline-offset-4 cursor-pointer hover:decoration-primary transition-colors">Blind 75</Link> list to cover the most essential patterns.
+                        Short on time? If your interview is in 2 weeks, we highly recommend starting with the <Link href="/dsa/blind-75" className="font-semibold text-foreground underline decoration-primary/30 underline-offset-4 cursor-pointer hover:decoration-primary transition-colors">Blind 75</Link> list to cover the most essential patterns.
                     </p>
                 )}
             </div>

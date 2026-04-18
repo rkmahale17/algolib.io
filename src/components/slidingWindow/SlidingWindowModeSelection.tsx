@@ -2,14 +2,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { WindowMode } from "@/hooks/useSlidingWindowGame";
 import { TrendingUp, Grid3x3, Type, Target, ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 
 interface SlidingWindowModeSelectionProps {
   onSelectMode: (mode: WindowMode) => void;
 }
 
 export const SlidingWindowModeSelection = ({ onSelectMode }: SlidingWindowModeSelectionProps) => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const modes = [
     {
       id: "maxSum" as WindowMode,
@@ -54,7 +54,7 @@ export const SlidingWindowModeSelection = ({ onSelectMode }: SlidingWindowModeSe
       <div className="mb-6">
         <Button
           variant="ghost"
-          onClick={() => navigate('/games')}
+          onClick={() => router.push('/games')}
           className="gap-2"
         >
           <ArrowLeft className="w-4 h-4" />

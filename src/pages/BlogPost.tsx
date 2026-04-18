@@ -1,3 +1,4 @@
+"use client";
 import "../../src/styles/blog.css";
 
 import { ArrowLeft, Calendar, Clock, User } from "lucide-react";
@@ -10,6 +11,7 @@ import { Helmet } from "react-helmet-async";
 import { Separator } from "@/components/ui/separator";
 import { ShareButton } from "@/components/ShareButton";
 import { BlogSidebar } from "@/components/blog/BlogSidebar";
+import Script from "next/script";
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -52,10 +54,13 @@ const BlogPost = () => {
         <meta name="twitter:title" content={post.title} />
         <meta name="twitter:description" content={post.description} />
         <meta name="twitter:image" content={post.image || 'https://rulcode.com/og-image.png'} />
+      </Helmet>
 
-        {/* JSON-LD Structured Data */}
-        <script type="application/ld+json">
-          {JSON.stringify({
+      <Script
+        id={`blog-post-json-ld-${post.slug}`}
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "BlogPosting",
             "headline": post.title,
@@ -82,9 +87,9 @@ const BlogPost = () => {
             "articleSection": post.category,
             "keywords": `${post.category}, algorithms, coding tutorial`,
             "timeRequired": post.readTime
-          })}
-        </script>
-      </Helmet>
+          })
+        }}
+      />
 
       <div className="min-h-screen bg-background py-12 px-4 blog-post-container">
         <div className="container mx-auto max-w-4xl">

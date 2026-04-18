@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
-import { Check, ArrowRight, Circle, Lock, Flame, FileCode2, Layout } from "lucide-react";
+import Link from "next/link";
+import { Check, ArrowRight, Lock, Flame, FileCode2, Layout } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AlgorithmListItem } from "@/types/algorithm";
 
@@ -44,7 +44,7 @@ export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp
 
     return (
         <Link
-            to={algorithm.slug ? `/problem/${algorithm.slug}` : `/problem/${algorithm.id}`}
+            href={algorithm.slug ? `/problem/${algorithm.slug}` : `/problem/${algorithm.id}`}
             className="group block relative w-full break-words"
         >
             <div className={cn(

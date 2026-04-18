@@ -1,3 +1,4 @@
+"use client";
 import * as React from "react"
 import { ListTodo, BookOpen, Code2, Play, Search, Folder, MoreHorizontal, LayoutDashboard, Compass, Rocket, ChevronRight, Eye, Code, FileText, PanelLeftClose, PanelLeftOpen, Github, Linkedin, MonitorSmartphone, LogOut, Code as CodeIcon, ThumbsUp, Clock, Layers, Target, Brain } from "lucide-react"
 
@@ -17,7 +18,8 @@ import {
     SidebarMenuSubItem,
     useSidebar,
 } from "@/components/ui/sidebar"
-import { Link, useLocation } from "react-router-dom"
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { ChevronDown } from "lucide-react"
 import logo from "@/assets/logo.svg";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
@@ -74,50 +76,33 @@ const sidebarConfig = {
                     },
                 ],
             },
-            // {
-            //     title: "Recommended strategy",
-            //     url: "#",
-            //     icon: ThumbsUp,
-            //     hasCaret: true,
-            // },
-            // {
-            //     title: "Time-savers",
-            //     url: "#",
-            //     icon: Clock,
-            //     hasCaret: true,
-            // },
-            // {
-            //     title: "Guides",
-            //     url: "#",
-            //     icon: BookOpen,
-            //     hasCaret: true,
-            // },
         ],
     }
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-    const location = useLocation()
+    const pathname = usePathname()
+    const router = useRouter()
     const { toggleSidebar, state, isMobile, setOpen } = useSidebar()
     const { theme, setTheme } = useTheme()
 
     const sidebarRoutes = ['/dsa/problems', '/problems', '/dsa/get-started', '/dsa/blind-75', '/dsa/core'];
-    const isSidebarRoute = sidebarRoutes.some(route => location.pathname.startsWith(route));
-    const lastPathRef = React.useRef(location.pathname);
+    const isSidebarRoute = sidebarRoutes.some(route => pathname?.startsWith(route));
+    const lastPathRef = React.useRef(pathname);
 
     React.useEffect(() => {
-        const isCurrentlyListing = sidebarRoutes.some(route => location.pathname.startsWith(route));
-        const wasListing = sidebarRoutes.some(route => lastPathRef.current.startsWith(route));
+        const isCurrentlyListing = sidebarRoutes.some(route => pathname?.startsWith(route));
+        const wasListing = sidebarRoutes.some(route => lastPathRef.current?.startsWith(route));
 
         // If we just entered a listing route from somewhere else, or switched between listing routes
-        if (isCurrentlyListing && (!wasListing || lastPathRef.current !== location.pathname)) {
+        if (isCurrentlyListing && (!wasListing || lastPathRef.current !== pathname)) {
             if (!isMobile && state === "collapsed") {
                 setOpen(true);
             }
         }
 
-        lastPathRef.current = location.pathname;
-    }, [location.pathname, isMobile, state, setOpen]);
+        lastPathRef.current = pathname;
+    }, [pathname, isMobile, state, setOpen]);
 
     const { user } = useApp();
 
@@ -125,7 +110,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         if (!supabase) return;
         const { error } = await supabase.auth.signOut();
         if (error) toast.error("Failed to sign out");
-        else toast.success("Signed out successfully");
+        else {
+            toast.success("Signed out successfully");
+            router.refresh();
+            router.push("/");
+        }
     };
 
     const isCollapsed = state === "collapsed";
@@ -142,8 +131,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarHeader className="p-4 border-b border-border/50 h-12 flex items-center justify-center">
 
                 <div className="flex items-center gap-3 w-full">
-                    <Link to="/" className="flex items-center gap-2 shrink-0 group-data-[collapsible=icon]:mx-auto">
-                        <img src={logo} alt="RulCode Logo" className="w-5 h-5 transition-all" />
+                    <Link href="/" className="flex items-center gap-2 shrink-0 group-data-[collapsible=icon]:mx-auto">
+                        <img src={typeof logo === 'string' ? logo : (logo as any).src} alt="RulCode Logo" className="w-5 h-5 transition-all" />
                         <span className="font-medium text-[15px] tracking-tight group-data-[collapsible=icon]:hidden">rulcode</span>
                     </Link>
                     <div className="h-4 w-[1px] bg-border/80 group-data-[collapsible=icon]:hidden"></div>
@@ -161,11 +150,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     {!item.isGroup ? (
                                         <SidebarMenuButton
                                             asChild
-                                            isActive={location.pathname === item.url}
+                                            isActive={pathname === item.url}
                                             tooltip={item.title}
                                             className="h-8 justify-between hover:bg-muted/50 text-[#666] data-[active=true]:text-foreground data-[active=true]:font-medium"
                                         >
-                                            <Link to={item.url} className="w-full flex items-center justify-between">
+                                            <Link href={item.url} className="w-full flex items-center justify-between">
                                                 <div className="flex items-center gap-2.5">
                                                     {item.icon && <item.icon className="w-4 h-4 opacity-70" />}
                                                     <span className="text-[13px] group-data-[collapsible=icon]:hidden">{item.title}</span>
@@ -185,7 +174,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                                     <HoverCardContent side="right" align="start" sideOffset={15} className="w-[260px] flex flex-col rounded-xl border border-border bg-popover text-popover-foreground shadow-lg p-1.5 py-2 z-[100]">
                                                         <div className="text-xs font-medium px-3 py-1 text-foreground border-b border-border/40 mb-1">{item.title}</div>
                                                         {item.items?.map((subItem) => (
-                                                            <Link key={subItem.title} to={subItem.url} className="flex items-center justify-between gap-3 cursor-pointer rounded-md p-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors group/sub">
+                                                            <Link key={subItem.title} href={subItem.url} className="flex items-center justify-between gap-3 cursor-pointer rounded-md p-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors group/sub">
                                                                 <div className="flex flex-col gap-0.5">
                                                                     <div className="flex items-center gap-2 text-foreground">
                                                                         {subItem.icon && <subItem.icon className="w-4 h-4 opacity-70" />}
@@ -215,8 +204,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                                     {item.items.map((subItem) => (
                                                         <Link
                                                             key={subItem.title}
-                                                            to={subItem.url}
-                                                            className={`flex items-center gap-2 text-[13px] py-1.5 px-2 rounded-md transition-colors ${location.pathname === subItem.url
+                                                            href={subItem.url}
+                                                            className={`flex items-center gap-2 text-[13px] py-1.5 px-2 rounded-md transition-colors ${pathname === subItem.url
                                                                 ? "text-foreground font-medium bg-muted/50"
                                                                 : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
                                                                 }`}
@@ -237,49 +226,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarContent>
 
             <SidebarFooter className="p-4 mt-auto border-t border-border/50 flex flex-col gap-4">
-                {/* Promotional cards - Hidden when collapsed completely */}
-                {/* 
-                <div className="flex flex-col gap-4 group-data-[collapsible=icon]:hidden">
-                    <Link to="#" className="group flex items-start gap-3 rounded-lg bg-transparent transition-colors">
-                        <div className="w-12 h-12 rounded-md bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0">
-                            <CodeIcon className="w-6 h-6 text-white" />
-                        </div>
-                        <div className="flex flex-col mt-0.5">
-                            <span className="text-[10px] uppercase font-medium text-muted-foreground tracking-wider mb-0.5">Sponsored</span>
-                            <span className="text-xs font-medium leading-tight text-foreground group-hover:underline decoration-border underline-offset-2">
-                                30% off the fastest way to learn front end skills &rarr;
-                            </span>
-                        </div>
-                    </Link>
-
-                    <Link to="#" className="group flex items-start gap-3 rounded-lg overflow-hidden border border-border bg-card hover:bg-muted/50 transition-colors p-3">
-                        <div className="w-12 shrink-0 flex items-center justify-center font-medium text-sm bg-transparent border-0">
-                            20% off
-                        </div>
-                        <div className="flex flex-col mt-0.5 border-l border-border/50 pl-3">
-                            <span className="text-xs font-medium leading-tight text-muted-foreground group-hover:text-foreground transition-colors overflow-hidden text-ellipsis whitespace-normal line-clamp-2">
-                                Complete simple social tasks &rarr;
-                            </span>
-                        </div>
-                    </Link>
-                </div>
-                */}
-
-                {/* Showing a simple 20% badge instead of large cards when collapsed */}
-                {/* 
-                <div className="hidden group-data-[collapsible=icon]:flex items-center justify-center w-full my-2">
-                    <Badge variant="outline" className="text-[9px] px-1 py-0 shadow-none border-border">20%</Badge>
-                </div>
-                */}
-
                 {/* Bottom Action Row */}
                 <div className="flex items-center justify-between w-full">
                     {/* Socials - hidden when collapsed */}
                     <div className="flex items-center gap-1 group-data-[collapsible=icon]:hidden">
-                        <Link to="#" className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors border border-transparent shadow-none hover:border-border/50 hover:shadow-sm">
+                        <Link href="#" className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors border border-transparent shadow-none hover:border-border/50 hover:shadow-sm">
                             <Github className="w-4 h-4" />
                         </Link>
-                        <Link to="#" className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors border border-transparent shadow-none hover:border-border/50 hover:shadow-sm">
+                        <Link href="#" className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors border border-transparent shadow-none hover:border-border/50 hover:shadow-sm">
                             <Linkedin className="w-4 h-4" />
                         </Link>
                         <DropdownMenu>
@@ -295,7 +249,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem asChild>
-                                    <Link to="/pricing" className="cursor-pointer text-xs">Pricing</Link>
+                                    <Link href="/pricing" className="cursor-pointer text-xs">Pricing</Link>
                                 </DropdownMenuItem>
                                 {user ? (
                                     <>
@@ -309,7 +263,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     <>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem asChild>
-                                            <Link to="/login" className="cursor-pointer text-xs">Log in</Link>
+                                            <Link href="/login" className="cursor-pointer text-xs">Log in</Link>
                                         </DropdownMenuItem>
                                     </>
                                 )}
@@ -351,7 +305,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     <>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem asChild>
-                                            <Link to="/login" className="cursor-pointer text-xs">Log in</Link>
+                                            <Link href="/login" className="cursor-pointer text-xs">Log in</Link>
                                         </DropdownMenuItem>
                                     </>
                                 )}

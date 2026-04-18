@@ -1,4 +1,5 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+"use client";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +10,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   Github,
-  LogOut,
   Menu as MenuIcon,
   MessageSquare,
   ShieldCheck,
@@ -30,16 +30,14 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./ThemeToggle";
 import logo from "@/assets/logo.svg";
 
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { FeatureGuard } from "./FeatureGuard";
 import { useApp } from "@/contexts/AppContext";
 import { Badge } from "./ui/badge";
 import { useSidebar } from "@/components/ui/sidebar";
@@ -49,8 +47,13 @@ import UserMenu from "./UserMenu";
 const Navbar = () => {
   const { profile, user } = useApp();
   const { setOpenMobile, toggleSidebar, state } = useSidebar();
-  const location = useLocation();
-  const isAuthPage = location.pathname === "/login";
+  const pathname = usePathname();
+  const isAuthPage = pathname === "/login";
+
+  // Hide Navbar on DSA and Problem pages as they have their own implementation
+  if (pathname?.startsWith('/dsa/') || pathname?.startsWith('/problem/')) {
+    return null;
+  }
 
   const [isInterviewsOpen, setIsInterviewsOpen] = useState(false);
   const [isPrepareOpen, setIsPrepareOpen] = useState(false);
@@ -91,7 +94,7 @@ const Navbar = () => {
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-md">
-      <div className="w-full px-4 md:px-6">
+      <div className="w-full px-4 md:px-6 lg:px-8">
         <div className="flex h-12 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-4">
@@ -99,7 +102,8 @@ const Navbar = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="hidden md:flex h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all rounded-full"
+              className="hidden data-[show=true]:md:flex h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all rounded-full"
+              data-show={pathname?.startsWith('/dsa/') || pathname?.startsWith('/problems') || pathname?.startsWith('/dashboard')}
               onClick={toggleSidebar}
             >
               {state === "collapsed" ? (
@@ -109,11 +113,11 @@ const Navbar = () => {
               )}
             </Button>
             <Link
-              to="/"
+              href="/"
               className="flex items-center gap-2 hover:opacity-80 transition-opacity shutter-click"
               onClick={closeMenus}
             >
-              <img src={logo} alt="RulCode Logo" className="w-6 h-6" />
+              <img src={typeof logo === 'string' ? logo : (logo as any).src} alt="RulCode Logo" className="w-6 h-6" />
               <span className="font-bold text-lg tracking-tight">rulcode</span>
             </Link>
           </div>
@@ -140,15 +144,14 @@ const Navbar = () => {
                   <div className="text-xs text-muted-foreground mb-3 font-normal">Products</div>
                   <div className="flex flex-col gap-1 mb-4">
                     <Link
-                      to="/"
+                      href="/"
                       className="flex items-center gap-3 hover:bg-muted p-2 rounded-md transition-colors shutter-click"
-                      onClick={closeMenus}
                     >
-                      <img src={logo} alt="RulCode Logo" className="w-5 h-5" />
+                      <img src={typeof logo === 'string' ? logo : (logo as any).src} alt="RulCode Logo" className="w-5 h-5" />
                       <span className="font-medium text-sm">Rulcode <span className="text-muted-foreground font-normal ml-1">Interviews</span></span>
                     </Link>
                     <div className="flex items-center gap-3 hover:bg-muted p-2 rounded-md transition-colors cursor-not-allowed opacity-80">
-                      <img src={logo} alt="RulCode Logo" className="w-5 h-5" />
+                      <img src={typeof logo === 'string' ? logo : (logo as any).src} alt="RulCode Logo" className="w-5 h-5" />
                       <span className="font-medium text-sm flex items-center gap-2">Rulcode <span className="text-muted-foreground font-normal ml-1">Projects</span><div className="w-1.5 h-1.5 bg-red-500 rounded-full"></div></span>
                       <Badge variant="secondary" className="bg-[#E5FF7F] text-black hover:bg-[#d6f555] border-transparent ml-auto text-[10px] h-5 py-0 whitespace-nowrap">Coming soon</Badge>
                     </div>
@@ -157,7 +160,7 @@ const Navbar = () => {
                   <div className="text-xs text-muted-foreground mb-3 font-normal">Resources</div>
                   <div className="flex flex-col gap-1">
                     <Link
-                      to="/blogs"
+                      href="/blog"
                       className="flex items-center gap-3 hover:bg-muted p-2 rounded-md transition-colors shutter-click"
                       onClick={closeMenus}
                     >
@@ -172,7 +175,7 @@ const Navbar = () => {
             <div className="h-4 w-[1px] bg-border/60 mx-1"></div>
 
             <Link
-              to="/dashboard"
+              href="/dashboard"
               className="font-normal hover:text-primary transition-colors shutter-click"
               onClick={closeMenus}
             >
@@ -222,7 +225,7 @@ const Navbar = () => {
                     {activePrepareTab === 'dsa_practice' && (
                       <div className="flex flex-col gap-8">
                         <Link
-                          to="/dsa/get-started"
+                          href="/dsa/get-started"
                           className="group flex items-start gap-5 relative shutter-click"
                           onClick={closeMenus}
                         >
@@ -241,7 +244,7 @@ const Navbar = () => {
                         </Link>
 
                         <Link
-                          to="/dsa/problems"
+                          href="/dsa/problems"
                           className="group flex items-start gap-5 relative shutter-click"
                           onClick={closeMenus}
                         >
@@ -261,7 +264,7 @@ const Navbar = () => {
                         </Link>
 
                         <Link
-                          to="/dsa/core"
+                          href="/dsa/core"
                           className="group flex items-start gap-5 relative shutter-click"
                           onClick={closeMenus}
                         >
@@ -281,7 +284,7 @@ const Navbar = () => {
                         </Link>
 
                         <Link
-                          to="/dsa/blind-75"
+                          href="/dsa/blind-75"
                           className="group flex items-start gap-5 relative shutter-click"
                           onClick={closeMenus}
                         >
@@ -302,7 +305,7 @@ const Navbar = () => {
 
                     {activePrepareTab === 'dsa_strategy' && (
                       <Link
-                        to="/dsa/blind-75"
+                        href="/dsa/blind-75"
                         className="group flex items-start gap-5 relative shutter-click"
                         onClick={closeMenus}
                       >
@@ -326,7 +329,7 @@ const Navbar = () => {
                         <div className="text-xs font-bold text-muted-foreground/40 uppercase tracking-[0.2em]">Guides</div>
 
                         <Link
-                          to="/blog"
+                          href="/blog"
                           className="group flex items-start gap-5 relative shutter-click"
                           onClick={closeMenus}
                         >
@@ -335,7 +338,6 @@ const Navbar = () => {
                           </div>
                           <div className="flex-1 pr-8">
                             <h4 className="text-[15px] font-semibold mb-1.5 text-foreground group-hover:text-primary transition-colors tracking-tight">Engineering Blogs</h4>
-                            {/* <p className="text-[13px] text-muted-foreground mb-3 leading-relaxed max-w-[320px]">In-depth guides, company-specific interview experiences, and study materials.</p> */}
                             <div className="flex flex-wrap gap-2">
                               <Badge variant="secondary" className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5">Guides</Badge>
                               <Badge variant="secondary" className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5">Insights</Badge>
@@ -354,7 +356,7 @@ const Navbar = () => {
           {/* Right side actions */}
           <div className="flex items-center gap-2">
             {(!user || profile?.subscription_status !== 'active') && !isAuthPage && (
-              <Link to="/pricing" className="text-sm font-normal hover:text-primary transition-colors hidden md:block mr-2">
+              <Link href="/pricing" className="text-sm font-normal hover:text-primary transition-colors hidden md:block mr-2">
                 Pricing
               </Link>
             )}
@@ -372,14 +374,6 @@ const Navbar = () => {
             >
               <MenuIcon className="w-4 h-4" />
             </Button>
-
-            {/* {(!user || profile?.subscription_status !== 'active') && !isAuthPage && (
-              <Link to="/pricing" className="hidden md:block ml-1">
-                <Button className="h-8 px-4 rounded-full bg-[#E5FF7F] text-black hover:bg-[#d6f555] font-medium border border-transparent shadow-[0_2px_10px_0_rgba(229,255,127,0.3)] text-xs">
-                  Get full access
-                </Button>
-              </Link>
-            )} */}
           </div>
         </div>
       </div>
@@ -388,3 +382,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+

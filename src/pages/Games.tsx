@@ -1,3 +1,4 @@
+"use client";
 import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trophy, Brain, ArrowLeft } from "lucide-react";
@@ -82,10 +83,13 @@ const Games = () => {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Algorithmic Games - Interactive Learning" />
         <meta name="twitter:description" content="Master algorithms through fun, interactive games." />
+      </Helmet>
 
-        {/* JSON-LD */}
-        <script type="application/ld+json">
-          {JSON.stringify({
+      <Script
+        id="games-json-ld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebPage",
             "name": "Algorithmic Games",
@@ -102,9 +106,9 @@ const Games = () => {
                 "educationalLevel": game.difficulty
               }))
             }
-          })}
-        </script>
-      </Helmet>
+          })
+        }}
+      />
 
       <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-8 px-4">
         <div className="container mx-auto max-w-6xl">
