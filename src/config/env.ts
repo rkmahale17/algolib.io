@@ -28,10 +28,10 @@ const configs: Record<Environment, Partial<EnvConfig>> = {
     apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
   },
   qa: {
-    apiUrl: 'https://qa-api.algolib.io', // TODO: Update with actual QA URL
+    apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000', // TODO: Update with actual QA URL
   },
   production: {
-    apiUrl: 'https://api.algolib.io', // TODO: Update with actual Prod URL
+    apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000', // TODO: Update with actual Prod URL
   },
 };
 
