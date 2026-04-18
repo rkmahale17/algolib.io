@@ -54,19 +54,19 @@ const Navbar = () => {
     setMounted(true);
   }, []);
 
-  const isAuthPage = pathname === "/login";
-
-  // Hide Navbar on DSA and Problem pages as they have their own implementation
-  if (pathname?.startsWith('/dsa/') || pathname?.startsWith('/problem/')) {
-    return null;
-  }
-
   const [isInterviewsOpen, setIsInterviewsOpen] = useState(false);
   const [isPrepareOpen, setIsPrepareOpen] = useState(false);
   const [activePrepareTab, setActivePrepareTab] = useState<'dsa_practice' | 'dsa_strategy' | 'blogs'>('dsa_practice');
 
   const interviewsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const prepareTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const isAuthPage = pathname === "/login";
+
+  // Hide Navbar on DSA and Problem pages as they have their own implementation
+  if (pathname?.startsWith('/dsa/') || pathname?.startsWith('/problem/')) {
+    return null;
+  }
 
   const handleInterviewsMouseEnter = () => {
     if (interviewsTimeoutRef.current) clearTimeout(interviewsTimeoutRef.current);
