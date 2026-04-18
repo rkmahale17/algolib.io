@@ -31,10 +31,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/router';
 
 export function AdminTaggingUpdate() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   
   const { data, isLoading } = useAlgorithms(searchQuery, '');
@@ -88,7 +88,7 @@ export function AdminTaggingUpdate() {
       <div className="flex flex-col gap-4 sticky top-0 bg-background/95 backdrop-blur z-10 pb-4 border-b">
         <div className="flex justify-between items-end">
           <div className="flex items-center gap-4">
-             <Button variant="ghost" size="icon" onClick={() => navigate('/admin')}>
+             <Button variant="ghost" size="icon" onClick={() => router.push('/admin')}>
                 <ArrowLeft className="h-4 w-4" />
              </Button>
             <div>

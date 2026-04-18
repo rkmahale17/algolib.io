@@ -1,5 +1,5 @@
 "use client";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/router";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Code2, MessageSquare, Database, ArrowRight, Activity, ShieldCheck, Users, Mail } from "lucide-react";
@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { useAlgorithms } from "@/hooks/useAlgorithms";
 
 export default function AdminDashboard() {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const container = {
     hidden: { opacity: 0 },
@@ -156,7 +156,7 @@ export default function AdminDashboard() {
             <motion.div key={index} variants={item}>
               <Card
                 className="group relative overflow-hidden border-muted/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg cursor-pointer h-full flex flex-col"
-                onClick={() => navigate(module.path)}
+                onClick={() => router.push(module.path)}
               >
                 {/* Background Gradient Effect */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${module.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />

@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { Trophy, Medal, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from 'next/router';
 
 interface LeaderboardEntry {
   id: string;
@@ -22,7 +22,7 @@ interface LeaderboardEntry {
 }
 
 const Leaderboard = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [allTimeData, setAllTimeData] = useState<LeaderboardEntry[]>([]);
   const [todayData, setTodayData] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -148,7 +148,7 @@ const Leaderboard = () => {
             </h1>
             <p className="text-muted-foreground">Top players - Sort Hero</p>
           </div>
-          <Button variant="outline" onClick={() => navigate('/games')}>
+          <Button variant="outline" onClick={() => router.push('/games')}>
             Back to Games
           </Button>
         </div>

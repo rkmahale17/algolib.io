@@ -5,7 +5,7 @@ import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { PremiumLoader } from "@/components/PremiumLoader";
 import type { Profile } from "@/types/profile";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { EditProfileDialog } from "@/components/profile/EditProfileDialog";
 import { SidebarLayout } from '@/components/SidebarLayout';
@@ -15,7 +15,7 @@ const ProfileEdit = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const navigate = useNavigate();
+  const router = useRouter();
 
   useEffect(() => {
     fetchProfileData();
@@ -25,7 +25,7 @@ const ProfileEdit = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        navigate('/login');
+        router.push('/login');
         return;
       }
 
@@ -38,9 +38,8 @@ const ProfileEdit = () => {
       if (profileError) throw profileError;
       setProfile({ ...profileData, is_public: true } as any as Profile);
 
-      // If user has username, redirect to public view
       if (profileData?.username) {
-        navigate(`/profile/${profileData.username}`);
+        router.push(`/profile/${profileData.username}`);
       }
     } catch (error) {
       console.error("Error fetching profile:", error);
@@ -139,7 +138,7 @@ const ProfileEdit = () => {
 
               <div className="flex gap-4">
                 <Button
-                  onClick={() => navigate('/pricing')}
+                  onClick={() => router.push('/pricing')}
                   className={cn(
                     "font-semibold",
                     profile.subscription_status === 'active' ? "bg-muted text-foreground hover:bg-muted/80" : "bg-[#E5FF7F] text-black hover:bg-[#d6f555]"

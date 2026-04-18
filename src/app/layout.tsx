@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import React, { Suspense } from "react";
 import Navbar from "@/components/Navbar";
 import { Providers } from "./providers";
 import { AppSidebar } from "@/components/AppSidebar";
@@ -40,10 +41,16 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <Providers>
-          <AppSidebar />
+          <Suspense fallback={null}>
+            <AppSidebar />
+          </Suspense>
           <SidebarInset>
-            <Navbar />
-            {children}
+            <Suspense fallback={null}>
+              <Navbar />
+            </Suspense>
+            <Suspense fallback={null}>
+              {children}
+            </Suspense>
           </SidebarInset>
         </Providers>
       </body>

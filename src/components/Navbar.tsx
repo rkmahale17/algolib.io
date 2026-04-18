@@ -45,9 +45,15 @@ import { useSidebar } from "@/components/ui/sidebar";
 import UserMenu from "./UserMenu";
 
 const Navbar = () => {
+  const [mounted, setMounted] = useState(false);
   const { profile, user } = useApp();
   const { setOpenMobile, toggleSidebar, state } = useSidebar();
   const pathname = usePathname();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const isAuthPage = pathname === "/login";
 
   // Hide Navbar on DSA and Problem pages as they have their own implementation
@@ -106,7 +112,7 @@ const Navbar = () => {
               data-show={pathname?.startsWith('/dsa/') || pathname?.startsWith('/problems') || pathname?.startsWith('/dashboard')}
               onClick={toggleSidebar}
             >
-              {state === "collapsed" ? (
+              {(!mounted || state === "collapsed") ? (
                 <PanelLeftOpen className="w-4 h-4" />
               ) : (
                 <PanelLeftClose className="w-4 h-4" />

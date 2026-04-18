@@ -34,9 +34,12 @@ export const useAlgorithmInteractions = ({
 
     // Code Management
     const [savedCode, setSavedCode] = useState<string>("");
-    const [selectedLanguage, setSelectedLanguage] = useState(
-        localStorage.getItem('preferredLanguage') || 'typescript'
-    );
+    const [selectedLanguage, setSelectedLanguage] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('preferredLanguage') || 'typescript';
+        }
+        return 'typescript';
+    });
     const [codeCache, setCodeCache] = useState<Record<string, string>>({});
     const [isUserModified, setIsUserModified] = useState(false);
     const latestCodeRef = useRef(savedCode);

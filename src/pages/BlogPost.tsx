@@ -1,8 +1,9 @@
-"use client";
+import React, { useEffect } from "react";
 import "../../src/styles/blog.css";
 
 import { ArrowLeft, Calendar, Clock, User } from "lucide-react";
-import { Link, Navigate, useParams } from "react-router-dom";
+import { useRouter } from "next/router";
+import NextLink from "next/link";
 import { getBlogPost, getRelatedPosts } from "@/data/blogPosts";
 
 import { Badge } from "@/components/ui/badge";
@@ -14,12 +15,19 @@ import { BlogSidebar } from "@/components/blog/BlogSidebar";
 import Script from "next/script";
 
 const BlogPost = () => {
-  const { slug } = useParams<{ slug: string }>();
-  const post = slug ? getBlogPost(slug) : undefined;
-  const relatedPosts = slug ? getRelatedPosts(slug) : [];
+  const router = useRouter();
+  const { slug } = router.query;
+  const post = slug ? getBlogPost(slug as string) : undefined;
+  const relatedPosts = slug ? getRelatedPosts(slug as string) : [];
+
+  useEffect(() => {
+    if (router.isReady && !post) {
+      router.replace("/blog");
+    }
+  }, [router.isReady, post]);
 
   if (!post) {
-    return <Navigate to="/blog" replace />;
+    return null;
   }
 
   const popularTags = [
@@ -94,13 +102,13 @@ const BlogPost = () => {
       <div className="min-h-screen bg-background py-12 px-4 blog-post-container">
         <div className="container mx-auto max-w-4xl">
           {/* Back Button */}
-          <Link
-            to="/blog"
+          <NextLink
+            href="/blog"
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Blog
-          </Link>
+          </NextLink>
 
           {/* Main Content - Always Centered */}
           <article>

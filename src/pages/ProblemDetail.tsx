@@ -1,6 +1,7 @@
 "use client";
 import React, { useCallback, useEffect, useState, useMemo, Suspense } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useRouter } from "next/router";
+import NextLink from "next/link";
 import { Code2, ArrowLeft, Eye, Lightbulb, Minimize2, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 import { usePostHog } from "@posthog/react";
@@ -53,10 +54,10 @@ import { ListType, LIST_TYPE_LABELS } from "@/types/algorithm";
 
 
 const ProblemDetail: React.FC = () => {
-  const { id, slug } = useParams<{ id?: string; slug?: string }>();
+  const router = useRouter();
+  const { id, slug } = router.query;
   // Unified route: /problem/:id (supports both core patterns and Blind 75)
-  const algorithmIdOrSlug = id || slug;
-  const navigate = useNavigate();
+  const algorithmIdOrSlug = (id || slug) as string;
   const posthog = usePostHog();
 
   // -- Data Fetching State --
@@ -178,7 +179,7 @@ const ProblemDetail: React.FC = () => {
       toast.error("Failed to sign out");
     } else {
       toast.success("Signed out successfully");
-      navigate("/");
+      router.push("/");
     }
   };
 
@@ -249,9 +250,9 @@ const ProblemDetail: React.FC = () => {
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center space-y-4">
             <h2 className="text-2xl font-">Algorithm not found</h2>
-            <Link to="/">
+            <NextLink href="/">
               <Button>Go Home</Button>
-            </Link>
+            </NextLink>
           </div>
         </div>
       </>
@@ -317,12 +318,12 @@ const ProblemDetail: React.FC = () => {
                   This algorithm is currently getting a makeover. Please check back shortly!
                 </p>
               </div>
-              <Link to="/">
+              <NextLink href="/">
                 <Button variant="outline" className="gap-2 hover:bg-primary/10">
                   <ArrowLeft className="w-4 h-4" />
                   Back to Problems
                 </Button>
-              </Link>
+              </NextLink>
             </div>
           ) : (
             /* Normal Content */

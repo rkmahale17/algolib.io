@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Clock, Server, Terminal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import ComplexityCard from '@/components/complexity/ComplexityCard';
 import {
   ConstantTimeAnim,
@@ -34,7 +34,7 @@ const TimeComplexity = () => {
       <div className="relative h-[300px] w-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-blue-600/20 via-primary/10 to-green-600/20">
         <div className="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,white,transparent)]" />
         <div className="container relative z-10 flex flex-col items-center text-center p-4">
-          <Link to="/" className="absolute top-4 left-4 md:left-12">
+          <Link href="/" className="absolute top-4 left-4 md:left-12">
             <Button variant="ghost" className="gap-2">
               <ArrowLeft className="w-4 h-4" /> Back to Home
             </Button>

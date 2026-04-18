@@ -1,5 +1,15 @@
-import { BadgeCheck, Beaker, Code2 } from "lucide-react";
+import { BadgeCheck, Beaker, Code2, Brain, Target, Layers, Rocket } from "lucide-react";
 import Link from "next/link";
+
+const ICON_MAP: Record<string, any> = {
+    brain: Brain,
+    target: Target,
+    layers: Layers,
+    rocket: Rocket,
+    code: Code2,
+    beaker: Beaker,
+    check: BadgeCheck
+};
 
 interface ProblemHeroProps {
     title: string;
@@ -12,7 +22,7 @@ interface ProblemHeroProps {
 export const ProblemHero = ({
     title,
     description,
-    icon: PageIcon,
+    icon: iconProp,
     benefits = [
         { icon: BadgeCheck, text: "Questions and solutions by ex-interviewers" },
         { icon: Beaker, text: "Comprehensive test cases" },
@@ -20,6 +30,8 @@ export const ProblemHero = ({
     ],
     showRecommendation = true
 }: ProblemHeroProps) => {
+    // Resolve icon if it's a string
+    const PageIcon = typeof iconProp === 'string' ? ICON_MAP[iconProp.toLowerCase()] : iconProp;
     return (
         <div className="mb-8 md:mb-12 space-y-6 md:space-y-8 animate-in fade-in slide-in-from-top-4 duration-700 w-full break-words">
             <div className="space-y-3 md:space-y-4">

@@ -22,7 +22,7 @@ export default function Blind75Page() {
           title="Blind 75 Problems"
           description="The definitive list of 75 essential problems designed to maximize your preparation in minimal time. Focus on the most frequent FAANG interview questions to ensure you're ready for the highest-level technical assessments."
           progressTitle="Blind 75 Progress"
-          icon={Brain}
+          icon="brain"
         />
       </Suspense>
     </div>

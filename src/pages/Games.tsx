@@ -1,5 +1,7 @@
 "use client";
-import { Link, useNavigate } from "react-router-dom";
+import { useRouter } from "next/router";
+import NextLink from "next/link";
+import Script from "next/script";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trophy, Brain, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,7 +9,7 @@ import { Helmet } from "react-helmet-async";
 import { usePostHog } from "@posthog/react";
 
 const Games = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const posthog = usePostHog();
 
   const games = [
@@ -115,7 +117,7 @@ const Games = () => {
           <div className="mb-6">
             <Button
               variant="ghost"
-              onClick={() => navigate('/')}
+              onClick={() => router.push('/')}
               className="gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -134,7 +136,7 @@ const Games = () => {
             {games.map((game) => {
               const Icon = game.icon;
               return (
-                <Link key={game.id} to={`/games/${game.id}`} onClick={() => posthog?.capture('game_started', { game_id: game.id, game_name: game.name, category: game.category })}>
+                <NextLink key={game.id} href={`/games/${game.id}`} onClick={() => posthog?.capture('game_started', { game_id: game.id, game_name: game.name, category: game.category })}>
                   <Card className="hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer">
                     <CardHeader>
                       <div className="flex items-center gap-3 mb-2">
@@ -158,13 +160,13 @@ const Games = () => {
                       </div>
                     </CardContent>
                   </Card>
-                </Link>
+                </NextLink>
               );
             })}
           </div>
 
           <div className="mt-12">
-            <Link to="/games/leaderboard">
+            <NextLink href="/games/leaderboard">
               <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer bg-gradient-to-r from-primary/5 to-secondary/5">
                 <CardHeader>
                   <div className="flex items-center gap-3">
@@ -176,7 +178,7 @@ const Games = () => {
                   </div>
                 </CardHeader>
               </Card>
-            </Link>
+            </NextLink>
           </div>
         </div>
       </div>

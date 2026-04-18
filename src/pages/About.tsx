@@ -5,6 +5,7 @@ import { Code2, Github, Heart, Users, ExternalLink, Layers, BarChart, Database }
 import { Footer } from "@/components/Footer";
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
+import Script from "next/script";
 
 const container = {
   hidden: { opacity: 0 },

@@ -1,6 +1,6 @@
 "use client";
 import { useMemo } from "react";
-import { useSearchParams, useLocation } from "react-router-dom";
+import { useRouter } from "next/router";
 import { Helmet } from "react-helmet-async";
 import { useAlgorithms } from "@/hooks/useAlgorithms";
 import { ListType } from "@/types/algorithm";
@@ -11,12 +11,12 @@ import { useSidebar } from "@/components/ui/sidebar";
 
 const Problems = () => {
   const { setOpenMobile, toggleSidebar, state } = useSidebar();
-  const location = useLocation();
+  const router = useRouter();
   const { data, isLoading } = useAlgorithms();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const listMode = searchParams.get('mode') || 'all';
-  const topicFilter = searchParams.get('topic');
-  const companyFilter = searchParams.get('company');
+  
+  const listMode = (router.query.mode as string) || 'all';
+  const topicFilter = router.query.topic as string;
+  const companyFilter = router.query.company as string;
 
   const allAlgorithms = data?.algorithms ?? [];
 
@@ -98,14 +98,14 @@ const Problems = () => {
           <div className="flex flex-wrap items-center gap-3 mb-8">
             <Button
               variant={listMode === 'all' ? 'default' : 'outline'}
-              onClick={() => setSearchParams({ mode: 'all' })}
+              onClick={() => router.push({ query: { ...router.query, mode: 'all' } })}
               className="rounded-xl h-10 font-medium transition-all"
             >
               All Questions
             </Button>
             <Button
               variant={listMode === 'core' ? 'default' : 'outline'}
-              onClick={() => setSearchParams({ mode: 'core' })}
+              onClick={() => router.push({ query: { ...router.query, mode: 'core' } })}
               className="rounded-xl h-10 font-medium transition-all"
             >
               <Target className="w-4 h-4 mr-2" />
@@ -113,7 +113,7 @@ const Problems = () => {
             </Button>
             <Button
               variant={listMode === 'blind' ? 'default' : 'outline'}
-              onClick={() => setSearchParams({ mode: 'blind' })}
+              onClick={() => router.push({ query: { ...router.query, mode: 'blind' } })}
               className="rounded-xl h-10 font-medium transition-all"
             >
               <Brain className="w-4 h-4 mr-2" />

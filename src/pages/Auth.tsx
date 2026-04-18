@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/router';
 import { supabase } from '@/integrations/supabase/client';
 import { usePostHog } from '@posthog/react';
 import { Button } from '@/components/ui/button';
@@ -13,7 +13,7 @@ import { Loader2, Mail, Lock, User, ArrowLeft, CheckCircle2 } from 'lucide-react
 import Logo from '@/assets/logo.svg';
 
 const Auth = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const posthog = usePostHog();
   const [isLoading, setIsLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
@@ -31,7 +31,7 @@ const Auth = () => {
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate('/');
+        router.push('/');
       }
     });
 
@@ -39,12 +39,12 @@ const Auth = () => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        navigate('/');
+        router.push('/');
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [router]);
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();

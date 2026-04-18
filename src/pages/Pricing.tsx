@@ -20,12 +20,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/router';
 import { usePostHog } from '@posthog/react';
 
 const Pricing: React.FC = () => {
   const { profile, user } = useApp();
-  const navigate = useNavigate();
+  const router = useRouter();
   const posthog = usePostHog();
   const [isUpgrading, setIsUpgrading] = useState(false);
   const [activePlanId, setActivePlanId] = useState<string | null>(null);
@@ -34,7 +34,7 @@ const Pricing: React.FC = () => {
   const handleUpgrade = async (planType: string) => {
     if (!user) {
       toast.error("Please sign in to continue with your purchase");
-      navigate("/login");
+      router.push("/login");
       return;
     }
 
@@ -100,7 +100,7 @@ const Pricing: React.FC = () => {
     return date.toLocaleDateString();
   };
 
-  const isLocal = window.location.hostname === 'localhost';
+  const isLocal = typeof window !== 'undefined' && window.location.hostname === 'localhost';
 
   return (
     <div className="min-h-screen bg-background pt-24 pb-24 px-4 font-sans text-foreground">

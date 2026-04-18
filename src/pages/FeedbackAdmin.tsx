@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { format } from 'date-fns';
-import { Link } from 'react-router-dom'; // Added Link
+import NextLink from 'next/link';
 import { ExternalLink, Loader2, MessageSquare, Trash2, CheckCircle, Clock, XCircle, ArrowLeft } from 'lucide-react'; // Added ArrowLeft
 import { cn } from "@/lib/utils";
 
@@ -66,7 +66,7 @@ const FeedbackAdmin = () => {
       console.error('Error fetching feedback:', error);
       toast.error('Failed to load feedback');
     } else {
-      setFeedback(data || []);
+      setFeedback((data as any) as FeedbackItem[]);
     }
     setLoading(false);
   };
@@ -128,12 +128,12 @@ const FeedbackAdmin = () => {
         <div className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-between mb-8">
             <div className="space-y-4">
-              <Link to="/admin">
+              <NextLink href="/admin">
                 <Button variant="ghost" className="gap-2 -ml-2 text-muted-foreground">
                   <ArrowLeft className="w-4 h-4" />
                   Back to Dashboard
                 </Button>
-              </Link>
+              </NextLink>
               <div>
                 <h1 className="text-3xl font- flex items-center gap-2">
                   <MessageSquare className="w-8 h-8 text-primary" />

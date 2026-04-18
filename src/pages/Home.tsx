@@ -29,7 +29,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import React, { lazy, Suspense, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import NextLink from "next/link";
 import { FAQ } from "@/components/FAQ";
 import { FeaturedSection } from "@/components/FeaturedSection";
 import { Footer } from "@/components/Footer";
@@ -139,9 +139,9 @@ const Home = () => {
               <div className="flex flex-wrap items-center gap-6 mb-8">
                 <div className="flex flex-col gap-4">
                   <Button className=" text-black rounded-full bg-primary hover:bg-primary/80 transition-colors " asChild>
-                    <Link to="/dsa/get-started">
+                    <NextLink href="/dsa/get-started">
                       Get started now <ArrowRight className="ml-2 w-6 h-6" />
-                    </Link>
+                    </NextLink>
                   </Button>
                   <span className="text-[10px] text-gray-500 font- uppercase tracking-wider opacity-60 text-center">
                     Try the free questions
@@ -211,7 +211,7 @@ const Home = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
                     {/* Core Problems Card */}
-                    <Link to="/dsa/core" className="group">
+                    <NextLink href="/dsa/core" className="group">
                       <Card className="h-full bg-white dark:bg-zinc-900/50 border-gray-100 dark:border-zinc-800 hover:border-primary/30 transition-all duration-300 group-hover:shadow-2xl group-hover:shadow-primary/5 group-hover:-translate-y-1 overflow-hidden">
                         <CardHeader className="pb-4">
                           <div className="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center mb-4 border border-orange-500/20 group-hover:bg-orange-500 group-hover:text-white transition-colors duration-300">
@@ -225,10 +225,10 @@ const Home = () => {
                           </CardDescription>
                         </CardContent>
                       </Card>
-                    </Link>
+                    </NextLink>
 
                     {/* Blind 75 Card */}
-                    <Link to="/dsa/blind75" className="group">
+                    <NextLink href="/dsa/blind75" className="group">
                       <Card className="h-full bg-white dark:bg-zinc-900/50 border-gray-100 dark:border-zinc-800 hover:border-primary/30 transition-all duration-300 group-hover:shadow-2xl group-hover:shadow-primary/5 group-hover:-translate-y-1 overflow-hidden">
                         <CardHeader className="pb-4">
                           <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center mb-4 border border-blue-500/20 group-hover:bg-blue-500 group-hover:text-white transition-colors duration-300">
@@ -242,10 +242,10 @@ const Home = () => {
                           </CardDescription>
                         </CardContent>
                       </Card>
-                    </Link>
+                    </NextLink>
 
                     {/* All Problems Card */}
-                    <Link to="/dsa/problems" className="group">
+                    <NextLink href="/dsa/problems" className="group">
                       <Card className="h-full bg-white dark:bg-zinc-900/50 border-gray-100 dark:border-zinc-800 hover:border-primary/30 transition-all duration-300 group-hover:shadow-2xl group-hover:shadow-primary/5 group-hover:-translate-y-1 overflow-hidden">
                         <CardHeader className="pb-4">
                           <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 border border-primary/20 group-hover:bg-primary group-hover:text-black transition-colors duration-300">
@@ -259,14 +259,14 @@ const Home = () => {
                           </CardDescription>
                         </CardContent>
                       </Card>
-                    </Link>
+                    </NextLink>
                   </div>
 
                   <div className="flex justify-center">
                     <Button size="lg" className="rounded-full px-8 py-6 text-base bg-primary hover:bg-primary/90 text-black transition-all hover:scale-105 active:scale-95 shadow-xl shadow-primary/20" asChild>
-                      <Link to="/dsa/get-started">
+                      <NextLink href="/dsa/get-started">
                         Get Started <ArrowRight className="ml-2 w-5 h-5" />
-                      </Link>
+                      </NextLink>
                     </Button>
                   </div>
                 </div>

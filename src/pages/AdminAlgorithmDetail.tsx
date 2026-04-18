@@ -1,21 +1,21 @@
 "use client";
-import { useNavigate, useParams } from 'react-router-dom';
+import { useRouter } from 'next/router';
 import { useAlgorithm } from '@/hooks/useAlgorithm';
 import { AlgorithmFormBuilder } from '@/components/admin/AlgorithmFormBuilder';
 import { Loader2, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function AdminAlgorithmDetail() {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const { data: algorithm, isLoading, error } = useAlgorithm(id || '');
+  const router = useRouter();
+  const { id } = router.query;
+  const { data: algorithm, isLoading, error } = useAlgorithm((id as string) || '');
 
   const handleCancel = () => {
-    navigate('/admin/problems');
+    router.push('/admin/problems');
   };
 
   const handleSuccess = () => {
-    navigate('/admin/problems');
+    router.push('/admin/problems');
   };
 
   if (id && isLoading) {
@@ -32,7 +32,7 @@ export default function AdminAlgorithmDetail() {
         <h1 className="text-2xl font- text-destructive">Error loading algorithm</h1>
         <p className="text-muted-foreground">{error.message}</p>
         <button
-          onClick={() => navigate('/admin/problems')}
+          onClick={() => router.push('/admin/problems')}
           className="mt-4 text-primary hover:underline"
         >
           Back to list

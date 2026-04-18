@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { FeatureFlag } from "@/types/featureFlags";
 import { toast } from "sonner";
-import { Link } from "react-router-dom"; // Added Link
+import Link from "next/link"; // Changed to next/link
 import { Loader2, Plus, RefreshCw, Trash2, ArrowLeft } from "lucide-react"; // Added ArrowLeft
 
 export default function AdminFeatureFlags() {
@@ -113,7 +113,7 @@ export default function AdminFeatureFlags() {
     <div className="container mx-auto p-8 space-y-8">
       <div className="flex justify-between items-center">
         <div className="space-y-4">
-          <Link to="/admin">
+          <Link href="/admin">
             <Button variant="ghost" className="gap-2 -ml-2 text-muted-foreground">
               <ArrowLeft className="w-4 h-4" />
               Back to Dashboard

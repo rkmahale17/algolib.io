@@ -32,7 +32,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Pencil, Trash2, Plus, Search, ArrowLeft } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 
 export function AlgorithmList() {
   const router = useRouter();
@@ -207,7 +207,7 @@ export function AlgorithmList() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => navigate(`/admin/problem/${algo.id}`)}
+                        onClick={() => router.push(`/admin/problem/${algo.id}`)}
                         className="h-8 w-8 hover:bg-muted"
                         title="Edit Algorithm"
                       >

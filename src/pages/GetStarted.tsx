@@ -1,6 +1,6 @@
 "use client";
 import { useMemo } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { Helmet } from "react-helmet-async";
 import { useAlgorithms } from "@/hooks/useAlgorithms";
 import { ListType } from "@/types/algorithm";
@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { ProblemsList } from "@/components/listing/ProblemsList";
 
 const ListCard = ({ title, description, icon: Icon, badge, link, color, isFirst, isLast }: any) => (
-  <Link to={link} className="group block relative w-full">
+  <Link href={link} className="group block relative w-full">
     <div className={cn(
       "flex items-center gap-4 sm:gap-6 p-5 transition-all duration-300",
       "bg-card hover:bg-muted/15",

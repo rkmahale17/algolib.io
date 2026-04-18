@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { BlogCard } from "@/components/blog/BlogCard";
 import { Button } from "@/components/ui/button";
 import { Helmet } from "react-helmet-async";
-import { Link } from "react-router-dom";
+import NextLink from "next/link";
 import { blogPosts } from "@/data/blogPosts";
 import Script from "next/script";
 
@@ -115,7 +115,7 @@ const Blog = () => {
                 guides
               </p>
               <Button asChild size="lg" className="rounded-full">
-                <Link to="/games">Explore Games</Link>
+                <NextLink href="/games">Explore Games</NextLink>
               </Button>
             </CardContent>
           </Card>
