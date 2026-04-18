@@ -5,6 +5,8 @@ export interface CompanyTag {
   svglSlug?: string;
 }
 
+// need to check this later 
+
 export const TOP_COMPANIES: CompanyTag[] = [
   { id: "amazon", name: "Amazon", iconSlug: "amazon", svglSlug: "amazon" },
   { id: "google", name: "Google", iconSlug: "google", svglSlug: "google" },
