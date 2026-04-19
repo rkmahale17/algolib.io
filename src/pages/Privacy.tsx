@@ -1,12 +1,12 @@
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Footer } from "@/components/Footer";
-import { Helmet } from "react-helmet-async";
+import Head from 'next/head';
 
 export default function Privacy() {
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Privacy Policy - Rulcode.com | Data Protection & User Privacy</title>
         <meta
           name="description"
@@ -22,7 +22,7 @@ export default function Privacy() {
         <meta property="og:description" content="How Rulcode.com protects your data and respects your privacy" />
         <meta property="og:url" content="https://rulcode.com/privacy" />
         <meta name="robots" content="index, follow" />
-      </Helmet>
+      </Head>
 
       <div className="min-h-screen bg-background">
         <main className="container mx-auto px-4 py-8 max-w-4xl">

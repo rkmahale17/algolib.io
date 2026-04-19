@@ -2,13 +2,13 @@ import React, { useEffect } from "react";
 import "../../src/styles/blog.css";
 
 import { ArrowLeft, Calendar, Clock, User } from "lucide-react";
-import { useRouter } from "next/router";
+import { useRouter, useParams } from "next/navigation";
 import NextLink from "next/link";
 import { getBlogPost, getRelatedPosts } from "@/data/blogPosts";
 
 import { Badge } from "@/components/ui/badge";
 import { BlogContent } from "@/components/blog/BlogContent";
-import { Helmet } from "react-helmet-async";
+import Head from "next/head";
 import { Separator } from "@/components/ui/separator";
 import { ShareButton } from "@/components/ShareButton";
 import { BlogSidebar } from "@/components/blog/BlogSidebar";
@@ -16,15 +16,16 @@ import Script from "next/script";
 
 const BlogPost = () => {
   const router = useRouter();
-  const { slug } = router.query;
+  const params = useParams();
+  const slug = params?.slug as string | undefined;
   const post = slug ? getBlogPost(slug as string) : undefined;
   const relatedPosts = slug ? getRelatedPosts(slug as string) : [];
 
   useEffect(() => {
-    if (router.isReady && !post) {
+    if (!post && slug) {
       router.replace("/blog");
     }
-  }, [router.isReady, post]);
+  }, [slug, post]);
 
   if (!post) {
     return null;
@@ -41,7 +42,7 @@ const BlogPost = () => {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>{post.title} | Rulcode Blog</title>
         <meta name="description" content={post.description} />
         <meta name="keywords" content={`${post.category}, algorithms, ${post.title}, coding tutorial, DSA, competitive programming`} />
@@ -62,7 +63,7 @@ const BlogPost = () => {
         <meta name="twitter:title" content={post.title} />
         <meta name="twitter:description" content={post.description} />
         <meta name="twitter:image" content={post.image || 'https://rulcode.com/og-image.png'} />
-      </Helmet>
+      </Head>
 
       <Script
         id={`blog-post-json-ld-${post.slug}`}

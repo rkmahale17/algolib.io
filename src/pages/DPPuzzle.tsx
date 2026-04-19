@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Helmet } from "react-helmet-async";
+import Head from 'next/head';
 import { DPModeSelection } from "@/components/dpPuzzle/DPModeSelection";
 import { DPGameBoard } from "@/components/dpPuzzle/DPGameBoard";
 import { DPMode } from "@/hooks/useDPGame";
@@ -24,7 +24,7 @@ const DPPuzzle = () => {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>DP Puzzle Grid Game - Learn Dynamic Programming | Rulcode.com</title>
         <meta name="description" content="Master dynamic programming through interactive table-filling puzzles. Learn Fibonacci, Knapsack, LCS, and more DP patterns by solving visual challenges." />
         <meta name="keywords" content="dynamic programming game, DP table game, knapsack game, fibonacci game, LCS game, memoization learning, coding interview DP" />
@@ -38,7 +38,7 @@ const DPPuzzle = () => {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="DP Puzzle Grid - Learn Dynamic Programming" />
         <meta name="twitter:description" content="Master DP through interactive table-filling puzzles." />
-      </Helmet>
+      </Head>
 
       <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-8 px-4">
         <div className="container mx-auto max-w-7xl">

@@ -3,7 +3,7 @@ import { Loader2, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import { useState, useEffect, useCallback } from 'react';
 import { Footer } from '@/components/Footer';
-import { Helmet } from 'react-helmet-async';
+import Head from 'next/head';
 import { supabase } from '@/integrations/supabase/client';
 import { FeedbackCard } from '@/components/feedback/FeedbackCard';
 import { FeedbackFilters } from '@/components/feedback/FeedbackFilters';
@@ -290,14 +290,14 @@ const Feedback = () => {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Feedback & Suggestions - Rulcode.com | Report Bugs & Request Features</title>
         <meta
           name="description"
           content="Share your feedback, report bugs, or request new features for Rulcode.com. Help us improve our free algorithm learning platform."
         />
         <link rel="canonical" href="https://rulcode.com/feedback" />
-      </Helmet>
+      </Head>
 
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-16">

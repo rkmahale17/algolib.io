@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Helmet } from "react-helmet-async";
+import Head from 'next/head';
 import { ModeSelection } from "@/components/sortHero/ModeSelection";
 import { GameBoard } from "@/components/sortHero/GameBoard";
 
@@ -25,7 +25,7 @@ const SortHero = () => {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Sort Hero Game - Learn Sorting Algorithms Interactively | Rulcode.com</title>
         <meta name="description" content="Master bubble sort, selection sort, and quicksort through interactive gameplay. Learn sorting algorithms with step-by-step visualizations and challenges." />
         <meta name="keywords" content="sorting algorithms game, bubble sort game, quicksort game, learn sorting interactively, algorithm visualization game, coding education" />
@@ -39,7 +39,7 @@ const SortHero = () => {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Sort Hero - Learn Sorting Algorithms" />
         <meta name="twitter:description" content="Master bubble sort, selection sort, and quicksort through gameplay." />
-      </Helmet>
+      </Head>
 
       <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-8 px-4">
         <div className="container mx-auto max-w-6xl">

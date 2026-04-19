@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
+import Head from 'next/head';
 import { format } from 'date-fns';
 import NextLink from 'next/link';
 import { ExternalLink, Loader2, MessageSquare, Trash2, CheckCircle, Clock, XCircle, ArrowLeft } from 'lucide-react'; // Added ArrowLeft
@@ -119,10 +119,10 @@ const FeedbackAdmin = () => {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Feedback Management - Rulcode.com</title>
         <meta name="robots" content="noindex, nofollow" />
-      </Helmet>
+      </Head>
 
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">

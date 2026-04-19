@@ -1,6 +1,6 @@
 "use client";
 import { useMemo } from 'react';
-import { Helmet } from 'react-helmet-async';
+import Head from 'next/head';
 import { ListType } from "@/types/algorithm";
 import { useAlgorithms } from "@/hooks/useAlgorithms";
 import { ProblemsList } from "@/components/listing/ProblemsList";
@@ -17,9 +17,9 @@ const CorePatterns = () => {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Core Patterns - Master the Fundamentals | Rulcode.com</title>
-      </Helmet>
+      </Head>
 
       <ProblemsList
         algorithms={coreAlgorithms}

@@ -1,11 +1,11 @@
 "use client";
-import { useRouter } from "next/router";
+import { useRouter } from 'next/navigation';
 import NextLink from "next/link";
 import Script from "next/script";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trophy, Brain, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Helmet } from "react-helmet-async";
+import Head from 'next/head';
 import { usePostHog } from "@posthog/react";
 
 const Games = () => {
@@ -65,7 +65,7 @@ const Games = () => {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Algorithmic Games - Learn Algorithms Interactively | Rulcode.com</title>
         <meta
           name="description"
@@ -85,7 +85,7 @@ const Games = () => {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Algorithmic Games - Interactive Learning" />
         <meta name="twitter:description" content="Master algorithms through fun, interactive games." />
-      </Helmet>
+      </Head>
 
       <Script
         id="games-json-ld"

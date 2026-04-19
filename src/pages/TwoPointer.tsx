@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Helmet } from "react-helmet-async";
+import Head from 'next/head';
 import { TwoPointerModeSelection } from "@/components/twoPointer/TwoPointerModeSelection";
 import { TwoPointerGameBoard } from "@/components/twoPointer/TwoPointerGameBoard";
 import { PointerMode } from "@/hooks/useTwoPointerGame";
@@ -24,7 +24,7 @@ const TwoPointer = () => {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Two Pointer Race Game - Learn Two Pointer Technique | Rulcode.com</title>
         <meta name="description" content="Master the two-pointer technique through interactive gameplay. Find valid pairs, learn sorted array patterns, and optimize your algorithm skills." />
         <meta name="keywords" content="two pointer game, two pointer technique, algorithm pattern game, sorted array problems, coding interview prep, pair sum game" />
@@ -38,7 +38,7 @@ const TwoPointer = () => {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Two Pointer Race - Learn Algorithm Patterns" />
         <meta name="twitter:description" content="Master two-pointer technique by catching correct pairs." />
-      </Helmet>
+      </Head>
 
       <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-8 px-4">
         <div className="container mx-auto max-w-7xl">

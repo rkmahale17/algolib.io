@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { Trophy, Medal, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 interface LeaderboardEntry {
   id: string;

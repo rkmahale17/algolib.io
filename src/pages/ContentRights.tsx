@@ -1,12 +1,12 @@
 "use client";
-import { Helmet } from 'react-helmet-async';
+import Head from 'next/head';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Footer } from "@/components/Footer";
 
 const ContentRights = () => {
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Content Rights & Usage Policy - RulCode</title>
         <meta name="description" content="Learn about RulCode's content rights, embedded video usage, and original educational materials." />
         <meta name="keywords" content="content rights, usage policy, educational content, embedded videos, NeetCode" />
@@ -15,7 +15,7 @@ const ContentRights = () => {
         <meta property="og:description" content="Learn about RulCode's content rights, embedded video usage, and original educational materials." />
         <meta property="og:url" content="https://rulcode.com/content-rights" />
         <meta property="og:type" content="website" />
-      </Helmet>
+      </Head>
 
       <main className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8 max-w-4xl">

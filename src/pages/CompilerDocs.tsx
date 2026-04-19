@@ -1,7 +1,7 @@
 "use client";
 import { Badge } from "@/components/ui/badge";
 import { Footer } from "@/components/Footer";
-import { Helmet } from "react-helmet-async";
+import Head from "next/head";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Code2,
@@ -187,10 +187,10 @@ export default function CompilerDocs() {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Compiler Infrastructure & Documentation - RulCode</title>
         <meta name="description" content="Detailed documentation of RulCode's execution environment, resource limits, and algorithm glossary." />
-      </Helmet>
+      </Head>
 
       <div className="min-h-screen bg-background flex flex-col">
         {/* Main Content Area */}

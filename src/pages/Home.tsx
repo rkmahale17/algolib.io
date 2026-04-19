@@ -46,7 +46,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Helmet } from "react-helmet-async";
+import Head from 'next/head';
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useApp } from "@/contexts/AppContext";
@@ -60,7 +60,7 @@ const Home = () => {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>
           RulCode - Master Competitive Programming & Technical Interviews |
           Free & Open Source
@@ -99,7 +99,7 @@ const Home = () => {
           content="Free interactive algorithm visualizations and integrated code runner for FAANG interview preparation."
         />
         <meta name="twitter:image" content="https://rulcode.com/og-image.png" />
-      </Helmet>
+      </Head>
 
       <Script
         id="legacy-home-json-ld"

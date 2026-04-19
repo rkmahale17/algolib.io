@@ -1,12 +1,12 @@
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Footer } from "@/components/Footer";
-import { Helmet } from "react-helmet-async";
+import Head from 'next/head';
 
 export default function TermsOfService() {
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Terms of Service - Rulcode.com | Usage Terms & Conditions</title>
         <meta
           name="description"
@@ -22,7 +22,7 @@ export default function TermsOfService() {
         <meta property="og:description" content="Terms and conditions for using Rulcode.com platform and educational content" />
         <meta property="og:url" content="https://rulcode.com/terms" />
         <meta name="robots" content="index, follow" />
-      </Helmet>
+      </Head>
 
       <div className="min-h-screen bg-background">
         <main className="container mx-auto px-4 py-8 max-w-4xl">

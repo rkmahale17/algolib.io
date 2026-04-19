@@ -1,6 +1,6 @@
 "use client";
 import { useMemo } from 'react';
-import { Helmet } from 'react-helmet-async';
+import Head from 'next/head';
 import { ListType } from "@/types/algorithm";
 import { useAlgorithms } from "@/hooks/useAlgorithms";
 import { ProblemsList } from "@/components/listing/ProblemsList";
@@ -17,9 +17,9 @@ const Blind75 = () => {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Blind 75 LeetCode Problems - Rulcode.com</title>
-      </Helmet>
+      </Head>
 
       <ProblemsList
         algorithms={blind75Algorithms}

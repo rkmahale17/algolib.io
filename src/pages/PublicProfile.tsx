@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, useMemo } from "react";
-import { useRouter } from "next/router";
+import { useRouter, useParams } from "next/navigation";
 import NextLink from "next/link";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
@@ -91,7 +91,8 @@ interface ProfileStats {
 
 const PublicProfile = () => {
   const router = useRouter();
-  const { username } = router.query;
+  const params = useParams();
+  const username = params?.username as string | undefined;
   const { user: currentUser } = useApp();
   const { data: algoMeta } = useAlgorithms();
   const allAlgorithms = algoMeta?.algorithms;
@@ -196,7 +197,7 @@ const PublicProfile = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Check if user is authenticated first using existing state from context
       if (!currentUser) {
         // Fallback check in case the context is still loading
@@ -206,7 +207,7 @@ const PublicProfile = () => {
           return;
         }
       }
-      
+
       const authUserId = currentUser?.id || (await supabase.auth.getUser()).data.user?.id;
 
       // Fetch profile by username with optimized columns
@@ -241,7 +242,7 @@ const PublicProfile = () => {
         // @ts-ignore
         ...profileData,
         is_public: !!isPublic,
-        email: "", 
+        email: "",
       } as Profile;
 
       setProfile(publicProfile);
@@ -267,7 +268,7 @@ const PublicProfile = () => {
 
   const handleProfileUpdate = () => {
     setIsEditOpen(false);
-    fetchPublicProfile(); 
+    fetchPublicProfile();
   };
 
   if (loading) return <PremiumLoader text="Loading Profile..." />;

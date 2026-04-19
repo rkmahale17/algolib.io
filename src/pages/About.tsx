@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Code2, Github, Heart, Users, ExternalLink, Layers, BarChart, Database } from "lucide-react";
 import { Footer } from "@/components/Footer";
-import { Helmet } from "react-helmet-async";
+import Head from "next/head";
 import { motion } from "framer-motion";
 import Script from "next/script";
 
@@ -25,7 +25,7 @@ const item = {
 export default function About() {
   return (
     <>
-      <Helmet>
+      <Head>
         <title>About RulCode - Free Open Source Algorithm Learning Platform</title>
         <meta
           name="description"
@@ -40,7 +40,7 @@ export default function About() {
         <meta property="og:title" content="About RulCode - Free Algorithm Learning Platform" />
         <meta property="og:description" content="100% free and open-source platform for learning algorithms with interactive visualizations" />
         <meta property="og:url" content="https://rulcode.com/about" />
-      </Helmet>
+      </Head>
 
       <Script
         id="about-json-ld"

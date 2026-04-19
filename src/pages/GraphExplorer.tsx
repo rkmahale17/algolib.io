@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Helmet } from "react-helmet-async";
+import Head from 'next/head';
 import { GraphModeSelection } from "@/components/graphExplorer/GraphModeSelection";
 import { GraphGameBoard } from "@/components/graphExplorer/GraphGameBoard";
 import { GraphMode } from "@/hooks/useGraphGame";
@@ -24,7 +24,7 @@ const GraphExplorer = () => {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Graph Explorer Game - Learn BFS and DFS Algorithms | Rulcode.com</title>
         <meta name="description" content="Master graph traversal algorithms through maze navigation. Learn BFS, DFS, and pathfinding by solving visual graph puzzles interactively." />
         <meta name="keywords" content="graph algorithms game, BFS game, DFS game, maze solver, graph traversal learning, pathfinding game, coding interview graphs" />
@@ -38,7 +38,7 @@ const GraphExplorer = () => {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Graph Explorer - Graph Algorithm Game" />
         <meta name="twitter:description" content="Learn graph traversal by solving maze puzzles." />
-      </Helmet>
+      </Head>
 
       <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-8 px-4">
         <div className="container mx-auto max-w-7xl">

@@ -1,7 +1,7 @@
 "use client";
 import { useMemo } from "react";
 import Link from "next/link";
-import { Helmet } from "react-helmet-async";
+import Head from 'next/head';
 import { useAlgorithms } from "@/hooks/useAlgorithms";
 import { ListType } from "@/types/algorithm";
 import { Rocket, Layers, ChevronRight, Target, Brain } from "lucide-react";
@@ -45,10 +45,10 @@ const GetStarted = () => {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>DSA Roadmap - RulCode | Master Patterns</title>
         <meta name="description" content="Master essential recurring algorithm patterns with our curated DSA roadmap." />
-      </Helmet>
+      </Head>
 
       <ProblemsList
         algorithms={coreAlgorithms}

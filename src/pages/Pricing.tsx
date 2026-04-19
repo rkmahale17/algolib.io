@@ -20,7 +20,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { usePostHog } from '@posthog/react';
 
 const Pricing: React.FC = () => {

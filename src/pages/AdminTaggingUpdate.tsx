@@ -31,15 +31,15 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 export function AdminTaggingUpdate() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
-  
+
   const { data, isLoading } = useAlgorithms(searchQuery, '');
   const algorithms = data?.algorithms ?? [];
-  
+
   const stagedUpdatesMutation = useBatchStagedUpdates();
   const [stagedEdits, setStagedEdits] = useState<Record<string, { is_pro?: boolean, companies?: string[] }>>({});
 
@@ -55,10 +55,10 @@ export function AdminTaggingUpdate() {
     setStagedEdits(prev => {
       const current = prev[algo.id] || {};
       const currentCompanies = current.companies ?? originalCompanies;
-      const newCompanies = isAdding 
+      const newCompanies = isAdding
         ? [...currentCompanies, company]
         : currentCompanies.filter((c: string) => c !== company);
-      
+
       if (isAdding && currentCompanies.includes(company)) return prev;
 
       return { ...prev, [algo.id]: { ...current, companies: newCompanies } };
@@ -70,9 +70,9 @@ export function AdminTaggingUpdate() {
       id,
       ...stagedEdits[id]
     }));
-    
+
     if (updatesArray.length === 0) return;
-    
+
     try {
       await stagedUpdatesMutation.mutateAsync(updatesArray);
       toast.success(`Successfully saved updates for ${updatesArray.length} algorithms!`);
@@ -88,15 +88,15 @@ export function AdminTaggingUpdate() {
       <div className="flex flex-col gap-4 sticky top-0 bg-background/95 backdrop-blur z-10 pb-4 border-b">
         <div className="flex justify-between items-end">
           <div className="flex items-center gap-4">
-             <Button variant="ghost" size="icon" onClick={() => router.push('/admin')}>
-                <ArrowLeft className="h-4 w-4" />
-             </Button>
+            <Button variant="ghost" size="icon" onClick={() => router.push('/admin')}>
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Tagging & Pro Operations</h1>
               <p className="text-muted-foreground text-sm mt-1">Batch assign top companies and PRO state globally.</p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-4">
             <div className="relative w-[300px]">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -123,7 +123,7 @@ export function AdminTaggingUpdate() {
                 Discard Edits
               </Button>
               <Button size="sm" onClick={handleSaveStagedChanges} disabled={stagedUpdatesMutation.isPending} className="gap-2 shadow-md bg-amber-500 hover:bg-amber-600">
-                {stagedUpdatesMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin"/> : <Save className="w-4 h-4" />} 
+                {stagedUpdatesMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 Save Changes
               </Button>
             </div>
@@ -133,7 +133,7 @@ export function AdminTaggingUpdate() {
 
       {isLoading ? (
         <div className="flex justify-center p-12">
-           <Loader2 className="animate-spin text-primary w-8 h-8"/>
+          <Loader2 className="animate-spin text-primary w-8 h-8" />
         </div>
       ) : (
         <div className="border rounded-lg shadow-sm bg-card overflow-hidden">
@@ -155,17 +155,17 @@ export function AdminTaggingUpdate() {
                 </TableRow>
               ) : (
                 algorithms.map((algo) => {
-                   const algoCompanies = stagedEdits[algo.id]?.companies ?? (algo.metadata?.companies || []);
-                   const isPro = stagedEdits[algo.id]?.is_pro ?? (algo.metadata?.is_pro || false);
-                   const isModified = !!stagedEdits[algo.id];
-                   
-                   return (
-                    <TableRow 
-                      key={algo.id} 
+                  const algoCompanies = stagedEdits[algo.id]?.companies ?? (algo.metadata?.companies || []);
+                  const isPro = stagedEdits[algo.id]?.is_pro ?? (algo.metadata?.is_pro || false);
+                  const isModified = !!stagedEdits[algo.id];
+
+                  return (
+                    <TableRow
+                      key={algo.id}
                       className={`transition-colors ${isModified ? 'bg-amber-500/5 hover:bg-amber-500/10' : ''}`}
                     >
                       <TableCell className="font-mono text-xs text-muted-foreground">
-                        {algo.serial_no || '-'}<br/>
+                        {algo.serial_no || '-'}<br />
                         <span className="text-[9px] opacity-50">{algo.id.slice(0, 8)}</span>
                       </TableCell>
                       <TableCell>
@@ -175,21 +175,21 @@ export function AdminTaggingUpdate() {
                       <TableCell>
                         <div className="flex flex-wrap items-center gap-1.5">
                           {algoCompanies.map((c: string) => {
-                              const compConfig = TOP_COMPANIES.find(comp => comp.name.toLowerCase() === c.toLowerCase());
-                              return (
-                                <Badge key={c} variant="outline" className="text-[10px] bg-background gap-1 pr-1 cursor-pointer hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30" onClick={() => handleCompanyToggleInline(algo, c, false)}>
-                                  <CompanyIcon company={c} className="w-2.5 h-2.5 opacity-70" />
-                                  {c} <X className="w-2.5 h-2.5" />
-                                </Badge>
-                              );
+                            const compConfig = TOP_COMPANIES.find(comp => comp.name.toLowerCase() === c.toLowerCase());
+                            return (
+                              <Badge key={c} variant="outline" className="text-[10px] bg-background gap-1 pr-1 cursor-pointer hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30" onClick={() => handleCompanyToggleInline(algo, c, false)}>
+                                <CompanyIcon company={c} className="w-2.5 h-2.5 opacity-70" />
+                                {c} <X className="w-2.5 h-2.5" />
+                              </Badge>
+                            );
                           })}
                           <Popover>
                             <PopoverTrigger asChild>
-                              <Button variant="ghost" size="sm" className="h-5 px-1.5 text-[10px] rounded-full border border-dashed text-muted-foreground w-6"><Plus className="w-3 h-3 hover:text-primary"/></Button>
+                              <Button variant="ghost" size="sm" className="h-5 px-1.5 text-[10px] rounded-full border border-dashed text-muted-foreground w-6"><Plus className="w-3 h-3 hover:text-primary" /></Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-[200px] p-0" align="start">
                               <Command>
-                                <CommandInput placeholder="Add company..." className="h-8"/>
+                                <CommandInput placeholder="Add company..." className="h-8" />
                                 <CommandList className="max-h-[350px]">
                                   <CommandEmpty>No company found.</CommandEmpty>
                                   <CommandGroup className="overflow-auto pb-4">
@@ -216,13 +216,13 @@ export function AdminTaggingUpdate() {
                       </TableCell>
                       <TableCell className="text-center">
                         <div className="flex justify-center items-center gap-2">
-                           {isPro && <Badge className="bg-amber-500/20 text-amber-600 border-amber-500/30 text-[9px] px-1 py-0 uppercase shadow-sm mr-1">pro</Badge>}
-                           <Switch 
-                             checked={isPro}
-                             onCheckedChange={(checked) => handleToggleProInline(algo.id, checked)}
-                             disabled={stagedUpdatesMutation.isPending}
-                             className="data-[state=checked]:bg-amber-500"
-                           />
+                          {isPro && <Badge className="bg-amber-500/20 text-amber-600 border-amber-500/30 text-[9px] px-1 py-0 uppercase shadow-sm mr-1">pro</Badge>}
+                          <Switch
+                            checked={isPro}
+                            onCheckedChange={(checked) => handleToggleProInline(algo.id, checked)}
+                            disabled={stagedUpdatesMutation.isPending}
+                            className="data-[state=checked]:bg-amber-500"
+                          />
                         </div>
                       </TableCell>
                     </TableRow>

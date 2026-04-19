@@ -1,6 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useState, useMemo, Suspense } from "react";
-import { useRouter } from "next/router";
+import { useRouter, useParams } from "next/navigation";
 import NextLink from "next/link";
 import { Code2, ArrowLeft, Eye, Lightbulb, Minimize2, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
@@ -41,12 +41,12 @@ import {
   Sheet,
   SheetContent,
 } from "@/components/ui/sheet";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from "@/components/ui/select";
 import { ProblemSidebar } from "@/components/ProblemSidebar";
 import { useAlgorithms } from "@/hooks/useAlgorithms";
@@ -55,7 +55,9 @@ import { ListType, LIST_TYPE_LABELS } from "@/types/algorithm";
 
 const ProblemDetail: React.FC = () => {
   const router = useRouter();
-  const { id, slug } = router.query;
+  const routeParams = useParams();
+  const id = routeParams?.id as string | undefined;
+  const slug = routeParams?.slug as string | undefined;
   // Unified route: /problem/:id (supports both core patterns and Blind 75)
   const algorithmIdOrSlug = (id || slug) as string;
   const posthog = usePostHog();
@@ -89,7 +91,7 @@ const ProblemDetail: React.FC = () => {
   const filteredAlgorithms = useMemo(() => {
     if (!allAlgorithms) return [];
     if (!activeListType || activeListType === 'all') return allAlgorithms;
-    
+
     return allAlgorithms.filter(algo => {
       const algoListType = (algo.list_type || (algo as any).listType || 'core').toLowerCase();
       const currentListType = activeListType.toLowerCase();
@@ -438,8 +440,8 @@ const ProblemDetail: React.FC = () => {
 
         <SheetContent side="left" className="w-full sm:max-w-[600px] p-0 border-r border-border shadow-2xl flex flex-col">
           <div className="flex items-center justify-between p-3 border-b border-border bg-background">
-            <Select 
-              value={activeListType || "all"} 
+            <Select
+              value={activeListType || "all"}
               onValueChange={(val) => setActiveListType(val as any)}
             >
               <SelectTrigger className="border-none bg-transparent hover:bg-muted/50 focus:ring-0 px-2 h-9 text-sm font-medium w-fit min-w-[140px] gap-2 transition-colors">

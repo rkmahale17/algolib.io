@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 
 import { BlogCard } from "@/components/blog/BlogCard";
 import { Button } from "@/components/ui/button";
-import { Helmet } from "react-helmet-async";
+import Head from "next/head";
 import NextLink from "next/link";
 import { blogPosts } from "@/data/blogPosts";
 import Script from "next/script";
@@ -15,7 +15,7 @@ const Blog = () => {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Rulcode Blog - Algorithm Tutorials & DSA Patterns | 200+ Free Guides</title>
         <meta
           name="description"
@@ -36,7 +36,7 @@ const Blog = () => {
         <meta name="twitter:title" content="Rulcode Blog - Algorithm Tutorials" />
         <meta name="twitter:description" content="Master algorithms through interactive tutorials and guides." />
         <meta name="twitter:image" content="https://rulcode.com/og-image.png" />
-      </Helmet>
+      </Head>
 
       <Script
         id="blog-json-ld"

@@ -1,5 +1,5 @@
 "use client";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Code2, MessageSquare, Database, ArrowRight, Activity, ShieldCheck, Users, Mail } from "lucide-react";
@@ -74,7 +74,7 @@ export default function AdminDashboard() {
 
   const { data, isLoading } = useAlgorithms('', '');
   const algorithms = data?.algorithms || [];
-  
+
   const totalAlgorithms = algorithms.length;
   const proCount = algorithms.filter(a => a.metadata?.is_pro).length;
   const taggedCount = algorithms.filter(a => a.metadata?.companies && a.metadata.companies.length > 0).length;

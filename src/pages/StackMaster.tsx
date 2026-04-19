@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Helmet } from "react-helmet-async";
+import Head from 'next/head';
 import { StackModeSelection } from "@/components/stackMaster/StackModeSelection";
 import { StackGameBoard } from "@/components/stackMaster/StackGameBoard";
 import { StackMode } from "@/hooks/useStackGame";
@@ -18,7 +18,7 @@ const StackMaster = () => {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Stack Master Game - Learn Stack Data Structure | Rulcode.com</title>
         <meta name="description" content="Master stack operations through fast-paced symbol matching game. Learn LIFO data structure, push/pop operations, and valid parentheses patterns interactively." />
         <meta name="keywords" content="stack data structure game, learn stack operations, LIFO game, parentheses matching, data structure learning, interactive stack tutorial" />
@@ -32,7 +32,7 @@ const StackMaster = () => {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Stack Master - Learn Stack Data Structure" />
         <meta name="twitter:description" content="Master stack operations through fast-paced symbol matching game." />
-      </Helmet>
+      </Head>
 
       <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-8 px-4">
         <div className="container mx-auto max-w-7xl">

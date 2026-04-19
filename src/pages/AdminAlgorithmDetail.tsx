@@ -1,5 +1,5 @@
 "use client";
-import { useRouter } from 'next/router';
+import { useRouter, useParams } from 'next/navigation';
 import { useAlgorithm } from '@/hooks/useAlgorithm';
 import { AlgorithmFormBuilder } from '@/components/admin/AlgorithmFormBuilder';
 import { Loader2, ArrowLeft } from 'lucide-react';
@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 
 export default function AdminAlgorithmDetail() {
   const router = useRouter();
-  const { id } = router.query;
+  const params = useParams();
+  const id = params?.id as string | undefined;
   const { data: algorithm, isLoading, error } = useAlgorithm((id as string) || '');
 
   const handleCancel = () => {
