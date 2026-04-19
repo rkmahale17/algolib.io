@@ -9,8 +9,20 @@ interface AlgorithmsState {
   lastFetched: number | null;
 }
 
+const CACHE_KEY = 'rulcode_algorithms_cache_v1';
+
+const getCachedAlgorithms = (): AlgorithmListItem[] => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    return cached ? JSON.parse(cached) : [];
+  } catch (e) {
+    return [];
+  }
+};
+
 const initialState: AlgorithmsState = {
-  items: [],
+  items: getCachedAlgorithms(),
   isLoading: false,
   error: null,
   lastFetched: null,
@@ -26,7 +38,7 @@ export const fetchAllAlgorithms = createAsyncThunk(
 
       if (error) throw error;
 
-      return (data || []).map((algo: any) => ({
+      const mappedData = (data || []).map((algo: any) => ({
         id: algo.id,
         title: algo.title || algo.name,
         name: algo.name,
@@ -40,6 +52,13 @@ export const fetchAllAlgorithms = createAsyncThunk(
         serial_no: algo.serial_no,
         metadata: algo.metadata,
       }));
+
+      // Cache the result
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(CACHE_KEY, JSON.stringify(mappedData));
+      }
+
+      return mappedData;
     } catch (err: any) {
       return rejectWithValue(err.message);
     }
@@ -47,12 +66,9 @@ export const fetchAllAlgorithms = createAsyncThunk(
   {
     condition: (_, { getState }) => {
       const state = getState() as { algorithms: AlgorithmsState };
-      const { items, isLoading } = state.algorithms;
-      // Skip if we already have items or if currently fetching
-      if (items.length > 0 || isLoading) {
-        return false;
-      }
-      return true;
+      const { isLoading } = state.algorithms;
+      // Fetch if not already loading. We allow re-fetching even if we have items (SWR)
+      return !isLoading;
     }
   }
 );

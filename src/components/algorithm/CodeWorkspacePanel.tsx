@@ -14,12 +14,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AuthGuard } from "@/components/AuthGuard";
 import { TabWarning } from "@/components/TabWarning";
-import { CodeRunner } from "@/components/CodeRunner/CodeRunner";
-import { BrainstormSection } from "@/components/brainstorm/BrainstormSection";
+import dynamic from 'next/dynamic';
 import { useApp } from "@/contexts/AppContext";
-import { ProOverlay } from "@/components/ProOverlay";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Submission } from "@/types/userAlgorithmData";
+
+const CodeRunner = dynamic(() => import("@/components/CodeRunner/CodeRunner").then(mod => mod.CodeRunner), {
+  ssr: false,
+  loading: () => (
+    <div className="flex-1 flex items-center justify-center h-full">
+      <Skeleton className="h-[80%] w-[90%]" />
+    </div>
+  )
+});
 
 interface CodeWorkspacePanelProps {
   algorithm: any;

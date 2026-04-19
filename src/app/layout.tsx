@@ -41,16 +41,10 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <Providers>
-          <Suspense fallback={null}>
-            <AppSidebar />
-          </Suspense>
+          <AppSidebar />
           <SidebarInset>
-            <Suspense fallback={null}>
-              <Navbar />
-            </Suspense>
-            <Suspense fallback={null}>
-              {children}
-            </Suspense>
+            <Navbar />
+            {children}
           </SidebarInset>
         </Providers>
       </body>

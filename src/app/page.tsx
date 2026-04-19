@@ -1,6 +1,16 @@
 import { Metadata } from 'next';
 import HomeClient from './HomeClient';
 import Script from 'next/script';
+import { HeroSection } from '@/components/Home/sections/HeroSection';
+import { CraftingSection } from '@/components/Home/sections/CraftingSection';
+import { CommunitySection } from '@/components/Home/sections/CommunitySection';
+import { VisualPatternsSection } from '@/components/Home/sections/VisualPatternsSection';
+import { WorkspaceSection } from '@/components/Home/sections/WorkspaceSection';
+import { ScratchpadSection } from '@/components/Home/sections/ScratchpadSection';
+import { FeedbackSection } from '@/components/Home/sections/FeedbackSection';
+import { BottomCTA } from '@/components/Home/sections/BottomCTA';
+import { FAQ } from '@/components/FAQ';
+import { Footer } from '@/components/Footer';
 
 export const metadata: Metadata = {
   title: "RulCode - Master Competitive Programming & Technical Interviews | Free & Open Source",
@@ -39,7 +49,20 @@ export default function Page() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <HomeClient />
+      <div className="min-h-screen bg-white dark:bg-black text-[#1A1A1A] dark:text-white">
+        <HeroSection />
+        <HomeClient type="platform-preview" />
+        <HomeClient type="interviews" />
+        <CraftingSection />
+        <VisualPatternsSection />
+        <WorkspaceSection />
+        <ScratchpadSection />
+        <FeedbackSection />
+        <CommunitySection />
+        <BottomCTA />
+        <FAQ />
+        <Footer />
+      </div>
     </>
   );
 }

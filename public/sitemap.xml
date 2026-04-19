@@ -319,12 +319,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://rulcode.com/problem/two-pointers</loc>
-    <lastmod>2026-04-19</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://rulcode.com/problem/tarjans</loc>
     <lastmod>2026-04-19</lastmod>
     <changefreq>weekly</changefreq>
@@ -398,6 +392,12 @@
   </url>
   <url>
     <loc>https://rulcode.com/problem/bfs-level-order</loc>
+    <lastmod>2026-04-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://rulcode.com/problem/two-pointers</loc>
     <lastmod>2026-04-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

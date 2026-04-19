@@ -43,21 +43,24 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { AuthGuard } from "@/components/AuthGuard";
 import { TabWarning } from "@/components/TabWarning";
 import { FeatureGuard } from "@/components/FeatureGuard";
-import { SolutionViewer } from "@/components/SolutionViewer";
-import { RichText } from "@/components/RichText";
-import ContentRights from "@/pages/ContentRights"; // just adjusting imports slightly
+import { useApp } from "@/contexts/AppContext";
+import { ProOverlay } from "@/components/ProOverlay";
+import { VideoTutorialCard } from "./VideoTutorialCard";
+
+// Lazy components
+const TreeDiagram = React.lazy(() => import("../visualizations/TreeDiagram").then(mod => ({ default: mod.TreeDiagram })));
+const GraphDiagram = React.lazy(() => import("../visualizations/GraphDiagram").then(mod => ({ default: mod.GraphDiagram })));
+const SolutionViewer = React.lazy(() => import("@/components/SolutionViewer").then(mod => ({ default: mod.SolutionViewer })));
+const RichText = React.lazy(() => import("@/components/RichText").then(mod => ({ default: mod.RichText })));
+const ContentRights = React.lazy(() => import("@/pages/ContentRights"));
+
 import { renderBlind75Visualization } from "@/utils/blind75Visualizations";
 import { renderVisualization as renderVizFromMapping, hasVisualization } from "@/utils/visualizationMapping";
 import { TOP_COMPANIES } from "@/constants/companies";
 import { CompanyIcon } from "@/components/CompanyIcon";
 import { DIFFICULTY_MAP } from "@/types/algorithm";
-import { TreeDiagram } from "../visualizations/TreeDiagram";
-import { GraphDiagram } from "../visualizations/GraphDiagram";
 import { isTreeType } from "@/utils/treeUtils";
 import { AlgoLink } from "../AlgoLink";
-import { useApp } from "@/contexts/AppContext";
-import { ProOverlay } from "@/components/ProOverlay";
-import { VideoTutorialCard } from "./VideoTutorialCard";
 
 interface ProblemDescriptionPanelProps {
   algorithm: any;
@@ -357,11 +360,13 @@ export const ProblemDescriptionPanel = React.memo(({
                 </div>
                 <section className="max-w-[800px] ">
                   {algorithm.explanation.problemStatement && (!algorithm?.controls || algorithm.controls?.description?.problem_statement !== false) && (
-                    <RichText
-                      content={algorithm.explanation.problemStatement}
-                      className="text-base leading-relaxed pr-4 dark:text-muted-foreground"
-                      onClick={handleRichTextClick}
-                    ></RichText>
+                    <React.Suspense fallback={<div className="h-20 w-full animate-pulse bg-muted rounded-md" />}>
+                      <RichText
+                        content={algorithm.explanation.problemStatement}
+                        className="text-base leading-relaxed pr-4 dark:text-muted-foreground"
+                        onClick={handleRichTextClick}
+                      ></RichText>
+                    </React.Suspense>
 
                   )}
                 </section>
@@ -375,7 +380,9 @@ export const ProblemDescriptionPanel = React.memo(({
                           <h4 className="font-medium mb-3">Example {index + 1}:</h4>
                           <div className="space-y-2 font-mono text-sm">
                             {example.inputBeforeHtml && (
-                              <RichText content={example.inputBeforeHtml} className="mb-2" />
+                              <React.Suspense fallback={<div className="h-6 w-full animate-pulse bg-muted rounded" />}>
+                                <RichText content={example.inputBeforeHtml} className="mb-2" />
+                              </React.Suspense>
                             )}
                             {example.input && (
                               <div className="space-y-2">
@@ -384,18 +391,26 @@ export const ProblemDescriptionPanel = React.memo(({
                                   <code className="bg-muted px-2 py-0.5 rounded">{example.input}</code>
                                 </div>
                                 {example.inputAfterHtml && (
-                                  <RichText content={example.inputAfterHtml} className="mt-2" />
+                                  <React.Suspense fallback={<div className="h-6 w-full animate-pulse bg-muted rounded" />}>
+                                    <RichText content={example.inputAfterHtml} className="mt-2" />
+                                  </React.Suspense>
                                 )}
                                 {(algorithm?.controls?.visualizations?.tree?.enabled ?? algorithm?.controls?.show_tree_visualization) && algorithm?.controls?.visualizations?.tree?.examples_input !== false && (
-                                  <TreeDiagram data={example.input} height={120} multiple={algorithm?.controls?.visualizations?.tree?.multiple} />
+                                  <React.Suspense fallback={<div className="h-[120px] w-full animate-pulse bg-muted rounded-md" />}>
+                                    <TreeDiagram data={example.input} height={120} multiple={algorithm?.controls?.visualizations?.tree?.multiple} />
+                                  </React.Suspense>
                                 )}
                                 {(algorithm?.controls?.visualizations?.graph?.enabled ?? algorithm?.controls?.show_graph_visualization) && algorithm?.controls?.visualizations?.graph?.examples_input !== false && (
-                                  <GraphDiagram data={example.input} height={120} />
+                                  <React.Suspense fallback={<div className="h-[120px] w-full animate-pulse bg-muted rounded-md" />}>
+                                    <GraphDiagram data={example.input} height={120} />
+                                  </React.Suspense>
                                 )}
                               </div>
                             )}
                             {example.outputBeforeHtml && (
-                              <RichText content={example.outputBeforeHtml} className="mb-2" />
+                              <React.Suspense fallback={<div className="h-6 w-full animate-pulse bg-muted rounded" />}>
+                                <RichText content={example.outputBeforeHtml} className="mb-2" />
+                              </React.Suspense>
                             )}
                             {example.output && (
                               <div className="space-y-2">
@@ -404,13 +419,19 @@ export const ProblemDescriptionPanel = React.memo(({
                                   <code className="bg-muted px-2 py-0.5 rounded">{example.output}</code>
                                 </div>
                                 {example.outputAfterHtml && (
-                                  <RichText content={example.outputAfterHtml} className="mt-2" />
+                                  <React.Suspense fallback={<div className="h-6 w-full animate-pulse bg-muted rounded" />}>
+                                    <RichText content={example.outputAfterHtml} className="mt-2" />
+                                  </React.Suspense>
                                 )}
                                 {(algorithm?.controls?.visualizations?.tree?.enabled ?? algorithm?.controls?.show_tree_visualization) && algorithm?.controls?.visualizations?.tree?.examples_output !== false && (
-                                  <TreeDiagram data={example.output} height={120} multiple={algorithm?.controls?.visualizations?.tree?.multiple} />
+                                  <React.Suspense fallback={<div className="h-[120px] w-full animate-pulse bg-muted rounded-md" />}>
+                                    <TreeDiagram data={example.output} height={120} multiple={algorithm?.controls?.visualizations?.tree?.multiple} />
+                                  </React.Suspense>
                                 )}
                                 {(algorithm?.controls?.visualizations?.graph?.enabled ?? algorithm?.controls?.show_graph_visualization) && algorithm?.controls?.visualizations?.graph?.examples_output !== false && (
-                                  <GraphDiagram data={example.output} height={120} />
+                                  <React.Suspense fallback={<div className="h-[120px] w-full animate-pulse bg-muted rounded-md" />}>
+                                    <GraphDiagram data={example.output} height={120} />
+                                  </React.Suspense>
                                 )}
                               </div>
                             )}
@@ -436,11 +457,13 @@ export const ProblemDescriptionPanel = React.memo(({
                       {algorithm.explanation.constraints.map((constraint: string, index: number) => (
                         <li key={index} className="flex items-start gap-2">
                           <span className="text-muted-foreground mt-0.5">•</span>
-                          <RichText
-                            content={constraint}
-                            className="text-base leading-relaxed pr-4 text-sm "
-                            onClick={handleRichTextClick}
-                          ></RichText>
+                          <React.Suspense fallback={<div className="h-6 w-full animate-pulse bg-muted rounded" />}>
+                            <RichText
+                              content={constraint}
+                              className="text-base leading-relaxed pr-4 text-sm "
+                              onClick={handleRichTextClick}
+                            ></RichText>
+                          </React.Suspense>
                         </li>
                       ))}
                     </ul>
@@ -483,11 +506,13 @@ export const ProblemDescriptionPanel = React.memo(({
                                   <>
                                     <div className="text-sm text-muted-foreground">
                                       {/* Using RichText if available, otherwise fallback */}
-                                      {overview ? (
-                                        <RichText content={overview} />
-                                      ) : (
-                                        <RichText content={algorithm.explanation.problemStatement} />
-                                      )}
+                                      <React.Suspense fallback={<div className="h-20 w-full animate-pulse bg-muted rounded" />}>
+                                        {overview ? (
+                                          <RichText content={overview} />
+                                        ) : (
+                                          <RichText content={algorithm.explanation.problemStatement} />
+                                        )}
+                                      </React.Suspense>
                                     </div>
 
                                     <Separator />
@@ -571,16 +596,20 @@ export const ProblemDescriptionPanel = React.memo(({
                                             <ProOverlay className="rounded-none border-0 py-12" />
                                           ) : (
                                             <div className="text-sm text-muted-foreground">
-                                              <RichText content={algorithm.explanation.steps} />
+                                              <React.Suspense fallback={<div className="h-20 w-full animate-pulse bg-muted rounded" />}>
+                                                <RichText content={algorithm.explanation.steps} />
+                                              </React.Suspense>
                                             </div>
                                           )}
                                         </TabsContent>
 
                                         <TabsContent value="usecase" className="mt-4">
-                                          <RichText
-                                            className="text-sm text-muted-foreground"
-                                            content={algorithm.explanation.useCase}
-                                          />
+                                          <React.Suspense fallback={<div className="h-20 w-full animate-pulse bg-muted rounded" />}>
+                                            <RichText
+                                              className="text-sm text-muted-foreground"
+                                              content={algorithm.explanation.useCase}
+                                            />
+                                          </React.Suspense>
                                         </TabsContent>
 
                                         <TabsContent value="tips" className="mt-4 h-full">
@@ -588,7 +617,9 @@ export const ProblemDescriptionPanel = React.memo(({
                                             <ProOverlay className="rounded-none border-0 py-12" />
                                           ) : (
                                             <div className="text-sm text-muted-foreground">
-                                              <RichText content={algorithm.explanation.tips} />
+                                              <React.Suspense fallback={<div className="h-20 w-full animate-pulse bg-muted rounded" />}>
+                                                <RichText content={algorithm.explanation.tips} />
+                                              </React.Suspense>
                                             </div>
                                           )}
                                         </TabsContent>
@@ -621,9 +652,9 @@ export const ProblemDescriptionPanel = React.memo(({
                           <Separator className="mb-4 bg-border/40" />
                           <div className="flex flex-wrap gap-2">
                             {(algorithm.category.includes(',') ? algorithm.category.split(',').map((c: string) => c.trim()) : [algorithm.category]).map((tag: string, i: number) => (
-                              <Badge 
-                                key={i} 
-                                variant="secondary" 
+                              <Badge
+                                key={i}
+                                variant="secondary"
                                 className="bg-muted hover:bg-muted/80 text-foreground border-border font-normal cursor-pointer flex items-center gap-1.5"
                                 onClick={() => router.push(`/dsa/query?topic=${tag}`)}
                               >
@@ -697,7 +728,9 @@ export const ProblemDescriptionPanel = React.memo(({
                           {algorithm.metadata.hints.map((hint: string, i: number) => (
                             <div key={i} className="flex gap-3 text-sm text-muted-foreground p-3 rounded-lg bg-muted/20 border border-border/30">
                               <span className="font-semibold text-amber-500 shrink-0">Hint {i + 1}:</span>
-                              <RichText content={hint} />
+                              <React.Suspense fallback={<div className="h-4 w-full animate-pulse bg-muted rounded" />}>
+                                <RichText content={hint} />
+                              </React.Suspense>
                             </div>
                           ))}
                         </AccordionContent>
@@ -805,13 +838,15 @@ export const ProblemDescriptionPanel = React.memo(({
               <ScrollArea className="h-full relative">
                 <div className="p-4 space-y-4 pb-20">
                   {algorithm?.implementations ? (
-                    <SolutionViewer
-                      implementations={algorithm.implementations}
-                      approachName="Optimal Solution"
-                      controls={algorithm?.controls?.solutions}
-                      tutorial={algorithm.tutorials?.[0]}
-                      problemName={algorithm.name}
-                    />
+                    <React.Suspense fallback={<div className="h-64 w-full animate-pulse bg-muted rounded-md" />}>
+                      <SolutionViewer
+                        implementations={algorithm.implementations}
+                        approachName="Optimal Solution"
+                        controls={algorithm?.controls?.solutions}
+                        tutorial={algorithm.tutorials?.[0]}
+                        problemName={algorithm.name}
+                      />
+                    </React.Suspense>
                   ) : (
                     <div className="text-center py-12 text-muted-foreground border rounded-lg border-dashed">
                       No solutions available.

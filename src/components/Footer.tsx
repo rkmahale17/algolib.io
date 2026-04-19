@@ -1,16 +1,9 @@
-"use client";
-
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Github, Heart, ExternalLink } from "lucide-react";
 import { Button } from "./ui/button";
+import { FooterYear } from "./FooterYear";
 
 export function Footer() {
-  const [year, setYear] = useState(2025);
-
-  useEffect(() => {
-    setYear(new Date().getFullYear());
-  }, []);
   return (
     <footer className="border-t bg-background">
       <div className="container mx-auto px-4 py-8">
@@ -125,7 +118,7 @@ export function Footer() {
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="flex flex-col items-center sm:items-start gap-2">
               <p className="text-sm text-muted-foreground text-center sm:text-left">
-                © {year || '2025'} RulCode. Open source and free forever.
+                © <FooterYear /> RulCode. Open source and free forever.
               </p>
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-3 text-xs text-muted-foreground">
                 <a
