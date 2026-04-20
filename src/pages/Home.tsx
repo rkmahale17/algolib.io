@@ -182,12 +182,12 @@ const Home = () => {
         {/* Interviews Section */}
         <section className="py-24 relative overflow-hidden">
           {/* Background Pattern */}
-          <div className="absolute inset-0 z-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none" 
-               style={{ 
-                 backgroundImage: 'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)', 
-                 backgroundSize: '40px 40px' 
-               }}></div>
-          
+          <div className="absolute inset-0 z-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none"
+            style={{
+              backgroundImage: 'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)',
+              backgroundSize: '40px 40px'
+            }}></div>
+
           <div className="container mx-auto px-4 relative z-10">
             <Tabs defaultValue="interviews" className="w-full">
               <div className="flex justify-center mb-12">
@@ -228,7 +228,7 @@ const Home = () => {
                     </NextLink>
 
                     {/* Blind 75 Card */}
-                    <NextLink href="/dsa/blind75" className="group">
+                    <NextLink href="/dsa/blind-75" className="group">
                       <Card className="h-full bg-white dark:bg-zinc-900/50 border-gray-100 dark:border-zinc-800 hover:border-primary/30 transition-all duration-300 group-hover:shadow-2xl group-hover:shadow-primary/5 group-hover:-translate-y-1 overflow-hidden">
                         <CardHeader className="pb-4">
                           <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center mb-4 border border-blue-500/20 group-hover:bg-blue-500 group-hover:text-white transition-colors duration-300">

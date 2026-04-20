@@ -4,12 +4,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
-import { ProblemDescriptionPanel } from "@/components/algorithm/ProblemDescriptionPanel";
-import { CodeWorkspacePanel } from "@/components/algorithm/CodeWorkspacePanel";
-import { AlgorithmHeader } from "@/components/algorithm/AlgorithmHeader";
+import dynamic from "next/dynamic";
+const ProblemDescriptionPanel = dynamic(() => import("@/components/algorithm/ProblemDescriptionPanel").then(mod => mod.ProblemDescriptionPanel), { ssr: false });
+const CodeWorkspacePanel = dynamic(() => import("@/components/algorithm/CodeWorkspacePanel").then(mod => mod.CodeWorkspacePanel), { ssr: false });
+const AlgorithmHeader = dynamic(() => import("@/components/algorithm/AlgorithmHeader").then(mod => mod.AlgorithmHeader), { ssr: false });
+const CodeRunner = dynamic(() => import("@/components/CodeRunner/CodeRunner").then(mod => mod.CodeRunner), { ssr: false });
+const BrainstormSection = dynamic(() => import("@/components/brainstorm/BrainstormSection").then(mod => mod.BrainstormSection), { ssr: false });
+
 import { Code2, Minimize2, Eye, Lightbulb, Maximize2, Lock } from "lucide-react";
-import { CodeRunner } from "@/components/CodeRunner/CodeRunner";
-import { BrainstormSection } from "@/components/brainstorm/BrainstormSection";
 
 interface AlgorithmPreviewProps {
   algorithm: any;

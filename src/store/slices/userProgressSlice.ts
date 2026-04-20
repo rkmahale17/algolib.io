@@ -9,6 +9,7 @@ interface UserProgressState {
   data: UserAlgorithmData[];
   progressMap: Record<string, ProgressStatus>;
   isLoading: boolean;
+  isInitialized: boolean;
   error: string | null;
 }
 
@@ -16,6 +17,7 @@ const initialState: UserProgressState = {
   data: [],
   progressMap: {},
   isLoading: false,
+  isInitialized: false,
   error: null,
 };
 
@@ -41,6 +43,15 @@ export const fetchUserProgress = createAsyncThunk(
       return data;
     } catch (err: any) {
       return rejectWithValue(err.message);
+    }
+  },
+  {
+    condition: (userId, { getState }) => {
+      const { userProgress } = getState() as { userProgress: UserProgressState };
+      if (userProgress.isLoading) {
+        return false;
+      }
+      return true;
     }
   }
 );
@@ -79,6 +90,7 @@ const userProgressSlice = createSlice({
       })
       .addCase(fetchUserProgress.fulfilled, (state, action: PayloadAction<UserAlgorithmData[]>) => {
         state.isLoading = false;
+        state.isInitialized = true;
         state.data = action.payload;
         state.progressMap = calculateProgressMap(action.payload);
       })

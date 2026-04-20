@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import Editor from "@monaco-editor/react";
+import dynamic from 'next/dynamic';
+const Editor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";

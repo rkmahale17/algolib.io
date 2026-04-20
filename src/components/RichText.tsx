@@ -62,15 +62,7 @@ export const RichText: React.FC<RichTextProps> = ({ content, className = '', onC
 
     // Auto-fix: Remove document-level tags (html, head, body) that cause React nesting warnings
     // We strip the tags but keep their inner content
-    text = text.replace(/<\/?(html|head|body)[\s\S]*?>/gi, '');
-
-    // Auto-fix: Escape non-HTML angle brackets like <number> or <T>
-    // We only want to keep legitimate HTML tags and our custom components.
-    // This prevents 'Invalid tag' errors during prerendering when algorithm descriptions
-    // contain mathematical or type notation.
-    text = text.replace(/<(?!(\/?(a|p|br|hr|h[1-6]|div|span|ul|ol|li|blockquote|code|pre|img|table|thead|tbody|tr|th|td|strong|em|b|i|u|mark|svg|path|algolink|scrollarea|scrollbar|tips)(\b|>)))/gi, '&lt;');
-
-    return text;
+    return text.replace(/<\/?(html|head|body)[\s\S]*?>/gi, '');
   }, [content]);
 
   const options: HTMLReactParserOptions = useMemo(() => ({

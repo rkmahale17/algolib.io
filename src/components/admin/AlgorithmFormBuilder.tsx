@@ -23,18 +23,23 @@ import {
 import { ArrowLeft, Loader2, Save, X } from "lucide-react";
 import { toast } from "sonner";
 
-// Import all editor components
-import { ExplanationEditor } from "./ExplanationEditor";
-import { CodeImplementationEditor } from "./CodeImplementationEditor";
-import { TestCaseEditor } from "./TestCaseEditor";
-import { InputSchemaEditor } from "./InputSchemaEditor";
-import { MetadataEditor } from "./MetadataEditor";
-import { ProblemsEditor } from "./ProblemsEditor";
-import { AlgorithmPreview } from "./AlgorithmPreview";
-import { TutorialsEditor } from "./TutorialsEditor";
-import { ControlsEditor, DEFAULT_CONTROLS } from "./ControlsEditor";
+import dynamic from "next/dynamic";
+
+// Import all editor components dynamically
+const ExplanationEditor = dynamic(() => import("./ExplanationEditor").then(mod => mod.ExplanationEditor), { ssr: false });
+const CodeImplementationEditor = dynamic(() => import("./CodeImplementationEditor").then(mod => mod.CodeImplementationEditor), { ssr: false });
+const TestCaseEditor = dynamic(() => import("./TestCaseEditor").then(mod => mod.TestCaseEditor), { ssr: false });
+const InputSchemaEditor = dynamic(() => import("./InputSchemaEditor").then(mod => mod.InputSchemaEditor), { ssr: false });
+const MetadataEditor = dynamic(() => import("./MetadataEditor").then(mod => mod.MetadataEditor), { ssr: false });
+const ProblemsEditor = dynamic(() => import("./ProblemsEditor").then(mod => mod.ProblemsEditor), { ssr: false });
+const AlgorithmPreview = dynamic(() => import("./AlgorithmPreview").then(mod => mod.AlgorithmPreview), { ssr: false });
+const TutorialsEditor = dynamic(() => import("./TutorialsEditor").then(mod => mod.TutorialsEditor), { ssr: false });
+const ControlsEditor = dynamic(() => import("./ControlsEditor").then(mod => mod.ControlsEditor).then(mod => ({ default: mod.ControlsEditor })), { ssr: false });
+// Special handling for named export and the constant
+import { DEFAULT_CONTROLS } from "./ControlsEditor";
+
+const SmartFillDialog = dynamic(() => import("./SmartFillDialog").then(mod => mod.SmartFillDialog), { ssr: false });
 import { useRouter } from "next/navigation";
-import { SmartFillDialog } from "./SmartFillDialog";
 
 interface AlgorithmFormBuilderProps {
   algorithm?: Algorithm | null;

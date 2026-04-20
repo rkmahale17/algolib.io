@@ -1,7 +1,11 @@
 import { AppProps } from 'next/app';
 import { Providers } from '@/app/providers';
 import Navbar from "@/components/Navbar";
-import { AppSidebar } from "@/components/AppSidebar";
+import dynamic from 'next/dynamic';
+
+const AppSidebar = dynamic(() => import("@/components/AppSidebar").then(mod => mod.AppSidebar), {
+  ssr: false
+});
 import { SidebarInset } from "@/components/ui/sidebar";
 import { Inter } from "next/font/google";
 import '@/app/globals.css';
