@@ -107,7 +107,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       profileFetchInProgress.current = userId;
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, email, full_name, avatar_url, subscription_status, subscription_tier, trial_end_date, current_period_end, cancel_at_period_end')
+        .select('id, email, full_name, avatar_url, username, subscription_status, subscription_tier, trial_end_date, current_period_end, cancel_at_period_end, role')
         .eq('id', userId)
         .maybeSingle();
 
@@ -182,7 +182,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!supabase) {
       console.warn('Supabase not available, skipping authentication');
-      setIsAuthLoading(false);
+      dispatch(setAuthLoading(false));
       return;
     }
 

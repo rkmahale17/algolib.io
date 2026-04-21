@@ -1,52 +1,29 @@
 'use client';
 
 import { PremiumLoader } from "@/components/PremiumLoader";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/integrations/supabase/client";
+import { useApp } from "@/contexts/AppContext";
 
 export const ProtectedAdminRoute = ({ children }: { children: React.ReactNode }) => {
-  const [session, setSession] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, profile, isAuthLoading } = useApp();
   const router = useRouter();
-  const adminId = process.env.NEXT_PUBLIC_ADMIN_USER_ID;
 
   useEffect(() => {
-    if (!supabase) {
-      console.warn("Supabase client is not initialized. Preventing access to protected route.");
-      setLoading(false);
-      return;
+    if (!isAuthLoading) {
+      if (!user) {
+        router.push('/login');
+      } else if (profile && profile.role !== 'admin') {
+        router.push('/');
+      }
     }
+  }, [user, profile, isAuthLoading, router]);
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
-      if (!session) {
-        router.push('/login');
-      } else if (!adminId || session.user.id !== adminId) {
-        router.push('/');
-      }
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      if (!session) {
-        router.push('/login');
-      } else if (!adminId || session.user.id !== adminId) {
-        router.push('/');
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [router, adminId]);
-
-  if (loading) {
+  if (isAuthLoading) {
     return <PremiumLoader />;
   }
 
-  if (!session || !adminId || session.user.id !== adminId) {
+  if (!user || !profile || profile.role !== 'admin') {
     return null; // Redirection handled by useEffect
   }
 

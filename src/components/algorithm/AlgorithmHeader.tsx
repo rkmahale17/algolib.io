@@ -299,7 +299,7 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
                 <span>Share</span>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/dashboard">
+                <Link href={profile?.username ? `/profile/${profile.username}` : "/profile"}>
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile</span>
                 </Link>

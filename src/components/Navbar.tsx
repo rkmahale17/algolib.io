@@ -181,7 +181,7 @@ const Navbar = () => {
             <div className="h-4 w-[1px] bg-border/60 mx-1"></div>
 
             <Link
-              href="/dashboard"
+              href={profile?.username ? `/profile/${profile.username}` : "/profile"}
               className="font-normal hover:text-primary transition-colors shutter-click"
               onClick={closeMenus}
             >

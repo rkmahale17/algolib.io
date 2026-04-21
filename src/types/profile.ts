@@ -22,6 +22,7 @@ export interface Profile {
     cancel_at_period_end: boolean;
     created_at: string;
     updated_at: string;
+    role: 'user' | 'admin';
 }
 
 export interface ProfileUpdateData {
@@ -44,4 +45,5 @@ export interface ProfileUpdateData {
     trial_end_date?: string | null;
     current_period_end?: string | null;
     cancel_at_period_end?: boolean;
+    role?: 'user' | 'admin';
 }

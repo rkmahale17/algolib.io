@@ -12,16 +12,23 @@ import { EditProfileDialog } from "@/components/profile/EditProfileDialog";
 import { SidebarLayout } from '@/components/SidebarLayout';
 import { cn } from "@/lib/utils";
 import Link from 'next/link';
+import { useApp } from '@/contexts/AppContext';
 
 const ProfileClient = () => {
+  const { profile: appProfile } = useApp();
+  const router = useRouter();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const router = useRouter();
 
   useEffect(() => {
+    // If username is already in global context, redirect immediately
+    if (appProfile?.username) {
+      router.push(`/profile/${appProfile.username}`);
+      return;
+    }
     fetchProfileData();
-  }, []);
+  }, [appProfile?.username]);
 
   const fetchProfileData = async () => {
     try {
