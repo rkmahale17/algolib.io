@@ -7,19 +7,8 @@ export enum ListType {
 export const LIST_TYPE_LABELS: Record<string, string> = {
     [ListType.Core]: 'Core Patterns',
     [ListType.Blind75]: 'Blind 75',
-    [ListType.CoreAndBlind75]: 'Core + Blind 75',
     'all': 'All Problems'
 };
-
-export const LIST_TYPE_OPTIONS = [
-    { value: ListType.Core, label: LIST_TYPE_LABELS[ListType.Core] },
-    { value: ListType.CoreAndBlind75, label: LIST_TYPE_LABELS[ListType.CoreAndBlind75] },
-]; ``
-export const LIST_TYPE_OPTIONS_ADMIN = [
-    { value: ListType.Core, label: LIST_TYPE_LABELS[ListType.Core] },
-    { value: ListType.Blind75, label: LIST_TYPE_LABELS[ListType.Blind75] },
-    { value: ListType.CoreAndBlind75, label: LIST_TYPE_LABELS[ListType.CoreAndBlind75] },
-];
 
 export const DIFFICULTY_MAP: Record<string, string> = {
     'beginner': 'Easy',

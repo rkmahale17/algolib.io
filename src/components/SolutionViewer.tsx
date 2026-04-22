@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Copy, Check, Maximize2 } from 'lucide-react';
+import { Copy, Check, Maximize } from 'lucide-react';
 import { toast } from 'sonner';
 import { RichText } from '@/components/RichText';
 import { IsolatedSolutionEditor } from "./algorithm/IsolatedSolutionEditor";
@@ -392,7 +392,7 @@ const SolutionApproach: React.FC<{
             <div className="resize-y overflow-hidden h-[500px] min-h-[200px] w-full border-b relative group">
               {/* Resize Hint Overlay */}
               <div className="absolute bottom-1 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                <Maximize2 className="w-3 h-3 text-muted-foreground/50" />
+                <Maximize className="w-3 h-3 text-muted-foreground/50" />
               </div>
 
               {sortedImplementations.map(langImpl => (

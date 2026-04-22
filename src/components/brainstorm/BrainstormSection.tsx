@@ -1,5 +1,5 @@
 import {
-  Maximize2,
+  Maximize,
   Palette,
   FileText,
   History,
@@ -156,7 +156,7 @@ export const BrainstormSection = ({
           <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
             <DialogTrigger asChild>
               <Button variant="ghost" size="icon" className="h-10 w-10 rounded-none border-l">
-                <Maximize2 className="w-4 h-4" />
+                <Maximize className="w-4 h-4" />
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-full w-full h-[100vh] p-0 gap-0 z-50 bg-background">

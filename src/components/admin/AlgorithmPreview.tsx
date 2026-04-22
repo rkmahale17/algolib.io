@@ -11,7 +11,7 @@ const AlgorithmHeader = dynamic(() => import("@/components/algorithm/AlgorithmHe
 const CodeRunner = dynamic(() => import("@/components/CodeRunner/CodeRunner").then(mod => mod.CodeRunner), { ssr: false });
 const BrainstormSection = dynamic(() => import("@/components/brainstorm/BrainstormSection").then(mod => mod.BrainstormSection), { ssr: false });
 
-import { Code2, Minimize2, Eye, Lightbulb, Maximize2, Lock } from "lucide-react";
+import { Code2, Minimize2, Eye, Lightbulb, Maximize, Lock } from "lucide-react";
 
 interface AlgorithmPreviewProps {
   algorithm: any;

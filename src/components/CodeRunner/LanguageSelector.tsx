@@ -30,7 +30,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   disabled,
   availableLanguages
 }) => {
-  const displayLanguages = availableLanguages 
+  const displayLanguages = availableLanguages
     ? languages.filter(l => availableLanguages.includes(l.id))
     : languages;
 

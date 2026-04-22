@@ -51,7 +51,7 @@
 
   [data-bs-theme="dark"],
   .dark {
-    --background: 0 0% 0%;
+    --background: 0 0% 2%;
     /* True Black */
     --foreground: 0 0% 95%;
     --card: 0 0% 8%;
@@ -270,10 +270,12 @@
     transform: scale(1);
     opacity: 1;
   }
+
   50% {
     transform: scale(0.98);
     opacity: 0.9;
   }
+
   100% {
     transform: scale(1);
     opacity: 1;

@@ -35,12 +35,12 @@ import {
   Sheet,
   SheetContent,
 } from "@/components/ui/sheet";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from "@/components/ui/select";
 import { ProblemSidebar } from "@/components/ProblemSidebar";
 import { LIST_TYPE_LABELS } from "@/types/algorithm";
@@ -93,7 +93,7 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({ initialAlgori
   const filteredAlgorithms = useMemo(() => {
     if (!allAlgorithms) return [];
     if (!activeListType || activeListType === 'all') return allAlgorithms;
-    
+
     return allAlgorithms.filter(algo => {
       const algoListType = (algo.list_type || (algo as any).listType || 'core').toLowerCase();
       const currentListType = activeListType.toLowerCase();
@@ -220,7 +220,6 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({ initialAlgori
     algorithmIdOrSlug,
     layout.isMobile,
     layout.toggleRightPanel,
-    interactions.savedCode,
     interactions.handleCodeChange,
     interactions.handleCodeSuccess,
     interactions.selectedLanguage,
@@ -301,42 +300,48 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({ initialAlgori
             isMobileView ? (
               <div className="h-full overflow-y-auto no-scrollbar pb-20 scroll-smooth">
                 <div className="min-h-screen">
-                  <ProblemDescriptionPanel
-                    algorithm={activeAlgorithm}
-                    activeTab={layout.activeTab}
-                    setActiveTab={layout.setActiveTab}
-                    isMobile={true}
-                    toggleLeftPanel={layout.toggleLeftPanel}
-                    isCompleted={interactions.isCompleted}
-                    likes={interactions.likes}
-                    dislikes={interactions.dislikes}
-                    userVote={interactions.userVote}
-                    isFavorite={interactions.isFavorite}
-                    handleVote={interactions.handleVote}
-                    toggleFavorite={interactions.toggleFavorite}
-                    isVisualizationMaximized={layout.isVisualizationMaximized}
-                    setIsVisualizationMaximized={layout.setIsVisualizationMaximized}
-                    handleRichTextClick={handleRichTextClick}
-                  />
+                  <div className="min-h-screen p-3 pt-0.5">
+                    <div className="h-full rounded-xl overflow-hidden border border-border/70 shadow-md bg-card/30 backdrop-blur-sm">
+                      <ProblemDescriptionPanel
+                        algorithm={activeAlgorithm}
+                        activeTab={layout.activeTab}
+                        setActiveTab={layout.setActiveTab}
+                        isMobile={true}
+                        toggleLeftPanel={layout.toggleLeftPanel}
+                        isCompleted={interactions.isCompleted}
+                        likes={interactions.likes}
+                        dislikes={interactions.dislikes}
+                        userVote={interactions.userVote}
+                        isFavorite={interactions.isFavorite}
+                        handleVote={interactions.handleVote}
+                        toggleFavorite={interactions.toggleFavorite}
+                        isVisualizationMaximized={layout.isVisualizationMaximized}
+                        setIsVisualizationMaximized={layout.setIsVisualizationMaximized}
+                        handleRichTextClick={handleRichTextClick}
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                <div id="mobile-code-section" className="min-h-screen border-t-4 border-muted">
-                  <CodeWorkspacePanel
-                    algorithm={activeAlgorithm}
-                    algorithmId={algorithmIdOrSlug || ""}
-                    isMobile={true}
-                    toggleRightPanel={layout.toggleRightPanel}
-                    savedCode={interactions.savedCode}
-                    handleCodeChange={interactions.handleCodeChange}
-                    handleCodeSuccess={interactions.handleCodeSuccess}
-                    selectedLanguage={interactions.selectedLanguage}
-                    setSelectedLanguage={interactions.setSelectedLanguage}
-                    isCodeRunnerMaximized={layout.isCodeRunnerMaximized}
-                    setIsCodeRunnerMaximized={layout.setIsCodeRunnerMaximized}
-                    submissions={submissions}
-                    className="h-[85vh]"
-                    isInterviewMode={session.isInterviewMode}
-                  />
+                <div id="mobile-code-section" className="min-h-screen border-t-4 border-muted p-3 pt-0.5">
+                  <div className="h-full rounded-xl overflow-hidden border border-border/70 shadow-md bg-card/30 backdrop-blur-sm">
+                    <CodeWorkspacePanel
+                      algorithm={activeAlgorithm}
+                      algorithmId={algorithmIdOrSlug || ""}
+                      isMobile={true}
+                      toggleRightPanel={layout.toggleRightPanel}
+                      savedCode={interactions.savedCode}
+                      handleCodeChange={interactions.handleCodeChange}
+                      handleCodeSuccess={interactions.handleCodeSuccess}
+                      selectedLanguage={interactions.selectedLanguage}
+                      setSelectedLanguage={interactions.setSelectedLanguage}
+                      isCodeRunnerMaximized={layout.isCodeRunnerMaximized}
+                      setIsCodeRunnerMaximized={layout.setIsCodeRunnerMaximized}
+                      submissions={submissions}
+                      className="h-[85vh]"
+                      isInterviewMode={session.isInterviewMode}
+                    />
+                  </div>
                 </div>
 
                 <div className="fixed bottom-6 right-6 z-50">
@@ -360,26 +365,32 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({ initialAlgori
                     collapsible={true}
                     className={layout.isLeftCollapsed ? 'min-w-[0px]' : ''}
                   >
-                    <ProblemDescriptionPanel
-                      algorithm={activeAlgorithm}
-                      activeTab={layout.activeTab}
-                      setActiveTab={layout.setActiveTab}
-                      isMobile={layout.isMobile}
-                      toggleLeftPanel={layout.toggleLeftPanel}
-                      isCompleted={interactions.isCompleted}
-                      likes={interactions.likes}
-                      dislikes={interactions.dislikes}
-                      userVote={interactions.userVote}
-                      isFavorite={interactions.isFavorite}
-                      handleVote={interactions.handleVote}
-                      toggleFavorite={interactions.toggleFavorite}
-                      isVisualizationMaximized={layout.isVisualizationMaximized}
-                      setIsVisualizationMaximized={layout.setIsVisualizationMaximized}
-                      handleRichTextClick={handleRichTextClick}
-                    />
+                    <div className="h-full p-1.5 pt-0 pr-0 sm:p-2 sm:pt-0 sm:pr-0">
+                      <div className="h-full rounded-xl overflow-hidden border border-border/70 shadow-md bg-card/30 backdrop-blur-sm">
+                        <ProblemDescriptionPanel
+                          algorithm={activeAlgorithm}
+                          activeTab={layout.activeTab}
+                          setActiveTab={layout.setActiveTab}
+                          isMobile={layout.isMobile}
+                          toggleLeftPanel={layout.toggleLeftPanel}
+                          isCompleted={interactions.isCompleted}
+                          likes={interactions.likes}
+                          dislikes={interactions.dislikes}
+                          userVote={interactions.userVote}
+                          isFavorite={interactions.isFavorite}
+                          handleVote={interactions.handleVote}
+                          toggleFavorite={interactions.toggleFavorite}
+                          isVisualizationMaximized={layout.isVisualizationMaximized}
+                          setIsVisualizationMaximized={layout.setIsVisualizationMaximized}
+                          handleRichTextClick={handleRichTextClick}
+                        />
+                      </div>
+                    </div>
                   </ResizablePanel>
 
-                  <ResizableHandle withHandle className="bg-border hover:bg-primary/20 data-[resize-handle-active]:bg-primary/40 transition-colors" />
+                  <ResizableHandle className="bg-transparent hover:bg-primary/5 data-[resize-handle-active]:bg-primary/10 transition-colors w-1 group">
+                    <div className="z-10 flex h-10 w-1 items-center justify-center rounded-full bg-muted-foreground/40 group-hover:bg-primary transition-colors shadow-sm" />
+                  </ResizableHandle>
 
                   <ResizablePanel
                     ref={layout.rightPanelRef}
@@ -389,7 +400,11 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({ initialAlgori
                     collapsible={true}
                     className={layout.isRightCollapsed ? 'min-w-[0px]' : ''}
                   >
-                    {codeWorkspacePanel}
+                    <div className="h-full pt-0 pl-0 pr-0 sm:pt-0 sm:pl-0 sm:pr-0 pb-1.5 sm:pb-2">
+                      <div className="h-full rounded-xl overflow-hidden border border-border/70 shadow-md bg-card/30 backdrop-blur-sm">
+                        {codeWorkspacePanel}
+                      </div>
+                    </div>
                   </ResizablePanel>
                 </ResizablePanelGroup>
               </div>
@@ -399,8 +414,8 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({ initialAlgori
 
         <SheetContent side="left" className="w-full sm:max-w-[600px] p-0 border-r border-border shadow-2xl flex flex-col">
           <div className="flex items-center justify-between p-3 border-b border-border bg-background">
-            <Select 
-              value={activeListType || "all"} 
+            <Select
+              value={activeListType || "all"}
               onValueChange={(val) => setActiveListType(val as any)}
             >
               <SelectTrigger className="border-none bg-transparent hover:bg-muted/50 focus:ring-0 px-2 h-9 text-sm font-medium w-fit min-w-[140px] gap-2 transition-colors">

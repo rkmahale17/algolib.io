@@ -5,6 +5,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { FeatureFlag } from "@/types/featureFlags";
 import { toast } from "sonner";
 
+const DEFAULT_FLAGS: Record<string, boolean> = {
+  paywall_enabled: false,
+  naugty_cloud: false,
+  profile_private: false,
+  todays_limit_exceed: false,
+  code_runner_tab: true,
+  brainstrom_tab: true,
+  code_panel: true,
+};
+
 interface FeatureFlagContextType {
   flags: Record<string, boolean>;
   isLoading: boolean;
@@ -14,28 +24,28 @@ interface FeatureFlagContextType {
 const FeatureFlagContext = createContext<FeatureFlagContextType | undefined>(undefined);
 
 export const FeatureFlagProvider = ({ children }: { children: ReactNode }) => {
-  const [flags, setFlags] = useState<Record<string, boolean>>({});
-  const [isLoading, setIsLoading] = useState(true);
+  const [flags, setFlags] = useState<Record<string, boolean>>(DEFAULT_FLAGS);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchFlags = async () => {
     if (!supabase) {
       setIsLoading(false);
       return;
     }
-    
+
     try {
       // @ts-ignore - feature_flags table is new and types are not regenerated yet
       const { data, error } = await supabase
         .from('feature_flags')
         .select('key, is_enabled');
-      
+
       if (error) throw error;
 
       const flagMap: Record<string, boolean> = {};
       data?.forEach(flag => {
         flagMap[flag.key] = flag.is_enabled;
       });
-      
+
       setFlags(flagMap);
     } catch (error) {
       console.error("Error fetching feature flags:", error);
@@ -86,5 +96,5 @@ export const useFeatureFlags = () => {
 
 export const useFeatureFlag = (key: string): boolean => {
   const { flags } = useFeatureFlags();
-  return flags[key] ?? false; // Default to false if flag doesn't exist
+  return flags[key] ?? DEFAULT_FLAGS[key] ?? false; // Fallback to DEFAULT_FLAGS then false
 };

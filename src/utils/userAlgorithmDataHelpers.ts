@@ -112,17 +112,23 @@ export async function updateProgress(
 export async function updateCode(
     userId: string,
     algorithmId: string,
-    codeData: UpdateCodeData
+    codeData: UpdateCodeData,
+    existingCode?: CodeStorage
 ): Promise<boolean> {
     if (!supabase) {
         console.warn('Supabase not available');
         return false;
     }
 
-    // First, get existing data
-    const existing = await getUserAlgorithmData(userId, algorithmId);
+    // Use provided code or fetch existing data
+    let currentCode: CodeStorage = {};
+    if (existingCode) {
+        currentCode = existingCode;
+    } else {
+        const existing = await getUserAlgorithmData(userId, algorithmId);
+        currentCode = existing?.code || {};
+    }
 
-    const currentCode: CodeStorage = existing?.code || {};
     const updatedCode: CodeStorage = {
         ...currentCode,
         [codeData.language]: codeData.code,

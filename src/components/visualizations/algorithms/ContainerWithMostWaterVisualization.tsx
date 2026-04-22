@@ -5,15 +5,15 @@ import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { Card } from '@/components/ui/card';
-import { 
-  Zap, 
-  Target, 
-  ArrowRight, 
-  ArrowLeft, 
-  Repeat, 
-  CheckCircle2, 
+import {
+  Zap,
+  Target,
+  ArrowRight,
+  ArrowLeft,
+  Repeat,
+  CheckCircle2,
   Info,
-  Maximize2,
+  Maximize,
   MoveHorizontal,
   Droplets,
   ArrowDown
@@ -154,7 +154,7 @@ export const ContainerWithMostWaterVisualization = () => {
         width,
         currentHeight: h,
         currentArea: area,
-        message: isNewMax 
+        message: isNewMax
           ? `New maximum area found! Updated maxArea to ${maxArea}.`
           : `Current area (${area}) is not greater than maxArea (${maxArea}).`,
         lineNumber: 10,
@@ -219,15 +219,15 @@ export const ContainerWithMostWaterVisualization = () => {
           <Card className="p-8 bg-card/50 backdrop-blur-sm border-primary/20 relative overflow-hidden min-h-[500px] flex flex-col shadow-lg shadow-primary/5">
             {/* Header Info */}
             <div className="flex justify-between items-center mb-12">
-               <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
                 <Droplets className="w-3 h-3 text-primary" />
                 Container Volume Maximizer
               </h3>
               <div className="flex gap-4 items-center">
-                 <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted/50 border border-border/50 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                    <Repeat className="w-3 h-3" />
-                    Phase: {currentStep.phase.replace('-', ' ')}
-                 </div>
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted/50 border border-border/50 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  <Repeat className="w-3 h-3" />
+                  Phase: {currentStep.phase.replace('-', ' ')}
+                </div>
               </div>
             </div>
 
@@ -242,24 +242,24 @@ export const ContainerWithMostWaterVisualization = () => {
 
               {/* Overlay for Water Fill to ensure perfect alignment */}
               <div className="absolute top-0 bottom-0 left-12 right-12 z-0 pointer-events-none">
-                 <AnimatePresence>
-                    {currentStep.currentArea !== '-' && currentStep.width !== '-' && (
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="absolute bottom-0 bg-blue-500/20 border-x-2 border-t-2 border-blue-400 overflow-hidden"
-                        style={{
-                          left: `${(currentStep.left / (heights.length - 1)) * 100}%`,
-                          width: `${(currentStep.width / (heights.length - 1)) * 100}%`,
-                          height: `${(Number(currentStep.currentHeight) / maxHeight) * 100}%`,
-                          transformOrigin: 'bottom'
-                        }}
-                      >
-                         <div className="w-full h-full bg-[linear-gradient(180deg,rgba(59,130,246,0.3)_0%,rgba(59,130,246,0.05)_100%)] animate-pulse-subtle" />
-                      </motion.div>
-                    )}
-                 </AnimatePresence>
+                <AnimatePresence>
+                  {currentStep.currentArea !== '-' && currentStep.width !== '-' && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="absolute bottom-0 bg-blue-500/20 border-x-2 border-t-2 border-blue-400 overflow-hidden"
+                      style={{
+                        left: `${(currentStep.left / (heights.length - 1)) * 100}%`,
+                        width: `${(currentStep.width / (heights.length - 1)) * 100}%`,
+                        height: `${(Number(currentStep.currentHeight) / maxHeight) * 100}%`,
+                        transformOrigin: 'bottom'
+                      }}
+                    >
+                      <div className="w-full h-full bg-[linear-gradient(180deg,rgba(59,130,246,0.3)_0%,rgba(59,130,246,0.05)_100%)] animate-pulse-subtle" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               {heights.map((h, i) => {
@@ -298,11 +298,10 @@ export const ContainerWithMostWaterVisualization = () => {
 
                     {/* The Line (from (i,0) to (i,height[i])) */}
                     <motion.div
-                      className={`w-0.5 rounded-full transition-all duration-500 ${
-                        isMember 
+                      className={`w-0.5 rounded-full transition-all duration-500 ${isMember
                           ? isLeft ? 'bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.4)]' : 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.4)]'
                           : 'bg-muted-foreground/20'
-                      }`}
+                        }`}
                       style={{ height: `${barHeight}%` }}
                       animate={{
                         scaleX: isMember ? 4 : 1,
@@ -317,25 +316,25 @@ export const ContainerWithMostWaterVisualization = () => {
             <div className="grid grid-cols-4 gap-4 mt-auto pt-6 border-t border-border/40">
               <div className="flex flex-col items-center p-2.5 rounded-xl bg-orange-500/5 border border-orange-500/10">
                 <span className="text-[9px] font-bold text-orange-600 uppercase mb-0.5 flex items-center gap-1">
-                   <MoveHorizontal className="w-2 h-2" /> width
+                  <MoveHorizontal className="w-2 h-2" /> width
                 </span>
                 <span className="text-base font-black text-orange-600 font-mono">{currentStep.width}</span>
               </div>
               <div className="flex flex-col items-center p-2.5 rounded-xl bg-blue-500/5 border border-blue-500/10">
                 <span className="text-[9px] font-bold text-blue-600 uppercase mb-0.5 flex items-center gap-1">
-                   <Target className="w-2 h-2" /> height
+                  <Target className="w-2 h-2" /> height
                 </span>
                 <span className="text-base font-black text-blue-600 font-mono">{currentStep.currentHeight}</span>
               </div>
               <div className="flex flex-col items-center p-2.5 rounded-xl bg-primary/5 border border-primary/10">
                 <span className="text-[9px] font-bold text-primary uppercase mb-0.5 flex items-center gap-1">
-                   <Droplets className="w-2 h-2" /> area
+                  <Droplets className="w-2 h-2" /> area
                 </span>
                 <span className="text-base font-black text-primary font-mono">{currentStep.currentArea}</span>
               </div>
               <div className="flex flex-col items-center p-2.5 rounded-xl bg-indigo-500/5 border border-indigo-500/10">
                 <span className="text-[9px] font-bold text-indigo-600 uppercase mb-0.5 flex items-center gap-1">
-                   <Maximize2 className="w-2 h-2" /> best
+                  <Maximize className="w-2 h-2" /> best
                 </span>
                 <span className="text-base font-black text-indigo-600 font-mono">{currentStep.maxArea}</span>
               </div>
@@ -349,7 +348,7 @@ export const ContainerWithMostWaterVisualization = () => {
               </div>
               <div className="space-y-1">
                 <h4 className="text-[10px] font-bold uppercase tracking-[0.15em] text-primary/80">
-                   Reasoning Insight
+                  Reasoning Insight
                 </h4>
                 <p className="text-[15px] font-medium leading-relaxed text-foreground/90 leading-tight">
                   {currentStep.message}
@@ -362,11 +361,11 @@ export const ContainerWithMostWaterVisualization = () => {
       rightContent={
         <div className="space-y-6 h-full flex flex-col">
           <div className="flex-1 overflow-hidden min-h-[400px]">
-             <AnimatedCodeEditor
-                code={code}
-                highlightedLines={[currentStep.lineNumber]}
-                language="typescript"
-              />
+            <AnimatedCodeEditor
+              code={code}
+              highlightedLines={[currentStep.lineNumber]}
+              language="typescript"
+            />
           </div>
 
           <Card className="p-6 bg-card border border-border/50 shadow-sm">
@@ -374,38 +373,38 @@ export const ContainerWithMostWaterVisualization = () => {
               <Zap className="w-3 h-3 text-primary" />
               Algorithm intuition
             </h4>
-            
-            <div className="space-y-4">
-               {currentStep.insight ? (
-                  <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 flex gap-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                    <div className="shrink-0 flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary">
-                       <Repeat className="w-4 h-4" />
-                    </div>
-                    <p className="text-xs text-muted-foreground leading-relaxed italic">
-                      {currentStep.insight}
-                    </p>
-                  </div>
-               ) : (
-                  <div className="p-4 rounded-xl bg-muted/20 border border-border/40 flex flex-col items-center justify-center gap-2 py-8 text-center">
-                    <div className="w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center opacity-40">
-                       <Repeat className="w-4 h-4" />
-                    </div>
-                    <p className="text-[10px] uppercase font-bold text-muted-foreground/40 tracking-wider">
-                       Optimizing search space...
-                    </p>
-                  </div>
-               )}
 
-               <div className="grid grid-cols-2 gap-3">
-                  <div className="p-3 rounded-lg bg-orange-500/5 border border-orange-500/10 flex justify-between items-center">
-                      <span className="text-[10px] font-bold text-orange-600/60 uppercase">left height</span>
-                      <span className="text-sm font-mono font-bold text-orange-600">{heights[currentStep.left]}</span>
+            <div className="space-y-4">
+              {currentStep.insight ? (
+                <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 flex gap-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                  <div className="shrink-0 flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary">
+                    <Repeat className="w-4 h-4" />
                   </div>
-                  <div className="p-3 rounded-lg bg-blue-500/5 border border-blue-500/10 flex justify-between items-center">
-                      <span className="text-[10px] font-bold text-blue-600/60 uppercase">right height</span>
-                      <span className="text-sm font-mono font-bold text-blue-600">{heights[currentStep.right]}</span>
+                  <p className="text-xs text-muted-foreground leading-relaxed italic">
+                    {currentStep.insight}
+                  </p>
+                </div>
+              ) : (
+                <div className="p-4 rounded-xl bg-muted/20 border border-border/40 flex flex-col items-center justify-center gap-2 py-8 text-center">
+                  <div className="w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center opacity-40">
+                    <Repeat className="w-4 h-4" />
                   </div>
-               </div>
+                  <p className="text-[10px] uppercase font-bold text-muted-foreground/40 tracking-wider">
+                    Optimizing search space...
+                  </p>
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3 rounded-lg bg-orange-500/5 border border-orange-500/10 flex justify-between items-center">
+                  <span className="text-[10px] font-bold text-orange-600/60 uppercase">left height</span>
+                  <span className="text-sm font-mono font-bold text-orange-600">{heights[currentStep.left]}</span>
+                </div>
+                <div className="p-3 rounded-lg bg-blue-500/5 border border-blue-500/10 flex justify-between items-center">
+                  <span className="text-[10px] font-bold text-blue-600/60 uppercase">right height</span>
+                  <span className="text-sm font-mono font-bold text-blue-600">{heights[currentStep.right]}</span>
+                </div>
+              </div>
             </div>
           </Card>
         </div>

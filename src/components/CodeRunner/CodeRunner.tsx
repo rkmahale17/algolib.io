@@ -10,7 +10,7 @@ import { usePostHog } from "@posthog/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Play, RotateCcw, Loader2, Maximize2, Minimize2, Settings, AlignLeft, Info, Send, Copy, X, Clock, Terminal, Book, PanelRightClose, Code } from "lucide-react";
+import { Play, RotateCcw, Loader2, Maximize, Minimize2, Settings, AlignLeft, Info, Send, Copy, X, Clock, Terminal, Book, PanelRightClose, Code } from "lucide-react";
 import { BrainstormSection } from "../brainstorm/BrainstormSection";
 import { FeatureGuard } from "@/components/FeatureGuard";
 import { toast } from "sonner";
@@ -41,6 +41,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { generateStub } from '@/utils/stubGenerator';
 import { addSubmission, updateProgress, getUserAlgorithmData } from '@/utils/userAlgorithmDataHelpers';
 import { Submission } from '@/types/userAlgorithmData';
+import { RunnerFooter } from './RunnerFooter';
 import env from '@/config/env';
 
 interface CodeRunnerProps {
@@ -148,6 +149,20 @@ const parseErrorLines = (output: string, lang: string): Array<{ line: number; co
   return errors;
 };
 
+const mapStatusStringToId = (status: string): { id: number; description: string } => {
+  switch (status.toLowerCase()) {
+    case 'accepted': return { id: 3, description: 'Accepted' };
+    case 'wrong answer': return { id: 4, description: 'Wrong Answer' };
+    case 'time limit exceeded': return { id: 5, description: 'Time Limit Exceeded' };
+    case 'compilation error': return { id: 6, description: 'Compilation Error' };
+    case 'runtime error': return { id: 7, description: 'Runtime Error' };
+    case 'internal error': return { id: 13, description: 'Internal Error' };
+    case 'executing': return { id: 2, description: 'Processing' };
+    case 'pending': return { id: 1, description: 'In Queue' };
+    default: return { id: 3, description: status }; // Fallback to Accepted if unknown but finished? Or keep as is.
+  }
+};
+
 export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
   algorithmId,
   algorithmData,
@@ -205,8 +220,41 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
 
   const editorRef = useRef<CodeEditorRef>(null);
   const panelGroupRef = useRef<ImperativePanelGroupHandle>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [minPanelSize, setMinPanelSize] = useState(8);
   const [isOutputExpanded, setIsOutputExpanded] = useState(false);
+  const [isOutputModalOpen, setIsOutputModalOpen] = useState(false);
   const [activeTestCaseTab, setActiveTestCaseTab] = useState<string>("");
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    let initialSet = false;
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry && entry.contentRect.height > 0) {
+        const minPercent = (82 / entry.contentRect.height) * 100;
+        setMinPanelSize(minPercent);
+      }
+    });
+
+    const timer = setInterval(() => {
+      if (!initialSet && panelGroupRef.current && !isMobile && containerRef.current?.clientHeight) {
+        const minPercent = (82 / containerRef.current.clientHeight) * 100;
+        panelGroupRef.current.setLayout([100 - minPercent, minPercent]);
+        initialSet = true;
+        clearInterval(timer);
+      }
+    }, 50);
+
+    // Safety cleanup if it never mounts within 3 seconds
+    setTimeout(() => clearInterval(timer), 3000);
+
+    observer.observe(containerRef.current);
+    return () => {
+      observer.disconnect();
+      clearInterval(timer);
+    };
+  }, [isMobile]);
 
 
   const activeAlgorithm = algorithmData || fetchedAlgorithm;
@@ -303,7 +351,9 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
       // 3. Initialize Code
       // Priority 1: User-saved code (initialCode) - only if it has content
       if (typeof initialCode === 'string' && initialCode.trim().length > 0) {
-        setCode(initialCode);
+        if (initialCode !== code) {
+          setCode(initialCode);
+        }
         return;
       }
 
@@ -376,7 +426,17 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
   };
 
   const handleToggleOutputExpand = () => {
-    setIsOutputExpanded(!isOutputExpanded);
+    const newExpanded = !isOutputExpanded;
+    setIsOutputExpanded(newExpanded);
+
+    // On desktop, adjust the panel layout if needed
+    if (!isMobile && panelGroupRef.current) {
+      if (newExpanded) {
+        panelGroupRef.current.setLayout([60, 40]);
+      } else {
+        panelGroupRef.current.setLayout([100 - minPanelSize, minPanelSize]);
+      }
+    }
   };
 
 
@@ -426,6 +486,47 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
       setActiveEditorTab("scratchpad");
     }
   }));
+
+  const waitForSubmissionResult = (submissionId: string): Promise<any> => {
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        supabase?.removeChannel(channel);
+        reject(new Error("Execution timeout. Please try again or check submissions history."));
+      }, 30000); // 30 seconds timeout
+
+      const channel = supabase!
+        .channel(`submission-${submissionId}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'submissions',
+            filter: `id=eq.${submissionId}`,
+          },
+          (payload) => {
+            console.log('Submission Updated Realtime:', payload.new);
+            const { status } = payload.new;
+            if (status && status !== 'pending' && status !== 'executing') {
+              clearTimeout(timeout);
+              supabase?.removeChannel(channel);
+
+              // Map record to match the expected format in CodeRunner
+              const result = {
+                ...payload.new,
+                status: mapStatusStringToId(payload.new.status)
+              };
+              resolve(result);
+            }
+          }
+        )
+        .subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            console.log(`Subscribed to submission-${submissionId}`);
+          }
+        });
+    });
+  };
 
   // Report state changes to parent
   useEffect(() => {
@@ -495,7 +596,7 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
   const executeCode = async (isSubmission: boolean = false) => {
     if (isLimitExceeded) {
       toast.error("Daily execution limit exceeded! Please try again in sometime.");
-      return;
+      return { result: { stderr: "Limit exceeded" }, allPassed: false, execTime: 0 };
     }
 
     if (isSubmission) setIsSubmitting(true);
@@ -584,6 +685,7 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
         language_id: LANGUAGE_IDS[language],
         source_code: fullCode,
         stdin: "",
+        problem_id: algorithmId, // Added problem_id if available
         compiler_options: language === 'typescript' ? "--target ES2020 --downlevelIteration" : undefined
       }, {
         headers: {
@@ -591,11 +693,17 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
         }
       });
 
+      const { submission_id } = response.data;
+      if (!submission_id) {
+        throw new Error("No submission_id received from server");
+      }
+
+      // Wait for real-time update
+      const result = await waitForSubmissionResult(submission_id);
+
       const endTime = performance.now();
       const execTime = Math.round(endTime - startTime);
       setExecutionTime(execTime);
-
-      const result = response.data;
 
       // Parse test results immediately if present in stdout
       if (result.stdout && !result.stderr && !result.compile_output) {
@@ -714,7 +822,8 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
     if (isMobile) {
       setIsOutputExpanded(true);
     } else {
-      panelGroupRef.current?.setLayout([50, 50]);
+      panelGroupRef.current?.setLayout([60, 40]);
+      setIsOutputExpanded(true);
     }
     executeCode(false);
   };
@@ -724,7 +833,8 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
 
     // Auto-resize panel on desktop
     if (!isMobile) {
-      panelGroupRef.current?.setLayout([50, 50]);
+      panelGroupRef.current?.setLayout([60, 40]);
+      setIsOutputExpanded(true);
     }
 
     const { result, allPassed, execTime } = await executeCode(true);
@@ -796,6 +906,7 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
     setViewingSubmission(submission);
     setActiveEditorTab("submission");
     setIsOutputExpanded(false);
+    setIsOutputModalOpen(false);
 
     posthog?.capture('code_view_switched', {
       problemId: algorithmId,
@@ -858,7 +969,7 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
       className="h-full flex flex-col"
     >
       {/* Top Toolbar Integrated with Tabs */}
-      <div className="flex items-center justify-between px-3 border-b bg-muted/40 h-10 shrink-0 gap-2">
+      <div className="flex items-center justify-between px-0 border-b bg-muted/40 h-10 shrink-0 gap-2">
         <div className="flex items-center gap-0 overflow-x-auto no-scrollbar mask-linear-fade shrink-0 h-full">
           {!isMobile && onToggleRightPanel && (
             <Button
@@ -866,7 +977,7 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
               size="icon"
               onClick={onToggleRightPanel}
               title="Collapse Panel"
-              className="h-10 w-10 p-0 rounded-none border-r border-border/50 hover:bg-primary/10 hover:text-primary shrink-0 mr-2"
+              className="h-10 w-10 p-0 rounded-none hover:bg-primary/10 hover:text-primary shrink-0"
             >
               <PanelRightClose className="w-4 h-4" />
             </Button>
@@ -947,7 +1058,7 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
         </div>
 
         {/* Right Group: Actions (Reset, Format, Settings) */}
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex items-center gap-1 shrink-0 pr-1">
           {activeEditorTab === 'current' && (
             <>
               <TooltipProvider>
@@ -1101,14 +1212,14 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8"
+            className="h-8 w-8 text-muted-foreground hover:text-foreground"
             onClick={toggleFullscreen}
             title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
           >
             {isFullscreen ? (
               <Minimize2 className="w-4 h-4" />
             ) : (
-              <Maximize2 className="w-4 h-4" />
+              <Maximize className="w-4 h-4" />
             )}
           </Button>
         </div>
@@ -1139,86 +1250,6 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
                 }}
               />
             )}
-
-            {/* Mobile-only Floating Buttons */}
-            <div className="absolute bottom-5 right-5 z-10 md:hidden">
-              <div className="flex items-center gap-0.5 p-0.5 bg-white backdrop-blur-xl border border-gray-200 shadow-lg rounded-full">
-                <TooltipProvider>
-                  <FeatureGuard flag="code_runner">
-                    {controls?.run_code !== false && (
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            onClick={handleRun}
-                            disabled={isLoading || isSubmitting}
-                            size="sm"
-                            variant="default"
-                            className="h-8 px-3 text-xs rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all border-0 group"
-                          >
-                            {isLoading ? (
-                              <>
-                                <Loader2 className="w-3 h-3 mr-1.5 animate-spin group-hover:text-white" />
-                                Running
-                              </>
-                            ) : (
-                              <>
-                                <Play className="w-3 h-3 mr-1 text-primary fill-primary group-hover:text-primary group-hover:fill-white" />
-                                Run
-                              </>
-                            )}
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom">Run Code</TooltipContent>
-                      </Tooltip>
-                    )}
-                  </FeatureGuard>
-
-
-
-                  <FeatureGuard flag="submit_button">
-                    {controls?.submit !== false && (
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <span tabIndex={0} className="cursor-default">
-                            <Button
-                              onClick={handleSubmit}
-                              disabled={isLoading || isSubmitting || !lastRunSuccess}
-                              size="sm"
-                              variant="default"
-                              className={`h-8 px-3 text-xs rounded-full transition-all border-0 group ${lastRunSuccess
-                                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                                : 'bg-muted text-muted-foreground'
-                                } ${(!lastRunSuccess && !isLoading && !isSubmitting) ? 'opacity-50' : ''}`}
-                            >
-                              {isSubmitting ? (
-                                <>
-                                  <Loader2 className="w-3 h-3 mr-1.5 animate-spin group-hover:text-white" />
-                                  Submitting
-                                </>
-                              ) : (
-                                <>
-                                  <Send className="w-3 h-3 mr-1 group-hover:text-primary" />
-                                  Submit
-                                </>
-                              )}
-                            </Button>
-                          </span>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom">
-                          {!lastRunSuccess && !isLoading && !isSubmitting ? (
-                            <span className="text-orange-500 font-medium">Run all test cases successfully to enable submission</span>
-                          ) : (
-                            "Submit Solution"
-                          )}
-                        </TooltipContent>
-                      </Tooltip>
-                    )}
-                  </FeatureGuard>
-
-                </TooltipProvider>
-              </div>
-            </div>
-
           </div>
         </div>
       </TabsContent>
@@ -1276,11 +1307,14 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
   );
 
   const outputPanelContent = (
-    <div className="h-full flex flex-col">
-      <div className="flex-1 min-h-0 overflow-hidden">
+    <div className="h-full flex flex-col overflow-hidden">
+      {/* Output Panel - Contains persistent tabs and expanded content */}
+      <div className="flex-1 min-h-0 overflow-hidden relative">
         <OutputPanel
           onToggleExpand={handleToggleOutputExpand}
           isExpanded={isOutputExpanded}
+          onMaximize={() => setIsOutputModalOpen(!isOutputModalOpen)}
+          isMaximized={isOutputModalOpen}
           output={output}
           loading={isLoading}
           submitting={isSubmitting as boolean}
@@ -1323,11 +1357,50 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
           onTestCaseTabChange={setActiveTestCaseTab}
         />
       </div>
+
+      {/* Runner Footer - Always visible fixed at bottom */}
+      <RunnerFooter
+        isExpanded={isOutputExpanded}
+        onToggleExpand={handleToggleOutputExpand}
+        onRun={handleRun}
+        onSubmit={handleSubmit}
+        isLoading={isLoading}
+        isSubmitting={isSubmitting}
+        lastRunSuccess={lastRunSuccess}
+        algorithm={activeAlgorithm}
+      />
     </div>
   );
 
+  // Global Keyboard Shortcuts
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      // Ctrl/Cmd + ' for Run
+      if ((e.ctrlKey || e.metaKey) && e.key === "'") {
+        e.preventDefault();
+        e.stopPropagation();
+        handleRun();
+      }
+      
+      // Ctrl/Cmd + Enter for Submit
+      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const canSubmit = controls?.allow_submission !== false;
+        if (!isLoading && !isSubmitting && canSubmit) {
+          handleSubmit();
+        }
+      }
+    };
+
+    // Use capture phase to intercept before Monaco Editor swallows the keystroke
+    window.addEventListener('keydown', handleGlobalKeyDown, { capture: true });
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown, { capture: true });
+  }, [handleRun, handleSubmit, isLoading, isSubmitting, controls?.allow_submission]);
+
   const content = (
-    <div className={`w-full bg-background shadow-sm flex flex-col ${isFullscreen
+    <div ref={containerRef} className={`w-full bg-background shadow-sm flex flex-col ${isFullscreen
       ? 'fixed inset-0 z-50 h-screen w-screen rounded-none border-0'
       : `border rounded-lg overflow-hidden ${className || 'h-[calc(100vh-100px)]'}`
       }`}>
@@ -1336,69 +1409,35 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
           <div className="flex-1 min-h-0 overflow-hidden">
             {editorTabs}
           </div>
-          {/* Mobile Output: Fixed height at bottom, non-resizable for stability */}
-          <div className="h-px bg-border shadow-sm" />
-          <div className="h-[40vh] min-h-[300px] flex flex-col">
-            {outputPanelContent}
+          {/* Mobile Output: Shared space for console tabs and content */}
+          <div className={`flex flex-col border-t bg-background transition-all duration-300 ease-in-out ${isOutputExpanded ? 'h-[50vh]' : 'h-[64px]'}`}>
+            {!isOutputModalOpen && outputPanelContent}
           </div>
         </div>
       ) : (
         <ResizablePanelGroup ref={panelGroupRef} direction="vertical" className="h-full">
-          <ResizablePanel defaultSize={75} minSize={30}>
+          <ResizablePanel defaultSize={100 - minPanelSize} minSize={20} collapsible={true} collapsedSize={0}>
             {editorTabs}
           </ResizablePanel>
 
           <ResizableHandle withHandle className="bg-muted/50 hover:bg-primary/20 data-[resize-handle-active]:bg-primary/40 transition-colors" />
-          <ResizablePanel defaultSize={25} minSize={10}>
-            {outputPanelContent}
+          <ResizablePanel 
+            defaultSize={minPanelSize} 
+            minSize={minPanelSize}
+            onResize={(size) => {
+              if (size > minPanelSize + 5 && !isOutputExpanded) setIsOutputExpanded(true);
+              if (size <= minPanelSize + 5 && isOutputExpanded) setIsOutputExpanded(false);
+            }}
+          >
+            {!isOutputModalOpen && outputPanelContent}
           </ResizablePanel>
         </ResizablePanelGroup>
       )}
 
-      {/* Expanded Modal View */}
-      <Dialog open={isOutputExpanded} onOpenChange={setIsOutputExpanded}>
-        <DialogContent className="max-w-screen w-screen h-screen flex flex-col p-0 gap-0 border-none bg-background/95 backdrop-blur-xl rounded-none">
-          <div className="h-full flex flex-col overflow-hidden">
-            <OutputPanel
-              onToggleExpand={handleToggleOutputExpand}
-              isExpanded={true}
-              activeTestCaseTab={activeTestCaseTab}
-              onTestCaseTabChange={setActiveTestCaseTab}
-              output={output}
-              loading={isLoading}
-              submitting={isSubmitting as boolean}
-              stdin=""
-              onStdinChange={() => { }}
-              testCases={testCases.map(tc => ({
-                input: tc.input,
-                output: tc.expectedOutput
-              }))}
-              executionTime={executionTime}
-              algorithmMeta={algorithmMeta as any}
-
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-
-              allTestCases={testCases}
-              executedTestCases={executedTestCases}
-              onAddTestCase={handleAddTestCase}
-              onUpdateTestCase={handleUpdateTestCase}
-              onDeleteTestCase={handleDeleteTestCase}
-
-              submissions={submissions}
-              onSelectSubmission={handleSelectSubmission}
-
-              editingTestCaseId={editingTestCaseId}
-              onEditTestCase={setEditingTestCaseId}
-              onCancelEdit={() => {
-                setEditingTestCaseId(null);
-                setPendingTestCaseId(null);
-              }}
-
-              inputSchema={algorithmData?.input_schema}
-              controls={controls}
-            />
-          </div>
+      {/* Fullscreen Output Modal */}
+      <Dialog open={isOutputModalOpen} onOpenChange={setIsOutputModalOpen}>
+        <DialogContent className="max-w-none w-screen h-screen m-0 flex flex-col p-0 overflow-hidden border-0 bg-background shadow-none rounded-none [&>button]:hidden">
+          {outputPanelContent}
         </DialogContent>
       </Dialog>
     </div>
@@ -1409,7 +1448,7 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
   }
 
   return content;
-
-
 });
+
+export default CodeRunner;
 

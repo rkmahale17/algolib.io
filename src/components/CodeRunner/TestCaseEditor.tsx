@@ -222,7 +222,7 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
         </div>
       ))}
 
-      <div className="space-y-1.5 pt-4 border-t mt-4">
+      <div className="space-y-1.5 mt-2">
         <h5 className="text-xs font-semibold text-muted-foreground  tracking-wider mb-2">Expected Output</h5>
         <Label htmlFor="input-expected" className="text-xs font-medium sr-only">
           Expected Output (JSON)

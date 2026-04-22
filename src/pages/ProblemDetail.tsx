@@ -444,7 +444,7 @@ const ProblemDetail: React.FC = () => {
               value={activeListType || "all"}
               onValueChange={(val) => setActiveListType(val as any)}
             >
-              <SelectTrigger className="border-none bg-transparent hover:bg-muted/50 focus:ring-0 px-2 h-9 text-sm font-medium w-fit min-w-[140px] gap-2 transition-colors">
+              <SelectTrigger className="w-[140px] h-8 bg-background border-input text-xs focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none">
                 <SelectValue>
                   {LIST_TYPE_LABELS[activeListType as any] || 'Problem List'}
                 </SelectValue>

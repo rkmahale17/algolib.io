@@ -7,7 +7,7 @@ import {
   Eye,
   Code2,
   PanelLeftClose,
-  Maximize2,
+  Maximize,
   Minimize2,
   BookOpen,
   Youtube,
@@ -25,6 +25,7 @@ import {
   Lock,
   Tag,
   Building2,
+  Check,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -180,7 +181,7 @@ export const ProblemDescriptionPanel = React.memo(({
   };
 
   return (
-    <div ref={containerRef} className="h-full flex flex-col bg-card/30 backdrop-blur-sm">
+    <div ref={containerRef} className="h-full flex flex-col">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden w-full pt-0 mt-0">
         <div className="px-0 shrink-0 flex items-stretch border-b">
           <TabsList className="flex-1 grid grid-cols-3 p-0 bg-transparent gap-0 rounded-none">
@@ -350,9 +351,11 @@ export const ProblemDescriptionPanel = React.memo(({
                     {(!algorithm?.controls || algorithm.controls?.metadata?.attempted_badge !== false) && isCompleted && (
                       <Badge
                         variant="outline"
-                        className="bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20 px-3 py-1 hover:bg-green-500/20 transition-colors cursor-default flex items-center h-7 rounded-full text-[10px] sm:text-xs"
+                        className="bg-primary/10 text-primary border-primary/20 px-3 py-1 hover:bg-primary/20 transition-colors cursor-default flex items-center h-7 rounded-full text-[10px] sm:text-xs font-medium"
                       >
-                        <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" />
+                        <div className="bg-primary rounded-full p-0.5 mr-1.5 flex items-center justify-center text-primary-foreground shadow-sm">
+                          <Check className="w-2.5 h-2.5 stroke-[3]" />
+                        </div>
                         Solved
                       </Badge>
                     )}
@@ -812,7 +815,7 @@ export const ProblemDescriptionPanel = React.memo(({
                       onClick={() => setIsVisualizationMaximized(true)}
                       title="Maximize Visualization"
                     >
-                      <Maximize2 className="w-4 h-4" />
+                      <Maximize className="w-4 h-4" />
                     </Button>
                   </div>
                   <div className={`flex-1 overflow-auto no-scrollbar relative flex flex-col ${(algorithm?.is_premium || algorithm?.is_pro || algorithm?.metadata?.is_pro) && !hasPremiumAccess && !isPlatformPreview ? 'p-0' : 'p-6'}`}>

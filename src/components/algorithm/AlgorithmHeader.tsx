@@ -19,6 +19,7 @@ import {
   List as ListIcon,
   Crown,
   Lightbulb,
+  ChevronsUpDown,
 } from "lucide-react";
 import { ListType, LIST_TYPE_LABELS } from "@/types/algorithm";
 import { Button } from "@/components/ui/button";
@@ -48,6 +49,7 @@ import { useApp } from "@/contexts/AppContext";
 import { Badge } from "@/components/ui/badge";
 import logo from "@/assets/logo.svg";
 import UserMenu from "@/components/UserMenu";
+import { CodeExecutionButtonGroup } from "@/components/CodeRunner/CodeExecutionButtonGroup";
 
 interface AlgorithmHeaderProps {
   user: any;
@@ -122,7 +124,7 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
     : 'All Problems';
 
   return (
-    <div className="h-12 border-b flex items-center px-4 gap-4 shrink-0 bg-background/95 relative">
+    <div className="h-12 flex items-center px-4 gap-4 shrink-0 bg-background/95 relative">
       {/* Left Side: Logo + Navigation */}
       <div className="flex items-center gap-3">
         <Link
@@ -132,140 +134,80 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
           <img src={typeof logo === 'string' ? logo : (logo as any).src} alt="RulCode Logo" className="w-8 h-8" />
         </Link>
 
-        <div className="h-4 w-px bg-border" />
+        <div className="flex items-center shadow-sm rounded-md overflow-hidden border border-border bg-secondary/50">
+          <button
+            onClick={onToggleSidebar}
+            className={`flex items-center h-8 gap-2.5 px-3 hover:bg-muted transition-colors group ${!showCondensedMenu ? 'border-r border-border' : ''}`}
+          >
+            <ChevronsUpDown className="w-4 h-4 " />
+            <span className="text-[13px] font-semibold text-foreground/90 group-hover:text-foreground transition-colors tracking-tight">
+              {listLabel.charAt(0).toUpperCase() + listLabel.slice(1).toLowerCase()}
+            </span>
+          </button>
 
-        <button
-          onClick={onToggleSidebar}
-          className="flex items-center gap-2 px-2 py-1 rounded-md hover:bg-muted transition-colors group"
-        >
-          <ListIcon className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-          <span className="text-xs font- text-muted-foreground group-hover:text-foreground transition-colors uppercase tracking-wider">
-            {listLabel}
-          </span>
-        </button>
-
-        <div className="h-4 w-px bg-border" />
-
-        {/* Desktop Navigation - Show only if NOT condensed menu */}
-        {!showCondensedMenu && (
-          <TooltipProvider>
-            {(!algorithm?.controls || algorithm.controls?.header?.random_problem !== false) && (
+          {!showCondensedMenu && (
+            <TooltipProvider>
+              {(!algorithm?.controls || algorithm.controls?.header?.random_problem !== false) && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={handleRandomProblem}
+                      className="h-8 w-9 rounded-none hover:bg-muted border-r border-border transition-colors px-0"
+                    >
+                      <Shuffle className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Random Problem</TooltipContent>
+                </Tooltip>
+              )}
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={handleRandomProblem} className="h-8 w-8">
-                    <Shuffle className="h-4 w-4" />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handlePreviousProblem}
+                    className="h-8 w-9 rounded-none text-muted-foreground hover:text-foreground hover:bg-muted border-r border-border transition-colors px-0"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Random Problem</TooltipContent>
+                <TooltipContent>Previous Problem</TooltipContent>
               </Tooltip>
-            )}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handlePreviousProblem}
-                  className="h-9 w-9 text-muted-foreground hover:text-foreground"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Previous Problem</TooltipContent>
-            </Tooltip>
-            {(!algorithm?.controls || algorithm.controls?.header?.next_problem !== false) && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={handleNextProblem} className="h-8 w-8">
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Next Problem</TooltipContent>
-              </Tooltip>
-            )}
-          </TooltipProvider>
-        )}
+              {(!algorithm?.controls || algorithm.controls?.header?.next_problem !== false) && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={handleNextProblem}
+                      className="h-8 w-9 rounded-none hover:bg-muted transition-colors px-0"
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Next Problem</TooltipContent>
+                </Tooltip>
+              )}
+            </TooltipProvider>
+          )}
+        </div>
       </div>
 
       {/* Middle: Run / Submit Buttons */}
       {!showCondensedMenu && onRun && onSubmit && (
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
-          <TooltipProvider>
-            <div className="flex items-center shadow-sm rounded-md">
-              <FeatureGuard flag="code_runner">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      onClick={onRun}
-                      disabled={isRunnerLoading || isRunnerSubmitting}
-                      size="sm"
-                      variant="secondary"
-                      className="h-8 px-4 text-xs rounded-r-none border border-r-0 border-border font-medium transition-colors hover:bg-secondary/80"
-                    >
-                      {isRunnerLoading ? (
-                        <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
-                      ) : (
-                        <Play className="w-3.5 h-3.5 mr-2 fill-current" />
-                      )}
-                      Run
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">Run Code <kbd className="ml-2 pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100"><span className="text-xs">Ctrl</span> + '</kbd></TooltipContent>
-                </Tooltip>
-              </FeatureGuard>
-
-              <FeatureGuard flag="submit_button">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      onClick={onSubmit}
-                      disabled={isRunnerLoading || isRunnerSubmitting || !lastRunSuccess || ((algorithm?.is_premium || algorithm?.metadata?.is_pro) && !hasPremiumAccess && !hideUserMenu)}
-                      size="sm"
-                      variant="default"
-                      className={`h-8 px-4 text-xs rounded-l-none border ${lastRunSuccess
-                        ? 'bg-primary text-primary-foreground hover:bg-primary/90 border-primary/20'
-                        : 'bg-muted text-muted-foreground border-border'
-                        } transition-colors`}
-                    >
-                      {isRunnerSubmitting ? (
-                        <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
-                      ) : (
-                        <Send className="w-3.5 h-3.5 mr-2" />
-                      )}
-                      Submit
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">
-                    {(algorithm?.is_premium || algorithm?.metadata?.is_pro) && !hasPremiumAccess && !hideUserMenu ? (
-                      <span className="text-orange-500 font-medium">Unlock Pro mode to submit this problem</span>
-                    ) : !lastRunSuccess && !isRunnerLoading && !isRunnerSubmitting ? (
-                      <span className="text-orange-500 font-medium">Run all test cases successfully to enable submission</span>
-                    ) : (
-                      <>Submit Solution <kbd className="ml-2 pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100"><span className="text-xs">Ctrl</span> + Enter</kbd></>
-                    )}
-                  </TooltipContent>
-                </Tooltip>
-              </FeatureGuard>
-            </div>
-
-            {onThinkpad && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={onThinkpad}
-                      className="h-8 gap-2 ml-3 text-xs text-orange-500 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-950/20"
-                    >
-                      <Lightbulb className="w-3.5 h-3.5 fill-current" />
-                      Thinkpad
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">Open Thinkpad (Workspace Notes)</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
-          </TooltipProvider>
+          <CodeExecutionButtonGroup
+            onRun={onRun}
+            onSubmit={onSubmit}
+            isLoading={isRunnerLoading || isRunnerSubmitting}
+            isSubmitting={isRunnerSubmitting || false}
+            lastRunSuccess={lastRunSuccess || false}
+            algorithm={algorithm}
+            hasPremiumAccess={hasPremiumAccess}
+            hideUserMenu={hideUserMenu}
+          />
         </div>
       )}
 

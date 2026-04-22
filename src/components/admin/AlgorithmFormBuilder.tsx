@@ -5,7 +5,7 @@ import {
   useUpdateAlgorithm,
 } from "@/hooks/useAlgorithms";
 import { Algorithm } from "@/types/algorithm";
-import { ListType, LIST_TYPE_OPTIONS } from "@/types/algorithm";
+import { ListType, LIST_TYPE_LABELS } from "@/types/algorithm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -490,11 +490,13 @@ export function AlgorithmFormBuilder({
                             <SelectValue placeholder="Select list type" />
                           </SelectTrigger>
                           <SelectContent>
-                            {LIST_TYPE_OPTIONS.map((opt) => (
-                              <SelectItem key={opt.value} value={opt.value}>
-                                {opt.label}
-                              </SelectItem>
-                            ))}
+                            {Object.entries(LIST_TYPE_LABELS)
+                              .filter(([key]) => key !== 'all')
+                              .map(([value, label]) => (
+                                <SelectItem key={value} value={value}>
+                                  {label}
+                                </SelectItem>
+                              ))}
                           </SelectContent>
                         </Select>
                       </div>

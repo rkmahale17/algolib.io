@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, Terminal, FlaskConical, Clock, Zap, Plus, CheckCircle2, XCircle, AlertTriangle, History, Code, ChevronUp, ChevronDown, Minimize2, Minimize, Maximize2 } from "lucide-react";
+import { Loader2, Terminal, FlaskConical, Clock, Zap, Plus, Check, CheckCircle2, XCircle, AlertTriangle, History, Code, ChevronUp, ChevronDown, Minimize2, Minimize, Maximize } from "lucide-react";
 import { Algorithm } from '@/types/algorithm';
 import { Button } from "@/components/ui/button";
 import { FeatureGuard } from "@/components/FeatureGuard";
@@ -78,6 +78,8 @@ interface OutputPanelProps {
   onTestCaseTabChange?: (val: string) => void;
   onToggleExpand?: () => void;
   isExpanded?: boolean;
+  onMaximize?: () => void;
+  isMaximized?: boolean;
   submitting?: boolean;
 }
 
@@ -107,6 +109,8 @@ export const OutputPanel = ({
   onTestCaseTabChange,
   onToggleExpand,
   isExpanded,
+  onMaximize,
+  isMaximized,
   submitting = false
 }: OutputPanelProps) => {
   const [internalActiveTestCaseTab, setInternalActiveTestCaseTab] = useState<string>("");
@@ -161,14 +165,14 @@ export const OutputPanel = ({
   return (
     <div className="h-full flex flex-col border-t overflow-hidden">
       {/* Top Bar / Tabs */}
-      <div className="flex items-center justify-between border-b shrink-0">
+      <div className="flex items-center justify-between border-b shrink-0 h-10">
         {/* Scrollable Tabs Area */}
-        <div className="flex-1 flex items-center gap-1 px-1 overflow-x-auto scrollbar-thin mask-image-linear-gradient-to-r">
+        <div className="flex-1 flex items-center pr-1 pl-0 overflow-x-auto scrollbar-thin mask-image-linear-gradient-to-r">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => onTabChange("testcase")}
-            className={`h-9 text-xs gap-2 shrink-0 rounded-none transition-all ${activeTab === "testcase" ? "text-foreground bg-muted/50" : "text-muted-foreground"}`}
+            className={`h-10 text-xs gap-2 shrink-0 rounded-none transition-all ${activeTab === "testcase" ? "text-foreground bg-muted/50 border-b-2 border-primary" : "text-muted-foreground border-b-2 border-transparent"}`}
           >
             <FlaskConical className="w-3.5 h-3.5" />
             Testcase
@@ -178,7 +182,7 @@ export const OutputPanel = ({
             variant="ghost"
             size="sm"
             onClick={() => onTabChange("result")}
-            className={`h-9 text-xs gap-2 shrink-0 rounded-none transition-all ${activeTab === "result" ? "text-foreground bg-muted/50" : "text-muted-foreground"}`}
+            className={`h-10 text-xs gap-2 shrink-0 rounded-none transition-all ${activeTab === "result" ? "text-foreground bg-muted/50 border-b-2 border-primary" : "text-muted-foreground border-b-2 border-transparent"}`}
             disabled={!output}
           >
             <Terminal className="w-3.5 h-3.5" />
@@ -189,7 +193,7 @@ export const OutputPanel = ({
             variant="ghost"
             size="sm"
             onClick={() => onTabChange("submissions")}
-            className={`h-9 text-xs gap-2 shrink-0 rounded-none transition-all ${activeTab === "submissions" ? "text-foreground bg-muted/50" : "text-muted-foreground"}`}
+            className={`h-10 text-xs gap-2 shrink-0 rounded-none transition-all ${activeTab === "submissions" ? "text-foreground bg-muted/50 border-b-2 border-primary" : "text-muted-foreground border-b-2 border-transparent"}`}
           >
             <History className="w-3.5 h-3.5" />
             Submissions
@@ -197,17 +201,17 @@ export const OutputPanel = ({
         </div>
 
         {/* Fixed Right Actions */}
-        <div className="flex items-center px-2 shrink-0 bg-background/50 h-full shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)] z-10">
-          {onToggleExpand && (
+        <div className="flex items-center pr-1 shrink-0 bg-background/50 h-full shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)] z-10">
+          {onMaximize && (
             <Button
               variant="ghost"
               size="icon"
-              onClick={onToggleExpand}
-              className="h-6 w-6 text-muted-foreground hover:text-foreground"
-              title={isExpanded ? "Collapse" : "Expand output"}
+              onClick={onMaximize}
+              className="h-10 w-10 text-muted-foreground hover:text-foreground rounded-none"
+              title={isMaximized ? "Restore to panel" : "Maximize output"}
             >
 
-              {isExpanded ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+              {isMaximized ? <Minimize2 className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
             </Button>
           )}
         </div>
@@ -222,15 +226,15 @@ export const OutputPanel = ({
               onValueChange={setActiveTestCaseTab}
               className="flex-1 flex flex-col min-h-0"
             >
-              <div className="flex items-center justify-between border-b bg-background/50 shrink-0">
+              <div className="flex items-center justify-between bg-background/50 shrink-0 h-10">
                 {/* Scrollable Tabs List */}
                 <div className="flex-1 overflow-x-auto scrollbar-thin mask-image-linear-gradient-to-r">
-                  <TabsList className="h-8 bg-transparent p-0 gap-1 flex-nowrap w-max justify-start">
+                  <TabsList className="h-10 bg-transparent p-0 flex-nowrap w-max justify-start rounded-none">
                     {allTestCases.filter(tc => !tc.isSubmission).map((tc, index) => (
                       <TabsTrigger
                         key={tc.id}
                         value={`case-${tc.id}`}
-                        className="text-xs px-3 h-7 whitespace-nowrap data-[state=active]:bg-primary/10 data-[state=active]:text-black dark:data-[state=active]:text-white relative group shrink-0"
+                        className="text-xs px-3 h-10 rounded-none whitespace-nowrap data-[state=active]:bg-primary/10 data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-black dark:data-[state=active]:text-white relative group shrink-0"
                       >
                         {tc.isCustom ? `Case ${index + 1}` : `Case ${index + 1}`}
                         {/* Delete button for all cases */}
@@ -357,19 +361,23 @@ export const OutputPanel = ({
               {output.testResults && (
                 <div className="h-full flex flex-col min-h-0">
                   <Tabs value={activeResultTab} onValueChange={setActiveResultTab} className="flex-1 flex flex-col min-h-0">
-                    <div className="flex border-b bg-background/50 shrink-0 sticky top-0 z-10 overflow-x-auto overflow-y-hidden">
-                      <div className="flex-1 overflow-x-auto scrollbar-thin mask-image-linear-gradient-to-r px-4">
-                        <TabsList className="h-8 bg-transparent p-0 gap-2 flex-nowrap w-max justify-start">
+                    <div className="flex border-b bg-background/50 shrink-0 sticky top-0 z-10 overflow-x-auto overflow-y-hidden h-10">
+                      <div className="flex-1 overflow-x-auto scrollbar-thin mask-image-linear-gradient-to-r">
+                        <TabsList className="h-10 bg-transparent p-0 flex-nowrap w-max justify-start rounded-none">
                           {output.testResults.map((result: any, index: number) => (
                             <TabsTrigger
                               key={index}
                               value={`result-${index}`}
-                              className={`text-xs px-3 h-7 rounded-md whitespace-nowrap gap-2 shadow-none transition-all border ${result.status === 'pass'
-                                ? 'bg-green-500/10 text-green-700 dark:text-green-500 border-transparent hover:bg-green-500/20 data-[state=active]:bg-green-500/20 data-[state=active]:border-green-500/50 data-[state=active]:text-green-800 dark:data-[state=active]:text-green-400 data-[state=active]:shadow-sm font-medium'
-                                : 'bg-red-500/10 text-red-700 dark:text-red-500 border-transparent hover:bg-red-500/20 data-[state=active]:bg-red-500/20 data-[state=active]:border-red-500/50 data-[state=active]:text-red-800 dark:data-[state=active]:text-red-400 data-[state=active]:shadow-sm font-medium'
+                              className={`text-xs px-3 h-10 rounded-none whitespace-nowrap gap-2 shadow-none transition-all border-b-2 ${result.status === 'pass'
+                                ? 'bg-green-500/10 text-green-700 dark:text-green-500 border-transparent hover:bg-green-500/20 data-[state=active]:bg-green-500/20 data-[state=active]:border-green-500 data-[state=active]:text-green-800 dark:data-[state=active]:text-green-400 data-[state=active]:shadow-none font-medium'
+                                : 'bg-red-500/10 text-red-700 dark:text-red-500 border-transparent hover:bg-red-500/20 data-[state=active]:bg-red-500/20 data-[state=active]:border-red-500 data-[state=active]:text-red-800 dark:data-[state=active]:text-red-400 data-[state=active]:shadow-none font-medium'
                                 }`}
                             >
-                              {result.status === 'pass' ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
+                              {result.status === 'pass' ? (
+                                <div className="bg-primary rounded-full p-0.5 flex items-center justify-center text-primary-foreground shrink-0 border border-primary/20">
+                                  <Check className="w-2.5 h-2.5 stroke-[3]" />
+                                </div>
+                              ) : <XCircle className="w-3.5 h-3.5" />}
                               Case {index + 1}
                               {/* Show tooltip or small indicator if description exists */}
                               {(() => {
@@ -410,9 +418,9 @@ export const OutputPanel = ({
 
                                   // Fallback to original test case input if result input is missing
                                   const inputData = result.input !== undefined ? result.input : tc?.input;
- 
-                                  const metadata = typeof algorithmMeta?.metadata === 'string' 
-                                    ? JSON.parse(algorithmMeta.metadata) 
+
+                                  const metadata = typeof algorithmMeta?.metadata === 'string'
+                                    ? JSON.parse(algorithmMeta.metadata)
                                     : (algorithmMeta?.metadata || {});
                                   const isClassMode = !!metadata.class_mode;
 
@@ -457,10 +465,10 @@ export const OutputPanel = ({
                                             </div>
                                             {(algorithmMeta?.controls?.visualizations?.tree?.enabled ?? algorithmMeta?.controls?.show_tree_visualization) && algorithmMeta?.controls?.visualizations?.tree?.results_input !== false && isTreeType(field.type) && (
                                               <div className="mt-1">
-                                                <TreeDiagram 
-                                                  data={inputData[i]} 
-                                                  height={120} 
-                                                  multiple={algorithmMeta?.controls?.visualizations?.tree?.multiple} 
+                                                <TreeDiagram
+                                                  data={inputData[i]}
+                                                  height={120}
+                                                  multiple={algorithmMeta?.controls?.visualizations?.tree?.multiple}
                                                 />
                                               </div>
                                             )}
@@ -497,8 +505,8 @@ export const OutputPanel = ({
                                   const tc = executedTestCases ? executedTestCases[index] : allTestCases[index];
                                   const actual = result.actual;
 
-                                  const metadata = typeof algorithmMeta?.metadata === 'string' 
-                                    ? JSON.parse(algorithmMeta.metadata) 
+                                  const metadata = typeof algorithmMeta?.metadata === 'string'
+                                    ? JSON.parse(algorithmMeta.metadata)
                                     : (algorithmMeta?.metadata || {});
                                   const isClassMode = !!metadata.class_mode;
 
@@ -522,10 +530,10 @@ export const OutputPanel = ({
                                     <div className="space-y-3">
                                       <div>{content}</div>
                                       {(algorithmMeta?.controls?.visualizations?.tree?.enabled ?? algorithmMeta?.controls?.show_tree_visualization) && algorithmMeta?.controls?.visualizations?.tree?.results_output !== false && actual !== undefined && actual !== null && (
-                                        <TreeDiagram 
-                                          data={actual} 
-                                          height={120} 
-                                          multiple={algorithmMeta?.controls?.visualizations?.tree?.multiple} 
+                                        <TreeDiagram
+                                          data={actual}
+                                          height={120}
+                                          multiple={algorithmMeta?.controls?.visualizations?.tree?.multiple}
                                         />
                                       )}
                                       {(isGraphType(inputSchema?.[0]?.type) || (algorithmMeta?.controls?.visualizations?.graph?.enabled ?? algorithmMeta?.controls?.show_graph_visualization)) && algorithmMeta?.controls?.visualizations?.graph?.results_output !== false && actual !== undefined && actual !== null && (
@@ -543,8 +551,8 @@ export const OutputPanel = ({
                                 <div className="text-xs font-semibold text-muted-foreground  tracking-wider">Expected Output</div>
                                 <div className="p-3 rounded-md bg-muted/30 border font-mono text-sm">
                                   {(() => {
-                                    const metadata = typeof algorithmMeta?.metadata === 'string' 
-                                      ? JSON.parse(algorithmMeta.metadata) 
+                                    const metadata = typeof algorithmMeta?.metadata === 'string'
+                                      ? JSON.parse(algorithmMeta.metadata)
                                       : (algorithmMeta?.metadata || {});
                                     const isClassMode = !!metadata.class_mode;
 
@@ -567,10 +575,10 @@ export const OutputPanel = ({
                                       <div className="space-y-3">
                                         <div>{content}</div>
                                         {(algorithmMeta?.controls?.visualizations?.tree?.enabled ?? algorithmMeta?.controls?.show_tree_visualization) && algorithmMeta?.controls?.visualizations?.tree?.results_output !== false && (
-                                          <TreeDiagram 
-                                            data={result.expected} 
-                                            height={120} 
-                                            multiple={algorithmMeta?.controls?.visualizations?.tree?.multiple} 
+                                          <TreeDiagram
+                                            data={result.expected}
+                                            height={120}
+                                            multiple={algorithmMeta?.controls?.visualizations?.tree?.multiple}
                                           />
                                         )}
                                         {(isGraphType(inputSchema?.[0]?.type) || (algorithmMeta?.controls?.visualizations?.graph?.enabled ?? algorithmMeta?.controls?.show_graph_visualization)) && algorithmMeta?.controls?.visualizations?.graph?.results_output !== false && (
@@ -654,11 +662,13 @@ export const OutputPanel = ({
                       >
                         <div className="col-span-4 flex items-center gap-2">
                           {sub.status === 'passed' ? (
-                            <CheckCircle2 className="w-4 h-4 text-green-500" />
+                            <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-primary-foreground shrink-0 shadow-sm border border-primary/20">
+                              <Check className="w-3.5 h-3.5 stroke-[3]" />
+                            </div>
                           ) : sub.status === 'error' ? (
-                            <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                            <AlertTriangle className="w-6 h-6 text-yellow-500 shrink-0" />
                           ) : (
-                            <XCircle className="w-4 h-4 text-destructive" />
+                            <XCircle className="w-6 h-6 text-destructive shrink-0" />
                           )}
                           <div className="flex flex-col">
                             <span className={`font-medium ${sub.status === 'passed' ? 'text-green-600' : 'text-destructive'}`}>
@@ -708,7 +718,6 @@ export const OutputPanel = ({
           </div>
         )}
       </div>
-
     </div>
   );
 };

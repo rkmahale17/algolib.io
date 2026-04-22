@@ -52,6 +52,9 @@ export const useAlgorithmInteractions = ({
 
     const isNaughtyCloud = useFeatureFlag("naugty_cloud");
 
+    const lastSyncedCodeRef = useRef<string>("");
+    const hasInitializedCodeRef = useRef<Record<string, boolean>>({});
+
     // Sync state with userAlgoData
     useEffect(() => {
         if (userAlgoData) {
@@ -61,10 +64,19 @@ export const useAlgorithmInteractions = ({
 
             if (userAlgoData.code && typeof userAlgoData.code === 'object') {
                 const cache = userAlgoData.code as Record<string, string>;
+                const remoteCode = cache[selectedLanguage] || '';
+
                 setCodeCache(cache);
-                // Only update saved code if user hasn't modified it locally
-                if (!isUserModified) {
-                    setSavedCode(cache[selectedLanguage] || '');
+
+                // LOAD-ONCE STRATEGY:
+                // Only load code from DB if we haven't initialized it yet for this language
+                // or if the current savedCode is empty and remote has some content
+                const isLanguageInitialized = hasInitializedCodeRef.current[selectedLanguage];
+
+                if (!isLanguageInitialized || (savedCode === "" && remoteCode !== "")) {
+                    setSavedCode(remoteCode);
+                    lastSyncedCodeRef.current = remoteCode;
+                    hasInitializedCodeRef.current[selectedLanguage] = true;
                 }
             }
         }
@@ -79,6 +91,11 @@ export const useAlgorithmInteractions = ({
 
         const codeForLanguage = codeCache[selectedLanguage] || '';
         setSavedCode(codeForLanguage);
+
+        // Mark as initialized if we have code from cache
+        if (codeForLanguage) {
+            hasInitializedCodeRef.current[selectedLanguage] = true;
+        }
     }, [selectedLanguage]); // Keeping this simple for language switch
 
     // Reset local state when algorithmId changes
@@ -86,6 +103,7 @@ export const useAlgorithmInteractions = ({
         setSavedCode("");
         setCodeCache({});
         setIsUserModified(false);
+        hasInitializedCodeRef.current = {}; // Reset initialization tracking
     }, [algorithmId]);
 
     // Auto-save Effect
@@ -99,7 +117,7 @@ export const useAlgorithmInteractions = ({
                 const success = await updateCode(user.id, algorithmId, {
                     language: selectedLanguage,
                     code: savedCode,
-                });
+                }, codeCache);
 
                 if (!success) throw new Error('Failed to save code');
 
@@ -112,10 +130,10 @@ export const useAlgorithmInteractions = ({
                 // ONLY reset if no further changes happened during the save
                 if (latestCodeRef.current === savedCode) {
                     setIsUserModified(false);
+                    lastSyncedCodeRef.current = savedCode;
                 }
 
-                // Background refetch to sync
-                refetchUserData();
+                // Removed redundant refetchUserData() as real-time subscription handles it
             } catch (err) {
                 console.error("Error saving code:", err);
             }

@@ -91,7 +91,7 @@ export const CodeWorkspacePanel = React.memo(({
   }, []);
 
   return (
-    <div ref={containerRef} className={`h-full flex flex-col bg-card/30 backdrop-blur-sm ${className || ''}`}>
+    <div ref={containerRef} className={`h-full flex flex-col ${className || ''}`}>
       <div className="flex-1 overflow-hidden p-0">
         {(algorithm?.controls?.tabs?.code === false || algorithm?.controls?.code_runner === false || !isCodeRunnerGlobalEnabled) ? (
           <TabWarning message={!isCodeRunnerGlobalEnabled ? "Code Runner is currently disabled globally." : "Code Runner is not available for this problem."} />

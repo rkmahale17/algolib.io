@@ -95,11 +95,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const fetchProfile = useCallback(async (userId: string) => {
+  const lastFetchedProfileId = useRef<string | null>(null);
+
+  const fetchProfile = useCallback(async (userId: string, force: boolean = false) => {
     if (!userId) return;
 
-    // Check if we already have the profile for this user and it's being fetched
-    if (profileFetchInProgress.current === userId) {
+    // Skip if already fetching or if already have this profile (unless forced)
+    if (profileFetchInProgress.current === userId) return;
+    if (!force && profile && profile.id === userId && lastFetchedProfileId.current === userId) {
       return;
     }
 
@@ -113,12 +116,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
       if (error) throw error;
       dispatch(setProfile(data as any as Profile));
+      lastFetchedProfileId.current = userId;
     } catch (error) {
       console.error('Error fetching profile:', error);
     } finally {
       profileFetchInProgress.current = null;
     }
-  }, [dispatch]);
+  }, [dispatch, profile]);
 
   // hasPremiumAccess and progressMap are now computed in Redux slices
 
@@ -144,7 +148,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     } else {
       // toast.success("Trial activated! Enjoy 10 days of Premium."); // Assuming toast is available
       console.log("Trial activated! Enjoy 10 days of Premium.");
-      await fetchProfile(user.id);
+      await fetchProfile(user.id, true); // Force refresh
     }
   };
 
