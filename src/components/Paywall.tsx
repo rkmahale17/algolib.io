@@ -18,6 +18,12 @@ export const Paywall: React.FC<PaywallProps> = ({ onUpgrade }) => {
 
   React.useEffect(() => {
     posthog?.capture('paywall_viewed');
+
+    // Initialize DodoPayments SDK
+    const isLocal = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+    DodoPayments.Initialize({
+      mode: isLocal ? 'test' : 'live',
+    });
   }, [posthog]);
 
   const handleUpgrade = async () => {
@@ -38,7 +44,7 @@ export const Paywall: React.FC<PaywallProps> = ({ onUpgrade }) => {
 
       if (data?.checkout_url) {
         DodoPayments.Checkout.open({
-          checkoutUrl: data.checkout_url,
+          checkoutUrl: DodoPayments.Checkout.buildUrl(data.checkout_url),
         });
         if (onUpgrade) onUpgrade();
       } else {

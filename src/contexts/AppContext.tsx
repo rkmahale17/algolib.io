@@ -110,7 +110,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       profileFetchInProgress.current = userId;
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, email, full_name, avatar_url, username, subscription_status, subscription_tier, trial_end_date, current_period_end, cancel_at_period_end, role')
+        .select('id, email, full_name, avatar_url, username, subscription_status, subscription_tier, subscription_duration, subscription_plan_id, trial_end_date, current_period_end, cancel_at_period_end, role')
         .eq('id', userId)
         .maybeSingle();
 

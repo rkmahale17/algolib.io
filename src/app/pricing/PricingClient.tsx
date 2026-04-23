@@ -29,6 +29,15 @@ const PricingClient = () => {
   const [isUpgrading, setIsUpgrading] = useState(false);
   const [activePlanId, setActivePlanId] = useState<string | null>(null);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+    const isLocal = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+    DodoPayments.Initialize({
+      mode: isLocal ? 'test' : 'live',
+    });
+  }, []);
 
   const handleUpgrade = async (planType: string) => {
     if (!user) {
@@ -55,7 +64,7 @@ const PricingClient = () => {
 
       if (data?.checkout_url) {
         DodoPayments.Checkout.open({
-          checkoutUrl: data.checkout_url,
+          checkoutUrl: DodoPayments.Checkout.buildUrl(data.checkout_url),
         });
       } else {
         throw new Error('No checkout URL returned');
@@ -98,7 +107,7 @@ const PricingClient = () => {
     return date.toLocaleDateString();
   };
 
-  const isLocal = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+  const isLocal = mounted && typeof window !== 'undefined' && window.location.hostname === 'localhost';
 
   return (
     <>
@@ -191,11 +200,6 @@ const PricingClient = () => {
 
                 <div className="flex items-center justify-between mb-4">
                   <div className="font-semibold text-lg">{plan.title}</div>
-                  {isCurrentPlan && (
-                    <div className="bg-primary/10 p-1.5 rounded-full">
-                      <Check className="w-4 h-4 text-primary stroke-[3]" />
-                    </div>
-                  )}
                 </div>
 
                 <div className="flex flex-col gap-1 min-h-[72px]">
@@ -220,9 +224,9 @@ const PricingClient = () => {
                 <Button
                   variant={isCurrentPlan ? "secondary" : "outline"}
                   className={cn(
-                    "w-full rounded-full py-6 font-bold mb-8 transition-all",
+                    "w-full rounded-full py-6 font-bold mb-8 transition-all flex items-center justify-center gap-2",
                     isCurrentPlan
-                      ? "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 cursor-default"
+                      ? "bg-primary text-primary-foreground border-primary hover:bg-primary/90 cursor-default"
                       : "hover:bg-muted"
                   )}
                   onClick={() => !isCurrentPlan && handleUpgrade(plan.productId)}
@@ -231,7 +235,12 @@ const PricingClient = () => {
                   {isUpgrading && activePlanId === plan.productId
                     ? "Processing..."
                     : isCurrentPlan
-                      ? "Active Selection"
+                      ? (
+                        <>
+                          <Check className="w-5 h-5 stroke-[3]" />
+                          Active Plan
+                        </>
+                      )
                       : plan.buttonText}
                 </Button>
 
