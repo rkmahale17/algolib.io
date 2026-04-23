@@ -169,7 +169,7 @@ export default function About() {
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-2">
-                      {["React 18", "TypeScript", "Vite", "Tailwind CSS", "Shadcn/UI", "Framer Motion"].map((tech) => (
+                      {["React 18", "TypeScript", "Next.js", "Tailwind CSS", "Shadcn/UI", "Framer Motion"].map((tech) => (
                         <li key={tech} className="flex items-center gap-2 text-muted-foreground">
                           <div className="w-1.5 h-1.5 rounded-full bg-blue-400/50" />
                           {tech}

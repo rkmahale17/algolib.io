@@ -1,5 +1,5 @@
 {
-  "name": "vite_react_shadcn_ts",
+  "name": "rulcode",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -8,8 +8,7 @@
     "build": "tsx generate-sitemap.ts && next build",
     "start": "next start",
     "lint": "next lint",
-    "generate-sitemap": "tsx generate-sitemap.ts",
-    "seed": "tsx scripts/seedSupabase.ts"
+    "generate-sitemap": "tsx generate-sitemap.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

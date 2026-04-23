@@ -165,9 +165,9 @@ export const OutputPanel = ({
   return (
     <div className="h-full flex flex-col border-t overflow-hidden">
       {/* Top Bar / Tabs */}
-      <div className="flex items-center justify-between border-b shrink-0 h-10">
+      <div className="flex items-center justify-between border-b shrink-0 h-[46px]">
         {/* Scrollable Tabs Area */}
-        <div className="flex-1 flex items-center pr-1 pl-0 overflow-x-auto scrollbar-thin mask-image-linear-gradient-to-r">
+        <div className="flex-1 flex items-center pr-1 pl-0 overflow-x-auto overflow-y-hidden scrollbar-thin mask-image-linear-gradient-to-r h-[46px] pb-1.5">
           <Button
             variant="ghost"
             size="sm"
@@ -226,9 +226,9 @@ export const OutputPanel = ({
               onValueChange={setActiveTestCaseTab}
               className="flex-1 flex flex-col min-h-0"
             >
-              <div className="flex items-center justify-between bg-background/50 shrink-0 h-10">
+              <div className="flex items-center justify-between bg-background/50 shrink-0 h-[46px]">
                 {/* Scrollable Tabs List */}
-                <div className="flex-1 overflow-x-auto scrollbar-thin mask-image-linear-gradient-to-r">
+                <div className="flex-1 overflow-x-auto overflow-y-hidden scrollbar-thin mask-image-linear-gradient-to-r h-[46px] pb-1.5">
                   <TabsList className="h-10 bg-transparent p-0 flex-nowrap w-max justify-start rounded-none">
                     {allTestCases.filter(tc => !tc.isSubmission).map((tc, index) => (
                       <TabsTrigger
@@ -361,8 +361,8 @@ export const OutputPanel = ({
               {output.testResults && (
                 <div className="h-full flex flex-col min-h-0">
                   <Tabs value={activeResultTab} onValueChange={setActiveResultTab} className="flex-1 flex flex-col min-h-0">
-                    <div className="flex border-b bg-background/50 shrink-0 sticky top-0 z-10 overflow-x-auto overflow-y-hidden h-10">
-                      <div className="flex-1 overflow-x-auto scrollbar-thin mask-image-linear-gradient-to-r">
+                    <div className="flex border-b bg-background/50 shrink-0 sticky top-0 z-10 overflow-y-hidden h-[46px]">
+                      <div className="flex-1 overflow-x-auto overflow-y-hidden scrollbar-thin mask-image-linear-gradient-to-r h-[46px] pb-1.5">
                         <TabsList className="h-10 bg-transparent p-0 flex-nowrap w-max justify-start rounded-none">
                           {output.testResults.map((result: any, index: number) => (
                             <TabsTrigger

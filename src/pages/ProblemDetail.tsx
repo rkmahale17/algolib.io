@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Button } from "@/components/ui/button";
 import { PremiumLoader } from "@/components/PremiumLoader";
-import AlgoMetaHead from "@/services/meta.injectot";
+import { AlgoMetaHead } from "@/services/meta.injector";
 import { CodeRunnerRef } from "@/components/CodeRunner/CodeRunner";
 
 // New Refactored Components

@@ -272,7 +272,7 @@ npm run dev
 
 ## 🧰 Tech Stack
 
-- ⚡ Vite
+- ⚡ Next.js
 - 💎 TypeScript
 - ⚛️ React
 - 🎨 shadcn/ui

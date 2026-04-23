@@ -19,6 +19,61 @@ import { LANGUAGE_IDS } from '@/components/CodeRunner/constants';
 import { Language } from '@/components/CodeRunner/LanguageSelector';
 import env from '@/config/env';
 
+const mapStatusStringToId = (status: string): { id: number; description: string } => {
+  switch (status.toLowerCase()) {
+    case 'accepted': return { id: 3, description: 'Accepted' };
+    case 'wrong answer': return { id: 4, description: 'Wrong Answer' };
+    case 'time limit exceeded': return { id: 5, description: 'Time Limit Exceeded' };
+    case 'compilation error': return { id: 6, description: 'Compilation Error' };
+    case 'runtime error': return { id: 7, description: 'Runtime Error' };
+    case 'internal error': return { id: 13, description: 'Internal Error' };
+    case 'executing': return { id: 2, description: 'Processing' };
+    case 'pending': return { id: 1, description: 'In Queue' };
+    default: return { id: 3, description: status }; // Fallback to Accepted if unknown but finished? Or keep as is.
+  }
+};
+
+const waitForSubmissionResult = (submissionId: string): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      supabase?.removeChannel(channel);
+      reject(new Error("Execution timeout. Please try again or check submissions history."));
+    }, 30000); // 30 seconds timeout
+
+    const channel = supabase!
+      .channel(`submission-${submissionId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'submissions',
+          filter: `id=eq.${submissionId}`,
+        },
+        (payload) => {
+          console.log('Submission Updated Realtime (Admin):', payload.new);
+          const { status } = payload.new;
+          if (status && status !== 'pending' && status !== 'executing') {
+            clearTimeout(timeout);
+            supabase?.removeChannel(channel);
+
+            // Map record to match the expected format
+            const result = {
+              ...payload.new,
+              status: mapStatusStringToId(payload.new.status)
+            };
+            resolve(result);
+          }
+        }
+      )
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          console.log(`Subscribed to submission-${submissionId}`);
+        }
+      });
+  });
+};
+
 // Types
 interface LogEntry {
   id: string;
@@ -212,13 +267,21 @@ const AdminSimulator: React.FC = () => {
         language_id: LANGUAGE_IDS[language],
         source_code: fullCode,
         stdin: "",
+        problem_id: algo.id,
         compiler_options: language === 'typescript' ? "--target ES2020 --downlevelIteration" : undefined
       }, {
         headers: {
           Authorization: `Bearer ${session?.access_token}`
         }
       });
-      return response.data;
+
+      const { submission_id } = response.data;
+      if (!submission_id) {
+        throw new Error("No submission_id received from server");
+      }
+
+      // Wait for real-time update
+      return await waitForSubmissionResult(submission_id);
     } catch (e: any) {
       return { stderr: e.message || "Execution Error" };
     }
@@ -503,7 +566,7 @@ const AdminSimulator: React.FC = () => {
           if (stopRequested.current) break;
           const lang = (impl.lang as string).toLowerCase() as Language;
           if (!LANGUAGE_IDS[lang]) continue;
-          
+
           if (languageFilter !== "all" && lang !== languageFilter) continue;
 
           // FILTER LOGIC

@@ -1381,12 +1381,12 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
         e.stopPropagation();
         handleRun();
       }
-      
+
       // Ctrl/Cmd + Enter for Submit
       if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
         e.preventDefault();
         e.stopPropagation();
-        
+
         const canSubmit = controls?.allow_submission !== false;
         if (!isLoading && !isSubmitting && canSubmit) {
           handleSubmit();
@@ -1421,8 +1421,8 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
           </ResizablePanel>
 
           <ResizableHandle withHandle className="bg-muted/50 hover:bg-primary/20 data-[resize-handle-active]:bg-primary/40 transition-colors" />
-          <ResizablePanel 
-            defaultSize={minPanelSize} 
+          <ResizablePanel
+            defaultSize={minPanelSize}
             minSize={minPanelSize}
             onResize={(size) => {
               if (size > minPanelSize + 5 && !isOutputExpanded) setIsOutputExpanded(true);
