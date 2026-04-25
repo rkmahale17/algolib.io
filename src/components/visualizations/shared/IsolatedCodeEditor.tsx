@@ -14,6 +14,7 @@ interface IsolatedCodeEditorProps {
   options?: Record<string, any>;
   className?: string;
   primaryColor?: string;
+  onShortcut?: (key: string) => void;
 }
 
 export const IsolatedCodeEditor = React.forwardRef<any, IsolatedCodeEditorProps>(({
@@ -29,7 +30,8 @@ export const IsolatedCodeEditor = React.forwardRef<any, IsolatedCodeEditorProps>
   onReady,
   options = {},
   className = '',
-  primaryColor = '#3e72ff'
+  primaryColor = '#3e72ff',
+  onShortcut
 }, ref) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isInternalReady, setIsInternalReady] = useState(false);
@@ -79,6 +81,8 @@ export const IsolatedCodeEditor = React.forwardRef<any, IsolatedCodeEditorProps>
         const newCode = event.data.data.code;
         lastEmittedCodeRef.current = newCode;
         onChange?.(newCode);
+      } else if (event.data.type === 'KEYBOARD_SHORTCUT') {
+        onShortcut?.(event.data.data.key);
       }
     };
     window.addEventListener('message', handleMessage);

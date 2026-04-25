@@ -14,6 +14,7 @@ import { isTreeType, parseTreeValue } from '@/utils/treeUtils';
 import { GraphDiagram } from '../visualizations/GraphDiagram';
 import { isGraphType, parseGraphValue } from '@/utils/graphUtils';
 import { isListType, parseListValue } from '@/utils/listUtils';
+import { getStatusColor, getStatusText, formatDate } from './outputHelpers';
 
 const DiffView = ({ expected, actual }: { expected: any, actual: any }) => {
   const expectedStr = (typeof expected === 'string' ? expected : JSON.stringify(expected, null, 2)) || "";
@@ -83,7 +84,7 @@ interface OutputPanelProps {
   submitting?: boolean;
 }
 
-export const OutputPanel = ({
+export const OutputPanel = React.memo(({
   output,
   loading,
   stdin,
@@ -138,29 +139,6 @@ export const OutputPanel = ({
     }
   }, [output]);
 
-  // Determine status color
-  const getStatusColor = (statusId?: number, testResults?: any[]) => {
-    // ...
-    if (statusId === 3) {
-      const allPassed = testResults?.every((r: any) => r.status === 'pass');
-      return allPassed ? "text-green-500" : "text-red-500";
-    }
-    if (statusId === 6) return "text-red-600 dark:text-red-400"; // Compilation Error
-    return "text-red-500"; // Runtime Error or Wrong Answer
-  };
-
-  const getStatusText = (statusId?: number, description?: string, testResults?: any[]) => {
-    // ... 
-    if (statusId === 3) {
-      const allPassed = testResults?.every((r: any) => r.status === 'pass');
-      return allPassed ? "Accepted" : "Wrong Answer";
-    }
-    return description || "Error";
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString();
-  };
 
   return (
     <div className="h-full flex flex-col border-t overflow-hidden">
@@ -720,4 +698,6 @@ export const OutputPanel = ({
       </div>
     </div>
   );
-};
+});
+
+OutputPanel.displayName = 'OutputPanel';

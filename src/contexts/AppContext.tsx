@@ -276,7 +276,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     userAlgorithmData,
     isUserDataLoading,
     refreshUserData: fetchUserData,
-    refreshProfile: useCallback(() => user ? fetchProfile(user.id) : Promise.resolve(), [user, fetchProfile]),
+    refreshProfile: useCallback(() => user ? fetchProfile(user.id, true) : Promise.resolve(), [user, fetchProfile]),
     activateTrial,
     activeListType,
     setActiveListType: updateActiveListType,

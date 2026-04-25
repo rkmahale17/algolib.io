@@ -45,7 +45,6 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FeatureGuard } from "@/components/FeatureGuard";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { useApp } from "@/contexts/AppContext";
 import { Badge } from "@/components/ui/badge";
 import logo from "@/assets/logo.svg";
 import UserMenu from "@/components/UserMenu";
@@ -87,6 +86,8 @@ interface AlgorithmHeaderProps {
   // Preview Mode
   hideUserMenu?: boolean;
   onThinkpad?: () => void;
+  hasPremiumAccess?: boolean;
+  profile?: any;
 }
 
 export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
@@ -115,8 +116,9 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
   onToggleSidebar,
   hideUserMenu = false,
   onThinkpad,
+  hasPremiumAccess = false,
+  profile,
 }) => {
-  const { hasPremiumAccess, profile } = useApp();
   const showCondensedMenu = windowWidth < 778;
 
   const listLabel = activeListType && activeListType !== 'all'

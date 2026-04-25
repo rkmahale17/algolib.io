@@ -1,8 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Crown, CheckCircle2, Lock, ArrowRight } from 'lucide-react';
+import { Crown, CheckCircle2, Lock, ArrowRight, Info } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
-import { DodoPayments } from 'dodopayments-checkout';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { usePostHog } from '@posthog/react';
@@ -18,12 +17,6 @@ export const Paywall: React.FC<PaywallProps> = ({ onUpgrade }) => {
 
   React.useEffect(() => {
     posthog?.capture('paywall_viewed');
-
-    // Initialize DodoPayments SDK
-    const isLocal = typeof window !== 'undefined' && window.location.hostname === 'localhost';
-    DodoPayments.Initialize({
-      mode: isLocal ? 'test' : 'live',
-    });
   }, [posthog]);
 
   const handleUpgrade = async () => {
@@ -43,9 +36,10 @@ export const Paywall: React.FC<PaywallProps> = ({ onUpgrade }) => {
       if (error) throw error;
 
       if (data?.checkout_url) {
-        DodoPayments.Checkout.open({
-          checkoutUrl: DodoPayments.Checkout.buildUrl(data.checkout_url),
-        });
+        // Using direct redirect instead of SDK overlay (iframe) to avoid browser security restrictions
+        // like "Permissions policy violation" (accelerometer, bluetooth) which often block the form in iframes.
+        console.log('Using direct redirect for maximum compatibility');
+        window.location.href = data.checkout_url;
         if (onUpgrade) onUpgrade();
       } else {
         throw new Error('No checkout URL returned');
@@ -110,6 +104,17 @@ export const Paywall: React.FC<PaywallProps> = ({ onUpgrade }) => {
               {isUpgrading ? "Loading..." : "Upgrade Now"}
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
+
+            {typeof window !== 'undefined' && window.location.hostname === 'localhost' && (
+              <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-[11px] text-amber-600 text-left space-y-1">
+                <p className="font-bold flex items-center gap-1">
+                  <Info className="w-3 h-3" /> Test Mode Info:
+                </p>
+                <p>Card: <code className="bg-amber-500/10 px-1 rounded font-mono">4242 4242 4242 4242</code></p>
+                <p>UPI: <code className="bg-amber-500/10 px-1 rounded font-mono">success@upi</code></p>
+              </div>
+            )}
+
             <p className="text-[10px] text-muted-foreground">
               Secure payment powered by Dodo Payments. Cancel anytime.
             </p>

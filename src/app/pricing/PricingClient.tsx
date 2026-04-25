@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Check, Info, Calendar, CreditCard, AlertCircle } from 'lucide-react';
-import { DodoPayments } from 'dodopayments-checkout';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -33,11 +32,41 @@ const PricingClient = () => {
 
   React.useEffect(() => {
     setMounted(true);
-    const isLocal = typeof window !== 'undefined' && window.location.hostname === 'localhost';
-    DodoPayments.Initialize({
-      mode: isLocal ? 'test' : 'live',
-    });
   }, []);
+  const { refreshProfile } = useApp();
+
+  React.useEffect(() => {
+    if (mounted && typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const status = urlParams.get('status');
+      const sessionId = urlParams.get('checkout_session_id');
+
+      if (status || sessionId) {
+        // Clean up URL immediately to prevent re-triggers on refresh
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, '', newUrl);
+
+        if (status === 'succeeded') {
+          toast.success("Payment successful! Updating your account...");
+          setTimeout(() => refreshProfile(), 2000);
+        } else if (status === 'failed') {
+          toast.error("Payment failed. Please try again or contact support.");
+        } else if (status === 'cancelled') {
+          toast.info("Payment was cancelled.");
+        } else if (status === 'processing' || sessionId) {
+          toast.loading("Payment is processing on Dodo's side. If you are stuck there, please ensure you selected 'Success' in the sandbox screen.", {
+            duration: 10000,
+            id: 'processing-toast-client'
+          });
+          const timer = setTimeout(() => {
+            refreshProfile();
+            toast.dismiss('processing-toast-client');
+          }, 8000);
+          return () => clearTimeout(timer);
+        }
+      }
+    }
+  }, [mounted, refreshProfile]);
 
   const handleUpgrade = async (planType: string) => {
     if (!user) {
@@ -54,8 +83,8 @@ const PricingClient = () => {
         body: {
           planType: planType,
           userId: user?.id,
-          customerEmail: user?.email || '',
-          returnUrl: typeof window !== 'undefined' ? window.location.href : '',
+          email: user?.email,
+          returnUrl: typeof window !== 'undefined' ? `${window.location.origin}${window.location.pathname}` : '',
           isLocal: typeof window !== 'undefined' && window.location.hostname === 'localhost',
         }
       });
@@ -63,9 +92,10 @@ const PricingClient = () => {
       if (error) throw error;
 
       if (data?.checkout_url) {
-        DodoPayments.Checkout.open({
-          checkoutUrl: DodoPayments.Checkout.buildUrl(data.checkout_url),
-        });
+        // Using direct redirect instead of SDK overlay (iframe) to avoid browser security restrictions
+        // like "Permissions policy violation" (accelerometer, bluetooth) which often block the form in iframes.
+        console.log('Using direct redirect for maximum compatibility');
+        window.location.href = data.checkout_url;
       } else {
         throw new Error('No checkout URL returned');
       }
@@ -113,9 +143,22 @@ const PricingClient = () => {
     <>
       <div className="w-full max-w-[1600px] mx-auto px-4">
         {isLocal && (
-          <div className="mb-6 bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 flex items-center gap-2 text-amber-600 text-sm font-medium">
-            <Info className="w-4 h-4" />
-            <span>Test Mode Active: Using Dodo Test environment and TEST_ secrets.</span>
+          <div className="mb-6 bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 flex flex-col gap-3 text-amber-600">
+            <div className="flex items-center gap-2 text-sm font-medium">
+              <Info className="w-4 h-4" />
+              <span>Test Mode Active: Using Dodo Test environment.</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs bg-amber-500/5 p-3 rounded border border-amber-500/10">
+              <div>
+                <p className="font-bold mb-1 uppercase tracking-wider opacity-70">Success Card</p>
+                <code className="bg-amber-500/10 px-1.5 py-0.5 rounded text-amber-700">4242 4242 4242 4242</code>
+              </div>
+              <div>
+                <p className="font-bold mb-1 uppercase tracking-wider opacity-70">UPI Success</p>
+                <code className="bg-amber-500/10 px-1.5 py-0.5 rounded text-amber-700">success@upi</code>
+              </div>
+            </div>
+            <p className="text-[10px] opacity-70 italic">Use any future expiry (12/30) and CVC (123).</p>
           </div>
         )}
 

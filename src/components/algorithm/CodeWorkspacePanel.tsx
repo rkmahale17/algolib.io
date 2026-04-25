@@ -15,7 +15,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { AuthGuard } from "@/components/AuthGuard";
 import { TabWarning } from "@/components/TabWarning";
 import dynamic from 'next/dynamic';
-import { useApp } from "@/contexts/AppContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Submission } from "@/types/userAlgorithmData";
 
@@ -47,6 +46,7 @@ interface CodeWorkspacePanelProps {
   onRunnerStateChange?: (state: any) => void;
   isLoading?: boolean;
   isPlatformPreview?: boolean;
+  hasPremiumAccess?: boolean;
 }
 
 export const CodeWorkspacePanel = React.memo(({
@@ -68,9 +68,9 @@ export const CodeWorkspacePanel = React.memo(({
   onRunnerStateChange,
   isLoading = false,
   isPlatformPreview = false,
+  hasPremiumAccess = false,
 }: CodeWorkspacePanelProps) => {
   const posthog = usePostHog();
-  const { hasPremiumAccess } = useApp();
   const containerRef = useRef<HTMLDivElement>(null);
   const [isCompact, setIsCompact] = useState(false);
 
@@ -130,6 +130,7 @@ export const CodeWorkspacePanel = React.memo(({
                   algorithmTitle: algorithm?.title || algorithm?.name || "",
                   controls: algorithm?.controls?.brainstorm
                 } : undefined}
+                hasPremiumAccess={hasPremiumAccess}
               />
             ) : (
               <div className="flex-1 flex items-center justify-center">

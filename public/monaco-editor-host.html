@@ -146,6 +146,24 @@
             window.parent.postMessage({ type: 'CODE_CHANGED', data: { code: editor.getValue() } }, '*');
           });
 
+          // Register keyboard shortcuts
+          // 2 is KeyMod.CtrlCmd, 3 is KeyMod.Shift, 4 is KeyMod.Alt, 1 is KeyMod.WinCtrl
+          // KeyCode for ' is 102 (US_QUOTE)
+          // KeyCode for Enter is 3 (Enter)
+          
+          const KeyMod = window.monaco.KeyMod;
+          const KeyCode = window.monaco.KeyCode;
+
+          // Ctrl/Cmd + ' (Quote)
+          editor.addCommand(KeyMod.CtrlCmd | KeyCode.Quote, () => {
+             window.parent.postMessage({ type: 'KEYBOARD_SHORTCUT', data: { key: "'" } }, '*');
+          });
+
+          // Ctrl/Cmd + Enter
+          editor.addCommand(KeyMod.CtrlCmd | KeyCode.Enter, () => {
+             window.parent.postMessage({ type: 'KEYBOARD_SHORTCUT', data: { key: "Enter" } }, '*');
+          });
+
           document.getElementById('editor-container').classList.add('ready');
           window.parent.postMessage({ type: 'EDITOR_READY' }, '*');
         } else if (!editor) {

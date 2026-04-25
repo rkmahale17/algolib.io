@@ -53,11 +53,34 @@ Deno.serve(async (req) => {
 
         // Identify User
         let finalUserId = userId;
-        const finalEmail = email;
+        let finalEmail = email;
+
+        const supabaseUrl = Deno.env.get('SUPABASE_URL')
+        const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+        const supabase = (supabaseUrl && supabaseServiceKey) ? createClient(supabaseUrl, supabaseServiceKey) : null
+
+        // If email is missing but userId exists, try to resolve email from profile
+        if (!finalEmail && finalUserId && supabase) {
+            console.log(`Email missing for ${finalUserId}, attempting profile lookup...`)
+            const { data: profile, error: profileError } = await supabase
+                .from('profiles')
+                .select('email')
+                .eq('id', finalUserId)
+                .maybeSingle()
+
+            if (profileError) {
+                console.error('Email lookup error:', profileError)
+            } else if (profile?.email) {
+                finalEmail = profile.email
+                console.log(`Resolved email from userId: ${finalEmail}`)
+            } else {
+                console.warn(`No email found for userId: ${finalUserId}`)
+            }
+        }
 
         if (!finalEmail) {
-            console.error('CRITICAL: No email found in request body')
-            throw new Error('Missing email')
+            console.error('CRITICAL: No email found in request body or database')
+            throw new Error('Missing email. Please ensure your profile has an email address.')
         }
 
         if (!finalUserId) {
@@ -92,8 +115,7 @@ Deno.serve(async (req) => {
         }
 
         const isLive = dodoApiKey.startsWith('live_')
-        const baseUrl =
-            'https://test.dodopayments.com'
+        const baseUrl = isLive ? 'https://api.dodopayments.com' : 'https://test.dodopayments.com'
 
         console.log(`Dodo Environment Check: isLive=${isLive}, baseUrl=${baseUrl}`)
         console.log(`Initiating ${isLive ? 'LIVE' : 'TEST'} checkout for ${finalEmail} (Plan: ${planType}, Product: ${productId})`)
@@ -102,6 +124,7 @@ Deno.serve(async (req) => {
             product_cart: [{ product_id: productId, quantity: 1 }],
             metadata: {
                 supabase_user_id: finalUserId,
+                userId: finalUserId, // Providing both for compatibility
                 plan_type: planType
             },
             customer: { email: finalEmail },

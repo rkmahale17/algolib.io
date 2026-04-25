@@ -7,7 +7,12 @@ const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || Deno.env
 const webhookSecret = Deno.env.get('DODO_PAYMENTS_WEBHOOK_SECRET')
 const testWebhookSecret = (Deno.env.get('TEST_DODO_PAYMENTS_WEBHOOK_SECRET') || Deno.env.get('DODO_WEBHOOK_SECRET'))?.trim()
 
-const supabase = createClient(supabaseUrl!, supabaseServiceKey!)
+const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+if (!serviceRoleKey) {
+    console.warn('CRITICAL: SUPABASE_SERVICE_ROLE_KEY is missing. Profile updates will likely fail.')
+}
+
+const supabase = createClient(supabaseUrl!, serviceRoleKey || supabaseServiceKey!)
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -104,33 +109,52 @@ Deno.serve(async (req) => {
 
     const customerEmail = data.customer?.email
     const subscriptionId = data.subscription_id || data.id
+    const metadataUserId = data.metadata?.supabase_user_id || data.metadata?.userId
 
-    if (!customerEmail) {
-        console.error('No customer email found in event data', {
-            event_type,
-            has_customer: !!data.customer,
-            customer_keys: data.customer ? Object.keys(data.customer) : []
-        })
-        return new Response('Missing customer email', { status: 400 })
+    console.log('User identification attempt:', {
+        metadataUserId,
+        customerEmail,
+        has_metadata: !!data.metadata
+    })
+
+    let userId = metadataUserId
+
+    // Fallback to email lookup if metadata userId is missing
+    if (!userId) {
+        if (!customerEmail) {
+            console.error('No customer email and no metadata userId found in event data', {
+                event_type,
+                has_customer: !!data.customer,
+                has_metadata: !!data.metadata
+            })
+            return new Response('Missing user identification', { status: 400 })
+        }
+
+        console.log(`userId missing in metadata for ${customerEmail}, attempting profile lookup...`)
+        const { data: userData, error: userError } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('email', customerEmail)
+            .maybeSingle()
+
+        if (userError) {
+            console.error(`Database error searching for user ${customerEmail}:`, userError)
+            return new Response('Database error looking up user', { status: 500 })
+        }
+
+        if (!userData) {
+            console.error(`User not found for email: ${customerEmail}`)
+            return new Response('User not found', { status: 404 })
+        }
+        userId = userData.id
+        console.log(`Resolved userId from email fallback: ${userId}`)
+    } else {
+        console.log(`Using userId from metadata: ${userId}`)
     }
 
-    // Find user by email
-    const { data: userData, error: userError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', customerEmail)
-        .single()
-
-    if (userError || !userData) {
-        console.error(`User not found for email: ${customerEmail}`, userError)
-        return new Response('User not found', { status: 404 })
-    }
-
-    const userId = userData.id
-
-    const rawPeriodEnd = data.current_period_end || data.subscription?.current_period_end
+    const rawPeriodEnd = data.current_period_end || data.subscription?.current_period_end || data.data?.current_period_end
     const rawPlanType = data.metadata?.plan_type || '3monthly'
-    const tier = 'pro' // As per requirement, all current purchases are for 'pro'
+    const tier = 'pro'
 
     // Normalize plan types to match database schema if needed
     const normalizedPlanType = rawPlanType === 'yearly' ? 'yearly' :
@@ -159,88 +183,132 @@ Deno.serve(async (req) => {
     const currentPeriodEnd = parseDodoDate(rawPeriodEnd) || calculatePeriodEnd(new Date(), normalizedPlanType)
 
     try {
+        console.log(`Processing event ${event_type} for user ${userId}...`)
+
         switch (event_type) {
             case 'subscription.active':
             case 'subscription.created':
             case 'subscription.renewed':
-                const subscriptionUpdate = {
-                    subscription_status: 'active',
-                    subscription_tier: tier,
-                    subscription_duration: normalizedPlanType,
-                    subscription_plan_id: data.product_id,
-                    current_period_end: currentPeriodEnd,
-                    cancel_at_period_end: false,
-                }
-                console.log(`Updating profile for ${event_type}:`, subscriptionUpdate)
-                const { error: subError } = await supabase
-                    .from('profiles')
-                    .update(subscriptionUpdate)
-                    .eq('id', userId)
+            case 'subscription.updated':
+                try {
+                    const subscriptionUpdate = {
+                        subscription_status: data.status || 'active',
+                        subscription_tier: tier,
+                        subscription_duration: normalizedPlanType,
+                        subscription_plan_id: data.product_id || data.product_cart?.[0]?.product_id,
+                        current_period_end: currentPeriodEnd,
+                        cancel_at_period_end: data.cancel_at_next_billing_date || false,
+                    }
+                    console.log(`Updating profile for ${event_type}:`, subscriptionUpdate)
+                    const { error: subError } = await supabase
+                        .from('profiles')
+                        .update(subscriptionUpdate)
+                        .eq('id', userId)
 
-                if (subError) {
-                    console.error(`Supabase update error for ${event_type}:`, subError)
-                } else {
-                    console.log(`Successfully updated profile for ${event_type}`)
+                    if (subError) {
+                        console.error(`Supabase update error for ${event_type}:`, subError)
+                        throw subError
+                    } else {
+                        console.log(`Successfully updated profile for ${event_type}`)
+                    }
+                } catch (e: any) {
+                    console.error(`Error in ${event_type} handler:`, e.message)
+                    throw e
                 }
                 break
 
             case 'subscription.cancelled':
-                console.log(`Setting cancel_at_period_end for user ${userId}`)
-                const { error: cancelUpdateError } = await supabase
-                    .from('profiles')
-                    .update({
-                        cancel_at_period_end: true,
-                    })
-                    .eq('id', userId)
+                try {
+                    console.log(`Setting cancel_at_period_end for user ${userId}`)
+                    const { error: cancelUpdateError } = await supabase
+                        .from('profiles')
+                        .update({
+                            cancel_at_period_end: true,
+                        })
+                        .eq('id', userId)
 
-                if (cancelUpdateError) {
-                    console.error(`Supabase update error for ${event_type}:`, cancelUpdateError)
-                } else {
-                    console.log(`Successfully set cancel_at_period_end for ${event_type}`)
+                    if (cancelUpdateError) {
+                        console.error(`Supabase update error for ${event_type}:`, cancelUpdateError)
+                        throw cancelUpdateError
+                    } else {
+                        console.log(`Successfully set cancel_at_period_end for ${event_type}`)
+                    }
+                } catch (e: any) {
+                    console.error(`Error in ${event_type} handler:`, e.message)
+                    throw e
                 }
                 break
 
             case 'subscription.expired':
-                console.log(`Expiring subscription for user ${userId}`)
-                const { error: expireError } = await supabase
-                    .from('profiles')
-                    .update({
-                        subscription_status: 'expired',
-                        subscription_tier: 'free',
-                        cancel_at_period_end: false,
-                    })
-                    .eq('id', userId)
+            case 'subscription.failed':
+                try {
+                    console.log(`Subscription ${event_type} for user ${userId}`)
+                    const { error: expireError } = await supabase
+                        .from('profiles')
+                        .update({
+                            subscription_status: event_type === 'subscription.failed' ? 'past_due' : 'expired',
+                            subscription_tier: 'free',
+                            cancel_at_period_end: false,
+                        })
+                        .eq('id', userId)
 
-                if (expireError) {
-                    console.error(`Supabase update error for ${event_type}:`, expireError)
-                } else {
-                    console.log(`Successfully expired subscription for ${event_type}`)
+                    if (expireError) {
+                        console.error(`Supabase update error for ${event_type}:`, expireError)
+                        throw expireError
+                    } else {
+                        console.log(`Successfully handled ${event_type}`)
+                    }
+                } catch (e: any) {
+                    console.error(`Error in ${event_type} handler:`, e.message)
+                    throw e
                 }
                 break
 
             case 'payment.succeeded':
-                // For direct payments or subscription payments
-                const paymentSubscriptionId = data.subscription_id || data.id
-                console.log(`Processing payment.succeeded for user ${userId}, subId: ${paymentSubscriptionId}`)
+                try {
+                    // For direct payments or subscription payments
+                    const paymentSubscriptionId = data.subscription_id || data.subscription?.subscription_id || data.id
+                    console.log(`Processing payment.succeeded for user ${userId}, subId: ${paymentSubscriptionId}`)
 
-                const { error: paymentError } = await supabase
-                    .from('profiles')
-                    .update({
+                    const paymentUpdate: any = {
                         subscription_status: 'active',
                         subscription_tier: tier,
                         subscription_duration: normalizedPlanType,
-                        // Update period end if provided in the payment event
+                        subscription_plan_id: data.product_id || data.product_cart?.[0]?.product_id,
                         current_period_end: currentPeriodEnd,
-                        ...(paymentSubscriptionId && { subscription_id: paymentSubscriptionId }),
                         cancel_at_period_end: false
-                    })
-                    .eq('id', userId)
+                    }
 
-                if (paymentError) {
-                    console.error('Supabase update error for payment.succeeded:', paymentError)
-                } else {
-                    console.log('Successfully updated profile for payment.succeeded')
+                    // Only add subscription_id if we found one and it looks like a subscription ID (starts with sub_)
+                    if (paymentSubscriptionId && String(paymentSubscriptionId).startsWith('sub_')) {
+                        paymentUpdate.subscription_id = paymentSubscriptionId
+                    }
+
+                    console.log('Final payment update payload:', JSON.stringify(paymentUpdate))
+
+                    const { error: paymentError } = await supabase
+                        .from('profiles')
+                        .update(paymentUpdate)
+                        .eq('id', userId)
+
+                    if (paymentError) {
+                        console.error('Supabase update error for payment.succeeded:', paymentError)
+                        throw paymentError
+                    } else {
+                        console.log('Successfully updated profile for payment.succeeded')
+                    }
+                } catch (e: any) {
+                    console.error(`Error in ${event_type} handler:`, e.message)
+                    throw e
                 }
+                break
+
+            case 'payment.failed':
+                console.warn(`Payment failed for user ${userId}`)
+                break
+
+            case 'payment.processing':
+                console.log(`Payment is processing for user ${userId}. This is just an info event.`)
                 break
 
             default:
@@ -249,16 +317,35 @@ Deno.serve(async (req) => {
 
         // Send welcome email on new subscription or renewal payment
         if (event_type === 'subscription.created' || event_type === 'subscription.renewed' || event_type === 'payment.succeeded') {
-            await sendWelcomeEmail(customerEmail)
+            try {
+                console.log(`Attempting to send welcome email to ${customerEmail}...`)
+                await sendWelcomeEmail(customerEmail)
+            } catch (emailErr: any) {
+                console.warn('Failed to send welcome email, but payment was successful:', emailErr.message)
+                // Don't fail the whole webhook just because an email failed
+            }
         }
 
-        return new Response(JSON.stringify({ success: true }), {
+        return new Response(JSON.stringify({ success: true, event: event_type }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 200,
         })
-    } catch (err) {
-        console.error('Error updating profile:', err)
-        return new Response('Error updating profile', { status: 500 })
+    } catch (err: any) {
+        console.error('CRITICAL Webhook Process Error:', {
+            message: err.message,
+            stack: err.stack,
+            event_type,
+            userId,
+            data_keys: Object.keys(data)
+        })
+        return new Response(JSON.stringify({
+            error: true,
+            message: err.message,
+            event: event_type
+        }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 500
+        })
     }
 })
 

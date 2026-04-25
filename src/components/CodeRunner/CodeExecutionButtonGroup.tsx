@@ -1,6 +1,7 @@
 import React from "react";
 import { Play, Loader2, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import {
     Tooltip,
     TooltipContent,
@@ -8,7 +9,6 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { FeatureGuard } from "@/components/FeatureGuard";
-import { useApp } from "@/contexts/AppContext";
 
 interface CodeExecutionButtonGroupProps {
     onRun: () => void;
@@ -30,15 +30,12 @@ export const CodeExecutionButtonGroup: React.FC<CodeExecutionButtonGroupProps> =
     isSubmitting,
     lastRunSuccess,
     algorithm,
-    hasPremiumAccess,
+    hasPremiumAccess = false,
     hideUserMenu = false,
     className = "",
     showTooltips = true,
 }) => {
-    const { hasPremiumAccess: contextPremiumAccess } = useApp();
-    const effectivePremiumAccess = hasPremiumAccess ?? contextPremiumAccess;
-
-    const isUnlockRequired = (algorithm?.is_premium || algorithm?.metadata?.is_pro) && !effectivePremiumAccess && !hideUserMenu;
+    const isUnlockRequired = (algorithm?.is_premium || algorithm?.metadata?.is_pro) && !hasPremiumAccess && !hideUserMenu;
 
     const runButton = (
         <Button
@@ -59,8 +56,16 @@ export const CodeExecutionButtonGroup: React.FC<CodeExecutionButtonGroupProps> =
 
     const submitButton = (
         <Button
-            onClick={onSubmit}
-            disabled={isLoading || isSubmitting || !lastRunSuccess || isUnlockRequired}
+            onClick={() => {
+                if (!lastRunSuccess && !isLoading && !isSubmitting) {
+                    toast.warning("Please run your code successfully before submitting", {
+                        description: "You need to pass all sample test cases first."
+                    });
+                    return;
+                }
+                onSubmit();
+            }}
+            disabled={isLoading || isSubmitting || isUnlockRequired}
             size="sm"
             variant="default"
             className={`h-8 px-4 text-xs rounded-l-none border ${lastRunSuccess && !isUnlockRequired

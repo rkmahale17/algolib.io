@@ -68,7 +68,7 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({ initialAlgori
   const { data: algorithm } = useAlgorithm(algorithmIdOrSlug);
   const activeAlgorithm = algorithm || initialAlgorithm;
 
-  const { user, hasPremiumAccess, activeListType, setActiveListType, progressMap } = useApp();
+  const { user, profile, hasPremiumAccess, activeListType, setActiveListType, progressMap } = useApp();
   const { data: algorithmsData } = useAlgorithms();
   const allAlgorithms = algorithmsData?.algorithms || [];
   const isPaywallEnabled = useFeatureFlag('paywall_enabled');
@@ -214,7 +214,9 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({ initialAlgori
       codeRunnerRef={runnerRef}
       onRunnerStateChange={handleRunnerStateChange}
       isLoading={loadingUserData}
+      hasPremiumAccess={hasPremiumAccess}
     />
+
   ), [
     activeAlgorithm,
     algorithmIdOrSlug,
@@ -247,6 +249,8 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({ initialAlgori
       <div className={`h-screen w-full overflow-hidden flex flex-col bg-background ${session.isInterviewMode ? 'border-4 border-green-500/30' : ''}`}>
         <AlgorithmHeader
           user={user}
+          profile={profile}
+          hasPremiumAccess={hasPremiumAccess}
           algorithm={activeAlgorithm}
           isMobile={layout.isMobile}
           windowWidth={layout.windowWidth}
@@ -383,6 +387,7 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({ initialAlgori
                           isVisualizationMaximized={layout.isVisualizationMaximized}
                           setIsVisualizationMaximized={layout.setIsVisualizationMaximized}
                           handleRichTextClick={handleRichTextClick}
+                          hasPremiumAccess={hasPremiumAccess}
                         />
                       </div>
                     </div>

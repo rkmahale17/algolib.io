@@ -1,9 +1,11 @@
-import React, { Suspense, forwardRef } from 'react';
+import React, { forwardRef } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { CodeEditorRef } from './CodeEditor';
+import dynamic from 'next/dynamic';
 
-const CodeEditor = React.lazy(() =>
-  import('./CodeEditor').then((mod) => ({ default: mod.CodeEditor }))
+const CodeEditor = dynamic(
+  () => import('./CodeEditor').then((mod) => mod.CodeEditor),
+  { ssr: false, loading: () => <CodeEditorSkeleton /> }
 );
 
 export const CodeEditorSkeleton = () => (
@@ -31,14 +33,11 @@ interface LazyCodeEditorProps {
   theme?: string;
   path?: string;
   isMobile?: boolean;
+  onShortcut?: (key: string) => void;
 }
 
 export const LazyCodeEditor = forwardRef<CodeEditorRef, LazyCodeEditorProps>(
-  (props, ref) => (
-    <Suspense fallback={<CodeEditorSkeleton />}>
-      <CodeEditor ref={ref} {...props} />
-    </Suspense>
-  )
+  (props, ref) => <CodeEditor ref={ref as any} {...props} />
 );
 
 LazyCodeEditor.displayName = 'LazyCodeEditor';

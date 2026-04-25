@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
-import { useRouter, useParams } from "next/navigation";
+import dynamic from "next/dynamic";
 import {
   Book,
   Eye,
@@ -44,16 +44,15 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { AuthGuard } from "@/components/AuthGuard";
 import { TabWarning } from "@/components/TabWarning";
 import { FeatureGuard } from "@/components/FeatureGuard";
-import { useApp } from "@/contexts/AppContext";
 import { ProOverlay } from "@/components/ProOverlay";
 import { VideoTutorialCard } from "./VideoTutorialCard";
 
-// Lazy components
-const TreeDiagram = React.lazy(() => import("../visualizations/TreeDiagram").then(mod => ({ default: mod.TreeDiagram })));
-const GraphDiagram = React.lazy(() => import("../visualizations/GraphDiagram").then(mod => ({ default: mod.GraphDiagram })));
-const SolutionViewer = React.lazy(() => import("@/components/SolutionViewer").then(mod => ({ default: mod.SolutionViewer })));
-const RichText = React.lazy(() => import("@/components/RichText").then(mod => ({ default: mod.RichText })));
-const ContentRights = React.lazy(() => import("@/pages/ContentRights"));
+// Lazy components via next/dynamic to avoid SSR issues
+const TreeDiagram = dynamic(() => import("../visualizations/TreeDiagram").then(mod => mod.TreeDiagram), { ssr: false });
+const GraphDiagram = dynamic(() => import("../visualizations/GraphDiagram").then(mod => mod.GraphDiagram), { ssr: false });
+const SolutionViewer = dynamic(() => import("@/components/SolutionViewer").then(mod => mod.SolutionViewer), { ssr: false });
+const RichText = dynamic(() => import("@/components/RichText").then(mod => mod.RichText), { ssr: false });
+const ContentRights = dynamic(() => import("@/pages/ContentRights"), { ssr: false });
 
 import { renderBlind75Visualization } from "@/utils/blind75Visualizations";
 import { renderVisualization as renderVizFromMapping, hasVisualization } from "@/utils/visualizationMapping";
@@ -84,6 +83,7 @@ interface ProblemDescriptionPanelProps {
   setIsVisualizationMaximized: (val: boolean) => void;
   handleRichTextClick: (e: React.MouseEvent<HTMLDivElement>) => void;
   isPlatformPreview?: boolean;
+  hasPremiumAccess?: boolean;
 }
 
 export const ProblemDescriptionPanel = React.memo(({
@@ -103,16 +103,13 @@ export const ProblemDescriptionPanel = React.memo(({
   setIsVisualizationMaximized,
   handleRichTextClick,
   isPlatformPreview = false,
+  hasPremiumAccess = false,
 }: ProblemDescriptionPanelProps) => {
-  const { hasPremiumAccess } = useApp();
   const containerRef = useRef<HTMLDivElement>(null);
   const topicsRef = useRef<HTMLDivElement>(null);
   const companiesRef = useRef<HTMLDivElement>(null);
   const hintsRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
-  const params = useParams();
-  const id = params?.id as string;
-  const slug = params?.slug as string;
+
   const [isCompact, setIsCompact] = useState(false);
   const [isUltraCompact, setIsUltraCompact] = useState(false);
 
@@ -655,15 +652,19 @@ export const ProblemDescriptionPanel = React.memo(({
                           <Separator className="mb-4 bg-border/40" />
                           <div className="flex flex-wrap gap-2">
                             {(algorithm.category.includes(',') ? algorithm.category.split(',').map((c: string) => c.trim()) : [algorithm.category]).map((tag: string, i: number) => (
-                              <Badge
+                              <Link
                                 key={i}
-                                variant="secondary"
-                                className="bg-muted hover:bg-muted/80 text-foreground border-border font-normal cursor-pointer flex items-center gap-1.5"
-                                onClick={() => router.push(`/dsa/query?topic=${tag}`)}
+                                href={`/dsa/query?topic=${tag}`}
+                                passHref
                               >
-                                <Tag className="w-3 h-3 text-primary/70" />
-                                {tag}
-                              </Badge>
+                                <Badge
+                                  variant="secondary"
+                                  className="bg-muted hover:bg-muted/80 text-foreground border-border font-normal cursor-pointer flex items-center gap-1.5"
+                                >
+                                  <Tag className="w-3 h-3 text-primary/70" />
+                                  {tag}
+                                </Badge>
+                              </Link>
                             ))}
                           </div>
                         </AccordionContent>
@@ -688,15 +689,19 @@ export const ProblemDescriptionPanel = React.memo(({
                           {hasPremiumAccess || isPlatformPreview ? (
                             <div className="flex flex-wrap gap-2">
                               {algorithm.metadata.companies.map((company: string, index: number) => (
-                                <Badge
+                                <Link
                                   key={index}
-                                  variant="secondary"
-                                  className="bg-muted hover:bg-muted/80 text-foreground border-border text-xs px-2 py-1 flex items-center gap-1.5 font-normal cursor-pointer"
-                                  onClick={() => router.push(`/dsa/query?company=${company}`)}
+                                  href={`/dsa/query?company=${company}`}
+                                  passHref
                                 >
-                                  <CompanyIcon company={company} className="w-3.5 h-3.5 opacity-80" />
-                                  {company}
-                                </Badge>
+                                  <Badge
+                                    variant="secondary"
+                                    className="bg-muted hover:bg-muted/80 text-foreground border-border text-xs px-2 py-1 flex items-center gap-1.5 font-normal cursor-pointer"
+                                  >
+                                    <CompanyIcon company={company} className="w-3.5 h-3.5 opacity-80" />
+                                    {company}
+                                  </Badge>
+                                </Link>
                               ))}
                             </div>
                           ) : (

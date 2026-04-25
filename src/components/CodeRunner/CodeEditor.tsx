@@ -25,6 +25,7 @@ interface CodeEditorProps {
   theme?: string; // Explicit theme override
   path?: string; // Unique path for the model to prevent duplicates
   isMobile?: boolean; // Mobile flag for responsive sizing
+  onShortcut?: (key: string) => void;
 }
 
 export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(({
@@ -35,7 +36,8 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(({
   options: customOptions,
   theme: customTheme,
   path,
-  isMobile
+  isMobile,
+  onShortcut
 }, ref) => {
   const { theme: systemTheme } = useTheme();
   const isolatedEditorRef = useRef<any>(null);
@@ -101,6 +103,7 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(({
           acceptSuggestionOnEnter: customOptions?.autocomplete !== false ? 'on' : 'off',
         }}
         className={isMobile ? "min-h-[300px]" : ""}
+        onShortcut={onShortcut}
       />
     </div>
   );

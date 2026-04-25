@@ -16,6 +16,7 @@ interface RunnerFooterProps {
     lastRunSuccess: boolean;
     algorithm?: any;
     hideUserMenu?: boolean;
+    hasPremiumAccess?: boolean;
 }
 
 export const RunnerFooter: React.FC<RunnerFooterProps> = ({
@@ -28,6 +29,7 @@ export const RunnerFooter: React.FC<RunnerFooterProps> = ({
     lastRunSuccess,
     algorithm,
     hideUserMenu,
+    hasPremiumAccess,
 }) => {
     return (
         <div className="flex items-center px-4 bg-background border-t border-border shrink-0 z-20 h-10 relative">
@@ -56,10 +58,11 @@ export const RunnerFooter: React.FC<RunnerFooterProps> = ({
                     lastRunSuccess={lastRunSuccess}
                     algorithm={algorithm}
                     hideUserMenu={hideUserMenu}
+                    hasPremiumAccess={hasPremiumAccess}
                     showTooltips={true}
                 />
             </div>
-            
+
             {/* Right: Empty spacer for true centering */}
             <div className="flex-1"></div>
         </div>
