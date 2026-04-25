@@ -284,18 +284,18 @@ Deno.serve(async (req) => {
                         paymentUpdate.subscription_id = paymentSubscriptionId
                     }
 
-                    console.log('Final payment update payload:', JSON.stringify(paymentUpdate))
-
-                    const { error: paymentError } = await supabase
+                    console.log('Attempting to update profile with final payload:', JSON.stringify(paymentUpdate))
+                    const { data: updateResult, error: paymentError } = await supabase
                         .from('profiles')
                         .update(paymentUpdate)
                         .eq('id', userId)
+                        .select()
 
                     if (paymentError) {
                         console.error('Supabase update error for payment.succeeded:', paymentError)
                         throw paymentError
                     } else {
-                        console.log('Successfully updated profile for payment.succeeded')
+                        console.log('Successfully updated profile for payment.succeeded:', updateResult)
                     }
                 } catch (e: any) {
                     console.error(`Error in ${event_type} handler:`, e.message)

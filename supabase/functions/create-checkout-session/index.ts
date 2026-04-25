@@ -124,13 +124,28 @@ Deno.serve(async (req) => {
             product_cart: [{ product_id: productId, quantity: 1 }],
             metadata: {
                 supabase_user_id: finalUserId,
-                userId: finalUserId, // Providing both for compatibility
+                userId: finalUserId,
                 plan_type: planType
             },
-            customer: { email: finalEmail },
-            billing_address: { country: 'IN' },
-            payment_link: true,
+            customer: {
+                email: finalEmail,
+                name: body.customerName || undefined
+            },
             return_url: body.returnUrl || `${req.headers.get('origin') ?? 'http://localhost:3000'}/dashboard?success=true`,
+            cancel_url: body.cancelUrl || `${req.headers.get('origin') ?? 'http://localhost:3000'}/pricing`,
+            allowed_payment_method_types: ['credit', 'debit', 'upi_intent', 'upi_collect'],
+            customization: {
+                theme: 'dark',
+                show_order_details: true,
+                show_on_demand_tag: true
+            },
+            feature_flags: {
+                allow_discount_code: true,
+                allow_tax_id: true,
+                allow_customer_editing_email: false,
+                allow_customer_editing_name: true,
+                redirect_immediately: false
+            }
         }
 
         console.log('Sending request to Dodo Payments...')

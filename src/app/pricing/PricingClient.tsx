@@ -84,6 +84,7 @@ const PricingClient = () => {
           planType: planType,
           userId: user?.id,
           email: user?.email,
+          customerName: profile?.full_name,
           returnUrl: typeof window !== 'undefined' ? `${window.location.origin}${window.location.pathname}` : '',
           isLocal: typeof window !== 'undefined' && window.location.hostname === 'localhost',
         }

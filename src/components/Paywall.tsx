@@ -11,7 +11,7 @@ interface PaywallProps {
 }
 
 export const Paywall: React.FC<PaywallProps> = ({ onUpgrade }) => {
-  const { user } = useApp();
+  const { user, profile } = useApp();
   const posthog = usePostHog();
   const [isUpgrading, setIsUpgrading] = React.useState(false);
 
@@ -29,6 +29,7 @@ export const Paywall: React.FC<PaywallProps> = ({ onUpgrade }) => {
         body: {
           email: user?.email,
           userId: user?.id,
+          customerName: profile?.full_name,
           returnUrl: window.location.href,
         }
       });
