@@ -275,68 +275,74 @@ const PublicProfileClient = ({ username }: PublicProfileClientProps) => {
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* ROW 1: ULTRA-COMPACT HORIZONTAL PROFILE & INTEGRATED STATS */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-          {/* Left: Horizontal Profile Info */}
-          <ProfileHeader profile={profile} onEdit={() => setIsEditOpen(true)} isOwnProfile={isOwnProfile} />
+        <div className="flex flex-col lg:flex-row gap-6 items-stretch">
+          {/* Left: Horizontal Profile Info - Auto width, shrink-0 to prevent compression */}
+          <div className="shrink-0">
+            <ProfileHeader profile={profile} onEdit={() => setIsEditOpen(true)} isOwnProfile={isOwnProfile} />
+          </div>
 
-          {/* Right: Horizontal Integrated Stats Card */}
-          <Card className="border border-border/40 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+          {/* Right: Horizontal Integrated Stats Card - Grows to fill remaining space */}
+          <Card className="flex-1 border border-border/40 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden bg-gradient-to-br from-card to-muted/20">
             <div className="px-5 py-3 border-b border-border/40 bg-muted/5 flex justify-between items-center">
               <h3 className="font-bold text-xs text-foreground flex items-center gap-2">
-                <div className="w-1 h-3 bg-primary rounded-full" />
-                Progress
+                <Trophy className="w-3.5 h-3.5 text-primary" />
+                Performance Overview
               </h3>
               <div className="flex items-center gap-1.5 text-[9px] font-bold text-primary bg-primary/5 px-2 py-0.5 rounded-full border border-primary/10">
-                <Trophy className="w-2.5 h-2.5" />
-                {Math.round((stats.totalSolved / Math.max(1, stats.totalQuestions)) * 100)}% Complete
+                {Math.round((stats.totalSolved / Math.max(1, stats.totalQuestions)) * 100)}% Mastered
               </div>
             </div>
 
-            <div className="p-5 space-y-5">
-              {/* Metrics Row - Compact Horizontal Cards */}
-              <div className="grid grid-cols-3 gap-3">
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border/60 shadow-sm group hover:border-orange-500/30 transition-all">
-                  <div className="w-8 h-8 rounded-full bg-orange-500/10 flex items-center justify-center shrink-0 group-hover:bg-orange-500/20">
-                    <Flame className="w-4 h-4 text-orange-500" />
+            <div className="p-5 space-y-6">
+              {/* Metrics Row - Expanded Data Cards */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="flex flex-col gap-1 p-3 rounded-xl bg-card border border-border/60 shadow-sm group hover:border-orange-500/30 transition-all">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Flame className="w-3.5 h-3.5 text-orange-500" />
+                    <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest leading-none">Current</span>
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest leading-none mb-1">Streak</p>
-                    <p className="text-xl font-black text-orange-500 leading-none">{stats.currentStreak}<span className="text-[9px] text-muted-foreground/60 ml-0.5">d</span></p>
-                  </div>
+                  <p className="text-xl font-black text-orange-500 leading-none">{stats.currentStreak}<span className="text-[9px] text-muted-foreground/60 ml-0.5 font-bold">days</span></p>
                 </div>
 
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border/60 shadow-sm group hover:border-blue-500/30 transition-all">
-                  <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center shrink-0 group-hover:bg-blue-500/20">
-                    <CalendarDays className="w-4 h-4 text-blue-500" />
+                <div className="flex flex-col gap-1 p-3 rounded-xl bg-card border border-border/60 shadow-sm group hover:border-blue-500/30 transition-all">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Trophy className="w-3.5 h-3.5 text-blue-500" />
+                    <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest leading-none">Longest</span>
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest leading-none mb-1">Active</p>
-                    <p className="text-xl font-black text-blue-500 leading-none">{stats.totalActiveDays}<span className="text-[9px] text-muted-foreground/60 ml-0.5">d</span></p>
-                  </div>
+                  <p className="text-xl font-black text-blue-500 leading-none">{stats.longestStreak}<span className="text-[9px] text-muted-foreground/60 ml-0.5 font-bold">days</span></p>
                 </div>
 
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border/60 shadow-sm group hover:border-primary/30 transition-all">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20">
-                    <CheckCircle2 className="w-4 h-4 text-primary" />
+                <div className="flex flex-col gap-1 p-3 rounded-xl bg-card border border-border/60 shadow-sm group hover:border-indigo-500/30 transition-all">
+                  <div className="flex items-center gap-2 mb-1">
+                    <CalendarDays className="w-3.5 h-3.5 text-indigo-500" />
+                    <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest leading-none">Active</span>
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest leading-none mb-1">Solved</p>
-                    <p className="text-xl font-black text-primary leading-none">{stats.totalSolved}</p>
+                  <p className="text-xl font-black text-indigo-500 leading-none">{stats.totalActiveDays}<span className="text-[9px] text-muted-foreground/60 ml-0.5 font-bold">total</span></p>
+                </div>
+
+                <div className="flex flex-col gap-1 p-3 rounded-xl bg-card border border-border/60 shadow-sm group hover:border-primary/30 transition-all">
+                  <div className="flex items-center gap-2 mb-1">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
+                    <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest leading-none">Solved</span>
                   </div>
+                  <p className="text-xl font-black text-primary leading-none">{stats.totalSolved}</p>
                 </div>
               </div>
 
-              {/* Progress Chart Section - High Density */}
-              <div className="space-y-2">
+              {/* Progress Chart Section - High Density & Constrained Width */}
+              <div className="space-y-3">
                 <div className="flex justify-between items-center text-[9px] font-bold text-muted-foreground uppercase tracking-widest">
-                  <span>Progress Chart</span>
-                  <div className="flex gap-3 text-foreground font-bold">
-                    <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-green-500" /> {stats.easySolved}</span>
-                    <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-yellow-500" /> {stats.mediumSolved}</span>
-                    <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-red-500" /> {stats.hardSolved}</span>
+                  <span className="flex items-center gap-2">
+                    <div className="w-1 h-3 bg-primary/40 rounded-full" />
+                    Accuracy Breakdown
+                  </span>
+                  <div className="flex gap-4 text-foreground font-bold">
+                    <span className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]" /> {stats.easySolved}</span>
+                    <span className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(245,158,11,0.4)]" /> {stats.mediumSolved}</span>
+                    <span className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.4)]" /> {stats.hardSolved}</span>
                   </div>
                 </div>
-                <div className="p-1.5 rounded-lg border border-muted/30 bg-muted/5">
+                <div className="max-w-[400px] p-1.5 rounded-2xl border border-border/40 bg-card/50 backdrop-blur-sm shadow-inner overflow-hidden">
                   <ProgressStats
                     totalSolved={stats.totalSolved} totalQuestions={stats.totalQuestions}
                     easySolved={stats.easySolved} easyTotal={stats.easyTotal}

@@ -212,6 +212,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const currentUser = session?.user ?? null;
       dispatch(setUser(currentUser));
 
+      // Clear all React Query caches on any auth change (Sign in, Sign out, etc)
+      // to ensure no data from previous user remains in memory
+      queryClient.clear();
+
       if (currentUser) {
         if (event === 'SIGNED_IN' || event === 'USER_UPDATED' || event === 'TOKEN_REFRESHED') {
           fetchProfile(currentUser.id);

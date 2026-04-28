@@ -28,7 +28,7 @@ const SocialLink = ({ href, icon: Icon, label }: { href: string; icon: any; labe
 
 export const ProfileHeader = ({ profile, onEdit, isOwnProfile }: ProfileHeaderProps) => {
   return (
-    <Card className="w-full h-full border border-border/40 shadow-sm bg-card overflow-hidden sticky top-24 flex flex-col justify-center">
+    <Card className="w-full lg:w-auto h-full border border-border/40 shadow-sm bg-card overflow-hidden sticky top-24 flex flex-col justify-center">
       <CardContent className="p-6">
         <div className="flex flex-col gap-6">
           {/* Main Identity Row: Avatar + Name/Badge/Username (Centrally Aligned) */}
@@ -58,8 +58,8 @@ export const ProfileHeader = ({ profile, onEdit, isOwnProfile }: ProfileHeaderPr
 
             {/* Info Section - Vertically Centered with Avatar */}
             <div className="flex-1 min-w-0 space-y-1">
-              <div className="flex items-center gap-3">
-                <h1 className="text-xl font-black text-foreground leading-tight truncate">
+              <div className="flex-row items-center gap-3">
+                <h1 className="text-xl text-foreground leading-tight truncate">
                   {profile.full_name || "User"}
                 </h1>
 

@@ -46,12 +46,19 @@ Deno.serve(async (req) => {
     const rawBody = await req.text()
     const signature = req.headers.get('x-signature') || ''
 
-    // 1. Verify signature
+    // 1. Signature Verification
     if (webhookSecret) {
         if (!signature || !(await verifySignature(webhookSecret, rawBody, signature))) {
             return new Response('Invalid signature', { status: 401 })
         }
     }
+
+    // 2. Generate unique event_id (SHA-256 of raw body)
+    const encoder = new TextEncoder()
+    const dataHash = await crypto.subtle.digest('SHA-256', encoder.encode(rawBody))
+    const eventId = Array.from(new Uint8Array(dataHash))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('')
 
     let event: any
     try {
@@ -64,65 +71,139 @@ Deno.serve(async (req) => {
     const customData = event.meta?.custom_data || {}
     const attributes = event.data?.attributes || {}
     const resourceId = String(event.data?.id || '')
-    // Composite ID to prevent blocking different events for the same resource
-    const eventId = `${resourceId}_${eventName}`
+    const resourceType = String(event.data?.type || 'unknown')
+    const resourceUpdatedAt = attributes.updated_at || new Date().toISOString()
+    const idempotencyKey = `${eventName}:${resourceId}`
 
     console.log(`Received LS event: ${eventName}`, {
-        custom_data: customData,
         subscription_id: resourceId,
-        status: attributes.status,
+        event_id: eventId,
+        updated_at: resourceUpdatedAt
     })
 
-    if (!eventName || !eventId) {
+    if (!eventName || !resourceId) {
         return new Response('Invalid event structure', { status: 400 })
     }
 
+    let webhookEventDbId: string | undefined
     try {
-        // 2. Idempotency Check
-        const { data: existingEvent } = await supabase
+        // 3. Atomic Dedup (Step 2 in flow)
+        const { data: inserted, error: insertError } = await supabase
             .from('webhook_events')
+            .insert({
+                event_id: eventId,
+                event_name: eventName,
+                resource_id: resourceId,
+                resource_type: resourceType,
+                payload: event,
+                resource_updated_at: resourceUpdatedAt,
+                idempotency_key: idempotencyKey,
+                status: 'received'
+            })
             .select('id')
-            .eq('id', eventId)
             .maybeSingle()
 
-        if (existingEvent) {
-            console.log(`Event ${eventId} already processed. Skipping.`)
+        if (insertError) {
+            // Check if it was a conflict or a real error
+            if (insertError.code === '23505') {
+                console.log(`Event ${eventId} already in DB. Skipping (duplicate).`)
+                return new Response('OK (duplicate)', { status: 200 })
+            }
+            throw insertError
+        }
+
+        if (!inserted) {
+            console.log(`Event ${eventId} was not inserted (likely already exists). Skipping.`)
             return new Response('OK (duplicate)', { status: 200 })
         }
 
-        // 3. Resolve User
-        let userId = customData.supabase_user_id
-        const customerEmail = attributes.user_email
+        webhookEventDbId = inserted.id
 
-        if (!userId) {
-            // Fallback 1: Email
-            if (customerEmail) {
-                console.log(`userId missing in custom_data for ${customerEmail}, attempting profile lookup by email...`)
-                const { data: userData } = await supabase.from('profiles').select('id').eq('email', customerEmail).maybeSingle()
-                if (userData) {
-                    userId = userData.id
-                    console.log(`Resolved userId from email: ${userId}`)
+        // 4. Update status to processing
+        await supabase.from('webhook_events').update({ status: 'processing' }).eq('id', webhookEventDbId)
+
+        // 5. Stale Check (Step 4 in flow)
+        const { data: latestProcessed } = await supabase
+            .from('webhook_events')
+            .select('resource_updated_at')
+            .eq('idempotency_key', idempotencyKey)
+            .eq('status', 'processed')
+            .order('resource_updated_at', { ascending: false })
+            .limit(1)
+            .maybeSingle()
+
+        if (latestProcessed && new Date(latestProcessed.resource_updated_at) >= new Date(resourceUpdatedAt)) {
+            console.log(`Event ${eventId} is stale. Skipping.`)
+            await supabase.from('webhook_events').update({
+                status: 'skipped',
+                skip_reason: 'stale'
+            }).eq('id', webhookEventDbId)
+            return new Response('OK (stale)', { status: 200 })
+        }
+
+        // 6. Resolve User
+        let userId = customData.supabase_user_id
+        console.log(`[DEBUG] Event: ${eventName}, Attributes Keys: ${Object.keys(attributes).join(', ')}`)
+
+        let customerEmail = attributes.user_email || attributes.email || attributes.customer_email
+        console.log(`[DEBUG] Resolved initial customerEmail from LS payload: ${customerEmail}`)
+
+        if (userId) {
+            console.log(`[DEBUG] userId ${userId} present in customData, fetching profile...`)
+            const { data: userData } = await supabase.from('profiles').select('email, subscription_status').eq('id', userId).maybeSingle()
+            if (userData) {
+                if (userData.email) {
+                    console.log(`[DEBUG] Found account email in DB: ${userData.email}. Using this for the welcome email.`)
+                    customerEmail = userData.email
+                }
+
+                // 7. Terminal State Check (Step 5 in flow)
+                const isTerminalIncoming = ['subscription_cancelled', 'subscription_expired'].includes(eventName)
+                const isTerminalExisting = ['canceled', 'expired'].includes(userData.subscription_status)
+
+                if (isTerminalIncoming && isTerminalExisting) {
+                    console.log(`User ${userId} is already in terminal state. Skipping ${eventName}.`)
+                    await supabase.from('webhook_events').update({
+                        status: 'skipped',
+                        skip_reason: 'terminal'
+                    }).eq('id', webhookEventDbId)
+                    return new Response('OK (terminal)', { status: 200 })
                 }
             }
-            // Fallback 2: Subscription ID
-            if (!userId && resourceId) {
-                console.log(`Still no userId, attempting lookup by LS subscription_id: ${resourceId}`)
-                const { data: subData } = await supabase.from('profiles').select('id').eq('subscription_id', resourceId).maybeSingle()
-                if (subData) {
-                    userId = subData.id
-                    console.log(`Resolved userId from subscription_id: ${userId}`)
+        } else if (customerEmail) {
+            // Fallback: Resolution by email
+            console.log(`[DEBUG] userId missing, attempting profile lookup by email ${customerEmail}...`)
+            const { data: userData } = await supabase.from('profiles').select('id, subscription_status').eq('email', customerEmail).maybeSingle()
+            if (userData) {
+                userId = userData.id
+                console.log(`[DEBUG] Resolved userId from email: ${userId}`)
+
+                // Terminal State Check
+                const isTerminalIncoming = ['subscription_cancelled', 'subscription_expired'].includes(eventName)
+                const isTerminalExisting = ['canceled', 'expired'].includes(userData.subscription_status)
+
+                if (isTerminalIncoming && isTerminalExisting) {
+                    console.log(`User ${userId} is already in terminal state. Skipping ${eventName}.`)
+                    await supabase.from('webhook_events').update({
+                        status: 'skipped',
+                        skip_reason: 'terminal'
+                    }).eq('id', webhookEventDbId)
+                    return new Response('OK (terminal)', { status: 200 })
                 }
             }
         }
 
         if (!userId) {
             console.error(`User resolution failed for event ${eventName} (Sub ID: ${resourceId})`)
+            await supabase.from('webhook_events').update({
+                status: 'failed',
+                last_error: 'User not found'
+            }).eq('id', webhookEventDbId)
             return new Response('User not found', { status: 404 })
         }
 
+        // 8. Process Logic
         console.log(`Processing LS event "${eventName}" for user ${userId}...`)
-
-        // 4. Map LS fields
         const rawPlanType: string = customData.plan_type || 'yearly'
         const lsStatus: string = attributes.status || ''
         const renewsAt: string | null = attributes.renews_at || null
@@ -130,26 +211,21 @@ Deno.serve(async (req) => {
         const trialEndsAt: string | null = attributes.trial_ends_at || null
         const isCancelled: boolean = attributes.cancelled === true
         const customerPortalUrl: string | null = attributes.urls?.update_payment_method || attributes.urls?.customer_portal || null
-
         const actualSubscriptionId = eventName === 'subscription_payment_success'
             ? (attributes.subscription_id ? String(attributes.subscription_id) : resourceId)
             : resourceId
-
         const currentPeriodEnd = (lsStatus === 'on_trial' && trialEndsAt) ? trialEndsAt : (renewsAt || endsAt || null)
 
-        // 5. Update Profile
         switch (eventName) {
             case 'subscription_created':
             case 'subscription_updated':
             case 'subscription_resumed':
+            case 'subscription_payment_recovered':
             case 'subscription_payment_success': {
                 let targetStatus = lsStatus === 'on_trial' ? 'trialing' : (lsStatus === 'paid' ? 'active' : (lsStatus || 'active'));
-
-                // Priority: Future trial date
                 if (trialEndsAt && new Date(trialEndsAt) > new Date()) {
                     targetStatus = 'trialing';
                 }
-
                 const update: any = {
                     subscription_status: targetStatus,
                     subscription_tier: 'pro',
@@ -157,7 +233,6 @@ Deno.serve(async (req) => {
                     subscription_plan_id: attributes.variant_id ? String(attributes.variant_id) : undefined,
                     cancel_at_period_end: isCancelled,
                 }
-
                 if (customerPortalUrl) update.customer_portal_url = customerPortalUrl
                 if (trialEndsAt) update.trial_end_date = trialEndsAt
                 if (currentPeriodEnd) update.current_period_end = currentPeriodEnd
@@ -167,7 +242,6 @@ Deno.serve(async (req) => {
                 if (error) throw error
                 break
             }
-
             case 'subscription_cancelled': {
                 const { error } = await supabase.from('profiles').update({
                     subscription_status: 'canceled',
@@ -177,7 +251,6 @@ Deno.serve(async (req) => {
                 if (error) throw error
                 break
             }
-
             case 'subscription_expired': {
                 await supabase.from('profiles').update({
                     subscription_status: 'expired',
@@ -186,7 +259,6 @@ Deno.serve(async (req) => {
                 }).eq('id', userId)
                 break
             }
-
             case 'subscription_payment_failed':
             case 'subscription_unpaid': {
                 await supabase.from('profiles').update({
@@ -195,10 +267,18 @@ Deno.serve(async (req) => {
                 }).eq('id', userId)
                 break
             }
+            default:
+                // Handle ignored events
+                await supabase.from('webhook_events').update({
+                    status: 'skipped',
+                    skip_reason: 'ignored'
+                }).eq('id', webhookEventDbId)
+                return new Response('OK (ignored)', { status: 200 })
         }
 
-        // 6. Emails
-        if (eventName === 'subscription_created' || eventName === 'subscription_payment_success') {
+        // 9. Send Emails
+        // Only send welcome email on initial creation to prevent duplicates
+        if (eventName === 'subscription_created') {
             try {
                 await sendWelcomeEmail(customerEmail || '')
             } catch (e: any) {
@@ -206,16 +286,11 @@ Deno.serve(async (req) => {
             }
         }
 
-        // 7. Mark as processed
-        try {
-            await supabase.from('webhook_events').insert({
-                id: eventId,
-                event_name: eventName,
-                payload: event.data
-            })
-        } catch (e: any) {
-            console.warn('Idempotency error:', e.message)
-        }
+        // 10. Mark as processed
+        await supabase.from('webhook_events').update({
+            status: 'processed',
+            processed_at: new Date().toISOString()
+        }).eq('id', webhookEventDbId)
 
         return new Response(JSON.stringify({ success: true }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -224,6 +299,16 @@ Deno.serve(async (req) => {
 
     } catch (err: any) {
         console.error('Webhook Runtime Error:', err.message)
+        if (typeof webhookEventDbId !== 'undefined') {
+            try {
+                await supabase.from('webhook_events').update({
+                    status: 'failed',
+                    last_error: err.message
+                }).eq('id', webhookEventDbId)
+            } catch (dbErr: any) {
+                console.error('Failed to record error in DB:', dbErr.message)
+            }
+        }
         return new Response(JSON.stringify({ error: err.message }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 500
@@ -239,15 +324,72 @@ async function sendWelcomeEmail(email: string) {
         body: JSON.stringify({
             from: 'RulCode <support@rulcode.com>',
             to: email,
-            subject: 'Welcome to RulCode Pro!',
-            html: `
-                <h1>Welcome to RulCode Pro! 🚀</h1>
-                <p>Thank you for subscribing. You now have full access to all algorithms and premium content.</p>
-                <p>Start mastering algorithms today: <a href="https://rulcode.com">https://rulcode.com</a></p>
-                <br/>
-                <p>Happy Coding,</p>
-                <p>The RulCode Team</p>
-            `,
+            subject: 'Welcome to RulCode Pro! 🚀',
+            html: `<!DOCTYPE html>
+<html>
+<body style="margin:0; padding:0; background-color:#f9fafb;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9fafb; padding:20px 0;">
+    <tr>
+      <td align="center">
+        
+        <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff; border-radius:10px; padding:30px; font-family:Arial, sans-serif;">
+          
+          <!-- Logo -->
+          <tr>
+            <td align="center" style="padding-bottom:20px;">
+              <img src="https://rulcode.com/logo.png" width="120" alt="RulCode" />
+            </td>
+          </tr>
+
+          <!-- Heading -->
+          <tr>
+            <td align="center">
+              <h1 style="margin:0; font-size:22px; color:#111827;">
+                Welcome to RulCode Pro 🚀
+              </h1>
+            </td>
+          </tr>
+
+          <!-- Text -->
+          <tr>
+            <td style="padding:20px 0; color:#4b5563; font-size:15px;">
+              Your subscription is confirmed. You've unlocked the full power of RulCode.
+            </td>
+          </tr>
+
+          <!-- Features -->
+          <tr>
+            <td style="font-size:14px; color:#374151;">
+              ✅ Full premium visualizations<br/>
+              ⚡ Advanced practice problems<br/>
+              📊 Progress tracking
+            </td>
+          </tr>
+
+          <!-- CTA -->
+          <tr>
+            <td align="center" style="padding:30px 0;">
+              <a href="https://rulcode.com"
+                 style="background:#2563eb; color:#ffffff; padding:12px 24px; text-decoration:none; border-radius:6px; font-weight:bold;">
+                 Start Practicing
+              </a>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="font-size:12px; color:#9ca3af; border-top:1px solid #eee; padding-top:20px;">
+              Happy Coding,<br/>RulCode Team
+            </td>
+          </tr>
+
+        </table>
+
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`,
         }),
     })
 

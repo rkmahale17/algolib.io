@@ -134,8 +134,8 @@ Deno.serve(async (req) => {
             },
         }
 
-        console.log(`Creating LS checkout for ${finalEmail} (Plan: ${planType}, Variant: ${variantId})`)
-        console.log('LS Payload:', JSON.stringify(lsPayload, null, 2))
+        console.log(`[DIAGNOSTIC] Final Email being sent to LS: ${finalEmail} (Resolved from: ${email ? 'body' : 'profile'})`)
+        console.log(`[DIAGNOSTIC] Final UserId being sent to LS: ${finalUserId}`)
 
         const response = await fetch('https://api.lemonsqueezy.com/v1/checkouts', {
             method: 'POST',
