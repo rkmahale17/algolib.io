@@ -281,51 +281,6 @@ export type Database = {
         }
         Relationships: []
       }
-      game_sessions: {
-        Row: {
-          completed_at: string
-          created_at: string
-          duration_seconds: number | null
-          errors: number
-          game_type: Database["public"]["Enums"]["game_type"]
-          grade: string | null
-          hints_used: number
-          id: string
-          level: number
-          moves: number
-          score: number
-          user_id: string
-        }
-        Insert: {
-          completed_at?: string
-          created_at?: string
-          duration_seconds?: number | null
-          errors?: number
-          game_type: Database["public"]["Enums"]["game_type"]
-          grade?: string | null
-          hints_used?: number
-          id?: string
-          level: number
-          moves?: number
-          score: number
-          user_id: string
-        }
-        Update: {
-          completed_at?: string
-          created_at?: string
-          duration_seconds?: number | null
-          errors?: number
-          game_type?: Database["public"]["Enums"]["game_type"]
-          grade?: string | null
-          hints_used?: number
-          id?: string
-          level?: number
-          moves?: number
-          score?: number
-          user_id?: string
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -559,13 +514,7 @@ export type Database = {
       is_algorithms_admin: { Args: never; Returns: boolean }
     }
     Enums: {
-      game_type:
-        | "sort_hero"
-        | "graph_explorer"
-        | "stack_master"
-        | "dp_puzzle"
-        | "sliding_window"
-        | "two_pointer"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -693,14 +642,6 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      game_type: [
-        "sort_hero",
-        "graph_explorer",
-        "stack_master",
-        "dp_puzzle",
-        "sliding_window",
-        "two_pointer",
-      ],
     },
   },
 } as const

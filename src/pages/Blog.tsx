@@ -104,21 +104,6 @@ const Blog = () => {
             ))}
           </div>
 
-          {/* Bottom CTA Card */}
-          <Card className="bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border-primary/20">
-            <CardContent className="p-8 text-center">
-              <h2 className="text-2xl font- mb-3">
-                Play Algo Games for learning algo in fun way!
-              </h2>
-              <p className="text-muted-foreground mb-6">
-                Interactive visualizations, games, and comprehensive algorithm
-                guides
-              </p>
-              <Button asChild size="lg" className="rounded-full">
-                <NextLink href="/games">Explore Games</NextLink>
-              </Button>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </>

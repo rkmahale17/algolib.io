@@ -20,21 +20,11 @@ const staticRoutes = [
   '/terms',
   '/content-rights',
   '/feedback',
-  '/games',
-  '/games/leaderboard',
   '/blind75',
   '/blog',
 ];
 
-// Game routes
-const gameRoutes = [
-  '/games/sort-hero',
-  '/games/graph-explorer',
-  '/games/stack-master',
-  '/games/dp-puzzle',
-  '/games/sliding-window',
-  '/games/two-pointer',
-];
+
 
 const blogRoutes = blogPosts.map((post) => `/blog/${post.slug}`);
 
@@ -72,7 +62,7 @@ async function generateSitemap() {
   // All algorithms now use unified /problem/ route
   const problemRoutes = algorithms.map((algo) => `/problem/${algo.id}`);
 
-  const allRoutes = [...staticRoutes, ...problemRoutes, ...blogRoutes, ...gameRoutes];
+  const allRoutes = [...staticRoutes, ...problemRoutes, ...blogRoutes];
 
   // Generate sitemap XML
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -83,14 +73,12 @@ ${allRoutes.map(route => `  <url>
     <changefreq>${route === '/' ? 'daily' :
       route.startsWith('/problem/') ? 'weekly' :
         route.startsWith('/blog/') ? 'weekly' :
-          route.startsWith('/games/') ? 'weekly' :
-            'monthly'
+          'monthly'
     }</changefreq>
     <priority>${route === '/' ? '1.0' :
       route.startsWith('/problem/') ? '0.8' :
         route.startsWith('/blog/') ? '0.7' :
-          route.startsWith('/games/') ? '0.6' :
-            '0.5'
+          '0.5'
     }</priority>
   </url>`).join('\n')}
 </urlset>`;

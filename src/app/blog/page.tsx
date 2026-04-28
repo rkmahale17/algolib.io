@@ -98,21 +98,6 @@ export default function BlogPage() {
           ))}
         </div>
 
-        {/* Bottom CTA Card */}
-        <Card className="bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border-primary/20">
-          <CardContent className="p-8 text-center">
-            <h2 className="text-2xl font-bold mb-3">
-              Play Algo Games for learning algo in fun way!
-            </h2>
-            <p className="text-muted-foreground mb-6">
-              Interactive visualizations, games, and comprehensive algorithm
-              guides
-            </p>
-            <Button asChild size="lg" className="rounded-full">
-              <Link href="/games">Explore Games</Link>
-            </Button>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

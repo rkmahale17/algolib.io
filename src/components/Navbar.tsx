@@ -16,7 +16,6 @@ import {
   User,
   ChevronDown,
   ChevronRight,
-  Trophy,
   Languages,
   PenTool,
   CreditCard,

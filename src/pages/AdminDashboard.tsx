@@ -53,15 +53,6 @@ export default function AdminDashboard() {
       gradient: "from-emerald-500/20 to-teal-500/20"
     },
     {
-      title: "Email Management",
-      description: "Send broadcast emails to users or test email functionality.",
-      icon: Mail,
-      path: "/admin/mail",
-      color: "text-orange-500",
-      bgColor: "bg-orange-500/10",
-      gradient: "from-orange-500/20 to-red-500/20"
-    },
-    {
       title: "Tagging & Pro Management",
       description: "Batch assign Pro status and Tech company identifiers natively to multiple algorithms.",
       icon: Database,
