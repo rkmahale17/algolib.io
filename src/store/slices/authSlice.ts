@@ -19,18 +19,40 @@ const initialState: AuthState = {
 const calculatePremiumAccess = (profile: Profile | null): boolean => {
   if (!profile) return false;
 
-  if (profile.subscription_status === 'active') {
-    if (profile.current_period_end && new Date(profile.current_period_end) < new Date()) {
-      return false;
+  const status = profile.subscription_status;
+  const premiumStatuses = ['active', 'on_trial', 'trialing', 'paid', 'past_due', 'canceled', 'cancelled'];
+
+  if (!premiumStatuses.includes(status as string)) {
+    return false;
+  }
+
+  // Date-based access validation
+  const now = new Date();
+
+  // 1. If strictly in trial status, check trial_end_date
+  if (status === 'trialing' || status === 'on_trial') {
+    if (profile.trial_end_date && new Date(profile.trial_end_date) < now) {
+      return false; // Trial expired
     }
     return true;
   }
 
-  if ((profile.subscription_status === 'canceled' || profile.cancel_at_period_end) && profile.current_period_end) {
-    return new Date(profile.current_period_end) > new Date();
+  // 2. For paid/active/canceled, check current_period_end
+  // We allow a small 24h buffer for webhook processing delays
+  if (profile.current_period_end) {
+    const expiry = new Date(profile.current_period_end);
+    const buffer = 24 * 60 * 60 * 1000; // 24 hours buffer
+
+    if (expiry.getTime() + buffer < now.getTime()) {
+      // One last check: if they have a future trial date (e.g. from a separate trial period), they still have access
+      if (profile.trial_end_date && new Date(profile.trial_end_date) > now) {
+        return true;
+      }
+      return false;
+    }
   }
 
-  return false;
+  return true;
 };
 
 const authSlice = createSlice({

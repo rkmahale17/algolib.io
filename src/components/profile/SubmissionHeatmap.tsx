@@ -87,7 +87,7 @@ export const SubmissionHeatmap = ({ submissions }: SubmissionHeatmapProps) => {
 
 
     const getColor = (count: number) => {
-        if (count === 0) return "bg-muted/30";
+        if (count === 0) return "bg-zinc-200 dark:bg-zinc-800";
         if (count === 1) return "bg-green-500/30";
         if (count <= 3) return "bg-green-500/50";
         if (count <= 5) return "bg-green-500/70";
@@ -184,9 +184,9 @@ export const SubmissionHeatmap = ({ submissions }: SubmissionHeatmapProps) => {
                         })()}
                     </div>
                     {/* Legend */}
-                    <div className="flex items-center gap-2 mt-4 text-xs text-muted-foreground justify-end">
+                    <div className="flex items-center gap-2 mt-4 text-[10px] text-muted-foreground justify-end uppercase tracking-tighter">
                         <span>Less</span>
-                        <div className="w-[10px] h-[10px] rounded-[2px] bg-muted/30" />
+                        <div className="w-[10px] h-[10px] rounded-[2px] bg-zinc-200 dark:bg-zinc-800" />
                         <div className="w-[10px] h-[10px] rounded-[2px] bg-green-500/30" />
                         <div className="w-[10px] h-[10px] rounded-[2px] bg-green-500/50" />
                         <div className="w-[10px] h-[10px] rounded-[2px] bg-green-500/70" />

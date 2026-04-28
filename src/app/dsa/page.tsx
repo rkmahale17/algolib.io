@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation';
 
-export default function DSARedirect() {
-    console.log('DSA Redirect page hit');
+export default function DSAPage() {
     redirect('/dsa/problems');
 }

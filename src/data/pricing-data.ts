@@ -25,51 +25,54 @@ export const pricingData = {
     subscriptionPlans: [
         {
             id: "3month",
-            title: "3 Month plan",
-            originalPrice: "$7.50/month",
-            discountText: "(10% off)",
-            price: "$20",
+            title: "3 Month Subscription",
+            price: "$9.99",
             period: "/3 months",
             periodSubLabel: "Billed every 3 months",
             buttonText: "Buy now",
             productId: "3monthly",
+            hasTrial: true,
+            originalPrice: undefined,
+            discountText: undefined,
             features: [
-                "Unlock all premium interviews content",
+                "Unlock all premium interview content",
                 "Access to updates while subscription is active",
-                "Join our exclusive private Discord channel with real-time support and a helpful community"
+                "Join our exclusive private Discord channel"
             ]
         },
         {
             id: "6month",
-            title: "6 Month plan",
-            originalPrice: "$6.50/month",
-            discountText: "(10% off)",
-            price: "$35",
+            title: "6 Month Subscription",
+            price: "$19.99",
             period: "/6 months",
             periodSubLabel: "Billed every 6 months",
             buttonText: "Buy now",
             productId: "6monthly",
+            hasTrial: true,
+            originalPrice: undefined,
+            discountText: undefined,
             features: [
-                "Unlock all premium interviews content",
+                "Unlock all premium interview content",
                 "Access to updates while subscription is active",
-                "Join our exclusive private Discord channel with real-time support and a helpful community"
+                "Join our exclusive private Discord channel"
             ]
         },
         {
             id: "annual",
-            title: "Annual plan",
+            title: "Annual Subscription",
             badge: "RECOMMENDED",
-            originalPrice: "$5/month",
-            discountText: "(10% off)",
-            price: "$55",
+            price: "$29.99",
             period: "/year",
-            periodSubLabel: "Billed yearly ($55)",
+            periodSubLabel: "Billed yearly ($29.99)",
             buttonText: "Buy now",
             productId: "yearly",
+            hasTrial: true,
+            originalPrice: undefined,
+            discountText: undefined,
             features: [
-                "Unlock all premium interviews content",
+                "Unlock all premium interview content",
                 "Access to updates while subscription is active",
-                "Join our exclusive private Discord channel with real-time support and a helpful community"
+                "Join our exclusive private Discord channel"
             ],
         }
     ],

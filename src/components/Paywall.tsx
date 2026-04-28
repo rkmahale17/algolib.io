@@ -25,12 +25,13 @@ export const Paywall: React.FC<PaywallProps> = ({ onUpgrade }) => {
       setIsUpgrading(true);
       console.log('Starting upgrade for user:', user?.id, user?.email);
 
-      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+      const { data, error } = await supabase.functions.invoke('lemon-create-checkout', {
         body: {
           email: user?.email,
           userId: user?.id,
           customerName: profile?.full_name,
           returnUrl: window.location.href,
+          isLocal: window.location.hostname === 'localhost',
         }
       });
 
@@ -109,15 +110,15 @@ export const Paywall: React.FC<PaywallProps> = ({ onUpgrade }) => {
             {typeof window !== 'undefined' && window.location.hostname === 'localhost' && (
               <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-[11px] text-amber-600 text-left space-y-1">
                 <p className="font-bold flex items-center gap-1">
-                  <Info className="w-3 h-3" /> Test Mode Info:
+                  <Info className="w-3 h-3" /> Test Mode (Lemon Squeezy):
                 </p>
                 <p>Card: <code className="bg-amber-500/10 px-1 rounded font-mono">4242 4242 4242 4242</code></p>
-                <p>UPI: <code className="bg-amber-500/10 px-1 rounded font-mono">success@upi</code></p>
+                <p>Expiry / CVC: <code className="bg-amber-500/10 px-1 rounded font-mono">12/30 / 123</code></p>
               </div>
             )}
 
             <p className="text-[10px] text-muted-foreground">
-              Secure payment powered by Dodo Payments. Cancel anytime.
+              Secure payment powered by Lemon Squeezy. Cancel anytime.
             </p>
           </div>
 

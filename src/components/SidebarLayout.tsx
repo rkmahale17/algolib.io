@@ -9,6 +9,7 @@ import { Crown, MenuIcon, Rocket, Twitter } from "lucide-react";
 
 import { useApp } from "@/contexts/AppContext";
 import UserMenu from "./UserMenu";
+import { GlobalDunningBanner } from "./GlobalDunningBanner";
 
 interface SidebarLayoutProps {
     children: ReactNode;
@@ -17,9 +18,11 @@ interface SidebarLayoutProps {
 export function SidebarLayout({ children }: SidebarLayoutProps) {
     const pathname = usePathname();
     const isDsaRoute = pathname?.startsWith('/dsa/');
+    const { hasPremiumAccess } = useApp();
 
     return (
         <SidebarInset>
+            <GlobalDunningBanner />
             <header className="flex h-12 shrink-0 items-center justify-between gap-2 border-b border-border/50 bg-background/80 backdrop-blur-md px-4 md:px-6 w-full sticky top-0 z-50 overflow-x-hidden">
                 <div className="flex items-center gap-2">
                     {!isDsaRoute && <SidebarTrigger className="-ml-1" />}
@@ -44,9 +47,11 @@ export function SidebarLayout({ children }: SidebarLayoutProps) {
                             </Link>
                         )}
 
-                        <Link href="/pricing" className="text-[12px] font-normal text-muted-foreground hover:text-foreground transition-colors hidden md:block">
-                            Pricing
-                        </Link>
+                        {!hasPremiumAccess && (
+                            <Link href="/pricing" className="text-[12px] font-normal text-muted-foreground hover:text-foreground transition-colors hidden md:block">
+                                Pricing
+                            </Link>
+                        )}
 
                         <ThemeToggle />
                         <UserMenu />

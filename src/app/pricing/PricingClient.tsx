@@ -38,31 +38,34 @@ const PricingClient = () => {
   React.useEffect(() => {
     if (mounted && typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search);
+      const orderId = urlParams.get('order_id');
       const status = urlParams.get('status');
-      const sessionId = urlParams.get('checkout_session_id');
 
-      if (status || sessionId) {
-        // Clean up URL immediately to prevent re-triggers on refresh
-        const newUrl = window.location.pathname;
-        window.history.replaceState({}, '', newUrl);
+      if (orderId || status) {
+        // Clean up URL immediately
+        window.history.replaceState({}, '', window.location.pathname);
 
-        if (status === 'succeeded') {
-          toast.success("Payment successful! Updating your account...");
-          setTimeout(() => refreshProfile(), 2000);
+        if (orderId || status === 'succeeded') {
+          toast.success('Payment successful! Syncing your account...');
+
+          // Poll for status update (up to 5 times, every 3 seconds)
+          let attempts = 0;
+          const pollInterval = setInterval(async () => {
+            attempts++;
+            await refreshProfile();
+
+            // Stop polling if we reach max attempts or if status changed from trialing
+            // (We keep polling even if it's still trialing in case the user was already trialing)
+            if (attempts >= 5) {
+              clearInterval(pollInterval);
+            }
+          }, 3000);
+
+          return () => clearInterval(pollInterval);
         } else if (status === 'failed') {
-          toast.error("Payment failed. Please try again or contact support.");
+          toast.error('Payment failed. Please try again or contact support.');
         } else if (status === 'cancelled') {
-          toast.info("Payment was cancelled.");
-        } else if (status === 'processing' || sessionId) {
-          toast.loading("Payment is processing on Dodo's side. If you are stuck there, please ensure you selected 'Success' in the sandbox screen.", {
-            duration: 10000,
-            id: 'processing-toast-client'
-          });
-          const timer = setTimeout(() => {
-            refreshProfile();
-            toast.dismiss('processing-toast-client');
-          }, 8000);
-          return () => clearTimeout(timer);
+          toast.info('Payment was cancelled.');
         }
       }
     }
@@ -79,7 +82,7 @@ const PricingClient = () => {
     try {
       setIsUpgrading(true);
       setActivePlanId(planType);
-      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+      const { data, error } = await supabase.functions.invoke('lemon-create-checkout', {
         body: {
           planType: planType,
           userId: user?.id,
@@ -95,7 +98,6 @@ const PricingClient = () => {
       if (data?.checkout_url) {
         // Using direct redirect instead of SDK overlay (iframe) to avoid browser security restrictions
         // like "Permissions policy violation" (accelerometer, bluetooth) which often block the form in iframes.
-        console.log('Using direct redirect for maximum compatibility');
         window.location.href = data.checkout_url;
       } else {
         throw new Error('No checkout URL returned');
@@ -109,14 +111,23 @@ const PricingClient = () => {
     }
   };
 
-  const isPremium = profile?.subscription_status === 'active';
-  const isCancelled = profile?.cancel_at_period_end;
+  const isPremium = useApp().hasPremiumAccess;
+  const isTrial = profile?.subscription_status === 'on_trial' ||
+    profile?.subscription_status === 'trialing' ||
+    (profile?.trial_end_date && new Date(profile.trial_end_date) > new Date());
+
+  const isPastDue = profile?.subscription_status === 'past_due';
+  const isCancelled = profile?.cancel_at_period_end === true || profile?.subscription_status === 'canceled';
+
+  const trialEnd = profile?.trial_end_date ? new Date(profile.trial_end_date) : null;
+  const trialDaysLeft = trialEnd ? Math.ceil((trialEnd.getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : null;
+  const isTrialEndingSoon = isTrial && trialDaysLeft !== null && trialDaysLeft >= 0 && trialDaysLeft <= 2;
 
   const handleCancel = async () => {
     posthog?.capture('subscription_cancelled');
     try {
       setIsUpgrading(true);
-      const { error } = await supabase.functions.invoke('cancel-subscription', {
+      const { error } = await supabase.functions.invoke('lemon-cancel-subscription', {
         body: {
           isLocal: typeof window !== 'undefined' && window.location.hostname === 'localhost'
         }
@@ -143,25 +154,6 @@ const PricingClient = () => {
   return (
     <>
       <div className="w-full max-w-[1600px] mx-auto px-4">
-        {isLocal && (
-          <div className="mb-6 bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 flex flex-col gap-3 text-amber-600">
-            <div className="flex items-center gap-2 text-sm font-medium">
-              <Info className="w-4 h-4" />
-              <span>Test Mode Active: Using Dodo Test environment.</span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs bg-amber-500/5 p-3 rounded border border-amber-500/10">
-              <div>
-                <p className="font-bold mb-1 uppercase tracking-wider opacity-70">Success Card</p>
-                <code className="bg-amber-500/10 px-1.5 py-0.5 rounded text-amber-700">4242 4242 4242 4242</code>
-              </div>
-              <div>
-                <p className="font-bold mb-1 uppercase tracking-wider opacity-70">UPI Success</p>
-                <code className="bg-amber-500/10 px-1.5 py-0.5 rounded text-amber-700">success@upi</code>
-              </div>
-            </div>
-            <p className="text-[10px] opacity-70 italic">Use any future expiry (12/30) and CVC (123).</p>
-          </div>
-        )}
 
         {/* Pro Status Banner */}
         {isPremium && (
@@ -176,16 +168,26 @@ const PricingClient = () => {
                   <span className={cn(
                     "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border",
                     isCancelled
-                      ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
-                      : "bg-green-500/10 text-green-600 border-green-500/20"
+                      ? "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                      : isPastDue
+                        ? "bg-red-500/10 text-red-600 border-red-500/20"
+                        : isTrial
+                          ? "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                          : "bg-green-500/10 text-green-600 border-green-500/20"
                   )}>
-                    {isCancelled ? 'Cancelling' : 'Active'}
+                    {isCancelled ? 'Subscription Cancelled' : isPastDue ? 'Payment Pending' : isTrial ? 'Free Trial' : 'Active'}
                   </span>
                 </div>
                 <p className="text-sm text-muted-foreground flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5" />
                   {isCancelled ? (
-                    <>Your subscription will not renew. Access until <span className="text-foreground font-medium">{formatPeriodEnd(profile?.current_period_end || null)}</span></>
+                    <>Your subscription has been cancelled. You will continue to have access until <span className="text-foreground font-medium">{formatPeriodEnd(profile?.current_period_end || null)}</span></>
+                  ) : isPastDue ? (
+                    <>We couldn't process your payment. We are retrying, but please <a href={profile?.customer_portal_url || "https://app.lemonsqueezy.com/my-orders"} target="_blank" rel="noopener noreferrer" className="text-foreground font-medium underline cursor-pointer">update your payment method</a> to avoid interruption.</>
+                  ) : isTrialEndingSoon ? (
+                    <>Your trial ends in {trialDaysLeft} days. <span className="text-foreground font-medium underline cursor-pointer">Upgrade now</span> to continue uninterrupted access.</>
+                  ) : isTrial ? (
+                    <>Your free trial ends on <span className="text-foreground font-medium">{formatPeriodEnd(profile?.current_period_end || null)}</span>. You will not be billed until then.</>
                   ) : (
                     <>Next billing is at <span className="text-foreground font-medium">{formatPeriodEnd(profile?.current_period_end || null)}</span></>
                   )}
@@ -261,9 +263,20 @@ const PricingClient = () => {
                   </div>
                 </div>
 
-                <div className="text-sm text-muted-foreground mb-8 mt-2 h-5">
+                <div className="text-sm text-muted-foreground mb-4 mt-2 h-5">
                   {plan.periodSubLabel}
                 </div>
+
+                {plan.hasTrial && (
+                  <div className="mb-6 flex flex-col gap-1">
+                    <div className="text-xs font-bold text-green-600 bg-green-500/5 px-2 py-1 rounded border border-green-500/10 w-fit">
+                      Includes 14-day free trial
+                    </div>
+                    <div className="text-[10px] text-muted-foreground italic">
+                      Cancel anytime before 14 days and you will not be charged.
+                    </div>
+                  </div>
+                )}
 
                 <Button
                   variant={isCurrentPlan ? "secondary" : "outline"}
