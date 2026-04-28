@@ -81,6 +81,12 @@ const Navbar = () => {
               Blog
             </Link>
             <Link
+              to="/pricing"
+              className="text-sm font-medium hover:text-primary transition-colors"
+            >
+              Pricing
+            </Link>
+            <Link
               to="/feedback"
               className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1.5"
             >
@@ -118,6 +124,11 @@ const Navbar = () => {
                 <DropdownMenuItem asChild>
                   <Link to="/blog" className="cursor-pointer">
                     Blog
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/pricing" className="cursor-pointer">
+                    Pricing
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>

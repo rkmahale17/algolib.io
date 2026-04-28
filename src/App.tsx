@@ -29,11 +29,15 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 
+import Pricing from "./pages/Pricing";
+import RefundPolicy from "./pages/RefundPolicy";
+
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <Toaster />
       <Toaster />
       <Sonner />
       <BrowserRouter basename="/">
@@ -46,8 +50,10 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/about" element={<About />} />
+          <Route path="/pricing" element={<Pricing />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/content-rights" element={<ContentRights />} />
           <Route path="/games" element={<ProtectedRoute><Games /></ProtectedRoute>} />
           <Route path="/games/sort-hero" element={<ProtectedRoute><SortHero /></ProtectedRoute>} />

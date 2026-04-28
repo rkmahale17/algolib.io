@@ -29,14 +29,19 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link to="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Pricing
+                </Link>
+              </li>
+              <li>
                 <Link to="/feedback" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Feedback
                 </Link>
               </li>
               <li>
-                <a 
-                  href="https://github.com/rkmahale17/algolib.io#-algorithm-index" 
-                  target="_blank" 
+                <a
+                  href="https://github.com/rkmahale17/algolib.io#-algorithm-index"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
@@ -51,9 +56,9 @@ export function Footer() {
             <h3 className="font-semibold text-foreground">Community</h3>
             <ul className="space-y-2">
               <li>
-                <a 
-                  href="https://github.com/rkmahale17/algolib.io" 
-                  target="_blank" 
+                <a
+                  href="https://github.com/rkmahale17/algolib.io"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1"
                 >
@@ -62,9 +67,9 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <a 
-                  href="https://github.com/rkmahale17/algolib.io/issues/new" 
-                  target="_blank" 
+                <a
+                  href="https://github.com/rkmahale17/algolib.io/issues/new"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
@@ -72,9 +77,9 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <a 
-                  href="https://github.com/rkmahale17/algolib.io#-contribute" 
-                  target="_blank" 
+                <a
+                  href="https://github.com/rkmahale17/algolib.io#-contribute"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
@@ -99,13 +104,18 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link to="/refund-policy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Refund Policy
+                </Link>
+              </li>
+              <li>
                 <Link to="/content-rights" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Content Rights
                 </Link>
               </li>
               <li>
-                <a 
-                  href="mailto:support@rulcode.com" 
+                <a
+                  href="mailto:support@rulcode.com"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Support
@@ -123,9 +133,9 @@ export function Footer() {
                 © {new Date().getFullYear()} RulCode.com. Open source and free forever.
               </p>
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-3 text-xs text-muted-foreground">
-                <a 
-                  href="https://neetcode.io" 
-                  target="_blank" 
+                <a
+                  href="https://neetcode.io"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-foreground transition-colors inline-flex items-center gap-1"
                 >
@@ -133,9 +143,9 @@ export function Footer() {
                   <ExternalLink className="w-3 h-3" />
                 </a>
                 <span className="hidden sm:inline">•</span>
-                <a 
-                  href="https://jsonmaster.com" 
-                  target="_blank" 
+                <a
+                  href="https://jsonmaster.com"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-foreground transition-colors inline-flex items-center gap-1"
                 >
@@ -146,9 +156,9 @@ export function Footer() {
             </div>
             <div className="flex items-center gap-3">
               <Button variant="outline" size="sm" asChild>
-                <a 
-                  href="https://github.com/rkmahale17/algolib.io" 
-                  target="_blank" 
+                <a
+                  href="https://github.com/rkmahale17/algolib.io"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2"
                 >
@@ -157,9 +167,9 @@ export function Footer() {
                 </a>
               </Button>
               <Button size="sm" asChild className="bg-[#FFDD00] text-[#000000] hover:bg-[#FFDD00]/90">
-                <a 
-                  href="https://buymeacoffee.com/jsonmaster" 
-                  target="_blank" 
+                <a
+                  href="https://buymeacoffee.com/jsonmaster"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2"
                 >
