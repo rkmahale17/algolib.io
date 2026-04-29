@@ -1,5 +1,5 @@
 "use client";
-import { AlgorithmList } from '@/components/admin/AlgorithmList';
+import { AlgorithmList } from '@/admin/components/AlgorithmList';
 
 export default function AdminAlgorithms() {
   return (

@@ -2,6 +2,12 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  webpack: (config, { isServer, dev }) => {
+    // Note: Admin code exclusion is handled via conditional dynamic imports
+    // in the respective page.tsx files. This ensures that in production
+    // builds where BUILD_ADMIN is not set, the admin code is tree-shaken.
+    return config;
+  },
   turbopack: {
     root: process.cwd(),
   },

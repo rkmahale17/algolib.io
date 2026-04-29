@@ -34,6 +34,40 @@ interface ListingLayoutProps {
     icon?: any;
 }
 
+interface FilterContentProps {
+    selectedTopics: string[];
+    onTopicToggle: (topic: string) => void;
+    topics?: string[];
+    selectedCompanies: string[];
+    onCompanyToggle: (company: string) => void;
+    companies?: string[];
+}
+
+const FilterContent = ({
+    selectedTopics,
+    onTopicToggle,
+    topics,
+    selectedCompanies,
+    onCompanyToggle,
+    companies
+}: FilterContentProps) => (
+    <div className="space-y-8 h-fit pb-12">
+        <div className="space-y-1 xl-listing:block hidden">
+            <h2 className="text-lg font-medium">Filters</h2>
+            <p className="text-md text-muted-foreground">Narrow down by topic or difficulty</p>
+        </div>
+
+        <ProblemSidebarFilters
+            selectedTopics={selectedTopics}
+            onTopicToggle={onTopicToggle}
+            topics={topics}
+            selectedCompanies={selectedCompanies}
+            onCompanyToggle={onCompanyToggle}
+            companies={companies}
+        />
+    </div>
+);
+
 export const ListingLayout = ({
     title,
     description,
@@ -58,23 +92,14 @@ export const ListingLayout = ({
 }: ListingLayoutProps) => {
     const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
 
-    const FilterContent = () => (
-        <div className="space-y-8 h-fit pb-12">
-            <div className="space-y-1 xl-listing:block hidden">
-                <h2 className="text-lg font-medium">Filters</h2>
-                <p className="text-md text-muted-foreground">Narrow down by topic or difficulty</p>
-            </div>
-
-            <ProblemSidebarFilters
-                selectedTopics={selectedTopics}
-                onTopicToggle={onTopicToggle}
-                topics={topics}
-                selectedCompanies={selectedCompanies}
-                onCompanyToggle={onCompanyToggle}
-                companies={companies}
-            />
-        </div>
-    );
+    const filterProps = {
+        selectedTopics,
+        onTopicToggle,
+        topics,
+        selectedCompanies,
+        onCompanyToggle,
+        companies
+    };
 
     return (
         <SidebarLayout>
@@ -120,7 +145,7 @@ export const ListingLayout = ({
 
                                                     <ScrollArea className="flex-1">
                                                         <div className="p-6">
-                                                            <FilterContent />
+                                                            <FilterContent {...filterProps} />
                                                         </div>
                                                     </ScrollArea>
 
@@ -171,7 +196,7 @@ export const ListingLayout = ({
                         <aside className="hidden xl-listing:block xl-listing:w-80 shrink-0">
                             <div className="sticky top-[80px]">
                                 <ScrollArea className="h-[calc(100vh-120px)] pr-4 -mr-4">
-                                    <FilterContent />
+                                    <FilterContent {...filterProps} />
                                 </ScrollArea>
                             </div>
                         </aside>
@@ -181,4 +206,3 @@ export const ListingLayout = ({
         </SidebarLayout>
     );
 };
-

@@ -99,7 +99,7 @@ export const SubmissionHeatmap = ({ submissions }: SubmissionHeatmapProps) => {
             <CardHeader className="pb-2">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-center gap-2">
-                        <CardTitle className="text-sm font- flex items-center gap-2">
+                        <CardTitle className="text-sm font-bold flex items-center gap-2">
                             {totalSubmissionsInPeriod}
                             <span className="text-base font-normal text-muted-foreground mr-1">submissions in</span>
                             {selectedYear === "Current" ? "the past one year" : selectedYear}

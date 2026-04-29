@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import React, { lazy, Suspense } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { FAQ } from "@/components/FAQ";
 import { FeaturedSection } from "@/components/FeaturedSection";
@@ -50,8 +51,7 @@ import {
 } from "@/components/ui/card";
 import { useApp } from "@/contexts/AppContext";
 
-import PlatformPreview from "@/components/Home/PlatformPreview";
-// const PlatformPreview = lazy(() => import("@/components/Home/PlatformPreview"));
+const PlatformPreview = dynamic(() => import("@/components/Home/PlatformPreview"), { ssr: false });
 
 interface HomeClientProps {
   type?: 'platform-preview' | 'interviews' | 'all';

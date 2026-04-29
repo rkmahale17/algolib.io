@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, Terminal, FlaskConical, Clock, Zap, Plus, Check, CheckCircle2, XCircle, AlertTriangle, History, Code, ChevronUp, ChevronDown, Minimize2, Minimize, Maximize } from "lucide-react";
+import { Loader2, Terminal, FlaskConical, Clock, Plus, Check, CheckCircle2, XCircle, AlertTriangle, History, Code, ChevronUp, ChevronDown, Minimize2, Minimize, Maximize } from "lucide-react";
 import { Algorithm } from '@/types/algorithm';
 import { Button } from "@/components/ui/button";
 import { FeatureGuard } from "@/components/FeatureGuard";
@@ -112,7 +112,7 @@ export const OutputPanel = React.memo(({
   isExpanded,
   onMaximize,
   isMaximized,
-  submitting = false
+  submitting = false,
 }: OutputPanelProps) => {
   const [internalActiveTestCaseTab, setInternalActiveTestCaseTab] = useState<string>("");
   const activeTestCaseTab = controlledActiveTestCaseTab ?? internalActiveTestCaseTab;
@@ -188,7 +188,6 @@ export const OutputPanel = React.memo(({
               className="h-10 w-10 text-muted-foreground hover:text-foreground rounded-none"
               title={isMaximized ? "Restore to panel" : "Maximize output"}
             >
-
               {isMaximized ? <Minimize2 className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
             </Button>
           )}

@@ -51,7 +51,7 @@ export const ShareableProfileLink = ({ username, className }: ShareableProfileLi
               onError={() => setImageError(true)}
             />
           ) : (
-            <div className="text-2xl font- text-primary uppercase">
+            <div className="text-2xl font-bold text-primary uppercase">
               {username?.charAt(0) || 'R'}
             </div>
           )}
@@ -66,7 +66,7 @@ export const ShareableProfileLink = ({ username, className }: ShareableProfileLi
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <p className="text-base font- text-foreground truncate font-mono">
+            <p className="text-base font-bold text-foreground truncate">
               @{username}
             </p>
             <Button
@@ -88,7 +88,7 @@ export const ShareableProfileLink = ({ username, className }: ShareableProfileLi
       <div className="mt-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 rounded-lg bg-muted/40 px-3 py-1.5 flex-1 min-w-0">
           <div className="h-1.5 w-1.5 rounded-full bg-primary/40 shrink-0" />
-          <p className="text-[10px] text-muted-foreground truncate font-mono flex-1">
+          <p className="text-[10px] text-muted-foreground truncate flex-1">
             {profileUrl}
           </p>
         </div>

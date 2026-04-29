@@ -11,6 +11,8 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
 import { Loader2, Mail, Lock, User, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import logo from '@/assets/logo.svg';
+
 
 const LoginClient = () => {
   const router = useRouter();
@@ -37,8 +39,11 @@ const LoginClient = () => {
   useEffect(() => {
     if (!supabase) return;
 
+    // Check if we are on the login page specifically to avoid redirection loops
+    const isLoginPage = window.location.pathname === '/login';
+
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
+      if (session && isLoginPage) {
         const next = searchParams.get('next') || '/';
         router.push(next);
       }
@@ -47,15 +52,15 @@ const LoginClient = () => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && session) {
+      if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && session && isLoginPage) {
         const next = searchParams.get('next') || '/';
-        router.refresh();
         router.push(next);
+        router.refresh();
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [router]);
+  }, [router, searchParams]);
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,7 +100,11 @@ const LoginClient = () => {
         if (error) throw error;
         posthog?.identify(email, { email });
         posthog?.capture('user_logged_in', { method: 'email' });
+        
         toast.success('Welcome back!');
+        
+        const next = searchParams.get('next') || '/';
+        router.push(next);
         router.refresh();
       }
     } catch (error: any) {
@@ -176,8 +185,12 @@ const LoginClient = () => {
         <div className="p-8 sm:p-10">
           <div className="text-center mb-8">
             <div className="flex justify-center mb-6">
-              <div className="h-16 w-16 bg-primary/10 rounded-2xl shadow-lg flex items-center justify-center">
-                <span className="text-primary font-bold text-2xl">R</span>
+              <div className="h-16 w-16 bg-primary/10 rounded-2xl shadow-lg flex items-center justify-center overflow-hidden p-3">
+                <img 
+                  src={typeof logo === 'string' ? logo : (logo as any).src} 
+                  alt="RulCode Logo" 
+                  className="w-full h-full object-contain" 
+                />
               </div>
             </div>
             <h1 className="text-2xl font-semibold mb-2">

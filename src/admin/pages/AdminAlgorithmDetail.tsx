@@ -1,7 +1,7 @@
 "use client";
 import { useRouter, useParams } from 'next/navigation';
 import { useAlgorithm } from '@/hooks/useAlgorithm';
-import { AlgorithmFormBuilder } from '@/components/admin/AlgorithmFormBuilder';
+import { AlgorithmFormBuilder } from '@/admin/components/AlgorithmFormBuilder';
 import { Loader2, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 

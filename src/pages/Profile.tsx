@@ -87,7 +87,7 @@ const ProfileEdit = () => {
           {/* Message to set username */}
           {!profile.username && (
             <div className="text-center py-12">
-              <h2 className="text-2xl font- mb-4">Welcome to Your Profile!</h2>
+              <h2 className="text-2xl font-bold mb-4">Welcome to Your Profile!</h2>
               <p className="text-muted-foreground mb-6">
                 Set up your username to make your profile shareable and start tracking your progress.
               </p>

@@ -103,6 +103,9 @@ const ProblemsClient = ({
     return "Overall Progress";
   };
 
+  const initialTopics = useMemo(() => topicFilter ? [topicFilter] : [], [topicFilter]);
+  const initialCompanies = useMemo(() => companyFilter ? [companyFilter] : [], [companyFilter]);
+
   return (
     <ProblemsList
       algorithms={filteredAlgorithms}
@@ -113,8 +116,8 @@ const ProblemsClient = ({
       isLoading={isLoading}
       showRecommendation={listMode === 'all' && !topicFilter && !companyFilter}
       icon={manualIcon || Layers}
-      initialSelectedTopics={topicFilter ? [topicFilter] : []}
-      initialSelectedCompanies={companyFilter ? [companyFilter] : []}
+      initialSelectedTopics={initialTopics}
+      initialSelectedCompanies={initialCompanies}
       headerSlot={!manualListType ? (
         <div className="flex flex-wrap items-center gap-3 mb-8">
           <Button

@@ -32,7 +32,7 @@ const TestCaseEditor = dynamic(() => import("./TestCaseEditor").then(mod => mod.
 const InputSchemaEditor = dynamic(() => import("./InputSchemaEditor").then(mod => mod.InputSchemaEditor), { ssr: false });
 const MetadataEditor = dynamic(() => import("./MetadataEditor").then(mod => mod.MetadataEditor), { ssr: false });
 const ProblemsEditor = dynamic(() => import("./ProblemsEditor").then(mod => mod.ProblemsEditor), { ssr: false });
-const AlgorithmPreview = dynamic(() => import("./AlgorithmPreview").then(mod => mod.AlgorithmPreview), { ssr: false });
+const AlgorithmPreview = dynamic(() => import("@/components/AlgorithmPreview").then(mod => mod.AlgorithmPreview), { ssr: false });
 const TutorialsEditor = dynamic(() => import("./TutorialsEditor").then(mod => mod.TutorialsEditor), { ssr: false });
 const ControlsEditor = dynamic(() => import("./ControlsEditor").then(mod => mod.ControlsEditor).then(mod => ({ default: mod.ControlsEditor })), { ssr: false });
 // Special handling for named export and the constant

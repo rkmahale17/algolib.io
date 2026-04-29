@@ -1,7 +1,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.1'
 import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 
-const resendApiKey = Deno.env.get('RESEND_API_KEY')
+const sendEmailHookSecret = Deno.env.get('SEND_EMAIL_HOOK_SECRET')
 const supabaseUrl = Deno.env.get('SUPABASE_URL') || Deno.env.get('VITE_SUPABASE_URL')
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || Deno.env.get('VITE_SUPABASE_PUBLISHABLE_KEY')
 const webhookSecret = Deno.env.get('DODO_PAYMENTS_WEBHOOK_SECRET')
@@ -318,11 +318,17 @@ Deno.serve(async (req) => {
         // Send welcome email on new subscription or renewal payment
         if (event_type === 'subscription.created' || event_type === 'subscription.renewed' || event_type === 'payment.succeeded') {
             try {
-                console.log(`Attempting to send welcome email to ${customerEmail}...`)
-                await sendWelcomeEmail(customerEmail)
+                console.log(`Attempting to trigger welcome email for ${customerEmail}...`)
+                await triggerSubscriptionEmail(customerEmail, 'active')
             } catch (emailErr: any) {
-                console.warn('Failed to send welcome email, but payment was successful:', emailErr.message)
-                // Don't fail the whole webhook just because an email failed
+                console.warn('Failed to trigger welcome email, but payment was successful:', emailErr.message)
+            }
+        } else if (event_type === 'subscription.cancelled') {
+            try {
+                console.log(`Attempting to trigger cancellation email for ${customerEmail}...`)
+                await triggerSubscriptionEmail(customerEmail, 'cancelled', currentPeriodEnd)
+            } catch (emailErr: any) {
+                console.warn('Failed to trigger cancellation email:', emailErr.message)
             }
         }
 
@@ -349,41 +355,38 @@ Deno.serve(async (req) => {
     }
 })
 
-async function sendWelcomeEmail(email: string) {
-    if (!resendApiKey) {
-        console.log('RESEND_API_KEY not set, skipping email')
+async function triggerSubscriptionEmail(email: string, action_type: 'active' | 'cancelled', period_end?: string) {
+    if (!email || !supabaseServiceKey) {
+        console.warn('Missing email or supabaseServiceKey, skipping email trigger')
         return
     }
 
+    const payload = JSON.stringify({
+        user: { email },
+        action_type: 'subscription',
+        subscription_data: {
+            action_type,
+            period_end
+        }
+    })
+
     try {
-        const res = await fetch('https://api.resend.com/emails', {
+        const res = await fetch(`${supabaseUrl}/functions/v1/send-email`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${resendApiKey}`,
+                'Authorization': `Bearer ${supabaseServiceKey}`,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                from: 'RulCode <support@rulcode.com>',
-                to: email,
-                subject: 'Welcome to RulCode Pro!',
-                html: `
-                    <h1>Welcome to RulCode Pro! 🚀</h1>
-                    <p>Thank you for subscribing. You now have full access to all algorithms and premium content.</p>
-                    <p>Start mastering algorithms today: <a href="https://rulcode.com">https://rulcode.com</a></p>
-                    <br/>
-                    <p>Happy Coding,</p>
-                    <p>The RulCode Team</p>
-                `,
-            }),
+            body: payload,
         })
 
         if (!res.ok) {
-            const error = await res.text()
-            console.error('Error sending email:', error)
+            const errorText = await res.text()
+            console.error('Error triggering send-email function:', errorText)
         } else {
-            console.log(`Welcome email sent to ${email}`)
+            console.log(`Successfully triggered ${action_type} email for ${email}`)
         }
-    } catch (e) {
-        console.error('Failed to send welcome email:', e)
+    } catch (err: any) {
+        console.error('Failed to call send-email function:', err.message)
     }
 }

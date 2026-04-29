@@ -215,6 +215,9 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({ initialAlgori
       onRunnerStateChange={handleRunnerStateChange}
       isLoading={loadingUserData}
       hasPremiumAccess={hasPremiumAccess}
+      handleRandomProblem={interactions.handleRandomProblem}
+      handleNextProblem={interactions.handleNextProblem}
+      handlePreviousProblem={interactions.handlePreviousProblem}
     />
 
   ), [
@@ -229,7 +232,10 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({ initialAlgori
     layout.isCodeRunnerMaximized,
     layout.setIsCodeRunnerMaximized,
     submissions,
-    loadingUserData
+    loadingUserData,
+    interactions.handleRandomProblem,
+    interactions.handleNextProblem,
+    interactions.handlePreviousProblem
   ]);
 
   // -- Render Guards --
@@ -344,6 +350,9 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({ initialAlgori
                       submissions={submissions}
                       className="h-[85vh]"
                       isInterviewMode={session.isInterviewMode}
+                      handleRandomProblem={interactions.handleRandomProblem}
+                      handleNextProblem={interactions.handleNextProblem}
+                      handlePreviousProblem={interactions.handlePreviousProblem}
                     />
                   </div>
                 </div>

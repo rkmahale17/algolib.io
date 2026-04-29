@@ -1,12 +1,21 @@
-
 import { Metadata } from 'next';
-import AdminProblemClient from '../AdminProblemClient';
+import dynamic from 'next/dynamic';
+import { notFound } from 'next/navigation';
+
+const isAdminEnabled = process.env.NODE_ENV === 'development' || process.env.BUILD_ADMIN === 'true';
+
+const AdminProblemClient = isAdminEnabled 
+  ? dynamic(() => import('@/admin/app-logic/AdminProblemClient'))
+  : () => { notFound(); return null; };
 
 export const metadata: Metadata = {
   title: 'New Algorithm | Admin',
-  description: 'Add a new algorithm to the library.',
+  description: 'Create a new algorithm for the catalog.',
 };
 
-export default function NewAlgorithmPage() {
+export default function AdminNewProblemPage() {
+  if (!isAdminEnabled) {
+    notFound();
+  }
   return <AdminProblemClient />;
 }

@@ -1,12 +1,17 @@
-import React from 'https://esm.sh/react@18.3.1'
+import React from 'react'
+import { createClient } from '@supabase/supabase-js'
 import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 import { Resend } from 'https://esm.sh/resend@4.0.0'
-import { renderAsync } from 'https://esm.sh/@react-email/components@0.0.22'
-import { ConfirmationEmail } from './_templates/confirmation.tsx'
-import { SubscriptionEmail } from './_templates/subscription.tsx'
+import { renderAsync } from '@react-email/components'
+import { WelcomeEmail } from './_templates/welcome.tsx'
+import { LoginWelcomeEmail } from './_templates/login-welcome.tsx'
+import { SubscriptionSuccessEmail } from './_templates/subscription-success.tsx'
+import { SubscriptionCancelledEmail } from './_templates/subscription-cancelled.tsx'
 
 const resend = new Resend(Deno.env.get('RESEND_API_KEY') as string)
 const hookSecret = Deno.env.get('SEND_EMAIL_HOOK_SECRET') as string
+const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
+const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -23,42 +28,84 @@ Deno.serve(async (req) => {
     return new Response('Method not allowed', { status: 405, headers: corsHeaders })
   }
 
+  const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+  const authHeader = req.headers.get('Authorization')
+  const isServiceRole = serviceRoleKey && authHeader?.includes(serviceRoleKey)
+
   const payload = await req.text()
   const headers = Object.fromEntries(req.headers)
 
-  console.log('Received email hook request')
-  console.log(`Hook secret present: ${Boolean(hookSecret)}`)
+  let payload_data: any
 
-  const wh = new Webhook(hookSecret)
+  if (isServiceRole) {
+    console.log('Authenticating via Service Role')
+    payload_data = JSON.parse(payload)
+  } else if (authHeader && authHeader.startsWith('Bearer ')) {
+    // Check if the caller is an admin
+    console.log('Authenticating via Admin Session')
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    })
+    
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+      
+      if (profile?.role === 'admin') {
+        payload_data = JSON.parse(payload)
+      }
+    }
+  }
 
-  try {
-    const payload_data = wh.verify(payload, headers) as {
-      user: {
-        email: string
-      }
-      email_data: {
-        token: string
-        token_hash: string
-        redirect_to: string
-        email_action_type: string
-        site_url: string
-        token_new: string
-        token_hash_new: string
-      }
-      subscription_data?: {
-        action_type: 'active' | 'cancelled' | 'trial_ending'
-        period_end?: string
+  if (!payload_data) {
+    console.log('Authenticating via Webhook Signature')
+    // Standardwebhooks expects a base64 encoded secret or a whsec_ prefixed string
+    const getValidSecret = (secret: string) => {
+      if (!secret) return ''
+      if (secret.startsWith('whsec_')) return secret
+      try {
+        atob(secret)
+        return secret
+      } catch {
+        return btoa(secret)
       }
     }
 
+    const wh = new Webhook(getValidSecret(hookSecret))
+    try {
+      payload_data = wh.verify(payload, headers) as any
+    } catch (err: any) {
+      console.error('Webhook verification failed:', err.message)
+      return new Response(JSON.stringify({ error: 'Unauthorized or Invalid Signature' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+  }
+
+  try {
     const {
       user,
-      email_data: { token, token_hash, redirect_to, email_action_type },
+      email_data = {},
+      action_type: root_action_type,
     } = payload_data
+
+    const { token, token_hash, redirect_to, email_action_type: nested_action_type } = email_data
+    const email_action_type = root_action_type || nested_action_type || 'unknown'
 
     console.log(`Processing ${email_action_type} email for ${user.email}`)
 
     const getSubject = (actionType: string): string => {
+      if (actionType === 'subscription') {
+        return payload_data.subscription_data?.action_type === 'cancelled'
+          ? 'RulCode - Subscription Cancelled'
+          : 'Welcome to RulCode Pro! 🚀'
+      }
+
       switch (actionType) {
         case 'signup':
           return 'Welcome to RulCode - Confirm Your Email'
@@ -67,36 +114,46 @@ Deno.serve(async (req) => {
         case 'invite':
           return "You're Invited to RulCode!"
         case 'magiclink':
-          return 'RulCode - Your Magic Link'
-        case 'email_change':
-          return 'RulCode - Confirm Your New Email'
-        case 'subscription':
-          return 'RulCode - Premium Subscription Update'
+          return 'Sign in to RulCode'
         default:
-          return 'RulCode - Verify Your Email'
+          return 'Verify Your Email'
       }
     }
 
-    const html = email_action_type === 'subscription'
-      ? await renderAsync(
-        React.createElement(SubscriptionEmail, {
+    let template;
+    if (email_action_type === 'subscription') {
+      if (payload_data.subscription_data?.action_type === 'cancelled') {
+        template = React.createElement(SubscriptionCancelledEmail, {
           user_email: user.email,
-          action_type: payload_data.subscription_data?.action_type || 'active',
           period_end: payload_data.subscription_data?.period_end,
-        })
-      )
-      : await renderAsync(
-        React.createElement(ConfirmationEmail, {
-          supabase_url: Deno.env.get('SUPABASE_URL') ?? '',
-          token,
-          token_hash,
-          redirect_to,
-          email_action_type,
+        });
+      } else {
+        template = React.createElement(SubscriptionSuccessEmail, {
           user_email: user.email,
-        })
-      )
+        });
+      }
+    } else if (email_action_type === 'signup') {
+      template = React.createElement(WelcomeEmail, {
+        user_email: user.email,
+        supabase_url: supabaseUrl,
+        token_hash,
+        redirect_to,
+        email_action_type,
+      });
+    } else {
+      template = React.createElement(LoginWelcomeEmail, {
+        supabase_url: supabaseUrl,
+        token_hash,
+        redirect_to,
+        email_action_type,
+        token,
+      });
+    }
+
+    const html = await renderAsync(template)
 
     console.log('Email HTML rendered successfully')
+
 
     const { error } = await resend.emails.send({
       from: 'RulCode <support@rulcode.com>',

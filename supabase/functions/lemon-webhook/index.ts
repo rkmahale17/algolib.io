@@ -1,8 +1,9 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.1'
+import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!
 const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-const resendApiKey = Deno.env.get('RESEND_API_KEY')
+const sendEmailHookSecret = Deno.env.get('SEND_EMAIL_HOOK_SECRET')
 const webhookSecret = Deno.env.get('LS_WEBHOOK_SECRET')?.trim()
 
 if (!serviceRoleKey) {
@@ -280,7 +281,13 @@ Deno.serve(async (req) => {
         // Only send welcome email on initial creation to prevent duplicates
         if (eventName === 'subscription_created') {
             try {
-                await sendWelcomeEmail(customerEmail || '')
+                await triggerSubscriptionEmail(customerEmail || '', 'active')
+            } catch (e: any) {
+                console.warn('Email error:', e.message)
+            }
+        } else if (eventName === 'subscription_cancelled') {
+            try {
+                await triggerSubscriptionEmail(customerEmail || '', 'cancelled', currentPeriodEnd || undefined)
             } catch (e: any) {
                 console.warn('Email error:', e.message)
             }
@@ -316,87 +323,38 @@ Deno.serve(async (req) => {
     }
 })
 
-async function sendWelcomeEmail(email: string) {
-    if (!email || !resendApiKey) return
-    const res = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${resendApiKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            from: 'RulCode <support@rulcode.com>',
-            to: email,
-            subject: 'Welcome to RulCode Pro! 🚀',
-            html: `<!DOCTYPE html>
-<html>
-<body style="margin:0; padding:0; background-color:#f9fafb;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9fafb; padding:20px 0;">
-    <tr>
-      <td align="center">
-        
-        <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff; border-radius:10px; padding:30px; font-family:Arial, sans-serif;">
-          
-          <!-- Logo -->
-          <tr>
-            <td align="center" style="padding-bottom:20px;">
-              <img src="https://rulcode.com/logo.png" width="120" alt="RulCode" />
-            </td>
-          </tr>
+async function triggerSubscriptionEmail(email: string, action_type: 'active' | 'cancelled', period_end?: string) {
+    if (!email || !serviceRoleKey) {
+        console.warn('Missing email or serviceRoleKey, skipping email trigger')
+        return
+    }
 
-          <!-- Heading -->
-          <tr>
-            <td align="center">
-              <h1 style="margin:0; font-size:22px; color:#111827;">
-                Welcome to RulCode Pro 🚀
-              </h1>
-            </td>
-          </tr>
-
-          <!-- Text -->
-          <tr>
-            <td style="padding:20px 0; color:#4b5563; font-size:15px;">
-              Your subscription is confirmed. You've unlocked the full power of RulCode.
-            </td>
-          </tr>
-
-          <!-- Features -->
-          <tr>
-            <td style="font-size:14px; color:#374151;">
-              ✅ Full premium visualizations<br/>
-              ⚡ Advanced practice problems<br/>
-              📊 Progress tracking
-            </td>
-          </tr>
-
-          <!-- CTA -->
-          <tr>
-            <td align="center" style="padding:30px 0;">
-              <a href="https://rulcode.com"
-                 style="background:#2563eb; color:#ffffff; padding:12px 24px; text-decoration:none; border-radius:6px; font-weight:bold;">
-                 Start Practicing
-              </a>
-            </td>
-          </tr>
-
-          <!-- Footer -->
-          <tr>
-            <td align="center" style="font-size:12px; color:#9ca3af; border-top:1px solid #eee; padding-top:20px;">
-              Happy Coding,<br/>RulCode Team
-            </td>
-          </tr>
-
-        </table>
-
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`,
-        }),
+    const payload = JSON.stringify({
+        user: { email },
+        action_type: 'subscription',
+        subscription_data: {
+            action_type,
+            period_end
+        }
     })
 
-    if (!res.ok) {
-        const errorText = await res.text()
-        console.error('Resend error:', errorText)
-    } else {
-        console.log(`Welcome email sent to ${email}`)
+    try {
+        const res = await fetch(`${supabaseUrl}/functions/v1/send-email`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${serviceRoleKey}`,
+                'Content-Type': 'application/json',
+            },
+            body: payload,
+        })
+
+        if (!res.ok) {
+            const errorText = await res.text()
+            console.error('Error triggering send-email function:', errorText)
+        } else {
+            console.log(`Successfully triggered ${action_type} email for ${email}`)
+        }
+    } catch (err: any) {
+        console.error('Failed to call send-email function:', err.message)
     }
 }

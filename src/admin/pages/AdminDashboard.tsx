@@ -60,6 +60,15 @@ export default function AdminDashboard() {
       color: "text-amber-500",
       bgColor: "bg-amber-500/10",
       gradient: "from-amber-500/20 to-yellow-500/20"
+    },
+    {
+      title: "Email Testing",
+      description: "Trigger and verify all branded email templates (Welcome, Pro, Magic Link) with custom recipients.",
+      icon: Mail,
+      path: "/admin/email-testing",
+      color: "text-rose-500",
+      bgColor: "bg-rose-500/10",
+      gradient: "from-rose-500/20 to-pink-500/20"
     }
   ];
 
