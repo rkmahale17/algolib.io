@@ -16,7 +16,6 @@ import {
   User,
   ChevronDown,
   ChevronRight,
-  Trophy,
   Languages,
   PenTool,
   CreditCard,
@@ -46,7 +45,7 @@ import UserMenu from "./UserMenu";
 
 const Navbar = () => {
   const [mounted, setMounted] = useState(false);
-  const { profile, user } = useApp();
+  const { profile, user, hasPremiumAccess } = useApp();
   const { setOpenMobile, toggleSidebar, state } = useSidebar();
   const pathname = usePathname();
 
@@ -361,7 +360,7 @@ const Navbar = () => {
 
           {/* Right side actions */}
           <div className="flex items-center gap-2">
-            {(!user || profile?.subscription_status !== 'active') && !isAuthPage && (
+            {(!user || !hasPremiumAccess) && !isAuthPage && (
               <Link href="/pricing" className="text-sm font-normal hover:text-primary transition-colors hidden md:block mr-2">
                 Pricing
               </Link>

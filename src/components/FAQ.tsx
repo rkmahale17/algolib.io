@@ -9,11 +9,7 @@ import Script from "next/script";
 const faqs = [
   {
     question: "What is Rulcode.com?",
-    answer: "Rulcode.com is a free, open-source platform that helps you learn data structures and algorithms through interactive visualizations. We provide step-by-step animated explanations of 200+ popular algorithms with code implementations in Python, Java, C++, and TypeScript."
-  },
-  {
-    question: "Is Rulcode.com really free?",
-    answer: "Yes! Rulcode.com is 100% free which are basic feature needed and will have some kind of premium if website needs to recover maintance. We believe education should be accessible to everyone. Our entire codebase is open source and available on GitHub."
+    answer: "Rulcode.com is a open-source platform that helps you learn data structures and algorithms through interactive visualizations. We provide step-by-step animated explanations of 200+ popular algorithms with code implementations in Python, Java, C++, and TypeScript."
   },
   {
     question: "What programming languages are supported?",

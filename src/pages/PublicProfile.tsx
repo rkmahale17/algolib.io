@@ -285,7 +285,7 @@ const PublicProfile = () => {
                 <img src="/logo.svg" alt="RulCode" className="w-14 h-18" />
               </div>
               <div className="space-y-2">
-                <h1 className="text-3xl font- bg-gradient-to-r from-white via-primary to-blue-400 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-primary to-blue-400 bg-clip-text text-transparent">
                   Profile Not Found
                 </h1>
                 <p className="text-gray-400 text-base">User doesn't exist</p>
@@ -294,7 +294,7 @@ const PublicProfile = () => {
                 <div className="flex items-start gap-3">
                   <UserX className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                   <p className="text-sm text-muted-foreground text-left">
-                    The user <span className="text-primary font-mono">@{username}</span> doesn't exist or hasn't set up their profile yet.
+                    The user <span className="text-primary font-bold">@{username}</span> doesn't exist or hasn't set up their profile yet.
                   </p>
                 </div>
               </div>
@@ -321,7 +321,7 @@ const PublicProfile = () => {
                 <img src="/logo.svg" alt="RulCode" className="w-14 h-18" />
               </div>
               <div className="space-y-2">
-                <h1 className="text-3xl font- bg-gradient-to-r from-white via-primary to-blue-400 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-primary to-blue-400 bg-clip-text text-transparent">
                   Private Profile
                 </h1>
                 <p className="text-gray-400 text-base">This profile is not publicly accessible</p>
@@ -357,7 +357,7 @@ const PublicProfile = () => {
                 <img src="/logo.svg" alt="RulCode" className="w-14 h-18" />
               </div>
               <div className="space-y-2">
-                <h1 className="text-3xl font- bg-gradient-to-r from-white via-primary to-blue-400 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-primary to-blue-400 bg-clip-text text-transparent">
                   Welcome Back
                 </h1>
                 <p className="text-gray-400 text-base">Continue exploring algorithmic journeys</p>
@@ -399,20 +399,20 @@ const PublicProfile = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="bg-card rounded-xl border border-border/40 shadow-sm p-5 hover:shadow-md transition-shadow">
                 <div className="text-sm font-medium text-muted-foreground mb-2">Total Solved</div>
-                <div className="text-3xl font- text-primary">{stats.totalSolved}</div>
+                <div className="text-3xl font-bold text-primary">{stats.totalSolved}</div>
                 <div className="text-xs text-muted-foreground mt-1">out of {stats.totalQuestions} questions</div>
               </div>
               <div className="bg-card rounded-xl border border-border/40 shadow-sm p-5 hover:shadow-md transition-shadow">
                 <div className="text-sm font-medium text-muted-foreground mb-2">Current Streak</div>
-                <div className="text-3xl font- text-orange-500">{stats.currentStreak} <span className="text-sm font-normal text-muted-foreground">days</span></div>
+                <div className="text-3xl font-bold text-orange-500">{stats.currentStreak} <span className="text-sm font-normal text-muted-foreground">days</span></div>
               </div>
               <div className="bg-card rounded-xl border border-border/40 shadow-sm p-5 hover:shadow-md transition-shadow">
                 <div className="text-sm font-medium text-muted-foreground mb-2">Max Streak</div>
-                <div className="text-3xl font- text-amber-500">{stats.longestStreak} <span className="text-sm font-normal text-muted-foreground">days</span></div>
+                <div className="text-3xl font-bold text-amber-500">{stats.longestStreak} <span className="text-sm font-normal text-muted-foreground">days</span></div>
               </div>
               <div className="bg-card rounded-xl border border-border/40 shadow-sm p-5 hover:shadow-md transition-shadow">
                 <div className="text-sm font-medium text-muted-foreground mb-2">Total Active Days</div>
-                <div className="text-3xl font- text-green-500">{stats.totalActiveDays}</div>
+                <div className="text-3xl font-bold text-green-500">{stats.totalActiveDays}</div>
               </div>
             </div>
 

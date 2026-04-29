@@ -1,6 +1,6 @@
 'use client';
 
-import { ProtectedAdminRoute } from "@/components/ProtectedAdminRoute";
+import { ProtectedAdminRoute } from "@/admin/components/ProtectedAdminRoute";
 
 export default function AdminLayout({
     children,

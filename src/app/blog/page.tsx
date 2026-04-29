@@ -7,8 +7,8 @@ import { blogPosts } from "@/data/blogPosts";
 import Script from "next/script";
 
 export const metadata: Metadata = {
-  title: "Rulcode Blog - Algorithm Tutorials & DSA Patterns | 200+ Free Guides",
-  description: "Explore algorithms, coding tips, and system design guides. Learn DSA patterns, interview strategies, and master data structures through clear explanations and examples. Free resources for competitive programming.",
+  title: "Rulcode Blog - Algorithm Tutorials & DSA Patterns | 200+ guides",
+  description: "Explore algorithms, coding tips, and system design guides. Learn DSA patterns, interview strategies, and master data structures through clear explanations and examples. Resources for competitive programming.",
   keywords: "algorithm tutorials, DSA patterns, data structures, competitive programming, coding interview preparation, Blind 75, LeetCode solutions",
   alternates: {
     canonical: "https://rulcode.com/blog",
@@ -98,21 +98,6 @@ export default function BlogPage() {
           ))}
         </div>
 
-        {/* Bottom CTA Card */}
-        <Card className="bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border-primary/20">
-          <CardContent className="p-8 text-center">
-            <h2 className="text-2xl font-bold mb-3">
-              Play Algo Games for learning algo in fun way!
-            </h2>
-            <p className="text-muted-foreground mb-6">
-              Interactive visualizations, games, and comprehensive algorithm
-              guides
-            </p>
-            <Button asChild size="lg" className="rounded-full">
-              <Link href="/games">Explore Games</Link>
-            </Button>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

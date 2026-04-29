@@ -26,19 +26,19 @@ export default function About() {
   return (
     <>
       <Head>
-        <title>About RulCode - Free Open Source Algorithm Learning Platform</title>
+        <title>About RulCode - Freemium Open Source Algorithm Learning Platform</title>
         <meta
           name="description"
           content="Learn about RulCode's mission to make algorithm learning accessible through interactive visualizations. 100% free, open-source, and community-driven platform for developers and competitive programmers."
         />
         <meta
           name="keywords"
-          content="about rulcode, algorithm learning platform, open source algorithms, free coding education, interactive algorithm visualizations, hotjar, google analytics"
+          content="about rulcode, algorithm learning platform, open source algorithms, freemium coding education, interactive algorithm visualizations, hotjar, google analytics"
         />
         <link rel="canonical" href="https://rulcode.com/about" />
 
-        <meta property="og:title" content="About RulCode - Free Algorithm Learning Platform" />
-        <meta property="og:description" content="100% free and open-source platform for learning algorithms with interactive visualizations" />
+        <meta property="og:title" content="About RulCode - freemium Algorithm Learning Platform" />
+        <meta property="og:description" content="100% Open-source platform for learning algorithms with interactive visualizations" />
         <meta property="og:url" content="https://rulcode.com/about" />
       </Head>
 
@@ -55,7 +55,7 @@ export default function About() {
             "mainEntity": {
               "@type": "EducationalOrganization",
               "name": "RulCode",
-              "description": "Free and open-source algorithm library for competitive programming and coding interviews",
+              "description": "Open-source algorithm library for competitive programming and coding interviews",
               "url": "https://rulcode.com"
             }
           })
@@ -117,7 +117,7 @@ export default function About() {
                       <div className="p-2 rounded-lg bg-red-500/10 text-red-500">
                         <Heart className="w-6 h-6" />
                       </div>
-                      100% Free & Open Source
+                      100%  Open Source
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">

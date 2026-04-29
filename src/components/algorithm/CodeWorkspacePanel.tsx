@@ -47,6 +47,9 @@ interface CodeWorkspacePanelProps {
   isLoading?: boolean;
   isPlatformPreview?: boolean;
   hasPremiumAccess?: boolean;
+  handleRandomProblem?: () => void;
+  handleNextProblem?: () => void;
+  handlePreviousProblem?: () => void;
 }
 
 export const CodeWorkspacePanel = React.memo(({
@@ -69,6 +72,9 @@ export const CodeWorkspacePanel = React.memo(({
   isLoading = false,
   isPlatformPreview = false,
   hasPremiumAccess = false,
+  handleRandomProblem,
+  handleNextProblem,
+  handlePreviousProblem
 }: CodeWorkspacePanelProps) => {
   const posthog = usePostHog();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -131,6 +137,9 @@ export const CodeWorkspacePanel = React.memo(({
                   controls: algorithm?.controls?.brainstorm
                 } : undefined}
                 hasPremiumAccess={hasPremiumAccess}
+                handleRandomProblem={handleRandomProblem}
+                handleNextProblem={handleNextProblem}
+                handlePreviousProblem={handlePreviousProblem}
               />
             ) : (
               <div className="flex-1 flex items-center justify-center">

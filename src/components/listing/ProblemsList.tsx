@@ -27,6 +27,8 @@ interface ProblemsListProps {
   initialSelectedCompanies?: string[];
 }
 
+const EMPTY_ARRAY: string[] = [];
+
 export const ProblemsList = ({
   algorithms,
   title,
@@ -40,8 +42,8 @@ export const ProblemsList = ({
   progressTitle = "Progress",
   isLoading = false,
   icon,
-  initialSelectedTopics = [],
-  initialSelectedCompanies = []
+  initialSelectedTopics = EMPTY_ARRAY,
+  initialSelectedCompanies = EMPTY_ARRAY
 }: ProblemsListProps) => {
   const { activeListType, setActiveListType, progressMap } = useApp();
 
@@ -57,6 +59,15 @@ export const ProblemsList = ({
       setActiveListType(listType as any);
     }
   }, [listType, activeListType, setActiveListType]);
+
+  // Sync internal filter state with URL-driven props
+  useEffect(() => {
+    setSelectedTopics(initialSelectedTopics);
+  }, [initialSelectedTopics]);
+
+  useEffect(() => {
+    setSelectedCompanies(initialSelectedCompanies);
+  }, [initialSelectedCompanies]);
 
   const filteredAndSortedAlgorithms = useMemo(() => {
     let result = algorithms.map(algo => ({

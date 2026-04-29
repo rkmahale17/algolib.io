@@ -110,7 +110,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       profileFetchInProgress.current = userId;
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, email, full_name, avatar_url, username, subscription_status, subscription_tier, subscription_duration, subscription_plan_id, trial_end_date, current_period_end, cancel_at_period_end, role')
+        .select('id, email, full_name, avatar_url, username, subscription_status, subscription_tier, subscription_duration, subscription_plan_id, trial_end_date, current_period_end, cancel_at_period_end, role, customer_portal_url')
         .eq('id', userId)
         .maybeSingle();
 
@@ -211,6 +211,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
       const currentUser = session?.user ?? null;
       dispatch(setUser(currentUser));
+
+      // Clear all React Query caches on any auth change (Sign in, Sign out, etc)
+      // to ensure no data from previous user remains in memory
+      queryClient.clear();
 
       if (currentUser) {
         if (event === 'SIGNED_IN' || event === 'USER_UPDATED' || event === 'TOKEN_REFRESHED') {

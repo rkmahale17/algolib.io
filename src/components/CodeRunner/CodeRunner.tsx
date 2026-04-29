@@ -45,6 +45,9 @@ interface CodeRunnerProps {
   onToggleRightPanel?: () => void;
   brainstormProps?: any;
   hasPremiumAccess?: boolean;
+  handleRandomProblem?: () => void;
+  handleNextProblem?: () => void;
+  handlePreviousProblem?: () => void;
 }
 
 export interface CodeRunnerRef {
@@ -71,7 +74,10 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
   isMobile,
   isLoading: isLoadingProp,
   onToggleRightPanel,
-  brainstormProps
+  brainstormProps,
+  handleRandomProblem,
+  handleNextProblem,
+  handlePreviousProblem
 }, ref) => {
   const posthog = usePostHog();
   const isLimitExceeded = useFeatureFlag("todays_limit_exceed");
@@ -374,6 +380,9 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
         isSubmitting={isSubmitting}
         lastRunSuccess={lastRunSuccess}
         algorithm={algorithmData}
+        handleRandomProblem={handleRandomProblem}
+        handleNextProblem={handleNextProblem}
+        handlePreviousProblem={handlePreviousProblem}
       />
     </div>
   );

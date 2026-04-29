@@ -1,5 +1,6 @@
 import React from "react";
-import { AlgorithmPreview } from "../admin/AlgorithmPreview";
+import dynamic from "next/dynamic";
+const AlgorithmPreview = dynamic(() => import("@/components/AlgorithmPreview").then(mod => mod.AlgorithmPreview), { ssr: false });
 import { platformPreviewData } from "../../data/platformPreviewData";
 import { motion } from "framer-motion";
 import Link from "next/link";

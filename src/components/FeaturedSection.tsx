@@ -2,7 +2,6 @@ import {
   ArrowRight,
   BookOpen,
   Layers,
-  Gamepad2,
   Lock,
 } from "lucide-react";
 
@@ -44,16 +43,6 @@ const features = [
     icon: BookOpen,
     link: "/blog",
     action: "Read Articles",
-  },
-  {
-    id: "games",
-    title: "Algo Games",
-    description:
-      "Practice algorithms through fun, interactive games that reinforce your understanding.",
-    icon: Gamepad2,
-    link: "/games",
-    action: "Play Now",
-    flag: "algo_games",
   },
 ];
 

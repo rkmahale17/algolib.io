@@ -104,7 +104,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         lastPathRef.current = pathname;
     }, [pathname, isMobile, state, setOpen]);
 
-    const { user } = useApp();
+    const { user, hasPremiumAccess } = useApp();
 
     const handleSignOut = async () => {
         if (!supabase) return;
@@ -248,9 +248,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     <span>Theme: {theme === 'dark' ? 'Dark' : 'Light'}</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem asChild>
-                                    <Link href="/pricing" className="cursor-pointer text-xs">Pricing</Link>
-                                </DropdownMenuItem>
+                                {!hasPremiumAccess && (
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/pricing" className="cursor-pointer text-xs">Pricing</Link>
+                                    </DropdownMenuItem>
+                                )}
                                 {user ? (
                                     <>
                                         <DropdownMenuSeparator />

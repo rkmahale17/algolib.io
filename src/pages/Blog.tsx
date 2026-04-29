@@ -16,10 +16,10 @@ const Blog = () => {
   return (
     <>
       <Head>
-        <title>Rulcode Blog - Algorithm Tutorials & DSA Patterns | 200+ Free Guides</title>
+        <title>Rulcode Blog - Algorithm Tutorials & DSA Patterns | 200+ freemium Guides</title>
         <meta
           name="description"
-          content="Explore algorithms, coding tips, and system design guides. Learn DSA patterns, interview strategies, and master data structures through clear explanations and examples. Free resources for competitive programming."
+          content="Explore algorithms, coding tips, and system design guides. Learn DSA patterns, interview strategies, and master data structures through clear explanations and examples. Freemium resources for competitive programming."
         />
         <meta name="keywords" content="algorithm tutorials, DSA patterns, data structures, competitive programming, coding interview preparation, Blind 75, LeetCode solutions" />
         <link rel="canonical" href="https://rulcode.com/blog" />
@@ -104,21 +104,6 @@ const Blog = () => {
             ))}
           </div>
 
-          {/* Bottom CTA Card */}
-          <Card className="bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border-primary/20">
-            <CardContent className="p-8 text-center">
-              <h2 className="text-2xl font- mb-3">
-                Play Algo Games for learning algo in fun way!
-              </h2>
-              <p className="text-muted-foreground mb-6">
-                Interactive visualizations, games, and comprehensive algorithm
-                guides
-              </p>
-              <Button asChild size="lg" className="rounded-full">
-                <NextLink href="/games">Explore Games</NextLink>
-              </Button>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </>

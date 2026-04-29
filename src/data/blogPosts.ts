@@ -1,3 +1,5 @@
+export const BLOG_IMAGE_BASE_URL = "https://dkebbjneobjtmuzzrsdo.supabase.co/storage/v1/object/public/blog";
+
 export interface BlogPost {
   id: string;
   slug: string;
@@ -37,8 +39,8 @@ export const blogPosts: BlogPost[] = [
     readTime: '18 min read',
     category: 'Interview Prep',
     tags: ['Blind 75', 'LeetCode', 'FAANG', 'Visual Learning', 'Coding Interview', 'Algorithm Patterns'],
-    thumbnail: '/_blog/blind75-patterns-diagram.png',
-    image: '/_blog/blind75-patterns-diagram.png', // Hero image
+    thumbnail: `${BLOG_IMAGE_BASE_URL}/blind75-patterns-diagram.webp`,
+    image: `${BLOG_IMAGE_BASE_URL}/blind75-patterns-diagram.webp`, // Hero image
 
     content: [
       {
@@ -150,7 +152,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: 'image',
-        content: '/_blog/patterns/two-pointers.png',
+        content: `${BLOG_IMAGE_BASE_URL}/two-pointers.webp`,
       },
       {
         type: "cta",
@@ -175,7 +177,7 @@ export const blogPosts: BlogPost[] = [
 
       {
         type: 'image',
-        content: '/_blog/patterns/slow-fast-pointers.png',
+        content: `${BLOG_IMAGE_BASE_URL}/slow-fast-pointers.webp`,
       },
       {
         type: "cta",
@@ -197,7 +199,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: 'image',
-        content: '/_blog/patterns/bineary-search.png',
+        content: `${BLOG_IMAGE_BASE_URL}/binary-search.webp`,
       },
       {
         type: "cta",
@@ -220,7 +222,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: 'image',
-        content: '/_blog/patterns/bfs.png',
+        content: `${BLOG_IMAGE_BASE_URL}/bfs.webp`,
       },
       {
         type: "cta",
@@ -262,7 +264,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: 'image',
-        content: '/_blog/patterns/coin-change.png',
+        content: `${BLOG_IMAGE_BASE_URL}/coin-change.webp`,
       },
       {
         type: "cta",
@@ -283,7 +285,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: 'image',
-        content: '/_blog/patterns/backtracking.png',
+        content: `${BLOG_IMAGE_BASE_URL}/backtracking.webp`,
       },
       {
         type: "cta",
@@ -306,7 +308,7 @@ export const blogPosts: BlogPost[] = [
 
       {
         type: 'image',
-        content: '/_blog/patterns/valid-parentesis.png',
+        content: `${BLOG_IMAGE_BASE_URL}/valid-parentesis.webp`,
       },
       {
         type: "cta",
@@ -595,8 +597,8 @@ export const blogPosts: BlogPost[] = [
     readTime: '35 min read',
     category: 'System Design & Data Structures',
     tags: ['LRU Cache', 'System Design', 'Caching', 'HashMap', 'Doubly Linked List', 'Performance', 'Algorithms'],
-    thumbnail: '/_blog/lru/hero.png',
-    image: '/_blog/lru/hero.png',
+    thumbnail: `${BLOG_IMAGE_BASE_URL}/lru-hero.webp`,
+    image: `${BLOG_IMAGE_BASE_URL}/lru-hero.webp`,
 
     content: [
       {
@@ -678,7 +680,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: 'image',
-        content: '/_blog/lru/basic.png'
+        content: `${BLOG_IMAGE_BASE_URL}/basic.webp`
       },
 
       {
@@ -720,7 +722,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: 'image',
-        content: '/_blog/lru/internal-structure.png'
+        content: `${BLOG_IMAGE_BASE_URL}/internal-structure.webp`
       },
 
       {
@@ -887,7 +889,7 @@ class LRUCache:
 
       {
         type: 'image',
-        content: '/_blog/lru/lru-cache-viz.png'
+        content: `${BLOG_IMAGE_BASE_URL}/lru-cache-viz.webp`
       },
 
       {
@@ -1042,8 +1044,8 @@ class LRUCache:
     "readTime": "7 min read",
     "category": "Algorithms",
     "tags": ["Dynamic Programming", "DP", "Visual Learning", "DSA", "Coding Interview", "Rulcode", "LeetCode"],
-    "thumbnail": "/_blog/3/hero.png",
-    "image": "/_blog/3/hero.png",
+    "thumbnail": `${BLOG_IMAGE_BASE_URL}/dyanamic-hero.webp`,
+    "image": `${BLOG_IMAGE_BASE_URL}/dyanamic-hero.webp`,
 
     "content": [
       {
@@ -1115,7 +1117,7 @@ class LRUCache:
       },
       {
         "type": "image",
-        "content": '/_blog/patterns/coin-change.png',
+        "content": `${BLOG_IMAGE_BASE_URL}/coin-change.webp`,
         "link": "https://rulcode.com",
         "large": false
       },
@@ -1200,7 +1202,7 @@ class LRUCache:
       {
         "type": "image",
         "alt": "DP Visualization",
-        "content": '/_blog/common/house-robber.png',
+        "content": `${BLOG_IMAGE_BASE_URL}/house-robber.webp`,
         "caption": "House Robber Visualization ",
         "large": true
       },
@@ -1229,7 +1231,7 @@ class LRUCache:
       {
         "type": "image",
         "alt": "Fib Simulation",
-        "content": "/_blog/common/fib-stack.png",
+        "content": `${BLOG_IMAGE_BASE_URL}/fib-stack.webp`,
         "large": false
       },
       {
@@ -1329,7 +1331,7 @@ class LRUCache:
         "type": "image",
         "alt": "Knapsack DP algo",
         "caption": "Knapsack Rulcode.com simulation ",
-        "content": "/_blog/common/knaps.png",
+        "content": `${BLOG_IMAGE_BASE_URL}/knaps.webp`,
         "large": false
       },
       {

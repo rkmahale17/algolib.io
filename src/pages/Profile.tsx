@@ -52,6 +52,13 @@ const ProfileEdit = () => {
   if (loading) return <PremiumLoader text="Loading Profile..." />;
   if (!profile) return null;
 
+  const isPremium = profile.subscription_status === 'active' || profile.subscription_status === 'on_trial' || profile.subscription_status === 'paid' || profile.subscription_status === 'trialing' || profile.subscription_status === 'past_due' || profile.subscription_status === 'canceled' || profile.subscription_status === 'cancelled';
+  const isTrial = profile.subscription_status === 'on_trial' ||
+    profile.subscription_status === 'trialing' ||
+    (profile.trial_end_date && new Date(profile.trial_end_date) > new Date());
+  const isPastDue = profile.subscription_status === 'past_due';
+  const isCancelled = profile.cancel_at_period_end || profile.subscription_status === 'canceled' || profile.subscription_status === 'cancelled';
+
   return (
     <SidebarLayout>
       <div className="min-h-screen bg-background pt-8 pb-12 px-4 md:px-8">
@@ -80,7 +87,7 @@ const ProfileEdit = () => {
           {/* Message to set username */}
           {!profile.username && (
             <div className="text-center py-12">
-              <h2 className="text-2xl font- mb-4">Welcome to Your Profile!</h2>
+              <h2 className="text-2xl font-bold mb-4">Welcome to Your Profile!</h2>
               <p className="text-muted-foreground mb-6">
                 Set up your username to make your profile shareable and start tracking your progress.
               </p>
@@ -95,15 +102,19 @@ const ProfileEdit = () => {
             <h3 className="text-xl font-semibold mb-6">Subscription & Billing</h3>
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
               <div className="space-y-1">
-                {profile.subscription_status === 'active' ? (
+                {isPremium ? (
                   <>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-muted-foreground">Current Plan:</span>
                       <span className={cn(
                         "px-3 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider border",
-                        profile.cancel_at_period_end
+                        isCancelled
                           ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
-                          : "bg-green-500/10 text-green-600 border-green-500/20"
+                          : isPastDue
+                            ? "bg-red-500/10 text-red-600 border-red-500/20"
+                            : isTrial
+                              ? "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                              : "bg-green-500/10 text-green-600 border-green-500/20"
                       )}>
                         {profile.subscription_tier || 'Pro'}
                       </span>
@@ -112,16 +123,18 @@ const ProfileEdit = () => {
                       <span className="font-medium text-muted-foreground tracking-tight">Status: </span>
                       <span className={cn(
                         "font-semibold",
-                        profile.cancel_at_period_end ? "text-amber-600 dark:text-amber-400" : "text-green-500"
+                        isPastDue ? "text-red-500" : (isCancelled || isTrial) ? "text-amber-600 dark:text-amber-400" : "text-green-500"
                       )}>
-                        {profile.cancel_at_period_end ? 'CANCELLED (Active until end)' : 'ACTIVE'}
+                        {isPastDue ? 'PAYMENT PENDING' : isCancelled ? 'CANCELLED (Active until end)' : isTrial ? 'FREE TRIAL' : 'ACTIVE'}
                       </span>
                     </div>
-                    {profile.current_period_end && (
+                    {(profile.current_period_end || profile.trial_end_date) && (
                       <div className="text-sm text-muted-foreground italic">
-                        {profile.cancel_at_period_end ? 'Access ends on: ' : 'Next billing date: '}
+                        {isCancelled ? 'Access ends on: ' : isTrial ? 'Trial ends on: ' : 'Next billing date: '}
                         <span className="text-foreground font-medium">{(() => {
-                          const date = new Date(profile.current_period_end);
+                          const dateStr = isTrial ? profile.trial_end_date : profile.current_period_end;
+                          if (!dateStr) return 'N/A';
+                          const date = new Date(dateStr);
                           if (isNaN(date.getTime()) || date.getFullYear() <= 1970) return 'N/A';
                           return date.toLocaleDateString();
                         })()}</span>
@@ -141,10 +154,10 @@ const ProfileEdit = () => {
                   onClick={() => router.push('/pricing')}
                   className={cn(
                     "font-semibold",
-                    profile.subscription_status === 'active' ? "bg-muted text-foreground hover:bg-muted/80" : "bg-[#E5FF7F] text-black hover:bg-[#d6f555]"
+                    isPremium ? "bg-muted text-foreground hover:bg-muted/80" : "bg-[#E5FF7F] text-black hover:bg-[#d6f555]"
                   )}
                 >
-                  {profile.subscription_status === 'active' ? 'Manage Subscription' : 'Upgrade Now'}
+                  {isPremium ? 'Manage Subscription' : 'Upgrade Now'}
                 </Button>
               </div>
             </div>

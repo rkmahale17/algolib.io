@@ -1,6 +1,12 @@
-
 import { Metadata } from 'next';
-import AdminProblemClient from '../AdminProblemClient';
+import dynamic from 'next/dynamic';
+import { notFound } from 'next/navigation';
+
+const isAdminEnabled = process.env.NODE_ENV === 'development' || process.env.BUILD_ADMIN === 'true';
+
+const AdminProblemClient = isAdminEnabled 
+  ? dynamic(() => import('@/admin/app-logic/AdminProblemClient'))
+  : () => { notFound(); return null; };
 
 export const metadata: Metadata = {
   title: 'Edit Algorithm | Admin',
@@ -8,6 +14,9 @@ export const metadata: Metadata = {
 };
 
 export default async function EditAlgorithmPage(props: { params: Promise<{ id: string }> }) {
+  if (!isAdminEnabled) {
+    notFound();
+  }
   const params = await props.params;
   return <AdminProblemClient />;
 }

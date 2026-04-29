@@ -20,6 +20,7 @@ import {
   Crown,
   Lightbulb,
   ChevronsUpDown,
+  MessageSquare,
 } from "lucide-react";
 import { ListType, LIST_TYPE_LABELS } from "@/types/algorithm";
 import { Button } from "@/components/ui/button";
@@ -147,69 +148,21 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
             </span>
           </button>
 
-          {!showCondensedMenu && (
-            <TooltipProvider>
-              {(!algorithm?.controls || algorithm.controls?.header?.random_problem !== false) && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={handleRandomProblem}
-                      className="h-8 w-9 rounded-none hover:bg-muted border-r border-border transition-colors px-0"
-                    >
-                      <Shuffle className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Random Problem</TooltipContent>
-                </Tooltip>
-              )}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handlePreviousProblem}
-                    className="h-8 w-9 rounded-none text-muted-foreground hover:text-foreground hover:bg-muted border-r border-border transition-colors px-0"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Previous Problem</TooltipContent>
-              </Tooltip>
-              {(!algorithm?.controls || algorithm.controls?.header?.next_problem !== false) && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={handleNextProblem}
-                      className="h-8 w-9 rounded-none hover:bg-muted transition-colors px-0"
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Next Problem</TooltipContent>
-                </Tooltip>
-              )}
-            </TooltipProvider>
-          )}
         </div>
       </div>
 
-      {/* Middle: Run / Submit Buttons */}
-      {!showCondensedMenu && onRun && onSubmit && (
+      {/* Middle: Feedback Button */}
+      {!showCondensedMenu && (
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
-          <CodeExecutionButtonGroup
-            onRun={onRun}
-            onSubmit={onSubmit}
-            isLoading={isRunnerLoading || isRunnerSubmitting}
-            isSubmitting={isRunnerSubmitting || false}
-            lastRunSuccess={lastRunSuccess || false}
-            algorithm={algorithm}
-            hasPremiumAccess={hasPremiumAccess}
-            hideUserMenu={hideUserMenu}
-          />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => window.open("/feedback", "_blank")}
+            className="gap-2 h-8 px-4 transition-all shadow-sm"
+          >
+            <MessageSquare className="w-3.5 h-3.5" />
+            <span className="text-xs font-bold tracking-tight">Feedback</span>
+          </Button>
         </div>
       )}
 
@@ -229,15 +182,6 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
               <DropdownMenuSeparator />
 
 
-              <DropdownMenuItem onClick={handleNextProblem}>
-                <ChevronRight className="mr-2 h-4 w-4" />
-                <span>Next Problem</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleRandomProblem}>
-                <Shuffle className="mr-2 h-4 w-4" />
-                <span>Random Problem</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleShare}>
                 <Share2 className="mr-2 h-4 w-4" />
                 <span>Share</span>
@@ -290,18 +234,6 @@ export const AlgorithmHeader: React.FC<AlgorithmHeaderProps> = ({
           </TooltipProvider>
         )}
 
-        {!showCondensedMenu && (!algorithm?.controls || algorithm.controls?.header?.bug_report !== false) && (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => window.open("/feedback", "_blank")}>
-                  <Bug className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Report Issue</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
 
         {!showCondensedMenu && (!algorithm?.controls || algorithm.controls?.header?.timer !== false) && (
           <TooltipProvider>
