@@ -7,8 +7,8 @@ import { blogPosts } from "@/data/blogPosts";
 import Script from "next/script";
 
 export const metadata: Metadata = {
-  title: "Rulcode Blog - Algorithm Tutorials & DSA Patterns | 200+ Free Guides",
-  description: "Explore algorithms, coding tips, and system design guides. Learn DSA patterns, interview strategies, and master data structures through clear explanations and examples. Free resources for competitive programming.",
+  title: "Rulcode Blog - Algorithm Tutorials & DSA Patterns | 200+ guides",
+  description: "Explore algorithms, coding tips, and system design guides. Learn DSA patterns, interview strategies, and master data structures through clear explanations and examples. Resources for competitive programming.",
   keywords: "algorithm tutorials, DSA patterns, data structures, competitive programming, coding interview preparation, Blind 75, LeetCode solutions",
   alternates: {
     canonical: "https://rulcode.com/blog",

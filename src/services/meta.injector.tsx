@@ -23,10 +23,10 @@ export function AlgoMetaHead({ algorithm }: { algorithm?: any }) {
   // Build page-level defaults
   const title = algo
     ? buildTitle(algo)
-    : "RulCode - Master 200+ Algorithms with Interactive Visualizations | Free & Open Source";
+    : "RulCode - Master 200+ Algorithms with Interactive Visualizations Open Source";
   const description = algo
-    ? `${algo.name}: ${algo.description}. Code snippets in Python, Java, C++, and TypeScript. Time: ${algo.timeComplexity}. Space: ${algo.spaceComplexity}. Free & open-source resource for competitive programming.`
-    : "RulCode is a free and open-source algorithm library for competitive programmers. Learn, visualize, and master algorithms with step-by-step explanations and multi-language snippets.";
+    ? `${algo.name}: ${algo.description}. Code snippets in Python, Java, C++, and TypeScript. Time: ${algo.timeComplexity}. Space: ${algo.spaceComplexity}. open-source resource for competitive programming.`
+    : "RulCode is open-source algorithm library for competitive programmers. Learn, visualize, and master algorithms with step-by-step explanations and multi-language snippets.";
 
   const keywords = algo
     ? [
@@ -41,7 +41,7 @@ export function AlgoMetaHead({ algorithm }: { algorithm?: any }) {
       "typescript",
       "rulcode",
     ].join(", ")
-    : "algorithms, open source, free, competitive programming, algorithm library, rulcode";
+    : "algorithms, open source, competitive programming, algorithm library, rulcode";
 
   const pageUrl = algo ? `${siteBase}/problem/${algo.id}` : siteBase;
   const ogImage = `${siteBase}/og-image.png`;
@@ -117,7 +117,7 @@ export function AlgoMetaHead({ algorithm }: { algorithm?: any }) {
       name: "RulCode",
       url: siteBase,
       description:
-        "Free and open-source algorithm library for competitive programming",
+        "Open-source algorithm library for competitive programming",
       publisher: {
         "@type": "Organization",
         name: "RulCode",

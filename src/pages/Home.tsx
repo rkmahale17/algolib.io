@@ -63,7 +63,7 @@ const Home = () => {
       <Head>
         <title>
           RulCode - Master Competitive Programming & Technical Interviews |
-          Free & Open Source
+          Open Source
         </title>
         <meta
           name="description"
@@ -96,7 +96,7 @@ const Home = () => {
         />
         <meta
           name="twitter:description"
-          content="Free interactive algorithm visualizations and integrated code runner for FAANG interview preparation."
+          content="Freemium interactive algorithm visualizations and integrated code runner for FAANG interview preparation."
         />
         <meta name="twitter:image" content="https://rulcode.com/og-image.png" />
       </Head>

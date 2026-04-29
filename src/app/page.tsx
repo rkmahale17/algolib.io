@@ -13,9 +13,9 @@ import { FAQ } from '@/components/FAQ';
 import { Footer } from '@/components/Footer';
 
 export const metadata: Metadata = {
-  title: "RulCode - Master Competitive Programming & Technical Interviews | Free & Open Source",
+  title: "RulCode - Master Competitive Programming & Technical Interviews |  Open Source",
   description: "Accelerate your FAANG preparation with interactive visualizations, code execution in 4+ languages, and multi-approach solutions. Master Blind 75 and 200+ algorithms visually.",
-  keywords: ["algorithms", "open source", "free", "data structures", "competitive programming", "coding interviews", "algorithm visualization", "code snippets", "python", "java", "c++", "typescript", "Rulcode.com"],
+  keywords: ["algorithms", "open source", "data structures", "competitive programming", "coding interviews", "algorithm visualization", "code snippets", "python", "java", "c++", "typescript", "Rulcode.com"],
   openGraph: {
     title: "RulCode - Master Competitive Programming & Technical Interviews",
     description: "Interactive visualizations, integrated code runner, and multi-approach solutions in 4+ languages. Master Blind 75 and 200+ algorithms visually.",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@rulcode_com",
     title: "RulCode - Master Algorithms & Solve Visually",
-    description: "Free interactive algorithm visualizations and integrated code runner for FAANG interview preparation.",
+    description: "Interactive algorithm visualizations and integrated code runner for FAANG interview preparation.",
     images: ["https://rulcode.com/og-image.png"],
   },
 };

@@ -16,10 +16,10 @@ const Blog = () => {
   return (
     <>
       <Head>
-        <title>Rulcode Blog - Algorithm Tutorials & DSA Patterns | 200+ Free Guides</title>
+        <title>Rulcode Blog - Algorithm Tutorials & DSA Patterns | 200+ freemium Guides</title>
         <meta
           name="description"
-          content="Explore algorithms, coding tips, and system design guides. Learn DSA patterns, interview strategies, and master data structures through clear explanations and examples. Free resources for competitive programming."
+          content="Explore algorithms, coding tips, and system design guides. Learn DSA patterns, interview strategies, and master data structures through clear explanations and examples. Freemium resources for competitive programming."
         />
         <meta name="keywords" content="algorithm tutorials, DSA patterns, data structures, competitive programming, coding interview preparation, Blind 75, LeetCode solutions" />
         <link rel="canonical" href="https://rulcode.com/blog" />
