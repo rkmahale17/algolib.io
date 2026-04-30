@@ -1,5 +1,4 @@
-import {
-  Body,
+import {Body,
   Container,
   Head,
   Heading,
@@ -30,8 +29,8 @@ import {
   HERO_IMAGE_URL,
   SOCIAL_ICONS,
   BACKGROUND_COLOR,
-  CARD_BACKGROUND,
-} from './shared.ts'
+  AntiClip,
+  forceDarkWrapper} from './shared.tsx'
 
 interface WelcomeEmailProps {
   user_email: string
@@ -55,8 +54,8 @@ export const WelcomeEmail = ({
   return (
     <Html lang="en">
       <Head>
-        <meta name="color-scheme" content="only dark" />
-        <meta name="supported-color-schemes" content="only dark" />
+        <meta name="color-scheme" content="dark" />
+        <meta name="supported-color-schemes" content="dark" />
         <Font
           fontFamily="IBM Plex Sans Condensed"
           fallbackFontFamily="Arial"
@@ -77,124 +76,121 @@ export const WelcomeEmail = ({
           fontWeight={400}
           fontStyle="normal"
         />
+      
+        
+        
+        
+        
         <style>{`
-          :root { color-scheme: only dark; }
-          
-          /* Gmail Dark Mode Hack */
-          u + .body .bg-main { background-color: ${BACKGROUND_COLOR} !important; }
-          u + .body .bg-card { background-color: ${CARD_BACKGROUND} !important; }
-          
-          [data-ogsc] .bg-main { background-color: ${BACKGROUND_COLOR} !important; }
-          [data-ogsb] .bg-main { background-color: ${BACKGROUND_COLOR} !important; }
-          
-          [data-ogsc] .bg-card { background-color: ${CARD_BACKGROUND} !important; }
-          [data-ogsb] .bg-card { background-color: ${CARD_BACKGROUND} !important; }
-
           @media (prefers-color-scheme: dark) {
-            body { background-color: ${BACKGROUND_COLOR} !important; }
-            .bg-main { background-color: ${BACKGROUND_COLOR} !important; }
-            .bg-card { background-color: ${CARD_BACKGROUND} !important; }
+            body, table, td, p, span, a {
+              color: #ffffff !important;
+              -webkit-text-fill-color: #ffffff !important;
+            }
+          }
+          .cta-button {
+            transition: all 0.2s ease-in-out !important;
+            box-shadow: 0 4px 12px rgba(132, 204, 22, 0.4) !important;
+          }
+          .cta-button:hover, .cta-button:focus {
+            background-color: #98e61a !important;
+            box-shadow: 0 10px 28px rgba(132, 204, 22, 0.7) !important;
+            transform: translateY(-3px) !important;
+            outline: none !important;
           }
         `}</style>
       </Head>
       <Preview>Confirm your email address for RulCode</Preview>
       <Body className="body" style={mainStyle}>
+        <div style={forceDarkWrapper}>
+
         <Container className="bg-main" style={containerStyle}>
           <Section className="bg-card" style={cardStyle}>
             
-            {/* Logo Section */}
-            <Section style={{ marginBottom: '32px' }}>
-              <Img
-                src={LOGO_URL}
-                width="32"
-                height="32"
-                alt="RulCode"
-                style={{ display: 'block', backgroundColor: 'transparent' }}
-              />
-            </Section>
-
-            {/* Hero Image Section */}
-            <Section style={{ marginBottom: '48px' }}>
+            <Section>
               <Img
                 src={HERO_IMAGE_URL}
-                width="520"
+                width="600"
                 height="auto"
-                alt="Welcome"
-                style={{ 
-                  display: 'block', 
-                  width: '100%', 
-                  maxWidth: '520px', 
-                  borderRadius: '12px',
-                  backgroundColor: 'transparent'
-                }}
+                alt="Welcome to RulCode"
+                style={{ display: 'block', width: '100%', maxWidth: '600px', backgroundColor: 'transparent' }}
               />
             </Section>
 
-            {/* Body Content */}
-            <Section>
-              <Heading style={headingCondensed}>
-                almost there
-              </Heading>
-              <Text style={textStyle}>
-                Thank you for signing up for RulCode.
-              </Text>
-              <Text style={textStyle}>
-                To verify your account and start mastering algorithm patterns, we just need to confirm your email.
-              </Text>
-              <Text style={{ ...textStyle, color: 'rgb(129,129,129)', marginTop: '24px' }}>
-                If you didn't create an account, you can safely ignore this email.
-              </Text>
-            </Section>
-
-            {/* Action Button */}
-            <Section style={{ margin: '40px 0' }}>
-              <Link href={confirmationUrl} style={buttonStyle}>
-                Confirm Email
-              </Link>
-            </Section>
-
-            <Hr style={hrStyle} />
-
-            <Section>
-              <Text style={footerStyle}>
-                RulCode helps developers master complex coding patterns through interactive visualizations and curated practice.
-              </Text>
-
-              <Section style={{ marginTop: '32px', width: '152px' }}>
+            <Section style={{ padding: '40px' }}>
+              
+              <Section style={{ marginBottom: '32px' }}>
                 <Row>
-                  <Column style={{ width: '20px', paddingRight: '24px' }}>
-                    <Link href="https://x.com/rulcode"><Img src={SOCIAL_ICONS.x} width="20" height="20" alt="X" /></Link>
+                  <Column style={{ width: '42px', verticalAlign: 'middle', paddingRight: '8px' }}>
+                    <Img
+                      src={LOGO_URL}
+                      width="42"
+                      height="39"
+                      alt="Logo"
+                      style={{ display: 'block', borderRadius: '4px' }}
+                    />
                   </Column>
-                  <Column style={{ width: '20px', paddingRight: '24px' }}>
-                    <Link href="https://linkedin.com/company/rulcode"><Img src={SOCIAL_ICONS.linkedin} width="20" height="20" alt="LinkedIn" /></Link>
-                  </Column>
-                  <Column style={{ width: '20px', paddingRight: '24px' }}>
-                    <Link href="https://youtube.com/@rulcode"><Img src={SOCIAL_ICONS.youtube} width="20" height="20" alt="YouTube" /></Link>
-                  </Column>
-                  <Column style={{ width: '20px' }}>
-                    <Link href="https://github.com/rulcode"><Img src={SOCIAL_ICONS.github} width="20" height="20" alt="GitHub" /></Link>
+                  <Column style={{ verticalAlign: 'middle' }}>
+                    <Heading className="text-force-white" style={headingCondensed}>
+                      ALMOST&nbsp;THERE
+                    </Heading>
                   </Column>
                 </Row>
               </Section>
 
-              <Section style={{ marginTop: '32px' }}>
-                <Text style={footerTextStyle}>
-                  Megapolis Street, Hinjewadi<br />
-                  Pune, 411057
+              <Section>
+                <Text className="text-force-grey" style={textStyle}>
+                  Thank you for signing up for RulCode.
+                </Text>
+                <Text className="text-force-grey" style={textStyle}>
+                  To verify your account and start mastering algorithm patterns, we just need to confirm your email address.
                 </Text>
               </Section>
 
-              <Section style={{ marginTop: '20px' }}>
-                <Text style={{ ...footerTextStyle, maxWidth: '160px' }}>
-                  <Link href="https://rulcode.com/unsubscribe" style={footerLinkStyle}>
-                    Unsubscribe
-                  </Link> from RulCode marketing emails.
+              <Section style={{ marginTop: '40px' }}>
+                <Link href={confirmationUrl} className="cta-button" style={buttonStyle}>
+                  Confirm Email
+                </Link>
+              </Section>
+
+              <Hr style={hrStyle} />
+
+              <Section>
+                <Text className="text-force-grey" style={footerStyle}>
+                  RulCode helps developers master complex coding patterns through interactive visualizations and curated practice.
                 </Text>
+
+                <Section style={{ marginTop: '32px', width: '152px' }}>
+                  <Row>
+                    <Column style={{ width: '20px', paddingRight: '24px' }}>
+                      <Link href="https://x.com/rulcode"><Img src={SOCIAL_ICONS.x} width="20" height="20" alt="X" /></Link>
+                    </Column>
+                    <Column style={{ width: '20px', paddingRight: '24px' }}>
+                      <Link href="https://linkedin.com/company/rulcode"><Img src={SOCIAL_ICONS.linkedin} width="20" height="20" alt="LinkedIn" /></Link>
+                    </Column>
+                    <Column style={{ width: '20px', paddingRight: '24px' }}>
+                      <Link href="https://youtube.com/@rulcode"><Img src={SOCIAL_ICONS.youtube} width="20" height="20" alt="YouTube" /></Link>
+                    </Column>
+                    <Column style={{ width: '20px' }}>
+                      <Link href="https://github.com/rulcode"><Img src={SOCIAL_ICONS.github} width="20" height="20" alt="GitHub" /></Link>
+                    </Column>
+                  </Row>
+                </Section>
+
+                <Section style={{ marginTop: '32px' }}>
+                  <Text className="text-force-grey" style={footerTextStyle}>
+                    Megapolis Street, Hinjewadi<br />
+                    Pune, 411057
+                    <AntiClip />
+                  </Text>
+                </Section>
               </Section>
             </Section>
 
           </Section>
         </Container>
+      
+        </div>
       </Body>
     </Html>
   )

@@ -15,7 +15,7 @@ import Link from 'next/link';
 import { useApp } from '@/contexts/AppContext';
 
 const ProfileClient = () => {
-  const { profile: appProfile } = useApp();
+  const { profile: appProfile, hasPremiumAccess } = useApp();
   const router = useRouter();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -62,7 +62,6 @@ const ProfileClient = () => {
   if (loading) return <PremiumLoader text="Loading Profile..." />;
   if (!profile) return null;
 
-  const { hasPremiumAccess } = useApp();
   const isPremium = hasPremiumAccess;
   const isTrial = profile.subscription_status === 'on_trial' ||
     profile.subscription_status === 'trialing' ||

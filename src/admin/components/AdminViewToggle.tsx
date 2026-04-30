@@ -10,10 +10,9 @@ const AdminViewToggle = () => {
     const router = useRouter();
     const params = useParams();
     const { id, slug } = params as { id?: string; slug?: string };
-    const { user } = useApp();
+    const { user, profile } = useApp();
 
-    const adminId = process.env.NEXT_PUBLIC_ADMIN_USER_ID;
-    const isAdmin = adminId && user?.id === adminId;
+    const isAdmin = profile?.role === 'admin';
 
     // We only show this toggle on problem detail pages or admin problem detail pages
     const isProblemPage = pathname.startsWith('/problem/');

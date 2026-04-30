@@ -2,9 +2,9 @@ import { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 import { notFound } from 'next/navigation';
 
-const isAdminEnabled = process.env.NODE_ENV === 'development' || process.env.BUILD_ADMIN === 'true';
+import { IS_ADMIN_ENABLED } from '@/admin/constants';
 
-const AdminProblemClient = isAdminEnabled 
+const AdminProblemClient = IS_ADMIN_ENABLED 
   ? dynamic(() => import('@/admin/app-logic/AdminProblemClient'))
   : () => { notFound(); return null; };
 
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default function AdminNewProblemPage() {
-  if (!isAdminEnabled) {
+  if (!IS_ADMIN_ENABLED) {
     notFound();
   }
   return <AdminProblemClient />;

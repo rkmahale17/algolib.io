@@ -1,5 +1,4 @@
-import {
-  Body,
+import {Body,
   Container,
   Head,
   Heading,
@@ -30,7 +29,8 @@ import {
   HERO_IMAGE_URL,
   SOCIAL_ICONS,
   BACKGROUND_COLOR,
-} from './shared.ts'
+  AntiClip,
+  forceDarkWrapper} from './shared.tsx'
 
 interface SubscriptionSuccessEmailProps {
   user_email: string
@@ -42,8 +42,8 @@ export const SubscriptionSuccessEmail = ({
   return (
     <Html lang="en">
       <Head>
-        <meta name="color-scheme" content="only dark" />
-        <meta name="supported-color-schemes" content="only dark" />
+        <meta name="color-scheme" content="dark" />
+        <meta name="supported-color-schemes" content="dark" />
         <Font
           fontFamily="IBM Plex Sans Condensed"
           fallbackFontFamily="Arial"
@@ -64,85 +64,116 @@ export const SubscriptionSuccessEmail = ({
           fontWeight={400}
           fontStyle="normal"
         />
+      
+        
+        
+        
+        
         <style>{`
-          :root { color-scheme: only dark; }
           @media (prefers-color-scheme: dark) {
-            body { background-color: ${BACKGROUND_COLOR} !important; }
+            body, table, td, p, span, a {
+              color: #ffffff !important;
+              -webkit-text-fill-color: #ffffff !important;
+            }
+          }
+          .cta-button {
+            transition: all 0.2s ease-in-out !important;
+            box-shadow: 0 4px 12px rgba(132, 204, 22, 0.4) !important;
+          }
+          .cta-button:hover, .cta-button:focus {
+            background-color: #98e61a !important;
+            box-shadow: 0 10px 28px rgba(132, 204, 22, 0.7) !important;
+            transform: translateY(-3px) !important;
+            outline: none !important;
           }
         `}</style>
       </Head>
-      <Preview>Welcome to RulCode Pro!</Preview>
-      <Body style={mainStyle}>
-        <Container style={containerStyle}>
-          <Section style={cardStyle}>
-            <Section style={{ marginBottom: '32px' }}>
-              <Img src={LOGO_URL} width="32" height="32" alt="RulCode" style={{ display: 'block', backgroundColor: 'transparent' }} />
-            </Section>
+      <Preview>Welcome to RulCode Pro! 🚀</Preview>
+      <Body className="body" style={mainStyle}>
+        <div style={forceDarkWrapper}>
 
-            <Section style={{ marginBottom: '48px' }}>
+        <Container className="bg-main" style={containerStyle}>
+          <Section className="bg-card" style={cardStyle}>
+            
+            <Section>
               <Img
                 src={HERO_IMAGE_URL}
-                width="520"
+                width="600"
                 height="auto"
-                alt="Pro Activated"
-                style={{ display: 'block', width: '100%', maxWidth: '520px', borderRadius: '12px', backgroundColor: 'transparent' }}
+                alt="Welcome to RulCode"
+                style={{ display: 'block', width: '100%', maxWidth: '600px', backgroundColor: 'transparent' }}
               />
             </Section>
 
-            <Section>
-              <Heading style={headingCondensed}>PRO ACTIVATED</Heading>
-              <Text style={textStyle}>
-                Congratulations! Your RulCode Pro subscription is now active. You have full access to all premium algorithms, advanced visualizations, and curated study plans.
-              </Text>
-            </Section>
-
-            <Section style={{ margin: '40px 0' }}>
-              <Link href="https://rulcode.com/dashboard" style={buttonStyle}>
-                Go to Dashboard
-              </Link>
-            </Section>
-
-            <Hr style={hrStyle} />
-
-            <Section>
-              <Text style={footerStyle}>
-                Thank you for supporting RulCode. We're excited to help you accelerate your technical interview preparation.
-              </Text>
-
-              <Section style={{ marginTop: '32px', width: '152px' }}>
+            <Section style={{ padding: '40px' }}>
+              <Section style={{ marginBottom: '32px' }}>
                 <Row>
-                  <Column style={{ width: '20px', paddingRight: '24px' }}>
-                    <Link href="https://x.com/rulcode"><Img src={SOCIAL_ICONS.x} width="20" height="20" alt="X" /></Link>
+                  <Column style={{ width: '42px', verticalAlign: 'middle', paddingRight: '8px' }}>
+                    <Img
+                      src={LOGO_URL}
+                      width="42"
+                      height="39"
+                      alt="Logo"
+                      style={{ display: 'block', borderRadius: '4px' }}
+                    />
                   </Column>
-                  <Column style={{ width: '20px', paddingRight: '24px' }}>
-                    <Link href="https://linkedin.com/company/rulcode"><Img src={SOCIAL_ICONS.linkedin} width="20" height="20" alt="LinkedIn" /></Link>
-                  </Column>
-                  <Column style={{ width: '20px', paddingRight: '24px' }}>
-                    <Link href="https://youtube.com/@rulcode"><Img src={SOCIAL_ICONS.youtube} width="20" height="20" alt="YouTube" /></Link>
-                  </Column>
-                  <Column style={{ width: '20px' }}>
-                    <Link href="https://github.com/rulcode"><Img src={SOCIAL_ICONS.github} width="20" height="20" alt="GitHub" /></Link>
+                  <Column style={{ verticalAlign: 'middle' }}>
+                    <Heading className="text-force-white" style={headingCondensed}>
+                      PRO&nbsp;ACTIVATED
+                    </Heading>
                   </Column>
                 </Row>
               </Section>
 
-              <Section style={{ marginTop: '32px' }}>
-                <Text style={footerTextStyle}>
-                  Megapolis Street, Hinjewadi<br />
-                  Pune, 411057
+              <Section>
+                <Text className="text-force-grey" style={textStyle}>
+                  Congratulations! Your RulCode Pro subscription is now active. You have full access to all premium algorithms, advanced visualizations, and curated study plans.
                 </Text>
               </Section>
 
-              <Section style={{ marginTop: '20px' }}>
-                <Text style={{ ...footerTextStyle, maxWidth: '160px' }}>
-                  <Link href="https://rulcode.com/unsubscribe" style={footerLinkStyle}>
-                    Unsubscribe
-                  </Link> from RulCode marketing emails.
+              <Section style={{ marginTop: '40px' }}>
+                <Link href="https://rulcode.com/dashboard" style={buttonStyle}>
+                  Go to Dashboard
+                </Link>
+              </Section>
+
+              <Hr style={hrStyle} />
+
+              <Section>
+                <Text className="text-force-grey" style={footerStyle}>
+                  Thank you for supporting RulCode. We're excited to help you accelerate your technical interview preparation.
                 </Text>
+
+                <Section style={{ marginTop: '32px', width: '152px' }}>
+                  <Row>
+                    <Column style={{ width: '20px', paddingRight: '24px' }}>
+                      <Link href="https://x.com/rulcode"><Img src={SOCIAL_ICONS.x} width="20" height="20" alt="X" /></Link>
+                    </Column>
+                    <Column style={{ width: '20px', paddingRight: '24px' }}>
+                      <Link href="https://linkedin.com/company/rulcode"><Img src={SOCIAL_ICONS.linkedin} width="20" height="20" alt="LinkedIn" /></Link>
+                    </Column>
+                    <Column style={{ width: '20px', paddingRight: '24px' }}>
+                      <Link href="https://youtube.com/@rulcode"><Img src={SOCIAL_ICONS.youtube} width="20" height="20" alt="YouTube" /></Link>
+                    </Column>
+                    <Column style={{ width: '20px' }}>
+                      <Link href="https://github.com/rulcode"><Img src={SOCIAL_ICONS.github} width="20" height="20" alt="GitHub" /></Link>
+                    </Column>
+                  </Row>
+                </Section>
+
+                <Section style={{ marginTop: '32px' }}>
+                  <Text className="text-force-grey" style={footerTextStyle}>
+                    Megapolis Street, Hinjewadi<br />
+                    Pune, 411057
+                    <AntiClip />
+                  </Text>
+                </Section>
               </Section>
             </Section>
           </Section>
         </Container>
+      
+        </div>
       </Body>
     </Html>
   )

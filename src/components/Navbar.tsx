@@ -31,7 +31,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
+import { useAppSelector } from "@/store/hooks";
 
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./ThemeToggle";
@@ -62,8 +63,27 @@ const Navbar = () => {
 
   const isAuthPage = pathname === "/login";
 
-  // Hide Navbar on DSA and Problem pages as they have their own implementation
-  if (pathname?.startsWith('/dsa/') || pathname?.startsWith('/problem/')) {
+  const algorithms = useAppSelector(state => state.algorithms.items);
+
+  const isDsaProblemPage = useMemo(() => {
+    if (!pathname) return false;
+    
+    // Exact match for known paths that have their own header
+    const knownPaths = ['/dsa/problems', '/dsa/get-started', '/dsa/core', '/dsa/blind-75'];
+    if (knownPaths.includes(pathname)) return true;
+    
+    // Match for /problem/[slug]
+    if (pathname.startsWith('/problem/')) {
+      const slug = pathname.replace('/problem/', '');
+      // Only hide if it's a VALID algorithm slug
+      return algorithms.some(algo => algo.slug === slug || algo.id === slug);
+    }
+    
+    return false;
+  }, [pathname, algorithms]);
+
+  // Hide Navbar on valid DSA and Problem pages as they have their own implementation
+  if (isDsaProblemPage) {
     return null;
   }
 

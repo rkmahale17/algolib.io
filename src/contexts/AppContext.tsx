@@ -198,7 +198,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const currentUser = session?.user ?? null;
         dispatch(setUser(currentUser));
         if (currentUser) {
-          fetchProfile(currentUser.id);
+          // Await profile fetch before marking auth as finished loading
+          await fetchProfile(currentUser.id);
         }
         dispatch(setAuthLoading(false));
       }

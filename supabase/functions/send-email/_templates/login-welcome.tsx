@@ -1,5 +1,4 @@
-import {
-  Body,
+import {Body,
   Container,
   Head,
   Heading,
@@ -32,7 +31,8 @@ import {
   BACKGROUND_COLOR,
   BRAND_COLOR,
   BORDER_COLOR,
-} from './shared.ts'
+  AntiClip,
+  forceDarkWrapper} from './shared.tsx'
 
 interface LoginWelcomeEmailProps {
   supabase_url: string
@@ -54,8 +54,8 @@ export const LoginWelcomeEmail = ({
   return (
     <Html lang="en">
       <Head>
-        <meta name="color-scheme" content="only dark" />
-        <meta name="supported-color-schemes" content="only dark" />
+        <meta name="color-scheme" content="dark" />
+        <meta name="supported-color-schemes" content="dark" />
         <Font
           fontFamily="IBM Plex Sans Condensed"
           fallbackFontFamily="Arial"
@@ -76,102 +76,137 @@ export const LoginWelcomeEmail = ({
           fontWeight={400}
           fontStyle="normal"
         />
+      
+        
+        
+        
+        
         <style>{`
-          :root { color-scheme: only dark; }
           @media (prefers-color-scheme: dark) {
-            body { background-color: ${BACKGROUND_COLOR} !important; }
+            body, table, td, p, span, a {
+              color: #ffffff !important;
+              -webkit-text-fill-color: #ffffff !important;
+            }
+          }
+          .cta-button {
+            transition: all 0.2s ease-in-out !important;
+            box-shadow: 0 4px 12px rgba(132, 204, 22, 0.4) !important;
+          }
+          .cta-button:hover, .cta-button:focus {
+            background-color: #98e61a !important;
+            box-shadow: 0 10px 28px rgba(132, 204, 22, 0.7) !important;
+            transform: translateY(-3px) !important;
+            outline: none !important;
           }
         `}</style>
       </Head>
       <Preview>Sign in to RulCode - Your Magic Link</Preview>
-      <Body style={mainStyle}>
-        <Container style={containerStyle}>
-          <Section style={cardStyle}>
-            <Section style={{ marginBottom: '32px' }}>
-              <Img src={LOGO_URL} width="32" height="32" alt="RulCode" style={{ display: 'block', backgroundColor: 'transparent' }} />
-            </Section>
+      <Body className="body" style={mainStyle}>
+        <div style={forceDarkWrapper}>
 
-            <Section style={{ marginBottom: '48px' }}>
+        <Container className="bg-main" style={containerStyle}>
+          <Section className="bg-card" style={cardStyle}>
+            
+            {/* 1. Hero Image at the Absolute Top */}
+            <Section>
               <Img
                 src={HERO_IMAGE_URL}
-                width="520"
+                width="600"
                 height="auto"
                 alt="Welcome Back"
-                style={{ display: 'block', width: '100%', maxWidth: '520px', borderRadius: '12px', backgroundColor: 'transparent' }}
+                style={{ display: 'block', width: '100%', maxWidth: '600px', backgroundColor: 'transparent' }}
               />
             </Section>
 
-            <Section>
-              <Heading style={headingCondensed}>Welcome Back</Heading>
-              <Text style={textStyle}>
-                Click the button below to securely sign in to your RulCode account. This link will expire shortly.
-              </Text>
-            </Section>
-
-            <Section style={{ margin: '40px 0' }}>
-              <Link href={confirmationUrl} style={buttonStyle}>
-                Sign In to RulCode
-              </Link>
-            </Section>
-
-            {token && (
-              <Section style={{ marginBottom: '40px' }}>
-                <Text style={{ ...textStyle, marginBottom: '12px' }}>Alternatively, use this verification code:</Text>
-                <code style={{
-                  display: 'inline-block',
-                  padding: '12px 24px',
-                  backgroundColor: BACKGROUND_COLOR,
-                  borderRadius: '8px',
-                  border: `1px solid ${BORDER_COLOR}`,
-                  color: BRAND_COLOR,
-                  fontSize: '24px',
-                  fontFamily: 'monospace',
-                  letterSpacing: '4px',
-                }}>{token}</code>
-              </Section>
-            )}
-
-            <Hr style={hrStyle} />
-
-            <Section>
-              <Text style={footerStyle}>
-                If you didn't request this sign-in link, you can safely ignore this email.
-              </Text>
-
-              <Section style={{ marginTop: '32px', width: '152px' }}>
+            <Section style={{ padding: '40px' }}>
+              
+              {/* 2. Logo and Heading Row below Hero */}
+              <Section style={{ marginBottom: '32px' }}>
                 <Row>
-                  <Column style={{ width: '20px', paddingRight: '24px' }}>
-                    <Link href="https://x.com/rulcode"><Img src={SOCIAL_ICONS.x} width="20" height="20" alt="X" /></Link>
+                  <Column style={{ width: '42px', verticalAlign: 'middle', paddingRight: '8px' }}>
+                    <Img src={LOGO_URL} width="42" height="39" alt="Logo" style={{ display: 'block', borderRadius: '4px' }} />
                   </Column>
-                  <Column style={{ width: '20px', paddingRight: '24px' }}>
-                    <Link href="https://linkedin.com/company/rulcode"><Img src={SOCIAL_ICONS.linkedin} width="20" height="20" alt="LinkedIn" /></Link>
-                  </Column>
-                  <Column style={{ width: '20px', paddingRight: '24px' }}>
-                    <Link href="https://youtube.com/@rulcode"><Img src={SOCIAL_ICONS.youtube} width="20" height="20" alt="YouTube" /></Link>
-                  </Column>
-                  <Column style={{ width: '20px' }}>
-                    <Link href="https://github.com/rulcode"><Img src={SOCIAL_ICONS.github} width="20" height="20" alt="GitHub" /></Link>
+                  <Column style={{ verticalAlign: 'middle' }}>
+                    <Heading className="text-force-white" style={headingCondensed}>
+                      WELCOME&nbsp;BACK
+                    </Heading>
                   </Column>
                 </Row>
               </Section>
 
-              <Section style={{ marginTop: '32px' }}>
-                <Text style={footerTextStyle}>
-                  Megapolis Street, Hinjewadi<br />
-                  Pune, 411057
+              <Section>
+                <Text className="text-force-grey" style={textStyle}>
+                  Click the button below to securely sign in to your RulCode account. This link will expire shortly.
                 </Text>
               </Section>
 
-              <Section style={{ marginTop: '20px' }}>
-                <Text style={{ ...footerTextStyle, maxWidth: '160px' }}>
-                  <Link href="https://rulcode.com/unsubscribe" style={footerLinkStyle}>
-                    Unsubscribe
-                  </Link> from RulCode marketing emails.
+              <Section style={{ marginTop: '40px' }}>
+                <Link href={confirmationUrl} className="cta-button" style={buttonStyle}>
+                  Sign In to RulCode
+                </Link>
+              </Section>
+
+              {token && (
+                <Section style={{ marginTop: '40px' }}>
+                  <Text className="text-force-grey" style={{ ...textStyle, marginBottom: '16px' }}>
+                    Alternatively, use this verification code:
+                  </Text>
+                  <Section style={{ 
+                    backgroundColor: '#000000', 
+                    borderRadius: '8px', 
+                    border: `1px solid ${BORDER_COLOR}`,
+                    padding: '16px',
+                    textAlign: 'center' as const,
+                    width: '180px'
+                  }}>
+                    <Text style={{ color: BRAND_COLOR, WebkitTextFillColor: BRAND_COLOR,
+                      fontSize: '32px',
+                      fontFamily: 'monospace',
+                      letterSpacing: '6px',
+                      fontWeight: 'bold',
+                      margin: '0',
+                     }}>{token}</Text>
+                  </Section>
+                </Section>
+              )}
+
+              <Hr style={hrStyle} />
+
+              <Section>
+                <Text className="text-force-grey" style={footerStyle}>
+                  If you didn't request this sign-in link, you can safely ignore this email.
                 </Text>
+
+                <Section style={{ marginTop: '32px', width: '152px' }}>
+                  <Row>
+                    <Column style={{ width: '20px', paddingRight: '24px' }}>
+                      <Link href="https://x.com/rulcode"><Img src={SOCIAL_ICONS.x} width="20" height="20" alt="X" /></Link>
+                    </Column>
+                    <Column style={{ width: '20px', paddingRight: '24px' }}>
+                      <Link href="https://linkedin.com/company/rulcode"><Img src={SOCIAL_ICONS.linkedin} width="20" height="20" alt="LinkedIn" /></Link>
+                    </Column>
+                    <Column style={{ width: '20px', paddingRight: '24px' }}>
+                      <Link href="https://youtube.com/@rulcode"><Img src={SOCIAL_ICONS.youtube} width="20" height="20" alt="YouTube" /></Link>
+                    </Column>
+                    <Column style={{ width: '20px' }}>
+                      <Link href="https://github.com/rulcode"><Img src={SOCIAL_ICONS.github} width="20" height="20" alt="GitHub" /></Link>
+                    </Column>
+                  </Row>
+                </Section>
+
+                <Section style={{ marginTop: '32px' }}>
+                  <Text className="text-force-grey" style={footerTextStyle}>
+                    Megapolis Street, Hinjewadi<br />
+                    Pune, 411057
+                    <AntiClip />
+                  </Text>
+                </Section>
               </Section>
             </Section>
           </Section>
         </Container>
+      
+        </div>
       </Body>
     </Html>
   )

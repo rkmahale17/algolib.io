@@ -71,11 +71,14 @@ export async function updateSession(request: NextRequest) {
           return NextResponse.redirect(url)
       }
 
-      // Admin Protection
+      // Admin Protection - Basic authentication check only.
+      // Role-based protection is handled at the layout/page level (ProtectedAdminRoute)
+      // to avoid redundant database queries in the middleware.
       if (url.pathname.startsWith('/admin')) {
-          const adminId = process.env.NEXT_PUBLIC_ADMIN_USER_ID;
-          if (user.id !== adminId) {
-              url.pathname = '/dashboard'
+          if (!user) {
+              const next = url.pathname
+              url.pathname = '/login'
+              url.searchParams.set('next', next)
               return NextResponse.redirect(url)
           }
       }

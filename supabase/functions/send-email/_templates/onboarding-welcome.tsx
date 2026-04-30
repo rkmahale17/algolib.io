@@ -32,17 +32,13 @@ import {
   AntiClip,
   forceDarkWrapper} from './shared.tsx'
 
-interface SubscriptionCancelledEmailProps {
+interface OnboardingWelcomeEmailProps {
   user_email: string
-  period_end?: string
 }
 
-export const SubscriptionCancelledEmail = ({
+export const OnboardingWelcomeEmail = ({
   user_email,
-  period_end,
-}: SubscriptionCancelledEmailProps) => {
-  const expiryDate = period_end ? new Date(period_end).toLocaleDateString() : 'the end of your current period'
-
+}: OnboardingWelcomeEmailProps) => {
   return (
     <Html lang="en">
       <Head>
@@ -92,7 +88,7 @@ export const SubscriptionCancelledEmail = ({
           }
         `}</style>
       </Head>
-      <Preview>RulCode Pro: Subscription Cancelled</Preview>
+      <Preview>Welcome to the future of algorithm mastery!</Preview>
       <Body className="body" style={mainStyle}>
         <div style={forceDarkWrapper}>
 
@@ -104,7 +100,7 @@ export const SubscriptionCancelledEmail = ({
                 src={HERO_IMAGE_URL}
                 width="600"
                 height="auto"
-                alt="RulCode Pro"
+                alt="Welcome to RulCode"
                 style={{ display: 'block', width: '100%', maxWidth: '600px', backgroundColor: 'transparent' }}
               />
             </Section>
@@ -113,17 +109,11 @@ export const SubscriptionCancelledEmail = ({
               <Section style={{ marginBottom: '32px' }}>
                 <Row>
                   <Column style={{ width: '42px', verticalAlign: 'middle', paddingRight: '8px' }}>
-                    <Img
-                      src={LOGO_URL}
-                      width="42"
-                      height="39"
-                      alt="Logo"
-                      style={{ display: 'block', borderRadius: '4px' }}
-                    />
+                    <Img src={LOGO_URL} width="42" height="39" alt="Logo" style={{ display: 'block', borderRadius: '4px' }} />
                   </Column>
                   <Column style={{ verticalAlign: 'middle' }}>
                     <Heading className="text-force-white" style={headingCondensed}>
-                      PRO&nbsp;CANCELLED
+                      WELCOME&nbsp;HOME
                     </Heading>
                   </Column>
                 </Row>
@@ -131,16 +121,16 @@ export const SubscriptionCancelledEmail = ({
 
               <Section>
                 <Text className="text-force-grey" style={textStyle}>
-                  Your RulCode Pro subscription has been cancelled. You will continue to have access to all premium features until <span style={{ color: '#ffffff', WebkitTextFillColor: '#ffffff', fontWeight: '600'  }}>{expiryDate}</span>.
+                  We're thrilled to have you on board. RulCode is designed to help you master complex algorithms through intuitive visualizations and focused practice.
                 </Text>
                 <Text className="text-force-grey" style={textStyle}>
-                  After this date, your account will revert to the free plan. We'd love to have you back whenever you're ready to resume your prep!
+                  You now have access to our library of 200+ algorithm patterns, interactive playgrounds, and expert study guides.
                 </Text>
               </Section>
 
               <Section style={{ marginTop: '40px' }}>
-                <Link href="https://rulcode.com/pricing" style={buttonStyle}>
-                  Reactivate Pro
+                <Link href="https://rulcode.com/problems" style={buttonStyle}>
+                  Start Practicing
                 </Link>
               </Section>
 
@@ -148,7 +138,7 @@ export const SubscriptionCancelledEmail = ({
 
               <Section>
                 <Text className="text-force-grey" style={footerStyle}>
-                  If you have any questions or feedback about why you're leaving, we'd love to hear from you. Just reply to this email.
+                  If you have any questions or need help getting started, our team is always here to support you.
                 </Text>
 
                 <Section style={{ marginTop: '32px', width: '152px' }}>
@@ -186,4 +176,4 @@ export const SubscriptionCancelledEmail = ({
   )
 }
 
-export default SubscriptionCancelledEmail
+export default OnboardingWelcomeEmail

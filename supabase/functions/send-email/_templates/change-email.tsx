@@ -32,16 +32,20 @@ import {
   AntiClip,
   forceDarkWrapper} from './shared.tsx'
 
-interface SubscriptionCancelledEmailProps {
-  user_email: string
-  period_end?: string
+interface ChangeEmailProps {
+  supabase_url: string
+  token_hash: string
+  redirect_to: string
+  email_action_type: string
 }
 
-export const SubscriptionCancelledEmail = ({
-  user_email,
-  period_end,
-}: SubscriptionCancelledEmailProps) => {
-  const expiryDate = period_end ? new Date(period_end).toLocaleDateString() : 'the end of your current period'
+export const ChangeEmail = ({
+  supabase_url,
+  token_hash,
+  redirect_to,
+  email_action_type,
+}: ChangeEmailProps) => {
+  const verifyUrl = `${supabase_url}/auth/v1/verify?token=${token_hash}&type=${email_action_type}&redirect_to=${redirect_to}`
 
   return (
     <Html lang="en">
@@ -92,7 +96,7 @@ export const SubscriptionCancelledEmail = ({
           }
         `}</style>
       </Head>
-      <Preview>RulCode Pro: Subscription Cancelled</Preview>
+      <Preview>Verify your new email address for RulCode</Preview>
       <Body className="body" style={mainStyle}>
         <div style={forceDarkWrapper}>
 
@@ -104,7 +108,7 @@ export const SubscriptionCancelledEmail = ({
                 src={HERO_IMAGE_URL}
                 width="600"
                 height="auto"
-                alt="RulCode Pro"
+                alt="Change Email"
                 style={{ display: 'block', width: '100%', maxWidth: '600px', backgroundColor: 'transparent' }}
               />
             </Section>
@@ -113,17 +117,11 @@ export const SubscriptionCancelledEmail = ({
               <Section style={{ marginBottom: '32px' }}>
                 <Row>
                   <Column style={{ width: '42px', verticalAlign: 'middle', paddingRight: '8px' }}>
-                    <Img
-                      src={LOGO_URL}
-                      width="42"
-                      height="39"
-                      alt="Logo"
-                      style={{ display: 'block', borderRadius: '4px' }}
-                    />
+                    <Img src={LOGO_URL} width="42" height="39" alt="Logo" style={{ display: 'block', borderRadius: '4px' }} />
                   </Column>
                   <Column style={{ verticalAlign: 'middle' }}>
                     <Heading className="text-force-white" style={headingCondensed}>
-                      PRO&nbsp;CANCELLED
+                      VERIFY&nbsp;EMAIL
                     </Heading>
                   </Column>
                 </Row>
@@ -131,16 +129,13 @@ export const SubscriptionCancelledEmail = ({
 
               <Section>
                 <Text className="text-force-grey" style={textStyle}>
-                  Your RulCode Pro subscription has been cancelled. You will continue to have access to all premium features until <span style={{ color: '#ffffff', WebkitTextFillColor: '#ffffff', fontWeight: '600'  }}>{expiryDate}</span>.
-                </Text>
-                <Text className="text-force-grey" style={textStyle}>
-                  After this date, your account will revert to the free plan. We'd love to have you back whenever you're ready to resume your prep!
+                  You've requested to change your email address. Please click the button below to verify your new email and complete the change.
                 </Text>
               </Section>
 
               <Section style={{ marginTop: '40px' }}>
-                <Link href="https://rulcode.com/pricing" style={buttonStyle}>
-                  Reactivate Pro
+                <Link className="cta-button" href={verifyUrl} style={buttonStyle}>
+                  Verify New Email
                 </Link>
               </Section>
 
@@ -148,7 +143,7 @@ export const SubscriptionCancelledEmail = ({
 
               <Section>
                 <Text className="text-force-grey" style={footerStyle}>
-                  If you have any questions or feedback about why you're leaving, we'd love to hear from you. Just reply to this email.
+                  If you didn't request this change, please contact our support team immediately.
                 </Text>
 
                 <Section style={{ marginTop: '32px', width: '152px' }}>
@@ -186,4 +181,4 @@ export const SubscriptionCancelledEmail = ({
   )
 }
 
-export default SubscriptionCancelledEmail
+export default ChangeEmail
