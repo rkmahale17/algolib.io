@@ -3,8 +3,6 @@ project_id = "dkebbjneobjtmuzzrsdo"
 [functions.fetch-algorithms]
 verify_jwt = false
 
-[functions.generate-algorithm-diagram]
-verify_jwt = false
 
 [functions.generate-algorithm]
 verify_jwt = false
@@ -12,5 +10,3 @@ verify_jwt = false
 [functions.send-email]
 verify_jwt = false
 
-[functions.create-checkout-session]
-verify_jwt = false
