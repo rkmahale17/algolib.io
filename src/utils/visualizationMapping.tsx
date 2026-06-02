@@ -78,6 +78,7 @@ export const visualizationMap: Record<string, any> = {
   'lcs': dynamic(() => import('@/components/visualizations/algorithms/LCSVisualization').then(m => m.LCSVisualization), { ssr: false }),
   'lis': dynamic(() => import('@/components/visualizations/algorithms/LISVisualization').then(m => m.LISVisualization), { ssr: false }),
   'edit-distance': dynamic(() => import('@/components/visualizations/algorithms/EditDistanceVisualization').then(m => m.EditDistanceVisualization), { ssr: false }),
+  'regular-expression-matching': dynamic(() => import('@/components/visualizations/algorithms/RegularExpressionMatchingVisualization').then(m => m.RegularExpressionMatchingVisualization), { ssr: false }),
   'matrix-path-dp': dynamic(() => import('@/components/visualizations/algorithms/MatrixPathVisualization').then(m => m.MatrixPathVisualization), { ssr: false }),
   'house-robber': dynamic(() => import('@/components/visualizations/algorithms/HouseRobberVisualization').then(m => m.HouseRobberVisualization), { ssr: false }),
   'best-time-to-buy-and-sell-stock-with-cooldown': dynamic(() => import('@/components/visualizations/algorithms/BestTimeToBuyAndSellStockWithCooldownVisualization').then(m => m.BestTimeToBuyAndSellStockWithCooldownVisualization), { ssr: false }),
@@ -327,6 +328,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
   'distinct-subsequences': {
     title: 'Distinct Subsequences',
     description: 'Visualize how a 2D dynamic programming table tracks the number of ways a short string can be formed from a long string by deleting characters.'
+  },
+  'regular-expression-matching': {
+    title: 'Regular Expression Matching',
+    description: 'Visualize the top-down dynamic programming approach to match a string against a pattern containing . and *.'
   },
   'burst-balloons': {
     title: 'Burst Balloons',
