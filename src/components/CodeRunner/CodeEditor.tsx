@@ -1,4 +1,4 @@
-import React, { useRef, useImperativeHandle, forwardRef } from 'react';
+import React, { useRef, useImperativeHandle, forwardRef, useMemo } from 'react';
 import { useTheme } from "next-themes";
 import { IsolatedCodeEditor } from '../visualizations/shared/IsolatedCodeEditor';
 
@@ -71,6 +71,35 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(({
     }
   };
 
+  // Stable reference: only updates when individual settings values change
+  const monacoOptions = useMemo(() => ({
+    minimap: { enabled: customOptions?.minimap ?? false },
+    lineNumbers: customOptions?.lineNumbers || 'on',
+    roundedSelection: false,
+    scrollBeyondLastLine: false,
+    automaticLayout: true,
+    padding: { top: 16, bottom: 16 },
+    fontFamily: "'JetBrains Mono', 'Fira Code', Consolas, monospace",
+    fontLigatures: true,
+    tabSize: customOptions?.tabSize || 2,
+    detectIndentation: false,
+    insertSpaces: true,
+    wordWrap: customOptions?.wordWrap || 'off',
+    quickSuggestions: customOptions?.autocomplete !== false,
+    suggestOnTriggerCharacters: customOptions?.autocomplete !== false,
+    parameterHints: { enabled: customOptions?.autocomplete !== false },
+    tabCompletion: customOptions?.autocomplete !== false ? 'on' : 'off',
+    wordBasedSuggestions: customOptions?.autocomplete !== false ? 'currentDocument' : 'off',
+    acceptSuggestionOnCommitCharacter: customOptions?.autocomplete !== false,
+    acceptSuggestionOnEnter: customOptions?.autocomplete !== false ? 'on' : 'off',
+  }), [
+    customOptions?.minimap,
+    customOptions?.lineNumbers,
+    customOptions?.tabSize,
+    customOptions?.wordWrap,
+    customOptions?.autocomplete,
+  ]);
+
   return (
     <div className={`h-full w-full overflow-hidden bg-background min-h-[300px] `}>
       <IsolatedCodeEditor
@@ -81,27 +110,7 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(({
         onChange={onChange}
         readOnly={customOptions?.readOnly ?? false}
         fontSize={customOptions?.fontSize || 15}
-        options={{
-          minimap: { enabled: false },
-          lineNumbers: customOptions?.lineNumbers || 'on',
-          roundedSelection: false,
-          scrollBeyondLastLine: false,
-          automaticLayout: true,
-          padding: { top: 16, bottom: 16 },
-          fontFamily: "'JetBrains Mono', 'Fira Code', Consolas, monospace",
-          fontLigatures: true,
-          tabSize: customOptions?.tabSize || 2,
-          detectIndentation: false,
-          insertSpaces: true,
-          wordWrap: customOptions?.wordWrap || 'off',
-          quickSuggestions: customOptions?.autocomplete !== false,
-          suggestOnTriggerCharacters: customOptions?.autocomplete !== false,
-          parameterHints: { enabled: customOptions?.autocomplete !== false },
-          tabCompletion: customOptions?.autocomplete !== false ? 'on' : 'off',
-          wordBasedSuggestions: customOptions?.autocomplete !== false ? 'currentDocument' : 'off',
-          acceptSuggestionOnCommitCharacter: customOptions?.autocomplete !== false,
-          acceptSuggestionOnEnter: customOptions?.autocomplete !== false ? 'on' : 'off',
-        }}
+        options={monacoOptions}
         className={isMobile ? "min-h-[300px]" : ""}
         onShortcut={onShortcut}
       />

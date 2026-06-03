@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 
 interface FilterState {
     status: string;
-    difficulty: string;
+    difficulty: string[];
     topics: string[];
     language: string;
 }
@@ -26,7 +26,7 @@ export const ProblemFilterPopup = ({ filters, setFilters, trigger, topics = [] }
     const handleReset = () => {
         setFilters({
             status: 'all',
-            difficulty: 'all',
+            difficulty: [],
             topics: [],
             language: 'all'
         });
@@ -127,13 +127,20 @@ export const ProblemFilterPopup = ({ filters, setFilters, trigger, topics = [] }
                             label="Difficulty"
                             id="filter-difficulty"
                             icon={<div className="w-4 h-4 border-2 border-current rounded-full flex items-center justify-center text-[8px] font-">D</div>}
-                            value={filters.difficulty}
-                            onValueChange={(val: string) => setFilters(prev => ({ ...prev, difficulty: val }))}
+                            value={filters.difficulty.length === 1 ? filters.difficulty[0] : (filters.difficulty.length === 0 ? 'all' : 'multiple')}
+                            onValueChange={(val: string) => {
+                                if (val === 'all') {
+                                    setFilters(prev => ({ ...prev, difficulty: [] }));
+                                } else if (val !== 'multiple') {
+                                    setFilters(prev => ({ ...prev, difficulty: [val] }));
+                                }
+                            }}
                             options={[
                                 { label: 'All', value: 'all' },
                                 { label: 'Easy', value: 'easy' },
                                 { label: 'Medium', value: 'medium' },
-                                { label: 'Hard', value: 'hard' }
+                                { label: 'Hard', value: 'hard' },
+                                ...(filters.difficulty.length > 1 ? [{ label: 'Multiple', value: 'multiple' }] : [])
                             ]}
                         />
                         <FilterRow

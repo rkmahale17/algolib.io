@@ -54,49 +54,42 @@ export const useAlgorithmLayout = (): UseAlgorithmLayoutReturn => {
     // Legacy activeTab compatibility
     const [activeTab, setActiveTabState] = useState("description");
 
-    const [leftTabs, setLeftTabs] = useState<string[]>(() => {
-        if (typeof window !== "undefined") {
-            const saved = localStorage.getItem("dsa-layout-left-tabs");
-            if (saved) {
-                try {
-                    return JSON.parse(saved);
-                } catch (e) {
-                    console.error("Failed to parse left tabs", e);
-                }
+    const [leftTabs, setLeftTabs] = useState<string[]>(DEFAULT_LEFT_TABS);
+    const [rightTabs, setRightTabs] = useState<string[]>(DEFAULT_RIGHT_TABS);
+    const [activeLeftTab, setActiveLeftTabState] = useState<string>("description");
+    const [activeRightTab, setActiveRightTabState] = useState<string>("editor");
+
+    // Load layout states from localStorage on client mount to prevent SSR hydration mismatch
+    useEffect(() => {
+        const savedLeft = localStorage.getItem("dsa-layout-left-tabs");
+        if (savedLeft) {
+            try {
+                setLeftTabs(JSON.parse(savedLeft));
+            } catch (e) {
+                console.error("Failed to parse left tabs", e);
             }
         }
-        return DEFAULT_LEFT_TABS;
-    });
 
-    const [rightTabs, setRightTabs] = useState<string[]>(() => {
-        if (typeof window !== "undefined") {
-            const saved = localStorage.getItem("dsa-layout-right-tabs");
-            if (saved) {
-                try {
-                    return JSON.parse(saved);
-                } catch (e) {
-                    console.error("Failed to parse right tabs", e);
-                }
+        const savedRight = localStorage.getItem("dsa-layout-right-tabs");
+        if (savedRight) {
+            try {
+                setRightTabs(JSON.parse(savedRight));
+            } catch (e) {
+                console.error("Failed to parse right tabs", e);
             }
         }
-        return DEFAULT_RIGHT_TABS;
-    });
 
-    const [activeLeftTab, setActiveLeftTabState] = useState<string>(() => {
-        if (typeof window !== "undefined") {
-            const saved = localStorage.getItem("dsa-layout-active-left-tab");
-            if (saved) return saved;
+        const savedActiveLeft = localStorage.getItem("dsa-layout-active-left-tab");
+        if (savedActiveLeft) {
+            setActiveLeftTabState(savedActiveLeft);
+            setActiveTabState(savedActiveLeft); // Sync legacy activeTab compatibility
         }
-        return "description";
-    });
 
-    const [activeRightTab, setActiveRightTabState] = useState<string>(() => {
-        if (typeof window !== "undefined") {
-            const saved = localStorage.getItem("dsa-layout-active-right-tab");
-            if (saved) return saved;
+        const savedActiveRight = localStorage.getItem("dsa-layout-active-right-tab");
+        if (savedActiveRight) {
+            setActiveRightTabState(savedActiveRight);
         }
-        return "editor";
-    });
+    }, []);
 
     const setActiveTab = useCallback((tab: string) => {
         setActiveTabState(tab);
