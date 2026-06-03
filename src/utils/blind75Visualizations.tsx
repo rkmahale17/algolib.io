@@ -95,6 +95,7 @@ const blind75Map: Record<string, React.LazyExoticComponent<React.ComponentType<a
   "last-stone-weight": React.lazy(() => import("@/components/visualizations/algorithms/LastStoneWeightVisualization").then(m => ({ default: m.LastStoneWeightVisualization }))),
   "k-closest-points-to-origin": React.lazy(() => import("@/components/visualizations/algorithms/KClosestPointsVisualization").then(m => ({ default: m.KClosestPointsVisualization }))),
   "k-closest": React.lazy(() => import("@/components/visualizations/algorithms/KClosestPointsVisualization").then(m => ({ default: m.KClosestPointsVisualization }))),
+  "happy-number": React.lazy(() => import("@/components/visualizations/algorithms/HappyNumberVisualization").then(m => ({ default: m.HappyNumberVisualization }))),
 };
 
 export const renderBlind75Visualization = (algoId: string): React.ReactNode | null => {

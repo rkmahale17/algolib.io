@@ -238,7 +238,7 @@ Deno.serve(async (req) => {
         {
           "implementations": [
             {
-              "lang": "TypeScript", // "Python", "Java", "C++"
+              "lang": "TypeScript", // "python", "java", "cpp"
               "code": [
                 {
                   "codeType": "optimize" | "strategy-name", 
@@ -341,7 +341,7 @@ Deno.serve(async (req) => {
       // But passing it is good context.
 
       const [tsData, pyData, javaData, cppData] = await Promise.all([
-        generateChunk(implsPrompt(["typescript"])),
+        generateChunk(implsPrompt(["TypeScript"])),
         generateChunk(implsPrompt(["python"])),
         generateChunk(implsPrompt(["java"])),
         generateChunk(implsPrompt(["cpp"])),
@@ -349,13 +349,32 @@ Deno.serve(async (req) => {
 
       if (!tsData || !pyData || !javaData || !cppData) throw new Error("Failed to generate Implementations.");
 
+      const allImpls = [
+        ...(tsData.implementations || []),
+        ...(pyData.implementations || []),
+        ...(javaData.implementations || []),
+        ...(cppData.implementations || [])
+      ];
+
+      // Normalize languages to match frontend expected IDs
+      const normalizedImpls = allImpls.map((impl: any) => {
+        let normalizedLang = impl.lang;
+        if (!normalizedLang) return impl;
+        const lower = normalizedLang.toLowerCase();
+        if (lower === 'c++' || lower === 'cplusplus' || lower === 'cpp') {
+          normalizedLang = 'cpp';
+        } else if (lower === 'typescript') {
+          normalizedLang = 'TypeScript';
+        } else if (lower === 'python') {
+          normalizedLang = 'python';
+        } else if (lower === 'java') {
+          normalizedLang = 'java';
+        }
+        return { ...impl, lang: normalizedLang };
+      });
+
       responseData = {
-        implementations: [
-          ...(tsData.implementations || []),
-          ...(pyData.implementations || []),
-          ...(javaData.implementations || []),
-          ...(cppData.implementations || [])
-        ],
+        implementations: normalizedImpls,
       };
 
     } else if (target === "enhance_comments") {
@@ -404,15 +423,34 @@ Deno.serve(async (req) => {
         generateChunk(implsPrompt(["cpp"])),
       ]);
 
+      const allImplsLegacy = [
+        ...(tsData.implementations || []),
+        ...(pyData.implementations || []),
+        ...(javaData.implementations || []),
+        ...(cppData.implementations || [])
+      ];
+
+      // Normalize languages to match frontend expected IDs
+      const normalizedImplsLegacy = allImplsLegacy.map((impl: any) => {
+        let normalizedLang = impl.lang;
+        if (!normalizedLang) return impl;
+        const lower = normalizedLang.toLowerCase();
+        if (lower === 'c++' || lower === 'cplusplus' || lower === 'cpp') {
+          normalizedLang = 'cpp';
+        } else if (lower === 'typescript') {
+          normalizedLang = 'TypeScript';
+        } else if (lower === 'python') {
+          normalizedLang = 'python';
+        } else if (lower === 'java') {
+          normalizedLang = 'java';
+        }
+        return { ...impl, lang: normalizedLang };
+      });
+
       responseData = {
         ...infoData,
         ...testData,
-        implementations: [
-          ...(tsData.implementations || []),
-          ...(pyData.implementations || []),
-          ...(javaData.implementations || []),
-          ...(cppData.implementations || [])
-        ],
+        implementations: normalizedImplsLegacy,
       };
     }
 

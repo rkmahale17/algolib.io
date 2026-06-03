@@ -162,6 +162,7 @@ export const visualizationMap: Record<string, any> = {
   'sieve-of-eratosthenes': dynamic(() => import('@/components/visualizations/algorithms/SieveOfEratosthenesVisualization').then(m => m.SieveOfEratosthenesVisualization), { ssr: false }),
   'karatsuba': dynamic(() => import('@/components/visualizations/algorithms/KaratsubaVisualization').then(m => m.KaratsubaVisualization), { ssr: false }),
   'karatsuba-multiplication': dynamic(() => import('@/components/visualizations/algorithms/KaratsubaVisualization').then(m => m.KaratsubaVisualization), { ssr: false }),
+  'happy-number': dynamic(() => import('@/components/visualizations/algorithms/HappyNumberVisualization').then(m => m.HappyNumberVisualization), { ssr: false }),
 };
 
 export const visualizationMetadataMap: Record<string, { title: string; description: string }> = {
@@ -344,6 +345,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
   'number-of-islands': {
     title: 'Number of Islands',
     description: 'Visualize DFS/BFS flood-fill on a 2D grid to count distinct connected land masses surrounded by water.'
+  },
+  'happy-number': {
+    title: 'Happy Number',
+    description: "Visualize cycle detection using a Hash Set to determine if repeatedly summing the square of a number's digits eventually reaches 1."
   }
 };
 
