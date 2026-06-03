@@ -206,6 +206,13 @@
           window.monaco.editor.setModelMarkers(editor.getModel(), "owner", markers);
         } else if (type === 'TRIGGER_LAYOUT') {
           editor.layout();
+        } else if (type === 'UPDATE_OPTIONS') {
+          // Apply live setting changes (fontSize, lineNumbers, wordWrap, minimap, tabSize, autocomplete, etc.)
+          var updatedOpts = Object.assign({}, data.options || {});
+          if (data.fontSize) {
+            updatedOpts.fontSize = data.fontSize;
+          }
+          editor.updateOptions(updatedOpts);
         } else if (type === 'UPDATE_PRIMARY_COLOR') {
           const styleId = 'dynamic-primary-color';
           let style = document.getElementById(styleId);

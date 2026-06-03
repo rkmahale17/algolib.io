@@ -59,13 +59,13 @@ const UserMenu = () => {
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button
-                        variant="ghost"
-                        className="relative h-8 w-8 rounded-full"
+                        variant="outline"
+                        className="relative h-8 w-8 rounded-full border border-border/60 bg-background/50 p-0 overflow-hidden flex items-center justify-center hover:bg-muted/80 transition-colors"
                     >
-                        <Avatar className="h-8 w-8">
+                        <Avatar className="h-7 w-7">
                             <AvatarImage src={profile?.avatar_url || user?.user_metadata?.avatar_url || undefined} alt={profile?.full_name || user?.user_metadata?.full_name || "User"} className="object-cover" />
                             <AvatarFallback className="bg-muted text-muted-foreground">
-                                <User className="h-4 w-4" />
+                                <User className="h-3.5 w-3.5" />
                             </AvatarFallback>
                         </Avatar>
                     </Button>

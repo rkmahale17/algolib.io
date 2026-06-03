@@ -126,6 +126,13 @@ export const IsolatedCodeEditor = React.forwardRef<any, IsolatedCodeEditorProps>
     }
   }, [highlightedLines, isInternalReady]);
 
+  // Send live option updates (fontSize, lineNumbers, wordWrap, minimap, tabSize, autocomplete, etc.)
+  useEffect(() => {
+    if (isInternalReady && iframeRef.current?.contentWindow) {
+      iframeRef.current.contentWindow.postMessage({ type: 'UPDATE_OPTIONS', data: { fontSize, options } }, '*');
+    }
+  }, [fontSize, options, isInternalReady]);
+
   return (
     <iframe
       ref={iframeRef}

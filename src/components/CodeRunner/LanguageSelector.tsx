@@ -39,7 +39,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
       onValueChange={(value) => onLanguageChange(value as Language)}
       disabled={disabled}
     >
-      <SelectTrigger className="w-[140px] h-full bg-background border-0 border-r rounded-none rounded-tl-lg text-xs focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none transition-colors hover:bg-muted/50">
+      <SelectTrigger className="w-[140px] h-full bg-transparent border-0 border-r rounded-none text-xs focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none transition-colors hover:bg-muted/50">
         <SelectValue placeholder="Select Language" />
       </SelectTrigger>
       <SelectContent className="p-2 z-[100]">

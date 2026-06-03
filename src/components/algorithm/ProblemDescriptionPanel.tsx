@@ -1464,24 +1464,18 @@ export const ProblemDescriptionPanel = React.memo(
                   fallbackDescription="Create an account or sign in to access interactive algorithm visualizations."
                   disabled={true}
                 >
-                  <div className="flex-1 flex flex-col border rounded-lg overflow-hidden bg-muted/10 m-4">
-                    <div className="flex items-center justify-between px-4 py-2 border-b bg-background/50 backdrop-blur-sm shrink-0">
-                      <h3 className="text-sm font-medium flex items-center gap-2">
-                        <Eye className="w-4 h-4 text-primary" />
-                        Visualization
-                      </h3>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => setIsVisualizationMaximized(true)}
-                        title="Maximize Visualization"
-                      >
-                        <Maximize className="w-4 h-4" />
-                      </Button>
-                    </div>
+                  <div className="flex-1 flex flex-col relative h-full">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="absolute top-2 right-2 z-50 h-8 w-8 rounded-full bg-background/80 backdrop-blur shadow-sm hover:bg-background"
+                      onClick={() => setIsVisualizationMaximized(true)}
+                      title="Maximize Visualization"
+                    >
+                      <Maximize className="w-4 h-4" />
+                    </Button>
                     <div
-                      className={`flex-1 overflow-auto no-scrollbar relative flex flex-col ${(algorithm?.is_premium || algorithm?.is_pro || algorithm?.metadata?.is_pro) && !hasPremiumAccess && !isPlatformPreview ? "p-0" : "p-6"}`}
+                      className={`flex-1 overflow-auto no-scrollbar relative flex flex-col ${(algorithm?.is_premium || algorithm?.is_pro || algorithm?.metadata?.is_pro) && !hasPremiumAccess && !isPlatformPreview ? "p-0" : "p-2 sm:p-4"}`}
                     >
                       {(algorithm?.is_premium ||
                         algorithm?.is_pro ||

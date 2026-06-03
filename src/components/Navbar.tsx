@@ -747,10 +747,10 @@ const Navbar = ({
             </div>
           )}
 
-          {/* Problem Navigation (All screens) */}
+          {/* Problem Navigation */}
           {isProblemMode && (
-            <div className="flex items-center gap-2 ml-1 sm:ml-6 flex-1 text-sm font-medium">
-              <div className="flex items-center shadow-sm rounded-md overflow-hidden border border-border bg-secondary/50">
+            <div className="flex flex-1 justify-start lg:absolute lg:left-1/2 lg:top-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 lg:justify-center items-center z-10 ml-2 sm:ml-4 lg:ml-0 min-w-0 overflow-x-auto no-scrollbar">
+              <div className="flex items-center shadow-sm rounded-md overflow-hidden border border-border bg-secondary/50 shrink-0">
                 <button
                   onClick={onToggleSidebar}
                   className="flex items-center h-8 gap-1.5 sm:gap-2.5 px-2 sm:px-3 hover:bg-muted transition-colors group border-r border-border"
@@ -765,46 +765,26 @@ const Navbar = ({
                 {/* Navigation Buttons Group */}
                 <button
                   onClick={handlePreviousProblem}
-                  className="flex items-center justify-center h-8 w-7 sm:w-8 hover:bg-muted transition-colors border-r border-border text-foreground/80 hover:text-foreground"
+                  className="flex items-center justify-center h-8 w-7 sm:w-8 hover:bg-muted transition-colors border-r border-border text-foreground/80 hover:text-foreground shrink-0"
                   title="Previous problem"
                 >
                   <ChevronLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </button>
                 <button
                   onClick={handleRandomProblem}
-                  className="flex items-center justify-center h-8 w-7 sm:w-8 hover:bg-muted transition-colors border-r border-border text-foreground/80 hover:text-foreground"
+                  className="flex items-center justify-center h-8 w-7 sm:w-8 hover:bg-muted transition-colors border-r border-border text-foreground/80 hover:text-foreground shrink-0"
                   title="Random problem"
                 >
                   <Shuffle className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                 </button>
                 <button
                   onClick={handleNextProblem}
-                  className="flex items-center justify-center h-8 w-7 sm:w-8 hover:bg-muted transition-colors text-foreground/80 hover:text-foreground"
+                  className="flex items-center justify-center h-8 w-7 sm:w-8 hover:bg-muted transition-colors text-foreground/80 hover:text-foreground shrink-0"
                   title="Next problem"
                 >
                   <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </button>
               </div>
-            </div>
-          )}
-          {/* Center: Feedback Button */}
-          {isProblemMode && !hideFeedback && !showCondensedMenu && (
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
-              <Button variant="outline" size="sm" asChild className="h-8">
-                <a
-                  href="https://github.com/rkmahale17/rulcode.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    window.open("/feedback", "_blank");
-                  }}
-                >
-                  <MessageSquare className="w-4 h-4" />
-                  Feedback
-                </a>
-              </Button>
             </div>
           )}
 
@@ -898,79 +878,111 @@ const Navbar = ({
                   </DropdownMenu>
                 )}
 
-                {/* Desktop Actions - Show only if NOT condensed menu */}
-                {!hideShare &&
-                  !showCondensedMenu &&
-                  (!algorithm?.controls ||
-                    algorithm.controls?.social?.share !== false) &&
-                  handleShare && (
+                {/* Desktop Actions - Button Group for Share, Timer & Bug */}
+                {!showCondensedMenu && (
+                  <div className="flex items-center shadow-sm rounded-md overflow-hidden border border-border/60 bg-background/50 h-8">
+                    {/* Share Button */}
+                    {!hideShare && handleShare && (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                onClick={handleShare}
+                                className="flex items-center justify-center h-8 w-8 hover:bg-muted/80 transition-colors text-foreground/80 hover:text-foreground shrink-0 outline-none"
+                              >
+                                <Share2 className="h-4 w-4" />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">Share</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      )}
+
+                    {/* Divider between Share and Timer */}
+                    {!hideShare &&
+                      handleShare &&
+                      (!algorithm?.controls ||
+                        algorithm.controls?.header?.timer !== false) &&
+                      formatTime && (
+                        <div className="w-px h-4 bg-border/60 shrink-0" />
+                      )}
+
+                    {/* Timer Button */}
+                    {(!algorithm?.controls ||
+                      algorithm.controls?.header?.timer !== false) &&
+                      formatTime && (
+                        <TooltipProvider>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button
+                                className={cn(
+                                  "flex items-center justify-center h-8 w-8 hover:bg-muted/80 transition-colors text-foreground/80 hover:text-foreground shrink-0 outline-none",
+                                  isTimerRunning && "bg-secondary/80 text-foreground font-medium"
+                                )}
+                                title="Timer"
+                              >
+                                <Timer className="h-4 w-4" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-48">
+                              <div className="flex flex-col gap-2">
+                                <div className="flex items-center justify-between">
+                                  <span className="font-mono text-lg">
+                                    {formatTime(timerSeconds)}
+                                  </span>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => setTimerSeconds?.(0)}
+                                  >
+                                    <RotateCcw className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                                <div className="flex gap-2">
+                                  <Button
+                                    className="flex-1"
+                                    onClick={() =>
+                                      setIsTimerRunning?.(!isTimerRunning)
+                                    }
+                                  >
+                                    {isTimerRunning ? (
+                                      <Pause className="h-4 w-4 mr-2" />
+                                    ) : (
+                                      <Play className="h-4 w-4 mr-2" />
+                                    )}
+                                    {isTimerRunning ? "Pause" : "Start"}
+                                  </Button>
+                                </div>
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        </TooltipProvider>
+                      )}
+
+                    {/* Divider before Bug */}
+                    {((!hideShare && handleShare) ||
+                      ((!algorithm?.controls ||
+                        algorithm.controls?.header?.timer !== false) &&
+                        formatTime)) && (
+                      <div className="w-px h-4 bg-border/60 shrink-0" />
+                    )}
+
+                    {/* Bug / Feedback Button */}
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={handleShare}
+                          <button
+                            onClick={() => window.open("/feedback", "_blank")}
+                            className="flex items-center justify-center h-8 w-8 hover:bg-muted/80 transition-colors text-foreground/80 hover:text-foreground shrink-0 outline-none"
                           >
-                            <Share2 className="h-4 w-4" />
-                          </Button>
+                            <Bug className="h-4 w-4" />
+                          </button>
                         </TooltipTrigger>
-                        <TooltipContent side="bottom">Share</TooltipContent>
+                        <TooltipContent side="bottom">Feedback</TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
-                  )}
-
-                {!showCondensedMenu &&
-                  (!algorithm?.controls ||
-                    algorithm.controls?.header?.timer !== false) &&
-                  formatTime && (
-                    <TooltipProvider>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant={isTimerRunning ? "secondary" : "ghost"}
-                            size="sm"
-                            className="gap-2 font-mono h-8 text-xs"
-                          >
-                            <Timer className="h-4 w-4" />
-                            {formatTime(timerSeconds)}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-48">
-                          <div className="flex flex-col gap-2">
-                            <div className="flex items-center justify-between">
-                              <span className="font-mono text-lg">
-                                {formatTime(timerSeconds)}
-                              </span>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => setTimerSeconds?.(0)}
-                              >
-                                <RotateCcw className="h-4 w-4" />
-                              </Button>
-                            </div>
-                            <div className="flex gap-2">
-                              <Button
-                                className="flex-1"
-                                onClick={() =>
-                                  setIsTimerRunning?.(!isTimerRunning)
-                                }
-                              >
-                                {isTimerRunning ? (
-                                  <Pause className="h-4 w-4 mr-2" />
-                                ) : (
-                                  <Play className="h-4 w-4 mr-2" />
-                                )}
-                                {isTimerRunning ? "Pause" : "Start"}
-                              </Button>
-                            </div>
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-                    </TooltipProvider>
-                  )}
+                  </div>
+                )}
 
                 <div className="h-4 w-px bg-border mx-1" />
 
