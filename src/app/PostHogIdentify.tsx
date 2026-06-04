@@ -25,15 +25,20 @@ export default function PostHogIdentify(): null {
     if (!posthog) return;
 
     if (user?.id) {
-      // Only call identify if the user changed (avoid redundant calls)
-      if (lastIdentifiedId.current === user.id) return;
-      lastIdentifiedId.current = user.id;
+      // Only call identify if the user or important profile data changed
+      const plan = profile?.subscription_tier ?? 'free';
+      const status = profile?.subscription_status ?? 'none';
+      const isAdmin = profile?.role === 'admin';
+      
+      const currentIdState = `${user.id}-${plan}-${status}-${isAdmin}`;
+      if (lastIdentifiedId.current === currentIdState) return;
+      lastIdentifiedId.current = currentIdState;
 
       identifyUser(posthog, user.id, {
         email: user.email,
-        plan: profile?.subscription_tier ?? 'free',
-        subscription_status: profile?.subscription_status ?? 'none',
-        is_admin: profile?.role === 'admin',
+        plan: plan,
+        subscription_status: status,
+        is_admin: isAdmin,
       });
     } else {
       // User signed out — reset PostHog identity

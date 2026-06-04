@@ -7,7 +7,7 @@ import { Providers } from "./providers";
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarInset } from "@/components/ui/sidebar";
 import { FeedbackButton } from "@/components/FeedbackButton";
-import Script from "next/script";
+import { GoogleAnalytics } from '@next/third-parties/google';
 import PostHogPageView from "./PostHogPageView";
 import AdminViewToggle from "@/admin/components/AdminViewToggle";
 
@@ -52,20 +52,7 @@ export default function RootLayout({
 
           {/* Google Analytics 4 */}
           {process.env.NEXT_PUBLIC_GA_ID && (
-            <>
-              <Script
-                src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
-                strategy="afterInteractive"
-              />
-              <Script id="google-analytics" strategy="afterInteractive">
-                {`
-                  window.dataLayer = window.dataLayer || [];
-                  function gtag(){dataLayer.push(arguments);}
-                  gtag('js', new Date());
-                  gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}');
-                `}
-              </Script>
-            </>
+            <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
           )}
 
           <AppSidebar />
