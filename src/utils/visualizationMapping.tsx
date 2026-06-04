@@ -163,6 +163,8 @@ export const visualizationMap: Record<string, any> = {
   'karatsuba': dynamic(() => import('@/components/visualizations/algorithms/KaratsubaVisualization').then(m => m.KaratsubaVisualization), { ssr: false }),
   'karatsuba-multiplication': dynamic(() => import('@/components/visualizations/algorithms/KaratsubaVisualization').then(m => m.KaratsubaVisualization), { ssr: false }),
   'happy-number': dynamic(() => import('@/components/visualizations/algorithms/HappyNumberVisualization').then(m => m.HappyNumberVisualization), { ssr: false }),
+  'powx-n': dynamic(() => import('@/components/visualizations/algorithms/PowxNVisualization').then(m => m.PowxNVisualization), { ssr: false }),
+  'pow': dynamic(() => import('@/components/visualizations/algorithms/PowxNVisualization').then(m => m.PowxNVisualization), { ssr: false }),
 };
 
 export const visualizationMetadataMap: Record<string, { title: string; description: string }> = {
@@ -349,6 +351,14 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
   'happy-number': {
     title: 'Happy Number',
     description: "Visualize cycle detection using a Hash Set to determine if repeatedly summing the square of a number's digits eventually reaches 1."
+  },
+  'powx-n': {
+    title: 'Pow(x, n)',
+    description: 'Visualize binary exponentiation (exponentiation by squaring) to compute powers in O(log n) time.'
+  },
+  'pow': {
+    title: 'Pow(x, n)',
+    description: 'Visualize binary exponentiation (exponentiation by squaring) to compute powers in O(log n) time.'
   }
 };
 

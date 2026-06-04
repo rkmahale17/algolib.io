@@ -280,7 +280,7 @@ const formatValue = (value: any, type: string, lang: Language, typeHint?: string
         }
         if (lang === 'typescript') return `jsonToGraphNode(${JSON.stringify(val)})`;
         if (lang === 'python') return `json_to_graph_node(${jsonToPython(val)})`;
-        if (lang === 'java') return `jsonToGraphNode(${formatValue(val, 'any', 'java', 'List<List<Integer>>')})`;
+        if (lang === 'java') return `jsonToGraphNode(${formatValue(val, 'any', 'java', 'int[][]')})`;
         if (lang === 'cpp') return `jsonToGraphNode(${formatValue(val, 'any', 'cpp', 'vector<vector<int>>')})`;
     }
     if (type.includes('TrieNode')) {
@@ -600,6 +600,23 @@ const results = testCases.map((tc, index) => {
         ${requiredDS.includes('TrieNode') ? `if (actual instanceof TrieNode) serializedActual = trieNodeToJson(actual);` : ''}
     } catch(e) { serializedActual = "Serialization Failed: " + (e as Error).message; }
     
+    const isEpsilonEqual = (a, b) => {
+      if (typeof a === 'number' && typeof b === 'number') {
+        return Math.abs(a - b) < 1e-5;
+      }
+      if (Array.isArray(a) && Array.isArray(b)) {
+        if (a.length !== b.length) return false;
+        return a.every((val, i) => isEpsilonEqual(val, b[i]));
+      }
+      if (a !== null && typeof a === 'object' && b !== null && typeof b === 'object') {
+        const keysA = Object.keys(a);
+        const keysB = Object.keys(b);
+        if (keysA.length !== keysB.length) return false;
+        return keysA.every(k => isEpsilonEqual(a[k], b[k]));
+      }
+      return a === b;
+    };
+
     const isEqual = (a, b) => {
       const flatten = (val) => {
         if (Array.isArray(val)) return val;
@@ -628,7 +645,7 @@ const results = testCases.map((tc, index) => {
         return flat;
       };
       
-      return JSON.stringify(normalize(a)) === JSON.stringify(normalize(b));
+      return isEpsilonEqual(normalize(a), normalize(b));
     };
 
     let passed = false;
@@ -776,7 +793,19 @@ for tc in test_cases:
             # If it's the {head, pos} format from serializer, flatten it for comparison
             a_flat = a["head"] if isinstance(a, dict) and "head" in a and "pos" in a else a
             b_flat = b["head"] if isinstance(b, dict) and "head" in b and "pos" in b else b
-            return normalize(a_flat) == normalize(b_flat)
+            
+            def deep_approx_equal(x, y):
+                if isinstance(x, (int, float)) and isinstance(y, (int, float)):
+                    return abs(float(x) - float(y)) < 1e-5
+                if isinstance(x, list) and isinstance(y, list):
+                    if len(x) != len(y): return False
+                    return all(deep_approx_equal(i, j) for i, j in zip(x, y))
+                if isinstance(x, dict) and isinstance(y, dict):
+                    if set(x.keys()) != set(y.keys()): return False
+                    return all(deep_approx_equal(x[k], y[k]) for k in x)
+                return x == y
+                
+            return deep_approx_equal(normalize(a_flat), normalize(b_flat))
 
         passed = False
         if ${options?.multiExpected ? 'True' : 'False'} and isinstance(tc['expected'], list):
@@ -1030,15 +1059,64 @@ public class Main {
         return obj;
     }
 
-    private static boolean isEqual(Object a, Object b, boolean unordered) {
-        // If unordered, we must normalize and compare JSON
-        if (unordered) {
-            return toJson(normalize(a, true)).equals(toJson(normalize(b, true)));
+    private static List<Object> toList(Object obj) {
+        if (obj instanceof List) return new ArrayList<>((List<?>) obj);
+        if (obj != null && obj.getClass().isArray()) {
+            List<Object> list = new ArrayList<>();
+            int len = java.lang.reflect.Array.getLength(obj);
+            for (int i = 0; i < len; i++) {
+                list.add(java.lang.reflect.Array.get(obj, i));
+            }
+            return list;
+        }
+        return null;
+    }
+
+    private static boolean deepEqualEpsilon(Object a, Object b) {
+        if (a == b) return true;
+        if (a == null || b == null) return false;
+        
+        if (a instanceof Number && b instanceof Number) {
+            return Math.abs(((Number) a).doubleValue() - ((Number) b).doubleValue()) < 1e-5;
         }
         
-        // Robust comparison: Convert both to JSON string and compare
-        // This handles List vs Array, int[] vs Integer[], etc. automatically
-        return toJson(a).equals(toJson(b));
+        List<Object> listA = toList(a);
+        List<Object> listB = toList(b);
+        
+        if (listA != null && listB != null) {
+            if (listA.size() != listB.size()) return false;
+            for (int i = 0; i < listA.size(); i++) {
+                if (!deepEqualEpsilon(listA.get(i), listB.get(i))) return false;
+            }
+            return true;
+        }
+        
+        if (a instanceof Map && b instanceof Map) {
+            Map<?, ?> mapA = (Map<?, ?>) a;
+            Map<?, ?> mapB = (Map<?, ?>) b;
+            if (mapA.size() != mapB.size()) return false;
+            for (Map.Entry<?, ?> entry : mapA.entrySet()) {
+                if (!mapB.containsKey(entry.getKey())) return false;
+                if (!deepEqualEpsilon(entry.getValue(), mapB.get(entry.getKey()))) return false;
+            }
+            return true;
+        }
+
+        if (a instanceof String && b instanceof Character) {
+            return a.equals(b.toString());
+        }
+        if (a instanceof Character && b instanceof String) {
+            return b.equals(a.toString());
+        }
+
+        return a.equals(b);
+    }
+
+    private static boolean isEqual(Object a, Object b, boolean unordered) {
+        if (unordered) {
+            return deepEqualEpsilon(normalize(a, true), normalize(b, true));
+        }
+        return deepEqualEpsilon(normalize(a, false), normalize(b, false));
     }
 
     private static String toJson(Object obj) {
@@ -1294,7 +1372,7 @@ const generateCppRunner = (
                 chrono::duration<double, milli> duration = end - start;
                 
                 auto is_equal = [&](auto a, auto b) {
-                     return toJson(normalize(a, ${!!options?.unordered})) == toJson(normalize(b, ${!!options?.unordered}));
+                     return isEqualEpsilon(normalize(a, ${!!options?.unordered}), normalize(b, ${!!options?.unordered}));
                 };
 
                 bool passed = false;
@@ -1333,6 +1411,7 @@ const generateCppRunner = (
 #include <vector>
 #include <string>
 #include <chrono>
+#include <cmath>
 #include <algorithm>
 #include <queue>
 #include <map>
@@ -1388,6 +1467,8 @@ template < typename T >
         return "{}";
     } else if constexpr(std:: is_same_v<T, char>) {
         return "\\"" + string(1, val) + "\\"";
+    } else if constexpr(std::is_floating_point_v<T>) {
+        ostringstream ss; ss.precision(5); ss << val; return ss.str();
     } else if constexpr(std:: is_arithmetic_v<T>) {
         return to_string(val);
     } else if constexpr(std:: is_same_v<T, string>) {
@@ -1417,6 +1498,37 @@ template < typename T >
 template < typename T >
     void printJSON(const T& val) {
     cout << toJson(val);
+}
+template < typename T, typename U >
+bool isEqualEpsilon(const T& a, const U& b) {
+    using Ta = std::decay_t<T>;
+    using Tb = std::decay_t<U>;
+    if constexpr(std::is_arithmetic_v<Ta> && std::is_arithmetic_v<Tb>) {
+        if constexpr(std::is_floating_point_v<Ta> || std::is_floating_point_v<Tb>) {
+            return std::abs(static_cast<double>(a) - static_cast<double>(b)) < 1e-5;
+        } else {
+            return a == b;
+        }
+    } else if constexpr(is_vector_v<Ta> && is_vector_v<Tb>) {
+        if (a.size() != b.size()) return false;
+        for (size_t i = 0; i < a.size(); ++i) {
+            if (!isEqualEpsilon(a[i], b[i])) return false;
+        }
+        return true;
+    } else {
+        if constexpr(std::is_same_v<Ta, Tb>) {
+            return a == b;
+        } else if constexpr((std::is_same_v<Ta, char> && std::is_same_v<Tb, std::string>) || 
+                            (std::is_same_v<Ta, std::string> && std::is_same_v<Tb, char>)) {
+            if constexpr (std::is_same_v<Ta, char>) {
+                return b.length() == 1 && a == b[0];
+            } else {
+                return a.length() == 1 && a[0] == b;
+            }
+        } else {
+            return toJson(a) == toJson(b);
+        }
+    }
 }
 
 ${userHeaders}
@@ -1587,13 +1699,52 @@ const generateCppClassRunner = (
 #include <queue>
 #include <tuple>
 #include <chrono>
+#include <cmath>
+#include <type_traits>
 using namespace std;
+
+template<typename T> struct is_vector : std::false_type {};
+template<typename T> struct is_vector<std::vector<T>> : std::true_type {};
+template<typename T> constexpr bool is_vector_v = is_vector<T>::value;
+
+template < typename T, typename U >
+bool isEqualEpsilon(const T& a, const U& b) {
+    using Ta = std::decay_t<T>;
+    using Tb = std::decay_t<U>;
+    if constexpr(std::is_arithmetic_v<Ta> && std::is_arithmetic_v<Tb>) {
+        if constexpr(std::is_floating_point_v<Ta> || std::is_floating_point_v<Tb>) {
+            return std::abs(static_cast<double>(a) - static_cast<double>(b)) < 1e-5;
+        } else {
+            return a == b;
+        }
+    } else if constexpr(is_vector_v<Ta> && is_vector_v<Tb>) {
+        if (a.size() != b.size()) return false;
+        for (size_t i = 0; i < a.size(); ++i) {
+            if (!isEqualEpsilon(a[i], b[i])) return false;
+        }
+        return true;
+    } else {
+        if constexpr(std::is_same_v<Ta, Tb>) {
+            return a == b;
+        } else if constexpr((std::is_same_v<Ta, char> && std::is_same_v<Tb, std::string>) || 
+                            (std::is_same_v<Ta, std::string> && std::is_same_v<Tb, char>)) {
+            if constexpr (std::is_same_v<Ta, char>) {
+                return b.length() == 1 && a == b[0];
+            } else {
+                return a.length() == 1 && a[0] == b;
+            }
+        } else {
+            return toJson(a) == toJson(b);
+        }
+    }
+}
 
 // Json Helpers
 template<typename T> std::string toJson(const T& val) { 
     std::stringstream ss; 
     if constexpr (std::is_same_v<T, std::string>) { ss << "\\"" << val << "\\""; }
     else if constexpr (std::is_same_v<T, bool>) { ss << (val ? "true" : "false"); }
+    else if constexpr (std::is_floating_point_v<T>) { ss.precision(5); ss << val; }
     else { ss << val; }
     return ss.str(); 
 }
