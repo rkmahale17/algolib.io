@@ -29,7 +29,7 @@ if (typeof window !== 'undefined') {
   if (isProduction && !posthog.__loaded) {
     console.log("Posthog init");
     posthog.init(process.env.NEXT_PUBLIC_POSTHOG_TOKEN || '', {
-      api_host: `${window.location.origin}/ingest`,
+      api_host: `${window.location.origin}/p`,
       person_profiles: 'identified_only',
       ui_host: 'https://app.posthog.com',
       capture_pageview: false, // Next.js handles this via PostHogPageView
