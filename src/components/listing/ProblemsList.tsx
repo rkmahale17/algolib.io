@@ -1,16 +1,19 @@
-import { useState, useMemo, useEffect, ReactNode } from 'react';
+import { useState, useMemo, useEffect, ReactNode, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { DIFFICULTY_MAP } from "@/types/algorithm";
 import { ListingLayout } from "@/components/listing/ListingLayout";
 import { PremiumProblemCard } from "@/components/listing/PremiumProblemCard";
 import { useApp } from '@/contexts/AppContext';
+import { useAppSelector } from "@/store/hooks";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { getGroupedByCategory, normalizeCategory, resolveAlgoCategories } from "@/constants/categories";
-import { Brain, Target } from "lucide-react";
+import { Brain, Target, ListFilter } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { ProgressStats } from "@/components/profile/ProgressStats";
 import { cn } from "@/lib/utils";
 import { ProOverlay } from "@/components/ProOverlay";
+import { Button } from "@/components/ui/button";
+import { ProblemFilterPopup } from "@/components/ProblemFilterPopup";
 
 interface ProblemsListProps {
   algorithms: any[];
@@ -52,6 +55,7 @@ export const ProblemsList = ({
   stickyHeaderSlot
 }: ProblemsListProps) => {
   const { activeListType, setActiveListType, progressMap, hasPremiumAccess } = useApp();
+  const { lastFetched, error: reduxError } = useAppSelector(state => state.algorithms);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -61,6 +65,54 @@ export const ProblemsList = ({
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>(initialSelectedCompanies);
   const [selectedDifficulties, setSelectedDifficulties] = useState<string[]>([]);
   const [isCategoryWise, setIsCategoryWise] = useState(initialCategoryWise);
+  const [popupFilters, setPopupFilters] = useState({
+    status: 'all',
+    difficulty: [] as string[],
+    topics: [] as string[],
+    language: 'all'
+  });
+
+  const handleSetPopupFilters = useCallback((update: any) => {
+    setPopupFilters(prev => {
+      const next = typeof update === 'function' ? update(prev) : update;
+      
+      // Sync topics
+      setSelectedTopics(next.topics.map(normalizeCategory));
+      
+      // Sync difficulties
+      const capitalizedDiffs = next.difficulty.map((d: string) => {
+        const lower = d.toLowerCase();
+        if (lower === 'easy') return 'Easy';
+        if (lower === 'medium') return 'Medium';
+        if (lower === 'hard') return 'Hard';
+        return d;
+      });
+      setSelectedDifficulties(capitalizedDiffs);
+
+      return next;
+    });
+  }, []);
+
+  // Sync sidebar/pills updates to popupFilters
+  useEffect(() => {
+    setPopupFilters(prev => {
+      const nextTopics = selectedTopics;
+      const nextDiffs = selectedDifficulties.map(d => d.toLowerCase());
+      
+      const topicsMatch = JSON.stringify(prev.topics) === JSON.stringify(nextTopics);
+      const diffsMatch = JSON.stringify(prev.difficulty) === JSON.stringify(nextDiffs);
+      
+      if (!topicsMatch || !diffsMatch) {
+        return {
+          ...prev,
+          topics: nextTopics,
+          difficulty: nextDiffs
+        };
+      }
+      return prev;
+    });
+  }, [selectedTopics, selectedDifficulties]);
+
   const [mounted, setMounted] = useState(false);
   
   useEffect(() => {
@@ -136,6 +188,22 @@ export const ProblemsList = ({
       result = result.filter(algo => selectedDifficulties.includes(algo.mappedDifficulty));
     }
 
+    // Filter by status (solved / attempted / none / all)
+    if (popupFilters.status !== 'all') {
+      result = result.filter(algo => {
+        const status = progressMap?.[algo.id] || 'none';
+        return status === popupFilters.status;
+      });
+    }
+
+    // Filter by language
+    if (popupFilters.language !== 'all') {
+      result = result.filter(algo => {
+        const langs = algo.metadata?.languages || [];
+        return langs.some((l: string) => l.toLowerCase() === popupFilters.language.toLowerCase());
+      });
+    }
+
     const rank: any = { 'Easy': 1, 'Medium': 2, 'Hard': 3 };
     if (sortBy === 'name-asc') result.sort((a, b) => a.displayTitle.localeCompare(b.displayTitle));
     else if (sortBy === 'name-desc') result.sort((a, b) => b.displayTitle.localeCompare(a.displayTitle));
@@ -145,7 +213,7 @@ export const ProblemsList = ({
     else if (sortBy === 'serial-desc') result.sort((a, b) => (b.serial_no || 0) - (a.serial_no || 0));
 
     return result;
-  }, [algorithms, searchQuery, sortBy, selectedTopics, selectedCompanies, selectedDifficulties]);
+  }, [algorithms, searchQuery, sortBy, selectedTopics, selectedCompanies, selectedDifficulties, popupFilters, progressMap]);
 
   const currentGroupedAlgos = useMemo(() => {
     if (!isCategoryWise) return [];
@@ -280,6 +348,46 @@ export const ProblemsList = ({
   }, [filteredAndSortedAlgorithms]);
 
   const showCompanyLock = !hasPremiumAccess && selectedCompanies.length > 0;
+  const showSkeleton = !mounted || (isLoading && algorithms.length === 0) || (lastFetched === null && !reduxError);
+
+  const hasActiveFilters = useMemo(() => {
+    return (
+      searchQuery.length > 0 ||
+      selectedTopics.length > 0 ||
+      selectedCompanies.length > 0 ||
+      selectedDifficulties.length > 0 ||
+      sortBy !== 'serial-asc' ||
+      popupFilters.status !== 'all' ||
+      popupFilters.language !== 'all' ||
+      popupFilters.difficulty.length > 0 ||
+      popupFilters.topics.length > 0
+    );
+  }, [searchQuery, selectedTopics, selectedCompanies, selectedDifficulties, sortBy, popupFilters]);
+
+  const handleReset = useCallback(() => {
+    setSearchQuery('');
+    setSortBy('serial-asc');
+    setSelectedTopics([]);
+    setSelectedCompanies([]);
+    setSelectedDifficulties([]);
+    setPopupFilters({
+      status: 'all',
+      difficulty: [],
+      topics: [],
+      language: 'all'
+    });
+  }, []);
+
+  const handleRandomClick = () => {
+    const pool = filteredAndSortedAlgorithms.length > 0 ? filteredAndSortedAlgorithms : algorithms;
+    const unlockedPool = pool.filter(algo => !(algo.is_premium || algo.is_pro || algo.metadata?.is_pro) || hasPremiumAccess);
+    const selectPool = unlockedPool.length > 0 ? unlockedPool : pool;
+    if (selectPool.length === 0) return;
+    const randomIndex = Math.floor(Math.random() * selectPool.length);
+    const randomAlgo = selectPool[randomIndex];
+    const targetUrl = randomAlgo.slug ? `/problem/${randomAlgo.slug}` : `/problem/${randomAlgo.id}`;
+    router.push(targetUrl);
+  };
 
   return (
     <ListingLayout
@@ -299,11 +407,34 @@ export const ProblemsList = ({
       selectedDifficulties={selectedDifficulties}
       onDifficultyToggle={handleDifficultyToggle}
       showRecommendation={showRecommendation}
-      stats={{ count: filteredAndSortedAlgorithms.length, hours: totalHours }}
+      stats={{ solved: overallStats.totalSolved, total: overallStats.totalQuestions }}
+      onRandomClick={handleRandomClick}
       showCategoryToggle={showCategoryToggle}
       isCategoryWise={isCategoryWise}
       onCategoryWiseChange={setIsCategoryWise}
       stickyHeaderSlot={stickyHeaderSlot}
+      hasActiveFilters={hasActiveFilters}
+      onReset={handleReset}
+      filterButtonSlot={
+        <ProblemFilterPopup
+          filters={popupFilters}
+          setFilters={handleSetPopupFilters}
+          topics={allTopics}
+          trigger={
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-11 sm:h-12 w-11 sm:w-12 rounded-xl border-border/60 bg-background shadow-sm hover:border-primary/40 hover:bg-accent/10 active:scale-95 transition-all shrink-0 relative"
+              aria-label="Filter problems"
+            >
+              <ListFilter className="w-5 h-5 text-muted-foreground" />
+              {(popupFilters.status !== 'all' || popupFilters.language !== 'all' || popupFilters.difficulty.length > 0 || popupFilters.topics.length > 0) && (
+                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-[#84cc16] ring-2 ring-background animate-pulse" />
+              )}
+            </Button>
+          }
+        />
+      }
       progressWidget={
         !isLoading && overallStats.totalQuestions > 0 ? (
           <Card className="bg-card border-border/40 shadow-sm overflow-hidden h-full flex flex-col mt-[-10px]">
@@ -319,10 +450,47 @@ export const ProblemsList = ({
     >
       {headerSlot}
 
-      {!mounted || isLoading ? (
-        <div className="p-8 space-y-4 max-w-[820px] mx-auto">
+      {showSkeleton ? (
+        <div className="w-full max-w-[820px] mx-auto">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-32 bg-muted/20 animate-pulse rounded-xl" />
+            <div
+              key={i}
+              className={cn(
+                "flex items-center gap-3 sm:gap-6 p-4 sm:p-6",
+                "bg-card border-x border-t border-border/40",
+                i === 0 && "rounded-t-xl",
+                i === 4 && "rounded-b-xl border-b",
+                "animate-pulse"
+              )}
+            >
+              {/* Status Indicator Skeleton */}
+              <div className="shrink-0 scale-90 sm:scale-100">
+                <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800" />
+              </div>
+
+              {/* Content Skeleton */}
+              <div className="flex-1 min-w-0 space-y-3">
+                <div className="flex items-center gap-3">
+                  {/* Title skeleton */}
+                  <div className="h-5 bg-zinc-200 dark:bg-zinc-800 rounded-lg w-1/3 min-w-[120px]" />
+                </div>
+
+                {/* Description skeleton */}
+                <div className="h-4 bg-zinc-200/60 dark:bg-zinc-800/60 rounded-md w-3/4 max-w-[500px]" />
+
+                <div className="flex flex-wrap items-center gap-4 pt-1">
+                  {/* Difficulty Badge skeleton */}
+                  <div className="h-6 bg-zinc-200 dark:bg-zinc-800 rounded-full w-16" />
+                  {/* Category Badge skeleton */}
+                  <div className="h-6 bg-zinc-200/60 dark:bg-zinc-800/60 rounded-full w-20" />
+                </div>
+              </div>
+
+              {/* Action Indicator Skeleton */}
+              <div className="shrink-0">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-zinc-200/60 dark:bg-zinc-800/60" />
+              </div>
+            </div>
           ))}
         </div>
       ) : showCompanyLock && filteredAndSortedAlgorithms.length > 0 ? (

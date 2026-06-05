@@ -3,7 +3,7 @@ import { Check, ArrowRight, Lock, Flame, FileCode2, Layout } from "lucide-react"
 import { cn } from "@/lib/utils";
 import { AlgorithmListItem, DIFFICULTY_MAP } from "@/types/algorithm";
 import { Badge } from "@/components/ui/badge";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CollapsibleCategories } from "./CollapsibleCategories";
 
 interface PremiumProblemCardProps {
     algorithm: AlgorithmListItem;
@@ -19,6 +19,7 @@ interface PremiumProblemCardProps {
 const difficultyColors: Record<string, string> = {
     'Easy': 'text-green-500',
     'Medium': 'text-yellow-500',
+    'Med': 'text-yellow-500',
     'Hard': 'text-red-500',
 };
 
@@ -42,7 +43,8 @@ const StatusIcon = ({ status, isPremium }: { status: string; isPremium?: boolean
 
 export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp, index, isFirst, isLast, disableRounding, onCategoryClick }: PremiumProblemCardProps) => {
     const isPremium = isPremiumProp ?? (algorithm.is_premium || algorithm.is_pro || algorithm.metadata?.is_pro);
-    const displayDifficulty = algorithm.mappedDifficulty || DIFFICULTY_MAP[algorithm.difficulty?.toLowerCase()] || 'Medium';
+    const rawDifficulty = algorithm.mappedDifficulty || DIFFICULTY_MAP[algorithm.difficulty?.toLowerCase()] || 'Medium';
+    const displayDifficulty = rawDifficulty === 'Medium' ? 'Med' : rawDifficulty;
 
     const isLockedLink = algorithm.id === 'locked' || algorithm.slug === 'locked';
 
@@ -74,7 +76,7 @@ export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp
                         </h3>
                         <div className="flex flex-wrap gap-2">
                             {isPremium && (
-                                <div className="font-semibold px-3 py-0.5 h-6 rounded-full border border-primary/20 bg-primary/10 text-primary text-[10px] sm:text-[11px] uppercase tracking-wider flex items-center gap-1.5 select-none cursor-default">
+                                <div className="hidden sm:flex font-semibold px-3 py-0.5 h-6 rounded-full border border-primary/20 bg-primary/10 text-primary text-[10px] sm:text-[11px] uppercase tracking-wider items-center gap-1.5 select-none cursor-default">
                                     <Lock className="w-3 h-3" />
                                     Pro
                                 </div>
@@ -86,15 +88,15 @@ export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp
                         {algorithm.description}
                     </p>
 
-                    <div className="flex flex-wrap items-center gap-x-4 sm:gap-x-8 gap-y-2 text-[11px] sm:text-xs font-normal pt-1">
+                    <div className="meta-info-row flex flex-wrap items-center gap-x-4 sm:gap-x-8 gap-y-1.5 text-[11px] sm:text-xs font-normal pt-1 w-full">
                         {/* Difficulty */}
-                        <div className="flex items-center">
+                        <div className="difficulty-badge flex items-center shrink-0">
                             <Badge
                                 variant="outline"
                                 className={cn(
-                                    "font-semibold px-3 py-0.5 h-6 rounded-full text-[10px] sm:text-[11px] select-none cursor-default border",
+                                    "font-semibold px-3 py-0.5 h-6 rounded-full text-[10px] sm:text-[11px] select-none cursor-default border justify-center w-14",
                                     displayDifficulty === "Easy" && "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/30",
-                                    displayDifficulty === "Medium" && "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/30",
+                                    displayDifficulty === "Med" && "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/30",
                                     displayDifficulty === "Hard" && "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30"
                                 )}
                             >
@@ -103,75 +105,15 @@ export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp
                         </div>
 
                         {/* Category */}
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                            {(() => {
-                                const categories = (algorithm.category || '').split(',').map(c => c.trim()).filter(Boolean);
-                                const visibleCats = categories.slice(0, 3);
-                                const hiddenCats = categories.slice(3);
-
-                                return (
-                                    <>
-                                        {visibleCats.map((cat) => (
-                                            <button
-                                                key={cat}
-                                                onClick={(e) => {
-                                                    if (onCategoryClick) {
-                                                        onCategoryClick(cat, e);
-                                                    } else {
-                                                        e.preventDefault();
-                                                        e.stopPropagation();
-                                                    }
-                                                }}
-                                                className="font-semibold px-3 py-0.5 h-6 rounded-full text-[10px] sm:text-[11px] bg-muted/60 text-muted-foreground/90 hover:bg-primary/10 hover:text-primary transition-all duration-300 border border-border/30 hover:border-primary/20 shrink-0 select-none z-10 flex items-center"
-                                            >
-                                                {cat}
-                                            </button>
-                                        ))}
-                                        {hiddenCats.length > 0 && (
-                                            <span
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    e.stopPropagation();
-                                                }}
-                                            >
-                                                <Popover>
-                                                    <PopoverTrigger asChild>
-                                                        <button
-                                                            className="font-semibold px-3 py-0.5 h-6 rounded-full text-[10px] sm:text-[11px] bg-primary/10 text-primary hover:bg-primary/20 transition-all duration-300 border border-primary/20 shrink-0 z-10 flex items-center"
-                                                        >
-                                                            +{hiddenCats.length}
-                                                        </button>
-                                                    </PopoverTrigger>
-                                                    <PopoverContent 
-                                                        className="w-48 p-2 bg-popover border border-border/60 shadow-xl rounded-xl z-50"
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            e.stopPropagation();
-                                                        }}
-                                                    >
-                                                        <div className="flex flex-col gap-1.5">
-                                                            {hiddenCats.map((cat) => (
-                                                                <button
-                                                                    key={cat}
-                                                                    onClick={(e) => {
-                                                                        if (onCategoryClick) {
-                                                                            onCategoryClick(cat, e);
-                                                                        }
-                                                                    }}
-                                                                    className="w-full text-left px-2.5 py-1.5 rounded-lg text-[11px] sm:text-[12px] font-medium hover:bg-accent hover:text-accent-foreground transition-colors duration-200 select-none"
-                                                                >
-                                                                    {cat}
-                                                                </button>
-                                                            ))}
-                                                        </div>
-                                                    </PopoverContent>
-                                                </Popover>
-                                            </span>
-                                        )}
-                                    </>
-                                );
-                            })()}
-                        </div>
+                        {(() => {
+                            const categories = (algorithm.category || '').split(',').map(c => c.trim()).filter(Boolean);
+                            return (
+                                <CollapsibleCategories
+                                    categories={categories}
+                                    onCategoryClick={onCategoryClick}
+                                />
+                            );
+                        })()}
                     </div>
                 </div>
 

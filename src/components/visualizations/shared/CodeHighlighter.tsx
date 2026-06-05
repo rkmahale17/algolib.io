@@ -4,13 +4,25 @@ interface CodeHighlighterProps {
   language: string;
 }
 
+const getLanguageDisplayName = (lang: string) => {
+  const displayNames: Record<string, string> = {
+    typescript: 'TypeScript',
+    javascript: 'JavaScript',
+    python: 'Python',
+    java: 'Java',
+    cpp: 'C++',
+    c: 'C',
+  };
+  return displayNames[lang.toLowerCase()] || lang;
+};
+
 export const CodeHighlighter = ({ code, highlightedLine = -1, language }: CodeHighlighterProps) => {
   const lines = code.split('\n');
 
   return (
     <div className="bg-muted/50 rounded-lg border border-border overflow-hidden ">
       <div className="bg-muted px-4 py-2 border-b border-border">
-        <span className="text-xs font-semibold text-foreground">{language}</span>
+        <span className="text-xs font-semibold text-foreground">{getLanguageDisplayName(language)}</span>
       </div>
       <div className="overflow-x-auto">
         <pre className="text-sm p-4 min-w-max">
