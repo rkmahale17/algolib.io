@@ -159,31 +159,35 @@ const SaveButton = ({
   }, [editor, title]);
 
   return (
-    <div className="relative top-0  z-10 flex gap-2 p-3 ">
+    <div className="relative top-0 z-10 flex items-center gap-3 p-2 border-b border-border/50 bg-background text-foreground shadow-sm">
       <Input
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Whiteboard title"
-        className="bg-background text-foreground border-border dark:bg-white dark:text-black dark:border-black"
+        className="h-9 max-w-[250px] text-sm bg-background text-foreground border-border/60 rounded-xl shadow-sm focus-visible:ring-primary/20 focus-visible:border-primary/40 transition-all"
       />
-      <Button
-        onClick={handleSave}
-        disabled={isSaving}
-        size="sm"
-
-        className="gap-2  bg-black text-white  hover:text-black"
-      >
-        {isSaving ? (
-          <Loader2 className="w-4 h-4 animate-spin" />
-        ) : (
-          <Save className="w-4 h-4" />
-        )}
-        Save
-      </Button>
-      <Button onClick={handleExportPNG} size="sm" className="gap-2 bg-black  text-white hover:text-black">
-        <Download className="w-4 h-4" />
-        Export PNG
-      </Button>
+      <div className="flex items-center h-9 rounded-xl border border-border/60 bg-muted/30 dark:bg-muted/20 overflow-hidden shadow-sm shrink-0 select-none">
+        <button
+          onClick={handleSave}
+          disabled={isSaving}
+          className="flex items-center justify-center gap-1.5 h-full px-4 text-[12px] font-semibold tracking-wide transition-all duration-200 text-foreground/80 hover:text-foreground hover:bg-muted/50 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isSaving ? (
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          ) : (
+            <Save className="w-3.5 h-3.5" />
+          )}
+          Save
+        </button>
+        <div className="w-px h-5 bg-border/60 shrink-0" />
+        <button 
+          onClick={handleExportPNG} 
+          className="flex items-center justify-center gap-1.5 h-full px-4 text-[12px] font-semibold tracking-wide transition-all duration-200 text-foreground/80 hover:text-foreground hover:bg-muted/50 cursor-pointer"
+        >
+          <Download className="w-3.5 h-3.5" />
+          Export PNG
+        </button>
+      </div>
     </div>
   );
 };
@@ -196,8 +200,7 @@ export const WhiteboardComponent = ({
 }: WhiteboardComponentProps) => {
   return (
     <div
-      className={` relative w-full  border rounded-none overflow-hidden z-10 ${isExpand ? "h-full" : "h-[700px]"
-        }`}
+      className={` relative w-full h-full border rounded-none overflow-hidden z-10`}
     >
       <Tldraw snapshot={restoreData} className="tldraw-rulcode">
         <div>
