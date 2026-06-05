@@ -41,11 +41,11 @@ export const HistoryTab = ({ algorithmId, onRestoreWhiteboard, onRestoreNote }: 
     <>
       <Tabs defaultValue="whiteboards" className="space-y-4">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="whiteboards" className="gap-2 text-[12px] data-[state=active]:bg-transparent data-[state=active]:text-black dark:data-[state=active]:text-white">
+          <TabsTrigger value="whiteboards" className="gap-2 text-[12px]">
             <Palette className="w-4 h-4" />
             Whiteboard {hasWhiteboard ? '(Saved)' : '(Empty)'}
           </TabsTrigger>
-          <TabsTrigger value="notes" className="gap-2 text-[12px] data-[state=active]:bg-transparent data-[state=active]:text-black dark:data-[state=active]:text-white">
+          <TabsTrigger value="notes" className="gap-2 text-[12px]">
             <FileText className="w-4 h-4" />
             Notes {hasNotes ? '(Saved)' : '(Empty)'}
           </TabsTrigger>

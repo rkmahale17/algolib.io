@@ -1688,7 +1688,8 @@ export const ProblemDescriptionPanel = React.memo(
               )}
 
             {/* Bottom Action Bar - Ultra Slim Capsule (Visible across all tabs) */}
-            <div className="absolute bottom-[2px] left-0 right-0 z-10 flex justify-center pointer-events-none px-4">
+            {activeTab !== "thinkpad" && activeTab !== "editor" && (
+              <div className="absolute bottom-[2px] left-0 right-0 z-10 flex justify-center pointer-events-none px-4">
               <div className="pointer-events-auto max-w-full overflow-x-auto no-scrollbar flex items-center gap-1 p-0.5 bg-background/60 backdrop-blur-xl border border-border/50 shadow-lg rounded-full animate-in fade-in slide-in-from-bottom-4 duration-300">
                 {/* Like Button */}
                 {(!algorithm?.controls ||
@@ -1774,6 +1775,7 @@ export const ProblemDescriptionPanel = React.memo(
                 )}
               </div>
             </div>
+            )}
           </div>
         </Tabs>
 
