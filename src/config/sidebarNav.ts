@@ -24,6 +24,7 @@ export const PATTERN_IDS = [
   "recursion",
   "backtracking",
   "merge-intervals",
+  "dynamic-programming",
 ] as const;
 
 export function getGuideUrl(categoryId: string, slug: string): string {
