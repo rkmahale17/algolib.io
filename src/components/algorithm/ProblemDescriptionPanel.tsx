@@ -122,6 +122,7 @@ const BASE_RIGHT_TABS = ["editor"];
 
 interface ProblemDescriptionPanelProps {
   algorithm: any;
+  nextProblem?: any;
   activeTab: string;
   setActiveTab: (tab: string) => void;
   isMobile: boolean;
@@ -159,6 +160,7 @@ interface ProblemDescriptionPanelProps {
 export const ProblemDescriptionPanel = React.memo(
   ({
     algorithm,
+    nextProblem,
     activeTab,
     setActiveTab,
     isMobile,
@@ -1390,7 +1392,42 @@ export const ProblemDescriptionPanel = React.memo(
                       )}
                   </FeatureGuard>
 
-                  {/* Practice Problems Card */}
+                  {/* Next Problem Card */}
+                  {nextProblem && (
+                    <Card className="p-4 sm:p-6 glass-card overflow-hidden">
+                      <h3 className="font-medium mb-4">
+                        Next Problem
+                      </h3>
+                      <div className="space-y-2">
+                        <Link
+                          href={`/problem/${nextProblem.slug || nextProblem.id}`}
+                          className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                        >
+                          <div className="flex-1">
+                            <p className="text-sm font-medium">
+                              {nextProblem.serial_no}. {nextProblem.title || nextProblem.name}
+                            </p>
+                            <div className="mt-1.5 flex">
+                              <Badge
+                                variant="secondary"
+                                className={`
+                                text-[10px] h-5 px-2 capitalize font-medium border
+                                ${(nextProblem.difficulty || '').toLowerCase() === "easy" ? "bg-green-100 text-green-700 border-green-200 hover:bg-green-200" : ""}
+                                ${(nextProblem.difficulty || '').toLowerCase() === "medium" ? "bg-orange-100 text-orange-700 border-orange-200 hover:bg-orange-200" : ""}
+                                ${(nextProblem.difficulty || '').toLowerCase() === "hard" ? "bg-red-100 text-red-700 border-red-200 hover:bg-red-200" : ""}
+                              `}
+                              >
+                                {nextProblem.difficulty}
+                              </Badge>
+                            </div>
+                          </div>
+                          <ExternalLink className="w-4 h-4 text-muted-foreground" />
+                        </Link>
+                      </div>
+                    </Card>
+                  )}
+
+                  {/* Similar Problems Card */}
                   <FeatureGuard flag="external_links">
                     {algorithm?.problems_to_solve?.internal &&
                     algorithm.problems_to_solve.internal.length > 0 &&
@@ -1398,8 +1435,8 @@ export const ProblemDescriptionPanel = React.memo(
                       algorithm.controls?.content?.practice_problems !==
                         false) ? (
                       <Card className="p-4 sm:p-6 glass-card overflow-hidden">
-                        <h3 className="font-semibold mb-4">
-                          Practice Problems
+                        <h3 className="font-medium mb-4">
+                          Similar Problems
                         </h3>
                         <div className="space-y-2">
                           {algorithm.problems_to_solve.internal.map(
@@ -1413,7 +1450,7 @@ export const ProblemDescriptionPanel = React.memo(
                               >
                                 <div className="flex-1">
                                   <p className="text-sm font-medium">
-                                    {problem.serial_no}.{problem.title}
+                                    {problem.serial_no || i + 1}. {problem.title}
                                   </p>
                                   <div className="mt-1.5 flex">
                                     <Badge

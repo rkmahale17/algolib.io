@@ -35,7 +35,6 @@ import Navbar from "@/components/Navbar";
 import { Paywall } from "@/components/Paywall";
 import { ProblemDescriptionPanel } from "@/components/algorithm/ProblemDescriptionPanel";
 import { ProblemSidebar } from "@/components/ProblemSidebar";
-import { Progress } from "@/components/ui/progress";
 import { SettingsPopover } from "@/components/CodeRunner/SettingsPopover";
 import dynamic from "next/dynamic";
 import { supabase } from "@/integrations/supabase/client";
@@ -99,6 +98,22 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({
         .filter((algo) => algo.published !== false || isUserAdmin),
     [algorithmsData, isUserAdmin],
   );
+
+  const nextProblem = useMemo(() => {
+    if (!activeAlgorithm || !allAlgorithms) return null;
+    const sorted = [...allAlgorithms].sort((a, b) => (a.serial_no || 0) - (b.serial_no || 0));
+    const currentIndex = sorted.findIndex(
+      (a) =>
+        a.id === activeAlgorithm.id ||
+        a.slug === activeAlgorithm.slug ||
+        a.id === slug,
+    );
+    if (currentIndex >= 0 && currentIndex < sorted.length - 1) {
+      return sorted[currentIndex + 1];
+    }
+    return null;
+  }, [activeAlgorithm, allAlgorithms, slug]);
+
   const isPaywallEnabled = useFeatureFlag("paywall_enabled");
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -591,6 +606,7 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({
                   <div className="h-full rounded-xl overflow-hidden border border-border/70 shadow-md bg-card/30 backdrop-blur-sm">
                     <ProblemDescriptionPanel
                       algorithm={activeAlgorithm}
+                      nextProblem={nextProblem}
                       activeTab={layout.activeLeftTab}
                       setActiveTab={layout.setActiveLeftTab}
                       isMobile={true}
@@ -686,6 +702,7 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({
                     <div className="h-full rounded-xl overflow-hidden border border-border/70 shadow-md bg-card/30 backdrop-blur-sm">
                       <ProblemDescriptionPanel
                         algorithm={activeAlgorithm}
+                        nextProblem={nextProblem}
                         activeTab={layout.activeLeftTab}
                         setActiveTab={layout.setActiveLeftTab}
                         isMobile={layout.isMobile}
@@ -736,6 +753,7 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({
                     <div className="h-full rounded-lg overflow-hidden border border-border/70 shadow-md bg-card/30 backdrop-blur-sm">
                       <ProblemDescriptionPanel
                         algorithm={activeAlgorithm}
+                        nextProblem={nextProblem}
                         activeTab={layout.activeRightTab}
                         setActiveTab={layout.setActiveRightTab}
                         isMobile={layout.isMobile}
@@ -801,13 +819,44 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({
                 </SelectContent>
               </Select>
 
-              {/* Progress Bar */}
-              <div className="flex items-center gap-2.5 flex-1 max-w-[200px] min-w-[100px] border border-border/80 bg-muted/30 px-2.5 h-8 rounded-md">
-                <Progress value={progressPercentage} className="h-1.5 flex-1 bg-muted" />
-                <span className="text-[11px] font-semibold text-muted-foreground whitespace-nowrap">
-                  {completedCount}/{totalCount}
-                </span>
-              </div>
+              {/* Progress Widget - circular SVG style matching DSA listing */}
+              {(() => {
+                const radius = 14;
+                const circumference = 2 * Math.PI * radius;
+                const percentage = totalCount > 0 ? completedCount / totalCount : 0;
+                const strokeDashoffset = circumference - percentage * circumference;
+                return (
+                  <div className="flex items-center gap-2 h-8 px-2.5 rounded-md border border-border/80 bg-muted/30 shrink-0 select-none">
+                    <svg className="w-4 h-4 transform -rotate-90 shrink-0" viewBox="0 0 36 36">
+                      <circle
+                        className="stroke-zinc-200 dark:stroke-zinc-800"
+                        strokeWidth="3.5"
+                        fill="transparent"
+                        r={radius}
+                        cx="18"
+                        cy="18"
+                      />
+                      <circle
+                        className="stroke-green-500 transition-all duration-500"
+                        strokeWidth="3.5"
+                        strokeDasharray={circumference}
+                        strokeDashoffset={strokeDashoffset}
+                        strokeLinecap="round"
+                        fill="transparent"
+                        r={radius}
+                        cx="18"
+                        cy="18"
+                      />
+                    </svg>
+                    <span className="text-xs font-medium tracking-tight whitespace-nowrap">
+                      <strong className="text-foreground font-semibold">{completedCount}</strong>
+                      <span className="text-muted-foreground/50 mx-0.5">/</span>
+                      <strong className="text-foreground font-semibold">{totalCount}</strong>
+                      <span className="text-muted-foreground/80 ml-1 text-[11px] font-semibold">Solved</span>
+                    </span>
+                  </div>
+                );
+              })()}
             </div>
           </div>
           <div className="flex-1 overflow-hidden">

@@ -4,7 +4,7 @@ import { Language } from '@/types/algorithm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Copy, Check, Maximize } from 'lucide-react';
+import { Copy, Check, Maximize, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { RichText } from '@/components/RichText';
 import { IsolatedCodeEditor } from "./visualizations/shared/IsolatedCodeEditor";
@@ -43,6 +43,7 @@ interface SolutionViewerProps {
     languages?: boolean | Record<string, boolean>; // Supported granular control
     explanation_before?: boolean;
     explanation_after?: boolean;
+    show_hide_code?: boolean;
   };
   tutorial?: {
     url: string;
@@ -62,6 +63,34 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
 }) => {
   const [copiedTab, setCopiedTab] = useState<string | null>(null);
   const [isAppDark, setIsAppDark] = useState(false);
+  const [isBlurred, setIsBlurred] = useState(false);
+
+  // Load blurred state and listen to custom event to sync with visualizer/other solutions
+  useEffect(() => {
+    const checkBlurred = () => {
+      const saved = localStorage.getItem('visualization-code-blurred');
+      if (saved !== null) {
+        setIsBlurred(saved === 'true');
+      }
+    };
+
+    checkBlurred();
+
+    const handleBlurEvent = () => {
+      checkBlurred();
+    };
+
+    window.addEventListener('code-blur-change', handleBlurEvent);
+    return () => {
+      window.removeEventListener('code-blur-change', handleBlurEvent);
+    };
+  }, []);
+
+  const handleBlurChange = (val: boolean) => {
+    setIsBlurred(val);
+    localStorage.setItem('visualization-code-blurred', String(val));
+    window.dispatchEvent(new Event('code-blur-change'));
+  };
 
   // Detect theme from document class
   useEffect(() => {
@@ -199,11 +228,11 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
           );
         }
 
+        const optimizedCodeType = filteredApproaches.find(([type]) => type === 'optimize' || type === 'solution')?.[0]
+          || filteredApproaches[filteredApproaches.length - 1]?.[0];
+
         return (
           <div className="space-y-12">
-            {tutorial && (
-              <VideoTutorialCard tutorial={tutorial} title={`${problemName || 'Problem'} Tutorial`} />
-            )}
             {filteredApproaches.map(([codeType, langImplementations], approachIndex) => (
               <SolutionApproach
                 key={codeType}
@@ -218,6 +247,10 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
                 getLanguageForMonaco={getLanguageForMonaco}
                 getFileExtension={getFileExtension}
                 approachName={approachName}
+                tutorial={codeType === optimizedCodeType ? tutorial : undefined}
+                problemName={problemName}
+                isBlurred={isBlurred}
+                onBlurChange={handleBlurChange}
               />
             ))}
           </div>
@@ -248,6 +281,10 @@ const SolutionApproach: React.FC<{
   getLanguageForMonaco: (lang: string) => string;
   getFileExtension: (lang: string) => string;
   approachName: string;
+  tutorial?: SolutionViewerProps['tutorial'];
+  problemName?: string;
+  isBlurred: boolean;
+  onBlurChange: (val: boolean) => void;
 }> = ({
   codeType,
   langImplementations,
@@ -260,6 +297,10 @@ const SolutionApproach: React.FC<{
   getLanguageForMonaco,
   getFileExtension,
   approachName,
+  tutorial,
+  problemName,
+  isBlurred,
+  onBlurChange,
 }) => {
     // Sort implementations based on the specified order
     const sortedImplementations = [...langImplementations].sort((a, b) => {
@@ -399,26 +440,44 @@ const SolutionApproach: React.FC<{
                 )}
               </div>
 
-              {/* RIGHT SIDE: Copy Button */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleCopy(activeImpl.code, `${codeType}-${activeLang}`)}
-                className="gap-2 h-10 rounded-none border-l shrink-0 hover:bg-primary/10 hover:text-primary"
-              >
-                {copiedTab === `${codeType}-${activeLang}` ? (
-                  <>
-                    <Check className="w-4 h-4" />
-                    <span className={isNarrow ? "" : "hidden sm:inline"}>
-                      {!isNarrow ? "Copied" : ""}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-4 h-4" />
-                  </>
+              {/* RIGHT SIDE: Eye/EyeOff (Show/Hide) and Copy Buttons */}
+              <div className="flex items-center shrink-0">
+                {controls?.show_hide_code !== false && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onBlurChange(!isBlurred)}
+                    className="gap-2 h-10 w-10 p-0 rounded-none border-l shrink-0 hover:bg-primary/10 hover:text-primary flex items-center justify-center"
+                    title={isBlurred ? "Show Code" : "Hide Code"}
+                  >
+                    {isBlurred ? (
+                      <EyeOff className="w-4 h-4 text-muted-foreground" />
+                    ) : (
+                      <Eye className="w-4 h-4 text-muted-foreground" />
+                    )}
+                  </Button>
                 )}
-              </Button>
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleCopy(activeImpl.code, `${codeType}-${activeLang}`)}
+                  className="gap-2 h-10 rounded-none border-l shrink-0 hover:bg-primary/10 hover:text-primary"
+                >
+                  {copiedTab === `${codeType}-${activeLang}` ? (
+                    <>
+                      <Check className="w-4 h-4" />
+                      <span className={isNarrow ? "" : "hidden sm:inline"}>
+                        {!isNarrow ? "Copied" : ""}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4" />
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
 
             {/* Resizable Container for Editor */}
@@ -428,18 +487,33 @@ const SolutionApproach: React.FC<{
                 <Maximize className="w-3 h-3 text-muted-foreground/50" />
               </div>
 
-              {sortedImplementations.map(langImpl => (
-                langImpl.lang === activeLang && (
-                  <TabsContent key={langImpl.lang} value={langImpl.lang} className="absolute inset-0 mt-0">
-                    <IsolatedCodeEditor
-                      code={langImpl.code}
-                      language={getLanguageForMonaco(langImpl.lang)}
-                      theme={editorTheme as any}
-                      readOnly={true}
-                    />
-                  </TabsContent>
-                )
-              ))}
+              <div className={`h-full w-full transition-all duration-300 ${isBlurred ? 'blur-md opacity-40 pointer-events-none' : ''}`}>
+                {sortedImplementations.map(langImpl => (
+                  langImpl.lang === activeLang && (
+                    <TabsContent key={langImpl.lang} value={langImpl.lang} className="absolute inset-0 mt-0">
+                      <IsolatedCodeEditor
+                        code={langImpl.code}
+                        language={getLanguageForMonaco(langImpl.lang)}
+                        theme={editorTheme as any}
+                        readOnly={true}
+                      />
+                    </TabsContent>
+                  )
+                ))}
+              </div>
+
+              {isBlurred && (
+                <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/10 backdrop-blur-[2px]">
+                  <Button 
+                    onClick={() => onBlurChange(false)}
+                    variant="outline"
+                    className="backdrop-blur-md bg-background/60 hover:bg-background/80 border border-border/50 text-foreground px-4 py-2 rounded-full text-sm font-medium flex items-center gap-1.5 transition-all shadow-lg hover:scale-105 pointer-events-auto"
+                  >
+                    <Eye size={14} />
+                    Reveal Code
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </Tabs>
@@ -450,6 +524,13 @@ const SolutionApproach: React.FC<{
             content={explanationAfter}
             className="text-sm text-muted-foreground mt-4"
           />
+        )}
+
+        {/* Video Tutorial (only for optimized solution) */}
+        {tutorial && (
+          <div className="mt-6">
+            <VideoTutorialCard tutorial={tutorial} title={`${problemName || 'Problem'} Tutorial`} />
+          </div>
         )}
       </div>
     );

@@ -2,8 +2,9 @@ import React, { useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useTheme } from 'next-themes';
 import { IsolatedCodeEditor } from './IsolatedCodeEditor';
-import { Eye, EyeOff } from 'lucide-react';
-import { Switch } from '@/components/ui/switch';
+import { Eye, EyeOff, Copy, Check } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 interface AnimatedCodeEditorProps {
   code: string;
@@ -11,6 +12,18 @@ interface AnimatedCodeEditorProps {
   highlightedLines?: number[];
   className?: string;
 }
+
+const getLanguageDisplayName = (lang: string) => {
+  const displayNames: Record<string, string> = {
+    typescript: 'TypeScript',
+    javascript: 'JavaScript',
+    python: 'Python',
+    java: 'Java',
+    cpp: 'C++',
+    c: 'C',
+  };
+  return displayNames[lang.toLowerCase()] || lang;
+};
 
 export const AnimatedCodeEditor = ({
   code,
@@ -24,17 +37,43 @@ export const AnimatedCodeEditor = ({
   const [isReady, setIsReady] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [isBlurred, setIsBlurred] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      toast.success('Code copied to clipboard!');
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      toast.error('Failed to copy code');
+    }
+  };
 
   useEffect(() => {
-    const saved = localStorage.getItem('visualization-code-blurred');
-    if (saved !== null) {
-      setIsBlurred(saved === 'true');
-    }
+    const checkBlurred = () => {
+      const saved = localStorage.getItem('visualization-code-blurred');
+      if (saved !== null) {
+        setIsBlurred(saved === 'true');
+      }
+    };
+
+    checkBlurred();
+
+    const handleBlurEvent = () => {
+      checkBlurred();
+    };
+
+    window.addEventListener('code-blur-change', handleBlurEvent);
+    return () => {
+      window.removeEventListener('code-blur-change', handleBlurEvent);
+    };
   }, []);
 
   const handleBlurChange = (val: boolean) => {
     setIsBlurred(val);
     localStorage.setItem('visualization-code-blurred', String(val));
+    window.dispatchEvent(new Event('code-blur-change'));
   };
 
   useEffect(() => {
@@ -66,25 +105,47 @@ export const AnimatedCodeEditor = ({
       className={`rounded-lg border border-border overflow-hidden bg-card ${className}`}
     >
       <div ref={colorRef} className="bg-primary hidden" />
-      <div className="bg-muted px-4 py-2 border-b border-border flex justify-between items-center">
-        <span className="text-xs font-semibold text-foreground">{language}</span>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
-              {isBlurred ? 'Show' : 'Hide'}
-            </span>
-            <Switch 
-              checked={isBlurred} 
-              onCheckedChange={handleBlurChange}
-              className="data-[state=checked]:bg-primary"
-            />
-          </div>
+      <div className="bg-muted pl-4 pr-0 border-b border-border flex justify-between items-center h-10 shrink-0">
+        <span className="text-xs font-semibold text-foreground">{getLanguageDisplayName(language)}</span>
+        <div className="flex items-center gap-3 shrink-0 h-full">
           {!isReady && (
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              <span className="text-[10px] text-muted-foreground animate-pulse">Initializing...</span>
+            <div className="flex items-center gap-1.5 animate-pulse">
+              <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+              <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-semibold">Initializing...</span>
             </div>
           )}
+
+          <div className="flex items-center shrink-0 h-full">
+            {/* Eye Toggle Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleBlurChange(!isBlurred)}
+              className="gap-2 h-10 w-10 p-0 rounded-none border-l shrink-0 hover:bg-primary/10 hover:text-primary flex items-center justify-center"
+              title={isBlurred ? "Show Code" : "Hide Code"}
+            >
+              {isBlurred ? (
+                <EyeOff className="w-4 h-4 text-muted-foreground" />
+              ) : (
+                <Eye className="w-4 h-4 text-muted-foreground" />
+              )}
+            </Button>
+
+            {/* Copy Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCopy}
+              className="gap-2 h-10 w-10 p-0 rounded-none border-l shrink-0 hover:bg-primary/10 hover:text-primary flex items-center justify-center"
+              title="Copy Code"
+            >
+              {copied ? (
+                <Check className="w-4 h-4 text-primary" />
+              ) : (
+                <Copy className="w-4 h-4 text-muted-foreground" />
+              )}
+            </Button>
+          </div>
         </div>
       </div>
       <div className="h-[500px] relative">

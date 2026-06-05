@@ -3,8 +3,14 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
-import { Check, RotateCcw, Minus, Plus } from 'lucide-react';
+import { Check, RotateCcw, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+    DropdownMenu,
+    DropdownMenuCheckboxItem,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface FilterState {
     status: string;
@@ -33,13 +39,31 @@ export const ProblemFilterPopup = ({ filters, setFilters, trigger, topics = [] }
     };
 
     const topicOptions = React.useMemo(() => {
-        const opts = topics.map(topic => ({
+        return topics.map(topic => ({
             label: topic,
             value: topic.toLowerCase()
         }));
-        return [{ label: 'All', value: 'all' }, ...opts];
     }, [topics]);
 
+    const difficultyOptions = [
+        { label: 'Easy', value: 'easy' },
+        { label: 'Medium', value: 'medium' },
+        { label: 'Hard', value: 'hard' },
+    ];
+
+    const toggleArrayItem = (arr: string[], item: string) => {
+        return arr.includes(item) ? arr.filter(v => v !== item) : [...arr, item];
+    };
+
+    const getMultiLabel = (selected: string[], options: { label: string; value: string }[]) => {
+        if (selected.length === 0) return 'All';
+        const first = options.find(o => o.value === selected[0]);
+        const firstName = first?.label || selected[0];
+        if (selected.length === 1) return firstName;
+        return `${firstName} +${selected.length - 1}`;
+    };
+
+    // Single-select filter row (for Status, Language)
     const FilterRow = ({ icon, label, id, value, onValueChange, options }: any) => (
         <div className="flex items-center gap-4 py-2 group">
             <div className="flex items-center gap-2 w-28">
@@ -78,13 +102,89 @@ export const ProblemFilterPopup = ({ filters, setFilters, trigger, topics = [] }
                         ))}
                     </SelectContent>
                 </Select>
-
-                <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground/40 hover:text-foreground">
-                    <Minus className="w-3 h-3" />
-                </Button>
             </div>
         </div>
     );
+
+    // Multi-select filter row (for Difficulty, Topics)
+    const MultiFilterRow = ({ icon, label, id, selected, onToggle, options }: {
+        icon: React.ReactNode;
+        label: string;
+        id: string;
+        selected: string[];
+        onToggle: (value: string) => void;
+        options: { label: string; value: string }[];
+    }) => {
+        const displayLabel = getMultiLabel(selected, options);
+        const hasSelection = selected.length > 0;
+
+        return (
+            <div className="flex items-center gap-4 py-2 group">
+                <div className="flex items-center gap-2 w-28">
+                    <Checkbox
+                        id={id}
+                        checked={hasSelection}
+                        onCheckedChange={() => {
+                            if (hasSelection) {
+                                // Clear all
+                                selected.forEach(v => onToggle(v));
+                            }
+                        }}
+                        className="h-3.5 w-3.5 rounded-none border border-muted-foreground/30 data-[state=checked]:bg-foreground data-[state=checked]:text-background"
+                    />
+                    <div className="text-muted-foreground/60 group-hover:text-foreground transition-colors">
+                        {icon}
+                    </div>
+                    <label htmlFor={id} className="text-[11px] font-normal text-muted-foreground/80 group-hover:text-foreground cursor-pointer whitespace-nowrap uppercase tracking-wider">
+                        {label}
+                    </label>
+                </div>
+
+                <div className="flex items-center gap-2 flex-1">
+                    <Select value="is" disabled>
+                        <SelectTrigger className="h-8 w-20 bg-muted/20 border-border text-[11px] font-medium">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="is">is</SelectItem>
+                        </SelectContent>
+                    </Select>
+
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button className="h-8 flex-1 flex items-center justify-between px-3 bg-muted/10 border border-border rounded-md text-[11px] font-medium hover:bg-muted/20 transition-colors cursor-pointer min-w-0">
+                                <span className={cn(
+                                    "truncate",
+                                    hasSelection ? "text-foreground" : "text-muted-foreground"
+                                )}>
+                                    {displayLabel}
+                                </span>
+                                {hasSelection && selected.length > 1 && (
+                                    <span className="ml-1 shrink-0 text-[9px] font-bold bg-foreground text-background rounded px-1 py-0.5 leading-none">
+                                        {selected.length}
+                                    </span>
+                                )}
+                                <ChevronDown className="w-3 h-3 ml-1 shrink-0 opacity-50" />
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="w-[200px] max-h-[240px] overflow-y-auto rounded-xl border-border/60 p-1.5">
+                            {options.map((opt) => (
+                                <DropdownMenuCheckboxItem
+                                    key={opt.value}
+                                    checked={selected.includes(opt.value)}
+                                    onCheckedChange={() => onToggle(opt.value)}
+                                    onSelect={(e) => e.preventDefault()}
+                                    className="text-[11px] font-medium cursor-pointer rounded-lg py-1.5 pl-8 pr-2"
+                                >
+                                    {opt.label}
+                                </DropdownMenuCheckboxItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+            </div>
+        );
+    };
 
     return (
         <Popover>
@@ -94,7 +194,7 @@ export const ProblemFilterPopup = ({ filters, setFilters, trigger, topics = [] }
             <PopoverContent className="w-[400px] p-4 bg-background border-border shadow-2xl rounded-xl" align="end">
                 <div className="space-y-4">
                     {/* Match Toggle */}
-                    <div className="flex items-center gap-2 text-[11px] font- uppercase tracking-wider">
+                    <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider">
                         <span>Match</span>
                         <Select value={matchMode} onValueChange={(val: any) => setMatchMode(val)}>
                             <SelectTrigger className="h-8 w-20 bg-muted/20 border-border text-[11px]">
@@ -123,38 +223,26 @@ export const ProblemFilterPopup = ({ filters, setFilters, trigger, topics = [] }
                                 { label: 'Attempted', value: 'attempted' }
                             ]}
                         />
-                        <FilterRow
+                        <MultiFilterRow
                             label="Difficulty"
                             id="filter-difficulty"
-                            icon={<div className="w-4 h-4 border-2 border-current rounded-full flex items-center justify-center text-[8px] font-">D</div>}
-                            value={filters.difficulty.length === 1 ? filters.difficulty[0] : (filters.difficulty.length === 0 ? 'all' : 'multiple')}
-                            onValueChange={(val: string) => {
-                                if (val === 'all') {
-                                    setFilters(prev => ({ ...prev, difficulty: [] }));
-                                } else if (val !== 'multiple') {
-                                    setFilters(prev => ({ ...prev, difficulty: [val] }));
-                                }
-                            }}
-                            options={[
-                                { label: 'All', value: 'all' },
-                                { label: 'Easy', value: 'easy' },
-                                { label: 'Medium', value: 'medium' },
-                                { label: 'Hard', value: 'hard' },
-                                ...(filters.difficulty.length > 1 ? [{ label: 'Multiple', value: 'multiple' }] : [])
-                            ]}
+                            icon={<div className="w-4 h-4 border-2 border-current rounded-full flex items-center justify-center text-[8px]">D</div>}
+                            selected={filters.difficulty}
+                            onToggle={(val: string) => setFilters(prev => ({ ...prev, difficulty: toggleArrayItem(prev.difficulty, val) }))}
+                            options={difficultyOptions}
                         />
-                        <FilterRow
+                        <MultiFilterRow
                             label="Topics"
                             id="filter-topics"
-                            icon={<div className="w-4 h-4 border-2 border-current rounded rounded-tr-none flex items-center justify-center text-[8px] font-">T</div>}
-                            value={filters.topics[0] || 'all'}
-                            onValueChange={(val: string) => setFilters(prev => ({ ...prev, topics: [val] }))}
+                            icon={<div className="w-4 h-4 border-2 border-current rounded rounded-tr-none flex items-center justify-center text-[8px]">T</div>}
+                            selected={filters.topics}
+                            onToggle={(val: string) => setFilters(prev => ({ ...prev, topics: toggleArrayItem(prev.topics, val) }))}
                             options={topicOptions}
                         />
                         <FilterRow
                             label="Language"
                             id="filter-language"
-                            icon={<div className="w-4 h-4 font-mono text-[10px] font-">{"</>"}</div>}
+                            icon={<div className="w-4 h-4 font-mono text-[10px]">{"</>"}</div>}
                             value={filters.language}
                             onValueChange={(val: string) => setFilters(prev => ({ ...prev, language: val }))}
                             options={[
@@ -166,17 +254,10 @@ export const ProblemFilterPopup = ({ filters, setFilters, trigger, topics = [] }
                         />
                     </div>
 
-                    {/* Footer */}
-                    <div className="flex items-center gap-2 pt-2">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-foreground/40 hover:text-foreground">
-                            <Plus className="w-4 h-4" />
-                        </Button>
-                    </div>
-
                     <div className="pt-4 border-t border-border flex justify-center">
                         <Button
                             variant="ghost"
-                            className="w-full text-[11px] font- uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-muted/50 gap-2"
+                            className="w-full text-[11px] uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-muted/50 gap-2"
                             onClick={handleReset}
                         >
                             <RotateCcw className="w-3.5 h-3.5" />
