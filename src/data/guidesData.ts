@@ -13,6 +13,8 @@ import { content as backtrackingContent } from "./guides/backtracking";
 import { content as coreDataStructuresContent } from "./guides/core-data-structures";
 import { content as mergeIntervalsContent } from "./guides/merge-intervals";
 import { content as prefixSumContent } from "./guides/prefix-sum";
+import { content as dynamicProgrammingContent } from "./guides/dynamic-programming";
+
 
 export interface RelatedQuestion {
   id: string;
@@ -505,6 +507,31 @@ Here is an overview of Space Complexity, followed by the reference table of stan
           { id: "merge-intervals", name: "Merge Intervals", difficulty: "Medium" },
           { id: "insert-interval", name: "Insert Interval", difficulty: "Medium" },
           { id: "non-overlapping-intervals", name: "Non-overlapping Intervals", difficulty: "Medium" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "dynamic-programming",
+    title: "Dynamic Programming",
+    guides: [
+      {
+        slug: "dynamic-programming",
+        title: "Dynamic Programming",
+        description: "Learn the art of remembering past solutions to avoid doing extra work.",
+        category: "dynamic-programming",
+        heroImage: "dp-hero",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        visualizations: ["coin-change", "knapsack-01", "climbing-stairs"],
+        content: dynamicProgrammingContent,
+        questions: [
+          { id: "climbing-stairs", name: "Climbing Stairs", difficulty: "Easy" },
+          { id: "coin-change", name: "Coin Change", difficulty: "Medium" },
+          { id: "house-robber", name: "House Robber", difficulty: "Medium" }
         ]
       }
     ]
