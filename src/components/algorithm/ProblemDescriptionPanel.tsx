@@ -28,7 +28,9 @@ import {
   Maximize,
   Minimize2,
   PanelLeftClose,
+  Pencil,
   Star,
+  Sparkles,
   Tag,
   ThumbsDown,
   ThumbsUp,
@@ -646,106 +648,185 @@ export const ProblemDescriptionPanel = React.memo(
                   </section>
 
                   {/* Workspace Playgrounds renamed to Helpful Tools to Learn & Understand */}
-                  <div className="max-w-[600px] space-y-3.5 my-6">
-                    <div className="flex items-center gap-2 text-xs font-bold tracking-wide text-muted-foreground/75">
-                      <Zap className="w-3.5 h-3.5 text-primary" />
-                      Helpful tools to learn & understand
+                  <div className="max-w-[600px] my-6 rounded-xl border border-border/50 bg-card p-4 shadow-sm">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 text-primary shadow-sm">
+                        <Lightbulb className="w-4 h-4" />
+                      </div>
+                      <h3 className="text-md font-medium text-foreground">
+                        Understand Before Coding
+                      </h3>
                     </div>
-                    <div className="flex flex-col gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {/* Visualize Card */}
                       <div
                         onClick={() => handleToolCardClick("visualizations")}
-                        className="group cursor-pointer flex items-center justify-between p-4 rounded-xl border border-border/50 bg-card hover:bg-muted/30 dark:hover:bg-zinc-900/20 hover:border-primary/40 transition-all duration-300 shadow-sm"
+                        className="group relative cursor-pointer overflow-hidden rounded-xl border border-border/50 bg-card hover:border-primary/50 hover:ring-1 hover:ring-primary/50 transition-all duration-300 shadow-sm h-32"
                       >
-                        <div className="flex items-start gap-4">
-                          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary/20 transition-all duration-300 shrink-0 mt-0.5">
-                            <Eye className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <h5 className="font-semibold text-sm text-foreground flex items-center gap-2">
-                              Visualize Logic
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                Active Simulator
-                              </span>
-                            </h5>
-                            <p className="text-xs text-muted-foreground mt-1 leading-relaxed max-w-[400px] line-clamp-1">
-                              Watch key transitions, pointers, and variables
-                              update step-by-step.
-                            </p>
-                          </div>
+                        {/* Background Abstract / Live Preview */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent dark:from-primary/10 overflow-hidden">
+                           {(algorithm?.id && (hasVisualization(algorithm.id) || renderBlind75Visualization(algorithm.id))) ? (
+                             <div className="absolute top-0 left-0 w-[800px] h-[600px] origin-top-left scale-[0.4] opacity-50 pointer-events-none select-none blur-[0.5px]">
+                               {renderVizFromMapping(algorithm.id) || renderBlind75Visualization(algorithm.id)}
+                             </div>
+                           ) : (
+                             <svg className="absolute inset-0 w-full h-full text-primary/30" fill="none" viewBox="0 0 300 120" stroke="currentColor" strokeWidth="1.5">
+                               {/* Array [1, 2, 3, 4] */}
+                               <g transform="translate(40, 25)">
+                                 <rect x="0" y="0" width="24" height="24" rx="4" className="fill-primary/10" />
+                                 <rect x="32" y="0" width="24" height="24" rx="4" className="fill-primary/10" />
+                                 <rect x="64" y="0" width="24" height="24" rx="4" className="fill-primary/10" />
+                                 <rect x="96" y="0" width="24" height="24" rx="4" className="fill-primary/10" />
+                                 <text x="12" y="16" fontSize="12" textAnchor="middle" className="fill-primary font-bold" stroke="none">1</text>
+                                 <text x="44" y="16" fontSize="12" textAnchor="middle" className="fill-primary font-bold" stroke="none">2</text>
+                                 <text x="76" y="16" fontSize="12" textAnchor="middle" className="fill-primary font-bold" stroke="none">3</text>
+                                 <text x="108" y="16" fontSize="12" textAnchor="middle" className="fill-primary font-bold" stroke="none">4</text>
+                               </g>
+
+                               {/* Binary Tree */}
+                               <g transform="translate(220, 20)">
+                                 {/* Edges */}
+                                 <line x1="20" y1="10" x2="-5" y2="40" />
+                                 <line x1="20" y1="10" x2="45" y2="40" />
+                                 <line x1="-5" y1="40" x2="-20" y2="70" />
+                                 <line x1="-5" y1="40" x2="10" y2="70" />
+                                 {/* Nodes */}
+                                 <circle cx="20" cy="10" r="10" className="fill-primary/10 border-primary/40" />
+                                 <circle cx="-5" cy="40" r="10" className="fill-primary/10 border-primary/40" />
+                                 <circle cx="45" cy="40" r="10" className="fill-primary/10 border-primary/40" />
+                                 <circle cx="-20" cy="70" r="10" className="fill-primary/10 border-primary/40" />
+                                 <circle cx="10" cy="70" r="10" className="fill-primary/10 border-primary/40" />
+                               </g>
+
+                               {/* Stack / 2D Matrix */}
+                               <g transform="translate(40, 70)">
+                                 <rect x="0" y="0" width="16" height="16" rx="2" className="fill-primary/10" />
+                                 <rect x="20" y="0" width="16" height="16" rx="2" className="fill-primary/10" />
+                                 <rect x="40" y="0" width="16" height="16" rx="2" className="fill-primary/10" />
+                                 
+                                 <rect x="0" y="20" width="16" height="16" rx="2" className="fill-primary/10" />
+                                 <rect x="20" y="20" width="16" height="16" rx="2" className="fill-primary/10 opacity-50" />
+                                 <rect x="40" y="20" width="16" height="16" rx="2" className="fill-primary/10" />
+                               </g>
+
+                               {/* Connecting / Pointer line */}
+                               <g transform="translate(130, 60)">
+                                 <path d="M 0 0 C 20 -10, 30 20, 50 10" className="stroke-primary/50" strokeDasharray="4 4" strokeWidth="2" strokeLinecap="round" />
+                                 <path d="M 45 5 L 50 10 L 45 15" className="stroke-primary/50" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                               </g>
+                             </svg>
+                           )}
+                           {/* Dark Gradient Overlay for Readability */}
+                           <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background/90 via-background/50 to-transparent pointer-events-none transition-opacity duration-300 group-hover:opacity-0" />
+                           
+                           {/* Text Label overlay */}
+                           <div className="absolute bottom-3 left-4 right-4 flex justify-between items-center transition-opacity duration-300 group-hover:opacity-0 z-10">
+                              <h5 className="font-semibold text-sm text-foreground flex items-center gap-2 drop-shadow-sm">
+                                <Eye className="w-5 h-5 text-primary" /> Visualize This Problem
+                              </h5>
+                              <div className="w-6 h-6 rounded-full bg-background/50 border border-border/50 flex items-center justify-center text-muted-foreground shadow-sm">
+                                <ArrowRight className="w-3 h-3" />
+                              </div>
+                           </div>
                         </div>
-                        <div className="flex items-center gap-1 text-xs font-semibold text-foreground/75 group-hover:text-foreground transition-all duration-300 shrink-0 ml-4">
-                          Open{" "}
-                          <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" />
+                        
+                        {/* Hover Overlay with Button */}
+                        <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+                          <Badge variant="default" className="gap-2 px-4 py-2 shadow-md hover:scale-105 transition-transform cursor-pointer">
+                            Open Visualizer <ArrowRight className="w-3.5 h-3.5" />
+                          </Badge>
                         </div>
                       </div>
 
-                      {/* Solutions Card */}
-                      <div
-                        onClick={() => handleToolCardClick("solutions")}
-                        className="group cursor-pointer flex items-center justify-between p-4 rounded-xl border border-border/50 bg-card hover:bg-muted/30 dark:hover:bg-zinc-900/20 hover:border-primary/40 transition-all duration-300 shadow-sm"
-                      >
-                        <div className="flex items-start gap-4">
-                          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary/20 transition-all duration-300 shrink-0 mt-0.5">
-                            <Flashlight className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <h5 className="font-semibold text-sm text-foreground">
-                              Check Solutions
-                            </h5>
-                            <p className="text-xs text-muted-foreground mt-1 leading-relaxed max-w-[400px] line-clamp-1">
-                              Read clean, documented implementations across
-                              multiple patterns.
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-1 text-xs font-semibold text-foreground/75 group-hover:text-foreground transition-all duration-300 shrink-0 ml-4">
-                          View Code{" "}
-                          <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" />
-                        </div>
-                      </div>
+
 
                       {/* Thinkpad Card */}
-                      {isBrainstormEnabled &&
-                        algorithm?.controls?.brainstorm !== false && (
-                          <div
-                            onClick={() => handleToolCardClick("thinkpad")}
-                            className="group cursor-pointer flex items-center justify-between p-4 rounded-xl border border-border/50 bg-card hover:bg-muted/30 dark:hover:bg-zinc-900/20 hover:border-primary/40 transition-all duration-300 shadow-sm"
-                          >
-                            <div className="flex items-start gap-4">
-                              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary/20 transition-all duration-300 shrink-0 mt-0.5">
-                                <Book className="w-5 h-5" />
-                              </div>
-                              <div>
-                                <h5 className="font-semibold text-sm text-foreground">
-                                  Thinkpad (Draw & Note)
+                      {isBrainstormEnabled && algorithm?.controls?.brainstorm !== false && (
+                        <div
+                          onClick={() => handleToolCardClick("thinkpad")}
+                          className="group relative cursor-pointer overflow-hidden rounded-xl border border-border/50 bg-card hover:border-primary/50 hover:ring-1 hover:ring-primary/50 transition-all duration-300 shadow-sm h-32"
+                        >
+                          {/* Background Abstract Preview */}
+                          <div className="absolute inset-0 bg-[radial-gradient(#d1d5db_1.5px,transparent_1.5px)] dark:bg-[radial-gradient(#4b5563_1px,transparent_1px)] [background-size:16px_16px] opacity-70 dark:opacity-40" />
+                          <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent dark:from-amber-500/10">
+                             {/* Abstract Drawing SVG Mimicking Homepage */}
+                             <svg className="absolute inset-0 w-full h-full text-amber-500/40" fill="none" viewBox="0 0 300 120" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                               {/* Wobbly Array */}
+                               <g transform="translate(30, 20)">
+                                 <path d="M 0,0 C 8,-3 15,3 24,0 C 24,8 21,15 24,24 C 15,27 8,21 0,24 C -3,15 3,8 0,0" />
+                                 <path d="M 32,0 C 40,-3 47,3 56,0 C 56,8 53,15 56,24 C 47,27 40,21 32,24 C 29,15 35,8 32,0" />
+                                 <path d="M 64,0 C 72,-3 79,3 88,0 C 88,8 85,15 88,24 C 79,27 72,21 64,24 C 61,15 67,8 64,0" />
+                                 <path d="M 96,0 C 104,-3 111,3 120,0 C 120,8 117,15 120,24 C 111,27 104,21 96,24 C 93,15 99,8 96,0" />
+                               </g>
+
+                               {/* Wobbly Tree */}
+                               <g transform="translate(210, 20)">
+                                 <path d="M 30,8 C 24,18 18,28 12,38" />
+                                 <path d="M 30,8 C 36,18 42,28 48,38" />
+                                 <path d="M 12,38 C 6,48 0,58 -6,68" />
+                                 <path d="M 48,38 C 54,48 60,58 66,68" />
+                                 
+                                 <path d="M 25,8 C 25,3 35,3 35,8 C 35,13 25,13 25,8" />
+                                 <path d="M 7,38 C 7,33 17,33 17,38 C 17,43 7,43 7,38" />
+                                 <path d="M 43,38 C 43,33 53,33 53,38 C 53,43 43,43 43,38" />
+                                 <path d="M -11,68 C -11,63 -1,63 -1,68 C -1,73 -11,73 -11,68" />
+                                 <path d="M 61,68 C 61,63 71,63 71,68 C 71,73 61,73 61,68" />
+                               </g>
+
+                               {/* Hand-drawn Math / Loop */}
+                               <g transform="translate(30, 80)">
+                                 <path d="M 0,0 C 15, -8 30, 8 45, 0" />
+                                 <path d="M 0,15 C 15, 7 30, 23 45, 15" />
+                                 <path d="M 22,-15 C 15,7 30,30 22,38" className="text-amber-500/20" strokeWidth="5" />
+                               </g>
+
+                               {/* Highlight Lasso around something */}
+                               <g transform="translate(120, 60)">
+                                 <path d="M 0,15 C 15,-8 30,-8 45,15 C 60,38 30,53 15,38 C 0,23 -15,38 0,15" strokeDasharray="6 6" className="text-amber-500/60" strokeWidth="2" />
+                                 <path d="M 40,38 C 48,53 60,53 68,45" />
+                                 <path d="M 60,45 L 68,45 L 65,53" />
+                               </g>
+                             </svg>
+                             {/* Dark Gradient Overlay for Readability */}
+                             <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background/90 via-background/50 to-transparent pointer-events-none transition-opacity duration-300 group-hover:opacity-0" />
+
+                             <div className="absolute bottom-3 left-4 right-4 flex justify-between items-center transition-opacity duration-300 group-hover:opacity-0 z-10">
+                                <h5 className="font-semibold text-sm text-foreground flex items-center gap-2 drop-shadow-sm">
+                                  <Pencil className="w-5 h-5 text-amber-500"/> Draw Your Approach
                                 </h5>
-                                <p className="text-xs text-muted-foreground mt-1 leading-relaxed max-w-[400px] line-clamp-1">
-                                  Sketch diagrams on an infinite canvas and
-                                  draft notes directly inline.
-                                </p>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-1 text-xs font-semibold text-foreground/75 group-hover:text-foreground transition-all duration-300 shrink-0 ml-4">
-                              Draw{" "}
-                              <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" />
-                            </div>
+                                <div className="w-6 h-6 rounded-full bg-background/50 border border-border/50 flex items-center justify-center text-muted-foreground shadow-sm">
+                                  <ArrowRight className="w-3 h-3" />
+                                </div>
+                             </div>
                           </div>
-                        )}
+                          
+                          {/* Hover Overlay with Button */}
+                          <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+                            <Badge variant="secondary" className="gap-2 px-3 py-1.5 shadow-md hover:scale-105 transition-transform bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400 cursor-pointer">
+                              Draw <ArrowRight className="w-3.5 h-3.5" />
+                            </Badge>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
 
-                  {/* Examples Section */}
-                  {algorithm.explanation.io &&
-                    algorithm.explanation.io.length > 0 &&
-                    (!algorithm?.controls ||
-                      algorithm.controls?.description?.examples !== false) && (
-                      <Card className="glass-card max-w-[600px] overflow-hidden">
+                  {/* Examples and Constraints Group */}
+                  {(() => {
+                    const hasExamples = algorithm.explanation.io && algorithm.explanation.io.length > 0 && (!algorithm?.controls || algorithm.controls?.description?.examples !== false);
+                    const hasConstraints = algorithm.explanation.constraints && algorithm.explanation.constraints.length > 0 && (!algorithm?.controls || algorithm.controls?.description?.constraints !== false);
+                    
+                    if (!hasExamples && !hasConstraints) return null;
+                    
+                    return (
+                      <Card className="glass-card max-w-[600px] overflow-hidden flex flex-col divide-y divide-border/50">
+                        {hasExamples && (
+                          <div className="flex flex-col">
                         {algorithm.explanation.io.map(
                           (example: any, index: number) => (
                             <React.Fragment key={index}>
                               <div className="p-4">
-                                <h4 className="font-medium mb-3">
+                                <h4 className="text-base font-medium mb-3 transition-colors text-foreground">
                                   Example {index + 1}:
                                 </h4>
                                 <div className="space-y-2 font-mono text-sm">
@@ -912,23 +993,19 @@ export const ProblemDescriptionPanel = React.memo(
                                   )}
                                 </div>
                               </div>
-                              {index < algorithm.explanation.io.length - 1 && (
-                                <Separator className="bg-border/50 mx-5 w-auto" />
-                              )}
-                            </React.Fragment>
-                          ),
+                                {index < algorithm.explanation.io.length - 1 && (
+                                  <Separator className="bg-border/50 mx-5 w-auto" />
+                                )}
+                              </React.Fragment>
+                            ),
+                          )}
+                          </div>
                         )}
-                      </Card>
-                    )}
 
-                  {/* Constraints Section */}
-                  {algorithm.explanation.constraints &&
-                    algorithm.explanation.constraints.length > 0 &&
-                    (!algorithm?.controls ||
-                      algorithm.controls?.description?.constraints !==
-                        false) && (
-                      <Card className="glass-card max-w-[500px] p-4 overflow-hidden">
-                        <h4 className="font-medium mb-3">Constraints:</h4>
+                        {/* Constraints Section */}
+                        {hasConstraints && (
+                          <div className="p-4">
+                        <h4 className="text-base font-medium mb-3 transition-colors text-foreground">Constraints:</h4>
                         <ul className="space-y-1.5 font-mono text-sm">
                           {algorithm.explanation.constraints.map(
                             (constraint: string, index: number) => (
@@ -954,8 +1031,11 @@ export const ProblemDescriptionPanel = React.memo(
                             ),
                           )}
                         </ul>
+                          </div>
+                        )}
                       </Card>
-                    )}
+                    );
+                  })()}
 
                   {/* Note Section */}
                   {algorithm.explanation.note &&
@@ -969,6 +1049,8 @@ export const ProblemDescriptionPanel = React.memo(
                       </div>
                     )}
 
+                  {/* Unified Content Card */}
+                  <Card className="glass-card max-w-[600px] overflow-hidden flex flex-col my-6">
                   {/* Collapsible Section for Overview and Guides */}
                   {(() => {
                     const showOverview =
@@ -992,7 +1074,7 @@ export const ProblemDescriptionPanel = React.memo(
                       algorithm.spaceComplexity;
 
                     return (
-                      <Card className="glass-card overflow-hidden">
+                      <div className="border-b border-border/50">
                         <Accordion
                           type="single"
                           collapsible
@@ -1004,7 +1086,7 @@ export const ProblemDescriptionPanel = React.memo(
                             className="border-none"
                           >
                             <AccordionTrigger className="px-4 sm:px-6 py-4 hover:no-underline">
-                              <div className="flex items-center gap-2 text-lg font-medium">
+                              <div className="flex items-center gap-2 text-base font-medium transition-colors text-foreground">
                                 <BookOpen className="w-5 h-5 text-primary" />
                                 Algorithm Overview
                               </div>
@@ -1215,15 +1297,15 @@ export const ProblemDescriptionPanel = React.memo(
                             </AccordionContent>
                           </AccordionItem>
                         </Accordion>
-                      </Card>
+                      </div>
                     );
                   })()}
 
                   {/* Metadata Accordions (Topics, Companies, Hints) */}
-                  <div className="space-y-0 max-w-5xl mx-auto w-full">
+                  <div className="w-full">
                     <Accordion
                       type="multiple"
-                      className="w-full space-y-4"
+                      className="w-full"
                       value={openAccordionItems}
                       onValueChange={setOpenAccordionItems}
                     >
@@ -1231,7 +1313,7 @@ export const ProblemDescriptionPanel = React.memo(
                       {algorithm.category && (
                         <AccordionItem
                           value="topics"
-                          className="border rounded-lg glass-card shadow-sm border-border/50"
+                          className="border-b border-border/50"
                           ref={topicsRef}
                         >
                           <AccordionTrigger className="px-4 sm:px-6 py-4 hover:no-underline group">
@@ -1273,7 +1355,7 @@ export const ProblemDescriptionPanel = React.memo(
                         algorithm.metadata.companies.length > 0 && (
                           <AccordionItem
                             value="companies"
-                            className="border rounded-lg glass-card shadow-sm border-border/50"
+                            className="border-b border-border/50"
                             ref={companiesRef}
                           >
                             <AccordionTrigger className="px-4 sm:px-6 py-4 hover:no-underline group">
@@ -1378,6 +1460,7 @@ export const ProblemDescriptionPanel = React.memo(
                         )}
                     </Accordion>
                   </div>
+                  </Card>
 
                   {/* Video Tutorial Card */}
                   <FeatureGuard flag="youtube_video">
@@ -1387,15 +1470,16 @@ export const ProblemDescriptionPanel = React.memo(
                           false) && (
                         <VideoTutorialCard
                           tutorial={algorithm.tutorials[0]}
-                          title={`${algorithm.name} Tutorial`}
+                          title="Video Tutorial"
+                          className="max-w-[600px] mt-6 mx-0"
                         />
                       )}
                   </FeatureGuard>
 
                   {/* Next Problem Card */}
                   {nextProblem && (
-                    <Card className="p-4 sm:p-6 glass-card overflow-hidden">
-                      <h3 className="font-medium mb-4">
+                    <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-[600px]">
+                      <h3 className="text-base font-medium mb-4 transition-colors text-foreground">
                         Next Problem
                       </h3>
                       <div className="space-y-2">
@@ -1434,8 +1518,8 @@ export const ProblemDescriptionPanel = React.memo(
                     (!algorithm?.controls ||
                       algorithm.controls?.content?.practice_problems !==
                         false) ? (
-                      <Card className="p-4 sm:p-6 glass-card overflow-hidden">
-                        <h3 className="font-medium mb-4">
+                      <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-[600px]">
+                        <h3 className="text-base font-medium mb-4 transition-colors text-foreground">
                           Similar Problems
                         </h3>
                         <div className="space-y-2">
