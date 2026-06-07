@@ -200,11 +200,6 @@ export const normalizeCategory = (cat: string | null | undefined): string => {
     if (CATEGORY_MAP[withAnd]) return CATEGORY_MAP[withAnd];
   }
 
-  // Array or Hash or String tags individually resolve to their base groups
-  if (ARRAY_TAGS.has(trimmed)) return "_Array";   // internal placeholder
-  if (HASH_TAGS.has(trimmed)) return "_Hash";     // internal placeholder
-  if (STRING_TAGS.has(trimmed)) return "_String"; // internal placeholder
-
   return cat.trim();
 };
 
