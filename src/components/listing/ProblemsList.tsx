@@ -143,9 +143,7 @@ export const ProblemsList = ({
 
   // Sync internal filter state with URL-driven props
   useEffect(() => {
-    if (initialSelectedTopics && initialSelectedTopics.length > 0) {
-      setSelectedTopics(initialSelectedTopics.map(normalizeCategory));
-    }
+    setSelectedTopics(initialSelectedTopics.map(normalizeCategory));
   }, [initialSelectedTopics]);
 
   useEffect(() => {
@@ -172,7 +170,9 @@ export const ProblemsList = ({
         if (!algo.category) return false;
         const rawCats = algo.category.split(',').map((c: string) => c.trim());
         const cats = resolveAlgoCategories(rawCats);
-        return cats.some(cat => selectedTopics.includes(cat));
+        const lowerSelectedTopics = selectedTopics.map(t => t.toLowerCase());
+        return cats.some(cat => selectedTopics.includes(cat)) || 
+               rawCats.some(raw => lowerSelectedTopics.includes(raw.toLowerCase()) || selectedTopics.includes(normalizeCategory(raw)));
       });
     }
 
@@ -293,11 +293,7 @@ export const ProblemsList = ({
   const handleCategoryClick = (cat: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (pathname === '/dsa/query') {
-      handleTopicToggle(normalizeCategory(cat));
-    } else {
-      router.push(`/dsa/query?topic=${encodeURIComponent(cat)}`);
-    }
+    router.push(`/dsa/query?topic=${encodeURIComponent(cat)}`);
   };
 
   const handleCompanyToggle = (company: string) => {
@@ -376,7 +372,16 @@ export const ProblemsList = ({
       topics: [],
       language: 'all'
     });
-  }, []);
+
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('topic') || params.has('company')) {
+        params.delete('topic');
+        params.delete('company');
+        router.push(`${pathname}?${params.toString()}`);
+      }
+    }
+  }, [router, pathname]);
 
   const handleRandomClick = () => {
     const pool = filteredAndSortedAlgorithms.length > 0 ? filteredAndSortedAlgorithms : algorithms;

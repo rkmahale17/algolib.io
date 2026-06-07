@@ -12,11 +12,14 @@ import {
 } from "@/components/ui/select";
 import { Plus, Trash2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAppSelector } from "@/store/hooks";
+import { DIFFICULTY_MAP } from "@/types/algorithm";
 
 interface Problem {
   type: "easy" | "medium" | "hard";
   url: string;
   title: string;
+  serial_no?: number;
 }
 
 interface ProblemsData {
@@ -40,6 +43,49 @@ export function ProblemsEditor({ data, onChange }: ProblemsEditorProps) {
     url: "",
     title: "",
   });
+
+  const { items } = useAppSelector(state => state.algorithms);
+  const [bulkIds, setBulkIds] = useState("");
+
+  const addBulkInternal = () => {
+    if (!bulkIds.trim()) return;
+
+    const ids = bulkIds.split(",").map(id => id.trim()).filter(Boolean);
+    const newProblems: Problem[] = [];
+
+    for (const id of ids) {
+      const found = items?.find(item => item.id === id);
+      if (found) {
+        if (!data.internal.find(p => p.url === found.id)) {
+          const rawDiff = (found.difficulty || "easy").toLowerCase();
+          const mappedDiff = (DIFFICULTY_MAP[rawDiff] || "Easy").toLowerCase() as any;
+
+          newProblems.push({
+            title: found.title || found.name || id,
+            type: mappedDiff,
+            url: found.id,
+            serial_no: found.serial_no
+          });
+        }
+      } else {
+        if (!data.internal.find(p => p.url === id)) {
+          newProblems.push({
+            title: id,
+            type: "easy",
+            url: id
+          });
+        }
+      }
+    }
+
+    if (newProblems.length > 0) {
+      onChange({
+        ...data,
+        internal: [...data.internal, ...newProblems],
+      });
+    }
+    setBulkIds("");
+  };
 
   const addInternal = () => {
     if (newInternal.url && newInternal.title) {
@@ -352,6 +398,33 @@ export function ProblemsEditor({ data, onChange }: ProblemsEditorProps) {
               >
                 <Plus className="h-4 w-4" />
                 Add Problem
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Add Bulk Internal Problems */}
+          <Card className="border-dashed bg-muted/20">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Bulk Add Internal Problems</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="space-y-2">
+                <Label>Problem IDs (Comma separated)</Label>
+                <Input
+                  value={bulkIds}
+                  onChange={(e) => setBulkIds(e.target.value)}
+                  placeholder="e.g., two-sum, valid-palindrome"
+                />
+              </div>
+              <Button
+                type="button"
+                onClick={addBulkInternal}
+                disabled={!bulkIds.trim()}
+                className="w-full gap-2"
+                variant="secondary"
+              >
+                <Plus className="h-4 w-4" />
+                Bulk Add
               </Button>
             </CardContent>
           </Card>

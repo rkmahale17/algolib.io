@@ -11,6 +11,7 @@ import {
   ArrowRight,
   Book,
   BookOpen,
+  Briefcase,
   Building2,
   Check,
   CheckCircle2,
@@ -194,6 +195,7 @@ export const ProblemDescriptionPanel = React.memo(
     const topicsRef = useRef<HTMLDivElement>(null);
     const companiesRef = useRef<HTMLDivElement>(null);
     const hintsRef = useRef<HTMLDivElement>(null);
+    const tipsRef = useRef<HTMLDivElement>(null);
     const tabsScrollRef = useRef<HTMLDivElement>(null);
 
     const isBrainstormEnabled = useFeatureFlag("brainstrom_tab");
@@ -203,6 +205,7 @@ export const ProblemDescriptionPanel = React.memo(
     const [tabsShowLeftFade, setTabsShowLeftFade] = useState(false);
     const [tabsShowRightFade, setTabsShowRightFade] = useState(false);
     const [openAccordionItems, setOpenAccordionItems] = useState<string[]>([]);
+    const [learnAccordionOpen, setLearnAccordionOpen] = useState<string>("details");
 
     const ALL_AVAILABLE_TABS = [
       { id: "description", label: "Description", icon: FileText },
@@ -593,6 +596,21 @@ export const ProblemDescriptionPanel = React.memo(
                               </Badge>
                             )}
 
+                          {/* Tips Badge */}
+                          {algorithm.explanation?.tips && (
+                            <Badge
+                              variant="outline"
+                              className="bg-transparent text-foreground border-border text-[10px] sm:text-[11px] px-3 py-0.5 cursor-pointer hover:bg-muted/50 transition-all flex items-center h-6 rounded-full gap-1.5"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                scrollToSection(tipsRef, "tips");
+                              }}
+                            >
+                              <Lightbulb className="w-3.5 h-3.5 text-primary" />
+                              Hint
+                            </Badge>
+                          )}
+
                           {/* Hint Badge */}
                           {algorithm.metadata?.hints &&
                             algorithm.metadata.hints.length > 0 && (
@@ -722,7 +740,7 @@ export const ProblemDescriptionPanel = React.memo(
                            {/* Text Label overlay */}
                            <div className="absolute bottom-3 left-4 right-4 flex justify-between items-center transition-opacity duration-300 group-hover:opacity-0 z-10">
                               <h5 className="font-semibold text-sm text-foreground flex items-center gap-2 drop-shadow-sm">
-                                <Eye className="w-5 h-5 text-primary" /> Visualize This Problem
+                                <Eye className="w-4 h-4 text-primary" /> Visualize This Problem
                               </h5>
                               <div className="w-6 h-6 rounded-full bg-background/50 border border-border/50 flex items-center justify-center text-muted-foreground shadow-sm">
                                 <ArrowRight className="w-3 h-3" />
@@ -792,7 +810,7 @@ export const ProblemDescriptionPanel = React.memo(
 
                              <div className="absolute bottom-3 left-4 right-4 flex justify-between items-center transition-opacity duration-300 group-hover:opacity-0 z-10">
                                 <h5 className="font-semibold text-sm text-foreground flex items-center gap-2 drop-shadow-sm">
-                                  <Pencil className="w-5 h-5 text-amber-500"/> Draw Your Approach
+                                  <Pencil className="w-4 h-4 text-amber-500"/> Draw Your Approach
                                 </h5>
                                 <div className="w-6 h-6 rounded-full bg-background/50 border border-border/50 flex items-center justify-center text-muted-foreground shadow-sm">
                                   <ArrowRight className="w-3 h-3" />
@@ -826,7 +844,7 @@ export const ProblemDescriptionPanel = React.memo(
                           (example: any, index: number) => (
                             <React.Fragment key={index}>
                               <div className="p-4">
-                                <h4 className="text-base font-medium mb-3 transition-colors text-foreground">
+                                <h4 className="text-sm font-medium mb-3 transition-colors text-foreground">
                                   Example {index + 1}:
                                 </h4>
                                 <div className="space-y-2 font-mono text-sm">
@@ -1005,7 +1023,7 @@ export const ProblemDescriptionPanel = React.memo(
                         {/* Constraints Section */}
                         {hasConstraints && (
                           <div className="p-4">
-                        <h4 className="text-base font-medium mb-3 transition-colors text-foreground">Constraints:</h4>
+                        <h4 className="text-sm font-medium mb-3 transition-colors text-foreground">Constraints:</h4>
                         <ul className="space-y-1.5 font-mono text-sm">
                           {algorithm.explanation.constraints.map(
                             (constraint: string, index: number) => (
@@ -1056,12 +1074,7 @@ export const ProblemDescriptionPanel = React.memo(
                     const showOverview =
                       !algorithm?.controls ||
                       algorithm.controls?.description?.overview !== false;
-                    const showGuides =
-                      algorithm &&
-                      (!algorithm?.controls ||
-                        algorithm.controls?.description?.guides !== false);
-
-                    if (!showOverview && !showGuides) return null;
+                    if (!showOverview) return null;
 
                     // Prioritize metadata (Preview Mode) then root properties (Production Mode)
                     const overview =
@@ -1078,7 +1091,8 @@ export const ProblemDescriptionPanel = React.memo(
                         <Accordion
                           type="single"
                           collapsible
-                          defaultValue="details"
+                          value={learnAccordionOpen}
+                          onValueChange={setLearnAccordionOpen}
                           className="w-full"
                         >
                           <AccordionItem
@@ -1086,213 +1100,100 @@ export const ProblemDescriptionPanel = React.memo(
                             className="border-none"
                           >
                             <AccordionTrigger className="px-4 sm:px-6 py-4 hover:no-underline">
-                              <div className="flex items-center gap-2 text-base font-medium transition-colors text-foreground">
-                                <BookOpen className="w-5 h-5 text-primary" />
-                                Algorithm Overview
+                              <div className="flex items-center gap-2 text-sm font-medium transition-colors text-foreground">
+                                <BookOpen className="w-4 h-4 text-primary" />
+                                Learn
                               </div>
                             </AccordionTrigger>
                             <AccordionContent className="px-1 sm:px-1 pb-4">
                               <div className="space-y-6 pt-0">
-                                <div className="px-3 sm:px-5 space-y-4">
-                                  {showOverview && (
-                                    <>
-                                      <div className="text-sm text-muted-foreground">
-                                        {/* Using RichText if available, otherwise fallback */}
-                                        <React.Suspense
-                                          fallback={
-                                            <div className="h-20 w-full animate-pulse bg-muted rounded" />
-                                          }
-                                        >
-                                          {overview ? (
-                                            <RichText content={overview} />
-                                          ) : (
-                                            <RichText
-                                              content={
-                                                algorithm.explanation
-                                                  .problemStatement
-                                              }
-                                            />
-                                          )}
-                                        </React.Suspense>
-                                      </div>
+                                <Tabs defaultValue="overview" className="w-full">
+                                  <TabsList className="w-full justify-start rounded-none border-b border-border/50 bg-transparent p-0 mb-4 h-auto px-3 sm:px-5">
+                                    <TabsTrigger
+                                      value="overview"
+                                      className="rounded-none border-b-2 border-transparent px-4 py-2 text-sm font-medium transition-all data-[state=active]:border-primary data-[state=active]:bg-muted/30 data-[state=active]:text-foreground data-[state=inactive]:text-muted-foreground hover:bg-muted/50"
+                                    >
+                                      Understand the pattern
+                                    </TabsTrigger>
+                                    {algorithm?.explanation?.steps && (!algorithm?.controls || algorithm.controls?.description?.guides !== false) && (
+                                      <TabsTrigger
+                                        value="steps"
+                                        className="rounded-none border-b-2 border-transparent px-4 py-2 text-sm font-medium transition-all data-[state=active]:border-primary data-[state=active]:bg-muted/30 data-[state=active]:text-foreground data-[state=inactive]:text-muted-foreground hover:bg-muted/50"
+                                      >
+                                        Steps to Solve
+                                      </TabsTrigger>
+                                    )}
+                                  </TabsList>
 
-                                      <Separator />
-
-                                      <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                          <p className="text-sm font-medium mb-1">
-                                            Time Complexity
-                                          </p>
-                                          <Badge
-                                            variant="outline"
-                                            className="font-mono"
-                                          >
-                                            {timeComplexity || "N/A"}
-                                          </Badge>
-                                        </div>
-                                        <div>
-                                          <p className="text-sm font-medium mb-1">
-                                            Space Complexity
-                                          </p>
-                                          <Badge
-                                            variant="outline"
-                                            className="font-mono"
-                                          >
-                                            {spaceComplexity || "N/A"}
-                                          </Badge>
-                                        </div>
-                                      </div>
-                                      <Separator />
-                                    </>
-                                  )}
-
-                                  {/* Steps, Use Cases & Tips */}
-                                  {showGuides && (
-                                    <div className="pt-2">
-                                      <Tabs defaultValue="usecase">
-                                        <TabsList className="grid w-full grid-cols-3 h-auto">
-                                          <TooltipProvider>
-                                            <TabsTrigger
-                                              value="usecase"
-                                              className="text-[12px]"
-                                            >
-                                              {isUltraCompact ? (
-                                                <Tooltip>
-                                                  <TooltipTrigger asChild>
-                                                    <Lightbulb className="w-4 h-4" />
-                                                  </TooltipTrigger>
-                                                  <TooltipContent>
-                                                    Use Cases
-                                                  </TooltipContent>
-                                                </Tooltip>
-                                              ) : (
-                                                <>
-                                                  <Lightbulb className="w-3.5 h-3.5 mr-1.5 shrink-0" />
-                                                  Use Cases
-                                                </>
-                                              )}
-                                            </TabsTrigger>
-                                            <TabsTrigger
-                                              value="tips"
-                                              className="text-[12px]"
-                                            >
-                                              {isUltraCompact ? (
-                                                <Tooltip>
-                                                  <TooltipTrigger asChild>
-                                                    <Zap className="w-4 h-4" />
-                                                  </TooltipTrigger>
-                                                  <TooltipContent>
-                                                    Pro Tips
-                                                  </TooltipContent>
-                                                </Tooltip>
-                                              ) : (
-                                                <>
-                                                  <Zap className="w-3.5 h-3.5 mr-1.5 shrink-0" />
-                                                  Pro Tips
-                                                </>
-                                              )}
-                                            </TabsTrigger>
-                                            <TabsTrigger
-                                              value="steps"
-                                              className="text-[12px]"
-                                            >
-                                              {isUltraCompact ? (
-                                                <Tooltip>
-                                                  <TooltipTrigger asChild>
-                                                    <ListChecks className="w-4 h-4" />
-                                                  </TooltipTrigger>
-                                                  <TooltipContent>
-                                                    Steps to solve
-                                                  </TooltipContent>
-                                                </Tooltip>
-                                              ) : (
-                                                <>
-                                                  <ListChecks className="w-3.5 h-3.5 mr-1.5 shrink-0" />
-                                                  Steps to solve
-                                                </>
-                                              )}
-                                            </TabsTrigger>
-                                          </TooltipProvider>
-                                        </TabsList>
-
-                                        <div className="p-1 min-h-[150px] relative">
-                                          <TabsContent
-                                            value="steps"
-                                            className="mt-4 h-full"
-                                          >
-                                            {(algorithm?.is_premium ||
-                                              algorithm?.is_pro ||
-                                              algorithm?.metadata?.is_pro) &&
-                                            !hasPremiumAccess &&
-                                            !isPlatformPreview ? (
-                                              <ProOverlay className="rounded-none border-0 py-12" />
-                                            ) : (
-                                              <div className="text-sm text-muted-foreground">
-                                                <React.Suspense
-                                                  fallback={
-                                                    <div className="h-20 w-full animate-pulse bg-muted rounded" />
-                                                  }
-                                                >
-                                                  <RichText
-                                                    content={
-                                                      algorithm.explanation
-                                                        .steps
-                                                    }
-                                                  />
-                                                </React.Suspense>
-                                              </div>
-                                            )}
-                                          </TabsContent>
-
-                                          <TabsContent
-                                            value="usecase"
-                                            className="mt-4"
-                                          >
+                                  <TabsContent value="overview" className="mt-0">
+                                    <div className="px-3 sm:px-5 space-y-4">
+                                      {showOverview && (
+                                        <>
+                                          <div className="text-sm text-muted-foreground">
+                                            {/* Using RichText if available, otherwise fallback */}
                                             <React.Suspense
                                               fallback={
                                                 <div className="h-20 w-full animate-pulse bg-muted rounded" />
                                               }
                                             >
-                                              <RichText
-                                                className="text-sm text-muted-foreground"
-                                                content={
-                                                  algorithm.explanation.useCase
-                                                }
-                                              />
-                                            </React.Suspense>
-                                          </TabsContent>
-
-                                          <TabsContent
-                                            value="tips"
-                                            className="mt-4 h-full"
-                                          >
-                                            {(algorithm?.is_premium ||
-                                              algorithm?.is_pro ||
-                                              algorithm?.metadata?.is_pro) &&
-                                            !hasPremiumAccess &&
-                                            !isPlatformPreview ? (
-                                              <ProOverlay className="rounded-none border-0 py-12" />
-                                            ) : (
-                                              <div className="text-sm text-muted-foreground">
-                                                <React.Suspense
-                                                  fallback={
-                                                    <div className="h-20 w-full animate-pulse bg-muted rounded" />
+                                              {overview ? (
+                                                <RichText content={overview} />
+                                              ) : (
+                                                <RichText
+                                                  content={
+                                                    algorithm.explanation
+                                                      .problemStatement
                                                   }
-                                                >
-                                                  <RichText
-                                                    content={
-                                                      algorithm.explanation.tips
-                                                    }
-                                                  />
-                                                </React.Suspense>
-                                              </div>
-                                            )}
-                                          </TabsContent>
-                                        </div>
-                                      </Tabs>
+                                                />
+                                              )}
+                                            </React.Suspense>
+                                          </div>
+
+                                          <Separator />
+
+                                          <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                              <p className="text-sm font-medium mb-1">
+                                                Time Complexity
+                                              </p>
+                                              <Badge
+                                                variant="outline"
+                                                className="font-mono"
+                                              >
+                                                {timeComplexity || "N/A"}
+                                              </Badge>
+                                            </div>
+                                            <div>
+                                              <p className="text-sm font-medium mb-1">
+                                                Space Complexity
+                                              </p>
+                                              <Badge
+                                                variant="outline"
+                                                className="font-mono"
+                                              >
+                                                {spaceComplexity || "N/A"}
+                                              </Badge>
+                                            </div>
+                                          </div>
+                                        </>
+                                      )}
                                     </div>
+                                  </TabsContent>
+
+                                  {algorithm?.explanation?.steps && (!algorithm?.controls || algorithm.controls?.description?.guides !== false) && (
+                                    <TabsContent value="steps" className="mt-0 px-3 sm:px-5 pb-4">
+                                      {(algorithm?.is_premium || algorithm?.is_pro || algorithm?.metadata?.is_pro) && !hasPremiumAccess && !isPlatformPreview ? (
+                                        <ProOverlay className="rounded-none border-0 py-12" />
+                                      ) : (
+                                        <div className="text-sm text-muted-foreground">
+                                          <React.Suspense fallback={<div className="h-20 w-full animate-pulse bg-muted rounded" />}>
+                                            <RichText content={algorithm.explanation.steps} />
+                                          </React.Suspense>
+                                        </div>
+                                      )}
+                                    </TabsContent>
                                   )}
-                                </div>
+                                </Tabs>
                               </div>
                             </AccordionContent>
                           </AccordionItem>
@@ -1300,7 +1201,6 @@ export const ProblemDescriptionPanel = React.memo(
                       </div>
                     );
                   })()}
-
                   {/* Metadata Accordions (Topics, Companies, Hints) */}
                   <div className="w-full">
                     <Accordion
@@ -1317,8 +1217,8 @@ export const ProblemDescriptionPanel = React.memo(
                           ref={topicsRef}
                         >
                           <AccordionTrigger className="px-4 sm:px-6 py-4 hover:no-underline group">
-                            <div className="flex items-center gap-2 text-base font-medium transition-colors text-foreground">
-                              <Tag className="w-5 h-5 text-primary" />
+                            <div className="flex items-center gap-2 text-sm font-medium transition-colors text-foreground">
+                              <Tag className="w-4 h-4 text-primary" />
                               Topics
                             </div>
                           </AccordionTrigger>
@@ -1359,11 +1259,11 @@ export const ProblemDescriptionPanel = React.memo(
                             ref={companiesRef}
                           >
                             <AccordionTrigger className="px-4 sm:px-6 py-4 hover:no-underline group">
-                              <div className="flex items-center gap-2 text-base font-medium transition-colors text-foreground">
+                              <div className="flex items-center gap-2 text-sm font-medium transition-colors text-foreground">
                                 {hasPremiumAccess || isPlatformPreview ? (
-                                  <Building2 className="w-5 h-5 text-primary" />
+                                  <Building2 className="w-4 h-4 text-primary" />
                                 ) : (
-                                  <Lock className="w-5 h-5 text-amber-500" />
+                                  <Lock className="w-4 h-4 text-amber-500" />
                                 )}
                                 Companies
                               </div>
@@ -1420,6 +1320,57 @@ export const ProblemDescriptionPanel = React.memo(
                           </AccordionItem>
                         )}
 
+                      {/* Hint Item */}
+                      {algorithm?.explanation?.tips && (!algorithm?.controls || algorithm.controls?.description?.guides !== false) && (
+                        <AccordionItem
+                          value="tips"
+                          className="border-b border-border/50"
+                          ref={tipsRef}
+                        >
+                          <AccordionTrigger className="px-4 sm:px-6 py-4 hover:no-underline group">
+                            <div className="flex items-center gap-2 text-sm font-medium transition-colors text-foreground">
+                              <Lightbulb className="w-4 h-4 text-primary" />
+                              Hint
+                            </div>
+                          </AccordionTrigger>
+                          <AccordionContent className="px-4 sm:px-6 pb-6 pt-0">
+                            <Separator className="mb-4 bg-border/40" />
+                            {(algorithm?.is_premium || algorithm?.is_pro || algorithm?.metadata?.is_pro) && !hasPremiumAccess && !isPlatformPreview ? (
+                              <ProOverlay className="rounded-none border-0 py-12" />
+                            ) : (
+                              <div className="text-sm text-muted-foreground">
+                                <React.Suspense fallback={<div className="h-20 w-full animate-pulse bg-muted rounded" />}>
+                                  <RichText content={algorithm.explanation.tips} />
+                                </React.Suspense>
+                              </div>
+                            )}
+                          </AccordionContent>
+                        </AccordionItem>
+                      )}
+
+                      {/* Use Cases Item */}
+                      {algorithm?.explanation?.useCase && (!algorithm?.controls || algorithm.controls?.description?.guides !== false) && (
+                        <AccordionItem
+                          value="usecase"
+                          className="border-b border-border/50"
+                        >
+                          <AccordionTrigger className="px-4 sm:px-6 py-4 hover:no-underline group">
+                            <div className="flex items-center gap-2 text-sm font-medium transition-colors text-foreground">
+                              <Briefcase className="w-4 h-4 text-primary" />
+                              Use Cases
+                            </div>
+                          </AccordionTrigger>
+                          <AccordionContent className="px-4 sm:px-6 pb-6 pt-0">
+                            <Separator className="mb-4 bg-border/40" />
+                            <div className="text-sm text-muted-foreground">
+                              <React.Suspense fallback={<div className="h-20 w-full animate-pulse bg-muted rounded" />}>
+                                <RichText content={algorithm.explanation.useCase} />
+                              </React.Suspense>
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      )}
+
                       {/* Hints Item */}
                       {algorithm.metadata?.hints &&
                         algorithm.metadata.hints.length > 0 && (
@@ -1429,8 +1380,8 @@ export const ProblemDescriptionPanel = React.memo(
                             ref={hintsRef}
                           >
                             <AccordionTrigger className="px-4 sm:px-6 py-4 hover:no-underline group">
-                              <div className="flex items-center gap-2 text-base font-medium transition-colors text-foreground">
-                                <Lightbulb className="w-5 h-5 text-primary" />
+                              <div className="flex items-center gap-2 text-sm font-medium transition-colors text-foreground">
+                                <Lightbulb className="w-4 h-4 text-primary" />
                                 Hints
                               </div>
                             </AccordionTrigger>
@@ -1476,88 +1427,101 @@ export const ProblemDescriptionPanel = React.memo(
                       )}
                   </FeatureGuard>
 
-                  {/* Next Problem Card */}
-                  {nextProblem && (
-                    <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-[600px]">
-                      <h3 className="text-base font-medium mb-4 transition-colors text-foreground">
-                        Next Problem
-                      </h3>
-                      <div className="space-y-2">
-                        <Link
-                          href={`/problem/${nextProblem.slug || nextProblem.id}`}
-                          className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
-                        >
-                          <div className="flex-1">
-                            <p className="text-sm font-medium">
-                              {nextProblem.serial_no}. {nextProblem.title || nextProblem.name}
-                            </p>
-                            <div className="mt-1.5 flex">
-                              <Badge
-                                variant="secondary"
-                                className={`
-                                text-[10px] h-5 px-2 capitalize font-medium border
-                                ${(nextProblem.difficulty || '').toLowerCase() === "easy" ? "bg-green-100 text-green-700 border-green-200 hover:bg-green-200" : ""}
-                                ${(nextProblem.difficulty || '').toLowerCase() === "medium" ? "bg-orange-100 text-orange-700 border-orange-200 hover:bg-orange-200" : ""}
-                                ${(nextProblem.difficulty || '').toLowerCase() === "hard" ? "bg-red-100 text-red-700 border-red-200 hover:bg-red-200" : ""}
-                              `}
-                              >
-                                {nextProblem.difficulty}
-                              </Badge>
+                  {/* Next & Similar Problems Combined Card */}
+                  {(nextProblem || (algorithm?.problems_to_solve?.internal && algorithm.problems_to_solve.internal.length > 0 && (!algorithm?.controls || algorithm.controls?.content?.practice_problems !== false))) && (
+                    <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-[600px] flex flex-col gap-6">
+                      {nextProblem && (
+                        <div>
+                          <h3 className="text-sm font-medium text-muted-foreground mb-3 transition-colors">
+                            Next problem to solve
+                          </h3>
+                          <div className="space-y-2">
+                            <Link
+                              href={`/problem/${nextProblem.slug || nextProblem.id}`}
+                              className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                            >
+                              <div className="flex-1">
+                                <p className="text-sm">
+                                  {nextProblem.serial_no}. {nextProblem.title || nextProblem.name}
+                                </p>
+                                <div className="mt-1.5 flex">
+                                  <Badge
+                                    variant="secondary"
+                                    className={`
+                                    text-[10px] h-5 px-2 capitalize font-medium border
+                                    ${(nextProblem.difficulty || '').toLowerCase() === "easy" ? "bg-green-100 text-green-700 border-green-200 hover:bg-green-200" : ""}
+                                    ${(nextProblem.difficulty || '').toLowerCase() === "medium" ? "bg-orange-100 text-orange-700 border-orange-200 hover:bg-orange-200" : ""}
+                                    ${(nextProblem.difficulty || '').toLowerCase() === "hard" ? "bg-red-100 text-red-700 border-red-200 hover:bg-red-200" : ""}
+                                  `}
+                                  >
+                                    {nextProblem.difficulty}
+                                  </Badge>
+                                </div>
+                              </div>
+                              <ExternalLink className="w-4 h-4 text-muted-foreground" />
+                            </Link>
+                          </div>
+                        </div>
+                      )}
+
+                      {nextProblem &&
+                        algorithm?.problems_to_solve?.internal &&
+                        algorithm.problems_to_solve.internal.length > 0 &&
+                        (!algorithm?.controls ||
+                          algorithm.controls?.content?.practice_problems !== false) && (
+                          <FeatureGuard flag="external_links">
+                            <Separator />
+                          </FeatureGuard>
+                        )}
+
+                      <FeatureGuard flag="external_links">
+                        {algorithm?.problems_to_solve?.internal &&
+                        algorithm.problems_to_solve.internal.length > 0 &&
+                        (!algorithm?.controls ||
+                          algorithm.controls?.content?.practice_problems !==
+                            false) ? (
+                          <div>
+                            <h3 className="text-sm font-medium text-muted-foreground mb-3 transition-colors">
+                              Similar problems to solve
+                            </h3>
+                            <div className="space-y-2">
+                              {algorithm.problems_to_solve.internal.map(
+                                (problem: any, i: number) => (
+                                  <Link
+                                    key={`internal-${i}`}
+                                    href={`/problem/${problem.url}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                                  >
+                                    <div className="flex-1">
+                                      <p className="text-sm">
+                                        {problem.serial_no || i + 1}. {problem.title}
+                                      </p>
+                                      <div className="mt-1.5 flex">
+                                        <Badge
+                                          variant="secondary"
+                                          className={`
+                                          text-[10px] h-5 px-2 capitalize font-medium border
+                                          ${problem.type.toLowerCase() === "easy" ? "bg-green-100 text-green-700 border-green-200 hover:bg-green-200  " : ""}
+                                          ${problem.type.toLowerCase() === "medium" ? "bg-orange-100 text-orange-700 border-orange-200 hover:bg-orange-200" : ""}
+                                          ${problem.type.toLowerCase() === "hard" ? "bg-red-100 text-red-700 border-red-200 hover:bg-red-200" : ""}
+                                        `}
+                                        >
+                                          {problem.type}
+                                        </Badge>
+                                      </div>
+                                    </div>
+                                    <ExternalLink className="w-4 h-4 text-muted-foreground" />
+                                  </Link>
+                                ),
+                              )}
                             </div>
                           </div>
-                          <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                        </Link>
-                      </div>
+                        ) : null}
+                      </FeatureGuard>
                     </Card>
                   )}
-
-                  {/* Similar Problems Card */}
-                  <FeatureGuard flag="external_links">
-                    {algorithm?.problems_to_solve?.internal &&
-                    algorithm.problems_to_solve.internal.length > 0 &&
-                    (!algorithm?.controls ||
-                      algorithm.controls?.content?.practice_problems !==
-                        false) ? (
-                      <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-[600px]">
-                        <h3 className="text-base font-medium mb-4 transition-colors text-foreground">
-                          Similar Problems
-                        </h3>
-                        <div className="space-y-2">
-                          {algorithm.problems_to_solve.internal.map(
-                            (problem: any, i: number) => (
-                              <Link
-                                key={`internal-${i}`}
-                                href={`/problem/${problem.url}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
-                              >
-                                <div className="flex-1">
-                                  <p className="text-sm font-medium">
-                                    {problem.serial_no || i + 1}. {problem.title}
-                                  </p>
-                                  <div className="mt-1.5 flex">
-                                    <Badge
-                                      variant="secondary"
-                                      className={`
-                                      text-[10px] h-5 px-2 capitalize font-medium border
-                                      ${problem.type.toLowerCase() === "easy" ? "bg-green-100 text-green-700 border-green-200 hover:bg-green-200  " : ""}
-                                      ${problem.type.toLowerCase() === "medium" ? "bg-orange-100 text-orange-700 border-orange-200 hover:bg-orange-200" : ""}
-                                      ${problem.type.toLowerCase() === "hard" ? "bg-red-100 text-red-700 border-red-200 hover:bg-red-200" : ""}
-                                    `}
-                                    >
-                                      {problem.type}
-                                    </Badge>
-                                  </div>
-                                </div>
-                                <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                              </Link>
-                            ),
-                          )}
-                        </div>
-                      </Card>
-                    ) : null}
-                  </FeatureGuard>
 
                   {/* Bottom Action Bar moved to parent container */}
                 </div>
@@ -1869,7 +1833,7 @@ export const ProblemDescriptionPanel = React.memo(
             <div className="fixed inset-0 z-[100] bg-background flex flex-col w-screen h-screen">
               <div className="flex items-center justify-between px-4 py-2 border-b bg-background shrink-0 h-14">
                 <h2 className="text-lg font-semibold flex items-center gap-2">
-                  <Eye className="w-5 h-5 text-primary" />
+                  <Eye className="w-4 h-4 text-primary" />
                   Visualization
                 </h2>
                 <Button

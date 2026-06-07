@@ -214,7 +214,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { theme, setTheme } = useTheme();
   const { user, hasPremiumAccess } = useApp();
 
-  const isCollapsed = state === "collapsed";
+  const isCollapsed = state === "collapsed" && !isMobile;
   const showGuides = isGuideRoute(pathname);
   const headerSubtitle = showGuides ? "Guides" : "Interviews";
 
