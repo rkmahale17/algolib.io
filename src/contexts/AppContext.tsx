@@ -76,6 +76,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // Track in-flight profile fetch to avoid redundant calls
   const profileFetchInProgress = React.useRef<string | null>(null);
   const lastFetchedUserId = useRef<string | null>(null);
+  // Ref mirror of profile — avoids stale-closure in fetchProfile without
+  // needing profile as a useCallback dependency (which would cause the auth
+  // useEffect to re-run on every profile update).
+  const profileRef = useRef(profile);
+  useEffect(() => { profileRef.current = profile; }, [profile]);
 
   const isAlgorithmsLoading = useAppSelector(state => state.algorithms.isLoading);
 
@@ -102,7 +107,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     // Skip if already fetching or if already have this profile (unless forced)
     if (profileFetchInProgress.current === userId) return;
-    if (!force && profile && profile.id === userId && lastFetchedProfileId.current === userId) {
+    if (!force && profileRef.current && profileRef.current.id === userId && lastFetchedProfileId.current === userId) {
       return;
     }
 
@@ -122,7 +127,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     } finally {
       profileFetchInProgress.current = null;
     }
-  }, [dispatch, profile]);
+  // profile intentionally omitted — we use profileRef to avoid stale closure
+  // while preventing the auth useEffect from re-running on every profile update.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch]);
 
   // hasPremiumAccess and progressMap are now computed in Redux slices
 

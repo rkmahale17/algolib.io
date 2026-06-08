@@ -46,6 +46,7 @@ import { useApp } from "@/contexts/AppContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import logo from "@/assets/logo.svg";
+import Image from "next/image";
 import { guidesData } from "@/data/guidesData";
 import { cn } from "@/lib/utils";
 import {
@@ -293,10 +294,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             href="/"
             className="flex items-center gap-2 shrink-0 group-data-[collapsible=icon]:mx-auto"
           >
-            <img
+            <Image
               src={typeof logo === "string" ? logo : (logo as any).src}
               alt="RulCode Logo"
+              width={24}
+              height={24}
               className="w-6 h-6 transition-all"
+              unoptimized
             />
             <span className="font-medium group-data-[collapsible=icon]:hidden">rulcode</span>
           </Link>

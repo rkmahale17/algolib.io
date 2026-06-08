@@ -31,11 +31,11 @@ const getWobblyRect = (x: number, y: number, w: number, h: number, seed = 0) => 
 
     return `M ${x1} ${y1} 
             C ${x + w/3} ${y - 1 + offset2}, ${x + 2*w/3} ${y + 1 + offset1}, ${x2} ${y2}
-            C ${x + w + 1 + offset3}, ${y + h/3} ${y + 2*h/3 + offset4}, ${x3} ${y3}
+            C ${x + w + 1 + offset3} ${y + h/3}, ${x + w + offset4} ${y + 2*h/3 + offset4}, ${x3} ${y3}
             C ${x + 2*w/3} ${y + h + 1 + offset2}, ${x + w/3} ${y + h - 1 + offset3}, ${x4} ${y4}
-            C ${x - 1 + offset1}, ${y + 2*h/3} ${y + h/3 + offset2}, ${x1} ${y1}
+            C ${x - 1 + offset1} ${y + 2*h/3}, ${x + offset2} ${y + h/3 + offset2}, ${x1} ${y1}
             M ${x1 - 1} ${y1 + 1}
-            C ${x + w/2} ${y + offset2}, ${x2 + 1} ${y2 - 1}`;
+            C ${x + w/3} ${y + offset2}, ${x + 2*w/3} ${y + offset2}, ${x2 + 1} ${y2 - 1}`;
 };
 
 const getWobblyCircle = (cx: number, cy: number, r: number, seed = 0) => {

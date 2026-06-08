@@ -96,7 +96,6 @@ export const IsolatedCodeEditor = React.forwardRef<any, IsolatedCodeEditorProps>
       const lastEmitted = (lastEmittedCodeRef.current || '').replace(/\r\n/g, '\n');
 
       if (currentVal !== lastEmitted) {
-        console.log('[IsolatedCodeEditor] Content mismatch, sending UPDATE_CODE. Prop length:', currentVal.length, 'Last emitted length:', lastEmitted.length);
         iframeRef.current.contentWindow.postMessage({ type: 'UPDATE_CODE', data: { code } }, '*');
       }
     }

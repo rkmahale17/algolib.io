@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import { Search, TrendingUp, BookOpen, Check, Circle, MoreVertical, Timer, Database, ExternalLink, Lock, LayoutGrid, List } from 'lucide-react';
 
 import { Skeleton } from '@/components/ui/skeleton';
@@ -157,6 +158,14 @@ export const ProblemList = ({
 
     return result;
   }, [algorithms, searchQuery, selectedCategory, selectedDifficulty, selectedListType, sortBy]);
+
+  const listRef = useRef<HTMLDivElement>(null);
+
+  const virtualizer = useWindowVirtualizer({
+    count: filteredAndSortedAlgorithms.length,
+    estimateSize: () => 110, // Approximate height of AlgorithmCard
+    overscan: 5,
+  });
 
   // Debounced search tracking
   const trackSearch = useCallback((query: string, resultCount: number) => {
@@ -343,23 +352,36 @@ export const ProblemList = ({
 
             {/* List View */}
             {viewMode === 'list' && (
-              <div className="divide-y divide-border/10">
-                {filteredAndSortedAlgorithms.map((algo, index) => {
+              <div ref={listRef} style={{ position: 'relative', height: `${virtualizer.getTotalSize()}px` }}>
+                {virtualizer.getVirtualItems().map((virtualItem) => {
+                  const algo = filteredAndSortedAlgorithms[virtualItem.index];
                   const status = progressMap?.[algo.id] || 'none';
                   const isPremium = algo.is_premium || algo.is_pro || (algo.metadata as any)?.is_pro;
 
                   return (
-                    <AlgorithmCard
-                      key={algo.id}
-                      algorithm={algo}
-                      status={status as any}
-                      isPremium={isPremium}
-                      index={index}
-                      isSidebar={isSidebar}
-                      hasPremiumAccess={hasPremiumAccess}
-                      isPaywallEnabled={isPaywallEnabled}
-                      onCategoryClick={handleCategoryClick}
-                    />
+                    <div
+                      key={virtualItem.key}
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        transform: `translateY(${virtualItem.start}px)`,
+                      }}
+                      ref={virtualizer.measureElement}
+                      data-index={virtualItem.index}
+                    >
+                      <AlgorithmCard
+                        algorithm={algo}
+                        status={status as any}
+                        isPremium={isPremium}
+                        index={virtualItem.index}
+                        isSidebar={isSidebar}
+                        hasPremiumAccess={hasPremiumAccess}
+                        isPaywallEnabled={isPaywallEnabled}
+                        onCategoryClick={handleCategoryClick}
+                      />
+                    </div>
                   );
                 })}
               </div>
@@ -375,6 +397,7 @@ export const ProblemList = ({
                       key={algo.id}
                       href={algo.slug ? `/problem/${algo.slug}` : `/problem/${algo.id}`}
                       className="group relative flex flex-col h-full"
+                      style={{ contentVisibility: 'auto' }}
                     >
                       <div className={`
                         h-full p-5 rounded-xl border transition-all duration-300

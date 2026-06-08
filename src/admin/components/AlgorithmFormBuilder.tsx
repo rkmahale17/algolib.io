@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import {
   useCreateAlgorithm,
@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Loader2, Save, X } from "lucide-react";
+import { ArrowLeft, Loader2, Save, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { ADMIN_CATEGORIES } from "@/constants/categories";
 import { Badge } from "@/components/ui/badge";
@@ -42,6 +42,7 @@ import { DEFAULT_CONTROLS } from "./ControlsEditor";
 
 const SmartFillDialog = dynamic(() => import("./SmartFillDialog").then(mod => mod.SmartFillDialog), { ssr: false });
 import { useRouter } from "next/navigation";
+import { useAppSelector } from "@/store/hooks";
 
 interface AlgorithmFormBuilderProps {
   algorithm?: Algorithm | null;
@@ -104,6 +105,49 @@ export function AlgorithmFormBuilder({
     tutorials: [],
     controls: DEFAULT_CONTROLS,
   });
+
+  const allAlgorithms = useAppSelector((state) => state.algorithms.items);
+
+  const currentId = algorithm?.id;
+  const currentIndex = allAlgorithms.findIndex((algo) => algo.id === currentId);
+  const prevAlgo = currentIndex > 0 ? allAlgorithms[currentIndex - 1] : null;
+  const nextAlgo = currentIndex !== -1 && currentIndex < allAlgorithms.length - 1 ? allAlgorithms[currentIndex + 1] : null;
+
+  const [isDirty, setIsDirty] = useState(false);
+  const isInitialLoadRef = useRef(true);
+
+  // Reset initial load ref when algorithm changes
+  useEffect(() => {
+    isInitialLoadRef.current = true;
+  }, [algorithm?.id]);
+
+  // Track if form becomes dirty after initial load
+  useEffect(() => {
+    if (isInitialLoadRef.current) {
+      isInitialLoadRef.current = false;
+      setIsDirty(false);
+    } else {
+      setIsDirty(true);
+    }
+  }, [formData, listTypes, categories, published]);
+
+  const handlePrevProblem = () => {
+    if (prevAlgo) {
+      if (isDirty && !window.confirm("You have unsaved changes. Are you sure you want to navigate?")) {
+        return;
+      }
+      router.push(`/admin/problem/${prevAlgo.id}`);
+    }
+  };
+
+  const handleNextProblem = () => {
+    if (nextAlgo) {
+      if (isDirty && !window.confirm("You have unsaved changes. Are you sure you want to navigate?")) {
+        return;
+      }
+      router.push(`/admin/problem/${nextAlgo.id}`);
+    }
+  };
 
   // Load algorithm data when editing
   useEffect(() => {
@@ -217,10 +261,12 @@ export function AlgorithmFormBuilder({
           updates: payload,
         });
         toast.success("Algorithm updated successfully!");
+        setIsDirty(false);
         // Don't navigate away, stay on the page
       } else {
         await createMutation.mutateAsync(payload);
         toast.success("Algorithm created successfully!");
+        setIsDirty(false);
         onSuccess(); // Navigate away only for new algorithms
       }
     } catch (error) {
@@ -377,21 +423,56 @@ export function AlgorithmFormBuilder({
     <div className="space-y-0 w-full">
       {/* Header with Action Buttons */}
       <div className="flex items-center justify-between sticky top-0 z-10 bg-background pb-0 border-b">
-        <div>
+        <div className="flex items-center gap-4">
           <h2 className="text-2xl font-">
-            <div className="mb-1">
+            <div className="mb-1 flex items-center gap-3">
               <Button
                 variant="ghost"
-                onClick={() => router.push('/admin/problems')}
+                onClick={() => {
+                  if (isDirty && !window.confirm("You have unsaved changes. Are you sure you want to navigate?")) {
+                    return;
+                  }
+                  router.push('/admin/problems');
+                }}
                 className="gap-2 pl-0 hover:pl-2 transition-all"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back to Problems
               </Button>
-              {algorithm ? "Edit Problem" : "Create New Problem"} - {algorithm?.name}
+              <span>
+                {algorithm ? "Edit Problem" : "Create New Problem"} - {algorithm?.name}
+              </span>
             </div>
           </h2>
-
+          {algorithm && (
+            <div className="flex items-center gap-1.5 border rounded-full px-2 py-0.5 bg-muted/40 h-8 self-center mb-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handlePrevProblem}
+                disabled={!prevAlgo}
+                className="h-6 w-6 rounded-full p-0 hover:bg-background/80"
+                title={prevAlgo ? `Previous: ${prevAlgo.title}` : "No previous problem"}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="text-xs text-muted-foreground font-semibold px-1 select-none">
+                {algorithm.serial_no ? `#${algorithm.serial_no}` : "-"}
+              </span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleNextProblem}
+                disabled={!nextAlgo}
+                className="h-6 w-6 rounded-full p-0 hover:bg-background/80"
+                title={nextAlgo ? `Next: ${nextAlgo.title}` : "No next problem"}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-2 pr-4">
           <SmartFillDialog
@@ -797,7 +878,12 @@ export function AlgorithmFormBuilder({
         <Button
           type="button"
           variant="outline"
-          onClick={onCancel}
+          onClick={() => {
+            if (isDirty && !window.confirm("You have unsaved changes. Are you sure you want to navigate?")) {
+              return;
+            }
+            onCancel();
+          }}
           disabled={isLoading}
           className="gap-2 rounded-full"
         >

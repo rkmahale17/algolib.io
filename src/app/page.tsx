@@ -1,20 +1,41 @@
 import { Metadata } from 'next';
 import HomeClient from './HomeClient';
 import Script from 'next/script';
+import dynamic from 'next/dynamic';
+
+// ── Above-the-fold sections (static imports for fast LCP) ───────────────────
 import { HeroSection } from '@/components/Home/sections/HeroSection';
 import { ProblemsSection } from '@/components/Home/sections/ProblemsSection';
 import { GuidedSection } from '@/components/Home/sections/GuidedSection';
 import { InteractiveSandboxTeaser } from '@/components/Home/sections/InteractiveSandboxTeaser';
-import { TopicRoadmapSection } from '@/components/Home/sections/TopicRoadmapSection';
 import { SprintsAndTracksSection } from '@/components/Home/sections/SprintsAndTracksSection';
-import { CraftingSection } from '@/components/Home/sections/CraftingSection';
-import { CommunitySection } from '@/components/Home/sections/CommunitySection';
-import { WorkspaceSection } from '@/components/Home/sections/WorkspaceSection';
-import { ScratchpadSection } from '@/components/Home/sections/ScratchpadSection';
-import { FeedbackSection } from '@/components/Home/sections/FeedbackSection';
-import { BottomCTA } from '@/components/Home/sections/BottomCTA';
-import { FAQ } from '@/components/FAQ';
-import { Footer } from '@/components/Footer';
+import { TopicRoadmapSection } from '@/components/Home/sections/TopicRoadmapSection';
+
+// ── Below-the-fold sections (lazy loaded to reduce initial bundle) ───────────
+const WorkspaceSection = dynamic(() =>
+  import('@/components/Home/sections/WorkspaceSection').then(m => ({ default: m.WorkspaceSection }))
+);
+const ScratchpadSection = dynamic(() =>
+  import('@/components/Home/sections/ScratchpadSection').then(m => ({ default: m.ScratchpadSection }))
+);
+const FeedbackSection = dynamic(() =>
+  import('@/components/Home/sections/FeedbackSection').then(m => ({ default: m.FeedbackSection }))
+);
+const CommunitySection = dynamic(() =>
+  import('@/components/Home/sections/CommunitySection').then(m => ({ default: m.CommunitySection }))
+);
+const CraftingSection = dynamic(() =>
+  import('@/components/Home/sections/CraftingSection').then(m => ({ default: m.CraftingSection }))
+);
+const BottomCTA = dynamic(() =>
+  import('@/components/Home/sections/BottomCTA').then(m => ({ default: m.BottomCTA }))
+);
+const FAQ = dynamic(() =>
+  import('@/components/FAQ').then(m => ({ default: m.FAQ }))
+);
+const Footer = dynamic(() =>
+  import('@/components/Footer').then(m => ({ default: m.Footer }))
+);
 
 export const metadata: Metadata = {
   title: "Rulcode | Master Algorithms & Coding Interviews",
