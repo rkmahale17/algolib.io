@@ -10,6 +10,8 @@ interface AlgorithmsState {
 }
 
 const CACHE_KEY = 'rulcode_algorithms_cache_v1';
+// How long we consider cached data fresh before refetching from Supabase
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 const getCachedAlgorithms = (): AlgorithmListItem[] => {
   if (typeof window === 'undefined') return [];
@@ -22,7 +24,9 @@ const getCachedAlgorithms = (): AlgorithmListItem[] => {
 };
 
 const initialState: AlgorithmsState = {
-  items: [],
+  // Pre-populate from localStorage so the list is immediately available on
+  // page load without waiting for the Supabase round-trip.
+  items: getCachedAlgorithms(),
   isLoading: false,
   error: null,
   lastFetched: null,
@@ -70,9 +74,12 @@ export const fetchAllAlgorithms = createAsyncThunk(
   {
     condition: (_, { getState }) => {
       const state = getState() as { algorithms: AlgorithmsState };
-      const { isLoading } = state.algorithms;
-      // Fetch if not already loading. We allow re-fetching even if we have items (SWR)
-      return !isLoading;
+      const { isLoading, items, lastFetched } = state.algorithms;
+      // Never run two fetches concurrently
+      if (isLoading) return false;
+      // Skip if data is still fresh (within TTL), even after a remount
+      if (items.length > 0 && lastFetched && Date.now() - lastFetched < CACHE_TTL_MS) return false;
+      return true;
     }
   }
 );

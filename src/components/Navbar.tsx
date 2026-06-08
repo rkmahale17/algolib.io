@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  BookOpen,
   Brain,
   Bug,
   ChevronDown,
@@ -10,21 +9,11 @@ import {
   ChevronsUpDown,
   Clock,
   Code2,
-  CreditCard,
-  Crown,
-  Github,
   HardDrive,
-  Languages,
   Layers,
-  Lightbulb,
   List as ListIcon,
-  ListTodo,
-  Loader2,
-  Menu,
   Menu as MenuIcon,
-  MessageSquare,
   Monitor,
-  MoreHorizontal,
   PanelLeftClose,
   PanelLeftOpen,
   Pause,
@@ -34,7 +23,6 @@ import {
   RotateCcw,
   Send,
   Share2,
-  ShieldCheck,
   Shuffle,
   Target,
   Timer,
@@ -68,6 +56,7 @@ import { FeatureGuard } from "@/components/FeatureGuard";
 import Link from "next/link";
 import { ThemeToggle } from "./ThemeToggle";
 import UserMenu from "./UserMenu";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/logo.svg";
 import { trackEvent } from "@/lib/analytics";
@@ -130,18 +119,23 @@ const Navbar = ({
 
   useEffect(() => {
     setMounted(true);
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    let raf: number;
+    const handleResize = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => setWindowWidth(window.innerWidth));
+    };
+    window.addEventListener("resize", handleResize, { passive: true });
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      cancelAnimationFrame(raf);
+    };
   }, []);
 
-  const [isInterviewsOpen, setIsInterviewsOpen] = useState(false);
   const [isPrepareOpen, setIsPrepareOpen] = useState(false);
   const [activePrepareTab, setActivePrepareTab] = useState<
     "dsa_practice" | "dsa_strategy" | "blogs"
   >("dsa_practice");
 
-  const interviewsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const prepareTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const currentPath =
@@ -174,18 +168,6 @@ const Navbar = ({
       ? LIST_TYPE_LABELS[activeListType as ListType] || activeListType
       : "All Problems";
 
-  const handleInterviewsMouseEnter = () => {
-    if (interviewsTimeoutRef.current)
-      clearTimeout(interviewsTimeoutRef.current);
-    setIsInterviewsOpen(true);
-  };
-
-  const handleInterviewsMouseLeave = () => {
-    interviewsTimeoutRef.current = setTimeout(() => {
-      setIsInterviewsOpen(false);
-    }, 150);
-  };
-
   const handlePrepareMouseEnter = () => {
     if (prepareTimeoutRef.current) clearTimeout(prepareTimeoutRef.current);
     setIsPrepareOpen(true);
@@ -199,10 +181,7 @@ const Navbar = ({
 
   // Close menus instantly on click
   const closeMenus = () => {
-    if (interviewsTimeoutRef.current)
-      clearTimeout(interviewsTimeoutRef.current);
     if (prepareTimeoutRef.current) clearTimeout(prepareTimeoutRef.current);
-    setIsInterviewsOpen(false);
     setIsPrepareOpen(false);
   };
 
@@ -224,10 +203,13 @@ const Navbar = ({
                 className="flex items-center gap-2 hover:opacity-80 transition-opacity shutter-click"
                 onClick={closeMenus}
               >
-                <img
+                <Image
                   src={typeof logo === "string" ? logo : (logo as any).src}
                   alt="RulCode Logo"
+                  width={24}
+                  height={24}
                   className="w-6 h-6"
+                  unoptimized
                 />
                 <span className="hidden md:inline-block  font-medium ">
                   rulcode
@@ -257,10 +239,13 @@ const Navbar = ({
                   )}
                   onClick={closeMenus}
                 >
-                  <img
+                  <Image
                     src={typeof logo === "string" ? logo : (logo as any).src}
                     alt="RulCode Logo"
+                    width={24}
+                    height={24}
                     className="w-6 h-6"
+                    unoptimized
                   />
                   <span className="font-medium">rulcode</span>
                 </Link>
@@ -271,97 +256,6 @@ const Navbar = ({
           {/* Standard Navigation Links (Desktop only) */}
           {!isProblemMode && (
             <div className="hidden md:flex items-center gap-6 lg:gap-8 ml-6 flex-1 text-sm font-medium">
-              {/* Hidden for now as per user request */}
-              {false && (
-                <div
-                  onMouseEnter={handleInterviewsMouseEnter}
-                  onMouseLeave={handleInterviewsMouseLeave}
-                >
-                  <DropdownMenu
-                    open={isInterviewsOpen}
-                    onOpenChange={setIsInterviewsOpen}
-                    modal={false}
-                  >
-                    <DropdownMenuTrigger className="flex items-center gap-1 hover:text-primary transition-colors outline-none relative font-normal shutter-click">
-                      <span>Interviews</span>
-                      <span className="absolute -top-1 -right-2 w-1.5 h-1.5 bg-red-500 rounded-full"></span>
-                      <ChevronDown className="w-3.5 h-3.5 text-muted-foreground ml-1" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      align="start"
-                      className="w-[300px] p-4"
-                      onMouseEnter={handleInterviewsMouseEnter}
-                      onMouseLeave={handleInterviewsMouseLeave}
-                      sideOffset={4}
-                    >
-                      <div className="text-xs text-muted-foreground mb-3 font-normal">
-                        Products
-                      </div>
-                      <div className="flex flex-col gap-1 mb-4">
-                        <Link
-                          href="/"
-                          className="flex items-center gap-3 hover:bg-muted p-2 rounded-md transition-colors shutter-click"
-                        >
-                          <img
-                            src={
-                              typeof logo === "string"
-                                ? logo
-                                : (logo as any).src
-                            }
-                            alt="RulCode Logo"
-                            className="w-5 h-5"
-                          />
-                          <span className="font-medium text-sm">
-                            rulcode{" "}
-                            <span className="text-muted-foreground font-normal ml-1">
-                              Interviews
-                            </span>
-                          </span>
-                        </Link>
-                        <div className="flex items-center gap-3 hover:bg-muted p-2 rounded-md transition-colors cursor-not-allowed opacity-80">
-                          <img
-                            src={
-                              typeof logo === "string"
-                                ? logo
-                                : (logo as any).src
-                            }
-                            alt="RulCode Logo"
-                            className="w-5 h-5"
-                          />
-                          <span className="font-medium text-sm flex items-center gap-2">
-                            rulcode{" "}
-                            <span className="text-muted-foreground font-normal ml-1">
-                              Projects
-                            </span>
-                            <div className="w-1.5 h-1.5 bg-red-500 rounded-full"></div>
-                          </span>
-                          <Badge
-                            variant="secondary"
-                            className="bg-[#E5FF7F] text-black hover:bg-[#d6f555] border-transparent ml-auto text-[10px] h-5 py-0 whitespace-nowrap"
-                          >
-                            Coming soon
-                          </Badge>
-                        </div>
-                      </div>
-
-                      <div className="text-xs text-muted-foreground mb-3 font-normal">
-                        Resources
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        <Link
-                          href="/blog"
-                          className="flex items-center gap-3 hover:bg-muted p-2 rounded-md transition-colors shutter-click"
-                          onClick={closeMenus}
-                        >
-                          <MessageSquare className="w-5 h-5 text-muted-foreground" />
-                          <span className="font-medium text-sm">Blog</span>
-                        </Link>
-                      </div>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              )}
-
               {!hasSidebar && (
                 <div className="h-4 w-[1px] bg-border/60 mx-1"></div>
               )}

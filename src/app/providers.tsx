@@ -15,8 +15,8 @@ import { queryClient } from "@/lib/queryClient";
 import { AppProvider } from "@/contexts/AppContext";
 import { FeatureFlagProvider } from "@/contexts/FeatureFlagContext";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { usePathname } from 'next/navigation';
 import PostHogIdentify from "./PostHogIdentify";
+import SidebarController from "./SidebarController";
 
 // Initialize PostHog synchronously at module load (client-side only).
 // This ensures the SDK is ready before any component mounts and tries to
@@ -27,7 +27,6 @@ if (typeof window !== 'undefined') {
     window.location.hostname === "www.rulcode.com";
 
   if (isProduction && !posthog.__loaded) {
-    console.log("Posthog init");
     posthog.init(process.env.NEXT_PUBLIC_POSTHOG_TOKEN || '', {
       api_host: `${window.location.origin}/p`,
       person_profiles: 'identified_only',
@@ -38,9 +37,6 @@ if (typeof window !== 'undefined') {
 }
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const isDsaPath = pathname ? pathname.startsWith('/dsa/') || pathname === '/dsa' : false;
-
   return (
     <PostHogProvider client={posthog}>
       <Provider store={store}>
@@ -48,7 +44,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
           <AppProvider>
             <FeatureFlagProvider>
               <TooltipProvider>
-                <SidebarProvider key={isDsaPath ? "dsa" : "other"} defaultOpen={isDsaPath}>
+                {/*
+                 * SidebarProvider is controlled by SidebarController (a child).
+                 * Keeping defaultOpen=false here; SidebarController opens it
+                 * reactively on DSA routes — this avoids re-rendering the whole
+                 * provider tree on every pathname change.
+                 */}
+                <SidebarProvider defaultOpen={false}>
                   <ThemeProvider
                     attribute="class"
                     defaultTheme="system"
@@ -58,6 +60,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
                     {/* Reactively identifies the user in PostHog using Redux auth state.
                         No extra Supabase calls — avoids lock contention. */}
                     <PostHogIdentify />
+                    {/* Reactively manages sidebar open state per route */}
+                    <SidebarController />
                     {children}
                     <Toaster />
                     <Sonner />

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useTheme } from 'next-themes';
 import { useLanguagePreference } from '@/hooks/useLanguagePreference';
 import { Language } from '@/types/algorithm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -62,9 +63,8 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
   problemName,
 }) => {
   const [copiedTab, setCopiedTab] = useState<string | null>(null);
-  const [isAppDark, setIsAppDark] = useState(false);
+  const { resolvedTheme } = useTheme();
   const [isBlurred, setIsBlurred] = useState(false);
-
   // Load blurred state and listen to custom event to sync with visualizer/other solutions
   useEffect(() => {
     const checkBlurred = () => {
@@ -76,14 +76,8 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
 
     checkBlurred();
 
-    const handleBlurEvent = () => {
-      checkBlurred();
-    };
-
-    window.addEventListener('code-blur-change', handleBlurEvent);
-    return () => {
-      window.removeEventListener('code-blur-change', handleBlurEvent);
-    };
+    window.addEventListener('code-blur-change', checkBlurred);
+    return () => window.removeEventListener('code-blur-change', checkBlurred);
   }, []);
 
   const handleBlurChange = (val: boolean) => {
@@ -92,25 +86,8 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
     window.dispatchEvent(new Event('code-blur-change'));
   };
 
-  // Detect theme from document class
-  useEffect(() => {
-    const checkTheme = () => {
-      setIsAppDark(document.documentElement.classList.contains('dark'));
-    };
-
-    checkTheme();
-
-    // Watch for theme changes
-    const observer = new MutationObserver(checkTheme);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class'],
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
-  const effectiveTheme = isAppDark ? 'vs-dark' : 'light';
+  // Derive editor theme directly from next-themes — no MutationObserver needed
+  const effectiveTheme = resolvedTheme === 'dark' ? 'vs-dark' : 'light';
 
   const handleCopy = async (code: string, tabName: string) => {
     try {

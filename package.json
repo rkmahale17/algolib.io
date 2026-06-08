@@ -47,6 +47,7 @@
     "@supabase/ssr": "^0.10.2",
     "@supabase/supabase-js": "^2.87.1",
     "@tanstack/react-query": "^5.83.0",
+    "@tanstack/react-virtual": "^3.14.2",
     "@types/canvas-confetti": "^1.9.0",
     "@types/react-syntax-highlighter": "^15.5.13",
     "axios": "^1.6.2",
