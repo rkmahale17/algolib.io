@@ -28,7 +28,7 @@ export function HeroSection() {
             </div>
 
             {/* Headline */}
-            <h1 className="text-5xl lg:text5xl font-medium tracking-tight mb-8 leading-[1.1] text-white">
+            <h1 className="text-5xl lg:text5xl font-medium tracking-tight mb-8 leading-[1.1] text-zinc-900 dark:text-white">
               Don't Just Memorize Code.
               <span className="block text-3xl lg:text-5xl text-gray-500 mt-4 font-semibold">
                 See How It Works.
@@ -36,7 +36,7 @@ export function HeroSection() {
             </h1>
 
             {/* Subheadline with styled links */}
-            <div className="text-[17px] text-gray-400 mb-12 max-w-xl leading-relaxed">
+            <div className="text-[17px] text-zinc-600 dark:text-gray-400 mb-12 max-w-xl leading-relaxed">
               <p className="mb-6">
                 A learn-first platform for coding interviews.
               </p>
@@ -44,28 +44,28 @@ export function HeroSection() {
                 Read the problem,{" "}
                 <Link
                   href="#visualization"
-                  className="text-white underline decoration-primary underline-offset-4 hover:opacity-80 transition-all"
+                  className="text-zinc-900 dark:text-white underline decoration-primary underline-offset-4 hover:opacity-80 transition-all"
                 >
                   Visualize
                 </Link>{" "}
                 the solution, think through the approach, sketch your ideas in{" "}
                 <Link
                   href="#thinkpad"
-                  className="text-white underline decoration-primary underline-offset-4 hover:opacity-80 transition-all"
+                  className="text-zinc-900 dark:text-white underline decoration-primary underline-offset-4 hover:opacity-80 transition-all"
                 >
                   Thinkpad
                 </Link>
                 , write{" "}
                 <Link
                   href="/problem/kadanes-algorithm"
-                  className="text-white underline decoration-primary underline-offset-4 hover:opacity-80 transition-all"
+                  className="text-zinc-900 dark:text-white underline decoration-primary underline-offset-4 hover:opacity-80 transition-all"
                 >
                   code
                 </Link>
                 , and{" "}
                 <Link
                   href="/problem/kadanes-algorithm?tab=solution"
-                  className="text-white underline decoration-primary underline-offset-4 hover:opacity-80 transition-all"
+                  className="text-zinc-900 dark:text-white underline decoration-primary underline-offset-4 hover:opacity-80 transition-all"
                 >
                   review
                 </Link>{" "}
