@@ -102,14 +102,26 @@ export default function Page() {
       />
       <div className="min-h-screen bg-white dark:bg-black text-[#1A1A1A] dark:text-white overflow-x-hidden relative w-full">
         <HeroSection />
-        <ProblemsSection />
-        <GuidedSection />
-        <InteractiveSandboxTeaser />
+        <div id="visualize">
+          <InteractiveSandboxTeaser />
+        </div>
+        <div id="thinkpad">
+          <ScratchpadSection />
+        </div>
+        <div id="guides">
+          <GuidedSection />
+        </div>
+        <div id="problems">
+          <ProblemsSection />
+        </div>
         <SprintsAndTracksSection />
         <TopicRoadmapSection />
-        <HomeClient type="platform-preview" />
-        <WorkspaceSection />
-        <ScratchpadSection />
+        <div id="playground">
+          <HomeClient type="platform-preview" />
+        </div>
+        <div id="workspace">
+          <WorkspaceSection />
+        </div>
         <FeedbackSection />
         <CommunitySection />
         <CraftingSection />

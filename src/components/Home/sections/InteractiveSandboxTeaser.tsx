@@ -21,7 +21,7 @@ export function InteractiveSandboxTeaser() {
   };
 
   return (
-    <section className="py-20 lg:py-28 bg-[#FAFAFA] dark:bg-[#050505] text-zinc-900 dark:text-white relative overflow-hidden">
+    <section id="visualization" className="pt-32 lg:pt-48 pb-20 lg:pb-28 bg-[#FAFAFA] dark:bg-[#050505] text-zinc-900 dark:text-white relative overflow-hidden">
       {/* Background Glow Orb */}
       <div className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-1/3 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
 
@@ -44,7 +44,7 @@ export function InteractiveSandboxTeaser() {
         <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
 
           {/* Detailed Selling Copy - Theme Aware */}
-          <div className="lg:col-span-5 order-2 lg:order-1">
+          <div className="lg:col-span-5 order-2 lg:order-2">
             <h4 className="text-sm md:text-lg font-normal tracking-tight text-zinc-900 dark:text-white mb-3">
               Visualize, Understand and Solve
             </h4>
@@ -87,7 +87,7 @@ export function InteractiveSandboxTeaser() {
           </div>
 
           {/* Interactive Visualizer Component from Platform */}
-          <div className="lg:col-span-7 order-1 lg:order-2 w-full">
+          <div className="lg:col-span-7 order-1 lg:order-1 w-full">
             <div className="relative group w-full">
               {/* Vibrant neon background aura */}
               <div className="absolute -inset-[1.5px] bg-gradient-to-r from-primary/30 to-[#EAFF96]/20 rounded-xl blur-xl opacity-20 dark:opacity-30 group-hover:opacity-60 transition duration-700"></div>
