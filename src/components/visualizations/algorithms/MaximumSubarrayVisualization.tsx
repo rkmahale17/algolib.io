@@ -333,7 +333,7 @@ export const MaximumSubarrayVisualization = () => {
               Visualizing Subarray Sum Growth
             </h3>
 
-            <div className="flex justify-center items-end gap-3 h-48 mb-16 relative">
+            <div className="grid grid-cols-5 gap-2 sm:gap-3 h-48 mb-16 relative w-full max-w-md mx-auto items-end">
               <AnimatePresence mode="popLayout">
                 {currentStep.array.map((value, index) => {
                   const isCurrent = index === currentStep.i;
@@ -341,10 +341,10 @@ export const MaximumSubarrayVisualization = () => {
                   const isInBestRange = index >= currentStep.bestRange[0] && index <= currentStep.bestRange[1];
 
                   return (
-                    <div key={index} className="flex flex-col items-center gap-2 relative">
+                    <div key={index} className="flex flex-col items-center gap-2 relative w-full">
                       {/* Bar visualization */}
                       <motion.div
-                        className={`w-12 rounded-t-lg transition-all duration-300 ${value < 0 ? 'bg-red-500/30' : 'bg-blue-500/30'
+                        className={`w-full max-w-[3rem] rounded-t-lg transition-all duration-300 ${value < 0 ? 'bg-red-500/30' : 'bg-blue-500/30'
                           } ${isCurrent ? 'ring-4 ring-primary/40 ring-offset-2 ring-offset-background' : ''}`}
                         initial={{ height: 0 }}
                         animate={{
@@ -358,8 +358,8 @@ export const MaximumSubarrayVisualization = () => {
 
                       {/* Value Box */}
                       <motion.div
-                        className={`w-12 h-12 rounded-lg flex items-center justify-center font-bold text-lg border-2 transition-all duration-300 ${isCurrent
-                            ? 'bg-primary text-primary-foreground border-primary scale-110 shadow-xl shadow-primary/30'
+                        className={`w-full max-w-[3rem] h-10 sm:h-12 rounded-lg flex items-center justify-center font-bold text-sm sm:text-lg border-2 transition-all duration-300 ${isCurrent
+                            ? 'bg-primary text-primary-foreground border-primary scale-110 shadow-xl shadow-primary/30 z-10'
                             : 'bg-muted/50 border-border text-foreground hover:bg-muted'
                           }`}
                         animate={{
@@ -371,13 +371,14 @@ export const MaximumSubarrayVisualization = () => {
                       </motion.div>
 
                       {/* Index Label */}
-                      <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-tighter">idx {index}</span>
+                      <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-tighter hidden sm:inline">idx {index}</span>
+                      <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-tighter sm:hidden">{index}</span>
 
                       {/* Best Range Marker (Bottom) */}
                       {isInBestRange && (
                         <motion.div
                           layoutId="best-marker"
-                          className="absolute -bottom-8 w-full h-1.5 bg-primary rounded-full"
+                          className="absolute -bottom-6 sm:-bottom-8 w-full max-w-[3rem] h-1.5 bg-primary rounded-full"
                           initial={{ opacity: 0, scaleX: 0 }}
                           animate={{ opacity: 1, scaleX: 1 }}
                         />
@@ -389,24 +390,26 @@ export const MaximumSubarrayVisualization = () => {
 
               {/* Current Subarray Overlay with more visible colors */}
               {currentStep.curRange[0] !== -1 && (
-                <motion.div
-                  layoutId="current-subarray-frame"
-                  className="absolute bottom-[66px] h-16 border-2 border-dashed border-indigo-500 bg-indigo-500/5 rounded-xl pointer-events-none"
-                  initial={false}
-                  animate={{
-                    left: `${currentStep.curRange[0] * 60 + (currentStep.array.length === 5 ? -2 : 0)}px`,
-                    width: `${(currentStep.curRange[1] - currentStep.curRange[0] + 1) * 60 - 8}px`,
-                  }}
-                  transition={{ type: 'spring', stiffness: 150, damping: 20 }}
-                >
+                <div className="absolute bottom-[56px] sm:bottom-[66px] pointer-events-none grid grid-cols-5 gap-2 sm:gap-3 w-full left-0 right-0 h-14 sm:h-16">
                   <motion.div
-                    className="absolute -top-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-indigo-500 text-[10px] font-bold text-white shadow-sm whitespace-nowrap"
-                    initial={{ opacity: 0, scale: 0.5 }}
-                    animate={{ opacity: 1, scale: 1 }}
+                    layout
+                    className="border-2 border-dashed border-indigo-500 bg-indigo-500/5 rounded-xl relative w-full h-full"
+                    style={{
+                      gridColumnStart: currentStep.curRange[0] + 1,
+                      gridColumnEnd: currentStep.curRange[1] + 2,
+                    }}
+                    initial={false}
+                    transition={{ type: 'spring', stiffness: 150, damping: 20 }}
                   >
-                    Sum: {currentStep.curSum}
+                    <motion.div
+                      className="absolute -top-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-indigo-500 text-[10px] font-bold text-white shadow-sm whitespace-nowrap"
+                      initial={{ opacity: 0, scale: 0.5 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                    >
+                      Sum: {currentStep.curSum}
+                    </motion.div>
                   </motion.div>
-                </motion.div>
+                </div>
               )}
             </div>
 

@@ -1,68 +1,108 @@
 "use client";
 
-import { ArrowRight, BarChart3 } from "lucide-react";
+import { ArrowRight, PlaySquare, Star } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import React from "react";
-import { usePostHog } from '@posthog/react';
-import { trackEvent } from '@/lib/analytics';
+import { trackEvent } from "@/lib/analytics";
+import { usePostHog } from "@posthog/react";
+
+import { HeroFlowDiagram } from "./HeroFlowDiagram";
 
 export function HeroSection() {
-    const posthog = usePostHog();
+  const posthog = usePostHog();
 
-    return (
-        <div className="relative pt-16 pb-16 lg:pt-24 lg:pb-24 overflow-hidden">
-            <div className="w-full max-w-[1600px] mx-auto px-4 relative z-10">
-                <div className="md:max-w-[80%] mx-auto animate-in fade-in slide-in-from-bottom duration-1000">
-                    <h1 className="hero-title mb-8 text-[#1A1A1A] dark:text-white">
-                        Everything you need to prepare, practice, and succeed in technical interviews — all in one place.
-                    </h1>
-
-                    <div className="hero-subtitle mb-12 max-w-2xl font-medium text-gray-600 dark:text-gray-400">
-                        Experience the <span className="text-black dark:text-white underline decoration-[#EAFF96] underline-offset-4">preparation platform</span> engineered to streamline your path to top-tier engineering roles. Built by industry veterans from
-                        <div className="flex flex-wrap items-center gap-x-8 gap-y-4 mt-8 opacity-60 grayscale hover:grayscale-0 transition-all duration-500 font- text-xl tracking-tight">
-                            <span>Google</span>
-                            <span>Amazon</span>
-                            <span>Meta</span>
-                            <span className="uppercase">Netflix</span>
-                        </div>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-6 mb-8">
-                        <div className="flex flex-col gap-4">
-                            <Button 
-                                size="lg"
-                                className="rounded-full px-8 py-6 text-base bg-primary hover:bg-primary/90 text-black transition-all hover:scale-105 active:scale-95 shadow-xl shadow-primary/20" 
-                                asChild
-                            >
-                                <Link 
-                                    href="/dsa/get-started"
-                                    onClick={() => trackEvent(posthog, 'home_cta_clicked', { 
-                                        cta_label: 'Start Practice', 
-                                        destination: '/dsa/get-started',
-                                        section: 'hero'
-                                    })}
-                                >
-                                    Start Practice <ArrowRight className="ml-2 w-6 h-6" />
-                                </Link>
-                            </Button>
-                            <span className="text-[10px] text-gray-500 font- uppercase tracking-wider opacity-60 text-center">
-                                Try the free questions
-                            </span>
-                        </div>
-
-                        <div className="flex items-center gap-4 border-l border-gray-100 dark:border-zinc-800 pl-8">
-                            <div className="text-sm">
-                                <div className="font-black text-black dark:text-white text-lg leading-tight tracking-tight font-medium">1k+ users</div>
-                                <div className="text-gray-500 flex items-center gap-1 font-">
-                                    <BarChart3 className="w-4 h-4 text-orange-500 fill-orange-500" />
-                                    Google Analytics verified
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  return (
+    <div className="relative pt-16 pb-16 lg:pt-24 lg:pb-24 overflow-hidden">
+      <div className="w-full max-w-[1700px] mx-auto px-4 relative z-10">
+        <div className="grid grid-cols-1 xl:grid-cols-[1fr_1.2fr] gap-12 items-center animate-in fade-in slide-in-from-bottom duration-1000">
+          
+          {/* Left Column: Text Content */}
+          <div className="flex flex-col justify-center pl-4 lg:pl-12">
+            {/* Pill Tag */}
+            <div className="mb-8 inline-flex w-max">
+              <div className="px-4 py-1.5 rounded-full border border-primary/30 text-primary text-sm font-medium tracking-wide bg-black/50 backdrop-blur-sm">
+                Learn-First Platform
+              </div>
             </div>
+
+            {/* Headline */}
+            <h1 className="text-5xl lg:text5xl font-medium tracking-tight mb-8 leading-[1.1] text-white">
+              Don't Just Memorize Code.
+              <span className="block text-3xl lg:text-5xl text-gray-500 mt-4 font-semibold">
+                See How It Works.
+              </span>
+            </h1>
+
+            {/* Subheadline with styled links */}
+            <div className="text-[17px] text-gray-400 mb-12 max-w-xl leading-relaxed">
+              <p className="mb-6">
+                A learn-first platform for coding interviews.
+              </p>
+              <p>
+                Read the problem,{" "}
+                <Link
+                  href="#visualization"
+                  className="text-white underline decoration-primary underline-offset-4 hover:opacity-80 transition-all"
+                >
+                  Visualize
+                </Link>{" "}
+                the solution, think through the approach, sketch your ideas in{" "}
+                <Link
+                  href="#thinkpad"
+                  className="text-white underline decoration-primary underline-offset-4 hover:opacity-80 transition-all"
+                >
+                  Thinkpad
+                </Link>
+                , write{" "}
+                <Link
+                  href="/problem/kadanes-algorithm"
+                  className="text-white underline decoration-primary underline-offset-4 hover:opacity-80 transition-all"
+                >
+                  code
+                </Link>
+                , and{" "}
+                <Link
+                  href="/problem/kadanes-algorithm?tab=solution"
+                  className="text-white underline decoration-primary underline-offset-4 hover:opacity-80 transition-all"
+                >
+                  review
+                </Link>{" "}
+                expert solutions.
+              </p>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex flex-wrap items-center gap-4 mb-16 xl:mb-0">
+              <Button
+                size="lg"
+                className="rounded-full px-8 py-6 text-base font-semibold bg-primary hover:bg-primary/90 text-black transition-all hover:scale-105 active:scale-95 shadow-[0_0_30px_hsl(var(--primary)/0.3)]"
+                asChild
+              >
+                <Link
+                  href="/dsa/get-started"
+                  onClick={() =>
+                    trackEvent(posthog, "home_cta_clicked", {
+                      cta_label: "Start Learning",
+                      destination: "/dsa/get-started",
+                      section: "hero",
+                    })
+                  }
+                >
+                  Start Learning <ArrowRight className="ml-2 w-5 h-5" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+
+          {/* Right Column: Interactive Diagram */}
+          <div className="hidden lg:flex items-center justify-center relative w-full h-[800px] mt-10 xl:mt-0">
+            <HeroFlowDiagram />
+          </div>
+
         </div>
-    );
+      </div>
+    </div>
+  );
 }

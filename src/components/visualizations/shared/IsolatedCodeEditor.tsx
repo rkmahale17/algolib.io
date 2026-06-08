@@ -54,6 +54,16 @@ export const IsolatedCodeEditor = React.forwardRef<any, IsolatedCodeEditorProps>
     }
   }));
   const lastEmittedCodeRef = useRef(code);
+  
+  const onChangeRef = useRef(onChange);
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+  
+  const onShortcutRef = useRef(onShortcut);
+  useEffect(() => {
+    onShortcutRef.current = onShortcut;
+  }, [onShortcut]);
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -80,9 +90,9 @@ export const IsolatedCodeEditor = React.forwardRef<any, IsolatedCodeEditorProps>
       } else if (event.data.type === 'CODE_CHANGED') {
         const newCode = event.data.data.code;
         lastEmittedCodeRef.current = newCode;
-        onChange?.(newCode);
+        onChangeRef.current?.(newCode);
       } else if (event.data.type === 'KEYBOARD_SHORTCUT') {
-        onShortcut?.(event.data.data.key);
+        onShortcutRef.current?.(event.data.data.key);
       }
     };
     window.addEventListener('message', handleMessage);
@@ -97,6 +107,7 @@ export const IsolatedCodeEditor = React.forwardRef<any, IsolatedCodeEditorProps>
 
       if (currentVal !== lastEmitted) {
         iframeRef.current.contentWindow.postMessage({ type: 'UPDATE_CODE', data: { code } }, '*');
+        lastEmittedCodeRef.current = code;
       }
     }
   }, [code, isInternalReady]);
