@@ -78,12 +78,12 @@ export function HeroFlowDiagram() {
         <div className="w-20 h-20 rounded-full bg-black/60 border border-primary/30 flex items-center justify-center shadow-[0_0_30px_rgba(163,230,57,0.2)] mb-4 backdrop-blur-md">
           <Brain className="w-10 h-10 text-primary animate-pulse" />
         </div>
-        <h3 className="text-xl font-semibold text-white mb-1">
+        <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-1">
           Understand
           <br />
           Deeply
         </h3>
-        <p className="text-sm text-gray-400">
+        <p className="text-sm text-zinc-500 dark:text-gray-400">
           Build intuition. Not
           <br />
           just solutions.
@@ -103,10 +103,10 @@ export function HeroFlowDiagram() {
         transition={{ delay: 0.1 }}
       >
         <div className="flex items-center gap-3 mb-2 -translate-y-6">
-          <div className="w-8 h-8 rounded-full border border-primary/50 flex items-center justify-center text-primary font-bold text-sm bg-black/80">
+          <div className="w-8 h-8 rounded-full border border-primary/50 flex items-center justify-center text-primary font-bold text-sm bg-white dark:bg-black/80">
             1
           </div>
-          <span className="text-white font-medium">Read</span>
+          <span className="text-zinc-900 dark:text-white font-medium">Read</span>
         </div>
         <div className="w-[280px] bg-[#111111]/90 border border-zinc-800 rounded-xl p-5 shadow-2xl backdrop-blur-md relative">
           <div className="flex items-center gap-2 mb-3">
@@ -115,10 +115,10 @@ export function HeroFlowDiagram() {
               Medium
             </span>
           </div>
-          <p className="text-xs text-gray-400 leading-relaxed mb-4">
-            Given a <strong className="text-gray-300">1-indexed</strong> array
-            of integers <code className="text-gray-300">numbers</code> that is
-            already <strong className="text-gray-300">sorted</strong>, find two
+          <p className="text-xs text-zinc-400 leading-relaxed mb-4">
+            Given a <strong className="text-zinc-200">1-indexed</strong> array
+            of integers <code className="text-zinc-200">numbers</code> that is
+            already <strong className="text-zinc-200">sorted</strong>, find two
             numbers that add up to target.
           </p>
           <div className="space-y-1.5 opacity-40">
@@ -141,10 +141,10 @@ export function HeroFlowDiagram() {
         transition={{ delay: 0.3 }}
       >
         <div className="flex items-center gap-3 mb-2 -translate-y-6">
-          <div className="w-8 h-8 rounded-full border border-primary/50 flex items-center justify-center text-primary font-bold text-sm bg-black/80">
+          <div className="w-8 h-8 rounded-full border border-primary/50 flex items-center justify-center text-primary font-bold text-sm bg-white dark:bg-black/80">
             2
           </div>
-          <span className="text-white font-medium">Visualize</span>
+          <span className="text-zinc-900 dark:text-white font-medium">Visualize</span>
         </div>
         <div className="w-[260px] bg-[#111111]/90 border border-primary/30 rounded-xl p-5 shadow-[0_0_20px_rgba(163,230,57,0.1)] backdrop-blur-md">
           <div className="flex justify-center gap-1 mb-6">
@@ -202,10 +202,10 @@ export function HeroFlowDiagram() {
         transition={{ delay: 0.5 }}
       >
         <div className="flex items-center gap-3 mb-2 -translate-y-6">
-          <div className="w-8 h-8 rounded-full border border-[#F97316]/50 flex items-center justify-center text-[#F97316] font-bold text-sm bg-black/80">
+          <div className="w-8 h-8 rounded-full border border-[#F97316]/50 flex items-center justify-center text-[#F97316] font-bold text-sm bg-white dark:bg-black/80">
             3
           </div>
-          <span className="text-white font-medium">Think</span>
+          <span className="text-zinc-900 dark:text-white font-medium">Think</span>
         </div>
         <div className="w-[250px] bg-[#111111]/90 border border-[#F97316]/30 rounded-xl p-5 shadow-[0_0_20px_rgba(249,115,22,0.1)] backdrop-blur-md relative">
           <span className="text-[#F97316] font-medium text-sm block mb-3">
@@ -236,10 +236,10 @@ export function HeroFlowDiagram() {
         transition={{ delay: 0.7 }}
       >
         <div className="flex items-center gap-3 mb-2 -translate-y-6">
-          <div className="w-8 h-8 rounded-full border border-[#A855F7]/50 flex items-center justify-center text-[#A855F7] font-bold text-sm bg-black/80">
+          <div className="w-8 h-8 rounded-full border border-[#A855F7]/50 flex items-center justify-center text-[#A855F7] font-bold text-sm bg-white dark:bg-black/80">
             4
           </div>
-          <span className="text-white font-medium">Thinkpad</span>
+          <span className="text-zinc-900 dark:text-white font-medium">Thinkpad</span>
         </div>
         <div className="w-[240px] bg-[#111111]/90 border-2 border-dashed border-[#A855F7]/30 rounded-xl p-4 shadow-2xl backdrop-blur-md -rotate-2">
           <span className="text-[#A855F7] font-[var(--font-caveat)] text-2xl block mb-4 -rotate-1">
@@ -344,16 +344,16 @@ export function HeroFlowDiagram() {
         transition={{ delay: 0.9 }}
       >
         <div className="flex items-center gap-3 mb-2 -translate-y-6">
-          <div className="w-8 h-8 rounded-full border border-[#3B82F6]/50 flex items-center justify-center text-[#3B82F6] font-bold text-sm bg-black/80">
+          <div className="w-8 h-8 rounded-full border border-[#3B82F6]/50 flex items-center justify-center text-[#3B82F6] font-bold text-sm bg-white dark:bg-black/80">
             5
           </div>
-          <span className="text-white font-medium">Code</span>
+          <span className="text-zinc-900 dark:text-white font-medium">Code</span>
         </div>
         <div className="w-[280px] bg-[#111111]/90 border border-zinc-800 rounded-xl shadow-2xl backdrop-blur-md overflow-hidden flex flex-col">
           <div className="px-4 py-2 border-b border-zinc-800 flex items-center justify-between bg-black/50">
             <span className="text-xs text-gray-400">Python</span>
           </div>
-          <div className="p-4 text-xs font-mono leading-relaxed">
+          <div className="p-4 text-xs font-mono leading-relaxed text-zinc-300">
             <span className="text-[#A855F7]">def</span>{" "}
             <span className="text-[#3B82F6]">twoSum</span>
             <span className="text-white">(nums, target):</span>
@@ -404,10 +404,10 @@ export function HeroFlowDiagram() {
         transition={{ delay: 1.1 }}
       >
         <div className="flex items-center gap-3 mb-2 -translate-y-6">
-          <div className="w-8 h-8 rounded-full border border-[#3B82F6]/50 flex items-center justify-center text-[#3B82F6] font-bold text-sm bg-black/80">
+          <div className="w-8 h-8 rounded-full border border-[#3B82F6]/50 flex items-center justify-center text-[#3B82F6] font-bold text-sm bg-white dark:bg-black/80">
             6
           </div>
-          <span className="text-white font-medium">Review</span>
+          <span className="text-zinc-900 dark:text-white font-medium">Review</span>
         </div>
         <div className="w-[240px] bg-[#111111]/90 border border-zinc-800 rounded-xl p-5 shadow-2xl backdrop-blur-md">
           <div className="flex items-center gap-2 mb-4">
