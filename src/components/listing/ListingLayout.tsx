@@ -1,5 +1,5 @@
 import { ReactNode, useState } from "react";
-import { SidebarLayout } from "@/components/SidebarLayout";
+
 import { ProblemHero } from "./ProblemHero";
 import { ProblemSidebarFilters } from "./ProblemSidebarFilters";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -145,7 +145,7 @@ export const ListingLayout = ({
     };
 
     return (
-        <SidebarLayout>
+        <>
             <div className="min-h-screen bg-background flex flex-col min-w-0">
                 <main className="flex-1 w-full max-w-[1600px] mx-auto px-2 sm:px-4 py-8 md:py-12">
                     <div className="flex flex-col xl-listing:flex-row gap-8 xl-listing:gap-12 justify-center">
@@ -462,6 +462,6 @@ export const ListingLayout = ({
                     </div>
                 </main>
             </div>
-        </SidebarLayout>
+        </>
     );
 };

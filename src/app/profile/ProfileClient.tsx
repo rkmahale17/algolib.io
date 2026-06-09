@@ -9,7 +9,7 @@ import type { Profile } from "@/types/profile";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { EditProfileDialog } from "@/components/profile/EditProfileDialog";
-import { SidebarLayout } from '@/components/SidebarLayout';
+
 import { cn } from "@/lib/utils";
 import Link from 'next/link';
 import { useApp } from '@/contexts/AppContext';
@@ -70,7 +70,7 @@ const ProfileClient = () => {
   const isCancelled = profile.cancel_at_period_end === true || profile.subscription_status === 'canceled' || profile.subscription_status === 'cancelled';
 
   return (
-    <SidebarLayout>
+    <>
       <div className="min-h-screen bg-background pt-8 pb-12 px-4 md:px-8">
         <div className="max-w-[1600px] mx-auto space-y-8">
 
@@ -176,7 +176,7 @@ const ProfileClient = () => {
           </div>
         </div>
       </div>
-    </SidebarLayout>
+    </>
   );
 };
 

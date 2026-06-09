@@ -135,6 +135,7 @@ export const SIDEBAR_ROUTES = [
   "/dsa/blind-75",
   "/dsa/core",
   "/dsa/query",
+  "/dsa/visual-library",
   "/dashboard",
 ];
 

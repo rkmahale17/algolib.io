@@ -28,9 +28,9 @@ export function HeroSection() {
 
             {/* Headline */}
             <h1 className="text-5xl lg:text5xl font-medium tracking-tight mb-8 leading-[1.1] text-zinc-900 dark:text-white">
-              Don't Just Memorize Code.
+              Don't practice solutions.
               <span className="block text-3xl lg:text-5xl text-primary mt-4 font-semibold">
-                See How It Works.
+                Practice thinking.
               </span>
             </h1>
 

@@ -177,10 +177,11 @@ export const ProblemsList = ({
     }
 
     if (selectedCompanies.length > 0) {
+      const lowerSelected = selectedCompanies.map(c => c.toLowerCase());
       result = result.filter(algo => {
         const c = algo.metadata?.companies;
         if (!Array.isArray(c)) return false;
-        return c.some((comp: string) => selectedCompanies.includes(comp));
+        return c.some((comp: string) => lowerSelected.includes(comp.toLowerCase()));
       });
     }
 
