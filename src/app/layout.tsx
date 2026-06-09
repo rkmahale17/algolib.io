@@ -55,7 +55,9 @@ export default function RootLayout({
             <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
           )}
 
-          <AppSidebar />
+          <Suspense fallback={null}>
+            <AppSidebar />
+          </Suspense>
           <SidebarInset>
             <Navbar className="global-nav" />
             {children}
