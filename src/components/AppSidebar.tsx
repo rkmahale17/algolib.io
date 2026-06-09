@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTheme } from "next-themes";
 import {
   BookOpen,
@@ -17,6 +17,7 @@ import {
   MoreHorizontal,
   PanelLeftClose,
   PanelLeftOpen,
+  Target,
 } from "lucide-react";
 
 import { Button } from "./ui/button";
@@ -43,6 +44,8 @@ import {
 } from "@/components/ui/sidebar";
 
 import { useApp } from "@/contexts/AppContext";
+import { useAlgorithms } from "@/hooks/useAlgorithms";
+import { ListType } from "@/types/algorithm";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import logo from "@/assets/logo.svg";
@@ -211,16 +214,51 @@ function SidebarLinkHoverCard({
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toggleSidebar, state, isMobile, setOpenMobile } = useSidebar();
   const { theme, setTheme } = useTheme();
   const { user, hasPremiumAccess } = useApp();
+  const { data: algorithmsData } = useAlgorithms();
 
   const isCollapsed = state === "collapsed" && !isMobile;
-  const showGuides = isGuideRoute(pathname);
-  const headerSubtitle = showGuides ? "Guides" : "Interviews";
+  const isGuides = isGuideRoute(pathname);
+  const isVisualLibrary = pathname?.startsWith("/dsa/visual-library");
+  const isPractice = pathname?.startsWith("/dsa") && !isVisualLibrary;
+  const isDashboard = pathname?.startsWith("/dashboard");
+  const isProfile = pathname?.startsWith("/profile");
 
-  const [isDsaExpanded, setIsDsaExpanded] = React.useState(true);
-  const [isGuidebookExpanded, setIsGuidebookExpanded] = React.useState(true);
+  const coreAlgorithms = React.useMemo(() => {
+    if (!algorithmsData?.algorithms) return [];
+    return algorithmsData.algorithms
+      .filter((a) => a.problemType === "dsa" && a.published !== false && (a.listTypes?.includes(ListType.Core) || a.list_type === "core"))
+      .sort((a, b) => (a.serial_no || 0) - (b.serial_no || 0))
+      .map((algo, index) => {
+        const isPro = index >= 10;
+        return {
+          ...algo,
+          is_premium: isPro,
+          is_pro: isPro,
+          metadata: {
+            ...(algo.metadata || {}),
+            is_pro: isPro
+          }
+        };
+      });
+  }, [algorithmsData]);
+
+  const headerSubtitle = isGuides ? "Guides" : isVisualLibrary ? "Visual" : isPractice ? "Practice" : isDashboard ? "Dashboard" : isProfile ? "Profile" : "Dashboard";
+
+  // Independent accordion states
+  const [isPracticeExpanded, setIsPracticeExpanded] = React.useState(isPractice);
+  const [isVisualExpanded, setIsVisualExpanded] = React.useState(isVisualLibrary);
+  const [isGuidesExpanded, setIsGuidesExpanded] = React.useState(isGuides);
+
+  // Sync expanded state with route
+  React.useEffect(() => {
+    if (isGuides) setIsGuidesExpanded(true);
+    if (isVisualLibrary) setIsVisualExpanded(true);
+    if (isPractice) setIsPracticeExpanded(true);
+  }, [pathname, isGuides, isVisualLibrary, isPractice]);
   const [expandedCategories, setExpandedCategories] = React.useState<Record<string, boolean>>(() => {
     const state: Record<string, boolean> = {
       "time-complexity": false,
@@ -318,13 +356,108 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <SidebarMenuItem>
                 {isCollapsed ? (
                   <div className="flex flex-col gap-2 items-center">
-                    {showGuides ? (
-                      /* Guide Route: Single Guidebook HoverCard containing all guide groups */
+                    <SidebarLinkHoverCard
+                      href="/dashboard"
+                      title="Dashboard"
+                      icon={LayoutDashboard}
+                      isActive={pathname === "/dashboard"}
+                      onClick={closeMobileNav}
+                    />
+                    <SidebarHoverCard
+                      title="Practice"
+                      icon={ListTodo}
+                      isActive={isPractice}
+                    >
+                      {DSA_ITEMS.map((item) => (
+                        <SidebarLink
+                          key={item.id}
+                          href={item.url}
+                          title={item.title}
+                          icon={item.icon}
+                          isActive={pathname === item.url}
+                          onClick={closeMobileNav}
+                        />
+                      ))}
+                    </SidebarHoverCard>
+                    
+                    {isVisualLibrary ? (
                       <SidebarHoverCard
-                        title="Guides"
-                        icon={BookOpen}
-                        isActive={pathname?.startsWith("/guides")}
+                        title="Visual Library"
+                        icon={Target}
+                        isActive={isVisualLibrary}
                       >
+                        {coreAlgorithms.map((algo) => (
+                          <SidebarLink
+                            key={algo.id}
+                            href={`/dsa/visual-library?problem=${algo.slug || algo.id}`}
+                            title={algo.name}
+                            icon={FileText}
+                            isActive={searchParams.get("problem") === (algo.slug || algo.id)}
+                            onClick={closeMobileNav}
+                          />
+                        ))}
+                      </SidebarHoverCard>
+                    ) : (
+                      <SidebarLinkHoverCard
+                        href="/dsa/visual-library"
+                        title="Visual Library"
+                        icon={Target}
+                        isActive={isVisualLibrary}
+                        onClick={closeMobileNav}
+                      />
+                    )}
+
+                    <SidebarHoverCard
+                      title="Guidebook"
+                      icon={BookOpen}
+                      isActive={isGuides}
+                    >
+                      {GUIDE_GROUPS.map((group) => {
+                        if (group.isSingleLink) {
+                          const url = group.id === "time-complexity" ? "/guides/time-complexity" : "/guides/space-complexity";
+                          return (
+                            <SidebarLink
+                              key={group.id}
+                              href={url}
+                              title={group.title}
+                              icon={group.icon}
+                              isActive={pathname === url}
+                              onClick={closeMobileNav}
+                            />
+                          );
+                        }
+                        return (
+                          <div key={group.id} className="mt-2 px-1">
+                            <div className="text-[11px] font-semibold text-muted-foreground px-2 py-0.5 flex items-center gap-1.5 uppercase tracking-wider">
+                              <group.icon className="w-3 h-3 opacity-60" />
+                              {group.title}
+                            </div>
+                            <div className="flex flex-col gap-1 mt-1 pl-1">
+                              {group.guides.map((guide) => {
+                                const url = getGuideUrl(group.id, guide.slug);
+                                return (
+                                  <SidebarLink
+                                    key={guide.slug}
+                                    href={url}
+                                    title={guide.title}
+                                    icon={FileText}
+                                    isActive={pathname === url}
+                                    onClick={closeMobileNav}
+                                  />
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </SidebarHoverCard>
+                  </div>
+                ) : (
+                  /* Expanded state */
+                  <div className="flex flex-col gap-4 select-none animate-fadeIn">
+                    {isGuides ? (
+                      <>
+                        {/* Guides items at the root level */}
                         {GUIDE_GROUPS.map((group) => {
                           if (group.isSingleLink) {
                             const url = group.id === "time-complexity" ? "/guides/time-complexity" : "/guides/space-complexity";
@@ -339,137 +472,65 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                               />
                             );
                           }
+                          const isExpanded = !!expandedCategories[group.id];
                           return (
-                            <div key={group.id} className="mt-2 px-1">
-                              <div className="text-[11px] font-semibold text-muted-foreground px-2 py-0.5 flex items-center gap-1.5 uppercase tracking-wider">
-                                <group.icon className="w-3 h-3 opacity-60" />
-                                {group.title}
-                              </div>
-                              <div className="flex flex-col gap-1 mt-1 pl-1">
-                                {group.guides.map((guide) => {
-                                  const url = getGuideUrl(group.id, guide.slug);
-                                  return (
-                                    <SidebarLink
-                                      key={guide.slug}
-                                      href={url}
-                                      title={guide.title}
-                                      icon={FileText}
-                                      isActive={pathname === url}
-                                      onClick={closeMobileNav}
-                                    />
-                                  );
-                                })}
-                              </div>
-                            </div>
+                            <SidebarCollapsible
+                              key={group.id}
+                              title={group.title}
+                              icon={group.icon}
+                              isExpanded={isExpanded}
+                              onToggle={() =>
+                                setExpandedCategories((prev) => ({
+                                  ...prev,
+                                  [group.id]: !prev[group.id],
+                                }))
+                              }
+                            >
+                              {group.guides.map((guide) => {
+                                const url = getGuideUrl(group.id, guide.slug);
+                                return (
+                                  <SidebarLink
+                                    key={guide.slug}
+                                    href={url}
+                                    title={guide.title}
+                                    icon={FileText}
+                                    isActive={pathname === url}
+                                    onClick={closeMobileNav}
+                                  />
+                                );
+                              })}
+                            </SidebarCollapsible>
                           );
                         })}
-                      </SidebarHoverCard>
-                    ) : (
-                      /* DSA / Dashboard Route */
-                      <>
-                        <SidebarLinkHoverCard
+
+                        {/* Border separator */}
+                        <div className="h-px bg-border my-2 mx-2 opacity-50" />
+
+                        <SidebarLink
                           href="/dashboard"
                           title="Dashboard"
                           icon={LayoutDashboard}
-                          isActive={pathname === "/dashboard"}
+                          isActive={false}
                           onClick={closeMobileNav}
                         />
-                        <SidebarHoverCard
-                          title="DSA"
+
+                        <SidebarLink
+                          href="/dsa/visual-library"
+                          title="Visual Library"
+                          icon={Target}
+                          isActive={false}
+                          onClick={closeMobileNav}
+                        />
+
+                        <SidebarLink
+                          href="/dsa/problems"
+                          title="Practice"
                           icon={ListTodo}
-                          isActive={pathname?.startsWith("/dsa")}
-                        >
-                          {DSA_ITEMS.map((item) => (
-                            <SidebarLink
-                              key={item.id}
-                              href={item.url}
-                              title={item.title}
-                              icon={item.icon}
-                              isActive={pathname === item.url}
-                              onClick={closeMobileNav}
-                            />
-                          ))}
-                        </SidebarHoverCard>
-                        <SidebarHoverCard
-                          title="Guidebook"
-                          icon={BookOpen}
-                          isActive={pathname?.startsWith("/guides")}
-                        >
-                          {GUIDE_GROUPS.map((group) => {
-                            const url =
-                              group.id === "time-complexity"
-                                ? "/guides/time-complexity"
-                                : group.id === "space-complexity"
-                                ? "/guides/space-complexity"
-                                : group.id === "fundamentals"
-                                ? "/guides/fundamentals/core-data-structures"
-                                : "/guides/patterns/arrays-hashing";
-                            return (
-                              <SidebarLink
-                                key={group.id}
-                                href={url}
-                                title={group.title}
-                                icon={group.icon}
-                                isActive={pathname === url}
-                                onClick={closeMobileNav}
-                              />
-                            );
-                          })}
-                        </SidebarHoverCard>
+                          isActive={false}
+                          onClick={closeMobileNav}
+                        />
                       </>
-                    )}
-                  </div>
-                ) : (
-                  /* Expanded state */
-                  <div className="flex flex-col gap-4 select-none animate-fadeIn">
-                    {showGuides ? (
-                      /* Guide Route */
-                      GUIDE_GROUPS.map((group) => {
-                        if (group.isSingleLink) {
-                          const url = group.id === "time-complexity" ? "/guides/time-complexity" : "/guides/space-complexity";
-                          return (
-                            <SidebarLink
-                              key={group.id}
-                              href={url}
-                              title={group.title}
-                              icon={group.icon}
-                              isActive={pathname === url}
-                              onClick={closeMobileNav}
-                            />
-                          );
-                        }
-                        const isExpanded = !!expandedCategories[group.id];
-                        return (
-                          <SidebarCollapsible
-                            key={group.id}
-                            title={group.title}
-                            icon={group.icon}
-                            isExpanded={isExpanded}
-                            onToggle={() =>
-                              setExpandedCategories((prev) => ({
-                                ...prev,
-                                [group.id]: !prev[group.id],
-                              }))
-                            }
-                          >
-                            {group.guides.map((guide) => {
-                              const url = getGuideUrl(group.id, guide.slug);
-                              return (
-                                <SidebarLink
-                                  key={guide.slug}
-                                  href={url}
-                                  title={guide.title}
-                                  icon={FileText}
-                                  isActive={pathname === url}
-                                  onClick={closeMobileNav}
-                                />
-                              );
-                            })}
-                          </SidebarCollapsible>
-                        );
-                      })
                     ) : (
-                      /* DSA / Dashboard Route */
                       <>
                         <SidebarLink
                           href="/dashboard"
@@ -478,11 +539,40 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           isActive={pathname === "/dashboard"}
                           onClick={closeMobileNav}
                         />
+
+                        {isVisualLibrary ? (
+                          <SidebarCollapsible
+                            title="Visual Library"
+                            icon={Target}
+                            isExpanded={isVisualExpanded}
+                            onToggle={() => setIsVisualExpanded(!isVisualExpanded)}
+                          >
+                            {coreAlgorithms.map((algo) => (
+                              <SidebarLink
+                                key={algo.id}
+                                href={`/dsa/visual-library?problem=${algo.slug || algo.id}`}
+                                title={algo.name}
+                                icon={FileText}
+                                isActive={searchParams.get("problem") === (algo.slug || algo.id)}
+                                onClick={closeMobileNav}
+                              />
+                            ))}
+                          </SidebarCollapsible>
+                        ) : (
+                          <SidebarLink
+                            href="/dsa/visual-library"
+                            title="Visual Library"
+                            icon={Target}
+                            isActive={false}
+                            onClick={closeMobileNav}
+                          />
+                        )}
+
                         <SidebarCollapsible
-                          title="DSA"
+                          title="Practice"
                           icon={ListTodo}
-                          isExpanded={isDsaExpanded}
-                          onToggle={() => setIsDsaExpanded(!isDsaExpanded)}
+                          isExpanded={isPracticeExpanded}
+                          onToggle={() => setIsPracticeExpanded(!isPracticeExpanded)}
                         >
                           {DSA_ITEMS.map((item) => (
                             <SidebarLink
@@ -495,28 +585,30 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             />
                           ))}
                         </SidebarCollapsible>
+
                         <SidebarCollapsible
                           title="Guidebook"
                           icon={BookOpen}
-                          isExpanded={isGuidebookExpanded}
-                          onToggle={() => setIsGuidebookExpanded(!isGuidebookExpanded)}
+                          isExpanded={isGuidesExpanded}
+                          onToggle={() => setIsGuidesExpanded(!isGuidesExpanded)}
                         >
                           {GUIDE_GROUPS.map((group) => {
-                            const url =
-                              group.id === "time-complexity"
-                                ? "/guides/time-complexity"
-                                : group.id === "space-complexity"
-                                ? "/guides/space-complexity"
-                                : group.id === "fundamentals"
-                                ? "/guides/fundamentals/core-data-structures"
-                                : "/guides/patterns/arrays-hashing";
+                            let url = "";
+                            if (group.id === "time-complexity") url = "/guides/time-complexity";
+                            else if (group.id === "space-complexity") url = "/guides/space-complexity";
+                            else if (group.guides.length > 0) {
+                              url = getGuideUrl(group.id, group.guides[0].slug);
+                            } else {
+                              url = "/guides";
+                            }
+
                             return (
                               <SidebarLink
                                 key={group.id}
                                 href={url}
                                 title={group.title}
                                 icon={group.icon}
-                                isActive={pathname === url}
+                                isActive={false}
                                 onClick={closeMobileNav}
                               />
                             );

@@ -123,7 +123,7 @@ const Home = () => {
               {/* Removed pill-badge as requested */}
 
               <h1 className="hero-title mb-8">
-                Everything you need to prepare, practice, and succeed in technical interviews — all in one place.
+                Don't practice solutions. Practice thinking.
               </h1>
 
               <div className="hero-subtitle mb-12 max-w-2xl font-medium">

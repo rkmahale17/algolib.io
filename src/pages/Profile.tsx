@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { EditProfileDialog } from "@/components/profile/EditProfileDialog";
-import { SidebarLayout } from '@/components/SidebarLayout';
+
 import { cn } from "@/lib/utils";
 
 const ProfileEdit = () => {
@@ -60,7 +60,7 @@ const ProfileEdit = () => {
   const isCancelled = profile.cancel_at_period_end || profile.subscription_status === 'canceled' || profile.subscription_status === 'cancelled';
 
   return (
-    <SidebarLayout>
+    <>
       <div className="min-h-screen bg-background pt-8 pb-12 px-4 md:px-8">
         <div className="max-w-6xl mx-auto space-y-8">
 
@@ -164,7 +164,7 @@ const ProfileEdit = () => {
           </div>
         </div>
       </div>
-    </SidebarLayout>
+    </>
   );
 };
 

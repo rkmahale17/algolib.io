@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 import { notFound } from 'next/navigation';
-
+import { Suspense } from 'react';
 import { IS_ADMIN_ENABLED } from '@/admin/constants';
 
 const AdminDashboardClient = IS_ADMIN_ENABLED 
@@ -17,5 +17,9 @@ export default function AdminPage() {
   if (!IS_ADMIN_ENABLED) {
     notFound();
   }
-  return <AdminDashboardClient />;
+  return (
+    <Suspense fallback={<div>Loading dashboard...</div>}>
+      <AdminDashboardClient />
+    </Suspense>
+  );
 }

@@ -35,7 +35,7 @@ const ProblemsClient = ({
   const searchMode = searchParams.get('mode') || 'all';
   const listMode = manualListType || searchMode;
   const topicFilter = searchParams.get('topic');
-  const companyFilter = searchParams.get('company');
+  const rawCompanyFilter = searchParams.get('company');
 
   const normalizedTopic = useMemo(() => topicFilter ? normalizeCategory(topicFilter) : null, [topicFilter]);
 
@@ -47,6 +47,12 @@ const ProblemsClient = ({
       .filter(algo => algo.published !== false || isUserAdmin),
     [data, isUserAdmin]
   );
+
+  const companyFilter = useMemo(() => {
+    if (!rawCompanyFilter) return null;
+    const exactMatch = allAlgorithms.flatMap(a => a.metadata?.companies || []).find(c => typeof c === 'string' && c.toLowerCase() === rawCompanyFilter.toLowerCase());
+    return exactMatch || (rawCompanyFilter.charAt(0).toUpperCase() + rawCompanyFilter.slice(1).toLowerCase());
+  }, [rawCompanyFilter, allAlgorithms]);
 
   const coreAlgorithms = useMemo(() => 
     allAlgorithms.filter(algo => {

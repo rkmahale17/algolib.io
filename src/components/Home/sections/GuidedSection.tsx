@@ -29,7 +29,7 @@ export function GuidedSection() {
                     {/* Badge Pill */}
                     <div className="flex justify-center mb-12">
                         <div className="bg-gray-100/50 dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 px-8 py-2 rounded-full text-base font-medium shadow-sm text-gray-900 dark:text-white transition-all hover:border-gray-300 dark:hover:border-zinc-700">
-                            Guides
+                            Guidebook
                         </div>
                     </div>
 
@@ -41,6 +41,28 @@ export function GuidedSection() {
                         <p className="text-gray-500 dark:text-gray-400 text-base md:text-lg max-w-2xl mx-auto font-medium leading-relaxed">
                             Step-by-step visual guides and blueprints to master algorithmic theory, fundamentals, and runtime optimization.
                         </p>
+                    </div>
+
+                    {/* Visual Library Showcase Card */}
+                    <div className="grid grid-cols-1 mb-8">
+                        <Link href="/dsa/visual-library" className="group block" onClick={() => handleCtaClick('Visual Library', '/dsa/visual-library', 'guided_section')}>
+                            <Card className="h-full bg-white dark:bg-zinc-900/50 border-gray-100 dark:border-zinc-800 hover:border-primary/30 transition-all duration-300 group-hover:shadow-2xl group-hover:shadow-primary/5 group-hover:-translate-y-1 overflow-hidden p-8 flex flex-col md:flex-row items-center gap-8">
+                                <div className="w-20 h-20 shrink-0 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-black transition-colors duration-300">
+                                    <Target className="w-10 h-10" />
+                                </div>
+                                <div className="flex-1 text-center md:text-left">
+                                    <CardTitle className="text-3xl font-medium group-hover:text-primary transition-colors mb-3">Visual Library</CardTitle>
+                                    <CardDescription className="text-lg text-gray-500 dark:text-gray-400 leading-relaxed font-medium">
+                                        Explore our comprehensive library of interactive visualizations. Master complex algorithms by watching data structures animate in real-time as the code executes.
+                                    </CardDescription>
+                                </div>
+                                <div className="shrink-0">
+                                    <Button size="lg" className="rounded-full px-8 py-6 text-base bg-zinc-900 text-white dark:bg-white dark:text-black group-hover:bg-primary group-hover:text-black transition-all">
+                                        Open Library <ArrowRight className="ml-2 w-5 h-5" />
+                                    </Button>
+                                </div>
+                            </Card>
+                        </Link>
                     </div>
 
                     {/* Cards Grid (4 columns on desktop, 2 on tablet, 1 on mobile) */}
@@ -113,8 +135,8 @@ export function GuidedSection() {
                     {/* Bottom CTA Button */}
                     <div className="flex justify-center">
                         <Button size="lg" className="rounded-full px-8 py-6 text-base bg-primary hover:bg-primary/90 text-black transition-all hover:scale-105 active:scale-95 shadow-xl shadow-primary/20" asChild>
-                            <Link href="/guides/time-complexity" onClick={() => handleCtaClick('Explore Guides', '/guides/time-complexity', 'guided_section_cta')}>
-                                Explore Guides <ArrowRight className="ml-2 w-5 h-5" />
+                            <Link href="/dsa/visual-library" onClick={() => handleCtaClick('Explore Visual Library', '/dsa/visual-library', 'guided_section_cta')}>
+                                Explore Visual Library <ArrowRight className="ml-2 w-5 h-5" />
                             </Link>
                         </Button>
                     </div>

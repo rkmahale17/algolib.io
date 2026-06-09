@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import ProblemDetailClient from './ProblemDetailClient';
 import Script from 'next/script';
 import { headers } from 'next/headers';
-
+import { Suspense } from 'react';
 interface ProblemPageProps {
   params: Promise<{ slug: string }>;
 }
@@ -226,11 +226,13 @@ export default async function ProblemPage({ params }: ProblemPageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(techArticleJsonLd) }}
       />
-      <ProblemDetailClient 
-        initialAlgorithm={algorithm} 
-        slug={slug} 
-        isCrawler={isCrawler}
-      />
+      <Suspense fallback={<div>Loading problem details...</div>}>
+        <ProblemDetailClient 
+          initialAlgorithm={algorithm} 
+          slug={slug} 
+          isCrawler={isCrawler}
+        />
+      </Suspense>
     </>
   );
 }
