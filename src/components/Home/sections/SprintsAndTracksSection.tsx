@@ -212,8 +212,8 @@ export function SprintsAndTracksSection() {
                   {TOP_TRACK_COMPANIES.map((company, index) => (
                     <Link
                       key={index}
-                      href={`/dsa/problems?company=${company.name}`}
-                      onClick={() => handleCtaClick(company.name, `/dsa/problems?company=${company.name}`, "company_track_pills")}
+                      href={`/dsa/problems?company=${encodeURIComponent(company.name)}`}
+                      onClick={() => handleCtaClick(company.name, `/dsa/problems?company=${encodeURIComponent(company.name)}`, "company_track_pills")}
                       className={`group/pill flex flex-col items-center justify-center p-2 rounded-lg border border-zinc-200 dark:border-zinc-900/80 bg-white dark:bg-zinc-950/50 hover:bg-zinc-50/45 dark:hover:bg-zinc-900/40 hover:border-zinc-300 dark:hover:border-zinc-800 transition-all duration-300 hover:-translate-y-0.5 ${company.color}`}
                     >
                       <CompanyIcon

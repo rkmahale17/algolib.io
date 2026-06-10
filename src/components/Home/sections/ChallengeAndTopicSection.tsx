@@ -392,8 +392,8 @@ export function ChallengeAndTopicSection() {
                   {TOP_TRACK_COMPANIES.map((company, index) => (
                     <Link
                       key={index}
-                      href={`/dsa/problems?company=${company.name}`}
-                      onClick={() => handleCtaClick(company.name, `/dsa/problems?company=${company.name}`, "company_track_pills")}
+                      href={`/dsa/problems?company=${encodeURIComponent(company.name)}`}
+                      onClick={() => handleCtaClick(company.name, `/dsa/problems?company=${encodeURIComponent(company.name)}`, "company_track_pills")}
                       className={`group/pill flex flex-col items-center justify-center p-3 rounded-2xl border border-zinc-900/80 bg-zinc-950/50 hover:bg-zinc-900/40 hover:border-zinc-800 transition-all duration-300 hover:-translate-y-1 ${company.color}`}
                     >
                       <CompanyIcon

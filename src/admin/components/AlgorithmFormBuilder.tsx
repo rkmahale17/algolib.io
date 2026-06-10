@@ -116,11 +116,6 @@ export function AlgorithmFormBuilder({
   const [isDirty, setIsDirty] = useState(false);
   const isInitialLoadRef = useRef(true);
 
-  // Reset initial load ref when algorithm changes
-  useEffect(() => {
-    isInitialLoadRef.current = true;
-  }, [algorithm?.id]);
-
   // Track if form becomes dirty after initial load
   useEffect(() => {
     if (isInitialLoadRef.current) {
@@ -225,6 +220,10 @@ export function AlgorithmFormBuilder({
       setListTypes(["core"]);
       setPublished(false); // default to false (draft) for new algorithms
     }
+    
+    // Allow state to settle before tracking dirty again
+    isInitialLoadRef.current = true;
+    setIsDirty(false);
   }, [algorithm]);
 
   const handleSave = async () => {

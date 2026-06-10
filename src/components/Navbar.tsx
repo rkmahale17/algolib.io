@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ArrowUpRight,
   Brain,
   Bug,
   ChevronDown,
@@ -39,7 +40,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LIST_TYPE_LABELS, ListType } from "@/types/algorithm";
 import { TOP_COMPANIES } from "@/constants/companies";
-import { CATEGORY_ORDER, slugifyCategory } from "@/constants/categories";
 import { CompanyIcon } from "@/components/CompanyIcon";
 import {
   Popover,
@@ -69,7 +69,7 @@ import { useAppSelector } from "@/store/hooks";
 import { usePathname } from "next/navigation";
 import { usePostHog } from "@posthog/react";
 import { useSidebar } from "@/components/ui/sidebar";
-import { isSidebarRoute } from "@/config/sidebarNav";
+import { isSidebarRoute, GUIDE_GROUPS } from "@/config/sidebarNav";
 
 interface NavbarProps {
   isProblemMode?: boolean;
@@ -602,7 +602,7 @@ const Navbar = ({
                             {TOP_COMPANIES.map(company => (
                               <Link
                                 key={company.id}
-                                href={`/dsa/problems?company=${company.id}`}
+                                href={`/dsa/problems?company=${encodeURIComponent(company.name)}`}
                                 className="px-4 py-2.5 rounded-lg border border-border hover:border-primary hover:bg-primary/5 transition-all flex items-center justify-between group shutter-click"
                                 onClick={closeMenus}
                               >
@@ -645,18 +645,15 @@ const Navbar = ({
                           </div>
 
                           <div className="grid grid-cols-2 gap-3 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
-                            {CATEGORY_ORDER.map(pattern => (
+                            {GUIDE_GROUPS.find(g => g.id === "patterns")?.guides.map((guide) => (
                               <Link
-                                key={pattern}
-                                href={`/guides/patterns/${slugifyCategory(pattern)}`}
-                                className="px-4 py-2.5 rounded-lg border border-border hover:border-primary hover:bg-primary/5 transition-all flex items-center justify-between group shutter-click"
+                                key={guide.slug}
+                                href={`/guides/patterns/${guide.slug}`}
+                                className="px-3 py-2 rounded-lg hover:bg-primary/5 transition-all flex items-center justify-between group shutter-click"
                                 onClick={closeMenus}
                               >
-                                <div className="flex items-center gap-2">
-                                  <FileText className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                                  <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">{pattern}</span>
-                                </div>
-                                <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                                <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">{guide.title}</span>
+                                <ArrowUpRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
                               </Link>
                             ))}
                           </div>
