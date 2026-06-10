@@ -90,11 +90,16 @@ export const FeedbackCard = ({
 
                         <span>{format(new Date(created_at), 'MMM d, yyyy')}</span>
 
-                        {status !== 'pending' && (
-                            <Badge variant="secondary" className="capitalize text-[10px] py-0">
-                                {status.replace('_', ' ')}
-                            </Badge>
-                        )}
+                        <Badge 
+                            variant="secondary" 
+                            className={cn(
+                                "capitalize text-[10px] py-0",
+                                (status === 'open' || status === 'pending') && "bg-green-100 text-green-700 hover:bg-green-100/80",
+                                status === 'closed' && "bg-slate-100 text-slate-700 hover:bg-slate-100/80"
+                            )}
+                        >
+                            {status === 'pending' ? 'Open' : status.replace('_', ' ')}
+                        </Badge>
                     </div>
                 </div>
 
