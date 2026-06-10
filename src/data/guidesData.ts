@@ -14,6 +14,8 @@ import { content as coreDataStructuresContent } from "./guides/core-data-structu
 import { content as mergeIntervalsContent } from "./guides/merge-intervals";
 import { content as prefixSumContent } from "./guides/prefix-sum";
 import { content as dynamicProgrammingContent } from "./guides/dynamic-programming";
+import { content as cyclicSortContent } from "./guides/cyclic-sort";
+import { content as mergeSortContent } from "./guides/merge-sort";
 
 
 export interface RelatedQuestion {
@@ -434,6 +436,54 @@ Here is an overview of Space Complexity, followed by the reference table of stan
           { id: "binary-search", name: "Binary Search", difficulty: "Easy" },
           { id: "search-a-2d-matrix", name: "Search a 2D Matrix", difficulty: "Medium" },
           { id: "find-minimum-in-rotated-sorted-array", name: "Find Min in Rotated Sorted Array", difficulty: "Medium" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "cyclic-sort",
+    title: "Cyclic Sort",
+    guides: [
+      {
+        slug: "cyclic-sort",
+        title: "Cyclic Sort",
+        description: "Master finding missing and duplicate numbers in O(n) time and O(1) space.",
+        category: "cyclic-sort",
+        heroImage: "core-pattern-cyclic-sort-hero",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        visualizations: ["missing-number"],
+        content: cyclicSortContent,
+        questions: [
+          { id: "missing-number", name: "Missing Number", difficulty: "Easy" },
+          { id: "find-the-duplicate-number", name: "Find the Duplicate Number", difficulty: "Medium" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "merge-sort",
+    title: "Merge Sort",
+    guides: [
+      {
+        slug: "merge-sort",
+        title: "Merge Sort",
+        description: "Master Divide and Conquer with O(n log n) sorting and merging techniques.",
+        category: "merge-sort",
+        heroImage: "core-pattern-merge-sort-hero",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        visualizations: ["merge-two-sorted-lists"],
+        content: mergeSortContent,
+        questions: [
+          { id: "sort-an-array", name: "Sort an Array", difficulty: "Medium" },
+          { id: "merge-two-sorted-lists", name: "Merge Two Sorted Lists", difficulty: "Easy" }
         ]
       }
     ]

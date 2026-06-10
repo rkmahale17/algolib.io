@@ -21,6 +21,8 @@ export const PATTERN_IDS = [
   "sliding-window",
   "stack",
   "binary-search",
+  "cyclic-sort",
+  "merge-sort",
   "recursion",
   "backtracking",
   "merge-intervals",

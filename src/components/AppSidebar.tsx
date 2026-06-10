@@ -374,7 +374,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           href={item.url}
                           title={item.title}
                           icon={item.icon}
-                          isActive={pathname === item.url}
+                          isActive={pathname === item.url || (pathname === '/dsa/problems' && item.url === '/dsa/get-started')}
                           onClick={closeMobileNav}
                         />
                       ))}
@@ -580,7 +580,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                               href={item.url}
                               title={item.title}
                               icon={item.icon}
-                              isActive={pathname === item.url}
+                              isActive={pathname === item.url || (pathname === '/dsa/problems' && item.url === '/dsa/get-started')}
                               onClick={closeMobileNav}
                             />
                           ))}

@@ -25,6 +25,7 @@ export const visualizationMap: Record<string, any> = {
   'trapping-rain-water': dynamic(() => import('@/components/visualizations/algorithms/TrappingRainWaterVisualization').then(m => m.TrappingRainWaterVisualization), { ssr: false }),
   'rotate-array': dynamic(() => import('@/components/visualizations/algorithms/RotateArrayVisualization').then(m => m.RotateArrayVisualization), { ssr: false }),
   'cyclic-sort': dynamic(() => import('@/components/visualizations/algorithms/CyclicSortVisualization').then(m => m.CyclicSortVisualization), { ssr: false }),
+  'missing-number': dynamic(() => import('@/components/visualizations/algorithms/MissingNumberVisualization').then(m => m.MissingNumberVisualization), { ssr: false }),
   'valid-anagram': dynamic(() => import('@/components/visualizations/algorithms/ValidAnagramVisualization').then(m => m.ValidAnagramVisualization), { ssr: false }),
 
   // Tree Algorithms
@@ -199,6 +200,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
   'two-sum': {
     title: 'Two Sum',
     description: 'Visualize using a hash map to find two numbers that add up to a target value in O(n) time.'
+  },
+  'missing-number': {
+    title: 'Missing Number',
+    description: 'Visualize finding the missing number in an array from 0 to n using Cyclic Sort in O(n) time.'
   },
   'valid-anagram': {
     title: 'Valid Anagram',
