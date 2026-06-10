@@ -10,6 +10,7 @@ import { FeedbackFilters } from '@/components/feedback/FeedbackFilters';
 import { FeedbackSubmissionSidebar } from '@/components/feedback/FeedbackSubmissionSidebar';
 import { FeedbackDetailModal } from '@/components/feedback/FeedbackDetailModal';
 import { usePostHog } from '@posthog/react';
+import { useApp } from '@/contexts/AppContext';
 
 interface FeedbackItem {
   id: string;
@@ -37,28 +38,14 @@ const Feedback = () => {
   const [activeTab, setActiveTab] = useState<'all' | 'suggestions' | 'bugs'>('all');
   const [activeSort, setActiveSort] = useState<'hot' | 'top' | 'new'>('hot');
   const [counts, setCounts] = useState({ all: 0, suggestions: 0, bugs: 0 });
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  const { user: currentUser, profile } = useApp();
+  const isAdmin = profile?.role === 'admin';
 
   // Modal state
   const [selectedFeedback, setSelectedFeedback] = useState<FeedbackItem | null>(null);
   const [comments, setComments] = useState<any[]>([]);
   const [loadingComments, setLoadingComments] = useState(false);
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
-
-  useEffect(() => {
-    const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setCurrentUser(session?.user ?? null);
-
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-        setCurrentUser(session?.user ?? null);
-      });
-
-      return () => subscription.unsubscribe();
-    };
-
-    getSession();
-  }, []);
 
   const fetchFeedback = useCallback(async () => {
     if (!supabase) return;
@@ -200,7 +187,7 @@ const Feedback = () => {
         .insert({
           ...data,
           user_id: currentUser.id,
-          status: 'pending'
+          status: 'open'
         });
 
       if (error) throw error;
@@ -222,7 +209,7 @@ const Feedback = () => {
     try {
       const { data, error } = await supabase
         .from('feedback_comments')
-        .select('*, profiles:user_id(full_name, avatar_url)')
+        .select('*, profiles:user_id(full_name, avatar_url, role)')
         .eq('feedback_id', feedback.id)
         .order('created_at', { ascending: true });
 
@@ -230,7 +217,8 @@ const Feedback = () => {
 
       setComments(data.map(c => ({
         ...c,
-        user_full_name: c.profiles?.full_name || 'User'
+        user_full_name: c.profiles?.full_name || 'User',
+        user_role: c.profiles?.role
       })));
     } catch (error) {
       console.error('Comments fetch error:', error);
@@ -283,6 +271,55 @@ const Feedback = () => {
     } catch (error) {
       console.error('Comment error:', error);
       toast.error('Failed to add comment');
+    } finally {
+      setIsSubmittingComment(false);
+    }
+  };
+
+  const handleCloseTicket = async (content: string) => {
+    if (!currentUser || !selectedFeedback || !isAdmin) return;
+    
+    setIsSubmittingComment(true);
+    try {
+      if (content.trim()) {
+        const { data, error: commentError } = await supabase
+          .from('feedback_comments')
+          .insert({
+            feedback_id: selectedFeedback.id,
+            user_id: currentUser.id,
+            content,
+            is_anonymous: false
+          })
+          .select('*, profiles:user_id(full_name, avatar_url, role)')
+          .single();
+
+        if (commentError) throw commentError;
+
+        const newComment = {
+          ...data,
+          user_full_name: data.profiles?.full_name || 'User',
+          user_role: data.profiles?.role
+        };
+
+        setComments(prev => [...prev, newComment]);
+        setItems(prev => prev.map(i => i.id === selectedFeedback.id ? { ...i, comments_count: i.comments_count + 1 } : i));
+        setSelectedFeedback(prev => prev ? { ...prev, comments_count: prev.comments_count + 1 } : null);
+      }
+
+      const { error: updateError } = await supabase
+        .from('feedback')
+        .update({ status: 'closed' })
+        .eq('id', selectedFeedback.id);
+
+      if (updateError) throw updateError;
+
+      setSelectedFeedback(prev => prev ? { ...prev, status: 'closed' } : null);
+      setItems(prev => prev.map(i => i.id === selectedFeedback.id ? { ...i, status: 'closed' } : i));
+      
+      toast.success('Ticket closed successfully');
+    } catch (error) {
+      console.error('Close ticket error:', error);
+      toast.error('Failed to close ticket');
     } finally {
       setIsSubmittingComment(false);
     }
@@ -368,6 +405,8 @@ const Feedback = () => {
         isSubmittingComment={isSubmittingComment}
         onVote={handleVote}
         onAddComment={handleAddComment}
+        isAdmin={isAdmin}
+        onCloseTicket={handleCloseTicket}
       />
     </>
   );

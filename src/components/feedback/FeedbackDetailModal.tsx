@@ -13,6 +13,7 @@ interface Comment {
     id: string;
     user_full_name: string;
     user_avatar?: string;
+    user_role?: string;
     content: string;
     is_anonymous: boolean;
     created_at: string;
@@ -37,6 +38,8 @@ interface FeedbackDetailModalProps {
     isSubmittingComment: boolean;
     onVote: (id: string) => void;
     onAddComment: (content: string, isAnonymous: boolean) => void;
+    isAdmin?: boolean;
+    onCloseTicket?: (content: string) => void;
 }
 
 export const FeedbackDetailModal = ({
@@ -47,6 +50,8 @@ export const FeedbackDetailModal = ({
     isSubmittingComment,
     onVote,
     onAddComment,
+    isAdmin,
+    onCloseTicket,
 }: FeedbackDetailModalProps) => {
     const [newComment, setNewComment] = useState("");
     const [isAnonymous, setIsAnonymous] = useState(false);
@@ -83,8 +88,8 @@ export const FeedbackDetailModal = ({
 
                         <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
-                                <Badge variant="outline" className="text-[10px] uppercase py-0 border-muted-foreground/20">
-                                    {feedback.status.replace('_', ' ')}
+                                <Badge variant="outline" className={cn("text-[10px] uppercase py-0 border-muted-foreground/20", (feedback.status === 'open' || feedback.status === 'pending') ? 'bg-green-50 text-green-600 border-green-200' : 'bg-slate-50 text-slate-600 border-slate-200')}>
+                                    {(feedback.status === 'pending' ? 'open' : feedback.status).replace('_', ' ')}
                                 </Badge>
                                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                     <span>{format(new Date(feedback.created_at), 'MMM d')}</span>
@@ -130,19 +135,37 @@ export const FeedbackDetailModal = ({
                                                 Post anonymously
                                             </Label>
                                         </div>
-                                        <Button
-                                            size="sm"
-                                            className="bg-green-500/50 hover:bg-green-500 text-white gap-2"
-                                            disabled={isSubmittingComment || !newComment.trim()}
-                                            onClick={handleSubmitComment}
-                                        >
-                                            {isSubmittingComment ? (
-                                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                            ) : (
-                                                <Send className="w-3.5 h-3.5" />
+                                        <div className="flex items-center gap-2">
+                                            {isAdmin && feedback.status !== 'closed' && onCloseTicket && (
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 gap-2"
+                                                    disabled={isSubmittingComment}
+                                                    onClick={() => onCloseTicket(newComment)}
+                                                >
+                                                    {isSubmittingComment ? (
+                                                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                                    ) : (
+                                                        <X className="w-3.5 h-3.5" />
+                                                    )}
+                                                    <span>Close Ticket</span>
+                                                </Button>
                                             )}
-                                            <span>Post Comment</span>
-                                        </Button>
+                                            <Button
+                                                size="sm"
+                                                className="bg-green-500/50 hover:bg-green-500 text-white gap-2"
+                                                disabled={isSubmittingComment || !newComment.trim()}
+                                                onClick={handleSubmitComment}
+                                            >
+                                                {isSubmittingComment ? (
+                                                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                                ) : (
+                                                    <Send className="w-3.5 h-3.5" />
+                                                )}
+                                                <span>Post Comment</span>
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -154,14 +177,19 @@ export const FeedbackDetailModal = ({
                                             </div>
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    <span className="font- text-sm">
+                                                    <span className="font-semibold text-sm">
                                                         {comment.is_anonymous ? 'Anonymous' : comment.user_full_name}
                                                     </span>
+                                                    {comment.user_role === 'admin' && (
+                                                        <Badge variant="secondary" className="text-[9px] py-0 px-1 bg-green-100 text-green-700 border-none hover:bg-green-100">
+                                                            Admin
+                                                        </Badge>
+                                                    )}
                                                     <span className="text-xs text-muted-foreground">
                                                         {format(new Date(comment.created_at), 'MMM d')}
                                                     </span>
                                                 </div>
-                                                <div className="bg-muted/30 rounded-lg p-3 text-sm text-muted-foreground">
+                                                <div className="bg-muted/30 rounded-lg p-3 text-sm text-muted-foreground whitespace-pre-wrap">
                                                     {comment.content}
                                                 </div>
                                             </div>
