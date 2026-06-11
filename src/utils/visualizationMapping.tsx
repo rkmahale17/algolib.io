@@ -156,6 +156,7 @@ export const visualizationMap: Record<string, any> = {
   'lru': dynamic(() => import('@/components/visualizations/algorithms/LRUCacheVisualization').then(m => m.LRUCacheVisualization), { ssr: false }),
 
   // Math Algorithms
+  'multiply-strings': dynamic(() => import('@/components/visualizations/algorithms/MultiplyStringsVisualization').then(m => m.MultiplyStringsVisualization), { ssr: false }),
   'gcd-euclidean': dynamic(() => import('@/components/visualizations/algorithms/GCDVisualization').then(m => m.GCDVisualization), { ssr: false }),
   'gcd': dynamic(() => import('@/components/visualizations/algorithms/GCDVisualization').then(m => m.GCDVisualization), { ssr: false }),
   'modular-exponentiation': dynamic(() => import('@/components/visualizations/algorithms/ModularExponentiationVisualization').then(m => m.ModularExponentiationVisualization), { ssr: false }),
@@ -364,6 +365,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
   'pow': {
     title: 'Pow(x, n)',
     description: 'Visualize binary exponentiation (exponentiation by squaring) to compute powers in O(log n) time.'
+  },
+  'multiply-strings': {
+    title: 'Multiply Strings',
+    description: 'Visualize multiplying two large numbers represented as strings, simulating the manual paper-and-pencil method digit by digit.'
   }
 };
 
