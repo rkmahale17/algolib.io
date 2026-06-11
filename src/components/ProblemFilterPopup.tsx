@@ -3,8 +3,13 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
-import { Check, RotateCcw, ChevronDown } from 'lucide-react';
+import { 
+    Check, RotateCcw, ChevronDown, 
+    Building2, Layers, Compass, Zap, Target, Share2, Network, ArrowDownToDot, Map, Box, Calculator, Binary, Folder
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { CompanyIcon } from '@/components/CompanyIcon';
+import { slugifyCompany } from '@/constants/companies';
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
@@ -16,6 +21,7 @@ interface FilterState {
     status: string;
     difficulty: string[];
     topics: string[];
+    companies: string[];
     language: string;
 }
 
@@ -24,9 +30,31 @@ interface ProblemFilterPopupProps {
     setFilters: React.Dispatch<React.SetStateAction<FilterState>>;
     trigger: React.ReactNode;
     topics?: string[];
+    companies?: string[];
 }
 
-export const ProblemFilterPopup = ({ filters, setFilters, trigger, topics = [] }: ProblemFilterPopupProps) => {
+export const TOPIC_ICONS: Record<string, React.ElementType> = {
+    "Arrays & Hashing": Layers,
+    "Two Pointers": Compass,
+    "Sliding Window": Zap,
+    "Stack": Layers,
+    "Binary Search": Target,
+    "Linked List": Share2,
+    "Trees": Network,
+    "Tries": ArrowDownToDot,
+    "Backtracking": Map,
+    "Heap / Priority Queue": Box,
+    "Graphs": Network,
+    "1-D DP": Calculator,
+    "Intervals": Map,
+    "Greedy": Target,
+    "Advanced Graphs": Network,
+    "2-D DP": Calculator,
+    "Bit Manipulation": Binary,
+    "Math & Geometry": Calculator,
+};
+
+export const ProblemFilterPopup = ({ filters, setFilters, trigger, topics = [], companies = [] }: ProblemFilterPopupProps) => {
     const [matchMode, setMatchMode] = React.useState<'all' | 'any'>('all');
 
     const handleReset = () => {
@@ -34,16 +62,29 @@ export const ProblemFilterPopup = ({ filters, setFilters, trigger, topics = [] }
             status: 'all',
             difficulty: [],
             topics: [],
+            companies: [],
             language: 'all'
         });
     };
 
     const topicOptions = React.useMemo(() => {
-        return topics.map(topic => ({
-            label: topic,
-            value: topic.toLowerCase()
-        }));
+        return topics.map(topic => {
+            const Icon = TOPIC_ICONS[topic] || Folder;
+            return {
+                label: topic,
+                value: topic,
+                icon: <Icon className="w-3.5 h-3.5 opacity-70" />
+            };
+        });
     }, [topics]);
+
+    const companyOptions = React.useMemo(() => {
+        return companies.map(company => ({
+            label: company,
+            value: company,
+            icon: <CompanyIcon company={slugifyCompany(company)} className="w-3.5 h-3.5 opacity-70 grayscale group-hover:grayscale-0" forceLoad={true} />
+        }));
+    }, [companies]);
 
     const difficultyOptions = [
         { label: 'Easy', value: 'easy' },
@@ -174,9 +215,12 @@ export const ProblemFilterPopup = ({ filters, setFilters, trigger, topics = [] }
                                     checked={selected.includes(opt.value)}
                                     onCheckedChange={() => onToggle(opt.value)}
                                     onSelect={(e) => e.preventDefault()}
-                                    className="text-[11px] font-medium cursor-pointer rounded-lg py-1.5 pl-8 pr-2"
+                                    className="text-[11px] font-medium cursor-pointer rounded-lg py-1.5 pl-8 pr-2 group"
                                 >
-                                    {opt.label}
+                                    <div className="flex items-center gap-2">
+                                        {opt.icon && <div className="shrink-0">{opt.icon}</div>}
+                                        <span>{opt.label}</span>
+                                    </div>
                                 </DropdownMenuCheckboxItem>
                             ))}
                         </DropdownMenuContent>
@@ -238,6 +282,14 @@ export const ProblemFilterPopup = ({ filters, setFilters, trigger, topics = [] }
                             selected={filters.topics}
                             onToggle={(val: string) => setFilters(prev => ({ ...prev, topics: toggleArrayItem(prev.topics, val) }))}
                             options={topicOptions}
+                        />
+                        <MultiFilterRow
+                            label="Company"
+                            id="filter-companies"
+                            icon={<Building2 className="w-4 h-4" />}
+                            selected={filters.companies || []}
+                            onToggle={(val: string) => setFilters(prev => ({ ...prev, companies: toggleArrayItem(prev.companies || [], val) }))}
+                            options={companyOptions}
                         />
                         <FilterRow
                             label="Language"

@@ -60,7 +60,7 @@ export const ProblemSidebar = ({
   }, [algorithms]);
 
   const filteredAlgorithms = useMemo(() => {
-    let result = algorithms.filter((algo) => {
+    const result = algorithms.filter((algo) => {
       const matchesSearch =
         algo.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         algo.name?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -77,14 +77,15 @@ export const ProblemSidebar = ({
         filters.difficulty.length === 0 ||
         filters.difficulty.includes(normalizedAlgoDiff);
 
+      const lowerTopics = filters.topics.map(t => t.toLowerCase());
       const matchesTopic =
-        filters.topics.length === 0 ||
-        filters.topics.includes("all") ||
+        lowerTopics.length === 0 ||
+        lowerTopics.includes("all") ||
         (algo.category &&
           algo.category
             .split(",")
             .some((c: string) =>
-              filters.topics.includes(c.trim().toLowerCase()),
+              lowerTopics.includes(c.trim().toLowerCase()),
             ));
 
       return (

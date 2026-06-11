@@ -1,4 +1,4 @@
-import { BadgeCheck, Beaker, Code2, Brain, Target, Layers, Rocket } from "lucide-react";
+import { BadgeCheck, Beaker, Code2, Brain, Target, Layers, Rocket, BookOpen, Presentation, PencilLine, GitCompare, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
 const ICON_MAP: Record<string, any> = {
@@ -24,9 +24,12 @@ export const ProblemHero = ({
     description,
     icon: iconProp,
     benefits = [
-        { icon: BadgeCheck, text: "Questions and solutions by ex-interviewers" },
-        { icon: Beaker, text: "Comprehensive test cases" },
-        { icon: Code2, text: "Code in browser" }
+        { icon: BookOpen, text: "Read Problem" },
+        { icon: Brain, text: "Think" },
+        { icon: Presentation, text: "Check Visualization" },
+        { icon: PencilLine, text: "Draw in Think Pad" },
+        { icon: Code2, text: "Code Solve" },
+        { icon: GitCompare, text: "Compare Solution" }
     ],
     showRecommendation = true
 }: ProblemHeroProps) => {
@@ -48,24 +51,26 @@ export const ProblemHero = ({
                 </p>
             </div>
 
-            <div className="flex flex-wrap gap-x-6 md:gap-x-8 gap-y-3 md:gap-y-4 py-4 md:py-6 border-y border-border/40">
+            <div className="flex flex-wrap items-center gap-x-2 md:gap-x-3 gap-y-3 md:gap-y-4 py-4 md:py-6 border-y border-border/40">
                 {benefits.map((benefit, index) => {
                     const Icon = benefit.icon;
                     return (
-                        <div key={index} className="flex items-center gap-2 md:gap-2.5 text-[13px] md:text-sm font-medium text-muted-foreground/80">
-                            <div className="p-1 md:p-1.5 rounded-lg bg-primary/5 text-primary">
-                                <Icon className="w-3.5 md:w-4 h-3.5 md:h-4" />
+                        <div key={index} className="flex items-center gap-2 md:gap-3">
+                            <div className="flex items-center gap-2 md:gap-2.5 text-[12px] md:text-sm font-medium text-muted-foreground/80">
+                                <div className="p-1 md:p-1.5 rounded-lg bg-primary/5 text-primary shrink-0">
+                                    <Icon className="w-3.5 md:w-4 h-3.5 md:h-4" />
+                                </div>
+                                <span className="whitespace-nowrap">{benefit.text}</span>
                             </div>
-                            <span>{benefit.text}</span>
+                            {index < benefits.length - 1 && (
+                                <ChevronRight className="w-3.5 h-3.5 md:w-4 md:h-4 text-muted-foreground/30 shrink-0" />
+                            )}
                         </div>
                     );
                 })}
             </div>
 
             <div className="space-y-3 md:space-y-4 text-md text-muted-foreground/90 leading-relaxed max-w-[820px]">
-                <p>
-                    Master the foundational and advanced data structures and algorithms. Practice 150+ curated questions, each with high quality visualizations, multiple language solutions, and optimized complexity analysis.
-                </p>
                 {showRecommendation && (
                     <p>
                         Short on time? If your interview is in 2 weeks, we highly recommend starting with the <Link href="/dsa/blind-75" className="font-semibold text-foreground underline decoration-primary/30 underline-offset-4 cursor-pointer hover:decoration-primary transition-colors">Blind 75</Link> list to cover the most essential patterns.

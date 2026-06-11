@@ -41,18 +41,18 @@ export const ProgressStats = ({
     const isVertical = variant === 'vertical';
 
     return (
-        <div className={cn("w-full", isVertical ? "p-4" : "p-1")}>
-            <div className={cn("flex gap-8", isVertical ? "flex-col items-center" : "items-center")}>
+        <div className={cn("w-full flex-1 flex flex-col justify-center", isVertical ? "p-4" : "p-3 sm:p-5")}>
+            <div className={cn("flex gap-6 sm:gap-8", isVertical ? "flex-col items-center" : "flex-col sm:flex-row items-center")}>
                 {/* Segmented Circular Chart */}
-                <div className={cn("shrink-0 relative flex justify-center", isVertical ? "h-32 w-32" : "h-20 w-20")}>
+                <div className={cn("shrink-0 relative flex justify-center", isVertical ? "h-32 w-32" : "h-24 w-24 sm:h-28 sm:w-28")}>
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                             <Pie
                                 data={data}
                                 cx="50%"
                                 cy="50%"
-                                innerRadius={isVertical ? 42 : 28}
-                                outerRadius={isVertical ? 56 : 38}
+                                innerRadius={isVertical ? 42 : 38}
+                                outerRadius={isVertical ? 56 : 52}
                                 fill="#8884d8"
                                 paddingAngle={2}
                                 dataKey="value"
@@ -68,10 +68,10 @@ export const ProgressStats = ({
                                         const { cx, cy } = viewBox as any;
                                         return (
                                             <text x={cx} y={cy} textAnchor="middle" dominantBaseline="middle">
-                                                <tspan x={cx} dy="-0.1em" className={cn("fill-foreground font-black tracking-tight", isVertical ? "text-2xl" : "text-base")}>
+                                                <tspan x={cx} dy="-0.1em" className={cn("fill-foreground font-black tracking-tight", isVertical ? "text-2xl" : "text-xl sm:text-2xl")}>
                                                     {totalSolved}
                                                 </tspan>
-                                                <tspan x={cx} dy="1.4em" className={cn("fill-muted-foreground font-bold tracking-widest opacity-60", isVertical ? "text-[8px]" : "text-[6px]")}>
+                                                <tspan x={cx} dy="1.4em" className={cn("fill-muted-foreground font-bold tracking-widest opacity-60", isVertical ? "text-[8px]" : "text-[7px] sm:text-[8px]")}>
                                                     SOLVED
                                                 </tspan>
                                             </text>
@@ -86,18 +86,18 @@ export const ProgressStats = ({
                 {/* Proportional Breakdown */}
                 <div className="flex-1 w-full min-w-0">
                     <div className="flex justify-between items-end mb-2.5">
-                        <div className="flex gap-5">
+                        <div className="flex gap-3 sm:gap-8 w-full justify-between sm:justify-start">
                             <div className="flex flex-col">
-                                <span className="text-green-500 font-bold text-[9px] uppercase tracking-widest opacity-80">Easy</span>
-                                <span className="text-xs font-black">{easySolved}<span className="text-muted-foreground/40 font-bold ml-0.5">/ {easyTotal}</span></span>
+                                <span className="text-green-500 font-bold text-[10px] sm:text-[11px] uppercase tracking-widest opacity-80">Easy</span>
+                                <span className="text-sm sm:text-base font-black whitespace-nowrap">{easySolved}<span className="text-muted-foreground/40 font-bold ml-0.5 text-xs">/ {easyTotal}</span></span>
                             </div>
                             <div className="flex flex-col">
-                                <span className="text-amber-500 font-bold text-[9px] uppercase tracking-widest opacity-80">Med</span>
-                                <span className="text-xs font-black">{mediumSolved}<span className="text-muted-foreground/40 font-bold ml-0.5">/ {mediumTotal}</span></span>
+                                <span className="text-amber-500 font-bold text-[10px] sm:text-[11px] uppercase tracking-widest opacity-80">Med</span>
+                                <span className="text-sm sm:text-base font-black whitespace-nowrap">{mediumSolved}<span className="text-muted-foreground/40 font-bold ml-0.5 text-xs">/ {mediumTotal}</span></span>
                             </div>
                             <div className="flex flex-col">
-                                <span className="text-red-500 font-bold text-[9px] uppercase tracking-widest opacity-80">Hard</span>
-                                <span className="text-xs font-black">{hardSolved}<span className="text-muted-foreground/40 font-bold ml-0.5">/ {hardTotal}</span></span>
+                                <span className="text-red-500 font-bold text-[10px] sm:text-[11px] uppercase tracking-widest opacity-80">Hard</span>
+                                <span className="text-sm sm:text-base font-black whitespace-nowrap">{hardSolved}<span className="text-muted-foreground/40 font-bold ml-0.5 text-xs">/ {hardTotal}</span></span>
                             </div>
                         </div>
                         {isVertical && (
@@ -109,7 +109,7 @@ export const ProgressStats = ({
                     </div>
 
                     {/* Proportional Stacked Bar */}
-                    <div className="h-2 w-full bg-muted/20 rounded-full flex overflow-hidden">
+                    <div className="h-3 sm:h-3.5 w-full bg-muted/20 rounded-full flex overflow-hidden">
                         <div className="h-full bg-green-500 transition-all duration-1000 shadow-[0_0_10px_rgba(34,197,94,0.3)]" style={{ width: `${(easySolved / safeTotal) * 100}%` }} />
                         <div className="h-full bg-green-500/10 transition-all duration-1000" style={{ width: `${((easyTotal - easySolved) / safeTotal) * 100}%` }} />
                         <div className="h-full bg-amber-500 transition-all duration-1000 shadow-[0_0_10px_rgba(245,158,11,0.3)]" style={{ width: `${(mediumSolved / safeTotal) * 100}%` }} />

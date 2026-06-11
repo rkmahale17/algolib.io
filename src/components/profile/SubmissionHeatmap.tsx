@@ -8,9 +8,10 @@ import { Info } from 'lucide-react';
 
 interface SubmissionHeatmapProps {
     submissions: { date: string; count: number }[];
+    actionSlot?: React.ReactNode;
 }
 
-export const SubmissionHeatmap = ({ submissions }: SubmissionHeatmapProps) => {
+export const SubmissionHeatmap = ({ submissions, actionSlot }: SubmissionHeatmapProps) => {
     const [selectedYear, setSelectedYear] = useState<string>("Current");
 
     // available years from data + current year
@@ -126,6 +127,7 @@ export const SubmissionHeatmap = ({ submissions }: SubmissionHeatmapProps) => {
                                 ))}
                             </SelectContent>
                         </Select>
+                        {actionSlot}
                     </div>
                 </div>
                 {/* Mobile stats visible below */}

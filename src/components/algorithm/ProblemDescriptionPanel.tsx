@@ -80,7 +80,8 @@ import Link from "next/link";
 import { ProOverlay } from "@/components/ProOverlay";
 import { Separator } from "@/components/ui/separator";
 import { Submission } from "@/types/userAlgorithmData";
-import { TOP_COMPANIES } from "@/constants/companies";
+import { TOP_COMPANIES, slugifyCompany } from "@/constants/companies";
+import { slugifyCategory } from "@/constants/categories";
 import { TabWarning } from "@/components/TabWarning";
 import { User } from "@supabase/supabase-js";
 import { VideoTutorialCard } from "./VideoTutorialCard";
@@ -1233,7 +1234,7 @@ export const ProblemDescriptionPanel = React.memo(
                               ).map((tag: string, i: number) => (
                                 <Link
                                   key={i}
-                                  href={`/dsa/query?topic=${tag}`}
+                                  href={`/dsa/query?topic=${slugifyCategory(tag)}`}
                                   passHref
                                 >
                                   <Badge
@@ -1276,7 +1277,7 @@ export const ProblemDescriptionPanel = React.memo(
                                     (company: string, index: number) => (
                                       <Link
                                         key={index}
-                                        href={`/dsa/query?company=${company}`}
+                                        href={`/dsa/query?company=${slugifyCompany(company)}`}
                                         passHref
                                       >
                                         <Badge
