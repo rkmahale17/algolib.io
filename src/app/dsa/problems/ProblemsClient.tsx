@@ -8,6 +8,9 @@ import { ProblemsList } from "@/components/listing/ProblemsList";
 import { Button } from "@/components/ui/button";
 import { Target, Brain, Layers, X } from "lucide-react";
 import { normalizeCategory } from "@/constants/categories";
+import { normalizeCompany, slugifyCompany } from "@/constants/companies";
+import { CompanyIcon } from "@/components/CompanyIcon";
+import { TOPIC_ICONS } from "@/components/ProblemFilterPopup";
 
 import { useApp } from "@/contexts/AppContext";
 
@@ -50,9 +53,8 @@ const ProblemsClient = ({
 
   const companyFilter = useMemo(() => {
     if (!rawCompanyFilter) return null;
-    const exactMatch = allAlgorithms.flatMap(a => a.metadata?.companies || []).find(c => typeof c === 'string' && c.toLowerCase() === rawCompanyFilter.toLowerCase());
-    return exactMatch || (rawCompanyFilter.charAt(0).toUpperCase() + rawCompanyFilter.slice(1).toLowerCase());
-  }, [rawCompanyFilter, allAlgorithms]);
+    return normalizeCompany(rawCompanyFilter);
+  }, [rawCompanyFilter]);
 
   const coreAlgorithms = useMemo(() => 
     allAlgorithms.filter(algo => {
@@ -136,6 +138,19 @@ const ProblemsClient = ({
   const initialTopics = useMemo(() => topicFilter ? [topicFilter] : [], [topicFilter]);
   const initialCompanies = useMemo(() => companyFilter ? [companyFilter] : [], [companyFilter]);
 
+  const resolvedIcon = useMemo(() => {
+    if (manualIcon) return manualIcon;
+    if (companyFilter) {
+      return ({ className }: { className?: string }) => (
+        <CompanyIcon company={slugifyCompany(companyFilter)} className={className} forceLoad={true} />
+      );
+    }
+    if (normalizedTopic && TOPIC_ICONS[normalizedTopic]) {
+      return TOPIC_ICONS[normalizedTopic];
+    }
+    return Layers;
+  }, [manualIcon, companyFilter, normalizedTopic]);
+
   return (
     <ProblemsList
       algorithms={filteredAlgorithms}
@@ -145,7 +160,7 @@ const ProblemsClient = ({
       progressTitle={getProgressTitle()}
       isLoading={isLoading}
       showRecommendation={listMode === 'all' && !topicFilter && !companyFilter}
-      icon={manualIcon || Layers}
+      icon={resolvedIcon}
       initialSelectedTopics={initialTopics}
       initialSelectedCompanies={initialCompanies}
       initialExpandAll={pathname === '/dsa/query'}

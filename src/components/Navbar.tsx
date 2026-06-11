@@ -39,7 +39,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LIST_TYPE_LABELS, ListType } from "@/types/algorithm";
-import { TOP_COMPANIES } from "@/constants/companies";
+import { TOP_COMPANIES, slugifyCompany } from "@/constants/companies";
+import { slugifyCategory } from "@/constants/categories";
 import { CompanyIcon } from "@/components/CompanyIcon";
 import {
   Popover,
@@ -602,7 +603,7 @@ const Navbar = ({
                             {TOP_COMPANIES.map(company => (
                               <Link
                                 key={company.id}
-                                href={`/dsa/problems?company=${encodeURIComponent(company.name)}`}
+                                href={`/dsa/problems?company=${slugifyCompany(company.name)}`}
                                 className="px-4 py-2.5 rounded-lg border border-border hover:border-primary hover:bg-primary/5 transition-all flex items-center justify-between group shutter-click"
                                 onClick={closeMenus}
                               >
@@ -626,7 +627,7 @@ const Navbar = ({
                             {['Arrays & Hashing', 'Two Pointers', 'Sliding Window', 'Stack', 'Binary Search', 'Linked List', 'Trees', 'Tries', 'Backtracking', 'Graphs', 'Dynamic Programming', 'Greedy', 'Intervals', 'Math & Geometry', 'Bit Manipulation'].map(topic => (
                               <Link
                                 key={topic}
-                                href={`/dsa/problems?topic=${encodeURIComponent(topic)}`}
+                                href={`/dsa/problems?topic=${slugifyCategory(topic)}`}
                                 className="px-4 py-2.5 rounded-lg border border-border hover:border-primary hover:bg-primary/5 transition-all flex items-center justify-between group shutter-click"
                                 onClick={closeMenus}
                               >

@@ -34,3 +34,24 @@ export const TOP_COMPANIES: CompanyTag[] = [
   { id: "byte_dance", name: "ByteDance", iconSlug: "bytedance", svglSlug: "bytedance" },
   { id: "two_sigma", name: "Two Sigma", iconSlug: "twosigma", svglSlug: "two-sigma" }
 ];
+
+export const slugifyCompany = (company: string): string => {
+  return company
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric with -
+    .replace(/^-+|-+$/g, '');    // Trim leading/trailing hyphens
+};
+
+export const normalizeCompany = (slug: string): string => {
+  if (!slug) return '';
+  const trimmed = slug.trim().toLowerCase();
+  
+  // Try to find an exact match in TOP_COMPANIES by comparing slugified names
+  const exactMatch = TOP_COMPANIES.find(c => slugifyCompany(c.name) === trimmed);
+  if (exactMatch) {
+    return exactMatch.name;
+  }
+  
+  // If not in TOP_COMPANIES, just un-slugify (replace hyphens with spaces and capitalize each word)
+  return trimmed.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+};

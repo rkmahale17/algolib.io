@@ -160,7 +160,7 @@ export const ListingLayout = ({
 
                             <div className="space-y-6">
                                 {progressWidget && (
-                                    <div className="w-full max-w-[300px]">
+                                    <div className="w-full">
                                         {progressWidget}
                                     </div>
                                 )}

@@ -6,14 +6,17 @@ import { PremiumProblemCard } from "@/components/listing/PremiumProblemCard";
 import { useApp } from '@/contexts/AppContext';
 import { useAppSelector } from "@/store/hooks";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { getGroupedByCategory, normalizeCategory, resolveAlgoCategories } from "@/constants/categories";
-import { Brain, Target, ListFilter } from "lucide-react";
+import { getGroupedByCategory, normalizeCategory, resolveAlgoCategories, slugifyCategory } from "@/constants/categories";
+import { Brain, Target, ListFilter, SearchX, RotateCcw } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { ProgressStats } from "@/components/profile/ProgressStats";
 import { cn } from "@/lib/utils";
 import { ProOverlay } from "@/components/ProOverlay";
 import { Button } from "@/components/ui/button";
 import { ProblemFilterPopup } from "@/components/ProblemFilterPopup";
+import { supabase } from "@/integrations/supabase/client";
+import { StreakCalendar } from "@/components/profile/StreakCalendar";
+import { parseISO, eachDayOfInterval, format } from 'date-fns';
 
 interface ProblemsListProps {
   algorithms: any[];
@@ -56,8 +59,69 @@ export const ProblemsList = ({
 }: ProblemsListProps) => {
   const { activeListType, setActiveListType, progressMap, hasPremiumAccess } = useApp();
   const { lastFetched, error: reduxError } = useAppSelector(state => state.algorithms);
+  const userProgressData = useAppSelector(state => state.userProgress?.data || []);
   const router = useRouter();
   const pathname = usePathname();
+
+  const submissionsData = useMemo(() => {
+    const map = new Map<string, any[]>();
+    userProgressData.forEach(item => {
+      if (item.submissions && Array.isArray(item.submissions)) {
+        item.submissions.forEach((sub: any) => {
+          if (sub.timestamp) {
+            const date = new Date(sub.timestamp).toISOString().split('T')[0];
+            const current = map.get(date) || [];
+            const algo = algorithms.find(a => a.id === item.algorithm_id);
+            current.push({ 
+                ...sub, 
+                algorithm_id: item.algorithm_id,
+                algorithm_title: algo?.title || 'Unknown Problem',
+                difficulty: algo?.difficulty || 'EASY'
+            });
+            map.set(date, current);
+          }
+        });
+      }
+    });
+    return Array.from(map.entries()).map(([date, list]) => ({ date, count: list.length, activities: list }));
+  }, [userProgressData, algorithms]);
+
+  const { currentStreak, maxStreak } = useMemo(() => {
+    let current = 0;
+    let max = 0;
+    const sortedDates = [...submissionsData].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    if (sortedDates.length === 0) return { currentStreak: 0, maxStreak: 0 };
+    const submissionMap = new Map(sortedDates.map(s => [s.date, s.count]));
+    const firstDate = parseISO(sortedDates[0].date);
+    const today = new Date();
+    const days = eachDayOfInterval({ start: firstDate, end: today });
+    let streak = 0;
+    days.forEach(day => {
+        const dateStr = format(day, 'yyyy-MM-dd');
+        if (submissionMap.get(dateStr)) {
+            streak++;
+            max = Math.max(max, streak);
+        } else {
+            streak = 0;
+        }
+    });
+    current = streak;
+    return { currentStreak: current, maxStreak: max };
+  }, [submissionsData]);
+
+  const handleResetStreak = async () => {
+    if (typeof window !== 'undefined' && confirm("Are you sure you want to reset your streaks? This will clear your submission history but keep your completed status.")) {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase.from('user_algorithm_data').update({ submissions: [] }).eq('user_id', user.id);
+          window.location.reload();
+        }
+      } catch (err) {
+        console.error("Error resetting streaks:", err);
+      }
+    }
+  };
 
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('serial-asc');
@@ -69,6 +133,7 @@ export const ProblemsList = ({
     status: 'all',
     difficulty: [] as string[],
     topics: [] as string[],
+    companies: [] as string[],
     language: 'all'
   });
 
@@ -76,8 +141,9 @@ export const ProblemsList = ({
     setPopupFilters(prev => {
       const next = typeof update === 'function' ? update(prev) : update;
       
-      // Sync topics
+      // Sync topics & companies
       setSelectedTopics(next.topics.map(normalizeCategory));
+      setSelectedCompanies(next.companies || []);
       
       // Sync difficulties
       const capitalizedDiffs = next.difficulty.map((d: string) => {
@@ -97,21 +163,24 @@ export const ProblemsList = ({
   useEffect(() => {
     setPopupFilters(prev => {
       const nextTopics = selectedTopics;
+      const nextCompanies = selectedCompanies;
       const nextDiffs = selectedDifficulties.map(d => d.toLowerCase());
       
       const topicsMatch = JSON.stringify(prev.topics) === JSON.stringify(nextTopics);
+      const companiesMatch = JSON.stringify(prev.companies) === JSON.stringify(nextCompanies);
       const diffsMatch = JSON.stringify(prev.difficulty) === JSON.stringify(nextDiffs);
       
-      if (!topicsMatch || !diffsMatch) {
+      if (!topicsMatch || !companiesMatch || !diffsMatch) {
         return {
           ...prev,
           topics: nextTopics,
+          companies: nextCompanies,
           difficulty: nextDiffs
         };
       }
       return prev;
     });
-  }, [selectedTopics, selectedDifficulties]);
+  }, [selectedTopics, selectedCompanies, selectedDifficulties]);
 
   const [mounted, setMounted] = useState(false);
   
@@ -294,7 +363,7 @@ export const ProblemsList = ({
   const handleCategoryClick = (cat: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    router.push(`/dsa/query?topic=${encodeURIComponent(cat)}`);
+    router.push(`/dsa/query?topic=${slugifyCategory(cat)}`);
   };
 
   const handleCompanyToggle = (company: string) => {
@@ -371,6 +440,7 @@ export const ProblemsList = ({
       status: 'all',
       difficulty: [],
       topics: [],
+      companies: [],
       language: 'all'
     });
 
@@ -426,6 +496,7 @@ export const ProblemsList = ({
           filters={popupFilters}
           setFilters={handleSetPopupFilters}
           topics={allTopics}
+          companies={allCompanies}
           trigger={
             <Button
               variant="outline"
@@ -434,7 +505,7 @@ export const ProblemsList = ({
               aria-label="Filter problems"
             >
               <ListFilter className="w-5 h-5 text-muted-foreground" />
-              {(popupFilters.status !== 'all' || popupFilters.language !== 'all' || popupFilters.difficulty.length > 0 || popupFilters.topics.length > 0) && (
+              {(popupFilters.status !== 'all' || popupFilters.language !== 'all' || popupFilters.difficulty.length > 0 || popupFilters.topics.length > 0 || (popupFilters.companies && popupFilters.companies.length > 0)) && (
                 <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-[#84cc16] ring-2 ring-background animate-pulse" />
               )}
             </Button>
@@ -443,14 +514,46 @@ export const ProblemsList = ({
       }
       progressWidget={
         !isLoading && overallStats.totalQuestions > 0 ? (
-          <Card className="bg-card border-border/40 shadow-sm overflow-hidden h-full flex flex-col mt-[-10px]">
-            <div className="px-4 py-3 border-b border-border/40 shrink-0 bg-muted/20">
-              <h3 className="font-medium text-[13px] text-foreground/80">{progressTitle}</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-[320px_1fr] xl:grid-cols-[1fr_320px] gap-6 w-full mt-[-10px] items-start">
+            {/* Progress Stats */}
+            <div className="sm:col-span-2 xl:col-span-1 xl:col-start-1 xl:row-start-1 min-w-0 flex flex-col h-full">
+              <Card className="bg-card border-border/40 shadow-sm overflow-hidden flex flex-col h-full rounded-xl">
+                <div className="px-4 py-3 border-b border-border/40 shrink-0 bg-muted/20">
+                  <h3 className="font-medium text-[13px] text-foreground/80">{progressTitle}</h3>
+                </div>
+                <div className="flex-1 flex flex-col justify-center">
+                  <ProgressStats {...overallStats} />
+                </div>
+              </Card>
             </div>
-            <div className="flex-1 flex flex-col justify-center">
-              <ProgressStats {...overallStats} />
+
+            {/* Calendar */}
+            <div className="sm:col-start-1 sm:row-start-2 xl:col-start-2 xl:row-start-1 xl:row-span-2 w-full max-w-[320px] mx-auto sm:mx-0 flex-none shrink-0">
+              <StreakCalendar 
+                submissions={submissionsData} 
+              />
             </div>
-          </Card>
+
+            {/* Streaks */}
+            <div className="sm:col-start-2 sm:row-start-2 xl:col-start-1 xl:row-start-2 flex flex-col xl:flex-row gap-4 w-full min-w-0 h-full justify-center items-center xl:items-stretch">
+                <div className="flex-1 bg-card rounded-xl p-3 sm:p-4 border border-border/40 shadow-sm flex flex-col min-w-0 justify-center items-center text-center w-full max-w-[320px] xl:max-w-none">
+                    <span className="text-[12px] sm:text-[13px] text-muted-foreground font-semibold mb-1 sm:mb-2 truncate">Current Streak</span>
+                    <div className="flex items-center justify-center gap-2">
+                        <span className="text-orange-500 text-lg sm:text-xl shrink-0">🔥</span>
+                        <span className="text-lg sm:text-2xl font-bold text-foreground tracking-tight truncate">{currentStreak}</span>
+                        <span className="text-[11px] sm:text-xs text-muted-foreground/80 font-medium pb-0.5">days</span>
+                    </div>
+                </div>
+                <div className="flex-1 bg-card rounded-xl p-3 sm:p-4 border border-border/40 shadow-sm flex flex-col min-w-0 justify-center items-center text-center w-full max-w-[320px] xl:max-w-none">
+                    <span className="text-[12px] sm:text-[13px] text-muted-foreground font-semibold mb-1 sm:mb-2 truncate">Best Streak</span>
+                    <div className="flex items-center justify-center gap-2">
+                        <span className="text-yellow-500 text-lg sm:text-xl shrink-0">🏆</span>
+                        <span className="text-lg sm:text-2xl font-bold text-foreground tracking-tight truncate">{maxStreak}</span>
+                        <span className="text-[11px] sm:text-xs text-muted-foreground/80 font-medium pb-0.5">days</span>
+                    </div>
+                </div>
+            </div>
+          </div>
         ) : undefined
       }
     >
@@ -568,8 +671,26 @@ export const ProblemsList = ({
             />
           ))}
           {filteredAndSortedAlgorithms.length === 0 && (
-            <div className="p-12 text-center text-muted-foreground border border-dashed border-border rounded-xl">
-              No problems found matching your search.
+            <div className="flex flex-col items-center justify-center py-16 px-6 text-center border border-dashed border-border/60 rounded-xl bg-card/20 mx-4 sm:mx-0">
+              <div className="w-16 h-16 mb-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                <SearchX className="w-8 h-8 text-primary/60" />
+              </div>
+              <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2 tracking-tight">No problems found</h3>
+              <p className="text-sm sm:text-base text-muted-foreground max-w-md mb-8 leading-relaxed">
+                {searchQuery ? (
+                  <>We couldn't find any problems matching "<span className="text-foreground font-medium">{searchQuery}</span>". Try adjusting your search term or filters.</>
+                ) : hasActiveFilters ? (
+                  "We couldn't find any problems matching your current filters. Try adjusting them to see more results."
+                ) : (
+                  "There are no problems available at the moment."
+                )}
+              </p>
+              {hasActiveFilters && (
+                <Button onClick={handleReset} variant="outline" className="gap-2 rounded-full h-10 px-6 font-medium shadow-sm hover:bg-accent hover:text-accent-foreground transition-all">
+                  <RotateCcw className="w-4 h-4" />
+                  Clear all filters
+                </Button>
+              )}
             </div>
           )}
         </div>
@@ -648,8 +769,26 @@ export const ProblemsList = ({
               ))}
             </Accordion>
           ) : (
-            <div className="p-12 text-center text-muted-foreground border border-dashed border-border rounded-xl">
-              No problems found matching your search.
+            <div className="flex flex-col items-center justify-center py-16 px-6 text-center border border-dashed border-border/60 rounded-xl bg-card/20 mx-4 sm:mx-0">
+              <div className="w-16 h-16 mb-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                <SearchX className="w-8 h-8 text-primary/60" />
+              </div>
+              <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2 tracking-tight">No problems found</h3>
+              <p className="text-sm sm:text-base text-muted-foreground max-w-md mb-8 leading-relaxed">
+                {searchQuery ? (
+                  <>We couldn't find any problems matching "<span className="text-foreground font-medium">{searchQuery}</span>". Try adjusting your search term or filters.</>
+                ) : hasActiveFilters ? (
+                  "We couldn't find any problems matching your current filters. Try adjusting them to see more results."
+                ) : (
+                  "There are no problems available at the moment."
+                )}
+              </p>
+              {hasActiveFilters && (
+                <Button onClick={handleReset} variant="outline" className="gap-2 rounded-full h-10 px-6 font-medium shadow-sm hover:bg-accent hover:text-accent-foreground transition-all">
+                  <RotateCcw className="w-4 h-4" />
+                  Clear all filters
+                </Button>
+              )}
             </div>
           )}
         </div>
