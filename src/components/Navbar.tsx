@@ -137,11 +137,11 @@ const Navbar = ({
   }, []);
 
   const [isLearnOpen, setIsLearnOpen] = useState(false);
-  const [activeLearnTab, setActiveLearnTab] = useState<"visual" | "pattern" | "fundamentals">("visual");
+  const [activeLearnTab, setActiveLearnTab] = useState<"visual" | "pattern" | "fundamentals">("fundamentals");
   const learnTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [isPracticeOpen, setIsPracticeOpen] = useState(false);
-  const [activePracticeTab, setActivePracticeTab] = useState<"problems" | "company" | "topics" | "patterns">("problems");
+  const [activePracticeTab, setActivePracticeTab] = useState<"problems" | "company" | "topics" | "patterns" | "blind75">("problems");
   const practiceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const currentPath =
@@ -299,22 +299,22 @@ const Navbar = ({
                   >
                     <div className="w-[240px] bg-muted/30 p-4 border-r border-border flex flex-col gap-1.5">
                       <div
+                        onClick={() => setActiveLearnTab("fundamentals")}
+                        className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activeLearnTab === "fundamentals" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
+                      >
+                        Fundamentals
+                      </div>
+                      <div
                         onClick={() => setActiveLearnTab("visual")}
                         className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activeLearnTab === "visual" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
                       >
-                        Visual library
+                        Visual Algorithms
                       </div>
                       <div
                         onClick={() => setActiveLearnTab("pattern")}
                         className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activeLearnTab === "pattern" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
                       >
-                        Pattern Problems
-                      </div>
-                      <div
-                        onClick={() => setActiveLearnTab("fundamentals")}
-                        className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activeLearnTab === "fundamentals" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
-                      >
-                        Fundamentals
+                        Core patterns
                       </div>
                     </div>
 
@@ -327,7 +327,7 @@ const Navbar = ({
                             onClick={() => {
                               closeMenus();
                               trackEvent(posthog, "home_cta_clicked", {
-                                cta_label: "Visual library",
+                                cta_label: "Visual Algorithms",
                                 destination: "/dsa/visual-library",
                                 section: "navbar_learn",
                               });
@@ -338,7 +338,7 @@ const Navbar = ({
                             </div>
                             <div className="flex-1 pr-8">
                               <h4 className="text-[15px] font-semibold mb-1.5 text-foreground group-hover:text-primary transition-colors tracking-tight">
-                                Visual library
+                                Visual Algorithms
                               </h4>
                               <p className="text-[13px] text-muted-foreground mb-3 leading-relaxed max-w-[320px]">
                                 Explore our recommended 30 patterns and interact with visualizations and problem descriptions.
@@ -353,37 +353,45 @@ const Navbar = ({
                       )}
 
                       {activeLearnTab === "pattern" && (
-                        <div className="flex flex-col gap-8">
-                          <Link
-                            href="/dsa/core"
-                            className="group flex items-start gap-5 relative shutter-click"
-                            onClick={() => {
-                              closeMenus();
-                              trackEvent(posthog, "home_cta_clicked", {
-                                cta_label: "Pattern Problems",
-                                destination: "/dsa/core",
-                                section: "navbar_learn",
-                              });
-                            }}
-                          >
-                            <div className="p-3 bg-muted/50 rounded-xl group-hover:bg-primary/10 transition-colors border border-border/50 shrink-0">
-                              <Target className="w-5 h-5 text-foreground group-hover:text-primary" />
-                            </div>
-                            <div className="flex-1 pr-8">
-                              <h4 className="text-[15px] font-semibold mb-1.5 text-foreground group-hover:text-primary transition-colors tracking-tight">
-                                Pattern Problems
-                              </h4>
-                              <p className="text-[13px] text-muted-foreground mb-3 leading-relaxed max-w-[320px]">
-                                Targeted learning in specific problem-solving patterns and algorithms. Review the top patterns.
-                              </p>
-                              <div className="flex flex-wrap gap-2">
-                                <Badge variant="secondary" className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5">Two Pointers</Badge>
-                                <Badge variant="secondary" className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5">Sliding Window</Badge>
-                                <Badge variant="secondary" className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5">DP</Badge>
-                              </div>
-                            </div>
-                            <ChevronRight className="w-5 h-5 text-muted-foreground/30 absolute right-0 top-1/2 -translate-y-1/2 group-hover:translate-x-1 group-hover:text-primary transition-all" />
-                          </Link>
+                        <div className="flex flex-col gap-6">
+                          <div className="text-xs font-bold text-muted-foreground/40 uppercase tracking-[0.2em]">
+                            Core Patterns
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-3">
+                            {GUIDE_GROUPS.find((g) => g.id === "patterns")
+                              ?.guides.slice(0, 5)
+                              .map((guide) => (
+                                <Link
+                                  key={guide.slug}
+                                  href={`/guides/patterns/${guide.slug}`}
+                                  className="px-3 py-2 rounded-lg hover:bg-primary/5 transition-all flex items-center justify-between group shutter-click"
+                                  onClick={closeMenus}
+                                >
+                                  <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">
+                                    {guide.title}
+                                  </span>
+                                  <ArrowUpRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                                </Link>
+                              ))}
+                          </div>
+
+                          <div className="border-t border-border/60 pt-3 flex justify-end">
+                            <Link
+                              href="/dsa/core"
+                              className="text-[13px] font-semibold text-primary hover:underline flex items-center gap-1 group shutter-click"
+                              onClick={() => {
+                                closeMenus();
+                                trackEvent(posthog, "home_cta_clicked", {
+                                  cta_label: "View all patterns",
+                                  destination: "/dsa/core",
+                                  section: "navbar_learn_core_patterns",
+                                });
+                              }}
+                            >
+                              View all <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                            </Link>
+                          </div>
                         </div>
                       )}
 
@@ -510,25 +518,31 @@ const Navbar = ({
                         onClick={() => setActivePracticeTab("problems")}
                         className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activePracticeTab === "problems" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
                       >
-                        PROBLEMS
-                      </div>
-                      <div
-                        onClick={() => setActivePracticeTab("company")}
-                        className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activePracticeTab === "company" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
-                      >
-                        Company wise
+                        All Problems
                       </div>
                       <div
                         onClick={() => setActivePracticeTab("topics")}
                         className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activePracticeTab === "topics" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
                       >
-                        Topic Wise
+                        By Topic
+                      </div>
+                      <div
+                        onClick={() => setActivePracticeTab("company")}
+                        className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activePracticeTab === "company" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
+                      >
+                        By Company
+                      </div>
+                      <div
+                        onClick={() => setActivePracticeTab("blind75")}
+                        className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activePracticeTab === "blind75" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
+                      >
+                        Blind 75
                       </div>
                       <div
                         onClick={() => setActivePracticeTab("patterns")}
                         className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activePracticeTab === "patterns" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
                       >
-                        Guides Patterns
+                        Pattern Guides
                       </div>
                     </div>
 
@@ -636,6 +650,40 @@ const Navbar = ({
                               </Link>
                             ))}
                           </div>
+                        </div>
+                      )}
+
+                      {activePracticeTab === "blind75" && (
+                        <div className="flex flex-col gap-8">
+                          <Link
+                            href="/dsa/blind-75"
+                            className="group flex items-start gap-5 relative shutter-click"
+                            onClick={() => {
+                              closeMenus();
+                              trackEvent(posthog, "home_cta_clicked", {
+                                cta_label: "Blind 75",
+                                destination: "/dsa/blind-75",
+                                section: "navbar_practice",
+                              });
+                            }}
+                          >
+                            <div className="p-3 bg-muted/50 rounded-xl group-hover:bg-primary/10 transition-colors border border-border/50 shrink-0">
+                              <Brain className="w-5 h-5 text-foreground group-hover:text-primary" />
+                            </div>
+                            <div className="flex-1 pr-8">
+                              <h4 className="text-[15px] font-semibold mb-1.5 text-foreground group-hover:text-primary transition-colors tracking-tight">
+                                Blind 75
+                              </h4>
+                              <p className="text-[13px] text-muted-foreground mb-3 leading-relaxed max-w-[320px]">
+                                Curated collection of 75 essential questions to master DSA patterns for interviews.
+                              </p>
+                              <div className="flex flex-wrap gap-2">
+                                <Badge variant="secondary" className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5">Top Curated</Badge>
+                                <Badge variant="secondary" className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5">FAANG Prep</Badge>
+                              </div>
+                            </div>
+                            <ChevronRight className="w-5 h-5 text-muted-foreground/30 absolute right-0 top-1/2 -translate-y-1/2 group-hover:translate-x-1 group-hover:text-primary transition-all" />
+                          </Link>
                         </div>
                       )}
 
