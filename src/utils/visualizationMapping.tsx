@@ -21,6 +21,7 @@ export const visualizationMap: Record<string, any> = {
   'valid-parentheses': dynamic(() => import('@/components/visualizations/algorithms/ValidParenthesesVisualization').then(m => m.ValidParenthesesVisualization), { ssr: false }),
   'two-sum': dynamic(() => import('@/components/visualizations/algorithms/TwoSumVisualization').then(m => m.TwoSumVisualization), { ssr: false }),
   'quick-select': dynamic(() => import('@/components/visualizations/algorithms/QuickSelectVisualization').then(m => m.QuickSelectVisualization), { ssr: false }),
+  'median-of-two-sorted-arrays': dynamic(() => import('@/components/visualizations/algorithms/MedianOfTwoSortedArraysVisualization').then(m => m.MedianOfTwoSortedArraysVisualization), { ssr: false }),
   'container-with-most-water': dynamic(() => import('@/components/visualizations/algorithms/ContainerWithMostWaterVisualization').then(m => m.ContainerWithMostWaterVisualization), { ssr: false }),
   'trapping-rain-water': dynamic(() => import('@/components/visualizations/algorithms/TrappingRainWaterVisualization').then(m => m.TrappingRainWaterVisualization), { ssr: false }),
   'rotate-array': dynamic(() => import('@/components/visualizations/algorithms/RotateArrayVisualization').then(m => m.RotateArrayVisualization), { ssr: false }),
@@ -51,6 +52,7 @@ export const visualizationMap: Record<string, any> = {
   'merge-two-sorted-lists': dynamic(() => import('@/components/visualizations/algorithms/MergeSortLinkedListVisualization').then(m => m.MergeSortLinkedListVisualization), { ssr: false }),
   'merge-k-lists': dynamic(() => import('@/components/visualizations/algorithms/MergeKSortedListsVisualization').then(m => m.MergeKSortedListsVisualization), { ssr: false }),
   'merge-k-sorted-lists': dynamic(() => import('@/components/visualizations/algorithms/MergeKSortedListsVisualization').then(m => m.MergeKSortedListsVisualization), { ssr: false }),
+  'add-two-numbers': dynamic(() => import('@/components/visualizations/algorithms/AddTwoNumbersVisualization').then(m => m.AddTwoNumbersVisualization), { ssr: false }),
 
   // Graph Algorithms
   'graph-dfs': dynamic(() => import('@/components/visualizations/GraphVisualization').then(m => m.GraphVisualization), { ssr: false }),
@@ -92,6 +94,7 @@ export const visualizationMap: Record<string, any> = {
   'burst-balloons': dynamic(() => import('@/components/visualizations/algorithms/BurstBalloonsVisualization').then(m => m.BurstBalloonsVisualization), { ssr: false }),
 
   // Backtracking
+  'generate-parentheses': dynamic(() => import('@/components/visualizations/algorithms/GenerateParenthesesVisualization').then(m => m.GenerateParenthesesVisualization), { ssr: false }),
   'subsets': dynamic(() => import('@/components/visualizations/algorithms/SubsetsVisualization').then(m => m.SubsetsVisualization), { ssr: false }),
   'subsets-ii': dynamic(() => import('@/components/visualizations/algorithms/SubsetsIIVisualization').then(m => m.SubsetsIIVisualization), { ssr: false }),
   'permutations': dynamic(() => import('@/components/visualizations/algorithms/PermutationsVisualization').then(m => m.PermutationsVisualization), { ssr: false }),
@@ -206,6 +209,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
     title: 'Missing Number',
     description: 'Visualize finding the missing number in an array from 0 to n using Cyclic Sort in O(n) time.'
   },
+  'median-of-two-sorted-arrays': {
+    title: 'Median of Two Sorted Arrays',
+    description: 'Visualize binary search on two sorted arrays to find the overall median in O(log(min(m,n))) time.'
+  },
   'valid-anagram': {
     title: 'Valid Anagram',
     description: 'Visualize checking if two strings are anagrams by comparing their character frequencies using Hash Maps.'
@@ -265,6 +272,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
   'merge-two-sorted-lists': {
     title: 'Merge Two Sorted Lists',
     description: 'Visualize the merge step of two sorted linked lists by comparing head elements and linking them in sorted order.'
+  },
+  'add-two-numbers': {
+    title: 'Add Two Numbers',
+    description: 'Visualize adding two numbers represented by linked lists, carrying over digits just like manual addition.'
   },
   'top-k-frequent-elements': {
     title: 'Top K Frequent Elements',
@@ -369,6 +380,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
   'multiply-strings': {
     title: 'Multiply Strings',
     description: 'Visualize multiplying two large numbers represented as strings, simulating the manual paper-and-pencil method digit by digit.'
+  },
+  'generate-parentheses': {
+    title: 'Generate Parentheses',
+    description: 'Visualize the recursive backtracking approach to build all combinations of well-formed parentheses strings.'
   }
 };
 

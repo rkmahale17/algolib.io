@@ -18,6 +18,7 @@ const blind75Map: Record<string, React.LazyExoticComponent<React.ComponentType<a
   "3sum": React.lazy(() => import("@/components/visualizations/algorithms/ThreeSumVisualization").then(m => ({ default: m.ThreeSumVisualization }))),
   "find-minimum-in-rotated-sorted-array": React.lazy(() => import("@/components/visualizations/algorithms/FindMinimumInRotatedSortedArrayVisualization").then(m => ({ default: m.FindMinimumInRotatedSortedArrayVisualization }))),
   "search-in-rotated-sorted-array": React.lazy(() => import("@/components/visualizations/algorithms/SearchInRotatedSortedArrayVisualization").then(m => ({ default: m.SearchInRotatedSortedArrayVisualization }))),
+  "median-of-two-sorted-arrays": React.lazy(() => import("@/components/visualizations/algorithms/MedianOfTwoSortedArraysVisualization").then(m => ({ default: m.MedianOfTwoSortedArraysVisualization }))),
   "container-with-most-water": React.lazy(() => import("@/components/visualizations/algorithms/ContainerWithMostWaterVisualization").then(m => ({ default: m.ContainerWithMostWaterVisualization }))),
   "best-time-to-buy-and-sell-stock": React.lazy(() => import("@/components/visualizations/algorithms/BestTimeToBuyAndSellStockVisualization").then(m => ({ default: m.BestTimeToBuyAndSellStockVisualization }))),
   "contains-duplicate": React.lazy(() => import("@/components/visualizations/algorithms/ContainsDuplicateVisualization").then(m => ({ default: m.ContainsDuplicateVisualization }))),
