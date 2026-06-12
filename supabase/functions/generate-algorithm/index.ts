@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
         <hr />
         <p><strong>Step-by-step thinking:</strong></p>
         <ol>
-           <li><p>[Detailed step explanation (max 60 words)]</p></li>
+           <li><p>[Crystal clear, short step explanation (max 30 words)]</p></li>
            <li>...</li>
         </ol>
         <hr />
@@ -87,6 +87,7 @@ Deno.serve(async (req) => {
         1. **Truthfulness**: Verify complexity. No hallucinations.
         2. **HTML**: Use strict HTML for formatted fields.
         3. **Detailed**: Explanations must be deep and educational.
+        4. **C++ namespace**: For C++ code, do NOT use the 'std::' namespace prefix (e.g. write 'vector<string>' instead of 'std::vector<std::string>', 'string' instead of 'std::string', etc.) as 'using namespace std;' is already globally defined.
         `;
 
     // --- HELPER TO CALL GEMINI ---
@@ -129,11 +130,10 @@ Deno.serve(async (req) => {
         Do NOT generate test cases or code yet.
 
         **CRITICAL JSON FORMATTING RULES**:
-        1. **Escape Control Characters**: In JSON strings, you MUST properly escape:
-           - Newlines: Use \\\\n (NOT literal newlines)
-           - Tabs: Use \\\\t (NOT literal tabs)
-           - Quotes: Use \\\\" for double quotes inside strings
-        2. **No Literal Line Breaks**: NEVER include actual line breaks inside JSON string values.
+        1. **No Literal Line Breaks in JSON**: NEVER include actual unescaped line breaks inside JSON string values.
+        2. **No Newline Text Escape inside Text/HTML**: Do NOT use literal '\\\\n' or '\\\\n' (backslash-n) inside HTML, description, overview, tips, or explanation fields. Write all HTML and text fields as a single line (no newlines). Use HTML tags (like '<p>', '<br>', '<li>') for formatting and breaks.
+        3. **Code Newlines**: In code blocks, use standard JSON escaped newlines (which appear as '\\n' in JSON). Do NOT double-escape (do NOT use '\\\\n').
+        4. **Escape Quotes**: Use \\\\" for double quotes inside JSON strings.
 
         JSON Structure:
         {
@@ -146,11 +146,11 @@ Deno.serve(async (req) => {
           "serial_no": 376,
           "list_type": "coreAlgo or blind75",
           "explanation": {
-            "problemDescription": "DETAILED HTML explanation... (What needs to be solved, Input format, Output format, Constraints)",
-            "problemStatement": "STRICT HTML - The formal problem statement",
-            "steps": "HTML <ol><li>Global high level steps</li></ol>",
+            "problemDescription": "DETAILED HTML explanation (What needs to be solved, Input format, Output format, Constraints). Do NOT include, mention, or append any examples here.",
+            "problemStatement": "STRICT HTML - The formal problem statement. Do NOT include, mention, or append any examples, input/output samples, or walk-through explanations here (examples must go exclusively in the 'io' field).",
+            "steps": "HTML <ol><li>Crystal clear and short step to solve the problem (max 25 words per step, exactly 4-5 steps total)</li></ol>",
             "useCase": "HTML <ul><li><strong>Domain</strong> - Desc</li></ul> (5+ items)",
-            "tips": "HTML <ul><li>Tip</li></ul> (5+ items)",
+            "tips": "HTML <ul><li>Short hint/tip (max 20 words)</li></ul> (exactly 5 items)",
             "comparisonTable": "STRICT HTML Table with 6 columns: Approach, Core Idea, Time, Space, When to Use, Notes. Use this structure: \\n${TABLE_STRUCTURE}",
             "timeComplexity": "O(..)",
             "spaceComplexity": "O(..)",
@@ -172,7 +172,14 @@ Deno.serve(async (req) => {
           ],
           "metadata": {
             "overview": "Detailed Guide. Max 300 words. Split into many paragraphs (break after ~60 words). use <p> tags.",
-            "companyTags": [], "likes": 0, "dislikes": 0
+            "companyTags": [], "likes": 0, "dislikes": 0,
+            "hints": [
+              "Short progressive hint 1 (max 20 words)",
+              "Short progressive hint 2 (max 20 words)",
+              "Short progressive hint 3 (max 20 words)",
+              "Short progressive hint 4 (max 20 words)",
+              "Short progressive hint 5 (max 20 words)"
+            ]
           }
         }
         `;
@@ -225,14 +232,18 @@ Deno.serve(async (req) => {
       }
 
         **CRITICAL JSON FORMATTING RULES**:
-        1. **Escape Control Characters**: Use \\\\n for newlines, \\\\" for quotes.
-        2. **Stand-alone Functions**: For **TypeScript** and **Python**, use standalone functions.
-        3. **Helpers**: Place helpers ABOVE main function.
-        4. **All Languages**: Must implement in TS, Python, Java, C++.
-        5. **Strict Wrapping (Java/C++)**:
+        1. **No Literal Line Breaks in JSON**: NEVER include actual unescaped line breaks inside JSON string values.
+        2. **No Newline Text Escape inside Text/HTML**: Do NOT use literal '\\\\n' or '\\\\n' (backslash-n) inside HTML, explanationBefore, or explanationAfter fields. Write all HTML and text fields as a single line (no newlines). Use HTML tags (like '<p>', '<br>', '<li>') for formatting and breaks.
+        3. **Code Newlines**: In code blocks, use standard JSON escaped newlines (which appear as '\\n' in JSON). Do NOT double-escape (do NOT use '\\\\n').
+        4. **Escape Quotes**: Use \\\\" for double quotes inside JSON strings.
+        5. **Stand-alone Functions**: For **TypeScript** and **Python**, use standalone functions.
+        6. **Helpers**: Place helpers ABOVE main function.
+        7. **All Languages**: Must implement in TS, Python, Java, C++.
+        8. **Strict Wrapping (Java/C++)**:
            - For **Java**: You MUST wrap everything in \`public static class Solution { ... }\`.
            - For **C++**: You MUST wrap everything in \`class Solution { public: ... };\`.
            - NO main function, NO example calls, NO extra boilerplates outside the class.
+        9. **C++ namespace**: Do NOT use 'std::' namespace prefix in C++ code. The environment already uses 'using namespace std;'.
 
         JSON Structure:
         {
@@ -311,6 +322,10 @@ Deno.serve(async (req) => {
            - For **C++**: You MUST wrap everything in \`class Solution { public: ... };\`.
            - NO main function, NO example calls, NO extra boilerplates outside the class.
         6. **Python Rule**: Do NOT use a class-based approach for Python. Use standalone functions.
+        7. **C++ namespace**: Do NOT use 'std::' namespace prefix in C++ starter code. The environment already uses 'using namespace std;'.
+
+        **CRITICAL JSON FORMATTING RULES**:
+        1. **No Literal Line Breaks in JSON**: NEVER include actual unescaped line breaks inside JSON string values. Use standard JSON escaped newlines (e.g. '\\n' in JSON) for code. Do NOT double-escape as '\\\\n'.
 
         JSON Structure:
         {

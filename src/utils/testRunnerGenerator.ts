@@ -1265,6 +1265,10 @@ const generateCppRunner = (
             if (cleanTarget && cleanTarget.includes('char')) return 'vector<char>';
             if (typeof first === 'string') return 'vector<string>';
             if (typeof first === 'boolean') return 'vector<bool>';
+            if (typeof first === 'number') {
+                const hasFloat = val.some(v => typeof v === 'number' && !Number.isInteger(v));
+                return hasFloat ? 'vector<double>' : 'vector<int>';
+            }
             return 'vector<int>';
         }
         if (typeof val === 'string') {
@@ -1272,6 +1276,7 @@ const generateCppRunner = (
             return 'string';
         }
         if (typeof val === 'boolean') return 'bool';
+        if (typeof val === 'number' && !Number.isInteger(val)) return 'double';
         return 'int';
     };
 
