@@ -16,37 +16,25 @@ Search `src/components/visualizations/algorithms/` for the file matching the pro
 - **File exists**: Update it to match the standards below.
 - **File missing**: Confirm with the user before generating a new visualization.
 
-### 2. Implement the visualization
+### 2. Implementation Rules & Standards
 
-#### Code display rules
+When creating or updating the visualization, rigidly follow these rules:
 
-- The execution steps MUST be perfectly synchronized with the highlighted lines of code in the editor view.
-- The algorithm code block MUST NOT contain any comments — remove all inline and block comments.
-- Always use the `AnimatedCodeEditor` component for code blocks. Do not add redundant wrapper `div`s, headings, or extra layout containers around it.
+1. **Proper Code and Steps Sync:** The execution steps (logic state) MUST be perfectly synchronized with the exact lines of code being executed in the editor view.
+2. **No Code Comments:** The algorithm code block displayed to the user MUST NOT contain any comments. Remove all inline or block comments to ensure a clean, distraction-free reading experience.
+3. **Proper Commentary:** Implement descriptive, step-by-step narrative commentary for each execution step. The text should clearly explain to the coder _why_ an action is taken and _how_ the algorithm solves the problem.
+4. **Educational Value:** With respect to the problem description, the visualization must be intuitively designed so the coder visually and conceptually understands the algorithm's mechanics.
+5. **Instantaneous Transitions (No Click Animations):** Disable all click-based animations to ensure stable, professional, and instant visual transitions when navigating between steps.
+6. **Standardized UI/UX Layout:** Maintain consistent placement of variable panels and use intuitive geometric representations for data structures. The layout should typically be a two-column grid on large screens.
+7. **No Array Index Labels:** Do not add "idx" labels (or similar index markings) to array visual elements. Keep the array representations clean.
+8. **Text Color:** Ensure the color of the text used in visualizations has high contrast with its background and respects dark mode by using theme-aware classes (e.g., `text-foreground`, `text-primary-foreground`).
+9. **Top-Aligned Controls:** The `SimpleStepControls` component MUST be placed at the top of the visualization, above the main content grid, to ensure immediate user access to navigation.
+10. **Use AnimatedCodeEditor:** Always use the `AnimatedCodeEditor` component when an implementation code block is required within the visualization.
+11. **Minimal Code Editor Container:** Do NOT include a redundant `div` wrapper, "Implementation" heading, or extra layout containers (like `flex-1 overflow-auto`) within the `Card` that encloses the `AnimatedCodeEditor`. The editor should be the primary child of its container card.
+12. **Test Case Selection:** Only implement multiple test cases (and the selection UI) if explicitly requested by the user. If not requested, one robust default case is sufficient. When multiple cases ARE requested, provide a premium, visually stunning UI (e.g., an animated sliding toggle with icons from `lucide-react`) to switch between them. Switching cases MUST reset the execution state (`currentStepIndex` back to 0, `isPlaying` to false). Place these controls at the top, typically next to or just below the `StepControls`.
+13. **Pedagogical Layout:** Ensure that the descriptive commentary box is placed **at the bottom** of the visualization to provide immediate context for the current state, and the `VariablePanel` MUST be placed **below** the commentary box.
 
-#### Layout rules
+### 3. Verification
 
-- Place `SimpleStepControls` at the top of the visualization, above the main content grid.
-- Use a two-column grid on large screens with consistent `VariablePanel` placement.
-- Place the descriptive commentary box above the `VariablePanel` to provide immediate context.
-- Use theme-aware text classes (`text-foreground`, `text-primary-foreground`) instead of hardcoded colors.
-- Do not add index labels (e.g., "idx") to array visual elements.
-
-#### Interaction rules
-
-- Disable all click-based animations — transitions between steps must be instantaneous.
-- Only implement multiple test cases if explicitly requested. When implemented, provide a visually polished toggle UI using `lucide-react` icons. Switching cases must reset `currentStepIndex` to 0 and `isPlaying` to false.
-
-#### Commentary rules
-
-- Write descriptive, step-by-step narrative commentary explaining *why* each action is taken and *how* the algorithm progresses toward the solution.
-
-### 3. Verify
-
-Confirm each of the following before completing:
-
-- [ ] No comments inside the code block string
-- [ ] Variable/pointer states match the active execution step at every step index
-- [ ] `SimpleStepControls` renders above the content grid
-- [ ] `AnimatedCodeEditor` has no redundant wrapper elements
-- [ ] Text colors use theme-aware classes
+- Double-check that there are absolutely no comments inside the code block string.
+- Verify array/pointer/variable states correspond exactly to the active execution step.
