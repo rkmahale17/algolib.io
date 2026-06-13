@@ -140,6 +140,7 @@ export const visualizationMap: Record<string, any> = {
   'subset-generation-bits': dynamic(() => import('@/components/visualizations/algorithms/SubsetBitsVisualization').then(m => m.SubsetBitsVisualization), { ssr: false }),
 
   // Scheduling / Greedy
+  'hand-of-straights': dynamic(() => import('@/components/visualizations/algorithms/HandOfStraightsVisualization').then(m => m.HandOfStraightsVisualization), { ssr: false }),
   'task-scheduler': dynamic(() => import('@/components/visualizations/algorithms/TaskSchedulerVisualization').then(m => m.TaskSchedulerVisualization), { ssr: false }),
 
   // Heap/Priority Queue
@@ -300,6 +301,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
   'task-scheduler': {
     title: 'Task Scheduler',
     description: 'Visualize scheduling tasks with cooling intervals using a max-heap and queue to minimize idle time.'
+  },
+  'hand-of-straights': {
+    title: 'Hand of Straights',
+    description: "Visualize how to group magical cards into consecutive stairs, checking if it's possible to form perfect groups of a required size."
   },
   'coin-change-ii': {
     title: 'Coin Change II',

@@ -30,8 +30,7 @@ When creating or updating the visualization, rigidly follow these rules:
 10. **Use AnimatedCodeEditor:** Always use the `AnimatedCodeEditor` component when an implementation code block is required within the visualization.
 11. **Minimal Code Editor Container:** Do NOT include a redundant `div` wrapper, "Implementation" heading, or extra layout containers (like `flex-1 overflow-auto`) within the `Card` that encloses the `AnimatedCodeEditor`. The editor should be the primary child of its container card.
 12. **Test Case Selection:** Only implement multiple test cases (and the selection UI) if explicitly requested by the user. If not requested, one robust default case is sufficient. When multiple cases ARE requested, provide a premium, visually stunning UI (e.g., an animated sliding toggle with icons from `lucide-react`) to switch between them. Switching cases MUST reset the execution state (`currentStepIndex` back to 0, `isPlaying` to false). Place these controls at the top, typically next to or just below the `StepControls`.
-13. **Pedagogical Layout:** Ensure that the descriptive commentary box is placed **above** the `VariablePanel` to provide immediate context for the current state.
-
+13. **Pedagogical Layout:** Ensure that the descriptive commentary box is placed **at the bottom** of the visualization to provide immediate context for the current state, and the `VariablePanel` MUST be placed **below** the commentary box.
 ### 3. Verification
 - Double-check that there are absolutely no comments inside the code block string.
 - Verify array/pointer/variable states correspond exactly to the active execution step.
