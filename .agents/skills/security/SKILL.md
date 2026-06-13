@@ -1,35 +1,55 @@
 ---
-name: Security Scan
-description: Skill for scanning the repository for sensitive data, keys, network vulnerabilities, and cyber attack patterns.
+name: security-scan
+description: "Scan the repository for hardcoded secrets, exposed API keys, insecure network configurations, and vulnerable dependencies. Use when the user asks for a security audit, secret detection, credential scan, vulnerability check, or wants to find leaked tokens in the codebase."
 ---
 
-# Security Scan Skill
+# Security Scan
 
-This skill is invoked when the user requests a security audit, a scan for secrets, or checks for network vulnerabilities. Keywords: `security scan`, `audit`, `secrets`, `leaks`, `vulnerabilities`.
+Detect hardcoded secrets, insecure network patterns, and vulnerable dependencies in the repository using integrated scanning scripts.
 
-## Workflow Process
+## Workflow
 
-### 1. Preparation
-- Ensure all dependencies for the scanning scripts are available (Python, Shell).
-- Identify the scope of the scan (entire repo or specific subdirectories).
+### 1. Determine scope
 
-### 2. Execution
-Run the integrated security scan using the provided scripts:
-- **Secret Detection**: Checks for hardcoded API keys, tokens, and credentials.
-- **Network Check**: Identifies hardcoded IP addresses and usage of insecure protocols (e.g., `http://` where `https://` is expected).
-- **Dependency Audit**: Runs `npm audit` to find vulnerable packages.
+Identify whether to scan the entire repo or specific subdirectories based on the user request.
 
-### 3. Reporting
-- Organize findings into a clear, formatted report in the chat.
-- Categorize issues by severity: **High**, **Medium**, **Low**.
-- Provide actionable advice for each finding (e.g., "Rotate this key", "Upgrade this package").
+### 2. Run the scan
 
-### 4. Safety First
-- **IMPORTANT**: If a real secret is found, DO NOT display the full secret in the chat. Mask it (e.g., `AKIA...XXXX`).
-- Warn the user about the risks of committing secrets to the repository.
-
-## Commands
-The primary command to run the full scan is:
 ```bash
 bash .agents/skills/security/scripts/main_scan.sh
 ```
+
+The scan checks three categories:
+
+- **Secret detection**: Hardcoded API keys, tokens, passwords, and credentials (e.g., patterns like `AKIA`, `sk-`, `ghp_`, `Bearer`)
+- **Network check**: Hardcoded IP addresses and insecure protocol usage (`http://` where `https://` is expected)
+- **Dependency audit**: `npm audit` for vulnerable packages
+
+If the main script is unavailable, run checks manually:
+
+```bash
+# Secret patterns
+grep -rn "AKIA\|sk-\|ghp_\|password\s*=\|api_key\s*=" --include="*.ts" --include="*.js" --include="*.env" .
+
+# Insecure protocols
+grep -rn "http://" --include="*.ts" --include="*.js" . | grep -v localhost
+
+# Dependency vulnerabilities
+npm audit --json
+```
+
+### 3. Report findings
+
+Organize results by severity:
+
+| Severity | Examples |
+|----------|----------|
+| **High** | Exposed API keys, hardcoded passwords, leaked tokens |
+| **Medium** | Insecure protocol usage, hardcoded IPs in production code |
+| **Low** | Outdated dependencies with low-severity CVEs |
+
+Provide actionable remediation for each finding (e.g., "Rotate this key and move to environment variable", "Upgrade package X to version Y").
+
+### 4. Safety
+
+**CRITICAL**: Never display a full secret in the output. Mask all sensitive values (e.g., `AKIA...XXXX`, `sk-...abcd`). Warn the user about the risk of committing secrets to version control.
