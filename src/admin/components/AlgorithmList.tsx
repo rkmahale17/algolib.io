@@ -50,6 +50,8 @@ export function AlgorithmList() {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [listTypeFilters, setListTypeFilters] = useState<string[]>([]);
+  const [problemTypeFilter, setProblemTypeFilter] = useState<string>('all');
+  const [publishedFilter, setPublishedFilter] = useState<string>('all');
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' }>({ key: 'serial_no', direction: 'asc' });
   const [customCategoryInputs, setCustomCategoryInputs] = useState<Record<string, string>>({});
@@ -80,9 +82,24 @@ export function AlgorithmList() {
   };
 
   const filteredAlgorithms = algorithms.filter(algo => {
-    if (listTypeFilters.length === 0) return true;
-    const types = algo.listTypes || (algo.list_type ? [algo.list_type] : ['core']);
-    return types.some((t: string) => listTypeFilters.includes(t));
+    if (listTypeFilters.length > 0) {
+      const types = algo.listTypes || (algo.list_type ? [algo.list_type] : ['core']);
+      if (!types.some((t: string) => listTypeFilters.includes(t))) return false;
+    }
+    
+    if (problemTypeFilter !== 'all') {
+      const pt = algo.problemType || algo.problem_type;
+      if (problemTypeFilter === 'dsa' && pt !== 'dsa') return false;
+      if (problemTypeFilter === 'other' && pt === 'dsa') return false;
+    }
+
+    if (publishedFilter !== 'all') {
+      const isPublished = algo.published !== false;
+      if (publishedFilter === 'published' && !isPublished) return false;
+      if (publishedFilter === 'unpublished' && isPublished) return false;
+    }
+    
+    return true;
   })?.sort((a: any, b: any) => {
     let aValue = sortConfig.key === 'list_type' ? (a.listTypes?.join(', ') || a.listType || '') : a[sortConfig.key];
     let bValue = sortConfig.key === 'list_type' ? (b.listTypes?.join(', ') || b.listType || '') : b[sortConfig.key];
@@ -161,7 +178,7 @@ export function AlgorithmList() {
           />
         </div>
         <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="All Categories" />
           </SelectTrigger>
           <SelectContent>
@@ -171,6 +188,28 @@ export function AlgorithmList() {
                 {category}
               </SelectItem>
             ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={problemTypeFilter} onValueChange={setProblemTypeFilter}>
+          <SelectTrigger className="w-[140px]">
+            <SelectValue placeholder="Problem Type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Types</SelectItem>
+            <SelectItem value="dsa">DSA</SelectItem>
+            <SelectItem value="other">Other</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={publishedFilter} onValueChange={setPublishedFilter}>
+          <SelectTrigger className="w-[140px]">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="published">Published</SelectItem>
+            <SelectItem value="unpublished">Unpublished</SelectItem>
           </SelectContent>
         </Select>
         <Popover>
