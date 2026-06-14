@@ -43,13 +43,19 @@ export default function AdminAlgorithmDetail() {
   }
 
   return (
-    <div className=" mx-auto  mx-2">
-
-      <AlgorithmFormBuilder
-        algorithm={algorithm}
-        onCancel={handleCancel}
-        onSuccess={handleSuccess}
+    <>
+      <style
+        dangerouslySetInnerHTML={{
+          __html: ".global-nav { display: none !important; }",
+        }}
       />
-    </div>
+      <div className=" mx-auto  mx-2">
+        <AlgorithmFormBuilder
+          algorithm={algorithm}
+          onCancel={handleCancel}
+          onSuccess={handleSuccess}
+        />
+      </div>
+    </>
   );
 }

@@ -34,6 +34,7 @@ export const visualizationMap: Record<string, any> = {
   'dfs-inorder': dynamic(() => import('@/components/visualizations/algorithms/DFSInorderVisualization').then(m => m.DFSInorderVisualization), { ssr: false }),
   'dfs-postorder': dynamic(() => import('@/components/visualizations/algorithms/DFSPostorderVisualization').then(m => m.DFSPostorderVisualization), { ssr: false }),
   'bfs-level-order': dynamic(() => import('@/components/visualizations/algorithms/BFSLevelOrderVisualization').then(m => m.BFSLevelOrderVisualization), { ssr: false }),
+  'binary-tree-right-side-view': dynamic(() => import('@/components/visualizations/algorithms/BinaryTreeRightSideViewVisualization').then(m => m.BinaryTreeRightSideViewVisualization), { ssr: false }),
   'bst-insert': dynamic(() => import('@/components/visualizations/algorithms/BSTInsertVisualization').then(m => m.BSTInsertVisualization), { ssr: false }),
   'lca': dynamic(() => import('@/components/visualizations/algorithms/LowestCommonAncestorBSTVisualization').then(m => m.LowestCommonAncestorBSTVisualization), { ssr: false }),
   'lowest-common-ancestor-of-bst': dynamic(() => import('@/components/visualizations/algorithms/LowestCommonAncestorBSTVisualization').then(m => m.LowestCommonAncestorBSTVisualization), { ssr: false }),
@@ -229,6 +230,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
   'bfs-level-order': {
     title: 'BFS Level Order Traversal',
     description: 'See how a queue organizes nodes to traverse a binary tree level-by-level from top to bottom, left to right.'
+  },
+  'binary-tree-right-side-view': {
+    title: 'Binary Tree Right Side View',
+    description: 'Visualize using level-order traversal (BFS) to capture the rightmost node at each level of the binary tree.'
   },
   'lowest-common-ancestor-of-bst': {
     title: 'Lowest Common Ancestor in BST',
