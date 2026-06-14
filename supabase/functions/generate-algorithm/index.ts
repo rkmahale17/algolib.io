@@ -146,11 +146,11 @@ Deno.serve(async (req) => {
           "serial_no": 376,
           "list_type": "coreAlgo or blind75",
           "explanation": {
-            "problemDescription": "DETAILED HTML explanation (What needs to be solved, Input format, Output format, Constraints). Do NOT include, mention, or append any examples here.",
-            "problemStatement": "STRICT HTML - The formal problem statement. Do NOT include, mention, or append any examples, input/output samples, or walk-through explanations here (examples must go exclusively in the 'io' field).",
+            "problemDescription": "DETAILED HTML explanation (What needs to be solved, Input format, Output format, Constraints). MUST use multiple meaningful <p> tags properly divided for readability instead of a single block of text. Do NOT include, mention, or append any examples here.",
+            "problemStatement": "STRICT HTML - The formal problem statement. MUST use multiple meaningful <p> tags properly divided for readability instead of a single block of text. Do NOT include, mention, or append any examples, input/output samples, or walk-through explanations here (examples must go exclusively in the 'io' field).",
             "steps": "HTML <ol><li>Crystal clear and short step to solve the problem (max 25 words per step, exactly 4-5 steps total)</li></ol>",
             "useCase": "HTML <ul><li><strong>Domain</strong> - Desc</li></ul> (5+ items)",
-            "tips": "HTML <ul><li>Short hint/tip (max 20 words)</li></ul> (exactly 5 items)",
+            "tips": "HTML <ul><li>Short progressive hint to solve the problem (max 20 words)</li></ul> (exactly 5 items, getting progressively more revealing)",
             "comparisonTable": "STRICT HTML Table with 6 columns: Approach, Core Idea, Time, Space, When to Use, Notes. Use this structure: \\n${TABLE_STRUCTURE}",
             "timeComplexity": "O(..)",
             "spaceComplexity": "O(..)",
@@ -172,14 +172,7 @@ Deno.serve(async (req) => {
           ],
           "metadata": {
             "overview": "Detailed Guide. Max 300 words. Split into many paragraphs (break after ~60 words). use <p> tags.",
-            "companyTags": [], "likes": 0, "dislikes": 0,
-            "hints": [
-              "Short progressive hint 1 (max 20 words)",
-              "Short progressive hint 2 (max 20 words)",
-              "Short progressive hint 3 (max 20 words)",
-              "Short progressive hint 4 (max 20 words)",
-              "Short progressive hint 5 (max 20 words)"
-            ]
+            "companyTags": [], "likes": 0, "dislikes": 0
           }
         }
         `;
@@ -314,15 +307,14 @@ Deno.serve(async (req) => {
 
         RULES:
         1. **Strip Logic**: Remove the implementation details but KEEP the function signature and any necessary setup.
-        2. **Placeholder**: Use "// TODO: Implement" or similar.
+        2. **Placeholder**: Use exactly one comment inside the function body: "// TODO: Implement" (or "# TODO: Implement" for Python). Do NOT add ANY other comments or information inside the function body.
         3. **Common Classes**: If the problem uses classes like \`ListNode\`, \`TreeNode\`, \`GraphNode\`, etc., you MUST include commented-out definitions of these classes in the specific language's syntax at the top.
-        4. **Educational**: Add comments telling the user what to do.
-        5. **Strict Wrapping (Java/C++)**:
+        4. **Strict Wrapping (Java/C++)**:
            - For **Java**: You MUST wrap everything in \`public static class Solution { ... }\`.
            - For **C++**: You MUST wrap everything in \`class Solution { public: ... };\`.
            - NO main function, NO example calls, NO extra boilerplates outside the class.
-        6. **Python Rule**: Do NOT use a class-based approach for Python. Use standalone functions.
-        7. **C++ namespace**: Do NOT use 'std::' namespace prefix in C++ starter code. The environment already uses 'using namespace std;'.
+        5. **Python Rule**: Do NOT use a class-based approach for Python. You MUST create a standalone function ONLY. Because it is a standalone function, do NOT include the \`self\` parameter in the function signature.
+        6. **C++ namespace**: Do NOT use 'std::' namespace prefix in C++ starter code. The environment already uses 'using namespace std;'.
 
         **CRITICAL JSON FORMATTING RULES**:
         1. **No Literal Line Breaks in JSON**: NEVER include actual unescaped line breaks inside JSON string values. Use standard JSON escaped newlines (e.g. '\\n' in JSON) for code. Do NOT double-escape as '\\\\n'.

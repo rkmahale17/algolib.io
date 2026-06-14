@@ -195,7 +195,6 @@ export const ProblemDescriptionPanel = React.memo(
     const containerRef = useRef<HTMLDivElement>(null);
     const topicsRef = useRef<HTMLDivElement>(null);
     const companiesRef = useRef<HTMLDivElement>(null);
-    const hintsRef = useRef<HTMLDivElement>(null);
     const tipsRef = useRef<HTMLDivElement>(null);
     const tabsScrollRef = useRef<HTMLDivElement>(null);
 
@@ -612,21 +611,6 @@ export const ProblemDescriptionPanel = React.memo(
                             </Badge>
                           )}
 
-                          {/* Hint Badge */}
-                          {algorithm.metadata?.hints &&
-                            algorithm.metadata.hints.length > 0 && (
-                              <Badge
-                                variant="outline"
-                                className="bg-transparent text-foreground border-border text-[10px] sm:text-[11px] px-3 py-0.5 cursor-pointer hover:bg-muted/50 transition-all flex items-center h-6 rounded-full gap-1.5"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  scrollToSection(hintsRef, "hints");
-                                }}
-                              >
-                                <Lightbulb className="w-3.5 h-3.5 text-primary" />
-                                Hints
-                              </Badge>
-                            )}
                         </div>
                       </div>
                     </div>
@@ -1372,44 +1356,6 @@ export const ProblemDescriptionPanel = React.memo(
                         </AccordionItem>
                       )}
 
-                      {/* Hints Item */}
-                      {algorithm.metadata?.hints &&
-                        algorithm.metadata.hints.length > 0 && (
-                          <AccordionItem
-                            value="hints"
-                            className="border rounded-lg glass-card shadow-sm border-border/50"
-                            ref={hintsRef}
-                          >
-                            <AccordionTrigger className="px-4 sm:px-6 py-4 hover:no-underline group">
-                              <div className="flex items-center gap-2 text-sm font-medium transition-colors text-foreground">
-                                <Lightbulb className="w-4 h-4 text-primary" />
-                                Hints
-                              </div>
-                            </AccordionTrigger>
-                            <AccordionContent className="px-4 sm:px-6 pb-6 pt-0 space-y-3">
-                              <Separator className="mb-4 bg-border/40" />
-                              {algorithm.metadata.hints.map(
-                                (hint: string, i: number) => (
-                                  <div
-                                    key={i}
-                                    className="flex gap-3 text-sm text-muted-foreground p-3 rounded-lg bg-muted/20 border border-border/30"
-                                  >
-                                    <span className="font-semibold text-amber-500 shrink-0">
-                                      Hint {i + 1}:
-                                    </span>
-                                    <React.Suspense
-                                      fallback={
-                                        <div className="h-4 w-full animate-pulse bg-muted rounded" />
-                                      }
-                                    >
-                                      <RichText content={hint} />
-                                    </React.Suspense>
-                                  </div>
-                                ),
-                              )}
-                            </AccordionContent>
-                          </AccordionItem>
-                        )}
                     </Accordion>
                   </div>
                   </Card>
