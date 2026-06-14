@@ -85,6 +85,7 @@ import { slugifyCategory } from "@/constants/categories";
 import { TabWarning } from "@/components/TabWarning";
 import { User } from "@supabase/supabase-js";
 import { VideoTutorialCard } from "./VideoTutorialCard";
+import { ProgressiveHints } from "./ProgressiveHints";
 import { createPortal } from "react-dom";
 import dynamic from "next/dynamic";
 import { formatMemory } from "../CodeRunner/outputHelpers";
@@ -1323,9 +1324,9 @@ export const ProblemDescriptionPanel = React.memo(
                             {(algorithm?.is_premium || algorithm?.is_pro || algorithm?.metadata?.is_pro) && !hasPremiumAccess && !isPlatformPreview ? (
                               <ProOverlay className="rounded-none border-0 py-12" />
                             ) : (
-                              <div className="text-sm text-muted-foreground">
+                              <div className="text-sm">
                                 <React.Suspense fallback={<div className="h-20 w-full animate-pulse bg-muted rounded" />}>
-                                  <RichText content={algorithm.explanation.tips} />
+                                  <ProgressiveHints hintsHtml={algorithm.explanation.tips} />
                                 </React.Suspense>
                               </div>
                             )}
