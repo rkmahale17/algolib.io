@@ -87,7 +87,9 @@ export const visualizationMap: Record<string, any> = {
   'house-robber': dynamic(() => import('@/components/visualizations/algorithms/HouseRobberVisualization').then(m => m.HouseRobberVisualization), { ssr: false }),
   'best-time-to-buy-and-sell-stock-with-cooldown': dynamic(() => import('@/components/visualizations/algorithms/BestTimeToBuyAndSellStockWithCooldownVisualization').then(m => m.BestTimeToBuyAndSellStockWithCooldownVisualization), { ssr: false }),
   'climbing-stairs': dynamic(() => import('@/components/visualizations/algorithms/ClimbingStairsVisualization').then(m => m.ClimbingStairsVisualization), { ssr: false }),
+  'min-cost-climbing-stairs': dynamic(() => import('@/components/visualizations/algorithms/MinCostClimbingStairsVisualization').then(m => m.MinCostClimbingStairsVisualization), { ssr: false }),
   'partition-equal-subset': dynamic(() => import('@/components/visualizations/algorithms/PartitionEqualSubsetVisualization').then(m => m.PartitionEqualSubsetVisualization), { ssr: false }),
+  'partition-equal-subset-sum': dynamic(() => import('@/components/visualizations/algorithms/PartitionEqualSubsetVisualization').then(m => m.PartitionEqualSubsetVisualization), { ssr: false }),
   'target-sum': dynamic(() => import('@/components/visualizations/algorithms/TargetSumVisualization').then(m => m.TargetSumVisualization), { ssr: false }),
   'target-sum-ways': dynamic(() => import('@/components/visualizations/algorithms/TargetSumVisualization').then(m => m.TargetSumVisualization), { ssr: false }),
   'word-break': dynamic(() => import('@/components/visualizations/algorithms/WordBreakVisualization').then(m => m.WordBreakVisualization), { ssr: false }),
@@ -134,6 +136,7 @@ export const visualizationMap: Record<string, any> = {
   // Greedy Algorithms
   'activity-selection': dynamic(() => import('@/components/visualizations/algorithms/ActivitySelectionVisualization').then(m => m.ActivitySelectionVisualization), { ssr: false }),
   'gas-station': dynamic(() => import('@/components/visualizations/algorithms/GasStationVisualization').then(m => m.GasStationVisualization), { ssr: false }),
+  'partition-labels': dynamic(() => import('@/components/visualizations/algorithms/PartitionLabelsVisualization').then(m => m.PartitionLabelsVisualization), { ssr: false }),
 
   // Bit Manipulation
   'xor-trick': dynamic(() => import('@/components/visualizations/algorithms/XORTrickVisualization').then(m => m.XORTrickVisualization), { ssr: false }),
@@ -351,9 +354,13 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
     title: 'Time-Based Key-Value Store',
     description: 'Visualize how a hash map of dynamically growing arrays combined with binary search allows efficient retrieval of time-versioned values.'
   },
-  'target-sum': {
+  'target-sum-ways': {
     title: 'Target Sum',
     description: 'Visualize the dynamic programming approach to find the number of ways to assign +/- signs to an array to reach a specific target sum.'
+  },
+  'min-cost-climbing-stairs': {
+    title: 'Min Cost Climbing Stairs',
+    description: 'Visualize climbing a staircase where you calculate the minimum cost to reach the top by choosing between 1 or 2 steps using Dynamic Programming.'
   },
   'distinct-subsequences': {
     title: 'Distinct Subsequences',
@@ -394,6 +401,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
   'generate-parentheses': {
     title: 'Generate Parentheses',
     description: 'Visualize the recursive backtracking approach to build all combinations of well-formed parentheses strings.'
+  },
+  'partition-labels': {
+    title: 'Partition Labels',
+    description: 'Visualize greedily partitioning a string so that each letter appears in at most one part by continuously expanding the farthest required reach.'
   }
 };
 

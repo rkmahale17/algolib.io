@@ -29,6 +29,7 @@ const blind75Map: Record<string, React.LazyExoticComponent<React.ComponentType<a
   "missing-number": React.lazy(() => import("@/components/visualizations/algorithms/MissingNumberVisualization").then(m => ({ default: m.MissingNumberVisualization }))),
   "reverse-bits": React.lazy(() => import("@/components/visualizations/algorithms/ReverseBitsVisualization").then(m => ({ default: m.ReverseBitsVisualization }))),
   "climbing-stairs": React.lazy(() => import("@/components/visualizations/algorithms/ClimbingStairsVisualization").then(m => ({ default: m.ClimbingStairsVisualization }))),
+  "min-cost-climbing-stairs": React.lazy(() => import("@/components/visualizations/algorithms/MinCostClimbingStairsVisualization").then(m => ({ default: m.MinCostClimbingStairsVisualization }))),
   "coin-change": React.lazy(() => import("@/components/visualizations/algorithms/CoinChangeVisualization").then(m => ({ default: m.CoinChangeVisualization }))),
   "longest-increasing-subsequence": React.lazy(() => import("@/components/visualizations/algorithms/LISVisualization").then(m => ({ default: m.LISVisualization }))),
   "longest-common-subsequence": React.lazy(() => import("@/components/visualizations/algorithms/LCSVisualization").then(m => ({ default: m.LCSVisualization }))),
