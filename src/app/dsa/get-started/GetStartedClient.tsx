@@ -17,10 +17,12 @@ import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 import { useApp } from "@/contexts/AppContext";
+import { useProblemOfTheDay } from '@/hooks/useProblemOfTheDay';
+import { ProblemOfTheDay } from '@/components/listing/ProblemOfTheDay';
 
 const GetStartedClient = () => {
   const { data, isLoading } = useAlgorithms();
-  const { profile } = useApp();
+  const { profile, progressMap } = useApp();
   const [activeTab, setActiveTab] = useState("all");
   const isMobile = useIsMobile();
 
@@ -33,6 +35,8 @@ const GetStartedClient = () => {
     [data, isUserAdmin]
   );
   
+  const potd = useProblemOfTheDay(allAlgorithms);
+
   const coreAlgorithms = useMemo(() => 
     allAlgorithms.filter(algo => {
       const types = algo.listTypes || (algo.list_type ? [algo.list_type] : ['core']);
@@ -79,6 +83,7 @@ const GetStartedClient = () => {
       showRecommendation={activeTab === "all"}
       initialCategoryWise={activeTab !== "all"}
       icon={activeIcon}
+      potdSlot={activeTab === "all" ? <ProblemOfTheDay potd={potd} progressMap={progressMap} /> : undefined}
       stickyHeaderSlot={
         <div className="w-full">
           {isMobile ? (

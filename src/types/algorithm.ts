@@ -48,6 +48,7 @@ export interface AlgorithmListItem {
     is_premium?: boolean;
     serial_no?: number;
     metadata?: any;
+    controls?: any;
     published?: boolean;
     [key: string]: any;
 }
