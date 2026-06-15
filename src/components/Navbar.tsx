@@ -261,7 +261,12 @@ const Navbar = ({
 
           {/* Standard Navigation Links (Desktop only) */}
           {!isProblemMode && (
-            <div className="hidden md:flex items-center gap-6 lg:gap-8 ml-6 flex-1 text-sm font-medium">
+            <div
+              className={cn(
+                "hidden md:flex items-center ml-6 flex-1 text-sm font-medium",
+                currentPath === "/" ? "gap-2" : "gap-6 lg:gap-8"
+              )}
+            >
               {!hasSidebar && (
                 <div className="h-4 w-[1px] bg-border/60 mx-1"></div>
               )}

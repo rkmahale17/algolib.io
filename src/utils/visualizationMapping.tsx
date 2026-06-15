@@ -41,6 +41,7 @@ export const visualizationMap: Record<string, any> = {
   'serialize-tree': dynamic(() => import('@/components/visualizations/algorithms/SerializeTreeVisualization').then(m => m.SerializeTreeVisualization), { ssr: false }),
   'recover-bst': dynamic(() => import('@/components/visualizations/algorithms/RecoverBSTVisualization').then(m => m.RecoverBSTVisualization), { ssr: false }),
   'invert-binary-tree': dynamic(() => import('@/components/visualizations/algorithms/InvertBinaryTreeVisualization').then(m => m.InvertBinaryTreeVisualization), { ssr: false }),
+  'count-good-nodes-in-binary-tree': dynamic(() => import('@/components/visualizations/algorithms/CountGoodNodesVisualization').then(m => m.CountGoodNodesVisualization), { ssr: false }),
   'trie': dynamic(() => import('@/components/visualizations/algorithms/TrieVisualization').then(m => m.TrieVisualization), { ssr: false }),
 
   // Linked List Algorithms
@@ -61,6 +62,7 @@ export const visualizationMap: Record<string, any> = {
   'number-of-islands': dynamic(() => import('@/components/visualizations/algorithms/NumberOfIslandsVisualization').then(m => m.NumberOfIslandsVisualization), { ssr: false }),
   'number-of-connected-components-in-an-undirected-graph': dynamic(() => import('@/components/visualizations/algorithms/NumberOfConnectedComponentsVisualization').then(m => m.NumberOfConnectedComponentsVisualization), { ssr: false }),
   'pacific-atlantic-water-flow': dynamic(() => import('@/components/visualizations/algorithms/PacificAtlanticVisualization').then(m => m.PacificAtlanticVisualization), { ssr: false }),
+  'surrounded-regions': dynamic(() => import('@/components/visualizations/algorithms/SurroundedRegionsVisualization').then(m => m.SurroundedRegionsVisualization), { ssr: false }),
   'alien-dictionary': dynamic(() => import('@/components/visualizations/algorithms/AlienDictionaryVisualization').then(m => m.AlienDictionaryVisualization), { ssr: false }),
   'topological-sort': dynamic(() => import('@/components/visualizations/algorithms/TopologicalSortVisualization').then(m => m.TopologicalSortVisualization), { ssr: false }),
   'union-find': dynamic(() => import('@/components/visualizations/algorithms/UnionFindVisualization').then(m => m.UnionFindVisualization), { ssr: false }),
@@ -378,9 +380,17 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
     title: 'Invert Binary Tree',
     description: 'Watch how every node in a binary tree has its left and right children swapped recursively to create a mirror image.'
   },
+  'count-good-nodes-in-binary-tree': {
+    title: 'Count Good Nodes in Binary Tree',
+    description: 'Visualize DFS recursive traversal tracking path maximums to identify and count good nodes in a binary tree.'
+  },
   'number-of-islands': {
     title: 'Number of Islands',
     description: 'Visualize DFS/BFS flood-fill on a 2D grid to count distinct connected land masses surrounded by water.'
+  },
+  'surrounded-regions': {
+    title: 'Surrounded Regions',
+    description: 'Visualize boundary-connected DFS marking to identify and capture surrounded O-regions on a 2D grid.'
   },
   'happy-number': {
     title: 'Happy Number',
