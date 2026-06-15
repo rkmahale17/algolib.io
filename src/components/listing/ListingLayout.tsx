@@ -60,6 +60,7 @@ interface ListingLayoutProps {
     filterButtonSlot?: ReactNode;
     hasActiveFilters?: boolean;
     onReset?: () => void;
+    potdSlot?: ReactNode;
 }
 
 interface FilterContentProps {
@@ -129,7 +130,8 @@ export const ListingLayout = ({
     icon,
     filterButtonSlot,
     hasActiveFilters,
-    onReset
+    onReset,
+    potdSlot
 }: ListingLayoutProps) => {
     const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
 
@@ -162,6 +164,12 @@ export const ListingLayout = ({
                                 {progressWidget && (
                                     <div className="w-full">
                                         {progressWidget}
+                                    </div>
+                                )}
+
+                                {potdSlot && (
+                                    <div className="w-full">
+                                        {potdSlot}
                                     </div>
                                 )}
 

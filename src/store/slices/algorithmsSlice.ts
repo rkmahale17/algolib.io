@@ -37,7 +37,7 @@ export const fetchAllAlgorithms = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const { data, error } = await supabase.from("algorithms").select(`
-          id, name, title, difficulty, category, categories, list_type, list_types, published, description, time_complexity, space_complexity, serial_no, metadata, problem_type
+          id, name, title, difficulty, category, categories, list_type, list_types, published, description, time_complexity, space_complexity, serial_no, metadata, problem_type, controls
       `).order("serial_no", { ascending: true, nullsFirst: false });
 
       if (error) throw error;
@@ -59,6 +59,7 @@ export const fetchAllAlgorithms = createAsyncThunk(
         problemType: algo.problem_type,
         serial_no: algo.serial_no,
         metadata: algo.metadata,
+        controls: algo.controls,
       }));
 
       // Cache the result

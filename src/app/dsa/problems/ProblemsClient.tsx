@@ -12,7 +12,9 @@ import { normalizeCompany, slugifyCompany } from "@/constants/companies";
 import { CompanyIcon } from "@/components/CompanyIcon";
 import { TOPIC_ICONS } from "@/components/ProblemFilterPopup";
 
-import { useApp } from "@/contexts/AppContext";
+import { useApp } from '@/contexts/AppContext';
+import { useProblemOfTheDay } from '@/hooks/useProblemOfTheDay';
+import { ProblemOfTheDay } from '@/components/listing/ProblemOfTheDay';
 
 interface ProblemsClientProps {
   listType?: string;
@@ -32,7 +34,8 @@ const ProblemsClient = ({
   const router = useRouter();
   const pathname = usePathname();
   const { data, isLoading } = useAlgorithms();
-  const { profile } = useApp();
+  const { activeListType, setActiveListType, progressMap, profile } = useApp();
+  
   const searchParams = useSearchParams();
   
   const searchMode = searchParams.get('mode') || 'all';
@@ -50,6 +53,8 @@ const ProblemsClient = ({
       .filter(algo => algo.published !== false || isUserAdmin),
     [data, isUserAdmin]
   );
+
+  const potd = useProblemOfTheDay(allAlgorithms);
 
   const companyFilter = useMemo(() => {
     if (!rawCompanyFilter) return null;
@@ -164,6 +169,7 @@ const ProblemsClient = ({
       initialSelectedTopics={initialTopics}
       initialSelectedCompanies={initialCompanies}
       initialExpandAll={pathname === '/dsa/query'}
+      potdSlot={<ProblemOfTheDay potd={potd} progressMap={progressMap} />}
       headerSlot={!manualListType ? (
         <div className="flex flex-wrap items-center gap-3 mb-8">
           <Button

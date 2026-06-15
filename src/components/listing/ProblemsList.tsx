@@ -7,7 +7,7 @@ import { useApp } from '@/contexts/AppContext';
 import { useAppSelector } from "@/store/hooks";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { getGroupedByCategory, normalizeCategory, resolveAlgoCategories, slugifyCategory } from "@/constants/categories";
-import { Brain, Target, ListFilter, SearchX, RotateCcw } from "lucide-react";
+import { Brain, Target, ListFilter, SearchX, RotateCcw, Flame, Trophy } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { ProgressStats } from "@/components/profile/ProgressStats";
 import { cn } from "@/lib/utils";
@@ -35,6 +35,7 @@ interface ProblemsListProps {
   initialSelectedCompanies?: string[];
   initialExpandAll?: boolean;
   stickyHeaderSlot?: ReactNode;
+  potdSlot?: ReactNode;
 }
 
 const EMPTY_ARRAY: string[] = [];
@@ -55,7 +56,8 @@ export const ProblemsList = ({
   initialSelectedTopics = EMPTY_ARRAY,
   initialSelectedCompanies = EMPTY_ARRAY,
   initialExpandAll = false,
-  stickyHeaderSlot
+  stickyHeaderSlot,
+  potdSlot
 }: ProblemsListProps) => {
   const { activeListType, setActiveListType, progressMap, hasPremiumAccess } = useApp();
   const { lastFetched, error: reduxError } = useAppSelector(state => state.algorithms);
@@ -491,6 +493,7 @@ export const ProblemsList = ({
       stickyHeaderSlot={stickyHeaderSlot}
       hasActiveFilters={hasActiveFilters}
       onReset={handleReset}
+      potdSlot={potdSlot}
       filterButtonSlot={
         <ProblemFilterPopup
           filters={popupFilters}
@@ -539,7 +542,7 @@ export const ProblemsList = ({
                 <div className="flex-1 bg-card rounded-xl p-3 sm:p-4 border border-border/40 shadow-sm flex flex-col min-w-0 justify-center items-center text-center w-full max-w-[320px] xl:max-w-none">
                     <span className="text-[12px] sm:text-[13px] text-muted-foreground font-semibold mb-1 sm:mb-2 truncate">Current Streak</span>
                     <div className="flex items-center justify-center gap-2">
-                        <span className="text-orange-500 text-lg sm:text-xl shrink-0">🔥</span>
+                        <Flame className="w-5 h-5 sm:w-6 sm:h-6 text-foreground shrink-0" />
                         <span className="text-lg sm:text-2xl font-bold text-foreground tracking-tight truncate">{currentStreak}</span>
                         <span className="text-[11px] sm:text-xs text-muted-foreground/80 font-medium pb-0.5">days</span>
                     </div>
@@ -547,7 +550,7 @@ export const ProblemsList = ({
                 <div className="flex-1 bg-card rounded-xl p-3 sm:p-4 border border-border/40 shadow-sm flex flex-col min-w-0 justify-center items-center text-center w-full max-w-[320px] xl:max-w-none">
                     <span className="text-[12px] sm:text-[13px] text-muted-foreground font-semibold mb-1 sm:mb-2 truncate">Best Streak</span>
                     <div className="flex items-center justify-center gap-2">
-                        <span className="text-yellow-500 text-lg sm:text-xl shrink-0">🏆</span>
+                        <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-foreground shrink-0" />
                         <span className="text-lg sm:text-2xl font-bold text-foreground tracking-tight truncate">{maxStreak}</span>
                         <span className="text-[11px] sm:text-xs text-muted-foreground/80 font-medium pb-0.5">days</span>
                     </div>
