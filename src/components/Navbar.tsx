@@ -266,452 +266,476 @@ const Navbar = ({
                 <div className="h-4 w-[1px] bg-border/60 mx-1"></div>
               )}
 
-              <Link
-                href="/dashboard"
-                className="font-normal hover:text-primary transition-colors shutter-click"
-                onClick={closeMenus}
-              >
-                Dashboard
-              </Link>
+              {currentPath !== "/" &&
+                !currentPath.startsWith("/dashboard") &&
+                !currentPath.startsWith("/profile") && (
+                  <Link
+                    href="/dashboard"
+                    className="font-normal hover:text-primary transition-colors shutter-click"
+                    onClick={closeMenus}
+                  >
+                    Dashboard
+                  </Link>
+                )}
 
               {/* ───────────────────────────────────────────────────────────────── */}
               {/* LEARN MENU                                                        */}
               {/* ───────────────────────────────────────────────────────────────── */}
-              <div
-                onMouseEnter={handleLearnMouseEnter}
-                onMouseLeave={handleLearnMouseLeave}
-              >
-                <DropdownMenu
-                  open={isLearnOpen}
-                  onOpenChange={setIsLearnOpen}
-                  modal={false}
+              {currentPath === "/" ? (
+                <Link
+                  href="/guides/time-complexity"
+                  className="font-normal hover:bg-muted hover:text-foreground rounded-lg px-3 py-1.5 transition-all shutter-click"
+                  onClick={closeMenus}
                 >
-                  <DropdownMenuTrigger className="flex items-center gap-1 hover:text-primary transition-colors outline-none font-normal shutter-click">
-                    <span>Learn</span>
-                    <ChevronDown className="w-3.5 h-3.5 text-muted-foreground ml-1" />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="start"
-                    className="w-[700px] p-0 flex flex-row overflow-hidden border-border mt-2 rounded-xl shadow-2xl bg-background"
-                    onMouseEnter={handleLearnMouseEnter}
-                    onMouseLeave={handleLearnMouseLeave}
-                    sideOffset={4}
+                  Learn
+                </Link>
+              ) : (
+                <div
+                  onMouseEnter={handleLearnMouseEnter}
+                  onMouseLeave={handleLearnMouseLeave}
+                >
+                  <DropdownMenu
+                    open={isLearnOpen}
+                    onOpenChange={setIsLearnOpen}
+                    modal={false}
                   >
-                    <div className="w-[240px] bg-muted/30 p-4 border-r border-border flex flex-col gap-1.5">
-                      <div
-                        onClick={() => setActiveLearnTab("fundamentals")}
-                        className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activeLearnTab === "fundamentals" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
-                      >
-                        Fundamentals
-                      </div>
-                      <div
-                        onClick={() => setActiveLearnTab("visual")}
-                        className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activeLearnTab === "visual" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
-                      >
-                        Visual Algorithms
-                      </div>
-                      <div
-                        onClick={() => setActiveLearnTab("pattern")}
-                        className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activeLearnTab === "pattern" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
-                      >
-                        Core patterns
-                      </div>
-                    </div>
-
-                    <div className="flex-1 p-8 flex flex-col gap-8 bg-background overflow-y-auto max-h-[500px]">
-                      {activeLearnTab === "visual" && (
-                        <div className="flex flex-col gap-8">
-                          <Link
-                            href="/dsa/visual-library"
-                            className="group flex items-start gap-5 relative shutter-click"
-                            onClick={() => {
-                              closeMenus();
-                              trackEvent(posthog, "home_cta_clicked", {
-                                cta_label: "Visual Algorithms",
-                                destination: "/dsa/visual-library",
-                                section: "navbar_learn",
-                              });
-                            }}
-                          >
-                            <div className="p-3 bg-muted/50 rounded-xl group-hover:bg-primary/10 transition-colors border border-border/50 shrink-0">
-                              <Monitor className="w-5 h-5 text-foreground group-hover:text-primary" />
-                            </div>
-                            <div className="flex-1 pr-8">
-                              <h4 className="text-[15px] font-semibold mb-1.5 text-foreground group-hover:text-primary transition-colors tracking-tight">
-                                Visual Algorithms
-                              </h4>
-                              <p className="text-[13px] text-muted-foreground mb-3 leading-relaxed max-w-[320px]">
-                                Explore our recommended 30 patterns and interact with visualizations and problem descriptions.
-                              </p>
-                              <div className="flex flex-wrap gap-2">
-                                <Badge variant="secondary" className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5">Interactive</Badge>
-                              </div>
-                            </div>
-                            <ChevronRight className="w-5 h-5 text-muted-foreground/30 absolute right-0 top-1/2 -translate-y-1/2 group-hover:translate-x-1 group-hover:text-primary transition-all" />
-                          </Link>
+                    <DropdownMenuTrigger className="flex items-center gap-1 hover:text-primary transition-colors outline-none font-normal shutter-click">
+                      <span>Learn</span>
+                      <ChevronDown className="w-3.5 h-3.5 text-muted-foreground ml-1" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="start"
+                      className="w-[700px] p-0 flex flex-row overflow-hidden border-border mt-2 rounded-xl shadow-2xl bg-background"
+                      onMouseEnter={handleLearnMouseEnter}
+                      onMouseLeave={handleLearnMouseLeave}
+                      sideOffset={4}
+                    >
+                      <div className="w-[240px] bg-muted/30 p-4 border-r border-border flex flex-col gap-1.5">
+                        <div
+                          onClick={() => setActiveLearnTab("fundamentals")}
+                          className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activeLearnTab === "fundamentals" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
+                        >
+                          Fundamentals
                         </div>
-                      )}
+                        <div
+                          onClick={() => setActiveLearnTab("visual")}
+                          className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activeLearnTab === "visual" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
+                        >
+                          Visual Algorithms
+                        </div>
+                        <div
+                          onClick={() => setActiveLearnTab("pattern")}
+                          className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activeLearnTab === "pattern" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
+                        >
+                          Core patterns
+                        </div>
+                      </div>
 
-                      {activeLearnTab === "pattern" && (
-                        <div className="flex flex-col gap-6">
-                          <div className="text-xs font-bold text-muted-foreground/40 uppercase tracking-[0.2em]">
-                            Core Patterns
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-3">
-                            {GUIDE_GROUPS.find((g) => g.id === "patterns")
-                              ?.guides.slice(0, 5)
-                              .map((guide) => (
-                                <Link
-                                  key={guide.slug}
-                                  href={`/guides/patterns/${guide.slug}`}
-                                  className="px-3 py-2 rounded-lg hover:bg-primary/5 transition-all flex items-center justify-between group shutter-click"
-                                  onClick={closeMenus}
-                                >
-                                  <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">
-                                    {guide.title}
-                                  </span>
-                                  <ArrowUpRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
-                                </Link>
-                              ))}
-                          </div>
-
-                          <div className="border-t border-border/60 pt-3 flex justify-end">
+                      <div className="flex-1 p-8 flex flex-col gap-8 bg-background overflow-y-auto max-h-[500px]">
+                        {activeLearnTab === "visual" && (
+                          <div className="flex flex-col gap-8">
                             <Link
-                              href="/dsa/core"
-                              className="text-[13px] font-semibold text-primary hover:underline flex items-center gap-1 group shutter-click"
+                              href="/dsa/visual-library"
+                              className="group flex items-start gap-5 relative shutter-click"
                               onClick={() => {
                                 closeMenus();
                                 trackEvent(posthog, "home_cta_clicked", {
-                                  cta_label: "View all patterns",
-                                  destination: "/dsa/core",
-                                  section: "navbar_learn_core_patterns",
+                                  cta_label: "Visual Algorithms",
+                                  destination: "/dsa/visual-library",
+                                  section: "navbar_learn",
                                 });
                               }}
                             >
-                              View all <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                              <div className="p-3 bg-muted/50 rounded-xl group-hover:bg-primary/10 transition-colors border border-border/50 shrink-0">
+                                <Monitor className="w-5 h-5 text-foreground group-hover:text-primary" />
+                              </div>
+                              <div className="flex-1 pr-8">
+                                <h4 className="text-[15px] font-semibold mb-1.5 text-foreground group-hover:text-primary transition-colors tracking-tight">
+                                  Visual Algorithms
+                                </h4>
+                                <p className="text-[13px] text-muted-foreground mb-3 leading-relaxed max-w-[320px]">
+                                  Explore our recommended 30 patterns and interact with visualizations and problem descriptions.
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                  <Badge variant="secondary" className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5">Interactive</Badge>
+                                </div>
+                              </div>
+                              <ChevronRight className="w-5 h-5 text-muted-foreground/30 absolute right-0 top-1/2 -translate-y-1/2 group-hover:translate-x-1 group-hover:text-primary transition-all" />
                             </Link>
                           </div>
+                        )}
+
+                        {activeLearnTab === "pattern" && (
+                          <div className="flex flex-col gap-6">
+                            <div className="text-xs font-bold text-muted-foreground/40 uppercase tracking-[0.2em]">
+                              Core Patterns
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                              {GUIDE_GROUPS.find((g) => g.id === "patterns")
+                                ?.guides.slice(0, 5)
+                                .map((guide) => (
+                                  <Link
+                                    key={guide.slug}
+                                    href={`/guides/patterns/${guide.slug}`}
+                                    className="px-3 py-2 rounded-lg hover:bg-primary/5 transition-all flex items-center justify-between group shutter-click"
+                                    onClick={closeMenus}
+                                  >
+                                    <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">
+                                      {guide.title}
+                                    </span>
+                                    <ArrowUpRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                                  </Link>
+                                ))}
+                            </div>
+
+                            <div className="border-t border-border/60 pt-3 flex justify-end">
+                              <Link
+                                href="/dsa/core"
+                                className="text-[13px] font-semibold text-primary hover:underline flex items-center gap-1 group shutter-click"
+                                onClick={() => {
+                                  closeMenus();
+                                  trackEvent(posthog, "home_cta_clicked", {
+                                    cta_label: "View all patterns",
+                                    destination: "/dsa/core",
+                                    section: "navbar_learn_core_patterns",
+                                  });
+                                }}
+                              >
+                                View all <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                              </Link>
+                            </div>
+                          </div>
+                        )}
+
+                        {activeLearnTab === "fundamentals" && (
+                          <div className="flex flex-col gap-6">
+                            <div className="text-xs font-bold text-muted-foreground/40 uppercase tracking-[0.2em]">
+                              Fundamentals
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-5">
+                              {/* Time Complexity */}
+                              <Link
+                                href="/guides/time-complexity"
+                                className="group flex items-start gap-5 relative shutter-click"
+                                onClick={closeMenus}
+                              >
+                                <div className="p-3 bg-muted/50 rounded-xl group-hover:bg-primary/10 transition-colors border border-border/50 shrink-0">
+                                  <Clock className="w-5 h-5 text-foreground group-hover:text-primary" />
+                                </div>
+                                <div className="flex-1 pr-8">
+                                  <h4 className="text-[15px] font-semibold mb-1.5 text-foreground group-hover:text-primary transition-colors tracking-tight">
+                                    Time Complexity
+                                  </h4>
+                                  <p className="text-[13px] text-muted-foreground leading-relaxed">
+                                    Big O runtime analysis and operation budgets cheat sheet.
+                                  </p>
+                                </div>
+                                <ChevronRight className="w-5 h-5 text-muted-foreground/30 absolute right-0 top-1/2 -translate-y-1/2 group-hover:translate-x-1 group-hover:text-primary transition-all" />
+                              </Link>
+
+                              {/* Space Complexity */}
+                              <Link
+                                href="/guides/space-complexity"
+                                className="group flex items-start gap-5 relative shutter-click"
+                                onClick={closeMenus}
+                              >
+                                <div className="p-3 bg-muted/50 rounded-xl group-hover:bg-primary/10 transition-colors border border-border/50 shrink-0">
+                                  <HardDrive className="w-5 h-5 text-foreground group-hover:text-primary" />
+                                </div>
+                                <div className="flex-1 pr-8">
+                                  <h4 className="text-[15px] font-semibold mb-1.5 text-foreground group-hover:text-primary transition-colors tracking-tight">
+                                    Space Complexity
+                                  </h4>
+                                  <p className="text-[13px] text-muted-foreground leading-relaxed">
+                                    Recursion stack, memory bounds, and allocations cheat sheet.
+                                  </p>
+                                </div>
+                                <ChevronRight className="w-5 h-5 text-muted-foreground/30 absolute right-0 top-1/2 -translate-y-1/2 group-hover:translate-x-1 group-hover:text-primary transition-all" />
+                              </Link>
+
+                              {/* Core Data Structures */}
+                              <Link
+                                href="/guides/fundamentals/core-data-structures"
+                                className="group flex items-start gap-5 relative shutter-click"
+                                onClick={closeMenus}
+                              >
+                                <div className="p-3 bg-muted/50 rounded-xl group-hover:bg-primary/10 transition-colors border border-border/50 shrink-0">
+                                  <Layers className="w-5 h-5 text-foreground group-hover:text-primary" />
+                                </div>
+                                <div className="flex-1 pr-8">
+                                  <h4 className="text-[15px] font-semibold mb-1.5 text-foreground group-hover:text-primary transition-colors tracking-tight">
+                                    Core Data Structures
+                                  </h4>
+                                  <p className="text-[13px] text-muted-foreground leading-relaxed">
+                                    Core structures like Arrays, Linked Lists, and Hash Maps.
+                                  </p>
+                                </div>
+                                <ChevronRight className="w-5 h-5 text-muted-foreground/30 absolute right-0 top-1/2 -translate-y-1/2 group-hover:translate-x-1 group-hover:text-primary transition-all" />
+                              </Link>
+
+                              {/* Trees & Graphs */}
+                              <Link
+                                href="/guides/fundamentals/trees"
+                                className="group flex items-start gap-5 relative shutter-click"
+                                onClick={closeMenus}
+                              >
+                                <div className="p-3 bg-muted/50 rounded-xl group-hover:bg-primary/10 transition-colors border border-border/50 shrink-0">
+                                  <User className="w-5 h-5 text-foreground group-hover:text-primary" />
+                                </div>
+                                <div className="flex-1 pr-8">
+                                  <h4 className="text-[15px] font-semibold mb-1.5 text-foreground group-hover:text-primary transition-colors tracking-tight">
+                                    Trees & Graphs
+                                  </h4>
+                                  <p className="text-[13px] text-muted-foreground leading-relaxed">
+                                    Advanced non-linear data structures fundamentals.
+                                  </p>
+                                </div>
+                                <ChevronRight className="w-5 h-5 text-muted-foreground/30 absolute right-0 top-1/2 -translate-y-1/2 group-hover:translate-x-1 group-hover:text-primary transition-all" />
+                              </Link>
+
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              )}
+
+              {/* ───────────────────────────────────────────────────────────────── */}
+              {/* PRACTICE MENU                                                     */}
+              {/* ───────────────────────────────────────────────────────────────── */}
+              {currentPath === "/" ? (
+                <Link
+                  href="/dsa/get-started"
+                  className="font-normal hover:bg-muted hover:text-foreground rounded-lg px-3 py-1.5 transition-all shutter-click"
+                  onClick={closeMenus}
+                >
+                  Practice
+                </Link>
+              ) : (
+                <div
+                  onMouseEnter={handlePracticeMouseEnter}
+                  onMouseLeave={handlePracticeMouseLeave}
+                >
+                  <DropdownMenu
+                    open={isPracticeOpen}
+                    onOpenChange={setIsPracticeOpen}
+                    modal={false}
+                  >
+                    <DropdownMenuTrigger className="flex items-center gap-1 hover:text-primary transition-colors outline-none font-normal shutter-click">
+                      <span>Practice</span>
+                      <ChevronDown className="w-3.5 h-3.5 text-muted-foreground ml-1" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="start"
+                      className="w-[700px] p-0 flex flex-row overflow-hidden border-border mt-2 rounded-xl shadow-2xl bg-background"
+                      onMouseEnter={handlePracticeMouseEnter}
+                      onMouseLeave={handlePracticeMouseLeave}
+                      sideOffset={4}
+                    >
+                      <div className="w-[240px] bg-muted/30 p-4 border-r border-border flex flex-col gap-1.5">
+                        <div
+                          onClick={() => setActivePracticeTab("problems")}
+                          className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activePracticeTab === "problems" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
+                        >
+                          All Problems
                         </div>
-                      )}
+                        <div
+                          onClick={() => setActivePracticeTab("topics")}
+                          className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activePracticeTab === "topics" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
+                        >
+                          By Topic
+                        </div>
+                        <div
+                          onClick={() => setActivePracticeTab("company")}
+                          className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activePracticeTab === "company" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
+                        >
+                          By Company
+                        </div>
+                        <div
+                          onClick={() => setActivePracticeTab("blind75")}
+                          className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activePracticeTab === "blind75" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
+                        >
+                          Blind 75
+                        </div>
+                        <div
+                          onClick={() => setActivePracticeTab("patterns")}
+                          className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activePracticeTab === "patterns" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
+                        >
+                          Pattern Guides
+                        </div>
+                      </div>
 
-                      {activeLearnTab === "fundamentals" && (
-                        <div className="flex flex-col gap-6">
-                          <div className="text-xs font-bold text-muted-foreground/40 uppercase tracking-[0.2em]">
-                            Fundamentals
-                          </div>
-
-                          <div className="grid grid-cols-1 gap-5">
-                            {/* Time Complexity */}
+                      <div className="flex-1 p-8 flex flex-col gap-8 bg-background overflow-y-auto max-h-[500px]">
+                        {activePracticeTab === "problems" && (
+                          <div className="flex flex-col gap-8">
                             <Link
-                              href="/guides/time-complexity"
+                              href="/dsa/problems"
                               className="group flex items-start gap-5 relative shutter-click"
-                              onClick={closeMenus}
-                            >
-                              <div className="p-3 bg-muted/50 rounded-xl group-hover:bg-primary/10 transition-colors border border-border/50 shrink-0">
-                                <Clock className="w-5 h-5 text-foreground group-hover:text-primary" />
-                              </div>
-                              <div className="flex-1 pr-8">
-                                <h4 className="text-[15px] font-semibold mb-1.5 text-foreground group-hover:text-primary transition-colors tracking-tight">
-                                  Time Complexity
-                                </h4>
-                                <p className="text-[13px] text-muted-foreground leading-relaxed">
-                                  Big O runtime analysis and operation budgets cheat sheet.
-                                </p>
-                              </div>
-                              <ChevronRight className="w-5 h-5 text-muted-foreground/30 absolute right-0 top-1/2 -translate-y-1/2 group-hover:translate-x-1 group-hover:text-primary transition-all" />
-                            </Link>
-
-                            {/* Space Complexity */}
-                            <Link
-                              href="/guides/space-complexity"
-                              className="group flex items-start gap-5 relative shutter-click"
-                              onClick={closeMenus}
-                            >
-                              <div className="p-3 bg-muted/50 rounded-xl group-hover:bg-primary/10 transition-colors border border-border/50 shrink-0">
-                                <HardDrive className="w-5 h-5 text-foreground group-hover:text-primary" />
-                              </div>
-                              <div className="flex-1 pr-8">
-                                <h4 className="text-[15px] font-semibold mb-1.5 text-foreground group-hover:text-primary transition-colors tracking-tight">
-                                  Space Complexity
-                                </h4>
-                                <p className="text-[13px] text-muted-foreground leading-relaxed">
-                                  Recursion stack, memory bounds, and allocations cheat sheet.
-                                </p>
-                              </div>
-                              <ChevronRight className="w-5 h-5 text-muted-foreground/30 absolute right-0 top-1/2 -translate-y-1/2 group-hover:translate-x-1 group-hover:text-primary transition-all" />
-                            </Link>
-
-                            {/* Core Data Structures */}
-                            <Link
-                              href="/guides/fundamentals/core-data-structures"
-                              className="group flex items-start gap-5 relative shutter-click"
-                              onClick={closeMenus}
+                              onClick={() => {
+                                closeMenus();
+                                trackEvent(posthog, "home_cta_clicked", {
+                                  cta_label: "All Questions",
+                                  destination: "/dsa/problems",
+                                  section: "navbar_practice",
+                                });
+                              }}
                             >
                               <div className="p-3 bg-muted/50 rounded-xl group-hover:bg-primary/10 transition-colors border border-border/50 shrink-0">
                                 <Layers className="w-5 h-5 text-foreground group-hover:text-primary" />
                               </div>
                               <div className="flex-1 pr-8">
                                 <h4 className="text-[15px] font-semibold mb-1.5 text-foreground group-hover:text-primary transition-colors tracking-tight">
-                                  Core Data Structures
+                                  All Questions
                                 </h4>
-                                <p className="text-[13px] text-muted-foreground leading-relaxed">
-                                  Core structures like Arrays, Linked Lists, and Hash Maps.
+                                <p className="text-[13px] text-muted-foreground mb-3 leading-relaxed max-w-[320px]">
+                                  The largest question bank of 150+ practice questions for DSA interviews
                                 </p>
+                                <div className="flex flex-wrap gap-2">
+                                  <Badge variant="secondary" className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5">Coding</Badge>
+                                  <Badge variant="secondary" className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5">Data Structures</Badge>
+                                  <Badge variant="secondary" className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5">Algorithms</Badge>
+                                </div>
                               </div>
                               <ChevronRight className="w-5 h-5 text-muted-foreground/30 absolute right-0 top-1/2 -translate-y-1/2 group-hover:translate-x-1 group-hover:text-primary transition-all" />
                             </Link>
 
-                            {/* Trees & Graphs */}
                             <Link
-                              href="/guides/fundamentals/trees"
+                              href="/dsa/core"
                               className="group flex items-start gap-5 relative shutter-click"
-                              onClick={closeMenus}
+                              onClick={() => {
+                                closeMenus();
+                                trackEvent(posthog, "home_cta_clicked", {
+                                  cta_label: "Core problems",
+                                  destination: "/dsa/core",
+                                  section: "navbar_practice",
+                                });
+                              }}
                             >
                               <div className="p-3 bg-muted/50 rounded-xl group-hover:bg-primary/10 transition-colors border border-border/50 shrink-0">
-                                <User className="w-5 h-5 text-foreground group-hover:text-primary" />
+                                <Target className="w-5 h-5 text-foreground group-hover:text-primary" />
                               </div>
                               <div className="flex-1 pr-8">
                                 <h4 className="text-[15px] font-semibold mb-1.5 text-foreground group-hover:text-primary transition-colors tracking-tight">
-                                  Trees & Graphs
+                                  Core problems
                                 </h4>
-                                <p className="text-[13px] text-muted-foreground leading-relaxed">
-                                  Advanced non-linear data structures fundamentals.
+                                <p className="text-[13px] text-muted-foreground mb-3 leading-relaxed max-w-[320px]">
+                                  Practice specific problem-solving patterns.
                                 </p>
                               </div>
                               <ChevronRight className="w-5 h-5 text-muted-foreground/30 absolute right-0 top-1/2 -translate-y-1/2 group-hover:translate-x-1 group-hover:text-primary transition-all" />
                             </Link>
-
                           </div>
-                        </div>
-                      )}
-                    </div>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+                        )}
 
-              {/* ───────────────────────────────────────────────────────────────── */}
-              {/* PRACTICE MENU                                                     */}
-              {/* ───────────────────────────────────────────────────────────────── */}
-              <div
-                onMouseEnter={handlePracticeMouseEnter}
-                onMouseLeave={handlePracticeMouseLeave}
-              >
-                <DropdownMenu
-                  open={isPracticeOpen}
-                  onOpenChange={setIsPracticeOpen}
-                  modal={false}
-                >
-                  <DropdownMenuTrigger className="flex items-center gap-1 hover:text-primary transition-colors outline-none font-normal shutter-click">
-                    <span>Practice</span>
-                    <ChevronDown className="w-3.5 h-3.5 text-muted-foreground ml-1" />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="start"
-                    className="w-[700px] p-0 flex flex-row overflow-hidden border-border mt-2 rounded-xl shadow-2xl bg-background"
-                    onMouseEnter={handlePracticeMouseEnter}
-                    onMouseLeave={handlePracticeMouseLeave}
-                    sideOffset={4}
-                  >
-                    <div className="w-[240px] bg-muted/30 p-4 border-r border-border flex flex-col gap-1.5">
-                      <div
-                        onClick={() => setActivePracticeTab("problems")}
-                        className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activePracticeTab === "problems" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
-                      >
-                        All Problems
-                      </div>
-                      <div
-                        onClick={() => setActivePracticeTab("topics")}
-                        className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activePracticeTab === "topics" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
-                      >
-                        By Topic
-                      </div>
-                      <div
-                        onClick={() => setActivePracticeTab("company")}
-                        className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activePracticeTab === "company" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
-                      >
-                        By Company
-                      </div>
-                      <div
-                        onClick={() => setActivePracticeTab("blind75")}
-                        className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activePracticeTab === "blind75" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
-                      >
-                        Blind 75
-                      </div>
-                      <div
-                        onClick={() => setActivePracticeTab("patterns")}
-                        className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activePracticeTab === "patterns" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
-                      >
-                        Pattern Guides
-                      </div>
-                    </div>
-
-                    <div className="flex-1 p-8 flex flex-col gap-8 bg-background overflow-y-auto max-h-[500px]">
-                      {activePracticeTab === "problems" && (
-                        <div className="flex flex-col gap-8">
-                          <Link
-                            href="/dsa/problems"
-                            className="group flex items-start gap-5 relative shutter-click"
-                            onClick={() => {
-                              closeMenus();
-                              trackEvent(posthog, "home_cta_clicked", {
-                                cta_label: "All Questions",
-                                destination: "/dsa/problems",
-                                section: "navbar_practice",
-                              });
-                            }}
-                          >
-                            <div className="p-3 bg-muted/50 rounded-xl group-hover:bg-primary/10 transition-colors border border-border/50 shrink-0">
-                              <Layers className="w-5 h-5 text-foreground group-hover:text-primary" />
+                        {activePracticeTab === "company" && (
+                          <div className="flex flex-col gap-6">
+                            <div className="text-xs font-bold text-muted-foreground/40 uppercase tracking-[0.2em]">
+                              Top Companies
                             </div>
-                            <div className="flex-1 pr-8">
-                              <h4 className="text-[15px] font-semibold mb-1.5 text-foreground group-hover:text-primary transition-colors tracking-tight">
-                                All Questions
-                              </h4>
-                              <p className="text-[13px] text-muted-foreground mb-3 leading-relaxed max-w-[320px]">
-                                The largest question bank of 150+ practice questions for DSA interviews
-                              </p>
-                              <div className="flex flex-wrap gap-2">
-                                <Badge variant="secondary" className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5">Coding</Badge>
-                                <Badge variant="secondary" className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5">Data Structures</Badge>
-                                <Badge variant="secondary" className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5">Algorithms</Badge>
+                            <div className="grid grid-cols-2 gap-3 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
+                              {TOP_COMPANIES.map(company => (
+                                <Link
+                                  key={company.id}
+                                  href={`/dsa/problems?company=${slugifyCompany(company.name)}`}
+                                  className="px-4 py-2.5 rounded-lg border border-border hover:border-primary hover:bg-primary/5 transition-all flex items-center justify-between group shutter-click"
+                                  onClick={closeMenus}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <CompanyIcon company={company.id} className="w-4 h-4 grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all" />
+                                    <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">{company.name}</span>
+                                  </div>
+                                  <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {activePracticeTab === "topics" && (
+                          <div className="flex flex-col gap-6">
+                            <div className="text-xs font-bold text-muted-foreground/40 uppercase tracking-[0.2em]">
+                              Categories
+                            </div>
+                            <div className="grid grid-cols-2 gap-3 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
+                              {['Arrays & Hashing', 'Two Pointers', 'Sliding Window', 'Stack', 'Binary Search', 'Linked List', 'Trees', 'Tries', 'Backtracking', 'Graphs', 'Dynamic Programming', 'Greedy', 'Intervals', 'Math & Geometry', 'Bit Manipulation'].map(topic => (
+                                <Link
+                                  key={topic}
+                                  href={`/dsa/problems?topic=${slugifyCategory(topic)}`}
+                                  className="px-4 py-2.5 rounded-lg border border-border hover:border-primary hover:bg-primary/5 transition-all flex items-center justify-between group shutter-click"
+                                  onClick={closeMenus}
+                                >
+                                  <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">{topic}</span>
+                                  <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {activePracticeTab === "blind75" && (
+                          <div className="flex flex-col gap-8">
+                            <Link
+                              href="/dsa/blind-75"
+                              className="group flex items-start gap-5 relative shutter-click"
+                              onClick={() => {
+                                closeMenus();
+                                trackEvent(posthog, "home_cta_clicked", {
+                                  cta_label: "Blind 75",
+                                  destination: "/dsa/blind-75",
+                                  section: "navbar_practice",
+                                });
+                              }}
+                            >
+                              <div className="p-3 bg-muted/50 rounded-xl group-hover:bg-primary/10 transition-colors border border-border/50 shrink-0">
+                                <Brain className="w-5 h-5 text-foreground group-hover:text-primary" />
                               </div>
-                            </div>
-                            <ChevronRight className="w-5 h-5 text-muted-foreground/30 absolute right-0 top-1/2 -translate-y-1/2 group-hover:translate-x-1 group-hover:text-primary transition-all" />
-                          </Link>
-
-                          <Link
-                            href="/dsa/core"
-                            className="group flex items-start gap-5 relative shutter-click"
-                            onClick={() => {
-                              closeMenus();
-                              trackEvent(posthog, "home_cta_clicked", {
-                                cta_label: "Core problems",
-                                destination: "/dsa/core",
-                                section: "navbar_practice",
-                              });
-                            }}
-                          >
-                            <div className="p-3 bg-muted/50 rounded-xl group-hover:bg-primary/10 transition-colors border border-border/50 shrink-0">
-                              <Target className="w-5 h-5 text-foreground group-hover:text-primary" />
-                            </div>
-                            <div className="flex-1 pr-8">
-                              <h4 className="text-[15px] font-semibold mb-1.5 text-foreground group-hover:text-primary transition-colors tracking-tight">
-                                Core problems
-                              </h4>
-                              <p className="text-[13px] text-muted-foreground mb-3 leading-relaxed max-w-[320px]">
-                                Practice specific problem-solving patterns.
-                              </p>
-                            </div>
-                            <ChevronRight className="w-5 h-5 text-muted-foreground/30 absolute right-0 top-1/2 -translate-y-1/2 group-hover:translate-x-1 group-hover:text-primary transition-all" />
-                          </Link>
-                        </div>
-                      )}
-
-                      {activePracticeTab === "company" && (
-                        <div className="flex flex-col gap-6">
-                          <div className="text-xs font-bold text-muted-foreground/40 uppercase tracking-[0.2em]">
-                            Top Companies
-                          </div>
-                          <div className="grid grid-cols-2 gap-3 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
-                            {TOP_COMPANIES.map(company => (
-                              <Link
-                                key={company.id}
-                                href={`/dsa/problems?company=${slugifyCompany(company.name)}`}
-                                className="px-4 py-2.5 rounded-lg border border-border hover:border-primary hover:bg-primary/5 transition-all flex items-center justify-between group shutter-click"
-                                onClick={closeMenus}
-                              >
-                                <div className="flex items-center gap-2">
-                                  <CompanyIcon company={company.id} className="w-4 h-4 grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all" />
-                                  <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">{company.name}</span>
+                              <div className="flex-1 pr-8">
+                                <h4 className="text-[15px] font-semibold mb-1.5 text-foreground group-hover:text-primary transition-colors tracking-tight">
+                                  Blind 75
+                                </h4>
+                                <p className="text-[13px] text-muted-foreground mb-3 leading-relaxed max-w-[320px]">
+                                  Curated collection of 75 essential questions to master DSA patterns for interviews.
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                  <Badge variant="secondary" className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5">Top Curated</Badge>
+                                  <Badge variant="secondary" className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5">FAANG Prep</Badge>
                                 </div>
-                                <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {activePracticeTab === "topics" && (
-                        <div className="flex flex-col gap-6">
-                          <div className="text-xs font-bold text-muted-foreground/40 uppercase tracking-[0.2em]">
-                            Categories
-                          </div>
-                          <div className="grid grid-cols-2 gap-3 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
-                            {['Arrays & Hashing', 'Two Pointers', 'Sliding Window', 'Stack', 'Binary Search', 'Linked List', 'Trees', 'Tries', 'Backtracking', 'Graphs', 'Dynamic Programming', 'Greedy', 'Intervals', 'Math & Geometry', 'Bit Manipulation'].map(topic => (
-                              <Link
-                                key={topic}
-                                href={`/dsa/problems?topic=${slugifyCategory(topic)}`}
-                                className="px-4 py-2.5 rounded-lg border border-border hover:border-primary hover:bg-primary/5 transition-all flex items-center justify-between group shutter-click"
-                                onClick={closeMenus}
-                              >
-                                <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">{topic}</span>
-                                <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {activePracticeTab === "blind75" && (
-                        <div className="flex flex-col gap-8">
-                          <Link
-                            href="/dsa/blind-75"
-                            className="group flex items-start gap-5 relative shutter-click"
-                            onClick={() => {
-                              closeMenus();
-                              trackEvent(posthog, "home_cta_clicked", {
-                                cta_label: "Blind 75",
-                                destination: "/dsa/blind-75",
-                                section: "navbar_practice",
-                              });
-                            }}
-                          >
-                            <div className="p-3 bg-muted/50 rounded-xl group-hover:bg-primary/10 transition-colors border border-border/50 shrink-0">
-                              <Brain className="w-5 h-5 text-foreground group-hover:text-primary" />
-                            </div>
-                            <div className="flex-1 pr-8">
-                              <h4 className="text-[15px] font-semibold mb-1.5 text-foreground group-hover:text-primary transition-colors tracking-tight">
-                                Blind 75
-                              </h4>
-                              <p className="text-[13px] text-muted-foreground mb-3 leading-relaxed max-w-[320px]">
-                                Curated collection of 75 essential questions to master DSA patterns for interviews.
-                              </p>
-                              <div className="flex flex-wrap gap-2">
-                                <Badge variant="secondary" className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5">Top Curated</Badge>
-                                <Badge variant="secondary" className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5">FAANG Prep</Badge>
                               </div>
+                              <ChevronRight className="w-5 h-5 text-muted-foreground/30 absolute right-0 top-1/2 -translate-y-1/2 group-hover:translate-x-1 group-hover:text-primary transition-all" />
+                            </Link>
+                          </div>
+                        )}
+
+                        {activePracticeTab === "patterns" && (
+                          <div className="flex flex-col gap-6">
+                            <div className="text-xs font-bold text-muted-foreground/40 uppercase tracking-[0.2em]">
+                              Pattern Guides
                             </div>
-                            <ChevronRight className="w-5 h-5 text-muted-foreground/30 absolute right-0 top-1/2 -translate-y-1/2 group-hover:translate-x-1 group-hover:text-primary transition-all" />
-                          </Link>
-                        </div>
-                      )}
 
-                      {activePracticeTab === "patterns" && (
-                        <div className="flex flex-col gap-6">
-                          <div className="text-xs font-bold text-muted-foreground/40 uppercase tracking-[0.2em]">
-                            Pattern Guides
+                            <div className="grid grid-cols-2 gap-3 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
+                              {GUIDE_GROUPS.find(g => g.id === "patterns")?.guides.map((guide) => (
+                                <Link
+                                  key={guide.slug}
+                                  href={`/guides/patterns/${guide.slug}`}
+                                  className="px-3 py-2 rounded-lg hover:bg-primary/5 transition-all flex items-center justify-between group shutter-click"
+                                  onClick={closeMenus}
+                                >
+                                  <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">{guide.title}</span>
+                                  <ArrowUpRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                                </Link>
+                              ))}
+                            </div>
                           </div>
-
-                          <div className="grid grid-cols-2 gap-3 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
-                            {GUIDE_GROUPS.find(g => g.id === "patterns")?.guides.map((guide) => (
-                              <Link
-                                key={guide.slug}
-                                href={`/guides/patterns/${guide.slug}`}
-                                className="px-3 py-2 rounded-lg hover:bg-primary/5 transition-all flex items-center justify-between group shutter-click"
-                                onClick={closeMenus}
-                              >
-                                <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">{guide.title}</span>
-                                <ArrowUpRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+                        )}
+                      </div>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              )}
 
 
             </div>
