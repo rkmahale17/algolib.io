@@ -77,7 +77,7 @@ export function calculateGraphPositions(
     let isEdgeList = true;
     let maxVal = -1;
     for (const item of data) {
-        if (item.length !== 2) {
+        if (!Array.isArray(item) || item.length !== 2) {
             isEdgeList = false;
             break;
         }
@@ -107,7 +107,10 @@ export function calculateGraphPositions(
     }
 
     if (isEdgeList) {
-        data.forEach(([u, v]) => {
+        data.forEach((edge) => {
+            if (!Array.isArray(edge) || edge.length < 1) return;
+            const u = edge[0];
+            const v = edge[1];
             if (u === undefined) return;
             allNodesSet.add(u);
             if (!adj.has(u)) adj.set(u, new Set());
@@ -122,12 +125,14 @@ export function calculateGraphPositions(
         data.forEach((neighbors, i) => {
             allNodesSet.add(i);
             if (!adj.has(i)) adj.set(i, new Set());
-            neighbors.forEach(neighbor => {
-                allNodesSet.add(neighbor);
-                if (!adj.has(neighbor)) adj.set(neighbor, new Set());
-                adj.get(i)!.add(neighbor);
-                adj.get(neighbor)!.add(i);
-            });
+            if (Array.isArray(neighbors)) {
+                neighbors.forEach(neighbor => {
+                    allNodesSet.add(neighbor);
+                    if (!adj.has(neighbor)) adj.set(neighbor, new Set());
+                    adj.get(i)!.add(neighbor);
+                    adj.get(neighbor)!.add(i);
+                });
+            }
         });
     }
 
