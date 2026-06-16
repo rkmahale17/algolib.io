@@ -42,6 +42,7 @@ export const visualizationMap: Record<string, any> = {
   'recover-bst': dynamic(() => import('@/components/visualizations/algorithms/RecoverBSTVisualization').then(m => m.RecoverBSTVisualization), { ssr: false }),
   'invert-binary-tree': dynamic(() => import('@/components/visualizations/algorithms/InvertBinaryTreeVisualization').then(m => m.InvertBinaryTreeVisualization), { ssr: false }),
   'count-good-nodes-in-binary-tree': dynamic(() => import('@/components/visualizations/algorithms/CountGoodNodesVisualization').then(m => m.CountGoodNodesVisualization), { ssr: false }),
+  'diameter-of-binary-tree': dynamic(() => import('@/components/visualizations/algorithms/DiameterOfBinaryTreeVisualization').then(m => m.DiameterOfBinaryTreeVisualization), { ssr: false }),
   'trie': dynamic(() => import('@/components/visualizations/algorithms/TrieVisualization').then(m => m.TrieVisualization), { ssr: false }),
 
   // Linked List Algorithms
@@ -68,6 +69,7 @@ export const visualizationMap: Record<string, any> = {
   'union-find': dynamic(() => import('@/components/visualizations/algorithms/UnionFindVisualization').then(m => m.UnionFindVisualization), { ssr: false }),
   'union-find-by-rank': dynamic(() => import('@/components/visualizations/algorithms/UnionFindByRankVisualization').then(m => m.UnionFindByRankVisualization), { ssr: false }),
   'union-by-rank': dynamic(() => import('@/components/visualizations/algorithms/UnionFindByRankVisualization').then(m => m.UnionFindByRankVisualization), { ssr: false }),
+  'redundant-connection': dynamic(() => import('@/components/visualizations/algorithms/RedundantConnectionVisualization').then(m => m.RedundantConnectionVisualization), { ssr: false }),
   'tarjans': dynamic(() => import('@/components/visualizations/algorithms/TarjansVisualization').then(m => m.TarjansVisualization), { ssr: false }),
   'kruskals': dynamic(() => import('@/components/visualizations/algorithms/KruskalsVisualization').then(m => m.KruskalsVisualization), { ssr: false }),
   'prims': dynamic(() => import('@/components/visualizations/algorithms/PrimsVisualization').then(m => m.PrimsVisualization), { ssr: false }),
@@ -139,6 +141,7 @@ export const visualizationMap: Record<string, any> = {
   'activity-selection': dynamic(() => import('@/components/visualizations/algorithms/ActivitySelectionVisualization').then(m => m.ActivitySelectionVisualization), { ssr: false }),
   'gas-station': dynamic(() => import('@/components/visualizations/algorithms/GasStationVisualization').then(m => m.GasStationVisualization), { ssr: false }),
   'partition-labels': dynamic(() => import('@/components/visualizations/algorithms/PartitionLabelsVisualization').then(m => m.PartitionLabelsVisualization), { ssr: false }),
+  'merge-triplets-to-form-target-triplet': dynamic(() => import('@/components/visualizations/algorithms/MergeTripletsVisualization').then(m => m.MergeTripletsVisualization), { ssr: false }),
 
   // Bit Manipulation
   'xor-trick': dynamic(() => import('@/components/visualizations/algorithms/XORTrickVisualization').then(m => m.XORTrickVisualization), { ssr: false }),
@@ -384,6 +387,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
     title: 'Count Good Nodes in Binary Tree',
     description: 'Visualize DFS recursive traversal tracking path maximums to identify and count good nodes in a binary tree.'
   },
+  'diameter-of-binary-tree': {
+    title: 'Diameter of Binary Tree',
+    description: 'Visualize DFS traversal post-order recursion calculating subtree heights and tracing the longest path (diameter) dynamically.'
+  },
   'number-of-islands': {
     title: 'Number of Islands',
     description: 'Visualize DFS/BFS flood-fill on a 2D grid to count distinct connected land masses surrounded by water.'
@@ -391,6 +398,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
   'surrounded-regions': {
     title: 'Surrounded Regions',
     description: 'Visualize boundary-connected DFS marking to identify and capture surrounded O-regions on a 2D grid.'
+  },
+  'redundant-connection': {
+    title: 'Redundant Connection',
+    description: 'Visualize the DSU (Disjoint Set Union) forest to detect the redundant edge closing a cycle in a graph.'
   },
   'happy-number': {
     title: 'Happy Number',
@@ -415,6 +426,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
   'partition-labels': {
     title: 'Partition Labels',
     description: 'Visualize greedily partitioning a string so that each letter appears in at most one part by continuously expanding the farthest required reach.'
+  },
+  'merge-triplets-to-form-target-triplet': {
+    title: 'Merge Triplets to Form Target Triplet',
+    description: 'Visualize the greedy selection of valid triplets to match the target components.'
   }
 };
 
