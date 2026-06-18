@@ -61,8 +61,8 @@ export function SmartFillDialog({ onFill, initialTopic = "", existingApproaches 
   const [referenceCode, setReferenceCode] = useState("");
   const [userPrompt, setUserPrompt] = useState("");
   const [generatorMode, setGeneratorMode] = useState<"problem" | "core">("problem");
-  // Target: all=Full, add_approaches=New Only
-  const [target, setTarget] = useState<"all" | "add_approaches">("all");
+  // Target: optimized=Just Optimized, all=Full, add_approaches=New Only
+  const [target, setTarget] = useState<"optimized" | "all" | "add_approaches">("optimized");
   const [approachCount, setApproachCount] = useState(1);
 
   const [isGenerating, setIsGenerating] = useState(false);
@@ -144,7 +144,7 @@ export function SmartFillDialog({ onFill, initialTopic = "", existingApproaches 
     try {
       let finalData: any = {};
 
-      if (target === "all") {
+      if (target === "all" || target === "optimized") {
         // STEP 1: Info (Metadata, Description, Schema)
         const { data: infoData, error: infoError } = await supabase.functions.invoke("generate-algorithm", {
           body: {
@@ -179,7 +179,7 @@ export function SmartFillDialog({ onFill, initialTopic = "", existingApproaches 
             referenceCode,
             userPrompt,
             mode: generatorMode,
-            target: "solutions",
+            target: target === "optimized" ? "optimized" : "solutions",
             input_schema: finalData.input_schema // Pass schema from step 1
           },
         });
@@ -338,6 +338,7 @@ export function SmartFillDialog({ onFill, initialTopic = "", existingApproaches 
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="optimized">Just Optimized Approach (Default)</SelectItem>
                         <SelectItem value="all">Full Generation (Standard)</SelectItem>
                         <SelectItem value="add_approaches">Add More Approaches</SelectItem>
                       </SelectContent>

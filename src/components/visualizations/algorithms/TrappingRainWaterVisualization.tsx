@@ -1,256 +1,375 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useMemo } from 'react';
+import { Card } from '@/components/ui/card';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { StepControls } from '../shared/StepControls';
-import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
+import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
+import { Info } from 'lucide-react';
 
 interface Step {
-  heights: number[];
-  left: number;
-  right: number;
+  l: number;
+  r: number;
   leftMax: number;
   rightMax: number;
-  water: number;
-  totalWater: number;
-  message: string;
-  lineNumber: number;
+  res: number;
+  trappedWater: number[];
+  explanation: string;
+  lineExecution: string;
+  highlightedLines: number[];
 }
 
-export const TrappingRainWaterVisualization = () => {
-  const [steps, setSteps] = useState<Step[]>([]);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+const height = [0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1];
 
-  const code = `function trap(heights) {
-  let left = 0, right = heights.length - 1;
-  let leftMax = 0, rightMax = 0;
-  let totalWater = 0;
-  
-  while (left < right) {
-    if (heights[left] < heights[right]) {
-      if (heights[left] >= leftMax) {
-        leftMax = heights[left];
-      } else {
-        totalWater += leftMax - heights[left];
-      }
-      left++;
-    } else {
-      if (heights[right] >= rightMax) {
-        rightMax = heights[right];
-      } else {
-        totalWater += rightMax - heights[right];
-      }
-      right--;
+export const TrappingRainWaterVisualization: React.FC = () => {
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const code = `function trap(height: number[]): number {
+    if (!height.length) return 0;
+
+    let l = 0;
+    let r = height.length - 1;
+
+    let leftMax = height[l];
+    let rightMax = height[r];
+    let res = 0;
+
+    while (l < r) {
+        if (leftMax < rightMax) {
+            l++;
+            leftMax = Math.max(leftMax, height[l]);
+            res += leftMax - height[l];
+        } else {
+            r--;
+            rightMax = Math.max(rightMax, height[r]);
+            res += rightMax - height[r];
+        }
     }
-  }
-  return totalWater;
+
+    return res;
 }`;
 
-  const generateSteps = () => {
-    const heights = [0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1];
-    const newSteps: Step[] = [];
-    let left = 0, right = heights.length - 1;
-    let leftMax = 0, rightMax = 0;
-    let totalWater = 0;
+  const steps = useMemo(() => {
+    const stepsList: Step[] = [];
+    const trappedWater = new Array(height.length).fill(0);
 
-    newSteps.push({
-      heights: [...heights],
-      left, right, leftMax, rightMax,
-      water: 0, totalWater,
-      message: 'Initialize: Two pointers from both ends',
-      lineNumber: 1
+    // Initial check (line 2)
+    stepsList.push({
+      l: 0,
+      r: height.length - 1,
+      leftMax: 0,
+      rightMax: 0,
+      res: 0,
+      trappedWater: [...trappedWater],
+      explanation: "Check if the input array is empty. Since the height array has elements, we proceed.",
+      lineExecution: "if (!height.length) return 0;",
+      highlightedLines: [2]
     });
 
-    while (left < right) {
-      if (heights[left] < heights[right]) {
-        if (heights[left] >= leftMax) {
-          leftMax = heights[left];
-          newSteps.push({
-            heights: [...heights],
-            left, right, leftMax, rightMax,
-            water: 0, totalWater,
-            message: `heights[${left}]=${heights[left]} ≥ leftMax. Update leftMax=${leftMax}`,
-            lineNumber: 8
-          });
-        } else {
-          const water = leftMax - heights[left];
-          totalWater += water;
-          newSteps.push({
-            heights: [...heights],
-            left, right, leftMax, rightMax,
-            water, totalWater,
-            message: `Trap ${water} water at index ${left}. Total=${totalWater}`,
-            lineNumber: 10
-          });
-        }
-        left++;
+    // Initialize pointers (lines 3-4)
+    let l = 0;
+    let r = height.length - 1;
+    stepsList.push({
+      l,
+      r,
+      leftMax: 0,
+      rightMax: 0,
+      res: 0,
+      trappedWater: [...trappedWater],
+      explanation: `Initialize two pointers: left pointer l = 0 and right pointer r = ${r}.`,
+      lineExecution: `let l = 0;\nlet r = height.length - 1;`,
+      highlightedLines: [3, 4]
+    });
+
+    // Initialize max variables and result (lines 5-7)
+    let leftMax = height[l];
+    let rightMax = height[r];
+    let res = 0;
+    stepsList.push({
+      l,
+      r,
+      leftMax,
+      rightMax,
+      res,
+      trappedWater: [...trappedWater],
+      explanation: `Set leftMax to height[l] (${leftMax}) and rightMax to height[r] (${rightMax}). Initialize res (trapped water) to 0.`,
+      lineExecution: `let leftMax = height[l];\nlet rightMax = height[r];\nlet res = 0;`,
+      highlightedLines: [5, 6, 7]
+    });
+
+    // Loop
+    while (l < r) {
+      // Loop condition check
+      stepsList.push({
+        l,
+        r,
+        leftMax,
+        rightMax,
+        res,
+        trappedWater: [...trappedWater],
+        explanation: `Verify loop condition l < r (${l} < ${r} is true). The pointers have not met, so the loop continues.`,
+        lineExecution: `while (l < r)`,
+        highlightedLines: [8]
+      });
+
+      // Compare leftMax and rightMax
+      stepsList.push({
+        l,
+        r,
+        leftMax,
+        rightMax,
+        res,
+        trappedWater: [...trappedWater],
+        explanation: `Compare leftMax (${leftMax}) and rightMax (${rightMax}). Since leftMax ${leftMax < rightMax ? "<" : "≥"} rightMax, we process the ${leftMax < rightMax ? "left pointer (l)" : "right pointer (r)"} side.`,
+        lineExecution: `if (leftMax < rightMax)`,
+        highlightedLines: [9]
+      });
+
+      if (leftMax < rightMax) {
+        l++;
+        stepsList.push({
+          l,
+          r,
+          leftMax,
+          rightMax,
+          res,
+          trappedWater: [...trappedWater],
+          explanation: `Increment left pointer l to ${l} (height[${l}] = ${height[l]}).`,
+          lineExecution: `l++;`,
+          highlightedLines: [10]
+        });
+
+        const oldLeftMax = leftMax;
+        leftMax = Math.max(leftMax, height[l]);
+        stepsList.push({
+          l,
+          r,
+          leftMax,
+          rightMax,
+          res,
+          trappedWater: [...trappedWater],
+          explanation: `Update leftMax to max(leftMax, height[l]) = max(${oldLeftMax}, ${height[l]}) = ${leftMax}.`,
+          lineExecution: `leftMax = Math.max(leftMax, height[l]);`,
+          highlightedLines: [11]
+        });
+
+        const water = leftMax - height[l];
+        res += water;
+        trappedWater[l] = water;
+        stepsList.push({
+          l,
+          r,
+          leftMax,
+          rightMax,
+          res,
+          trappedWater: [...trappedWater],
+          explanation: `Calculate trapped water at index ${l}: leftMax - height[l] = ${leftMax} - ${height[l]} = ${water} units. Add this to res, making total water ${res} units.`,
+          lineExecution: `res += leftMax - height[l];`,
+          highlightedLines: [12]
+        });
       } else {
-        if (heights[right] >= rightMax) {
-          rightMax = heights[right];
-          newSteps.push({
-            heights: [...heights],
-            left, right, leftMax, rightMax,
-            water: 0, totalWater,
-            message: `heights[${right}]=${heights[right]} ≥ rightMax. Update rightMax=${rightMax}`,
-            lineNumber: 15
-          });
-        } else {
-          const water = rightMax - heights[right];
-          totalWater += water;
-          newSteps.push({
-            heights: [...heights],
-            left, right, leftMax, rightMax,
-            water, totalWater,
-            message: `Trap ${water} water at index ${right}. Total=${totalWater}`,
-            lineNumber: 17
-          });
-        }
-        right--;
+        r--;
+        stepsList.push({
+          l,
+          r,
+          leftMax,
+          rightMax,
+          res,
+          trappedWater: [...trappedWater],
+          explanation: `Decrement right pointer r to ${r} (height[${r}] = ${height[r]}).`,
+          lineExecution: `r--;`,
+          highlightedLines: [14]
+        });
+
+        const oldRightMax = rightMax;
+        rightMax = Math.max(rightMax, height[r]);
+        stepsList.push({
+          l,
+          r,
+          leftMax,
+          rightMax,
+          res,
+          trappedWater: [...trappedWater],
+          explanation: `Update rightMax to max(rightMax, height[r]) = max(${oldRightMax}, ${height[r]}) = ${rightMax}.`,
+          lineExecution: `rightMax = Math.max(rightMax, height[r]);`,
+          highlightedLines: [15]
+        });
+
+        const water = rightMax - height[r];
+        res += water;
+        trappedWater[r] = water;
+        stepsList.push({
+          l,
+          r,
+          leftMax,
+          rightMax,
+          res,
+          trappedWater: [...trappedWater],
+          explanation: `Calculate trapped water at index ${r}: rightMax - height[r] = ${rightMax} - ${height[r]} = ${water} units. Add this to res, making total water ${res} units.`,
+          lineExecution: `res += rightMax - height[r];`,
+          highlightedLines: [16]
+        });
       }
     }
 
-    newSteps.push({
-      heights: [...heights],
-      left, right, leftMax, rightMax,
-      water: 0, totalWater,
-      message: `Complete! Total trapped water = ${totalWater} units`,
-      lineNumber: 22
+    // Loop terminated
+    stepsList.push({
+      l,
+      r,
+      leftMax,
+      rightMax,
+      res,
+      trappedWater: [...trappedWater],
+      explanation: `Verify loop condition l < r (${l} < ${r} is false). The pointers have met at index ${l}, so the loop terminates.`,
+      lineExecution: `while (l < r)`,
+      highlightedLines: [8]
     });
 
-    setSteps(newSteps);
-    setCurrentStepIndex(0);
-  };
+    // Return statement
+    stepsList.push({
+      l,
+      r,
+      leftMax,
+      rightMax,
+      res,
+      trappedWater: [...trappedWater],
+      explanation: `Return the total trapped rain water res = ${res} units.`,
+      lineExecution: `return res;`,
+      highlightedLines: [19]
+    });
 
-  useEffect(() => {
-    generateSteps();
+    return stepsList;
   }, []);
 
-  useEffect(() => {
-    if (isPlaying && currentStepIndex < steps.length - 1) {
-      intervalRef.current = setInterval(() => {
-        setCurrentStepIndex(prev => {
-          if (prev >= steps.length - 1) {
-            setIsPlaying(false);
-            return prev;
-          }
-          return prev + 1;
-        });
-      }, 1000 / speed);
-    } else {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    }
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [isPlaying, currentStepIndex, steps.length, speed]);
-
-  const handlePlay = () => setIsPlaying(true);
-  const handlePause = () => setIsPlaying(false);
-  const handleStepForward = () => currentStepIndex < steps.length - 1 && setCurrentStepIndex(prev => prev + 1);
-  const handleStepBack = () => currentStepIndex > 0 && setCurrentStepIndex(prev => prev - 1);
-  const handleReset = () => {
-    setCurrentStepIndex(0);
-    setIsPlaying(false);
-    generateSteps();
-  };
-
-  if (steps.length === 0) return null;
-
-  const currentStep = steps[currentStepIndex];
-  const getMaxHeight = () => Math.max(...currentStep.heights, currentStep.leftMax, currentStep.rightMax);
-
-  // Calculate water at each position for visualization
-  const waterLevels = currentStep.heights.map((h, i) => {
-    if (i < currentStep.left || i > currentStep.right) return 0;
-    const maxHeight = i <= currentStep.left ? currentStep.leftMax : currentStep.rightMax;
-    return Math.max(0, maxHeight - h);
-  });
+  const step = steps[currentStep] || steps[0];
+  const maxVal = Math.max(...height);
 
   return (
-    <div className="space-y-6">
-      <StepControls
-        isPlaying={isPlaying}
-        onPlay={handlePlay}
-        onPause={handlePause}
-        onStepForward={handleStepForward}
-        onStepBack={handleStepBack}
-        onReset={handleReset}
-        speed={speed}
-        onSpeedChange={setSpeed}
-        currentStep={currentStepIndex}
-        totalSteps={steps.length - 1}
-      />
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <VisualizationLayout
+      controls={
+        <SimpleStepControls
+          currentStep={currentStep}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStep}
+        />
+      }
+      leftContent={
         <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg border border-border/50 p-6">
-            <div className="flex items-end justify-center gap-1 h-64">
-              {currentStep.heights.map((height, index) => {
-                const isLeft = index === currentStep.left;
-                const isRight = index === currentStep.right;
-                const waterLevel = waterLevels[index];
+          {/* Elevation Map Card */}
+          <Card className="bg-card border border-border/50 p-6 flex flex-col justify-between h-[360px]">
+            {/* Visualizer Panel */}
+            <div className="flex items-end justify-center gap-1 h-56 pt-8 relative">
+              {height.map((hVal, idx) => {
+                const isLeft = idx === step.l;
+                const isRight = idx === step.r;
+                const waterVal = step.trappedWater[idx];
 
                 return (
-                  <div key={index} className="flex flex-col items-center gap-2 flex-1 max-w-[50px] relative">
-                    {isLeft && (
-                      <div className="absolute -top-8 text-xs font- text-blue-500">L</div>
+                  <div key={idx} className="flex flex-col items-center flex-1 max-w-[40px] relative h-full">
+                    {/* Pointer Label */}
+                    {isLeft && isRight && (
+                      <div className="absolute -top-7 text-[10px] font-bold text-indigo-500 bg-indigo-500/10 px-1 rounded border border-indigo-500/20 whitespace-nowrap z-10">
+                        L & R
+                      </div>
                     )}
-                    {isRight && (
-                      <div className="absolute -top-8 text-xs font- text-purple-500">R</div>
+                    {isLeft && !isRight && (
+                      <div className="absolute -top-7 text-[10px] font-bold text-blue-500 bg-blue-500/10 px-1 rounded border border-blue-500/20 whitespace-nowrap z-10">
+                        L
+                      </div>
                     )}
-                    <div className="relative w-full flex-1 flex flex-col justify-end">
-                      {waterLevel > 0 && (
+                    {!isLeft && isRight && (
+                      <div className="absolute -top-7 text-[10px] font-bold text-purple-500 bg-purple-500/10 px-1 rounded border border-purple-500/20 whitespace-nowrap z-10">
+                        R
+                      </div>
+                    )}
+
+                    {/* Stacking Height & Water */}
+                    <div className="relative w-full h-full flex flex-col justify-end">
+                      {waterVal > 0 && (
                         <div
-                          className="w-full bg-blue-400 rounded-t animate-in fade-in"
-                          style={{ height: `${(waterLevel / getMaxHeight()) * 100}%` }}
+                          className="w-full bg-gradient-to-t from-sky-500 to-sky-400 border-t border-sky-300/30 rounded-t-sm"
+                          style={{ height: `${(waterVal / maxVal) * 100}%` }}
                         />
                       )}
                       <div
-                        className={`w-full rounded-t transition-all duration-300 ${isLeft || isRight
-                            ? 'bg-primary shadow-lg'
-                            : 'bg-gradient-to-t from-gray-600 to-gray-400'
-                          }`}
-                        style={{ height: `${(height / getMaxHeight()) * 100}%`, minHeight: height > 0 ? '10px' : '0' }}
+                        className={`w-full rounded-t-sm ${
+                          isLeft || isRight
+                            ? 'bg-primary shadow-md ring-2 ring-primary/30 ring-offset-1 ring-offset-background'
+                            : 'bg-slate-300 dark:bg-slate-700 border border-slate-400/20 dark:border-slate-600/20'
+                        }`}
+                        style={{ height: `${(hVal / maxVal) * 100}%` }}
                       />
                     </div>
-                    <span className={`text-xs font-mono ${isLeft || isRight ? 'text-primary font-' : 'text-muted-foreground'}`}>
-                      {height}
+                    {/* Height Label */}
+                    <span className={`text-[10px] font-mono mt-1 ${isLeft || isRight ? 'text-primary font-bold' : 'text-muted-foreground'}`}>
+                      {hVal}
                     </span>
                   </div>
                 );
               })}
             </div>
-          </div>
 
-          <div className="bg-accent/50 rounded-lg border border-accent p-4">
-            <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
-          </div>
-
-          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
-            <div className="text-center">
-              <div className="text-sm text-muted-foreground">Total Trapped Water</div>
-              <div className="font-mono font- text-2xl text-blue-500">{currentStep.totalWater} units</div>
+            {/* Legend and stats */}
+            <div className="flex items-center justify-between border-t border-border/40 pt-4 mt-2 text-xs">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 bg-slate-300 dark:bg-slate-700 border border-slate-400/20 rounded-sm" />
+                  <span className="text-muted-foreground text-[11px]">Elevation Bar</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 bg-gradient-to-t from-sky-500 to-sky-400 rounded-sm" />
+                  <span className="text-muted-foreground text-[11px]">Trapped Water</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-blue-500 font-bold text-[11px]">L</span> / <span className="text-purple-500 font-bold text-[11px]">R</span>
+                  <span className="text-muted-foreground text-[11px]">Pointers</span>
+                </div>
+              </div>
+              <div className="font-mono text-muted-foreground">
+                Total Trapped: <span className="text-sky-500 font-bold text-sm">{step.res}</span> units
+              </div>
             </div>
-          </div>
-        </div>
+          </Card>
 
-        <div className="space-y-4">
+          {/* Commentary Box Card */}
+          <Card className="p-5 border-l-4 border-primary bg-primary/5 shadow-sm min-h-[120px]">
+            <div className="flex items-start gap-3.5">
+              <div className="p-2.5 rounded-xl bg-primary/10 text-primary shrink-0">
+                <Info className="w-5 h-5" />
+              </div>
+              <div className="space-y-1">
+                <h4 className="text-[10px] font-bold uppercase tracking-[0.15em] text-primary/80">
+                  Reasoning Insight
+                </h4>
+                <p className="text-[14px] font-medium leading-relaxed text-foreground/90">
+                  {step.explanation}
+                </p>
+              </div>
+            </div>
+          </Card>
+
+          {/* Variable Panel */}
           <VariablePanel
             variables={{
-              left: currentStep.left,
-              right: currentStep.right,
-              leftMax: currentStep.leftMax,
-              rightMax: currentStep.rightMax,
-              'heights[left]': currentStep.heights[currentStep.left],
-              'heights[right]': currentStep.heights[currentStep.right],
-              waterAdded: currentStep.water,
-              totalWater: currentStep.totalWater
+              l: step.l,
+              r: step.r,
+              'height[l]': height[step.l],
+              'height[r]': height[step.r],
+              leftMax: step.leftMax,
+              rightMax: step.rightMax,
+              res: step.res
             }}
           />
-          <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="TypeScript" />
         </div>
-      </div>
-    </div>
+      }
+      rightContent={
+        <Card className="h-full border border-border/50 overflow-hidden">
+          <AnimatedCodeEditor
+            code={code}
+            highlightedLines={step.highlightedLines}
+            language="typescript"
+          />
+        </Card>
+      }
+    />
   );
 };

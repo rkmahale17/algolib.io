@@ -13,6 +13,8 @@ const blind75Map: Record<string, React.LazyExoticComponent<React.ComponentType<a
   "product-of-array-except-self": React.lazy(() => import("@/components/visualizations/algorithms/ProductOfArrayExceptSelfVisualization").then(m => ({ default: m.ProductOfArrayExceptSelfVisualization }))),
   "prefix-sum": React.lazy(() => import("@/components/visualizations/algorithms/PrefixSumVisualization").then(m => ({ default: m.PrefixSumVisualization }))),
   "binary-search": React.lazy(() => import("@/components/visualizations/algorithms/BinarySearchVisualization").then(m => ({ default: m.BinarySearchVisualization }))),
+  "koko-eating-bananas": React.lazy(() => import("@/components/visualizations/algorithms/KokoEatingBananasVisualization").then(m => ({ default: m.KokoEatingBananasVisualization }))),
+  "search-a-2d-matrix": React.lazy(() => import("@/components/visualizations/algorithms/Search2DMatrixVisualization").then(m => ({ default: m.Search2DMatrixVisualization }))),
   "maximum-subarray": React.lazy(() => import("@/components/visualizations/algorithms/MaximumSubarrayVisualization").then(m => ({ default: m.MaximumSubarrayVisualization }))),
   "kadanes-algorithm": React.lazy(() => import("@/components/visualizations/algorithms/MaximumSubarrayVisualization").then(m => ({ default: m.MaximumSubarrayVisualization }))),
   "3sum": React.lazy(() => import("@/components/visualizations/algorithms/ThreeSumVisualization").then(m => ({ default: m.ThreeSumVisualization }))),
