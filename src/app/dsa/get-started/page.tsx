@@ -1,14 +1,16 @@
-import { Metadata } from 'next';
-import GetStartedClient from './GetStartedClient';
+import { Metadata } from "next";
+import GetStartedClient from "./GetStartedClient";
 
 export const metadata: Metadata = {
   title: "All Practice - Master Data Structures & Algorithms | RulCode",
-  description: "Explore our comprehensive bank of 150+ coding problems and curated patterns.",
+  description:
+    "Explore our comprehensive bank of 200+ coding problems and curated patterns.",
   openGraph: {
     title: "All Practice - Master DSA | RulCode",
-    description: "Explore our comprehensive bank of 150+ coding problems and curated patterns.",
-    url: 'https://rulcode.com/dsa/get-started',
-  }
+    description:
+      "Explore our comprehensive bank of 200+ coding problems and curated patterns.",
+    url: "https://rulcode.com/dsa/get-started",
+  },
 };
 
 export default function GetStartedPage() {

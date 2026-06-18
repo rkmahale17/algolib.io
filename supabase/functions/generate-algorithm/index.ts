@@ -9,7 +9,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // target: "info" | "test_cases" | "solutions" | "add_approaches" | "all" (legacy) | "enhance_comments" | "starter_code"
+    // target: "info" | "test_cases" | "solutions" | "optimized" | "add_approaches" | "all" (legacy) | "enhance_comments" | "starter_code"
     const {
       topic,
       referenceCode,
@@ -218,10 +218,15 @@ Deno.serve(async (req) => {
           ? `GENERATE **${approachCount} NEW** distinct approaches. 
               EXCLUDE these existing approaches: ${existingApproaches.join(", ")}.
               Use strategy-based naming.`
-          : `You MUST generate MULTIPLE VIABLE APPROACHES (at least 1, MAX 3).
-              1. **Optimized Approach** (First) - codeType: "optimize"
-              2. **Strategy-Based Approach** (Required) - e.g. "dfs", "bfs", "dp", "greedy"
-              3. **Alternative Approaches** (Optional)`
+          : target === "optimized"
+            ? `GENERATE EXACTLY ONE APPROACH.
+               IF Reference Code is provided, use that logic.
+               ELSE use the best optimized approach for this problem.
+               - codeType: "optimize"`
+            : `You MUST generate MULTIPLE VIABLE APPROACHES (at least 1, MAX 3).
+               1. **Optimized Approach** (First) - codeType: "optimize"
+               2. **Strategy-Based Approach** (Required) - e.g. "dfs", "bfs", "dp", "greedy"
+               3. **Alternative Approaches** (Optional)`
       }
 
         **CRITICAL JSON FORMATTING RULES**:
@@ -340,9 +345,9 @@ Deno.serve(async (req) => {
       responseData = await generateChunk(testCasesPrompt);
       if (!responseData) throw new Error("Failed to generate Test Cases.");
 
-    } else if (target === "solutions" || target === "add_approaches") {
+    } else if (target === "solutions" || target === "optimized" || target === "add_approaches") {
       // 3. Generate Solutions
-      if (!input_schema && target !== 'add_approaches') throw new Error("input_schema is required for solutions generation");
+      if (!input_schema && target !== 'add_approaches') throw new Error("input_schema is required for solutions/optimized generation");
       // Note: add_approaches might not strictly need schema if it can infer from topic, but safer if provided. 
       // Existing flow didn't strictly leverage schema for code gen input args, it inferred. 
       // But passing it is good context.

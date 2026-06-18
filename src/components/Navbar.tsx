@@ -137,11 +137,15 @@ const Navbar = ({
   }, []);
 
   const [isLearnOpen, setIsLearnOpen] = useState(false);
-  const [activeLearnTab, setActiveLearnTab] = useState<"visual" | "pattern" | "fundamentals">("fundamentals");
+  const [activeLearnTab, setActiveLearnTab] = useState<
+    "visual" | "pattern" | "fundamentals"
+  >("fundamentals");
   const learnTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [isPracticeOpen, setIsPracticeOpen] = useState(false);
-  const [activePracticeTab, setActivePracticeTab] = useState<"problems" | "company" | "topics" | "patterns" | "blind75">("problems");
+  const [activePracticeTab, setActivePracticeTab] = useState<
+    "problems" | "company" | "topics" | "patterns" | "blind75"
+  >("problems");
   const practiceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const currentPath =
@@ -241,7 +245,7 @@ const Navbar = ({
                   href="/"
                   className={cn(
                     "flex items-center gap-2 hover:opacity-80 transition-opacity shutter-click",
-                    hasSidebar && "md:hidden"
+                    hasSidebar && "md:hidden",
                   )}
                   onClick={closeMenus}
                 >
@@ -264,7 +268,7 @@ const Navbar = ({
             <div
               className={cn(
                 "hidden md:flex items-center ml-6 flex-1 text-sm font-medium",
-                currentPath === "/" ? "gap-2" : "gap-6 lg:gap-8"
+                currentPath === "/" ? "gap-2" : "gap-6 lg:gap-8",
               )}
             >
               {!hasSidebar && (
@@ -359,10 +363,17 @@ const Navbar = ({
                                   Visual Algorithms
                                 </h4>
                                 <p className="text-[13px] text-muted-foreground mb-3 leading-relaxed max-w-[320px]">
-                                  Explore our recommended 30 patterns and interact with visualizations and problem descriptions.
+                                  Explore our recommended 30 patterns and
+                                  interact with visualizations and problem
+                                  descriptions.
                                 </p>
                                 <div className="flex flex-wrap gap-2">
-                                  <Badge variant="secondary" className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5">Interactive</Badge>
+                                  <Badge
+                                    variant="secondary"
+                                    className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5"
+                                  >
+                                    Interactive
+                                  </Badge>
                                 </div>
                               </div>
                               <ChevronRight className="w-5 h-5 text-muted-foreground/30 absolute right-0 top-1/2 -translate-y-1/2 group-hover:translate-x-1 group-hover:text-primary transition-all" />
@@ -407,7 +418,8 @@ const Navbar = ({
                                   });
                                 }}
                               >
-                                View all <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                                View all{" "}
+                                <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                               </Link>
                             </div>
                           </div>
@@ -434,7 +446,8 @@ const Navbar = ({
                                     Time Complexity
                                   </h4>
                                   <p className="text-[13px] text-muted-foreground leading-relaxed">
-                                    Big O runtime analysis and operation budgets cheat sheet.
+                                    Big O runtime analysis and operation budgets
+                                    cheat sheet.
                                   </p>
                                 </div>
                                 <ChevronRight className="w-5 h-5 text-muted-foreground/30 absolute right-0 top-1/2 -translate-y-1/2 group-hover:translate-x-1 group-hover:text-primary transition-all" />
@@ -454,7 +467,8 @@ const Navbar = ({
                                     Space Complexity
                                   </h4>
                                   <p className="text-[13px] text-muted-foreground leading-relaxed">
-                                    Recursion stack, memory bounds, and allocations cheat sheet.
+                                    Recursion stack, memory bounds, and
+                                    allocations cheat sheet.
                                   </p>
                                 </div>
                                 <ChevronRight className="w-5 h-5 text-muted-foreground/30 absolute right-0 top-1/2 -translate-y-1/2 group-hover:translate-x-1 group-hover:text-primary transition-all" />
@@ -474,7 +488,8 @@ const Navbar = ({
                                     Core Data Structures
                                   </h4>
                                   <p className="text-[13px] text-muted-foreground leading-relaxed">
-                                    Core structures like Arrays, Linked Lists, and Hash Maps.
+                                    Core structures like Arrays, Linked Lists,
+                                    and Hash Maps.
                                   </p>
                                 </div>
                                 <ChevronRight className="w-5 h-5 text-muted-foreground/30 absolute right-0 top-1/2 -translate-y-1/2 group-hover:translate-x-1 group-hover:text-primary transition-all" />
@@ -494,12 +509,12 @@ const Navbar = ({
                                     Trees & Graphs
                                   </h4>
                                   <p className="text-[13px] text-muted-foreground leading-relaxed">
-                                    Advanced non-linear data structures fundamentals.
+                                    Advanced non-linear data structures
+                                    fundamentals.
                                   </p>
                                 </div>
                                 <ChevronRight className="w-5 h-5 text-muted-foreground/30 absolute right-0 top-1/2 -translate-y-1/2 group-hover:translate-x-1 group-hover:text-primary transition-all" />
                               </Link>
-
                             </div>
                           </div>
                         )}
@@ -597,12 +612,28 @@ const Navbar = ({
                                   All Questions
                                 </h4>
                                 <p className="text-[13px] text-muted-foreground mb-3 leading-relaxed max-w-[320px]">
-                                  The largest question bank of 150+ practice questions for DSA interviews
+                                  The largest question bank of 200+ practice
+                                  questions for DSA interviews
                                 </p>
                                 <div className="flex flex-wrap gap-2">
-                                  <Badge variant="secondary" className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5">Coding</Badge>
-                                  <Badge variant="secondary" className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5">Data Structures</Badge>
-                                  <Badge variant="secondary" className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5">Algorithms</Badge>
+                                  <Badge
+                                    variant="secondary"
+                                    className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5"
+                                  >
+                                    Coding
+                                  </Badge>
+                                  <Badge
+                                    variant="secondary"
+                                    className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5"
+                                  >
+                                    Data Structures
+                                  </Badge>
+                                  <Badge
+                                    variant="secondary"
+                                    className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5"
+                                  >
+                                    Algorithms
+                                  </Badge>
                                 </div>
                               </div>
                               <ChevronRight className="w-5 h-5 text-muted-foreground/30 absolute right-0 top-1/2 -translate-y-1/2 group-hover:translate-x-1 group-hover:text-primary transition-all" />
@@ -642,7 +673,7 @@ const Navbar = ({
                               Top Companies
                             </div>
                             <div className="grid grid-cols-2 gap-3 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
-                              {TOP_COMPANIES.map(company => (
+                              {TOP_COMPANIES.map((company) => (
                                 <Link
                                   key={company.id}
                                   href={`/dsa/problems?company=${slugifyCompany(company.name)}`}
@@ -650,8 +681,13 @@ const Navbar = ({
                                   onClick={closeMenus}
                                 >
                                   <div className="flex items-center gap-2">
-                                    <CompanyIcon company={company.id} className="w-4 h-4 grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all" />
-                                    <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">{company.name}</span>
+                                    <CompanyIcon
+                                      company={company.id}
+                                      className="w-4 h-4 grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all"
+                                    />
+                                    <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">
+                                      {company.name}
+                                    </span>
                                   </div>
                                   <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
                                 </Link>
@@ -666,14 +702,32 @@ const Navbar = ({
                               Categories
                             </div>
                             <div className="grid grid-cols-2 gap-3 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
-                              {['Arrays & Hashing', 'Two Pointers', 'Sliding Window', 'Stack', 'Binary Search', 'Linked List', 'Trees', 'Tries', 'Backtracking', 'Graphs', 'Dynamic Programming', 'Greedy', 'Intervals', 'Math & Geometry', 'Bit Manipulation'].map(topic => (
+                              {[
+                                "Arrays & Hashing",
+                                "Two Pointers",
+                                "Sliding Window",
+                                "Stack",
+                                "Binary Search",
+                                "Linked List",
+                                "Trees",
+                                "Tries",
+                                "Backtracking",
+                                "Graphs",
+                                "Dynamic Programming",
+                                "Greedy",
+                                "Intervals",
+                                "Math & Geometry",
+                                "Bit Manipulation",
+                              ].map((topic) => (
                                 <Link
                                   key={topic}
                                   href={`/dsa/problems?topic=${slugifyCategory(topic)}`}
                                   className="px-4 py-2.5 rounded-lg border border-border hover:border-primary hover:bg-primary/5 transition-all flex items-center justify-between group shutter-click"
                                   onClick={closeMenus}
                                 >
-                                  <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">{topic}</span>
+                                  <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">
+                                    {topic}
+                                  </span>
                                   <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
                                 </Link>
                               ))}
@@ -703,11 +757,22 @@ const Navbar = ({
                                   Blind 75
                                 </h4>
                                 <p className="text-[13px] text-muted-foreground mb-3 leading-relaxed max-w-[320px]">
-                                  Curated collection of 75 essential questions to master DSA patterns for interviews.
+                                  Curated collection of 75 essential questions
+                                  to master DSA patterns for interviews.
                                 </p>
                                 <div className="flex flex-wrap gap-2">
-                                  <Badge variant="secondary" className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5">Top Curated</Badge>
-                                  <Badge variant="secondary" className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5">FAANG Prep</Badge>
+                                  <Badge
+                                    variant="secondary"
+                                    className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5"
+                                  >
+                                    Top Curated
+                                  </Badge>
+                                  <Badge
+                                    variant="secondary"
+                                    className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5"
+                                  >
+                                    FAANG Prep
+                                  </Badge>
                                 </div>
                               </div>
                               <ChevronRight className="w-5 h-5 text-muted-foreground/30 absolute right-0 top-1/2 -translate-y-1/2 group-hover:translate-x-1 group-hover:text-primary transition-all" />
@@ -722,14 +787,18 @@ const Navbar = ({
                             </div>
 
                             <div className="grid grid-cols-2 gap-3 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
-                              {GUIDE_GROUPS.find(g => g.id === "patterns")?.guides.map((guide) => (
+                              {GUIDE_GROUPS.find(
+                                (g) => g.id === "patterns",
+                              )?.guides.map((guide) => (
                                 <Link
                                   key={guide.slug}
                                   href={`/guides/patterns/${guide.slug}`}
                                   className="px-3 py-2 rounded-lg hover:bg-primary/5 transition-all flex items-center justify-between group shutter-click"
                                   onClick={closeMenus}
                                 >
-                                  <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">{guide.title}</span>
+                                  <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">
+                                    {guide.title}
+                                  </span>
                                   <ArrowUpRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
                                 </Link>
                               ))}
@@ -741,8 +810,6 @@ const Navbar = ({
                   </DropdownMenu>
                 </div>
               )}
-
-
             </div>
           )}
 
@@ -882,20 +949,20 @@ const Navbar = ({
                   <div className="flex items-center shadow-sm rounded-md overflow-hidden border border-border/60 bg-background/50 h-8">
                     {/* Share Button */}
                     {!hideShare && handleShare && (
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <button
-                                onClick={handleShare}
-                                className="flex items-center justify-center h-8 w-8 hover:bg-muted/80 transition-colors text-foreground/80 hover:text-foreground shrink-0 outline-none"
-                              >
-                                <Share2 className="h-4 w-4" />
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom">Share</TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      )}
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              onClick={handleShare}
+                              className="flex items-center justify-center h-8 w-8 hover:bg-muted/80 transition-colors text-foreground/80 hover:text-foreground shrink-0 outline-none"
+                            >
+                              <Share2 className="h-4 w-4" />
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom">Share</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )}
 
                     {/* Divider between Share and Timer */}
                     {!hideShare &&
@@ -916,7 +983,8 @@ const Navbar = ({
                               <button
                                 className={cn(
                                   "flex items-center justify-center h-8 w-8 hover:bg-muted/80 transition-colors text-foreground/80 hover:text-foreground shrink-0 outline-none",
-                                  isTimerRunning && "bg-secondary/80 text-foreground font-medium"
+                                  isTimerRunning &&
+                                    "bg-secondary/80 text-foreground font-medium",
                                 )}
                                 title="Timer"
                               >

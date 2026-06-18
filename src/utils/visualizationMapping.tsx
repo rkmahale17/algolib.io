@@ -10,15 +10,21 @@ export const visualizationMap: Record<string, any> = {
   // Core Patterns
   'two-pointers': dynamic(() => import('@/components/visualizations/algorithms/TwoPointersVisualization').then(m => m.TwoPointersVisualization), { ssr: false }),
   'sliding-window': dynamic(() => import('@/components/visualizations/algorithms/SlidingWindowVisualization').then(m => m.SlidingWindowVisualization), { ssr: false }),
+  'permutation-in-string': dynamic(() => import('@/components/visualizations/algorithms/PermutationInStringVisualization').then(m => m.PermutationInStringVisualization), { ssr: false }),
   'prefix-sum': dynamic(() => import('@/components/visualizations/algorithms/PrefixSumVisualization').then(m => m.PrefixSumVisualization), { ssr: false }),
   'binary-search': dynamic(() => import('@/components/visualizations/algorithms/BinarySearchVisualization').then(m => m.BinarySearchVisualization), { ssr: false }),
+  'koko-eating-bananas': dynamic(() => import('@/components/visualizations/algorithms/KokoEatingBananasVisualization').then(m => m.KokoEatingBananasVisualization), { ssr: false }),
+  'search-a-2d-matrix': dynamic(() => import('@/components/visualizations/algorithms/Search2DMatrixVisualization').then(m => m.Search2DMatrixVisualization), { ssr: false }),
   'kadanes-algorithm': dynamic(() => import('@/components/visualizations/algorithms/MaximumSubarrayVisualization').then(m => m.MaximumSubarrayVisualization), { ssr: false }),
   'maximum-subarray': dynamic(() => import('@/components/visualizations/algorithms/MaximumSubarrayVisualization').then(m => m.MaximumSubarrayVisualization), { ssr: false }),
   'dutch-national-flag': dynamic(() => import('@/components/visualizations/algorithms/DutchNationalFlagVisualization').then(m => m.DutchNationalFlagVisualization), { ssr: false }),
   'merge-intervals': dynamic(() => import('@/components/visualizations/algorithms/MergeIntervalsVisualization').then(m => m.MergeIntervalsVisualization), { ssr: false }),
   'interval-scheduling': dynamic(() => import('@/components/visualizations/algorithms/InsertIntervalVisualization').then(m => m.InsertIntervalVisualization), { ssr: false }),
   'monotonic-stack': dynamic(() => import('@/components/visualizations/algorithms/MonotonicStackVisualization').then(m => m.MonotonicStackVisualization), { ssr: false }),
+  'daily-temperatures': dynamic(() => import('@/components/visualizations/algorithms/DailyTemperaturesVisualization').then(m => m.DailyTemperaturesVisualization), { ssr: false }),
   'valid-parentheses': dynamic(() => import('@/components/visualizations/algorithms/ValidParenthesesVisualization').then(m => m.ValidParenthesesVisualization), { ssr: false }),
+  'evaluate-reverse-polish-notation': dynamic(() => import('@/components/visualizations/algorithms/EvaluateRPNVisualization').then(m => m.EvaluateRPNVisualization), { ssr: false }),
+  'min-stack': dynamic(() => import('@/components/visualizations/algorithms/MinStackVisualization').then(m => m.MinStackVisualization), { ssr: false }),
   'two-sum': dynamic(() => import('@/components/visualizations/algorithms/TwoSumVisualization').then(m => m.TwoSumVisualization), { ssr: false }),
   'quick-select': dynamic(() => import('@/components/visualizations/algorithms/QuickSelectVisualization').then(m => m.QuickSelectVisualization), { ssr: false }),
   'median-of-two-sorted-arrays': dynamic(() => import('@/components/visualizations/algorithms/MedianOfTwoSortedArraysVisualization').then(m => m.MedianOfTwoSortedArraysVisualization), { ssr: false }),
@@ -48,6 +54,7 @@ export const visualizationMap: Record<string, any> = {
   // Linked List Algorithms
   'fast-slow-pointers': dynamic(() => import('@/components/visualizations/algorithms/FastSlowPointersVisualization').then(m => m.FastSlowPointersVisualization), { ssr: false }),
   'reverse-linked-list': dynamic(() => import('@/components/visualizations/algorithms/ReverseLinkedListVisualization').then(m => m.ReverseLinkedListVisualization), { ssr: false }),
+  'reverse-linked-list-ii': dynamic(() => import('@/components/visualizations/algorithms/ReverseLinkedListIIVisualization').then(m => m.ReverseLinkedListIIVisualization), { ssr: false }),
   'detect-cycle': dynamic(() => import('@/components/visualizations/algorithms/DetectCycleVisualization').then(m => m.DetectCycleVisualization), { ssr: false }),
   'detect-cycle-in-a-linked-list': dynamic(() => import('@/components/visualizations/algorithms/FastSlowPointersVisualization').then(m => m.FastSlowPointersVisualization), { ssr: false }),
   'middle-node': dynamic(() => import('@/components/visualizations/algorithms/MiddleNodeVisualization').then(m => m.MiddleNodeVisualization), { ssr: false }),
@@ -56,14 +63,19 @@ export const visualizationMap: Record<string, any> = {
   'merge-k-lists': dynamic(() => import('@/components/visualizations/algorithms/MergeKSortedListsVisualization').then(m => m.MergeKSortedListsVisualization), { ssr: false }),
   'merge-k-sorted-lists': dynamic(() => import('@/components/visualizations/algorithms/MergeKSortedListsVisualization').then(m => m.MergeKSortedListsVisualization), { ssr: false }),
   'add-two-numbers': dynamic(() => import('@/components/visualizations/algorithms/AddTwoNumbersVisualization').then(m => m.AddTwoNumbersVisualization), { ssr: false }),
+  'copy-list-with-random-pointer': dynamic(() => import('@/components/visualizations/algorithms/CopyListWithRandomPointerVisualization').then(m => m.CopyListWithRandomPointerVisualization), { ssr: false }),
 
   // Graph Algorithms
   'graph-dfs': dynamic(() => import('@/components/visualizations/GraphVisualization').then(m => m.GraphVisualization), { ssr: false }),
   'graph-bfs': dynamic(() => import('@/components/visualizations/GraphVisualization').then(m => m.GraphVisualization), { ssr: false }),
   'number-of-islands': dynamic(() => import('@/components/visualizations/algorithms/NumberOfIslandsVisualization').then(m => m.NumberOfIslandsVisualization), { ssr: false }),
+  'max-area-of-island': dynamic(() => import('@/components/visualizations/algorithms/MaxAreaOfIslandVisualization').then(m => m.MaxAreaOfIslandVisualization), { ssr: false }),
+  'reconstruct-itinerary': dynamic(() => import('@/components/visualizations/algorithms/ReconstructItineraryVisualization').then(m => m.ReconstructItineraryVisualization), { ssr: false }),
   'number-of-connected-components-in-an-undirected-graph': dynamic(() => import('@/components/visualizations/algorithms/NumberOfConnectedComponentsVisualization').then(m => m.NumberOfConnectedComponentsVisualization), { ssr: false }),
   'pacific-atlantic-water-flow': dynamic(() => import('@/components/visualizations/algorithms/PacificAtlanticVisualization').then(m => m.PacificAtlanticVisualization), { ssr: false }),
   'surrounded-regions': dynamic(() => import('@/components/visualizations/algorithms/SurroundedRegionsVisualization').then(m => m.SurroundedRegionsVisualization), { ssr: false }),
+  'rotting-oranges': dynamic(() => import('@/components/visualizations/algorithms/RottingOrangesVisualization').then(m => m.RottingOrangesVisualization), { ssr: false }),
+  'swim-in-rising-water': dynamic(() => import('@/components/visualizations/algorithms/SwimInRisingWaterVisualization').then(m => m.SwimInRisingWaterVisualization), { ssr: false }),
   'alien-dictionary': dynamic(() => import('@/components/visualizations/algorithms/AlienDictionaryVisualization').then(m => m.AlienDictionaryVisualization), { ssr: false }),
   'topological-sort': dynamic(() => import('@/components/visualizations/algorithms/TopologicalSortVisualization').then(m => m.TopologicalSortVisualization), { ssr: false }),
   'union-find': dynamic(() => import('@/components/visualizations/algorithms/UnionFindVisualization').then(m => m.UnionFindVisualization), { ssr: false }),
@@ -98,6 +110,7 @@ export const visualizationMap: Record<string, any> = {
   'target-sum-ways': dynamic(() => import('@/components/visualizations/algorithms/TargetSumVisualization').then(m => m.TargetSumVisualization), { ssr: false }),
   'word-break': dynamic(() => import('@/components/visualizations/algorithms/WordBreakVisualization').then(m => m.WordBreakVisualization), { ssr: false }),
   'distinct-subsequences': dynamic(() => import('@/components/visualizations/algorithms/DistinctSubsequencesVisualization').then(m => m.DistinctSubsequencesVisualization), { ssr: false }),
+  'interleaving-string': dynamic(() => import('@/components/visualizations/algorithms/InterleavingStringVisualization').then(m => m.InterleavingStringVisualization), { ssr: false }),
   'burst-balloons': dynamic(() => import('@/components/visualizations/algorithms/BurstBalloonsVisualization').then(m => m.BurstBalloonsVisualization), { ssr: false }),
 
   // Backtracking
@@ -118,6 +131,7 @@ export const visualizationMap: Record<string, any> = {
   // Advanced Data Structures
   'time-based-key-value-store': dynamic(() => import('@/components/visualizations/algorithms/TimeMapVisualization').then(m => m.TimeMapVisualization), { ssr: false }),
   'design-twitter': dynamic(() => import('@/components/visualizations/algorithms/DesignTwitterVisualization').then(m => m.DesignTwitterVisualization), { ssr: false }),
+  'detect-squares': dynamic(() => import('@/components/visualizations/algorithms/DetectSquaresVisualization').then(m => m.DetectSquaresVisualization), { ssr: false }),
   'segment-tree': dynamic(() => import('@/components/visualizations/algorithms/SegmentTreeVisualization').then(m => m.SegmentTreeVisualization), { ssr: false }),
   'fenwick-tree': dynamic(() => import('@/components/visualizations/algorithms/FenwickTreeVisualization').then(m => m.FenwickTreeVisualization), { ssr: false }),
   'sparse-table': dynamic(() => import('@/components/visualizations/algorithms/SparseTableVisualization').then(m => m.SparseTableVisualization), { ssr: false }),
@@ -147,6 +161,7 @@ export const visualizationMap: Record<string, any> = {
   'xor-trick': dynamic(() => import('@/components/visualizations/algorithms/XORTrickVisualization').then(m => m.XORTrickVisualization), { ssr: false }),
   'count-bits': dynamic(() => import('@/components/visualizations/algorithms/CountingBitsVisualization').then(m => m.CountingBitsVisualization), { ssr: false }),
   'subset-generation-bits': dynamic(() => import('@/components/visualizations/algorithms/SubsetBitsVisualization').then(m => m.SubsetBitsVisualization), { ssr: false }),
+  'single-number': dynamic(() => import('@/components/visualizations/algorithms/SingleNumberVisualization').then(m => m.SingleNumberVisualization), { ssr: false }),
 
   // Scheduling / Greedy
   'hand-of-straights': dynamic(() => import('@/components/visualizations/algorithms/HandOfStraightsVisualization').then(m => m.HandOfStraightsVisualization), { ssr: false }),
@@ -159,6 +174,7 @@ export const visualizationMap: Record<string, any> = {
   'top-k-frequent-elements': dynamic(() => import('@/components/visualizations/algorithms/TopKFrequentElementsVisualization').then(m => m.TopKFrequentElementsVisualization), { ssr: false }),
   'sliding-window-maximum': dynamic(() => import('@/components/visualizations/algorithms/SlidingWindowMaxVisualization').then(m => m.SlidingWindowMaxVisualization), { ssr: false }),
   'minimum-window-substring': dynamic(() => import('@/components/visualizations/algorithms/MinimumWindowSubstringVisualization').then(m => m.MinimumWindowSubstringVisualization), { ssr: false }),
+  'minimum-interval-to-include-each-query': dynamic(() => import('@/components/visualizations/algorithms/MinimumIntervalToIncludeEachQueryVisualization').then(m => m.MinimumIntervalToIncludeEachQueryVisualization), { ssr: false }),
   'find-median-from-data-stream': dynamic(() => import('@/components/visualizations/algorithms/FindMedianFromDataStreamVisualization').then(m => m.FindMedianFromDataStreamVisualization), { ssr: false }),
   'last-stone-weight': dynamic(() => import('@/components/visualizations/algorithms/LastStoneWeightVisualization').then(m => m.LastStoneWeightVisualization), { ssr: false }),
   'k-closest-points-to-origin': dynamic(() => import('@/components/visualizations/algorithms/KClosestPointsVisualization').then(m => m.KClosestPointsVisualization), { ssr: false }),
@@ -180,6 +196,7 @@ export const visualizationMap: Record<string, any> = {
   'happy-number': dynamic(() => import('@/components/visualizations/algorithms/HappyNumberVisualization').then(m => m.HappyNumberVisualization), { ssr: false }),
   'powx-n': dynamic(() => import('@/components/visualizations/algorithms/PowxNVisualization').then(m => m.PowxNVisualization), { ssr: false }),
   'pow': dynamic(() => import('@/components/visualizations/algorithms/PowxNVisualization').then(m => m.PowxNVisualization), { ssr: false }),
+  'reverse-integer': dynamic(() => import('@/components/visualizations/algorithms/ReverseIntegerVisualization').then(m => m.ReverseIntegerVisualization), { ssr: false }),
 };
 
 export const visualizationMetadataMap: Record<string, { title: string; description: string }> = {
@@ -191,6 +208,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
     title: 'Sliding Window',
     description: 'See how left and right pointers define a dynamic window that expands and contracts to find optimal subarrays or substrings.'
   },
+  'permutation-in-string': {
+    title: 'Permutation in String',
+    description: 'Visualize the sliding window technique matching character frequencies with a 26-matches array comparison.'
+  },
   'prefix-sum': {
     title: 'Prefix Sum Array',
     description: 'Visualize how cumulative sums are precomputed to allow any subarray range sum query in constant O(1) time.'
@@ -198,6 +219,14 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
   'binary-search': {
     title: 'Binary Search',
     description: 'Watch the search space bisect at each step as low, high, and mid pointers narrow down the target value in a sorted array.'
+  },
+  'koko-eating-bananas': {
+    title: 'Koko Eating Bananas',
+    description: 'Use binary search on the answer space to find the minimum eating speed k that allows Koko to eat all bananas within h hours.'
+  },
+  'search-a-2d-matrix': {
+    title: 'Search a 2D Matrix',
+    description: 'Visualize binary search on the rows to find the candidate row, followed by standard binary search inside that row.'
   },
   'dutch-national-flag': {
     title: 'Dutch National Flag (3-Way Partition)',
@@ -207,9 +236,21 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
     title: 'Monotonic Stack',
     description: 'Visualize how elements are pushed and popped to maintain a strict increasing/decreasing order, solving next greater element problems in O(n).'
   },
+  'daily-temperatures': {
+    title: 'Daily Temperatures',
+    description: 'Visualize how a monotonic stack processes daily temperatures to efficiently calculate wait times for warmer days in O(n) time.'
+  },
   'valid-parentheses': {
     title: 'Valid Parentheses',
     description: 'Watch how a stack is used to ensure opening and closing brackets match correctly in a string.'
+  },
+  'evaluate-reverse-polish-notation': {
+    title: 'Evaluate Reverse Polish Notation',
+    description: 'Visualize evaluating an arithmetic expression in Reverse Polish Notation using a stack data structure.'
+  },
+  'min-stack': {
+    title: 'Min Stack',
+    description: 'Visualize how a dual-stack configuration is used to retrieve the minimum element in constant O(1) time while supporting standard stack operations.'
   },
   'two-sum': {
     title: 'Two Sum',
@@ -275,6 +316,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
     title: 'Reverse Linked List',
     description: 'Watch how pointers (prev, curr, next) are re-wired node by node to reverse a singly linked list in-place.'
   },
+  'reverse-linked-list-ii': {
+    title: 'Reverse Linked List II',
+    description: 'Visualize reversing a sublist of a singly linked list between positions left and right.'
+  },
   'detect-cycle-in-a-linked-list': {
     title: 'Linked List Cycle Detection',
     description: 'Visualize Floyd\'s Cycle-Finding Algorithm (Tortoise & Hare) where a fast pointer eventually laps a slow pointer inside a loop.'
@@ -291,6 +336,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
     title: 'Add Two Numbers',
     description: 'Visualize adding two numbers represented by linked lists, carrying over digits just like manual addition.'
   },
+  'copy-list-with-random-pointer': {
+    title: 'Copy List with Random Pointer',
+    description: 'Visualize copying a linked list with random pointers in two passes using an old-to-copy hash map representation.'
+  },
   'top-k-frequent-elements': {
     title: 'Top K Frequent Elements',
     description: 'Track how a frequency map and a min-heap extract the K most common elements in O(n log k) time.'
@@ -306,6 +355,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
   'minimum-window-substring': {
     title: 'Minimum Window Substring',
     description: 'Visualize using a dynamic sliding window with hash maps to find the shortest substring containing all required characters.'
+  },
+  'minimum-interval-to-include-each-query': {
+    title: 'Minimum Interval to Include Each Query',
+    description: 'Visualize how a sweep-line style pointer processing sorted queries combined with a min-heap tracks the smallest active interval covering each query.'
   },
   'knapsack-01': {
     title: '0/1 Knapsack',
@@ -355,6 +408,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
     title: 'Design Twitter',
     description: 'Visualize the internal data structures of a simplified Twitter implementation, tracking user followings and rendering chronological news feeds with a min-heap.'
   },
+  'detect-squares': {
+    title: 'Detect Squares',
+    description: 'Visualize how points from a coordinate stream are stored and matched using diagonals and corner frequencies to detect axis-aligned squares in O(N) time.'
+  },
   'time-based-key-value-store': {
     title: 'Time-Based Key-Value Store',
     description: 'Visualize how a hash map of dynamically growing arrays combined with binary search allows efficient retrieval of time-versioned values.'
@@ -370,6 +427,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
   'distinct-subsequences': {
     title: 'Distinct Subsequences',
     description: 'Visualize how a 2D dynamic programming table tracks the number of ways a short string can be formed from a long string by deleting characters.'
+  },
+  'interleaving-string': {
+    title: 'Interleaving String',
+    description: 'Visualize how two strings are interleaved to form a third string using recursive backtracking with 2D memoization.'
   },
   'regular-expression-matching': {
     title: 'Regular Expression Matching',
@@ -395,6 +456,14 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
     title: 'Number of Islands',
     description: 'Visualize DFS/BFS flood-fill on a 2D grid to count distinct connected land masses surrounded by water.'
   },
+  'max-area-of-island': {
+    title: 'Max Area of Island',
+    description: 'Visualize how DFS traversal counts connected land cells to find the island with the maximum area on a 2D grid.'
+  },
+  'reconstruct-itinerary': {
+    title: 'Reconstruct Itinerary',
+    description: 'Visualize Eulerian path search using backtracking DFS to find the lexicographically smallest itinerary using all tickets.'
+  },
   'surrounded-regions': {
     title: 'Surrounded Regions',
     description: 'Visualize boundary-connected DFS marking to identify and capture surrounded O-regions on a 2D grid.'
@@ -415,6 +484,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
     title: 'Pow(x, n)',
     description: 'Visualize binary exponentiation (exponentiation by squaring) to compute powers in O(log n) time.'
   },
+  'reverse-integer': {
+    title: 'Reverse Integer',
+    description: 'Visualize reversing the digits of a signed 32-bit integer, tracing modulo extraction and overflow bounds validation.'
+  },
   'multiply-strings': {
     title: 'Multiply Strings',
     description: 'Visualize multiplying two large numbers represented as strings, simulating the manual paper-and-pencil method digit by digit.'
@@ -430,6 +503,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
   'merge-triplets-to-form-target-triplet': {
     title: 'Merge Triplets to Form Target Triplet',
     description: 'Visualize the greedy selection of valid triplets to match the target components.'
+  },
+  'single-number': {
+    title: 'Single Number',
+    description: 'Visualize using the bitwise XOR operation to find the unique element in an array where all other elements appear twice in O(n) time and O(1) space.'
   }
 };
 
