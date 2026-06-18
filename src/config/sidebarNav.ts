@@ -41,6 +41,7 @@ export const DSA_ITEMS = [
   { id: "get-started", title: "Get started", icon: Rocket, url: "/dsa/get-started" },
   { id: "core-patterns", title: "Core patterns", icon: Target, url: "/dsa/core" },
   { id: "blind-75", title: "Blind 75", icon: Brain, url: "/dsa/blind-75" },
+  { id: "rulcode-150", title: "Rulcode 150", icon: Layers, url: "/dsa/rulcode-150" },
 ] as const;
 
 // ─── Guide nav groups (derived from guidesData) ───────────────────────────────
@@ -135,6 +136,7 @@ export const SIDEBAR_ROUTES = [
   "/problems",
   "/dsa/get-started",
   "/dsa/blind-75",
+  "/dsa/rulcode-150",
   "/dsa/core",
   "/dsa/query",
   "/dsa/visual-library",

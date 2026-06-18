@@ -472,6 +472,11 @@ export function ChallengeAndTopicSection() {
                   Blind 75
                 </Link>
               </Button>
+              <Button variant="outline" size="sm" className="rounded-xl font-bold border-zinc-800 text-xs h-10 hover:bg-zinc-900" asChild>
+                <Link href="/dsa/rulcode-150" onClick={() => handleCtaClick("Canvas - Rulcode 150", "/dsa/rulcode-150", "canvas_header_quicklinks")}>
+                  Rulcode 150
+                </Link>
+              </Button>
             </div>
           </div>
 

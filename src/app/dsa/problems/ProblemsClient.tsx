@@ -90,7 +90,7 @@ const ProblemsClient = ({
       allAlgorithms.filter((algo) => {
         const types =
           algo.listTypes || (algo.list_type ? [algo.list_type] : ["core"]);
-        return types.includes(ListType.Blind150);
+        return types.includes(ListType.Blind150) || types.includes(ListType.Blind75);
       }),
     [allAlgorithms],
   );
@@ -135,7 +135,7 @@ const ProblemsClient = ({
     if (companyFilter) return `${companyFilter} Interview Questions`;
     if (listMode === "core") return "Core Patterns";
     if (listMode === "blind") return "Blind 75";
-    if (listMode === "blind150") return "Blind 150";
+    if (listMode === "blind150") return "Rulcode 150";
     return "All Practice Questions";
   };
 
@@ -150,7 +150,7 @@ const ProblemsClient = ({
     if (listMode === "blind")
       return "The definitive list of 75 essential problems designed to maximize your preparation in minimal time. Focus on the most frequent FAANG interview questions to ensure you're ready for the highest-level technical assessments.";
     if (listMode === "blind150")
-      return "A comprehensive collection of 150 critical problems expanding upon Blind 75, providing thorough coverage across all standard algorithm sub-patterns and topics.";
+      return "A comprehensive collection of 150 critical problems combining Blind 75 and additional core patterns, providing thorough coverage across all standard algorithm topics.";
     return "Explore our comprehensive collection of 200+ problems covering all major data structures and algorithms. Master everything from basic arrays to advanced dynamic programming through hands-on practice and step-by-step visualizations.";
   };
 
@@ -160,7 +160,7 @@ const ProblemsClient = ({
     if (companyFilter) return `${companyFilter} Prep Progress`;
     if (listMode === "core") return "Pattern Progress";
     if (listMode === "blind") return "Blind 75 Progress";
-    if (listMode === "blind150") return "Blind 150 Progress";
+    if (listMode === "blind150") return "Rulcode 150 Progress";
     return "Overall Progress";
   };
 

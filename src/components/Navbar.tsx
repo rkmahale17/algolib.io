@@ -587,6 +587,12 @@ const Navbar = ({
                         >
                           Pattern Guides
                         </div>
+                        <div
+                          onClick={() => setActivePracticeTab("rulcode150")}
+                          className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activePracticeTab === "rulcode150" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
+                        >
+                          Rulcode 150
+                        </div>
                       </div>
 
                       <div className="flex-1 p-8 flex flex-col gap-8 bg-background overflow-y-auto max-h-[500px]">

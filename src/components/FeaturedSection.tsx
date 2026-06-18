@@ -36,6 +36,15 @@ const features = [
     flag: "blind_75",
   },
   {
+    id: "rulcode-150",
+    title: "Rulcode 150",
+    description:
+      "Comprehensive collection of 150 critical problems expanding upon core patterns.",
+    icon: Layers,
+    link: "/dsa/rulcode-150",
+    action: "Start Learning",
+  },
+  {
     id: "blog",
     title: "Blog & Tutorials",
     description:
