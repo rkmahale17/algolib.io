@@ -53,15 +53,25 @@ const GetStartedClient = () => {
     [allAlgorithms]
   );
 
+  const rulcode150Algorithms = useMemo(() => 
+    allAlgorithms.filter(algo => {
+      const types = algo.listTypes || (algo.list_type ? [algo.list_type] : ['core']);
+      return types.includes(ListType.Blind150) || types.includes(ListType.Blind75);
+    }),
+    [allAlgorithms]
+  );
+
   const currentAlgorithms = useMemo(() => {
     if (activeTab === "core") return coreAlgorithms;
     if (activeTab === "blind75") return blind75Algorithms;
+    if (activeTab === "rulcode150") return rulcode150Algorithms;
     return allAlgorithms;
-  }, [activeTab, allAlgorithms, coreAlgorithms, blind75Algorithms]);
+  }, [activeTab, allAlgorithms, coreAlgorithms, blind75Algorithms, rulcode150Algorithms]);
 
   const activeIcon = useMemo(() => {
     if (activeTab === "core") return Target;
     if (activeTab === "blind75") return Brain;
+    if (activeTab === "rulcode150") return Layers;
     return Layers;
   }, [activeTab]);
 
@@ -69,6 +79,7 @@ const GetStartedClient = () => {
     { value: "all", label: "All Questions", icon: Layers },
     { value: "core", label: "Core Patterns", icon: Target },
     { value: "blind75", label: "Blind 75", icon: Brain },
+    { value: "rulcode150", label: "Rulcode 150", icon: Layers },
   ];
 
   const activeTabLabel = tabs.find(t => t.value === activeTab)?.label || "Select Category";
@@ -95,6 +106,7 @@ const GetStartedClient = () => {
                       {activeTab === "all" && <Layers className="w-3.5 h-3.5" />}
                       {activeTab === "core" && <Target className="w-3.5 h-3.5" />}
                       {activeTab === "blind75" && <Brain className="w-3.5 h-3.5" />}
+                      {activeTab === "rulcode150" && <Layers className="w-3.5 h-3.5" />}
                     </div>
                     <span className="font-medium text-sm">{activeTabLabel}</span>
                   </div>

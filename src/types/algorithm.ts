@@ -10,7 +10,7 @@ export const LIST_TYPE_LABELS: Record<string, string> = {
     'all': 'All Problems',
     [ListType.Core]: 'Core',
     [ListType.Blind75]: 'Blind 75',
-    [ListType.Blind150]: 'Blind 150',
+    [ListType.Blind150]: 'Rulcode 150',
 };
 
 export const DIFFICULTY_MAP: Record<string, string> = {

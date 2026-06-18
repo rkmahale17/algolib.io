@@ -810,7 +810,7 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({
                 <SelectContent>
                   <SelectItem value="all">All Problems</SelectItem>
                   {Object.entries(LIST_TYPE_LABELS)
-                    .filter(([key]) => key !== "all" && key !== "blind150")
+                    .filter(([key]) => key !== "all")
                     .map(([value, label]) => (
                       <SelectItem key={value} value={value}>
                         {label}
