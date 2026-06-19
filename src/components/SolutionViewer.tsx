@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 import { RichText } from '@/components/RichText';
 import { IsolatedCodeEditor } from "./visualizations/shared/IsolatedCodeEditor";
 import { VideoTutorialCard } from "./algorithm/VideoTutorialCard";
-const LANGUAGE_ORDER = ['python', 'cpp', 'java', 'typescript'];
+const LANGUAGE_ORDER = ['python', 'cpp', 'java', 'typescript', 'sql'];
 
 interface CodeBlock {
   codeType: string;
@@ -108,6 +108,7 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
       java: 'java',
       cpp: 'cpp',
       c: 'c',
+      sql: 'sql',
     };
     return langMap[lang.toLowerCase()] || 'typescript';
   };
@@ -120,6 +121,7 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
       java: 'Java',
       cpp: 'C++',
       c: 'C',
+      sql: 'SQL',
     };
     return displayNames[lang.toLowerCase()] || lang;
   };
@@ -132,6 +134,7 @@ export const SolutionViewer: React.FC<SolutionViewerProps> = ({
       case 'c': return 'c';
       case 'javascript': return 'js';
       case 'typescript': return 'mts';
+      case 'sql': return 'sql';
       default: return 'mts';
     }
   };

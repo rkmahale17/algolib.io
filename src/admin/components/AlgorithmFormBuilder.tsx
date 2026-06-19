@@ -72,6 +72,7 @@ export function AlgorithmFormBuilder({
     title: "",
     category: "",
     difficulty: "easy",
+    problemType: "dsa",
 
     description: "",
     serial_no: "",
@@ -187,6 +188,7 @@ export function AlgorithmFormBuilder({
         title: algorithm.title,
         category: algorithm.category,
         difficulty: algorithm.difficulty,
+        problemType: algorithm.problemType || algorithm.problem_type || "dsa",
         description: algorithm.description || "",
         serial_no: algorithm.serial_no || "",
         explanation:
@@ -238,12 +240,14 @@ export function AlgorithmFormBuilder({
       return;
     }
 
+    const { problemType, ...restFormData } = formData;
     const payload = {
-      ...formData,
+      ...restFormData,
       categories: categories,
       category: categories.join(', '),
       list_type: listTypes[0] || "core",
       list_types: listTypes,
+      problem_type: problemType,
       published: published,
       serial_no: formData.serial_no ? parseInt(formData.serial_no) : null,
       metadata: {
@@ -482,6 +486,7 @@ export function AlgorithmFormBuilder({
                 (impl.code || []).map((c: any) => c.codeType)
               )
             ))}
+            problemType={formData.problemType}
           />
         </div>
 
@@ -662,6 +667,37 @@ export function AlgorithmFormBuilder({
                           </SelectContent>
                         </Select>
                       </div>
+                      <div className="space-y-2">
+                        <Label>Problem Type *</Label>
+                        <Select
+                          value={formData.problemType}
+                          onValueChange={(value) =>
+                            setFormData({ ...formData, problemType: value })
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="dsa">DSA</SelectItem>
+                            <SelectItem value="sql">SQL / Database</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {formData.problemType === 'sql' && (
+                        <div className="space-y-2">
+                          <Label>Database Setup Script (SQL)</Label>
+                          <textarea
+                            className="w-full min-h-[150px] p-3 rounded-md border bg-background text-sm font-mono"
+                            value={formData.metadata?.db_setup || ''}
+                            onChange={(e) =>
+                              setFormData({ ...formData, metadata: { ...formData.metadata, db_setup: e.target.value } })
+                            }
+                            placeholder="CREATE TABLE ...&#10;INSERT INTO ..."
+                          />
+                        </div>
+                      )}
 
                       <div className="space-y-2">
                         <Label className="block mb-2">List Types *</Label>

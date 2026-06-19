@@ -211,9 +211,12 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
       }
 
       const impl = algorithmData.implementations?.find((i: any) => i.lang.toLowerCase() === language.toLowerCase());
-      let algoCode = impl?.code?.find((c: any) => c.codeType === 'starter')?.code || impl?.code?.find((c: any) => c.codeType === 'optimize')?.code;
+      const isSqlProblem = algorithmData.problemType === 'sql' || algorithmData.problem_type === 'sql' || algorithmData.problem_type === 'SQL' || algorithmData.problemType === 'SQL';
+      
+      // For SQL, don't fall back to 'optimize' (the full solution query), just start blank if no 'starter'
+      let algoCode = impl?.code?.find((c: any) => c.codeType === 'starter')?.code || (!isSqlProblem ? impl?.code?.find((c: any) => c.codeType === 'optimize')?.code : undefined);
 
-      if (!algoCode && algorithmData.input_schema) {
+      if (!algoCode && algorithmData.input_schema && !isSqlProblem) {
         const functionName = algorithmId?.replace(/-/g, '_') || 'solution';
         const parsedInputs: Record<string, any> = {};
         algorithmData.input_schema.forEach((field: any) => {
@@ -250,7 +253,8 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
     let resetCode: string;
     if (algorithmData) {
       const impl = algorithmData.implementations?.find((i: any) => i.lang.toLowerCase() === language.toLowerCase());
-      const algoCode = impl?.code?.find((c: any) => c.codeType === 'starter')?.code || impl?.code?.find((c: any) => c.codeType === 'optimize')?.code;
+      const isSqlProblem = algorithmData.problemType === 'sql' || algorithmData.problem_type === 'sql' || algorithmData.problem_type === 'SQL' || algorithmData.problemType === 'SQL';
+      const algoCode = impl?.code?.find((c: any) => c.codeType === 'starter')?.code || (!isSqlProblem ? impl?.code?.find((c: any) => c.codeType === 'optimize')?.code : undefined);
       resetCode = algoCode || DEFAULT_CODE[language];
     } else {
       resetCode = DEFAULT_CODE[language];

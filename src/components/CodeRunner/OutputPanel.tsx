@@ -44,6 +44,171 @@ const DiffView = ({ expected, actual }: { expected: any, actual: any }) => {
   );
 };
 
+const getSqlTableSchemas = (dbSetup: string) => {
+  const schemas: Record<string, string[]> = {};
+  if (!dbSetup) return schemas;
+  
+  const tables = dbSetup.split(/CREATE\s+TABLE/i).slice(1);
+  
+  for (const table of tables) {
+      const nameMatch = table.match(/^\s*(\w+)/);
+      if (!nameMatch) continue;
+      const tableName = nameMatch[1];
+      
+      const parenStart = table.indexOf('(');
+      if (parenStart === -1) continue;
+      
+      let parenEnd = parenStart;
+      let depth = 0;
+      for (let i = parenStart; i < table.length; i++) {
+          if (table[i] === '(') depth++;
+          else if (table[i] === ')') {
+              depth--;
+              if (depth === 0) {
+                  parenEnd = i;
+                  break;
+              }
+          }
+      }
+      
+      const columnsDef = table.substring(parenStart + 1, parenEnd);
+      const cols: string[] = [];
+      let currentCol = '';
+      let nested = 0;
+      for (let i = 0; i < columnsDef.length; i++) {
+          const char = columnsDef[i];
+          if (char === '(') nested++;
+          else if (char === ')') nested--;
+          
+          if (char === ',' && nested === 0) {
+              cols.push(currentCol);
+              currentCol = '';
+          } else {
+              currentCol += char;
+          }
+      }
+      if (currentCol) cols.push(currentCol);
+      
+      const columns: string[] = [];
+      for (const col of cols) {
+          const trimmed = col.trim();
+          if (!trimmed) continue;
+          if (/^(PRIMARY\s+KEY|FOREIGN\s+KEY|UNIQUE|CHECK|CONSTRAINT)\b/i.test(trimmed)) continue;
+          
+          const parts = trimmed.split(/\s+/);
+          if (parts.length >= 2) {
+              columns.push(parts[0]);
+          }
+      }
+      
+      schemas[tableName] = columns;
+      schemas[tableName.toLowerCase()] = columns;
+  }
+  return schemas;
+};
+
+const getPreferredHeaders = (fieldName: string, schemas: Record<string, string[]>) => {
+    if (!schemas || !fieldName) return undefined;
+    const lowerName = fieldName.toLowerCase().replace('table', '').trim();
+    for (const key of Object.keys(schemas)) {
+        if (key.toLowerCase() === lowerName || lowerName.includes(key.toLowerCase()) || key.toLowerCase().includes(lowerName)) {
+            return schemas[key];
+        }
+    }
+    return undefined;
+};
+
+const parseSqlAsciiTable = (rawText: string) => {
+  if (!rawText || typeof rawText !== 'string') return null;
+  const lines = rawText.trim().split('\n');
+  if (lines.length < 3) return null;
+  
+  const separatorIndex = lines.findIndex(line => /^[-\+\| ]+$/.test(line) && line.includes('-') && !line.match(/[a-zA-Z0-9]/));
+  if (separatorIndex < 1) return null;
+  
+  const headerLine = lines[separatorIndex - 1];
+  const dataLines = lines.slice(separatorIndex + 1);
+  
+  const headers = headerLine.split('|').map(h => h.trim());
+  const rows = dataLines
+    .filter(line => line.includes('|'))
+    .map(line => line.split('|').map(cell => cell.trim()));
+    
+  return { headers, rows };
+};
+
+const SqlTableDisplay = ({ rawText }: { rawText: string }) => {
+  const tableData = parseSqlAsciiTable(rawText);
+  if (!tableData) {
+    return <div className="whitespace-pre-wrap font-mono text-xs">{rawText}</div>;
+  }
+  
+  return (
+    <div className="overflow-x-auto rounded border border-border mt-2 w-max max-w-full">
+      <table className="text-left border-collapse text-xs">
+        <thead className="bg-muted/50 border-b border-border">
+          <tr>
+            {tableData.headers.map((h, i) => (
+              <th key={i} className="px-3 py-2 font-medium text-muted-foreground whitespace-nowrap">{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-border font-mono">
+          {tableData.rows.length === 0 ? (
+            <tr><td colSpan={tableData.headers.length} className="px-3 py-4 text-center text-muted-foreground font-sans">0 rows</td></tr>
+          ) : (
+            tableData.rows.map((row, i) => (
+              <tr key={i} className="hover:bg-muted/30">
+                {row.map((cell, j) => (
+                  <td key={j} className="px-3 py-2 whitespace-nowrap">{cell}</td>
+                ))}
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+const JsonTableDisplay = ({ data, preferredHeaders }: { data: any[], preferredHeaders?: string[] }) => {
+  if (!Array.isArray(data) || data.length === 0) {
+    return <div className="text-muted-foreground text-xs p-3 font-sans text-center">0 rows</div>;
+  }
+  let headers = Array.from(new Set(data.flatMap(Object.keys)));
+  
+  if (preferredHeaders && preferredHeaders.length > 0) {
+      const orderedHeaders = preferredHeaders.filter(h => headers.includes(h));
+      const remainingHeaders = headers.filter(h => !preferredHeaders.includes(h));
+      headers = [...orderedHeaders, ...remainingHeaders];
+  }
+  
+  return (
+    <div className="overflow-x-auto rounded border border-border mt-2 w-max max-w-full">
+      <table className="text-left border-collapse text-xs">
+        <thead className="bg-muted/50 border-b border-border">
+          <tr>
+            {headers.map((h, i) => (
+              <th key={i} className="px-3 py-2 font-medium text-muted-foreground whitespace-nowrap">{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-border font-mono">
+          {data.map((row, i) => (
+            <tr key={i} className="hover:bg-muted/30">
+              {headers.map((h, j) => (
+                <td key={j} className="px-3 py-2 whitespace-nowrap">
+                  {row[h] === null || row[h] === undefined ? <span className="text-muted-foreground italic">null</span> : String(row[h])}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
 interface OutputPanelProps {
   output: any | null;
   loading: boolean;
@@ -122,6 +287,19 @@ export const OutputPanel = React.memo(({
 
   const containerRef = React.useRef<HTMLDivElement>(null);
   const [panelWidth, setPanelWidth] = useState(300);
+
+  const sqlSchemas = React.useMemo(() => {
+    const isSqlProblem = algorithmMeta?.problemType === 'sql' || algorithmMeta?.problem_type === 'sql' || algorithmMeta?.problem_type === 'SQL' || algorithmMeta?.problemType === 'SQL';
+    if (!isSqlProblem) return {};
+    try {
+      const metadata = typeof algorithmMeta?.metadata === 'string'
+        ? JSON.parse(algorithmMeta.metadata)
+        : (algorithmMeta?.metadata || {});
+      return getSqlTableSchemas(metadata.db_setup);
+    } catch {
+      return {};
+    }
+  }, [algorithmMeta]);
 
   // Ensure first test case is active by default
   React.useEffect(() => {
@@ -421,23 +599,47 @@ export const OutputPanel = React.memo(({
                                   if (inputSchema && inputSchema.length > 0 && Array.isArray(inputData)) {
                                     return (
                                       <div className="space-y-1">
-                                        {inputSchema.map((field, i) => (
-                                          <div key={i} className="flex flex-col gap-1">
-                                            <div className="flex gap-2">
-                                              <span className="text-muted-foreground select-none">{field.name}:</span>
-                                              <span>{(() => {
-                                                const val = inputData[i];
-                                                if (isTreeType(field.type)) {
-                                                  const treeArr = parseTreeValue(val);
-                                                  if (treeArr) return JSON.stringify(treeArr);
-                                                }
-                                                if (isListType(field.type)) {
-                                                  const listArr = parseListValue(val);
-                                                  if (listArr) return JSON.stringify(listArr);
-                                                }
-                                                return typeof val === 'string' ? val : JSON.stringify(val);
-                                              })()}</span>
-                                            </div>
+                                        {inputSchema.map((field, i) => {
+                                          const val = inputData[i];
+                                          const isSqlProblem = algorithmMeta?.problemType === 'sql' || algorithmMeta?.problem_type === 'sql' || algorithmMeta?.problem_type === 'SQL' || algorithmMeta?.problemType === 'SQL';
+                                          
+                                          let sqlTableData: any[] | null = null;
+                                          if (isSqlProblem) {
+                                            if (Array.isArray(val)) {
+                                              sqlTableData = val;
+                                            } else if (val && typeof val === 'object') {
+                                              const vals = Object.values(val);
+                                              if (vals.length > 0 && Array.isArray(vals[0])) {
+                                                sqlTableData = vals[0] as any[];
+                                              }
+                                            }
+                                          }
+                                          
+                                          return (
+                                            <div key={i} className="flex flex-col gap-1 mb-2">
+                                              {sqlTableData ? (
+                                                <>
+                                                  <div className="flex gap-2">
+                                                    <span className="text-muted-foreground select-none font-semibold">{field.name}:</span>
+                                                  </div>
+                                                  <JsonTableDisplay data={sqlTableData} preferredHeaders={getPreferredHeaders(field.name, sqlSchemas)} />
+                                                </>
+                                              ) : (
+                                              <div className="flex gap-2">
+                                                <span className="text-muted-foreground select-none">{field.name}:</span>
+                                                <span>{(() => {
+                                                  if (isTreeType(field.type)) {
+                                                    const treeArr = parseTreeValue(val);
+                                                    if (treeArr) return JSON.stringify(treeArr);
+                                                  }
+                                                  if (isListType(field.type)) {
+                                                    const listArr = parseListValue(val);
+                                                    if (listArr) return JSON.stringify(listArr);
+                                                  }
+                                                  return typeof val === 'string' ? val : JSON.stringify(val);
+                                                })()}</span>
+                                              </div>
+                                            )}
                                             {(algorithmMeta?.controls?.visualizations?.tree?.enabled ?? algorithmMeta?.controls?.show_tree_visualization) && algorithmMeta?.controls?.visualizations?.tree?.results_input !== false && isTreeType(field.type) && (
                                               <div className="mt-1">
                                                 <TreeDiagram
@@ -453,7 +655,8 @@ export const OutputPanel = React.memo(({
                                               </div>
                                             )}
                                           </div>
-                                        ))}
+                                          );
+                                        })}
                                       </div>
                                     );
                                   }
@@ -496,6 +699,15 @@ export const OutputPanel = React.memo(({
                                         ))}
                                       </div>
                                     );
+                                  }
+
+                                  const isSqlProblem = algorithmMeta?.problemType === 'sql' || algorithmMeta?.problem_type === 'sql' || algorithmMeta?.problem_type === 'SQL' || algorithmMeta?.problemType === 'SQL';
+                                  if (isSqlProblem) {
+                                    if (typeof actual === 'string') {
+                                      return <SqlTableDisplay rawText={actual} />;
+                                    } else if (Array.isArray(actual)) {
+                                      return <JsonTableDisplay data={actual} />;
+                                    }
                                   }
 
                                   const treeArr = actual !== undefined ? parseTreeValue(actual) : null;
@@ -542,6 +754,32 @@ export const OutputPanel = React.memo(({
                                           ))}
                                         </div>
                                       );
+                                    }
+
+                                    const isSqlProblem = algorithmMeta?.problemType === 'sql' || algorithmMeta?.problem_type === 'sql' || algorithmMeta?.problem_type === 'SQL' || algorithmMeta?.problemType === 'SQL';
+                                    
+                                    if (isSqlProblem) {
+                                      let parsedExpected = result.expected;
+                                      if (typeof result.expected === 'string') {
+                                        try {
+                                          const parsed = JSON.parse(result.expected);
+                                          if (Array.isArray(parsed)) {
+                                            parsedExpected = parsed;
+                                          }
+                                        } catch (e) {
+                                          // Not a JSON array string
+                                        }
+                                      }
+                                      
+                                      if (Array.isArray(parsedExpected)) {
+                                        let actualHeaders: string[] = [];
+                                        if (Array.isArray(result.actual) && result.actual.length > 0) {
+                                          actualHeaders = Object.keys(result.actual[0]);
+                                        }
+                                        return <JsonTableDisplay data={parsedExpected} preferredHeaders={actualHeaders} />;
+                                      } else if (typeof result.expected === 'string') {
+                                        return <SqlTableDisplay rawText={result.expected} />;
+                                      }
                                     }
 
                                     const listArr = result.expected !== undefined ? parseListValue(result.expected) : null;

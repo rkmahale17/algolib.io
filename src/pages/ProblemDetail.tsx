@@ -68,11 +68,15 @@ const ProblemDetail: React.FC = () => {
   const { user, hasPremiumAccess, activeListType, setActiveListType, progressMap, profile } = useApp();
   const { data: algorithmsData, isLoading: isAlgorithmsLoading } = useAlgorithms();
   const isUserAdmin = profile?.role === 'admin';
-  const allAlgorithms = useMemo(() => 
-    (algorithmsData?.algorithms || [])
-      .filter(algo => algo.published !== false || isUserAdmin),
-    [algorithmsData, isUserAdmin]
-  );
+  const allAlgorithms = useMemo(() => {
+    const isSql = (algorithm as any)?.problemType === 'sql' || (algorithm as any)?.problem_type === 'sql' || (algorithm as any)?.problem_type === 'SQL' || (algorithm as any)?.problemType === 'SQL';
+    return (algorithmsData?.algorithms || [])
+      .filter(algo => {
+        const algoIsSql = algo.problemType === 'sql' || algo.problem_type === 'sql' || algo.problem_type === 'SQL' || algo.problemType === 'SQL';
+        return isSql ? algoIsSql : (!algoIsSql && algo.problemType === "dsa");
+      })
+      .filter(algo => algo.published !== false || isUserAdmin);
+  }, [algorithmsData, isUserAdmin, algorithm]);
   const isPaywallEnabled = useFeatureFlag('paywall_enabled');
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);

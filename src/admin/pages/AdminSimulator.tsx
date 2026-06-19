@@ -18,6 +18,7 @@ import { generateTestRunner, generateClassTestRunner } from '@/utils/testRunnerG
 import { LANGUAGE_IDS } from '@/components/CodeRunner/constants';
 import { Language } from '@/components/CodeRunner/LanguageSelector';
 import env from '@/config/env';
+import { executeSqlTestCases, verifySqlResult } from '@/utils/sqlExecutor';
 
 const mapStatusStringToId = (status: string): { id: number; description: string } => {
   switch (status.toLowerCase()) {
@@ -251,6 +252,34 @@ const AdminSimulator: React.FC = () => {
       const metadata = typeof algo.metadata === 'string'
         ? JSON.parse(algo.metadata)
         : (algo.metadata || {});
+
+      if (language === 'sql') {
+        const sqlResults = await executeSqlTestCases(code, testCases, schema || [], metadata?.db_setup || '', algo.id);
+        
+        const testResults = [];
+        let anyError = false;
+        
+        for (let i = 0; i < sqlResults.length; i++) {
+          const res = sqlResults[i];
+          if (res.error) {
+            testResults.push({ id: i, status: 'error', error: res.error });
+            anyError = true;
+          } else if (res.submission_id) {
+            const judge0Res = await waitForSubmissionResult(res.submission_id);
+            const verified = verifySqlResult(res.tc, judge0Res.stdout || '', judge0Res.stderr || '');
+            testResults.push({
+              id: i,
+              status: verified.status,
+              expected: verified.expected,
+              actual: verified.actual,
+              error: verified.error,
+              stdout: verified.stdout
+            });
+          }
+        }
+        
+        return { testResults };
+      }
 
       let fullCode: string;
 

@@ -130,7 +130,11 @@ export const CodeWorkspacePanel = React.memo(({
                   setSelectedLanguage(lang);
                 }}
                 onSuccess={handleCodeSuccess}
-                controls={algorithm.controls?.code_runner}
+                controls={
+                  algorithm.problemType === 'sql' || algorithm.problem_type === 'sql' || algorithm.problem_type === 'SQL' || algorithm.problemType === 'SQL'
+                    ? { ...algorithm.controls?.code_runner, languages: { sql: true } }
+                    : { ...algorithm.controls?.code_runner, languages: { ...algorithm.controls?.code_runner?.languages, sql: false } }
+                }
                 submissions={submissions}
                 isInterviewMode={isInterviewMode}
                 ref={codeRunnerRef}

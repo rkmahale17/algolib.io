@@ -67,6 +67,7 @@ export const CodeEditor = forwardRef<CodeEditorRef, CodeEditorProps>(({
       case 'cpp': return 'cpp';
       case 'java': return 'java';
       case 'python': return 'python';
+      case 'sql': return 'sql';
       default: return 'typescript';
     }
   };

@@ -92,11 +92,16 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({
   const isUserAdmin = profile?.role === "admin";
 
   const allAlgorithms = useMemo(
-    () =>
-      (algorithmsData?.algorithms || [])
-        .filter((algo) => algo.problemType === "dsa")
-        .filter((algo) => algo.published !== false || isUserAdmin),
-    [algorithmsData, isUserAdmin],
+    () => {
+      const isSql = activeAlgorithm?.problemType === 'sql' || activeAlgorithm?.problem_type === 'sql' || activeAlgorithm?.problem_type === 'SQL' || activeAlgorithm?.problemType === 'SQL';
+      return (algorithmsData?.algorithms || [])
+        .filter((algo) => {
+          const algoIsSql = algo.problemType === 'sql' || algo.problem_type === 'sql' || algo.problem_type === 'SQL' || algo.problemType === 'SQL';
+          return isSql ? algoIsSql : (!algoIsSql && algo.problemType === "dsa");
+        })
+        .filter((algo) => algo.published !== false || isUserAdmin);
+    },
+    [algorithmsData, isUserAdmin, activeAlgorithm],
   );
 
   const nextProblem = useMemo(() => {
@@ -338,6 +343,9 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({
     layout.activeRightTab === "editor" && layout.rightTabs.includes("editor");
 
   const availableLanguages = useMemo(() => {
+    const isSqlProblem = activeAlgorithm?.problemType === 'sql' || activeAlgorithm?.problem_type === 'sql' || activeAlgorithm?.problem_type === 'SQL' || activeAlgorithm?.problemType === 'SQL';
+    if (isSqlProblem) return ['sql'];
+
     const controls = activeAlgorithm?.controls?.code_runner;
     return controls?.languages
       ? (Object.keys(controls.languages) as any[]).filter(

@@ -44,6 +44,11 @@ export const DSA_ITEMS = [
   { id: "rulcode-150", title: "Rulcode 150", icon: Layers, url: "/dsa/rulcode-150" },
 ] as const;
 
+// ─── Database nav items ───────────────────────────────────────────────────────
+export const DATABASE_ITEMS = [
+  { id: "sql-basics", title: "SQL Basics", icon: HardDrive, url: "/database/sql-basics" },
+] as const;
+
 // ─── Guide nav groups (derived from guidesData) ───────────────────────────────
 function buildGuideGroups() {
   const timeCompCat = guidesData.find((c) => c.id === "time-complexity");
@@ -141,6 +146,7 @@ export const SIDEBAR_ROUTES = [
   "/dsa/query",
   "/dsa/visual-library",
   "/dashboard",
+  "/database",
 ];
 
 /** Returns true if the given pathname should show the sidebar */

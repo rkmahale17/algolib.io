@@ -65,6 +65,7 @@ export function AlgorithmForm({
       title: "",
       category: "",
       difficulty: "easy",
+      problemType: "dsa",
       description: "",
       explanation: "{}",
       implementations: "{}",
@@ -119,6 +120,7 @@ export function AlgorithmForm({
 
       reset({
         ...algorithm,
+        problemType: algorithm.problemType || algorithm.problem_type || "dsa",
         explanation:
           typeof algorithm.explanation === "string"
             ? algorithm.explanation
@@ -163,6 +165,7 @@ export function AlgorithmForm({
         title: "",
         category: "",
         difficulty: "easy",
+        problemType: "dsa",
         description: "",
         explanation: "{}",
         implementations: "{}",
@@ -226,12 +229,14 @@ export function AlgorithmForm({
     }
 
     // Parse JSON fields
+    const { problemType, ...restData } = data;
     const parsedData = {
-      ...data,
+      ...restData,
       categories: categories,
       category: categories.join(', '),
       list_type: listTypes[0] || "core",
       list_types: listTypes,
+      problem_type: problemType,
       published: published,
       explanation: JSON.parse(data.explanation),
       implementations: JSON.parse(data.implementations),

@@ -22,6 +22,7 @@ interface ProblemsClientProps {
   description?: string;
   progressTitle?: string;
   icon?: any;
+  problemType?: string;
 }
 
 const ProblemsClient = ({
@@ -30,6 +31,7 @@ const ProblemsClient = ({
   description: manualDescription,
   progressTitle: manualProgressTitle,
   icon: manualIcon,
+  problemType = "dsa",
 }: ProblemsClientProps = {}) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -53,9 +55,9 @@ const ProblemsClient = ({
   const allAlgorithms = useMemo(
     () =>
       (data?.algorithms ?? [])
-        .filter((algo) => algo.problemType === "dsa")
+        .filter((algo) => algo.problemType === problemType)
         .filter((algo) => algo.published !== false || isUserAdmin),
-    [data, isUserAdmin],
+    [data, isUserAdmin, problemType],
   );
 
   const potd = useProblemOfTheDay(allAlgorithms);

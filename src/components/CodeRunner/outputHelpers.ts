@@ -12,6 +12,9 @@ export const getStatusText = (statusId?: number, description?: string, testResul
         const allPassed = testResults?.every((r: any) => r.status === 'pass');
         return allPassed ? "Accepted" : "Wrong Answer";
     }
+    if (statusId === 4) {
+        return "Wrong Answer";
+    }
     return description || "Error";
 };
 
