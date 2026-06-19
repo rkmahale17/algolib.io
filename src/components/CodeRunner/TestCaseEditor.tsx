@@ -10,6 +10,71 @@ import { isListType, parseListValue } from '@/utils/listUtils';
 import { GraphDiagram } from '../visualizations/GraphDiagram';
 import { isGraphType } from '@/utils/graphUtils';
 
+const JsonTableDisplay = ({ jsonText, preferredHeaders }: { jsonText: string, preferredHeaders?: string[] }) => {
+  try {
+    const data = JSON.parse(jsonText);
+    if (!data || typeof data !== 'object') return null;
+    
+    // Check if it's an array of objects or wrapped object like {"Person": [...]}
+    let rows: any[] = [];
+    if (Array.isArray(data)) {
+      rows = data;
+    } else if (Object.keys(data).length === 1 && Array.isArray(Object.values(data)[0])) {
+      rows = Object.values(data)[0] as any[];
+    } else {
+      return null;
+    }
+
+    if (rows.length === 0) return null;
+
+    let headers: string[] = [];
+    let isArrayOfArrays = false;
+
+    if (Array.isArray(rows[0])) {
+      isArrayOfArrays = true;
+      const maxLen = Math.max(...rows.map(r => Array.isArray(r) ? r.length : 0));
+      headers = Array.from({length: maxLen}, (_, i) => `Col ${i + 1}`);
+    } else if (typeof rows[0] === 'object' && rows[0] !== null) {
+      headers = Array.from(new Set(rows.flatMap(r => Object.keys(r || {}))));
+    } else {
+      return null;
+    }
+
+    if (preferredHeaders && preferredHeaders.length > 0 && !isArrayOfArrays) {
+      const orderedHeaders = preferredHeaders.filter(h => headers.includes(h));
+      const remainingHeaders = headers.filter(h => !preferredHeaders.includes(h));
+      headers = [...orderedHeaders, ...remainingHeaders];
+    }
+
+    return (
+      <div className="overflow-x-auto rounded border border-border mt-2 w-max max-w-full">
+        <table className="text-left border-collapse text-xs">
+          <thead className="bg-muted/50 border-b border-border">
+            <tr>
+              {headers.map((h, i) => (
+                <th key={i} className="px-3 py-2 font-medium text-muted-foreground whitespace-nowrap">{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border font-mono">
+            {rows.map((row, i) => (
+              <tr key={i} className="hover:bg-muted/30">
+                {headers.map((h, j) => {
+                  const cell = isArrayOfArrays ? row[j] : row[h];
+                  const content = cell === null ? 'null' : (typeof cell === 'object' ? JSON.stringify(cell) : String(cell));
+                  return <td key={j} className="px-3 py-2 whitespace-nowrap">{content}</td>;
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  } catch {
+    return null;
+  }
+};
+
 interface InputField {
   name: string;
   label?: string;
@@ -32,6 +97,7 @@ interface TestCaseEditorProps {
   onEdit?: () => void;
   canEdit?: boolean;
   controls?: any;
+  sqlSchemas?: Record<string, string[]>;
 }
 
 export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
@@ -42,10 +108,11 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
   isEditing = false,
   onEdit,
   canEdit = false,
-  controls
+  controls,
+  sqlSchemas
 }) => {
   const [editedInputs, setEditedInputs] = useState<string[]>(
-    testCase.input.map((val, idx) => {
+    (Array.isArray(testCase.input) ? testCase.input : [testCase.input]).map((val, idx) => {
       const field = inputSchema[idx];
       if (field && isTreeType(field.type)) {
         const treeArr = parseTreeValue(val);
@@ -66,7 +133,7 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
 
   // Sync state with props when testCase changes (e.g. after save or external update)
   React.useEffect(() => {
-    setEditedInputs(testCase.input.map((val, idx) => {
+    setEditedInputs((Array.isArray(testCase.input) ? testCase.input : [testCase.input]).map((val, idx) => {
       const field = inputSchema[idx];
       if (field && isTreeType(field.type)) {
         const treeArr = parseTreeValue(val);
@@ -185,23 +252,25 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
             {field.label || field.name}
             <span className="text-muted-foreground ml-1">({field.type})</span>
           </Label>
-          <div className="relative">
-            <Input
-              id={`input-${index}`}
-              value={editedInputs[index] || ''}
-              onChange={(e) => handleInputChange(index, e.target.value)}
-              className={`font-mono text-xs ${errors[index] ? 'border-destructive focus-visible:ring-destructive' : ''
-                }`}
-              placeholder={`Enter ${field.type}`}
-              readOnly={!isEditing}
-              disabled={!isEditing}
-            />
-            {errors[index] && (
-              <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                <AlertCircle className="w-4 h-4 text-destructive" />
-              </div>
-            )}
-          </div>
+          {!(field.type?.toLowerCase().includes('table') && !isEditing) && (
+            <div className="relative">
+              <Input
+                id={`input-${index}`}
+                value={editedInputs[index] || ''}
+                onChange={(e) => handleInputChange(index, e.target.value)}
+                className={`font-mono text-xs ${errors[index] ? 'border-destructive focus-visible:ring-destructive' : ''
+                  }`}
+                placeholder={`Enter ${field.type}`}
+                readOnly={!isEditing}
+                disabled={!isEditing}
+              />
+              {errors[index] && (
+                <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                  <AlertCircle className="w-4 h-4 text-destructive" />
+                </div>
+              )}
+            </div>
+          )}
           {errors[index] && (
             <p className="text-xs text-destructive">{errors[index]}</p>
           )}
@@ -219,6 +288,9 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
               />
             </div>
           )}
+          {field.type?.toLowerCase().includes('table') && editedInputs[index] && !errors[index] && (
+            <JsonTableDisplay jsonText={editedInputs[index]} preferredHeaders={sqlSchemas?.[field.name] || sqlSchemas?.[(field.name || '').toLowerCase()]} />
+          )}
         </div>
       ))}
 
@@ -228,20 +300,24 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
           Expected Output (JSON)
         </Label>
         <div className="relative">
-          <Input
-            id="input-expected"
-            value={editedExpected}
-            onChange={(e) => handleExpectedChange(e.target.value)}
-            className={`font-mono text-xs ${errors['expected'] ? 'border-destructive focus-visible:ring-destructive' : ''
-              }`}
-            placeholder="e.g. [1, 2] or 5 or true"
-            readOnly={!isEditing}
-            disabled={!isEditing}
-          />
-          {errors['expected'] && (
-            <div className="absolute right-2 top-1/2 -translate-y-1/2">
-              <AlertCircle className="w-4 h-4 text-destructive" />
-            </div>
+          {!(inputSchema?.some(f => f.type?.toLowerCase().includes('table')) && !isEditing) && (
+            <>
+              <Input
+                id="input-expected"
+                value={editedExpected}
+                onChange={(e) => handleExpectedChange(e.target.value)}
+                className={`font-mono text-xs ${errors['expected'] ? 'border-destructive focus-visible:ring-destructive' : ''
+                  }`}
+                placeholder="e.g. [1, 2] or 5 or true"
+                readOnly={!isEditing}
+                disabled={!isEditing}
+              />
+              {errors['expected'] && (
+                <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                  <AlertCircle className="w-4 h-4 text-destructive" />
+                </div>
+              )}
+            </>
           )}
         </div>
         {errors['expected'] && (
@@ -257,6 +333,10 @@ export const TestCaseEditor: React.FC<TestCaseEditorProps> = ({
           <div className="mt-2">
             <GraphDiagram data={editedExpected} height={160} />
           </div>
+        )}
+        {/* Render expected table if input is table-like */}
+        {inputSchema?.some(f => f.type?.toLowerCase().includes('table')) && editedExpected && !errors['expected'] && (
+          <JsonTableDisplay jsonText={editedExpected} />
         )}
       </div>
 

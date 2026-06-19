@@ -12,6 +12,7 @@ export const visualizationMap: Record<string, any> = {
   'sliding-window': dynamic(() => import('@/components/visualizations/algorithms/SlidingWindowVisualization').then(m => m.SlidingWindowVisualization), { ssr: false }),
   'permutation-in-string': dynamic(() => import('@/components/visualizations/algorithms/PermutationInStringVisualization').then(m => m.PermutationInStringVisualization), { ssr: false }),
   'prefix-sum': dynamic(() => import('@/components/visualizations/algorithms/PrefixSumVisualization').then(m => m.PrefixSumVisualization), { ssr: false }),
+  'find-the-highest-altitude': dynamic(() => import('@/components/visualizations/algorithms/FindTheHighestAltitudeVisualization').then(m => m.FindTheHighestAltitudeVisualization), { ssr: false }),
   'binary-search': dynamic(() => import('@/components/visualizations/algorithms/BinarySearchVisualization').then(m => m.BinarySearchVisualization), { ssr: false }),
   'koko-eating-bananas': dynamic(() => import('@/components/visualizations/algorithms/KokoEatingBananasVisualization').then(m => m.KokoEatingBananasVisualization), { ssr: false }),
   'search-a-2d-matrix': dynamic(() => import('@/components/visualizations/algorithms/Search2DMatrixVisualization').then(m => m.Search2DMatrixVisualization), { ssr: false }),

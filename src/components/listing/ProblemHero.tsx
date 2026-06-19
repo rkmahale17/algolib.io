@@ -1,4 +1,4 @@
-import { BadgeCheck, Beaker, Code2, Brain, Target, Layers, Rocket, BookOpen, Presentation, PencilLine, GitCompare, ChevronRight } from "lucide-react";
+import { BadgeCheck, Beaker, Code2, Brain, Target, Layers, Rocket, BookOpen, Presentation, PencilLine, GitCompare, ChevronRight, Database } from "lucide-react";
 import Link from "next/link";
 
 const ICON_MAP: Record<string, any> = {
@@ -8,7 +8,8 @@ const ICON_MAP: Record<string, any> = {
     rocket: Rocket,
     code: Code2,
     beaker: Beaker,
-    check: BadgeCheck
+    check: BadgeCheck,
+    database: Database
 };
 
 interface ProblemHeroProps {

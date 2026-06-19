@@ -17,6 +17,7 @@ Deno.serve(async (req) => {
       existingApproaches = [],
       approachCount = 2,
       mode = "problem",
+      problemType = "dsa",
       target = "all",
       input_schema, // Required for 'test_cases', 'solutions', 'starter_code'
       implementations: inputImplementations, // For 'enhance_comments'
@@ -82,7 +83,8 @@ Deno.serve(async (req) => {
         ${referenceCode ? `REFERENCE CODE PROVIDED (Use for Logic): \n${referenceCode}` : ""}
         ${userPrompt ? `USER CONTEXT / INSTRUCTIONS: \n"${userPrompt}"\n(Follow these instructions specifically.)` : ""}
         ${input_schema ? `INPUT SCHEMA PROVIDED: \n${JSON.stringify(input_schema)}` : ""}
-
+        PROBLEM TYPE: ${problemType === 'sql' ? 'SQL / Database Query' : 'Standard Data Structures & Algorithms'}
+        
         GENERAL RULES:
         1. **Truthfulness**: Verify complexity. No hallucinations.
         2. **HTML**: Use strict HTML for formatted fields.
@@ -146,8 +148,8 @@ Deno.serve(async (req) => {
           "serial_no": 376,
           "list_type": "coreAlgo or blind75",
           "explanation": {
-            "problemDescription": "DETAILED HTML explanation (What needs to be solved, Input format, Output format, Constraints). MUST use multiple meaningful <p> tags properly divided for readability instead of a single block of text. Do NOT include, mention, or append any examples here.",
-            "problemStatement": "STRICT HTML - The formal problem statement. MUST use multiple meaningful <p> tags properly divided for readability instead of a single block of text. Do NOT include, mention, or append any examples, input/output samples, or walk-through explanations here (examples must go exclusively in the 'io' field).",
+            "problemDescription": "DETAILED HTML explanation (What needs to be solved, Input format, Output format, Constraints). MUST use multiple meaningful <p> tags properly divided for readability instead of a single block of text. For SQL schemas, MUST use strict HTML <table> tags (<thead>, <tbody>, <th>, <td>) and NEVER use ASCII art tables (+---+---+). Do NOT include, mention, or append any examples here.",
+            "problemStatement": "STRICT HTML - The formal problem statement. MUST use multiple meaningful <p> tags properly divided for readability. For SQL schemas, MUST use strict HTML <table> tags and NEVER use ASCII art tables. Do NOT include, mention, or append any examples, input/output samples, or walk-through explanations here (examples must go exclusively in the 'io' field).",
             "steps": "HTML <ol><li>Crystal clear and short step to solve the problem (max 25 words per step, exactly 4-5 steps total)</li></ol>",
             "useCase": "HTML <ul><li><strong>Domain</strong> - Desc</li></ul> (5+ items)",
             "tips": "HTML <ul><li>Short progressive hint to solve the problem (max 20 words)</li></ul> (exactly 5 items, getting progressively more revealing)",
@@ -157,21 +159,22 @@ Deno.serve(async (req) => {
             "constraints": ["String array"],
             "io": [
               {
-                "input": "Labeled format using input_schema names. Example: 'nums = [2, 7], target = 9'",
-                "output": "Expected output value.",
-                "explanation": "Clear explanation"
+                "input": "${problemType === 'sql' ? 'MUST be a strict HTML <table> representing the input DB tables and their data. Use <thead> and <tbody>.' : 'Labeled format using input_schema names. Example: \\\'nums = [2, 7], target = 9\\\''}",
+                "output": "${problemType === 'sql' ? 'MUST be a strict HTML <table> representing the expected query result rows. Use <thead> and <tbody>.' : 'Expected output value.'}",
+                "explanation": "${problemType === 'sql' ? 'Clear explanation in strict HTML format using <p> tags.' : 'Clear explanation'}"
               }
             ]
           },
           "input_schema": [
             {
               "name": "nums", 
-              "type": "number[] | number[][] | string[][] | string | etc", 
+              "type": "${problemType === 'sql' ? 'table' : 'number[] | number[][] | string[][] | string | etc'}", 
               "label": "Numbers"
             }
           ],
           "metadata": {
             "overview": "Detailed Guide. Max 300 words. Split into many paragraphs (break after ~60 words). use <p> tags.",
+            ${problemType === 'sql' ? `"db_setup": "ONLY valid SQLite-compatible SQL CREATE TABLE statements for the problem. SQLite does not support AUTO_INCREMENT, so use INTEGER PRIMARY KEY (which auto-increments automatically) for primary keys and avoid AUTO_INCREMENT. Do NOT provide INSERT INTO statements here. Treat this as a Code Block: use standard escaped newlines (\\\\n), NOT HTML <br> tags.",` : ''}
             "companyTags": [], "likes": 0, "dislikes": 0
           }
         }
@@ -192,13 +195,8 @@ Deno.serve(async (req) => {
         }
 
         REQUIREMENTS:
-        1. **Input Format**: 'input' MUST be an **ARRAY of values** in order of input_schema.
-        2. **Quality**: 12 Total Cases.
-           - 2 Basic
-           - 3 Edge (Min/Max/Empty)
-           - 2 Boundary
-           - 3 Complex
-           - 2 Submission (Mark isSubmission: true)
+        1. **Input Format**: ${problemType === 'sql' ? '\'input\' MUST be an **ARRAY of values** in order of input_schema. For SQL problems, the input array should contain the actual JSON data representing the rows of the tables defined in the schema (e.g. `[{"Person": [{"personId": 1, ...}]}]` or `[[["John", "Doe"], ...]]`). Expected output should be the expected rows/result of the query.' : '\'input\' MUST be an **ARRAY of values** in order of input_schema.'}
+        2. **Quality**: ${problemType === 'sql' ? 'Exactly 3 Total Cases (1 Basic, 1 Edge, 1 Complex). Mark the last one as isSubmission: true.' : '12 Total Cases.\n           - 2 Basic\n           - 3 Edge (Min/Max/Empty)\n           - 2 Boundary\n           - 3 Complex\n           - 2 Submission (Mark isSubmission: true)'}
         3. **2D Arrays**: [[1,2], [3,4]] -> Input array wrapping it: [[[1,2], [3,4]]]
         `;
 
@@ -236,7 +234,7 @@ Deno.serve(async (req) => {
         4. **Escape Quotes**: Use \\\\" for double quotes inside JSON strings.
         5. **Stand-alone Functions**: For **TypeScript** and **Python**, use standalone functions.
         6. **Helpers**: Place helpers ABOVE main function.
-        7. **All Languages**: Must implement in TS, Python, Java, C++.
+        7. **All Languages**: ${problemType === 'sql' ? 'Must implement only in standard SQLite. DO NOT wrap the SQL query in a function or class. Just provide the raw SQLite query.' : 'Must implement in TS, Python, Java, C++.'}
         8. **Strict Wrapping (Java/C++)**:
            - For **Java**: You MUST wrap everything in \`public static class Solution { ... }\`.
            - For **C++**: You MUST wrap everything in \`class Solution { public: ... };\`.
@@ -247,11 +245,11 @@ Deno.serve(async (req) => {
         {
           "implementations": [
             {
-              "lang": "TypeScript", // "python", "java", "cpp"
+              "lang": "${problemType === 'sql' ? 'sql' : 'TypeScript'}", // ${problemType === 'sql' ? '"sql"' : '"python", "java", "cpp"'}
               "code": [
                 {
                   "codeType": "optimize" | "strategy-name", 
-                  "code": "FUNCTION CODE ONLY",
+                  "code": "${problemType === 'sql' ? 'RAW SQLITE QUERY ONLY (e.g. SELECT ...)' : 'FUNCTION CODE ONLY'}",
                   "explanationBefore": "Detailed HTML (approx 500+ words) using template provided earlier.",
                   "explanationAfter": "HTML content"
                 }
@@ -352,21 +350,21 @@ Deno.serve(async (req) => {
       // Existing flow didn't strictly leverage schema for code gen input args, it inferred. 
       // But passing it is good context.
 
-      const [tsData, pyData, javaData, cppData] = await Promise.all([
+      const sqlOnly = problemType === 'sql';
+      const generationPromises = sqlOnly ? [
+        generateChunk(implsPrompt(["sql"]))
+      ] : [
         generateChunk(implsPrompt(["TypeScript"])),
         generateChunk(implsPrompt(["python"])),
         generateChunk(implsPrompt(["java"])),
         generateChunk(implsPrompt(["cpp"])),
-      ]);
-
-      if (!tsData || !pyData || !javaData || !cppData) throw new Error("Failed to generate Implementations.");
-
-      const allImpls = [
-        ...(tsData.implementations || []),
-        ...(pyData.implementations || []),
-        ...(javaData.implementations || []),
-        ...(cppData.implementations || [])
       ];
+
+      const responses = await Promise.all(generationPromises);
+
+      if (responses.some(r => !r)) throw new Error("Failed to generate Implementations.");
+
+      const allImpls = responses.flatMap(r => r.implementations || []);
 
       // Normalize languages to match frontend expected IDs
       const normalizedImpls = allImpls.map((impl: any) => {
@@ -381,6 +379,8 @@ Deno.serve(async (req) => {
           normalizedLang = 'python';
         } else if (lower === 'java') {
           normalizedLang = 'java';
+        } else if (lower === 'sql') {
+          normalizedLang = 'sql';
         }
         return { ...impl, lang: normalizedLang };
       });

@@ -27,7 +27,9 @@ int main() {
         // Write your code here
         System.out.println("Hello from Java!");
     }
-}`
+}`,
+    sql: `-- Write your SQLite query here
+SELECT * FROM table_name;`
 };
 
 export const LANGUAGE_IDS: Record<Language, number> = {
@@ -35,5 +37,6 @@ export const LANGUAGE_IDS: Record<Language, number> = {
     java: 91, // Java (OpenJDK 17.0.6)
     python: 109, // Python (3.13.2)
     typescript: 101, // TypeScript (5.6.2)
+    sql: 82, // SQL (SQLite 3.27.2)
 };
 

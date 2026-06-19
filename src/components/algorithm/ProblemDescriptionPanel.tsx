@@ -18,6 +18,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Code2,
+  Database,
   ExternalLink,
   Eye,
   FileText,
@@ -217,9 +218,15 @@ export const ProblemDescriptionPanel = React.memo(
       { id: "editor", label: "Code", icon: Code2 },
     ];
 
-    const activeTabsList = tabs || (panelId === "left"
+    const isSqlProblem = algorithm?.problemType === 'sql' || algorithm?.problem_type === 'sql' || algorithm?.problem_type === 'SQL' || algorithm?.problemType === 'SQL';
+
+    const rawActiveTabsList = tabs || (panelId === "left"
       ? ["description", "visualizations", "solutions", "submissions"]
       : ["editor", "thinkpad"]);
+      
+    const activeTabsList = isSqlProblem 
+      ? rawActiveTabsList.filter(t => t !== "visualizations" && t !== "thinkpad")
+      : rawActiveTabsList;
 
     // Detect tab scroll overflow to show left/right gradient fades
     useEffect(() => {
@@ -419,6 +426,7 @@ export const ProblemDescriptionPanel = React.memo(
                                 {ALL_AVAILABLE_TABS
                                   .filter(t => {
                                     if (activeTabsList.includes(t.id)) return false;
+                                    if (isSqlProblem && (t.id === 'thinkpad' || t.id === 'visualizations')) return false;
                                     if (t.id === 'thinkpad') {
                                       return isBrainstormEnabled && algorithm?.controls?.brainstorm !== false;
                                     }
@@ -440,6 +448,7 @@ export const ProblemDescriptionPanel = React.memo(
                                 }
                                 {ALL_AVAILABLE_TABS.filter(t => {
                                   if (activeTabsList.includes(t.id)) return false;
+                                  if (isSqlProblem && (t.id === 'thinkpad' || t.id === 'visualizations')) return false;
                                   if (t.id === 'thinkpad') {
                                     return isBrainstormEnabled && algorithm?.controls?.brainstorm !== false;
                                   }
@@ -651,7 +660,26 @@ export const ProblemDescriptionPanel = React.memo(
                       )}
                   </section>
 
+                  {(algorithm.problemType === 'sql' || algorithm.problem_type === 'SQL' || algorithm.problemType === 'SQL') && algorithm.metadata?.db_setup && (
+                    <section className="max-w-[800px] mt-6">
+                      <h3 className="text-md font-semibold text-foreground mb-3 flex items-center gap-2">
+                        <Database className="w-4 h-4 text-primary" />
+                        Database Schema
+                      </h3>
+                      <div className="rounded-xl overflow-hidden border border-border/50 bg-card">
+                        <div className="bg-muted/40 px-4 py-2 border-b border-border/50 text-xs font-mono text-muted-foreground flex justify-between items-center">
+                          <span>Setup Script</span>
+                          <span className="bg-primary/10 text-primary px-2 py-0.5 rounded text-[10px] uppercase font-semibold">SQL</span>
+                        </div>
+                        <div className="p-4 overflow-x-auto text-sm font-mono text-foreground whitespace-pre-wrap">
+                          {algorithm.metadata.db_setup}
+                        </div>
+                      </div>
+                    </section>
+                  )}
+
                   {/* Workspace Playgrounds renamed to Helpful Tools to Learn & Understand */}
+                  {algorithm.problemType !== 'sql' && algorithm.problem_type !== 'sql' && algorithm.problem_type !== 'SQL' && algorithm.problemType !== 'SQL' && (
                   <div className="max-w-[600px] my-6 rounded-xl border border-border/50 bg-card p-4 shadow-sm">
                     <div className="flex items-center gap-2 mb-4">
                       <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 text-primary shadow-sm">
@@ -814,6 +842,7 @@ export const ProblemDescriptionPanel = React.memo(
                       )}
                     </div>
                   </div>
+                  )}
 
                   {/* Examples and Constraints Group */}
                   {(() => {
@@ -852,9 +881,13 @@ export const ProblemDescriptionPanel = React.memo(
                                         <span className="font-medium">
                                           Input:
                                         </span>{" "}
-                                        <code className="bg-muted px-2 py-0.5 rounded">
-                                          {example.input}
-                                        </code>
+                                        {typeof example.input === 'string' && (example.input.trim().startsWith('<') || example.input.includes('<table')) ? (
+                                          <div className="mt-2 prose dark:prose-invert max-w-none text-xs sm:text-sm overflow-x-auto" dangerouslySetInnerHTML={{ __html: example.input }} />
+                                        ) : (
+                                          <code className="bg-muted px-2 py-0.5 rounded">
+                                            {example.input}
+                                          </code>
+                                        )}
                                       </div>
                                       {example.inputAfterHtml && (
                                         <React.Suspense
@@ -927,9 +960,13 @@ export const ProblemDescriptionPanel = React.memo(
                                         <span className="font-medium">
                                           Output:
                                         </span>{" "}
-                                        <code className="bg-muted px-2 py-0.5 rounded">
-                                          {example.output}
-                                        </code>
+                                        {typeof example.output === 'string' && (example.output.trim().startsWith('<') || example.output.includes('<table')) ? (
+                                          <div className="mt-2 prose dark:prose-invert max-w-none text-xs sm:text-sm overflow-x-auto" dangerouslySetInnerHTML={{ __html: example.output }} />
+                                        ) : (
+                                          <code className="bg-muted px-2 py-0.5 rounded">
+                                            {example.output}
+                                          </code>
+                                        )}
                                       </div>
                                       {example.outputAfterHtml && (
                                         <React.Suspense
@@ -990,9 +1027,13 @@ export const ProblemDescriptionPanel = React.memo(
                                       <span className="font-medium">
                                         Explanation:
                                       </span>{" "}
-                                      <span className="text-muted-foreground whitespace-pre-line">
-                                        {example.explanation}
-                                      </span>
+                                      {typeof example.explanation === 'string' && (example.explanation.trim().startsWith('<') || example.explanation.includes('<p>')) ? (
+                                        <div className="text-muted-foreground prose dark:prose-invert max-w-none text-xs sm:text-sm" dangerouslySetInnerHTML={{ __html: example.explanation }} />
+                                      ) : (
+                                        <span className="text-muted-foreground whitespace-pre-line">
+                                          {example.explanation}
+                                        </span>
+                                      )}
                                     </div>
                                   )}
                                 </div>
@@ -1135,32 +1176,36 @@ export const ProblemDescriptionPanel = React.memo(
                                             </React.Suspense>
                                           </div>
 
-                                          <Separator />
+                                          {algorithm.problemType !== 'sql' && algorithm.problem_type !== 'sql' && algorithm.problem_type !== 'SQL' && algorithm.problemType !== 'SQL' && (
+                                            <>
+                                              <Separator />
 
-                                          <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                              <p className="text-sm font-medium mb-1">
-                                                Time Complexity
-                                              </p>
-                                              <Badge
-                                                variant="outline"
-                                                className="font-mono"
-                                              >
-                                                {timeComplexity || "N/A"}
-                                              </Badge>
-                                            </div>
-                                            <div>
-                                              <p className="text-sm font-medium mb-1">
-                                                Space Complexity
-                                              </p>
-                                              <Badge
-                                                variant="outline"
-                                                className="font-mono"
-                                              >
-                                                {spaceComplexity || "N/A"}
-                                              </Badge>
-                                            </div>
-                                          </div>
+                                              <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                  <p className="text-sm font-medium mb-1">
+                                                    Time Complexity
+                                                  </p>
+                                                  <Badge
+                                                    variant="outline"
+                                                    className="font-mono"
+                                                  >
+                                                    {timeComplexity || "N/A"}
+                                                  </Badge>
+                                                </div>
+                                                <div>
+                                                  <p className="text-sm font-medium mb-1">
+                                                    Space Complexity
+                                                  </p>
+                                                  <Badge
+                                                    variant="outline"
+                                                    className="font-mono"
+                                                  >
+                                                    {spaceComplexity || "N/A"}
+                                                  </Badge>
+                                                </div>
+                                              </div>
+                                            </>
+                                          )}
                                         </>
                                       )}
                                     </div>

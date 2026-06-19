@@ -40,7 +40,8 @@ export const useAlgorithmInteractions = ({
     // Code Management
     const [savedCode, setSavedCode] = useState<string>("");
     const { preferredLanguage, setPreferredLanguage } = useLanguagePreference('editor');
-    const selectedLanguage = preferredLanguage;
+    const isSqlProblem = algorithm?.problemType === 'sql' || algorithm?.problem_type === 'sql' || algorithm?.problem_type === 'SQL' || algorithm?.problemType === 'SQL';
+    const selectedLanguage = isSqlProblem ? 'sql' : preferredLanguage;
     const [codeCache, setCodeCache] = useState<Record<string, string>>({});
     const [isUserModified, setIsUserModified] = useState(false);
     const latestCodeRef = useRef(savedCode);

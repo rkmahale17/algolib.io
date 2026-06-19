@@ -59,6 +59,15 @@ const parseErrorLines = (output: string, lang: string): Array<{ line: number; co
     return errors;
 };
 
+const parseSqlAsciiTable = (rawText: string) => {
+    if (!rawText || typeof rawText !== 'string') return null;
+    const lines = rawText.trim().split('\n');
+    if (lines.length < 3) return null;
+    const separatorIndex = lines.findIndex(line => /^[-\+\| ]+$/.test(line) && line.includes('-') && !line.match(/[a-zA-Z0-9]/));
+    if (separatorIndex < 1) return null;
+    return lines.slice(separatorIndex + 1).filter(line => line.includes('|')).map(line => line.split('|').map(cell => cell.trim()));
+};
+
 interface UseCodeExecutionProps {
     algorithmId?: string; // problemId in future generic version
     activeAlgorithm: any;
@@ -201,14 +210,159 @@ export const useCodeExecution = ({
             }));
 
             if (algo && preparedTestCases.length > 0) {
-                const metadata = typeof algo.metadata === 'string'
-                    ? JSON.parse(algo.metadata)
-                    : (algo.metadata || {});
+                if (language === 'sql') {
+                    const metadata = typeof algo.metadata === 'string' ? JSON.parse(algo.metadata) : (algo.metadata || {});
+                    const { data: { session } } = await supabase.auth.getSession();
+                    
+                    const sqlPromises = preparedTestCases.map(async (tc: any) => {
+                        let script = `.bail on\n.headers on\n.mode list\n.separator '|_|_|'\n.nullvalue '___NULL___'\n`;
+                        const cleanDbSetup = metadata.db_setup 
+                            ? metadata.db_setup
+                                .replace(/<br\s*\/?>/gi, '\n')
+                                .replace(/&nbsp;/g, ' ')
+                                .replace(/\bAUTO_INCREMENT\b/gi, '')
+                                .replace(/\bAUTOINCREMENT\b/gi, '')
+                            : '';
+                        script += cleanDbSetup ? `${cleanDbSetup}\n\n` : '';
+                        
+                        algo.input_schema?.forEach((field: any, i: number) => {
+                            const tableName = field.name.replace(/ table/i, '').trim();
+                            const rows = tc.input[i];
+                            let dataToInsert: any[] = [];
+                            if (Array.isArray(rows)) {
+                                dataToInsert = rows;
+                            } else if (rows && typeof rows === 'object') {
+                                const vals = Object.values(rows);
+                                if (vals.length > 0 && Array.isArray(vals[0])) dataToInsert = vals[0] as any[];
+                            } else if (rows !== undefined && rows !== null) {
+                                dataToInsert = [{ [tableName]: rows }];
+                            }
+                            
+                            if (dataToInsert.length > 0 && typeof dataToInsert[0] === 'object' && dataToInsert[0] !== null) {
+                                const columns = Object.keys(dataToInsert[0]);
+                                dataToInsert.forEach((row: any) => {
+                                    const values = columns.map(col => {
+                                        const val = row[col];
+                                        if (val === null || val === undefined) return 'NULL';
+                                        if (typeof val === 'string') return `'${val.replace(/'/g, "''")}'`;
+                                        return val;
+                                    });
+                                    script += `INSERT INTO ${tableName} (${columns.join(', ')}) VALUES (${values.join(', ')});\n`;
+                                });
+                                script += '\n';
+                            }
+                        });
+                        
+                        script += code;
+                        
+                        const response = await axios.post(`${env.apiUrl}/api/execute`, {
+                            language_id: LANGUAGE_IDS[language],
+                            source_code: script,
+                            stdin: "",
+                            problem_id: algorithmId,
+                        }, { headers: { Authorization: `Bearer ${session?.access_token}` } });
+                        
+                        const result = await waitForSubmissionResult(response.data.submission_id);
+                        
+                        const actualStr = result.stdout ? result.stdout.replace(/\(\d+\s+rows?\)\s*$/, '').trim() : '';
+                        let passed = false;
+                        let expectedData = null;
+                        try {
+                            expectedData = typeof tc.expectedOutput === 'string' ? JSON.parse(tc.expectedOutput) : tc.expectedOutput;
+                        } catch {
+                            expectedData = tc.expectedOutput;
+                        }
+                        
+                        let parsedActual: any = actualStr;
 
-                if (metadata.class_mode) {
-                    const { generateClassTestRunner } = await import('@/utils/testRunnerGenerator');
-                    fullCode = generateClassTestRunner(code, language, preparedTestCases);
+                        if (actualStr && tc.expectedOutput !== undefined) {
+                            try {
+                                const lines = actualStr.split('\n').map(l => l.trim()).filter(l => l);
+                                if (lines.length > 0) {
+                                    const headers = lines[0].split('|_|_|');
+                                    parsedActual = lines.slice(1).map(line => {
+                                        const values = line.split('|_|_|');
+                                        const obj: any = {};
+                                        headers.forEach((h, idx) => {
+                                            const val = values[idx];
+                                            obj[h] = val === '___NULL___' ? null : val;
+                                        });
+                                        return obj;
+                                    });
+                                } else {
+                                    parsedActual = [];
+                                }
+
+                                if (Array.isArray(parsedActual) && Array.isArray(expectedData)) {
+                                    if (parsedActual.length === expectedData.length) {
+                                        passed = parsedActual.every((actRow, i) => {
+                                            const expRow = expectedData[i];
+                                            if (!expRow || typeof expRow !== 'object') return false;
+                                            
+                                            // Check if both objects have the exact same keys
+                                            const actKeys = Object.keys(actRow);
+                                            const expKeys = Object.keys(expRow);
+                                            
+                                            if (actKeys.length !== expKeys.length) return false;
+                                            
+                                            // Check if all expected keys exist in actual and have matching values
+                                            return expKeys.every(k => {
+                                                if (!actKeys.includes(k)) return false;
+                                                const aVal = actRow[k] === null ? 'null' : String(actRow[k]);
+                                                const eVal = expRow[k] === null ? 'null' : String(expRow[k]);
+                                                return aVal === eVal;
+                                            });
+                                        });
+                                    }
+                                } else {
+                                    passed = actualStr === JSON.stringify(expectedData);
+                                }
+                            } catch (e) {
+                                passed = actualStr === JSON.stringify(expectedData);
+                            }
+                        } else {
+                            passed = actualStr === JSON.stringify(expectedData) || !expectedData;
+                        }
+
+                        return {
+                            status: passed ? (result.stderr ? 'fail' : 'pass') : 'fail',
+                            input: tc.input || 'SQL Query',
+                            expected: expectedData,
+                            actual: parsedActual,
+                            error: result.stderr || result.compile_output,
+                            time: result.time ? Math.round(parseFloat(result.time) * 1000) : 0,
+                            logs: []
+                        };
+                    });
+                    
+                    const testCaseResults = await Promise.all(sqlPromises);
+                    const allPassed = testCaseResults.every((r: any) => r.status === 'pass');
+                    const totalTime = testCaseResults.reduce((acc: number, r: any) => acc + r.time, 0);
+                    
+                    const finalResult = { testResults: testCaseResults, status: { id: allPassed ? 3 : 4 } };
+                    setOutput(finalResult);
+                    setExecutionTime(totalTime);
+                    
+                    if (!isSubmission) {
+                        setLastRunSuccess(allPassed);
+                        setActiveTab("result");
+                        if (allPassed) toast.success("All test cases passed!");
+                        else toast.warning("Code ran, but some test cases failed.");
+                    }
+                    
+                    setIsLoading(false);
+                    setIsSubmitting(false);
+                    
+                    return { result: finalResult, allPassed, execTime: totalTime };
                 } else {
+                    const metadata = typeof algo.metadata === 'string'
+                        ? JSON.parse(algo.metadata)
+                        : (algo.metadata || {});
+
+                    if (metadata.class_mode) {
+                        const { generateClassTestRunner } = await import('@/utils/testRunnerGenerator');
+                        fullCode = generateClassTestRunner(code, language, preparedTestCases);
+                    } else {
                     const { generateTestRunner } = await import('@/utils/testRunnerGenerator');
                     const entryFunctionName = algo.function_name || algo.metadata?.function_name;
                     const inputSchema = algo.input_schema || [];
@@ -229,6 +383,7 @@ export const useCodeExecution = ({
                         }
                     );
                 }
+            }
             }
 
             const { data: { session } } = await supabase.auth.getSession();
@@ -260,8 +415,8 @@ export const useCodeExecution = ({
 
             if (result.stdout && !result.stderr && !result.compile_output) {
                 try {
-                    const startMarker = '___TEST_RESULTS_START___';
-                    const endMarker = '___TEST_RESULTS_END___';
+                        const startMarker = '___TEST_RESULTS_START___';
+                        const endMarker = '___TEST_RESULTS_END___';
                     const startIdx = result.stdout.indexOf(startMarker);
                     const endIdx = result.stdout.indexOf(endMarker);
                     let parsedResults = [];
@@ -298,7 +453,7 @@ export const useCodeExecution = ({
                 }
             }
 
-            setOutput(result);
+        setOutput(result);
 
             if (result.stderr || result.compile_output) {
                 const errorText = result.compile_output || result.stderr || "";
@@ -390,24 +545,23 @@ export const useCodeExecution = ({
             }
         };
 
-        await addSubmission(user.id, algorithmId, newSubmission);
-        setSubmissions(prev => [...prev, newSubmission]);
+        if (algorithmId !== 'preview-mode') {
+            await addSubmission(user.id, algorithmId, newSubmission);
+        }
+        
+        setSubmissions(prev => [newSubmission, ...prev]);
         onSubmissionComplete?.();
         setActiveTab("result");
 
         if (allPassed) {
-            const confetti = (await import('canvas-confetti')).default;
-            confetti({
-                particleCount: 100,
-                spread: 70,
-                origin: { y: 0.6 }
-            });
             toast.success("Solution Submitted Successfully!");
             onSuccess?.();
-            await updateProgress(user.id, algorithmId, {
-                completed: true,
-                completed_at: now
-            });
+            if (algorithmId !== 'preview-mode') {
+                await updateProgress(user.id, algorithmId, {
+                    completed: true,
+                    completed_at: now
+                });
+            }
         } else {
             toast.error("Submission Failed. Check the results.");
         }

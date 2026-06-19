@@ -27,7 +27,8 @@ export function AlgorithmPreview({ algorithm, initialCode = "", isPlatformPrevie
   const [isLeftCollapsed, setIsLeftCollapsed] = useState(false);
   const [isRightCollapsed, setIsRightCollapsed] = useState(false);
   const { preferredLanguage, setPreferredLanguage } = useLanguagePreference('editor');
-  const selectedLanguage = preferredLanguage;
+  const isSqlProblem = algorithm?.problemType === 'sql' || algorithm?.problem_type === 'sql' || algorithm?.problem_type === 'SQL' || algorithm?.problemType === 'SQL';
+  const selectedLanguage = isSqlProblem ? 'sql' : preferredLanguage;
   const setSelectedLanguage = (lang: string) => setPreferredLanguage(lang as Language);
   const [isCodeRunnerMaximized, setIsCodeRunnerMaximized] = useState(false);
   const [isVisualizationMaximized, setIsVisualizationMaximized] = useState(false);

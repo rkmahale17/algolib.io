@@ -32,6 +32,7 @@ interface SmartFillDialogProps {
   onFill: (data: any) => void;
   initialTopic?: string;
   existingApproaches?: string[];
+  problemType?: string;
 }
 
 const FIELD_GROUPS = [
@@ -42,7 +43,7 @@ const FIELD_GROUPS = [
   { id: "meta", label: "Metadata (Tags, Likes)", keys: ["metadata"] },
 ];
 
-export function SmartFillDialog({ onFill, initialTopic = "", existingApproaches = [] }: SmartFillDialogProps) {
+export function SmartFillDialog({ onFill, initialTopic = "", existingApproaches = [], problemType = "dsa" }: SmartFillDialogProps) {
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("paste");
 
@@ -152,6 +153,7 @@ export function SmartFillDialog({ onFill, initialTopic = "", existingApproaches 
             referenceCode,
             userPrompt,
             mode: generatorMode,
+            problemType,
             target: "info"
           },
         });
@@ -164,6 +166,7 @@ export function SmartFillDialog({ onFill, initialTopic = "", existingApproaches 
           body: {
             topic, // Context
             mode: generatorMode,
+            problemType,
             target: "test_cases",
             input_schema: finalData.input_schema // Pass schema from step 1
           },
@@ -179,6 +182,7 @@ export function SmartFillDialog({ onFill, initialTopic = "", existingApproaches 
             referenceCode,
             userPrompt,
             mode: generatorMode,
+            problemType,
             target: target === "optimized" ? "optimized" : "solutions",
             input_schema: finalData.input_schema // Pass schema from step 1
           },
@@ -198,6 +202,7 @@ export function SmartFillDialog({ onFill, initialTopic = "", existingApproaches 
             referenceCode,
             userPrompt,
             mode: generatorMode,
+            problemType,
             target,
             approachCount: target === 'add_approaches' ? approachCount : undefined,
             existingApproaches: target === 'add_approaches' ? existingApproaches : []

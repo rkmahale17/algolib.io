@@ -18,6 +18,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Target,
+  Database,
 } from "lucide-react";
 
 import { Button } from "./ui/button";
@@ -56,6 +57,7 @@ import {
   PATTERN_IDS,
   getGuideUrl,
   DSA_ITEMS,
+  DATABASE_ITEMS,
   GUIDE_GROUPS,
   isSidebarRoute,
   isGuideRoute,
@@ -69,27 +71,31 @@ interface SidebarLinkProps {
   icon: React.ComponentType<{ className?: string }>;
   isActive: boolean;
   onClick?: () => void;
+  badge?: React.ReactNode;
 }
 
-function SidebarLink({ href, title, icon: Icon, isActive, onClick }: SidebarLinkProps) {
+function SidebarLink({ href, title, icon: Icon, isActive, onClick, badge }: SidebarLinkProps) {
   return (
     <Link
       href={href}
       onClick={onClick}
       className={cn(
-        "group flex items-center gap-3 text-[13px] py-1.5 px-3 rounded-xl transition-all duration-300 relative border border-transparent font-medium",
+        "group flex items-center justify-between text-[13px] py-1.5 px-3 rounded-xl transition-all duration-300 relative border border-transparent font-medium",
         isActive
           ? "text-foreground bg-muted/50 shadow-sm"
           : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
       )}
     >
-      <Icon
-        className={cn(
-          "w-3.5 h-3.5 opacity-60 shrink-0 group-hover:scale-110 group-hover:rotate-6 group-hover:text-foreground transition-all duration-300",
-          isActive && "text-foreground opacity-100"
-        )}
-      />
-      <span className="truncate">{title}</span>
+      <div className="flex items-center gap-3 overflow-hidden">
+        <Icon
+          className={cn(
+            "w-3.5 h-3.5 opacity-60 shrink-0 group-hover:scale-110 group-hover:rotate-6 group-hover:text-foreground transition-all duration-300",
+            isActive && "text-foreground opacity-100"
+          )}
+        />
+        <span className="truncate">{title}</span>
+      </div>
+      {badge}
     </Link>
   );
 }
@@ -224,6 +230,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const isGuides = isGuideRoute(pathname);
   const isVisualLibrary = pathname?.startsWith("/dsa/visual-library");
   const isPractice = pathname?.startsWith("/dsa") && !isVisualLibrary;
+  const isDatabase = pathname?.startsWith("/database");
   const isDashboard = pathname?.startsWith("/dashboard");
   const isProfile = pathname?.startsWith("/profile");
 
@@ -246,10 +253,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       });
   }, [algorithmsData]);
 
-  const headerSubtitle = isGuides ? "Guides" : isVisualLibrary ? "Visual" : isPractice ? "Practice" : isDashboard ? "Dashboard" : isProfile ? "Profile" : "Dashboard";
+  const headerSubtitle = isGuides ? "Guides" : isVisualLibrary ? "Visual" : isPractice ? "DSA" : isDatabase ? "Database" : isDashboard ? "Dashboard" : isProfile ? "Profile" : "Dashboard";
 
   // Independent accordion states
   const [isPracticeExpanded, setIsPracticeExpanded] = React.useState(isPractice);
+  const [isDatabaseExpanded, setIsDatabaseExpanded] = React.useState(isDatabase);
   const [isVisualExpanded, setIsVisualExpanded] = React.useState(isVisualLibrary);
   const [isGuidesExpanded, setIsGuidesExpanded] = React.useState(isGuides);
 
@@ -258,7 +266,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     if (isGuides) setIsGuidesExpanded(true);
     if (isVisualLibrary) setIsVisualExpanded(true);
     if (isPractice) setIsPracticeExpanded(true);
-  }, [pathname, isGuides, isVisualLibrary, isPractice]);
+    if (isDatabase) setIsDatabaseExpanded(true);
+  }, [pathname, isGuides, isVisualLibrary, isPractice, isDatabase]);
   const [expandedCategories, setExpandedCategories] = React.useState<Record<string, boolean>>(() => {
     const state: Record<string, boolean> = {
       "time-complexity": false,
@@ -364,7 +373,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       onClick={closeMobileNav}
                     />
                     <SidebarHoverCard
-                      title="Practice"
+                      title="DSA"
                       icon={ListTodo}
                       isActive={isPractice}
                     >
@@ -375,6 +384,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           title={item.title}
                           icon={item.icon}
                           isActive={pathname === item.url || (pathname === '/dsa/problems' && item.url === '/dsa/get-started')}
+                          onClick={closeMobileNav}
+                        />
+                      ))}
+                    </SidebarHoverCard>
+
+                    <SidebarHoverCard
+                      title="Database"
+                      icon={Database}
+                      isActive={isDatabase}
+                    >
+                      {DATABASE_ITEMS.map((item) => (
+                        <SidebarLink
+                          key={item.id}
+                          href={item.url}
+                          title={item.title}
+                          icon={item.icon}
+                          isActive={pathname === item.url}
                           onClick={closeMobileNav}
                         />
                       ))}
@@ -394,6 +420,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             icon={FileText}
                             isActive={searchParams.get("problem") === (algo.slug || algo.id)}
                             onClick={closeMobileNav}
+                            badge={(algo.is_pro || algo.is_premium) && (
+                              <span className="text-[9px] font-bold bg-primary/10 text-primary px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0">
+                                PRO
+                              </span>
+                            )}
                           />
                         ))}
                       </SidebarHoverCard>
@@ -524,8 +555,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
                         <SidebarLink
                           href="/dsa/problems"
-                          title="Practice"
+                          title="DSA"
                           icon={ListTodo}
+                          isActive={false}
+                          onClick={closeMobileNav}
+                        />
+
+                        <SidebarLink
+                          href="/database/sql-basics"
+                          title="Database"
+                          icon={Database}
                           isActive={false}
                           onClick={closeMobileNav}
                         />
@@ -555,6 +594,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 icon={FileText}
                                 isActive={searchParams.get("problem") === (algo.slug || algo.id)}
                                 onClick={closeMobileNav}
+                                badge={(algo.is_pro || algo.is_premium) && (
+                                  <span className="text-[9px] font-bold bg-primary/10 text-primary px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0">
+                                    PRO
+                                  </span>
+                                )}
                               />
                             ))}
                           </SidebarCollapsible>
@@ -569,7 +613,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         )}
 
                         <SidebarCollapsible
-                          title="Practice"
+                          title="DSA"
                           icon={ListTodo}
                           isExpanded={isPracticeExpanded}
                           onToggle={() => setIsPracticeExpanded(!isPracticeExpanded)}
@@ -581,6 +625,24 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                               title={item.title}
                               icon={item.icon}
                               isActive={pathname === item.url || (pathname === '/dsa/problems' && item.url === '/dsa/get-started')}
+                              onClick={closeMobileNav}
+                            />
+                          ))}
+                        </SidebarCollapsible>
+
+                        <SidebarCollapsible
+                          title="Database"
+                          icon={Database}
+                          isExpanded={isDatabaseExpanded}
+                          onToggle={() => setIsDatabaseExpanded(!isDatabaseExpanded)}
+                        >
+                          {DATABASE_ITEMS.map((item) => (
+                            <SidebarLink
+                              key={item.id}
+                              href={item.url}
+                              title={item.title}
+                              icon={item.icon}
+                              isActive={pathname === item.url}
                               onClick={closeMobileNav}
                             />
                           ))}

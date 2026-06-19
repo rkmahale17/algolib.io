@@ -45,6 +45,7 @@ const FIELD_TYPES = [
   { value: "TreeNode[]", label: "Binary Tree Array (TreeNode[])" },
   { value: "Node", label: "Graph Node (Node)" },
   { value: "Interval", label: "Interval" },
+  { value: "table", label: "SQL Table" },
   { value: "string", label: "Char (String)" },
 ];
 

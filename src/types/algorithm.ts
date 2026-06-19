@@ -1,9 +1,10 @@
-export type Language = 'cpp' | 'java' | 'python' | 'typescript' | 'javascript' | 'c';
+export type Language = 'cpp' | 'java' | 'python' | 'typescript' | 'javascript' | 'c' | 'sql';
 
 export enum ListType {
     Core = 'core',
     Blind75 = 'blind75',
     Blind150 = 'blind150',
+    SqlBasics = 'sql-basics',
 }
 
 export const LIST_TYPE_LABELS: Record<string, string> = {
@@ -11,6 +12,7 @@ export const LIST_TYPE_LABELS: Record<string, string> = {
     [ListType.Core]: 'Core',
     [ListType.Blind75]: 'Blind 75',
     [ListType.Blind150]: 'Rulcode 150',
+    [ListType.SqlBasics]: 'SQL Basics',
 };
 
 export const DIFFICULTY_MAP: Record<string, string> = {
@@ -73,6 +75,7 @@ export interface Algorithm {
     list_type?: string;
     list_types?: string[];
     problemType?: string;
+    db_setup?: string;
     is_premium?: boolean;
     serial_no?: number;
     timeComplexity?: string;

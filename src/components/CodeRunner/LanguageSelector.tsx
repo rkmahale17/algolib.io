@@ -6,7 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Code2, Coffee, FileJson, Hash } from "lucide-react";
+import { Code2, Coffee, FileJson, Hash, Database } from "lucide-react";
 import { Language } from '@/types/algorithm';
 
 interface LanguageSelectorProps {
@@ -21,6 +21,7 @@ const languages: { id: Language; name: string; icon: React.ElementType }[] = [
   { id: 'java', name: 'Java', icon: Coffee },
   { id: 'python', name: 'Python', icon: Hash },
   { id: 'typescript', name: 'TypeScript', icon: FileJson },
+  { id: 'sql', name: 'SQLite', icon: Database },
 ];
 
 export const LanguageSelector: React.FC<LanguageSelectorProps> = ({

@@ -829,8 +829,8 @@ const Navbar = ({
                 >
                   <ChevronsUpDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   <span className="hidden xs:inline-block text-[11px] sm:text-[13px] font-semibold text-foreground/90 group-hover:text-foreground transition-colors tracking-tight">
-                    {listLabel.charAt(0).toUpperCase() +
-                      listLabel.slice(1).toLowerCase()}
+                    {(activeListType && LIST_TYPE_LABELS[activeListType]) || 
+                     (!activeListType ? "All Problems" : listLabel.charAt(0).toUpperCase() + listLabel.slice(1).toLowerCase())}
                   </span>
                 </button>
 
