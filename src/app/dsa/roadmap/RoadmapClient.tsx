@@ -580,7 +580,7 @@ export default function RoadmapClient() {
                               ? 'bg-green-500 border-green-500 text-white shadow-sm'
                               : isRec
                               ? 'bg-card border-primary text-primary shadow-[0_0_10px_rgba(var(--primary-rgb),0.3)]'
-                              : 'bg-card border-border/50 text-muted-foreground/40'
+                              : 'bg-card border-muted-foreground/30 text-muted-foreground/60'
                           )}>
                             {completed
                               ? <Check className="w-4 h-4 stroke-[3]" />
@@ -592,7 +592,7 @@ export default function RoadmapClient() {
                           {/* Label */}
                           <span className={cn(
                             'text-[10px] text-center leading-tight font-medium max-w-[64px]',
-                            isActive ? 'text-primary font-bold' : completed ? 'text-muted-foreground line-through' : isRec ? 'text-primary' : 'text-muted-foreground/60'
+                            isActive ? 'text-primary font-bold' : completed ? 'text-muted-foreground line-through' : isRec ? 'text-primary' : 'text-muted-foreground/80'
                           )}>
                             {step.label}
                           </span>
@@ -639,7 +639,7 @@ export default function RoadmapClient() {
                           left: 'calc(50% + 16px)',
                           right: 'calc(-50% + 16px)',
                         }}
-                        className="absolute top-4 -translate-y-1/2 h-[2px] bg-border/30 -z-10 overflow-hidden"
+                        className="absolute top-4 -translate-y-1/2 h-[2px] bg-muted-foreground/30 -z-10 overflow-hidden"
                       >
                         <div className={cn(
                           'h-full transition-all duration-500',
@@ -931,8 +931,8 @@ export default function RoadmapClient() {
                           
                           <div className="flex items-center gap-3 shrink-0">
                             {/* Inline progress bar + count */}
-                            <div className="flex items-center gap-2">
-                              <div className="w-16 h-1 bg-border/30 rounded-full overflow-hidden">
+                            <div className="hidden sm:flex items-center gap-2">
+                              <div className="w-16 h-1 bg-muted-foreground/30 rounded-full overflow-hidden">
                                 <div
                                   className={cn(
                                     'h-full transition-all duration-500 ease-out rounded-full',
@@ -941,7 +941,7 @@ export default function RoadmapClient() {
                                   style={{ width: problems.length > 0 ? `${(catCompleted / problems.length) * 100}%` : '0%' }}
                                 />
                               </div>
-                              <span className="text-xs font-normal text-muted-foreground tabular-nums">
+                              <span className="w-11 text-right text-xs font-normal text-muted-foreground tabular-nums">
                                 {catCompleted} / {problems.length}
                               </span>
                             </div>
