@@ -2,6 +2,8 @@ import {
   BookOpen,
   Brain,
   Clock,
+  Compass,
+  Database,
   FileText,
   HardDrive,
   Layers,
@@ -33,6 +35,7 @@ export function getGuideUrl(categoryId: string, slug: string): string {
   if (categoryId === "time-complexity") return "/guides/time-complexity";
   if (categoryId === "space-complexity") return "/guides/space-complexity";
   if (categoryId === "fundamentals") return `/guides/fundamentals/${slug}`;
+  if (categoryId === "database") return `/guides/database/${slug}`;
   return `/guides/patterns/${slug}`;
 }
 
@@ -42,6 +45,7 @@ export const DSA_ITEMS = [
   { id: "core-patterns", title: "Core patterns", icon: Target, url: "/dsa/core" },
   { id: "blind-75", title: "Blind 75", icon: Brain, url: "/dsa/blind-75" },
   { id: "rulcode-150", title: "Rulcode 150", icon: Layers, url: "/dsa/rulcode-150" },
+  { id: "roadmap", title: "Roadmap", icon: Compass, url: "/dsa/roadmap" },
 ] as const;
 
 // ─── Database nav items ───────────────────────────────────────────────────────
@@ -54,6 +58,7 @@ function buildGuideGroups() {
   const timeCompCat = guidesData.find((c) => c.id === "time-complexity");
   const spaceCompCat = guidesData.find((c) => c.id === "space-complexity");
   const fundamentalsCat = guidesData.find((c) => c.id === "fundamentals");
+  const databaseCat = guidesData.find((c) => c.id === "database");
   const patternGuides = guidesData
     .filter((c) => (PATTERN_IDS as readonly string[]).includes(c.id))
     .flatMap((c) => c.guides);
@@ -81,6 +86,13 @@ function buildGuideGroups() {
       icon: Layers,
       isSingleLink: false,
       guides: fundamentalsCat?.guides ?? [],
+    },
+    {
+      id: "database",
+      title: "Database",
+      icon: Database,
+      isSingleLink: false,
+      guides: databaseCat?.guides ?? [],
     },
     {
       id: "patterns",
@@ -130,6 +142,8 @@ export const DSA_NAV_SECTIONS = [
         ? "/guides/space-complexity"
         : g.id === "fundamentals"
         ? "/guides/fundamentals/core-data-structures"
+        : g.id === "database"
+        ? "/guides/database/what-is-database"
         : "/guides/patterns/arrays-hashing",
     })),
   },
@@ -145,6 +159,7 @@ export const SIDEBAR_ROUTES = [
   "/dsa/core",
   "/dsa/query",
   "/dsa/visual-library",
+  "/dsa/roadmap",
   "/dashboard",
   "/database",
 ];

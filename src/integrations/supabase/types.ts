@@ -475,6 +475,9 @@ export type Database = {
           user_id: string
           user_vote: string | null
           whiteboard_data: Json | null
+          visualization_completed: boolean | null
+          drawing_completed: boolean | null
+          solution_completed: boolean | null
         }
         Insert: {
           algorithm_id: string
@@ -493,6 +496,9 @@ export type Database = {
           user_id: string
           user_vote?: string | null
           whiteboard_data?: Json | null
+          visualization_completed?: boolean | null
+          drawing_completed?: boolean | null
+          solution_completed?: boolean | null
         }
         Update: {
           algorithm_id?: string
@@ -511,6 +517,9 @@ export type Database = {
           user_id?: string
           user_vote?: string | null
           whiteboard_data?: Json | null
+          visualization_completed?: boolean | null
+          drawing_completed?: boolean | null
+          solution_completed?: boolean | null
         }
         Relationships: []
       }

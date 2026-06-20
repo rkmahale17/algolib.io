@@ -14,6 +14,9 @@ interface PremiumProblemCardProps {
     isLast?: boolean;
     disableRounding?: boolean;
     onCategoryClick?: (category: string, e: React.MouseEvent) => void;
+    onClick?: (e: React.MouseEvent) => void;
+    isSelected?: boolean;
+    compact?: boolean;
 }
 
 const difficultyColors: Record<string, string> = {
@@ -41,37 +44,50 @@ const StatusIcon = ({ status, isPremium }: { status: string; isPremium?: boolean
     );
 };
 
-export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp, index, isFirst, isLast, disableRounding, onCategoryClick }: PremiumProblemCardProps) => {
+export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp, index, isFirst, isLast, disableRounding, onCategoryClick, onClick, isSelected, compact }: PremiumProblemCardProps) => {
     const isPremium = isPremiumProp ?? (algorithm.is_premium || algorithm.is_pro || algorithm.metadata?.is_pro);
     const rawDifficulty = algorithm.mappedDifficulty || DIFFICULTY_MAP[algorithm.difficulty?.toLowerCase()] || 'Medium';
     const displayDifficulty = rawDifficulty === 'Medium' ? 'Med' : rawDifficulty;
 
     const isLockedLink = algorithm.id === 'locked' || algorithm.slug === 'locked';
 
-    return (
-        <Link
-            href={isLockedLink ? '/pricing' : (algorithm.slug ? `/problem/${algorithm.slug}` : `/problem/${algorithm.id}`)}
-            className="group block relative w-full break-words"
-        >
-            <div className={cn(
-                "flex items-center gap-3 sm:gap-6 p-4 sm:p-6 transition-all duration-500 ease-out",
-                "bg-card hover:bg-accent/40 dark:hover:bg-accent/20",
-                "border-x border-t border-border/40",
-                !disableRounding && isFirst && "rounded-t-xl",
-                !disableRounding && isLast && "rounded-b-xl border-b",
-                (disableRounding || (!isFirst && !isLast)) && "rounded-none",
-                disableRounding && isLast && "border-b",
-                "shadow-sm hover:shadow-md z-0 hover:z-10 relative overflow-hidden"
-            )}>
+    const innerContent = (
+        <div className={cn(
+            compact
+                ? "flex items-center gap-2.5 px-3 py-2.5 transition-all duration-300 ease-out"
+                : "flex items-center gap-3 sm:gap-6 p-4 sm:p-6 transition-all duration-500 ease-out",
+            "bg-card hover:bg-accent/40 dark:hover:bg-accent/20",
+            "border-x border-t border-border/40",
+            !disableRounding && isFirst && "rounded-t-xl",
+            !disableRounding && isLast && "rounded-b-xl border-b",
+            (disableRounding || (!isFirst && !isLast)) && "rounded-none",
+            disableRounding && isLast && "border-b",
+            !compact && "shadow-sm hover:shadow-md z-0 hover:z-10 relative overflow-hidden",
+            isSelected && "bg-muted dark:bg-muted/60"
+        )}>
                 {/* Status Indicator */}
-                <div className="shrink-0 scale-90 sm:scale-100">
-                    <StatusIcon status={status} isPremium={isPremium} />
+                <div className={compact ? "shrink-0" : "shrink-0 scale-90 sm:scale-100"}>
+                    {compact ? (
+                        <div className={cn(
+                            'w-5 h-5 rounded-full flex items-center justify-center border transition-all duration-300',
+                            status === 'solved'
+                                ? 'bg-green-500 border-green-500 text-white'
+                                : 'bg-muted/5 border-muted-foreground/20'
+                        )}>
+                            <Check className="w-3 h-3" strokeWidth={3} style={{ opacity: status === 'solved' ? 1 : 0.3 }} />
+                        </div>
+                    ) : (
+                        <StatusIcon status={status} isPremium={isPremium} />
+                    )}
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 min-w-0 space-y-1 sm:space-y-2">
+                <div className={cn("flex-1 min-w-0", !compact && "space-y-1 sm:space-y-2")}>
                     <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 min-w-0">
-                        <h3 className="text-[15px] sm:text-[17px] font-normal text-foreground group-hover:text-black dark:group-hover:text-primary transition-colors duration-300 truncate">
+                        <h3 className={cn(
+                            "font-normal text-foreground group-hover:text-black dark:group-hover:text-primary transition-colors duration-300 truncate",
+                            compact ? "text-[13px]" : "text-[15px] sm:text-[17px]"
+                        )}>
                             {algorithm.serial_no || index + 1}. {algorithm.title || algorithm.name}
                         </h3>
                         <div className="flex flex-wrap gap-2">
@@ -84,10 +100,13 @@ export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp
                         </div>
                     </div>
 
+                    {!compact && (
                     <p className="text-[13px] sm:text-[14px] text-muted-foreground/80 line-clamp-1 max-w-2xl leading-relaxed font-normal">
                         {algorithm.description}
                     </p>
+                    )}
 
+                    {!compact && (
                     <div className="meta-info-row flex flex-wrap items-center gap-x-4 sm:gap-x-8 gap-y-1.5 text-[11px] sm:text-xs font-normal pt-1 w-full">
                         {/* Difficulty */}
                         <div className="difficulty-badge flex items-center shrink-0">
@@ -115,15 +134,44 @@ export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp
                             );
                         })()}
                     </div>
+                    )}
                 </div>
 
                 {/* Action Indicator */}
-                <div className="shrink-0 flex items-center justify-center">
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-muted-foreground/30 group-hover:text-primary group-hover:bg-primary/5 group-hover:shadow-[0_0_15px_rgba(var(--primary-rgb),0.15)] dark:group-hover:shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)] transition-all duration-300 transform group-hover:translate-x-1 border border-transparent group-hover:border-primary/10">
-                        <ArrowRight className="w-4 sm:w-5 h-4 sm:h-5" strokeWidth={2} />
+                {compact ? (
+                    <div className="shrink-0 text-muted-foreground/30 group-hover:text-primary transition-colors">
+                        <ArrowRight className="w-3.5 h-3.5" strokeWidth={2} />
                     </div>
-                </div>
+                ) : (
+                    <div className="shrink-0 flex items-center justify-center">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-muted-foreground/30 group-hover:text-primary group-hover:bg-primary/5 group-hover:shadow-[0_0_15px_rgba(var(--primary-rgb),0.15)] dark:group-hover:shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)] transition-all duration-300 transform group-hover:translate-x-1 border border-transparent group-hover:border-primary/10">
+                            <ArrowRight className="w-4 sm:w-5 h-4 sm:h-5" strokeWidth={2} />
+                        </div>
+                    </div>
+                )}
             </div>
+    );
+
+    if (onClick) {
+        return (
+            <div
+                role="button"
+                tabIndex={0}
+                onClick={onClick}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClick(e as any); }}
+                className="group block relative w-full break-words cursor-pointer"
+            >
+                {innerContent}
+            </div>
+        );
+    }
+
+    return (
+        <Link
+            href={isLockedLink ? '/pricing' : (algorithm.slug ? `/problem/${algorithm.slug}` : `/problem/${algorithm.id}`)}
+            className="group block relative w-full break-words"
+        >
+            {innerContent}
         </Link>
     );
 };

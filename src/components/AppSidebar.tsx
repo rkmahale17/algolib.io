@@ -19,6 +19,7 @@ import {
   PanelLeftOpen,
   Target,
   Database,
+  Compass,
 } from "lucide-react";
 
 import { Button } from "./ui/button";
@@ -274,12 +275,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       "space-complexity": false,
       fundamentals: false,
       patterns: false,
+      database: false,
     };
     if (pathname?.startsWith("/guides/")) {
       const slugParts = pathname.replace("/guides/", "").split("/");
       const slug = slugParts[slugParts.length - 1];
       const fundamentalsCat = guidesData.find((c) => c.id === "fundamentals");
       if (fundamentalsCat?.guides.some((g) => g.slug === slug)) state.fundamentals = true;
+      const databaseCat = guidesData.find((c) => c.id === "database");
+      if (databaseCat?.guides.some((g) => g.slug === slug)) state.database = true;
       const patternGuides = guidesData
         .filter((c) => (PATTERN_IDS as readonly string[]).includes(c.id))
         .flatMap((c) => c.guides);
@@ -298,6 +302,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       const isFundamentals = guidesData
         .find((c) => c.id === "fundamentals")
         ?.guides.some((g) => g.slug === slug);
+      const isDatabase = guidesData
+        .find((c) => c.id === "database")
+        ?.guides.some((g) => g.slug === slug);
       const patternGuides = guidesData
         .filter((c) => (PATTERN_IDS as readonly string[]).includes(c.id))
         .flatMap((c) => c.guides);
@@ -305,6 +312,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
       if (isFundamentals && !prev.fundamentals) {
         return { ...prev, fundamentals: true };
+      }
+      if (isDatabase && !prev.database) {
+        return { ...prev, database: true };
       }
       if (isPattern && !prev.patterns) {
         return { ...prev, patterns: true };
@@ -438,6 +448,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       />
                     )}
 
+                    <SidebarLinkHoverCard
+                      href="/dsa/roadmap"
+                      title="Roadmap"
+                      icon={Compass}
+                      isActive={pathname === "/dsa/roadmap"}
+                      onClick={closeMobileNav}
+                    />
+
                     <SidebarHoverCard
                       title="Guidebook"
                       icon={BookOpen}
@@ -554,6 +572,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         />
 
                         <SidebarLink
+                          href="/dsa/roadmap"
+                          title="Roadmap"
+                          icon={Compass}
+                          isActive={pathname === "/dsa/roadmap"}
+                          onClick={closeMobileNav}
+                        />
+
+                        <SidebarLink
                           href="/dsa/problems"
                           title="DSA"
                           icon={ListTodo}
@@ -611,6 +637,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             onClick={closeMobileNav}
                           />
                         )}
+
+                        <SidebarLink
+                          href="/dsa/roadmap"
+                          title="Roadmap"
+                          icon={Compass}
+                          isActive={pathname === "/dsa/roadmap"}
+                          onClick={closeMobileNav}
+                        />
 
                         <SidebarCollapsible
                           title="DSA"

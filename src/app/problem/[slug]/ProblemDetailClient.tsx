@@ -258,6 +258,22 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({
     }
   }, [activeAlgorithm, algorithmIdOrSlug, posthog, activeListType]);
 
+  // 2b. Auto-mark problem as "Learned" in localStorage when problem page is opened
+  // This auto-completes the "Learn" step in the Roadmap for this problem.
+  useEffect(() => {
+    if (!activeAlgorithm?.id) return;
+    try {
+      const saved = localStorage.getItem('roadmap_learned_problems');
+      const learned: string[] = saved ? JSON.parse(saved) : [];
+      if (!learned.includes(activeAlgorithm.id)) {
+        learned.push(activeAlgorithm.id);
+        localStorage.setItem('roadmap_learned_problems', JSON.stringify(learned));
+      }
+    } catch (e) {
+      // Silently ignore localStorage errors
+    }
+  }, [activeAlgorithm?.id]);
+
   // 3. Track Tab Switch
   useEffect(() => {
     if (activeAlgorithm) {
@@ -640,6 +656,12 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({
                       onRemoveTab={(tab) => layout.removeTab("left", tab)}
                       onActivateTab={activateWorkspaceTab}
                       editorContent={codeWorkspacePanel}
+                      visualizationCompleted={interactions.isVisualizationCompleted}
+                      drawingCompleted={interactions.isDrawingCompleted}
+                      solutionCompleted={interactions.isSolutionCompleted}
+                      onToggleVisualizationCompleted={interactions.toggleVisualizationCompletion}
+                      onToggleDrawingCompleted={interactions.toggleDrawingCompletion}
+                      onToggleSolutionCompleted={interactions.toggleSolutionCompletion}
                     />
                   </div>
                 </div>
@@ -740,6 +762,12 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({
                         onActivateTab={activateWorkspaceTab}
                         editorContent={codeWorkspacePanel}
                         rightHeaderContent={getEditorHeaderContent("left")}
+                        visualizationCompleted={interactions.isVisualizationCompleted}
+                        drawingCompleted={interactions.isDrawingCompleted}
+                        solutionCompleted={interactions.isSolutionCompleted}
+                        onToggleVisualizationCompleted={interactions.toggleVisualizationCompletion}
+                        onToggleDrawingCompleted={interactions.toggleDrawingCompletion}
+                        onToggleSolutionCompleted={interactions.toggleSolutionCompletion}
                       />
                     </div>
                   </div>
@@ -791,6 +819,12 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({
                         onActivateTab={activateWorkspaceTab}
                         editorContent={codeWorkspacePanel}
                         rightHeaderContent={getEditorHeaderContent("right")}
+                        visualizationCompleted={interactions.isVisualizationCompleted}
+                        drawingCompleted={interactions.isDrawingCompleted}
+                        solutionCompleted={interactions.isSolutionCompleted}
+                        onToggleVisualizationCompleted={interactions.toggleVisualizationCompletion}
+                        onToggleDrawingCompleted={interactions.toggleDrawingCompletion}
+                        onToggleSolutionCompleted={interactions.toggleSolutionCompletion}
                       />
                     </div>
                   </div>

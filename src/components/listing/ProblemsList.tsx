@@ -522,7 +522,7 @@ export const ProblemsList = ({
             <div className="sm:col-span-2 xl:col-span-1 xl:col-start-1 xl:row-start-1 min-w-0 flex flex-col h-full">
               <Card className="bg-card border-border/40 shadow-sm overflow-hidden flex flex-col h-full rounded-xl">
                 <div className="px-4 py-3 border-b border-border/40 shrink-0 bg-muted/20">
-                  <h3 className="font-medium text-[13px] text-foreground/80">{progressTitle}</h3>
+                  <h3 className="font-normal text-[13px] text-foreground/80">{progressTitle}</h3>
                 </div>
                 <div className="flex-1 flex flex-col justify-center">
                   <ProgressStats {...overallStats} />
@@ -540,19 +540,19 @@ export const ProblemsList = ({
             {/* Streaks */}
             <div className="sm:col-start-2 sm:row-start-2 xl:col-start-1 xl:row-start-2 flex flex-col xl:flex-row gap-4 w-full min-w-0 h-full justify-center items-center xl:items-stretch">
                 <div className="flex-1 bg-card rounded-xl p-3 sm:p-4 border border-border/40 shadow-sm flex flex-col min-w-0 justify-center items-center text-center w-full max-w-[320px] xl:max-w-none">
-                    <span className="text-[12px] sm:text-[13px] text-muted-foreground font-semibold mb-1 sm:mb-2 truncate">Current Streak</span>
+                    <span className="text-[12px] sm:text-[13px] text-muted-foreground font-normal mb-1 sm:mb-2 truncate">Current Streak</span>
                     <div className="flex items-center justify-center gap-2">
                         <Flame className="w-5 h-5 sm:w-6 sm:h-6 text-foreground shrink-0" />
-                        <span className="text-lg sm:text-2xl font-bold text-foreground tracking-tight truncate">{currentStreak}</span>
-                        <span className="text-[11px] sm:text-xs text-muted-foreground/80 font-medium pb-0.5">days</span>
+                        <span className="text-lg sm:text-2xl font-normal text-foreground tracking-tight truncate">{currentStreak}</span>
+                        <span className="text-[11px] sm:text-xs text-muted-foreground/80 font-normal pb-0.5">days</span>
                     </div>
                 </div>
                 <div className="flex-1 bg-card rounded-xl p-3 sm:p-4 border border-border/40 shadow-sm flex flex-col min-w-0 justify-center items-center text-center w-full max-w-[320px] xl:max-w-none">
-                    <span className="text-[12px] sm:text-[13px] text-muted-foreground font-semibold mb-1 sm:mb-2 truncate">Best Streak</span>
+                    <span className="text-[12px] sm:text-[13px] text-muted-foreground font-normal mb-1 sm:mb-2 truncate">Best Streak</span>
                     <div className="flex items-center justify-center gap-2">
                         <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-foreground shrink-0" />
-                        <span className="text-lg sm:text-2xl font-bold text-foreground tracking-tight truncate">{maxStreak}</span>
-                        <span className="text-[11px] sm:text-xs text-muted-foreground/80 font-medium pb-0.5">days</span>
+                        <span className="text-lg sm:text-2xl font-normal text-foreground tracking-tight truncate">{maxStreak}</span>
+                        <span className="text-[11px] sm:text-xs text-muted-foreground/80 font-normal pb-0.5">days</span>
                     </div>
                 </div>
             </div>

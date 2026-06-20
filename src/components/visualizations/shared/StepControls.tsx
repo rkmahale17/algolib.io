@@ -79,6 +79,7 @@ export const StepControls = ({
           disabled={isDisabled || currentStep >= totalSteps}
           variant="outline"
           size="icon"
+          title="Step Forward"
         >
           <SkipForward className="h-4 w-4" />
         </Button>

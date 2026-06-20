@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { updateProgress, updateSocial, updateCode } from '@/utils/userAlgorithmDataHelpers';
+import { updateProgress, updateSocial, updateCode, updateVisualizationProgress, updateDrawingProgress, updateSolutionProgress } from '@/utils/userAlgorithmDataHelpers';
 import { useFeatureFlag } from '@/contexts/FeatureFlagContext';
 import confetti from 'canvas-confetti';
 import { usePostHog } from '@posthog/react';
@@ -36,6 +36,9 @@ export const useAlgorithmInteractions = ({
     const [likes, setLikes] = useState(0);
     const [dislikes, setDislikes] = useState(0);
     const [userVote, setUserVote] = useState<'like' | 'dislike' | null>(null);
+    const [isVisualizationCompleted, setIsVisualizationCompleted] = useState(false);
+    const [isDrawingCompleted, setIsDrawingCompleted] = useState(false);
+    const [isSolutionCompleted, setIsSolutionCompleted] = useState(false);
 
     // Code Management
     const [savedCode, setSavedCode] = useState<string>("");
@@ -80,6 +83,9 @@ export const useAlgorithmInteractions = ({
             setIsCompleted(userAlgoData.completed || false);
             setIsFavorite(userAlgoData.is_favorite || false);
             setUserVote(userAlgoData.user_vote || null);
+            setIsVisualizationCompleted(userAlgoData.visualization_completed || false);
+            setIsDrawingCompleted(userAlgoData.drawing_completed || false);
+            setIsSolutionCompleted(userAlgoData.solution_completed || false);
 
             if (userAlgoData.code && typeof userAlgoData.code === 'object') {
                 const cache = userAlgoData.code as Record<string, string>;
@@ -201,6 +207,69 @@ export const useAlgorithmInteractions = ({
             toast.error("Failed to update progress");
         }
     }, [user, algorithmId, isCompleted, refetchUserData]);
+
+    const toggleVisualizationCompletion = useCallback(async () => {
+        if (!user || !algorithmId) {
+            toast.error("Please sign in to track progress");
+            return;
+        }
+
+        try {
+            const newStatus = !isVisualizationCompleted;
+            const success = await updateVisualizationProgress(user.id, algorithmId, newStatus);
+
+            if (!success) throw new Error('Failed to update');
+
+            setIsVisualizationCompleted(newStatus);
+            toast.success(newStatus ? "Visualization marked as completed!" : "Visualization marked as incomplete");
+            refetchUserData();
+        } catch (error) {
+            console.error('Error toggling visualization completion:', error);
+            toast.error("Failed to update visualization progress");
+        }
+    }, [user, algorithmId, isVisualizationCompleted, refetchUserData]);
+
+    const toggleDrawingCompletion = useCallback(async () => {
+        if (!user || !algorithmId) {
+            toast.error("Please sign in to track progress");
+            return;
+        }
+
+        try {
+            const newStatus = !isDrawingCompleted;
+            const success = await updateDrawingProgress(user.id, algorithmId, newStatus);
+
+            if (!success) throw new Error('Failed to update');
+
+            setIsDrawingCompleted(newStatus);
+            toast.success(newStatus ? "Drawing marked as completed!" : "Drawing marked as incomplete");
+            refetchUserData();
+        } catch (error) {
+            console.error('Error toggling drawing completion:', error);
+            toast.error("Failed to update drawing progress");
+        }
+    }, [user, algorithmId, isDrawingCompleted, refetchUserData]);
+
+    const toggleSolutionCompletion = useCallback(async () => {
+        if (!user || !algorithmId) {
+            toast.error("Please sign in to track progress");
+            return;
+        }
+
+        try {
+            const newStatus = !isSolutionCompleted;
+            const success = await updateSolutionProgress(user.id, algorithmId, newStatus);
+
+            if (!success) throw new Error('Failed to update');
+
+            setIsSolutionCompleted(newStatus);
+            toast.success(newStatus ? "Solution marked as completed!" : "Solution marked as incomplete");
+            refetchUserData();
+        } catch (error) {
+            console.error('Error toggling solution completion:', error);
+            toast.error("Failed to update solution progress");
+        }
+    }, [user, algorithmId, isSolutionCompleted, refetchUserData]);
 
     const handleCodeSuccess = useCallback(async () => {
         // Trigger Confetti
@@ -455,6 +524,9 @@ export const useAlgorithmInteractions = ({
         userVote,
         savedCode,
         selectedLanguage,
+        isVisualizationCompleted,
+        isDrawingCompleted,
+        isSolutionCompleted,
         setSelectedLanguage: (lang: string) => {
             const newLang = lang as Language;
             const prevLang = preferredLanguage;
@@ -475,6 +547,9 @@ export const useAlgorithmInteractions = ({
 
         // Actions
         toggleCompletion,
+        toggleVisualizationCompletion,
+        toggleDrawingCompletion,
+        toggleSolutionCompletion,
         handleCodeSuccess,
         toggleFavorite,
         handleVote,

@@ -289,11 +289,11 @@ const PublicProfileClient = ({ username }: PublicProfileClientProps) => {
           {/* Right: Horizontal Integrated Stats Card - Grows to fill remaining space */}
           <Card className="flex-1 border border-border/40 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden bg-gradient-to-br from-card to-muted/20">
             <div className="px-5 py-3 border-b border-border/40 bg-muted/5 flex justify-between items-center">
-              <h3 className="font-bold text-xs text-foreground flex items-center gap-2">
+              <h3 className="font-normal text-xs text-foreground flex items-center gap-2">
                 <Trophy className="w-3.5 h-3.5 text-primary" />
                 Performance Overview
               </h3>
-              <div className="flex items-center gap-1.5 text-[9px] font-bold text-primary bg-primary/5 px-2 py-0.5 rounded-full border border-primary/10">
+              <div className="flex items-center gap-1.5 text-[9px] font-normal text-primary bg-primary/5 px-2 py-0.5 rounded-full border border-primary/10">
                 {Math.round((stats.totalSolved / Math.max(1, stats.totalQuestions)) * 100)}% Mastered
               </div>
             </div>
@@ -304,44 +304,44 @@ const PublicProfileClient = ({ username }: PublicProfileClientProps) => {
                 <div className="flex flex-col gap-1 p-3 rounded-xl bg-card border border-border/60 shadow-sm group hover:border-orange-500/30 transition-all">
                   <div className="flex items-center gap-2 mb-1">
                     <Flame className="w-3.5 h-3.5 text-orange-500" />
-                    <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest leading-none">Current</span>
+                    <span className="text-[8px] font-normal text-muted-foreground uppercase tracking-widest leading-none">Current</span>
                   </div>
-                  <p className="text-xl font-black text-orange-500 leading-none">{stats.currentStreak}<span className="text-[9px] text-muted-foreground/60 ml-0.5 font-bold">days</span></p>
+                  <p className="text-xl font-normal text-orange-500 leading-none">{stats.currentStreak}<span className="text-[9px] text-muted-foreground/60 ml-0.5 font-normal">days</span></p>
                 </div>
 
                 <div className="flex flex-col gap-1 p-3 rounded-xl bg-card border border-border/60 shadow-sm group hover:border-blue-500/30 transition-all">
                   <div className="flex items-center gap-2 mb-1">
                     <Trophy className="w-3.5 h-3.5 text-blue-500" />
-                    <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest leading-none">Longest</span>
+                    <span className="text-[8px] font-normal text-muted-foreground uppercase tracking-widest leading-none">Longest</span>
                   </div>
-                  <p className="text-xl font-black text-blue-500 leading-none">{stats.longestStreak}<span className="text-[9px] text-muted-foreground/60 ml-0.5 font-bold">days</span></p>
+                  <p className="text-xl font-normal text-blue-500 leading-none">{stats.longestStreak}<span className="text-[9px] text-muted-foreground/60 ml-0.5 font-normal">days</span></p>
                 </div>
 
                 <div className="flex flex-col gap-1 p-3 rounded-xl bg-card border border-border/60 shadow-sm group hover:border-indigo-500/30 transition-all">
                   <div className="flex items-center gap-2 mb-1">
                     <CalendarDays className="w-3.5 h-3.5 text-indigo-500" />
-                    <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest leading-none">Active</span>
+                    <span className="text-[8px] font-normal text-muted-foreground uppercase tracking-widest leading-none">Active</span>
                   </div>
-                  <p className="text-xl font-black text-indigo-500 leading-none">{stats.totalActiveDays}<span className="text-[9px] text-muted-foreground/60 ml-0.5 font-bold">total</span></p>
+                  <p className="text-xl font-normal text-indigo-500 leading-none">{stats.totalActiveDays}<span className="text-[9px] text-muted-foreground/60 ml-0.5 font-normal">total</span></p>
                 </div>
 
                 <div className="flex flex-col gap-1 p-3 rounded-xl bg-card border border-border/60 shadow-sm group hover:border-primary/30 transition-all">
                   <div className="flex items-center gap-2 mb-1">
                     <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
-                    <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest leading-none">Solved</span>
+                    <span className="text-[8px] font-normal text-muted-foreground uppercase tracking-widest leading-none">Solved</span>
                   </div>
-                  <p className="text-xl font-black text-primary leading-none">{stats.totalSolved}</p>
+                  <p className="text-xl font-normal text-primary leading-none">{stats.totalSolved}</p>
                 </div>
               </div>
 
               {/* Progress Chart Section - High Density & Constrained Width */}
               <div className="space-y-3">
-                <div className="flex justify-between items-center text-[9px] font-bold text-muted-foreground uppercase tracking-widest">
+                <div className="flex justify-between items-center text-[9px] font-normal text-muted-foreground uppercase tracking-widest">
                   <span className="flex items-center gap-2">
                     <div className="w-1 h-3 bg-primary/40 rounded-full" />
                     Accuracy Breakdown
                   </span>
-                  <div className="flex gap-4 text-foreground font-bold">
+                  <div className="flex gap-4 text-foreground font-normal">
                     <span className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]" /> {stats.easySolved}</span>
                     <span className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(245,158,11,0.4)]" /> {stats.mediumSolved}</span>
                     <span className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.4)]" /> {stats.hardSolved}</span>

@@ -10,6 +10,7 @@ import {
   ChevronsUpDown,
   Clock,
   Code2,
+  Database,
   HardDrive,
   Layers,
   FileText,
@@ -138,7 +139,7 @@ const Navbar = ({
 
   const [isLearnOpen, setIsLearnOpen] = useState(false);
   const [activeLearnTab, setActiveLearnTab] = useState<
-    "visual" | "pattern" | "fundamentals"
+    "visual" | "pattern" | "fundamentals" | "database"
   >("fundamentals");
   const learnTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -337,6 +338,12 @@ const Navbar = ({
                           className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activeLearnTab === "pattern" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
                         >
                           Core patterns
+                        </div>
+                        <div
+                          onClick={() => setActiveLearnTab("database")}
+                          className={`px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shutter-click ${activeLearnTab === "database" ? "bg-background shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"}`}
+                        >
+                          Database
                         </div>
                       </div>
 
@@ -816,6 +823,14 @@ const Navbar = ({
                   </DropdownMenu>
                 </div>
               )}
+              {/* Roadmap Navigation for top nav */}
+              <Link
+                href="/dsa/roadmap"
+                className="font-normal hover:bg-muted hover:text-foreground rounded-lg px-3 py-1.5 transition-all shutter-click"
+                onClick={closeMenus}
+              >
+                Roadmap
+              </Link>
             </div>
           )}
 
