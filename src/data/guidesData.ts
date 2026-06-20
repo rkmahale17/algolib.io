@@ -598,7 +598,7 @@ Here is an overview of Space Complexity, followed by the reference table of stan
         title: "What is Database?",
         description: "An easy-to-understand introduction to databases, files vs databases, and real-world examples.",
         category: "database",
-        heroImage: "database-overview",
+        heroImage: "database-hero-what-is",
         author: {
           name: "Rahul Mahale",
           role: "Senior SLB Engineer",
@@ -612,7 +612,7 @@ Here is an overview of Space Complexity, followed by the reference table of stan
         title: "Types of Databases",
         description: "Learn the differences between Relational (SQL) and Non-Relational (NoSQL) databases.",
         category: "database",
-        heroImage: "database-types",
+        heroImage: "databse-core-types",
         author: {
           name: "Rahul Mahale",
           role: "Senior SLB Engineer",
@@ -626,7 +626,7 @@ Here is an overview of Space Complexity, followed by the reference table of stan
         title: "Database Terminology",
         description: "Master essential database terms like Schema, Table, Row, Column, and Primary Key.",
         category: "database",
-        heroImage: "database-terminology",
+        heroImage: "database-core-terminology",
         author: {
           name: "Rahul Mahale",
           role: "Senior SLB Engineer",

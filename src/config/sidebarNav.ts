@@ -87,18 +87,18 @@ function buildGuideGroups() {
       guides: fundamentalsCat?.guides ?? [],
     },
     {
-      id: "database",
-      title: "Database",
-      icon: Database,
-      isSingleLink: false,
-      guides: databaseCat?.guides ?? [],
-    },
-    {
       id: "patterns",
       title: "Patterns",
       icon: Target,
       isSingleLink: false,
       guides: patternGuides,
+    },
+    {
+      id: "database",
+      title: "Database",
+      icon: Database,
+      isSingleLink: false,
+      guides: databaseCat?.guides ?? [],
     },
   ];
 }
