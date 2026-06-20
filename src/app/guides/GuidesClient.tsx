@@ -277,6 +277,7 @@ export default function GuidesClient({ guide }: GuidesClientProps) {
     if (g.category === "time-complexity") return `/guides/time-complexity`;
     if (g.category === "space-complexity") return `/guides/space-complexity`;
     if (g.category === "fundamentals") return `/guides/fundamentals/${g.slug}`;
+    if (g.category === "database") return `/guides/database/${g.slug}`;
     if (patternCategoryIds.includes(g.category))
       return `/guides/patterns/${g.slug}`;
     return `/guides/${g.slug}`;
@@ -287,6 +288,7 @@ export default function GuidesClient({ guide }: GuidesClientProps) {
     if (guide.category === "time-complexity") return "Time Complexity";
     if (guide.category === "space-complexity") return "Space Complexity";
     if (guide.category === "fundamentals") return "Fundamentals";
+    if (guide.category === "database") return "Database";
     if (patternCategoryIds.includes(guide.category)) return "Patterns";
     return "Guides";
   }, [guide.category]);
@@ -295,6 +297,7 @@ export default function GuidesClient({ guide }: GuidesClientProps) {
     if (guide.category === "time-complexity") return `/guides/time-complexity`;
     if (guide.category === "space-complexity") return `/guides/space-complexity`;
     if (guide.category === "fundamentals") return `/guides`;
+    if (guide.category === "database") return `/guides`;
     if (patternCategoryIds.includes(guide.category)) return `/guides`;
     return `/guides`;
   }, [guide.category]);

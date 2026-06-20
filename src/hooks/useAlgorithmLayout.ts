@@ -58,37 +58,49 @@ export const useAlgorithmLayout = (): UseAlgorithmLayoutReturn => {
     const [rightTabs, setRightTabs] = useState<string[]>(DEFAULT_RIGHT_TABS);
     const [activeLeftTab, setActiveLeftTabState] = useState<string>("description");
     const [activeRightTab, setActiveRightTabState] = useState<string>("editor");
+    const [isLoaded, setIsLoaded] = useState(false);
 
     // Load layout states from localStorage on client mount to prevent SSR hydration mismatch
     useEffect(() => {
+        let parsedLeft = DEFAULT_LEFT_TABS;
         const savedLeft = localStorage.getItem("dsa-layout-left-tabs");
         if (savedLeft) {
             try {
-                setLeftTabs(JSON.parse(savedLeft));
+                parsedLeft = JSON.parse(savedLeft);
+                setLeftTabs(parsedLeft);
             } catch (e) {
                 console.error("Failed to parse left tabs", e);
             }
         }
 
+        let parsedRight = DEFAULT_RIGHT_TABS;
         const savedRight = localStorage.getItem("dsa-layout-right-tabs");
         if (savedRight) {
             try {
-                setRightTabs(JSON.parse(savedRight));
+                parsedRight = JSON.parse(savedRight);
+                setRightTabs(parsedRight);
             } catch (e) {
                 console.error("Failed to parse right tabs", e);
             }
         }
 
         const savedActiveLeft = localStorage.getItem("dsa-layout-active-left-tab");
-        if (savedActiveLeft) {
+        if (savedActiveLeft && parsedLeft.includes(savedActiveLeft)) {
             setActiveLeftTabState(savedActiveLeft);
             setActiveTabState(savedActiveLeft); // Sync legacy activeTab compatibility
+        } else if (parsedLeft.length > 0) {
+            setActiveLeftTabState(parsedLeft[0]);
+            setActiveTabState(parsedLeft[0]);
         }
 
         const savedActiveRight = localStorage.getItem("dsa-layout-active-right-tab");
-        if (savedActiveRight) {
+        if (savedActiveRight && parsedRight.includes(savedActiveRight)) {
             setActiveRightTabState(savedActiveRight);
+        } else if (parsedRight.length > 0) {
+            setActiveRightTabState(parsedRight[0]);
         }
+        
+        setIsLoaded(true);
     }, []);
 
     const setActiveTab = useCallback((tab: string) => {
@@ -180,19 +192,53 @@ export const useAlgorithmLayout = (): UseAlgorithmLayoutReturn => {
         localStorage.removeItem("dsa-layout-active-right-tab");
     }, [setActiveLeftTab, setActiveRightTab]);
 
+    const hasAppliedUrlTab = useRef(false);
+
     useEffect(() => {
-        if (typeof window !== "undefined") {
-            const params = new URLSearchParams(window.location.search);
-            const tabParam = params.get("tab");
-            if (tabParam) {
-                if (leftTabs.includes(tabParam)) {
+        if (!isLoaded || typeof window === "undefined" || hasAppliedUrlTab.current) return;
+        
+        const params = new URLSearchParams(window.location.search);
+        const tabParam = params.get("tab");
+        
+        if (tabParam) {
+            const inLeft = leftTabs.includes(tabParam);
+            const inRight = rightTabs.includes(tabParam);
+            
+            if (inLeft || inRight) {
+                hasAppliedUrlTab.current = true;
+                
+                let targetPanel = "left";
+                if (inLeft && inRight) {
+                    targetPanel = DEFAULT_RIGHT_TABS.includes(tabParam) ? "right" : "left";
+                } else if (inRight) {
+                    targetPanel = "right";
+                }
+
+                if (targetPanel === "left") {
                     setActiveLeftTab(tabParam);
-                } else if (rightTabs.includes(tabParam)) {
+                    if (activeRightTab === tabParam) {
+                        const fallback = rightTabs.find(t => t !== tabParam) || "editor";
+                        setActiveRightTab(fallback);
+                    }
+                } else {
                     setActiveRightTab(tabParam);
+                    if (activeLeftTab === tabParam) {
+                        const fallback = leftTabs.find(t => t !== tabParam) || "description";
+                        setActiveLeftTab(fallback);
+                    }
                 }
             }
         }
-    }, [leftTabs, rightTabs, setActiveLeftTab, setActiveRightTab]);
+    }, [isLoaded, leftTabs, rightTabs, activeLeftTab, activeRightTab, setActiveLeftTab, setActiveRightTab]);
+
+    // Ensure the same tab is not active on both panels initially
+    useEffect(() => {
+        if (activeLeftTab === activeRightTab && activeLeftTab !== "") {
+            const fallback = rightTabs.find(t => t !== activeRightTab) || "editor";
+            setActiveRightTab(fallback);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // Migration: Move thinkpad to right panel and remove from left panel for existing users
     useEffect(() => {

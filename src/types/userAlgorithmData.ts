@@ -17,6 +17,9 @@ export interface UserAlgorithmData {
     updated_at: string;
     last_viewed_at: string | null;
     time_spent_seconds: number;
+    visualization_completed: boolean;
+    drawing_completed: boolean;
+    solution_completed: boolean;
 }
 
 // Code storage structure (multi-language support)
@@ -61,6 +64,18 @@ export interface UpdateProgressData {
     completed_at?: string | null;
 }
 
+export interface UpdateVisualizationProgressData {
+    visualization_completed: boolean;
+}
+
+export interface UpdateDrawingProgressData {
+    drawing_completed: boolean;
+}
+
+export interface UpdateSolutionProgressData {
+    solution_completed: boolean;
+}
+
 export interface UpdateCodeData {
     language: string;
     code: string;
@@ -100,4 +115,7 @@ export interface InsertUserAlgorithmData {
     share_count?: number;
     last_viewed_at?: string | null;
     time_spent_seconds?: number;
+    visualization_completed?: boolean;
+    drawing_completed?: boolean;
+    solution_completed?: boolean;
 }

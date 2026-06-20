@@ -16,6 +16,9 @@ import { content as prefixSumContent } from "./guides/prefix-sum";
 import { content as dynamicProgrammingContent } from "./guides/dynamic-programming";
 import { content as cyclicSortContent } from "./guides/cyclic-sort";
 import { content as mergeSortContent } from "./guides/merge-sort";
+import { content as whatIsDatabaseContent } from "./guides/what-is-database";
+import { content as typesOfDatabasesContent } from "./guides/types-of-databases";
+import { content as databaseTerminologyContent } from "./guides/database-terminology";
 
 
 export interface RelatedQuestion {
@@ -583,6 +586,54 @@ Here is an overview of Space Complexity, followed by the reference table of stan
           { id: "coin-change", name: "Coin Change", difficulty: "Medium" },
           { id: "house-robber", name: "House Robber", difficulty: "Medium" }
         ]
+      }
+    ]
+  },
+  {
+    id: "database",
+    title: "Database",
+    guides: [
+      {
+        slug: "what-is-database",
+        title: "What is Database?",
+        description: "An easy-to-understand introduction to databases, files vs databases, and real-world examples.",
+        category: "database",
+        heroImage: "database-overview",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: whatIsDatabaseContent,
+        questions: []
+      },
+      {
+        slug: "types-of-databases",
+        title: "Types of Databases",
+        description: "Learn the differences between Relational (SQL) and Non-Relational (NoSQL) databases.",
+        category: "database",
+        heroImage: "database-types",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: typesOfDatabasesContent,
+        questions: []
+      },
+      {
+        slug: "database-terminology",
+        title: "Database Terminology",
+        description: "Master essential database terms like Schema, Table, Row, Column, and Primary Key.",
+        category: "database",
+        heroImage: "database-terminology",
+        author: {
+          name: "Rahul Mahale",
+          role: "Senior SLB Engineer",
+          linkedin: "https://linkedin.com/in/rkmahale"
+        },
+        content: databaseTerminologyContent,
+        questions: []
       }
     ]
   }

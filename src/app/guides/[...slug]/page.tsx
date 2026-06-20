@@ -14,6 +14,8 @@ export async function generateStaticParams() {
     category.guides.forEach((guide) => {
       if (category.id === "fundamentals") {
         slugs.push({ slug: ["fundamentals", guide.slug] });
+      } else if (category.id === "database") {
+        slugs.push({ slug: ["database", guide.slug] });
       } else if (category.id === "time-complexity" || category.id === "space-complexity") {
         // Exclude because they are dedicated static routes
       } else {

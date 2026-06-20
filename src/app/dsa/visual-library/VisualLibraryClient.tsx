@@ -197,8 +197,7 @@ export default function VisualLibraryClient() {
               <span className="hidden sm:inline">Fullscreen</span>
             </Button>
           </div>
-          
-          <div className="relative w-full h-[600px] bg-background overflow-hidden">
+          <div className="relative w-full h-[calc(100vh-250px)] min-h-[600px] bg-background overflow-hidden">
             {(!hasPremiumAccess && (activeAlgorithm?.is_premium || activeAlgorithm?.is_pro || activeAlgorithm?.metadata?.is_pro)) ? (
               <ProOverlay className="border-0 flex-1 h-full" />
             ) : (

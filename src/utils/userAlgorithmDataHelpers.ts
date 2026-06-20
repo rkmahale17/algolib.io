@@ -28,7 +28,7 @@ export async function getUserAlgorithmData(
 
     const { data, error } = await supabase
         .from('user_algorithm_data')
-        .select('id, user_id, algorithm_id, completed, code, submissions, notes, whiteboard_data, updated_at')
+        .select('id, user_id, algorithm_id, completed, code, submissions, notes, whiteboard_data, updated_at, visualization_completed, drawing_completed, solution_completed')
         .eq('user_id', userId)
         .eq('algorithm_id', algorithmId)
         .maybeSingle();
@@ -332,6 +332,109 @@ export async function updateTimeTracking(
 }
 
 /**
+ * Update visualization progress status
+ */
+export async function updateVisualizationProgress(
+    userId: string,
+    algorithmId: string,
+    completed: boolean
+): Promise<boolean> {
+    if (!supabase) {
+        console.warn('Supabase not available');
+        return false;
+    }
+
+    const { error } = await supabase
+        .from('user_algorithm_data')
+        .upsert(
+            {
+                user_id: userId,
+                algorithm_id: algorithmId,
+                visualization_completed: completed,
+            } as any,
+            {
+                onConflict: 'user_id,algorithm_id',
+            }
+        );
+
+    if (error) {
+        console.error('Error updating visualization progress:', error);
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * Update drawing progress status
+ */
+export async function updateDrawingProgress(
+    userId: string,
+    algorithmId: string,
+    completed: boolean
+): Promise<boolean> {
+    if (!supabase) {
+        console.warn('Supabase not available');
+        return false;
+    }
+
+    const { error } = await supabase
+        .from('user_algorithm_data')
+        .upsert(
+            {
+                user_id: userId,
+                algorithm_id: algorithmId,
+                drawing_completed: completed,
+            } as any,
+            {
+                onConflict: 'user_id,algorithm_id',
+            }
+        );
+
+    if (error) {
+        console.error('Error updating drawing progress:', error);
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * Update solution progress status
+ */
+export async function updateSolutionProgress(
+    userId: string,
+    algorithmId: string,
+    completed: boolean
+): Promise<boolean> {
+    if (!supabase) {
+        console.warn('Supabase not available');
+        return false;
+    }
+
+    const { error } = await supabase
+        .from('user_algorithm_data')
+        .upsert(
+            {
+                user_id: userId,
+                algorithm_id: algorithmId,
+                solution_completed: completed,
+            } as any,
+            {
+                onConflict: 'user_id,algorithm_id',
+            }
+        );
+
+    if (error) {
+        console.error('Error updating solution progress:', error);
+        return false;
+    }
+
+    return true;
+}
+
+
+/**
  * Get all user algorithm data for a user (for progress tracking)
  */
 export async function getAllUserAlgorithmData(
@@ -344,7 +447,7 @@ export async function getAllUserAlgorithmData(
 
     const { data, error } = await supabase
         .from('user_algorithm_data')
-        .select('id, algorithm_id, completed, submissions')
+        .select('id, algorithm_id, completed, submissions, visualization_completed, drawing_completed, solution_completed')
         .eq('user_id', userId);
 
     if (error) {

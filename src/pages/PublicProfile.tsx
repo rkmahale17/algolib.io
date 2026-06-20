@@ -404,27 +404,27 @@ const PublicProfile = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="bg-card rounded-xl border border-border/40 shadow-sm p-5 hover:shadow-md transition-shadow">
                 <div className="text-sm font-medium text-muted-foreground mb-2">Total Solved</div>
-                <div className="text-3xl font-bold text-primary">{stats.totalSolved}</div>
+                <div className="text-3xl font-normal text-primary">{stats.totalSolved}</div>
                 <div className="text-xs text-muted-foreground mt-1">out of {stats.totalQuestions} questions</div>
               </div>
               <div className="bg-card rounded-xl border border-border/40 shadow-sm p-5 hover:shadow-md transition-shadow">
                 <div className="text-sm font-medium text-muted-foreground mb-2">Current Streak</div>
-                <div className="text-3xl font-bold text-orange-500">{stats.currentStreak} <span className="text-sm font-normal text-muted-foreground">days</span></div>
+                <div className="text-3xl font-normal text-orange-500">{stats.currentStreak} <span className="text-sm font-normal text-muted-foreground">days</span></div>
               </div>
               <div className="bg-card rounded-xl border border-border/40 shadow-sm p-5 hover:shadow-md transition-shadow">
                 <div className="text-sm font-medium text-muted-foreground mb-2">Max Streak</div>
-                <div className="text-3xl font-bold text-amber-500">{stats.longestStreak} <span className="text-sm font-normal text-muted-foreground">days</span></div>
+                <div className="text-3xl font-normal text-amber-500">{stats.longestStreak} <span className="text-sm font-normal text-muted-foreground">days</span></div>
               </div>
               <div className="bg-card rounded-xl border border-border/40 shadow-sm p-5 hover:shadow-md transition-shadow">
                 <div className="text-sm font-medium text-muted-foreground mb-2">Total Active Days</div>
-                <div className="text-3xl font-bold text-green-500">{stats.totalActiveDays}</div>
+                <div className="text-3xl font-normal text-green-500">{stats.totalActiveDays}</div>
               </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
               <div className="space-y-6 lg:order-last">
                 <div className="bg-card rounded-xl border border-border/40 shadow-sm overflow-hidden lg:sticky lg:top-24">
-                  <div className="px-5 py-4 border-b border-border/40"><h3 className="font-semibold text-sm">Progress by Difficulty</h3></div>
+                  <div className="px-5 py-4 border-b border-border/40"><h3 className="font-normal text-sm">Progress by Difficulty</h3></div>
                   <ProgressStats
                     totalSolved={stats.totalSolved} totalQuestions={stats.totalQuestions}
                     easySolved={stats.easySolved} easyTotal={stats.easyTotal}

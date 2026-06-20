@@ -68,10 +68,10 @@ export const ProgressStats = ({
                                         const { cx, cy } = viewBox as any;
                                         return (
                                             <text x={cx} y={cy} textAnchor="middle" dominantBaseline="middle">
-                                                <tspan x={cx} dy="-0.1em" className={cn("fill-foreground font-black tracking-tight", isVertical ? "text-2xl" : "text-xl sm:text-2xl")}>
+                                                <tspan x={cx} dy="-0.1em" className={cn("fill-foreground font-normal tracking-tight", isVertical ? "text-2xl" : "text-xl sm:text-2xl")}>
                                                     {totalSolved}
                                                 </tspan>
-                                                <tspan x={cx} dy="1.4em" className={cn("fill-muted-foreground font-bold tracking-widest opacity-60", isVertical ? "text-[8px]" : "text-[7px] sm:text-[8px]")}>
+                                                <tspan x={cx} dy="1.4em" className={cn("fill-muted-foreground font-normal tracking-widest opacity-60", isVertical ? "text-[8px]" : "text-[7px] sm:text-[8px]")}>
                                                     SOLVED
                                                 </tspan>
                                             </text>
@@ -88,22 +88,22 @@ export const ProgressStats = ({
                     <div className="flex justify-between items-end mb-2.5">
                         <div className="flex gap-3 sm:gap-8 w-full justify-between sm:justify-start">
                             <div className="flex flex-col">
-                                <span className="text-green-500 font-bold text-[10px] sm:text-[11px] uppercase tracking-widest opacity-80">Easy</span>
-                                <span className="text-sm sm:text-base font-black whitespace-nowrap">{easySolved}<span className="text-muted-foreground/40 font-bold ml-0.5 text-xs">/ {easyTotal}</span></span>
+                                <span className="text-green-500 font-normal text-[10px] sm:text-[11px] uppercase tracking-widest opacity-80">Easy</span>
+                                <span className="text-sm sm:text-base font-normal whitespace-nowrap">{easySolved}<span className="text-muted-foreground/40 font-normal ml-0.5 text-xs">/ {easyTotal}</span></span>
                             </div>
                             <div className="flex flex-col">
-                                <span className="text-amber-500 font-bold text-[10px] sm:text-[11px] uppercase tracking-widest opacity-80">Med</span>
-                                <span className="text-sm sm:text-base font-black whitespace-nowrap">{mediumSolved}<span className="text-muted-foreground/40 font-bold ml-0.5 text-xs">/ {mediumTotal}</span></span>
+                                <span className="text-amber-500 font-normal text-[10px] sm:text-[11px] uppercase tracking-widest opacity-80">Med</span>
+                                <span className="text-sm sm:text-base font-normal whitespace-nowrap">{mediumSolved}<span className="text-muted-foreground/40 font-normal ml-0.5 text-xs">/ {mediumTotal}</span></span>
                             </div>
                             <div className="flex flex-col">
-                                <span className="text-red-500 font-bold text-[10px] sm:text-[11px] uppercase tracking-widest opacity-80">Hard</span>
-                                <span className="text-sm sm:text-base font-black whitespace-nowrap">{hardSolved}<span className="text-muted-foreground/40 font-bold ml-0.5 text-xs">/ {hardTotal}</span></span>
+                                <span className="text-red-500 font-normal text-[10px] sm:text-[11px] uppercase tracking-widest opacity-80">Hard</span>
+                                <span className="text-sm sm:text-base font-normal whitespace-nowrap">{hardSolved}<span className="text-muted-foreground/40 font-normal ml-0.5 text-xs">/ {hardTotal}</span></span>
                             </div>
                         </div>
                         {isVertical && (
                             <div className="text-right">
-                                <div className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mb-0.5 opacity-60">Success</div>
-                                <div className="text-lg font-black leading-none">{Math.round((totalSolved / safeTotal) * 100)}%</div>
+                                <div className="text-[10px] text-muted-foreground font-normal uppercase tracking-widest mb-0.5 opacity-60">Success</div>
+                                <div className="text-lg font-normal leading-none">{Math.round((totalSolved / safeTotal) * 100)}%</div>
                             </div>
                         )}
                     </div>

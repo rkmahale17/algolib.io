@@ -161,6 +161,14 @@ interface ProblemDescriptionPanelProps {
   onActivateTab?: (tabId: string) => void;
   editorContent?: React.ReactNode;
   rightHeaderContent?: React.ReactNode;
+
+  // New completion props
+  visualizationCompleted?: boolean;
+  drawingCompleted?: boolean;
+  solutionCompleted?: boolean;
+  onToggleVisualizationCompleted?: () => void;
+  onToggleDrawingCompleted?: () => void;
+  onToggleSolutionCompleted?: () => void;
 }
 
 export const ProblemDescriptionPanel = React.memo(
@@ -193,12 +201,88 @@ export const ProblemDescriptionPanel = React.memo(
     onActivateTab,
     editorContent,
     rightHeaderContent,
+    visualizationCompleted = false,
+    drawingCompleted = false,
+    solutionCompleted = false,
+    onToggleVisualizationCompleted,
+    onToggleDrawingCompleted,
+    onToggleSolutionCompleted,
   }: ProblemDescriptionPanelProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const topicsRef = useRef<HTMLDivElement>(null);
     const companiesRef = useRef<HTMLDivElement>(null);
     const tipsRef = useRef<HTMLDivElement>(null);
     const tabsScrollRef = useRef<HTMLDivElement>(null);
+    const endOfDescriptionRef = useRef<HTMLDivElement>(null);
+    const visualizerContainerRef = useRef<HTMLDivElement>(null);
+
+    // Auto-mark Read step complete when scrolled to bottom
+    useEffect(() => {
+      if (activeTab !== "description" || !algorithm?.id) return;
+      const el = endOfDescriptionRef.current;
+      if (!el) return;
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting) {
+            try {
+              const stored = JSON.parse(localStorage.getItem('roadmap_learned_problems') || '[]');
+              if (!stored.includes(algorithm.id)) {
+                stored.push(algorithm.id);
+                localStorage.setItem('roadmap_learned_problems', JSON.stringify(stored));
+                window.dispatchEvent(new Event('roadmap_learned_problems_updated'));
+              }
+            } catch (e) {
+              console.error('Failed to mark read complete', e);
+            }
+            observer.disconnect();
+          }
+        },
+        { threshold: 0.1 }
+      );
+
+      observer.observe(el);
+      return () => observer.disconnect();
+    }, [activeTab, algorithm?.id]);
+
+    // Auto-mark Visualization step complete when reached the end
+    useEffect(() => {
+      if (activeTab !== "visualizations" || visualizationCompleted || !onToggleVisualizationCompleted) return;
+      
+      const container = visualizerContainerRef.current;
+      if (!container) return;
+
+      const checkDisabledState = (target: HTMLButtonElement) => {
+        if (target.disabled && (target.title === "Step Forward" || target.querySelector('svg.lucide-skip-forward'))) {
+          onToggleVisualizationCompleted();
+          return true;
+        }
+        return false;
+      };
+
+      const observer = new MutationObserver((mutations) => {
+        for (const m of mutations) {
+          if (m.type === 'attributes' && m.attributeName === 'disabled') {
+            const target = m.target as HTMLButtonElement;
+            if (checkDisabledState(target)) {
+              observer.disconnect();
+              return;
+            }
+          }
+        }
+      });
+
+      observer.observe(container, { attributes: true, subtree: true, attributeFilter: ['disabled'] });
+      
+      // Also check if it's already disabled on mount (might happen if sequence is empty or user is at the end)
+      const skipIcon = container.querySelector('svg.lucide-skip-forward');
+      const stepForwardBtn = skipIcon ? skipIcon.closest('button') as HTMLButtonElement : null;
+      if (stepForwardBtn && checkDisabledState(stepForwardBtn)) {
+        observer.disconnect();
+      }
+
+      return () => observer.disconnect();
+    }, [activeTab, visualizationCompleted, onToggleVisualizationCompleted]);
 
     const isBrainstormEnabled = useFeatureFlag("brainstrom_tab");
 
@@ -474,6 +558,13 @@ export const ProblemDescriptionPanel = React.memo(
                           const IconComponent = tabMeta.icon;
                           const isRemovable = panelId === 'left' ? !BASE_LEFT_TABS.includes(tabId) : !BASE_RIGHT_TABS.includes(tabId);
                           
+                          // Determine if tab is completed
+                          let isTabCompleted = false;
+                          if (tabId === "visualizations") isTabCompleted = !!visualizationCompleted;
+                          if (tabId === "thinkpad") isTabCompleted = !!drawingCompleted;
+                          if (tabId === "solutions") isTabCompleted = !!solutionCompleted;
+                          if (tabId === "editor") isTabCompleted = !!isCompleted;
+
                           return (
                             <TabsTrigger
                               key={tabId}
@@ -483,8 +574,11 @@ export const ProblemDescriptionPanel = React.memo(
                               {isCompact ? (
                                 <Tooltip>
                                   <TooltipTrigger asChild>
-                                    <span className="flex items-center justify-center">
+                                    <span className="flex items-center justify-center relative">
                                       <IconComponent className="w-4 h-4" />
+                                      {isTabCompleted && (
+                                        <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-green-500 border border-background" />
+                                      )}
                                     </span>
                                   </TooltipTrigger>
                                   <TooltipContent>{tabMeta.label}</TooltipContent>
@@ -493,6 +587,11 @@ export const ProblemDescriptionPanel = React.memo(
                                 <>
                                   <IconComponent className="w-4 h-4 mr-2 shrink-0" />
                                   {tabMeta.label}
+                                  {isTabCompleted && (
+                                    <span className="ml-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-green-500 text-white text-[8px] font-bold shadow-sm shrink-0">
+                                      ✓
+                                    </span>
+                                  )}
                                 </>
                               )}
                             </TabsTrigger>
@@ -525,6 +624,25 @@ export const ProblemDescriptionPanel = React.memo(
             >
               <ScrollArea className="h-full">
                 <div className="p-4 space-y-6">
+                  {/* Mastery congratulations banner */}
+                  {isCompleted && 
+                   (isSqlProblem || (visualizationCompleted && drawingCompleted)) && 
+                   solutionCompleted && (
+                    <div className="p-4 rounded-xl border border-green-500/30 bg-green-500/10 dark:bg-green-950/20 shadow-md flex items-start gap-3.5 animate-in fade-in slide-in-from-top-4 duration-500 mb-4">
+                      <div className="p-2 rounded-full bg-green-500 text-white shadow-md shadow-green-500/25 shrink-0 mt-0.5 animate-bounce">
+                        <Sparkles className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-bold text-green-700 dark:text-green-400 text-sm sm:text-base flex items-center gap-1.5">
+                          Problem Mastered! 🌟
+                        </h4>
+                        <p className="text-xs sm:text-sm text-muted-foreground mt-1 leading-relaxed">
+                          Exceptional work! You have written the code, analyzed the step-by-step visualization, sketched your logic, and reviewed the optimal solution. You've fully mastered this algorithm!
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Title & Progress */}
                   <div className="flex items-start justify-between gap-4">
                     <div>
@@ -625,21 +743,21 @@ export const ProblemDescriptionPanel = React.memo(
                       </div>
                     </div>
                     <div className="shrink-0 flex flex-col gap-2">
-                      {(!algorithm?.controls ||
-                        algorithm.controls?.metadata?.attempted_badge !==
-                          false) &&
-                        isCompleted && (
-                          <Badge
-                            variant="outline"
-                            className="bg-primary/10 text-primary border-primary/20 px-3 py-0.5 hover:bg-primary/20 transition-colors cursor-default flex items-center h-6 rounded-full text-[10px] sm:text-[11px] font-medium"
-                          >
-                            <div className="bg-primary rounded-full p-0.5 mr-1.5 flex items-center justify-center text-primary-foreground shadow-sm">
-                              <Check className="w-2.5 h-2.5 stroke-[3]" />
-                            </div>
-                            Solved
-                          </Badge>
-                        )}
-                    </div>
+                       {(!algorithm?.controls ||
+                         algorithm.controls?.metadata?.attempted_badge !==
+                           false) &&
+                         isCompleted && (
+                           <Badge
+                             variant="outline"
+                             className="bg-primary/10 text-primary border-primary/20 px-3 py-0.5 hover:bg-primary/20 transition-colors cursor-default flex items-center h-6 rounded-full text-[10px] sm:text-[11px] font-medium"
+                           >
+                             <div className="bg-primary rounded-full p-0.5 mr-1.5 flex items-center justify-center text-primary-foreground shadow-sm">
+                               <Check className="w-2.5 h-2.5 stroke-[3]" />
+                             </div>
+                             Solved
+                           </Badge>
+                         )}
+                     </div>
                   </div>
                   <section className="max-w-[800px] ">
                     {algorithm.explanation.problemStatement &&
@@ -1517,6 +1635,7 @@ export const ProblemDescriptionPanel = React.memo(
                   )}
 
                   {/* Bottom Action Bar moved to parent container */}
+                  <div ref={endOfDescriptionRef} className="h-px w-full" />
                 </div>
               </ScrollArea>
             </TabsContent>
@@ -1552,7 +1671,35 @@ export const ProblemDescriptionPanel = React.memo(
                     >
                       <Maximize className="w-4 h-4" />
                     </Button>
+
+                    {/* Floating Visualization Completion Button */}
+                    {!(algorithm?.is_premium || algorithm?.is_pro || (algorithm?.metadata?.is_pro && !hasPremiumAccess)) && (
+                      <button
+                        onClick={onToggleVisualizationCompleted}
+                        className={`absolute bottom-4 right-4 z-40 px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg backdrop-blur-md transition-all active:scale-95 flex items-center gap-1.5 border select-none ${
+                          visualizationCompleted
+                            ? "bg-green-500/10 border-green-500/30 text-green-600 dark:text-green-400 hover:bg-green-500/20 hover:text-red-500 hover:border-red-500/30 hover:bg-red-500/10 group"
+                            : "bg-background/80 border-border text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                        }`}
+                        title={visualizationCompleted ? "Click to mark incomplete" : "Click to mark complete"}
+                      >
+                        {visualizationCompleted ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 stroke-[2.5] group-hover:hidden" />
+                            <X className="w-3.5 h-3.5 stroke-[2.5] hidden group-hover:block" />
+                            <span className="group-hover:hidden">Completed</span>
+                            <span className="hidden group-hover:block">Mark Incomplete</span>
+                          </>
+                        ) : (
+                          <>
+                            <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                            <span>Mark Complete</span>
+                          </>
+                        )}
+                      </button>
+                    )}
                     <div
+                      ref={visualizerContainerRef}
                       className={`flex-1 overflow-auto no-scrollbar relative flex flex-col ${(algorithm?.is_premium || algorithm?.is_pro || algorithm?.metadata?.is_pro) && !hasPremiumAccess && !isPlatformPreview ? "p-0" : "p-2 sm:p-4"}`}
                     >
                       {(algorithm?.is_premium ||
@@ -1576,7 +1723,7 @@ export const ProblemDescriptionPanel = React.memo(
 
             <TabsContent
               value="solutions"
-              className="h-full m-0 data-[state=inactive]:hidden"
+              className="h-full m-0 data-[state=inactive]:hidden relative"
             >
               {algorithm?.controls?.tabs?.solutions === false ? (
                 <TabWarning message="Detailed solutions are not available for this problem yet." />
@@ -1589,29 +1736,46 @@ export const ProblemDescriptionPanel = React.memo(
                   <ProOverlay className="rounded-none border-0 flex-1" />
                 </div>
               ) : (
-                <ScrollArea className="h-full relative">
-                  <div className="p-4 space-y-4 pb-20">
-                    {algorithm?.implementations ? (
-                      <React.Suspense
-                        fallback={
-                          <div className="h-64 w-full animate-pulse bg-muted rounded-md" />
-                        }
-                      >
-                        <SolutionViewer
-                          implementations={algorithm.implementations}
-                          approachName="Optimal Solution"
-                          controls={algorithm?.controls?.solutions}
-                          tutorial={algorithm.tutorials?.[0]}
-                          problemName={algorithm.name}
-                        />
-                      </React.Suspense>
-                    ) : (
-                      <div className="text-center py-12 text-muted-foreground border rounded-lg border-dashed">
-                        No solutions available.
-                      </div>
-                    )}
-                  </div>
-                </ScrollArea>
+                <>
+                  <ScrollArea className="h-full relative">
+                    <div className="p-4 space-y-4 pb-20">
+                      {algorithm?.implementations ? (
+                        <React.Suspense
+                          fallback={
+                            <div className="h-64 w-full animate-pulse bg-muted rounded-md" />
+                          }
+                        >
+                          <SolutionViewer
+                            implementations={algorithm.implementations}
+                            approachName="Optimal Solution"
+                            controls={algorithm?.controls?.solutions}
+                            tutorial={algorithm.tutorials?.[0]}
+                            problemName={algorithm.name}
+                          />
+                        </React.Suspense>
+                      ) : (
+                        <div className="text-center py-12 text-muted-foreground border rounded-lg border-dashed">
+                          No solutions available.
+                        </div>
+                      )}
+                    </div>
+                  </ScrollArea>
+
+                  {/* Floating Solution Completion Button */}
+                  {!(algorithm?.is_premium || algorithm?.is_pro || (algorithm?.metadata?.is_pro && !hasPremiumAccess)) && (
+                    <button
+                      onClick={onToggleSolutionCompleted}
+                      className={`absolute bottom-4 right-4 z-40 px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg backdrop-blur-md transition-all active:scale-95 flex items-center gap-1.5 border select-none ${
+                        solutionCompleted
+                          ? "bg-green-500/10 border-green-500/30 text-green-600 dark:text-green-400 hover:bg-green-500/20"
+                          : "bg-background/80 border-border/60 text-muted-foreground hover:text-foreground hover:bg-background/95"
+                      }`}
+                    >
+                      <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                      <span>{solutionCompleted ? "Completed" : "Mark Complete"}</span>
+                    </button>
+                  )}
+                </>
               )}
             </TabsContent>
             <TabsContent
@@ -1722,6 +1886,8 @@ export const ProblemDescriptionPanel = React.memo(
                         algorithmId={algorithm.id || algorithm.slug || ""}
                         algorithmTitle={algorithm.title || algorithm.name || ""}
                         controls={algorithm.controls?.brainstorm}
+                        drawingCompleted={drawingCompleted}
+                        onToggleDrawingCompleted={onToggleDrawingCompleted}
                       />
                     </div>
                   </AuthGuard>

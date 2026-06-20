@@ -3,6 +3,7 @@ import {
   Palette,
   FileText,
   History,
+  CheckCircle2,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -23,12 +24,16 @@ interface BrainstormSectionProps {
     whiteboard: boolean;
     history: boolean;
   };
+  drawingCompleted?: boolean;
+  onToggleDrawingCompleted?: () => void;
 }
 
 export const BrainstormSection = ({
   algorithmId,
   algorithmTitle,
   controls,
+  drawingCompleted = false,
+  onToggleDrawingCompleted,
 }: BrainstormSectionProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [whiteboardRestore, setWhiteboardRestore] = useState<any>(null);
@@ -188,7 +193,20 @@ export const BrainstormSection = ({
                   </TabsTrigger>
                 </TabsList>
 
-                <div className="flex-1 overflow-hidden">
+                <div className="flex-1 overflow-hidden relative">
+                  {activeTab === "whiteboard" && (
+                    <button
+                      onClick={onToggleDrawingCompleted}
+                      className={`absolute bottom-4 right-4 z-50 px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg backdrop-blur-md transition-all active:scale-95 flex items-center gap-1.5 border select-none ${
+                        drawingCompleted
+                          ? "bg-green-500/10 border-green-500/30 text-green-600 dark:text-green-400 hover:bg-green-500/25"
+                          : "bg-background/80 border-border/60 text-muted-foreground hover:text-foreground hover:bg-background/95"
+                      }`}
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span>{drawingCompleted ? "Completed" : "Mark Complete"}</span>
+                    </button>
+                  )}
                   <FeatureGuard flag="drawing">
                     {controls?.whiteboard !== false && (
                       <TabsContent value="whiteboard" className="h-full m-0">
@@ -230,7 +248,20 @@ export const BrainstormSection = ({
           </Dialog>
         </div>
 
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden relative">
+          {activeTab === "whiteboard" && (
+            <button
+              onClick={onToggleDrawingCompleted}
+              className={`absolute bottom-4 right-4 z-50 px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg backdrop-blur-md transition-all active:scale-95 flex items-center gap-1.5 border select-none ${
+                drawingCompleted
+                  ? "bg-green-500/10 border-green-500/30 text-green-600 dark:text-green-400 hover:bg-green-500/25"
+                  : "bg-background/80 border-border/60 text-muted-foreground hover:text-foreground hover:bg-background/95"
+              }`}
+            >
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>{drawingCompleted ? "Completed" : "Mark Complete"}</span>
+            </button>
+          )}
           <FeatureGuard flag="drawing">
             {controls?.whiteboard !== false && (
               <TabsContent value="whiteboard" className="h-full m-0">

@@ -138,6 +138,7 @@ export default function SpaceComplexityClient() {
     if (g.category === "time-complexity") return `/guides/time-complexity`;
     if (g.category === "space-complexity") return `/guides/space-complexity`;
     if (g.category === "fundamentals") return `/guides/fundamentals/${g.slug}`;
+    if (g.category === "database") return `/guides/database/${g.slug}`;
     if (patternCategoryIds.includes(g.category)) return `/guides/patterns/${g.slug}`;
     return `/guides/${g.slug}`;
   };
