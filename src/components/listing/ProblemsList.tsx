@@ -9,7 +9,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { getGroupedByCategory, normalizeCategory, resolveAlgoCategories, slugifyCategory } from "@/constants/categories";
 import { Brain, Target, ListFilter, SearchX, RotateCcw, Flame, Trophy } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { ProgressStats } from "@/components/profile/ProgressStats";
+import { SolvedProgressCard } from "@/components/profile/SolvedProgressCard";
 import { cn } from "@/lib/utils";
 import { ProOverlay } from "@/components/ProOverlay";
 import { Button } from "@/components/ui/button";
@@ -525,7 +525,10 @@ export const ProblemsList = ({
                   <h3 className="font-normal text-[13px] text-foreground/80">{progressTitle}</h3>
                 </div>
                 <div className="flex-1 flex flex-col justify-center">
-                  <ProgressStats {...overallStats} />
+                  <SolvedProgressCard
+                    {...overallStats}
+                    compact
+                  />
                 </div>
               </Card>
             </div>
