@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Info, LayoutList, Hash } from 'lucide-react';
-import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 import { Button } from '@/components/ui/button';
+import type { StepLineNumberMap, VisualizationLanguageMap } from '@/types/visualization';
 
 interface ListNodeData {
   id: string;
@@ -18,31 +19,66 @@ interface Step {
   fastId: string | null;
   allNodes: Record<string, ListNodeData>;
   message: string;
-  lineNumber: number;
+  pseudoStep: string;
   highlightNodes: string[];
   variables: Record<string, any>;
   isComplete: boolean;
 }
 
+// ─── DB Codes (no modification, exact match) ────────────────────────────────
+
+const languages: VisualizationLanguageMap = {
+  typescript: `function middleNode(head: ListNode | null): ListNode | null {
+    let slow =  head;
+    let fast = head;
+    while(fast && fast.next){
+        slow = slow.next;
+        fast = fast.next.next;
+    }
+    return slow;
+}`,
+
+  python: `def middleNode(head):
+    slow = head
+    fast = head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+    return slow`,
+
+  java: `public static class Solution {
+    public ListNode middleNode(ListNode head) {
+        ListNode slow = head;
+        ListNode fast = head;
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return slow;
+    }
+}`,
+
+  cpp: `class Solution {
+public:
+        ListNode * middleNode(ListNode * head) {
+          ListNode * slow = head, * fast = head;
+          while (fast && fast -> next) {
+            slow = slow -> next;
+            fast = fast -> next -> next;
+          }
+          return slow;
+        }
+};`
+};
+
 export const MiddleNodeVisualization: React.FC = () => {
   const [listType, setListType] = useState<'odd' | 'even'>('odd');
   const [steps, setSteps] = useState<Step[]>([]);
+  const [stepLineNumbers, setStepLineNumbers] = useState<StepLineNumberMap>({});
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  const code = `function middleNode(head: ListNode | null): ListNode | null {
-  let slow = head;
-  let fast = head;
-
-  while (fast && fast.next) {
-    slow = slow!.next;
-    fast = fast.next.next;
-  }
-
-  return slow;
-}`;
 
   const generateSteps = (type: 'odd' | 'even') => {
     const vals = type === 'odd' ? [1, 2, 3, 4, 5] : [1, 2, 3, 4, 5, 6];
@@ -59,15 +95,31 @@ export const MiddleNodeVisualization: React.FC = () => {
     }
 
     const newSteps: Step[] = [];
+    const lines: StepLineNumberMap = {
+        typescript: [],
+        python: [],
+        java: [],
+        cpp: []
+    };
 
-    const addStep = (msg: string, line: number, slow: string | null, fast: string | null, extra: any = {}) => {
+    const addStep = (
+        msg: string,
+        pseudo: string,
+        tsLine: number,
+        pyLine: number,
+        javaLine: number,
+        cppLine: number,
+        slow: string | null,
+        fast: string | null,
+        extra: any = {}
+    ) => {
       newSteps.push({
         headId,
         slowId: slow,
         fastId: fast,
         allNodes: { ...allNodes },
         message: msg,
-        lineNumber: line,
+        pseudoStep: pseudo,
         highlightNodes: extra.highlightNodes || [],
         variables: {
           slow: slow ? allNodes[slow].val : 'null',
@@ -76,50 +128,92 @@ export const MiddleNodeVisualization: React.FC = () => {
         },
         isComplete: !!extra.isComplete
       });
+      lines.typescript!.push(tsLine);
+      lines.python!.push(pyLine);
+      lines.java!.push(javaLine);
+      lines.cpp!.push(cppLine);
     };
 
     // Initial State
-    addStep(`Find the middle of a linked list with ${vals.length} nodes (${type} length)`, 1, null, null);
+    addStep(
+        `Find the middle of a linked list with ${vals.length} nodes (${type} length)`,
+        'START middleNode(head)',
+        1, 1, 2, 3,
+        null, null
+    );
 
     // let slow = head;
     let slowId: string | null = headId;
-    addStep('Initialize slow pointer at head', 2, slowId, null);
+    addStep(
+        'Initialize slow pointer at head',
+        'SET slow = head',
+        2, 2, 3, 4,
+        slowId, null
+    );
 
     // let fast = head;
     let fastId: string | null = headId;
-    addStep('Initialize fast pointer at head', 3, slowId, fastId);
+    addStep(
+        'Initialize fast pointer at head',
+        'SET fast = head',
+        3, 3, 4, 4,
+        slowId, fastId
+    );
 
     // while (fast && fast.next)
     while (fastId && allNodes[fastId]?.nextId) {
-      addStep('Check loop condition: fast and fast.next are both not null', 5, slowId, fastId, {
-        highlightNodes: [fastId, allNodes[fastId].nextId].filter(Boolean)
-      });
+      addStep(
+          'Check loop condition: fast and fast.next are both not null',
+          `WHILE fast AND fast.next  →  ${allNodes[fastId].val} and ${allNodes[allNodes[fastId].nextId!].val}`,
+          4, 4, 5, 5,
+          slowId, fastId,
+          { highlightNodes: [fastId, allNodes[fastId].nextId].filter(Boolean) }
+      );
 
       // slow = slow.next;
       slowId = allNodes[slowId!].nextId;
-      addStep('Move slow pointer forward by one node', 6, slowId, fastId, { highlightNodes: [slowId] });
+      addStep(
+          'Move slow pointer forward by one node',
+          'SET slow = slow.next',
+          5, 5, 6, 6,
+          slowId, fastId,
+          { highlightNodes: [slowId] }
+      );
 
       // fast = fast.next.next;
       const nextId = allNodes[fastId!].nextId;
       fastId = nextId ? allNodes[nextId].nextId : null;
-      addStep('Move fast pointer forward by two nodes (jump to next.next)', 7, slowId, fastId, {
-        highlightNodes: [fastId].filter(Boolean)
-      });
+      addStep(
+          'Move fast pointer forward by two nodes (jump to next.next)',
+          'SET fast = fast.next.next',
+          6, 6, 7, 7,
+          slowId, fastId,
+          { highlightNodes: [fastId].filter(Boolean) }
+      );
     }
 
     // Loop end
     const endMsg = !fastId
       ? 'Loop finished: fast pointer reached null'
       : 'Loop finished: fast.next is null';
-    addStep(endMsg, 5, slowId, fastId);
+    addStep(
+        endMsg,
+        'WHILE loop finished',
+        4, 4, 5, 5,
+        slowId, fastId
+    );
 
     // return slow;
-    addStep(`Middle node found! Returning node with value ${allNodes[slowId!].val}.`, 10, slowId, fastId, {
-      isComplete: true,
-      highlightNodes: [slowId]
-    });
+    addStep(
+        `Middle node found! Returning node with value ${allNodes[slowId!].val}.`,
+        'RETURN slow',
+        8, 7, 9, 9,
+        slowId, fastId,
+        { isComplete: true, highlightNodes: [slowId] }
+    );
 
     setSteps(newSteps);
+    setStepLineNumbers(lines);
     setCurrentStepIndex(0);
     setIsPlaying(false);
   };
@@ -138,7 +232,7 @@ export const MiddleNodeVisualization: React.FC = () => {
           }
           return prev + 1;
         });
-      }, 1000 / speed);
+      }, 1200 / speed);
     } else {
       if (intervalRef.current) clearInterval(intervalRef.current);
     }
@@ -154,12 +248,12 @@ export const MiddleNodeVisualization: React.FC = () => {
   const handleReset = () => {
     setCurrentStepIndex(0);
     setIsPlaying(false);
-    generateSteps(listType);
   };
 
   if (steps.length === 0) return null;
 
   const currentStep = steps[currentStepIndex];
+  const pseudoSteps = steps.map(s => s.pseudoStep);
 
   const getNodes = () => {
     const nodes: string[] = [];
@@ -210,8 +304,9 @@ export const MiddleNodeVisualization: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-6">
-          <div className="bg-card rounded-xl border border-border p-8 min-h-[300px] flex flex-col justify-center relative overflow-hidden">
+        {/* Left Column: Visual simulator, Commentary, and Variables */}
+        <div className="space-y-4">
+          <div className="bg-card/50 backdrop-blur-sm rounded-xl border border-border/50 p-8 min-h-[300px] flex flex-col justify-center relative overflow-hidden">
             <div className="flex items-center justify-center gap-1 flex-wrap relative z-10">
               <AnimatePresence mode="popLayout">
                 {allNodeIds.map((id, index) => {
@@ -233,15 +328,15 @@ export const MiddleNodeVisualization: React.FC = () => {
                         {/* Pointers Container */}
                         <div className="h-8 flex flex-col justify-end gap-0.5 mb-1.5">
                           <AnimatePresence>
-                            {isFast && (
+                             {isFast && (
                               <motion.div
                                 key="fast-pointer"
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
-                                className="bg-secondary text-secondary-foreground text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm"
+                                className="text-[10px] font-bold text-blue-500"
                               >
-                                FAST
+                                Fast
                               </motion.div>
                             )}
                             {isSlow && (
@@ -250,9 +345,9 @@ export const MiddleNodeVisualization: React.FC = () => {
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
-                                className="bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm"
+                                className="text-[10px] font-bold text-blue-500"
                               >
-                                SLOW
+                                Slow
                               </motion.div>
                             )}
                           </AnimatePresence>
@@ -308,58 +403,62 @@ export const MiddleNodeVisualization: React.FC = () => {
             </div>
           </div>
 
-          <motion.div
-            key={currentStepIndex}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-accent/5 rounded-xl border border-accent/20 p-5 flex gap-4 shadow-sm"
-          >
-            <div className="bg-accent/10 rounded-full p-2 h-fit">
-              <Info className="text-accent-foreground" size={20} />
+          {/* Commentary Panel */}
+          <div className="bg-card/50 backdrop-blur-sm rounded-xl border border-border/50 p-6 relative overflow-hidden transition-all duration-300 shadow-sm">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-border/40">
+                <div className="flex items-center gap-2">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full bg-primary opacity-75 rounded-full" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+                  </span>
+                  <span className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">
+                    Algorithm Commentary
+                  </span>
+                </div>
+                <div className="font-mono text-[10px] tracking-tight bg-muted/60 text-muted-foreground px-2 py-0.5 rounded-full border border-border/40">
+                  Step {currentStepIndex + 1} of {steps.length}
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                  <Info className="w-4.5 h-4.5 text-primary" />
+                </div>
+                <div className="space-y-1 flex-1">
+                  <h4 className="text-[11px] font-bold uppercase tracking-widest text-primary/70">
+                    Current Action
+                  </h4>
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={currentStepIndex}
+                      initial={{ y: 5, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      exit={{ y: -5, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="text-sm font-medium leading-relaxed text-foreground/90 select-none"
+                    >
+                      {currentStep.message}
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+              </div>
             </div>
-            <p className="text-sm font-medium leading-relaxed">{currentStep.message}</p>
-          </motion.div>
+          </div>
 
           <VariablePanel variables={currentStep.variables} />
         </div>
 
-        <div className="space-y-4">
-          <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="TypeScript" />
-
-          <div className="bg-card rounded-xl border border-border p-6 shadow-sm">
-            <h4 className="text-xs font- uppercase tracking-wider text-muted-foreground mb-4 flex items-center gap-2">
-              <LayoutList size={14} className="text-primary" /> How it Works
-            </h4>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <p className="text-xs font-semibold text-foreground">The Tortoise and the Hare</p>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  This algorithm uses two pointers moving at different speeds. By the time the fast pointer reaches the end, the slow pointer will be exactly at the middle.
-                </p>
-              </div>
-              <ul className="text-xs space-y-3">
-                <li className="flex gap-3 items-start">
-                  <div className="bg-primary/10 text-primary rounded w-5 h-5 flex items-center justify-center shrink-0 mt-0.5 font-">1</div>
-                  <span><strong>Slow</strong> moves forward one node at a time.</span>
-                </li>
-                <li className="flex gap-3 items-start">
-                  <div className="bg-secondary/10 text-secondary-foreground rounded w-5 h-5 flex items-center justify-center shrink-0 mt-0.5 font-">2</div>
-                  <span><strong>Fast</strong> moves twice as fast, skipping one node each turn.</span>
-                </li>
-                <li className="flex gap-3 items-start">
-                  <div className="bg-muted text-muted-foreground rounded w-5 h-5 flex items-center justify-center shrink-0 mt-0.5 font-">3</div>
-                  <span>When <strong>Fast</strong> hits the end (<code>null</code>) or its <code>next</code> is null, the loop ends.</span>
-                </li>
-              </ul>
-              <div className="pt-2">
-                <p className="text-[10px] text-muted-foreground italic border-t border-border/50 pt-2">
-                  * Note: For even-length lists, this implementation returns the <strong>second</strong> middle node.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Right Column: Code & Pseudocode Display */}
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={handleReset}
+        />
       </div>
     </div>
   );
 };
+export default MiddleNodeVisualization;

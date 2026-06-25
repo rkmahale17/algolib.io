@@ -2,87 +2,121 @@ import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
-import { motion } from 'framer-motion';
+import type { StepLineNumberMap, VisualizationLanguageMap } from '@/types/visualization';
 
 interface Step {
   variables: Record<string, any>;
   explanation: string;
-  highlightedLines: number[];
-  lineExecution: string;
+  pseudoStep: string;
   bitsN: string[];
   bitsResult: string[];
   activeBitIndex?: number;    // The 'i' index in n (visual index 31-i)
   targetBitIndex?: number;    // The '31-i' index in res (visual index i)
 }
 
-export const ReverseBitsVisualization = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-
-  // User provided code
-  const code = `function reverseBits(n: number): number {
+const languages: VisualizationLanguageMap = {
+  typescript: `function reverseBits(n: number): number {
   let res = 0;
   for (let i = 0; i < 32; i++) {
     const bit = (n >> i) & 1;
     res |= bit << (31 - i);
   }
   return res >>> 0;
-}`;
+}`,
+  python: `def reverseBits(n: int) -> int:
+    res = 0
+    for i in range(32):
+        bit = (n >> i) & 1
+        res |= bit << (31 - i)
+    return res`,
+  java: `public static class Solution {
+    public int reverseBits(int n) {
+        int res = 0;
+        for (int i = 0; i < 32; i++) {
+            int bit = (n >> i) & 1;
+            res |= bit << (31 - i);
+        }
+        return res;
+    }
+}`,
+  cpp: `class Solution {
+public:
+    uint32_t reverseBits(uint32_t n) {
+        uint32_t res = 0;
+        for (int i = 0; i < 32; i++) {
+            uint32_t bit = (n >> i) & 1;
+            res |= bit << (31 - i);
+        }
+        return res;
+    }
+};`
+};
 
-  const steps = useMemo(() => {
+export const ReverseBitsVisualization = () => {
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+
+  const { steps, stepLineNumbers } = useMemo(() => {
     const generatedSteps: Step[] = [];
-    // Example number n = 11 (binary ...00000000000000000000000000001011)
     const nVal = 11;
     let res = 0;
 
-    // Helper to get 32-bit string array
+    const lines: StepLineNumberMap = {
+      typescript: [],
+      python: [],
+      java: [],
+      cpp: []
+    };
+
+    const addLines = (ts: number, py: number, java: number, cpp: number) => {
+      lines.typescript!.push(ts);
+      lines.python!.push(py);
+      lines.java!.push(java);
+      lines.cpp!.push(cpp);
+    };
+
     const toBits = (num: number) =>
       (num >>> 0).toString(2).padStart(32, '0').split('');
 
     // Initial state
     generatedSteps.push({
       variables: { n: nVal, res: 0 },
-      explanation: "Initialize res = 0. We will build the Reversed result bit by bit.",
-      highlightedLines: [2],
-      lineExecution: "let res = 0;",
+      explanation: "Initialize res = 0. We will build the reversed result bit by bit.",
+      pseudoStep: "SET res = 0",
       bitsN: toBits(nVal),
       bitsResult: toBits(res)
     });
+    addLines(2, 2, 3, 4);
 
     for (let i = 0; i < 32; i++) {
-      // Visual mappings:
-      // Array index 0 is MSB (bit 31), Array index 31 is LSB (bit 0).
-      // Logic 'i' is bit position from LSB (0..31).
-      // So bit 'i' is located at array index 31 - i.
       const visualActiveIndex = 31 - i;
 
-      // Step: Loop Check
+      // Loop check
       generatedSteps.push({
         variables: { n: nVal, res, i },
-        explanation: `Loop i = ${i}. Processing bit at position ${i} of n. We shift 'n' right by 'i' positions to bring the target bit to the least significant position.`,
-        highlightedLines: [3],
-        lineExecution: `for (let i = 0; i < 32; i++)`,
+        explanation: `Loop i = ${i}. Processing bit at position ${i} of n. We shift 'n' right by 'i' positions to bring the target bit to the LSB position.`,
+        pseudoStep: `FOR i = 0 TO 31 (i = ${i})`,
         bitsN: toBits(nVal),
         bitsResult: toBits(res),
         activeBitIndex: visualActiveIndex
       });
+      addLines(3, 3, 4, 5);
 
-      // Step: Extract Bit
+      // Extract bit
       const bit = (nVal >> i) & 1;
       generatedSteps.push({
         variables: { n: nVal, res, i, bit },
         explanation: `Extract i-th bit: (n >> ${i}) & 1 = ${bit}. The bitwise AND with 1 isolates the single bit we care about.`,
-        highlightedLines: [4],
-        lineExecution: `const bit = (n >> i) & 1;`,
+        pseudoStep: `SET bit = (n >> ${i}) & 1 (bit = ${bit})`,
         bitsN: toBits(nVal),
         bitsResult: toBits(res),
         activeBitIndex: visualActiveIndex
       });
+      addLines(4, 4, 5, 6);
 
-      // Step: Place Bit
+      // Place bit
       const targetPos = 31 - i;
-      // Target bit position visual index: 31 - targetPos = 31 - (31-i) = i.
       const visualTargetIndex = i;
       const shiftVal = bit << targetPos;
       res |= shiftVal;
@@ -90,35 +124,36 @@ export const ReverseBitsVisualization = () => {
       generatedSteps.push({
         variables: { n: nVal, res: res >>> 0, i, bit },
         explanation: `Place bit at reversed position ${targetPos}.\nSet bit ${targetPos} in 'res' to ${bit} using bitwise OR (|) after shifting the bit left by ${targetPos}.`,
-        highlightedLines: [5],
-        lineExecution: `res |= bit << (31 - i);`,
+        pseudoStep: `SET res = res | (bit << ${targetPos}) (res = ${res >>> 0})`,
         bitsN: toBits(nVal),
         bitsResult: toBits(res),
         activeBitIndex: visualActiveIndex,
         targetBitIndex: visualTargetIndex
       });
+      addLines(5, 5, 6, 7);
     }
 
     // Final result
     generatedSteps.push({
       variables: { n: nVal, res: res >>> 0 },
       explanation: "Loop complete. Return unsigned 32-bit result. Using '>>> 0' forces JavaScript to treat 'res' as an unsigned 32-bit integer, avoiding negative representations.",
-      highlightedLines: [7],
-      lineExecution: "return res >>> 0;",
+      pseudoStep: "RETURN res >>> 0",
       bitsN: toBits(nVal),
       bitsResult: toBits(res)
     });
+    addLines(7, 6, 8, 9);
 
-    return generatedSteps;
+    return { steps: generatedSteps, stepLineNumbers: lines };
   }, []);
 
-  const step = steps[currentStep] || steps[0];
+  const step = steps[currentStepIndex] || steps[0];
+  const pseudoSteps = steps.map(s => s.pseudoStep);
 
   return (
     <VisualizationLayout
       leftContent={
-        <div className="space-y-6">
-          <div>
+        <div className="flex flex-col h-full justify-between gap-6">
+          <div className="space-y-6">
             <Card className="p-4 bg-card/50 backdrop-blur-sm border-border/50">
               <h3 className="font-bold mb-3 text-sm text-primary uppercase tracking-wider">Input n (32 bits)</h3>
               <div className="flex flex-wrap gap-0.5 justify-center">
@@ -141,9 +176,7 @@ export const ReverseBitsVisualization = () => {
                 <span>0 (LSB)</span>
               </div>
             </Card>
-          </div>
 
-          <div>
             <Card className="p-4 bg-card/50 backdrop-blur-sm border-border/50">
               <h3 className="font-bold mb-3 text-sm text-green-600 uppercase tracking-wider">Result res (32 bits)</h3>
               <div className="flex flex-wrap gap-0.5 justify-center">
@@ -168,51 +201,30 @@ export const ReverseBitsVisualization = () => {
             </Card>
           </div>
 
-          <div>
-            <Card className="p-5 border-l-4 border-primary bg-primary/5 relative overflow-hidden shadow-sm">
-              <div className="space-y-4">
-                <div>
-                   <h4 className="text-[10px] font-bold uppercase tracking-[0.1em] text-primary/80 mb-2">
-                     Current Execution
-                   </h4>
-                   <div className="text-sm font-mono bg-background/80 p-2.5 rounded-lg border border-border/50 shadow-sm inline-block">
-                     {step.lineExecution}
-                   </div>
-                </div>
-                <div>
-                   <h4 className="text-[10px] font-bold uppercase tracking-[0.1em] text-primary/80 mb-1">
-                     Commentary
-                   </h4>
-                   <p className="text-[14px] font-medium leading-relaxed text-foreground/90 whitespace-pre-wrap">
-                     {step.explanation}
-                   </p>
-                </div>
-              </div>
+          <div className="space-y-4 mt-auto">
+            <Card className="p-4 bg-primary/5 border-primary/20">
+              <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Step Explanation</h4>
+              <p className="text-sm text-foreground leading-relaxed font-medium min-h-[40px]">{step.explanation}</p>
             </Card>
-          </div>
 
-        </div>
-      }
-      rightContent={
-        <div className="space-y-6 h-full flex flex-col">
-          <div className="flex-1 overflow-hidden min-h-[400px]">
-            <AnimatedCodeEditor
-              code={code}
-              language="typescript"
-              highlightedLines={step.highlightedLines}
-            />
-          </div>
-          {/* Variable Panel */}
-          <div className="p-1">
             <VariablePanel variables={step.variables} />
           </div>
         </div>
       }
+      rightContent={
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={() => setCurrentStepIndex(0)}
+        />
+      }
       controls={
         <SimpleStepControls
-          currentStep={currentStep}
+          currentStep={currentStepIndex}
           totalSteps={steps.length}
-          onStepChange={setCurrentStep}
+          onStepChange={setCurrentStepIndex}
         />
       }
     />

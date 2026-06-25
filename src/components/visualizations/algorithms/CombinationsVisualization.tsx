@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
-
-import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
-import { StepControls } from '../shared/StepControls';
-import { VariablePanel } from '../shared/VariablePanel';
+import React, { useState, useEffect, useRef } from "react";
+import { StepControls } from "../shared/StepControls";
+import { VariablePanel } from "../shared/VariablePanel";
+import { VisualizationCodePanel } from "../shared/VisualizationCodePanel";
+import type { StepLineNumberMap, VisualizationLanguageMap } from "@/types/visualization";
 
 interface Step {
   n: number;
@@ -11,124 +11,211 @@ interface Step {
   i: number | null;
   res: number[][];
   message: string;
-  lineNumber: number;
+  pseudoStep: string;
 }
 
-export const CombinationsVisualization: React.FC = () => {
-  const [steps, setSteps] = useState<Step[]>([]);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1000);
-  const intervalRef = useRef<number | null>(null);
-
-  const code = `function combine(n: number, k: number): number[][] {
+const languages: VisualizationLanguageMap = {
+  typescript: `function combine(n: number, k: number): number[][] {
   const res: number[][] = [];
-
   function backtrack(start: number, comb: number[]) {
     if (comb.length === k) {
       res.push([...comb]);
       return;
     }
-
     for (let i = start; i <= n; i++) {
       comb.push(i);
       backtrack(i + 1, comb);
       comb.pop();
     }
   }
-
   backtrack(1, []);
   return res;
-}`;
+}`,
+  python: `def combine(n: int, k: int) -> list[list[int]]:
+    res: list[list[int]] = []
+    def backtrack(start: int, comb: list[int]) -> None:
+        if len(comb) == k:
+            res.append(comb.copy())
+            return
+        for i in range(start, n + 1):
+            comb.append(i)
+            backtrack(i + 1, comb)
+            comb.pop()
+    backtrack(1, [])
+    return res`,
+  java: `public static class Solution {
+    public List<List<Integer>> combine(int n, int k) {
+        List<List<Integer>> res = new ArrayList<>();
+        backtrack(n, k, 1, new ArrayList<>(), res);
+        return res;
+    }
+    private void backtrack(int n, int k, int start, List<Integer> comb, List<List<Integer>> res) {
+        if (comb.size() == k) {
+            res.add(new ArrayList<>(comb));
+            return;
+        }
+        for (int i = start; i <= n; i++) {
+            comb.add(i);
+            backtrack(n, k, i + 1, comb, res);
+            comb.remove(comb.size() - 1);
+        }
+    }
+}`,
+  cpp: `class Solution {
+public:
+    vector<vector<int>> combine(int n, int k) {
+        vector<vector<int>> res;
+        vector<int> comb;
+        backtrack(n, k, 1, comb, res);
+        return res;
+    }
+private:
+    void backtrack(int n, int k, int start, vector<int>& comb, vector<vector<int>>& res) {
+        if (comb.size() == k) {
+            res.push_back(comb);
+            return;
+        }
+        for (int i = start; i <= n; i++) {
+            comb.push_back(i);
+            backtrack(n, k, i + 1, comb, res);
+            comb.pop_back();
+        }
+    }
+};`
+};
 
-  const generateSteps = () => {
+export const CombinationsVisualization: React.FC = () => {
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [speed, setSpeed] = useState(1);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const generateStepsData = () => {
     const n = 4;
     const k = 2;
-    const newSteps: Step[] = [];
+    const steps: Step[] = [];
     const res: number[][] = [];
+    const stepLineNumbers: StepLineNumberMap = {
+      typescript: [],
+      python: [],
+      java: [],
+      cpp: []
+    };
 
-    newSteps.push({
+    const addLines = (ts: number, py: number, java: number, cpp: number) => {
+      stepLineNumbers.typescript!.push(ts);
+      stepLineNumbers.python!.push(py);
+      stepLineNumbers.java!.push(java);
+      stepLineNumbers.cpp!.push(cpp);
+    };
+
+    steps.push({
       n, k, comb: [], i: null, res: [],
       message: "Initialize result array res = []",
-      lineNumber: 2
+      pseudoStep: "SET res = []"
     });
+    addLines(2, 2, 3, 4);
+
+    steps.push({
+      n, k, comb: [], i: null, res: [],
+      message: "Initiate backtracking from index 1",
+      pseudoStep: "CALL backtrack(start = 1, comb = [])"
+    });
+    addLines(14, 11, 4, 6);
 
     function backtrack(start: number, comb: number[]) {
-      newSteps.push({
+      steps.push({
         n, k, comb: [...comb], i: null, res: res.map(r => [...r]),
         message: `Calling backtrack(start=${start}, comb=[${comb.join(", ")}])`,
-        lineNumber: 4
+        pseudoStep: `CALL backtrack(start = ${start}, comb = [${comb.join(", ")}])`
       });
+      addLines(3, 3, 7, 10);
 
-      newSteps.push({
+      steps.push({
         n, k, comb: [...comb], i: null, res: res.map(r => [...r]),
         message: `Condition check: comb.length === k (${comb.length} === ${k})`,
-        lineNumber: 5
+        pseudoStep: `IF comb.length === k  →  ${comb.length} === ${k} ?`
       });
+      addLines(4, 4, 8, 11);
 
       if (comb.length === k) {
         res.push([...comb]);
-        newSteps.push({
+        steps.push({
           n, k, comb: [...comb], i: null, res: res.map(r => [...r]),
           message: `Base case reached. Added [${comb.join(", ")}] to result.`,
-          lineNumber: 6
+          pseudoStep: `ADD comb copy to res  →  res.push([${comb.join(", ")}])`
         });
-        newSteps.push({
+        addLines(5, 5, 9, 12);
+
+        steps.push({
           n, k, comb: [...comb], i: null, res: res.map(r => [...r]),
           message: "Return from recursive call",
-          lineNumber: 7
+          pseudoStep: "RETURN"
         });
+        addLines(6, 6, 10, 13);
         return;
       }
 
       for (let i = start; i <= n; i++) {
-        newSteps.push({
+        steps.push({
           n, k, comb: [...comb], i: i, res: res.map(r => [...r]),
           message: `Iterating: i = ${i}`,
-          lineNumber: 10
+          pseudoStep: `FOR i = ${i} to ${n}`
         });
+        addLines(8, 7, 12, 15);
 
         comb.push(i);
-        newSteps.push({
+        steps.push({
           n, k, comb: [...comb], i: i, res: res.map(r => [...r]),
           message: `Included ${i} in current combination`,
-          lineNumber: 11
+          pseudoStep: `ADD i (${i}) to comb`
         });
+        addLines(9, 8, 13, 16);
+
+        steps.push({
+          n, k, comb: [...comb], i: i, res: res.map(r => [...r]),
+          message: `Recursive call backtrack(i + 1 = ${i + 1})`,
+          pseudoStep: `CALL backtrack(start = ${i + 1}, comb)`
+        });
+        addLines(10, 9, 14, 17);
 
         backtrack(i + 1, comb);
 
         const popped = comb.pop();
-        newSteps.push({
+        steps.push({
           n, k, comb: [...comb], i: i, res: res.map(r => [...r]),
           message: `Backtracked: Removed ${popped} from current combination`,
-          lineNumber: 13
+          pseudoStep: `REMOVE last element (${popped}) from comb (backtrack)`
         });
+        addLines(11, 10, 15, 18);
       }
     }
 
-    newSteps.push({
-      n, k, comb: [], i: null, res: [],
-      message: "Initiate backtracking from 1",
-      lineNumber: 17
-    });
     backtrack(1, []);
 
-    newSteps.push({
+    steps.push({
       n, k, comb: [], i: null, res: res.map(r => [...r]),
       message: "End backtracking. Return all combinations.",
-      lineNumber: 18
+      pseudoStep: "RETURN res"
     });
+    addLines(15, 12, 5, 7);
 
-    setSteps(newSteps);
+    const lastStep = steps[steps.length - 1];
+    steps.push({
+      ...lastStep,
+      message: "Algorithm Complete!",
+      pseudoStep: "DONE"
+    });
+    addLines(15, 12, 5, 7);
+
+    return { steps, stepLineNumbers };
   };
 
-  useEffect(() => {
-    generateSteps();
-  }, []);
+  const { steps, stepLineNumbers } = generateStepsData();
 
   useEffect(() => {
     if (isPlaying && currentStepIndex < steps.length - 1) {
-      intervalRef.current = window.setInterval(() => {
+      intervalRef.current = setInterval(() => {
         setCurrentStepIndex((prev) => {
           if (prev >= steps.length - 1) {
             setIsPlaying(false);
@@ -136,7 +223,7 @@ export const CombinationsVisualization: React.FC = () => {
           }
           return prev + 1;
         });
-      }, speed);
+      }, 1000 / speed);
     } else {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -165,6 +252,7 @@ export const CombinationsVisualization: React.FC = () => {
   if (steps.length === 0) return null;
 
   const currentStep = steps[currentStepIndex];
+  const pseudoSteps = steps.map((s) => s.pseudoStep);
 
   return (
     <div className="space-y-6">
@@ -176,75 +264,86 @@ export const CombinationsVisualization: React.FC = () => {
         onReset={handleReset}
         isPlaying={isPlaying}
         currentStep={currentStepIndex}
-        totalSteps={steps.length}
+        totalSteps={steps.length - 1}
         speed={speed}
         onSpeedChange={setSpeed}
       />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-        <div className="bg-card rounded-lg p-6 border">
-          <h3 className="text-lg font-semibold mb-4">Numbers: 1 to {currentStep.n}, Select {currentStep.k}</h3>
-          <div className="flex gap-2 mb-6 flex-wrap">
-            {Array.from({ length: currentStep.n }, (_, i) => i + 1).map((val) => (
-              <div
-                key={val}
-                className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${val === currentStep.i ? 'bg-primary/20 border-primary scale-110' :
-                  currentStep.comb.includes(val) ? 'bg-green-500/20 border-green-500' :
-                    'bg-card border-border'
-                  }`}
-              >
-                {val}
-              </div>
-            ))}
-          </div>
-
-          <h3 className="text-lg font-semibold mb-4">Current Combination ({currentStep.comb.length}/{currentStep.k})</h3>
-          <div className="flex gap-2 mb-6 min-h-[3rem] flex-wrap">
-            {currentStep.comb.length > 0 ? (
-              currentStep.comb.map((val, idx) => (
+        <div className="space-y-4">
+          <div className="bg-card rounded-lg p-6 border shadow-sm">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Numbers: 1 to {currentStep.n}, Select {currentStep.k}</h3>
+            <div className="flex gap-2 mb-6 flex-wrap">
+              {Array.from({ length: currentStep.n }, (_, i) => i + 1).map((val) => (
                 <div
-                  key={idx}
-                  className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-blue-500/20 border-blue-500 font-bold animate-in zoom-in"
+                  key={val}
+                  className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
+                    val === currentStep.i
+                      ? "bg-primary/20 border-primary scale-110 text-foreground"
+                      : currentStep.comb.includes(val)
+                      ? "bg-green-500/20 border-green-500 text-foreground"
+                      : "bg-card border-border text-foreground"
+                  }`}
                 >
                   {val}
                 </div>
-              ))
-            ) : (
-              <div className="text-muted-foreground italic h-12 flex items-center">Empty</div>
-            )}
+              ))}
+            </div>
+
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Current Combination ({currentStep.comb.length}/{currentStep.k})</h3>
+            <div className="flex gap-2 mb-6 min-h-[3rem] flex-wrap">
+              {currentStep.comb.length > 0 ? (
+                currentStep.comb.map((val, idx) => (
+                  <div
+                    key={idx}
+                    className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-blue-500/20 border-blue-500 text-foreground font-bold animate-in zoom-in"
+                  >
+                    {val}
+                  </div>
+                ))
+              ) : (
+                <div className="text-muted-foreground italic h-12 flex items-center">Empty</div>
+              )}
+            </div>
+
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Result (res) - Total: {currentStep.res.length}</h3>
+            <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto p-2 border rounded-lg bg-muted/20">
+              {currentStep.res.length > 0 ? (
+                currentStep.res.map((comb, idx) => (
+                  <div key={idx} className="px-3 py-1 bg-muted rounded border text-sm text-foreground animate-in fade-in">
+                    [{comb.join(', ')}]
+                  </div>
+                ))
+              ) : (
+                <div className="text-muted-foreground italic text-sm">No combinations found yet.</div>
+              )}
+            </div>
           </div>
 
-          <h3 className="text-lg font-semibold mb-4">Result (res) - Total: {currentStep.res.length}</h3>
-          <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto p-2 border rounded-lg bg-muted/20">
-            {currentStep.res.length > 0 ? (
-              currentStep.res.map((comb, idx) => (
-                <div key={idx} className="px-3 py-1 bg-muted rounded border text-sm animate-in fade-in slide-in-from-bottom-1">
-                  [{comb.join(', ')}]
-                </div>
-              ))
-            ) : (
-              <div className="text-muted-foreground italic text-sm">No combinations found yet.</div>
-            )}
+          <div className="p-4 bg-primary/5 border border-primary/20 rounded-xl">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Algorithm Logic</h4>
+            <p className="text-sm text-foreground leading-relaxed font-medium">
+              {currentStep.message}
+            </p>
           </div>
 
-          <div className="mt-6 p-4 bg-muted/50 rounded-lg border border-border">
-            <p className="text-sm font-medium text-foreground leading-relaxed italic">{currentStep.message}</p>
-          </div>
-
-          <div className="mt-4">
-            <VariablePanel
-              variables={{
-                'n': currentStep.n,
-                'k': currentStep.k,
-                'i': currentStep.i ?? 'null',
-                'comb': `[${currentStep.comb.join(', ')}]`,
-                'res.length': currentStep.res.length
-              }}
-            />
-          </div>
+          <VariablePanel
+            variables={{
+              'n': currentStep.n,
+              'k': currentStep.k,
+              'i': currentStep.i ?? 'null',
+              'comb': `[${currentStep.comb.join(', ')}]`,
+              'res.length': currentStep.res.length
+            }}
+          />
         </div>
-        <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="typescript" />
 
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={handleReset}
+        />
       </div>
     </div>
   );

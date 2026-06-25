@@ -1,329 +1,304 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Card } from '@/components/ui/card';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
-import { VisualizationLayout } from '../shared/VisualizationLayout';
-import { motion } from 'framer-motion';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
+import type { StepLineNumberMap, VisualizationLanguageMap } from '@/types/visualization';
 
 interface Step {
   variables: Record<string, any>;
   explanation: string;
-  highlightedLines: number[];
-  lineExecution: string;
+  pseudoStep: string;
   bits: string[];
-  checkingBit: number;
+  bitsPrev?: string[];
+  showPrev?: boolean;
 }
 
-export const NumberOf1BitsVisualization = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-
-  const steps: Step[] = [
-    {
-      variables: { n: 11, nBinary: '00001011', count: '?' },
-      explanation: "Starting function with n = 11 (binary: 00001011). Will count the number of 1 bits.",
-      highlightedLines: [1],
-      lineExecution: "function hammingWeight(n: number): number {",
-      bits: ['0', '0', '0', '0', '1', '0', '1', '1'],
-      checkingBit: -1
-    },
-    {
-      variables: { n: 11, nBinary: '00001011', count: 0 },
-      explanation: "Initialize count = 0. This will track the number of 1 bits found.",
-      highlightedLines: [2],
-      lineExecution: "let count = 0;",
-      bits: ['0', '0', '0', '0', '1', '0', '1', '1'],
-      checkingBit: -1
-    },
-    {
-      variables: { n: 11, nBinary: '00001011', count: 0 },
-      explanation: "Check loop condition: n (11) !== 0? Yes, enter loop.",
-      highlightedLines: [3],
-      lineExecution: "while (n !== 0)",
-      bits: ['0', '0', '0', '0', '1', '0', '1', '1'],
-      checkingBit: -1
-    },
-    {
-      variables: { n: 11, nBinary: '00001011', count: 0, rightmost: 1 },
-      explanation: "Check rightmost bit: n & 1 = 00001011 & 00000001 = 1.",
-      highlightedLines: [4],
-      lineExecution: "count += n & 1",
-      bits: ['0', '0', '0', '0', '1', '0', '1', '1'],
-      checkingBit: 7
-    },
-    {
-      variables: { n: 11, nBinary: '00001011', count: 1, rightmost: 1 },
-      explanation: "Rightmost bit is 1, add to count. count = 0 + 1 = 1.",
-      highlightedLines: [4],
-      lineExecution: "count = 1",
-      bits: ['0', '0', '0', '0', '1', '0', '1', '1'],
-      checkingBit: 7
-    },
-    {
-      variables: { n: 11, nBinary: '00001011', count: 1 },
-      explanation: "Unsigned right shift: n >>>= 1. Shifts all bits right by 1 position.",
-      highlightedLines: [5],
-      lineExecution: "n >>>= 1",
-      bits: ['0', '0', '0', '0', '1', '0', '1', '1'],
-      checkingBit: -1
-    },
-    {
-      variables: { n: 5, nBinary: '00000101', count: 1 },
-      explanation: "After shift: n = 5 (binary: 00000101). Lost the rightmost bit.",
-      highlightedLines: [5],
-      lineExecution: "n = 5",
-      bits: ['0', '0', '0', '0', '0', '1', '0', '1'],
-      checkingBit: -1
-    },
-    {
-      variables: { n: 5, nBinary: '00000101', count: 1 },
-      explanation: "Check loop condition: n (5) !== 0? Yes, continue.",
-      highlightedLines: [3],
-      lineExecution: "while (n !== 0)",
-      bits: ['0', '0', '0', '0', '0', '1', '0', '1'],
-      checkingBit: -1
-    },
-    {
-      variables: { n: 5, nBinary: '00000101', count: 1, rightmost: 1 },
-      explanation: "Check rightmost bit: n & 1 = 00000101 & 00000001 = 1.",
-      highlightedLines: [4],
-      lineExecution: "count += n & 1",
-      bits: ['0', '0', '0', '0', '0', '1', '0', '1'],
-      checkingBit: 7
-    },
-    {
-      variables: { n: 5, nBinary: '00000101', count: 2, rightmost: 1 },
-      explanation: "Rightmost bit is 1, add to count. count = 1 + 1 = 2.",
-      highlightedLines: [4],
-      lineExecution: "count = 2",
-      bits: ['0', '0', '0', '0', '0', '1', '0', '1'],
-      checkingBit: 7
-    },
-    {
-      variables: { n: 5, nBinary: '00000101', count: 2 },
-      explanation: "Unsigned right shift: n >>>= 1.",
-      highlightedLines: [5],
-      lineExecution: "n >>>= 1",
-      bits: ['0', '0', '0', '0', '0', '1', '0', '1'],
-      checkingBit: -1
-    },
-    {
-      variables: { n: 2, nBinary: '00000010', count: 2 },
-      explanation: "After shift: n = 2 (binary: 00000010).",
-      highlightedLines: [5],
-      lineExecution: "n = 2",
-      bits: ['0', '0', '0', '0', '0', '0', '1', '0'],
-      checkingBit: -1
-    },
-    {
-      variables: { n: 2, nBinary: '00000010', count: 2 },
-      explanation: "Check loop condition: n (2) !== 0? Yes, continue.",
-      highlightedLines: [3],
-      lineExecution: "while (n !== 0)",
-      bits: ['0', '0', '0', '0', '0', '0', '1', '0'],
-      checkingBit: -1
-    },
-    {
-      variables: { n: 2, nBinary: '00000010', count: 2, rightmost: 0 },
-      explanation: "Check rightmost bit: n & 1 = 00000010 & 00000001 = 0.",
-      highlightedLines: [4],
-      lineExecution: "count += n & 1",
-      bits: ['0', '0', '0', '0', '0', '0', '1', '0'],
-      checkingBit: 7
-    },
-    {
-      variables: { n: 2, nBinary: '00000010', count: 2, rightmost: 0 },
-      explanation: "Rightmost bit is 0, don't add. count = 2 + 0 = 2.",
-      highlightedLines: [4],
-      lineExecution: "count = 2",
-      bits: ['0', '0', '0', '0', '0', '0', '1', '0'],
-      checkingBit: 7
-    },
-    {
-      variables: { n: 2, nBinary: '00000010', count: 2 },
-      explanation: "Unsigned right shift: n >>>= 1.",
-      highlightedLines: [5],
-      lineExecution: "n >>>= 1",
-      bits: ['0', '0', '0', '0', '0', '0', '1', '0'],
-      checkingBit: -1
-    },
-    {
-      variables: { n: 1, nBinary: '00000001', count: 2 },
-      explanation: "After shift: n = 1 (binary: 00000001).",
-      highlightedLines: [5],
-      lineExecution: "n = 1",
-      bits: ['0', '0', '0', '0', '0', '0', '0', '1'],
-      checkingBit: -1
-    },
-    {
-      variables: { n: 1, nBinary: '00000001', count: 2 },
-      explanation: "Check loop condition: n (1) !== 0? Yes, continue.",
-      highlightedLines: [3],
-      lineExecution: "while (n !== 0)",
-      bits: ['0', '0', '0', '0', '0', '0', '0', '1'],
-      checkingBit: -1
-    },
-    {
-      variables: { n: 1, nBinary: '00000001', count: 2, rightmost: 1 },
-      explanation: "Check rightmost bit: n & 1 = 00000001 & 00000001 = 1.",
-      highlightedLines: [4],
-      lineExecution: "count += n & 1",
-      bits: ['0', '0', '0', '0', '0', '0', '0', '1'],
-      checkingBit: 7
-    },
-    {
-      variables: { n: 1, nBinary: '00000001', count: 3, rightmost: 1 },
-      explanation: "Rightmost bit is 1, add to count. count = 2 + 1 = 3.",
-      highlightedLines: [4],
-      lineExecution: "count = 3",
-      bits: ['0', '0', '0', '0', '0', '0', '0', '1'],
-      checkingBit: 7
-    },
-    {
-      variables: { n: 1, nBinary: '00000001', count: 3 },
-      explanation: "Unsigned right shift: n >>>= 1.",
-      highlightedLines: [5],
-      lineExecution: "n >>>= 1",
-      bits: ['0', '0', '0', '0', '0', '0', '0', '1'],
-      checkingBit: -1
-    },
-    {
-      variables: { n: 0, nBinary: '00000000', count: 3 },
-      explanation: "After shift: n = 0 (binary: 00000000). All bits processed.",
-      highlightedLines: [5],
-      lineExecution: "n = 0",
-      bits: ['0', '0', '0', '0', '0', '0', '0', '0'],
-      checkingBit: -1
-    },
-    {
-      variables: { n: 0, nBinary: '00000000', count: 3 },
-      explanation: "Check loop condition: n (0) !== 0? No, exit loop.",
-      highlightedLines: [3],
-      lineExecution: "while (n !== 0) -> false",
-      bits: ['0', '0', '0', '0', '0', '0', '0', '0'],
-      checkingBit: -1
-    },
-    {
-      variables: { n: 0, nBinary: '00000000', count: 3 },
-      explanation: "Return count = 3. The number 11 has three 1-bits!",
-      highlightedLines: [7],
-      lineExecution: "return count = 3",
-      bits: ['0', '0', '0', '0', '0', '0', '0', '0'],
-      checkingBit: -1
-    },
-    {
-      variables: { n: 0, nBinary: '00000000', count: 3, result: 3 },
-      explanation: "Algorithm complete! Found 3 one-bits. Time: O(log n), Space: O(1).",
-      highlightedLines: [7],
-      lineExecution: "Result: 3",
-      bits: ['0', '0', '0', '0', '0', '0', '0', '0'],
-      checkingBit: -1
+const languages: VisualizationLanguageMap = {
+  typescript: `function hammingWeight(n: number): number {
+    let count = 0;
+    while (n !== 0) {
+        n = n & (n - 1);
+        count++;
     }
-  ];
+    return count;
+}`,
+  python: `def hammingWeight(n: int) -> int:
+    count = 0
+    while n != 0:
+        n = n & (n - 1)
+        count += 1
+    return count`,
+  java: `public static class Solution {
+    public int hammingWeight(int n) {
+        int count = 0;
+        while (n != 0) {
+            n = n & (n - 1);
+            count++;
+        }
+        return count;
+    }
+}`,
+  cpp: `class Solution {
+public:
+    int hammingWeight(unsigned int n) {
+        int count = 0;
+        while (n != 0) {
+            n = n & (n - 1);
+            count++;
+        }
+        return count;
+    }
+};`
+};
 
-  const code = `function hammingWeight(n: number): number {
-  let count = 0;
-  while (n !== 0) {
-    count += n & 1;
-    n >>>= 1;
-  }
-  return count;
-}`;
+export const NumberOf1BitsVisualization = () => {
+  const [steps, setSteps] = useState<Step[]>([]);
+  const [stepLineNumbers, setStepLineNumbers] = useState<StepLineNumberMap>({
+    typescript: [],
+    python: [],
+    java: [],
+    cpp: []
+  });
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
-  const step = steps[currentStep];
+  useEffect(() => {
+    const generatedSteps: Step[] = [];
+    const stepLines: StepLineNumberMap = {
+      typescript: [],
+      python: [],
+      java: [],
+      cpp: []
+    };
+
+    const addLines = (ts: number, py: number, java: number, cpp: number) => {
+      stepLines.typescript!.push(ts);
+      stepLines.python!.push(py);
+      stepLines.java!.push(java);
+      stepLines.cpp!.push(cpp);
+    };
+
+    // Step 0: start
+    generatedSteps.push({
+      variables: { n: 11, nBinary: '00001011', count: '-' },
+      explanation: "Start counting set bits of n = 11 (binary 00001011) using Brian Kernighan's Algorithm.",
+      pseudoStep: "FUNCTION hammingWeight(n)",
+      bits: ['0', '0', '0', '0', '1', '0', '1', '1']
+    });
+    addLines(1, 1, 3, 4);
+
+    // Step 1: count init
+    let count = 0;
+    generatedSteps.push({
+      variables: { n: 11, nBinary: '00001011', count },
+      explanation: `Initialize count = ${count}.`,
+      pseudoStep: "SET count = 0",
+      bits: ['0', '0', '0', '0', '1', '0', '1', '1']
+    });
+    addLines(2, 2, 4, 5);
+
+    // Step 2: Loop check 1
+    generatedSteps.push({
+      variables: { n: 11, nBinary: '00001011', count },
+      explanation: "Check if n !== 0. Since n is 11, we enter the loop.",
+      pseudoStep: "WHILE n != 0",
+      bits: ['0', '0', '0', '0', '1', '0', '1', '1']
+    });
+    addLines(3, 3, 5, 6);
+
+    // Step 3: n = n & (n - 1)
+    generatedSteps.push({
+      variables: { n: 11, nBinary: '00001011', count, prevN: 10, prevNBinary: '00001010' },
+      explanation: "n & (n - 1) clears the rightmost set bit: 11 (00001011) & 10 (00001010) = 10 (00001010).",
+      pseudoStep: "SET n = n & (n - 1)",
+      bits: ['0', '0', '0', '0', '1', '0', '1', '1'],
+      bitsPrev: ['0', '0', '0', '0', '1', '0', '1', '0'],
+      showPrev: true
+    });
+    addLines(4, 4, 6, 7);
+
+    // Step 4: count++
+    count++;
+    generatedSteps.push({
+      variables: { n: 10, nBinary: '00001010', count },
+      explanation: `Increment count of set bits: count = ${count}.`,
+      pseudoStep: "SET count = count + 1",
+      bits: ['0', '0', '0', '0', '1', '0', '1', '0']
+    });
+    addLines(5, 5, 7, 8);
+
+    // Step 5: Loop check 2
+    generatedSteps.push({
+      variables: { n: 10, nBinary: '00001010', count },
+      explanation: "Check if n !== 0. Since n is 10, continue loop.",
+      pseudoStep: "WHILE n != 0",
+      bits: ['0', '0', '0', '0', '1', '0', '1', '0']
+    });
+    addLines(3, 3, 5, 6);
+
+    // Step 6: n = n & (n - 1)
+    generatedSteps.push({
+      variables: { n: 10, nBinary: '00001010', count, prevN: 9, prevNBinary: '00001001' },
+      explanation: "Clear rightmost set bit: 10 (00001010) & 9 (00001001) = 8 (00001000).",
+      pseudoStep: "SET n = n & (n - 1)",
+      bits: ['0', '0', '0', '0', '1', '0', '1', '0'],
+      bitsPrev: ['0', '0', '0', '0', '1', '0', '0', '1'],
+      showPrev: true
+    });
+    addLines(4, 4, 6, 7);
+
+    // Step 7: count++
+    count++;
+    generatedSteps.push({
+      variables: { n: 8, nBinary: '00001000', count },
+      explanation: `Increment count of set bits: count = ${count}.`,
+      pseudoStep: "SET count = count + 1",
+      bits: ['0', '0', '0', '0', '1', '0', '0', '0']
+    });
+    addLines(5, 5, 7, 8);
+
+    // Step 8: Loop check 3
+    generatedSteps.push({
+      variables: { n: 8, nBinary: '00001000', count },
+      explanation: "Check if n !== 0. Since n is 8, continue loop.",
+      pseudoStep: "WHILE n != 0",
+      bits: ['0', '0', '0', '0', '1', '0', '0', '0']
+    });
+    addLines(3, 3, 5, 6);
+
+    // Step 9: n = n & (n - 1)
+    generatedSteps.push({
+      variables: { n: 8, nBinary: '00001000', count, prevN: 7, prevNBinary: '00000111' },
+      explanation: "Clear rightmost set bit: 8 (00001000) & 7 (00000111) = 0 (00000000).",
+      pseudoStep: "SET n = n & (n - 1)",
+      bits: ['0', '0', '0', '0', '1', '0', '0', '0'],
+      bitsPrev: ['0', '0', '0', '0', '0', '1', '1', '1'],
+      showPrev: true
+    });
+    addLines(4, 4, 6, 7);
+
+    // Step 10: count++
+    count++;
+    generatedSteps.push({
+      variables: { n: 0, nBinary: '00000000', count },
+      explanation: `Increment count of set bits: count = ${count}.`,
+      pseudoStep: "SET count = count + 1",
+      bits: ['0', '0', '0', '0', '0', '0', '0', '0']
+    });
+    addLines(5, 5, 7, 8);
+
+    // Step 11: Loop check 4
+    generatedSteps.push({
+      variables: { n: 0, nBinary: '00000000', count },
+      explanation: "Check if n !== 0. Since n is 0, exit loop.",
+      pseudoStep: "WHILE n != 0",
+      bits: ['0', '0', '0', '0', '0', '0', '0', '0']
+    });
+    addLines(3, 3, 5, 6);
+
+    // Step 12: Return
+    generatedSteps.push({
+      variables: { n: 0, nBinary: '00000000', count, result: count },
+      explanation: `Return the final count of set bits: ${count}.`,
+      pseudoStep: "RETURN count",
+      bits: ['0', '0', '0', '0', '0', '0', '0', '0']
+    });
+    addLines(7, 6, 8, 9);
+
+    setSteps(generatedSteps);
+    setStepLineNumbers(stepLines);
+  }, []);
+
+  if (steps.length === 0) return null;
+
+  const currentStep = steps[currentStepIndex];
+  const pseudoSteps = steps.map(s => s.pseudoStep);
 
   return (
     <VisualizationLayout
-      leftContent={
-        <>
-          <motion.div
-            key={`binary-${currentStep}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="p-6 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg border">
-              <h3 className="font-semibold mb-4 text-center">Binary Representation</h3>
-              <div className="flex gap-1 justify-center mb-4 flex-wrap">
-                {step.bits.map((bit, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: idx * 0.05 }}
-                    className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center font-mono text-lg border-2 rounded transition-all ${bit === '1'
-                      ? 'bg-primary/30 border-primary font-'
-                      : 'bg-muted border-border'
-                      } ${idx === step.checkingBit ? 'ring-2 ring-accent scale-110' : ''}`}
-                  >
-                    {bit}
-                  </motion.div>
-                ))}
-              </div>
-              <div className="text-center">
-                <p className="font-mono text-xl">{step.variables.nBinary}</p>
-                <p className="text-sm text-muted-foreground mt-1">Decimal: {step.variables.n}</p>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            key={`execution-${currentStep}`}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-          >
-            <div className="p-4 bg-muted/50 rounded-lg border">
-              <div className="space-y-2">
-                <div className="text-sm font-semibold text-primary">Current Execution:</div>
-                <div className="text-sm font-mono bg-background/50 p-2 rounded">
-                  {step.lineExecution}
-                </div>
-                <div className="text-sm text-muted-foreground pt-2">
-                  {step.explanation}
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            key={`algorithm-${currentStep}`}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3, delay: 0.3 }}
-          >
-            <div className="p-4 bg-muted/50 rounded-lg border">
-              <h3 className="font-semibold mb-2 text-sm">Bit Manipulation:</h3>
-              <div className="text-xs space-y-1 text-muted-foreground">
-                <p>• n & 1: Gets the rightmost bit (0 or 1)</p>
-                <p>• n {'>>>='}  1: Unsigned right shift by 1</p>
-                <p>• Check each bit until n becomes 0</p>
-                <p>• Time: O(log n), Space: O(1)</p>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            key={`variables-${currentStep}`}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3, delay: 0.4 }}
-          >
-            <VariablePanel variables={{ count: step.variables.count }} />
-          </motion.div>
-        </>
-      }
-      rightContent={
-        <AnimatedCodeEditor
-          code={code}
-          language="typescript"
-          highlightedLines={step.highlightedLines}
-        />
-      }
       controls={
         <SimpleStepControls
-          currentStep={currentStep}
+          currentStep={currentStepIndex}
           totalSteps={steps.length}
-          onStepChange={setCurrentStep}
+          onStepChange={setCurrentStepIndex}
+        />
+      }
+      leftContent={
+        <div className="space-y-6 flex flex-col h-full">
+          <div>
+            <Card className="p-6 bg-card/50 backdrop-blur-sm border-primary/20 mb-4">
+              <h3 className="text-xs font-semibold mb-6 text-muted-foreground uppercase tracking-widest text-center">
+                Number of 1 Bits (Hamming Weight)
+              </h3>
+
+              <div className="space-y-4">
+                <div className="p-4 bg-primary/5 rounded-lg border border-primary/10">
+                  <div className="text-xs font-semibold text-muted-foreground mb-3 text-center">
+                    Value of n (Binary)
+                  </div>
+                  <div className="flex gap-1 justify-center mb-2">
+                    {currentStep.bits.map((bit, idx) => (
+                      <div key={idx} className={`w-8 h-8 flex items-center justify-center font-mono text-sm border rounded font-bold ${
+                        bit === '1' ? 'bg-primary/20 border-primary text-primary' : 'bg-muted border-border text-muted-foreground'
+                      }`}>
+                        {bit}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="text-center font-mono text-xs text-primary font-bold">
+                    Decimal: {currentStep.variables.n}
+                  </div>
+                </div>
+
+                {currentStep.showPrev && currentStep.bitsPrev && (
+                  <div className="p-4 bg-secondary/5 rounded-lg border border-secondary/10 animate-in fade-in duration-300">
+                    <div className="text-xs font-semibold text-muted-foreground mb-3 text-center">
+                      Value of n - 1 (Binary)
+                    </div>
+                    <div className="flex gap-1 justify-center mb-2">
+                      {currentStep.bitsPrev.map((bit, idx) => (
+                        <div key={idx} className={`w-8 h-8 flex items-center justify-center font-mono text-sm border rounded font-bold ${
+                          bit === '1' ? 'bg-orange-500/20 border-orange-500 text-orange-500' : 'bg-muted border-border text-muted-foreground'
+                        }`}>
+                          {bit}
+                        </div>
+                      ))}
+                    </div>
+                    <div className="text-center font-mono text-xs text-orange-500 font-bold">
+                      Decimal: {currentStep.variables.prevN}
+                    </div>
+                  </div>
+                )}
+
+                <div className="p-3 bg-muted/20 border border-border/40 rounded-lg text-xs space-y-1.5 text-muted-foreground leading-relaxed">
+                  <div className="font-bold text-muted-foreground">Brian Kernighan's Algorithm Intuition:</div>
+                  <div>• The operation <span className="font-semibold text-primary font-mono">n & (n - 1)</span> clears the least significant (rightmost) set bit of <span className="font-semibold font-mono">n</span>.</div>
+                  <div>• Instead of checking all 32 bits of an integer, we only loop as many times as there are 1 bits.</div>
+                  <div>• This makes the algorithm run in <span className="font-semibold font-mono">O(k)</span> time where <span className="font-mono">k</span> is the number of 1 bits.</div>
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          <div className="mt-auto space-y-4">
+            <Card className="p-4 bg-primary/5 border-primary/20 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
+              <h4 className="text-[10px] font-bold uppercase tracking-widest text-primary mb-2">Step Explanation</h4>
+              <p className="text-sm font-medium leading-relaxed min-h-[40px]">{currentStep.explanation}</p>
+            </Card>
+
+            <VariablePanel variables={currentStep.variables} />
+          </div>
+        </div>
+      }
+      rightContent={
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={() => setCurrentStepIndex(0)}
         />
       }
     />

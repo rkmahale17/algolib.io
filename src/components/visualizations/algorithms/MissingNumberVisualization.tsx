@@ -1,187 +1,204 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
-import { StepControls } from '../shared/StepControls';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
+import type { StepLineNumberMap, VisualizationLanguageMap } from '@/types/visualization';
+
+interface Step {
+  array: number[];
+  highlighting: number[];
+  variables: Record<string, any>;
+  explanation: string;
+  pseudoStep: string;
+  calc?: string;
+}
+
+const languages: VisualizationLanguageMap = {
+  typescript: `function missingNumber(nums: number[]): number {
+  let res = nums.length;
+  for (let i = 0; i < nums.length; i++) {
+    res += i - nums[i];
+  }
+  return res;
+}`,
+  python: `def missingNumber(nums) -> int:
+    res = len(nums)
+    for i in range(len(nums)):
+        res += (i - nums[i])
+    return res`,
+  java: `public static class Solution {
+    public int missingNumber(int[] nums) {
+        int res = nums.length;
+        for (int i = 0; i < nums.length; i++) {
+            res += i - nums[i];
+        }
+        return res;
+    }
+}`,
+  cpp: `class Solution {
+public:
+    int missingNumber(vector<int>& nums) {
+        int res = nums.size();
+        for (int i = 0; i < nums.size(); i++) {
+            res += i - nums[i];
+        }
+        return res;
+    }
+};`
+};
 
 export const MissingNumberVisualization = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const nums = [3, 0, 1];
 
-  const steps = [
-    {
+  const { steps, stepLineNumbers } = useMemo(() => {
+    const s: Step[] = [];
+    const lines: StepLineNumberMap = {
+      typescript: [],
+      python: [],
+      java: [],
+      cpp: []
+    };
+
+    const addLines = (ts: number, py: number, java: number, cpp: number) => {
+      lines.typescript!.push(ts);
+      lines.python!.push(py);
+      lines.java!.push(java);
+      lines.cpp!.push(cpp);
+    };
+
+    s.push({
       array: nums,
       highlighting: [],
       variables: { res: 3, n: 3 },
       explanation: "Initialize res = n = 3. This accounts for the missing index n in the 0..n range.",
-      highlightedLine: 2
-    },
-    {
-      array: nums,
-      highlighting: [],
-      variables: { res: 3, i: 0, 'nums[0]': 3 },
-      explanation: "Start loop at i = 0. We will compute diff = i - nums[i].",
-      highlightedLine: 3
-    },
-    {
-      array: nums,
-      highlighting: [0],
-      variables: { res: 3, i: 0, 'nums[0]': 3, diff: -3 },
-      explanation: "Calculate difference: i - nums[i] = 0 - 3 = -3.",
-      highlightedLine: 4,
-      calc: '0 - 3 = -3'
-    },
-    {
-      array: nums,
-      highlighting: [0],
-      variables: { res: 0, i: 0, 'nums[i]': 3, prevRes: 3 },
-      explanation: "Update res: res += -3 → 3 + (-3) = 0.",
-      highlightedLine: 4,
-      calc: '3 + (-3) = 0'
-    },
-    {
-      array: nums,
-      highlighting: [],
-      variables: { res: 0, i: 1, 'nums[1]': 0 },
-      explanation: "Loop: i = 1. We will compute diff = i - nums[i].",
-      highlightedLine: 3
-    },
-    {
-      array: nums,
-      highlighting: [1],
-      variables: { res: 0, i: 1, 'nums[1]': 0, diff: 1 },
-      explanation: "Calculate difference: i - nums[i] = 1 - 0 = 1.",
-      highlightedLine: 4,
-      calc: '1 - 0 = 1'
-    },
-    {
-      array: nums,
-      highlighting: [1],
-      variables: { res: 1, i: 1, 'nums[i]': 0, prevRes: 0 },
-      explanation: "Update res: res += 1 → 0 + 1 = 1.",
-      highlightedLine: 4,
-      calc: '0 + 1 = 1'
-    },
-    {
-      array: nums,
-      highlighting: [],
-      variables: { res: 1, i: 2, 'nums[2]': 1 },
-      explanation: "Loop: i = 2. We will compute diff = i - nums[i].",
-      highlightedLine: 3
-    },
-    {
-      array: nums,
-      highlighting: [2],
-      variables: { res: 1, i: 2, 'nums[2]': 1, diff: 1 },
-      explanation: "Calculate difference: i - nums[i] = 2 - 1 = 1.",
-      highlightedLine: 4,
-      calc: '2 - 1 = 1'
-    },
-    {
-      array: nums,
-      highlighting: [2],
-      variables: { res: 2, i: 2, 'nums[i]': 1, prevRes: 1 },
-      explanation: "Update res: res += 1 → 1 + 1 = 2.",
-      highlightedLine: 4,
-      calc: '1 + 1 = 2'
-    },
-    {
-      array: nums,
-      highlighting: [],
-      variables: { res: 2 },
-      explanation: "Loop finished. The accumulated result is the missing number: 2.",
-      highlightedLine: 6,
-      calc: 'Result: 2'
-    }
-  ];
+      pseudoStep: "SET res = nums.length (res = 3)",
+      calc: "res = 3"
+    });
+    addLines(2, 2, 3, 4);
 
-  const code = `function missingNumber(nums: number[]): number {
-    let res = nums.length;
     for (let i = 0; i < nums.length; i++) {
-        res += i - nums[i];
-    }
-    return res;
-}`;
+      s.push({
+        array: nums,
+        highlighting: [],
+        variables: { res: s[s.length - 1].variables.res, i, 'nums[i]': nums[i] },
+        explanation: `Start loop at index i = ${i}. We will compute the difference: i - nums[i].`,
+        pseudoStep: `FOR i = 0 TO n-1 (i = ${i})`,
+      });
+      addLines(3, 3, 4, 5);
 
-  const step = steps[currentStep];
+      const diff = i - nums[i];
+      s.push({
+        array: nums,
+        highlighting: [i],
+        variables: { res: s[s.length - 1].variables.res, i, 'nums[i]': nums[i], diff },
+        explanation: `Calculate difference: i - nums[i] = ${i} - ${nums[i]} = ${diff}.`,
+        pseudoStep: `SET diff = i - nums[i] (${i} - ${nums[i]} = ${diff})`,
+        calc: `${i} - ${nums[i]} = ${diff}`
+      });
+      addLines(4, 4, 5, 6);
+
+      const prevRes = s[s.length - 2].variables.res;
+      const nextRes = prevRes + diff;
+      s.push({
+        array: nums,
+        highlighting: [i],
+        variables: { res: nextRes, i, 'nums[i]': nums[i], prevRes },
+        explanation: `Update res by adding difference: res += diff → ${prevRes} + (${diff}) = ${nextRes}.`,
+        pseudoStep: `SET res = res + diff (res = ${prevRes} + (${diff}) = ${nextRes})`,
+        calc: `${prevRes} + (${diff}) = ${nextRes}`
+      });
+      addLines(4, 4, 5, 6);
+    }
+
+    const finalRes = s[s.length - 1].variables.res;
+    s.push({
+      array: nums,
+      highlighting: [],
+      variables: { res: finalRes },
+      explanation: `Loop finished. The accumulated result is the missing number: ${finalRes}.`,
+      pseudoStep: `RETURN res (res = ${finalRes})`,
+      calc: `Result = ${finalRes}`
+    });
+    addLines(6, 5, 7, 8);
+
+    return { steps: s, stepLineNumbers: lines };
+  }, []);
+
+  const step = steps[currentStepIndex];
+  const pseudoSteps = steps.map(s => s.pseudoStep);
 
   return (
-    <div className="space-y-6">
-      <StepControls
-        isPlaying={false}
-        onPlay={() => {}}
-        onPause={() => {}}
-        onStepForward={() => currentStep < steps.length - 1 && setCurrentStep(prev => prev + 1)}
-        onStepBack={() => currentStep > 0 && setCurrentStep(prev => prev - 1)}
-        onReset={() => setCurrentStep(0)}
-        speed={1}
-        onSpeedChange={() => {}}
-        currentStep={currentStep}
-        totalSteps={steps.length - 1}
-      />
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <Card className="p-6">
-            <h3 className="text-sm font-semibold mb-3">Input Array (nums)</h3>
-            <div className="flex flex-wrap items-center justify-center gap-2">
-              {step.array.map((value, index) => (
-                <div key={index} className="flex flex-col items-center gap-2">
-                  <div
-                    className={`w-14 h-14 rounded flex items-center justify-center font- transition-all duration-300 ${step.highlighting.includes(index)
-                      ? 'bg-primary text-primary-foreground scale-110'
-                      : 'bg-muted text-foreground'
-                      }`}
-                  >
-                    {value}
+    <VisualizationLayout
+      leftContent={
+        <div className="flex flex-col h-full justify-between gap-6">
+          <div className="space-y-6">
+            <Card className="p-6 bg-card/50 backdrop-blur-sm border-primary/20">
+              <h3 className="text-sm font-semibold mb-6 text-muted-foreground uppercase tracking-widest">Input Array (nums)</h3>
+              <div className="flex flex-wrap items-center justify-center gap-4">
+                {step.array.map((value, index) => (
+                  <div key={index} className="flex flex-col items-center gap-2">
+                    <div
+                      className={`w-14 h-14 rounded-lg flex items-center justify-center font-bold border-2 transition-all duration-200 ${step.highlighting.includes(index)
+                        ? 'bg-primary border-primary text-primary-foreground scale-105 shadow-md'
+                        : 'bg-muted/30 border-border text-foreground'
+                        }`}
+                    >
+                      {value}
+                    </div>
+                    <span className="text-xs text-muted-foreground font-mono">i = {index}</span>
                   </div>
-                  <span className="text-xs text-muted-foreground">i = {index}</span>
-                </div>
-              ))}
-              <div className="flex flex-col items-center gap-2 opacity-50 border border-dashed rounded p-1">
-                <div className="w-12 h-12 flex items-center justify-center text-xs text-center text-muted-foreground">
-                  n = {nums.length}
+                ))}
+                <div className="flex flex-col items-center gap-2 opacity-50 border border-dashed rounded-lg p-2">
+                  <div className="w-12 h-12 flex items-center justify-center text-xs text-center text-muted-foreground font-mono">
+                    n = {nums.length}
+                  </div>
                 </div>
               </div>
-            </div>
-          </Card>
-
-          {step.calc && (
-            <Card className="p-4">
-              <h3 className="font-semibold mb-2 text-sm">Calculation</h3>
-              <p className="font-mono text-center text-lg">{step.calc}</p>
             </Card>
-          )}
 
-          <Card className="p-4 bg-muted/50">
-            <div className="space-y-2">
-              <div className="text-sm font-semibold text-primary">Explanation:</div>
-              <div className="text-sm text-muted-foreground">
-                {step.explanation}
-              </div>
-            </div>
-          </Card>
+            {step.calc && (
+              <Card className="p-4 bg-primary/5 border-primary/10">
+                <h3 className="font-semibold mb-2 text-xs text-primary uppercase tracking-wider">Calculation</h3>
+                <p className="font-mono text-center text-lg font-bold">{step.calc}</p>
+              </Card>
+            )}
+          </div>
 
-          <VariablePanel variables={step.variables} />
+          <div className="space-y-4 mt-auto">
+            <Card className="p-4 bg-primary/5 border-primary/20">
+              <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Step Explanation</h4>
+              <p className="text-sm text-foreground leading-relaxed font-medium min-h-[40px]">{step.explanation}</p>
+            </Card>
 
-          <Card className="p-4 bg-muted/20">
-            <h3 className="font-semibold mb-2 text-sm">Why this works?</h3>
-            <div className="text-xs space-y-1 text-muted-foreground">
-              <p>Consider the sum of indices [0...n] and sum of values in array.</p>
-              <p>Missing Number = Sum(0...n) - Sum(nums)</p>
-              <p>This approach computes this difference incrementally to avoid separate loops or potential overflow (though less of an issue here than complex multiplication).</p>
-              <p>res ends up being accumulating `n + (0-nums[0]) + (1-nums[1]) ...` which effectively re-arranges to `(n + 0 + 1 + ... ) - (nums[0] + nums[1] + ...)`.</p>
-            </div>
-          </Card>
+            <VariablePanel variables={step.variables} />
+
+            <Card className="p-4 bg-muted/20 border border-border/40 rounded-lg text-xs space-y-1.5 text-muted-foreground leading-relaxed">
+              <h4 className="font-bold text-muted-foreground uppercase text-[10px] tracking-wider mb-2">Why this works</h4>
+              <p>Consider the sum of indices [0...n] and sum of values in array. Missing Number = Sum(0...n) - Sum(nums).</p>
+              <p>This approach computes this difference incrementally: `res` accumulates `n + (0-nums[0]) + (1-nums[1]) + ...` which re-arranges to `(n + 0 + 1 + ... ) - (nums[0] + nums[1] + ...)`, avoiding overflow.</p>
+            </Card>
+          </div>
         </div>
-
-        <AnimatedCodeEditor
-          code={code}
-          highlightedLines={[step.highlightedLine]}
-          language="typescript"
+      }
+      rightContent={
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={() => setCurrentStepIndex(0)}
         />
-      </div>
-    </div>
+      }
+      controls={
+        <SimpleStepControls
+          currentStep={currentStepIndex}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStepIndex}
+        />
+      }
+    />
   );
 };

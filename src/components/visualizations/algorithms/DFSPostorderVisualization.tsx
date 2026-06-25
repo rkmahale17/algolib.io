@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-
-import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
+import type { StepLineNumberMap, VisualizationLanguageMap } from '@/types/visualization';
 
 interface TreeNode {
   val: number;
@@ -14,34 +14,71 @@ interface TreeNode {
 
 interface Step {
   visited: number[];
-  current: number | null;
+  currentNode: number | null;
   stack: number[];
   message: string;
-  lineNumber: number;
+  pseudoStep: string;
+  variables: Record<string, any>;
 }
 
-export const DFSPostorderVisualization = () => {
-  const [steps, setSteps] = useState<Step[]>([]);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1);
-  const [tree, setTree] = useState<TreeNode | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  const code = `function postorder(root) {
-  const result = [];
-  
-  function traverse(node) {
+const languages: VisualizationLanguageMap = {
+  typescript: `function postorderTraversal(root: TreeNode | null): number[] {
+  const result: number[] = [];
+  function dfs(node: TreeNode | null) {
     if (!node) return;
-    
-    traverse(node.left);   // Visit left
-    traverse(node.right);  // Visit right
-    result.push(node.val); // Visit root
+    dfs(node.left);
+    dfs(node.right);
+    result.push(node.val);
   }
-  
-  traverse(root);
+  dfs(root);
   return result;
-}`;
+}`,
+
+  python: `def postorderTraversal(root):
+    result = []
+    def dfs(node):
+        if not node:
+            return
+        dfs(node.left)
+        dfs(node.right)
+        result.append(node.val)
+    dfs(root)
+    return result`,
+
+  java: `public static class Solution {
+    private void dfs(TreeNode node, List<Integer> result) {
+        if (node == null) {
+            return;
+        }
+        dfs(node.left, result);
+        dfs(node.right, result);
+        result.add(node.val);
+    }
+    public List<Integer> postorderTraversal(TreeNode root) {
+        List<Integer> result = new ArrayList<>();
+        dfs(root, result);
+        return result;
+    }
+ }`,
+
+  cpp: `class Solution {
+     public:
+        vector < int > postorderTraversal(TreeNode * root) {
+          vector < int > result;
+          dfs(root, result);
+          return result;
+        }
+          void dfs(TreeNode * node, vector<int> & result) {
+          if (!node) return;
+          dfs(node -> left, result);
+          dfs(node -> right, result);
+          result.push_back(node -> val);
+        }
+};`,
+};
+
+export const DFSPostorderVisualization = () => {
+  const [tree, setTree] = useState<TreeNode | null>(null);
 
   const createTree = (): TreeNode => {
     return {
@@ -72,79 +109,88 @@ export const DFSPostorderVisualization = () => {
     calculatePositions(root, 200, 50, 80);
     setTree(root);
 
-    const newSteps: Step[] = [];
+    const steps: Step[] = [];
     const visited: number[] = [];
     const stack: number[] = [];
 
-    const traverse = (node: TreeNode | null) => {
-      if (!node) return;
-
-      stack.push(node.val);
-      newSteps.push({
-        visited: [...visited],
-        current: node.val,
-        stack: [...stack],
-        message: `Visit node ${node.val}, go left first`,
-        lineNumber: 7 // traverse(node.left)
-      });
-
-      traverse(node.left);
-
-      newSteps.push({
-        visited: [...visited],
-        current: node.val,
-        stack: [...stack],
-        message: `Traverse right for node ${node.val}`,
-        lineNumber: 8 // traverse(node.right)
-      });
-
-      traverse(node.right);
-
-      visited.push(node.val);
-      newSteps.push({
-        visited: [...visited],
-        current: node.val,
-        stack: [...stack],
-        message: `Process node ${node.val} (both children done)`,
-        lineNumber: 9 // result.push(node.val)
-      });
-
-      stack.pop();
-
-      newSteps.push({
-        visited: [...visited],
-        current: node.val,
-        stack: [...stack],
-        message: `Node ${node.val} complete (added to result)`,
-        lineNumber: 10 // end of traverse function
-      });
+    const stepLineNumbers: StepLineNumberMap = {
+      typescript: [],
+      python: [],
+      java: [],
+      cpp: []
     };
 
-    newSteps.push({
-      visited: [],
-      current: null,
-      stack: [],
-      message: 'Start DFS Postorder: Left → Right → Root',
-      lineNumber: 12 // traverse(root)
-    });
+    const addLines = (ts: number, py: number, java: number, cpp: number) => {
+      stepLineNumbers.typescript!.push(ts);
+      stepLineNumbers.python!.push(py);
+      stepLineNumbers.java!.push(java);
+      stepLineNumbers.cpp!.push(cpp);
+    };
 
-    traverse(root);
+    const addStep = (currentNode: number | null, msg: string, pseudo: string, ts_l: number, py_l: number, java_l: number, cpp_l: number) => {
+      steps.push({
+        currentNode,
+        stack: [...stack],
+        visited: [...visited],
+        message: msg,
+        pseudoStep: pseudo,
+        variables: {
+          currentNode: currentNode ?? 'null',
+          stack: `[${stack.join(', ')}]`,
+          visited: `[${visited.join(', ')}]`,
+          'postorder result': visited.join(' → ') || 'empty'
+        }
+      });
+      addLines(ts_l, py_l, java_l, cpp_l);
+    };
 
-    newSteps.push({
-      visited,
-      current: null,
-      stack: [],
-      message: `Complete! Postorder: [${visited.join(', ')}]`,
-      lineNumber: 13 // return result
-    });
+    // 1. Initialize result
+    addStep(null, 'Initialize result array.', 'result = []', 2, 2, 11, 4);
 
-    setSteps(newSteps);
-    setCurrentStepIndex(0);
+    // 2. Call dfs(root)
+    addStep(null, 'Invoke dfs(root) to start traversal.', 'dfs(root)', 9, 9, 12, 5);
+
+    const dfs = (node: TreeNode | null) => {
+      if (!node) {
+        addStep(null, 'Node is null. Backtrack.', 'IF node is null → return', 4, 4, 3, 9);
+        addStep(null, 'Return from null node.', 'return', 4, 5, 4, 9);
+        return;
+      }
+
+      // Check if (!node) evaluates to false
+      stack.push(node.val);
+      addStep(node.val, `Check if node is null: node (${node.val}) is not null.`, 'IF node is null → NO', 4, 4, 3, 9);
+
+      // Recurse left
+      addStep(node.val, `Recurse into left subtree of node ${node.val}.`, `dfs(node.left)`, 5, 6, 6, 10);
+      dfs(node.left);
+
+      // Recurse right
+      addStep(node.val, `Recurse into right subtree of node ${node.val}.`, `dfs(node.right)`, 6, 7, 7, 11);
+      dfs(node.right);
+
+      // Visit node (postorder)
+      visited.push(node.val);
+      addStep(node.val, `Visit node ${node.val}. Append it to the result.`, `result.push(${node.val})`, 7, 8, 8, 12);
+
+      // Backtrack
+      stack.pop();
+      addStep(node.val, `Finished visiting node ${node.val}. Pop from stack and backtrack.`, 'End dfs(node) → Backtrack', 8, 8, 9, 13);
+    };
+
+    dfs(root);
+
+    // Return result
+    addStep(null, `Traversal complete. Return postorder result: [${visited.join(', ')}]`, 'return result', 10, 10, 13, 6);
+
+    return { steps, stepLineNumbers };
   };
 
-  useEffect(() => {
-    generateSteps();
-  }, []);
+  const [{ steps, stepLineNumbers }] = useState(generateSteps);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [speed, setSpeed] = useState(1);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (isPlaying && currentStepIndex < steps.length - 1) {
@@ -172,15 +218,19 @@ export const DFSPostorderVisualization = () => {
   const handleReset = () => {
     setCurrentStepIndex(0);
     setIsPlaying(false);
-    generateSteps();
   };
 
   if (steps.length === 0 || !tree) return null;
 
   const currentStep = steps[currentStepIndex];
+  const pseudoSteps = steps.map(s => s.pseudoStep);
 
   const renderTree = (node: TreeNode | null): JSX.Element | null => {
     if (!node || node.x === undefined || node.y === undefined) return null;
+
+    const isVisited = currentStep.visited.includes(node.val);
+    const isCurrent = currentStep.currentNode === node.val;
+    const isInStack = currentStep.stack.includes(node.val);
 
     return (
       <g key={node.val}>
@@ -193,12 +243,14 @@ export const DFSPostorderVisualization = () => {
         <circle
           cx={node.x}
           cy={node.y}
-          r="24"
-          className={`transition-all duration-300 ${currentStep.current === node.val
+          r="20"
+          className={`transition-all duration-300 ${isCurrent
             ? 'fill-primary stroke-primary'
-            : currentStep.visited.includes(node.val)
-              ? 'fill-green-500 stroke-green-500'
-              : 'fill-muted stroke-border'
+            : isVisited
+              ? 'fill-green-600 stroke-green-600'
+              : isInStack
+                ? 'fill-yellow-500 stroke-yellow-500'
+                : 'fill-muted stroke-border'
             }`}
           strokeWidth="2"
         />
@@ -207,7 +259,7 @@ export const DFSPostorderVisualization = () => {
           y={node.y}
           textAnchor="middle"
           dy=".3em"
-          className={`font- ${currentStep.visited.includes(node.val) || currentStep.current === node.val ? 'fill-white' : 'fill-foreground'}`}
+          className={`text-sm font-semibold ${isVisited || isCurrent ? 'fill-white' : 'fill-foreground'}`}
         >
           {node.val}
         </text>
@@ -233,6 +285,7 @@ export const DFSPostorderVisualization = () => {
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left: visual tree + commentary box + variable panel */}
         <div className="space-y-4">
           <div className="bg-muted/30 rounded-lg border border-border/50 p-6">
             <svg viewBox="0 0 400 250" className="w-full h-64">
@@ -240,33 +293,54 @@ export const DFSPostorderVisualization = () => {
             </svg>
           </div>
 
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
+              <h4 className="text-xs font-semibold mb-2 uppercase tracking-wider text-yellow-600">Call Stack</h4>
+              <div className="flex flex-col-reverse gap-1">
+                {currentStep.stack.map((val, i) => (
+                  <div key={i} className="bg-yellow-500 text-white rounded px-2 py-1 text-center font-mono text-xs">
+                    dfs({val})
+                  </div>
+                ))}
+                {currentStep.stack.length === 0 && <div className="text-xs text-muted-foreground italic">Empty</div>}
+              </div>
+            </div>
+
+            <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3">
+              <h4 className="text-xs font-semibold mb-2 uppercase tracking-wider text-green-600">Visited</h4>
+              <div className="flex flex-wrap gap-1">
+                {currentStep.visited.map((val, i) => (
+                  <div key={i} className="bg-green-600 text-white rounded px-2 py-1 font-mono text-xs">
+                    {val}
+                  </div>
+                ))}
+                {currentStep.visited.length === 0 && <div className="text-xs text-muted-foreground italic">Empty</div>}
+              </div>
+            </div>
+          </div>
+
           <div className="bg-accent/50 rounded-lg border border-accent p-4">
             <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
           </div>
 
-          <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3">
-            <h4 className="text-sm font-semibold mb-2">Visited</h4>
-            <div className="flex flex-wrap gap-1">
-              {currentStep.visited.map((val, idx) => (
-                <div key={idx} className="bg-green-500 text-white rounded px-2 py-1 font-mono text-sm">
-                  {val}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-4">
           <VariablePanel
             variables={{
-              current: currentStep.current || 'null',
-              'stack.size': currentStep.stack.length,
-              'visited.length': currentStep.visited.length,
-              visited: currentStep.visited
+              current: currentStep.currentNode ?? 'null',
+              callStackDepth: currentStep.stack.length,
+              visitedCount: currentStep.visited.length,
+              'postorder result': currentStep.visited.join(' → ') || 'empty'
             }}
           />
-          <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="TypeScript" />
         </div>
+
+        {/* Right: code / pseudocode panel */}
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={handleReset}
+        />
       </div>
     </div>
   );

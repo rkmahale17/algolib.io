@@ -279,10 +279,10 @@ export const TimeMapVisualization = () => {
                                       </div>
                                       
                                       {/* Pointer indicators */}
-                                      <div className="absolute -top-5 left-0 w-full flex justify-center gap-1">
-                                          {isLeft && <span className="text-[10px] font-bold text-secondary">L</span>}
-                                          {isRight && <span className="text-[10px] font-bold text-secondary">R</span>}
-                                          {isMid && <span className="text-[10px] font-bold text-primary">M</span>}
+                                      <div className="absolute -top-6 left-0 w-full flex justify-center gap-1 z-20">
+                                          {isLeft && <span className="text-[10px] font-bold text-blue-500">Left</span>}
+                                          {isMid && <span className="text-[10px] font-bold text-blue-500">Mid</span>}
+                                          {isRight && <span className="text-[10px] font-bold text-blue-500">Right</span>}
                                       </div>
                                   </div>
                               );

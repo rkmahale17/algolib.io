@@ -1,381 +1,372 @@
-import { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
-import { motion } from 'framer-motion';
+import type { StepLineNumberMap, VisualizationLanguageMap } from '@/types/visualization';
+import { Info } from 'lucide-react';
 
 interface Step {
   nums: number[];
-  numSet: Set<number>;
+  numSet: number[];
   currentNum: number | null;
   checking: number | null;
   longestStreak: number;
   currentStreak: number;
   variables: Record<string, any>;
   explanation: string;
-  highlightedLines: number[];
-  lineExecution: string;
+  pseudoStep: string;
 }
 
-export const LongestConsecutiveSequenceVisualization = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-
-  const nums = [100, 4, 200, 1, 3, 2];
-
-  const steps: Step[] = [
-    {
-      nums,
-      numSet: new Set(),
-      currentNum: null,
-      checking: null,
-      longestStreak: 0,
-      currentStreak: 0,
-      variables: { nums: '[100,4,200,1,3,2]' },
-      explanation: "Given an unsorted array of integers nums, return the length of the longest consecutive elements sequence.",
-      highlightedLines: [1],
-      lineExecution: "function longestConsecutive(nums: number[]): number"
-    },
-    {
-      nums,
-      numSet: new Set(),
-      currentNum: null,
-      checking: null,
-      longestStreak: 0,
-      currentStreak: 0,
-      variables: { length: 6 },
-      explanation: "Check edge case: nums.length > 0, continue.",
-      highlightedLines: [2],
-      lineExecution: "if (nums.length === 0) return 0; // false"
-    },
-    {
-      nums,
-      numSet: new Set([100, 4, 200, 1, 3, 2]),
-      currentNum: null,
-      checking: null,
-      longestStreak: 0,
-      currentStreak: 0,
-      variables: { numSet: '{1,2,3,4,100,200}' },
-      explanation: "Create a Set from the array. This allows us to check if a number exists in O(1) time, which is key to maintaining O(n) overall complexity.",
-      highlightedLines: [4],
-      lineExecution: "const numSet = new Set(nums);"
-    },
-    {
-      nums,
-      numSet: new Set([100, 4, 200, 1, 3, 2]),
-      currentNum: null,
-      checking: null,
-      longestStreak: 0,
-      currentStreak: 0,
-      variables: { longestStreak: 0 },
-      explanation: "Initialize longestStreak = 0 to track maximum consecutive length found.",
-      highlightedLines: [5],
-      lineExecution: "let longestStreak = 0;"
-    },
-    {
-      nums,
-      numSet: new Set([100, 4, 200, 1, 3, 2]),
-      currentNum: 1,
-      checking: 0,
-      longestStreak: 0,
-      currentStreak: 0,
-      variables: { num: 1, 'num-1': 0 },
-      explanation: "We only start counting a sequence from its smallest element. Since 0 is not in the set, 1 must be the start of a potential sequence.",
-      highlightedLines: [7, 8],
-      lineExecution: "for (const num of numSet) if (!numSet.has(num - 1)) // !has(0) -> true"
-    },
-    {
-      nums,
-      numSet: new Set([100, 4, 200, 1, 3, 2]),
-      currentNum: 1,
-      checking: null,
-      longestStreak: 0,
-      currentStreak: 1,
-      variables: { currentNum: 1, currentStreak: 1 },
-      explanation: "1 starts sequence. Initialize: currentNum=1, currentStreak=1.",
-      highlightedLines: [9, 10],
-      lineExecution: "let currentNum = num; let currentStreak = 1;"
-    },
-    {
-      nums,
-      numSet: new Set([100, 4, 200, 1, 3, 2]),
-      currentNum: 2,
-      checking: 2,
-      longestStreak: 0,
-      currentStreak: 2,
-      variables: { 'checking': 2, found: true },
-      explanation: "Check the set for the next consecutive number (2). It exists! We increment the current streak to 2.",
-      highlightedLines: [12, 13, 14],
-      lineExecution: "while (numSet.has(currentNum + 1)) currentNum++; // 2 exists"
-    },
-    {
-      nums,
-      numSet: new Set([100, 4, 200, 1, 3, 2]),
-      currentNum: 3,
-      checking: 3,
-      longestStreak: 0,
-      currentStreak: 3,
-      variables: { currentNum: 3, currentStreak: 3 },
-      explanation: "Check: does 3 exist? Yes! Increment: currentNum=3, currentStreak=3.",
-      highlightedLines: [12, 13, 14],
-      lineExecution: "while (numSet.has(3 + 1)) // 3 exists"
-    },
-    {
-      nums,
-      numSet: new Set([100, 4, 200, 1, 3, 2]),
-      currentNum: 4,
-      checking: 4,
-      longestStreak: 0,
-      currentStreak: 4,
-      variables: { currentNum: 4, currentStreak: 4 },
-      explanation: "Check: does 4 exist? Yes! Increment: currentNum=4, currentStreak=4.",
-      highlightedLines: [12, 13, 14],
-      lineExecution: "while (numSet.has(4 + 1)) // 4 exists"
-    },
-    {
-      nums,
-      numSet: new Set([100, 4, 200, 1, 3, 2]),
-      currentNum: 4,
-      checking: 5,
-      longestStreak: 0,
-      currentStreak: 4,
-      variables: { 'checking': 5, found: false },
-      explanation: "Check for 5. It's not in the set, so the current sequence [1, 2, 3, 4] is complete with a length of 4.",
-      highlightedLines: [12],
-      lineExecution: "while (numSet.has(4 + 1)) // false, exit loop"
-    },
-    {
-      nums,
-      numSet: new Set([100, 4, 200, 1, 3, 2]),
-      currentNum: 4,
-      checking: null,
-      longestStreak: 4,
-      currentStreak: 4,
-      variables: { longestStreak: 4 },
-      explanation: "Update longestStreak: max(0, 4) = 4. Found sequence [1,2,3,4].",
-      highlightedLines: [17],
-      lineExecution: "longestStreak = Math.max(longestStreak, currentStreak); // max(0,4) = 4"
-    },
-    {
-      nums,
-      numSet: new Set([100, 4, 200, 1, 3, 2]),
-      currentNum: 2,
-      checking: 1,
-      longestStreak: 4,
-      currentStreak: 0,
-      variables: { num: 2, 'num-1': 1 },
-      explanation: "Check num=2. Since 1 is in the set, 2 is already part of a sequence we've either processed or will process from its start. Skip it to avoid redundant work.",
-      highlightedLines: [7, 8],
-      lineExecution: "if (!numSet.has(num - 1)) // !has(1) -> false, skip"
-    },
-    {
-      nums,
-      numSet: new Set([100, 4, 200, 1, 3, 2]),
-      currentNum: 3,
-      checking: 2,
-      longestStreak: 4,
-      currentStreak: 0,
-      variables: { num: 3 },
-      explanation: "Checking 3. Since 2 is in the set, we know 3 is part of a sequence that starts at a number smaller than 3. We skip it, knowing we've already counted it when we processed its sequence starting from 1.",
-      highlightedLines: [7, 8],
-      lineExecution: "if (!numSet.has(2)) // false, skip"
-    },
-    {
-      nums,
-      numSet: new Set([100, 4, 200, 1, 3, 2]),
-      currentNum: 4,
-      checking: 3,
-      longestStreak: 4,
-      currentStreak: 0,
-      variables: { num: 4 },
-      explanation: "Checking 4. Since 3 is in the set, 4 is not the start of a sequence. Skipping to maintain O(n) complexity, ensuring each number is only part of one while-loop iteration.",
-      highlightedLines: [7, 8],
-      lineExecution: "if (!numSet.has(3)) // false, skip"
-    },
-    {
-      nums,
-      numSet: new Set([100, 4, 200, 1, 3, 2]),
-      currentNum: 100,
-      checking: 99,
-      longestStreak: 4,
-      currentStreak: 1,
-      variables: { num: 100 },
-      explanation: "Checking 100. 99 is not in the set, so 100 starts a sequence. We check for 101, which isn't there, so this sequence has length 1.",
-      highlightedLines: [7, 8, 9, 10, 12],
-      lineExecution: "!numSet.has(99) -> true; !numSet.has(101) -> exit; streak = 1"
-    },
-    {
-      nums,
-      numSet: new Set([100, 4, 200, 1, 3, 2]),
-      currentNum: 200,
-      checking: 199,
-      longestStreak: 4,
-      currentStreak: 1,
-      variables: { num: 200 },
-      explanation: "Checking 200. Since 199 is not in the set, 200 starts its own sequence. We check for 201, find it's also missing, so this sequence length is 1.",
-      highlightedLines: [7, 8, 9, 10, 12],
-      lineExecution: "!numSet.has(199) -> true; !numSet.has(201) -> exit; streak = 1"
-    },
-    {
-      nums,
-      numSet: new Set([100, 4, 200, 1, 3, 2]),
-      currentNum: null,
-      checking: null,
-      longestStreak: 4,
-      currentStreak: 0,
-      variables: { result: 4, sequence: '[1,2,3,4]' },
-      explanation: "All numbers in the set have been checked. The longest consecutive sequence found was [1, 2, 3, 4] with a length of 4.",
-      highlightedLines: [21],
-      lineExecution: "return longestStreak; // 4"
-    },
-    {
-      nums,
-      numSet: new Set([100, 4, 200, 1, 3, 2]),
-      currentNum: null,
-      checking: null,
-      longestStreak: 4,
-      currentStreak: 0,
-      variables: { length: 4, complexity: 'O(n)' },
-      explanation: "Visualization complete. By only starting sequences from elements with no predecessor, we ensure each element is visited at most twice (once in the main loop, once in a while loop), achieving O(n) time complexity.",
-      highlightedLines: [21],
-      lineExecution: "Result: 4"
-    }
-  ];
-
-  const code = `function longestConsecutive(nums: number[]): number {
+const languages: VisualizationLanguageMap = {
+  typescript: `function longestConsecutive(nums: number[]): number {
   if (nums.length === 0) return 0;
-  
   const numSet = new Set(nums);
-  let longestStreak = 0;
-  
-  for (const num of numSet) {
+  let longest = 0;
+  for (const num of nums) {
     if (!numSet.has(num - 1)) {
       let currentNum = num;
       let currentStreak = 1;
-      
       while (numSet.has(currentNum + 1)) {
         currentNum++;
         currentStreak++;
       }
-      
-      longestStreak = Math.max(longestStreak, currentStreak);
+      longest = Math.max(longest, currentStreak);
     }
   }
-  
-  return longestStreak;
-}`;
+  return longest;
+}`,
 
-  const step = steps[currentStep];
+  python: `def longestConsecutive(nums: list[int]) -> int:
+    if not nums:
+        return 0
+    numSet = set(nums)
+    longest = 0
+    for num in nums:
+        if (num - 1) not in numSet:
+            currentNum = num
+            currentStreak = 1
+            while (currentNum + 1) in numSet:
+                currentNum += 1
+                currentStreak += 1
+            longest = max(longest, currentStreak)
+    return longest`,
+
+  java: `public static class Solution {
+    public int longestConsecutive(int[] nums) {
+        if (nums == null || nums.length == 0) return 0;
+        Set<Integer> numSet = new HashSet<>();
+        for (int num : nums) {
+            numSet.add(num);
+        }
+        int longest = 0;
+        for (int num : nums) {
+            if (!numSet.contains(num - 1)) {
+                int currentNum = num;
+                int currentStreak = 1;
+                while (numSet.contains(currentNum + 1)) {
+                    currentNum++;
+                    currentStreak++;
+                }
+                longest = Math.max(longest, currentStreak);
+            }
+        }
+        return longest;
+    }
+}`,
+
+  cpp: `class Solution {
+public:
+    int longestConsecutive(vector<int>& nums) {
+        unordered_set<int> numSet(nums.begin(), nums.end());
+        int longest = 0;
+        for (int num : nums) {
+            if (!numSet.count(num - 1)) {
+                int currentNum = num;
+                int currentStreak = 1;
+                while (numSet.count(currentNum + 1)) {
+                    currentNum++;
+                    currentStreak++;
+                }
+                longest = max(longest, currentStreak);
+            }
+        }
+        return longest;
+    }
+};`
+};
+
+export const LongestConsecutiveSequenceVisualization: React.FC = () => {
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+
+  const nums = useMemo(() => [100, 4, 200, 1, 3, 2], []);
+
+  const { steps, stepLineNumbers } = useMemo(() => {
+    const stepsList: Step[] = [];
+    const stepLines: StepLineNumberMap = {
+      typescript: [],
+      python: [],
+      java: [],
+      cpp: []
+    };
+
+    const addLines = (ts: number, py: number, java: number, cpp: number) => {
+      stepLines.typescript!.push(ts);
+      stepLines.python!.push(py);
+      stepLines.java!.push(java);
+      stepLines.cpp!.push(cpp);
+    };
+
+    let longestStreak = 0;
+    const numSet = Array.from(new Set(nums)).sort((a, b) => a - b);
+    const setObj = new Set(nums);
+
+    const makeSnapshot = (
+      msg: string, 
+      pseudo: string, 
+      ts: number, 
+      py: number, 
+      java: number, 
+      cpp: number, 
+      currentNum: number | null, 
+      checking: number | null, 
+      currentStreak: number,
+      vars: Record<string, any>
+    ) => {
+      stepsList.push({
+        nums,
+        numSet: ts >= 3 ? numSet : [],
+        currentNum,
+        checking,
+        longestStreak,
+        currentStreak,
+        variables: {
+          ...vars,
+          longest: longestStreak,
+          streak: currentStreak
+        },
+        explanation: msg,
+        pseudoStep: pseudo
+      });
+      addLines(ts, py, java, cpp);
+    };
+
+    // Step 1: Start
+    makeSnapshot(
+      "Find the length of the longest consecutive elements sequence in the unsorted array.",
+      "START longestConsecutive(nums)",
+      1, 1, 2, 3, null, null, 0, {}
+    );
+
+    // Step 2: Check empty
+    makeSnapshot(
+      "Check if input array is empty.",
+      "IF nums is empty → NO ✗",
+      2, 2, 3, 4, null, null, 0, {}
+    );
+
+    // Step 3: Create set
+    makeSnapshot(
+      "Insert all numbers into a HashSet to allow O(1) time complexity lookups.",
+      "SET numSet = Set(nums)",
+      3, 3, 4, 5, null, null, 0, { numSet: `{${numSet.join(',')}}` }
+    );
+
+    // Step 4: Initialize longest
+    makeSnapshot(
+      "Initialize longest streak counter to 0.",
+      "SET longest = 0",
+      4, 4, 10, 6, null, null, 0, {}
+    );
+
+    // Loop elements
+    for (const num of nums) {
+      makeSnapshot(
+        `Iterate array: check element ${num}.`,
+        `FOR num = ${num}`,
+        5, 5, 11, 7, num, null, 0, {}
+      );
+
+      const hasPrev = setObj.has(num - 1);
+      makeSnapshot(
+        `Check if ${num} is the start of a consecutive sequence (i.e. ${num - 1} is NOT in set).`,
+        `IF num - 1 NOT in numSet → ${num - 1} not in set? → ${!hasPrev ? "YES ✓" : "NO ✗"}`,
+        6, 6, 12, 8, num, num - 1, 0, {}
+      );
+
+      if (!hasPrev) {
+        let currentNum = num;
+        let currentStreak = 1;
+
+        makeSnapshot(
+          `Since ${num - 1} is not in the set, ${num} is the start of a sequence. Initialize current sequence state.`,
+          `SET currentNum = ${num}, currentStreak = 1`,
+          7, 7, 13, 9, num, null, currentStreak, { currentNum }
+        );
+
+        while (setObj.has(currentNum + 1)) {
+          const nextVal = currentNum + 1;
+          makeSnapshot(
+            `Check if next consecutive value ${nextVal} exists in set.`,
+            `IF currentNum + 1 in numSet → ${nextVal} in set? → YES ✓`,
+            9, 10, 15, 11, num, nextVal, currentStreak, { currentNum }
+          );
+
+          currentNum++;
+          currentStreak++;
+
+          makeSnapshot(
+            `Found ${currentNum}. Increment currentNum to ${currentNum} and currentStreak to ${currentStreak}.`,
+            `SET currentNum = ${currentNum}, currentStreak = ${currentStreak}`,
+            10, 11, 15, 12, num, null, currentStreak, { currentNum }
+          );
+        }
+
+        const nextVal = currentNum + 1;
+        makeSnapshot(
+          `Check if next consecutive value ${nextVal} exists in set.`,
+          `IF currentNum + 1 in numSet → ${nextVal} in set? → NO ✗`,
+          9, 10, 15, 11, num, nextVal, currentStreak, { currentNum }
+        );
+
+        const oldLongest = longestStreak;
+        longestStreak = Math.max(longestStreak, currentStreak);
+        makeSnapshot(
+          `Update longest streak: max(${oldLongest}, ${currentStreak}) = ${longestStreak}.`,
+          `SET longest = max(longest, currentStreak) → ${longestStreak}`,
+          13, 13, 18, 14, num, null, currentStreak, { currentNum }
+        );
+      } else {
+        makeSnapshot(
+          `Since ${num - 1} exists in the set, ${num} cannot be the start of a consecutive sequence (it is processed in a larger sequence). Skip.`,
+          `Skip ${num}`,
+          6, 6, 12, 8, num, null, 0, {}
+        );
+      }
+    }
+
+    makeSnapshot(
+      `Finished checking all numbers. Return the longest consecutive sequence length: ${longestStreak}.`,
+      `RETURN longest → ${longestStreak}`,
+      16, 15, 22, 17, null, null, 0, {}
+    );
+
+    return { steps: stepsList, stepLineNumbers: stepLines };
+  }, [nums]);
+
+  const handleReset = () => {
+    setCurrentStepIndex(0);
+  };
+
+  const step = steps[currentStepIndex];
+  const pseudoSteps = steps.map(s => s.pseudoStep);
 
   return (
     <VisualizationLayout
       leftContent={
-        <>
-          <div
-            key={`array-${currentStep}`}
-          >
-            <Card className="p-4">
-              <h3 className="text-sm font-semibold mb-3">Original Array</h3>
-              <div className="flex gap-2 flex-wrap">
-                {step.nums.map((num, idx) => (
+        <div className="space-y-6">
+          <Card className="p-6 bg-card/50 backdrop-blur-sm border-border/50 shadow-sm overflow-hidden relative">
+            <h3 className="text-sm font-semibold mb-4 text-center text-foreground font-sans">
+              Array Elements & Visited States
+            </h3>
+            <div className="flex gap-2.5 flex-wrap justify-center py-4">
+              {nums.map((num, idx) => {
+                const isCurrent = num === step.currentNum;
+                const isChecking = num === step.checking;
+                return (
                   <div
                     key={idx}
-                    className={`w-14 h-14 rounded flex items-center justify-center font-mono text-sm ${num === step.currentNum
-                      ? 'bg-primary text-primary-foreground'
-                      : num === step.checking
-                        ? 'bg-accent text-accent-foreground'
-                        : 'bg-muted'
-                      }`}
+                    className={`w-12 h-12 rounded-lg flex items-center justify-center font-mono text-sm border-2 transition-all duration-300 ${
+                      isCurrent ? "border-orange-500 bg-orange-500/10 text-orange-600 dark:text-orange-400 font-bold scale-105" :
+                      isChecking ? "border-blue-500 bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold scale-105" :
+                      "border-border bg-muted/20 text-muted-foreground"
+                    }`}
                   >
                     {num}
                   </div>
-                ))}
-              </div>
-            </Card>
-          </div>
-
-          {step.numSet.size > 0 && (
-            <div
-              key={`set-${currentStep}`}
-            >
-              <Card className="p-4">
-                <h3 className="text-sm font-semibold mb-3">Number Set (O(1) lookup)</h3>
-                <div className="flex gap-2 flex-wrap">
-                  {Array.from(step.numSet)
-                    .sort((a, b) => a - b)
-                    .map((num, idx) => (
-                      <div
-                        key={idx}
-                        className={`w-14 h-14 rounded flex items-center justify-center font-mono text-sm ${num === step.currentNum
-                          ? 'bg-primary text-primary-foreground'
-                          : num === step.checking
-                            ? 'bg-accent text-accent-foreground'
-                            : 'bg-secondary/50'
-                          }`}
-                      >
-                        {num}
-                      </div>
-                    ))}
-                </div>
-              </Card>
+                );
+              })}
             </div>
-          )}
+          </Card>
 
-          {step.longestStreak > 0 && (
-            <div
-              key={`streak-${currentStep}`}
-            >
-              <Card className="p-4">
-                <div className="space-y-2">
-                  <div className="text-sm">
-                    <span className="font-semibold">Longest Streak:</span> {step.longestStreak}
-                  </div>
-                  {step.currentStreak > 0 && (
-                    <div className="text-sm">
-                      <span className="font-semibold">Current Streak:</span> {step.currentStreak}
+          {step.numSet.length > 0 && (
+            <Card className="p-6 bg-card/50 backdrop-blur border-border/50 shadow-sm overflow-hidden relative animate-in fade-in duration-300">
+              <h3 className="text-sm font-semibold mb-4 text-center text-foreground font-sans">
+                Number HashSet (O(1) lookups)
+              </h3>
+              <div className="flex gap-2.5 flex-wrap justify-center py-2">
+                {step.numSet.map((num, idx) => {
+                  const isCurrent = num === step.currentNum;
+                  const isChecking = num === step.checking;
+                  return (
+                    <div
+                      key={idx}
+                      className={`w-12 h-12 rounded-lg flex items-center justify-center font-mono text-sm border-2 transition-all duration-300 ${
+                        isCurrent ? "border-orange-500 bg-orange-500/10 text-orange-600 dark:text-orange-400 font-bold scale-105" :
+                        isChecking ? "border-blue-500 bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold scale-105" :
+                        "border-border bg-secondary/50 text-foreground/80"
+                      }`}
+                    >
+                      {num}
                     </div>
-                  )}
-                </div>
-              </Card>
-            </div>
-          )}
-
-          <div
-            key={`execution-${currentStep}`}
-          >
-            <Card className="p-4 bg-muted/50">
-              <div className="space-y-2">
-                <div className="text-sm font-semibold text-primary">Current Execution:</div>
-                <div className="text-sm font-mono bg-background/50 p-2 rounded">
-                  {step.lineExecution}
-                </div>
-                <div className="text-sm text-muted-foreground pt-2">
-                  {step.explanation}
-                </div>
+                  );
+                })}
               </div>
             </Card>
-          </div>
+          )}
 
-          <div
-            key={`variables-${currentStep}`}
-          >
-            <VariablePanel variables={step.variables} />
-          </div>
-        </>
+          {/* Commentary Panel */}
+          <Card className="p-6 bg-card border-border/50 shadow-sm relative overflow-hidden transition-all duration-300">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-border/40">
+                <div className="flex items-center gap-2">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full bg-primary opacity-75 rounded-full" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+                  </span>
+                  <span className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">
+                    Algorithm Commentary
+                  </span>
+                </div>
+                <div className="font-mono text-[10px] tracking-tight bg-muted/60 text-muted-foreground px-2 py-0.5 rounded-full border border-border/40">
+                  Step {currentStepIndex + 1} of {steps.length}
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                  <Info className="w-4.5 h-4.5 text-primary" />
+                </div>
+                <div className="space-y-1 flex-1">
+                  <h4 className="text-[11px] font-bold uppercase tracking-widest text-primary/70">
+                    Current Action
+                  </h4>
+                  <div className="text-sm font-medium leading-relaxed text-foreground/90 select-none">
+                    {step.explanation}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          <VariablePanel variables={step.variables} />
+        </div>
       }
       rightContent={
-        <AnimatedCodeEditor
-          code={code}
-          language="typescript"
-          highlightedLines={step.highlightedLines}
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={handleReset}
         />
       }
       controls={
         <SimpleStepControls
-          currentStep={currentStep}
+          currentStep={currentStepIndex}
           totalSteps={steps.length}
-          onStepChange={setCurrentStep}
+          onStepChange={setCurrentStepIndex}
         />
       }
     />

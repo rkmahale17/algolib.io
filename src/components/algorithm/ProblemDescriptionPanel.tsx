@@ -817,7 +817,7 @@ export const ProblemDescriptionPanel = React.memo(
                         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent dark:from-primary/10 overflow-hidden">
                            {(algorithm?.id && (hasVisualization(algorithm.id) || renderBlind75Visualization(algorithm.id))) ? (
                              <div className="absolute top-0 left-0 w-[800px] h-[600px] origin-top-left scale-[0.4] opacity-50 pointer-events-none select-none blur-[0.5px]">
-                               {renderVizFromMapping(algorithm.id) || renderBlind75Visualization(algorithm.id)}
+                             {renderVizFromMapping(algorithm.id) || renderBlind75Visualization(algorithm.id)}
                              </div>
                            ) : (
                              <svg className="absolute inset-0 w-full h-full text-primary/30" fill="none" viewBox="0 0 300 120" stroke="currentColor" strokeWidth="1.5">

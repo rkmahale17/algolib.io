@@ -67,8 +67,8 @@ export const visualizationMap: Record<string, any> = {
   'copy-list-with-random-pointer': dynamic(() => import('@/components/visualizations/algorithms/CopyListWithRandomPointerVisualization').then(m => m.CopyListWithRandomPointerVisualization), { ssr: false }),
 
   // Graph Algorithms
-  'graph-dfs': dynamic(() => import('@/components/visualizations/GraphVisualization').then(m => m.GraphVisualization), { ssr: false }),
-  'graph-bfs': dynamic(() => import('@/components/visualizations/GraphVisualization').then(m => m.GraphVisualization), { ssr: false }),
+  'graph-dfs': dynamic(() => import('@/components/visualizations/algorithms/GraphDFSVisualization').then(m => m.GraphDFSVisualization), { ssr: false }),
+  'graph-bfs': dynamic(() => import('@/components/visualizations/algorithms/GraphBFSVisualization').then(m => m.GraphBFSVisualization), { ssr: false }),
   'number-of-islands': dynamic(() => import('@/components/visualizations/algorithms/NumberOfIslandsVisualization').then(m => m.NumberOfIslandsVisualization), { ssr: false }),
   'max-area-of-island': dynamic(() => import('@/components/visualizations/algorithms/MaxAreaOfIslandVisualization').then(m => m.MaxAreaOfIslandVisualization), { ssr: false }),
   'reconstruct-itinerary': dynamic(() => import('@/components/visualizations/algorithms/ReconstructItineraryVisualization').then(m => m.ReconstructItineraryVisualization), { ssr: false }),

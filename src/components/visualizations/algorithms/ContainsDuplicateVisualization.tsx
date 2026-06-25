@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
+import type { StepLineNumberMap, VisualizationLanguageMap } from '@/types/visualization';
 
 interface Step {
   nums: number[];
@@ -11,111 +12,174 @@ interface Step {
   seen: Set<number>;
   variables: Record<string, any>;
   explanation: string;
-  highlightedLines: number[];
-  lineExecution: string;
+  pseudoStep: string;
+}
+
+const languages: VisualizationLanguageMap = {
+  typescript: `function containsDuplicate(nums: number[]): boolean {
+    const seen = new Set<number>();
+    for (const num of nums) {
+        if (seen.has(num)) {
+            return true;
+        }
+        seen.add(num);
+    }
+    return false;
+}`,
+
+  python: `def containsDuplicate(nums: List[int]) -> bool:
+    seen = set()
+    for num in nums:
+        if num in seen:
+            return True
+        seen.add(num)
+    return False`,
+
+  java: `public static class Solution {
+    public boolean containsDuplicate(int[] nums) {
+        Set<Integer> seen = new HashSet<>();
+        for (int num : nums) {
+            if (seen.contains(num)) {
+                return true;
+            }
+            seen.add(num);
+        }
+        return false;
+    }
+}`,
+
+  cpp: `class Solution {
+public:
+    bool containsDuplicate(vector<int>& nums) {
+        unordered_set<int> seen;
+        for (int num : nums) {
+            if (seen.count(num)) {
+                return true;
+            }
+            seen.insert(num);
+        }
+        return false;
+    }
+};`,
+};
+
+function generateVisualizationData() {
+  const nums = [1, 2, 3, 1];
+  const steps: Step[] = [];
+  const seen = new Set<number>();
+
+  const stepLineNumbers: StepLineNumberMap = {
+    typescript: [],
+    python: [],
+    java: [],
+    cpp: []
+  };
+
+  const addLines = (ts: number, py: number, java: number, cpp: number) => {
+    stepLineNumbers.typescript!.push(ts);
+    stepLineNumbers.python!.push(py);
+    stepLineNumbers.java!.push(java);
+    stepLineNumbers.cpp!.push(cpp);
+  };
+
+  // 1. Initial State
+  steps.push({
+    nums,
+    highlights: [],
+    seen: new Set(seen),
+    variables: { nums: `[${nums.join(', ')}]`, seen: '{}' },
+    explanation: "Given an array of integers, check if any value appears at least twice.",
+    pseudoStep: "CALL containsDuplicate(nums)"
+  });
+  addLines(1, 1, 2, 3);
+
+  // 2. Initialize Set
+  steps.push({
+    nums,
+    highlights: [],
+    seen: new Set(seen),
+    variables: { nums: `[${nums.join(', ')}]`, seen: '{}' },
+    explanation: "Initialize an empty set to keep track of the numbers we have seen so far.",
+    pseudoStep: "SET seen = {} (empty set)"
+  });
+  addLines(2, 2, 3, 4);
+
+  for (let i = 0; i < nums.length; i++) {
+    const num = nums[i];
+
+    // Loop header
+    steps.push({
+      nums,
+      highlights: [i],
+      seen: new Set(seen),
+      variables: { i, num, seen: `{${Array.from(seen).join(', ')}}` },
+      explanation: `Examine the next number in the array: ${num} at index ${i}.`,
+      pseudoStep: `FOR num = ${num} in nums`
+    });
+    addLines(3, 3, 4, 5);
+
+    const isDuplicate = seen.has(num);
+
+    // Check condition
+    steps.push({
+      nums,
+      highlights: [i],
+      seen: new Set(seen),
+      variables: { i, num, seen: `{${Array.from(seen).join(', ')}}`, "seen.has(num)": isDuplicate },
+      explanation: `Check if ${num} is already present in our 'seen' set.`,
+      pseudoStep: `IF num (${num}) IN seen  →  ${isDuplicate ? 'YES ✓' : 'NO ✗'}`
+    });
+    addLines(4, 4, 5, 6);
+
+    if (isDuplicate) {
+      steps.push({
+        nums,
+        highlights: [i],
+        seen: new Set(seen),
+        variables: { i, num, seen: `{${Array.from(seen).join(', ')}}`, result: true },
+        explanation: `Found a duplicate! Since ${num} is already in the set, we return true.`,
+        pseudoStep: `RETURN true`
+      });
+      addLines(5, 5, 6, 7);
+      return { steps, stepLineNumbers };
+    }
+
+    seen.add(num);
+
+    // Add to set
+    steps.push({
+      nums,
+      highlights: [i],
+      seen: new Set(seen),
+      variables: { i, num, seen: `{${Array.from(seen).join(', ')}}` },
+      explanation: `${num} is not a duplicate. Add it to the 'seen' set and continue.`,
+      pseudoStep: `CALL seen.add(${num})`
+    });
+    addLines(7, 6, 8, 9);
+  }
+
+  // Return false if no duplicates
+  steps.push({
+    nums,
+    highlights: [],
+    seen: new Set(seen),
+    variables: { seen: `{${Array.from(seen).join(', ')}}`, result: false },
+    explanation: "Finished iterating through the array without finding any duplicates. Return false.",
+    pseudoStep: "RETURN false"
+  });
+  addLines(9, 7, 10, 11);
+
+  return { steps, stepLineNumbers };
 }
 
 export const ContainsDuplicateVisualization: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [{ steps, stepLineNumbers }] = useState(generateVisualizationData);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
-  const nums = [1, 2, 3, 1];
+  if (steps.length === 0) return null;
 
-  const code = `function containsDuplicate(nums: number[]): boolean {
-  const seen = new Set<number>();
-  for (let i = 0; i < nums.length; i++) {
-    if (seen.has(nums[i])) {
-      return true;
-    }
-    seen.add(nums[i]);
-  }
-  return false;
-}`;
-
-  const steps = useMemo(() => {
-    const stepsList: Step[] = [];
-    const seen = new Set<number>();
-
-    stepsList.push({
-      nums,
-      highlights: [],
-      seen: new Set(seen),
-      variables: { nums: `[${nums.join(', ')}]` },
-      explanation: "Given an array of integers, check if any value appears at least twice.",
-      lineExecution: "function containsDuplicate(nums: number[]): boolean {",
-      highlightedLines: [1]
-    });
-
-    stepsList.push({
-      nums,
-      highlights: [],
-      seen: new Set(seen),
-      variables: { seen: "{}" },
-      explanation: "Initialize an empty Set to store numbers we encounter.",
-      lineExecution: "const seen = new Set<number>();",
-      highlightedLines: [2]
-    });
-
-    for (let i = 0; i < nums.length; i++) {
-      stepsList.push({
-        nums,
-        highlights: [i],
-        seen: new Set(seen),
-        variables: { i, "nums[i]": nums[i], seen: `{${Array.from(seen).join(', ')}}` },
-        explanation: `Iteration i = ${i}: Examining the value ${nums[i]}.`,
-        lineExecution: "for (let i = 0; i < nums.length; i++) {",
-        highlightedLines: [3]
-      });
-
-      const duplicate = seen.has(nums[i]);
-      stepsList.push({
-        nums,
-        highlights: [i],
-        seen: new Set(seen),
-        variables: { "seen.has(nums[i])": duplicate },
-        explanation: `Check if ${nums[i]} is already in our 'seen' set. ${duplicate ? "Yes, it is!" : "No, not yet."}`,
-        lineExecution: "if (seen.has(nums[i])) {",
-        highlightedLines: [4]
-      });
-
-      if (duplicate) {
-        stepsList.push({
-          nums,
-          highlights: [i],
-          seen: new Set(seen),
-          variables: { result: true },
-          explanation: `Found a duplicate! Since ${nums[i]} exists in the set, we return true.`,
-          lineExecution: "return true;",
-          highlightedLines: [5]
-        });
-        return stepsList;
-      }
-
-      seen.add(nums[i]);
-      stepsList.push({
-        nums,
-        highlights: [i],
-        seen: new Set(seen),
-        variables: { seen: `{${Array.from(seen).join(', ')}}` },
-        explanation: `Add ${nums[i]} to the 'seen' set and continue to the next index.`,
-        lineExecution: "seen.add(nums[i]);",
-        highlightedLines: [7]
-      });
-    }
-
-    stepsList.push({
-      nums,
-      highlights: [],
-      seen: new Set(seen),
-      variables: { result: false },
-      explanation: "Finished loop without finding any duplicates. Return false.",
-      lineExecution: "return false;",
-      highlightedLines: [10]
-    });
-
-    return stepsList;
-  }, [nums]);
-
-  const step = steps[currentStep];
+  const currentStep = steps[currentStepIndex];
+  const pseudoSteps = steps.map(s => s.pseudoStep);
 
   return (
     <VisualizationLayout
@@ -129,8 +193,8 @@ export const ContainsDuplicateVisualization: React.FC = () => {
               <div className="mb-10">
                 <h4 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-6">Input Array</h4>
                 <div className="flex gap-3 justify-center">
-                  {nums.map((num, idx) => {
-                    const isCurrent = step.highlights.includes(idx);
+                  {currentStep.nums.map((num, idx) => {
+                    const isCurrent = currentStep.highlights.includes(idx);
                     return (
                       <div key={idx} className="flex flex-col items-center gap-2">
                         <div 
@@ -151,10 +215,10 @@ export const ContainsDuplicateVisualization: React.FC = () => {
               <div>
                 <h4 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-4">Seen Set Content</h4>
                 <div className="min-h-[60px] p-4 bg-muted/20 border border-dashed border-gray-200 rounded-xl flex flex-wrap gap-2 items-center justify-center">
-                  {step.seen.size === 0 ? (
+                  {currentStep.seen.size === 0 ? (
                     <span className="text-xs text-gray-400 italic">Empty Set</span>
                   ) : (
-                    Array.from(step.seen).map((val) => (
+                    Array.from(currentStep.seen).map((val) => (
                       <div key={val} className="px-3 py-1 bg-green-100 border border-green-300 text-green-800 rounded-full font-bold text-sm shadow-sm ring-1 ring-green-500/10">
                         {val}
                       </div>
@@ -165,50 +229,33 @@ export const ContainsDuplicateVisualization: React.FC = () => {
             </Card>
           </div>
 
-          <div>
-             <Card className="p-5 border-l-4 border-primary bg-primary/5 shadow-sm">
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="text-[10px] font-bold uppercase tracking-[0.1em] text-primary/80 mb-2">
-                       Current Execution
-                    </h4>
-                    <div className="text-sm font-mono bg-background/80 p-2.5 rounded-lg border border-border/50 shadow-sm inline-block">
-                       {step.lineExecution}
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="text-[10px] font-bold uppercase tracking-[0.1em] text-primary/80 mb-1">
-                       Commentary
-                    </h4>
-                    <p className="text-[14px] font-medium leading-relaxed text-foreground/90 whitespace-pre-wrap text-black">
-                       {step.explanation}
-                    </p>
-                  </div>
-                </div>
-             </Card>
+          <div className="mt-auto space-y-4">
+            <Card className="p-5 border-l-4 border-primary bg-primary/5 shadow-sm">
+              <h4 className="text-[10px] font-bold uppercase tracking-[0.1em] text-primary/80 mb-2">
+                Commentary
+              </h4>
+              <p className="text-[14px] font-medium leading-relaxed text-foreground/90 whitespace-pre-wrap">
+                {currentStep.explanation}
+              </p>
+            </Card>
+            <VariablePanel variables={currentStep.variables} />
           </div>
         </div>
       }
       rightContent={
-        <div className="space-y-6 flex flex-col h-full">
-           <div className="flex-1 overflow-hidden min-h-[400px]">
-             <AnimatedCodeEditor
-               code={code}
-               language="typescript"
-               highlightedLines={step.highlightedLines}
-             />
-           </div>
-           
-           <div className="p-1">
-             <VariablePanel variables={step.variables} />
-           </div>
-        </div>
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={() => setCurrentStepIndex(0)}
+        />
       }
       controls={
         <SimpleStepControls
-          currentStep={currentStep}
+          currentStep={currentStepIndex}
           totalSteps={steps.length}
-          onStepChange={setCurrentStep}
+          onStepChange={setCurrentStepIndex}
         />
       }
     />

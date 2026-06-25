@@ -17,9 +17,9 @@ interface LanguageSelectorProps {
 }
 
 const languages: { id: Language; name: string; icon: React.ElementType }[] = [
+  { id: 'python', name: 'Python', icon: Hash },
   { id: 'cpp', name: 'C++', icon: Code2 },
   { id: 'java', name: 'Java', icon: Coffee },
-  { id: 'python', name: 'Python', icon: Hash },
   { id: 'typescript', name: 'TypeScript', icon: FileJson },
   { id: 'sql', name: 'SQLite', icon: Database },
 ];

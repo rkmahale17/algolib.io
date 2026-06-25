@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
+import React, { useState, useMemo } from 'react';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
-import { StepControls } from '../shared/StepControls';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
+import { Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import type { StepLineNumberMap, VisualizationLanguageMap } from '@/types/visualization';
 
 interface Interval {
   start: number;
@@ -17,8 +19,8 @@ interface Step {
   previous: number;
   hasOverlap: boolean;
   isSorted: boolean;
-  message: string;
-  highlightedLines: number[];
+  explanation: string;
+  pseudoStep: string;
   variables: Record<string, any>;
 }
 
@@ -35,298 +37,329 @@ const USE_CASES = [
   }
 ];
 
-export const MeetingRoomsVisualization = () => {
-  const [useCaseIdx, setUseCaseIdx] = useState(0);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1); // Changed to 1-3x as per StepControls
-
-  const currentCase = USE_CASES[useCaseIdx];
-
-  const generateSteps = (rawIntervals: number[][]): Step[] => {
-    const intervals: Interval[] = rawIntervals.map((arr, index) => ({
-      start: arr[0],
-      end: arr[1],
-      originalIndex: index,
-    }));
-
-    const steps: Step[] = [];
-
-    // Step: Initial State
-    steps.push({
-      intervals: [...intervals],
-      current: -1,
-      previous: -1,
-      hasOverlap: false,
-      isSorted: false,
-      message: "Check if we have 0 or 1 meetings. If so, return true immediately.",
-      highlightedLines: [2],
-      variables: { "intervals.length": intervals.length, "Result": "Continue" }
-    });
-
-    // Step: Sorting (before)
-    steps.push({
-      intervals: [...intervals],
-      current: -1,
-      previous: -1,
-      hasOverlap: false,
-      isSorted: false,
-      message: "Sort the meetings by start time to process them chronologically.",
-      highlightedLines: [4],
-      variables: { "Action": "Sorting..." }
-    });
-
-    // Step: Sorting (after)
-    const sortedIntervals = [...intervals].sort((a, b) => a.start - b.start);
-    steps.push({
-      intervals: sortedIntervals,
-      current: -1,
-      previous: -1,
-      hasOverlap: false,
-      isSorted: true,
-      message: "Meetings are now sorted by their start times.",
-      highlightedLines: [4],
-      variables: { "Sorted": "True" }
-    });
-
-    // Loop steps
-    for (let i = 1; i < sortedIntervals.length; i++) {
-      const prev = sortedIntervals[i - 1];
-      const cur = sortedIntervals[i];
-      const overlap = cur.start < prev.end;
-
-      // i check
-      steps.push({
-        intervals: sortedIntervals,
-        current: i,
-        previous: i - 1,
-        hasOverlap: false,
-        isSorted: true,
-        message: `Loop iteration i = ${i}. Comparing meeting ${i} with meeting ${i - 1}.`,
-        highlightedLines: [6],
-        variables: { "i": i, "intervals.length": sortedIntervals.length }
-      });
-
-      // destructure cur
-      steps.push({
-        intervals: sortedIntervals,
-        current: i,
-        previous: i - 1,
-        hasOverlap: false,
-        isSorted: true,
-        message: `Current meeting: [${cur.start}, ${cur.end}].`,
-        highlightedLines: [7],
-        variables: { "start": cur.start, "end": cur.end }
-      });
-
-      // destructure prev
-      steps.push({
-        intervals: sortedIntervals,
-        current: i,
-        previous: i - 1,
-        hasOverlap: false,
-        isSorted: true,
-        message: `Previous meeting: [${prev.start}, ${prev.end}].`,
-        highlightedLines: [8],
-        variables: { "prevStart": prev.start, "prevEnd": prev.end }
-      });
-
-      // if check
-      steps.push({
-        intervals: sortedIntervals,
-        current: i,
-        previous: i - 1,
-        hasOverlap: false,
-        isSorted: true,
-        message: `Is start (${cur.start}) < previous end (${prev.end})?`,
-        highlightedLines: [10],
-        variables: { "check": `${cur.start} < ${prev.end}`, "result": overlap.toString() }
-      });
-
-      if (overlap) {
-        steps.push({
-          intervals: sortedIntervals,
-          current: i,
-          previous: i - 1,
-          hasOverlap: true,
-          isSorted: true,
-          message: `OVERLAP! Person cannot attend both meetings.`,
-          highlightedLines: [11],
-          variables: { "Conflict": "Overlap found", "Return": "false" }
-        });
-        return steps;
-      }
-    }
-
-    // Final Success
-    steps.push({
-      intervals: sortedIntervals,
-      current: -1,
-      previous: -1,
-      hasOverlap: false,
-      isSorted: true,
-      message: "Checked all consecutive pairs. No overlaps found!",
-      highlightedLines: [15],
-      variables: { "Return": "true" }
-    });
-
-    return steps;
-  };
-
-  const steps = generateSteps(currentCase.intervals);
-  const currentStep = steps[currentStepIndex] || steps[steps.length - 1];
-
-  const code = `function canAttendMeetings(intervals: number[][]): boolean {
+const languages: VisualizationLanguageMap = {
+  typescript: `function canAttendMeetings(intervals: number[][]): boolean {
   if (intervals.length <= 1) return true;
-  
   intervals.sort((a, b) => a[0] - b[0]);
-  
   for (let i = 1; i < intervals.length; i++) {
-    const [start, end] = intervals[i];
-    const [prevStart, prevEnd] = intervals[i - 1];
-    
-    if (start < prevEnd) {
+    if (intervals[i][0] < intervals[i - 1][1]) {
       return false;
     }
   }
-  
   return true;
-}`;
+}`,
 
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isPlaying && currentStepIndex < steps.length - 1) {
-      timer = setTimeout(() => {
-        setCurrentStepIndex(prev => prev + 1);
-      }, 2000 / speed);
-    } else {
-      setIsPlaying(false);
+  python: `def canAttendMeetings(intervals: list[list[int]]) -> bool:
+  if len(intervals) <= 1:
+    return True
+  intervals.sort(key=lambda x: x[0])
+  for i in range(1, len(intervals)):
+    if intervals[i][0] < intervals[i - 1][1]:
+      return False
+  return True`,
+
+  java: `public boolean canAttendMeetings(int[][] intervals) {
+  if (intervals.length <= 1) {
+    return true;
+  }
+  Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));
+  for (int i = 1; i < intervals.length; i++) {
+    if (intervals[i][0] < intervals[i - 1][1]) {
+      return false;
     }
-    return () => clearTimeout(timer);
-  }, [isPlaying, currentStepIndex, steps.length, speed]);
+  }
+  return true;
+}`,
+
+  cpp: `bool canAttendMeetings(vector<vector<int>>& intervals) {
+  if (intervals.size() <= 1) return true;
+  sort(intervals.begin(), intervals.end(), [](const auto& a, const auto& b) {
+    return a[0] < b[0];
+  });
+  for (size_t i = 1; i < intervals.size(); i++) {
+    if (intervals[i][0] < intervals[i - 1][1]) {
+      return false;
+    }
+  }
+  return true;
+}`
+};
+
+function generateVisualizationData(rawIntervals: number[][]) {
+  const intervals: Interval[] = rawIntervals.map((arr, index) => ({
+    start: arr[0],
+    end: arr[1],
+    originalIndex: index,
+  }));
+
+  const steps: Step[] = [];
+  const stepLineNumbers: StepLineNumberMap = {
+    typescript: [],
+    python: [],
+    java: [],
+    cpp: []
+  };
+
+  const addLines = (ts: number, py: number, java: number, cpp: number) => {
+    stepLineNumbers.typescript!.push(ts);
+    stepLineNumbers.python!.push(py);
+    stepLineNumbers.java!.push(java);
+    stepLineNumbers.cpp!.push(cpp);
+  };
+
+  steps.push({
+    intervals: [...intervals],
+    current: -1,
+    previous: -1,
+    hasOverlap: false,
+    isSorted: false,
+    explanation: "First, verify list size. If there's 0 or 1 meetings, the schedule is instantly valid.",
+    pseudoStep: "IF intervals.length <= 1 RETURN true",
+    variables: { "intervals.length": intervals.length }
+  });
+  addLines(2, 2, 2, 2);
+
+  steps.push({
+    intervals: [...intervals],
+    current: -1,
+    previous: -1,
+    hasOverlap: false,
+    isSorted: false,
+    explanation: "Sort all meetings by start time to evaluate intervals sequentially.",
+    pseudoStep: "SORT intervals BY start_time ASC",
+    variables: { "action": "sorting" }
+  });
+  addLines(3, 4, 5, 3);
+
+  const sortedIntervals = [...intervals].sort((a, b) => a.start - b.start);
+  steps.push({
+    intervals: sortedIntervals,
+    current: -1,
+    previous: -1,
+    hasOverlap: false,
+    isSorted: true,
+    explanation: "Meetings are successfully sorted by start time.",
+    pseudoStep: "SORT COMPLETE",
+    variables: { "sorted": true }
+  });
+  addLines(3, 4, 5, 3);
+
+  for (let i = 1; i < sortedIntervals.length; i++) {
+    const prev = sortedIntervals[i - 1];
+    const cur = sortedIntervals[i];
+    const overlap = cur.start < prev.end;
+
+    steps.push({
+      intervals: sortedIntervals,
+      current: i,
+      previous: i - 1,
+      hasOverlap: false,
+      isSorted: true,
+      explanation: `Iteration i = ${i}: Compare meeting ${i} ([${cur.start}, ${cur.end}]) with meeting ${i - 1} ([${prev.start}, ${prev.end}]).`,
+      pseudoStep: `FOR i = ${i} TO intervals.length - 1`,
+      variables: { i, "current_meeting": `[${cur.start}, ${cur.end}]`, "previous_meeting": `[${prev.start}, ${prev.end}]` }
+    });
+    addLines(4, 5, 6, 6);
+
+    steps.push({
+      intervals: sortedIntervals,
+      current: i,
+      previous: i - 1,
+      hasOverlap: false,
+      isSorted: true,
+      explanation: `Check if current start (${cur.start}) is less than previous end (${prev.end}): ${cur.start} < ${prev.end}?`,
+      pseudoStep: `IF current.start < previous.end`,
+      variables: { i, "curr.start": cur.start, "prev.end": prev.end }
+    });
+    addLines(5, 6, 7, 7);
+
+    if (overlap) {
+      steps.push({
+        intervals: sortedIntervals,
+        current: i,
+        previous: i - 1,
+        hasOverlap: true,
+        isSorted: true,
+        explanation: `Overlap detected! Meeting starts at ${cur.start} before previous finishes at ${prev.end}. Return false.`,
+        pseudoStep: `RETURN false`,
+        variables: { "conflict": true, "return": false }
+      });
+      addLines(6, 7, 8, 8);
+      return { steps, stepLineNumbers };
+    }
+  }
+
+  steps.push({
+    intervals: sortedIntervals,
+    current: -1,
+    previous: -1,
+    hasOverlap: false,
+    isSorted: true,
+    explanation: "Checked all consecutive intervals. No overlaps found. Return true.",
+    pseudoStep: "RETURN true",
+    variables: { "return": true }
+  });
+  addLines(9, 8, 11, 11);
+
+  return { steps, stepLineNumbers };
+}
+
+export const MeetingRoomsVisualization: React.FC = () => {
+  const [useCaseIdx, setUseCaseIdx] = useState(0);
+  const currentCase = USE_CASES[useCaseIdx];
+  const { steps, stepLineNumbers } = useMemo(() => generateVisualizationData(currentCase.intervals), [useCaseIdx]);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+
+  const handleReset = () => {
+    setCurrentStepIndex(0);
+  };
 
   const handleUseCaseChange = (idx: number) => {
     setUseCaseIdx(idx);
     setCurrentStepIndex(0);
-    setIsPlaying(false);
   };
 
+  const currentStep = steps[currentStepIndex] || steps[steps.length - 1];
+  const pseudoSteps = steps.map((s) => s.pseudoStep);
+
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-6 bg-muted/30 p-6 rounded-xl border border-border shadow-sm">
-        <div className="flex flex-wrap gap-2">
-          {USE_CASES.map((uc, idx) => (
-            <Button
-              key={uc.id}
-              variant={useCaseIdx === idx ? "default" : "outline"}
-              size="sm"
-              onClick={() => handleUseCaseChange(idx)}
-              className={`text-xs h-8 px-4 rounded-full transition-all duration-200 ${useCaseIdx === idx ? "shadow-md scale-105" : "hover:bg-muted"
-                }`}
-            >
-              {uc.label}
-            </Button>
-          ))}
-        </div>
-
-        <div className="w-full pt-4 border-t border-border/50">
-          <StepControls
-            currentStep={currentStepIndex}
-            totalSteps={steps.length - 1}
-            onStepForward={() => setCurrentStepIndex(prev => Math.min(steps.length - 1, prev + 1))}
-            onStepBack={() => setCurrentStepIndex(prev => Math.max(0, prev - 1))}
-            isPlaying={isPlaying}
-            onPlay={() => setIsPlaying(true)}
-            onPause={() => setIsPlaying(false)}
-            onReset={() => {
-              setCurrentStepIndex(0);
-              setIsPlaying(false);
-            }}
-            speed={speed}
-            onSpeedChange={setSpeed}
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 pt-2">
-        <Card className="p-6 flex flex-col gap-6 overflow-hidden">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4 text-xs">
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded bg-primary/20 border border-primary"></div>
-                <span className="text-foreground">Normal</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded bg-destructive/20 border border-destructive"></div>
-                <span className="text-foreground">Conflict</span>
-              </div>
-            </div>
+    <VisualizationLayout
+      leftContent={
+        <div className="space-y-6">
+          <div className="flex flex-wrap gap-2">
+            {USE_CASES.map((uc, idx) => (
+              <Button
+                key={uc.id}
+                variant={useCaseIdx === idx ? "default" : "outline"}
+                size="sm"
+                onClick={() => handleUseCaseChange(idx)}
+                className={`text-xs h-8 px-4 rounded-full transition-all duration-200 ${useCaseIdx === idx ? "shadow-md scale-105" : "hover:bg-muted"}`}
+              >
+                {uc.label}
+              </Button>
+            ))}
           </div>
 
-          <div className="relative pt-8 pb-4 px-2 min-h-[300px]">
-            <div className="absolute top-0 left-0 right-0 flex justify-between text-[10px] text-muted-foreground border-b pb-1">
-              {[0, 5, 10, 15, 20, 25, 30].map(t => <span key={t} className="text-muted-foreground">{t}</span>)}
-            </div>
-
-            <div className="space-y-4 mt-4">
-              {currentStep.intervals.map((interval, idx) => {
-                const isCurrent = idx === currentStep.current;
-                const isPrevious = idx === currentStep.previous;
-                const isConflicting = (isCurrent || isPrevious) && currentStep.hasOverlap;
-
-                return (
-                  <div key={`${useCaseIdx}-${idx}`} className="relative h-8 flex items-center">
-                    <span className="w-8 text-[10px] font-mono text-muted-foreground">M{idx}</span>
-                    <div className="flex-1 relative h-full bg-muted/20 rounded-sm">
-                      <div
-                        className={`absolute inset-y-1 rounded border shadow-sm flex items-center justify-center text-[10px] font-bold transition-all duration-300 ${isConflicting
-                          ? "bg-destructive/20 border-destructive text-destructive z-20 scale-[1.05]"
-                          : isCurrent || isPrevious
-                            ? "bg-primary/20 border-primary text-primary z-10 scale-[1.02]"
-                            : "bg-secondary border-border text-foreground opacity-60"
-                          }`}
-                        style={{
-                          left: `${(interval.start / 30) * 100}%`,
-                          width: `${((interval.end - interval.start) / 30) * 100}%`,
-                        }}
-                      >
-                        <span className="truncate px-1 text-foreground">{interval.start}-{interval.end}</span>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {currentStep.previous !== -1 && currentStep.current !== -1 && (
-              <div
-                className={`absolute top-0 bottom-0 border-l-2 border-dashed transition-all duration-500 z-30 ${currentStep.hasOverlap ? 'border-destructive' : 'border-primary/50'
-                  }`}
-                style={{
-                  left: `calc(32px + ${(currentStep.intervals[currentStep.previous].end / 30) * (100 - (32 / 400 * 100))}%`
-                }}
-              >
-                <div className={`text-[8px] font-bold px-1 rounded-sm -ml-2 mb-1 ${currentStep.hasOverlap ? 'bg-destructive text-white' : 'bg-primary text-white'
-                  }`}>
-                  End: {currentStep.intervals[currentStep.previous].end}
+          <div className="bg-card rounded-xl p-6 border border-border/50 shadow-sm space-y-6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-foreground">Timeline</h3>
+              <div className="flex items-center gap-4 text-xs">
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded bg-primary/25 border border-primary"></div>
+                  <span className="text-muted-foreground text-[10px]">Comparing</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded bg-red-500/20 border border-red-500"></div>
+                  <span className="text-muted-foreground text-[10px]">Conflict</span>
                 </div>
               </div>
-            )}
+            </div>
+
+            <div className="relative pt-8 pb-4 px-2 min-h-[160px]">
+              <div className="absolute top-0 left-0 right-0 flex justify-between text-[10px] text-muted-foreground border-b pb-1">
+                {[0, 5, 10, 15, 20, 25, 30].map(t => <span key={t}>{t}</span>)}
+              </div>
+
+              <div className="space-y-3 mt-4">
+                {currentStep.intervals.map((interval, idx) => {
+                  const isCurrent = idx === currentStep.current;
+                  const isPrevious = idx === currentStep.previous;
+                  const isConflicting = (isCurrent || isPrevious) && currentStep.hasOverlap;
+
+                  return (
+                    <div key={idx} className="relative h-8 flex items-center">
+                      <span className="w-8 text-[10px] font-mono text-muted-foreground">M{idx}</span>
+                      <div className="flex-1 relative h-full bg-muted/20 rounded-sm">
+                        <div
+                          className={`absolute inset-y-1 rounded border shadow-sm flex items-center justify-center text-[10px] font-bold transition-all duration-300 ${
+                            isConflicting
+                              ? "bg-red-500/25 border-red-500 text-red-600 dark:text-red-400 z-20 scale-[1.03]"
+                              : isCurrent || isPrevious
+                              ? "bg-primary/20 border-primary text-primary z-10 scale-[1.01]"
+                              : "bg-muted border-border text-foreground/50 opacity-60"
+                          }`}
+                          style={{
+                            left: `${(interval.start / 30) * 100}%`,
+                            width: `${((interval.end - interval.start) / 30) * 100}%`,
+                          }}
+                        >
+                          <span className="truncate px-1">{interval.start}-{interval.end}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {currentStep.previous !== -1 && currentStep.current !== -1 && (
+                <div
+                  className={`absolute top-0 bottom-0 border-l-2 border-dashed transition-all duration-500 z-30 ${currentStep.hasOverlap ? 'border-red-500' : 'border-primary/50'}`}
+                  style={{
+                    left: `calc(32px + ${(currentStep.intervals[currentStep.previous].end / 30) * (100 - (32 / 400 * 100))}%`
+                  }}
+                >
+                  <div className={`text-[8px] font-bold px-1 rounded-sm -ml-2 mb-1 ${currentStep.hasOverlap ? 'bg-red-500 text-white' : 'bg-primary text-white'}`}>
+                    End: {currentStep.intervals[currentStep.previous].end}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="p-4 bg-muted/50 rounded-lg text-sm leading-relaxed text-foreground border border-border/50">
-            {currentStep.message}
+          <div className="bg-card/50 backdrop-blur-sm rounded-xl border border-border/50 p-6 relative overflow-hidden transition-all duration-300 shadow-sm">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-border/40">
+                <div className="flex items-center gap-2">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full bg-primary opacity-75 rounded-full" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+                  </span>
+                  <span className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">
+                    Algorithm Commentary
+                  </span>
+                </div>
+                <div className="font-mono text-[10px] tracking-tight bg-muted/60 text-muted-foreground px-2 py-0.5 rounded-full border border-border/40">
+                  Step {currentStepIndex + 1} of {steps.length}
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                  <Info className="w-4.5 h-4.5 text-primary" />
+                </div>
+                <div className="space-y-1 flex-1">
+                  <h4 className="text-[11px] font-bold uppercase tracking-widest text-primary/70">
+                    Current Action
+                  </h4>
+                  <div className="text-sm font-medium leading-relaxed text-foreground/90 select-none">
+                    {currentStep.explanation}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <VariablePanel variables={currentStep.variables} />
-        </Card>
-
-        <AnimatedCodeEditor
-          code={code}
-          language="typescript"
-          highlightedLines={currentStep.highlightedLines}
+        </div>
+      }
+      rightContent={
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={handleReset}
         />
-      </div>
-    </div>
+      }
+      controls={
+        <SimpleStepControls
+          currentStep={currentStepIndex}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStepIndex}
+        />
+      }
+    />
   );
 };
+
+export default MeetingRoomsVisualization;

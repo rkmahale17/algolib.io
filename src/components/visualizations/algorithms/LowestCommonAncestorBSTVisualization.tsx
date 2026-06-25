@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
+import type { StepLineNumberMap, VisualizationLanguageMap } from '@/types/visualization';
 
 interface Step {
   currentNode: number | null;
@@ -11,71 +11,171 @@ interface Step {
   q: number;
   found: boolean;
   message: string;
-  lineNumber: number;
+  pseudoStep: string;
   variables: Record<string, any>;
 }
 
-export const LowestCommonAncestorBSTVisualization = () => {
-  const code = `function lowestCommonAncestor(root, p, q) {
-  let cur = root;
-
+const languages: VisualizationLanguageMap = {
+  typescript: `function lowestCommonAncestor(
+  root: TreeNode | null,
+  p: TreeNode,
+  q: TreeNode
+): TreeNode | null {
+  let cur = root
   while (cur) {
     if (p.val > cur.val && q.val > cur.val) {
-      cur = cur.right;
-    } else if (p.val < cur.val && q.val < cur.val) {
-      cur = cur.left;
-    } else {
-      return cur;
+      cur = cur.right
+    }
+    else if (p.val < cur.val && q.val < cur.val) {
+      cur = cur.left
+    }
+    else {
+      return cur
     }
   }
+  return null
+}`,
 
-  return null;
-}`;
+  python: `def lowestCommonAncestor(root, p, q):
+    cur = root
+    while cur:
+        if p.val > cur.val and q.val > cur.val:
+            cur = cur.right
+        elif p.val < cur.val and q.val < cur.val:
+            cur = cur.left
+        else:
+            return cur
+    return None`,
 
-  // Example 1: LCA(3, 5) -> 4
-  const steps1: Step[] = [
-    { currentNode: null, p: 3, q: 5, found: false, message: "Find LCA of nodes 3 and 5 in the BST.", lineNumber: 1, variables: { p: '3', q: '5', root: '6' } },
-    { currentNode: 6, p: 3, q: 5, found: false, message: "Initialize 'cur' with the root node (6).", lineNumber: 2, variables: { cur: '6', p: '3', q: '5' } },
-    { currentNode: 6, p: 3, q: 5, found: false, message: "While 'cur' is not null, traverse the tree.", lineNumber: 4, variables: { cur: '6' } },
-    { currentNode: 6, p: 3, q: 5, found: false, message: "Compare p(3) and q(5) with cur(6).", lineNumber: 5, variables: { p: '3', q: '5', cur: '6', 'both > cur': false } },
-    { currentNode: 6, p: 3, q: 5, found: false, message: "Check if both p(3) and q(5) are less than cur(6).", lineNumber: 7, variables: { p: '3', q: '5', cur: '6', 'both < cur': true } },
-    { currentNode: 6, p: 3, q: 5, found: false, message: "Both are smaller. Move 'cur' to the left child (2).", lineNumber: 8, variables: { cur: '6', next: 'left (2)' } },
-    { currentNode: 2, p: 3, q: 5, found: false, message: "Updated 'cur' to 2. Continue loop.", lineNumber: 4, variables: { cur: '2' } },
-    { currentNode: 2, p: 3, q: 5, found: false, message: "Check if both p(3) and q(5) are greater than cur(2).", lineNumber: 5, variables: { p: '3', q: '5', cur: '2', 'both > cur': true } },
-    { currentNode: 2, p: 3, q: 5, found: false, message: "Both are greater. Move 'cur' to the right child (4).", lineNumber: 6, variables: { cur: '2', next: 'right (4)' } },
-    { currentNode: 4, p: 3, q: 5, found: false, message: "Updated 'cur' to 4. Continue loop.", lineNumber: 4, variables: { cur: '4' } },
-    { currentNode: 4, p: 3, q: 5, found: false, message: "Check if both nodes are in the same subtree.", lineNumber: 5, variables: { p: '3', q: '5', cur: '4', 'both > cur': false } },
-    { currentNode: 4, p: 3, q: 5, found: false, message: "Check if both nodes are in the same subtree.", lineNumber: 7, variables: { p: '3', q: '5', cur: '4', 'both < cur': false } },
-    { currentNode: 4, p: 3, q: 5, found: false, message: "Neither condition met. Split point found at 4!", lineNumber: 10, variables: { cur: '4', status: 'split' } },
-    { currentNode: 4, p: 3, q: 5, found: true, message: "Node 4 is the Lowest Common Ancestor.", lineNumber: 10, variables: { LCA: '4' } }
-  ];
+  java: `public static class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        TreeNode cur = root;
+        while (cur != null) {
+            if (p.val > cur.val && q.val > cur.val) {
+                cur = cur.right;
+            }
+            else if (p.val < cur.val && q.val < cur.val) {
+                cur = cur.left;
+            }
+            else {
+                return cur;
+            }
+        }
+        return null;
+    }
+}`,
 
-  // Example 2: LCA(2, 4) -> 2
-  const steps2: Step[] = [
-    { currentNode: null, p: 2, q: 4, found: false, message: "Find LCA of nodes 2 and 4 (where 2 is an ancestor of 4).", lineNumber: 1, variables: { p: '2', q: '4', root: '6' } },
-    { currentNode: 6, p: 2, q: 4, found: false, message: "Initialize 'cur' with the root node (6).", lineNumber: 2, variables: { cur: '6' } },
-    { currentNode: 6, p: 2, q: 4, found: false, message: "Check traversal conditions at node 6.", lineNumber: 7, variables: { p: '2', q: '4', cur: '6', 'both < cur': true } },
-    { currentNode: 6, p: 2, q: 4, found: false, message: "Both are smaller. Move to left child (2).", lineNumber: 8, variables: { next: 'left (2)' } },
-    { currentNode: 2, p: 2, q: 4, found: false, message: "Updated 'cur' to 2. Continue loop.", lineNumber: 4, variables: { cur: '2' } },
-    { currentNode: 2, p: 2, q: 4, found: false, message: "At node 2, p(2) matches cur(2).", lineNumber: 5, variables: { p: '2', q: '4', cur: '2', 'both > cur': false } },
-    { currentNode: 2, p: 2, q: 4, found: false, message: "At node 2, p(2) matches cur(2).", lineNumber: 7, variables: { p: '2', q: '4', cur: '2', 'both < cur': false } },
-    { currentNode: 2, p: 2, q: 4, found: false, message: "Split/Found point identified at 2.", lineNumber: 10, variables: { cur: '2', status: 'LCA node reached' } },
-    { currentNode: 2, p: 2, q: 4, found: true, message: "Node 2 is the Lowest Common Ancestor.", lineNumber: 10, variables: { LCA: '2' } }
-  ];
+  cpp: `class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        TreeNode* cur = root;
+        while (cur) {
+            if (p->val > cur->val && q->val > cur->val) {
+                cur = cur->right;
+            }
+            else if (p->val < cur->val && q->val < cur->val) {
+                cur = cur->left;
+            }
+            else {
+                return cur;
+            }
+        }
+        return nullptr;
+    }
+};`,
+};
 
-  const allSteps = [...steps1, ...steps2];
+export const LowestCommonAncestorBSTVisualization = () => {
+  const generateSteps = () => {
+    const steps: Step[] = [];
+    const stepLineNumbers: StepLineNumberMap = {
+      typescript: [],
+      python: [],
+      java: [],
+      cpp: []
+    };
 
-  const [idx, setIdx] = useState(0);
+    const addLines = (ts: number, py: number, java: number, cpp: number) => {
+      stepLineNumbers.typescript!.push(ts);
+      stepLineNumbers.python!.push(py);
+      stepLineNumbers.java!.push(java);
+      stepLineNumbers.cpp!.push(cpp);
+    };
+
+    const addStep = (
+      currentNode: number | null,
+      p: number,
+      q: number,
+      found: boolean,
+      msg: string,
+      pseudo: string,
+      ts_l: number, py_l: number, java_l: number, cpp_l: number
+    ) => {
+      steps.push({
+        currentNode,
+        p,
+        q,
+        found,
+        message: msg,
+        pseudoStep: pseudo,
+        variables: {
+          currentNode: currentNode ?? 'null',
+          p,
+          q,
+          found: found ? 'TRUE' : 'FALSE'
+        }
+      });
+      addLines(ts_l, py_l, java_l, cpp_l);
+    };
+
+    // Run Example 1: LCA(3, 5) -> 4
+    const p1 = 3, q1 = 5;
+    addStep(null, p1, q1, false, "Find LCA of nodes 3 and 5 in the BST.", "START lowestCommonAncestor(root, p=3, q=5)", 1, 1, 2, 3);
+    addStep(6, p1, q1, false, "Initialize 'cur' with the root node (6).", "cur = root", 6, 2, 3, 4);
+    addStep(6, p1, q1, false, "Check if 'cur' is not null.", "while (cur)", 7, 3, 4, 5);
+    addStep(6, p1, q1, false, "Compare target values with current node 6.", "if (p.val > cur.val && q.val > cur.val)", 8, 4, 5, 6);
+    addStep(6, p1, q1, false, "Check if both p and q are in the left subtree of 6.", "else if (p.val < cur.val && q.val < cur.val)", 11, 6, 8, 9);
+    addStep(6, p1, q1, false, "Both nodes are smaller than 6. Move 'cur' left.", "cur = cur.left", 12, 7, 9, 10);
+    
+    addStep(2, p1, q1, false, "Check if 'cur' (2) is not null.", "while (cur)", 7, 3, 4, 5);
+    addStep(2, p1, q1, false, "Check if both p and q are in the right subtree of 2.", "if (p.val > cur.val && q.val > cur.val)", 8, 4, 5, 6);
+    addStep(2, p1, q1, false, "Both nodes are larger than 2. Move 'cur' right.", "cur = cur.right", 9, 5, 6, 7);
+
+    addStep(4, p1, q1, false, "Check if 'cur' (4) is not null.", "while (cur)", 7, 3, 4, 5);
+    addStep(4, p1, q1, false, "Check if both target values are in the right subtree of 4.", "if (p.val > cur.val && q.val > cur.val)", 8, 4, 5, 6);
+    addStep(4, p1, q1, false, "Check if both target values are in the left subtree of 4.", "else if (p.val < cur.val && q.val < cur.val)", 11, 6, 8, 9);
+    addStep(4, p1, q1, false, "Neither condition met. Split point found at 4.", "else", 14, 8, 11, 12);
+    addStep(4, p1, q1, true, "Node 4 is the Lowest Common Ancestor. Return cur.", "return cur", 15, 9, 12, 13);
+
+    // Run Example 2: LCA(2, 4) -> 2
+    const p2 = 2, q2 = 4;
+    addStep(null, p2, q2, false, "Find LCA of nodes 2 and 4 (2 is ancestor of 4).", "START lowestCommonAncestor(root, p=2, q=4)", 1, 1, 2, 3);
+    addStep(6, p2, q2, false, "Initialize 'cur' with the root node (6).", "cur = root", 6, 2, 3, 4);
+    addStep(6, p2, q2, false, "Check if 'cur' (6) is not null.", "while (cur)", 7, 3, 4, 5);
+    addStep(6, p2, q2, false, "Compare target values with current node 6.", "if (p.val > cur.val && q.val > cur.val)", 8, 4, 5, 6);
+    addStep(6, p2, q2, false, "Check if both p and q are in the left subtree of 6.", "else if (p.val < cur.val && q.val < cur.val)", 11, 6, 8, 9);
+    addStep(6, p2, q2, false, "Both nodes are smaller than 6. Move 'cur' left.", "cur = cur.left", 12, 7, 9, 10);
+
+    addStep(2, p2, q2, false, "Check if 'cur' (2) is not null.", "while (cur)", 7, 3, 4, 5);
+    addStep(2, p2, q2, false, "Check if both p and q are in the right subtree of 2.", "if (p.val > cur.val && q.val > cur.val)", 8, 4, 5, 6);
+    addStep(2, p2, q2, false, "Check if both p and q are in the left subtree of 2.", "else if (p.val < cur.val && q.val < cur.val)", 11, 6, 8, 9);
+    addStep(2, p2, q2, false, "One value is cur.val (2). Split point found at 2.", "else", 14, 8, 11, 12);
+    addStep(2, p2, q2, true, "Node 2 is the Lowest Common Ancestor. Return cur.", "return cur", 15, 9, 12, 13);
+
+    return { steps, stepLineNumbers };
+  };
+
+  const [{ steps, stepLineNumbers }] = useState(generateSteps);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
-  const step = allSteps[idx];
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    if (isPlaying && idx < allSteps.length - 1) {
+    if (isPlaying && currentStepIndex < steps.length - 1) {
       intervalRef.current = setInterval(() => {
-        setIdx(prev => {
-          if (prev >= allSteps.length - 1) {
+        setCurrentStepIndex(prev => {
+          if (prev >= steps.length - 1) {
             setIsPlaying(false);
             return prev;
           }
@@ -87,17 +187,22 @@ export const LowestCommonAncestorBSTVisualization = () => {
     }
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
-    }
-  }, [isPlaying, idx, allSteps.length, speed]);
+    };
+  }, [isPlaying, currentStepIndex, steps.length, speed]);
 
   const handlePlay = () => setIsPlaying(true);
   const handlePause = () => setIsPlaying(false);
-  const handleStepForward = () => idx < allSteps.length - 1 && setIdx(prev => prev + 1);
-  const handleStepBack = () => idx > 0 && setIdx(prev => prev - 1);
+  const handleStepForward = () => currentStepIndex < steps.length - 1 && setCurrentStepIndex(prev => prev + 1);
+  const handleStepBack = () => currentStepIndex > 0 && setCurrentStepIndex(prev => prev - 1);
   const handleReset = () => {
-    setIdx(0);
+    setCurrentStepIndex(0);
     setIsPlaying(false);
   };
+
+  if (steps.length === 0) return null;
+
+  const currentStep = steps[currentStepIndex];
+  const pseudoSteps = steps.map(s => s.pseudoStep);
 
   const renderTree = () => {
     const nodes = [
@@ -135,22 +240,22 @@ export const LowestCommonAncestorBSTVisualization = () => {
           </g>
         ))}
         {nodes.map((pos) => {
-          const isCurrent = step.currentNode === pos.val;
-          const isTarget = pos.val === step.p || pos.val === step.q;
-          const isLCA = step.found && step.currentNode === pos.val;
+          const isCurrent = currentStep.currentNode === pos.val;
+          const isTarget = pos.val === currentStep.p || pos.val === currentStep.q;
+          const isLCA = currentStep.found && currentStep.currentNode === pos.val;
 
           return (
             <g key={pos.val}>
               <motion.circle
                 initial={false}
                 animate={{
-                  r: isCurrent ? 26 : 22,
-                  strokeWidth: isCurrent ? 4 : 2
+                  r: isCurrent ? 24 : 20,
+                  strokeWidth: isCurrent ? 3 : 2
                 }}
                 cx={pos.x}
                 cy={pos.y}
                 className={`transition-all duration-500 ${isLCA
-                  ? 'fill-green-500 stroke-green-600 shadow-lg shadow-green-500/50'
+                  ? 'fill-green-600 stroke-green-700 shadow-lg'
                   : isCurrent
                     ? 'fill-primary stroke-primary'
                     : isTarget
@@ -163,18 +268,18 @@ export const LowestCommonAncestorBSTVisualization = () => {
                 y={pos.y}
                 textAnchor="middle"
                 dy=".3em"
-                className={`text-sm font-medium transition-colors duration-300 ${isTarget || isCurrent || isLCA ? 'fill-white' : 'fill-foreground'}`}
+                className={`text-sm font-semibold transition-colors duration-300 ${isTarget || isCurrent || isLCA ? 'fill-white' : 'fill-foreground'}`}
               >
                 {pos.val}
               </text>
               {isTarget && !isLCA && !isCurrent && (
                 <text
                   x={pos.x}
-                  y={pos.y - 32}
+                  y={pos.y - 28}
                   textAnchor="middle"
                   className="text-xs font-bold fill-blue-600 animate-pulse"
                 >
-                  {pos.val === step.p ? 'p' : 'q'}
+                  {pos.val === currentStep.p ? 'p' : 'q'}
                 </text>
               )}
             </g>
@@ -195,11 +300,12 @@ export const LowestCommonAncestorBSTVisualization = () => {
         onReset={handleReset}
         speed={speed}
         onSpeedChange={setSpeed}
-        currentStep={idx}
-        totalSteps={allSteps.length - 1}
+        currentStep={currentStepIndex}
+        totalSteps={steps.length - 1}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left: visual tree + commentary box + variable panel */}
         <div className="space-y-4">
           <div className="bg-muted/30 rounded-lg border border-border/50 p-6 pb-4 overflow-hidden relative">
             <div className="absolute top-4 right-4 flex gap-4">
@@ -215,26 +321,38 @@ export const LowestCommonAncestorBSTVisualization = () => {
             {renderTree()}
           </div>
 
-          <div className={`rounded-lg border p-4 transition-all duration-300 ${step.found ? 'bg-green-500/10 border-green-500' : 'bg-accent/50 border-accent'}`}>
+          <div className={`rounded-lg border p-4 transition-all duration-300 ${currentStep.found ? 'bg-green-500/10 border-green-500' : 'bg-accent/50 border-accent'}`}>
             <AnimatePresence mode="wait">
               <motion.p
-                key={idx}
+                key={currentStepIndex}
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 className="text-sm text-foreground font-medium"
               >
-                {step.message}
+                {currentStep.message}
               </motion.p>
             </AnimatePresence>
           </div>
 
-          <div className='rounded-lg border bg-card'>
-            <VariablePanel variables={step.variables} />
-          </div>
+          <VariablePanel
+            variables={{
+              cur: currentStep.currentNode ?? 'null',
+              p: currentStep.p,
+              q: currentStep.q,
+              LCAFound: currentStep.found ? 'TRUE' : 'FALSE'
+            }}
+          />
         </div>
 
-        <AnimatedCodeEditor code={code} highlightedLines={[step.lineNumber]} language="TypeScript" />
+        {/* Right: code / pseudocode panel */}
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={handleReset}
+        />
       </div>
     </div>
   );
