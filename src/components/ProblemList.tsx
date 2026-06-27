@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
-import { Search, TrendingUp, BookOpen, Check, Circle, MoreVertical, Timer, Database, ExternalLink, Lock, LayoutGrid, List } from 'lucide-react';
+import { Search, TrendingUp, BookOpen, Check, Circle, MoreVertical, Timer, Database, ExternalLink, Lock, LayoutGrid, List, ArrowUp } from 'lucide-react';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
@@ -71,6 +71,29 @@ export const ProblemList = ({
   const [sortBy, setSortBy] = useState<string>('serial-asc');
   const [viewMode, setViewMode] = useState<'list' | 'grid'>(initialViewMode || 'grid');
   const [mounted, setMounted] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  const topRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!topRef.current) return;
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Hide button when topRef is near the top of the screen (or within 300px above it)
+        setShowScrollTop(!entries[0].isIntersecting);
+      },
+      { threshold: 0, rootMargin: '300px 0px 0px 0px' }
+    );
+    
+    observer.observe(topRef.current);
+    
+    return () => observer.disconnect();
+  }, [mounted]);
+
+  const scrollToTop = () => {
+    topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
   const { hasPremiumAccess, activeListType, setActiveListType, progressMap, user } = useApp();
   const isPaywallEnabled = useFeatureFlag('paywall_enabled');
   const posthog = usePostHog();
@@ -163,7 +186,7 @@ export const ProblemList = ({
 
   const virtualizer = useWindowVirtualizer({
     count: filteredAndSortedAlgorithms.length,
-    estimateSize: () => 110, // Approximate height of AlgorithmCard
+    estimateSize: () => 90, // Approximate height of AlgorithmCard
     overscan: 5,
   });
 
@@ -235,6 +258,8 @@ export const ProblemList = ({
 
   return (
     <div className={isSidebar ? "space-y-4" : "space-y-6"}>
+      {/* Anchor for scroll-to-top */}
+      <div ref={topRef} className="w-full h-0 pointer-events-none" aria-hidden="true" />
 
       {/* Single Container Table */}
       {!mounted || isLoading || !algorithms ? (
@@ -474,6 +499,16 @@ export const ProblemList = ({
             )}
           </div>
         </div>
+      )}
+
+      {showScrollTop && (
+        <Button
+          className="fixed bottom-8 right-8 rounded-full w-12 h-12 shadow-xl p-0 z-50 bg-primary/90 hover:bg-primary text-primary-foreground backdrop-blur-sm transition-all duration-300 animate-in fade-in slide-in-from-bottom-4 hover:scale-110 active:scale-95"
+          onClick={scrollToTop}
+          aria-label="Scroll to top"
+        >
+          <ArrowUp className="w-5 h-5" />
+        </Button>
       )}
     </div>
   );
