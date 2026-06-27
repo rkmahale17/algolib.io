@@ -62,10 +62,10 @@ export const ProblemOfTheDay = ({ potd, progressMap }: ProblemOfTheDayProps) => 
 
                 {/* Meta Info */}
                 <div className="meta-info-row flex flex-wrap items-center gap-x-5 gap-y-1.5 w-full">
-                    {/* POTD Badge */}
+                    {/* Daily Challenge Badge */}
                     <div className="flex items-center justify-center gap-1.5 px-3 py-0.5 rounded-full border border-primary/20 bg-primary/10 text-primary font-semibold tracking-wider h-6 select-none cursor-default shrink-0 text-[10px] sm:text-[11px]">
                         <Flame className="w-3 h-3 animate-pulse" />
-                        Problem of the Day
+                        Daily Challenge
                     </div>
 
                     {/* Difficulty */}

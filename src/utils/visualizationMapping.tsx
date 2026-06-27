@@ -90,6 +90,7 @@ export const visualizationMap: Record<string, any> = {
   'bellman-ford': dynamic(() => import('@/components/visualizations/algorithms/BellmanFordVisualization').then(m => m.BellmanFordVisualization), { ssr: false }),
   'floyd-warshall': dynamic(() => import('@/components/visualizations/algorithms/FloydWarshallVisualization').then(m => m.FloydWarshallVisualization), { ssr: false }),
   'a-star': dynamic(() => import('@/components/visualizations/algorithms/AStarVisualization').then(m => m.AStarVisualization), { ssr: false }),
+  'word-ladder': dynamic(() => import('@/components/visualizations/algorithms/WordLadderVisualization').then(m => m.WordLadderVisualization), { ssr: false }),
 
   // Dynamic Programming
   'knapsack-01': dynamic(() => import('@/components/visualizations/algorithms/KnapsackVisualization').then(m => m.KnapsackVisualization), { ssr: false }),
@@ -508,6 +509,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
   'single-number': {
     title: 'Single Number',
     description: 'Visualize using the bitwise XOR operation to find the unique element in an array where all other elements appear twice in O(n) time and O(1) space.'
+  },
+  'word-ladder': {
+    title: 'Word Ladder',
+    description: 'Visualize how Breadth-First Search (BFS) is used to find the shortest transformation sequence from a start word to an end word by changing one letter at a time.'
   }
 };
 
