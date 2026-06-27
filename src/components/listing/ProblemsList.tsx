@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, ReactNode, useCallback } from 'react';
+import { useState, useMemo, useEffect, ReactNode, useCallback, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { DIFFICULTY_MAP } from "@/types/algorithm";
 import { ListingLayout } from "@/components/listing/ListingLayout";
@@ -7,13 +7,15 @@ import { useApp } from '@/contexts/AppContext';
 import { useAppSelector } from "@/store/hooks";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { getGroupedByCategory, normalizeCategory, resolveAlgoCategories, slugifyCategory } from "@/constants/categories";
-import { Brain, Target, ListFilter, SearchX, RotateCcw, Flame, Trophy } from "lucide-react";
+import { Brain, Target, ListFilter, SearchX, RotateCcw, Flame, Trophy, ArrowUp } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { SolvedProgressCard } from "@/components/profile/SolvedProgressCard";
 import { cn } from "@/lib/utils";
 import { ProOverlay } from "@/components/ProOverlay";
 import { Button } from "@/components/ui/button";
 import { ProblemFilterPopup } from "@/components/ProblemFilterPopup";
+import { RecommendedProblems } from "@/components/listing/RecommendedProblems";
+import { ContinueLearningCard } from "@/components/listing/ContinueLearningCard";
 import { supabase } from "@/integrations/supabase/client";
 import { StreakCalendar } from "@/components/profile/StreakCalendar";
 import { parseISO, eachDayOfInterval, format } from 'date-fns';
@@ -35,7 +37,7 @@ interface ProblemsListProps {
   initialSelectedCompanies?: string[];
   initialExpandAll?: boolean;
   stickyHeaderSlot?: ReactNode;
-  potdSlot?: ReactNode;
+  potd?: any;
 }
 
 const EMPTY_ARRAY: string[] = [];
@@ -57,13 +59,36 @@ export const ProblemsList = ({
   initialSelectedCompanies = EMPTY_ARRAY,
   initialExpandAll = false,
   stickyHeaderSlot,
-  potdSlot
+  potd
 }: ProblemsListProps) => {
   const { activeListType, setActiveListType, progressMap, hasPremiumAccess } = useApp();
   const { lastFetched, error: reduxError } = useAppSelector(state => state.algorithms);
   const userProgressData = useAppSelector(state => state.userProgress?.data || []);
   const router = useRouter();
   const pathname = usePathname();
+
+  const listTopRef = useRef<HTMLDivElement>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    if (!listTopRef.current) return;
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Show button only when we have scrolled down by exactly one full screen height (or more) past the anchor
+        setShowScrollTop(!entries[0].isIntersecting);
+      },
+      { threshold: 0, rootMargin: '100% 0px 0px 0px' }
+    );
+    
+    observer.observe(listTopRef.current);
+    
+    return () => observer.disconnect();
+  }, []);
+
+  const scrollToTop = () => {
+    listTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   const submissionsData = useMemo(() => {
     const map = new Map<string, any[]>();
@@ -230,10 +255,21 @@ export const ProblemsList = ({
     }));
 
     if (searchQuery) {
-      result = result.filter(algo =>
-        algo.displayTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        algo.description.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      const q = searchQuery.toLowerCase();
+      result = result.filter(algo => {
+        const titleMatch = algo.displayTitle.toLowerCase().includes(q);
+        const descMatch = (algo.description || '').toLowerCase().includes(q);
+        
+        // Topic (category) match
+        let topicMatch = false;
+        if (algo.category) {
+          const rawCats = algo.category.split(',').map((c: string) => c.trim().toLowerCase());
+          const cats = resolveAlgoCategories(rawCats).map(c => c.toLowerCase());
+          topicMatch = rawCats.some(cat => cat.includes(q)) || cats.some(cat => cat.includes(q));
+        }
+        
+        return titleMatch || descMatch || topicMatch;
+      });
     }
 
     if (selectedTopics.length > 0) {
@@ -347,6 +383,32 @@ export const ProblemsList = ({
     };
   }, [filteredAndSortedAlgorithms, progressMap]);
 
+  const continueLearningAlgo = useMemo(() => {
+    if (!userProgressData || userProgressData.length === 0) return null;
+    
+    // Sort progress data by last_viewed_at or updated_at (descending)
+    const sorted = [...userProgressData].sort((a, b) => {
+      const timeA = new Date(a.last_viewed_at || a.updated_at).getTime();
+      const timeB = new Date(b.last_viewed_at || b.updated_at).getTime();
+      return timeB - timeA;
+    });
+
+    // Find the most recent incomplete algorithm first
+    const incomplete = sorted.find(p => !p.completed);
+    const target = incomplete || sorted[0];
+    
+    if (!target) return null;
+    
+    // Find the actual algorithm object
+    const algo = algorithms.find(a => a.id === target.algorithm_id);
+    if (!algo) return null;
+    
+    return {
+      algorithm: algo,
+      progress: target
+    };
+  }, [userProgressData, algorithms]);
+
   const getProgressBarColor = (percentage: number) => {
     if (percentage === 0) return 'bg-transparent';
     if (percentage < 33) return 'bg-gradient-to-r from-red-500 to-red-400';
@@ -432,6 +494,10 @@ export const ProblemsList = ({
     );
   }, [searchQuery, selectedTopics, selectedCompanies, selectedDifficulties, sortBy, popupFilters]);
 
+  const showPOTD = useMemo(() => {
+    return !!(potd?.problem && !hasActiveFilters && (!listType || listType === 'all'));
+  }, [potd, hasActiveFilters, listType]);
+
   const handleReset = useCallback(() => {
     setSearchQuery('');
     setSortBy('serial-asc');
@@ -493,7 +559,7 @@ export const ProblemsList = ({
       stickyHeaderSlot={stickyHeaderSlot}
       hasActiveFilters={hasActiveFilters}
       onReset={handleReset}
-      potdSlot={potdSlot}
+
       filterButtonSlot={
         <ProblemFilterPopup
           filters={popupFilters}
@@ -517,52 +583,69 @@ export const ProblemsList = ({
       }
       progressWidget={
         !isLoading && overallStats.totalQuestions > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-[320px_1fr] xl:grid-cols-[1fr_320px] gap-6 w-full mt-[-10px] items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 w-full mt-[-10px] items-stretch max-w-[820px] mx-auto">
             {/* Progress Stats */}
-            <div className="sm:col-span-2 xl:col-span-1 xl:col-start-1 xl:row-start-1 min-w-0 flex flex-col h-full">
+            <div className="min-w-0 flex flex-col h-full">
               <Card className="bg-card border-border/40 shadow-sm overflow-hidden flex flex-col h-full rounded-xl">
                 <div className="px-4 py-3 border-b border-border/40 shrink-0 bg-muted/20">
                   <h3 className="font-normal text-[13px] text-foreground/80">{progressTitle}</h3>
                 </div>
-                <div className="flex-1 flex flex-col justify-center">
+                <div className="flex-1 flex flex-col justify-center py-2">
                   <SolvedProgressCard
                     {...overallStats}
                     compact
                   />
                 </div>
+                {/* Streaks */}
+                <div className="border-t border-border/30 px-4 py-3.5 bg-muted/5 flex items-center justify-around divide-x divide-border/30 gap-2 shrink-0">
+                    {/* Current Streak */}
+                    <div className="flex-1 flex flex-col items-center justify-center text-center min-w-0">
+                        <span className="text-[11px] sm:text-[12px] text-muted-foreground font-normal mb-1 truncate">Current Streak</span>
+                        <div className="flex items-center justify-center gap-1.5">
+                            <Flame className="w-4.5 h-4.5 text-foreground shrink-0" />
+                            <span className="text-md sm:text-lg font-normal text-foreground tracking-tight truncate">{currentStreak}</span>
+                            <span className="text-[10px] sm:text-xs text-muted-foreground/80 font-normal pb-0.5">days</span>
+                        </div>
+                    </div>
+                    {/* Best Streak */}
+                    <div className="flex-1 flex flex-col items-center justify-center text-center min-w-0">
+                        <span className="text-[11px] sm:text-[12px] text-muted-foreground font-normal mb-1 truncate">Best Streak</span>
+                        <div className="flex items-center justify-center gap-1.5">
+                            <Trophy className="w-4.5 h-4.5 text-foreground shrink-0" />
+                            <span className="text-md sm:text-lg font-normal text-foreground tracking-tight truncate">{maxStreak}</span>
+                            <span className="text-[10px] sm:text-xs text-muted-foreground/80 font-normal pb-0.5">days</span>
+                        </div>
+                    </div>
+                </div>
               </Card>
             </div>
 
             {/* Calendar */}
-            <div className="sm:col-start-1 sm:row-start-2 xl:col-start-2 xl:row-start-1 xl:row-span-2 w-full max-w-[320px] mx-auto sm:mx-0 flex-none shrink-0">
+            <div className="w-full max-w-[320px] mx-auto lg:mx-0 flex-none shrink-0 h-full">
               <StreakCalendar 
                 submissions={submissionsData} 
               />
             </div>
-
-            {/* Streaks */}
-            <div className="sm:col-start-2 sm:row-start-2 xl:col-start-1 xl:row-start-2 flex flex-col xl:flex-row gap-4 w-full min-w-0 h-full justify-center items-center xl:items-stretch">
-                <div className="flex-1 bg-card rounded-xl p-3 sm:p-4 border border-border/40 shadow-sm flex flex-col min-w-0 justify-center items-center text-center w-full max-w-[320px] xl:max-w-none">
-                    <span className="text-[12px] sm:text-[13px] text-muted-foreground font-normal mb-1 sm:mb-2 truncate">Current Streak</span>
-                    <div className="flex items-center justify-center gap-2">
-                        <Flame className="w-5 h-5 sm:w-6 sm:h-6 text-foreground shrink-0" />
-                        <span className="text-lg sm:text-2xl font-normal text-foreground tracking-tight truncate">{currentStreak}</span>
-                        <span className="text-[11px] sm:text-xs text-muted-foreground/80 font-normal pb-0.5">days</span>
-                    </div>
-                </div>
-                <div className="flex-1 bg-card rounded-xl p-3 sm:p-4 border border-border/40 shadow-sm flex flex-col min-w-0 justify-center items-center text-center w-full max-w-[320px] xl:max-w-none">
-                    <span className="text-[12px] sm:text-[13px] text-muted-foreground font-normal mb-1 sm:mb-2 truncate">Best Streak</span>
-                    <div className="flex items-center justify-center gap-2">
-                        <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-foreground shrink-0" />
-                        <span className="text-lg sm:text-2xl font-normal text-foreground tracking-tight truncate">{maxStreak}</span>
-                        <span className="text-[11px] sm:text-xs text-muted-foreground/80 font-normal pb-0.5">days</span>
-                    </div>
-                </div>
-            </div>
           </div>
         ) : undefined
       }
+      recommendedWidget={
+        showRecommendation && !isLoading ? (
+          <div className="space-y-4 w-full">
+            {continueLearningAlgo && (
+              <ContinueLearningCard
+                algorithm={continueLearningAlgo.algorithm}
+                progress={continueLearningAlgo.progress}
+              />
+            )}
+            <RecommendedProblems algorithms={algorithms} />
+          </div>
+        ) : null
+      }
     >
+      {/* Anchor for scroll-to-top */}
+      <div ref={listTopRef} className="w-full h-0 pointer-events-none" aria-hidden="true" />
+
       {headerSlot}
 
       {showSkeleton ? (
@@ -664,6 +747,19 @@ export const ProblemsList = ({
         </div>
       ) : !isCategoryWise ? (
         <div className="w-full max-w-[820px] mx-auto">
+          {showPOTD && (
+            <PremiumProblemCard
+              algorithm={potd.problem}
+              status={(progressMap?.[potd.problem.id] || 'none') as any}
+              isPremium={potd.problem.is_premium}
+              index={-1}
+              isFirst={true}
+              isLast={filteredAndSortedAlgorithms.length === 0}
+              isPOTD={true}
+              potdCountdown={potd.countdown}
+              onCategoryClick={handleCategoryClick}
+            />
+          )}
           {filteredAndSortedAlgorithms.map((algo, index) => (
             <PremiumProblemCard
               key={algo.id}
@@ -671,7 +767,7 @@ export const ProblemsList = ({
               status={(progressMap?.[algo.id] || 'none') as any}
               isPremium={algo.is_premium}
               index={index}
-              isFirst={index === 0}
+              isFirst={!showPOTD && index === 0}
               isLast={index === filteredAndSortedAlgorithms.length - 1}
               onCategoryClick={handleCategoryClick}
             />
@@ -702,6 +798,21 @@ export const ProblemsList = ({
         </div>
       ) : (
         <div className="w-full max-w-[820px] mx-auto">
+          {showPOTD && (
+            <div className="mb-4">
+              <PremiumProblemCard
+                algorithm={potd.problem}
+                status={(progressMap?.[potd.problem.id] || 'none') as any}
+                isPremium={potd.problem.is_premium}
+                index={-1}
+                isFirst={true}
+                isLast={true}
+                isPOTD={true}
+                potdCountdown={potd.countdown}
+                onCategoryClick={handleCategoryClick}
+              />
+            </div>
+          )}
           {currentGroupedAlgos.length > 0 ? (
             <Accordion 
               type="multiple" 
@@ -801,6 +912,18 @@ export const ProblemsList = ({
       )}
 
       {footerSlot}
+
+      <div className="w-full max-w-[820px] mx-auto sticky bottom-8 flex justify-end pointer-events-none z-40 mt-4 sm:mt-0">
+        {showScrollTop && (
+          <Button
+            className="rounded-full w-12 h-12 shadow-xl p-0 bg-primary/90 hover:bg-primary text-primary-foreground backdrop-blur-sm transition-all duration-300 animate-in fade-in slide-in-from-bottom-4 hover:scale-110 active:scale-95 pointer-events-auto sm:mr-4 mr-0"
+            onClick={scrollToTop}
+            aria-label="Scroll to top"
+          >
+            <ArrowUp className="w-5 h-5" />
+          </Button>
+        )}
+      </div>
     </ListingLayout>
   );
 };

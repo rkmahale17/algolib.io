@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { updateProgress, updateSocial, updateCode, updateVisualizationProgress, updateDrawingProgress, updateSolutionProgress } from '@/utils/userAlgorithmDataHelpers';
+import { updateProgress, updateSocial, updateCode, updateVisualizationProgress, updateDrawingProgress, updateSolutionProgress, updateTimeTracking } from '@/utils/userAlgorithmDataHelpers';
 import { useFeatureFlag } from '@/contexts/FeatureFlagContext';
 import confetti from 'canvas-confetti';
 import { usePostHog } from '@posthog/react';
@@ -72,7 +72,16 @@ export const useAlgorithmInteractions = ({
             list_type: algorithm?.listType,
             user_plan: profile?.subscription_tier ?? 'free',
         });
-    }, [algorithmId, algorithm, posthog, profile]);
+
+        // Also update last_viewed_at in DB asynchronously in the background
+        if (user?.id && algorithmId) {
+            updateTimeTracking(user.id, algorithmId, {
+                last_viewed_at: new Date().toISOString()
+            }).catch(err => {
+                console.error("Error updating last_viewed_at in background:", err);
+            });
+        }
+    }, [algorithmId, algorithm, posthog, profile, user]);
 
     const lastSyncedCodeRef = useRef<string>("");
     const hasInitializedCodeRef = useRef<Record<string, boolean>>({});

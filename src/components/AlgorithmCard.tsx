@@ -25,6 +25,7 @@ const difficultyColors: Record<string, string> = {
 
 export const AlgorithmCard = ({ algorithm, status, isPremium, index, isSidebar, hasPremiumAccess, isPaywallEnabled, onCategoryClick }: AlgorithmCardProps) => {
     const displayTitle = algorithm.title || algorithm.name || '';
+    const truncatedTitle = displayTitle.length > 36 ? `${displayTitle.substring(0, 36)}...` : displayTitle;
     const serialNo = algorithm.serial_no || (index !== undefined ? index + 1 : null);
     const rawDifficulty = algorithm.mappedDifficulty || DIFFICULTY_MAP[algorithm.difficulty?.toLowerCase()] || 'Medium';
     const displayDifficulty = rawDifficulty === 'Medium' ? 'Med' : rawDifficulty;
@@ -41,16 +42,27 @@ export const AlgorithmCard = ({ algorithm, status, isPremium, index, isSidebar, 
                 {/* Status Icon */}
                 <div className="shrink-0 pt-1">
                     {status === 'solved' ? (
-                        <div className={cn("rounded-full bg-green-500 flex items-center justify-center text-white shadow-lg shadow-green-500/20", isSidebar ? "w-6 h-6" : "w-8 h-8")}>
-                            <Check className={cn("stroke-[3]", isSidebar ? "w-4 h-4" : "w-5 h-5")} />
-                        </div>
-                    ) : status === 'attempted' ? (
-                        <div className={cn("rounded-full border-2 border-orange-400 flex items-center justify-center text-orange-400", isSidebar ? "w-6 h-6" : "w-8 h-8")}>
-                            <Circle className={cn("fill-orange-400", isSidebar ? "w-4 h-4" : "w-5 h-5")} />
+                        isPremium ? (
+                            <div className={cn("relative", isSidebar ? "w-6 h-6" : "w-9 h-9")}>
+                                <div className={cn("rounded-full bg-green-500 flex items-center justify-center text-white shadow-lg shadow-green-500/20", isSidebar ? "w-6 h-6" : "w-9 h-9")}>
+                                    <Check className={cn("stroke-[3]", isSidebar ? "w-4 h-4" : "w-4.5 h-4.5")} />
+                                </div>
+                                <div className={cn("absolute rounded-full bg-primary text-primary-foreground border border-background flex items-center justify-center shadow-sm", isSidebar ? "-bottom-0.5 -right-0.5 w-3 h-3" : "-bottom-0.5 -right-0.5 w-3.5 h-3.5")}>
+                                    <Lock className={cn(isSidebar ? "w-1.5 h-1.5" : "w-2 h-2")} strokeWidth={3} />
+                                </div>
+                            </div>
+                        ) : (
+                            <div className={cn("rounded-full bg-green-500 flex items-center justify-center text-white shadow-lg shadow-green-500/20", isSidebar ? "w-6 h-6" : "w-9 h-9")}>
+                                <Check className={cn("stroke-[3]", isSidebar ? "w-4 h-4" : "w-4.5 h-4.5")} />
+                            </div>
+                        )
+                    ) : isPremium ? (
+                        <div className={cn("rounded-full border border-primary/20 bg-primary/10 flex items-center justify-center text-primary shadow-sm shadow-primary/5", isSidebar ? "w-6 h-6" : "w-9 h-9")}>
+                            <Lock className={cn(isSidebar ? "w-3 h-3" : "w-3.5 h-3.5")} strokeWidth={2} />
                         </div>
                     ) : (
-                        <div className={cn("rounded-full border-2 border-border/60 flex items-center justify-center text-muted-foreground/10 transition-colors", isSidebar ? "w-6 h-6" : "w-8 h-8")}>
-                            <Check className={cn("stroke-[3]", isSidebar ? "w-4 h-4" : "w-5 h-5")} />
+                        <div className={cn("rounded-full border border-border/60 flex items-center justify-center text-muted-foreground transition-colors font-sans text-[14px] font-medium bg-muted/5", isSidebar ? "w-6 h-6 text-[10px]" : "w-9 h-9")}>
+                            {serialNo}
                         </div>
                     )}
                 </div>
@@ -58,24 +70,12 @@ export const AlgorithmCard = ({ algorithm, status, isPremium, index, isSidebar, 
                 {/* Content */}
                 <div className="flex-1 min-w-0 space-y-1.5 md:space-y-2">
                     <div className="flex items-center flex-wrap gap-2">
-                        <h3 className={cn("font-medium tracking-tight transition-colors truncate", isSidebar ? "text-sm" : "text-md")}>
-                            {serialNo ? `${serialNo}. ` : ''}{displayTitle}
+                        <h3 className={cn("font-medium tracking-tight transition-colors truncate", isSidebar ? "text-sm" : "text-[16px]")}>
+                            <span>{truncatedTitle}</span>
                         </h3>
-
-
-                        {isPremium && (
-                            <Badge variant="secondary" className={cn("hidden sm:flex bg-primary/10 text-primary border-primary/20 px-3 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold items-center gap-1.5 h-6 uppercase tracking-wider shadow-none select-none cursor-default shrink-0", isSidebar ? "scale-90" : "")}>
-                                {isPaywallEnabled && !hasPremiumAccess && <Lock className="w-2.5 h-2.5" />}
-                                PRO
-                            </Badge>
-                        )}
                     </div>
 
-                    {!isSidebar && (
-                        <p className="text-muted-foreground text-[14px] leading-relaxed line-clamp-2 max-w-3xl opacity-80">
-                            {algorithm.description}
-                        </p>
-                    )}
+
 
                     {/* Meta Info */}
                     <div className={cn("meta-info-row flex flex-wrap items-center gap-y-1.5 w-full", isSidebar ? "gap-x-3" : "gap-x-5")}>

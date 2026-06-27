@@ -94,7 +94,7 @@ const GetStartedClient = () => {
       showRecommendation={activeTab === "all"}
       initialCategoryWise={activeTab !== "all"}
       icon={activeIcon}
-      potdSlot={activeTab === "all" ? <ProblemOfTheDay potd={potd} progressMap={progressMap} /> : undefined}
+      potd={activeTab === "all" ? potd : undefined}
       stickyHeaderSlot={
         <div className="w-full">
           {isMobile ? (

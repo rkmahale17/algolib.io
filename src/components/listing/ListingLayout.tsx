@@ -55,12 +55,12 @@ interface ListingLayoutProps {
     };
     onRandomClick?: () => void;
     progressWidget?: ReactNode;
+    recommendedWidget?: ReactNode;
     stickyHeaderSlot?: ReactNode;
     icon?: any;
     filterButtonSlot?: ReactNode;
     hasActiveFilters?: boolean;
     onReset?: () => void;
-    potdSlot?: ReactNode;
 }
 
 interface FilterContentProps {
@@ -126,12 +126,12 @@ export const ListingLayout = ({
     stats,
     onRandomClick,
     progressWidget,
+    recommendedWidget,
     stickyHeaderSlot,
     icon,
     filterButtonSlot,
     hasActiveFilters,
-    onReset,
-    potdSlot
+    onReset
 }: ListingLayoutProps) => {
     const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
 
@@ -167,11 +167,13 @@ export const ListingLayout = ({
                                     </div>
                                 )}
 
-                                {potdSlot && (
+                                {recommendedWidget && (
                                     <div className="w-full">
-                                        {potdSlot}
+                                        {recommendedWidget}
                                     </div>
                                 )}
+
+
 
                                 {stickyHeaderSlot && (
                                     <div className="sticky top-[48px] z-30 bg-background/95 backdrop-blur-sm -mx-2 px-2 py-3 mb-2">
@@ -181,19 +183,19 @@ export const ListingLayout = ({
 
                                 <div className="rounded-xl border border-border/40 bg-card shadow-sm hover:shadow-md transition-all duration-300 p-4 sm:p-5 space-y-4">
                                     {/* Search & Sort Row */}
-                                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center">
+                                    <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-stretch sm:items-center">
                                         <div className="relative flex-1 group">
                                             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-muted-foreground/60 group-focus-within:text-primary transition-colors" />
                                             <Input
                                                 type="text"
-                                                placeholder="Search within this list of questions"
+                                                placeholder="Search problems, topics"
                                                 value={searchQuery}
                                                 onChange={(e) => onSearchChange(e.target.value)}
                                                 className="pl-11 h-11 sm:h-12 text-sm sm:text-base bg-background border-border/60 rounded-xl shadow-sm focus-visible:ring-primary/20 focus-visible:border-primary/40 transition-all"
                                             />
                                         </div>
 
-                                        <div className="flex items-center gap-2 sm:gap-4">
+                                        <div className="flex items-center gap-3 sm:gap-5">
                                             <Select value={sortBy} onValueChange={onSortChange}>
                                                 <SelectTrigger className="h-11 sm:h-12 w-11 sm:w-12 rounded-xl bg-background border-border/60 shadow-sm hover:border-primary/40 transition-all justify-center p-0 shrink-0 [&>svg]:hidden [&>span]:hidden" aria-label="Sort options">
                                                     <div className="flex items-center justify-center w-full h-full">

@@ -205,7 +205,7 @@ const ProblemsClient = ({
       initialSelectedTopics={initialTopics}
       initialSelectedCompanies={initialCompanies}
       initialExpandAll={pathname === "/dsa/query"}
-      potdSlot={<ProblemOfTheDay potd={potd} progressMap={progressMap} />}
+      potd={potd}
       headerSlot={
         !manualListType ? (
           <div className="flex flex-wrap items-center gap-3 mb-8">
