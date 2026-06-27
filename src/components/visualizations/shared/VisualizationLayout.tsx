@@ -14,7 +14,7 @@ export const VisualizationLayout = ({
   return (
     <div className="space-y-4">
       {/* Top Controls */}
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-4 w-full">
         {controls}
       </div>
 

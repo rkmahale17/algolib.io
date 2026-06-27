@@ -379,25 +379,27 @@ export const KthLargestVisualization: React.FC = () => {
                         opacity: inRange || currentStep.l === -1 ? 1 : 0.4,
                         scale: isI || isP || targetMatch ? 1.1 : 1,
                         backgroundColor: targetMatch
-                          ? "green"
+                          ? "#22c55e"
                           : isP
-                          ? "green"
+                          ? "#22c55e"
                           : isI
-                          ? "purple"
+                          ? "#a855f7"
                           : isPivot
-                          ? "var(--primary)"
+                          ? "hsl(var(--primary))"
                           : "var(--card)",
-                        borderColor: isPivot || isCurrentPivot ? "var(--primary)" : "var(--border)"
+                        borderColor: isPivot || isCurrentPivot ? "hsl(var(--primary))" : "var(--border)"
                       }}
-                      className={`w-14 h-14 rounded-xl flex flex-col items-center justify-center border-2 transition-all relative ${
-                        isP ? "shadow-lg z-10 text-primary-foreground font-bold" : "text-foreground"
+                      className={`w-12 h-12 rounded-lg flex flex-col items-center justify-center border-2 transition-all relative ${
+                        isP || isI || targetMatch || isPivot
+                          ? "shadow-lg z-10 text-white font-bold"
+                          : "text-foreground"
                       }`}
                     >
-                      <span className="text-lg font-bold">{num}</span>
+                      <span className="text-base font-bold">{num}</span>
                       <div className="absolute -bottom-6 flex flex-col items-center">
-                        {isP && <span className="text-[10px] font-black text-accent-foreground uppercase bg-primary w-4 h-4 rounded-full flex items-center justify-center">p</span>}
-                        {isI && <span className="text-[10px] font-black text-muted-foreground uppercase bg-primary w-4 h-4 rounded-full flex items-center justify-center">i</span>}
-                        {targetMatch && <span className="text-[10px] font-black text-primary uppercase bg-primary w-4 h-4 rounded-full flex items-center justify-center">★ K</span>}
+                        {isP && <span className="text-[10px] font-black text-white uppercase bg-green-500 w-4 h-4 rounded-full flex items-center justify-center shadow-sm">p</span>}
+                        {isI && <span className="text-[10px] font-black text-white uppercase bg-purple-500 w-4 h-4 rounded-full flex items-center justify-center shadow-sm">i</span>}
+                        {targetMatch && <span className="text-[10px] font-black text-white uppercase bg-amber-500 px-1.5 h-4 rounded-full flex items-center justify-center shadow-sm whitespace-nowrap">★ K</span>}
                       </div>
                     </motion.div>
                   );
@@ -424,9 +426,9 @@ export const KthLargestVisualization: React.FC = () => {
 
           <VariablePanel variables={currentStep.variables} />
 
-          <Card className="p-4 bg-muted/20 border-dashed border-border text-[10px] text-muted-foreground">
-            <p>• <span className="text-accent font-bold">p pointer</span>: Elements to the left of p are guaranteed to be ≤ pivot.</p>
-            <p>• <span className="text-muted-foreground font-bold">i pointer</span>: Currently scanning element at this index.</p>
+          <Card className="p-4 bg-muted/20 border-dashed border-border text-[10px] text-muted-foreground space-y-1">
+            <p>• <span className="text-green-600 dark:text-green-400 font-bold">p pointer</span>: Elements to the left of p are guaranteed to be ≤ pivot.</p>
+            <p>• <span className="text-purple-600 dark:text-purple-400 font-bold">i pointer</span>: Currently scanning element at this index.</p>
             <p>• <span className="text-primary font-bold">Pivot</span>: Element used to partition the array.</p>
           </Card>
         </div>
