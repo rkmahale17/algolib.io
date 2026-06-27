@@ -1,49 +1,76 @@
-import { Metadata } from 'next';
-import HomeClient from './HomeClient';
-import Script from 'next/script';
-import dynamic from 'next/dynamic';
-
+import { DashboardWidgets } from "@/components/listing/DashboardWidgets";
+import { GuidedSection } from "@/components/Home/sections/GuidedSection";
 // ── Above-the-fold sections (static imports for fast LCP) ───────────────────
-import { HeroSection } from '@/components/Home/sections/HeroSection';
-import { ProblemsSection } from '@/components/Home/sections/ProblemsSection';
-import { GuidedSection } from '@/components/Home/sections/GuidedSection';
-import { InteractiveSandboxTeaser } from '@/components/Home/sections/InteractiveSandboxTeaser';
-import { SprintsAndTracksSection } from '@/components/Home/sections/SprintsAndTracksSection';
-import { TopicRoadmapSection } from '@/components/Home/sections/TopicRoadmapSection';
+import { HeroSection } from "@/components/Home/sections/HeroSection";
+import HomeClient from "./HomeClient";
+import { InteractiveSandboxTeaser } from "@/components/Home/sections/InteractiveSandboxTeaser";
+import { Metadata } from "next";
+import { ProblemsSection } from "@/components/Home/sections/ProblemsSection";
+import Script from "next/script";
+import { SprintsAndTracksSection } from "@/components/Home/sections/SprintsAndTracksSection";
+import { TopicRoadmapSection } from "@/components/Home/sections/TopicRoadmapSection";
+import dynamic from "next/dynamic";
 
 // ── Below-the-fold sections (lazy loaded to reduce initial bundle) ───────────
 const WorkspaceSection = dynamic(() =>
-  import('@/components/Home/sections/WorkspaceSection').then(m => ({ default: m.WorkspaceSection }))
+  import("@/components/Home/sections/WorkspaceSection").then((m) => ({
+    default: m.WorkspaceSection,
+  })),
 );
 const ScratchpadSection = dynamic(() =>
-  import('@/components/Home/sections/ScratchpadSection').then(m => ({ default: m.ScratchpadSection }))
+  import("@/components/Home/sections/ScratchpadSection").then((m) => ({
+    default: m.ScratchpadSection,
+  })),
 );
 const FeedbackSection = dynamic(() =>
-  import('@/components/Home/sections/FeedbackSection').then(m => ({ default: m.FeedbackSection }))
+  import("@/components/Home/sections/FeedbackSection").then((m) => ({
+    default: m.FeedbackSection,
+  })),
 );
 const CommunitySection = dynamic(() =>
-  import('@/components/Home/sections/CommunitySection').then(m => ({ default: m.CommunitySection }))
+  import("@/components/Home/sections/CommunitySection").then((m) => ({
+    default: m.CommunitySection,
+  })),
 );
 const CraftingSection = dynamic(() =>
-  import('@/components/Home/sections/CraftingSection').then(m => ({ default: m.CraftingSection }))
+  import("@/components/Home/sections/CraftingSection").then((m) => ({
+    default: m.CraftingSection,
+  })),
 );
 const BottomCTA = dynamic(() =>
-  import('@/components/Home/sections/BottomCTA').then(m => ({ default: m.BottomCTA }))
+  import("@/components/Home/sections/BottomCTA").then((m) => ({
+    default: m.BottomCTA,
+  })),
 );
 const FAQ = dynamic(() =>
-  import('@/components/FAQ').then(m => ({ default: m.FAQ }))
+  import("@/components/FAQ").then((m) => ({ default: m.FAQ })),
 );
 const Footer = dynamic(() =>
-  import('@/components/Footer').then(m => ({ default: m.Footer }))
+  import("@/components/Footer").then((m) => ({ default: m.Footer })),
 );
 
 export const metadata: Metadata = {
   title: "Rulcode | Master Algorithms & Coding Interviews",
-  description: "Accelerate your coding prep with interactive visualizations and multi-language solutions. Master Blind 75 and 200+ algorithms visually.",
-  keywords: ["algorithms", "open source", "data structures", "competitive programming", "coding interviews", "algorithm visualization", "code snippets", "python", "java", "c++", "typescript", "Rulcode.com"],
+  description:
+    "Accelerate your coding prep with interactive visualizations and multi-language solutions. Master Blind 75 and 200+ algorithms visually.",
+  keywords: [
+    "algorithms",
+    "open source",
+    "data structures",
+    "competitive programming",
+    "coding interviews",
+    "algorithm visualization",
+    "code snippets",
+    "python",
+    "java",
+    "c++",
+    "typescript",
+    "Rulcode.com",
+  ],
   openGraph: {
     title: "Rulcode | Master Algorithms & Coding Interviews",
-    description: "Accelerate your coding prep with interactive visualizations and multi-language solutions. Master Blind 75 and 200+ algorithms visually.",
+    description:
+      "Accelerate your coding prep with interactive visualizations and multi-language solutions. Master Blind 75 and 200+ algorithms visually.",
     type: "website",
     url: "https://rulcode.com/",
     images: ["https://rulcode.com/og-image.png"],
@@ -53,7 +80,8 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@rulcode_com",
     title: "Rulcode | Master Algorithms & Coding Interviews",
-    description: "Accelerate your coding prep with interactive visualizations and multi-language solutions. Master Blind 75 and 200+ algorithms visually.",
+    description:
+      "Accelerate your coding prep with interactive visualizations and multi-language solutions. Master Blind 75 and 200+ algorithms visually.",
     images: ["https://rulcode.com/og-image.png"],
   },
 };
@@ -65,32 +93,32 @@ export default function Page() {
       {
         "@type": "WebSite",
         "@id": "https://rulcode.com/#website",
-        "url": "https://rulcode.com",
-        "name": "Rulcode",
-        "description": "Interactive open-source algorithm library and visualization platform",
-        "potentialAction": {
+        url: "https://rulcode.com",
+        name: "Rulcode",
+        description:
+          "Interactive open-source algorithm library and visualization platform",
+        potentialAction: {
           "@type": "SearchAction",
-          "target": {
+          target: {
             "@type": "EntryPoint",
-            "urlTemplate": "https://rulcode.com/dsa/problems?q={search_term_string}"
+            urlTemplate:
+              "https://rulcode.com/dsa/problems?q={search_term_string}",
           },
-          "query-input": "required name=search_term_string"
-        }
+          "query-input": "required name=search_term_string",
+        },
       },
       {
         "@type": "Organization",
         "@id": "https://rulcode.com/#organization",
-        "name": "Rulcode",
-        "url": "https://rulcode.com",
-        "logo": {
+        name: "Rulcode",
+        url: "https://rulcode.com",
+        logo: {
           "@type": "ImageObject",
-          "url": "https://rulcode.com/android-chrome-512x512.png"
+          url: "https://rulcode.com/android-chrome-512x512.png",
         },
-        "sameAs": [
-          "https://github.com/rkmahale17/rulcode.com"
-        ]
-      }
-    ]
+        sameAs: ["https://github.com/rkmahale17/rulcode.com"],
+      },
+    ],
   };
 
   return (
@@ -102,6 +130,17 @@ export default function Page() {
       />
       <div className="min-h-screen bg-white dark:bg-black text-[#1A1A1A] dark:text-white overflow-x-hidden relative w-full">
         <HeroSection />
+        <section className="mt-[6rem] m-auto  p-4 block relative min-h-screen max-w-[1200px]  mb-8 bg-card rounded-xl border border-border/40 shadow-sm ">
+          <h4 className="font-medium text-xl pl-6 mt-4 mb-4">
+            👋 Welcome back,
+          </h4>
+          <h5 className="text-base text-muted-foreground pl-8 mb-8">
+            Continue building your problem-solving intuition.
+          </h5>
+
+          <DashboardWidgets />
+        </section>
+
         <div id="visualize">
           <InteractiveSandboxTeaser />
         </div>
