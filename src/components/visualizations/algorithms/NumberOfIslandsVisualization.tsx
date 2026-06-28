@@ -169,20 +169,20 @@ export const NumberOfIslandsVisualization: React.FC = () => {
 
     // Step 1: Start
     makeSnapshot("Start scanning grid for islands. Check if the grid is empty.", "START numIslands()", 2, 2, 3, 4, null, null);
-    makeSnapshot("Initialize count to 0, representing zero islands found so far.", "SET count = 0", 5, 6, 7, 7, null, null);
+    makeSnapshot("Initialize count to 0, representing zero islands found so far.", "SET count = 0", 5, 6, 6, 7, null, null);
 
     function dfs(r: number, c: number) {
       makeSnapshot(
         `DFS: Check if (${r}, ${c}) is within bounds and is a land cell ('1').`,
         `IF outOfBounds OR grid[${r}][${c}] == '0'`,
-        8, 8, 28, 31, r, c
+        7, 8, 18, 20, r, c
       );
 
       if (r < 0 || c < 0 || r >= rows || c >= cols || grid[r][c] === '0') {
         makeSnapshot(
           `DFS: Cell (${r}, ${c}) is either out of bounds or water. Return.`,
           "RETURN",
-          9, 9, 28, 32, r, c
+          8, 9, 19, 21, r, c
         );
         return;
       }
@@ -191,32 +191,32 @@ export const NumberOfIslandsVisualization: React.FC = () => {
       makeSnapshot(
         `DFS: Mark (${r}, ${c}) as visited by sinking it (change to '0').`,
         `SET grid[${r}][${c}] = '0'`,
-        11, 10, 31, 34, r, c, true
+        10, 10, 21, 23, r, c, true
       );
 
-      makeSnapshot(`DFS: Explore cell below (${r + 1}, ${c}).`, `CALL dfs(${r + 1}, ${c})`, 12, 11, 32, 35, r, c);
+      makeSnapshot(`DFS: Explore cell below (${r + 1}, ${c}).`, `CALL dfs(${r + 1}, ${c})`, 11, 11, 22, 24, r, c);
       dfs(r + 1, c);
 
-      makeSnapshot(`DFS: Explore cell above (${r - 1}, ${c}).`, `CALL dfs(${r - 1}, ${c})`, 13, 12, 33, 36, r, c);
+      makeSnapshot(`DFS: Explore cell above (${r - 1}, ${c}).`, `CALL dfs(${r - 1}, ${c})`, 12, 12, 23, 25, r, c);
       dfs(r - 1, c);
 
-      makeSnapshot(`DFS: Explore cell to the right (${r}, ${c + 1}).`, `CALL dfs(${r}, ${c + 1})`, 14, 13, 34, 37, r, c);
+      makeSnapshot(`DFS: Explore cell to the right (${r}, ${c + 1}).`, `CALL dfs(${r}, ${c + 1})`, 13, 13, 24, 26, r, c);
       dfs(r, c + 1);
 
-      makeSnapshot(`DFS: Explore cell to the left (${r}, ${c - 1}).`, `CALL dfs(${r}, ${c - 1})`, 15, 14, 35, 38, r, c);
+      makeSnapshot(`DFS: Explore cell to the left (${r}, ${c - 1}).`, `CALL dfs(${r}, ${c - 1})`, 14, 14, 25, 27, r, c);
       dfs(r, c - 1);
     }
 
     for (let r = 0; r < rows; r++) {
-      makeSnapshot(`Outer Loop: Scan row ${r}.`, `FOR r = ${r}`, 17, 15, 8, 9, r, null);
+      makeSnapshot(`Outer Loop: Scan row ${r}.`, `FOR r = ${r}`, 16, 15, 7, 8, r, null);
       for (let c = 0; c < cols; c++) {
-        makeSnapshot(`Inner Loop: Visiting cell (${r}, ${c}).`, `FOR c = ${c}`, 18, 16, 9, 10, r, c);
-        
+        makeSnapshot(`Inner Loop: Visiting cell (${r}, ${c}).`, `FOR c = ${c}`, 17, 16, 8, 9, r, c);
+
         const isLand = grid[r][c] === '1';
         makeSnapshot(
           `Check if cell (${r}, ${c}) is unvisited land ('1').`,
           `IF grid[${r}][${c}] == '1' → ${isLand ? "YES ✓" : "NO ✗"}`,
-          19, 17, 10, 11, r, c
+          18, 17, 9, 10, r, c
         );
 
         if (isLand) {
@@ -224,20 +224,20 @@ export const NumberOfIslandsVisualization: React.FC = () => {
           makeSnapshot(
             `New island detected! Increment island count to ${count}.`,
             `SET count = ${count}`,
-            20, 18, 11, 12, r, c, true
+            19, 18, 10, 11, r, c, true
           );
 
           makeSnapshot(
             `Call DFS starting from (${r}, ${c}) to submerge all adjacent land cells.`,
             `CALL dfs(${r}, ${c})`,
-            21, 19, 12, 13, r, c, true
+            20, 19, 11, 12, r, c, true
           );
           dfs(r, c);
         }
       }
     }
 
-    makeSnapshot(`Finished scanning. Total islands found: ${count}.`, "RETURN count", 24, 20, 25, 26, null, null, true);
+    makeSnapshot(`Finished scanning. Total islands found: ${count}.`, "RETURN count", 24, 20, 15, 16, null, null, true);
 
     return { steps: stepsList, stepLineNumbers: stepLines };
   }, []);

@@ -243,14 +243,14 @@ export const GraphValidTreeVisualization: React.FC = () => {
       return true;
     }
 
-    makeSnapshot("Start DFS traversal from root Node 0, with no parent (-1).", "CALL dfs(0, -1)", 20, 15, 11, 11);
+    makeSnapshot("Start DFS traversal from root Node 0, with no parent (-1).", "CALL dfs(0, -1)", 19, 15, 11, 11);
     const dfsResult = dfsSim(0, -1);
 
     finalResult = dfsResult && visitedSet.size === n;
     makeSnapshot(
       `Check if DFS found no cycles (${dfsResult}) and all nodes were connected (${visitedSet.size} visited nodes == total ${n}). Result: ${finalResult}.`,
       `RETURN dfs(0, -1) AND size == n → ${finalResult}`,
-      20, 15, 12, 12, true
+      19, 15, 12, 12, true
     );
 
     return { steps: s, stepLineNumbers: stepLines };

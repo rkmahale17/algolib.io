@@ -214,20 +214,20 @@ export const NumberOfConnectedComponentsVisualization: React.FC = () => {
 
     // Step 2: Init parent
     makeSnapshot(
-      "Initialize parent array: each node starts as its own representative root.", 
-      "SET par = [0..n-1]", 2, 2, 5, 7, [], {}
+      "Initialize parent array: each node starts as its own representative root.",
+      "SET par = [0..n-1]", 2, 2, 5, 4, [], {}
     );
 
     // Step 3: Init rank
     makeSnapshot(
-      "Initialize rank array: each component starts with a size/rank of 1.", 
-      "SET rank = [1]*n", 3, 3, 6, 8, [], {}
+      "Initialize rank array: each component starts with a size/rank of 1.",
+      "SET rank = [1]*n", 3, 3, 6, 5, [], {}
     );
 
     // Step 4: Init result
     makeSnapshot(
-      "Initially, the number of connected components is equal to the number of nodes.", 
-      "SET res = n", 24, 21, 9, 10, [], {}
+      "Initially, the number of connected components is equal to the number of nodes.",
+      "SET res = n", 25, 22, 9, 10, [], {}
     );
 
     const findFn = (n1: number): number => {
@@ -240,7 +240,7 @@ export const NumberOfConnectedComponentsVisualization: React.FC = () => {
         makeSnapshot(
           `Find root of Node ${n1}. Path compression: make Node ${curr} point to grandparent ${gPar}.`,
           `SET par[${curr}] = par[par[${curr}]]`,
-          6, 7, 36, 21, [curr, oldPar, gPar], { n1, curr }
+          7, 8, 11, 20, [curr, oldPar, gPar], { n1, curr }
         );
 
         par[curr] = gPar;
@@ -253,7 +253,7 @@ export const NumberOfConnectedComponentsVisualization: React.FC = () => {
       makeSnapshot(
         `Union nodes ${n1} and ${n2}. First, find their representatives.`,
         `union(${n1}, ${n2})`,
-        11, 10, 15, 27, [n1, n2], { n1, n2 }
+        12, 10, 15, 25, [n1, n2], { n1, n2 }
       );
 
       const p1 = findFn(n1);
@@ -263,7 +263,7 @@ export const NumberOfConnectedComponentsVisualization: React.FC = () => {
       makeSnapshot(
         `Representatives are p1=${p1}, p2=${p2}. Are they already connected? ${alreadyConnected ? "YES" : "NO"}.`,
         `IF p1 == p2 → ${alreadyConnected ? "YES ✓" : "NO ✗"}`,
-        14, 13, 18, 30, [p1, p2], { p1, p2 }
+        15, 13, 18, 28, [p1, p2], { p1, p2 }
       );
 
       if (p1 === p2) return 0;
@@ -274,7 +274,7 @@ export const NumberOfConnectedComponentsVisualization: React.FC = () => {
         makeSnapshot(
           `Union: Attach component ${p1} under root ${p2} because ${p2} has a larger rank.`,
           `SET par[${p1}] = ${p2}`,
-          17, 16, 20, 32, [p1, p2], { p1, p2 }
+          18, 16, 20, 30, [p1, p2], { p1, p2 }
         );
       } else {
         par[p2] = p1;
@@ -282,14 +282,14 @@ export const NumberOfConnectedComponentsVisualization: React.FC = () => {
         makeSnapshot(
           `Union: Attach component ${p2} under root ${p1} because ${p1} has a larger or equal rank.`,
           `SET par[${p2}] = ${p1}`,
-          20, 19, 23, 35, [p1, p2], { p1, p2 }
+          21, 19, 23, 33, [p1, p2], { p1, p2 }
         );
       }
       return 1;
     };
 
     for (const [n1, n2] of EDGES) {
-      makeSnapshot(`Process edge [${n1}, ${n2}].`, `FOR edge = [${n1}, ${n2}]`, 25, 22, 10, 11, [n1, n2], { n1, n2 });
+      makeSnapshot(`Process edge [${n1}, ${n2}].`, `FOR edge = [${n1}, ${n2}]`, 26, 23, 10, 11, [n1, n2], { n1, n2 });
 
       const united = unionFn(n1, n2);
       if (united) {
@@ -297,13 +297,13 @@ export const NumberOfConnectedComponentsVisualization: React.FC = () => {
         makeSnapshot(
           `Union successful. Decrement the component count to ${res}.`,
           `SET res = res - 1 → ${res}`,
-          26, 23, 11, 12, [], {}
+          27, 24, 11, 12, [], {}
         );
       } else {
         makeSnapshot(
           `Nodes ${n1} and ${n2} are already in the same component. Component count remains ${res}.`,
           `No decrement`,
-          25, 22, 10, 11, [], {}
+          15, 13, 18, 28, [], {}
         );
       }
     }
@@ -311,7 +311,7 @@ export const NumberOfConnectedComponentsVisualization: React.FC = () => {
     makeSnapshot(
       `Graph traversal completed. Total connected components: ${res}.`,
       `RETURN res → ${res}`,
-      28, 24, 13, 14, [], {}, true
+      29, 25, 13, 14, [], {}, true
     );
 
     return { steps: s, stepLineNumbers: stepLines };

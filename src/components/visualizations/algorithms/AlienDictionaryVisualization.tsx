@@ -251,7 +251,7 @@ export const AlienDictionaryVisualization: React.FC = () => {
     makeSnapshot("Start the Alien Dictionary algorithm to determine character ordering.", "START alienOrder(words)", 1, 1, 2, 3);
 
     // Step 2: Init
-    makeSnapshot("Initialize adjacency list and in-degree maps.", "SET adj = {}, inDegree = {}", 2, 2, 4, 4);
+    makeSnapshot("Initialize adjacency list and in-degree maps.", "SET adj = {}, inDegree = {}", 2, 2, 3, 4);
 
     // Populate unique characters
     for (const word of words) {
@@ -262,7 +262,7 @@ export const AlienDictionaryVisualization: React.FC = () => {
         }
       }
     }
-    makeSnapshot("Initialize all unique characters in the dictionary with an in-degree of 0.", "FOR char in words → inDegree[char] = 0", 4, 3, 5, 10);
+    makeSnapshot("Initialize all unique characters in the dictionary with an in-degree of 0.", "FOR char in words → inDegree[char] = 0", 4, 3, 5, 6);
 
     // Build graph edges
     for (let i = 0; i < words.length - 1; i++) {
@@ -276,7 +276,7 @@ export const AlienDictionaryVisualization: React.FC = () => {
       for (let j = 0; j < len; j++) {
         const c1 = w1[j];
         const c2 = w2[j];
-        makeSnapshot(`Compare character index ${j}: '${c1}' vs '${c2}'`, `IF word1[${j}] != word2[${j}]`, 14, 8, 17, 18, false, i, j, w1, w2);
+        makeSnapshot(`Compare character index ${j}: '${c1}' vs '${c2}'`, `IF word1[${j}] != word2[${j}]`, 16, 10, 21, 20, false, i, j, w1, w2);
 
         if (c1 !== c2) {
           if (!adj.get(c1)!.includes(c2)) {
@@ -285,11 +285,11 @@ export const AlienDictionaryVisualization: React.FC = () => {
             makeSnapshot(
               `First difference found: '${c1}' must come before '${c2}'. Add edge ${c1} → ${c2} and increment in-degree of '${c2}'.`,
               `adj[${c1}].add(${c2}) & inDegree[${c2}]++`,
-              16, 11, 20, 21, true, i, j, w1, w2, c1
+              18, 12, 23, 22, true, i, j, w1, w2, c1
             );
           }
           found = true;
-          makeSnapshot(`Edge established. Stop comparing characters for this pair.`, "BREAK character loop", 19, 13, 23, 23, false, i, j, w1, w2);
+          makeSnapshot(`Edge established. Stop comparing characters for this pair.`, "BREAK character loop", 22, 14, 26, 25, false, i, j, w1, w2);
           break;
         }
       }
@@ -298,7 +298,7 @@ export const AlienDictionaryVisualization: React.FC = () => {
         makeSnapshot(
           `Invalid dictionary order! "${w1}" has prefix "${w2}" but is longer. Return empty string.`,
           `IF w1 has prefix w2 AND len(w1) > len(w2) → RETURN ""`,
-          23, 6, 14, 15, true, i, null, w1, w2
+          25, 7, 15, 15, true, i, null, w1, w2
         );
         return { steps: stepsList, stepLineNumbers: stepLines };
       }
@@ -310,7 +310,7 @@ export const AlienDictionaryVisualization: React.FC = () => {
         queue.push(char);
       }
     }
-    makeSnapshot("Enqueue all characters with 0 in-degree (no dependencies).", "FOR c in inDegree IF degree == 0 → enqueue(c)", 25, 15, 25, 27);
+    makeSnapshot("Enqueue all characters with 0 in-degree (no dependencies).", "FOR c in inDegree IF degree == 0 → enqueue(c)", 28, 15, 31, 30);
 
     // BFS
     while (queue.length > 0) {
@@ -321,7 +321,7 @@ export const AlienDictionaryVisualization: React.FC = () => {
       makeSnapshot(
         `Pop character '${char}' from queue. Add to sorted result and increment visited count.`,
         `DEQUEUE '${char}' & result += '${char}'`,
-        30, 18, 35, 32, true, null, null, null, null, char
+        33, 18, 38, 35, true, null, null, null, null, char
       );
 
       const neighbors = adj.get(char) || [];
@@ -332,7 +332,7 @@ export const AlienDictionaryVisualization: React.FC = () => {
         makeSnapshot(
           `Decrement in-degree of neighbor '${neighbor}' to ${nextDegree}.`,
           `inDegree[${neighbor}]-- → ${nextDegree}`,
-          33, 20, 37, 34, false, null, null, null, null, neighbor
+          36, 21, 41, 38, false, null, null, null, null, neighbor
         );
 
         if (nextDegree === 0) {
@@ -340,7 +340,7 @@ export const AlienDictionaryVisualization: React.FC = () => {
           makeSnapshot(
             `In-degree of neighbor '${neighbor}' reached 0. Add it to the queue.`,
             `IF inDegree[${neighbor}] == 0 → enqueue(${neighbor})`,
-            34, 22, 38, 35, true, null, null, null, null, neighbor
+            38, 23, 43, 39, true, null, null, null, null, neighbor
           );
         }
       }
@@ -350,7 +350,7 @@ export const AlienDictionaryVisualization: React.FC = () => {
     makeSnapshot(
       `Topological sort finished. Visited ${result.length} characters of ${inDegree.size} unique characters. Is it valid? ${isValid ? "YES" : "NO"}`,
       `RETURN result.length == size ? result : ""`,
-      39, 23, 42, 38, true, null, null, null, null, null
+      42, 26, 47, 42, true, null, null, null, null, null
     );
 
     return { steps: stepsList, stepLineNumbers: stepLines };
