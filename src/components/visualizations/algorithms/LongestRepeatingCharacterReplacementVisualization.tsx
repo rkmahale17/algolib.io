@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { motion } from 'framer-motion';
 import { VariablePanel } from '../shared/VariablePanel';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
+import type { VisualizationLanguageMap, StepLineNumberMap } from '@/types/visualization';
 
 interface Step {
   l: number;
@@ -12,454 +13,176 @@ interface Step {
   maxf: number;
   res: number;
   count: Record<string, number>;
-  highlightedLines: number[];
-  message: string;
+  explanation: string;
+  pseudoStep: string;
 }
+
+const languages: VisualizationLanguageMap = {
+  python: `def characterReplacement(s: str, k: int) -> int:
+    count = {}
+    res = 0
+    l = 0
+    maxf = 0
+    for r in range(len(s)):
+        count[s[r]] = 1 + count.get(s[r], 0)
+        maxf = max(maxf, count[s[r]])
+        while (r - l + 1) - maxf > k:
+            count[s[l]] -= 1
+            l += 1
+        res = max(res, r - l + 1)
+    return res`,
+
+  typescript: `function characterReplacement(s: string, k: number): number {
+  const count: { [char: string]: number } = {};
+  let res = 0;
+  let l = 0;
+  let maxf = 0;
+  for (let r = 0; r < s.length; r++) {
+    count[s[r]] = 1 + (count[s[r]] || 0);
+    maxf = Math.max(maxf, count[s[r]]);
+    while ((r - l + 1) - maxf > k) {
+      count[s[l]] -= 1;
+      l += 1;
+    }
+    res = Math.max(res, r - l + 1);
+  }
+  return res;
+}`,
+
+  java: `public class Solution {
+    public int characterReplacement(String s, int k) {
+        int[] count = new int[26];
+        int res = 0;
+        int l = 0;
+        int maxf = 0;
+        for (int r = 0; r < s.length(); r++) {
+            count[s.charAt(r) - 'A']++;
+            maxf = Math.max(maxf, count[s.charAt(r) - 'A']);
+            while ((r - l + 1) - maxf > k) {
+                count[s.charAt(l) - 'A']--;
+                l++;
+            }
+            res = Math.max(res, r - l + 1);
+        }
+        return res;
+    }
+}`,
+
+  cpp: `class Solution {
+public:
+    int characterReplacement(string s, int k) {
+        unordered_map<char, int> count;
+        int res = 0;
+        int l = 0;
+        int maxf = 0;
+        for (int r = 0; r < s.length(); r++) {
+            char currentChar = s[r];
+            count[currentChar]++;
+            maxf = max(maxf, count[currentChar]);
+            while ((r - l + 1) - maxf > k) {
+                count[s[l]]--;
+                l += 1;
+            }
+            res = max(res, r - l + 1);
+        }
+        return res;
+    }
+};`
+};
+
+const generateVisualizationData = () => {
+  const s = "AABABBA";
+  const k = 1;
+  const steps: Step[] = [];
+  const stepLineNumbers: StepLineNumberMap = {
+    typescript: [],
+    python: [],
+    java: [],
+    cpp: []
+  };
+
+  const addLines = (ts: number, py: number, java: number, cpp: number) => {
+    stepLineNumbers.typescript!.push(ts);
+    stepLineNumbers.python!.push(py);
+    stepLineNumbers.java!.push(java);
+    stepLineNumbers.cpp!.push(cpp);
+  };
+
+  const count: Record<string, number> = {};
+  let res = 0;
+  let l = 0;
+  let maxf = 0;
+
+  const addStep = (msg: string, pseudo: string, tsLine: number, pyLine: number, javaLine: number, cppLine: number) => {
+    steps.push({
+      l,
+      r: steps.length === 0 ? -1 : r,
+      maxf,
+      res,
+      count: { ...count },
+      explanation: msg,
+      pseudoStep: pseudo
+    });
+    addLines(tsLine, pyLine, javaLine, cppLine);
+  };
+
+  // 1. Initial State
+  addStep("Initialize variables: l = 0, res = 0, count = {}, maxf = 0.", "CALL characterReplacement(s, k)", 2, 2, 3, 4);
+
+  let r = 0;
+  for (r = 0; r < s.length; r++) {
+    // 2. Loop start
+    addStep(`Increment right pointer r to ${r}. Character at s[${r}] is '${s[r]}'.`, `FOR r = ${r}`, 6, 6, 7, 8);
+
+    // 3. Increment frequency
+    count[s[r]] = (count[s[r]] || 0) + 1;
+    addStep(`Increment frequency of '${s[r]}'. count['${s[r]}'] becomes ${count[s[r]]}.`, `SET count[s[r]] = count[s[r]] + 1`, 7, 7, 8, 10);
+
+    // 4. Update maxf
+    maxf = Math.max(maxf, count[s[r]]);
+    addStep(`Update maxf to max(maxf, count['${s[r]}']) = ${maxf}.`, `SET maxf = max(maxf, count[s[r]])`, 8, 8, 9, 11);
+
+    // 5. Shrink window loop check
+    while ((r - l + 1) - maxf > k) {
+      addStep(`Window size (${r - l + 1}) - maxf (${maxf}) = ${(r - l + 1) - maxf} > k (${k}). Window is invalid, need to shrink.`, `WHILE (r - l + 1) - maxf > k`, 9, 9, 10, 12);
+
+      // Decrement count
+      count[s[l]] -= 1;
+      if (count[s[l]] === 0) delete count[s[l]];
+      addStep(`Decrement count of leftmost character s[${l}] ('${s[l]}').`, `SET count[s[l]] = count[s[l]] - 1`, 10, 10, 11, 13);
+
+      // Increment l
+      l += 1;
+      addStep(`Move left pointer l to ${l}.`, `SET l = l + 1`, 11, 11, 12, 14);
+    }
+    // Check loop finished
+    addStep(`Window size (${r - l + 1}) - maxf (${maxf}) = ${(r - l + 1) - maxf} <= k (${k}). Window is valid.`, `WHILE (r - l + 1) - maxf > k → FALSE ✗`, 9, 9, 10, 12);
+
+    // Update result
+    res = Math.max(res, r - l + 1);
+    addStep(`Update maximum length res = max(res, window size) = ${res}.`, `SET res = max(res, r - l + 1)`, 13, 12, 14, 16);
+  }
+
+  // Final return
+  addStep(`Algorithm completed. Return the maximum length of repeating character substring: ${res}.`, `RETURN res`, 15, 13, 16, 18);
+
+  return { steps, stepLineNumbers };
+};
 
 export const LongestRepeatingCharacterReplacementVisualization = () => {
   const s = "AABABBA";
   const k = 1;
 
-  const code = `function characterReplacement(s: string, k: number): number {
-  const count: { [char: string]: number } = {};
-  let res = 0;
-  let l = 0;
-  let maxf = 0;
-
-  for (let r = 0; r < s.length; r++) {
-    count[s[r]] = 1 + (count[s[r]] || 0);
-    maxf = Math.max(maxf, count[s[r]]);
-
-    while ((r - l + 1) - maxf > k) {
-      count[s[l]] -= 1;
-      l += 1;
-    }
-
-    res = Math.max(res, r - l + 1);
-  }
-
-  return res;
-}`;
-
-  const steps: Step[] = [
-    {
-      l: 0,
-      r: -1,
-      maxf: 0,
-      res: 0,
-      count: {},
-      highlightedLines: [2, 3, 4, 5],
-      message: "Initialize variables: l = 0, res = 0, count = {}, maxf = 0."
-    },
-    {
-      l: 0,
-      r: 0,
-      maxf: 0,
-      res: 0,
-      count: {},
-      highlightedLines: [7],
-      message: "Start loop with r = 0. Character at s[0] is 'A'."
-    },
-    {
-      l: 0,
-      r: 0,
-      maxf: 0,
-      res: 0,
-      count: { A: 1 },
-      highlightedLines: [8],
-      message: "Increment frequency of 'A'. count['A'] becomes 1."
-    },
-    {
-      l: 0,
-      r: 0,
-      maxf: 1,
-      res: 0,
-      count: { A: 1 },
-      highlightedLines: [9],
-      message: "Update maxf: max(0, 1) = 1."
-    },
-    {
-      l: 0,
-      r: 0,
-      maxf: 1,
-      res: 0,
-      count: { A: 1 },
-      highlightedLines: [11],
-      message: "Window size (1) - maxf (1) = 0. Since 0 <= k (1), the window is valid."
-    },
-    {
-      l: 0,
-      r: 0,
-      maxf: 1,
-      res: 1,
-      count: { A: 1 },
-      highlightedLines: [16],
-      message: "Update res: max(0, 1) = 1."
-    },
-    {
-      l: 0,
-      r: 1,
-      maxf: 1,
-      res: 1,
-      count: { A: 1 },
-      highlightedLines: [7],
-      message: "Increment r to 1. Character at s[1] is 'A'."
-    },
-    {
-      l: 0,
-      r: 1,
-      maxf: 1,
-      res: 1,
-      count: { A: 2 },
-      highlightedLines: [8],
-      message: "Increment frequency of 'A'. count['A'] becomes 2."
-    },
-    {
-      l: 0,
-      r: 1,
-      maxf: 2,
-      res: 1,
-      count: { A: 2 },
-      highlightedLines: [9],
-      message: "Update maxf: max(1, 2) = 2."
-    },
-    {
-      l: 0,
-      r: 1,
-      maxf: 2,
-      res: 1,
-      count: { A: 2 },
-      highlightedLines: [11],
-      message: "Window size (2) - maxf (2) = 0 <= k. Window is valid."
-    },
-    {
-      l: 0,
-      r: 1,
-      maxf: 2,
-      res: 2,
-      count: { A: 2 },
-      highlightedLines: [16],
-      message: "Update res: max(1, 2) = 2."
-    },
-    {
-      l: 0,
-      r: 2,
-      maxf: 2,
-      res: 2,
-      count: { A: 2 },
-      highlightedLines: [7],
-      message: "Increment r to 2. Character at s[2] is 'B'."
-    },
-    {
-      l: 0,
-      r: 2,
-      maxf: 2,
-      res: 2,
-      count: { A: 2, B: 1 },
-      highlightedLines: [8],
-      message: "Increment frequency of 'B'. count['B'] becomes 1."
-    },
-    {
-      l: 0,
-      r: 2,
-      maxf: 2,
-      res: 2,
-      count: { A: 2, B: 1 },
-      highlightedLines: [9],
-      message: "Update maxf: max(2, 1) = 2."
-    },
-    {
-      l: 0,
-      r: 2,
-      maxf: 2,
-      res: 2,
-      count: { A: 2, B: 1 },
-      highlightedLines: [11],
-      message: "Window size (3) - maxf (2) = 1 <= k. Window is valid (one character can be replaced)."
-    },
-    {
-      l: 0,
-      r: 2,
-      maxf: 2,
-      res: 3,
-      count: { A: 2, B: 1 },
-      highlightedLines: [16],
-      message: "Update res: max(2, 3) = 3."
-    },
-    {
-      l: 0,
-      r: 3,
-      maxf: 2,
-      res: 3,
-      count: { A: 2, B: 1 },
-      highlightedLines: [7],
-      message: "Increment r to 3. Character at s[3] is 'A'."
-    },
-    {
-      l: 0,
-      r: 3,
-      maxf: 2,
-      res: 3,
-      count: { A: 3, B: 1 },
-      highlightedLines: [8],
-      message: "Increment frequency of 'A'. count['A'] becomes 3."
-    },
-    {
-      l: 0,
-      r: 3,
-      maxf: 3,
-      res: 3,
-      count: { A: 3, B: 1 },
-      highlightedLines: [9],
-      message: "Update maxf: max(2, 3) = 3."
-    },
-    {
-      l: 0,
-      r: 3,
-      maxf: 3,
-      res: 3,
-      count: { A: 3, B: 1 },
-      highlightedLines: [11],
-      message: "Window size (4) - maxf (3) = 1 <= k. Window is valid."
-    },
-    {
-      l: 0,
-      r: 3,
-      maxf: 3,
-      res: 4,
-      count: { A: 3, B: 1 },
-      highlightedLines: [16],
-      message: "Update res: max(3, 4) = 4."
-    },
-    {
-      l: 0,
-      r: 4,
-      maxf: 3,
-      res: 4,
-      count: { A: 3, B: 1 },
-      highlightedLines: [7],
-      message: "Increment r to 4. Character at s[4] is 'B'."
-    },
-    {
-      l: 0,
-      r: 4,
-      maxf: 3,
-      res: 4,
-      count: { A: 3, B: 2 },
-      highlightedLines: [8],
-      message: "Increment frequency of 'B'. count['B'] becomes 2."
-    },
-    {
-      l: 0,
-      r: 4,
-      maxf: 3,
-      res: 4,
-      count: { A: 3, B: 2 },
-      highlightedLines: [9],
-      message: "Update maxf: max(3, 2) = 3."
-    },
-    {
-      l: 0,
-      r: 4,
-      maxf: 3,
-      res: 4,
-      count: { A: 3, B: 2 },
-      highlightedLines: [11],
-      message: "Window size (5) - maxf (3) = 2 > k. Window is invalid, need to shrink."
-    },
-    {
-      l: 0,
-      r: 4,
-      maxf: 3,
-      res: 4,
-      count: { A: 2, B: 2 },
-      highlightedLines: [12],
-      message: "Decrement count of character at l (index 0): 'A'."
-    },
-    {
-      l: 1,
-      r: 4,
-      maxf: 3,
-      res: 4,
-      count: { A: 2, B: 2 },
-      highlightedLines: [13],
-      message: "Increment l to 1."
-    },
-    {
-      l: 1,
-      r: 4,
-      maxf: 3,
-      res: 4,
-      count: { A: 2, B: 2 },
-      highlightedLines: [11],
-      message: "Window size (4) - maxf (3) = 1 <= k. Window is now valid."
-    },
-    {
-      l: 1,
-      r: 4,
-      maxf: 3,
-      res: 4,
-      count: { A: 2, B: 2 },
-      highlightedLines: [16],
-      message: "Update res: max(4, 4) = 4."
-    },
-    {
-      l: 1,
-      r: 5,
-      maxf: 3,
-      res: 4,
-      count: { A: 2, B: 2 },
-      highlightedLines: [7],
-      message: "Increment r to 5. Character at s[5] is 'B'."
-    },
-    {
-      l: 1,
-      r: 5,
-      maxf: 3,
-      res: 4,
-      count: { A: 2, B: 3 },
-      highlightedLines: [8],
-      message: "Increment frequency of 'B'. count['B'] becomes 3."
-    },
-    {
-      l: 1,
-      r: 5,
-      maxf: 3,
-      res: 4,
-      count: { A: 2, B: 3 },
-      highlightedLines: [9],
-      message: "Update maxf: max(3, 3) = 3."
-    },
-    {
-      l: 1,
-      r: 5,
-      maxf: 3,
-      res: 4,
-      count: { A: 2, B: 3 },
-      highlightedLines: [11],
-      message: "Window size (5) - maxf (3) = 2 > k. Window is invalid."
-    },
-    {
-      l: 1,
-      r: 5,
-      maxf: 3,
-      res: 4,
-      count: { A: 1, B: 3 },
-      highlightedLines: [12],
-      message: "Decrement count of character at l (index 1): 'A'."
-    },
-    {
-      l: 2,
-      r: 5,
-      maxf: 3,
-      res: 4,
-      count: { A: 1, B: 3 },
-      highlightedLines: [13],
-      message: "Increment l to 2."
-    },
-    {
-      l: 2,
-      r: 5,
-      maxf: 3,
-      res: 4,
-      count: { A: 1, B: 3 },
-      highlightedLines: [11],
-      message: "Window size (4) - maxf (3) = 1 <= k. Window is valid."
-    },
-    {
-      l: 2,
-      r: 5,
-      maxf: 3,
-      res: 4,
-      count: { A: 1, B: 3 },
-      highlightedLines: [16],
-      message: "Update res: max(4, 4) = 4."
-    },
-    {
-      l: 2,
-      r: 6,
-      maxf: 3,
-      res: 4,
-      count: { A: 1, B: 3 },
-      highlightedLines: [7],
-      message: "Increment r to 6. Character at s[6] is 'A'."
-    },
-    {
-      l: 2,
-      r: 6,
-      maxf: 3,
-      res: 4,
-      count: { A: 2, B: 3 },
-      highlightedLines: [8],
-      message: "Increment frequency of 'A'. count['A'] becomes 2."
-    },
-    {
-      l: 2,
-      r: 6,
-      maxf: 3,
-      res: 4,
-      count: { A: 2, B: 3 },
-      highlightedLines: [9],
-      message: "Update maxf: max(3, 2) = 3."
-    },
-    {
-      l: 2,
-      r: 6,
-      maxf: 3,
-      res: 4,
-      count: { A: 2, B: 3 },
-      highlightedLines: [11],
-      message: "Window size (5) - maxf (3) = 2 > k. Window is invalid."
-    },
-    {
-      l: 2,
-      r: 6,
-      maxf: 3,
-      res: 4,
-      count: { A: 2, B: 2 },
-      highlightedLines: [12],
-      message: "Decrement count of character at l (index 2): 'B'."
-    },
-    {
-      l: 3,
-      r: 6,
-      maxf: 3,
-      res: 4,
-      count: { A: 2, B: 2 },
-      highlightedLines: [13],
-      message: "Increment l to 3."
-    },
-    {
-      l: 3,
-      r: 6,
-      maxf: 3,
-      res: 4,
-      count: { A: 2, B: 2 },
-      highlightedLines: [11],
-      message: "Window size (4) - maxf (3) = 1 <= k. Window is valid."
-    },
-    {
-      l: 3,
-      r: 6,
-      maxf: 3,
-      res: 4,
-      count: { A: 2, B: 2 },
-      highlightedLines: [16],
-      message: "Update res: max(4, 4) = 4."
-    },
-    {
-      l: 3,
-      r: 6,
-      maxf: 3,
-      res: 4,
-      count: { A: 2, B: 2 },
-      highlightedLines: [19],
-      message: "Loop finished. Final result is 4."
-    }
-  ];
-
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
+
+  const { steps, stepLineNumbers } = useMemo(() => {
+    return generateVisualizationData();
+  }, []);
+
+  if (steps.length === 0) return null;
+
   const currentStep = steps[currentStepIndex];
+  const pseudoSteps = steps.map(s => s.pseudoStep);
 
   return (
     <VisualizationLayout
@@ -471,11 +194,11 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
         />
       }
       leftContent={
-        <Card className="p-6">
-          <div className="space-y-6">
+        <div className="space-y-6">
+          <Card className="p-6">
             <div>
               <h3 className="text-sm font-semibold mb-6 text-foreground">Input String: "{s}" (k={k})</h3>
-              <div className="flex flex-wrap gap-4 py-12">
+              <div className="flex flex-wrap gap-4 py-12 items-center justify-center">
                 {s.split('').map((char, idx) => {
                   const isInWindow = idx >= currentStep.l && idx <= currentStep.r;
                   const isLeft = idx === currentStep.l;
@@ -509,7 +232,19 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
                 })}
               </div>
             </div>
+          </Card>
 
+          {/* Descriptive Commentary Box (at the bottom) */}
+          <div className="p-3 bg-muted/50 rounded-lg text-xs leading-relaxed text-foreground border border-border shadow-inner">
+            <div className="flex items-center gap-2 mb-1 text-primary font-bold text-[10px] uppercase tracking-widest">
+              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              Process Step
+            </div>
+            {currentStep.explanation}
+          </div>
+
+          {/* Variable Panel (below the commentary box) */}
+          <div className="pt-2">
             <VariablePanel
               variables={{
                 l: currentStep.l,
@@ -519,18 +254,16 @@ export const LongestRepeatingCharacterReplacementVisualization = () => {
                 ...(Object.keys(currentStep.count).length > 0 && { count: JSON.stringify(currentStep.count) })
               }}
             />
-
-            <Card className="p-4 bg-primary/5 border-primary/20">
-              <p className="text-sm text-foreground leading-relaxed">{currentStep.message}</p>
-            </Card>
           </div>
-        </Card>
+        </div>
       }
       rightContent={
-        <AnimatedCodeEditor
-          code={code}
-          language="typescript"
-          highlightedLines={currentStep.highlightedLines}
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={() => setCurrentStepIndex(0)}
         />
       }
     />

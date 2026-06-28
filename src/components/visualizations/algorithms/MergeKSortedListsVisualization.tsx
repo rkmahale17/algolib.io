@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { StepControls } from '../shared/StepControls';
+import React, { useState, useMemo } from 'react';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
 import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
@@ -21,43 +21,9 @@ interface Step {
 
 // ─── Hardcoded code per language (No comments, no blank lines) ───────────────
 const languages: VisualizationLanguageMap = {
-  typescript: `function mergeKLists(lists: Array<ListNode | null>): ListNode | null {
-    if (!lists || lists.length === 0) {
-        return null;
-    }
-    while (lists.length > 1) {
-        const mergedLists: Array<ListNode | null> = [];
-        for (let i = 0; i < lists.length; i += 2) {
-            const l1 = lists[i] || null;
-            const l2 = (i + 1 < lists.length) ? lists[i + 1] : null;
-            mergedLists.push(mergeTwoLists(l1, l2));
-        }
-        lists = mergedLists;
-    }
-    return lists[0] || null;
-    function mergeTwoLists(l1: ListNode | null, l2: ListNode | null): ListNode | null {
-        const dummy = { val: -1, next: null } as any;
-        let tail = dummy;
-        while (l1 && l2) {
-            if (l1.val < l2.val) {
-                tail.next = l1;
-                l1 = l1.next;
-            } else {
-                tail.next = l2;
-                l2 = l2.next;
-            }
-            tail = tail.next;
-        }
-        tail.next = l1 || l2;
-        return dummy.next;
-    }
-}`,
-
-  python: `def mergeKLists(lists: list[ListNode]) -> ListNode:
-    if not lists:
-        return None
-    def mergeTwoLists(l1, l2):
-        dummy = ListNode(-1)
+  python: `def mergeKLists(lists: List[Optional[ListNode]]) -> Optional[ListNode]:
+    def mergeTwoLists(l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
+        dummy = ListNode()
         tail = dummy
         while l1 and l2:
             if l1.val < l2.val:
@@ -67,82 +33,113 @@ const languages: VisualizationLanguageMap = {
                 tail.next = l2
                 l2 = l2.next
             tail = tail.next
-        tail.next = l1 or l2
+        if l1:
+            tail.next = l1
+        elif l2:
+            tail.next = l2
         return dummy.next
-    while len(lists) > 1:
-        mergedLists = []
-        for i in range(0, len(lists), 2):
-            l1 = lists[i]
-            l2 = lists[i + 1] if i + 1 < len(lists) else None
-            mergedLists.append(mergeTwoLists(l1, l2))
-        lists = mergedLists
-    return lists[0]`,
+    if not lists:
+        return None
+    if len(lists) == 1:
+        return lists[0]
+    mid = len(lists) // 2
+    left = mergeKLists(lists[:mid])
+    right = mergeKLists(lists[mid:])
+    return mergeTwoLists(left, right)`,
 
-  java: `public ListNode mergeKLists(ListNode[] lists) {
-    if (lists.length == 0) {
+  typescript: `function mergeKLists(lists: Array<ListNode | null>): ListNode | null {
+    if (!lists || lists.length === 0) {
         return null;
     }
-    while (lists.length > 1) {
-        List<ListNode> mergedLists = new ArrayList<>();
-        for (int i = 0; i < lists.length; i += 2) {
-            ListNode l1 = lists[i];
-            ListNode l2 = (i + 1 < lists.length) ? lists[i + 1] : null;
-            mergedLists.add(mergeList(l1, l2));
+    function mergeTwoLists(l1: ListNode | null, l2: ListNode | null): ListNode | null {
+        const dummy = new ListNode();
+        let tail: ListNode = dummy;
+        while (l1 !== null && l2 !== null) {
+            if (l1.val < l2.val) {
+                tail.next = l1;
+                l1 = l1.next;
+            } else {
+                tail.next = l2;
+                l2 = l2.next;
+            }
+            tail = tail.next!;
         }
-        lists = mergedLists.toArray(new ListNode[0]);
-    }
-    return lists[0];
-}
-private ListNode mergeList(ListNode l1, ListNode l2) {
-    ListNode dummy = new ListNode(0);
-    ListNode tail = dummy;
-    while (l1 != null && l2 != null) {
-        if (l1.val < l2.val) {
+        if (l1 !== null) {
             tail.next = l1;
-            l1 = l1.next;
-        } else {
+        } else if (l2 !== null) {
             tail.next = l2;
-            l2 = l2.next;
         }
-        tail = tail.next;
+        return dummy.next;
     }
-    if (l1 != null) tail.next = l1;
-    if (l2 != null) tail.next = l2;
-    return dummy.next;
+    let mergedList: ListNode | null = null;
+    for (let i = 0; i < lists.length; i++) {
+        mergedList = mergeTwoLists(mergedList, lists[i]);
+    }
+    return mergedList;
 }`,
 
-  cpp: `ListNode* mergeKLists(vector<ListNode*>& lists) {
-    if (lists.size() == 0) {
-        return nullptr;
-    }
-    while (lists.size() > 1) {
-        vector<ListNode*> mergedLists;
-        for (int i = 0; i < lists.size(); i += 2) {
-            ListNode* l1 = lists[i];
-            ListNode* l2 = (i + 1 < lists.size()) ? lists[i + 1] : nullptr;
-            mergedLists.push_back(mergeList(l1, l2));
+  java: `public class Solution {
+    public ListNode mergeKLists(ListNode[] lists) {
+        if (lists == null || lists.length == 0) {
+            return null;
         }
-        lists = mergedLists;
+        return mergeKListsHelper(lists, 0, lists.length - 1);
     }
-    return lists[0];
-}
-ListNode* mergeList(ListNode* l1, ListNode* l2) {
-    ListNode dummy(0);
-    ListNode* tail = &dummy;
-    while (l1 != nullptr && l2 != nullptr) {
-        if (l1->val < l2->val) {
-            tail->next = l1;
-            l1 = l1->next;
+    private ListNode mergeKListsHelper(ListNode[] lists, int start, int end) {
+        if (start == end) {
+            return lists[start];
+        }
+        int mid = start + (end - start) / 2;
+        ListNode left = mergeKListsHelper(lists, start, mid);
+        ListNode right = mergeKListsHelper(lists, mid + 1, end);
+        return mergeTwoLists(left, right);
+    }
+    private ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        ListNode dummy = new ListNode();
+        ListNode tail = dummy;
+        while (l1 != null && l2 != null) {
+            if (l1.val < l2.val) {
+                tail.next = l1;
+                l1 = l1.next;
+            } else {
+                tail.next = l2;
+                l2 = l2.next;
+            }
+            tail = tail.next;
+        }
+        if (l1 != null) {
+            tail.next = l1;
         } else {
-            tail->next = l2;
-            l2 = l2->next;
+            tail.next = l2;
         }
-        tail = tail->next;
+        return dummy.next;
     }
-    if (l1 != nullptr) tail->next = l1;
-    if (l2 != nullptr) tail->next = l2;
-    return dummy.next;
-}`
+}`,
+
+  cpp: `class Solution {
+public:
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        auto cmp = [](ListNode* a, ListNode* b) { return a->val > b->val; };
+        priority_queue<ListNode*, vector<ListNode*>, decltype(cmp)> heap(cmp);
+        for (ListNode* head : lists) {
+            if (head) {
+                heap.push(head);
+            }
+        }
+        ListNode* dummy = new ListNode(0);
+        ListNode* current = dummy;
+        while (!heap.empty()) {
+            ListNode* node = heap.top();
+            heap.pop();
+            current->next = node;
+            current = current->next;
+            if (node->next) {
+                heap.push(node->next);
+            }
+        }
+        return dummy->next;
+    }
+};`
 };
 
 // ─── Step Generator ──────────────────────────────────────────────────────────
@@ -180,7 +177,7 @@ function generateVisualizationData() {
     pseudoStep: "CALL mergeKLists(lists)",
     variables: { totalLists: lists.length }
   });
-  addLines(1, 1, 1, 1);
+  addLines(1, 1, 2, 3);
 
   steps.push({
     allLists: lists.map(l => [...l]),
@@ -192,7 +189,7 @@ function generateVisualizationData() {
     pseudoStep: "IF lists IS EMPTY -> RETURN null",
     variables: { totalLists: lists.length }
   });
-  addLines(2, 2, 2, 2);
+  addLines(2, 18, 3, 6);
 
   while (lists.length > 1) {
     steps.push({
@@ -205,7 +202,7 @@ function generateVisualizationData() {
       pseudoStep: `WHILE lists.length = ${lists.length} > 1`,
       variables: { currentListsCount: lists.length }
     });
-    addLines(5, 17, 5, 5);
+    addLines(26, 22, 12, 13);
 
     const mergedLists: number[][] = [];
     steps.push({
@@ -218,7 +215,7 @@ function generateVisualizationData() {
       pseudoStep: "SET mergedLists = []",
       variables: { mergedProgress: "[]" }
     });
-    addLines(6, 18, 6, 6);
+    addLines(25, 22, 12, 11);
 
     for (let i = 0; i < lists.length; i += 2) {
       const l1 = lists[i];
@@ -234,7 +231,7 @@ function generateVisualizationData() {
         pseudoStep: `FOR i = ${i}: l1 = lists[${i}], l2 = lists[${i + 1}]`,
         variables: { i, l1Size: l1?.length || 0, l2Size: l2?.length || 0 }
       });
-      addLines(7, 19, 7, 7);
+      addLines(27, 23, 13, 14);
 
       const merged: number[] = [];
       if (l1 && l2) {
@@ -248,10 +245,10 @@ function generateVisualizationData() {
           mergedBuilder: [],
           phase: 'merging',
           explanation: "Call mergeTwoLists. Create a dummy node as a placeholder for the head of the new merged list.",
-          pseudoStep: "CALL mergeTwoLists(l1, l2) -> dummy = {-1, null}",
+          pseudoStep: "CALL mergeTwoLists(l1, l2) -> dummy = {val: 0, next: null}",
           variables: { l1: `[${l1.join(',')}]`, l2: `[${l2.join(',')}]`, dummy: "initialized" }
         });
-        addLines(16, 5, 17, 17);
+        addLines(6, 3, 18, 11);
 
         while (ptr1 < l1.length && ptr2 < l2.length) {
           steps.push({
@@ -264,7 +261,7 @@ function generateVisualizationData() {
             pseudoStep: `WHILE l1 AND l2 -> COMPARE l1.val (${l1[ptr1]}) AND l2.val (${l2[ptr2]})`,
             variables: { val1: l1[ptr1], val2: l2[ptr2] }
           });
-          addLines(18, 7, 19, 19);
+          addLines(8, 5, 20, 13);
 
           if (l1[ptr1] < l2[ptr2]) {
             const val = l1[ptr1];
@@ -278,7 +275,7 @@ function generateVisualizationData() {
               pseudoStep: `IF l1.val (${val}) < l2.val (${l2[ptr2]}) -> tail.next = l1`,
               variables: { chosen: val }
             });
-            addLines(20, 9, 21, 21);
+            addLines(10, 7, 22, 16);
 
             merged.push(val);
             ptr1++;
@@ -292,7 +289,7 @@ function generateVisualizationData() {
               pseudoStep: "SET l1 = l1.next, tail = tail.next",
               variables: { ptr1, mergedSize: merged.length }
             });
-            addLines(26, 14, 27, 27);
+            addLines(11, 8, 23, 17);
           } else {
             const val = l2[ptr2];
             steps.push({
@@ -305,7 +302,7 @@ function generateVisualizationData() {
               pseudoStep: `ELSE -> tail.next = l2`,
               variables: { chosen: val }
             });
-            addLines(23, 12, 24, 24);
+            addLines(13, 10, 25, 16);
 
             merged.push(val);
             ptr2++;
@@ -319,7 +316,7 @@ function generateVisualizationData() {
               pseudoStep: "SET l2 = l2.next, tail = tail.next",
               variables: { ptr2, mergedSize: merged.length }
             });
-            addLines(26, 14, 27, 27);
+            addLines(14, 11, 26, 17);
           }
         }
 
@@ -335,7 +332,7 @@ function generateVisualizationData() {
             pseudoStep: "SET tail.next = l1 OR l2",
             variables: { remainingSize: remaining.length }
           });
-          addLines(28, 15, 29, 29);
+          addLines(18, 13, 30, 18);
           merged.push(...remaining);
         }
 
@@ -349,7 +346,7 @@ function generateVisualizationData() {
           pseudoStep: "RETURN dummy.next",
           variables: { mergedList: `[${merged.join(',')}]` }
         });
-        addLines(29, 16, 31, 31);
+        addLines(23, 17, 35, 22);
       } else {
         merged.push(...(l1 || []));
         steps.push({
@@ -362,7 +359,7 @@ function generateVisualizationData() {
           pseudoStep: "ADD l1 to mergedLists",
           variables: { merged: `[${merged.join(',')}]` }
         });
-        addLines(9, 21, 9, 9);
+        addLines(29, 20, 9, 22);
       }
 
       mergedLists.push(merged);
@@ -376,7 +373,7 @@ function generateVisualizationData() {
         pseudoStep: "APPEND merged list to mergedLists",
         variables: { mergedListsSize: mergedLists.length }
       });
-      addLines(10, 22, 10, 10);
+      addLines(27, 25, 15, 13);
     }
 
     lists = mergedLists;
@@ -390,7 +387,7 @@ function generateVisualizationData() {
       pseudoStep: "SET lists = mergedLists",
       variables: { remainingLists: lists.length }
     });
-    addLines(12, 23, 12, 12);
+    addLines(26, 25, 15, 13);
   }
 
   steps.push({
@@ -403,7 +400,7 @@ function generateVisualizationData() {
     pseudoStep: "RETURN lists[0]",
     variables: { finalSize: lists[0]?.length || 0 }
   });
-  addLines(14, 24, 14, 14);
+  addLines(29, 25, 6, 22);
 
   return { steps, stepLineNumbers };
 }
@@ -411,37 +408,6 @@ function generateVisualizationData() {
 export const MergeKSortedListsVisualization = () => {
   const { steps, stepLineNumbers } = useMemo(generateVisualizationData, []);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    if (isPlaying && currentStepIndex < steps.length - 1) {
-      intervalRef.current = setInterval(() => {
-        setCurrentStepIndex(prev => {
-          if (prev >= steps.length - 1) {
-            setIsPlaying(false);
-            return prev;
-          }
-          return prev + 1;
-        });
-      }, 1000 / speed);
-    } else {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    }
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [isPlaying, currentStepIndex, steps.length, speed]);
-
-  const handlePlay = () => setIsPlaying(true);
-  const handlePause = () => setIsPlaying(false);
-  const handleStepForward = () => currentStepIndex < steps.length - 1 && setCurrentStepIndex(p => p + 1);
-  const handleStepBack = () => currentStepIndex > 0 && setCurrentStepIndex(p => p - 1);
-  const handleReset = () => {
-    setCurrentStepIndex(0);
-    setIsPlaying(false);
-  };
 
   const step = steps[currentStepIndex];
   const pseudoSteps = useMemo(() => steps.map(s => s.pseudoStep), [steps]);
@@ -450,7 +416,7 @@ export const MergeKSortedListsVisualization = () => {
     <VisualizationLayout
       leftContent={
         <div className="space-y-6">
-          <Card className="p-6 bg-card/50 backdrop-blur-sm border-primary/20">
+          <Card className="p-6 bg-card/50 backdrop-blur-sm border border-border">
             <h3 className="text-sm font-semibold mb-6 text-muted-foreground uppercase tracking-wider">Iterative Process</h3>
             <div className="space-y-6">
               {step.allLists.map((list, idx) => (
@@ -491,7 +457,7 @@ export const MergeKSortedListsVisualization = () => {
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.1 }}
               >
-                <Card className="p-6 bg-primary/5 border-primary/30 relative overflow-hidden">
+                <Card className="p-6 bg-primary/5 border border-primary/30 relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
                   <h3 className="text-sm font-semibold mb-4 uppercase tracking-widest text-primary">Merging Sandbox</h3>
 
@@ -544,19 +510,27 @@ export const MergeKSortedListsVisualization = () => {
             )}
           </AnimatePresence>
 
-          <div className="bg-accent/50 rounded-lg border border-accent p-4">
-            <p className="text-sm font-medium text-foreground">{step.explanation}</p>
+          {/* Descriptive Commentary Box (at the bottom) */}
+          <div className="p-3 bg-muted/50 rounded-lg text-xs leading-relaxed text-foreground border border-border shadow-inner">
+            <div className="flex items-center gap-2 mb-1 text-primary font-bold text-[10px] uppercase tracking-widest">
+              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              Process Step
+            </div>
+            {step.explanation}
           </div>
 
           <div className="bg-muted/50 rounded-lg border border-border/50 p-4">
-            <h5 className="text-xs font-bold text-muted-foreground uppercase mb-2">Divide & Conquer Complexity:</h5>
+            <h5 className="text-xs font-bold text-muted-foreground uppercase mb-2">Complexity Overview:</h5>
             <div className="text-[11px] space-y-1 text-muted-foreground">
               <p>• <strong>Time:</strong> O(N log k) where N is total nodes across all lists, and k is the number of lists.</p>
               <p>• <strong>Space:</strong> O(1) auxiliary space (excluding the output list) since we merge lists in-place.</p>
             </div>
           </div>
 
-          <VariablePanel variables={step.variables} />
+          {/* Variable Panel (below the commentary box) */}
+          <div className="pt-2">
+            <VariablePanel variables={step.variables} />
+          </div>
         </div>
       }
       rightContent={
@@ -565,21 +539,14 @@ export const MergeKSortedListsVisualization = () => {
           stepLineNumbers={stepLineNumbers}
           pseudoSteps={pseudoSteps}
           activeStepIndex={currentStepIndex}
-          onLanguageChange={handleReset}
+          onLanguageChange={() => setCurrentStepIndex(0)}
         />
       }
       controls={
-        <StepControls
-          isPlaying={isPlaying}
-          onPlay={handlePlay}
-          onPause={handlePause}
-          onStepForward={handleStepForward}
-          onStepBack={handleStepBack}
-          onReset={handleReset}
-          speed={speed}
-          onSpeedChange={setSpeed}
+        <SimpleStepControls
           currentStep={currentStepIndex}
-          totalSteps={steps.length - 1}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStepIndex}
         />
       }
     />

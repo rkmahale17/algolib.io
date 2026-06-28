@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { VariablePanel } from '../shared/VariablePanel';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
+import type { VisualizationLanguageMap, StepLineNumberMap } from '@/types/visualization';
 
 interface Step {
   s: string;
@@ -11,16 +13,31 @@ interface Step {
   r: number;
   currentCharL?: string;
   currentCharR?: string;
-  comment: string;
-  highlightedLines: number[];
+  explanation: string;
+  pseudoStep: string;
   isValid?: boolean;
 }
 
-export const ValidPalindromeVisualization = () => {
-  const code = `function isPalindrome(s: string): boolean {
+const languages: VisualizationLanguageMap = {
+  python: `def isPalindrome(s: str) -> bool:
+    def alphaNum(c: str) -> bool:
+        return c.isalnum()
+    l = 0
+    r = len(s) - 1
+    while l < r:
+        while l < r and not alphaNum(s[l]):
+            l += 1
+        while r > l and not alphaNum(s[r]):
+            r -= 1
+        if s[l].lower() != s[r].lower():
+            return False
+        l += 1
+        r -= 1
+    return True`,
+
+  typescript: `function isPalindrome(s: string): boolean {
   let l = 0;
   let r = s.length - 1;
-
   while (l < r) {
     while (l < r && !alphaNum(s[l])) {
       l++;
@@ -44,62 +61,160 @@ function alphaNum(c: string): boolean {
     (code >= 97 && code <= 122) ||
     (code >= 48 && code <= 57)
   );
-}`;
+}`,
 
-  const cases = {
-    valid: {
-      steps: [
-        { s: "race car", l: 0, r: 7, comment: "Initialize pointers at the start (l=0) and end (r=7).", highlightedLines: [2, 3] },
-        { s: "race car", l: 0, r: 7, comment: "Check main loop condition: 0 < 7 is true.", highlightedLines: [5] },
-        { s: "race car", l: 0, r: 7, currentCharL: 'r', comment: "Left pointer check: 'r' is alphanumeric, so we skip the l-skip loop.", highlightedLines: [6] },
-        { s: "race car", l: 0, r: 7, currentCharR: 'r', comment: "Right pointer check: 'r' is alphanumeric, so we skip the r-skip loop.", highlightedLines: [9] },
-        { s: "race car", l: 0, r: 7, currentCharL: 'r', currentCharR: 'r', comment: "Compare 'r' and 'r' (case-insensitive). They match!", highlightedLines: [12] },
-        { s: "race car", l: 1, r: 6, comment: "Matching characters found! Increment left and decrement right.", highlightedLines: [15, 16] },
-        { s: "race car", l: 1, r: 6, comment: "Next iteration: 1 < 6 is true.", highlightedLines: [5] },
-        { s: "race car", l: 1, r: 6, currentCharL: 'a', comment: "Left pointer at 'a' is alphanumeric.", highlightedLines: [6] },
-        { s: "race car", l: 1, r: 6, currentCharR: 'a', comment: "Right pointer at 'a' is alphanumeric.", highlightedLines: [9] },
-        { s: "race car", l: 1, r: 6, currentCharL: 'a', currentCharR: 'a', comment: "Characters 'a' and 'a' match.", highlightedLines: [12] },
-        { s: "race car", l: 2, r: 5, comment: "Increment l, decrement r.", highlightedLines: [15, 16] },
-        { s: "race car", l: 2, r: 5, comment: "Next iteration: 2 < 5 is true.", highlightedLines: [5] },
-        { s: "race car", l: 2, r: 5, currentCharL: 'c', comment: "Left pointer at 'c' is alphanumeric.", highlightedLines: [6] },
-        { s: "race car", l: 2, r: 5, currentCharR: 'c', comment: "Right pointer at 'c' is alphanumeric.", highlightedLines: [9] },
-        { s: "race car", l: 2, r: 5, currentCharL: 'c', currentCharR: 'c', comment: "Characters 'c' and 'c' match.", highlightedLines: [12] },
-        { s: "race car", l: 3, r: 4, comment: "Increment l, decrement r.", highlightedLines: [15, 16] },
-        { s: "race car", l: 3, r: 4, comment: "Next iteration: 3 < 4 is true.", highlightedLines: [5] },
-        { s: "race car", l: 3, r: 4, currentCharL: 'e', comment: "Left pointer at 'e' is alphanumeric.", highlightedLines: [6] },
-        { s: "race car", l: 3, r: 4, currentCharR: ' ', comment: "Right pointer check: space (' ') is NOT alphanumeric.", highlightedLines: [9] },
-        { s: "race car", l: 3, r: 3, currentCharR: ' ', comment: "Decrement right pointer to skip the space.", highlightedLines: [10] },
-        { s: "race car", l: 3, r: 3, comment: "End of r-skip loop: r is no longer greater than l.", highlightedLines: [9] },
-        { s: "race car", l: 3, r: 3, currentCharL: 'e', currentCharR: 'e', comment: "Compare 'e' and 'e'. Match!", highlightedLines: [12] },
-        { s: "race car", l: 4, r: 2, comment: "Increment l, decrement r.", highlightedLines: [15, 16] },
-        { s: "race car", l: 4, r: 2, comment: "Check main loop: 4 < 2 is false. Pointers have crossed.", highlightedLines: [5] },
-        { s: "race car", l: 4, r: 2, isValid: true, comment: "The string is a valid palindrome!", highlightedLines: [18] }
-      ]
-    },
-    invalid: {
-      steps: [
-        { s: "race a car", l: 0, r: 9, comment: "Initialize pointers: l=0, r=9.", highlightedLines: [2, 3] },
-        { s: "race a car", l: 0, r: 9, comment: "0 < 9 is true.", highlightedLines: [5] },
-        { s: "race a car", l: 0, r: 9, currentCharL: 'r', currentCharR: 'r', comment: "Match 'r' at ends.", highlightedLines: [12] },
-        { s: "race a car", l: 1, r: 8, comment: "Move pointers center-ward.", highlightedLines: [15, 16] },
-        { s: "race a car", l: 1, r: 8, comment: "Next iteration: 1 < 8.", highlightedLines: [5] },
-        { s: "race a car", l: 1, r: 8, currentCharL: 'a', currentCharR: 'a', comment: "Match 'a' at next position.", highlightedLines: [12] },
-        { s: "race a car", l: 2, r: 7, comment: "Move pointers.", highlightedLines: [15, 16] },
-        { s: "race a car", l: 2, r: 7, comment: "Next iteration: 2 < 7.", highlightedLines: [5] },
-        { s: "race a car", l: 2, r: 7, currentCharL: 'c', currentCharR: 'c', comment: "Match 'c'.", highlightedLines: [12] },
-        { s: "race a car", l: 3, r: 6, comment: "Move pointers.", highlightedLines: [15, 16] },
-        { s: "race a car", l: 3, r: 6, comment: "Next iteration: 3 < 6.", highlightedLines: [5] },
-        { s: "race a car", l: 3, r: 6, currentCharL: 'e', currentCharR: 'a', comment: "Compare 'e' and 'a'. No match!", highlightedLines: [12] },
-        { s: "race a car", l: 3, r: 6, isValid: false, comment: "Found a mismatch. Return false.", highlightedLines: [13] }
-      ]
+  java: `public class Solution {
+    public boolean isPalindrome(String s) {
+        int l = 0;
+        int r = s.length - 1;
+        while (l < r) {
+            while (l < r && !alphaNum(s.charAt(l))) {
+                l++;
+            }
+            while (r > l && !alphaNum(s.charAt(r))) {
+                r--;
+            }
+            if (s.charAt(l) != s.charAt(r) && Character.toLowerCase(s.charAt(l)) != Character.toLowerCase(s.charAt(r))) {
+                return false;
+            }
+            l++;
+            r--;
+        }
+        return true;
     }
+
+    private boolean alphaNum(char c) {
+        return Character.isLetterOrDigit(c);
+    }
+}`,
+
+  cpp: `class Solution {
+public:
+    bool isPalindrome(string s) {
+        int left = 0, right = s.length() - 1;
+        while (left < right) {
+            while (left < right && !isalnum(s[left])) {
+                left++;
+            }
+            while (left < right && !isalnum(s[right])) {
+                right--;
+            }
+            if (tolower(s[left]) != tolower(s[right])) {
+                return false;
+            }
+            left++;
+            right--;
+        }
+        return true;
+    }
+};`
+};
+
+const generateStepsData = (s: string) => {
+  const steps: Step[] = [];
+  const stepLineNumbers: StepLineNumberMap = {
+    typescript: [],
+    python: [],
+    java: [],
+    cpp: []
   };
 
+  const addLines = (ts: number, py: number, java: number, cpp: number) => {
+    stepLineNumbers.typescript!.push(ts);
+    stepLineNumbers.python!.push(py);
+    stepLineNumbers.java!.push(java);
+    stepLineNumbers.cpp!.push(cpp);
+  };
+
+  const alphaNum = (c: string) => {
+    const code = c.charCodeAt(0);
+    return (
+      (code >= 65 && code <= 90) ||
+      (code >= 97 && code <= 122) ||
+      (code >= 48 && code <= 57)
+    );
+  };
+
+  let l = 0;
+  let r = s.length - 1;
+
+  const addStep = (msg: string, pseudo: string, tsLine: number, pyLine: number, javaLine: number, cppLine: number, extra: Partial<Step> = {}) => {
+    steps.push({
+      s,
+      l,
+      r,
+      currentCharL: extra.currentCharL,
+      currentCharR: extra.currentCharR,
+      explanation: msg,
+      pseudoStep: pseudo,
+      isValid: extra.isValid
+    });
+    addLines(tsLine, pyLine, javaLine, cppLine);
+  };
+
+  // 1. Initial State
+  addStep("Initialize left and right pointers at both ends of the string.", "SET l = 0, r = len(s) - 1", 2, 4, 3, 4);
+
+  while (l < r) {
+    // 2. Loop check
+    addStep(`Loop check: is left (${l}) < right (${r})?`, `WHILE l < r → ${l} < ${r}`, 4, 6, 5, 5);
+
+    // 3. Skip left non-alphanumeric
+    addStep(`Check if character at left pointer s[${l}] ('${s[l]}') is alphanumeric.`, "WHILE l < r AND NOT alphaNum(s[l])", 5, 7, 6, 6, { currentCharL: s[l] });
+    while (l < r && !alphaNum(s[l])) {
+      l++;
+      addStep(`s[${l - 1}] is non-alphanumeric. Increment left pointer to ${l}.`, "SET l = l + 1", 6, 8, 7, 7);
+      addStep(`Check if character at left pointer s[${l}] ('${s[l]}') is alphanumeric.`, "WHILE l < r AND NOT alphaNum(s[l])", 5, 7, 6, 6, { currentCharL: s[l] });
+    }
+
+    // 4. Skip right non-alphanumeric
+    addStep(`Check if character at right pointer s[${r}] ('${s[r]}') is alphanumeric.`, "WHILE r > l AND NOT alphaNum(s[r])", 8, 9, 9, 9, { currentCharR: s[r] });
+    while (r > l && !alphaNum(s[r])) {
+      r--;
+      addStep(`s[${r + 1}] is non-alphanumeric. Decrement right pointer to ${r}.`, "SET r = r - 1", 9, 10, 10, 10);
+      addStep(`Check if character at right pointer s[${r}] ('${s[r]}') is alphanumeric.`, "WHILE r > l AND NOT alphaNum(s[r])", 8, 9, 9, 9, { currentCharR: s[r] });
+    }
+
+    // 5. Compare characters
+    const charL = s[l].toLowerCase();
+    const charR = s[r].toLowerCase();
+    addStep(
+      `Compare characters (case-insensitive): '${charL}' vs '${charR}'.`,
+      `IF s[l].lower() != s[r].lower() → '${charL}' != '${charR}'`,
+      11, 11, 12, 12,
+      { currentCharL: s[l], currentCharR: s[r] }
+    );
+
+    if (charL !== charR) {
+      addStep("Characters do not match! The string is not a palindrome.", "RETURN False", 12, 12, 13, 13, { isValid: false });
+      return { steps, stepLineNumbers };
+    }
+
+    // 6. Move pointers center-ward
+    l++;
+    r--;
+    addStep(`Match! Move both pointers center-ward. New left = ${l}, right = ${r}.`, "SET l = l + 1, r = r - 1", 14, 13, 15, 15);
+  }
+
+  // 7. Complete final check
+  addStep("Pointers crossed. All compared character pairs matched successfully.", "RETURN True", 17, 15, 18, 18, { isValid: true });
+
+  return { steps, stepLineNumbers };
+};
+
+export const ValidPalindromeVisualization = () => {
   const [caseId, setCaseId] = useState<'valid' | 'invalid'>('valid');
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
-  const steps = cases[caseId].steps;
-  const currentStep = steps[Math.min(currentStepIndex, steps.length - 1)];
+  const { steps, stepLineNumbers } = useMemo(() => {
+    const targetStr = caseId === 'valid' ? "race car" : "race a car";
+    return generateStepsData(targetStr);
+  }, [caseId]);
+
+  if (steps.length === 0) return null;
+
+  const currentStep = steps[currentStepIndex];
+  const pseudoSteps = steps.map(s => s.pseudoStep);
 
   const handleCaseChange = (newCase: 'valid' | 'invalid') => {
     setCaseId(newCase);
@@ -108,92 +223,111 @@ function alphaNum(c: string): boolean {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-4">
-        <SimpleStepControls
-          currentStep={currentStepIndex}
-          totalSteps={steps.length}
-          onStepChange={setCurrentStepIndex}
-        />
-        
-        <div className="flex p-1 bg-muted rounded-xl border border-border w-fit backdrop-blur-sm shadow-inner">
+      {/* Case selections / Controls at Top */}
+      <div className="flex flex-col gap-4 bg-card p-6 rounded-xl border border-border shadow-sm overflow-x-auto">
+        <div className="flex p-0.5 bg-muted rounded-lg border border-border w-fit shadow-inner">
           <button
             onClick={() => handleCaseChange('valid')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 ${
               caseId === 'valid' 
-              ? 'bg-card text-primary shadow-sm ring-1 ring-border/50' 
+              ? 'bg-background text-foreground border border-border/50 shadow-sm font-bold' 
               : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            <CheckCircle2 className={`h-4 w-4 ${caseId === 'valid' ? 'text-primary' : 'text-muted-foreground'}`} />
+            <CheckCircle2 className={`h-3.5 w-3.5 ${caseId === 'valid' ? 'text-green-500' : 'text-muted-foreground'}`} />
             Valid Case
           </button>
           <button
             onClick={() => handleCaseChange('invalid')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 ${
               caseId === 'invalid' 
-              ? 'bg-card text-destructive shadow-sm ring-1 ring-border/50' 
+              ? 'bg-background text-foreground border border-border/50 shadow-sm font-bold' 
               : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            <XCircle className={`h-4 w-4 ${caseId === 'invalid' ? 'text-destructive' : 'text-muted-foreground'}`} />
+            <XCircle className={`h-3.5 w-3.5 ${caseId === 'invalid' ? 'text-red-500' : 'text-muted-foreground'}`} />
             Invalid Case
           </button>
         </div>
+        <div className="w-full pt-4 border-t border-border">
+          <SimpleStepControls
+            currentStep={currentStepIndex}
+            totalSteps={steps.length}
+            onStepChange={setCurrentStepIndex}
+          />
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-6">
-          <Card className="p-6">
-            <div className="mb-8">
-              <h3 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wider">String Inspection</h3>
-              <div className="flex flex-wrap gap-2">
-                {currentStep.s.split('').map((char, idx) => {
-                  const isLeft = idx === currentStep.l;
-                  const isRight = idx === currentStep.r;
-                  return (
-                    <div
-                      key={idx}
-                      className={`w-10 h-10 flex items-center justify-center rounded-md font-mono text-lg border-2 transition-all duration-200 ${
-                        isLeft && isRight
-                        ? 'bg-purple-500/20 border-purple-500 text-purple-600 shadow-[0_0_10px_purple]'
-                        : isLeft
-                          ? 'bg-primary/20 border-primary text-primary shadow-[0_0_10px_rgba(var(--primary),0.3)]'
-                          : isRight
-                            ? 'bg-secondary/20 border-secondary text-secondary-foreground shadow-[0_0_10px_secondary]'
-                            : idx < currentStep.l || idx > currentStep.r
-                              ? 'bg-muted border-transparent text-muted-foreground opacity-50'
-                              : 'bg-card border-border text-foreground'
-                        }`}
-                    >
-                      {char}
-                    </div>
-                  );
-                })}
+      <VisualizationLayout
+        leftContent={
+          <div className="space-y-6">
+            <Card className="p-6">
+              <div className="mb-8">
+                <h3 className="text-xs font-bold text-muted-foreground mb-4 uppercase tracking-widest">String Inspection</h3>
+                <div className="flex flex-wrap gap-2">
+                  {currentStep.s.split('').map((char, idx) => {
+                    const isLeft = idx === currentStep.l;
+                    const isRight = idx === currentStep.r;
+                    return (
+                      <div
+                        key={idx}
+                        className={`w-10 h-10 flex items-center justify-center rounded-md font-mono text-lg border-2 transition-all duration-200 ${
+                          isLeft && isRight
+                          ? 'bg-purple-500/20 border-purple-500 text-purple-600 shadow-[0_0_10px_purple] font-bold'
+                          : isLeft
+                            ? 'bg-primary/20 border-primary text-primary shadow-[0_0_10px_rgba(var(--primary),0.3)] font-bold scale-105'
+                            : isRight
+                              ? 'bg-secondary/20 border-secondary text-secondary-foreground shadow-[0_0_10px_secondary] font-bold scale-105'
+                              : idx < currentStep.l || idx > currentStep.r
+                                ? 'bg-muted border-transparent text-muted-foreground opacity-50'
+                                : 'bg-card border-border text-foreground'
+                          }`}
+                      >
+                        {char}
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="mt-4 flex gap-4 text-xs font-mono">
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded bg-primary/20 border border-primary" />
+                    <span>Left Pointer</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded bg-secondary/20 border border-secondary" />
+                    <span>Right Pointer</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded bg-purple-500/20 border border-purple-500" />
+                    <span>Meeting Point</span>
+                  </div>
+                </div>
               </div>
-              <div className="mt-4 flex gap-4 text-xs font-mono">
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded bg-primary/20 border border-primary" />
-                  <span>Left Pointer</span>
+
+              {currentStep.isValid !== undefined && (
+                <div className={`p-4 rounded-lg border flex items-center justify-center gap-3 mb-4 ${
+                  currentStep.isValid
+                  ? 'bg-green-500/10 border-green-500/20 text-green-600 dark:text-green-400 font-bold'
+                  : 'bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-400 font-bold'
+                }`}>
+                  <span className="text-base font-bold">
+                    {currentStep.isValid ? '✓ Valid Palindrome' : '✗ Not a Palindrome'}
+                  </span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded bg-secondary/20 border border-secondary" />
-                  <span>Right Pointer</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded bg-purple-500/20 border border-purple-500" />
-                  <span>Meeting Point</span>
-                </div>
+              )}
+            </Card>
+
+            {/* Descriptive Commentary Box (at the bottom) */}
+            <div className="p-3 bg-muted/50 rounded-lg text-xs leading-relaxed text-foreground border border-border shadow-inner">
+              <div className="flex items-center gap-2 mb-1 text-primary font-bold text-[10px] uppercase tracking-widest">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                Process Step
               </div>
+              {currentStep.explanation}
             </div>
 
-            <div className="space-y-4">
-              <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 min-h-[80px] flex items-center">
-                <p className="text-sm leading-relaxed text-foreground">
-                  <span className="font-bold text-primary mr-2">Step {currentStepIndex}:</span>
-                  {currentStep.comment}
-                </p>
-              </div>
-
+            {/* Variable Panel (below the commentary box) */}
+            <div className="pt-2">
               <VariablePanel
                 variables={{
                   left: currentStep.l,
@@ -203,32 +337,19 @@ function alphaNum(c: string): boolean {
                   status: currentStep.isValid === undefined ? 'Comparing' : (currentStep.isValid ? 'Valid' : 'Invalid')
                 }}
               />
-
-              {currentStep.isValid !== undefined && (
-                <div className={`p-4 rounded-lg border flex items-center justify-center gap-3 ${
-                  currentStep.isValid
-                  ? 'bg-green-500/10 border-green-500/20 text-green-600 dark:text-green-400'
-                  : 'bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-400'
-                }`}>
-                  <span className="text-xl font-bold">
-                    {currentStep.isValid ? '✓ Valid Palindrome' : '✗ Not a Palindrome'}
-                  </span>
-                </div>
-              )}
             </div>
-          </Card>
-        </div>
-
-        <div className="lg:h-[calc(100vh-250px)] min-h-[500px]">
-          <AnimatedCodeEditor
-            code={code}
-            language="typescript"
-            highlightedLines={currentStep.highlightedLines}
+          </div>
+        }
+        rightContent={
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
           />
-        </div>
-      </div>
+        }
+      />
     </div>
   );
 };
-
-

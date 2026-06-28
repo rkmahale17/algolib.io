@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
+import type { VisualizationLanguageMap, StepLineNumberMap } from '@/types/visualization';
 
 interface Step {
   matrix: number[][];
@@ -13,370 +15,284 @@ interface Step {
   currentCol: number;
   variables: Record<string, any>;
   explanation: string;
-  highlightedLines: number[];
-  lineExecution: string;
+  pseudoStep: string;
   direction: string;
 }
+
+const languages: VisualizationLanguageMap = {
+  python: `def spiralOrder(matrix):
+    res = []
+    left, right = 0, len(matrix[0])
+    top, bottom = 0, len(matrix)
+    while left < right and top < bottom:
+        for i in range(left, right):
+            res.append(matrix[top][i])
+        top += 1
+        for i in range(top, bottom):
+            res.append(matrix[i][right - 1])
+        right -= 1
+        if not (left < right and top < bottom):
+            break
+        for i in range(right - 1, left - 1, -1):
+            res.append(matrix[bottom - 1][i])
+        bottom -= 1
+        for i in range(bottom - 1, top - 1, -1):
+            res.append(matrix[i][left])
+        left += 1
+    return res`,
+
+  typescript: `function spiralOrder(matrix: number[][]): number[] {
+  const res: number[] = [];
+  if (matrix.length === 0) return res;
+  let left = 0;
+  let right = matrix[0].length;
+  let top = 0;
+  let bottom = matrix.length;
+  while (left < right && top < bottom) {
+    for (let i = left; i < right; i++) {
+      res.push(matrix[top][i]);
+    }
+    top += 1;
+    for (let i = top; i < bottom; i++) {
+      res.push(matrix[i][right - 1]);
+    }
+    right -= 1;
+    if (!(left < right && top < bottom)) {
+      break;
+    }
+    for (let i = right - 1; i >= left; i--) {
+      res.push(matrix[bottom - 1][i]);
+    }
+    bottom -= 1;
+    for (let i = bottom - 1; i >= top; i--) {
+      res.push(matrix[i][left]);
+    }
+    left += 1;
+  }
+  return res;
+}`,
+
+  java: `public class Solution {
+    public List<Integer> spiralOrder(int[][] matrix) {
+        List<Integer> res = new ArrayList<>();
+        int left = 0;
+        int right = matrix[0].length;
+        int top = 0;
+        int bottom = matrix.length;
+        while (left < right && top < bottom) {
+            for (int i = left; i < right; i++) {
+                res.add(matrix[top][i]);
+            }
+            top += 1;
+            for (int i = top; i < bottom; i++) {
+                res.add(matrix[i][right - 1]);
+            }
+            right -= 1;
+            if (!(left < right && top < bottom)) {
+                break;
+            }
+            for (int i = right - 1; i >= left; i--) {
+                res.add(matrix[bottom - 1][i]);
+            }
+            bottom -= 1;
+            for (int i = bottom - 1; i >= top; i--) {
+                res.add(matrix[i][left]);
+            }
+            left += 1;
+        }
+        return res;
+    }
+}`,
+
+  cpp: `class Solution {
+public:
+    vector<int> spiralOrder(vector<vector<int>>& matrix) {
+        vector<int> res;
+        int left = 0;
+        int right = matrix[0].size();
+        int top = 0;
+        int bottom = matrix.size();
+        while (left < right && top < bottom) {
+            for (int i = left; i < right; i++) {
+                res.push_back(matrix[top][i]);
+            }
+            top += 1;
+            for (int i = top; i < bottom; i++) {
+                res.push_back(matrix[i][right - 1]);
+            }
+            right -= 1;
+            if (!(left < right && top < bottom)) {
+                break;
+            }
+            for (int i = right - 1; i >= left; i--) {
+                res.push_back(matrix[bottom - 1][i]);
+            }
+            bottom -= 1;
+            for (int i = bottom - 1; i >= top; i--) {
+                res.push_back(matrix[i][left]);
+            }
+            left += 1;
+        }
+        return res;
+    }
+};`
+};
+
+const generateVisualizationData = () => {
+  const matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
+  const m = matrix.length;
+  const n = matrix[0].length;
+
+  const steps: Step[] = [];
+  const stepLineNumbers: StepLineNumberMap = {
+    typescript: [],
+    python: [],
+    java: [],
+    cpp: []
+  };
+
+  const addLines = (ts: number, py: number, java: number, cpp: number) => {
+    stepLineNumbers.typescript!.push(ts);
+    stepLineNumbers.python!.push(py);
+    stepLineNumbers.java!.push(java);
+    stepLineNumbers.cpp!.push(cpp);
+  };
+
+  const result: number[] = [];
+  const visited = [
+    [false, false, false],
+    [false, false, false],
+    [false, false, false]
+  ];
+
+  let left = 0;
+  let right = n;
+  let top = 0;
+  let bottom = m;
+
+  let currentRow = -1;
+  let currentCol = -1;
+  let direction = "init";
+
+  const addStep = (msg: string, pseudo: string, tsLine: number, pyLine: number, javaLine: number, cppLine: number) => {
+    steps.push({
+      matrix: matrix.map(row => [...row]),
+      result: [...result],
+      visited: visited.map(row => [...row]),
+      currentRow,
+      currentCol,
+      variables: {
+        left,
+        right,
+        top,
+        bottom,
+        currentRow: currentRow >= 0 ? currentRow : "none",
+        currentCol: currentCol >= 0 ? currentCol : "none",
+        resultSize: result.length
+      },
+      explanation: msg,
+      pseudoStep: pseudo,
+      direction
+    });
+    addLines(tsLine, pyLine, javaLine, cppLine);
+  };
+
+  // 1. Initial State
+  addStep("Traverse a 3x3 matrix in spiral order.", "CALL spiralOrder(matrix)", 1, 1, 2, 3);
+
+  // 2. Initialize boundaries
+  addStep("Initialize boundaries: left = 0, right = 3 (exclusive), top = 0, bottom = 3 (exclusive).", "SET left = 0, right = 3, top = 0, bottom = 3", 4, 3, 4, 5);
+
+  while (left < right && top < bottom) {
+    direction = "check";
+    addStep("Loop condition: is left < right AND top < bottom?", "WHILE left < right AND top < bottom", 8, 5, 8, 9);
+
+    // Left to right
+    direction = "right";
+    for (let i = left; i < right; i++) {
+      currentCol = i;
+      currentRow = top;
+      result.push(matrix[currentRow][currentCol]);
+      visited[currentRow][currentCol] = true;
+      addStep(`Traverse right on top row. Collect cell matrix[${currentRow}][${currentCol}] = ${matrix[currentRow][currentCol]}.`, `APPEND matrix[top][${i}]`, 10, 7, 10, 11);
+    }
+    top += 1;
+    currentRow = -1;
+    currentCol = -1;
+    addStep("Finished top row traversal. Move top boundary inward.", "SET top = top + 1", 12, 8, 12, 13);
+
+    // Top to bottom
+    direction = "down";
+    for (let i = top; i < bottom; i++) {
+      currentCol = right - 1;
+      currentRow = i;
+      result.push(matrix[currentRow][currentCol]);
+      visited[currentRow][currentCol] = true;
+      addStep(`Traverse down on right column. Collect cell matrix[${currentRow}][${currentCol}] = ${matrix[currentRow][currentCol]}.`, `APPEND matrix[${i}][right - 1]`, 14, 10, 14, 15);
+    }
+    right -= 1;
+    currentRow = -1;
+    currentCol = -1;
+    addStep("Finished right column traversal. Move right boundary inward.", "SET right = right - 1", 16, 11, 16, 17);
+
+    // Check crossed
+    direction = "check";
+    addStep("Check if the submatrix boundaries have crossed to prevent duplicate traversal.", "IF NOT (left < right AND top < bottom) -> BREAK", 17, 12, 17, 18);
+    if (!(left < right && top < bottom)) {
+      break;
+    }
+
+    // Right to left
+    direction = "left";
+    for (let i = right - 1; i >= left; i--) {
+      currentCol = i;
+      currentRow = bottom - 1;
+      result.push(matrix[currentRow][currentCol]);
+      visited[currentRow][currentCol] = true;
+      addStep(`Traverse left on bottom row. Collect cell matrix[${currentRow}][${currentCol}] = ${matrix[currentRow][currentCol]}.`, `APPEND matrix[bottom - 1][${i}]`, 21, 15, 21, 22);
+    }
+    bottom -= 1;
+    currentRow = -1;
+    currentCol = -1;
+    addStep("Finished bottom row traversal. Move bottom boundary inward.", "SET bottom = bottom - 1", 23, 16, 23, 24);
+
+    // Bottom to top
+    direction = "up";
+    for (let i = bottom - 1; i >= top; i--) {
+      currentCol = left;
+      currentRow = i;
+      result.push(matrix[currentRow][currentCol]);
+      visited[currentRow][currentCol] = true;
+      addStep(`Traverse up on left column. Collect cell matrix[${currentRow}][${currentCol}] = ${matrix[currentRow][currentCol]}.`, `APPEND matrix[${i}][left]`, 25, 18, 25, 26);
+    }
+    left += 1;
+    currentRow = -1;
+    currentCol = -1;
+    addStep("Finished left column traversal. Move left boundary inward.", "SET left = left + 1", 27, 19, 27, 28);
+  }
+
+  direction = "complete";
+  addStep("Traversals complete. Return the elements in spiral order.", "RETURN res", 29, 20, 29, 30);
+
+  return { steps, stepLineNumbers };
+};
 
 export const SpiralMatrixVisualization = () => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
-  const initialMatrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
+  const { steps, stepLineNumbers } = useMemo(() => {
+    return generateVisualizationData();
+  }, []);
 
-  const steps: Step[] = [
-    {
-      matrix: initialMatrix,
-      result: [],
-      visited: [[false, false, false], [false, false, false], [false, false, false]],
-      currentRow: -1,
-      currentCol: -1,
-      variables: { matrix: '3x3' },
-      explanation: "Traverse a 3x3 matrix in spiral order: right → down → left → up.",
-      highlightedLines: [1],
-      lineExecution: "function spiralOrder(matrix: number[][])",
-      direction: "init"
-    },
-    {
-      matrix: initialMatrix,
-      result: [],
-      visited: [[false, false, false], [false, false, false], [false, false, false]],
-      currentRow: -1,
-      currentCol: -1,
-      variables: { m: 3, n: 3 },
-      explanation: "Initialize dimensions: 3 rows (m) and 3 columns (n).",
-      highlightedLines: [2],
-      lineExecution: "const m = matrix.length, n = matrix[0].length;",
-      direction: "init"
-    },
-    {
-      matrix: initialMatrix,
-      result: [],
-      visited: [[false, false, false], [false, false, false], [false, false, false]],
-      currentRow: -1,
-      currentCol: -1,
-      variables: { top: 0, bottom: 2, left: 0, right: 2 },
-      explanation: "Define boundaries: top = 0, bottom = 2, left = 0, right = 2.",
-      highlightedLines: [3],
-      lineExecution: "let top = 0, bottom = m - 1, left = 0, right = n - 1;",
-      direction: "init"
-    },
-    {
-      matrix: initialMatrix,
-      result: [],
-      visited: [[false, false, false], [false, false, false], [false, false, false]],
-      currentRow: -1,
-      currentCol: -1,
-      variables: { result: '[]' },
-      explanation: "Initialize an empty list to store the elements in spiral order.",
-      highlightedLines: [4],
-      lineExecution: "const result: number[] = [];",
-      direction: "init"
-    },
-    {
-      matrix: initialMatrix,
-      result: [],
-      visited: [[false, false, false], [false, false, false], [false, false, false]],
-      currentRow: 0,
-      currentCol: 0,
-      variables: { direction: 'RIGHT', col: 0, row: 0 },
-      explanation: "Move right along the top row from the 'left' boundary to the 'right' boundary.",
-      highlightedLines: [7],
-      lineExecution: "for (let col = left; col <= right; col++)",
-      direction: "right"
-    },
-    {
-      matrix: initialMatrix,
-      result: [1],
-      visited: [[true, false, false], [false, false, false], [false, false, false]],
-      currentRow: 0,
-      currentCol: 0,
-      variables: { add: 1, result: '[1]' },
-      explanation: "Collect the element at matrix[top][0], which is 1.",
-      highlightedLines: [8],
-      lineExecution: "result.push(matrix[top][col]);",
-      direction: "right"
-    },
-    {
-      matrix: initialMatrix,
-      result: [1, 2],
-      visited: [[true, true, false], [false, false, false], [false, false, false]],
-      currentRow: 0,
-      currentCol: 1,
-      variables: { add: 2, result: '[1, 2]' },
-      explanation: "Collect the next element in the top row: 2.",
-      highlightedLines: [8],
-      lineExecution: "result.push(matrix[top][col]);",
-      direction: "right"
-    },
-    {
-      matrix: initialMatrix,
-      result: [1, 2, 3],
-      visited: [[true, true, true], [false, false, false], [false, false, false]],
-      currentRow: 0,
-      currentCol: 2,
-      variables: { add: 3, result: '[1, 2, 3]' },
-      explanation: "Collect 3. The top row traversal is complete.",
-      highlightedLines: [8],
-      lineExecution: "result.push(matrix[top][col]);",
-      direction: "right"
-    },
-    {
-      matrix: initialMatrix,
-      result: [1, 2, 3],
-      visited: [[true, true, true], [false, false, false], [false, false, false]],
-      currentRow: 0,
-      currentCol: 2,
-      variables: { top: 1, action: 'increment top' },
-      explanation: "Shrink the top boundary: top = 1. We won't visit the first row again.",
-      highlightedLines: [10],
-      lineExecution: "top++;",
-      direction: "right"
-    },
-    {
-      matrix: initialMatrix,
-      result: [1, 2, 3],
-      visited: [[true, true, true], [false, false, false], [false, false, false]],
-      currentRow: 1,
-      currentCol: 2,
-      variables: { direction: 'DOWN', row: 1 },
-      explanation: "Move down along the right column from 'top' to 'bottom'.",
-      highlightedLines: [12],
-      lineExecution: "for (let row = top; row <= bottom; row++)",
-      direction: "down"
-    },
-    {
-      matrix: initialMatrix,
-      result: [1, 2, 3, 6],
-      visited: [[true, true, true], [false, false, true], [false, false, false]],
-      currentRow: 1,
-      currentCol: 2,
-      variables: { add: 6, result: '[1, 2, 3, 6]' },
-      explanation: "Collect the element matrix[1][right], which is 6.",
-      highlightedLines: [13],
-      lineExecution: "result.push(matrix[row][right]);",
-      direction: "down"
-    },
-    {
-      matrix: initialMatrix,
-      result: [1, 2, 3, 6, 9],
-      visited: [[true, true, true], [false, false, true], [false, false, true]],
-      currentRow: 2,
-      currentCol: 2,
-      variables: { add: 9, result: '[1, 2, 3, 6, 9]' },
-      explanation: "Collect 9. The right column traversal is complete.",
-      highlightedLines: [13],
-      lineExecution: "result.push(matrix[row][right]);",
-      direction: "down"
-    },
-    {
-      matrix: initialMatrix,
-      result: [1, 2, 3, 6, 9],
-      visited: [[true, true, true], [false, false, true], [false, false, true]],
-      currentRow: 2,
-      currentCol: 2,
-      variables: { right: 1, action: 'decrement right' },
-      explanation: "Shrink the right boundary: right = 1.",
-      highlightedLines: [15],
-      lineExecution: "right--;",
-      direction: "down"
-    },
-    {
-      matrix: initialMatrix,
-      result: [1, 2, 3, 6, 9],
-      visited: [[true, true, true], [false, false, true], [false, false, true]],
-      currentRow: 2,
-      currentCol: 1,
-      variables: { direction: 'LEFT', col: 1 },
-      explanation: "Since top <= bottom, move left along the bottom row from 'right' to 'left'.",
-      highlightedLines: [18],
-      lineExecution: "for (let col = right; col >= left; col--)",
-      direction: "left"
-    },
-    {
-      matrix: initialMatrix,
-      result: [1, 2, 3, 6, 9, 8],
-      visited: [[true, true, true], [false, false, true], [false, true, true]],
-      currentRow: 2,
-      currentCol: 1,
-      variables: { add: 8, result: '[1, 2, 3, 6, 9, 8]' },
-      explanation: "Collect matrix[bottom][1], which is 8.",
-      highlightedLines: [19],
-      lineExecution: "result.push(matrix[bottom][col]);",
-      direction: "left"
-    },
-    {
-      matrix: initialMatrix,
-      result: [1, 2, 3, 6, 9, 8, 7],
-      visited: [[true, true, true], [false, false, true], [true, true, true]],
-      currentRow: 2,
-      currentCol: 0,
-      variables: { add: 7, result: '[1, 2, 3, 6, 9, 8, 7]' },
-      explanation: "Collect 7. The bottom row traversal is complete.",
-      highlightedLines: [19],
-      lineExecution: "result.push(matrix[bottom][col]);",
-      direction: "left"
-    },
-    {
-      matrix: initialMatrix,
-      result: [1, 2, 3, 6, 9, 8, 7],
-      visited: [[true, true, true], [false, false, true], [true, true, true]],
-      currentRow: 2,
-      currentCol: 0,
-      variables: { bottom: 1, action: 'decrement bottom' },
-      explanation: "Shrink the bottom boundary: bottom = 1.",
-      highlightedLines: [21],
-      lineExecution: "bottom--;",
-      direction: "left"
-    },
-    {
-      matrix: initialMatrix,
-      result: [1, 2, 3, 6, 9, 8, 7],
-      visited: [[true, true, true], [false, false, true], [true, true, true]],
-      currentRow: 1,
-      currentCol: 0,
-      variables: { direction: 'UP', row: 1 },
-      explanation: "Since left <= right, move up along the left column from 'bottom' to 'top'.",
-      highlightedLines: [25],
-      lineExecution: "for (let row = bottom; row >= top; row--)",
-      direction: "up"
-    },
-    {
-      matrix: initialMatrix,
-      result: [1, 2, 3, 6, 9, 8, 7, 4],
-      visited: [[true, true, true], [true, false, true], [true, true, true]],
-      currentRow: 1,
-      currentCol: 0,
-      variables: { add: 4, result: '[1, 2, 3, 6, 9, 8, 7, 4]' },
-      explanation: "Collect matrix[1][left], which is 4.",
-      highlightedLines: [26],
-      lineExecution: "result.push(matrix[row][left]);",
-      direction: "up"
-    },
-    {
-      matrix: initialMatrix,
-      result: [1, 2, 3, 6, 9, 8, 7, 4],
-      visited: [[true, true, true], [true, false, true], [true, true, true]],
-      currentRow: 1,
-      currentCol: 0,
-      variables: { left: 1, action: 'increment left' },
-      explanation: "Shrink the left boundary: left = 1.",
-      highlightedLines: [28],
-      lineExecution: "left++;",
-      direction: "up"
-    },
-    {
-      matrix: initialMatrix,
-      result: [1, 2, 3, 6, 9, 8, 7, 4],
-      visited: [[true, true, true], [true, false, true], [true, true, true]],
-      currentRow: 1,
-      currentCol: 1,
-      variables: { check: 'top=1, bottom=1, left=1, right=1', continue: true },
-      explanation: "All boundaries are 1. The loop continue condition is still met.",
-      highlightedLines: [6],
-      lineExecution: "while (top <= bottom && left <= right)",
-      direction: "check"
-    },
-    {
-      matrix: initialMatrix,
-      result: [1, 2, 3, 6, 9, 8, 7, 4],
-      visited: [[true, true, true], [true, false, true], [true, true, true]],
-      currentRow: 1,
-      currentCol: 1,
-      variables: { direction: 'RIGHT', col: 1 },
-      explanation: "Traverse the remaining cells in the inner matrix starting with RIGHT.",
-      highlightedLines: [7],
-      lineExecution: "for (let col = left; col <= right; col++)",
-      direction: "right"
-    },
-    {
-      matrix: initialMatrix,
-      result: [1, 2, 3, 6, 9, 8, 7, 4, 5],
-      visited: [[true, true, true], [true, true, true], [true, true, true]],
-      currentRow: 1,
-      currentCol: 1,
-      variables: { add: 5, result: '[1, ..., 5]' },
-      explanation: "Collect the central element: 5.",
-      highlightedLines: [8],
-      lineExecution: "result.push(matrix[top][col]);",
-      direction: "right"
-    },
-    {
-      matrix: initialMatrix,
-      result: [1, 2, 3, 6, 9, 8, 7, 4, 5],
-      visited: [[true, true, true], [true, true, true], [true, true, true]],
-      currentRow: -1,
-      currentCol: -1,
-      variables: { check: 'top=2, bottom=1', stop: true },
-      explanation: "The boundaries have crossed (top > bottom). The spiral traversal is finished.",
-      highlightedLines: [6],
-      lineExecution: "while (top <= bottom && left <= right)",
-      direction: "complete"
-    },
-    {
-      matrix: initialMatrix,
-      result: [1, 2, 3, 6, 9, 8, 7, 4, 5],
-      visited: [[true, true, true], [true, true, true], [true, true, true]],
-      currentRow: -1,
-      currentCol: -1,
-      variables: { result: '[1, 2, 3, 6, 9, 8, 7, 4, 5]' },
-      explanation: "Return the final sequence of elements.",
-      highlightedLines: [31],
-      lineExecution: "return result;",
-      direction: "complete"
-    },
-    {
-      matrix: initialMatrix,
-      result: [1, 2, 3, 6, 9, 8, 7, 4, 5],
-      visited: [[true, true, true], [true, true, true], [true, true, true]],
-      currentRow: -1,
-      currentCol: -1,
-      variables: { time: 'O(m*n)', space: 'O(1)' },
-      explanation: "Complexity: O(m×n) time to visit each cell once, and O(1) extra space excluding the output.",
-      highlightedLines: [31],
-      lineExecution: "return result;",
-      direction: "complete"
-    }
-  ];
+  if (steps.length === 0) return null;
 
-  const code = `function spiralOrder(matrix: number[][]): number[] {
-  const m = matrix.length, n = matrix[0].length;
-  let top = 0, bottom = m - 1, left = 0, right = n - 1;
-  const result: number[] = [];
-  
-  while (top <= bottom && left <= right) {
-    for (let col = left; col <= right; col++) {
-      result.push(matrix[top][col]);
-    }
-    top++;
-    
-    for (let row = top; row <= bottom; row++) {
-      result.push(matrix[row][right]);
-    }
-    right--;
-    
-    if (top <= bottom) {
-      for (let col = right; col >= left; col--) {
-        result.push(matrix[bottom][col]);
-      }
-      bottom--;
-    }
-    
-    if (left <= right) {
-      for (let row = bottom; row >= top; row--) {
-        result.push(matrix[row][left]);
-      }
-      left++;
-    }
-  }
-  return result;
-}`;
-
-  const currentStep = steps[Math.min(currentStepIndex, steps.length - 1)];
+  const currentStep = steps[currentStepIndex];
+  const pseudoSteps = steps.map(s => s.pseudoStep);
 
   const getCellColor = (row: number, col: number) => {
     if (!currentStep?.matrix || !currentStep?.visited?.[row]) return 'bg-muted text-muted-foreground border-border';
     if (row === currentStep.currentRow && col === currentStep.currentCol) {
-      return 'bg-primary text-primary-foreground border-primary shadow-lg';
+      return 'bg-primary text-primary-foreground border-primary shadow-lg scale-105 z-10';
     }
     if (currentStep.visited[row][col]) {
       return 'bg-secondary/60 text-secondary-foreground border-secondary';
@@ -395,111 +311,82 @@ export const SpiralMatrixVisualization = () => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col gap-4 p-4">
-      <SimpleStepControls
-        currentStep={currentStepIndex}
-        totalSteps={steps.length}
-        onStepChange={setCurrentStepIndex}
-      />
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1">
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Spiral Matrix</h3>
-          <div className="space-y-4">
-            <motion.div
-              key={`matrix-${currentStepIndex}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0 }}
-              className="space-y-2"
-            >
-              <div className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                Direction:
-                <span className="text-primary font-mono text-lg">
-                  {getDirectionArrow(currentStep.direction)} {currentStep.direction.toUpperCase()}
-                </span>
+    <VisualizationLayout
+      leftContent={
+        <div className="space-y-6">
+          <div className="bg-card rounded-xl border border-border p-6 flex flex-col items-center justify-center min-h-[400px]">
+            <div className="mb-4 text-xs font-mono text-muted-foreground flex items-center gap-2 uppercase tracking-widest">
+              Direction:
+              <span className="text-primary font-bold">
+                {getDirectionArrow(currentStep.direction)} {currentStep.direction.toUpperCase()}
+              </span>
+            </div>
+            <div className="bg-slate-100 dark:bg-slate-900/30 p-6 rounded-xl border border-border shadow-inner w-full max-w-sm">
+              <div 
+                className="grid gap-2"
+                style={{ 
+                  gridTemplateColumns: `repeat(${currentStep.matrix[0].length}, minmax(0, 1fr))` 
+                }}
+              >
+                {currentStep.matrix.map((row, rowIdx) => (
+                  row.map((cell, colIdx) => (
+                    <div
+                      key={`${rowIdx}-${colIdx}`}
+                      className={`aspect-square flex items-center justify-center text-sm sm:text-lg font-bold rounded-lg border transition-all duration-200 shadow-sm ${getCellColor(rowIdx, colIdx)}`}
+                    >
+                      {cell}
+                    </div>
+                  ))
+                ))}
               </div>
-              <div className="inline-block bg-card p-4 rounded-lg border w-full max-w-sm mx-auto">
-                <div 
-                  className="grid gap-1"
-                  style={{ 
-                    gridTemplateColumns: `repeat(${currentStep.matrix[0].length}, minmax(0, 1fr))` 
-                  }}
-                >
-                  {currentStep.matrix.map((row, rowIdx) => (
-                    row.map((cell, colIdx) => (
-                      <div
-                        key={`${rowIdx}-${colIdx}`}
-                        className={`aspect-square flex items-center justify-center font-mono text-lg rounded border-2 ${getCellColor(rowIdx, colIdx)}`}
-                      >
-                        {cell}
-                      </div>
-                    ))
-                  ))}
-                </div>
-              </div>
-            </motion.div>
+            </div>
 
-            <motion.div
-              key={`result-${currentStepIndex}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0 }}
-              className="p-4 bg-primary/10 rounded-lg border-2 border-primary"
-            >
-              <div className="text-sm font-medium text-muted-foreground mb-2">Spiral Order Result:</div>
+            <div className="w-full mt-6 p-4 bg-primary/5 rounded-lg border border-primary/20">
+              <div className="text-xs font-semibold text-muted-foreground mb-2">Spiral Order Result:</div>
               <div className="flex flex-wrap gap-1">
                 {currentStep.result.map((num, idx) => (
                   <div
                     key={idx}
-                    className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center font-mono bg-primary text-primary-foreground rounded text-sm sm:text-base"
+                    className="w-8 h-8 flex items-center justify-center font-mono bg-primary text-primary-foreground rounded text-xs font-bold"
                   >
                     {num}
                   </div>
                 ))}
               </div>
-            </motion.div>
-
-            <motion.div
-              key={`execution-${currentStepIndex}`}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0 }}
-              className="p-3 bg-secondary/30 rounded border-l-4 border-secondary"
-            >
-              <div className="text-xs font-semibold text-secondary-foreground mb-1">Executing:</div>
-              <code className="text-xs text-foreground font-mono">{currentStep.lineExecution}</code>
-            </motion.div>
-
-            <motion.div
-              key={`explanation-${currentStepIndex}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0 }}
-              className="p-4 bg-muted/50 rounded text-sm leading-relaxed"
-            >
-              {currentStep.explanation}
-            </motion.div>
-
-            <motion.div
-              key={`variables-${currentStepIndex}`}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0 }}
-            >
-              <VariablePanel variables={currentStep.variables} />
-            </motion.div>
+            </div>
           </div>
-        </Card>
 
-        <Card className="p-6 overflow-hidden">
-          <AnimatedCodeEditor
-            code={code}
-            language="typescript"
-            highlightedLines={(currentStep.highlightedLines || []).filter((n) => n >= 1 && n <= code.split('\n').length)}
-          />
-        </Card>
-      </div>
-    </div>
+          {/* Descriptive Commentary Box (at the bottom) */}
+          <div className="p-3 bg-muted/50 rounded-lg text-xs leading-relaxed text-foreground border border-border shadow-inner">
+            <div className="flex items-center gap-2 mb-1 text-primary font-bold text-[10px] uppercase tracking-widest">
+              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              Process Step
+            </div>
+            {currentStep.explanation}
+          </div>
+
+          {/* Variable Panel (below the commentary box) */}
+          <div className="pt-2">
+            <VariablePanel variables={currentStep.variables} />
+          </div>
+        </div>
+      }
+      rightContent={
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={() => setCurrentStepIndex(0)}
+        />
+      }
+      controls={
+        <SimpleStepControls
+          currentStep={currentStepIndex}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStepIndex}
+        />
+      }
+    />
   );
 };

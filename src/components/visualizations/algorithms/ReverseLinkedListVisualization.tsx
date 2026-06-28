@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
-import { StepControls } from '../shared/StepControls';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
+import type { VisualizationLanguageMap, StepLineNumberMap } from '@/types/visualization';
 
 interface Step {
   nodes: number[];
@@ -10,200 +11,262 @@ interface Step {
   current: number | null;
   next: number | null;
   reversedLinks: Set<number>;
-  message: string;
-  lineNumber: number;
+  explanation: string;
+  pseudoStep: string;
   variables: Record<string, any>;
 }
 
-export const ReverseLinkedListVisualization = () => {
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1);
-
-  const list = [1, 2, 3, 4, 5];
-
-  const steps = useMemo(() => {
-    const newSteps: Step[] = [];
-    const reversedLinks = new Set<number>();
-
-    // Initial State
-    newSteps.push({
-      nodes: list,
-      prev: null,
-      current: null,
-      next: null,
-      reversedLinks: new Set(reversedLinks),
-      message: "Start with the head of the list.",
-      lineNumber: 1,
-      variables: { head: "Node 1" }
-    });
-
-    // let prev = null;
-    newSteps.push({
-      nodes: list,
-      prev: null,
-      current: null,
-      next: null,
-      reversedLinks: new Set(reversedLinks),
-      message: "Initialize 'prev' pointer as null.",
-      lineNumber: 2,
-      variables: { prev: "null" }
-    });
-
-    // let current = head;
-    newSteps.push({
-      nodes: list,
-      prev: null,
-      current: 0,
-      next: null,
-      reversedLinks: new Set(reversedLinks),
-      message: "Initialize 'current' pointer as the head node.",
-      lineNumber: 3,
-      variables: { prev: "null", current: "Node 1" }
-    });
-
-    let prev: number | null = null;
-    let current: number | null = 0;
-
-    while (current !== null) {
-      // while (current !== null)
-      newSteps.push({
-        nodes: list,
-        prev,
-        current,
-        next: null,
-        reversedLinks: new Set(reversedLinks),
-        message: `Check if current node is not null. Current: Node ${current + 1}`,
-        lineNumber: 4,
-        variables: { prev: prev !== null ? `Node ${prev + 1}` : "null", current: `Node ${current + 1}` }
-      });
-
-      // let next = current.next;
-      const next: number | null = current + 1 < list.length ? current + 1 : null;
-      newSteps.push({
-        nodes: list,
-        prev,
-        current,
-        next,
-        reversedLinks: new Set(reversedLinks),
-        message: `Store the next node (Node ${next !== null ? next + 1 : "null"}) before reversing the pointer.`,
-        lineNumber: 5,
-        variables: { prev: prev !== null ? `Node ${prev + 1}` : "null", current: `Node ${current + 1}`, next: next !== null ? `Node ${next + 1}` : "null" }
-      });
-
-      // current.next = prev;
-      reversedLinks.add(current);
-      newSteps.push({
-        nodes: list,
-        prev,
-        current,
-        next,
-        reversedLinks: new Set(reversedLinks),
-        message: `Point current node's next to 'prev' (Node ${prev !== null ? prev + 1 : "null"}). Pointer reversed!`,
-        lineNumber: 6,
-        variables: { prev: prev !== null ? `Node ${prev + 1}` : "null", current: `Node ${current + 1}`, next: next !== null ? `Node ${next + 1}` : "null" }
-      });
-
-      // prev = current;
-      prev = current;
-      newSteps.push({
-        nodes: list,
-        prev,
-        current,
-        next,
-        reversedLinks: new Set(reversedLinks),
-        message: "Move 'prev' pointer forward to the current node.",
-        lineNumber: 7,
-        variables: { prev: `Node ${prev + 1}`, current: `Node ${current + 1}`, next: next !== null ? `Node ${next + 1}` : "null" }
-      });
-
-      // current = next;
-      current = next;
-      newSteps.push({
-        nodes: list,
-        prev,
-        current,
-        next: null, // Reset next visually for the next iteration start
-        reversedLinks: new Set(reversedLinks),
-        message: "Move 'current' pointer forward to the next node.",
-        lineNumber: 8,
-        variables: { prev: `Node ${prev + 1}`, current: current !== null ? `Node ${current + 1}` : "null" }
-      });
-    }
-
-    // Final while check
-    newSteps.push({
-      nodes: list,
-      prev,
-      current: null,
-      next: null,
-      reversedLinks: new Set(reversedLinks),
-      message: "Current is null, the loop ends.",
-      lineNumber: 4,
-      variables: { prev: `Node ${prev + 1}`, current: "null" }
-    });
-
-    // return prev;
-    newSteps.push({
-      nodes: list,
-      prev,
-      current: null,
-      next: null,
-      reversedLinks: new Set(reversedLinks),
-      message: "Return 'prev' as the new head of the reversed list.",
-      lineNumber: 10,
-      variables: { return: `Node ${prev! + 1}` }
-    });
-
-    return newSteps;
-  }, []);
-
-  const currentStep = steps[currentStepIndex];
-
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isPlaying && currentStepIndex < steps.length - 1) {
-      timer = setTimeout(() => {
-        setCurrentStepIndex(prev => prev + 1);
-      }, 1500 / speed);
-    } else {
-      setIsPlaying(false);
-    }
-    return () => clearTimeout(timer);
-  }, [isPlaying, currentStepIndex, steps.length, speed]);
-
-  const code = `function reverseList(head: ListNode | null): ListNode | null {
-  let prev = null;
-  let current = head;
-  while (current !== null) {
-    let next = current.next;
-    current.next = prev;
-    prev = current;
-    current = next;
+const languages: VisualizationLanguageMap = {
+  python: `def reverseList(head):
+    prev = None
+    curr = head
+    while curr:
+        next_node = curr.next
+        curr.next = prev
+        prev = curr
+        curr = next_node
+    return prev`,
+  typescript: `function reverseList(head: ListNode | null): ListNode | null {
+  let prev: ListNode | null = null;
+  let curr: ListNode | null = head;
+  while (curr !== null) {
+    const nextNode: ListNode | null = curr.next;
+    curr.next = prev;
+    prev = curr;
+    curr = nextNode;
   }
   return prev;
-}`;
+}`,
+  java: `public class Solution {
+    public ListNode reverseList(ListNode head) {
+        ListNode prev = null;
+        ListNode curr = head;
+        while (curr != null) {
+            ListNode nextNode = curr.next;
+            curr.next = prev;
+            prev = curr;
+            curr = nextNode;
+        }
+        return prev;
+    }
+}`,
+  cpp: `class Solution {
+public:
+    ListNode* reverseList(ListNode* head) {
+        ListNode* prev = nullptr;
+        ListNode* curr = head;
+        ListNode* nextNode = nullptr;
+        while (curr != nullptr) {
+            nextNode = curr->next;
+            curr->next = prev;
+            prev = curr;
+            curr = nextNode;
+        }
+        return prev;
+    }
+};`,
+};
+
+const generateVisualizationData = () => {
+  const list = [1, 2, 3, 4, 5];
+  const steps: Step[] = [];
+  const stepLineNumbers: StepLineNumberMap = { typescript: [], python: [], java: [], cpp: [] };
+  const reversedLinks = new Set<number>();
+
+  const addLines = (ts: number, py: number, java: number, cpp: number) => {
+    stepLineNumbers.typescript!.push(ts);
+    stepLineNumbers.python!.push(py);
+    stepLineNumbers.java!.push(java);
+    stepLineNumbers.cpp!.push(cpp);
+  };
+
+  // 1. Initial State / Signature
+  steps.push({
+    nodes: list,
+    prev: null,
+    current: null,
+    next: null,
+    reversedLinks: new Set(reversedLinks),
+    explanation: "Start with the head of the list.",
+    pseudoStep: "CALL reverseList(head)",
+    variables: { head: "Node 1" }
+  });
+  addLines(1, 1, 2, 3);
+
+  // 2. Initialize prev = null
+  steps.push({
+    nodes: list,
+    prev: null,
+    current: null,
+    next: null,
+    reversedLinks: new Set(reversedLinks),
+    explanation: "Initialize 'prev' pointer as null.",
+    pseudoStep: "SET prev = null",
+    variables: { prev: "null" }
+  });
+  addLines(2, 2, 3, 4);
+
+  // 3. Initialize curr = head
+  steps.push({
+    nodes: list,
+    prev: null,
+    current: 0,
+    next: null,
+    reversedLinks: new Set(reversedLinks),
+    explanation: "Initialize 'curr' pointer as the head of the list.",
+    pseudoStep: "SET curr = head",
+    variables: { prev: "null", curr: "Node 1" }
+  });
+  addLines(3, 3, 4, 5);
+
+  let prev: number | null = null;
+  let current: number | null = 0;
+
+  while (current !== null) {
+    // 4. Loop check
+    steps.push({
+      nodes: list,
+      prev,
+      current,
+      next: null,
+      reversedLinks: new Set(reversedLinks),
+      explanation: `Check if current node is not null. Current: Node ${current + 1}`,
+      pseudoStep: `WHILE curr ≠ null → Node ${current + 1} ≠ null`,
+      variables: {
+        prev: prev !== null ? `Node ${prev + 1}` : "null",
+        curr: `Node ${current + 1}`
+      }
+    });
+    addLines(4, 4, 5, 7);
+
+    // 5. Store next
+    const next: number | null = current + 1 < list.length ? current + 1 : null;
+    steps.push({
+      nodes: list,
+      prev,
+      current,
+      next,
+      reversedLinks: new Set(reversedLinks),
+      explanation: `Store the next node (Node ${next !== null ? next + 1 : "null"}) before reversing the link pointer.`,
+      pseudoStep: `SET next = curr.next → Node ${next !== null ? next + 1 : "null"}`,
+      variables: {
+        prev: prev !== null ? `Node ${prev + 1}` : "null",
+        curr: `Node ${current + 1}`,
+        next: next !== null ? `Node ${next + 1}` : "null"
+      }
+    });
+    addLines(5, 5, 6, 8);
+
+    // 6. Reverse pointer
+    reversedLinks.add(current);
+    steps.push({
+      nodes: list,
+      prev,
+      current,
+      next,
+      reversedLinks: new Set(reversedLinks),
+      explanation: `Point current node's next to 'prev' (Node ${prev !== null ? prev + 1 : "null"}). Pointer reversed!`,
+      pseudoStep: `SET curr.next = prev → Node ${prev !== null ? prev + 1 : "null"}`,
+      variables: {
+        prev: prev !== null ? `Node ${prev + 1}` : "null",
+        curr: `Node ${current + 1}`,
+        next: next !== null ? `Node ${next + 1}` : "null"
+      }
+    });
+    addLines(6, 6, 7, 9);
+
+    // 7. Move prev
+    prev = current;
+    steps.push({
+      nodes: list,
+      prev,
+      current,
+      next,
+      reversedLinks: new Set(reversedLinks),
+      explanation: "Move 'prev' pointer forward to the current node.",
+      pseudoStep: `SET prev = curr → Node ${prev + 1}`,
+      variables: {
+        prev: `Node ${prev + 1}`,
+        curr: `Node ${current + 1}`,
+        next: next !== null ? `Node ${next + 1}` : "null"
+      }
+    });
+    addLines(7, 7, 8, 10);
+
+    // 8. Move curr
+    current = next;
+    steps.push({
+      nodes: list,
+      prev,
+      current,
+      next: null,
+      reversedLinks: new Set(reversedLinks),
+      explanation: "Move 'curr' pointer forward to the stored next node.",
+      pseudoStep: `SET curr = next → Node ${current !== null ? current + 1 : "null"}`,
+      variables: {
+        prev: `Node ${prev + 1}`,
+        curr: current !== null ? `Node ${current + 1}` : "null"
+      }
+    });
+    addLines(8, 8, 9, 11);
+  }
+
+  // 9. Loop check failed
+  steps.push({
+    nodes: list,
+    prev,
+    current: null,
+    next: null,
+    reversedLinks: new Set(reversedLinks),
+    explanation: "Current is null. The traversal is complete and loop terminates.",
+    pseudoStep: "WHILE curr ≠ null → FALSE ✗",
+    variables: {
+      prev: `Node ${prev + 1}`,
+      curr: "null"
+    }
+  });
+  addLines(4, 4, 5, 7);
+
+  // 10. Return result
+  steps.push({
+    nodes: list,
+    prev,
+    current: null,
+    next: null,
+    reversedLinks: new Set(reversedLinks),
+    explanation: `Return 'prev' (Node ${prev + 1}) as the new head of the reversed list.`,
+    pseudoStep: `RETURN prev → Node ${prev + 1}`,
+    variables: { return: `Node ${prev + 1}` }
+  });
+  addLines(10, 9, 11, 13);
+
+  return { steps, stepLineNumbers };
+};
+
+export const ReverseLinkedListVisualization = () => {
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+
+  const { steps, stepLineNumbers } = useMemo(() => {
+    return generateVisualizationData();
+  }, []);
+
+  const currentStep = steps[currentStepIndex] || steps[steps.length - 1];
+  const pseudoSteps = steps.map(s => s.pseudoStep);
 
   return (
     <div className="space-y-6">
-      <StepControls
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-        onStepForward={() => setCurrentStepIndex(prev => Math.min(steps.length - 1, prev + 1))}
-        onStepBack={() => setCurrentStepIndex(prev => Math.max(0, prev - 1))}
-        onReset={() => {
-          setCurrentStepIndex(0);
-          setIsPlaying(false);
-        }}
-        isPlaying={isPlaying}
-        currentStep={currentStepIndex}
-        totalSteps={steps.length - 1}
-        speed={speed}
-        onSpeedChange={setSpeed}
-      />
+      {/* Controls at Top */}
+      <div className="flex flex-col gap-4 bg-card p-6 rounded-xl border border-border shadow-sm overflow-x-auto">
+        <SimpleStepControls
+          currentStep={currentStepIndex}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStepIndex}
+        />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-card rounded-lg p-6 border space-y-6 overflow-hidden flex flex-col">
+        {/* Left Column: Visual Representation & Variables & Commentary */}
+        <div className="bg-card rounded-lg p-6 border space-y-6 overflow-hidden flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-foreground">Linked List View</h3>
             <div className="flex items-center gap-4 text-xs">
@@ -232,14 +295,15 @@ export const ReverseLinkedListVisualization = () => {
 
                 return (
                   <div key={idx} className="flex items-center">
-                    <div className={`w-8 h-8 flex items-center justify-center rounded-md font-bold text-xs border-2 transition-all duration-300 ${isCurrent
-                      ? "bg-primary/20 border-primary text-foreground scale-110 shadow-md z-10"
-                      : isPrev
+                    <div className={`w-8 h-8 flex items-center justify-center rounded-md font-bold text-xs border-2 transition-all duration-300 ${
+                      isCurrent
+                        ? "bg-primary/20 border-primary text-foreground scale-110 shadow-md z-10"
+                        : isPrev
                         ? "bg-orange-500/20 border-orange-500 text-foreground"
                         : isNext
-                          ? "bg-blue-500/20 border-blue-500 text-foreground"
-                          : "bg-muted border-border text-foreground"
-                      }`}>
+                        ? "bg-blue-500/20 border-blue-500 text-foreground"
+                        : "bg-muted border-border text-foreground"
+                    }`}>
                       {val}
                     </div>
                     {idx < currentStep.nodes.length - 1 && (
@@ -253,17 +317,28 @@ export const ReverseLinkedListVisualization = () => {
             </div>
           </div>
 
-          <div className="p-4 bg-accent/30 rounded-lg border border-accent/20">
-            <p className="text-sm font-medium leading-relaxed text-foreground">{currentStep.message}</p>
+          {/* Descriptive Commentary Box (at the bottom) */}
+          <div className="p-3 bg-muted/50 rounded-lg text-xs leading-relaxed text-foreground border border-border shadow-inner">
+            <div className="flex items-center gap-2 mb-1 text-primary font-bold text-[10px] uppercase tracking-widest">
+              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              Process Step
+            </div>
+            {currentStep.explanation}
           </div>
 
-          <VariablePanel variables={currentStep.variables} />
+          {/* Variable Panel (below the commentary box) */}
+          <div className="pt-2">
+            <VariablePanel variables={currentStep.variables} />
+          </div>
         </div>
 
-        <AnimatedCodeEditor
-          code={code}
-          highlightedLines={[currentStep.lineNumber]}
-          language="TypeScript"
+        {/* Right Column: Code panel (VisualizationCodePanel) */}
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={() => setCurrentStepIndex(0)}
         />
       </div>
     </div>
