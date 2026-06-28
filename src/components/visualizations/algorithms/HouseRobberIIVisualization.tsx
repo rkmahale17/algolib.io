@@ -287,7 +287,7 @@ export const HouseRobberIIVisualization: React.FC = () => {
       pseudoStep: `RETURN MAX(case1, case2) (${Math.max(res1, res2)})`,
       calc: `max(${res1}, ${res2}) = ${Math.max(res1, res2)}`
     });
-    addLines(15, 12, 6, 16);
+    addLines(15, 12, 6, 17);
 
     return { steps: stepsList, stepLineNumbers: lines };
   }, []);

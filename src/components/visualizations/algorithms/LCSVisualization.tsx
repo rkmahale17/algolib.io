@@ -133,7 +133,7 @@ export const LCSVisualization: React.FC = () => {
           explanation: `Compare character '${text1[i]}' at text1[${i}] with '${text2[j]}' at text2[${j}].`,
           pseudoStep: `IF text1[${i}] == text2[${j}] → '${text1[i]}' == '${text2[j]}'?`,
         });
-        addLines(8, 7, 8, 8);
+        addLines(9, 7, 8, 8);
 
         if (text1[i] === text2[j]) {
           dp[i][j] = 1 + dp[i + 1][j + 1];
@@ -147,8 +147,20 @@ export const LCSVisualization: React.FC = () => {
             explanation: `Characters match! Increment the LCS length by 1 from the diagonal neighbor dp[${i + 1}][${j + 1}].`,
             pseudoStep: `SET dp[${i}][${j}] = 1 + dp[${i + 1}][${j + 1}]`,
           });
-          addLines(9, 8, 9, 9);
+          addLines(10, 8, 9, 9);
         } else {
+          s.push({
+            dp: dp.map((row) => [...row]),
+            i,
+            j,
+            text1,
+            text2,
+            message: `No match. Entering else block.`,
+            explanation: `Characters do not match. Take the maximum LCS length from either omitting text1[${i}] (dp[${i + 1}][${j}]) or text2[${j}] (dp[${i}][${j + 1}]).`,
+            pseudoStep: `ELSE → SET dp[${i}][${j}] = MAX(dp[${i}][${j + 1}], dp[${i + 1}][${j}])`,
+          });
+          addLines(11, 9, 10, 10);
+
           dp[i][j] = Math.max(dp[i][j + 1], dp[i + 1][j]);
           s.push({
             dp: dp.map((row) => [...row]),
@@ -160,7 +172,7 @@ export const LCSVisualization: React.FC = () => {
             explanation: `Characters do not match. Take the maximum LCS length from either omitting text1[${i}] (dp[${i + 1}][${j}]) or text2[${j}] (dp[${i}][${j + 1}]).`,
             pseudoStep: `SET dp[${i}][${j}] = MAX(dp[${i}][${j + 1}], dp[${i + 1}][${j}])`,
           });
-          addLines(11, 10, 11, 11);
+          addLines(12, 10, 11, 11);
         }
       }
     }
@@ -176,7 +188,7 @@ export const LCSVisualization: React.FC = () => {
       explanation: `The LCS computation is complete. The length of the longest common subsequence is stored in the top-left cell dp[0][0], which is ${dp[0][0]}.`,
       pseudoStep: 'RETURN dp[0][0]',
     });
-    addLines(15, 11, 15, 15);
+    addLines(16, 11, 15, 15);
 
     return { steps: s, stepLineNumbers: lines };
   }, []);

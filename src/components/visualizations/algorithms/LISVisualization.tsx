@@ -106,7 +106,7 @@ export const LISVisualization: React.FC = () => {
       explanation: 'Initialize LIS array with 1s. Every single element is an increasing subsequence of length 1.',
       pseudoStep: 'SET LIS = [1] * n',
     });
-    addLines(3, 3, 5, 5);
+    addLines(3, 3, 4, 5);
 
     for (let i = n - 1; i >= 0; i--) {
       s.push({
@@ -158,7 +158,7 @@ export const LISVisualization: React.FC = () => {
       explanation: `Calculations complete. The maximum length in LIS array is ${Math.max(...LIS)}.`,
       pseudoStep: `RETURN MAX(LIS) → ${Math.max(...LIS)}`,
     });
-    addLines(11, 8, 17, 13);
+    addLines(11, 8, 19, 13);
 
     return { steps: s, stepLineNumbers: lines };
   }, []);
