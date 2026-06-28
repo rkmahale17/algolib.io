@@ -152,9 +152,9 @@ export const CloneGraphVisualization: React.FC = () => {
     stepsList.push(makeStep(
       "Given a reference to Node 1 in a connected cyclic graph. Deep copy the entire graph.",
       "START cloneGraph(node=1)",
-      22, 16, 4, 18, null
+      22, 16, 4, 16, null
     ));
-    addLines(22, 16, 4, 18);
+    addLines(22, 16, 4, 16);
 
     // Step 2: Init map
     stepsList.push(makeStep(
@@ -253,9 +253,9 @@ export const CloneGraphVisualization: React.FC = () => {
     stepsList.push(makeStep(
       "Final cloned Graph of Node 1 returned successfully.",
       "RETURN copy of Node 1",
-      22, 16, 5, 18, null
+      22, 16, 5, 17, null
     ));
-    addLines(22, 16, 5, 18);
+    addLines(22, 16, 5, 17);
 
     return { steps: stepsList, stepLineNumbers: stepLines };
   }, []);

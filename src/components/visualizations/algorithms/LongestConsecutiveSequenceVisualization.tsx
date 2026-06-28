@@ -177,7 +177,7 @@ export const LongestConsecutiveSequenceVisualization: React.FC = () => {
     makeSnapshot(
       "Initialize longest streak counter to 0.",
       "SET longest = 0",
-      4, 4, 10, 6, null, null, 0, {}
+      4, 5, 8, 5, null, null, 0, {}
     );
 
     // Loop elements
@@ -185,14 +185,14 @@ export const LongestConsecutiveSequenceVisualization: React.FC = () => {
       makeSnapshot(
         `Iterate array: check element ${num}.`,
         `FOR num = ${num}`,
-        5, 5, 11, 7, num, null, 0, {}
+        5, 6, 9, 6, num, null, 0, {}
       );
 
       const hasPrev = setObj.has(num - 1);
       makeSnapshot(
         `Check if ${num} is the start of a consecutive sequence (i.e. ${num - 1} is NOT in set).`,
         `IF num - 1 NOT in numSet → ${num - 1} not in set? → ${!hasPrev ? "YES ✓" : "NO ✗"}`,
-        6, 6, 12, 8, num, num - 1, 0, {}
+        6, 7, 10, 7, num, num - 1, 0, {}
       );
 
       if (!hasPrev) {
@@ -202,7 +202,7 @@ export const LongestConsecutiveSequenceVisualization: React.FC = () => {
         makeSnapshot(
           `Since ${num - 1} is not in the set, ${num} is the start of a sequence. Initialize current sequence state.`,
           `SET currentNum = ${num}, currentStreak = 1`,
-          7, 7, 13, 9, num, null, currentStreak, { currentNum }
+          7, 8, 11, 8, num, null, currentStreak, { currentNum }
         );
 
         while (setObj.has(currentNum + 1)) {
@@ -210,7 +210,7 @@ export const LongestConsecutiveSequenceVisualization: React.FC = () => {
           makeSnapshot(
             `Check if next consecutive value ${nextVal} exists in set.`,
             `IF currentNum + 1 in numSet → ${nextVal} in set? → YES ✓`,
-            9, 10, 15, 11, num, nextVal, currentStreak, { currentNum }
+            9, 10, 13, 10, num, nextVal, currentStreak, { currentNum }
           );
 
           currentNum++;
@@ -219,7 +219,7 @@ export const LongestConsecutiveSequenceVisualization: React.FC = () => {
           makeSnapshot(
             `Found ${currentNum}. Increment currentNum to ${currentNum} and currentStreak to ${currentStreak}.`,
             `SET currentNum = ${currentNum}, currentStreak = ${currentStreak}`,
-            10, 11, 15, 12, num, null, currentStreak, { currentNum }
+            10, 11, 14, 11, num, null, currentStreak, { currentNum }
           );
         }
 
@@ -227,7 +227,7 @@ export const LongestConsecutiveSequenceVisualization: React.FC = () => {
         makeSnapshot(
           `Check if next consecutive value ${nextVal} exists in set.`,
           `IF currentNum + 1 in numSet → ${nextVal} in set? → NO ✗`,
-          9, 10, 15, 11, num, nextVal, currentStreak, { currentNum }
+          9, 10, 13, 10, num, nextVal, currentStreak, { currentNum }
         );
 
         const oldLongest = longestStreak;
@@ -235,13 +235,13 @@ export const LongestConsecutiveSequenceVisualization: React.FC = () => {
         makeSnapshot(
           `Update longest streak: max(${oldLongest}, ${currentStreak}) = ${longestStreak}.`,
           `SET longest = max(longest, currentStreak) → ${longestStreak}`,
-          13, 13, 18, 14, num, null, currentStreak, { currentNum }
+          13, 13, 17, 14, num, null, currentStreak, { currentNum }
         );
       } else {
         makeSnapshot(
           `Since ${num - 1} exists in the set, ${num} cannot be the start of a consecutive sequence (it is processed in a larger sequence). Skip.`,
           `Skip ${num}`,
-          6, 6, 12, 8, num, null, 0, {}
+          6, 7, 10, 7, num, null, 0, {}
         );
       }
     }
@@ -249,7 +249,7 @@ export const LongestConsecutiveSequenceVisualization: React.FC = () => {
     makeSnapshot(
       `Finished checking all numbers. Return the longest consecutive sequence length: ${longestStreak}.`,
       `RETURN longest → ${longestStreak}`,
-      16, 15, 22, 17, null, null, 0, {}
+      16, 14, 20, 17, null, null, 0, {}
     );
 
     return { steps: stepsList, stepLineNumbers: stepLines };

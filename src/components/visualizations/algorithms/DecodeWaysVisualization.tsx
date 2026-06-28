@@ -159,7 +159,7 @@ export const DecodeWaysVisualization: React.FC = () => {
       explanation: `Initialize DP memo map. Base Case: Reaching index ${n} (end of string) is 1 valid path: dp.set(${n}, 1).`,
       pseudoStep: `SET dp[${n}] = 1`
     });
-    addLines(3, 2, 26, 26);
+    addLines(3, 2, 24, 25);
 
     const solve = (i: number): number => {
       stack.push(i);
@@ -308,7 +308,7 @@ export const DecodeWaysVisualization: React.FC = () => {
       explanation: "Launch recursive DFS traversal starting at index 0.",
       pseudoStep: "RETURN dfs(0)"
     });
-    addLines(17, 16, 27, 26);
+    addLines(17, 16, 26, 26);
 
     const finalRes = solve(0);
 
@@ -322,7 +322,7 @@ export const DecodeWaysVisualization: React.FC = () => {
       explanation: `Algorithm Complete! dfs(0) returned ${finalRes}. There are exactly ${finalRes} ways to decode "${s}".`,
       pseudoStep: `RETURN ${finalRes}`
     });
-    addLines(17, 16, 27, 26);
+    addLines(17, 16, 26, 26);
 
     return { steps: stepsList, stepLineNumbers: lines };
   }, []);
