@@ -1,293 +1,254 @@
-import { useState } from 'react';
-import { SimpleArrayVisualization } from '../shared/SimpleArrayVisualization';
-import { StepControls } from '../shared/StepControls';
-import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
+import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
+import { VariablePanel } from '../shared/VariablePanel';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
+import type { StepLineNumberMap, VisualizationLanguageMap } from '@/types/visualization';
 
 interface Step {
   array: number[];
-  highlighting: number[];
+  highlights: number[];
   variables: Record<string, any>;
   explanation: string;
-  highlightedLines: number[];
+  pseudoStep: string;
 }
 
-export const CountingBitsVisualization = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-
-  const steps: Step[] = [
-    {
-      array: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      highlighting: [],
-      variables: { n: 8 },
-      explanation: "Starting countBits with n = 8.",
-      highlightedLines: [1]
-    },
-    {
-      array: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      highlighting: [],
-      variables: { n: 8, dp: "[0,0,0,0,0,0,0,0,0]" },
-      explanation: "Initialize dp array of size n + 1 (9) with zeros.",
-      highlightedLines: [2]
-    },
-    {
-      array: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      highlighting: [],
-      variables: { n: 8, dp: "[0,0,0,0,0,0,0,0,0]", offset: 1 },
-      explanation: "Initialize offset = 1.",
-      highlightedLines: [3]
-    },
-    {
-      array: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      highlighting: [1],
-      variables: { n: 8, dp: "[0,...]", offset: 1, i: 1 },
-      explanation: "Start loop at i = 1.",
-      highlightedLines: [5]
-    },
-    {
-      array: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      highlighting: [1],
-      variables: { n: 8, dp: "[0,...]", offset: 1, i: 1 },
-      explanation: "Check power of 2: offset * 2 (2) === i (1)? False.",
-      highlightedLines: [6]
-    },
-    {
-      array: [0, 1, 0, 0, 0, 0, 0, 0, 0],
-      highlighting: [1, 0],
-      variables: { n: 8, dp: "[0,1,...]", offset: 1, i: 1 },
-      explanation: "dp[1] = 1 + dp[1 - 1] = 1 + dp[0] = 1 + 0 = 1.",
-      highlightedLines: [9]
-    },
-    {
-      array: [0, 1, 0, 0, 0, 0, 0, 0, 0],
-      highlighting: [2],
-      variables: { n: 8, dp: "[0,1,...]", offset: 1, i: 2 },
-      explanation: "Loop i = 2.",
-      highlightedLines: [5]
-    },
-    {
-      array: [0, 1, 0, 0, 0, 0, 0, 0, 0],
-      highlighting: [2],
-      variables: { n: 8, dp: "[0,1,...]", offset: 1, i: 2 },
-      explanation: "Check power of 2: offset * 2 (2) === i (2)? True.",
-      highlightedLines: [6]
-    },
-    {
-      array: [0, 1, 0, 0, 0, 0, 0, 0, 0],
-      highlighting: [2],
-      variables: { n: 8, dp: "[0,1,...]", offset: 2, i: 2 },
-      explanation: "Update offset = i = 2.",
-      highlightedLines: [7]
-    },
-    {
-      array: [0, 1, 1, 0, 0, 0, 0, 0, 0],
-      highlighting: [2, 0],
-      variables: { n: 8, dp: "[0,1,1,...]", offset: 2, i: 2 },
-      explanation: "dp[2] = 1 + dp[2 - 2] = 1 + dp[0] = 1 + 0 = 1.",
-      highlightedLines: [9]
-    },
-    {
-      array: [0, 1, 1, 0, 0, 0, 0, 0, 0],
-      highlighting: [3],
-      variables: { n: 8, dp: "[0,1,1,...]", offset: 2, i: 3 },
-      explanation: "Loop i = 3.",
-      highlightedLines: [5]
-    },
-    {
-      array: [0, 1, 1, 0, 0, 0, 0, 0, 0],
-      highlighting: [3],
-      variables: { n: 8, dp: "[0,1,1,...]", offset: 2, i: 3 },
-      explanation: "Check power of 2: offset * 2 (4) === i (3)? False.",
-      highlightedLines: [6]
-    },
-    {
-      array: [0, 1, 1, 2, 0, 0, 0, 0, 0],
-      highlighting: [3, 1],
-      variables: { n: 8, dp: "[0,1,1,2,...]", offset: 2, i: 3 },
-      explanation: "dp[3] = 1 + dp[3 - 2] = 1 + dp[1] = 1 + 1 = 2.",
-      highlightedLines: [9]
-    },
-    {
-      array: [0, 1, 1, 2, 0, 0, 0, 0, 0],
-      highlighting: [4],
-      variables: { n: 8, dp: "[0,1,1,2,...]", offset: 2, i: 4 },
-      explanation: "Loop i = 4.",
-      highlightedLines: [5]
-    },
-    {
-      array: [0, 1, 1, 2, 0, 0, 0, 0, 0],
-      highlighting: [4],
-      variables: { n: 8, dp: "[0,1,1,2,...]", offset: 2, i: 4 },
-      explanation: "Check power of 2: offset * 2 (4) === i (4)? True.",
-      highlightedLines: [6]
-    },
-    {
-      array: [0, 1, 1, 2, 0, 0, 0, 0, 0],
-      highlighting: [4],
-      variables: { n: 8, dp: "[0,1,1,2,...]", offset: 4, i: 4 },
-      explanation: "Update offset = i = 4.",
-      highlightedLines: [7]
-    },
-    {
-      array: [0, 1, 1, 2, 1, 0, 0, 0, 0],
-      highlighting: [4, 0],
-      variables: { n: 8, dp: "[0,1,1,2,1,...]", offset: 4, i: 4 },
-      explanation: "dp[4] = 1 + dp[4 - 4] = 1 + dp[0] = 1 + 0 = 1.",
-      highlightedLines: [9]
-    },
-    {
-      array: [0, 1, 1, 2, 1, 0, 0, 0, 0],
-      highlighting: [5],
-      variables: { n: 8, dp: "[0,1,1,2,1,...]", offset: 4, i: 5 },
-      explanation: "Loop i = 5.",
-      highlightedLines: [5]
-    },
-    {
-      array: [0, 1, 1, 2, 1, 2, 0, 0, 0],
-      highlighting: [5, 1],
-      variables: { n: 8, dp: "[0,1,1,2,1,2,...]", offset: 4, i: 5 },
-      explanation: "dp[5] = 1 + dp[5 - 4] = 1 + dp[1] = 1 + 1 = 2.",
-      highlightedLines: [9]
-    },
-    {
-      array: [0, 1, 1, 2, 1, 2, 0, 0, 0],
-      highlighting: [6],
-      variables: { n: 8, dp: "[0,1,1,2,1,2,...]", offset: 4, i: 6 },
-      explanation: "Loop i = 6.",
-      highlightedLines: [5]
-    },
-    {
-      array: [0, 1, 1, 2, 1, 2, 2, 0, 0],
-      highlighting: [6, 2],
-      variables: { n: 8, dp: "[0,1,1,2,1,2,2,...]", offset: 4, i: 6 },
-      explanation: "dp[6] = 1 + dp[6 - 4] = 1 + dp[2] = 1 + 1 = 2.",
-      highlightedLines: [9]
-    },
-    {
-      array: [0, 1, 1, 2, 1, 2, 2, 0, 0],
-      highlighting: [7],
-      variables: { n: 8, dp: "[0,1,1,2,1,2,2,...]", offset: 4, i: 7 },
-      explanation: "Loop i = 7.",
-      highlightedLines: [5]
-    },
-    {
-      array: [0, 1, 1, 2, 1, 2, 2, 3, 0],
-      highlighting: [7, 3],
-      variables: { n: 8, dp: "[0,1,1,2,1,2,2,3,...]", offset: 4, i: 7 },
-      explanation: "dp[7] = 1 + dp[7 - 4] = 1 + dp[3] = 1 + 2 = 3.",
-      highlightedLines: [9]
-    },
-    {
-      array: [0, 1, 1, 2, 1, 2, 2, 3, 0],
-      highlighting: [8],
-      variables: { n: 8, dp: "[0,1,1,2,1,2,2,3,...]", offset: 4, i: 8 },
-      explanation: "Loop i = 8.",
-      highlightedLines: [5]
-    },
-    {
-      array: [0, 1, 1, 2, 1, 2, 2, 3, 0],
-      highlighting: [8],
-      variables: { n: 8, dp: "[0,1,1,2,1,2,2,3,...]", offset: 4, i: 8 },
-      explanation: "Check power of 2: offset * 2 (8) === i (8)? True.",
-      highlightedLines: [6]
-    },
-    {
-      array: [0, 1, 1, 2, 1, 2, 2, 3, 0],
-      highlighting: [8],
-      variables: { n: 8, dp: "[0,1,1,2,1,2,2,3,...]", offset: 8, i: 8 },
-      explanation: "Update offset = i = 8.",
-      highlightedLines: [7]
-    },
-    {
-      array: [0, 1, 1, 2, 1, 2, 2, 3, 1],
-      highlighting: [8, 0],
-      variables: { n: 8, dp: "[0,1,1,2,1,2,2,3,1]", offset: 8, i: 8 },
-      explanation: "dp[8] = 1 + dp[8 - 8] = 1 + dp[0] = 1 + 0 = 1.",
-      highlightedLines: [9]
-    },
-    {
-      array: [0, 1, 1, 2, 1, 2, 2, 3, 1],
-      highlighting: [],
-      variables: { n: 8, dp: "[0,1,1,2,1,2,2,3,1]", offset: 8, i: 9 },
-      explanation: "Loop condition i <= n (9 <= 8) is false. Exit loop.",
-      highlightedLines: [5]
-    },
-    {
-      array: [0, 1, 1, 2, 1, 2, 2, 3, 1],
-      highlighting: [],
-      variables: { n: 8, dp: "[0,1,1,2,1,2,2,3,1]" },
-      explanation: "Return dp array.",
-      highlightedLines: [11]
-    }
-  ];
-
-  const code = `function countBits(n: number): number[] {
-    const dp: number[] = new Array(n + 1).fill(0);
+const languages: VisualizationLanguageMap = {
+  typescript: `function countBits(n: number): number[] {
+    const ans: number[] = new Array(n + 1).fill(0);
     let offset = 1;
-
     for (let i = 1; i <= n; i++) {
-        if (offset * 2 === i) {
+        if (i === offset * 2) {
             offset = i;
         }
-        dp[i] = 1 + dp[i - offset];
+        ans[i] = 1 + ans[i - offset];
     }
-    return dp;
-}`;
+    return ans;
+}`,
+  python: `def countBits(n: int):
+    ans = [0] * (n + 1)
+    offset = 1
+    for i in range(1, n + 1):
+        if i == offset * 2:
+            offset = i
+        ans[i] = 1 + ans[i - offset]
+    return ans`,
+  java: `public int[] countBits(int n) {
+    int[] ans = new int[n + 1];
+    int offset = 1;
+    for (int i = 1; i <= n; i++) {
+        if (i == offset * 2) {
+            offset = i;
+        }
+        ans[i] = 1 + ans[i - offset];
+    }
+    return ans;
+}`,
+  cpp: `vector<int> countBits(int n) {
+    vector<int> ans(n + 1, 0);
+    int offset = 1;
+    for (int i = 1; i <= n; i++) {
+        if (i == offset * 2) {
+            offset = i;
+        }
+        ans[i] = 1 + ans[i - offset];
+    }
+    return ans;
+}`
+};
 
-  const step = steps[currentStep];
+export const CountingBitsVisualization = () => {
+  const [steps, setSteps] = useState<Step[]>([]);
+  const [stepLineNumbers, setStepLineNumbers] = useState<StepLineNumberMap>({
+    typescript: [],
+    python: [],
+    java: [],
+    cpp: []
+  });
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+
+  useEffect(() => {
+    const n = 8;
+    const generatedSteps: Step[] = [];
+    const stepLines: StepLineNumberMap = {
+      typescript: [],
+      python: [],
+      java: [],
+      cpp: []
+    };
+
+    const addLines = (ts: number, py: number, java: number, cpp: number) => {
+      stepLines.typescript!.push(ts);
+      stepLines.python!.push(py);
+      stepLines.java!.push(java);
+      stepLines.cpp!.push(cpp);
+    };
+
+    const dp = new Array(n + 1).fill(0);
+
+    // Function Entry
+    generatedSteps.push({
+      array: [...dp],
+      highlights: [],
+      variables: { n, i: '-', offset: '-' },
+      explanation: `Count set bits for all numbers from 0 to ${n}.`,
+      pseudoStep: "FUNCTION countBits(n)"
+    });
+    addLines(1, 1, 1, 1);
+
+    // Array Init
+    generatedSteps.push({
+      array: [...dp],
+      highlights: [],
+      variables: { n, i: '-', offset: '-' },
+      explanation: `Initialize ans array of size ${n + 1} with 0s.`,
+      pseudoStep: "SET ans = [0] * (n + 1)"
+    });
+    addLines(2, 2, 2, 2);
+
+    let offset = 1;
+    // Offset Init
+    generatedSteps.push({
+      array: [...dp],
+      highlights: [],
+      variables: { n, i: '-', offset },
+      explanation: "Initialize offset to 1 to track the latest power of 2.",
+      pseudoStep: "SET offset = 1"
+    });
+    addLines(3, 3, 3, 3);
+
+    for (let i = 1; i <= n; i++) {
+      // Loop Check i
+      generatedSteps.push({
+        array: [...dp],
+        highlights: [i],
+        variables: { n, i, offset },
+        explanation: `Processing number i = ${i}.`,
+        pseudoStep: `FOR i = ${i} to ${n}`
+      });
+      addLines(4, 4, 4, 4);
+
+      // Power of 2 check
+      generatedSteps.push({
+        array: [...dp],
+        highlights: [i],
+        variables: { n, i, offset },
+        explanation: `Check if i (${i}) is the next power of 2 (i === offset * 2 = ${offset * 2}).`,
+        pseudoStep: `IF i == offset * 2`
+      });
+      addLines(5, 5, 5, 5);
+
+      if (i === offset * 2) {
+        offset = i;
+        generatedSteps.push({
+          array: [...dp],
+          highlights: [i],
+          variables: { n, i, offset },
+          explanation: `New power of 2 detected. Update offset to ${offset}.`,
+          pseudoStep: "SET offset = i"
+        });
+        addLines(6, 6, 6, 6);
+      }
+
+      dp[i] = 1 + dp[i - offset];
+      generatedSteps.push({
+        array: [...dp],
+        highlights: [i, i - offset],
+        variables: { n, i, offset },
+        explanation: `Calculate set bits for ${i} using dynamic programming: ans[${i}] = 1 + ans[${i} - ${offset}] = 1 + ans[${i - offset}] = ${dp[i]}.`,
+        pseudoStep: `SET ans[i] = 1 + ans[i - offset]`
+      });
+      addLines(8, 7, 8, 8);
+    }
+
+    // Return
+    generatedSteps.push({
+      array: [...dp],
+      highlights: [],
+      variables: { n, i: '-', offset },
+      explanation: `Return the final computed ans array: [${dp.join(', ')}].`,
+      pseudoStep: "RETURN ans"
+    });
+    addLines(10, 8, 10, 10);
+
+    setSteps(generatedSteps);
+    setStepLineNumbers(stepLines);
+  }, []);
+
+  if (steps.length === 0) return null;
+
+  const currentStep = steps[currentStepIndex];
+  const pseudoSteps = steps.map(s => s.pseudoStep);
 
   return (
-    <div className="space-y-6">
-      <StepControls
-        isPlaying={false}
-        onPlay={() => { }}
-        onPause={() => { }}
-        onStepForward={() => currentStep < steps.length - 1 && setCurrentStep(prev => prev + 1)}
-        onStepBack={() => currentStep > 0 && setCurrentStep(prev => prev - 1)}
-        onReset={() => setCurrentStep(0)}
-        speed={1}
-        onSpeedChange={() => { }}
-        currentStep={currentStep}
-        totalSteps={steps.length - 1}
-      />
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <Card className="p-6">
-            <SimpleArrayVisualization
-              array={step.array}
-              highlights={step.highlighting}
-              label="dp[] - Number of set bits"
-            />
-          </Card>
-
-          <Card className="p-4 bg-muted/50">
-            <div className="space-y-2">
-              <div className="text-sm font-semibold text-primary">Explanation:</div>
-              <div className="text-sm text-muted-foreground">
-                {step.explanation}
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-4 bg-muted/50">
-            <h3 className="font-semibold mb-2 text-sm">DP Strategy (Offset):</h3>
-            <div className="text-xs space-y-1 text-muted-foreground">
-              <p>• Offset tracks the largest power of 2 less than or equal to i.</p>
-              <p>• Bits for i = 1 (most significant bit) + bits for (i - offset).</p>
-            </div>
-          </Card>
-
-          <VariablePanel variables={step.variables} />
-        </div>
-
-        <AnimatedCodeEditor
-          code={code}
-          highlightedLines={[step.highlightedLines[0]]}
-          language="typescript"
+    <VisualizationLayout
+      controls={
+        <SimpleStepControls
+          currentStep={currentStepIndex}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStepIndex}
         />
-      </div>
-    </div>
+      }
+      leftContent={
+        <div className="space-y-6 flex flex-col h-full">
+          <div>
+            <Card className="p-6 bg-card/50 backdrop-blur-sm border-primary/20 mb-4">
+              <h3 className="text-xs font-semibold mb-6 text-muted-foreground uppercase tracking-widest text-center">
+                Counting Bits (DP)
+              </h3>
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="text-xs font-semibold text-center text-muted-foreground">DP Array (ans)</div>
+                  <div className="flex items-center justify-center gap-2 flex-wrap min-h-[90px]">
+                    {currentStep.array.map((value, index) => {
+                      const isHighlighted = currentStep.highlights.includes(index);
+                      return (
+                        <div key={index} className="flex flex-col items-center gap-1">
+                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm border-2 transition-all duration-300 ${
+                            isHighlighted
+                              ? 'bg-primary/20 border-primary text-primary scale-110 shadow-lg'
+                              : 'bg-muted/50 border-border text-foreground'
+                          }`}>
+                            {value}
+                          </div>
+                          <span className="text-[10px] text-muted-foreground">[{index}]</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="p-3 bg-muted/20 border border-border/40 rounded-lg text-xs space-y-1.5 text-muted-foreground leading-relaxed">
+                  <div className="font-bold text-muted-foreground">DP Relation Logic:</div>
+                  <div>• Any number <span className="font-semibold font-mono text-primary">i</span> can be broken into: <span className="font-semibold font-mono text-primary">1 + ans[i - offset]</span>.</div>
+                  <div>• The <span className="font-semibold font-mono">1</span> represents the most significant bit (the offset power of 2).</div>
+                  <div>• <span className="font-semibold font-mono text-primary">ans[i - offset]</span> retrieves the set bits for the remaining value.</div>
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          <div className="mt-auto space-y-4">
+            <Card className="p-4 bg-primary/5 border-primary/20 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
+              <h4 className="text-[10px] font-bold uppercase tracking-widest text-primary mb-2">Step Explanation</h4>
+              <p className="text-sm font-medium leading-relaxed min-h-[40px]">{currentStep.explanation}</p>
+            </Card>
+            <VariablePanel variables={currentStep.variables} />
+          </div>
+        </div>
+      }
+      rightContent={
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={() => setCurrentStepIndex(0)}
+        />
+      }
+    />
   );
 };

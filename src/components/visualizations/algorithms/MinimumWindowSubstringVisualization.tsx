@@ -1,9 +1,12 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
-import { StepControls } from '../shared/StepControls';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
 import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
+import type { VisualizationLanguageMap, StepLineNumberMap } from '@/types/visualization';
 
 interface Step {
   s: string;
@@ -16,8 +19,8 @@ interface Step {
   resLen: number;
   countT: Record<string, number>;
   window: Record<string, number>;
-  message: string;
-  highlightedLines: number[];
+  explanation: string;
+  pseudoStep: string;
   variables: Record<string, any>;
 }
 
@@ -42,197 +45,37 @@ const USE_CASES = [
   }
 ];
 
-export const MinimumWindowSubstringVisualization = () => {
-  const [useCaseIdx, setUseCaseIdx] = useState(0);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1);
+const languages: VisualizationLanguageMap = {
+  python: `def minWindow(s: str, t: str) -> str:
+    if not t:
+        return ""
+    countT = {}
+    window = {}
+    for c in t:
+        countT[c] = countT.get(c, 0) + 1
+    have = 0
+    need = len(countT)
+    res = [-1, -1]
+    resLen = float('inf')
+    l = 0
+    for r in range(len(s)):
+        c = s[r]
+        window[c] = window.get(c, 0) + 1
+        if c in countT and window[c] == countT[c]:
+            have += 1
+        while have == need:
+            if (r - l + 1) < resLen:
+                res = [l, r]
+                resLen = r - l + 1
+            leftChar = s[l]
+            window[leftChar] -= 1
+            if leftChar in countT and window[leftChar] < countT[leftChar]:
+                have -= 1
+            l += 1
+    start, end = res
+    return s[start:end+1] if resLen != float('inf') else ""`,
 
-  const currentCase = USE_CASES[useCaseIdx];
-
-  const steps = useMemo(() => {
-    const s = currentCase.s;
-    const t = currentCase.t;
-    const steps: Step[] = [];
-
-    // Signature
-    steps.push({
-      s, t, l: 0, r: -1, have: 0, need: 0, res: [-1, -1], resLen: Infinity,
-      countT: {}, window: {},
-      message: "Initialize the minWindow algorithm search.",
-      highlightedLines: [1],
-      variables: { s, t }
-    });
-
-    // Line 2: if (t === "") return "";
-    steps.push({
-      s, t, l: 0, r: -1, have: 0, need: 0, res: [-1, -1], resLen: Infinity,
-      countT: {}, window: {},
-      message: `Check if target string t is empty. t = "${t}"`,
-      highlightedLines: [2],
-      variables: { t }
-    });
-
-    if (t === "") {
-      steps.push({
-        s, t, l: 0, r: -1, have: 0, need: 0, res: [-1, -1], resLen: Infinity,
-        countT: {}, window: {},
-        message: "Target string is empty, returning empty string.",
-        highlightedLines: [2],
-        variables: { return: "" }
-      });
-      return steps;
-    }
-
-    const countT: Record<string, number> = {};
-    const window: Record<string, number> = {};
-
-    // Lines 3-4: Init records
-    steps.push({
-      s, t, l: 0, r: -1, have: 0, need: 0, res: [-1, -1], resLen: Infinity,
-      countT: { ...countT }, window: { ...window },
-      message: "Initialize frequency maps for target characters and current window.",
-      highlightedLines: [3, 4],
-      variables: { countT: {}, window: {} }
-    });
-
-    // Lines 5-7: Populate countT
-    for (const c of t) {
-      countT[c] = (countT[c] || 0) + 1;
-      steps.push({
-        s, t, l: 0, r: -1, have: 0, need: 0, res: [-1, -1], resLen: Infinity,
-        countT: { ...countT }, window: { ...window },
-        message: `Counting character '${c}' in target string t.`,
-        highlightedLines: [5, 6],
-        variables: { countT: { ...countT } }
-      });
-    }
-
-    // Lines 8-9: have, need
-    let have = 0;
-    const need = Object.keys(countT).length;
-    steps.push({
-      s, t, l: 0, r: -1, have, need, res: [-1, -1], resLen: Infinity,
-      countT: { ...countT }, window: { ...window },
-      message: `Initialize 'have' to 0. Number of unique characters needed: ${need}.`,
-      highlightedLines: [8, 9],
-      variables: { have, need }
-    });
-
-    // Lines 10-12: res, resLen, l
-    let res: [number, number] = [-1, -1];
-    let resLen = Infinity;
-    let l = 0;
-    steps.push({
-      s, t, l, r: -1, have, need, res, resLen,
-      countT: { ...countT }, window: { ...window },
-      message: "Initialize tracking variables and the left pointer 'l'.",
-      highlightedLines: [10, 11, 12],
-      variables: { res, resLen, l }
-    });
-
-    // Loop
-    for (let r = 0; r < s.length; r++) {
-      const c = s[r];
-      window[c] = (window[c] || 0) + 1;
-
-      steps.push({
-        s, t, l, r, have, need, res, resLen,
-        countT: { ...countT }, window: { ...window },
-        message: `Expand window by moving right pointer to index ${r} ('${c}').`,
-        highlightedLines: [13, 14, 15],
-        variables: { r, c, "window[c]": window[c] }
-      });
-
-      if (c in countT && window[c] === countT[c]) {
-        have++;
-        steps.push({
-          s, t, l, r, have, need, res, resLen,
-          countT: { ...countT }, window: { ...window },
-          message: `Character '${c}' count matches target frequency! Increment 'have'.`,
-          highlightedLines: [16, 17],
-          variables: { have, need }
-        });
-      }
-
-      while (have === need) {
-        steps.push({
-          s, t, l, r, have, need, res, resLen,
-          countT: { ...countT }, window: { ...window },
-          message: `All required characters found (${have}/${need}). Checking if current window is smaller.`,
-          highlightedLines: [19],
-          variables: { have, need, currentSize: r - l + 1, resLen }
-        });
-
-        if ((r - l + 1) < resLen) {
-          res = [l, r];
-          resLen = r - l + 1;
-          steps.push({
-            s, t, l, r, have, need, res, resLen,
-            countT: { ...countT }, window: { ...window },
-            message: `Found smaller window! New minimum length: ${resLen}. Substring: "${s.slice(l, r + 1)}"`,
-            highlightedLines: [20, 21, 22],
-            variables: { res, resLen }
-          });
-        }
-
-        const leftChar = s[l];
-        window[leftChar]--;
-        
-        steps.push({
-          s, t, l, r, have, need, res, resLen,
-          countT: { ...countT }, window: { ...window },
-          message: `Shrinking window by removing '${leftChar}' from index ${l}.`,
-          highlightedLines: [24, 25],
-          variables: { l, leftChar, "window[leftChar]": window[leftChar] }
-        });
-
-        if (leftChar in countT && window[leftChar] < countT[leftChar]) {
-          have--;
-          steps.push({
-            s, t, l, r, have, need, res, resLen,
-            countT: { ...countT }, window: { ...window },
-            message: `Window no longer contains enough '${leftChar}'. Decrement 'have'.`,
-            highlightedLines: [26, 27],
-            variables: { have, need }
-          });
-        }
-
-        l++;
-        steps.push({
-          s, t, l, r, have, need, res, resLen,
-          countT: { ...countT }, window: { ...window },
-          message: "Moving left pointer to search for a potentially smaller valid window.",
-          highlightedLines: [29],
-          variables: { l }
-        });
-      }
-    }
-
-    // Final Lines
-    steps.push({
-      s, t, l, r: s.length - 1, have, need, res, resLen,
-      countT: { ...countT }, window: { ...window },
-      message: "Finished iterating through the string. Preparing final result.",
-      highlightedLines: [32],
-      variables: { res }
-    });
-
-    const resultStr = resLen !== Infinity ? s.slice(res[0], res[1] + 1) : "";
-    steps.push({
-      s, t, l, r: s.length - 1, have, need, res, resLen,
-      countT: { ...countT }, window: { ...window },
-      message: `Final result: "${resultStr}"`,
-      highlightedLines: [33],
-      variables: { return: resultStr }
-    });
-
-    return steps;
-  }, [currentCase]);
-
-  const currentStep = steps[currentStepIndex] || steps[steps.length - 1];
-
-  const code = `function minWindow(s: string, t: string): string {
+  typescript: `function minWindow(s: string, t: string): string {
   if (t === "") return "";
   const countT: Record<string, number> = {};
   const window: Record<string, number> = {};
@@ -265,28 +108,221 @@ export const MinimumWindowSubstringVisualization = () => {
   }
   const [start, end] = res;
   return resLen !== Infinity ? s.slice(start, end + 1) : "";
-}`;
+}`,
 
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isPlaying && currentStepIndex < steps.length - 1) {
-      timer = setTimeout(() => {
-        setCurrentStepIndex(prev => prev + 1);
-      }, 1000 / speed);
-    } else {
-      setIsPlaying(false);
+  java: `public class Solution {
+    public String minWindow(String s, String t) {
+        if (t.equals("")) return "";
+        java.util.Map<Character, Integer> countT = new java.util.HashMap<>();
+        java.util.Map<Character, Integer> window = new java.util.HashMap<>();
+        for (char c : t.toCharArray()) {
+            countT.put(c, countT.getOrDefault(c, 0) + 1);
+        }
+        int have = 0;
+        int need = countT.size();
+        int[] res = {-1, -1};
+        int resLen = Integer.MAX_VALUE;
+        int l = 0;
+        for (int r = 0; r < s.length(); r++) {
+            char c = s.charAt(r);
+            window.put(c, window.getOrDefault(c, 0) + 1);
+            if (countT.containsKey(c) && window.get(c).equals(countT.get(c))) {
+                have++;
+            }
+            while (have == need) {
+                if ((r - l + 1) < resLen) {
+                    res[0] = l;
+                    res[1] = r;
+                    resLen = r - l + 1;
+                }
+                char leftChar = s.charAt(l);
+                window.put(leftChar, window.get(leftChar) - 1);
+                if (countT.containsKey(leftChar) && window.get(leftChar) < countT.get(leftChar)) {
+                    have--;
+                }
+                l++;
+            }
+        }
+        int start = res[0];
+        int end = res[1];
+        return resLen != Integer.MAX_VALUE ? s.substring(start, end + 1) : "";
     }
-    return () => clearTimeout(timer);
-  }, [isPlaying, currentStepIndex, steps.length, speed]);
+}`,
+
+  cpp: `class Solution {
+public:
+    string minWindow(string s, string t) {
+        if (s.empty() || t.empty()) return "";
+        unordered_map<char, int> need, window;
+        for (char c : t) {
+            need[c]++;
+        }
+        int required = need.size();
+        int formed = 0;
+        int left = 0;
+        int minLen = INT_MAX;
+        int minLeft = 0;
+        for (int right = 0; right < s.length(); right++) {
+            char c = s[right];
+            window[c]++;
+            if (need.find(c) != need.end() && window[c] == need[c]) {
+                formed++;
+            }
+            while (left <= right && formed == required) {
+                if (right - left + 1 < minLen) {
+                    minLen = right - left + 1;
+                    minLeft = left;
+                }
+                char leftChar = s[left];
+                window[leftChar]--;
+                if (need.find(leftChar) != need.end() && window[leftChar] < need[leftChar]) {
+                    formed--;
+                }
+                left++;
+            }
+        }
+        return minLen == INT_MAX ? "" : s.substr(minLeft, minLen);
+    }
+};`
+};
+
+export const MinimumWindowSubstringVisualization = () => {
+  const [useCaseIdx, setUseCaseIdx] = useState(0);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+
+  const currentCase = USE_CASES[useCaseIdx];
+
+  const { steps, stepLineNumbers } = useMemo(() => {
+    const s = currentCase.s;
+    const t = currentCase.t;
+    const steps: Step[] = [];
+    const stepLineNumbers: StepLineNumberMap = {
+      typescript: [],
+      python: [],
+      java: [],
+      cpp: []
+    };
+
+    const addLines = (ts: number, py: number, java: number, cpp: number) => {
+      stepLineNumbers.typescript!.push(ts);
+      stepLineNumbers.python!.push(py);
+      stepLineNumbers.java!.push(java);
+      stepLineNumbers.cpp!.push(cpp);
+    };
+
+    const addStep = (msg: string, pseudo: string, tsLine: number, pyLine: number, javaLine: number, cppLine: number, extra: Partial<Step> = {}) => {
+      steps.push({
+        s, t,
+        l: extra.hasOwnProperty('l') ? extra.l! : l,
+        r: extra.hasOwnProperty('r') ? extra.r! : r,
+        have: extra.hasOwnProperty('have') ? extra.have! : have,
+        need: extra.hasOwnProperty('need') ? extra.need! : need,
+        res: extra.res || res,
+        resLen: extra.hasOwnProperty('resLen') ? extra.resLen! : resLen,
+        countT: extra.countT || { ...countT },
+        window: extra.window || { ...window },
+        explanation: msg,
+        pseudoStep: pseudo,
+        variables: {
+          s, t,
+          l: extra.hasOwnProperty('l') ? extra.l! : l,
+          r: extra.hasOwnProperty('r') ? extra.r! : r,
+          have: extra.hasOwnProperty('have') ? extra.have! : have,
+          need: extra.hasOwnProperty('need') ? extra.need! : need,
+          resLen: extra.hasOwnProperty('resLen') ? (extra.resLen === Infinity ? "Infinity" : extra.resLen!) : (resLen === Infinity ? "Infinity" : resLen)
+        }
+      });
+      addLines(tsLine, pyLine, javaLine, cppLine);
+    };
+
+    let have = 0;
+    let need = 0;
+    let l = 0;
+    let r = -1;
+    let res: [number, number] = [-1, -1];
+    let resLen = Infinity;
+    const countT: Record<string, number> = {};
+    const window: Record<string, number> = {};
+
+    // 1. Signature
+    addStep("Initialize the minWindow algorithm search.", "CALL minWindow(s, t)", 1, 1, 2, 3);
+
+    // 2. Empty check
+    addStep(`Check if target string t is empty. t = "${t}"`, "IF t == \"\" -> RETURN \"\"", 2, 2, 3, 4);
+
+    if (t !== "") {
+      // 3. Init structures
+      addStep("Initialize frequency maps countT and window.", "SET countT = {}, window = {}", 3, 4, 4, 5);
+
+      // 4. Count target characters
+      for (const c of t) {
+        countT[c] = (countT[c] || 0) + 1;
+        addStep(`Count character '${c}' in target string t.`, `SET countT[${c}] = countT[${c}] + 1`, 5, 6, 6, 6);
+      }
+
+      need = Object.keys(countT).length;
+      // 5. Initialize have/need
+      addStep(`Initialize 'have' to 0. Unique characters to match: ${need}.`, `SET have = 0, need = ${need}`, 8, 8, 9, 9);
+
+      // 6. Initialize pointers
+      addStep("Initialize window result trackers and left pointer l = 0.", "SET res = [-1, -1], resLen = Infinity, l = 0", 10, 10, 11, 11);
+
+      // Loop
+      for (r = 0; r < s.length; r++) {
+        const c = s[r];
+        window[c] = (window[c] || 0) + 1;
+        addStep(`Expand sliding window: move right pointer to index ${r} ('${c}').`, `FOR r = ${r} TO len(s) - 1`, 13, 13, 14, 14);
+
+        if (c in countT && window[c] === countT[c]) {
+          have++;
+          addStep(`Frequency of '${c}' in window meets target. Increment 'have' to ${have}.`, `SET have = have + 1`, 16, 16, 17, 17);
+        }
+
+        while (have === need) {
+          addStep(`All character requirements met (${have}/${need}). Check window validity.`, "WHILE have == need", 19, 18, 20, 20);
+
+          if ((r - l + 1) < resLen) {
+            res = [l, r];
+            resLen = r - l + 1;
+            addStep(`Current window [${l}, ${r}] ("${s.slice(l, r + 1)}") is smaller than best seen. Update min.`, `SET res = [l, r], resLen = r - l + 1 → ${resLen}`, 20, 19, 21, 21);
+          }
+
+          const leftChar = s[l];
+          window[leftChar]--;
+          addStep(`Shrink window from left. Decrement count of '${leftChar}'.`, `SET window[${leftChar}] = window[${leftChar}] - 1`, 24, 22, 26, 25);
+
+          if (leftChar in countT && window[leftChar] < countT[leftChar]) {
+            have--;
+            addStep(`Frequency of '${leftChar}' falls below target. Decrement 'have' to ${have}.`, `SET have = have - 1`, 26, 24, 28, 27);
+          }
+
+          l++;
+          addStep(`Advance left pointer l to index ${l}.`, "SET l = l + 1", 29, 26, 31, 30);
+        }
+        // loop check false
+        addStep(`Window [${l}, ${r}] lacks required characters (${have}/${need}). Expand window next.`, "WHILE have == need → FALSE ✗", 19, 18, 20, 20);
+      }
+
+      // 7. Complete final check
+      addStep("All elements processed. Prepare final minimum substring result.", "RETURN", 32, 27, 34, 33);
+    }
+
+    const resultStr = resLen !== Infinity ? s.slice(res[0], res[1] + 1) : "";
+    addStep(`Final result substring is "${resultStr}".`, `RETURN result → "${resultStr}"`, 33, 28, 36, 33, { r: s.length - 1 });
+
+    return { steps, stepLineNumbers };
+  }, [currentCase]);
+
+  const currentStep = steps[currentStepIndex] || steps[steps.length - 1];
+  const pseudoSteps = steps.map(s => s.pseudoStep);
 
   const handleUseCaseChange = (idx: number) => {
     setUseCaseIdx(idx);
     setCurrentStepIndex(0);
-    setIsPlaying(false);
   };
 
   const getCharStyle = (idx: number) => {
-    const isCurrentR = idx === currentStep.variables.r;
+    const isCurrentR = idx === currentStep.r;
     const isCurrentL = idx === currentStep.l;
     const isInWindow = idx >= currentStep.l && idx <= currentStep.r && currentStep.r !== -1;
     const isInResult = currentStep.res[0] !== -1 && idx >= currentStep.res[0] && idx <= currentStep.res[1];
@@ -305,7 +341,8 @@ export const MinimumWindowSubstringVisualization = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-6 bg-card p-6 rounded-xl border-2 border-primary/10 shadow-sm overflow-x-auto">
+      {/* Controls / Case selection */}
+      <div className="flex flex-col gap-6 bg-card p-6 rounded-xl border border-border shadow-sm overflow-x-auto">
         <div className="flex flex-wrap gap-2">
           {USE_CASES.map((uc, idx) => (
             <Button
@@ -319,27 +356,18 @@ export const MinimumWindowSubstringVisualization = () => {
             </Button>
           ))}
         </div>
-        <div className="w-full pt-4 border-t border-border/50">
-          <StepControls
+        <div className="w-full pt-4 border-t border-border">
+          <SimpleStepControls
             currentStep={currentStepIndex}
-            totalSteps={steps.length - 1}
-            onStepForward={() => setCurrentStepIndex(prev => Math.min(steps.length - 1, prev + 1))}
-            onStepBack={() => setCurrentStepIndex(prev => Math.max(0, prev - 1))}
-            isPlaying={isPlaying}
-            onPlay={() => setIsPlaying(true)}
-            onPause={() => setIsPlaying(false)}
-            onReset={() => {
-              setCurrentStepIndex(0);
-              setIsPlaying(false);
-            }}
-            speed={speed}
-            onSpeedChange={setSpeed}
+            totalSteps={steps.length}
+            onStepChange={setCurrentStepIndex}
           />
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card className="p-6 flex flex-col gap-6 overflow-hidden border-2 border-primary/5 shadow-lg bg-card/50 backdrop-blur-sm">
+        {/* Left column visual representation */}
+        <Card className="p-6 flex flex-col gap-6 overflow-hidden border shadow-lg bg-card">
           <div className="space-y-6">
             <div className="space-y-2">
               <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Target Characters (t)</span>
@@ -360,7 +388,7 @@ export const MinimumWindowSubstringVisualization = () => {
                 <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Source String (s)</span>
                 <div className="flex gap-3 text-[10px] font-mono text-muted-foreground">
                   <span>L: {currentStep.l}</span>
-                  <span>R: {currentStep.variables.r !== undefined ? currentStep.variables.r : '-'}</span>
+                  <span>R: {currentStep.r !== -1 ? currentStep.r : '-'}</span>
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -408,27 +436,28 @@ export const MinimumWindowSubstringVisualization = () => {
             </div>
           </div>
 
-          <div className="flex-1" />
-
-          <div className="p-4 bg-primary/5 rounded-xl border border-primary/20 shadow-inner">
-            <div className="flex items-center gap-2 mb-2 text-primary font-bold text-[10px] uppercase tracking-widest">
+          {/* Descriptive Commentary Box (at the bottom) */}
+          <div className="p-3 bg-muted/50 rounded-lg text-xs leading-relaxed text-foreground border border-border shadow-inner">
+            <div className="flex items-center gap-2 mb-1 text-primary font-bold text-[10px] uppercase tracking-widest">
               <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-              Commentary
+              Process Step
             </div>
-            <p className="text-sm leading-relaxed text-foreground font-medium">
-              {currentStep.message}
-            </p>
+            {currentStep.explanation}
           </div>
 
+          {/* Variable Panel (below the commentary box) */}
           <div className="pt-2">
             <VariablePanel variables={currentStep.variables} />
           </div>
         </Card>
 
-        <AnimatedCodeEditor
-          code={code}
-          language="typescript"
-          highlightedLines={currentStep.highlightedLines}
+        {/* Right column code panel */}
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={() => setCurrentStepIndex(0)}
         />
       </div>
     </div>

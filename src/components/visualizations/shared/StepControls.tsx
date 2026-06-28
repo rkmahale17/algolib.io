@@ -45,7 +45,7 @@ export const StepControls = ({
   };
 
   return (
-    <div className="flex flex-col md:flex-row md:items-center gap-4">
+    <div className="flex flex-col md:flex-row md:items-center gap-4 w-full">
       <div className="flex items-center gap-2">
         <Button
           onClick={() => handleAction(onStepBack, "step back")}
@@ -94,7 +94,7 @@ export const StepControls = ({
         </Button>
       </div>
       
-      <div className="flex-1">
+      <div className="flex-1 max-w-[150px]">
         <div className="text-xs text-muted-foreground mb-1">
           Step {currentStep} / {totalSteps}
         </div>
@@ -106,7 +106,7 @@ export const StepControls = ({
         </div>
       </div>
       
-      <div className="flex-1">
+      <div className="flex-1 max-w-[150px]">
         <div className="text-xs text-muted-foreground mb-1">
           Speed: {speed.toFixed(1)}x
         </div>

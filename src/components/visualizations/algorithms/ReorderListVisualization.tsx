@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
-import { StepControls } from '../shared/StepControls';
+import React, { useState, useMemo } from 'react';
+import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
+import type { VisualizationLanguageMap, StepLineNumberMap } from '@/types/visualization';
 
 interface Step {
   list: number[];
@@ -17,19 +19,41 @@ interface Step {
   firstHalfNext: number | null;
   secondHalfNext: number | null;
   connections: Record<number, number | null>;
-  message: string;
+  explanation: string;
+  pseudoStep: string;
   lineNumber: number;
   variables: Record<string, any>;
 }
 
-export const ReorderListVisualization = () => {
-  const [steps, setSteps] = useState<Step[]>([]);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1);
-  const intervalRef = useRef<number | null>(null);
+const languages: VisualizationLanguageMap = {
+  python: `def reorderList(head: Optional[ListNode]) -> Optional[ListNode]:
+  if not head or not head.next:
+      return head
+  slow = head
+  fast = head
+  while fast and fast.next:
+      slow = slow.next
+      fast = fast.next.next
+  second = slow.next
+  slow.next = None
+  prev = None
+  curr = second
+  while curr:
+      nxt = curr.next
+      curr.next = prev
+      prev = curr
+      curr = nxt
+  second = prev
+  first = head
+  while second:
+      tmp1 = first.next
+      tmp2 = second.next
+      first.next = second
+      second.next = tmp1
+      first = tmp1
+      second = tmp2`,
 
-  const code = `function reorderList(head: ListNode | null): void {
+  typescript: `function reorderList(head: ListNode | null): void {
   if (!head || !head.next) return;
   let slow: ListNode | null = head;
   let fast: ListNode | null = head;
@@ -58,14 +82,99 @@ export const ReorderListVisualization = () => {
     firstHalfCurrent = firstHalfNext;
     secondHalfCurrent = secondHalfNext;
   }
-}`;
+}`,
 
-  const generateSteps = () => {
-    const list = [1, 2, 3, 4, 5];
-    const newSteps: Step[] = [];
-    let connections: Record<number, number | null> = { 0: 1, 1: 2, 2: 3, 3: 4, 4: null };
+  java: `public class Solution {
+    public void reorderList(ListNode head) {
+        if (head == null || head.next == null) {
+            return;
+        }
+        ListNode slow = head;
+        ListNode fast = head;
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        ListNode second = slow.next;
+        slow.next = null;
+        ListNode prev = null;
+        ListNode curr = second;
+        while (curr != null) {
+            ListNode next = curr.next;
+            curr.next = prev;
+            prev = curr;
+            curr = next;
+        }
+        second = prev;
+        ListNode first = head;
+        while (second != null) {
+            ListNode tmp1 = first.next;
+            ListNode tmp2 = second.next;
+            first.next = second;
+            second.next = tmp1;
+            first = tmp1;
+            second = tmp2;
+        }
+    }
+}`,
 
-    const createSnap = (overrides: Partial<Step>) => ({
+  cpp: `class Solution {
+ public:
+    void reorderList(ListNode* head) {
+        if (head == nullptr || head->next == nullptr) {
+            return;
+        }
+        ListNode* slow = head;
+        ListNode* fast = head;
+        while (fast != nullptr && fast->next != nullptr) {
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+        ListNode* second = slow->next;
+        slow->next = nullptr;
+        ListNode* prev = nullptr;
+        ListNode* curr = second;
+        while (curr != nullptr) {
+            ListNode* next = curr->next;
+            curr->next = prev;
+            prev = curr;
+            curr = next;
+        }
+        second = prev;
+        ListNode* first = head;
+        while (second != nullptr) {
+            ListNode* tmp1 = first->next;
+            ListNode* tmp2 = second->next;
+            first->next = second;
+            second->next = tmp1;
+            first = tmp1;
+            second = tmp2;
+        }
+    }
+};`
+};
+
+const generateVisualizationData = () => {
+  const list = [1, 2, 3, 4, 5];
+  const steps: Step[] = [];
+  const stepLineNumbers: StepLineNumberMap = {
+    typescript: [],
+    python: [],
+    java: [],
+    cpp: []
+  };
+
+  const addLines = (ts: number, py: number, java: number, cpp: number) => {
+    stepLineNumbers.typescript!.push(ts);
+    stepLineNumbers.python!.push(py);
+    stepLineNumbers.java!.push(java);
+    stepLineNumbers.cpp!.push(cpp);
+  };
+
+  let connections: Record<number, number | null> = { 0: 1, 1: 2, 2: 3, 3: 4, 4: null };
+
+  const createSnap = (overrides: Partial<Step>, tsLine: number, pyLine: number, javaLine: number, cppLine: number) => {
+    steps.push({
       list: [...list],
       phase: overrides.phase || 'find-middle',
       slow: null,
@@ -79,285 +188,295 @@ export const ReorderListVisualization = () => {
       firstHalfNext: null,
       secondHalfNext: null,
       connections: { ...connections },
-      message: '',
-      lineNumber: 1,
-      variables: {},
+      explanation: overrides.explanation || '',
+      pseudoStep: overrides.pseudoStep || '',
+      lineNumber: tsLine,
+      variables: overrides.variables || {},
       ...overrides
-    } as Step);
+    });
+    addLines(tsLine, pyLine, javaLine, cppLine);
+  };
 
-    newSteps.push(createSnap({
-      message: "Starting reorder list algorithm with input [1, 2, 3, 4, 5].",
-      lineNumber: 1,
-      variables: { head: '[1, 2, 3, 4, 5]' }
-    }));
+  // 1. Initial State
+  createSnap({
+    explanation: "Starting reorder list algorithm with input [1, 2, 3, 4, 5].",
+    pseudoStep: "CALL reorderList(head)",
+    variables: { head: '[1, 2, 3, 4, 5]' }
+  }, 1, 1, 2, 3);
 
-    newSteps.push(createSnap({
-      message: "Check if the list is empty or has only one node. If so, no reordering is needed.",
-      lineNumber: 2,
-      variables: { head: 'Node 1', "head.next": 'Node 2' }
-    }));
+  // 2. Check head/next null
+  createSnap({
+    explanation: "Check if the list is empty or has only one node. If so, return head.",
+    pseudoStep: "IF head IS null OR head.next IS null -> RETURN",
+    variables: { head: 'Node 1', "head.next": 'Node 2' }
+  }, 2, 2, 3, 4);
 
-    let slow = 0, fast = 0;
-    newSteps.push(createSnap({
-      slow,
-      message: "Initialize slow pointer to the head of the list.",
-      lineNumber: 3,
-      variables: { head: 'Node 1', slow: 'Node 1' }
-    }));
+  let slow = 0, fast = 0;
+  // 3. Initialize slow
+  createSnap({
+    slow,
+    explanation: "Initialize slow pointer to the head of the list.",
+    pseudoStep: "SET slow = head",
+    variables: { head: 'Node 1', slow: 'Node 1' }
+  }, 3, 4, 6, 7);
 
-    newSteps.push(createSnap({
+  // 4. Initialize fast
+  createSnap({
+    slow, fast,
+    explanation: "Initialize fast pointer to the head of the list.",
+    pseudoStep: "SET fast = head",
+    variables: { slow: 'Node 1', fast: 'Node 1' }
+  }, 4, 5, 7, 8);
+
+  while (fast !== null && connections[fast] !== null) {
+    // 5. Loop check
+    createSnap({
       slow, fast,
-      message: "Initialize fast pointer to the head. We'll use these to find the middle of the list.",
-      lineNumber: 4,
-      variables: { slow: 'Node 1', fast: 'Node 1' }
-    }));
+      explanation: "Check while loop condition: fast and fast.next are not null.",
+      pseudoStep: `WHILE fast AND fast.next → Node ${list[fast]} ≠ null`,
+      variables: { fast: `Node ${list[fast]}`, "fast.next": `Node ${list[connections[fast]!]}` }
+    }, 5, 6, 8, 9);
 
-    while (fast !== null && connections[fast] !== null) {
-      newSteps.push(createSnap({
-        slow, fast,
-        message: "The fast pointer can still move forward. Proceed with finding the middle.",
-        lineNumber: 5,
-        variables: { fast: `Node ${list[fast]}`, "fast.next": `Node ${list[connections[fast]!]}` }
-      }));
-
-      slow = connections[slow]!;
-      newSteps.push(createSnap({
-        slow, fast,
-        message: "Advance slow by one step. It moves at half the speed of the fast pointer.",
-        lineNumber: 6,
-        variables: { slow: `Node ${list[slow]}`, fast: `Node ${list[fast]}` }
-      }));
-
-      fast = connections[connections[fast]!]!;
-      newSteps.push(createSnap({
-        slow, fast,
-        message: "Advance fast by two steps. When fast reaches the end, slow will be at the middle.",
-        lineNumber: 7,
-        variables: { slow: `Node ${list[slow]}`, fast: fast !== null ? `Node ${list[fast]}` : 'null' }
-      }));
-    }
-
-    newSteps.push(createSnap({
+    // 6. Move slow
+    slow = connections[slow]!;
+    createSnap({
       slow, fast,
-      message: "The fast pointer has reached the end/tail. The slow pointer is now at the middle of the list.",
-      lineNumber: 5,
-      variables: { fast: fast !== null ? `Node ${list[fast]}` : 'null', slow: `Node ${list[slow]}` }
-    }));
+      explanation: "Advance slow pointer by one node.",
+      pseudoStep: "SET slow = slow.next",
+      variables: { slow: `Node ${list[slow]}`, fast: `Node ${list[fast]}` }
+    }, 6, 7, 9, 10);
 
-    let secondHalfHead: number | null = connections[slow];
-    newSteps.push(createSnap({
-      slow, secondHalfHead,
-      message: "Identify the start of the second half of the list, which begins after the slow pointer.",
-      lineNumber: 9,
-      variables: { slow: `Node ${list[slow]}`, secondHalfHead: secondHalfHead !== null ? `Node ${list[secondHalfHead]}` : 'null' }
-    }));
+    // 7. Move fast
+    fast = connections[connections[fast]!]!;
+    createSnap({
+      slow, fast,
+      explanation: "Advance fast pointer by two nodes.",
+      pseudoStep: "SET fast = fast.next.next",
+      variables: { slow: `Node ${list[slow]}`, fast: fast !== null ? `Node ${list[fast]}` : 'null' }
+    }, 7, 8, 10, 11);
+  }
 
-    connections[slow] = null;
-    newSteps.push(createSnap({
-      slow, secondHalfHead,
-      message: "Break the link between the first and second halves to treat them as separate lists.",
-      lineNumber: 10,
-      variables: { "slow.next": 'null', secondHalfHead: `Node ${list[secondHalfHead!]}` }
-    }));
+  // 8. Loop check failed
+  createSnap({
+    slow, fast,
+    explanation: "Fast pointer reached the end of the list. Loop terminates.",
+    pseudoStep: "WHILE fast AND fast.next → FALSE ✗",
+    variables: { fast: fast !== null ? `Node ${list[fast]}` : 'null', slow: `Node ${list[slow]}` }
+  }, 5, 6, 8, 9);
 
-    let prev: number | null = null;
-    newSteps.push(createSnap({
-      phase: 'reverse',
-      prev,
-      message: "Begin reversing the second half. Initialize prev to null to serve as the new tail.",
-      lineNumber: 11,
-      variables: { prev: 'null' }
-    }));
+  let secondHalfHead: number | null = connections[slow];
+  // 9. Get head of second half
+  createSnap({
+    slow, secondHalfHead,
+    explanation: "Set secondHalfHead to the node after slow.",
+    pseudoStep: "SET second = slow.next",
+    variables: { slow: `Node ${list[slow]}`, secondHalfHead: secondHalfHead !== null ? `Node ${list[secondHalfHead]}` : 'null' }
+  }, 9, 9, 12, 13);
 
-    let current: number | null = secondHalfHead;
-    newSteps.push(createSnap({
+  // 10. Split first and second halves
+  connections[slow] = null;
+  createSnap({
+    slow, secondHalfHead,
+    explanation: "Disconnect the first half from the second half by setting slow.next to null.",
+    pseudoStep: "SET slow.next = null",
+    variables: { "slow.next": 'null', secondHalfHead: `Node ${list[secondHalfHead!]}` }
+  }, 10, 10, 13, 14);
+
+  let prev: number | null = null;
+  // 11. Reversal prev = null
+  createSnap({
+    phase: 'reverse',
+    prev,
+    explanation: "Begin reversing the second half. Initialize prev pointer to null.",
+    pseudoStep: "SET prev = null",
+    variables: { prev: 'null' }
+  }, 11, 11, 14, 15);
+
+  let current: number | null = secondHalfHead;
+  // 12. Reversal curr = second
+  createSnap({
+    phase: 'reverse',
+    current, prev,
+    explanation: "Initialize current pointer to the head of the second half.",
+    pseudoStep: "SET curr = second",
+    variables: { current: `Node ${list[current!]}`, prev: 'null' }
+  }, 12, 12, 15, 16);
+
+  while (current !== null) {
+    // 13. Reversal loop check
+    createSnap({
       phase: 'reverse',
       current, prev,
-      message: "Start reversal from the head of the second half.",
-      lineNumber: 12,
-      variables: { current: `Node ${list[current!]}`, prev: 'null' }
-    }));
+      explanation: "Loop condition: is current pointer not null?",
+      pseudoStep: `WHILE curr → Node ${list[current]} ≠ null`,
+      variables: { current: `Node ${list[current]}` }
+    }, 13, 13, 16, 17);
 
-    while (current !== null) {
-      newSteps.push(createSnap({
-        phase: 'reverse',
-        current, prev,
-        message: "Continue reversing while we have nodes left in the second half.",
-        lineNumber: 13,
-        variables: { current: `Node ${list[current]}` }
-      }));
-
-      let nextNode: number | null = connections[current];
-      newSteps.push(createSnap({
-        phase: 'reverse',
-        current, prev, nextNode,
-        message: "Temporarily store the next node so we don't lose the rest of the list.",
-        lineNumber: 14,
-        variables: { current: `Node ${list[current]}`, next: nextNode !== null ? `Node ${list[nextNode]}` : 'null' }
-      }));
-
-      connections[current] = prev;
-      newSteps.push(createSnap({
-        phase: 'reverse',
-        current, prev, nextNode,
-        message: "Reverse the link: the current node now points to the previous node.",
-        lineNumber: 15,
-        variables: { "current.next": prev !== null ? `Node ${list[prev]}` : 'null' }
-      }));
-
-      prev = current;
-      newSteps.push(createSnap({
-        phase: 'reverse',
-        current, prev, nextNode,
-        message: "Move the prev pointer forward to the current node.",
-        lineNumber: 16,
-        variables: { prev: `Node ${list[prev]}` }
-      }));
-
-      current = nextNode;
-      newSteps.push(createSnap({
-        phase: 'reverse',
-        current, prev,
-        message: "Move the current pointer forward to the next node to continue reversal.",
-        lineNumber: 17,
-        variables: { current: current !== null ? `Node ${list[current]}` : 'null' }
-      }));
-    }
-
-    secondHalfHead = prev;
-    newSteps.push(createSnap({
+    let nextNode: number | null = connections[current];
+    // 14. Reversal store next
+    createSnap({
       phase: 'reverse',
-      secondHalfHead,
-      message: "Reversal complete. The second half is now reversed, and secondHalfHead points to its new head.",
-      lineNumber: 19,
-      variables: { secondHalfHead: `Node ${list[secondHalfHead!]}` }
-    }));
+      current, prev, nextNode,
+      explanation: "Temporarily store current's next node.",
+      pseudoStep: "SET next = curr.next",
+      variables: { current: `Node ${list[current]}`, next: nextNode !== null ? `Node ${list[nextNode]}` : 'null' }
+    }, 14, 14, 17, 18);
 
-    let firstHalfCurrent: number | null = 0;
-    newSteps.push(createSnap({
-      phase: 'merge',
-      firstHalfCurrent,
-      message: "Now we merge the two halves. Initialize firstHalfCurrent to the head of the first half.",
-      lineNumber: 20,
-      variables: { firstHalfCurrent: 'Node 1' }
-    }));
+    connections[current] = prev;
+    // 15. Reversal point back
+    createSnap({
+      phase: 'reverse',
+      current, prev, nextNode,
+      explanation: "Point current's next link backward to the prev node.",
+      pseudoStep: "SET curr.next = prev",
+      variables: { "current.next": prev !== null ? `Node ${list[prev]}` : 'null' }
+    }, 15, 15, 18, 19);
 
-    let secondHalfCurrent: number | null = secondHalfHead;
-    newSteps.push(createSnap({
-      phase: 'merge',
-      firstHalfCurrent, secondHalfCurrent,
-      message: "Initialize secondHalfCurrent to the head of the reversed second half.",
-      lineNumber: 21,
-      variables: { firstHalfCurrent: 'Node 1', secondHalfCurrent: `Node ${list[secondHalfCurrent!]}` }
-    }));
+    prev = current;
+    // 16. Reversal move prev
+    createSnap({
+      phase: 'reverse',
+      current, prev, nextNode,
+      explanation: "Move prev pointer forward to current.",
+      pseudoStep: "SET prev = curr",
+      variables: { prev: `Node ${list[prev]}` }
+    }, 16, 16, 19, 20);
 
-    while (secondHalfCurrent !== null) {
-      newSteps.push(createSnap({
-        phase: 'merge',
-        firstHalfCurrent, secondHalfCurrent,
-        message: "Continue merging while there are nodes remaining in the second half.",
-        lineNumber: 22,
-        variables: { secondHalfCurrent: `Node ${list[secondHalfCurrent]}` }
-      }));
+    current = nextNode;
+    // 17. Reversal move curr
+    createSnap({
+      phase: 'reverse',
+      current, prev,
+      explanation: "Move current pointer forward to the stored next node.",
+      pseudoStep: "SET curr = next",
+      variables: { current: current !== null ? `Node ${list[current]}` : 'null' }
+    }, 17, 17, 20, 21);
+  }
 
-      let firstHalfNext: number | null = connections[firstHalfCurrent!];
-      newSteps.push(createSnap({
-        phase: 'merge',
-        firstHalfCurrent, secondHalfCurrent, firstHalfNext,
-        message: "Save the next node in the first half to maintain the structure during the merge.",
-        lineNumber: 23,
-        variables: { firstHalfNext: firstHalfNext !== null ? `Node ${list[firstHalfNext]}` : 'null' }
-      }));
+  // 18. Reversal complete loop check failed
+  secondHalfHead = prev;
+  createSnap({
+    phase: 'reverse',
+    secondHalfHead,
+    explanation: "Current is null. Reversal is complete. Set secondHalfHead to the new head (prev).",
+    pseudoStep: "SET second = prev",
+    variables: { secondHalfHead: `Node ${list[secondHalfHead!]}` }
+  }, 19, 18, 22, 23);
 
-      let secondHalfNext: number | null = connections[secondHalfCurrent];
-      newSteps.push(createSnap({
-        phase: 'merge',
-        firstHalfCurrent, secondHalfCurrent, firstHalfNext, secondHalfNext,
-        message: "Save the next node in the reversed second half.",
-        lineNumber: 24,
-        variables: { secondHalfNext: secondHalfNext !== null ? `Node ${list[secondHalfNext]}` : 'null' }
-      }));
+  let firstHalfCurrent: number | null = 0;
+  // 19. Merge first = head
+  createSnap({
+    phase: 'merge',
+    firstHalfCurrent,
+    explanation: "Initialize firstHalfCurrent pointer to the head of the first half.",
+    pseudoStep: "SET first = head",
+    variables: { firstHalfCurrent: 'Node 1' }
+  }, 20, 19, 23, 24);
 
-      connections[firstHalfCurrent!] = secondHalfCurrent;
-      newSteps.push(createSnap({
-        phase: 'merge',
-        firstHalfCurrent, secondHalfCurrent, firstHalfNext, secondHalfNext,
-        message: "Insert the node from the second half between current first half nodes.",
-        lineNumber: 25,
-        variables: { "firstHalfCurrent.next": `Node ${list[secondHalfCurrent]}` }
-      }));
+  let secondHalfCurrent: number | null = secondHalfHead;
+  // 20. Merge second = prev
+  createSnap({
+    phase: 'merge',
+    firstHalfCurrent, secondHalfCurrent,
+    explanation: "Initialize secondHalfCurrent pointer to the head of the reversed second half.",
+    pseudoStep: "SET second = prev",
+    variables: { firstHalfCurrent: 'Node 1', secondHalfCurrent: `Node ${list[secondHalfCurrent!]}` }
+  }, 21, 18, 22, 23);
 
-      connections[secondHalfCurrent] = firstHalfNext;
-      newSteps.push(createSnap({
-        phase: 'merge',
-        firstHalfCurrent, secondHalfCurrent, firstHalfNext, secondHalfNext,
-        message: "Set the next pointer of the inserted node to point back to the first half's continuation.",
-        lineNumber: 26,
-        variables: { "secondHalfCurrent.next": firstHalfNext !== null ? `Node ${list[firstHalfNext]}` : 'null' }
-      }));
-
-      firstHalfCurrent = firstHalfNext;
-      newSteps.push(createSnap({
-        phase: 'merge',
-        firstHalfCurrent, secondHalfCurrent, firstHalfNext, secondHalfNext,
-        message: "Advance the first half pointer forward.",
-        lineNumber: 27,
-        variables: { firstHalfCurrent: firstHalfCurrent !== null ? `Node ${list[firstHalfCurrent]}` : 'null' }
-      }));
-
-      secondHalfCurrent = secondHalfNext;
-      newSteps.push(createSnap({
-        phase: 'merge',
-        firstHalfCurrent, secondHalfCurrent,
-        message: "Advance the second half pointer for the next iteration of the merge.",
-        lineNumber: 28,
-        variables: { secondHalfCurrent: secondHalfCurrent !== null ? `Node ${list[secondHalfCurrent]}` : 'null' }
-      }));
-    }
-
-    newSteps.push(createSnap({
+  while (secondHalfCurrent !== null) {
+    // 21. Merge loop check
+    createSnap({
       phase: 'merge',
       firstHalfCurrent, secondHalfCurrent,
-      message: "Reordering is complete. The list is now alternating between the start and the end.",
-      lineNumber: 22,
-      variables: { secondHalfCurrent: 'null' }
-    }));
+      explanation: "Loop condition: is secondHalfCurrent not null?",
+      pseudoStep: `WHILE second → Node ${list[secondHalfCurrent]} ≠ null`,
+      variables: { secondHalfCurrent: `Node ${list[secondHalfCurrent]}` }
+    }, 22, 20, 24, 25);
 
-    setSteps(newSteps);
-  };
+    let firstHalfNext: number | null = connections[firstHalfCurrent!];
+    // 22. Merge store first next
+    createSnap({
+      phase: 'merge',
+      firstHalfCurrent, secondHalfCurrent, firstHalfNext,
+      explanation: "Temporarily store the next node in the first half.",
+      pseudoStep: "SET tmp1 = first.next",
+      variables: { firstHalfNext: firstHalfNext !== null ? `Node ${list[firstHalfNext]}` : 'null' }
+    }, 23, 21, 25, 26);
 
-  useEffect(() => {
-    generateSteps();
+    let secondHalfNext: number | null = connections[secondHalfCurrent];
+    // 23. Merge store second next
+    createSnap({
+      phase: 'merge',
+      firstHalfCurrent, secondHalfCurrent, firstHalfNext, secondHalfNext,
+      explanation: "Temporarily store the next node in the second half.",
+      pseudoStep: "SET tmp2 = second.next",
+      variables: { secondHalfNext: secondHalfNext !== null ? `Node ${list[secondHalfNext]}` : 'null' }
+    }, 24, 22, 26, 27);
+
+    connections[firstHalfCurrent!] = secondHalfCurrent;
+    // 24. Merge point first to second
+    createSnap({
+      phase: 'merge',
+      firstHalfCurrent, secondHalfCurrent, firstHalfNext, secondHalfNext,
+      explanation: "Connect current node in first half to current node in second half.",
+      pseudoStep: "SET first.next = second",
+      variables: { "firstHalfCurrent.next": `Node ${list[secondHalfCurrent]}` }
+    }, 25, 23, 27, 28);
+
+    connections[secondHalfCurrent] = firstHalfNext;
+    // 25. Merge point second to first next
+    createSnap({
+      phase: 'merge',
+      firstHalfCurrent, secondHalfCurrent, firstHalfNext, secondHalfNext,
+      explanation: "Connect current node in second half to original next node in first half.",
+      pseudoStep: "SET second.next = tmp1",
+      variables: { "secondHalfCurrent.next": firstHalfNext !== null ? `Node ${list[firstHalfNext]}` : 'null' }
+    }, 26, 24, 28, 29);
+
+    firstHalfCurrent = firstHalfNext;
+    // 26. Merge move first
+    createSnap({
+      phase: 'merge',
+      firstHalfCurrent, secondHalfCurrent, firstHalfNext, secondHalfNext,
+      explanation: "Advance first pointer forward.",
+      pseudoStep: "SET first = tmp1",
+      variables: { firstHalfCurrent: firstHalfCurrent !== null ? `Node ${list[firstHalfCurrent]}` : 'null' }
+    }, 27, 25, 29, 30);
+
+    secondHalfCurrent = secondHalfNext;
+    // 27. Merge move second
+    createSnap({
+      phase: 'merge',
+      firstHalfCurrent, secondHalfCurrent,
+      explanation: "Advance second pointer forward.",
+      pseudoStep: "SET second = tmp2",
+      variables: { secondHalfCurrent: secondHalfCurrent !== null ? `Node ${list[secondHalfCurrent]}` : 'null' }
+    }, 28, 26, 30, 31);
+  }
+
+  // 28. Merge loop check failed / completed
+  createSnap({
+    phase: 'merge',
+    firstHalfCurrent, secondHalfCurrent,
+    explanation: "Reordering complete. Alternating links are successfully established.",
+    pseudoStep: "RETURN",
+    variables: { secondHalfCurrent: 'null' }
+  }, 22, 20, 24, 25);
+
+  return { steps, stepLineNumbers };
+};
+
+export const ReorderListVisualization = () => {
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+
+  const { steps, stepLineNumbers } = useMemo(() => {
+    return generateVisualizationData();
   }, []);
-
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isPlaying && currentStepIndex < steps.length - 1) {
-      timer = setTimeout(() => {
-        setCurrentStepIndex(prev => prev + 1);
-      }, 1500 / speed);
-    } else {
-      setIsPlaying(false);
-    }
-    return () => clearTimeout(timer);
-  }, [isPlaying, currentStepIndex, steps.length, speed]);
-
-  const handlePlay = () => setIsPlaying(true);
-  const handlePause = () => setIsPlaying(false);
-  const handleStepForward = () => {
-    if (currentStepIndex < steps.length - 1) setCurrentStepIndex(currentStepIndex + 1);
-  };
-  const handleStepBack = () => {
-    if (currentStepIndex > 0) setCurrentStepIndex(currentStepIndex - 1);
-  };
-  const handleReset = () => {
-    setCurrentStepIndex(0);
-    setIsPlaying(false);
-  };
 
   if (steps.length === 0) return null;
 
   const currentStep = steps[currentStepIndex];
+  const pseudoSteps = steps.map(s => s.pseudoStep);
 
   // Calculate logical order for the merge phase to show 1 -> 5 -> 2 -> 4 -> 3 sequence
   const getOrderedIndices = () => {
@@ -385,28 +504,14 @@ export const ReorderListVisualization = () => {
   const displayIndices = getOrderedIndices();
 
   return (
-    <div className="space-y-6">
-
-      <StepControls
-        onPlay={handlePlay}
-        onPause={handlePause}
-        onStepForward={handleStepForward}
-        onStepBack={handleStepBack}
-        onReset={handleReset}
-        isPlaying={isPlaying}
-        currentStep={currentStepIndex}
-        totalSteps={steps.length - 1}
-        speed={speed}
-        onSpeedChange={setSpeed}
-      />
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <VisualizationLayout
+      leftContent={
         <div className="space-y-4">
           <div className="bg-card rounded-lg p-6 border shadow-sm flex flex-col min-h-[450px]">
             <h3 className="text-lg font-semibold mb-6 flex items-center gap-2 text-foreground">
-              {currentStep.phase === 'find-middle' && <span className="w-2 h-2 rounded-full bg-blue-500" />}
-              {currentStep.phase === 'reverse' && <span className="w-2 h-2 rounded-full bg-purple-500" />}
-              {currentStep.phase === 'merge' && <span className="w-2 h-2 rounded-full bg-green-500" />}
+              {currentStep.phase === 'find-middle' && <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />}
+              {currentStep.phase === 'reverse' && <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />}
+              {currentStep.phase === 'merge' && <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />}
               {currentStep.phase === 'find-middle' && 'Phase 1: Find Middle'}
               {currentStep.phase === 'reverse' && 'Phase 2: Reverse Second Half'}
               {currentStep.phase === 'merge' && 'Phase 3: Merge Alternately'}
@@ -537,16 +642,38 @@ export const ReorderListVisualization = () => {
               )}
             </div>
 
-            <div className="mt-8 p-4 bg-muted/40 rounded-lg border border-border/50">
-              <p className="text-sm font-medium leading-relaxed text-foreground">{currentStep.message}</p>
+            {/* Descriptive Commentary Box (at the bottom) */}
+            <div className="p-3 bg-muted/50 rounded-lg text-xs leading-relaxed text-foreground border border-border shadow-inner">
+              <div className="flex items-center gap-2 mb-1 text-primary font-bold text-[10px] uppercase tracking-widest">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                Process Step
+              </div>
+              {currentStep.explanation}
             </div>
           </div>
 
-          <VariablePanel variables={currentStep.variables} />
+          {/* Variable Panel (below the commentary box) */}
+          <div className="pt-2">
+            <VariablePanel variables={currentStep.variables} />
+          </div>
         </div>
-
-        <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="typescript" />
-      </div>
-    </div>
+      }
+      rightContent={
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={() => setCurrentStepIndex(0)}
+        />
+      }
+      controls={
+        <SimpleStepControls
+          currentStep={currentStepIndex}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStepIndex}
+        />
+      }
+    />
   );
 };

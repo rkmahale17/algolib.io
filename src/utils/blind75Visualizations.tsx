@@ -55,6 +55,7 @@ const blind75Map: Record<string, React.LazyExoticComponent<React.ComponentType<a
   "course-schedule": React.lazy(() => import("@/components/visualizations/algorithms/CourseScheduleVisualization").then(m => ({ default: m.CourseScheduleVisualization }))),
   "course-schedule-ii": React.lazy(() => import("@/components/visualizations/algorithms/CourseScheduleIIVisualization").then(m => ({ default: m.CourseScheduleIIVisualization }))),
   "pacific-atlantic": React.lazy(() => import("@/components/visualizations/algorithms/PacificAtlanticVisualization").then(m => ({ default: m.PacificAtlanticVisualization }))),
+  "pacific-atlantic-water-flow": React.lazy(() => import("@/components/visualizations/algorithms/PacificAtlanticVisualization").then(m => ({ default: m.PacificAtlanticVisualization }))),
   "num-islands": React.lazy(() => import("@/components/visualizations/algorithms/NumberOfIslandsVisualization").then(m => ({ default: m.NumberOfIslandsVisualization }))),
   "number-of-islands": React.lazy(() => import("@/components/visualizations/algorithms/NumberOfIslandsVisualization").then(m => ({ default: m.NumberOfIslandsVisualization }))),
   "longest-consecutive-sequence": React.lazy(() => import("@/components/visualizations/algorithms/LongestConsecutiveSequenceVisualization").then(m => ({ default: m.LongestConsecutiveSequenceVisualization }))),

@@ -1,13 +1,15 @@
 interface VariablePanelProps {
-  variables: Record<string, any>;
+  variables?: Record<string, any> | null;
 }
 
 export const VariablePanel = ({ variables }: VariablePanelProps) => {
+  const entries = variables ? Object.entries(variables) : [];
+
   return (
     <div className="bg-muted/50 rounded-lg border border-border p-4">
       <h3 className="text-sm font-semibold mb-3 text-foreground">Variables</h3>
       <div className="space-y-2">
-        {Object.entries(variables).map(([key, value]) => {
+        {entries.map(([key, value]) => {
           const renderValue = (val: any) => {
             if (val === null) return 'null';
             if (val === undefined) return 'undefined';

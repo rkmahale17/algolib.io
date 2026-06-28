@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { motion, AnimatePresence } from 'framer-motion';
 import { VariablePanel } from '../shared/VariablePanel';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
+import type { VisualizationLanguageMap, StepLineNumberMap } from '@/types/visualization';
 
 interface Step {
   s: string;
@@ -12,22 +14,37 @@ interface Step {
   currentChar?: string;
   action: string;
   isValid?: boolean;
-  message: string;
-  highlightedLines: number[];
+  explanation: string;
+  pseudoStep: string;
 }
 
-export const ValidParenthesesVisualization = () => {
-  const code = `function isValid(s: string): boolean {
+const languages: VisualizationLanguageMap = {
+  python: `def isValid(s: str) -> bool:
+    stack = []
+    closeToOpen = {
+        ")": "(",
+        "]": "[",
+        "}": "{"
+    }
+    for c in s:
+        if c in closeToOpen:
+            if stack and stack[-1] == closeToOpen[c]:
+                stack.pop()
+            else:
+                return False
+        else:
+            stack.append(c)
+    return len(stack) == 0`,
+
+  typescript: `function isValid(s: string): boolean {
   const stack: string[] = [];
   const map: Record<string, string> = {
     ')': '(',
     '}': '{',
     ']': '['
   };
-  
   for (let i = 0; i < s.length; i++) {
     const char = s[i];
-    
     if (char in map) {
       if (stack.length === 0 || stack[stack.length - 1] !== map[char]) {
         return false;
@@ -37,265 +54,176 @@ export const ValidParenthesesVisualization = () => {
       stack.push(char);
     }
   }
-  
   return stack.length === 0;
-}`;
+}`,
 
-  const steps: Step[] = [
-    {
-      s: "({[]})",
-      idx: -1,
-      stack: [],
-      action: "initialization",
-      message: "First, we initialize an empty stack to keep track of opening brackets as we encounter them.",
-      highlightedLines: [2]
-    },
-    {
-      s: "({[]})",
-      idx: -1,
-      stack: [],
-      action: "initialization",
-      message: "We also define a map that links each closing bracket to its corresponding opening bracket.",
-      highlightedLines: [3, 4, 5, 6, 7]
-    },
-    // Iteration 0: '('
-    {
-      s: "({[]})",
-      idx: 0,
-      stack: [],
-      currentChar: "(",
-      action: "loop",
-      message: "Iteration 0: We start the loop for the first character in the string.",
-      highlightedLines: [9]
-    },
-    {
-      s: "({[]})",
-      idx: 0,
-      stack: [],
-      currentChar: "(",
-      action: "assignment",
-      message: "The current character is '('.",
-      highlightedLines: [10]
-    },
-    {
-      s: "({[]})",
-      idx: 0,
-      stack: [],
-      currentChar: "(",
-      action: "checking",
-      message: "We check if '(' is a closing bracket by looking it up in our 'map'.",
-      highlightedLines: [12]
-    },
-    {
-      s: "({[]})",
-      idx: 0,
-      stack: [],
-      currentChar: "(",
-      action: "pushing",
-      message: "'(' is not in the map (it's an opening bracket), so we move to the else block to push it onto the stack.",
-      highlightedLines: [17, 18]
-    },
-    {
-      s: "({[]})",
-      idx: 0,
-      stack: ["("],
-      currentChar: "(",
-      action: "pushed",
-      message: "The stack now contains: ['('].",
-      highlightedLines: [18]
-    },
-    // Iteration 1: '{'
-    {
-      s: "({[]})",
-      idx: 1,
-      stack: ["("],
-      currentChar: "{",
-      action: "loop",
-      message: "Iteration 1: Moving to the next character in the string.",
-      highlightedLines: [9]
-    },
-    {
-      s: "({[]})",
-      idx: 1,
-      stack: ["("],
-      currentChar: "{",
-      action: "assignment",
-      message: "The current character is now '{'.",
-      highlightedLines: [10]
-    },
-    {
-      s: "({[]})",
-      idx: 1,
-      stack: ["("],
-      currentChar: "{",
-      action: "checking",
-      message: "Checking if '{' is a closing bracket. It's not.",
-      highlightedLines: [12]
-    },
-    {
-      s: "({[]})",
-      idx: 1,
-      stack: ["(", "{"],
-      currentChar: "{",
-      action: "pushed",
-      message: "'{' is pushed onto the stack. Stack: ['(', '{'].",
-      highlightedLines: [18]
-    },
-    // Iteration 2: '['
-    {
-      s: "({[]})",
-      idx: 2,
-      stack: ["(", "{"],
-      currentChar: "[",
-      action: "loop",
-      message: "Iteration 2: Next character.",
-      highlightedLines: [9]
-    },
-    {
-      s: "({[]})",
-      idx: 2,
-      stack: ["(", "{", "["],
-      currentChar: "[",
-      action: "pushed",
-      message: "'[' is an opening bracket, so we push it. Stack: ['(', '{', '['].",
-      highlightedLines: [18]
-    },
-    // Iteration 3: ']'
-    {
-      s: "({[]})",
-      idx: 3,
-      stack: ["(", "{", "["],
-      currentChar: "]",
-      action: "loop",
-      message: "Iteration 3: Reached a closing bracket ']'.",
-      highlightedLines: [9, 10]
-    },
-    {
-      s: "({[]})",
-      idx: 3,
-      stack: ["(", "{", "["],
-      currentChar: "]",
-      action: "checking",
-      message: "']' IS in the map, so we enter the matching logic.",
-      highlightedLines: [12]
-    },
-    {
-      s: "({[]})",
-      idx: 3,
-      stack: ["(", "{", "["],
-      currentChar: "]",
-      action: "validating",
-      message: "We check if the stack is empty or if the top element matches the opening bracket for ']'.",
-      highlightedLines: [13]
-    },
-    {
-      s: "({[]})",
-      idx: 3,
-      stack: ["(", "{", "["],
-      currentChar: "]",
-      action: "validating",
-      message: "The top of the stack is '[', which matches map[']'].",
-      highlightedLines: [13]
-    },
-    {
-      s: "({[]})",
-      idx: 3,
-      stack: ["(", "{"],
-      currentChar: "]",
-      action: "popping",
-      message: "Match found! We pop '[' from the stack.",
-      highlightedLines: [16]
-    },
-    // Iteration 4: '}'
-    {
-      s: "({[]})",
-      idx: 4,
-      stack: ["(", "{"],
-      currentChar: "}",
-      action: "checking",
-      message: "Iteration 4: char='}'. It's in the map.",
-      highlightedLines: [12]
-    },
-    {
-      s: "({[]})",
-      idx: 4,
-      stack: ["(", "{"],
-      currentChar: "}",
-      action: "validating",
-      message: "Stack top '{' matches map['}'].",
-      highlightedLines: [13]
-    },
-    {
-      s: "({[]})",
-      idx: 4,
-      stack: ["("],
-      currentChar: "}",
-      action: "popping",
-      message: "Popping '{'. Stack now: ['('].",
-      highlightedLines: [16]
-    },
-    // Iteration 5: ')'
-    {
-      s: "({[]})",
-      idx: 5,
-      stack: ["("],
-      currentChar: ")",
-      action: "checking",
-      message: "Iteration 5: char=')'. Matches stack top '('.",
-      highlightedLines: [12, 13]
-    },
-    {
-      s: "({[]})",
-      idx: 5,
-      stack: [],
-      currentChar: ")",
-      action: "popping",
-      message: "Popping '('. The stack is now empty.",
-      highlightedLines: [16]
-    },
-    // Completion
-    {
-      s: "({[]})",
-      idx: 6,
-      stack: [],
-      action: "loop end",
-      message: "The string has been fully processed.",
-      highlightedLines: [20]
-    },
-    {
-      s: "({[]})",
-      idx: 6,
-      stack: [],
-      isValid: true,
-      action: "final check",
-      message: "Since the stack is empty, all parentheses were correctly matched. Return true.",
-      highlightedLines: [22]
+  java: `public class Solution {
+    public boolean isValid(String s) {
+        if (s == null || s.length() == 0) {
+            return true;
+        }
+        Stack<Character> stack = new Stack<>();
+        HashMap<Character, Character> map = new HashMap<>();
+        map.put(')', '(');
+        map.put(']', '[');
+        map.put('}', '{');
+        for (char c : s.toCharArray()) {
+            if (map.containsKey(c)) {
+                if (!stack.isEmpty() && stack.peek().equals(map.get(c))) {
+                    stack.pop();
+                } else {
+                    return false;
+                }
+            } else {
+                stack.push(c);
+            }
+        }
+        return stack.isEmpty();
     }
-  ];
+}`,
 
+  cpp: `class Solution {
+public:
+    bool isValid(string s) {
+        stack<char> st;
+        unordered_map<char, char> mapping = {
+            {')', '('}, {'}', '{'}, {']', '['}
+        };
+        for (char c : s) {
+            if (mapping.find(c) != mapping.end()) {
+                if (st.empty() || st.top() != mapping[c]) {
+                    return false;
+                }
+                st.pop();
+            } else {
+                st.push(c);
+            }
+        }
+        return st.empty();
+    }
+};`
+};
 
+const generateSteps = (s: string) => {
+  const steps: Step[] = [];
+  const stepLineNumbers: StepLineNumberMap = {
+    typescript: [],
+    python: [],
+    java: [],
+    cpp: []
+  };
+
+  const addLines = (ts: number, py: number, java: number, cpp: number) => {
+    stepLineNumbers.typescript!.push(ts);
+    stepLineNumbers.python!.push(py);
+    stepLineNumbers.java!.push(java);
+    stepLineNumbers.cpp!.push(cpp);
+  };
+
+  const stack: string[] = [];
+  const map: Record<string, string> = {
+    ')': '(',
+    '}': '{',
+    ']': '['
+  };
+
+  const addStep = (msg: string, pseudo: string, tsLine: number, pyLine: number, javaLine: number, cppLine: number, extra: Partial<Step> = {}) => {
+    steps.push({
+      s,
+      idx: extra.hasOwnProperty('idx') ? extra.idx! : -1,
+      stack: [...stack],
+      currentChar: extra.currentChar,
+      action: extra.action || "processing",
+      isValid: extra.isValid,
+      explanation: msg,
+      pseudoStep: pseudo
+    });
+    addLines(tsLine, pyLine, javaLine, cppLine);
+  };
+
+  // 1. Initial State
+  addStep("Initialize an empty stack to track unmatched opening brackets.", "SET stack = []", 2, 2, 6, 4);
+
+  // 2. Define map
+  addStep("Define lookup map for closing-to-opening bracket matches.", "SET map = { ')':'(', '}':'{', ']':'[' }", 3, 3, 7, 5);
+
+  let i = 0;
+  for (i = 0; i < s.length; i++) {
+    const char = s[i];
+
+    // 3. Loop start
+    addStep(`Iteration ${i}: Process character '${char}'.`, `FOR c IN s [i = ${i}]`, 8, 8, 11, 8, { idx: i, currentChar: char, action: "loop" });
+
+    // 4. Check if char in map
+    addStep(`Check if '${char}' is a closing bracket.`, `IF c IN map`, 10, 9, 12, 9, { idx: i, currentChar: char, action: "checking" });
+
+    if (char in map) {
+      // 5. Check stack top
+      const expected = map[char];
+      const actual = stack[stack.length - 1];
+      const match = stack.length > 0 && actual === expected;
+
+      addStep(
+        `Validate stack top: expected opening '${expected}', found '${actual || "empty"}'.`,
+        `IF stack AND stack[-1] == map[c]`,
+        11, 10, 13, 10,
+        { idx: i, currentChar: char, action: "checking" }
+      );
+
+      if (match) {
+        stack.pop();
+        addStep(`Match found! Pop '${expected}' from stack.`, "stack.pop()", 14, 11, 14, 13, { idx: i, currentChar: char, action: "popping" });
+      } else {
+        addStep(`Mismatch or empty stack for '${char}'! Return false.`, "RETURN False", 12, 13, 16, 11, { idx: i, currentChar: char, action: "checking", isValid: false });
+        return { steps, stepLineNumbers };
+      }
+    } else {
+      // 6. Push opening bracket
+      stack.push(char);
+      addStep(`'${char}' is an opening bracket. Push onto stack.`, "stack.append(c)", 16, 15, 19, 15, { idx: i, currentChar: char, action: "pushing" });
+    }
+  }
+
+  // 7. Loop complete
+  addStep("All characters processed. Check if stack is empty.", "IF len(stack) == 0", 19, 16, 22, 18);
+
+  const isValid = stack.length === 0;
+  addStep(
+    isValid ? "Stack is empty. All brackets matched successfully!" : `Stack has unmatched opening brackets: ${stack.join(', ')}`,
+    `RETURN len(stack) == 0 → ${isValid}`,
+    19, 16, 22, 18,
+    { isValid }
+  );
+
+  return { steps, stepLineNumbers };
+};
+
+export const ValidParenthesesVisualization = () => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const s = "({[]})";
+
+  const { steps, stepLineNumbers } = useMemo(() => {
+    return generateSteps(s);
+  }, [s]);
+
+  if (steps.length === 0) return null;
+
   const currentStep = steps[currentStepIndex];
+  const pseudoSteps = steps.map(s => s.pseudoStep);
 
   return (
-    <div className="space-y-6">
-      <SimpleStepControls
-        currentStep={currentStepIndex}
-        totalSteps={steps.length}
-        onStepChange={setCurrentStepIndex}
-      />
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <VisualizationLayout
+      leftContent={
         <div className="space-y-6">
           <Card className="p-6">
             <div className="mb-8">
-              <h3 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wider">Input String</h3>
+              <h3 className="text-xs font-bold text-muted-foreground mb-4 uppercase tracking-widest">Input String</h3>
               <div className="flex gap-2">
                 {currentStep.s.split('').map((char, idx) => (
                   <div
                     key={idx}
-                    className={`w-10 h-10 flex items-center justify-center rounded-md font-mono text-lg border-2 transition-colors duration-200 ${idx === currentStep.idx
-                      ? 'bg-primary/20 border-primary text-primary shadow-[0_0_10px_rgba(var(--primary),0.3)]'
+                    className={`w-10 h-10 flex items-center justify-center rounded-md font-mono text-lg border-2 transition-all duration-200 ${idx === currentStep.idx
+                      ? 'bg-primary/20 border-primary text-primary shadow-[0_0_10px_rgba(var(--primary),0.3)] font-bold scale-105'
                       : idx < currentStep.idx
                         ? 'bg-muted border-transparent text-muted-foreground opacity-50'
                         : 'bg-card border-border text-foreground'
@@ -308,8 +236,8 @@ export const ValidParenthesesVisualization = () => {
             </div>
 
             <div className="mb-8">
-              <h3 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wider">Stack</h3>
-              <div className="h-24 border-2 border-dashed border-border rounded-xl p-4 bg-muted/30 flex items-end">
+              <h3 className="text-xs font-bold text-muted-foreground mb-4 uppercase tracking-widest">Stack</h3>
+              <div className="h-24 border-2 border-dashed border-border rounded-xl p-4 bg-muted/30 flex items-end justify-center">
                 <AnimatePresence mode="popLayout">
                   {currentStep.stack.length > 0 ? (
                     <div className="flex gap-2">
@@ -317,9 +245,9 @@ export const ValidParenthesesVisualization = () => {
                         <motion.div
                           key={`${idx}-${item}`}
                           layout
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.8 }}
+                          initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.8, y: 20 }}
                           transition={{ duration: 0.2 }}
                           className="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-primary-foreground font-mono font-bold shadow-lg"
                         >
@@ -328,7 +256,7 @@ export const ValidParenthesesVisualization = () => {
                       ))}
                     </div>
                   ) : (
-                    <div className="w-full text-center text-sm text-muted-foreground italic">
+                    <div className="w-full text-center text-sm text-muted-foreground italic self-center">
                       Stack is empty
                     </div>
                   )}
@@ -336,46 +264,57 @@ export const ValidParenthesesVisualization = () => {
               </div>
             </div>
 
-            <div className="space-y-4">
-              <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
-                <p className="text-sm leading-relaxed text-foreground">
-                  <span className="font-bold text-primary mr-2">Step {currentStepIndex}:</span>
-                  {currentStep.message}
-                </p>
+            {currentStep.isValid !== undefined && (
+              <div className={`p-4 rounded-lg border flex items-center justify-center gap-3 mb-4 ${currentStep.isValid
+                ? 'bg-green-500/10 border-green-500/20 text-green-600 dark:text-green-400 font-bold'
+                : 'bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-400 font-bold'
+                }`}>
+                <span className="text-base font-bold">
+                  {currentStep.isValid ? '✓ Valid Parentheses' : '✗ Invalid Structure'}
+                </span>
               </div>
-
-              <VariablePanel
-                variables={{
-                  index: currentStep.idx === -1 ? 'None' : currentStep.idx,
-                  character: currentStep.currentChar || 'None',
-                  stackSize: currentStep.stack.length,
-                  action: currentStep.action.charAt(0).toUpperCase() + currentStep.action.slice(1),
-                  status: currentStep.isValid === undefined ? 'Processing' : (currentStep.isValid ? 'Valid' : 'Invalid')
-                }}
-              />
-
-              {currentStep.isValid !== undefined && (
-                <div className={`p-4 rounded-lg border flex items-center justify-center gap-3 ${currentStep.isValid
-                  ? 'bg-green-500/10 border-green-500/20 text-green-600 dark:text-green-400'
-                  : 'bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-400'
-                  }`}>
-                  <span className="text-xl font-bold">
-                    {currentStep.isValid ? '✓ Valid Parentheses' : '✗ Invalid Structure'}
-                  </span>
-                </div>
-              )}
-            </div>
+            )}
           </Card>
-        </div>
 
-        <div className="lg:h-[calc(100vh-250px)] min-h-[500px]">
-          <AnimatedCodeEditor
-            code={code}
-            language="typescript"
-            highlightedLines={currentStep.highlightedLines}
-          />
+          {/* Descriptive Commentary Box (at the bottom) */}
+          <div className="p-3 bg-muted/50 rounded-lg text-xs leading-relaxed text-foreground border border-border shadow-inner">
+            <div className="flex items-center gap-2 mb-1 text-primary font-bold text-[10px] uppercase tracking-widest">
+              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              Process Step
+            </div>
+            {currentStep.explanation}
+          </div>
+
+          {/* Variable Panel (below the commentary box) */}
+          <div className="pt-2">
+            <VariablePanel
+              variables={{
+                index: currentStep.idx === -1 ? 'None' : currentStep.idx,
+                character: currentStep.currentChar || 'None',
+                stackSize: currentStep.stack.length,
+                action: currentStep.action.charAt(0).toUpperCase() + currentStep.action.slice(1),
+                status: currentStep.isValid === undefined ? 'Processing' : (currentStep.isValid ? 'Valid' : 'Invalid')
+              }}
+            />
+          </div>
         </div>
-      </div>
-    </div>
+      }
+      rightContent={
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={() => setCurrentStepIndex(0)}
+        />
+      }
+      controls={
+        <SimpleStepControls
+          currentStep={currentStepIndex}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStepIndex}
+        />
+      }
+    />
   );
 };

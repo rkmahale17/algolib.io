@@ -1,23 +1,10 @@
-import { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { Card } from '@/components/ui/card';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
-import { Card } from '@/components/ui/card';
-import { 
-  Zap, 
-  Target, 
-  ArrowRight, 
-  ArrowLeft, 
-  Repeat, 
-  CheckCircle2, 
-  Search, 
-  MoveRight, 
-  Info,
-  Hash,
-  MoveLeft
-} from 'lucide-react';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
+import type { StepLineNumberMap, VisualizationLanguageMap } from '@/types/visualization';
 
 interface Step {
   array: number[];
@@ -27,65 +14,149 @@ interface Step {
   currentSum: number | '-';
   target: number | '-';
   result: number[][];
-  message: string;
-  lineNumber: number;
-  phase: 'sorting' | 'loop' | 'check-dupe' | 'pointers-init' | 'calc-sum' | 'match' | 'move' | 'skip-dupe' | 'done';
+  explanation: string;
+  pseudoStep: string;
   highlights: number[];
-  insight?: string;
-  isMatch?: boolean;
 }
 
+const languages: VisualizationLanguageMap = {
+  typescript: `function threeSum(nums: number[]): number[][] {
+    nums.sort((a, b) => a - b);
+    const result: number[][] = [];
+    for (let i = 0; i < nums.length - 2; i++) {
+        if (i > 0 && nums[i] === nums[i - 1]) {
+            continue;
+        }
+        let left = i + 1, right = nums.length - 1;
+        const target = -nums[i];
+        while (left < right) {
+            const currentSum = nums[left] + nums[right];
+            if (currentSum === target) {
+                result.push([nums[i], nums[left], nums[right]]);
+                while (left < right && nums[left] === nums[left + 1]) left++;
+                while (left < right && nums[right] === nums[right - 1]) right--;
+                left++;
+                right--;
+            } else if (currentSum < target) {
+                left++;
+            } else {
+                right--;
+            }
+        }
+    }
+    return result;
+}`,
+  python: `def threeSum(nums: List[int]) -> List[List[int]]:
+    nums.sort()
+    result = []
+    for i in range(len(nums) - 2):
+        if i > 0 and nums[i] == nums[i - 1]:
+            continue
+        left, right = i + 1, len(nums) - 1
+        target = -nums[i]
+        while left < right:
+            current_sum = nums[left] + nums[right]
+            if current_sum == target:
+                result.append([nums[i], nums[left], nums[right]])
+                while left < right and nums[left] == nums[left + 1]:
+                    left += 1
+                while left < right and nums[right] == nums[right - 1]:
+                    right -= 1
+                left += 1
+                right -= 1
+            elif current_sum < target:
+                left += 1
+            else:
+                right -= 1
+    return result`,
+  java: `public static class Solution {
+    public List<List<Integer>> threeSum(int[] nums) {
+        Arrays.sort(nums);
+        List<List<Integer>> result = new ArrayList<>();
+        for (int i = 0; i < nums.length - 2; i++) {
+            if (i > 0 && nums[i] == nums[i - 1]) {
+                continue;
+            }
+            int left = i + 1, right = nums.length - 1;
+            int target = -nums[i];
+            while (left < right) {
+                int currentSum = nums[left] + nums[right];
+                if (currentSum == target) {
+                    result.add(Arrays.asList(nums[i], nums[left], nums[right]));
+                    while (left < right && nums[left] == nums[left + 1]) left++;
+                    while (left < right && nums[right] == nums[right - 1]) right--;
+                    left++;
+                    right--;
+                } else if (currentSum < target) {
+                    left++;
+                } else {
+                    right--;
+                }
+            }
+        }
+        return result;
+    }
+}`,
+  cpp: `class Solution {
+public:
+    vector<vector<int>> threeSum(vector<int>& nums) {
+        sort(nums.begin(), nums.end());
+        vector<vector<int>> result;
+        for (int i = 0; i < nums.size() - 2; i++) {
+            if (i > 0 && nums[i] == nums[i - 1]) {
+                continue;
+            }
+            int left = i + 1, right = nums.size() - 1;
+            int target = -nums[i];
+            while (left < right) {
+                int currentSum = nums[left] + nums[right];
+                if (currentSum == target) {
+                    result.push_back({nums[i], nums[left], nums[right]});
+                    while (left < right && nums[left] == nums[left + 1]) left++;
+                    while (left < right && nums[right] == nums[right - 1]) right--;
+                    left++;
+                    right--;
+                } else if (currentSum < target) {
+                    left++;
+                } else {
+                    right--;
+                }
+            }
+        }
+        return result;
+    }
+};`
+};
+
 export const ThreeSumVisualization = () => {
+  const [steps, setSteps] = useState<Step[]>([]);
+  const [stepLineNumbers, setStepLineNumbers] = useState<StepLineNumberMap>({
+    typescript: [],
+    python: [],
+    java: [],
+    cpp: []
+  });
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
-  const code = `function threeSum(nums: number[]): number[][] {
-  nums.sort((a, b) => a - b);
-  const result: number[][] = [];
-
-  for (let i = 0; i < nums.length - 2; i++) {
-    if (i > 0 && nums[i] === nums[i - 1]) continue;
-
-    let left = i + 1, right = nums.length - 1;
-    while (left < right) {
-      const sum = nums[i] + nums[left] + nums[right];
-      if (sum === 0) {
-        result.push([nums[i], nums[left], nums[right]]);
-        while (left < right && nums[left] === nums[left + 1]) left++;
-        while (left < right && nums[right] === nums[right - 1]) right--;
-        left++; right--;
-      } else if (sum < 0) {
-        left++;
-      } else {
-        right--;
-      }
-    }
-  }
-  return result;
-}`;
-
-  const steps: Step[] = useMemo(() => {
+  useEffect(() => {
     const nums = [-1, 0, 1, 2, -1, -4];
-    const s: Step[] = [];
-    
-    // Initial State
-    s.push({
-      array: [...nums],
-      i: -1,
-      left: -1,
-      right: -1,
-      currentSum: '-',
-      target: '-',
-      result: [],
-      message: "The 3Sum problem asks for all unique triplets that sum to zero. Our first step is to sort the input array.",
-      lineNumber: 2,
-      phase: 'sorting',
-      highlights: [],
-      insight: "Sorting is crucial because it allows us to use the Two-Pointer approach and easily skip duplicate elements."
-    });
+    const generatedSteps: Step[] = [];
+    const stepLines: StepLineNumberMap = {
+      typescript: [],
+      python: [],
+      java: [],
+      cpp: []
+    };
 
-    // Sort
-    nums.sort((a, b) => a - b);
-    s.push({
+    const addLines = (ts: number, py: number, java: number, cpp: number) => {
+      stepLines.typescript!.push(ts);
+      stepLines.python!.push(py);
+      stepLines.java!.push(java);
+      stepLines.cpp!.push(cpp);
+    };
+
+    // Initial state / Sort
+    generatedSteps.push({
       array: [...nums],
       i: -1,
       left: -1,
@@ -93,191 +164,280 @@ export const ThreeSumVisualization = () => {
       currentSum: '-',
       target: '-',
       result: [],
-      message: `Array sorted: [${nums.join(', ')}]. Now we can use one fixed element (i) and search for the other two using pointers.`,
-      lineNumber: 3,
-      phase: 'sorting',
+      explanation: "Sort the input array to enable the two-pointer strategy and easily skip duplicates.",
+      pseudoStep: "SORT nums",
       highlights: []
     });
+    addLines(2, 2, 3, 4);
 
+    nums.sort((a, b) => a - b);
     const result: number[][] = [];
+
+    // Result init
+    generatedSteps.push({
+      array: [...nums],
+      i: -1,
+      left: -1,
+      right: -1,
+      currentSum: '-',
+      target: '-',
+      result: [],
+      explanation: "Initialize an empty list to store the unique triplets that sum to 0.",
+      pseudoStep: "SET result = []",
+      highlights: []
+    });
+    addLines(3, 3, 4, 5);
 
     for (let i = 0; i < nums.length - 2; i++) {
       // Loop Check i
-      s.push({
+      generatedSteps.push({
         array: [...nums],
         i,
         left: -1,
         right: -1,
         currentSum: '-',
-        target: 0,
+        target: '-',
         result: [...result.map(r => [...r])],
-        message: `Outer loop iteration: i = ${i}, nums[i] = ${nums[i]}.`,
-        lineNumber: 5,
-        phase: 'loop',
+        explanation: `Outer loop: Fix first element at index i = ${i} (value = ${nums[i]}).`,
+        pseudoStep: `FOR i = ${i} to ${nums.length - 3}`,
         highlights: [i]
       });
+      addLines(4, 4, 5, 6);
 
       if (i > 0 && nums[i] === nums[i - 1]) {
-        s.push({
+        generatedSteps.push({
           array: [...nums],
           i,
           left: -1,
           right: -1,
           currentSum: '-',
-          target: 0,
+          target: '-',
           result: [...result.map(r => [...r])],
-          message: `nums[${i}] (${nums[i]}) is the same as nums[${i - 1}]. Skip it to avoid duplicate triplets.`,
-          lineNumber: 6,
-          phase: 'check-dupe',
-          highlights: [i, i - 1],
-          insight: "If we use the same starting element again, we would find exactly the same triplets we already found."
+          explanation: `Duplicate starting element detected (nums[i] === nums[i - 1] === ${nums[i]}). Skip to avoid duplicates.`,
+          pseudoStep: `IF i > 0 AND nums[i] == nums[i - 1]`,
+          highlights: [i, i - 1]
         });
+        addLines(5, 5, 6, 7);
         continue;
       }
 
       let left = i + 1;
       let right = nums.length - 1;
+      let targetVal = -nums[i];
 
-      s.push({
+      // Pointer Init
+      generatedSteps.push({
         array: [...nums],
         i,
         left,
         right,
         currentSum: '-',
-        target: 0,
+        target: targetVal,
         result: [...result.map(r => [...r])],
-        message: `Initialize pointers: left = ${left} (after i), right = ${right} (end of array).`,
-        lineNumber: 8,
-        phase: 'pointers-init',
+        explanation: `Initialize two pointers: left = ${left} (index after i), right = ${right} (end of array).`,
+        pseudoStep: `SET left = i + 1, right = nums.length - 1`,
         highlights: [i, left, right]
       });
+      addLines(8, 7, 9, 10);
+
+      // Target Init
+      generatedSteps.push({
+        array: [...nums],
+        i,
+        left,
+        right,
+        currentSum: '-',
+        target: targetVal,
+        result: [...result.map(r => [...r])],
+        explanation: `Target sum for the two pointers is negative of the fixed element: target = -(${nums[i]}) = ${targetVal}.`,
+        pseudoStep: `SET target = -nums[i]`,
+        highlights: [i]
+      });
+      addLines(9, 8, 10, 11);
 
       while (left < right) {
-        const sum = nums[i] + nums[left] + nums[right];
-
-        s.push({
+        // Inner Loop Check
+        generatedSteps.push({
           array: [...nums],
           i,
           left,
           right,
-          currentSum: sum,
-          target: 0,
+          currentSum: '-',
+          target: targetVal,
           result: [...result.map(r => [...r])],
-          message: `Calculating sum: ${nums[i]} + ${nums[left]} + ${nums[right]} = ${sum}.`,
-          lineNumber: 10,
-          phase: 'calc-sum',
-          highlights: [i, left, right]
+          explanation: `Inner loop check: left (${left}) < right (${right}). Continue searching.`,
+          pseudoStep: "WHILE left < right",
+          highlights: [left, right]
         });
+        addLines(10, 9, 11, 12);
 
-        if (sum === 0) {
+        const currentSum = nums[left] + nums[right];
+
+        // Sum Calculation
+        generatedSteps.push({
+          array: [...nums],
+          i,
+          left,
+          right,
+          currentSum,
+          target: targetVal,
+          result: [...result.map(r => [...r])],
+          explanation: `Calculate sum of the elements at left and right pointers: nums[left] (${nums[left]}) + nums[right] (${nums[right]}) = ${currentSum}.`,
+          pseudoStep: "SET currentSum = nums[left] + nums[right]",
+          highlights: [left, right]
+        });
+        addLines(11, 10, 12, 13);
+
+        // Compare Sum with Target
+        generatedSteps.push({
+          array: [...nums],
+          i,
+          left,
+          right,
+          currentSum,
+          target: targetVal,
+          result: [...result.map(r => [...r])],
+          explanation: `Compare currentSum (${currentSum}) with target (${targetVal}).`,
+          pseudoStep: "IF currentSum == target",
+          highlights: [left, right]
+        });
+        addLines(12, 11, 13, 14);
+
+        if (currentSum === targetVal) {
           result.push([nums[i], nums[left], nums[right]]);
-          
-          s.push({
+
+          generatedSteps.push({
             array: [...nums],
             i,
             left,
             right,
-            currentSum: sum,
-            target: 0,
+            currentSum,
+            target: targetVal,
             result: [...result.map(r => [...r])],
-            message: `Match found! [${nums[i]}, ${nums[left]}, ${nums[right]}] sums to 0. Added to result.`,
-            lineNumber: 12,
-            phase: 'match',
-            highlights: [i, left, right],
-            isMatch: true,
-            insight: "One triplet found. Now we need to skip any identical values for 'left' and 'right' to maintain uniqueness."
+            explanation: `Found triplet: [${nums[i]}, ${nums[left]}, ${nums[right]}]. Add to results.`,
+            pseudoStep: `result.push([nums[i], nums[left], nums[right]])`,
+            highlights: [i, left, right]
           });
+          addLines(13, 12, 14, 15);
 
-          // Skip duplicate lefts
+          // Skip Duplicate Left
           if (left < right && nums[left] === nums[left + 1]) {
-            s.push({
+            generatedSteps.push({
               array: [...nums],
               i,
               left,
               right,
-              currentSum: sum,
-              target: 0,
+              currentSum,
+              target: targetVal,
               result: [...result.map(r => [...r])],
-              message: `nums[${left}] is ${nums[left]}, and the next is also ${nums[left + 1]}. Skipping...`,
-              lineNumber: 13,
-              phase: 'skip-dupe',
+              explanation: `Duplicate left value detected: nums[left] === nums[left+1] === ${nums[left]}. Skip duplicate lefts.`,
+              pseudoStep: "WHILE left < right AND nums[left] == nums[left + 1]",
               highlights: [left, left + 1]
             });
+            addLines(14, 13, 15, 16);
             while (left < right && nums[left] === nums[left + 1]) left++;
           }
 
-          // Skip duplicate rights
+          // Skip Duplicate Right
           if (left < right && nums[right] === nums[right - 1]) {
-             s.push({
+            generatedSteps.push({
               array: [...nums],
               i,
               left,
               right,
-              currentSum: sum,
-              target: 0,
+              currentSum,
+              target: targetVal,
               result: [...result.map(r => [...r])],
-              message: `nums[${right}] is ${nums[right]}, and the previous was also ${nums[right - 1]}. Skipping...`,
-              lineNumber: 14,
-              phase: 'skip-dupe',
+              explanation: `Duplicate right value detected: nums[right] === nums[right-1] === ${nums[right]}. Skip duplicate rights.`,
+              pseudoStep: "WHILE left < right AND nums[right] == nums[right - 1]",
               highlights: [right, right - 1]
             });
+            addLines(15, 15, 16, 17);
             while (left < right && nums[right] === nums[right - 1]) right--;
           }
 
           left++;
           right--;
-
-          s.push({
+          generatedSteps.push({
             array: [...nums],
             i,
             left,
             right,
             currentSum: '-',
-            target: 0,
+            target: targetVal,
             result: [...result.map(r => [...r])],
-            message: `Advanced both pointers to search for more pairs.`,
-            lineNumber: 15,
-            phase: 'move',
-            highlights: [i, left, right]
+            explanation: `Move left and right pointers inward to find new unique pairs.`,
+            pseudoStep: "SET left = left + 1, right = right - 1",
+            highlights: [left, right]
           });
+          addLines(16, 17, 17, 18);
 
-        } else if (sum < 0) {
-          s.push({
+        } else if (currentSum < targetVal) {
+          generatedSteps.push({
             array: [...nums],
             i,
             left,
             right,
-            currentSum: sum,
-            target: 0,
+            currentSum,
+            target: targetVal,
             result: [...result.map(r => [...r])],
-            message: `Sum (${sum}) is less than zero. Since the array is sorted, we need a larger value. Move 'left' inward.`,
-            lineNumber: 17,
-            phase: 'move',
-            highlights: [i, left, right],
-            insight: "Increasing 'left' increases the total sum in a sorted array."
+            explanation: `Since currentSum (${currentSum}) < target (${targetVal}), we need a larger sum. Move left pointer right.`,
+            pseudoStep: "ELSE IF currentSum < target",
+            highlights: [left]
           });
+          addLines(18, 19, 19, 20);
+
           left++;
-        } else {
-          s.push({
+          generatedSteps.push({
             array: [...nums],
             i,
             left,
             right,
-            currentSum: sum,
-            target: 0,
+            currentSum: '-',
+            target: targetVal,
             result: [...result.map(r => [...r])],
-            message: `Sum (${sum}) is greater than zero. Since the array is sorted, we need a smaller value. Move 'right' inward.`,
-            lineNumber: 19,
-            phase: 'move',
-            highlights: [i, left, right],
-            insight: "Decreasing 'right' decreases the total sum in a sorted array."
+            explanation: `Increment left to ${left}.`,
+            pseudoStep: "SET left = left + 1",
+            highlights: [left]
           });
+          addLines(19, 20, 20, 21);
+
+        } else {
+          // currentSum > target
+          generatedSteps.push({
+            array: [...nums],
+            i,
+            left,
+            right,
+            currentSum,
+            target: targetVal,
+            result: [...result.map(r => [...r])],
+            explanation: `Since currentSum (${currentSum}) > target (${targetVal}), we need a smaller sum. Move right pointer left.`,
+            pseudoStep: "ELSE right--",
+            highlights: [right]
+          });
+          addLines(18, 19, 19, 20);
+
           right--;
+          generatedSteps.push({
+            array: [...nums],
+            i,
+            left,
+            right,
+            currentSum: '-',
+            target: targetVal,
+            result: [...result.map(r => [...r])],
+            explanation: `Decrement right to ${right}.`,
+            pseudoStep: "SET right = right - 1",
+            highlights: [right]
+          });
+          addLines(21, 22, 22, 23);
         }
       }
     }
 
-    s.push({
+    // Done
+    generatedSteps.push({
       array: [...nums],
       i: -1,
       left: -1,
@@ -285,214 +445,23 @@ export const ThreeSumVisualization = () => {
       currentSum: '-',
       target: '-',
       result: [...result.map(r => [...r])],
-      message: `Execution finished. Found ${result.length} unique triplets.`,
-      lineNumber: 23,
-      phase: 'done',
-      highlights: [],
-      insight: "The Two-Pointer approach allowed us to solve this in O(n²) time complexity."
+      explanation: `Algorithm finished. Unique triplets that sum to 0: [${result.map(r => `[${r.join(', ')}]`).join(', ')}].`,
+      pseudoStep: "RETURN result",
+      highlights: []
     });
+    addLines(25, 23, 26, 27);
 
-    return s;
+    setSteps(generatedSteps);
+    setStepLineNumbers(stepLines);
   }, []);
 
-  const currentStep = steps[currentStepIndex] || steps[0];
+  if (steps.length === 0) return null;
+
+  const currentStep = steps[currentStepIndex];
+  const pseudoSteps = steps.map(s => s.pseudoStep);
 
   return (
     <VisualizationLayout
-      leftContent={
-        <div className="space-y-8">
-          <Card className="p-8 bg-card/50 backdrop-blur-sm border-primary/20 relative overflow-hidden min-h-[480px] flex flex-col shadow-lg shadow-primary/5">
-            {/* Header Info */}
-            <div className="flex justify-between items-center mb-12">
-               <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                <Search className="w-3 h-3 text-primary" />
-                Three-Pointers Search
-              </h3>
-              <div className="flex gap-4 items-center">
-                 <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted/50 border border-border/50 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                    <Repeat className="w-3 h-3" />
-                    Phase: {currentStep.phase.replace('-', ' ')}
-                 </div>
-              </div>
-            </div>
-
-            {/* Pointer Visualization */}
-            <div className="flex-1 flex justify-center items-center pb-12">
-               <div className="relative flex justify-center items-center gap-4">
-                  <div className="flex items-center gap-4 relative z-10">
-                    <AnimatePresence mode="popLayout">
-                      {currentStep.array.map((value, index) => {
-                        const isI = index === currentStep.i;
-                        const isL = index === currentStep.left;
-                        const isR = index === currentStep.right;
-                        const isHighlighted = currentStep.highlights.includes(index);
-                        
-                        return (
-                          <div key={index} className="flex flex-col items-center w-8 relative group">
-                            {/* Top Pointer Labels */}
-                            <div className="h-10 relative w-full mb-2">
-                               <AnimatePresence>
-                                  {isI && (
-                                    <motion.div 
-                                      initial={{ opacity: 0, y: 10 }}
-                                      animate={{ opacity: 1, y: 0 }}
-                                      exit={{ opacity: 0, y: 10 }}
-                                      className="absolute -top-2 left-1/2 flex flex-col items-center gap-1"
-                                      style={{ left: '50%', transform: 'translateX(-50%)' }}
-                                    >
-                                      <span className="px-1 py-0.5 rounded-sm bg-orange-500 text-[8px] font-bold text-white shadow-md">i</span>
-                                      <div className="w-0.5 h-1.5 bg-orange-500/50" />
-                                    </motion.div>
-                                  )}
-                                  {isL && (
-                                    <motion.div 
-                                      initial={{ opacity: 0, y: 10 }}
-                                      animate={{ opacity: 1, y: 0 }}
-                                      exit={{ opacity: 0, y: 10 }}
-                                      className="absolute -top-2 left-1/2 flex flex-col items-center gap-1"
-                                      style={{ left: '50%', transform: 'translateX(-50%)' }}
-                                    >
-                                      <span className="px-1 py-0.5 rounded-sm bg-green-500 text-[8px] font-bold text-white shadow-md">L</span>
-                                      <div className="w-0.5 h-1.5 bg-green-500/50" />
-                                    </motion.div>
-                                  )}
-                                  {isR && (
-                                    <motion.div 
-                                      initial={{ opacity: 0, y: 10 }}
-                                      animate={{ opacity: 1, y: 0 }}
-                                      exit={{ opacity: 0, y: 10 }}
-                                      className="absolute -top-2 left-1/2 flex flex-col items-center gap-1"
-                                      style={{ left: '50%', transform: 'translateX(-50%)' }}
-                                    >
-                                      <span className="px-1 py-0.5 rounded-sm bg-blue-500 text-[8px] font-bold text-white shadow-md">R</span>
-                                      <div className="w-0.5 h-1.5 bg-blue-500/50" />
-                                    </motion.div>
-                                  )}
-                               </AnimatePresence>
-                            </div>
-
-                            {/* Value Box */}
-                            <motion.div
-                              className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm border-2 z-30 transition-all duration-300 ${
-                                isHighlighted
-                                  ? 'bg-primary text-primary-foreground border-primary scale-110 shadow-xl shadow-primary/30'
-                                  : 'bg-muted/50 border-border text-foreground hover:bg-muted'
-                              } ${isI && 'border-orange-500/50 shadow-lg shadow-orange-500/10'} ${isL && 'border-green-500/50'} ${isR && 'border-blue-500/50'}`}
-                              animate={{
-                                scale: isHighlighted ? 1.1 : 1,
-                              }}
-                            >
-                              {value}
-                            </motion.div>
-
-                            <div className="mt-4 text-[9px] font-mono font-bold text-muted-foreground uppercase tracking-widest opacity-60">
-                              IDX {index}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </AnimatePresence>
-                  </div>
-               </div>
-            </div>
-
-            {/* Stats Grid */}
-            <div className="grid grid-cols-3 gap-4 mt-auto pt-6 border-t border-border/40">
-              <div className="flex flex-col items-center p-2 rounded-xl bg-blue-500/5 border border-blue-500/10">
-                <span className="text-[9px] font-bold text-blue-600 uppercase mb-0.5">currentSum</span>
-                <span className="text-base font-black text-blue-600 font-mono">{currentStep.currentSum}</span>
-              </div>
-              <div className="flex flex-col items-center p-2 rounded-xl bg-primary/5 border border-primary/10">
-                <span className="text-[9px] font-bold text-primary uppercase mb-0.5 flex items-center gap-1">
-                   <Target className="w-2 h-2" /> target
-                </span>
-                <span className="text-base font-black text-primary font-mono">{currentStep.target}</span>
-              </div>
-              <div className="flex flex-col items-center p-2 rounded-xl bg-indigo-500/5 border border-indigo-500/10">
-                <span className="text-[9px] font-bold text-indigo-600 uppercase mb-0.5">triplets</span>
-                <span className="text-base font-black text-indigo-600 font-mono">{currentStep.result.length}</span>
-              </div>
-            </div>
-          </Card>
-
-          <Card className={`p-5 border-l-4 relative overflow-hidden transition-all duration-300 shadow-sm min-h-[120px] flex items-center ${currentStep.isMatch ? 'bg-primary/10 border-primary' : 'bg-accent/30 border-primary'}`}>
-            <div className="flex items-start gap-4">
-              <div className={`p-2.5 rounded-xl shrink-0 ${currentStep.isMatch ? 'bg-primary text-primary-foreground' : 'bg-primary/10 text-primary'}`}>
-                {currentStep.isMatch ? <CheckCircle2 className="w-5 h-5" /> : <Info className="w-5 h-5" />}
-              </div>
-              <div className="space-y-1">
-                <h4 className="text-[9px] font-bold uppercase tracking-[0.12em] text-primary/80">
-                   Step Logic
-                </h4>
-                <p className="text-[14px] font-medium leading-relaxed text-foreground/90 leading-tight">
-                  {currentStep.message}
-                </p>
-              </div>
-            </div>
-          </Card>
-        </div>
-      }
-      rightContent={
-        <div className="space-y-6 h-full flex flex-col">
-          <div className="flex-1 overflow-hidden min-h-[400px]">
-             <AnimatedCodeEditor
-                code={code}
-                highlightedLines={[currentStep.lineNumber]}
-                language="typescript"
-              />
-          </div>
-
-          <Card className="p-5 bg-card border border-border/50 shadow-sm">
-            <h4 className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2 mb-3">
-              <Zap className="w-3 h-3 text-primary" />
-              Computational Insight
-            </h4>
-            
-            <div className="space-y-3">
-               {currentStep.insight ? (
-                  <div className="p-3 rounded-xl bg-primary/5 border border-primary/10 flex gap-3 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                    <div className="shrink-0 flex items-center justify-center w-7 h-7 rounded-lg bg-primary/10 text-primary">
-                       <Repeat className="w-3.5 h-3.5" />
-                    </div>
-                    <p className="text-[11px] text-muted-foreground leading-relaxed italic">
-                      {currentStep.insight}
-                    </p>
-                  </div>
-               ) : (
-                  <div className="p-3 rounded-xl bg-muted/20 border border-border/40 flex flex-col items-center justify-center gap-1.5 py-6 text-center">
-                    <div className="w-7 h-7 rounded-full bg-muted/50 flex items-center justify-center opacity-40">
-                       <Repeat className="w-3.5 h-3.5" />
-                    </div>
-                    <p className="text-[9px] uppercase font-bold text-muted-foreground/40 tracking-wider">
-                       Searching for matches...
-                    </p>
-                  </div>
-               )}
-
-               <div className="grid grid-cols-2 gap-2">
-                  <div className="p-1.5 rounded-lg bg-orange-500/5 border border-orange-500/10 flex justify-between items-center">
-                      <span className="text-[9px] font-bold text-orange-600/60 uppercase">fixed (i)</span>
-                      <span className="text-xs font-mono font-bold text-orange-600">{currentStep.i === -1 ? 'N/A' : currentStep.array[currentStep.i]}</span>
-                  </div>
-                  <div className="p-1.5 rounded-lg bg-green-500/5 border border-green-500/10 flex justify-between items-center">
-                      <span className="text-[9px] font-bold text-green-600/60 uppercase">left (L)</span>
-                      <span className="text-xs font-mono font-bold text-green-600">{currentStep.left === -1 ? 'N/A' : currentStep.array[currentStep.left]}</span>
-                  </div>
-                  <div className="p-1.5 rounded-lg bg-blue-500/5 border border-blue-500/10 flex justify-between items-center">
-                      <span className="text-[9px] font-bold text-blue-600/60 uppercase">right (R)</span>
-                      <span className="text-xs font-mono font-bold text-blue-600">{currentStep.right === -1 ? 'N/A' : currentStep.array[currentStep.right]}</span>
-                  </div>
-                  <div className="p-1.5 rounded-lg bg-primary/5 border border-primary/10 flex justify-between items-center">
-                      <span className="text-[9px] font-bold text-primary/60 uppercase flex items-center gap-1">
-                        <Hash className="w-2 h-2" /> results
-                      </span>
-                      <span className="text-xs font-mono font-bold text-primary">{currentStep.result.length}</span>
-                  </div>
-               </div>
-            </div>
-          </Card>
-        </div>
-      }
       controls={
         <SimpleStepControls
           currentStep={currentStepIndex}
@@ -500,6 +469,90 @@ export const ThreeSumVisualization = () => {
           onStepChange={setCurrentStepIndex}
         />
       }
+      leftContent={
+        <div className="space-y-6 flex flex-col h-full">
+          <div>
+            <Card className="p-6 bg-card/50 backdrop-blur-sm border-primary/20 mb-4">
+              <h3 className="text-xs font-semibold mb-6 text-muted-foreground uppercase tracking-widest text-center">
+                3Sum Triplet Finder
+              </h3>
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="text-xs font-semibold text-center text-muted-foreground">Sorted Array</div>
+                  <div className="flex items-center justify-center gap-2 flex-wrap min-h-[90px]">
+                    {currentStep.array.map((value, index) => {
+                      const isI = index === currentStep.i;
+                      const isL = index === currentStep.left;
+                      const isR = index === currentStep.right;
+
+                      return (
+                        <div key={index} className="flex flex-col items-center gap-1 relative pt-6">
+                          <div className="absolute top-0 flex gap-0.5 text-[9px] font-bold">
+                            {isI && <span className="bg-orange-500/10 border border-orange-500/30 text-orange-500 px-1 rounded">i</span>}
+                            {isL && <span className="bg-green-500/10 border border-green-500/30 text-green-500 px-1 rounded">L</span>}
+                            {isR && <span className="bg-blue-500/10 border border-blue-500/30 text-blue-500 px-1 rounded">R</span>}
+                          </div>
+                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm border-2 transition-all duration-300 ${
+                            currentStep.highlights.includes(index)
+                              ? 'bg-primary/20 border-primary text-primary scale-110 shadow-lg'
+                              : 'bg-muted/50 border-border text-foreground'
+                          } ${isI ? 'border-orange-500 text-orange-500' : ''} ${isL ? 'border-green-500 text-green-500' : ''} ${isR ? 'border-blue-500 text-blue-500' : ''}`}>
+                            {value}
+                          </div>
+                          <span className="text-[10px] text-muted-foreground">[{index}]</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {currentStep.result.length > 0 && (
+                  <div className="space-y-2">
+                    <div className="text-xs font-semibold text-center text-muted-foreground">Unique Triplets Found</div>
+                    <div className="flex items-center justify-center gap-2 flex-wrap">
+                      {currentStep.result.map((triplet, index) => (
+                        <div key={index} className="px-3 py-1.5 bg-primary/10 border border-primary/20 rounded-md font-mono text-xs font-bold text-primary">
+                          [{triplet.join(', ')}]
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </Card>
+          </div>
+
+          <div className="mt-auto space-y-4">
+            <Card className="p-4 bg-primary/5 border-primary/20 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
+              <h4 className="text-[10px] font-bold uppercase tracking-widest text-primary mb-2">Step Explanation</h4>
+              <p className="text-sm font-medium leading-relaxed min-h-[40px]">{currentStep.explanation}</p>
+            </Card>
+
+            <VariablePanel
+              variables={{
+                i: currentStep.i === -1 ? '-' : `${currentStep.i} (val: ${currentStep.array[currentStep.i]})`,
+                left: currentStep.left === -1 ? '-' : `${currentStep.left} (val: ${currentStep.array[currentStep.left]})`,
+                right: currentStep.right === -1 ? '-' : `${currentStep.right} (val: ${currentStep.array[currentStep.right]})`,
+                currentSum: currentStep.currentSum,
+                target: currentStep.target,
+                tripletsFound: currentStep.result.length
+              }}
+            />
+          </div>
+        </div>
+      }
+      rightContent={
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={() => setCurrentStepIndex(0)}
+        />
+      }
     />
   );
 };
+;

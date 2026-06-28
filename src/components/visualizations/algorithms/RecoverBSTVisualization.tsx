@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-
-import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
 import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
+import type { StepLineNumberMap, VisualizationLanguageMap } from '@/types/visualization';
 
 interface TreeNode {
   val: number;
@@ -19,37 +19,121 @@ interface Step {
   second: number | null;
   prev: number | null;
   message: string;
-  lineNumber: number;
+  pseudoStep: string;
+  variables: Record<string, any>;
 }
 
-export const RecoverBSTVisualization = () => {
-  const [steps, setSteps] = useState<Step[]>([]);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  const code = `function recoverTree(root) {
-  let first = null, second = null;
-  let prev = null;
-  
-  function inorder(node) {
+const languages: VisualizationLanguageMap = {
+  typescript: `function recoverTree(root: TreeNode | null): void {
+  let first: TreeNode | null = null;
+  let second: TreeNode | null = null;
+  let prev: TreeNode | null = null;
+  function inorder(node: TreeNode | null): void {
     if (!node) return;
-    
     inorder(node.left);
-    
     if (prev && prev.val > node.val) {
       if (!first) first = prev;
       second = node;
     }
     prev = node;
-    
     inorder(node.right);
   }
-  
   inorder(root);
-  [first.val, second.val] = [second.val, first.val];
-}`;
+  if (first && second) {
+    [first.val, second.val] = [second.val, first.val];
+  }
+}`,
+
+  python: `def recoverTree(root):
+    first = None
+    second = None
+    prev = None
+    def inorder(node):
+        nonlocal first, second, prev
+        if not node:
+            return
+        inorder(node.left)
+        if prev and prev.val > node.val:
+            if not first:
+                first = prev
+            second = node
+        prev = node
+        inorder(node.right)
+    inorder(root)
+    if first and second:
+        first.val, second.val = second.val, first.val`,
+
+  java: `public static class Solution {
+    private TreeNode first;
+    private TreeNode second;
+    private TreeNode prev;
+    public void recoverTree(TreeNode root) {
+        first = null;
+        second = null;
+        prev = null;
+        inorder(root);
+        if (first != null && second != null) {
+            int temp = first.val;
+            first.val = second.val;
+            second.val = temp;
+        }
+    }
+    private void inorder(TreeNode node) {
+        if (node == null) {
+            return;
+        }
+        inorder(node.left);
+        if (prev != null && prev.val > node.val) {
+            if (first == null) {
+                first = prev;
+            }
+            second = node;
+        }
+        prev = node;
+        inorder(node.right);
+    }
+}`,
+
+  cpp: `class Solution {
+private:
+    TreeNode* first;
+    TreeNode* second;
+    TreeNode* prev;
+public:
+    void recoverTree(TreeNode* root) {
+        first = nullptr;
+        second = nullptr;
+        prev = nullptr;
+        inorder(root);
+        if (first != nullptr && second != nullptr) {
+            int temp = first->val;
+            first->val = second->val;
+            second->val = temp;
+        }
+    }
+private:
+    void inorder(TreeNode* node) {
+        if (node == nullptr) {
+            return;
+        }
+        inorder(node->left);
+        if (prev != nullptr && prev->val > node->val) {
+            if (first == nullptr) {
+                first = prev;
+            }
+            second = node;
+        }
+        prev = node;
+        inorder(node->right);
+    }
+};`,
+};
+
+export const RecoverBSTVisualization = () => {
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [speed, setSpeed] = useState(1);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const deepClone = (node: TreeNode | null): TreeNode | null => {
     if (!node) return null;
@@ -71,7 +155,7 @@ export const RecoverBSTVisualization = () => {
   };
 
   const generateSteps = () => {
-    const tree: TreeNode = {
+    const initialTree: TreeNode = {
       val: 3,
       left: { val: 1, left: null, right: null },
       right: {
@@ -81,73 +165,108 @@ export const RecoverBSTVisualization = () => {
       }
     };
 
-    const newSteps: Step[] = [];
+    const steps: Step[] = [];
+    const tree = deepClone(initialTree);
+    calculatePositions(tree, 200, 50, 80);
+
     let first: TreeNode | null = null;
     let second: TreeNode | null = null;
     let prev: TreeNode | null = null;
 
-    // Helper to push positioned steps
-    const pushStep = (msg: string, line: number, current: number | null) => {
+    const stepLineNumbers: StepLineNumberMap = {
+      typescript: [],
+      python: [],
+      java: [],
+      cpp: []
+    };
+
+    const addLines = (ts: number, py: number, java: number, cpp: number) => {
+      stepLineNumbers.typescript!.push(ts);
+      stepLineNumbers.python!.push(py);
+      stepLineNumbers.java!.push(java);
+      stepLineNumbers.cpp!.push(cpp);
+    };
+
+    const addStep = (currentNode: number | null, msg: string, pseudo: string, ts_l: number, py_l: number, java_l: number, cpp_l: number) => {
       const currentTree = deepClone(tree);
       calculatePositions(currentTree, 200, 50, 80);
-      newSteps.push({
+      steps.push({
         tree: currentTree,
-        current,
+        current: currentNode,
         first: first?.val || null,
         second: second?.val || null,
         prev: prev?.val || null,
         message: msg,
-        lineNumber: line
+        pseudoStep: pseudo,
+        variables: {
+          currentNode: currentNode ?? 'null',
+          prev: prev?.val ?? 'null',
+          first: first?.val ?? 'null',
+          second: second?.val ?? 'null'
+        }
       });
+      addLines(ts_l, py_l, java_l, cpp_l);
     };
+
+    // Initialize variables
+    addStep(null, 'Initializing tracking variables (first, second, prev).', 'first = null, second = null, prev = null', 2, 2, 6, 8);
+
+    // Call inorder
+    addStep(null, 'Starting inorder traversal of the tree.', 'inorder(root)', 15, 16, 9, 11);
 
     const inorder = (node: TreeNode | null) => {
-      if (!node) return;
-
-      pushStep(`Going left from node ${node.val}.`, 8, node.val);
-      inorder(node.left);
-
-      pushStep(`Visiting node ${node.val}.${prev ? ` Comparing with prev (${prev.val}).` : ''}`, 10, node.val);
-      if (prev && prev.val > node.val) {
-        if (!first) {
-          first = prev;
-          pushStep(`Violation found: prev(${prev.val}) > current(${node.val}). Marking first as ${first.val}.`, 11, node.val);
-        }
-        second = node;
-        pushStep(`Marking second as current node (${second.val}).`, 12, node.val);
+      if (!node) {
+        addStep(null, 'Node is null. Backtrack.', 'if (!node) → return', 6, 7, 17, 20);
+        addStep(null, 'Return from null node.', 'return', 6, 8, 18, 21);
+        return;
       }
 
-      prev = node;
-      pushStep(`Updating prev to ${prev.val}.`, 14, node.val);
+      // Check if node is null (NO)
+      addStep(node.val, `Checking if node (${node.val}) is null.`, 'if (!node) → NO', 6, 7, 17, 20);
 
-      pushStep(`Going right from node ${node.val}.`, 16, node.val);
+      // Go left
+      addStep(node.val, `Traverse left subtree of node ${node.val}.`, 'inorder(node.left)', 7, 9, 20, 23);
+      inorder(node.left);
+
+      // Compare
+      addStep(node.val, `Visit node ${node.val}.${prev ? ` Compare prev (${prev.val}) with current (${node.val}).` : ''}`, 'if (prev && prev.val > node.val)', 8, 10, 21, 24);
+      if (prev && prev.val > node.val) {
+        addStep(node.val, `BST violation found: prev (${prev.val}) > current (${node.val}).`, 'if (!first)', 9, 11, 22, 25);
+        if (!first) {
+          first = prev;
+          addStep(node.val, `First incorrect node identified as prev node (${first.val}).`, `first = prev  →  ${first.val}`, 9, 12, 23, 26);
+        }
+        second = node;
+        addStep(node.val, `Second incorrect node identified as current node (${second.val}).`, `second = node  →  ${second.val}`, 10, 13, 25, 28);
+      }
+
+      // Update prev
+      prev = node;
+      addStep(node.val, `Update prev pointer to current node ${prev.val}.`, `prev = node  →  ${prev.val}`, 12, 14, 27, 30);
+
+      // Go right
+      addStep(node.val, `Traverse right subtree of node ${node.val}.`, 'inorder(node.right)', 13, 15, 28, 31);
       inorder(node.right);
     };
-
-    pushStep("Initializing tracking variables.", 2, null);
-    pushStep("Starting inorder traversal.", 19, null);
 
     inorder(tree);
 
     if (first && second) {
-      pushStep(`Identifying nodes to swap: ${first.val} and ${second.val}.`, 20, null);
+      addStep(null, `Identify incorrect nodes: ${first.val} and ${second.val}.`, 'if (first && second)', 16, 17, 10, 12);
 
       const val1 = first.val;
       const val2 = second.val;
       first.val = val2;
       second.val = val1;
 
-      pushStep(`Swapping values: ${val1} ↔ ${val2}.`, 20, null);
-      pushStep("BST recovery complete!", 21, null);
+      addStep(null, `Swap values: ${val1} ↔ ${val2} to restore BST properties.`, `swap(first.val, second.val)  →  ${val2} ↔ ${val1}`, 17, 18, 11, 13);
+      addStep(null, 'BST recovery complete!', 'RETURN', 19, 18, 15, 17);
     }
 
-    setSteps(newSteps);
-    setCurrentStepIndex(0);
+    return { steps, stepLineNumbers };
   };
 
-  useEffect(() => {
-    generateSteps();
-  }, []);
+  const [{ steps, stepLineNumbers }] = useState(generateSteps);
 
   useEffect(() => {
     if (isPlaying && currentStepIndex < steps.length - 1) {
@@ -159,7 +278,7 @@ export const RecoverBSTVisualization = () => {
           }
           return prev + 1;
         });
-      }, 1000 / speed);
+      }, 1200 / speed);
     } else {
       if (intervalRef.current) clearInterval(intervalRef.current);
     }
@@ -175,12 +294,12 @@ export const RecoverBSTVisualization = () => {
   const handleReset = () => {
     setCurrentStepIndex(0);
     setIsPlaying(false);
-    generateSteps();
   };
 
   if (steps.length === 0) return null;
 
   const currentStep = steps[currentStepIndex];
+  const pseudoSteps = steps.map(s => s.pseudoStep);
 
   const renderTree = (node: TreeNode | null): JSX.Element | null => {
     if (!node || node.x === undefined || node.y === undefined) return null;
@@ -196,11 +315,11 @@ export const RecoverBSTVisualization = () => {
         <circle
           cx={node.x}
           cy={node.y}
-          r="24"
+          r="20"
           className={`transition-all duration-300 ${node.val === currentStep.first || node.val === currentStep.second
-            ? 'fill-red-500 stroke-red-600 shadow-lg shadow-red-500/50'
+            ? 'fill-red-500 stroke-red-600 shadow-lg'
             : currentStep.current === node.val
-              ? 'fill-primary stroke-primary'
+              ? 'fill-primary stroke-primary animate-pulse'
               : 'fill-card stroke-border'
             }`}
           strokeWidth="2"
@@ -210,7 +329,7 @@ export const RecoverBSTVisualization = () => {
           y={node.y}
           textAnchor="middle"
           dy=".3em"
-          className={`text-sm font-medium transition-colors duration-300 ${node.val === currentStep.first || node.val === currentStep.second || currentStep.current === node.val
+          className={`text-sm font-semibold transition-colors duration-300 ${node.val === currentStep.first || node.val === currentStep.second || currentStep.current === node.val
             ? 'fill-white'
             : 'fill-foreground'
             }`}
@@ -239,6 +358,7 @@ export const RecoverBSTVisualization = () => {
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left: visual tree + commentary box + variable panel */}
         <div className="space-y-4">
           <div className="bg-muted/30 rounded-lg border border-border/50 p-6 pb-4 overflow-hidden">
             <svg viewBox="0 0 400 250" className="w-full h-64 overflow-visible">
@@ -246,23 +366,28 @@ export const RecoverBSTVisualization = () => {
             </svg>
           </div>
 
-          <div className={`rounded-lg border p-4 transition-all duration-300 ${currentStep.lineNumber === 20 ? 'bg-green-500/10 border-green-500' : 'bg-accent/50 border-accent'}`}>
+          <div className="bg-accent/50 rounded-lg border border-accent p-4">
             <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
           </div>
 
-          <div className="rounded-lg border bg-card p-2">
-            <VariablePanel
-              variables={{
-                current: currentStep.current ?? 'null',
-                prev: currentStep.prev ?? 'null',
-                first: currentStep.first ?? 'null',
-                second: currentStep.second ?? 'null'
-              }}
-            />
-          </div>
+          <VariablePanel
+            variables={{
+              currentNode: currentStep.current ?? 'null',
+              prev: currentStep.prev ?? 'null',
+              first: currentStep.first ?? 'null',
+              second: currentStep.second ?? 'null'
+            }}
+          />
         </div>
 
-        <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="TypeScript" />
+        {/* Right: code / pseudocode panel */}
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={handleReset}
+        />
       </div>
     </div>
   );

@@ -1,30 +1,26 @@
 import { useEffect, useRef, useState } from 'react';
-
-import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { StepControls } from '../shared/StepControls';
 import { VariablePanel } from '../shared/VariablePanel';
+import type { StepLineNumberMap, VisualizationLanguageMap } from '@/types/visualization';
 
 interface Step {
   array: number[];
   low: number;
   mid: number;
   high: number;
-  message: string;
-  lineNumber: number;
+  explanation: string;
+  pseudoStep: string;
+  variables: Record<string, any>;
 }
 
-export const DutchNationalFlagVisualization = () => {
-  const [steps, setSteps] = useState<Step[]>([]);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+// ─── Hardcoded code per language (no comments) ──────────────────────────────
 
-  const code = `function sortColors(nums: number[]): void {
+const languages: VisualizationLanguageMap = {
+  typescript: `function dutchNationalFlag(nums: number[]): void {
   let low = 0;
   let mid = 0;
   let high = nums.length - 1;
-  
   while (mid <= high) {
     if (nums[mid] === 0) {
       [nums[low], nums[mid]] = [nums[mid], nums[low]];
@@ -37,186 +33,259 @@ export const DutchNationalFlagVisualization = () => {
       high--;
     }
   }
-}`;
+}`,
 
-  const generateSteps = () => {
-    const initialArray = [2, 0, 2, 1, 1, 0, 2, 1, 0];
-    const newSteps: Step[] = [];
-    const nums = [...initialArray];
-    let low = 0, mid = 0, high = nums.length - 1;
+  python: `def dutch_national_flag(nums):
+    low = 0
+    mid = 0
+    high = len(nums) - 1
+    while mid <= high:
+        if nums[mid] == 0:
+            nums[low], nums[mid] = nums[mid], nums[low]
+            low += 1
+            mid += 1
+        elif nums[mid] == 1:
+            mid += 1
+        else:
+            nums[mid], nums[high] = nums[high], nums[mid]
+            high -= 1`,
 
-    // Line 1: Function entry
-    newSteps.push({
-      array: [...nums],
-      low: -1,
-      mid: -1,
-      high: -1,
-      message: 'Starting Dutch National Flag algorithm (Sort Colors).',
-      lineNumber: 1
-    });
-
-    // Line 2: Initialize low
-    low = 0;
-    newSteps.push({
-      array: [...nums],
-      low,
-      mid: -1,
-      high: -1,
-      message: 'Initialize low pointer at index 0.',
-      lineNumber: 2
-    });
-
-    // Line 3: Initialize mid
-    mid = 0;
-    newSteps.push({
-      array: [...nums],
-      low,
-      mid,
-      high: -1,
-      message: 'Initialize mid pointer at index 0.',
-      lineNumber: 3
-    });
-
-    // Line 4: Initialize high
-    high = nums.length - 1;
-    newSteps.push({
-      array: [...nums],
-      low,
-      mid,
-      high,
-      message: `Initialize high pointer at index ${high}.`,
-      lineNumber: 4
-    });
-
+  java: `public void sortColors(int[] nums) {
+    int low = 0, mid = 0, high = nums.length - 1;
     while (mid <= high) {
-      // Line 6: While condition
-      newSteps.push({
-        array: [...nums],
-        low,
-        mid,
-        high,
-        message: `Check condition: mid (${mid}) <= high (${high}) is true.`,
-        lineNumber: 6
-      });
-
-      // Line 7: Check if nums[mid] === 0
-      newSteps.push({
-        array: [...nums],
-        low,
-        mid,
-        high,
-        message: `Check if nums[mid] (${nums[mid]}) is 0.`,
-        lineNumber: 7
-      });
-
-      if (nums[mid] === 0) {
-        // Line 8: Swap low and mid
-        [nums[low], nums[mid]] = [nums[mid], nums[low]];
-        newSteps.push({
-          array: [...nums],
-          low,
-          mid,
-          high,
-          message: `nums[mid] is 0. Swap nums[low] and nums[mid].`,
-          lineNumber: 8
-        });
-
-        // Line 9: low++
-        low++;
-        newSteps.push({
-          array: [...nums],
-          low,
-          mid,
-          high,
-          message: 'Move low pointer forward.',
-          lineNumber: 9
-        });
-
-        // Line 10: mid++
-        mid++;
-        newSteps.push({
-          array: [...nums],
-          low,
-          mid,
-          high,
-          message: 'Move mid pointer forward.',
-          lineNumber: 10
-        });
-
-      } else if (nums[mid] === 1) {
-        // Line 11: Check if nums[mid] === 1
-        newSteps.push({
-          array: [...nums],
-          low,
-          mid,
-          high,
-          message: `nums[mid] is 1. Already in the middle region.`,
-          lineNumber: 11
-        });
-
-        // Line 12: mid++
-        mid++;
-        newSteps.push({
-          array: [...nums],
-          low,
-          mid,
-          high,
-          message: 'Move mid pointer forward.',
-          lineNumber: 12
-        });
-
-      } else {
-        // Line 13: nums[mid] is 2
-        newSteps.push({
-          array: [...nums],
-          low,
-          mid,
-          high,
-          message: `nums[mid] is 2. Needs to go to the high region.`,
-          lineNumber: 11 // Mapping else if check or the logic below
-        });
-
-        // Line 14: Swap mid and high
-        [nums[mid], nums[high]] = [nums[high], nums[mid]];
-        newSteps.push({
-          array: [...nums],
-          low,
-          mid,
-          high,
-          message: `Swap nums[mid] and nums[high].`,
-          lineNumber: 14
-        });
-
-        // Line 15: high--
-        high--;
-        newSteps.push({
-          array: [...nums],
-          low,
-          mid,
-          high,
-          message: 'Move high pointer backward. Mid stays current to check swapped value.',
-          lineNumber: 15
-        });
-      }
+        if (nums[mid] == 0) {
+            int tmp = nums[low];
+            nums[low] = nums[mid];
+            nums[mid] = tmp;
+            low++;
+            mid++;
+        }
+        else if (nums[mid] == 1) {
+            mid++;
+        }
+        else {
+            int tmp = nums[mid];
+            nums[mid] = nums[high];
+            nums[high] = tmp;
+            high--;
+        }
     }
+}`,
 
-    // Line 18: Completion
-    newSteps.push({
-      array: [...nums],
-      low,
-      mid,
-      high,
-      message: 'Algorithm complete. Array is now sorted.',
-      lineNumber: 18
-    });
+  cpp: `void dutchNationalFlag(vector<int>& nums) {
+    int low = 0;
+    int mid = 0;
+    int high = nums.size() - 1;
+    while (mid <= high) {
+        if (nums[mid] == 0) {
+            swap(nums[low], nums[mid]);
+            low++;
+            mid++;
+        }
+        else if (nums[mid] == 1) {
+            mid++;
+        }
+        else {
+            swap(nums[mid], nums[high]);
+            high--;
+        }
+    }
+}`,
+};
 
-    setSteps(newSteps);
-    setCurrentStepIndex(0);
+// ─── Step generator ──────────────────────────────────────────────────────────
+
+function generateVisualizationData() {
+  const initialArray = [2, 0, 2, 1, 1, 0, 2, 1, 0];
+  const steps: Step[] = [];
+  const nums = [...initialArray];
+  const stepLineNumbers: StepLineNumberMap = {
+    typescript: [],
+    python: [],
+    java: [],
+    cpp: []
   };
 
-  useEffect(() => {
-    generateSteps();
-  }, []);
+  const addLines = (ts: number, py: number, java: number, cpp: number) => {
+    stepLineNumbers.typescript!.push(ts);
+    stepLineNumbers.python!.push(py);
+    stepLineNumbers.java!.push(java);
+    stepLineNumbers.cpp!.push(cpp);
+  };
+
+  let low = 0;
+  steps.push({
+    array: [...nums],
+    low: 0,
+    mid: -1,
+    high: -1,
+    explanation: 'Initialize low pointer to 0.',
+    pseudoStep: 'SET low = 0',
+    variables: { low: 0, mid: '-', high: '-', 'nums[mid]': '-' }
+  });
+  addLines(2, 2, 2, 2);
+
+  let mid = 0;
+  steps.push({
+    array: [...nums],
+    low,
+    mid: 0,
+    high: -1,
+    explanation: 'Initialize mid pointer to 0.',
+    pseudoStep: 'SET mid = 0',
+    variables: { low, mid: 0, high: '-', 'nums[mid]': nums[0] }
+  });
+  addLines(3, 3, 2, 3);
+
+  let high = nums.length - 1;
+  steps.push({
+    array: [...nums],
+    low,
+    mid,
+    high,
+    explanation: `Initialize high pointer to the last index (${high}).`,
+    pseudoStep: `SET high = nums.length − 1  →  ${high}`,
+    variables: { low, mid, high, 'nums[mid]': nums[mid] }
+  });
+  addLines(4, 4, 2, 4);
+
+  while (mid <= high) {
+    steps.push({
+      array: [...nums],
+      low,
+      mid,
+      high,
+      explanation: `Check loop condition: mid (${mid}) <= high (${high}) is true.`,
+      pseudoStep: `WHILE mid <= high  →  ${mid} <= ${high}  →  YES ✓`,
+      variables: { low, mid, high, 'nums[mid]': nums[mid] }
+    });
+    addLines(5, 5, 3, 5);
+
+    steps.push({
+      array: [...nums],
+      low,
+      mid,
+      high,
+      explanation: `Compare current value nums[mid] (${nums[mid]}) with 0.`,
+      pseudoStep: `IF nums[mid] == 0  →  ${nums[mid]} == 0  →  ${nums[mid] === 0 ? 'YES ✓' : 'NO ✗'}`,
+      variables: { low, mid, high, 'nums[mid]': nums[mid] }
+    });
+    addLines(6, 6, 4, 6);
+
+    if (nums[mid] === 0) {
+      const prevLowVal = nums[low];
+      const prevMidVal = nums[mid];
+      [nums[low], nums[mid]] = [nums[mid], nums[low]];
+      steps.push({
+        array: [...nums],
+        low,
+        mid,
+        high,
+        explanation: `nums[mid] is 0. Swap nums[low] (${prevLowVal}) and nums[mid] (${prevMidVal}) to move it to the low section.`,
+        pseudoStep: `SWAP nums[low], nums[mid]  →  swap index ${low} & ${mid}`,
+        variables: { low, mid, high, 'nums[mid]': nums[mid] }
+      });
+      addLines(7, 7, 5, 7);
+
+      low++;
+      steps.push({
+        array: [...nums],
+        low,
+        mid,
+        high,
+        explanation: `Increment low pointer to ${low}.`,
+        pseudoStep: 'low++  (move low boundary right)',
+        variables: { low, mid, high, 'nums[mid]': nums[mid] }
+      });
+      addLines(8, 8, 8, 8);
+
+      mid++;
+      steps.push({
+        array: [...nums],
+        low,
+        mid,
+        high,
+        explanation: `Increment mid pointer to ${mid}.`,
+        pseudoStep: 'mid++  (move mid pointer right)',
+        variables: { low, mid, high, 'nums[mid]': mid <= high ? nums[mid] : 'done' }
+      });
+      addLines(9, 9, 9, 9);
+    } else {
+      steps.push({
+        array: [...nums],
+        low,
+        mid,
+        high,
+        explanation: `Compare current value nums[mid] (${nums[mid]}) with 1.`,
+        pseudoStep: `ELSE IF nums[mid] == 1  →  ${nums[mid]} == 1  →  ${nums[mid] === 1 ? 'YES ✓' : 'NO ✗'}`,
+        variables: { low, mid, high, 'nums[mid]': nums[mid] }
+      });
+      addLines(10, 10, 11, 11);
+
+      if (nums[mid] === 1) {
+        mid++;
+        steps.push({
+          array: [...nums],
+          low,
+          mid,
+          high,
+          explanation: `nums[mid] is 1, which belongs in the middle. Just increment mid pointer to ${mid}.`,
+          pseudoStep: 'mid++  (value is 1, keep in middle)',
+          variables: { low, mid, high, 'nums[mid]': mid <= high ? nums[mid] : 'done' }
+        });
+        addLines(11, 11, 12, 12);
+      } else {
+        const prevHighVal = nums[high];
+        const prevMidVal = nums[mid];
+        [nums[mid], nums[high]] = [nums[high], nums[mid]];
+        steps.push({
+          array: [...nums],
+          low,
+          mid,
+          high,
+          explanation: `nums[mid] is 2. Swap nums[mid] (${prevMidVal}) and nums[high] (${prevHighVal}) to move it to the high section.`,
+          pseudoStep: `SWAP nums[mid], nums[high]  →  swap index ${mid} & ${high}`,
+          variables: { low, mid, high, 'nums[mid]': nums[mid] }
+        });
+        addLines(13, 13, 15, 15);
+
+        high--;
+        steps.push({
+          array: [...nums],
+          low,
+          mid,
+          high,
+          explanation: `Decrement high pointer to ${high}. Mid stays current to inspect the swapped value.`,
+          pseudoStep: 'high--  (move high boundary left)',
+          variables: { low, mid, high, 'nums[mid]': nums[mid] }
+        });
+        addLines(14, 14, 18, 16);
+      }
+    }
+  }
+
+  steps.push({
+    array: [...nums],
+    low,
+    mid,
+    high,
+    explanation: 'Algorithm finished. All colors sorted: Red (0), White (1), and Blue (2).',
+    pseudoStep: 'RETURN  (sorted)',
+    variables: { low, mid, high, 'nums[mid]': 'done' }
+  });
+  addLines(17, 14, 21, 19);
+
+  return { steps, stepLineNumbers };
+}
+
+// ─── Component ───────────────────────────────────────────────────────────────
+
+export const DutchNationalFlagVisualization = () => {
+  const [{ steps, stepLineNumbers }] = useState(generateVisualizationData);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [speed, setSpeed] = useState(1);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (isPlaying && currentStepIndex < steps.length - 1) {
@@ -239,17 +308,17 @@ export const DutchNationalFlagVisualization = () => {
 
   const handlePlay = () => setIsPlaying(true);
   const handlePause = () => setIsPlaying(false);
-  const handleStepForward = () => currentStepIndex < steps.length - 1 && setCurrentStepIndex(prev => prev + 1);
-  const handleStepBack = () => currentStepIndex > 0 && setCurrentStepIndex(prev => prev - 1);
+  const handleStepForward = () => currentStepIndex < steps.length - 1 && setCurrentStepIndex(p => p + 1);
+  const handleStepBack = () => currentStepIndex > 0 && setCurrentStepIndex(p => p - 1);
   const handleReset = () => {
     setCurrentStepIndex(0);
     setIsPlaying(false);
-    generateSteps();
   };
 
   if (steps.length === 0) return null;
 
   const currentStep = steps[currentStepIndex];
+  const pseudoSteps = steps.map(s => s.pseudoStep);
 
   const getColorClass = (value: number) => {
     switch (value) {
@@ -276,6 +345,7 @@ export const DutchNationalFlagVisualization = () => {
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left: visual state */}
         <div className="space-y-4">
           <div className="bg-muted/30 rounded-lg border border-border/50 p-6">
             <div className="flex items-center justify-center gap-2 flex-wrap">
@@ -286,13 +356,13 @@ export const DutchNationalFlagVisualization = () => {
 
                 return (
                   <div key={index} className="flex flex-col items-center gap-2 relative">
-                    <div className="text-xs space-y-0.5 h-8">
-                      {isLow && <div className="font- text-blue-500">LOW</div>}
-                      {isMid && <div className="font- text-primary">MID</div>}
-                      {isHigh && <div className="font- text-blue-500">HIGH</div>}
+                    <div className="text-xs space-y-0.5 h-8 flex flex-col justify-end items-center">
+                      {isLow && <div className="font-semibold text-blue-500">Low</div>}
+                      {isMid && <div className="font-semibold text-blue-500">Mid</div>}
+                      {isHigh && <div className="font-semibold text-blue-500">High</div>}
                     </div>
                     <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center font- text-lg transition-all duration-300 ${getColorClass(
+                      className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold text-lg transition-all duration-300 ${getColorClass(
                         value
                       )} ${isMid ? 'shadow-lg shadow-primary/50 scale-110 ring-4 ring-primary' :
                         isLow || isHigh ? 'scale-105' : ''
@@ -309,39 +379,52 @@ export const DutchNationalFlagVisualization = () => {
             <div className="mt-6 flex justify-center gap-4 text-sm">
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded-full bg-red-500"></div>
-                <span className="text-muted-foreground">0 (Red)</span>
+                <span className="text-muted-foreground text-xs">0 (Red)</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-400"></div>
-                <span className="text-muted-foreground">1 (White)</span>
+                <span className="text-muted-foreground text-xs">1 (White)</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded-full bg-blue-500"></div>
-                <span className="text-muted-foreground">2 (Blue)</span>
+                <span className="text-muted-foreground text-xs">2 (Blue)</span>
               </div>
             </div>
           </div>
 
           <div className="bg-accent/50 rounded-lg border border-accent p-4">
-            <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
+            <p className="text-sm font-medium text-foreground">{currentStep.explanation}</p>
           </div>
 
-          <div className=" rounded-lg p-4">
-            <VariablePanel
-              variables={{
-                low: currentStep.low,
-                mid: currentStep.mid,
-                high: currentStep.high,
-                'nums[mid]': currentStep.mid <= currentStep.high ? currentStep.array[currentStep.mid] : 'done'
-              }}
-            />
+          <div className="bg-muted/50 rounded-lg border p-4">
+            <h3 className="font-semibold mb-2 text-sm text-foreground">Dutch National Flag Strategy:</h3>
+            <div className="text-xs space-y-1 text-muted-foreground">
+              <p>• Divide the array into three sections: low (0s), mid (1s), and high (2s)</p>
+              <p>• Pointers track boundaries: `low` (end of 0s), `mid` (current element), `high` (start of 2s)</p>
+              <p>• Swap element at `mid` to its correct region and update boundaries accordingly</p>
+              <p>• Time: O(n) · Space: O(1) in-place</p>
+            </div>
           </div>
+
+          <VariablePanel
+            variables={{
+              low: currentStep.low,
+              mid: currentStep.mid,
+              high: currentStep.high,
+              'nums[mid]': currentStep.mid >= 0 && currentStep.mid <= currentStep.high ? currentStep.array[currentStep.mid] : 'done'
+            }}
+          />
         </div>
 
-        <AnimatedCodeEditor code={code} highlightedLines={[currentStep.lineNumber]} language="TypeScript" />
+        {/* Right: code / pseudocode panel */}
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={handleReset}
+        />
       </div>
-
-
     </div>
   );
 };

@@ -74,7 +74,7 @@ export const SimpleStepControls = ({
   };
 
   return (
-    <div className="flex items-center gap-4 flex-wrap">
+    <div className="flex items-center gap-4 flex-wrap w-full">
       {/* Playback Controls */}
       <div className="flex items-center gap-2">
         <Button
@@ -117,7 +117,7 @@ export const SimpleStepControls = ({
       </div>
 
       {/* Speed Control */}
-      <div className="flex items-center gap-2 flex-1 min-w-[200px]">
+      <div className="flex items-center gap-2 flex-1 min-w-[120px] max-w-[150px]">
         <span className="text-sm text-muted-foreground whitespace-nowrap">
           Speed: {speed.toFixed(1)}x
         </span>

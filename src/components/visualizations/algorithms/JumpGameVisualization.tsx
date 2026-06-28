@@ -2,8 +2,10 @@ import React, { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
+import type { StepLineNumberMap, VisualizationLanguageMap } from '@/types/visualization';
+import { Info } from 'lucide-react';
 
 interface Step {
   nums: number[];
@@ -11,19 +13,11 @@ interface Step {
   goal: number | null;
   variables: Record<string, any>;
   explanation: string;
-  highlightedLines: number[];
-  lineExecution: string;
+  pseudoStep: string;
 }
 
-export const JumpGameVisualization: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [caseType, setCaseType] = useState<'reachable' | 'unreachable'>('reachable');
-
-  const nums = useMemo(() => 
-    caseType === 'reachable' ? [2, 3, 1, 1, 4] : [3, 2, 1, 0, 4], 
-  [caseType]);
-
-  const code = `function canJump(nums: number[]): boolean {
+const languages: VisualizationLanguageMap = {
+  typescript: `function canJump(nums: number[]): boolean {
   let goal = nums.length - 1;
   for (let i = nums.length - 1; i >= 0; i--) {
     if (i + nums[i] >= goal) {
@@ -31,10 +25,65 @@ export const JumpGameVisualization: React.FC = () => {
     }
   }
   return goal === 0;
-}`;
+}`,
 
-  const steps = useMemo(() => {
+  python: `def canJump(nums: list[int]) -> bool:
+    goal = len(nums) - 1
+    for i in range(len(nums) - 1, -1, -1):
+        if i + nums[i] >= goal:
+            goal = i
+    return goal == 0`,
+
+  java: `public static class Solution {
+    public boolean canJump(int[] nums) {
+        int goal = nums.length - 1;
+        for (int i = nums.length - 1; i >= 0; i--) {
+            if (i + nums[i] >= goal) {
+                goal = i;
+            }
+        }
+        return goal == 0;
+    }
+}`,
+
+  cpp: `class Solution {
+public:
+    bool canJump(vector<int>& nums) {
+        int goal = nums.size() - 1;
+        for (int i = nums.size() - 1; i >= 0; i--) {
+            if (i + nums[i] >= goal) {
+                goal = i;
+            }
+        }
+        return goal == 0;
+    }
+};`
+};
+
+export const JumpGameVisualization: React.FC = () => {
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [caseType, setCaseType] = useState<'reachable' | 'unreachable'>('reachable');
+
+  const nums = useMemo(() => 
+    caseType === 'reachable' ? [2, 3, 1, 1, 4] : [3, 2, 1, 0, 4], 
+  [caseType]);
+
+  const { steps, stepLineNumbers } = useMemo(() => {
     const stepsList: Step[] = [];
+    const stepLines: StepLineNumberMap = {
+      typescript: [],
+      python: [],
+      java: [],
+      cpp: []
+    };
+
+    const addLines = (ts: number, py: number, java: number, cpp: number) => {
+      stepLines.typescript!.push(ts);
+      stepLines.python!.push(py);
+      stepLines.java!.push(java);
+      stepLines.cpp!.push(cpp);
+    };
+
     const n = nums.length;
     let goal = n - 1;
 
@@ -43,10 +92,10 @@ export const JumpGameVisualization: React.FC = () => {
       i: null,
       goal: null,
       variables: { nums: `[${nums.join(', ')}]` },
-      explanation: `Use Case: ${caseType.toUpperCase()}. Can we reach the last index? We work backward from target index ${n-1}.`,
-      lineExecution: "function canJump(nums: number[]): boolean {",
-      highlightedLines: [1]
+      explanation: `Check if we can reach the last index. We use a greedy strategy working backward from target index ${n-1}.`,
+      pseudoStep: `START canJump(nums=[${nums.join(', ')}])`,
     });
+    addLines(1, 1, 2, 3);
 
     stepsList.push({
       nums,
@@ -54,9 +103,9 @@ export const JumpGameVisualization: React.FC = () => {
       goal: n - 1,
       variables: { goal: n - 1 },
       explanation: `Initially, the target we must reach is the last index (${n - 1}).`,
-      lineExecution: "let goal = nums.length - 1;",
-      highlightedLines: [2]
+      pseudoStep: `SET goal = ${n - 1}`,
     });
+    addLines(2, 2, 3, 4);
 
     for (let i = n - 1; i >= 0; i--) {
       stepsList.push({
@@ -64,10 +113,10 @@ export const JumpGameVisualization: React.FC = () => {
         i,
         goal,
         variables: { i, goal },
-        explanation: `Checking index ${i}. Target goal post is at index ${goal}.`,
-        lineExecution: "for (let i = nums.length - 1; i >= 0; i--) {",
-        highlightedLines: [3]
+        explanation: `Checking index ${i}. Current goal post is at index ${goal}.`,
+        pseudoStep: `FOR i = ${i} down to 0`,
       });
+      addLines(3, 3, 4, 5);
 
       const reach = i + nums[i];
       const canReach = reach >= goal;
@@ -77,10 +126,10 @@ export const JumpGameVisualization: React.FC = () => {
         i,
         goal,
         variables: { i, "nums[i]": nums[i], reach, goal, result: canReach },
-        explanation: `Index ${i} jumps to ${reach}. Is this >= ${goal}? ${canReach ? "Yes." : "No."}`,
-        lineExecution: "if (i + nums[i] >= goal) {",
-        highlightedLines: [4]
+        explanation: `Index ${i} has jump size ${nums[i]}, reaching up to index ${reach}. Is reach >= goal? ${canReach ? "Yes." : "No."}`,
+        pseudoStep: `IF i + nums[i] >= goal → ${i} + ${nums[i]} >= ${goal} → ${canReach ? "YES ✓" : "NO ✗"}`,
       });
+      addLines(4, 4, 5, 6);
 
       if (canReach) {
         goal = i;
@@ -89,10 +138,10 @@ export const JumpGameVisualization: React.FC = () => {
           i,
           goal,
           variables: { goal },
-          explanation: `Updated: Index ${i} can reach the goal, so ${i} becomes the new target index.`,
-          lineExecution: "goal = i;",
-          highlightedLines: [5]
+          explanation: `Since index ${i} can reach the current goal, update the goal to ${i}. Any index that reaches ${i} can now reach the end.`,
+          pseudoStep: `SET goal = ${i}`,
         });
+        addLines(5, 5, 6, 7);
       }
     }
 
@@ -101,29 +150,34 @@ export const JumpGameVisualization: React.FC = () => {
       i: null,
       goal,
       variables: { goal, result: goal === 0 },
-      explanation: `Finished. Did we reach index 0? ${goal === 0 ? "YES (Successful)" : "NO (Failed)"}. Final result: ${goal === 0}.`,
-      lineExecution: "return goal === 0;",
-      highlightedLines: [8]
+      explanation: `Finished checking all indices. The leftmost index that can reach the end is ${goal}. Can we reach it from the start? ${goal === 0 ? "YES" : "NO"}.`,
+      pseudoStep: `RETURN goal === 0 → ${goal === 0 ? "TRUE" : "FALSE"}`,
     });
+    addLines(8, 6, 9, 10);
 
-    return stepsList;
+    return { steps: stepsList, stepLineNumbers: stepLines };
   }, [nums, caseType]);
 
   const handleCaseToggle = (type: 'reachable' | 'unreachable') => {
     setCaseType(type);
-    setCurrentStep(0);
+    setCurrentStepIndex(0);
   };
 
-  const step = steps[currentStep];
+  const handleReset = () => {
+    setCurrentStepIndex(0);
+  };
+
+  const step = steps[currentStepIndex];
+  const pseudoSteps = steps.map(s => s.pseudoStep);
 
   return (
     <VisualizationLayout
       leftContent={
-        <div className="space-y-4 flex flex-col h-full">
-          <div className="flex gap-2 mb-2">
+        <div className="space-y-6">
+          <div className="flex gap-2">
             <button 
               onClick={() => handleCaseToggle('reachable')}
-              className={`px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${
                 caseType === 'reachable' ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted text-muted-foreground hover:bg-muted/80"
               }`}
             >
@@ -131,7 +185,7 @@ export const JumpGameVisualization: React.FC = () => {
             </button>
             <button 
               onClick={() => handleCaseToggle('unreachable')}
-              className={`px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${
                 caseType === 'unreachable' ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted text-muted-foreground hover:bg-muted/80"
               }`}
             >
@@ -139,99 +193,89 @@ export const JumpGameVisualization: React.FC = () => {
             </button>
           </div>
 
-          <div>
-            <h2 className="text-sm font-bold text-foreground mb-3 opacity-90">
-              Jump Game (Greedy Strategy)
-            </h2>
-            <Card className="p-4 bg-card/60 backdrop-blur border-border/50 shadow-sm overflow-hidden relative">
-              <div className="mb-6">
-                <div className="flex gap-2 justify-center items-end">
-                  {nums.map((num, idx) => {
-                    const isGoal = idx === step.goal;
-                    const isCurrent = idx === step.i;
-                    const isPassed = step.goal !== null && idx > step.goal;
-                    
-                    return (
-                      <div key={idx} className="flex flex-col items-center gap-1 group relative">
-                        <div 
-                          className={`w-8 h-8 flex items-center justify-center rounded border-2 font-black transition-colors duration-0 ${
-                            isGoal ? "border-green-500 bg-green-100 text-black shadow-sm ring-2 ring-green-500/10" :
-                            isCurrent ? "border-orange-500 bg-orange-100 text-black scale-105 z-10" :
-                            isPassed ? "border-green-200 bg-green-50/50 text-gray-400" :
-                            "border-gray-100 bg-white text-black"
-                          }`}
-                        >
-                          <span className="text-xs">{num}</span>
-                        </div>
-                        <div className="h-3 flex items-center">
-                          {isGoal && <div className="text-[8px] font-black text-green-700 bg-green-200 px-1 rounded uppercase tracking-tighter">Goal</div>}
-                          {!isGoal && isCurrent && <div className="text-[8px] font-black text-orange-700 bg-orange-200 px-1 rounded uppercase tracking-tighter">i</div>}
-                        </div>
-                      </div>
-                    );
-                  })}
+          <Card className="p-6 bg-card/60 backdrop-blur border-border/50 shadow-sm overflow-hidden relative">
+            <h3 className="text-sm font-semibold mb-6 text-center text-foreground font-sans">
+              Array State & Goal Post
+            </h3>
+            <div className="flex gap-3 justify-center items-end h-16">
+              {nums.map((num, idx) => {
+                const isGoal = idx === step.goal;
+                const isCurrent = idx === step.i;
+                const isPassed = step.goal !== null && idx > step.goal;
+                
+                return (
+                  <div key={idx} className="flex flex-col items-center gap-1.5 group relative">
+                    <div 
+                      className={`w-10 h-10 flex items-center justify-center rounded-lg border-2 font-black transition-all duration-300 ${
+                        isGoal ? "border-green-500 bg-green-500/10 text-green-600 dark:text-green-400 shadow-sm scale-105" :
+                        isCurrent ? "border-orange-500 bg-orange-500/10 text-orange-600 dark:text-orange-400 scale-110 z-10 font-bold" :
+                        isPassed ? "border-border/30 bg-muted/10 text-muted-foreground/30" :
+                        "border-border bg-muted/20 text-muted-foreground"
+                      }`}
+                    >
+                      <span className="text-sm font-mono">{num}</span>
+                    </div>
+                    <div className="h-4 flex items-center">
+                      {isGoal && <div className="text-[8px] font-bold text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-950/50 px-1 rounded uppercase">Goal</div>}
+                      {!isGoal && isCurrent && <div className="text-[8px] font-bold text-orange-700 dark:text-orange-400 bg-orange-100 dark:bg-orange-950/50 px-1.5 rounded uppercase">i</div>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+
+          {/* Commentary Panel */}
+          <Card className="p-6 bg-card border-border/50 shadow-sm relative overflow-hidden transition-all duration-300">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-border/40">
+                <div className="flex items-center gap-2">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full bg-primary opacity-75 rounded-full" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+                  </span>
+                  <span className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">
+                    Algorithm Commentary
+                  </span>
+                </div>
+                <div className="font-mono text-[10px] tracking-tight bg-muted/60 text-muted-foreground px-2 py-0.5 rounded-full border border-border/40">
+                  Step {currentStepIndex + 1} of {steps.length}
                 </div>
               </div>
 
-              {step.goal !== null && (
-                <div className="mt-2 p-3 rounded bg-green-50 border border-green-200 flex items-center justify-between">
-                  <div>
-                    <div className="text-[8px] font-bold text-green-700 uppercase tracking-widest mb-0.5">Current Target</div>
-                    <div className="text-xs font-black text-black">Index {step.goal}</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-[8px] font-bold text-green-600 uppercase tracking-widest mb-0.5">Dist to Start</div>
-                    <div className="text-xs font-black text-black">{step.goal}</div>
+              <div className="flex items-start gap-4">
+                <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                  <Info className="w-4.5 h-4.5 text-primary" />
+                </div>
+                <div className="space-y-1 flex-1">
+                  <h4 className="text-[11px] font-bold uppercase tracking-widest text-primary/70">
+                    Current Action
+                  </h4>
+                  <div className="text-sm font-medium leading-relaxed text-foreground/90 select-none">
+                    {step.explanation}
                   </div>
                 </div>
-              )}
-            </Card>
-          </div>
+              </div>
+            </div>
+          </Card>
 
-          <div>
-             <Card className="p-4 border-l-4 border-primary bg-primary/5 shadow-sm">
-                <div className="space-y-3">
-                  <div>
-                    <h4 className="text-[9px] font-bold uppercase tracking-[0.1em] text-primary/80 mb-1">
-                       Current Execution
-                    </h4>
-                    <div className="text-[11px] font-mono bg-background/80 p-1.5 rounded border border-border/50 shadow-sm inline-block">
-                       {step.lineExecution}
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="text-[9px] font-bold uppercase tracking-[0.1em] text-primary/80 mb-0.5">
-                       Commentary
-                    </h4>
-                    <p className="text-[12px] font-medium leading-tight text-foreground/90 whitespace-pre-wrap text-black">
-                       {step.explanation}
-                    </p>
-                  </div>
-                </div>
-             </Card>
-          </div>
+          <VariablePanel variables={step.variables} />
         </div>
       }
       rightContent={
-        <div className="space-y-4 flex flex-col h-full">
-           <div className="flex-1 overflow-hidden min-h-[400px]">
-             <AnimatedCodeEditor
-               code={code}
-               language="typescript"
-               highlightedLines={step.highlightedLines}
-             />
-           </div>
-           
-           <div className="p-1">
-             <VariablePanel variables={step.variables} />
-           </div>
-        </div>
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={handleReset}
+        />
       }
       controls={
         <SimpleStepControls
-          currentStep={currentStep}
+          currentStep={currentStepIndex}
           totalSteps={steps.length}
-          onStepChange={setCurrentStep}
+          onStepChange={setCurrentStepIndex}
         />
       }
     />
