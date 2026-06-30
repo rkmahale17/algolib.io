@@ -1890,7 +1890,7 @@ export const ProblemDescriptionPanel = React.memo(
 
                       {/* List */}
                       <div className="space-y-2">
-                        {[...submissions].reverse().map((sub) => (
+                        {submissions.map((sub) => (
                           <div
                             key={sub.id}
                             className="grid grid-cols-12 gap-2 p-3 rounded-lg border bg-card hover:bg-muted/50 cursor-pointer transition-colors items-center text-sm shadow-sm"
