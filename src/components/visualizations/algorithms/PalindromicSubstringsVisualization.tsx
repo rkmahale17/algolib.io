@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ListFilter, Hash } from 'lucide-react';
 import { VariablePanel } from '../shared/VariablePanel';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
+import { ListFilter, Hash } from 'lucide-react';
+import type { VisualizationLanguageMap, StepLineNumberMap } from '@/types/visualization';
 
 interface Step {
   s: string;
@@ -13,13 +14,27 @@ interface Step {
   r: number;
   totalRes: number;
   paliRes: number;
-  comment: string;
-  highlightedLines: number[];
+  explanation: string;
+  pseudoStep: string;
   phase: 'odd' | 'even' | 'init' | 'result';
 }
 
-export const PalindromicSubstringsVisualization = () => {
-  const code = `function countSubstrings(s: string): number {
+const languages: VisualizationLanguageMap = {
+  python: `def countSubstrings(s: str) -> int:
+    def countPali(s: str, l: int, r: int) -> int:
+        res = 0
+        while l >= 0 and r < len(s) and s[l] == s[r]:
+            res += 1
+            l -= 1
+            r += 1
+        return res
+    res = 0
+    for i in range(len(s)):
+        res += countPali(s, i, i)
+        res += countPali(s, i, i + 1)
+    return res`,
+
+  typescript: `function countSubstrings(s: string): number {
   let res = 0;
   for (let i = 0; i < s.length; i++) {
     res += countPali(s, i, i);
@@ -36,50 +51,215 @@ function countPali(s: string, l: number, r: number): number {
     r++;
   }
   return res;
-}`;
+}`,
 
-  const cases = {
-    "aaa": {
-      steps: [
-        { s: "aaa", i: -1, l: -1, r: -1, totalRes: 0, paliRes: 0, phase: 'init', comment: "Initialize the total result counter `res` to 0.", highlightedLines: [2] },
-        { s: "aaa", i: 0, l: 0, r: 0, totalRes: 0, paliRes: 0, phase: 'odd', comment: "i=0: Expanding for odd-length palindromes centered at 'a' (index 0).", highlightedLines: [3, 4, 10, 11] },
-        { s: "aaa", i: 0, l: 0, r: 0, totalRes: 0, paliRes: 1, phase: 'odd', comment: "Condition check: l=0, r=0 match. Palindrome 'a' found. Local `res` = 1.", highlightedLines: [12, 13] },
-        { s: "aaa", i: 0, l: -1, r: 1, totalRes: 0, paliRes: 1, phase: 'odd', comment: "Expand l=-1. Boundary check fails. Return 1 to `totalRes`.", highlightedLines: [12, 17] },
-        { s: "aaa", i: 0, l: -1, r: -1, totalRes: 1, paliRes: 0, phase: 'odd', comment: "Total updated: 0 + 1 = 1.", highlightedLines: [4] },
-        { s: "aaa", i: 0, l: 0, r: 1, totalRes: 1, paliRes: 0, phase: 'even', comment: "i=0: Even expansion between index 0 and 1.", highlightedLines: [5, 10, 11] },
-        { s: "aaa", i: 0, l: 0, r: 1, totalRes: 1, paliRes: 1, phase: 'even', comment: "Match! Palindrome 'aa' found. Local `res` = 1.", highlightedLines: [12, 13] },
-        { s: "aaa", i: 0, l: -1, r: 2, totalRes: 1, paliRes: 1, phase: 'even', comment: "Expand: l=-1 out of bounds.", highlightedLines: [12, 17] },
-        { s: "aaa", i: 0, l: -1, r: -1, totalRes: 2, paliRes: 0, phase: 'even', comment: "Total updated: 1 + 1 = 2.", highlightedLines: [5] },
-        { s: "aaa", i: 1, l: 1, r: 1, totalRes: 2, paliRes: 0, phase: 'odd', comment: "i=1: Center 'a' (index 1).", highlightedLines: [3, 4, 11] },
-        { s: "aaa", i: 1, l: 1, r: 1, totalRes: 2, paliRes: 1, phase: 'odd', comment: "Match 'a'. Local `res` = 1.", highlightedLines: [12, 13] },
-        { s: "aaa", i: 1, l: 0, r: 2, totalRes: 2, paliRes: 1, phase: 'odd', comment: "Expand: compare s[0] and s[2]. Match!", highlightedLines: [12] },
-        { s: "aaa", i: 1, l: 0, r: 2, totalRes: 2, paliRes: 2, phase: 'odd', comment: "Palindrome 'aaa' found. Local `res` = 2.", highlightedLines: [13] },
-        { s: "aaa", i: 1, l: -1, r: 3, totalRes: 2, paliRes: 2, phase: 'odd', comment: "Expansion ends.", highlightedLines: [12, 17] },
-        { s: "aaa", i: 1, l: -1, r: -1, totalRes: 4, paliRes: 0, phase: 'odd', comment: "Total updated: 2 + 2 = 4.", highlightedLines: [4] },
-        { s: "aaa", i: 1, l: 1, r: 2, totalRes: 4, paliRes: 0, phase: 'even', comment: "i=1: Even center index 1, 2.", highlightedLines: [5, 11] },
-        { s: "aaa", i: 1, l: 1, r: 2, totalRes: 4, paliRes: 1, phase: 'even', comment: "Match 'aa'. Local `res` = 1.", highlightedLines: [12, 13] },
-        { s: "aaa", i: 1, l: -1, r: -1, totalRes: 5, paliRes: 0, phase: 'even', comment: "Total: 4 + 1 = 5.", highlightedLines: [5] },
-        { s: "aaa", i: 2, l: 2, r: 2, totalRes: 5, paliRes: 1, phase: 'odd', comment: "i=2: Center 'a' (index 2).", highlightedLines: [3, 4, 13] },
-        { s: "aaa", i: 2, l: -1, r: -1, totalRes: 6, paliRes: 0, phase: 'odd', comment: "Total: 5 + 1 = 6.", highlightedLines: [4] },
-        { s: "aaa", i: -1, l: -1, r: -1, totalRes: 6, paliRes: 0, phase: 'result', comment: "Finished. Found 6 palindromic substrings.", highlightedLines: [7] }
-      ]
-    },
-    "abc": {
-      steps: [
-        { s: "abc", i: 0, l: 0, r: 0, totalRes: 0, paliRes: 1, phase: 'odd', comment: "Center 'a' found (1).", highlightedLines: [2, 4, 13] },
-        { s: "abc", i: 0, l: 0, r: 1, totalRes: 1, paliRes: 0, phase: 'even', comment: "Even center 'a','b' (0).", highlightedLines: [5, 12] },
-        { s: "abc", i: 1, l: 1, r: 1, totalRes: 1, paliRes: 1, phase: 'odd', comment: "Center 'b' found (1).", highlightedLines: [4, 13] },
-        { s: "abc", i: 2, l: 2, r: 2, totalRes: 2, paliRes: 1, phase: 'odd', comment: "Center 'c' found (1).", highlightedLines: [4, 13] },
-        { s: "abc", i: -1, l: -1, r: -1, totalRes: 3, paliRes: 0, phase: 'result', comment: "Only single characters are palindromes in 'abc'. Total: 3.", highlightedLines: [7] }
-      ]
+  java: `public class Solution {
+    public int countSubstrings(String s) {
+        int res = 0;
+        for (int i = 0; i < s.length(); i++) {
+            res += countPali(s, i, i);
+            res += countPali(s, i, i + 1);
+        }
+        return res;
     }
+
+    private int countPali(String s, int l, int r) {
+        int res = 0;
+        while (l >= 0 && r < s.length() && s.charAt(l) == s.charAt(r)) {
+            res++;
+            l--;
+            r++;
+        }
+        return res;
+    }
+}`,
+
+  cpp: `class Solution {
+public:
+    int expandAroundCenter(string& s, int left, int right) {
+        int count = 0;
+        while (left >= 0 && right < s.length() && s[left] == s[right]) {
+            count++;
+            left--;
+            right++;
+        }
+        return count;
+    }
+
+    int countSubstrings(string s) {
+        int count = 0;
+        for (int i = 0; i < s.length(); i++) {
+            count += expandAroundCenter(s, i, i);
+            count += expandAroundCenter(s, i, i + 1);
+        }
+        return count;
+    }
+};`
+};
+
+const generateSteps = (s: string) => {
+  const steps: Step[] = [];
+  const stepLineNumbers: StepLineNumberMap = {
+    typescript: [],
+    python: [],
+    java: [],
+    cpp: []
   };
 
+  const addLines = (ts: number, py: number, java: number, cpp: number) => {
+    stepLineNumbers.typescript!.push(ts);
+    stepLineNumbers.python!.push(py);
+    stepLineNumbers.java!.push(java);
+    stepLineNumbers.cpp!.push(cpp);
+  };
+
+  let totalRes = 0;
+
+  const addStep = (msg: string, pseudo: string, tsLine: number, pyLine: number, javaLine: number, cppLine: number, extra: Partial<Step> = {}) => {
+    steps.push({
+      s,
+      i: extra.hasOwnProperty('i') ? extra.i! : -1,
+      l: extra.hasOwnProperty('l') ? extra.l! : -1,
+      r: extra.hasOwnProperty('r') ? extra.r! : -1,
+      totalRes,
+      paliRes: extra.paliRes ?? 0,
+      phase: extra.phase || 'init',
+      explanation: msg,
+      pseudoStep: pseudo
+    });
+    addLines(tsLine, pyLine, javaLine, cppLine);
+  };
+
+  // 1. Initial State
+  addStep("Initialize total result counter res = 0.", "SET res = 0", 2, 9, 3, 14);
+
+  for (let i = 0; i < s.length; i++) {
+    // 2. Loop iteration start
+    addStep(`Iteration i = ${i}: Consider character '${s[i]}' as center.`, `FOR i = ${i} TO len(s) - 1`, 3, 10, 4, 15, { i, phase: 'odd' });
+
+    // 3. Odd palindrome expansion
+    addStep(`Call countPali/expandAroundCenter to check odd-length palindromes centered at index ${i} ('${s[i]}').`, `CALL countPali(s, ${i}, ${i})`, 4, 11, 5, 16, { i, l: i, r: i, phase: 'odd' });
+
+    let l1 = i;
+    let r1 = i;
+    let oddCount = 0;
+    addStep(`[countPali] Initialize local palindrome count local_res = 0.`, `SET local_res = 0`, 11, 3, 12, 4, { i, l: l1, r: r1, phase: 'odd', paliRes: 0 });
+
+    while (l1 >= 0 && r1 < s.length && s[l1] === s[r1]) {
+      addStep(
+        `[countPali] Check bounds and characters at l = ${l1} ('${s[l1]}') and r = ${r1} ('${s[r1]}'). Match found!`,
+        `WHILE l >= 0 AND r < len(s) AND s[l] == s[r] → TRUE`,
+        12, 4, 13, 5,
+        { i, l: l1, r: r1, phase: 'odd', paliRes: oddCount }
+      );
+
+      oddCount++;
+      addStep(
+        `[countPali] Increment local palindrome count local_res = ${oddCount}.`,
+        `SET local_res = local_res + 1`,
+        13, 5, 14, 6,
+        { i, l: l1, r: r1, phase: 'odd', paliRes: oddCount }
+      );
+
+      l1--;
+      r1++;
+      addStep(
+        `[countPali] Expand pointers: decrement l to ${l1}, increment r to ${r1}.`,
+        `SET l = l - 1, r = r + 1`,
+        14, 6, 15, 7,
+        { i, l: l1, r: r1, phase: 'odd', paliRes: oddCount }
+      );
+    }
+
+    const conditionReason = l1 < 0 ? "left pointer out of bounds" : (r1 >= s.length ? "right pointer out of bounds" : `character mismatch: s[${l1}] ('${s[l1]}') !== s[${r1}] ('${s[r1]}')`);
+    addStep(
+      `[countPali] Check bounds and characters at l = ${l1}, r = ${r1}. Condition fails: ${conditionReason}.`,
+      `WHILE l >= 0 AND r < len(s) AND s[l] == s[r] → FALSE`,
+      12, 4, 13, 5,
+      { i, l: l1, r: r1, phase: 'odd', paliRes: oddCount }
+    );
+
+    addStep(
+      `[countPali] Return local palindrome count ${oddCount} to caller.`,
+      `RETURN local_res → ${oddCount}`,
+      17, 8, 18, 10,
+      { i, l: l1, r: r1, phase: 'odd', paliRes: oddCount }
+    );
+
+    totalRes += oddCount;
+    addStep(`Update total palindromes count: res = res + ${oddCount} → ${totalRes}.`, `SET res = res + ${oddCount}`, 4, 11, 5, 16, { i, phase: 'odd' });
+
+    // 4. Even palindrome expansion
+    addStep(`Call countPali/expandAroundCenter to check even-length palindromes centered between index ${i} ('${s[i]}') and ${i+1} ('${s[i+1] || ""}').`, `CALL countPali(s, ${i}, ${i+1})`, 5, 12, 6, 17, { i, l: i, r: i + 1, phase: 'even' });
+
+    let l2 = i;
+    let r2 = i + 1;
+    let evenCount = 0;
+    addStep(`[countPali] Initialize local palindrome count local_res = 0.`, `SET local_res = 0`, 11, 3, 12, 4, { i, l: l2, r: r2, phase: 'even', paliRes: 0 });
+
+    while (l2 >= 0 && r2 < s.length && s[l2] === s[r2]) {
+      addStep(
+        `[countPali] Check bounds and characters at l = ${l2} ('${s[l2]}') and r = ${r2} ('${s[r2]}'). Match found!`,
+        `WHILE l >= 0 AND r < len(s) AND s[l] == s[r] → TRUE`,
+        12, 4, 13, 5,
+        { i, l: l2, r: r2, phase: 'even', paliRes: evenCount }
+      );
+
+      evenCount++;
+      addStep(
+        `[countPali] Increment local palindrome count local_res = ${evenCount}.`,
+        `SET local_res = local_res + 1`,
+        13, 5, 14, 6,
+        { i, l: l2, r: r2, phase: 'even', paliRes: evenCount }
+      );
+
+      l2--;
+      r2++;
+      addStep(
+        `[countPali] Expand pointers: decrement l to ${l2}, increment r to ${r2}.`,
+        `SET l = l - 1, r = r + 1`,
+        14, 6, 15, 7,
+        { i, l: l2, r: r2, phase: 'even', paliRes: evenCount }
+      );
+    }
+
+    const conditionReasonEven = l2 < 0 ? "left pointer out of bounds" : (r2 >= s.length ? "right pointer out of bounds" : `character mismatch: s[${l2}] ('${s[l2]}') !== s[${r2}] ('${s[r2]}')`);
+    addStep(
+      `[countPali] Check bounds and characters at l = ${l2}, r = ${r2}. Condition fails: ${conditionReasonEven}.`,
+      `WHILE l >= 0 AND r < len(s) AND s[l] == s[r] → FALSE`,
+      12, 4, 13, 5,
+      { i, l: l2, r: r2, phase: 'even', paliRes: evenCount }
+    );
+
+    addStep(
+      `[countPali] Return local palindrome count ${evenCount} to caller.`,
+      `RETURN local_res → ${evenCount}`,
+      17, 8, 18, 10,
+      { i, l: l2, r: r2, phase: 'even', paliRes: evenCount }
+    );
+
+    totalRes += evenCount;
+    addStep(`Update total palindromes count: res = res + ${evenCount} → ${totalRes}.`, `SET res = res + ${evenCount}`, 5, 12, 6, 17, { i, phase: 'even' });
+  }
+
+  // 5. Complete
+  addStep(`Finished counting. Total palindromic substrings: ${totalRes}.`, `RETURN res → ${totalRes}`, 7, 13, 8, 19, { phase: 'result' });
+
+  return { steps, stepLineNumbers };
+};
+
+export const PalindromicSubstringsVisualization = () => {
   const [activeCase, setActiveCase] = useState<'aaa' | 'abc'>('aaa');
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
-  const steps = cases[activeCase].steps;
-  const currentStep = steps[Math.min(currentStepIndex, steps.length - 1)];
+  const { steps, stepLineNumbers } = useMemo(() => {
+    return generateSteps(activeCase);
+  }, [activeCase]);
+
+  if (steps.length === 0) return null;
+
+  const currentStep = steps[currentStepIndex];
+  const pseudoSteps = steps.map(s => s.pseudoStep);
 
   const handleCaseChange = (newCase: 'aaa' | 'abc') => {
     setActiveCase(newCase);
@@ -88,96 +268,105 @@ function countPali(s: string, l: number, r: number): number {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-4">
-        <SimpleStepControls
-          currentStep={currentStepIndex}
-          totalSteps={steps.length}
-          onStepChange={setCurrentStepIndex}
-        />
-        
-        <div className="flex p-1 bg-muted rounded-xl border border-border w-fit backdrop-blur-sm shadow-inner">
+      {/* Case selections / Controls at Top */}
+      <div className="flex flex-col gap-4 bg-card p-6 rounded-xl border border-border shadow-sm overflow-x-auto">
+        <div className="flex p-0.5 bg-muted rounded-lg border border-border w-fit shadow-inner">
           <button
             onClick={() => handleCaseChange('aaa')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 ${
               activeCase === 'aaa' 
-              ? 'bg-card text-primary shadow-sm ring-1 ring-border/50' 
+              ? 'bg-background text-foreground border border-border/50 shadow-sm font-bold' 
               : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            <ListFilter className="h-4 w-4" />
+            <ListFilter className="h-3.5 w-3.5" />
             Mixed (aaa)
           </button>
           <button
             onClick={() => handleCaseChange('abc')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 ${
               activeCase === 'abc' 
-              ? 'bg-card text-primary shadow-sm ring-1 ring-border/50' 
+              ? 'bg-background text-foreground border border-border/50 shadow-sm font-bold' 
               : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            <Hash className={activeCase === 'abc' ? 'text-primary h-4 w-4' : 'text-muted-foreground h-4 w-4'} />
+            <Hash className="h-3.5 w-3.5" />
             Minimal (abc)
           </button>
         </div>
+        <div className="w-full pt-4 border-t border-border">
+          <SimpleStepControls
+            currentStep={currentStepIndex}
+            totalSteps={steps.length}
+            onStepChange={setCurrentStepIndex}
+          />
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-6">
-          <Card className="p-6">
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">String Inspection</h3>
-                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                  currentStep.phase === 'odd' ? 'bg-blue-500/10 text-blue-500' :
-                  currentStep.phase === 'even' ? 'bg-purple-500/10 text-purple-500' :
-                  currentStep.phase === 'result' ? 'bg-green-500/10 text-green-500' :
-                  'bg-muted text-muted-foreground'
-                }`}>
-                  {currentStep.phase} mode
-                </span>
+      <VisualizationLayout
+        leftContent={
+          <div className="space-y-6">
+            <Card className="p-6">
+              <div className="mb-8">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">String Inspection</h3>
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                    currentStep.phase === 'odd' ? 'bg-blue-500/10 text-blue-500' :
+                    currentStep.phase === 'even' ? 'bg-purple-500/10 text-purple-500' :
+                    currentStep.phase === 'result' ? 'bg-green-500/10 text-green-500' :
+                    'bg-muted text-muted-foreground'
+                  }`}>
+                    {currentStep.phase} mode
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {currentStep.s.split('').map((char, idx) => {
+                    const isCenter = idx === currentStep.i;
+                    const isExpanding = currentStep.l >= 0 && idx >= currentStep.l && idx <= currentStep.r;
+                    
+                    return (
+                      <div
+                        key={idx}
+                        className={`w-10 h-10 flex items-center justify-center rounded-md font-mono text-lg border-2 transition-all duration-200 ${
+                          isCenter
+                          ? 'bg-yellow-500/20 border-yellow-500 text-yellow-600 shadow-[0_0_10px_rgba(234,179,8,0.3)] font-bold scale-105'
+                          : isExpanding
+                            ? 'bg-primary/20 border-primary text-primary font-bold scale-105 shadow-sm'
+                            : 'bg-card border-border text-foreground'
+                        }`}
+                      >
+                        {char}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {currentStep.s.split('').map((char, idx) => {
-                  const isCenter = idx === currentStep.i;
-                  const isExpanding = currentStep.l >= 0 && idx >= currentStep.l && idx <= currentStep.r;
-                  
-                  return (
-                    <div
-                      key={idx}
-                      className={`w-10 h-10 flex items-center justify-center rounded-md font-mono text-lg border-2 transition-all duration-200 ${
-                        isCenter
-                        ? 'bg-yellow-500/20 border-yellow-500 text-yellow-600 shadow-[0_0_10px_rgba(234,179,8,0.3)]'
-                        : isExpanding
-                          ? 'bg-primary/20 border-primary text-primary'
-                          : 'bg-card border-border text-foreground'
-                      }`}
-                    >
-                      {char}
-                    </div>
-                  );
-                })}
+
+              <div className="space-y-4">
+                <div className="flex gap-4">
+                  <Card className="flex-1 p-4 bg-green-500/5 border-green-500/20 text-center">
+                    <p className="text-2xl font-bold text-green-600 dark:text-green-400">{currentStep.totalRes}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase font-semibold">Total Count</p>
+                  </Card>
+                  <Card className="flex-1 p-4 bg-blue-500/5 border-blue-500/20 text-center">
+                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{currentStep.paliRes}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase font-semibold">Center {currentStep.phase === 'odd' ? 'Odd' : 'Even'}</p>
+                  </Card>
+                </div>
               </div>
+            </Card>
+
+            {/* Descriptive Commentary Box (at the bottom) */}
+            <div className="p-3 bg-muted/50 rounded-lg text-xs leading-relaxed text-foreground border border-border shadow-inner">
+              <div className="flex items-center gap-2 mb-1 text-primary font-bold text-[10px] uppercase tracking-widest">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                Process Step
+              </div>
+              {currentStep.explanation}
             </div>
 
-            <div className="space-y-4">
-              <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 min-h-[80px] flex items-center">
-                <p className="text-sm leading-relaxed text-foreground">
-                  <span className="font-bold text-primary mr-2">Step {currentStepIndex}:</span>
-                  {currentStep.comment}
-                </p>
-              </div>
-
-              <div className="flex gap-4">
-                <Card className="flex-1 p-4 bg-green-500/5 border-green-500/20 text-center">
-                  <p className="text-2xl font-bold text-green-600 dark:text-green-400">{currentStep.totalRes}</p>
-                  <p className="text-[10px] text-muted-foreground uppercase font-semibold">Total Count</p>
-                </Card>
-                <Card className="flex-1 p-4 bg-blue-500/5 border-blue-500/20 text-center">
-                  <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{currentStep.paliRes}</p>
-                  <p className="text-[10px] text-muted-foreground uppercase font-semibold">Center {currentStep.phase === 'odd' ? 'Odd' : 'Even'}</p>
-                </Card>
-              </div>
-
+            {/* Variable Panel (below the commentary box) */}
+            <div className="pt-2">
               <VariablePanel
                 variables={{
                   center_i: currentStep.i === -1 ? 'None' : currentStep.i,
@@ -187,18 +376,18 @@ function countPali(s: string, l: number, r: number): number {
                 }}
               />
             </div>
-          </Card>
-        </div>
-
-        <div className="lg:h-[calc(100vh-250px)] min-h-[500px]">
-          <AnimatedCodeEditor
-            code={code}
-            language="typescript"
-            highlightedLines={currentStep.highlightedLines}
+          </div>
+        }
+        rightContent={
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
           />
-        </div>
-      </div>
+        }
+      />
     </div>
   );
 };
-

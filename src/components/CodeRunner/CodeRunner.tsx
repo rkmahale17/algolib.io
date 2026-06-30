@@ -318,7 +318,17 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
     onSubmissionStart
   });
 
-  const { isLoading, isSubmitting, output, executionTime, memoryUsage, lastRunSuccess, handleRun, handleSubmit } = executionHook;
+  const { isLoading, isSubmitting, output, setOutput, executionTime, memoryUsage, lastRunSuccess, handleRun, handleSubmit } = executionHook;
+
+  // Reset output panel whenever the user navigates to a different problem.
+  // This clears the "Accepted" / "Wrong Answer" result tab so it never bleeds
+  // across to a new problem. Also re-disables the "Test Result" tab button.
+  useEffect(() => {
+    if (!algorithmId) return;
+    setActiveTab("testcase");
+    setOutput(null);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [algorithmId]);
 
   // Expose Imperative Handle
   React.useImperativeHandle(ref, () => ({

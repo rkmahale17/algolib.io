@@ -90,6 +90,7 @@ import { ProgressiveHints } from "./ProgressiveHints";
 import { createPortal } from "react-dom";
 import dynamic from "next/dynamic";
 import { formatMemory } from "../CodeRunner/outputHelpers";
+import { SubmissionDetailView } from "../submission/SubmissionDetailView";
 import { isTreeType } from "@/utils/treeUtils";
 import { renderBlind75Visualization } from "@/utils/blind75Visualizations";
 import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
@@ -215,6 +216,44 @@ export const ProblemDescriptionPanel = React.memo(
     const tabsScrollRef = useRef<HTMLDivElement>(null);
     const endOfDescriptionRef = useRef<HTMLDivElement>(null);
     const visualizerContainerRef = useRef<HTMLDivElement>(null);
+
+    // State for submission detail view (push/pop within submissions tab)
+    const [selectedSubmissionDetail, setSelectedSubmissionDetail] = useState<Submission | null>(null);
+
+    // Track the ID of the newest submission we've seen to detect new ones accurately
+    const initialTopSubmissionId = useRef<string | null>(null);
+    const isInitialLoadRef = useRef(true);
+
+    // Reset the submission detail tab whenever the problem changes.
+    useEffect(() => {
+      setSelectedSubmissionDetail(null);
+      initialTopSubmissionId.current = null;
+      isInitialLoadRef.current = true;
+    }, [algorithm?.id]);
+
+    // Auto-open detail view ONLY for submissions added during the current session
+    // (i.e. the user just clicked Submit). Never auto-opens on page load / reload.
+    useEffect(() => {
+      if (panelId !== 'left' || submissions.length === 0) return;
+
+      const topSubmissionId = submissions[0].id.toString();
+
+      if (isInitialLoadRef.current) {
+        // First time submissions arrive (from DB). Record baseline silently — do NOT auto-open.
+        initialTopSubmissionId.current = topSubmissionId;
+        isInitialLoadRef.current = false;
+        return;
+      }
+
+      if (topSubmissionId !== initialTopSubmissionId.current) {
+        // A brand-new submission was prepended during this session → auto-open it
+        initialTopSubmissionId.current = topSubmissionId;
+        setSelectedSubmissionDetail(submissions[0]);
+        setTimeout(() => {
+          setActiveTab("submission_detail");
+        }, 50);
+      }
+    }, [submissions, setActiveTab, panelId]);
 
     // Auto-mark Read step complete when scrolled to bottom
     useEffect(() => {
@@ -597,6 +636,45 @@ export const ProblemDescriptionPanel = React.memo(
                             </TabsTrigger>
                           );
                         })}
+
+                          {/* Dynamic Submission Detail Tab */}
+                          {selectedSubmissionDetail && panelId === 'left' && (
+                            <TabsTrigger
+                              value="submission_detail"
+                              className={`group/trigger relative flex-1 text-[12px] data-[state=active]:bg-transparent data-[state=active]:text-foreground border-b-[2px] border-transparent rounded-none h-9 px-3 sm:px-4 transition-all flex items-center justify-center gap-2 ${
+                                selectedSubmissionDetail.status === 'passed' ? 'data-[state=active]:border-primary' : 'data-[state=active]:border-red-500'
+                              }`}
+                            >
+                              <span className="flex items-center gap-1.5">
+                                {selectedSubmissionDetail.status === 'passed' ? (
+                                  <div className="w-4 h-4 rounded-full bg-primary/20 flex items-center justify-center">
+                                    <Check className="w-3 h-3 text-primary stroke-[3]" />
+                                  </div>
+                                ) : (
+                                  <XCircle className="w-4 h-4 text-red-500" />
+                                )}
+                                <span className={selectedSubmissionDetail.status === 'passed' ? 'text-primary font-medium' : 'text-red-500 font-medium'}>
+                                  {selectedSubmissionDetail.status === 'passed' ? 'Accepted' : 'Wrong Answer'}
+                                </span>
+                              </span>
+                              {/* Must be a span, not Button — TabsTrigger renders as <button>
+                                  and nesting <button> inside <button> is invalid HTML. */}
+                              <span
+                                role="button"
+                                aria-label="Close tab"
+                                className="h-4 w-4 p-0 ml-1 rounded-sm opacity-50 hover:opacity-100 hover:bg-muted inline-flex items-center justify-center cursor-pointer"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedSubmissionDetail(null);
+                                  if (activeTab === "submission_detail") {
+                                    setActiveTab("submissions");
+                                  }
+                                }}
+                              >
+                                <X className="w-3 h-3" />
+                              </span>
+                            </TabsTrigger>
+                          )}
                       </TooltipProvider>
                     </TabsList>
                   </div>
@@ -1809,7 +1887,10 @@ export const ProblemDescriptionPanel = React.memo(
                           <div
                             key={sub.id}
                             className="grid grid-cols-12 gap-2 p-3 rounded-lg border bg-card hover:bg-muted/50 cursor-pointer transition-colors items-center text-sm shadow-sm"
-                            onClick={() => onSelectSubmission?.(sub)}
+                            onClick={() => {
+                              setSelectedSubmissionDetail(sub);
+                              setActiveTab("submission_detail");
+                            }}
                           >
                             <div className="col-span-3 flex items-center gap-2">
                               {sub.status === "passed" ? (
@@ -1817,13 +1898,13 @@ export const ProblemDescriptionPanel = React.memo(
                                   <Check className="w-3.5 h-3.5 stroke-[3]" />
                                 </div>
                               ) : sub.status === "error" ? (
-                                <AlertTriangle className="w-6 h-6 text-yellow-500 shrink-0" />
+                                <AlertTriangle className="w-6 h-6 text-red-500 shrink-0" />
                               ) : (
-                                <XCircle className="w-6 h-6 text-destructive shrink-0" />
+                                <XCircle className="w-6 h-6 text-red-500 shrink-0" />
                               )}
                               <div className="flex flex-col overflow-hidden">
                                 <span
-                                  className={`font-medium truncate ${sub.status === "passed" ? "text-green-600" : "text-destructive"}`}
+                                  className={`font-medium truncate ${sub.status === "passed" ? "text-primary" : "text-red-500"}`}
                                 >
                                   {sub.status === "passed"
                                     ? "Accepted"
@@ -1869,6 +1950,27 @@ export const ProblemDescriptionPanel = React.memo(
                 )}
               </div>
             </TabsContent>
+
+            {/* Dynamic Submission Detail Content */}
+            {selectedSubmissionDetail && panelId === 'left' && (
+              <TabsContent
+                value="submission_detail"
+                className="h-full m-0 data-[state=inactive]:hidden"
+              >
+                <div className="h-full flex flex-col min-h-0 bg-background/50">
+                  <SubmissionDetailView
+                    submission={selectedSubmissionDetail}
+                    algorithmId={algorithm?.id || algorithm?.slug || ''}
+                    onBack={() => {
+                      setSelectedSubmissionDetail(null);
+                      setActiveTab("submissions");
+                    }}
+                    optimalTimeComplexity={algorithm?.metadata?.timeComplexity}
+                    optimalSpaceComplexity={algorithm?.metadata?.spaceComplexity}
+                  />
+                </div>
+              </TabsContent>
+            )}
 
             {isBrainstormEnabled &&
               algorithm?.controls?.brainstorm !== false && (
