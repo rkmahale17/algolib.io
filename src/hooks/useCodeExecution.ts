@@ -446,11 +446,11 @@ export const useCodeExecution = ({
 
             const result = await waitForSubmissionResult(submission_id);
             
-            // Priority: Judge0 provided time > Frontend performance.now()
-            const judgeTimeMs = result.time ? Math.round(parseFloat(result.time) * 1000) : null;
-            const execTime = judgeTimeMs !== null ? judgeTimeMs : Math.round(performance.now() - startTime);
+            // Priority: strictly use Judge0 provided time.
+            // Do NOT fall back to performance.now() as that measures network latency (e.g. 5000ms+) rather than code execution time.
+            const execTime = result.time ? Math.round(parseFloat(result.time) * 1000) : undefined;
             
-            setExecutionTime(execTime);
+            setExecutionTime(execTime ?? null);
             if (result.memory) {
                 setMemoryUsage(result.memory);
             }

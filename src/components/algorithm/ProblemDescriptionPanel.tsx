@@ -152,6 +152,7 @@ interface ProblemDescriptionPanelProps {
   hasPremiumAccess?: boolean;
   user?: User | null;
   submissions?: Submission[];
+  isSubmissionsLoading?: boolean;
   onSelectSubmission?: (submission: Submission) => void;
 
   // Customizable workspace panel props
@@ -194,6 +195,7 @@ export const ProblemDescriptionPanel = React.memo(
     hasPremiumAccess = false,
     user = null,
     submissions = [],
+    isSubmissionsLoading = false,
     onSelectSubmission,
     panelId = "left",
     tabs,
@@ -234,16 +236,21 @@ export const ProblemDescriptionPanel = React.memo(
     // Auto-open detail view ONLY for submissions added during the current session
     // (i.e. the user just clicked Submit). Never auto-opens on page load / reload.
     useEffect(() => {
-      if (panelId !== 'left' || submissions.length === 0) return;
-
-      const topSubmissionId = submissions[0].id.toString();
+      if (panelId !== 'left') return;
 
       if (isInitialLoadRef.current) {
-        // First time submissions arrive (from DB). Record baseline silently — do NOT auto-open.
-        initialTopSubmissionId.current = topSubmissionId;
+        // Don't do anything if we are still fetching from the database for the FIRST time
+        if (isSubmissionsLoading) return;
+
+        // DB has finished loading at least once. Record the top ID silently and mark initial load as done.
+        initialTopSubmissionId.current = submissions.length > 0 ? submissions[0].id.toString() : null;
         isInitialLoadRef.current = false;
         return;
       }
+
+      if (submissions.length === 0) return;
+
+      const topSubmissionId = submissions[0].id.toString();
 
       if (topSubmissionId !== initialTopSubmissionId.current) {
         // A brand-new submission was prepended during this session → auto-open it
@@ -253,7 +260,7 @@ export const ProblemDescriptionPanel = React.memo(
           setActiveTab("submission_detail");
         }, 50);
       }
-    }, [submissions, setActiveTab, panelId]);
+    }, [submissions, isSubmissionsLoading, setActiveTab, panelId]);
 
     // Auto-mark Read step complete when scrolled to bottom
     useEffect(() => {

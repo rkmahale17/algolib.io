@@ -46,8 +46,8 @@ export function StatusHeader({ submission, onBack }: StatusHeaderProps) {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border/40">
                     <div className="flex items-center gap-3">
                         {isPassed ? (
-                            <div className="w-8 h-8 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center shadow-[0_0_12px_rgba(16,185,129,0.15)] shrink-0">
-                                <Check className="w-4 h-4 text-emerald-500 dark:text-emerald-400 stroke-[3]" />
+                            <div className="w-8 h-8 rounded-full bg-green-500/10 dark:bg-green-500/20 border border-green-500/30 flex items-center justify-center shadow-[0_0_12px_rgba(34,197,94,0.15)] shrink-0">
+                                <Check className="w-4 h-4 text-green-500 dark:text-green-400 stroke-[3]" />
                             </div>
                         ) : isError ? (
                             <div className="w-8 h-8 rounded-full bg-amber-500/10 dark:bg-amber-500/20 border border-amber-500/30 flex items-center justify-center shadow-[0_0_12px_rgba(245,158,11,0.15)] shrink-0">
@@ -60,7 +60,7 @@ export function StatusHeader({ submission, onBack }: StatusHeaderProps) {
                         )}
                         <div className="flex items-center gap-2">
                             <h2 className={`text-lg font-bold tracking-tight ${
-                                isPassed ? 'text-emerald-500 dark:text-emerald-400' : isError ? 'text-amber-500 dark:text-amber-400' : 'text-rose-500 dark:text-rose-400'
+                                isPassed ? 'text-green-500 dark:text-green-400' : isError ? 'text-amber-500 dark:text-amber-400' : 'text-rose-500 dark:text-rose-400'
                             }`}>
                                 {statusText}
                             </h2>
@@ -95,7 +95,7 @@ export function StatusHeader({ submission, onBack }: StatusHeaderProps) {
                     <div className="bg-muted/20 border border-border/30 rounded-lg p-3 flex flex-col justify-between space-y-2">
                         <div className="flex items-center justify-between text-xs text-muted-foreground">
                             <span>Test Cases</span>
-                            <ShieldCheck className={`w-3.5 h-3.5 ${isPassed ? 'text-emerald-500' : isError ? 'text-amber-500' : 'text-rose-500'}`} />
+                            <ShieldCheck className={`w-3.5 h-3.5 ${isPassed ? 'text-green-500' : isError ? 'text-amber-500' : 'text-rose-500'}`} />
                         </div>
                         <div>
                             <div className="text-xl font-bold font-mono tracking-tight text-foreground">
@@ -105,7 +105,7 @@ export function StatusHeader({ submission, onBack }: StatusHeaderProps) {
                                 <div className="w-full bg-muted/60 h-1.5 rounded-full overflow-hidden mt-1.5">
                                     <div 
                                         className={`h-full rounded-full transition-all duration-500 ${
-                                            isPassed ? 'bg-emerald-500' : isError ? 'bg-amber-500' : 'bg-rose-500'
+                                            isPassed ? 'bg-green-500' : isError ? 'bg-amber-500' : 'bg-rose-500'
                                         }`} 
                                         style={{ width: `${passPercentage}%` }}
                                     />

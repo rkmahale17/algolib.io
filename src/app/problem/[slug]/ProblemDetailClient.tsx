@@ -182,12 +182,17 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({
   });
 
   const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [prevDbSubmissions, setPrevDbSubmissions] = useState<Submission[] | undefined>(undefined);
 
-  useEffect(() => {
+  if (userAlgoData?.submissions !== prevDbSubmissions) {
+    setPrevDbSubmissions(userAlgoData?.submissions);
     if (userAlgoData?.submissions) {
-      setSubmissions(userAlgoData.submissions);
+      const sortedSubmissions = [...userAlgoData.submissions].sort((a, b) => 
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      );
+      setSubmissions(sortedSubmissions);
     }
-  }, [userAlgoData?.submissions]);
+  }
 
   const handleSelectSubmission = useCallback(
     (submission: any) => {
@@ -754,6 +759,7 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({
                         hasPremiumAccess={hasPremiumAccess}
                         user={user}
                         submissions={submissions}
+                        isSubmissionsLoading={loadingUserData}
                         onSelectSubmission={handleSelectSubmission}
                         panelId="left"
                         tabs={layout.leftTabs}
