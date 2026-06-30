@@ -10,12 +10,14 @@ import { updateProgressItem, removeProgressItem } from '@/store/slices/userProgr
 interface UseUserAlgorithmDataOptions {
     userId: string | undefined;
     algorithmId: string;
+    numericAlgorithmId?: string;
     enabled?: boolean;
 }
 
 export function useUserAlgorithmData({
     userId,
     algorithmId,
+    numericAlgorithmId,
     enabled = true,
 }: UseUserAlgorithmDataOptions) {
     const [data, setData] = useState<UserAlgorithmData | null>(null);
@@ -35,7 +37,7 @@ export function useUserAlgorithmData({
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const result = await getUserAlgorithmData(userId, algorithmId);
+                const result = await getUserAlgorithmData(userId, algorithmId, numericAlgorithmId);
 
                 if (isMounted) {
                     setData(result);
@@ -61,7 +63,7 @@ export function useUserAlgorithmData({
         return () => {
             isMounted = false;
         };
-    }, [userId, algorithmId, enabled, dispatch]);
+    }, [userId, algorithmId, numericAlgorithmId, enabled, dispatch]);
 
     // Set up real-time subscription
     useEffect(() => {
@@ -92,9 +94,21 @@ export function useUserAlgorithmData({
                 (payload) => {
                     if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
                         const newData = payload.new as UserAlgorithmData;
-                        setData(newData);
-                        // 🔑 Dispatch to global Redux store so all list pages update immediately
-                        dispatch(updateProgressItem(newData));
+                        
+                        setData(prevData => {
+                            if (!prevData) return newData;
+                            
+                            // Prevent split-brain wipe: if realtime pushes empty submissions 
+                            // but we already merged old submissions, preserve them.
+                            if ((!newData.submissions || newData.submissions.length === 0) && prevData.submissions?.length > 0) {
+                                newData.submissions = prevData.submissions;
+                            }
+                            
+                            // Also dispatch to Redux with the merged data
+                            dispatch(updateProgressItem(newData));
+                            
+                            return newData;
+                        });
                     } else if (payload.eventType === 'DELETE') {
                         setData(null);
                         dispatch(removeProgressItem(algorithmId));
@@ -113,7 +127,7 @@ export function useUserAlgorithmData({
         if (!userId) return;
 
         try {
-            const result = await getUserAlgorithmData(userId, algorithmId);
+            const result = await getUserAlgorithmData(userId, algorithmId, numericAlgorithmId);
             setData(result);
             setError(null);
             // Sync into global Redux store on manual refetch too
@@ -123,7 +137,7 @@ export function useUserAlgorithmData({
         } catch (err) {
             setError(err as Error);
         }
-    }, [userId, algorithmId, dispatch]);
+    }, [userId, algorithmId, numericAlgorithmId, dispatch]);
 
     return {
         data,

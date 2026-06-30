@@ -144,6 +144,7 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({
   } = useUserAlgorithmData({
     userId: user?.id,
     algorithmId: algorithmIdOrSlug || "",
+    numericAlgorithmId: activeAlgorithm?.id?.toString(),
     enabled: !!user && !!algorithmIdOrSlug,
   });
 
@@ -187,10 +188,27 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({
   if (userAlgoData?.submissions !== prevDbSubmissions) {
     setPrevDbSubmissions(userAlgoData?.submissions);
     if (userAlgoData?.submissions) {
-      const sortedSubmissions = [...userAlgoData.submissions].sort((a, b) => 
-        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-      );
-      setSubmissions(sortedSubmissions);
+      setSubmissions((current) => {
+        // Create a map of all known submissions (DB + Local)
+        const allSubmissionsMap = new Map();
+        
+        // Add DB submissions first
+        userAlgoData.submissions.forEach((sub: Submission) => {
+          allSubmissionsMap.set(sub.id, sub);
+        });
+        
+        // Add current local submissions (to preserve any optimistic updates that haven't propagated yet)
+        current.forEach((sub: Submission) => {
+          if (!allSubmissionsMap.has(sub.id)) {
+            allSubmissionsMap.set(sub.id, sub);
+          }
+        });
+        
+        // Convert back to array and sort descending by timestamp
+        return Array.from(allSubmissionsMap.values()).sort((a, b) => 
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        );
+      });
     }
   }
 

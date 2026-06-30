@@ -588,7 +588,10 @@ export const useCodeExecution = ({
         };
 
         if (algorithmId !== 'preview-mode') {
-            await addSubmission(user.id, algorithmId, newSubmission);
+            const slugForUserData = activeAlgorithm?.slug || algorithmId;
+            const numericIdForBackend = activeAlgorithm?.id?.toString() || algorithmId;
+            
+            await addSubmission(user.id, slugForUserData, newSubmission);
 
             // Insert into submission_performance for cross-user distribution tracking.
             // We use a known UUID so we can update it later with the relative_score.
@@ -597,7 +600,7 @@ export const useCodeExecution = ({
                 const { error: perfInsertError } = await supabase.from('submission_performance').insert({
                     id: perfRowId,
                     user_id: user.id,
-                    algorithm_id: algorithmId,
+                    algorithm_id: numericIdForBackend,
                     language: language,
                     status: newSubmission.status,
                     execution_time_ms: newSubmission.test_results?.execution_time_ms ?? null,
@@ -614,7 +617,7 @@ export const useCodeExecution = ({
                     const accessToken = session?.access_token;
 
                     if (accessToken) {
-                        fetchReferenceTimeMs(algorithmId, language, accessToken)
+                        fetchReferenceTimeMs(numericIdForBackend, language, accessToken)
                             .then(async (refTimeMs) => {
                                 // refTimeMs is null when reference code failed — skip update
                                 if (refTimeMs === null || refTimeMs <= 0) {
@@ -638,7 +641,7 @@ export const useCodeExecution = ({
                             })
                             .catch((err) => {
                                 // Should never reach here (fetchReferenceTimeMs catches internally)
-                                console.warn('[useCodeExecution] Unexpected error in relative score update:', err);
+                                console.error('[useCodeExecution] Error in fire-and-forget relative_score update:', err);
                             });
                     }
                 }
