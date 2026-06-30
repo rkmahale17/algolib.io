@@ -19,30 +19,71 @@ import type {
  */
 export async function getUserAlgorithmData(
     userId: string,
-    algorithmId: string
+    algorithmId: string,
+    numericAlgorithmId?: string
 ): Promise<UserAlgorithmData | null> {
     if (!supabase) {
         console.warn('Supabase not available');
         return null;
     }
 
+    const idsToFetch = numericAlgorithmId && numericAlgorithmId !== algorithmId 
+        ? [algorithmId, numericAlgorithmId] 
+        : [algorithmId];
+
     const { data, error } = await supabase
         .from('user_algorithm_data')
         .select('id, user_id, algorithm_id, completed, code, submissions, notes, whiteboard_data, updated_at, visualization_completed, drawing_completed, solution_completed')
         .eq('user_id', userId)
-        .eq('algorithm_id', algorithmId)
-        .maybeSingle();
+        .in('algorithm_id', idsToFetch);
 
     if (error) {
         if (error.code === 'PGRST116') {
-            // No rows returned - this is expected for new algorithms
             return null;
         }
         console.error('Error fetching user algorithm data:', error);
         return null;
     }
 
-    return data as unknown as UserAlgorithmData;
+    if (!data || data.length === 0) {
+        return null;
+    }
+
+    // If only one row found, return it
+    if (data.length === 1) {
+        return data[0] as unknown as UserAlgorithmData;
+    }
+
+    // If multiple rows found (split-brain between slug and numeric ID), merge them
+    // Primary row is the one matching the slug (algorithmId), or fallback to the first
+    const primaryRow = data.find(row => row.algorithm_id === algorithmId) || data[0];
+    const secondaryRow = data.find(row => row.algorithm_id !== primaryRow.algorithm_id);
+
+    if (secondaryRow) {
+        // Merge submissions from both rows, avoiding duplicates by ID
+        const allSubmissionsMap = new Map();
+        
+        // Add secondary row submissions
+        const secondarySubs = secondaryRow.submissions || [];
+        (Array.isArray(secondarySubs) ? secondarySubs : []).forEach((sub: any) => {
+            if (sub?.id) allSubmissionsMap.set(sub.id, sub);
+        });
+
+        // Add primary row submissions (overwrites secondary if same ID)
+        const primarySubs = primaryRow.submissions || [];
+        (Array.isArray(primarySubs) ? primarySubs : []).forEach((sub: any) => {
+            if (sub?.id) allSubmissionsMap.set(sub.id, sub);
+        });
+
+        // Sort descending by timestamp
+        const mergedSubmissions = Array.from(allSubmissionsMap.values()).sort((a, b) => 
+            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        );
+
+        primaryRow.submissions = mergedSubmissions;
+    }
+
+    return primaryRow as unknown as UserAlgorithmData;
 }
 
 /**
