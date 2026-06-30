@@ -1,16 +1,12 @@
 import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { VariablePanel } from '../shared/VariablePanel';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, X, Trees, Binary, GitBranch } from 'lucide-react';
-
-interface TreeNode {
-  val: number;
-  left: TreeNode | null;
-  right: TreeNode | null;
-}
+import type { VisualizationLanguageMap, StepLineNumberMap } from '@/types/visualization';
 
 interface Step {
   pNodeId: string | null;
@@ -19,8 +15,8 @@ interface Step {
   qVal: number | string | null;
   checking: string;
   result: boolean | null;
-  message: string;
-  highlightedLines: number[];
+  explanation: string;
+  pseudoStep: string;
 }
 
 interface TestCase {
@@ -59,16 +55,49 @@ const testCases: TestCase[] = [
   }
 ];
 
-const code = `function isSameTree(p: TreeNode | null, q: TreeNode | null): boolean {
-  if (!p && !q) return true;
-  
-  if (!p || !q || p.val !== q.val) return false;
-  
-  return isSameTree(p.left, q.left) && 
-         isSameTree(p.right, q.right);
-}`;
+const languages: VisualizationLanguageMap = {
+  python: `def isSameTree(p: Optional[TreeNode], q: Optional[TreeNode]) -> bool:
+    if not p and not q:
+        return True
+    if not p or not q or p.val != q.val:
+        return False
+    return isSameTree(p.left, q.left) and isSameTree(p.right, q.right)`,
 
-// Helper to convert BFS array to tree nodes with unique IDs for highlighting
+  typescript: `function isSameTree(p: TreeNode | null, q: TreeNode | null): boolean {
+  if (!p && !q) return true;
+  if (!p || !q || p.val !== q.val) return false;
+  return isSameTree(p.left, q.left) && isSameTree(p.right, q.right);
+}`,
+
+  java: `public class Solution {
+    public boolean isSameTree(TreeNode p, TreeNode q) {
+        if (p == null && q == null) {
+            return true;
+        }
+        if (p == null || q == null || p.val != q.val) {
+            return false;
+        }
+        return isSameTree(p.left, q.left) && isSameTree(p.right, q.right);
+    }
+}`,
+
+  cpp: `class Solution {
+public:
+    bool isSameTree(TreeNode* p, TreeNode* q) {
+        if (!p && !q) {
+            return true;
+        }
+        if (!p || !q) {
+            return false;
+        }
+        if (p->val != q->val) {
+            return false;
+        }
+        return isSameTree(p->left, q->left) && isSameTree(p->right, q->right);
+    }
+};`
+};
+
 const buildTreeWithIds = (arr: (number | null)[], prefix: string) => {
   if (!arr.length || arr[0] === null) return null;
   
@@ -92,7 +121,6 @@ const buildTreeWithIds = (arr: (number | null)[], prefix: string) => {
   return root;
 };
 
-// Simple position calculator for tree nodes
 const getTreePositions = (root: any, width: number = 300, rowHeight: number = 60) => {
   const nodes: any[] = [];
   const edges: any[] = [];
@@ -121,9 +149,36 @@ export const SameTreeVisualization = () => {
   const [testCase, setTestCase] = useState<TestCase>(testCases[0]);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
-  const steps = useMemo(() => {
-    const s: Step[] = [];
-    
+  const { steps, stepLineNumbers } = useMemo(() => {
+    const steps: Step[] = [];
+    const stepLineNumbers: StepLineNumberMap = {
+      typescript: [],
+      python: [],
+      java: [],
+      cpp: []
+    };
+
+    const addLines = (ts: number, py: number, java: number, cpp: number) => {
+      stepLineNumbers.typescript!.push(ts);
+      stepLineNumbers.python!.push(py);
+      stepLineNumbers.java!.push(java);
+      stepLineNumbers.cpp!.push(cpp);
+    };
+
+    const addStep = (msg: string, pseudo: string, tsLine: number, pyLine: number, javaLine: number, cppLine: number, extra: Partial<Step> = {}) => {
+      steps.push({
+        pNodeId: extra.pNodeId || null,
+        qNodeId: extra.qNodeId || null,
+        pVal: extra.hasOwnProperty('pVal') ? extra.pVal : null,
+        qVal: extra.hasOwnProperty('qVal') ? extra.qVal : null,
+        checking: extra.checking || 'nodes',
+        result: extra.hasOwnProperty('result') ? extra.result : null,
+        explanation: msg,
+        pseudoStep: pseudo
+      });
+      addLines(tsLine, pyLine, javaLine, cppLine);
+    };
+
     const pRoot = buildTreeWithIds(testCase.p, 'p');
     const qRoot = buildTreeWithIds(testCase.q, 'q');
 
@@ -134,160 +189,131 @@ export const SameTreeVisualization = () => {
       const qVal = q?.val ?? 'null';
 
       // Step 1: Comparing current nodes
-      s.push({
-        pNodeId: pId,
-        qNodeId: qId,
-        pVal,
-        qVal,
-        checking: 'nodes',
-        result: null,
-        message: `Comparing node p(${pVal}) and q(${qVal})`,
-        highlightedLines: [1]
-      });
+      addStep(
+        `Comparing node p(${pVal}) and q(${qVal})`,
+        `isSameTree(p, q)`,
+        1, 1, 2, 3,
+        { pNodeId: pId, qNodeId: qId, pVal, qVal, checking: 'nodes' }
+      );
 
       // Step 2: Null check
       if (!p && !q) {
-        s.push({
-          pNodeId: pId,
-          qNodeId: qId,
-          pVal,
-          qVal,
-          checking: 'null-base-case',
-          result: true,
-          message: "Both nodes are null. This subtree represents the 'same tree'.",
-          highlightedLines: [2]
-        });
+        addStep(
+          "Both nodes are null. This subtree represents the 'same tree'.",
+          "IF p == null AND q == null → RETURN true",
+          2, 2, 3, 4,
+          { pNodeId: pId, qNodeId: qId, pVal, qVal, checking: 'null-base-case', result: true }
+        );
         return true;
       }
-      s.push({
-        pNodeId: pId,
-        qNodeId: qId,
-        pVal,
-        qVal,
-        checking: 'null-base-case',
-        result: null,
-        message: "Nodes are not both null, continuing check.",
-        highlightedLines: [2]
-      });
+      addStep(
+        "Nodes are not both null, continuing check.",
+        "IF p == null AND q == null → FALSE",
+        2, 2, 3, 4,
+        { pNodeId: pId, qNodeId: qId, pVal, qVal, checking: 'null-base-case' }
+      );
 
       // Step 3: Different null state or different values
       if (!p || !q || p.val !== q.val) {
         let reason = "";
-        if (!p) reason = "Node p is null while q is not.";
-        else if (!q) reason = "Node q is null while p is not.";
-        else reason = `Values differ: p(${p.val}) !== q(${q.val})`;
+        let lineCpp = 10;
+        let lineJava = 6;
+        if (!p) {
+          reason = "Node p is null while q is not.";
+          lineCpp = 7;
+        } else if (!q) {
+          reason = "Node q is null while p is not.";
+          lineCpp = 7;
+        } else {
+          reason = `Values differ: p(${p.val}) !== q(${q.val})`;
+          lineCpp = 10;
+          lineJava = 6;
+        }
 
-        s.push({
-          pNodeId: pId,
-          qNodeId: qId,
-          pVal,
-          qVal,
-          checking: 'diff-case',
-          result: false,
-          message: `${reason} Returning false.`,
-          highlightedLines: [4]
-        });
+        addStep(
+          `${reason} Returning false.`,
+          "IF p == null OR q == null OR p.val != q.val → RETURN false",
+          3, 4, lineJava, lineCpp,
+          { pNodeId: pId, qNodeId: qId, pVal, qVal, checking: 'diff-case', result: false }
+        );
         return false;
       }
 
-      s.push({
-        pNodeId: pId,
-        qNodeId: qId,
-        pVal,
-        qVal,
-        checking: 'value-check',
-        result: null,
-        message: `Values both match (${pVal}). Now checking children.`,
-        highlightedLines: [4]
-      });
+      addStep(
+        `Values both match (${pVal}). Now checking children.`,
+        "IF p == null OR q == null OR p.val != q.val → FALSE",
+        3, 4, 6, 10,
+        { pNodeId: pId, qNodeId: qId, pVal, qVal, checking: 'value-check' }
+      );
 
       // Step 4: Recurse left
-      s.push({
-        pNodeId: pId,
-        qNodeId: qId,
-        pVal,
-        qVal,
-        checking: 'recurse-left',
-        result: null,
-        message: `Recursively checking left children of p(${pVal}) and q(${qVal}).`,
-        highlightedLines: [6]
-      });
+      addStep(
+        `Recursively checking left children of p(${pVal}) and q(${qVal}).`,
+        "isSameTree(p.left, q.left)",
+        4, 6, 9, 13,
+        { pNodeId: pId, qNodeId: qId, pVal, qVal, checking: 'recurse-left' }
+      );
       const leftSame = check(p.left, q.left);
       
       if (!leftSame) {
-        s.push({
-          pNodeId: pId,
-          qNodeId: qId,
-          pVal,
-          qVal,
-          checking: 'left-result',
-          result: false,
-          message: "Left children were different, so these trees are not the same.",
-          highlightedLines: [6]
-        });
+        addStep(
+          "Left children were different, so these trees are not the same.",
+          "RETURN false",
+          4, 6, 9, 13,
+          { pNodeId: pId, qNodeId: qId, pVal, qVal, checking: 'left-result', result: false }
+        );
         return false;
       }
 
       // Step 5: Recurse right
-      s.push({
-        pNodeId: pId,
-        qNodeId: qId,
-        pVal,
-        qVal,
-        checking: 'recurse-right',
-        result: null,
-        message: "Left children match! Now checking right children.",
-        highlightedLines: [7]
-      });
+      addStep(
+        "Left children match! Now checking right children.",
+        "isSameTree(p.right, q.right)",
+        4, 6, 9, 13,
+        { pNodeId: pId, qNodeId: qId, pVal, qVal, checking: 'recurse-right' }
+      );
       const rightSame = check(p.right, q.right);
 
       const finalResult = rightSame;
-      s.push({
-        pNodeId: pId,
-        qNodeId: qId,
-        pVal,
-        qVal,
-        checking: 'final-result',
-        result: finalResult,
-        message: finalResult 
+      addStep(
+        finalResult 
           ? "Both left and right children match! This subtree is the same."
           : "Right children were different.",
-        highlightedLines: [6, 7]
-      });
+        `RETURN ${finalResult}`,
+        4, 6, 9, 13,
+        { pNodeId: pId, qNodeId: qId, pVal, qVal, checking: 'final-result', result: finalResult }
+      );
 
       return finalResult;
     };
 
     check(pRoot, qRoot);
-    return s;
+    return { steps, stepLineNumbers };
   }, [testCase]);
 
-  const currentStep = steps[currentStepIndex];
+  const currentStep = steps[currentStepIndex] || steps[steps.length - 1];
+  const pseudoSteps = steps.map(s => s.pseudoStep);
 
   const pTreeData = useMemo(() => getTreePositions(buildTreeWithIds(testCase.p, 'p')), [testCase.p]);
   const qTreeData = useMemo(() => getTreePositions(buildTreeWithIds(testCase.q, 'q')), [testCase.q]);
 
-  const resetState = () => {
-    setCurrentStepIndex(0);
-  };
-
   const handleTestCaseChange = (tc: TestCase) => {
     setTestCase(tc);
-    resetState();
+    setCurrentStepIndex(0);
   };
 
   const TreeDisplay = ({ data, activeNodeId, title }: { data: any, activeNodeId: string | null, title: string }) => (
     <div className="flex flex-col items-center">
-      <h4 className="text-xs font-mono font-bold text-muted-foreground uppercase mb-4 tracking-widest">{title}</h4>
-      <div className="relative w-full h-[200px] bg-primary/5 rounded-xl border border-primary/10 overflow-hidden">
-        <svg width="100%" height="100%" viewBox="0 0 300 200" className="overflow-visible">
+      <h4 className="text-[10px] font-mono font-bold text-muted-foreground uppercase mb-2 tracking-widest">{title}</h4>
+      <div className="relative w-full h-[160px] bg-primary/5 rounded-xl border border-primary/10 overflow-hidden">
+        <svg width="100%" height="100%" viewBox="0 0 300 160" className="overflow-visible">
           {data.edges.map((edge: any, i: number) => (
             <line
               key={i}
               x1={edge.x1}
-              y1={edge.y1}
+              y1={edge.y1 - 10}
               x2={edge.x2}
-              y2={edge.y2}
+              y2={edge.y2 - 10}
               stroke="currentColor"
               className="text-primary/20"
               strokeWidth="2"
@@ -299,8 +325,8 @@ export const SameTreeVisualization = () => {
               <g key={node.id}>
                 <motion.circle
                   cx={node.x}
-                  cy={node.y}
-                  r="18"
+                  cy={node.y - 10}
+                  r="15"
                   animate={{
                     scale: isActive ? 1.2 : 1,
                     strokeWidth: isActive ? 3 : 1.5,
@@ -313,10 +339,10 @@ export const SameTreeVisualization = () => {
                 />
                 <text
                   x={node.x}
-                  y={node.y + 1}
+                  y={node.y - 9}
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  className={`text-[12px] font-mono font-bold ${
+                  className={`text-[10px] font-mono font-bold ${
                     isActive ? 'fill-primary' : 'fill-muted-foreground'
                   }`}
                 >
@@ -332,9 +358,9 @@ export const SameTreeVisualization = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Test Case Selection */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex bg-muted/50 p-1 rounded-xl border border-border shadow-sm">
+      {/* Case selections / Controls at Top */}
+      <div className="flex flex-col gap-4 bg-card p-6 rounded-xl border border-border shadow-sm overflow-x-auto">
+        <div className="flex p-0.5 bg-muted rounded-lg border border-border w-fit shadow-inner">
           {testCases.map((tc) => {
             const Icon = tc.icon;
             const isSelected = testCase.id === tc.id;
@@ -342,104 +368,110 @@ export const SameTreeVisualization = () => {
               <button
                 key={tc.id}
                 onClick={() => handleTestCaseChange(tc)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 ${
                   isSelected
-                    ? 'bg-background text-primary shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
+                    ? 'bg-background text-foreground border border-border/50 shadow-sm font-bold'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isSelected ? 'text-primary' : 'text-muted-foreground'}`} />
+                <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-primary' : 'text-muted-foreground'}`} />
                 {tc.name}
               </button>
             );
           })}
         </div>
-        <SimpleStepControls
-          currentStep={currentStepIndex}
-          totalSteps={steps.length}
-          onStepChange={setCurrentStepIndex}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-6">
-          <Card className="p-6 overflow-hidden border-primary/10 shadow-xl bg-gradient-to-b from-background to-primary/5">
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h3 className="text-xl font-bold tracking-tight">Recursive Comparison</h3>
-                <p className="text-xs text-muted-foreground mt-1">{testCase.description}</p>
-              </div>
-              <AnimatePresence mode="wait">
-                {currentStep.result !== null && (
-                  <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.8, opacity: 0 }}
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full border shadow-sm ${
-                      currentStep.result 
-                        ? 'bg-green-500/10 border-green-500/20 text-green-500' 
-                        : 'bg-red-500/10 border-red-500/20 text-red-500'
-                    }`}
-                  >
-                    {currentStep.result ? (
-                      <>
-                        <Check className="w-4 h-4" />
-                        <span className="text-xs font-bold uppercase tracking-wider">Same Tree</span>
-                      </>
-                    ) : (
-                      <>
-                        <X className="w-4 h-4" />
-                        <span className="text-xs font-bold uppercase tracking-wider">Different</span>
-                      </>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            <div className="flex flex-col gap-6 mb-8">
-              <TreeDisplay 
-                data={pTreeData} 
-                activeNodeId={currentStep.pNodeId} 
-                title="Tree P" 
-              />
-              <TreeDisplay 
-                data={qTreeData} 
-                activeNodeId={currentStep.qNodeId} 
-                title="Tree Q" 
-              />
-            </div>
-
-            <div className="space-y-4">
-              <Card className="p-4 bg-primary/5 border-primary/20 shadow-inner">
-                <p className="text-sm leading-relaxed text-foreground/90 font-medium">
-                  {currentStep.message}
-                </p>
-              </Card>
-            </div>
-          </Card>
-        </div>
-
-        <div className="flex flex-col gap-6">
-          <div className="max-h-[400px] overflow-hidden rounded-xl border border-primary/10 shadow-xl">
-            <AnimatedCodeEditor
-              code={code}
-              language="typescript"
-              highlightedLines={currentStep.highlightedLines}
-            />
-          </div>
-
-          <VariablePanel
-            variables={{
-              'p.val': currentStep.pVal,
-              'q.val': currentStep.qVal,
-              'checking': currentStep.checking,
-              'step': `${currentStepIndex + 1} / ${steps.length}`
-            }}
+        <div className="w-full pt-4 border-t border-border">
+          <SimpleStepControls
+            currentStep={currentStepIndex}
+            totalSteps={steps.length}
+            onStepChange={setCurrentStepIndex}
           />
         </div>
       </div>
+
+      <VisualizationLayout
+        leftContent={
+          <div className="space-y-6">
+            <Card className="p-6 overflow-hidden bg-gradient-to-b from-background to-primary/5">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-sm font-bold tracking-tight">Recursive Comparison</h3>
+                  <p className="text-[10px] text-muted-foreground mt-1">{testCase.description}</p>
+                </div>
+                <AnimatePresence mode="wait">
+                  {currentStep.result !== null && (
+                    <motion.div
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0.8, opacity: 0 }}
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-full border shadow-sm ${
+                        currentStep.result 
+                          ? 'bg-green-500/10 border-green-500/20 text-green-500' 
+                          : 'bg-red-500/10 border-red-500/20 text-red-500'
+                      }`}
+                    >
+                      {currentStep.result ? (
+                        <>
+                          <Check className="w-3.5 h-3.5" />
+                          <span className="text-[10px] font-bold uppercase tracking-wider">Same Tree</span>
+                        </>
+                      ) : (
+                        <>
+                          <X className="w-3.5 h-3.5" />
+                          <span className="text-[10px] font-bold uppercase tracking-wider">Different</span>
+                        </>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              <div className="flex flex-col gap-6">
+                <TreeDisplay 
+                  data={pTreeData} 
+                  activeNodeId={currentStep.pNodeId} 
+                  title="Tree P" 
+                />
+                <TreeDisplay 
+                  data={qTreeData} 
+                  activeNodeId={currentStep.qNodeId} 
+                  title="Tree Q" 
+                />
+              </div>
+            </Card>
+
+            {/* Descriptive Commentary Box (at the bottom) */}
+            <div className="p-3 bg-muted/50 rounded-lg text-xs leading-relaxed text-foreground border border-border shadow-inner">
+              <div className="flex items-center gap-2 mb-1 text-primary font-bold text-[10px] uppercase tracking-widest">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                Process Step
+              </div>
+              {currentStep.explanation}
+            </div>
+
+            {/* Variable Panel (below the commentary box) */}
+            <div className="pt-2">
+              <VariablePanel
+                variables={{
+                  'p.val': currentStep.pVal,
+                  'q.val': currentStep.qVal,
+                  'checking': currentStep.checking,
+                  'step': `${currentStepIndex + 1} / ${steps.length}`
+                }}
+              />
+            </div>
+          </div>
+        }
+        rightContent={
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
+        }
+      />
     </div>
   );
 };
-

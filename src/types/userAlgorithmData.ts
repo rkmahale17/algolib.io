@@ -50,6 +50,29 @@ export interface Submission {
     };
 }
 
+// Distribution bucket for performance charts
+export interface DistributionBucket {
+    range_start: number;
+    range_end: number;
+    count: number;
+}
+
+// Distribution data returned from RPC
+export interface DistributionData {
+    buckets: DistributionBucket[];
+    percentile: number;
+    total_submissions: number;
+    user_value: number | null;
+    /** 'relative' = normalized against reference solution; 'raw' = raw ms (legacy data) */
+    mode?: 'relative' | 'raw';
+}
+
+// Full submission distribution response
+export interface SubmissionDistribution {
+    runtime: DistributionData;
+    memory: DistributionData;
+}
+
 // Whiteboard data structure (flexible JSON)
 export interface WhiteboardData {
     board_json?: any; // Tldraw format
@@ -118,4 +141,11 @@ export interface InsertUserAlgorithmData {
     visualization_completed?: boolean;
     drawing_completed?: boolean;
     solution_completed?: boolean;
+}
+
+// Distribution bucket for runtime/memory histogram charts
+export interface DistributionBucket {
+    range_start: number;
+    range_end: number;
+    count: number;
 }

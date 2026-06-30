@@ -9,6 +9,48 @@ import { LANGUAGE_IDS } from '@/components/CodeRunner/constants';
 import { Language } from '@/components/CodeRunner/LanguageSelector';
 import { trackEvent } from '@/lib/analytics';
 
+/**
+ * Calls the run-reference Edge Function to execute the problem's "optimize" reference
+ * solution and returns that solution's execution time in ms.
+ *
+ * Returns null if:
+ * - The algorithm has no optimize code for this language
+ * - The reference code fails / times out (TLE, Runtime Error, etc.)
+ * - Any network or server error occurs
+ *
+ * Per design requirements, a null result means we do NOT record a relative_score —
+ * the submission is still saved normally, just without normalization data.
+ */
+async function fetchReferenceTimeMs(
+    algorithmId: string,
+    language: string,
+    accessToken: string
+): Promise<number | null> {
+    try {
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+            || process.env.NEXT_PUBLIC_VITE_SUPABASE_URL
+            || '';
+        const fnUrl = `${supabaseUrl}/functions/v1/run-reference`;
+
+        const res = await fetch(fnUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({ algorithm_id: algorithmId, language }),
+        });
+
+        if (!res.ok) return null;
+        const data = await res.json();
+        return typeof data?.ref_time_ms === 'number' ? data.ref_time_ms : null;
+    } catch (err) {
+        // Network error or edge function unavailable — silently skip
+        console.warn('[useCodeExecution] run-reference call failed:', err);
+        return null;
+    }
+}
+
 const mapStatusStringToId = (status: string): { id: number; description: string } => {
     switch (status.toLowerCase()) {
         case 'accepted': return { id: 3, description: 'Accepted' };
@@ -547,6 +589,63 @@ export const useCodeExecution = ({
 
         if (algorithmId !== 'preview-mode') {
             await addSubmission(user.id, algorithmId, newSubmission);
+
+            // Insert into submission_performance for cross-user distribution tracking.
+            // We use a known UUID so we can update it later with the relative_score.
+            try {
+                const perfRowId = crypto.randomUUID();
+                const { error: perfInsertError } = await supabase.from('submission_performance').insert({
+                    id: perfRowId,
+                    user_id: user.id,
+                    algorithm_id: algorithmId,
+                    language: language,
+                    status: newSubmission.status,
+                    execution_time_ms: newSubmission.test_results?.execution_time_ms ?? null,
+                    memory_usage_kb: newSubmission.test_results?.memory_usage_kb ?? null,
+                    // relative_score starts as null; filled in asynchronously below
+                });
+
+                if (!perfInsertError && allPassed && execTime && execTime > 0) {
+                    // Fire-and-forget: compute relative_score after submission is saved.
+                    // This MUST NOT block the user-facing submission flow.
+                    // If the reference code fails for any reason, relative_score stays null
+                    // and this submission simply won't appear in the normalized distribution.
+                    const { data: { session } } = await supabase.auth.getSession();
+                    const accessToken = session?.access_token;
+
+                    if (accessToken) {
+                        fetchReferenceTimeMs(algorithmId, language, accessToken)
+                            .then(async (refTimeMs) => {
+                                // refTimeMs is null when reference code failed — skip update
+                                if (refTimeMs === null || refTimeMs <= 0) {
+                                    console.info('[useCodeExecution] Reference code unavailable or failed; relative_score not recorded.');
+                                    return;
+                                }
+
+                                const relativeScore = Math.round((execTime / refTimeMs) * 10000) / 10000; // 4 decimal places
+
+                                const { error: updateError } = await supabase
+                                    .from('submission_performance')
+                                    .update({
+                                        relative_score: relativeScore,
+                                        ref_execution_time_ms: refTimeMs,
+                                    })
+                                    .eq('id', perfRowId);
+
+                                if (updateError) {
+                                    console.warn('[useCodeExecution] Failed to update relative_score:', updateError);
+                                }
+                            })
+                            .catch((err) => {
+                                // Should never reach here (fetchReferenceTimeMs catches internally)
+                                console.warn('[useCodeExecution] Unexpected error in relative score update:', err);
+                            });
+                    }
+                }
+            } catch (perfError) {
+                // Non-blocking: don't fail the submission if perf tracking fails
+                console.warn('Failed to record submission performance:', perfError);
+            }
         }
         
         setSubmissions(prev => [newSubmission, ...prev]);

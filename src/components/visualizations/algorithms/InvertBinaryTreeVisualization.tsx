@@ -2,10 +2,11 @@ import React, { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
 import { TreeDeciduous, RefreshCw } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
+import type { VisualizationLanguageMap, StepLineNumberMap } from '@/types/visualization';
 
 interface Step {
   currentNode: number | null;
@@ -14,25 +15,61 @@ interface Step {
   swapped: boolean;
   tree: { [key: number]: { left: number | null; right: number | null } };
   explanation: string;
-  highlightedLines: number[];
+  pseudoStep: string;
   stackDepth: number;
 }
 
-export const InvertBinaryTreeVisualization: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState(0);
+const languages: VisualizationLanguageMap = {
+  python: `def invertTree(root: TreeNode) -> TreeNode:
+    if not root:
+        return None
+    root.left, root.right = root.right, root.left
+    invertTree(root.left)
+    invertTree(root.right)
+    return root`,
 
-  const code = `function invertTree(root: TreeNode | null): TreeNode | null {
+  typescript: `function invertTree(root: TreeNode | null): TreeNode | null {
   if (root === null) return null;
-  
   const temp = root.left;
   root.left = root.right;
   root.right = temp;
-  
   invertTree(root.left);
   invertTree(root.right);
-  
   return root;
-}`;
+}`,
+
+  java: `public class Solution {
+    public TreeNode invertTree(TreeNode root) {
+        if (root == null) {
+            return null;
+        }
+        TreeNode temp = root.left;
+        root.left = root.right;
+        root.right = temp;
+        invertTree(root.left);
+        invertTree(root.right);
+        return root;
+    }
+}`,
+
+  cpp: `class Solution {
+public:
+    TreeNode* invertTree(TreeNode* root) {
+        if (!root) {
+            return nullptr;
+        }
+        TreeNode* temp = root->left;
+        root->left = root->right;
+        root->right = temp;
+        invertTree(root->left);
+        invertTree(root->right);
+        return root;
+    }
+};`
+};
+
+export const InvertBinaryTreeVisualization: React.FC = () => {
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
   const initialTree = {
     4: { left: 2, right: 7 },
@@ -45,26 +82,34 @@ export const InvertBinaryTreeVisualization: React.FC = () => {
   };
 
   const steps: Step[] = useMemo(() => [
-    { currentNode: 4, leftVal: 2, rightVal: 7, swapped: false, tree: initialTree, explanation: "Starting invertTree(4).", highlightedLines: [1, 2], stackDepth: 1 },
-    { currentNode: 4, leftVal: 2, rightVal: 7, swapped: false, tree: initialTree, explanation: "Storing left child (2) in temp.", highlightedLines: [4], stackDepth: 1 },
-    { currentNode: 4, leftVal: 7, rightVal: 7, swapped: false, tree: initialTree, explanation: "Moving right child (7) to left position.", highlightedLines: [5], stackDepth: 1 },
-    { currentNode: 4, leftVal: 7, rightVal: 2, swapped: true, tree: { ...initialTree, 4: { left: 7, right: 2 } }, explanation: "Moving temp (2) to right position. Children of node 4 swapped!", highlightedLines: [6], stackDepth: 1 },
+    { currentNode: 4, leftVal: 2, rightVal: 7, swapped: false, tree: initialTree, explanation: "Starting invertTree(4).", pseudoStep: "isSameTree(root)", stackDepth: 1 },
+    { currentNode: 4, leftVal: 2, rightVal: 7, swapped: false, tree: initialTree, explanation: "Storing left child (2) in temp.", pseudoStep: "SET temp = root.left", stackDepth: 1 },
+    { currentNode: 4, leftVal: 7, rightVal: 7, swapped: false, tree: initialTree, explanation: "Moving right child (7) to left position.", pseudoStep: "SET root.left = root.right", stackDepth: 1 },
+    { currentNode: 4, leftVal: 7, rightVal: 2, swapped: true, tree: { ...initialTree, 4: { left: 7, right: 2 } }, explanation: "Moving temp (2) to right position. Children of node 4 swapped!", pseudoStep: "SET root.right = temp", stackDepth: 1 },
 
-    { currentNode: 7, leftVal: 6, rightVal: 9, swapped: false, tree: { ...initialTree, 4: { left: 7, right: 2 } }, explanation: "Recursing on left child (7).", highlightedLines: [8], stackDepth: 2 },
-    { currentNode: 7, leftVal: 6, rightVal: 9, swapped: false, tree: { ...initialTree, 4: { left: 7, right: 2 } }, explanation: "Swapping children of node 7.", highlightedLines: [4, 5, 6], stackDepth: 2 },
-    { currentNode: 7, leftVal: 9, rightVal: 6, swapped: true, tree: { ...initialTree, 4: { left: 7, right: 2 }, 7: { left: 9, right: 6 } }, explanation: "Node 7's children swapped!", highlightedLines: [6], stackDepth: 2 },
+    { currentNode: 7, leftVal: 6, rightVal: 9, swapped: false, tree: { ...initialTree, 4: { left: 7, right: 2 } }, explanation: "Recursing on left child (7).", pseudoStep: "CALL invertTree(root.left)", stackDepth: 2 },
+    { currentNode: 7, leftVal: 6, rightVal: 9, swapped: false, tree: { ...initialTree, 4: { left: 7, right: 2 } }, explanation: "Swapping children of node 7.", pseudoStep: "SWAP(root.left, root.right)", stackDepth: 2 },
+    { currentNode: 7, leftVal: 9, rightVal: 6, swapped: true, tree: { ...initialTree, 4: { left: 7, right: 2 }, 7: { left: 9, right: 6 } }, explanation: "Node 7's children swapped!", pseudoStep: "SWAP(root.left, root.right) → DONE", stackDepth: 2 },
 
-    { currentNode: 9, leftVal: null, rightVal: null, swapped: false, tree: { ...initialTree, 4: { left: 7, right: 2 }, 7: { left: 9, right: 6 } }, explanation: "Recursing on node 9. It's null, returning.", highlightedLines: [2], stackDepth: 3 },
-    { currentNode: 6, leftVal: null, rightVal: null, swapped: false, tree: { ...initialTree, 4: { left: 7, right: 2 }, 7: { left: 9, right: 6 } }, explanation: "Recursing on node 6. It's null, returning.", highlightedLines: [2], stackDepth: 3 },
+    { currentNode: 9, leftVal: null, rightVal: null, swapped: false, tree: { ...initialTree, 4: { left: 7, right: 2 }, 7: { left: 9, right: 6 } }, explanation: "Recursing on node 9. It's null, returning.", pseudoStep: "IF root == null → RETURN null", stackDepth: 3 },
+    { currentNode: 6, leftVal: null, rightVal: null, swapped: false, tree: { ...initialTree, 4: { left: 7, right: 2 }, 7: { left: 9, right: 6 } }, explanation: "Recursing on node 6. It's null, returning.", pseudoStep: "IF root == null → RETURN null", stackDepth: 3 },
     
-    { currentNode: 2, leftVal: 1, rightVal: 3, swapped: false, tree: { ...initialTree, 4: { left: 7, right: 2 }, 7: { left: 9, right: 6 } }, explanation: "Back at root, recursing on right child (2).", highlightedLines: [9], stackDepth: 1 },
-    { currentNode: 2, leftVal: 1, rightVal: 3, swapped: false, tree: { ...initialTree, 4: { left: 7, right: 2 }, 7: { left: 9, right: 6 } }, explanation: "Swapping children of node 2.", highlightedLines: [4, 5, 6], stackDepth: 2 },
-    { currentNode: 2, leftVal: 3, rightVal: 1, swapped: true, tree: { ...initialTree, 4: { left: 7, right: 2 }, 7: { left: 9, right: 6 }, 2: { left: 3, right: 1 } }, explanation: "Node 2's children swapped!", highlightedLines: [6], stackDepth: 2 },
+    { currentNode: 2, leftVal: 1, rightVal: 3, swapped: false, tree: { ...initialTree, 4: { left: 7, right: 2 }, 7: { left: 9, right: 6 } }, explanation: "Back at root, recursing on right child (2).", pseudoStep: "CALL invertTree(root.right)", stackDepth: 1 },
+    { currentNode: 2, leftVal: 1, rightVal: 3, swapped: false, tree: { ...initialTree, 4: { left: 7, right: 2 }, 7: { left: 9, right: 6 } }, explanation: "Swapping children of node 2.", pseudoStep: "SWAP(root.left, root.right)", stackDepth: 2 },
+    { currentNode: 2, leftVal: 3, rightVal: 1, swapped: true, tree: { ...initialTree, 4: { left: 7, right: 2 }, 7: { left: 9, right: 6 }, 2: { left: 3, right: 1 } }, explanation: "Node 2's children swapped!", pseudoStep: "SWAP(root.left, root.right) → DONE", stackDepth: 2 },
 
-    { currentNode: 4, leftVal: 7, rightVal: 2, swapped: true, tree: { ...initialTree, 4: { left: 7, right: 2 }, 7: { left: 9, right: 6 }, 2: { left: 3, right: 1 } }, explanation: "All levels processed. Returning the inverted tree root.", highlightedLines: [11], stackDepth: 1 }
+    { currentNode: 4, leftVal: 7, rightVal: 2, swapped: true, tree: { ...initialTree, 4: { left: 7, right: 2 }, 7: { left: 9, right: 6 }, 2: { left: 3, right: 1 } }, explanation: "All levels processed. Returning the inverted tree root.", pseudoStep: "RETURN root", stackDepth: 1 }
   ], []);
 
-  const step = steps[currentStep];
+  const stepLineNumbers: StepLineNumberMap = {
+    typescript: [1, 3, 4, 5, 6, 3, 5, 2, 2, 7, 3, 5, 8],
+    python: [1, 4, 4, 4, 5, 4, 4, 2, 2, 6, 4, 4, 7],
+    java: [2, 6, 7, 8, 9, 6, 8, 4, 4, 10, 6, 8, 11],
+    cpp: [3, 7, 8, 9, 10, 7, 9, 5, 5, 11, 7, 9, 12]
+  };
+
+  const step = steps[currentStepIndex];
+  const pseudoSteps = steps.map(s => s.pseudoStep);
 
   const renderTree = () => {
     const tree = step.tree;
@@ -131,71 +176,79 @@ export const InvertBinaryTreeVisualization: React.FC = () => {
   };
 
   return (
-    <VisualizationLayout
-      controls={
-        <SimpleStepControls
-          currentStep={currentStep}
-          totalSteps={steps.length}
-          onStepChange={setCurrentStep}
-        />
-      }
-      leftContent={
-        <div className="space-y-6 flex flex-col h-full">
-          <div>
-            <h2 className="text-sm font-bold text-foreground mb-4 opacity-90 flex items-center gap-2">
-              <TreeDeciduous size={16} className="text-primary" />
-              Tree Inversion Workspace
-            </h2>
-            <Card className="p-8 bg-card/60 backdrop-blur border-border/50 shadow-sm overflow-hidden flex justify-center items-center">
-              {renderTree()}
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-             <Card className="p-4 bg-primary/5 border-l-4 border-primary shadow-sm h-full flex flex-col justify-center">
-               <h4 className="text-[9px] font-bold uppercase tracking-widest text-primary/80 mb-2">Commentary</h4>
-               <p className="text-[13px] font-medium leading-relaxed text-foreground/90">
-                 {step.explanation}
-               </p>
-             </Card>
-             
-             <Card className="p-4 bg-muted/30 border-muted flex flex-col justify-center">
-                <h4 className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground mb-3 flex items-center gap-2">
-                  <RefreshCw size={12} />
-                  Status
-                </h4>
-                <div className="flex flex-col gap-2">
-                  <div className="flex justify-between items-center text-[11px]">
-                    <span className="text-muted-foreground">Current Node:</span>
-                    <span className="font-mono font-bold text-primary">{step.currentNode}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-[11px]">
-                    <span className="text-muted-foreground">Stack Depth:</span>
-                    <span className="font-mono font-bold text-primary">{step.stackDepth}</span>
-                  </div>
-                </div>
-             </Card>
-          </div>
-
-          <VariablePanel
-            variables={{
-              currentNode: step.currentNode,
-              left: step.leftVal,
-              right: step.rightVal,
-              swapped: step.swapped ? "Yes" : "No"
-            }}
+    <div className="flex flex-col gap-6">
+      {/* Controls at Top */}
+      <div className="flex flex-col gap-4 bg-card p-6 rounded-xl border border-border shadow-sm overflow-x-auto">
+        <div className="w-full">
+          <SimpleStepControls
+            currentStep={currentStepIndex}
+            totalSteps={steps.length}
+            onStepChange={setCurrentStepIndex}
           />
         </div>
-      }
-      rightContent={
-        <Card className="h-full overflow-hidden flex flex-col shadow-sm border-border/50">
-          <AnimatedCodeEditor
-            code={code}
-            language="typescript"
-            highlightedLines={step.highlightedLines}
+      </div>
+
+      <VisualizationLayout
+        leftContent={
+          <div className="space-y-6 flex flex-col h-full">
+            <div>
+              <h2 className="text-sm font-bold text-foreground mb-4 opacity-90 flex items-center gap-2">
+                <TreeDeciduous size={16} className="text-primary" />
+                Tree Inversion Workspace
+              </h2>
+              <Card className="p-8 bg-card/60 backdrop-blur border-border/50 shadow-sm overflow-hidden flex justify-center items-center">
+                {renderTree()}
+              </Card>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Descriptive Commentary Box (at the bottom) */}
+              <div className="p-3 bg-muted/50 rounded-lg text-xs leading-relaxed text-foreground border border-border shadow-inner">
+                <div className="flex items-center gap-2 mb-1 text-primary font-bold text-[10px] uppercase tracking-widest">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                  Process Step
+                </div>
+                {step.explanation}
+              </div>
+               
+               <Card className="p-4 bg-muted/30 border-muted flex flex-col justify-center">
+                  <h4 className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground mb-3 flex items-center gap-2">
+                    <RefreshCw size={12} />
+                    Status
+                  </h4>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex justify-between items-center text-[11px]">
+                      <span className="text-muted-foreground">Current Node:</span>
+                      <span className="font-mono font-bold text-primary">{step.currentNode}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-[11px]">
+                      <span className="text-muted-foreground">Stack Depth:</span>
+                      <span className="font-mono font-bold text-primary">{step.stackDepth}</span>
+                    </div>
+                  </div>
+               </Card>
+            </div>
+
+            <VariablePanel
+              variables={{
+                currentNode: step.currentNode,
+                left: step.leftVal,
+                right: step.rightVal,
+                swapped: step.swapped ? "Yes" : "No"
+              }}
+            />
+          </div>
+        }
+        rightContent={
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
           />
-        </Card>
-      }
-    />
+        }
+      />
+    </div>
   );
 };

@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ListFilter, FileText } from 'lucide-react';
 import { VariablePanel } from '../shared/VariablePanel';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
+import { ListFilter, FileText } from 'lucide-react';
+import type { VisualizationLanguageMap, StepLineNumberMap } from '@/types/visualization';
 
 interface Step {
   strs: string[];
@@ -16,12 +18,40 @@ interface Step {
   i: number;
   j: number;
   length: number;
-  comment: string;
-  highlightedLines: number[];
+  explanation: string;
+  pseudoStep: string;
 }
 
-export const EncodeDecodeStringsVisualization = () => {
-  const code = `function Solution(strs: string[]): string[] {
+const USE_CASES = [
+  { name: "Standard (hello)", id: "standard", strs: ["hello", "word"] },
+  { name: "Edge Case (empty)", id: "empty", strs: ["", "a"] }
+];
+
+const languages: VisualizationLanguageMap = {
+  python: `def Solution(strs):
+    def encode(strs):
+        res = ""
+        for s in strs:
+            res += str(len(s)) + "#" + s
+        return res
+
+    def decode(s):
+        res = []
+        i = 0
+        while i < len(s):
+            j = i
+            while s[j] != "#":
+                j += 1
+            length = int(s[i:j])
+            word = s[j+1:j+1+length]
+            res.append(word)
+            i = j + 1 + length
+        return res
+
+    encoded = encode(strs)
+    return decode(encoded)`,
+
+  typescript: `function Solution(strs: string[]): string[] {
   function encode(strs: string[]): string {
     let res = "";
     for (const s of strs) {
@@ -48,173 +78,302 @@ export const EncodeDecodeStringsVisualization = () => {
 
   const encoded = encode(strs);
   return decode(encoded);
-}`;
+}`,
 
-  const cases = {
-    "standard": {
-      strs: ["hello", "word"],
-      steps: [
-        { strs: ["hello", "word"], encoded: "", decoded: [], phase: 'init', currentIdx: -1, currentStr: "", i: -1, j: -1, length: 0, comment: "Starting the Encode and Decode process for ['hello', 'word'].", highlightedLines: [1] },
-        { strs: ["hello", "word"], encoded: "", decoded: [], phase: 'encode', currentIdx: -1, currentStr: "", i: -1, j: -1, length: 0, comment: "Calling `encode(strs)`. Initializing `res` to an empty string.", highlightedLines: [2, 3, 26] },
-        { strs: ["hello", "word"], encoded: "", decoded: [], phase: 'encode', currentIdx: 0, currentStr: "hello", i: -1, j: -1, length: 0, comment: "Iteration 1: Processing the first string 'hello'.", highlightedLines: [4] },
-        { strs: ["hello", "word"], encoded: "5#hello", decoded: [], phase: 'encode', currentIdx: 0, currentStr: "hello", i: -1, j: -1, length: 0, comment: "Append '5#hello' (length + '#' + string) to `res`.", highlightedLines: [5] },
-        { strs: ["hello", "word"], encoded: "5#hello", decoded: [], phase: 'encode', currentIdx: 1, currentStr: "word", i: -1, j: -1, length: 0, comment: "Iteration 2: Processing the string 'word'.", highlightedLines: [4] },
-        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: [], phase: 'encode', currentIdx: 1, currentStr: "word", i: -1, j: -1, length: 0, comment: "Append '4#word' to `res`.", highlightedLines: [5] },
-        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: [], phase: 'encode', currentIdx: -1, currentStr: "", i: -1, j: -1, length: 0, comment: "Encoding finished. Resulting string: '5#hello4#word'.", highlightedLines: [7, 26] },
-        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: [], phase: 'decode', currentIdx: -1, currentStr: "", i: -1, j: -1, length: 0, comment: "Calling `decode(encoded)`. Initializing `res` array and pointer `i = 0`.", highlightedLines: [10, 11, 12, 27] },
-        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: [], phase: 'decode', currentIdx: -1, currentStr: "", i: 0, j: 0, length: 0, comment: "While i (0) < 13: Search for '#' starting from j = i (0).", highlightedLines: [13, 14, 15] },
-        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: [], phase: 'decode', currentIdx: -1, currentStr: "", i: 0, j: 1, length: 0, comment: "Found '#' at index j = 1.", highlightedLines: [15, 16] },
-        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: [], phase: 'decode', currentIdx: -1, currentStr: "", i: 0, j: 1, length: 5, comment: "Parse length between i and j: str.substring(0, 1) = '5'.", highlightedLines: [18] },
-        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: [], phase: 'decode', currentIdx: -1, currentStr: "hello", i: 0, j: 1, length: 5, comment: "Extract word using parsed length 5: str.substring(2, 7) = 'hello'.", highlightedLines: [19] },
-        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: ["hello"], phase: 'decode', currentIdx: -1, currentStr: "hello", i: 0, j: 1, length: 5, comment: "Add 'hello' to decoded array.", highlightedLines: [20] },
-        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: ["hello"], phase: 'decode', currentIdx: -1, currentStr: "", i: 7, j: 1, length: 5, comment: "Advance `i` to j + 1 + length (1 + 1 + 5 = 7).", highlightedLines: [21] },
-        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: ["hello"], phase: 'decode', currentIdx: -1, currentStr: "", i: 7, j: 7, length: 0, comment: "Next iteration: Find next '#' starting from j = 7.", highlightedLines: [13, 14, 15] },
-        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: ["hello"], phase: 'decode', currentIdx: -1, currentStr: "", i: 7, j: 8, length: 0, comment: "Found '#' at index j = 8.", highlightedLines: [15, 16] },
-        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: ["hello"], phase: 'decode', currentIdx: -1, currentStr: "", i: 7, j: 8, length: 4, comment: "Parse length: str.substring(7, 8) = '4'.", highlightedLines: [18] },
-        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: ["hello"], phase: 'decode', currentIdx: -1, currentStr: "word", i: 7, j: 8, length: 4, comment: "Extract word of length 4: 'word'.", highlightedLines: [19] },
-        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: ["hello", "word"], phase: 'decode', currentIdx: -1, currentStr: "word", i: 7, j: 8, length: 4, comment: "Add 'word' to result.", highlightedLines: [20] },
-        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: ["hello", "word"], phase: 'decode', currentIdx: -1, currentStr: "", i: 13, j: 8, length: 4, comment: "Advance `i` to 8 + 1 + 4 = 13.", highlightedLines: [21] },
-        { strs: ["hello", "word"], encoded: "5#hello4#word", decoded: ["hello", "word"], phase: 'result', currentIdx: -1, currentStr: "", i: -1, j: -1, length: 0, comment: "Decoding complete. Final array restored!", highlightedLines: [23, 27] }
-      ]
-    },
-    "empty": {
-      strs: ["", "a"],
-      steps: [
-        { strs: ["", "a"], encoded: "", decoded: [], phase: 'init', currentIdx: -1, currentStr: "", i: -1, j: -1, length: 0, comment: "Checking edge case with an empty string.", highlightedLines: [1] },
-        { strs: ["", "a"], encoded: "0#", decoded: [], phase: 'encode', currentIdx: 0, currentStr: "", i: -1, j: -1, length: 0, comment: "Encoding empty string: length 0 + '#'.", highlightedLines: [5] },
-        { strs: ["", "a"], encoded: "0#1#a", decoded: [], phase: 'encode', currentIdx: 1, currentStr: "a", i: -1, j: -1, length: 0, comment: "Encoding 'a': length 1 + '#'.", highlightedLines: [5] },
-        { strs: ["", "a"], encoded: "0#1#a", decoded: [], phase: 'decode', currentIdx: -1, currentStr: "", i: 0, j: 1, length: 0, comment: "Length 0 found at index 1.", highlightedLines: [18] },
-        { strs: ["", "a"], encoded: "0#1#a", decoded: [""], phase: 'decode', currentIdx: -1, currentStr: "", i: 2, j: 1, length: 0, comment: "Extracted empty string.", highlightedLines: [20] },
-        { strs: ["", "a"], encoded: "0#1#a", decoded: ["", "a"], phase: 'result', currentIdx: -1, currentStr: "", i: -1, j: -1, length: 0, comment: "Correctly restored ['', 'a'].", highlightedLines: [23] }
-      ]
+  java: `public class Solution {
+    public String encode(List<String> strs) {
+        StringBuilder res = new StringBuilder();
+        for (String s : strs) {
+            res.append(s.length()).append("#").append(s);
+        }
+        return res.toString();
     }
+
+    public List<String> decode(String str) {
+        List<String> res = new ArrayList<>();
+        int i = 0;
+        while (i < str.length()) {
+            int j = i;
+            while (str.charAt(j) != '#') {
+                j++;
+            }
+            int length = Integer.parseInt(str.substring(i, j));
+            String word = str.substring(j + 1, j + 1 + length);
+            res.add(word);
+            i = j + 1 + length;
+        }
+        return res;
+    }
+
+    public List<String> solution(String[] strs) {
+        String encoded = encode(Arrays.asList(strs));
+        return decode(encoded);
+    }
+}`,
+
+  cpp: `class Solution {
+public:
+    string encode(vector<string>& strs) {
+        string res = "";
+        for (string s : strs) {
+            res += to_string(s.length()) + "#" + s;
+        }
+        return res;
+    }
+
+    vector<string> decode(string str) {
+        vector<string> res;
+        int i = 0;
+        while (i < str.length()) {
+            int j = i;
+            while (str[j] != '#') {
+                j++;
+            }
+            int length = stoi(str.substr(i, j - i));
+            string word = str.substr(j + 1, length);
+            res.push_back(word);
+            i = j + 1 + length;
+        }
+        return res;
+    }
+
+    vector<string> SolutionFunc(vector<string>& strs) {
+        string encoded = encode(strs);
+        return decode(encoded);
+    }
+};`
+};
+
+const generateStepsData = (strs: string[]) => {
+  const steps: Step[] = [];
+  const stepLineNumbers: StepLineNumberMap = {
+    typescript: [],
+    python: [],
+    java: [],
+    cpp: []
   };
 
-  const [activeCase, setActiveCase] = useState<'standard' | 'empty'>('standard');
+  const addLines = (ts: number, py: number, java: number, cpp: number) => {
+    stepLineNumbers.typescript!.push(ts);
+    stepLineNumbers.python!.push(py);
+    stepLineNumbers.java!.push(java);
+    stepLineNumbers.cpp!.push(cpp);
+  };
+
+  let encoded = "";
+  const decoded: string[] = [];
+
+  const addStep = (msg: string, pseudo: string, tsLine: number, pyLine: number, javaLine: number, cppLine: number, extra: Partial<Step> = {}) => {
+    steps.push({
+      strs,
+      encoded,
+      decoded: [...decoded],
+      phase: extra.phase || 'init',
+      currentIdx: extra.hasOwnProperty('currentIdx') ? extra.currentIdx! : -1,
+      currentStr: extra.currentStr || "",
+      i: extra.hasOwnProperty('i') ? extra.i! : -1,
+      j: extra.hasOwnProperty('j') ? extra.j! : -1,
+      length: extra.length || 0,
+      explanation: msg,
+      pseudoStep: pseudo
+    });
+    addLines(tsLine, pyLine, javaLine, cppLine);
+  };
+
+  // 1. Initial State
+  addStep("Initialize the Encode and Decode strings process.", "CALL Solution(strs)", 1, 1, 26, 27);
+
+  // 2. Call Encode
+  addStep("Call encode(strs) function. Initialize res to empty string.", "CALL encode(strs)", 26, 21, 27, 28);
+
+  // Loop inside Encode
+  for (let idx = 0; idx < strs.length; idx++) {
+    const s = strs[idx];
+    addStep(`Processing string at index ${idx}: "${s}".`, `FOR s IN strs`, 4, 4, 4, 5, { phase: 'encode', currentIdx: idx, currentStr: s });
+
+    encoded += s.length + "#" + s;
+    addStep(`Append length (${s.length}) + "#" + string ("${s}") to res.`, `SET res = res + len(s) + "#" + s`, 5, 5, 5, 6, { phase: 'encode', currentIdx: idx, currentStr: s });
+  }
+
+  // Return from Encode
+  addStep(`Encoding finished. Return encoded representation: "${encoded}".`, `RETURN res → "${encoded}"`, 7, 6, 7, 8, { phase: 'encode' });
+
+  // 3. Call Decode
+  addStep("Call decode(str) function. Initialize empty result list and pointer i = 0.", "CALL decode(encoded)", 27, 22, 28, 29, { phase: 'decode', i: 0 });
+
+  let i = 0;
+  while (i < encoded.length) {
+    addStep(`Loop check: i = ${i} < length = ${encoded.length}.`, `WHILE i < len(s)`, 13, 11, 13, 14, { phase: 'decode', i });
+
+    let j = i;
+    addStep(`Initialize j to ${i} to scan for the delimiter '#'.`, "SET j = i", 14, 12, 14, 15, { phase: 'decode', i, j });
+
+    while (encoded[j] !== "#") {
+      j++;
+    }
+    addStep(`Scan complete. Delimiter '#' found at index ${j}.`, `WHILE s[j] != "#"`, 15, 13, 15, 16, { phase: 'decode', i, j });
+
+    const length = parseInt(encoded.substring(i, j));
+    addStep(`Parse string length between indices ${i} and ${j}: ${length}.`, `SET length = int(s[i:j]) → ${length}`, 18, 15, 18, 19, { phase: 'decode', i, j, length });
+
+    const word = encoded.substring(j + 1, j + 1 + length);
+    addStep(`Extract word of length ${length} starting at index ${j + 1}: "${word}".`, `SET word = s[j+1 : j+1+length] → "${word}"`, 19, 16, 19, 20, { phase: 'decode', i, j, length, currentStr: word });
+
+    decoded.push(word);
+    addStep(`Add extracted word "${word}" to the result list.`, `APPEND word TO res`, 20, 17, 20, 21, { phase: 'decode', i, j, length, currentStr: word });
+
+    i = j + 1 + length;
+    addStep(`Advance pointer i to the start of the next segment (index ${i}).`, `SET i = j + 1 + length → ${i}`, 21, 18, 21, 22, { phase: 'decode', i, j, length });
+  }
+
+  // End Decode Loop
+  addStep(`Loop check: i = ${i} >= length = ${encoded.length}. Loop complete.`, `WHILE i < len(s) → FALSE ✗`, 13, 11, 13, 14, { phase: 'decode', i });
+
+  // Return from Decode
+  addStep("Decoding complete. Return restored string list.", "RETURN res", 23, 19, 23, 24, { phase: 'result' });
+
+  return { steps, stepLineNumbers };
+};
+
+export const EncodeDecodeStringsVisualization = () => {
+  const [activeCaseIdx, setActiveCaseIdx] = useState(0);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const activeCase = USE_CASES[activeCaseIdx];
 
-  const steps = cases[activeCase].steps;
-  const currentStep = steps[Math.min(currentStepIndex, steps.length - 1)];
+  const { steps, stepLineNumbers } = useMemo(() => {
+    return generateStepsData(activeCase.strs);
+  }, [activeCase]);
 
-  const handleCaseChange = (newCase: 'standard' | 'empty') => {
-    setActiveCase(newCase);
+  if (steps.length === 0) return null;
+
+  const currentStep = steps[currentStepIndex];
+  const pseudoSteps = steps.map(s => s.pseudoStep);
+
+  const handleCaseChange = (idx: number) => {
+    setActiveCaseIdx(idx);
     setCurrentStepIndex(0);
   };
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Top Controls: Controller first, then Test Cases */}
-      <div className="flex flex-col gap-4">
-        <SimpleStepControls
-          currentStep={currentStepIndex}
-          totalSteps={steps.length}
-          onStepChange={setCurrentStepIndex}
-        />
-        
-        <div className="flex p-1 bg-muted rounded-xl border border-border w-fit backdrop-blur-sm shadow-inner">
+      {/* Case selections / Controls at Top */}
+      <div className="flex flex-col gap-4 bg-card p-6 rounded-xl border border-border shadow-sm overflow-x-auto">
+        <div className="flex p-0.5 bg-muted rounded-lg border border-border w-fit shadow-inner">
           <button
-            onClick={() => handleCaseChange('standard')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-              activeCase === 'standard' 
-              ? 'bg-card text-primary shadow-sm ring-1 ring-border/50' 
+            onClick={() => handleCaseChange(0)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 ${
+              activeCaseIdx === 0 
+              ? 'bg-background text-foreground border border-border/50 shadow-sm font-bold' 
               : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            <ListFilter className="h-4 w-4" />
+            <ListFilter className="h-3.5 w-3.5" />
             Standard (hello)
           </button>
           <button
-            onClick={() => handleCaseChange('empty')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-              activeCase === 'empty' 
-              ? 'bg-card text-primary shadow-sm ring-1 ring-border/50' 
+            onClick={() => handleCaseChange(1)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 ${
+              activeCaseIdx === 1 
+              ? 'bg-background text-foreground border border-border/50 shadow-sm font-bold' 
               : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            <FileText className={activeCase === 'empty' ? 'text-primary h-4 w-4' : 'text-muted-foreground h-4 w-4'} />
+            <FileText className="h-3.5 w-3.5" />
             Edge Case ("", a)
           </button>
         </div>
+        <div className="w-full pt-4 border-t border-border">
+          <SimpleStepControls
+            currentStep={currentStepIndex}
+            totalSteps={steps.length}
+            onStepChange={setCurrentStepIndex}
+          />
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-6">
-          <Card className="p-6">
-            <div className="mb-4">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider italic">Input Strings</h3>
-              </div>
-              <div className="flex gap-2 flex-wrap">
-                {currentStep.strs.map((str, idx) => (
-                  <div
-                    key={idx}
-                    className={`px-3 py-1 rounded font-mono text-sm border-2 transition-all duration-200 ${
-                      idx === currentStep.currentIdx 
-                      ? 'bg-blue-500/20 border-blue-500 text-blue-600' 
-                      : 'bg-muted/50 border-border text-muted-foreground'
-                    }`}
-                  >
-                    "{str}"
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="mb-6">
-              <p className="text-xs text-muted-foreground mb-2 uppercase italic">Intermediary Encoded Representation</p>
-              <div className="p-4 bg-muted/30 rounded-lg border border-border font-mono text-lg break-all flex flex-wrap gap-1">
-                {currentStep.encoded ? (
-                  currentStep.encoded.split('').map((char, idx) => {
-                    const isFocus = (currentStep.phase === 'decode' && idx >= currentStep.i && idx <= currentStep.j);
-                    const isLengthMatch = (currentStep.phase === 'decode' && char !== '#' && idx >= currentStep.j + 1 && idx <= currentStep.j + currentStep.length);
-                    
-                    return (
-                      <motion.span
-                        key={idx}
-                        className={`inline-block px-1 rounded transition-colors ${
-                          isFocus ? 'bg-yellow-500 text-yellow-950 font-bold' :
-                          isLengthMatch ? 'bg-primary/20 text-primary' :
-                          'text-muted-foreground'
-                        }`}
-                      >
-                        {char}
-                      </motion.span>
-                    );
-                  })
-                ) : (
-                  <span className="text-muted-foreground italic text-sm">Waiting for encoding...</span>
-                )}
-              </div>
-            </div>
-
-            {currentStep.decoded.length > 0 && (
-              <div className="mb-6">
-                <p className="text-xs text-muted-foreground mb-2 uppercase italic">Decoded Strings (Restored)</p>
+      <VisualizationLayout
+        leftContent={
+          <div className="space-y-6">
+            <Card className="p-6">
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest italic">Input Strings</h3>
+                </div>
                 <div className="flex gap-2 flex-wrap">
-                  <AnimatePresence>
-                    {currentStep.decoded.map((str, idx) => (
-                      <motion.div
-                        key={idx}
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        className="px-3 py-1 rounded bg-green-500/10 border-2 border-green-500/30 text-green-600 font-mono text-sm"
-                      >
-                        "{str}"
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
+                  {currentStep.strs.map((str, idx) => (
+                    <div
+                      key={idx}
+                      className={`px-3 py-1 rounded font-mono text-sm border-2 transition-all duration-200 ${
+                        idx === currentStep.currentIdx 
+                        ? 'bg-blue-500/20 border-blue-500 text-blue-600 font-bold scale-105 shadow-sm' 
+                        : 'bg-muted/50 border-border text-muted-foreground'
+                      }`}
+                    >
+                      "{str}"
+                    </div>
+                  ))}
                 </div>
               </div>
-            )}
 
-            <div className="space-y-4">
-              <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 min-h-[80px]">
-                <p className="text-sm leading-relaxed text-foreground">
-                  <span className="font-bold text-primary mr-2 uppercase tracking-tighter">[{currentStep.phase.toUpperCase()}]</span>
-                  {currentStep.comment}
-                </p>
+              <div className="mb-6">
+                <p className="text-xs font-bold text-muted-foreground mb-2 uppercase tracking-widest italic">Intermediary Encoded Representation</p>
+                <div className="p-4 bg-muted/30 rounded-lg border border-border font-mono text-lg break-all flex flex-wrap gap-1">
+                  {currentStep.encoded ? (
+                    currentStep.encoded.split('').map((char, idx) => {
+                      const isFocus = (currentStep.phase === 'decode' && idx >= currentStep.i && idx <= currentStep.j);
+                      const isLengthMatch = (currentStep.phase === 'decode' && char !== '#' && idx >= currentStep.j + 1 && idx <= currentStep.j + currentStep.length);
+                      
+                      return (
+                        <motion.span
+                          key={idx}
+                          className={`inline-block px-1 rounded transition-colors ${
+                            isFocus ? 'bg-yellow-500 text-yellow-950 font-bold scale-110 shadow-sm' :
+                            isLengthMatch ? 'bg-primary/20 text-primary font-bold' :
+                            'text-muted-foreground'
+                          }`}
+                        >
+                          {char}
+                        </motion.span>
+                      );
+                    })
+                  ) : (
+                    <span className="text-muted-foreground italic text-sm">Waiting for encoding...</span>
+                  )}
+                </div>
               </div>
 
+              {currentStep.decoded.length > 0 && (
+                <div className="mb-2">
+                  <p className="text-xs font-bold text-muted-foreground mb-2 uppercase tracking-widest italic">Decoded Strings (Restored)</p>
+                  <div className="flex gap-2 flex-wrap">
+                    <AnimatePresence>
+                      {currentStep.decoded.map((str, idx) => (
+                        <motion.div
+                          key={idx}
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          className="px-3 py-1 rounded bg-green-500/10 border-2 border-green-500/30 text-green-600 font-mono text-sm font-bold shadow-sm"
+                        >
+                          "{str}"
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </div>
+                </div>
+              )}
+            </Card>
+
+            {/* Descriptive Commentary Box (at the bottom) */}
+            <div className="p-3 bg-muted/50 rounded-lg text-xs leading-relaxed text-foreground border border-border shadow-inner">
+              <div className="flex items-center gap-2 mb-1 text-primary font-bold text-[10px] uppercase tracking-widest">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                Process Step
+              </div>
+              {currentStep.explanation}
+            </div>
+
+            {/* Variable Panel (below the commentary box) */}
+            <div className="pt-2">
               <VariablePanel
                 variables={{
                   phase: currentStep.phase.toUpperCase(),
@@ -225,17 +384,18 @@ export const EncodeDecodeStringsVisualization = () => {
                 }}
               />
             </div>
-          </Card>
-        </div>
-
-        <div className="lg:h-[calc(100vh-250px)] min-h-[500px]">
-          <AnimatedCodeEditor
-            code={code}
-            language="typescript"
-            highlightedLines={currentStep.highlightedLines}
+          </div>
+        }
+        rightContent={
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
           />
-        </div>
-      </div>
+        }
+      />
     </div>
   );
 };

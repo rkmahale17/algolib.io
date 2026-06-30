@@ -457,6 +457,39 @@ export type Database = {
         }
         Relationships: []
       }
+      submission_performance: {
+        Row: {
+          id: string
+          user_id: string
+          algorithm_id: string
+          language: string
+          status: string
+          execution_time_ms: number | null
+          memory_usage_kb: number | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          algorithm_id: string
+          language: string
+          status: string
+          execution_time_ms?: number | null
+          memory_usage_kb?: number | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          algorithm_id?: string
+          language?: string
+          status?: string
+          execution_time_ms?: number | null
+          memory_usage_kb?: number | null
+          created_at?: string | null
+        }
+        Relationships: []
+      }
       user_algorithm_data: {
         Row: {
           algorithm_id: string
@@ -579,6 +612,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_submission_distribution: {
+        Args: {
+          p_algorithm_id: string
+          p_language: string
+          p_user_time_ms?: number | null
+          p_user_memory_kb?: number | null
+        }
+        Returns: Json
+      }
       is_algorithms_admin: { Args: never; Returns: boolean }
       is_internal_user: { Args: { u: string }; Returns: boolean }
     }
