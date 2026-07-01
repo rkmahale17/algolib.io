@@ -2,10 +2,11 @@ import React, { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
 import { TreeDeciduous, Inbox, ListChecks } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import type { VisualizationLanguageMap, StepLineNumberMap } from '@/types/visualization';
 
 interface Step {
   queue: number[];
@@ -15,14 +16,11 @@ interface Step {
   currentNode: number | string;
   rightSideNode: number | string;
   explanation: string;
-  highlightedLines: number[];
+  pseudoStep: string;
 }
 
-export const BinaryTreeRightSideViewVisualization: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [activeTestCase, setActiveTestCase] = useState(0);
-
-  const code = `function rightSideView(root: TreeNode | null): number[] {
+const languages: VisualizationLanguageMap = {
+  typescript: `function rightSideView(root: TreeNode | null): number[] {
   if (!root) return [];
   const result: number[] = [];
   const queue: TreeNode[] = [root];
@@ -40,7 +38,86 @@ export const BinaryTreeRightSideViewVisualization: React.FC = () => {
     }
   }
   return result;
-}`;
+}`,
+  python: `def rightSideView(root: TreeNode | None) -> list[int]:
+    if not root:
+        return []
+    result = []
+    queue = deque([root])
+    while queue:
+        level_size = len(queue)
+        right_side_val = None
+        for _ in range(level_size):
+            node = queue.popleft()
+            right_side_val = node.val
+            if node.left:
+                queue.append(node.left)
+            if node.right:
+                queue.append(node.right)
+        if right_side_val is not None:
+            result.append(right_side_val)
+    return result`,
+  java: `public static class Solution {
+    public List<Integer> rightSideView(TreeNode root) {
+        List<Integer> result = new ArrayList<>();
+        if (root == null) {
+            return result;
+        }
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        while (!queue.isEmpty()) {
+            int levelSize = queue.size();
+            TreeNode rightmostNode = null;
+            for (int i = 0; i < levelSize; i++) {
+                TreeNode currentNode = queue.poll();
+                rightmostNode = currentNode;
+                if (currentNode.left != null) {
+                    queue.offer(currentNode.left);
+                }
+                if (currentNode.right != null) {
+                    queue.offer(currentNode.right);
+                }
+            }
+            if (rightmostNode != null) {
+                result.add(rightmostNode.val);
+            }
+        }
+        return result;
+    }
+}`,
+  cpp: `class Solution {
+public:
+    vector<int> rightSideView(TreeNode* root) {
+        if (!root) {
+            return {};
+        }
+        vector<int> result;
+        queue<TreeNode*> q;
+        q.push(root);
+        while (!q.empty()) {
+            int levelSize = q.size();
+            int rightmostVal = 0;
+            for (int i = 0; i < levelSize; ++i) {
+                TreeNode* node = q.front();
+                q.pop();
+                rightmostVal = node->val;
+                if (node->left) {
+                    q.push(node->left);
+                }
+                if (node->right) {
+                    q.push(node->right);
+                }
+            }
+            result.push_back(rightmostVal);
+        }
+        return result;
+    }
+};`
+};
+
+export const BinaryTreeRightSideViewVisualization: React.FC = () => {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [activeTestCase, setActiveTestCase] = useState(0);
 
   const testCases = [
     {
@@ -99,87 +176,123 @@ export const BinaryTreeRightSideViewVisualization: React.FC = () => {
     }
   ];
 
-  const steps = useMemo(() => {
+  const { steps, stepLineNumbers } = useMemo(() => {
     const stepsList: Step[] = [];
+    const lines: StepLineNumberMap = { typescript: [], python: [], java: [], cpp: [] };
     const root = testCases[activeTestCase].data;
 
-    if (!root) {
+    const addStep = (
+      q: number[],
+      res: number[],
+      levelSize: number,
+      i: number | string,
+      currentNode: number | string,
+      rightSideNode: number | string,
+      explanation: string,
+      pseudo: string,
+      ts: number, py: number, java: number, cpp: number
+    ) => {
       stepsList.push({
-        queue: [], result: [], levelSize: 0, i: '-', currentNode: '-', rightSideNode: '-',
-        explanation: "Since the tree is completely empty, we can't see any nodes from the right side. We immediately return an empty array.",
-        highlightedLines: [2]
+        queue: q,
+        result: res,
+        levelSize,
+        i,
+        currentNode,
+        rightSideNode,
+        explanation,
+        pseudoStep: pseudo
       });
-      return stepsList;
+      lines.typescript!.push(ts);
+      lines.python!.push(py);
+      lines.java!.push(java);
+      lines.cpp!.push(cpp);
+    };
+
+    if (!root) {
+      addStep(
+        [], [], 0, '-', '-', '-',
+        "Since the tree is completely empty, we can't see any nodes from the right side. We immediately return an empty array.",
+        "IF NOT root  →  RETURN []",
+        2, 2, 4, 4
+      );
+      return { steps: stepsList, stepLineNumbers: lines };
     }
 
     const result: number[] = [];
     const queue: any[] = [root];
 
-    stepsList.push({
-      queue: [root.val], result: [], levelSize: 0, i: '-', currentNode: '-', rightSideNode: '-',
-      explanation: "We're using Breadth-First Search (BFS) to traverse the tree level by level. We start by putting the root node in our queue to begin processing.",
-      highlightedLines: [3, 4]
-    });
+    addStep(
+      [root.val], [], 0, '-', '-', '-',
+      "We're using Breadth-First Search (BFS) to traverse the tree level by level. We start by putting the root node in our queue to begin processing.",
+      "SET result = [], queue = [root]",
+      4, 5, 8, 9
+    );
 
     while (queue.length > 0) {
       let rightSideNode: any = null;
       const levelSize = queue.length;
-
-      stepsList.push({
-        queue: queue.map(q => q.val), result: [...result], levelSize, i: '-', currentNode: '-', rightSideNode: '-',
-        explanation: `We start processing a new level. We freeze the current queue size (${levelSize}) so we only process nodes currently on this level, ignoring children we're about to add.`,
-        highlightedLines: [5, 6, 7]
-      });
+      addStep(
+        queue.map(q => q.val), [...result], levelSize, '-', '-', '-',
+        `We start processing a new level. We freeze the current queue size (${levelSize}) so we only process nodes currently on this level, ignoring children we're about to add.`,
+        `SET levelSize = queue.length → ${levelSize}`,
+        7, 7, 10, 11
+      );
 
       for (let i = 0; i < levelSize; i++) {
         const node = queue.shift()!;
         rightSideNode = node;
 
-        stepsList.push({
-          queue: queue.map(q => q.val), result: [...result], levelSize, i, currentNode: node.val, rightSideNode: rightSideNode.val,
-          explanation: `We dequeue ${node.val}. We constantly overwrite 'rightSideNode' with the current node. Since we process from left to right, this ensures the last node on the level stays saved here!`,
-          highlightedLines: [8, 9, 10]
-        });
+        addStep(
+          queue.map(q => q.val), [...result], levelSize, i, node.val, rightSideNode.val,
+          `We dequeue ${node.val}. We constantly overwrite 'rightSideNode' with the current node. Since we process from left to right, this ensures the last node on the level stays saved here!`,
+          `SET rightSideNode = queue.shift() → ${node.val}`,
+          9, 10, 13, 14
+        );
 
         if (node.left) {
           queue.push(node.left);
-          stepsList.push({
-            queue: queue.map(q => q.val), result: [...result], levelSize, i, currentNode: node.val, rightSideNode: rightSideNode.val,
-            explanation: `We push the left child (${node.left.val}) to the queue so it can be processed when we move down to the next level.`,
-            highlightedLines: [11]
-          });
+          addStep(
+            queue.map(q => q.val), [...result], levelSize, i, node.val, rightSideNode.val,
+            `We push the left child (${node.left.val}) to the queue so it can be processed when we move down to the next level.`,
+            `CALL queue.push(node.left)`,
+            11, 13, 16, 18
+          );
         }
 
         if (node.right) {
           queue.push(node.right);
-          stepsList.push({
-            queue: queue.map(q => q.val), result: [...result], levelSize, i, currentNode: node.val, rightSideNode: rightSideNode.val,
-            explanation: `We push the right child (${node.right.val}) to the queue for the next level's processing.`,
-            highlightedLines: [12]
-          });
+          addStep(
+            queue.map(q => q.val), [...result], levelSize, i, node.val, rightSideNode.val,
+            `We push the right child (${node.right.val}) to the queue for the next level's processing.`,
+            `CALL queue.push(node.right)`,
+            12, 15, 20, 21
+          );
         }
       }
 
       if (rightSideNode) {
         result.push(rightSideNode.val);
-        stepsList.push({
-          queue: queue.map(q => q.val), result: [...result], levelSize, i: '-', currentNode: '-', rightSideNode: rightSideNode.val,
-          explanation: `We've finished scanning this level. The final node we processed was ${rightSideNode.val}, making it the rightmost node visible from the side! We add it to our result array.`,
-          highlightedLines: [14, 15]
-        });
+        addStep(
+          queue.map(q => q.val), [...result], levelSize, '-', '-', rightSideNode.val,
+          `We've finished scanning this level. The final node we processed was ${rightSideNode.val}, making it the rightmost node visible from the side! We add it to our result array.`,
+          `CALL result.push(${rightSideNode.val})`,
+          15, 17, 23, 24
+        );
       }
     }
 
-    stepsList.push({
-      queue: [], result: [...result], levelSize: 0, i: '-', currentNode: '-', rightSideNode: '-',
-      explanation: "The queue is empty, meaning we've visited every level in the tree. Our result array now perfectly represents the view from the right side. We return it!",
-      highlightedLines: [18]
-    });
+    addStep(
+      [], [...result], 0, '-', '-', '-',
+      "The queue is empty, meaning we've visited every level in the tree. Our result array now perfectly represents the view from the right side. We return it!",
+      "RETURN result",
+      18, 18, 26, 26
+    );
 
-    return stepsList;
+    return { steps: stepsList, stepLineNumbers: lines };
   }, [activeTestCase]);
 
   const step = steps[currentStep];
+  const pseudoSteps = useMemo(() => steps.map(s => s.pseudoStep), [steps]);
 
   const renderTree = () => {
     const currentCase = testCases[activeTestCase];
@@ -217,7 +330,7 @@ export const BinaryTreeRightSideViewVisualization: React.FC = () => {
                 />
                 <text 
                   x={positions[val].x} y={positions[val].y + 4} textAnchor="middle" 
-                  className={`text-[11px] font-bold select-none ${isCurrent ? 'fill-white' : 'fill-foreground'}`}
+                  className={`text-[11px] font-bold select-none \${isCurrent ? 'fill-white' : 'fill-foreground'}`}
                 >
                   {val}
                 </text>
@@ -244,7 +357,7 @@ export const BinaryTreeRightSideViewVisualization: React.FC = () => {
               <button
                 key={tc.id}
                 onClick={() => { setActiveTestCase(idx); setCurrentStep(0); }}
-                className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all relative ${
+                className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all relative \${
                   activeTestCase === idx 
                     ? 'text-primary-foreground' 
                     : 'text-muted-foreground hover:text-foreground'
@@ -292,7 +405,7 @@ export const BinaryTreeRightSideViewVisualization: React.FC = () => {
                   <AnimatePresence mode="popLayout">
                     {step.queue.map((q, idx) => (
                       <motion.div 
-                        key={`${q}-${idx}`}
+                        key={`\${q}-\${idx}`}
                         layout
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
@@ -337,14 +450,15 @@ export const BinaryTreeRightSideViewVisualization: React.FC = () => {
         </div>
       }
       rightContent={
-        <Card className="h-full overflow-hidden flex flex-col shadow-sm border-border/50">
-          <AnimatedCodeEditor
-            code={code}
-            language="typescript"
-            highlightedLines={step.highlightedLines}
-          />
-        </Card>
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStep}
+          onLanguageChange={() => setCurrentStep(0)}
+        />
       }
     />
   );
 };
+export default BinaryTreeRightSideViewVisualization;

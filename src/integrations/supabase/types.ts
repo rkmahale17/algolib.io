@@ -607,6 +607,54 @@ export type Database = {
         }
         Relationships: []
       }
+      visualization_feedback: {
+        Row: {
+          algorithm_id: string
+          created_at: string
+          feedback_checkboxes: Json
+          id: string
+          rating: number
+          review_text: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          algorithm_id: string
+          created_at?: string
+          feedback_checkboxes?: Json
+          id?: string
+          rating: number
+          review_text?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          algorithm_id?: string
+          created_at?: string
+          feedback_checkboxes?: Json
+          id?: string
+          rating?: number
+          review_text?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visualization_feedback_algorithm_id_fkey"
+            columns: ["algorithm_id"]
+            isOneToOne: false
+            referencedRelation: "algorithms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visualization_feedback_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never

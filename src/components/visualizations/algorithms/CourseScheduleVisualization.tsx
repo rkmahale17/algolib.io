@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
 import { motion } from 'framer-motion';
+import type { VisualizationLanguageMap, StepLineNumberMap } from '@/types/visualization';
 
 interface Step {
   courses: number;
@@ -15,9 +16,129 @@ interface Step {
   hasCycle: boolean;
   variables: Record<string, any>;
   explanation: string;
-  highlightedLines: number[];
+  pseudoStep: string;
   lineExecution: string;
 }
+
+const languages: VisualizationLanguageMap = {
+  typescript: `function canFinish(numCourses: number, prerequisites: number[][]): boolean {
+  const graph = new Map<number, number[]>();
+  for (const [course, prereq] of prerequisites) {
+    if (!graph.has(course)) graph.set(course, []);
+    graph.get(course)!.push(prereq);
+  }
+  const visiting = new Set<number>();
+  const visited = new Set<number>();
+  function hasCycle(course: number): boolean {
+    if (visiting.has(course)) return true;
+    if (visited.has(course)) return false;
+    visiting.add(course);
+    for (const prereq of graph.get(course) || []) {
+      if (hasCycle(prereq)) return true;
+    }
+    visiting.delete(course);
+    visited.add(course);
+    return false;
+  }
+  for (let i = 0; i < numCourses; i++) {
+    if (hasCycle(i)) return false;
+  }
+  return true;
+}`,
+  python: `def canFinish(numCourses: int, prerequisites: list[list[int]]) -> bool:
+    adj_list = [[] for _ in range(numCourses)]
+    for course, pre in prerequisites:
+        adj_list[pre].append(course)
+    visited = [0] * numCourses
+    def has_cycle(course: int) -> bool:
+        visited[course] = 1
+        for neighbor in adj_list[course]:
+            if visited[neighbor] == 1:
+                return True
+            if visited[neighbor] == 0:
+                if has_cycle(neighbor):
+                    return True
+        visited[course] = 2
+        return False
+    for course in range(numCourses):
+        if visited[course] == 0:
+            if has_cycle(course):
+                return False
+    return True`,
+  java: `public static class Solution {
+    public boolean canFinish(int numCourses, int[][] prerequisites) {
+        if (prerequisites == null || prerequisites.length == 0) {
+            return true;
+        }
+        int[] indegree = new int[numCourses];
+        List<List<Integer>> adjList = new ArrayList<>();
+        for (int i = 0; i < numCourses; i++) {
+            adjList.add(new ArrayList<>());
+        }
+        for (int[] prerequisite : prerequisites) {
+            int course = prerequisite[0];
+            int pre = prerequisite[1];
+            adjList.get(pre).add(course);
+            indegree[course]++;
+        }
+        Queue<Integer> queue = new LinkedList<>();
+        for (int i = 0; i < numCourses; i++) {
+            if (indegree[i] == 0) {
+                queue.offer(i);
+            }
+        }
+        int count = 0;
+        while (!queue.isEmpty()) {
+            int course = queue.poll();
+            count++;
+            for (int neighbor : adjList.get(course)) {
+                indegree[neighbor]--;
+                if (indegree[neighbor] == 0) {
+                    queue.offer(neighbor);
+                }
+            }
+        }
+        return count == numCourses;
+    }
+}`,
+  cpp: `class Solution {
+public:
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+        vector<vector<int>> adjList(numCourses);
+        vector<int> inDegree(numCourses, 0);
+        for (const auto& pre : prerequisites) {
+            adjList[pre[1]].push_back(pre[0]);
+            inDegree[pre[0]]++;
+        }
+        queue<int> q;
+        for (int i = 0; i < numCourses; i++) {
+            if (inDegree[i] == 0) {
+                q.push(i);
+            }
+        }
+        int count = 0;
+        while (!q.empty()) {
+            int course = q.front();
+            q.pop();
+            count++;
+            for (int neighbor : adjList[course]) {
+                inDegree[neighbor]--;
+                if (inDegree[neighbor] == 0) {
+                    q.push(neighbor);
+                }
+            }
+        }
+        return count == numCourses;
+    }
+};`
+};
+
+const stepLineNumbers: StepLineNumberMap = {
+  typescript: [1, 2, 3, 7, 20, 10, 11, 12, 13, 16, 17, 12, 11, 16, 12, 12, 16, 23, 23],
+  python: [1, 2, 3, 5, 16, 9, 17, 7, 8, 14, 14, 12, 17, 14, 14, 12, 14, 20, 20],
+  java: [3, 7, 11, 17, 24, 25, 26, 25, 27, 25, 26, 27, 26, 26, 27, 27, 26, 34, 34],
+  cpp: [4, 4, 6, 10, 17, 18, 20, 18, 21, 18, 20, 21, 20, 20, 21, 21, 20, 28, 28]
+};
 
 export const CourseScheduleVisualization = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -35,7 +156,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { numCourses: 4, prerequisites: '[[1,0],[2,0],[3,1],[3,2]]' },
       explanation: "4 courses with prerequisites. [1,0] means: take course 0 before course 1. Check if all courses can be completed (no cycles).",
-      highlightedLines: [1, 2, 3, 4],
+      pseudoStep: "canFinish(numCourses=4, prerequisites=[[1,0],[2,0],[3,1],[3,2]])",
       lineExecution: "function canFinish(numCourses: number, prerequisites: number[][]): boolean"
     },
     {
@@ -47,7 +168,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { graph: 'Map()' },
       explanation: "Build adjacency list: graph[course] = array of prerequisites for that course.",
-      highlightedLines: [5],
+      pseudoStep: "SET graph = Map()",
       lineExecution: "const graph = new Map<number, number[]>();"
     },
     {
@@ -59,7 +180,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { graph: '{1:[0], 2:[0], 3:[1,2]}' },
       explanation: "Populate graph from prerequisites. Course 3 requires both courses 1 and 2.",
-      highlightedLines: [6, 7, 8],
+      pseudoStep: "FOR [course, prereq] IN prerequisites → graph.set(...)",
       lineExecution: "for (const [course, prereq] of prerequisites) graph.set(...)"
     },
     {
@@ -71,7 +192,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { visiting: 'Set()', visited: 'Set()' },
       explanation: "Create two sets: 'visiting' tracks current DFS path (cycle detection), 'visited' tracks completed courses.",
-      highlightedLines: [10, 11],
+      pseudoStep: "SET visiting = Set(), visited = Set()",
       lineExecution: "const visiting = new Set(); const visited = new Set();"
     },
     {
@@ -83,7 +204,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { i: 0, course: 0 },
       explanation: "Start checking courses: i = 0. Call hasCycle(0) to check if course 0 has cycle.",
-      highlightedLines: [26, 27],
+      pseudoStep: "FOR i = 0 TO numCourses",
       lineExecution: "for (let i = 0; i < numCourses; i++) if (hasCycle(i)) ..."
     },
     {
@@ -95,7 +216,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { course: 0, 'visiting.has(0)': false },
       explanation: "Check if course 0 is in current DFS path: visiting.has(0)? No, no cycle yet.",
-      highlightedLines: [14],
+      pseudoStep: "IF visiting.has(course=0)  →  NO",
       lineExecution: "if (visiting.has(course)) return true; // false"
     },
     {
@@ -107,7 +228,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { 'visited.has(0)': false },
       explanation: "Check if course 0 already processed: visited.has(0)? No, continue DFS.",
-      highlightedLines: [15],
+      pseudoStep: "IF visited.has(course=0)  →  NO",
       lineExecution: "if (visited.has(course)) return false; // false"
     },
     {
@@ -119,7 +240,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { visiting: '{0}' },
       explanation: "Mark course 0 as visiting (in current DFS path). Used for cycle detection.",
-      highlightedLines: [17],
+      pseudoStep: "visiting.add(course=0)",
       lineExecution: "visiting.add(course); // visiting = {0}"
     },
     {
@@ -131,7 +252,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { prerequisites: '[]' },
       explanation: "Check prerequisites for course 0: none. Empty array, loop doesn't execute.",
-      highlightedLines: [18, 19],
+      pseudoStep: "FOR prereq IN graph.get(course=0)",
       lineExecution: "for (const prereq of graph.get(course) || []) // []"
     },
     {
@@ -143,7 +264,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { visiting: '{}' },
       explanation: "Course 0 DFS complete. Remove from visiting set (no longer in current path).",
-      highlightedLines: [21],
+      pseudoStep: "visiting.delete(course=0)",
       lineExecution: "visiting.delete(course); // visiting = {}"
     },
     {
@@ -155,7 +276,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { visited: '{0}' },
       explanation: "Mark course 0 as visited (fully processed). Can be safely taken.",
-      highlightedLines: [22],
+      pseudoStep: "visited.add(course=0)",
       lineExecution: "visited.add(course); // visited = {0}"
     },
     {
@@ -167,7 +288,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { course: 1, prerequisites: '[0]' },
       explanation: "Check course 1. Prerequisite: course 0. Add 1 to visiting, recursively check prereq 0.",
-      highlightedLines: [17, 18, 19],
+      pseudoStep: "CALL hasCycle(course=1)",
       lineExecution: "visiting.add(1); for (const prereq of [0]) hasCycle(0)"
     },
     {
@@ -179,7 +300,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { 'visited.has(0)': true },
       explanation: "Checking prereq 0: already in visited set. Return false immediately (no cycle).",
-      highlightedLines: [15],
+      pseudoStep: "IF visited.has(prereq=0)  →  YES",
       lineExecution: "if (visited.has(course)) return false; // true, return false"
     },
     {
@@ -191,7 +312,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { visited: '{0,1}' },
       explanation: "Course 1 valid. Remove from visiting, add to visited.",
-      highlightedLines: [21, 22],
+      pseudoStep: "visited.add(course=1)",
       lineExecution: "visiting.delete(1); visited.add(1);"
     },
     {
@@ -203,7 +324,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { course: 2 },
       explanation: "Check course 2. Prerequisite: course 0 (already visited). Course 2 valid.",
-      highlightedLines: [17, 18, 19, 21, 22],
+      pseudoStep: "CALL hasCycle(course=2)",
       lineExecution: "Process course 2: prereq 0 in visited, add 2 to visited"
     },
     {
@@ -215,7 +336,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { course: 3, prerequisites: '[1,2]' },
       explanation: "Check course 3. Prerequisites: courses 1 and 2 (both in visited). Course 3 valid.",
-      highlightedLines: [17, 18, 19],
+      pseudoStep: "CALL hasCycle(course=3)",
       lineExecution: "visiting.add(3); check prereqs 1 and 2 (both visited)"
     },
     {
@@ -227,7 +348,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { visited: '{0,1,2,3}' },
       explanation: "Course 3 valid. All courses processed, no cycles found!",
-      highlightedLines: [21, 22],
+      pseudoStep: "visited.add(course=3)",
       lineExecution: "visiting.delete(3); visited.add(3);"
     },
     {
@@ -239,7 +360,7 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { result: true },
       explanation: "Loop complete. No cycle detected. Return true - all courses can be finished!",
-      highlightedLines: [29],
+      pseudoStep: "RETURN true",
       lineExecution: "return true;"
     },
     {
@@ -251,49 +372,25 @@ export const CourseScheduleVisualization = () => {
       hasCycle: false,
       variables: { canFinish: true, complexity: 'O(V+E)' },
       explanation: "Algorithm complete! DFS cycle detection. Time: O(V+E) where V=courses, E=prerequisites. Space: O(V).",
-      highlightedLines: [29],
+      pseudoStep: "RETURN true",
       lineExecution: "Result: true (can finish all courses)"
     }
   ];
 
-  const code = `function canFinish(
-  numCourses: number, 
-  prerequisites: number[][]
-): boolean {
-  const graph = new Map<number, number[]>();
-  for (const [course, prereq] of prerequisites) {
-    if (!graph.has(course)) graph.set(course, []);
-    graph.get(course)!.push(prereq);
-  }
-  
-  const visiting = new Set<number>();
-  const visited = new Set<number>();
-  
-  function hasCycle(course: number): boolean {
-    if (visiting.has(course)) return true;
-    if (visited.has(course)) return false;
-    
-    visiting.add(course);
-    for (const prereq of graph.get(course) || []) {
-      if (hasCycle(prereq)) return true;
-    }
-    visiting.delete(course);
-    visited.add(course);
-    return false;
-  }
-  
-  for (let i = 0; i < numCourses; i++) {
-    if (hasCycle(i)) return false;
-  }
-  return true;
-}`;
-
   const step = steps[currentStep];
+  const pseudoSteps = useMemo(() => steps.map(s => s.pseudoStep), []);
 
   return (
     <VisualizationLayout
+      controls={
+        <SimpleStepControls
+          currentStep={currentStep}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStep}
+        />
+      }
       leftContent={
-        <>
+        <div className="space-y-6">
           <motion.div
             key={`courses-${currentStep}`}
             initial={{ opacity: 0, y: 20 }}
@@ -306,13 +403,13 @@ export const CourseScheduleVisualization = () => {
                 {Array.from({ length: step.courses }, (_, i) => (
                   <div
                     key={i}
-                    className={`w-16 h-16 rounded-full flex items-center justify-center font- text-lg ${i === step.currentCourse
-                      ? 'bg-primary text-primary-foreground ring-4 ring-primary'
+                    className={`w-16 h-16 rounded-full flex items-center justify-center font-bold text-lg transition-all duration-300 ${i === step.currentCourse
+                      ? 'bg-primary text-primary-foreground ring-4 ring-primary scale-105'
                       : step.visited.includes(i)
-                        ? 'bg-green-500/30'
+                        ? 'bg-green-500/20 border border-green-500/50 text-green-700 font-bold'
                         : step.visiting.includes(i)
-                          ? 'bg-yellow-500/30'
-                          : 'bg-muted'
+                          ? 'bg-yellow-500/20 border border-yellow-500/50 text-yellow-700 font-bold'
+                          : 'bg-muted border border-border'
                       }`}
                   >
                     {i}
@@ -321,10 +418,10 @@ export const CourseScheduleVisualization = () => {
               </div>
               <div className="flex gap-4 mt-3 text-xs">
                 <div className="flex items-center gap-1">
-                  <div className="w-4 h-4 bg-yellow-500/30 rounded-full"></div> Visiting
+                  <div className="w-4 h-4 bg-yellow-500/20 border border-yellow-500/50 rounded"></div> Visiting
                 </div>
                 <div className="flex items-center gap-1">
-                  <div className="w-4 h-4 bg-green-500/30 rounded-full"></div> Visited
+                  <div className="w-4 h-4 bg-green-500/20 border border-green-500/50 rounded"></div> Visited
                 </div>
               </div>
             </Card>
@@ -375,20 +472,15 @@ export const CourseScheduleVisualization = () => {
           >
             <VariablePanel variables={step.variables} />
           </motion.div>
-        </>
+        </div>
       }
       rightContent={
-        <AnimatedCodeEditor
-          code={code}
-          language="typescript"
-          highlightedLines={step.highlightedLines}
-        />
-      }
-      controls={
-        <SimpleStepControls
-          currentStep={currentStep}
-          totalSteps={steps.length}
-          onStepChange={setCurrentStep}
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStep}
+          onLanguageChange={() => setCurrentStep(0)}
         />
       }
     />

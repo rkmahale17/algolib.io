@@ -2,9 +2,11 @@ import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { motion, AnimatePresence } from 'framer-motion';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
 import { Check, X, ShieldCheck, ShieldAlert } from 'lucide-react';
+import type { VisualizationLanguageMap, StepLineNumberMap } from '@/types/visualization';
 
 interface TreeNode {
   val: number;
@@ -16,11 +18,10 @@ interface Step {
   currentNode: number | null;
   leftBound: number | string;
   rightBound: number | string;
-  comparison?: string;
   isValid: boolean | null;
   tree: Record<number, TreeNode>;
   message: string;
-  highlightedLines: number[];
+  pseudoStep: string;
   stackDepth: number;
 }
 
@@ -42,84 +43,208 @@ const INVALID_TREE: Record<number, TreeNode> = {
   7: { val: 7, left: null, right: null },
 };
 
+const languages: VisualizationLanguageMap = {
+  typescript: `function isValidBST(root: TreeNode | null): boolean {
+  function valid(node: TreeNode | null, left: number, right: number): boolean {
+    if (!node) return true;
+    if (!(node.val > left && node.val < right)) {
+      return false;
+    }
+    return valid(node.left, left, node.val) &&
+           valid(node.right, node.val, right);
+  }
+  return valid(root, -Infinity, Infinity);
+}`,
+  python: `def isValidBST(root: TreeNode | None) -> bool:
+    def valid(node: TreeNode | None, left: float, right: float) -> bool:
+        if not node:
+            return True
+        if not (node.val < right and node.val > left):
+            return False
+        return (
+            valid(node.left, left, node.val) and
+            valid(node.right, node.val, right)
+        )
+    return valid(root, float('-inf'), float('inf'))`,
+  java: `public static class Solution {
+    public boolean isValidBST(TreeNode root) {
+        return valid(root, Long.MIN_VALUE, Long.MAX_VALUE);
+    }
+    private boolean valid(TreeNode node, long left, long right) {
+        if (node == null) {
+            return true;
+        }
+        if (!(node.val < right && node.val > left)) {
+            return false;
+        }
+        return valid(node.left, left, node.val) &&
+               valid(node.right, node.val, right);
+    }
+}`,
+  cpp: `class Solution {
+public:
+    bool isValidBST(TreeNode* root) {
+        return valid(root, LONG_MIN, LONG_MAX);
+    }
+private:
+    bool valid(TreeNode* node, long left, long right) {
+        if (node == nullptr) {
+            return true;
+        }
+        if (!(node->val < right && node->val > left)) {
+            return false;
+        }
+        return valid(node->left, left, node->val) &&
+               valid(node->right, node->val, right);
+    }
+};`
+};
+
+function generateSteps(tree: Record<number, TreeNode>, rootVal: number) {
+  const steps: Step[] = [];
+  const lineNumbers: StepLineNumberMap = { typescript: [], python: [], java: [], cpp: [] };
+
+  const addStep = (
+    node: number | null,
+    left: number | string,
+    right: number | string,
+    isValid: boolean | null,
+    msg: string,
+    pseudo: string,
+    stackDepth: number,
+    ts: number, py: number, java: number, cpp: number
+  ) => {
+    steps.push({
+      currentNode: node,
+      leftBound: left,
+      rightBound: right,
+      isValid,
+      tree,
+      message: msg,
+      pseudoStep: pseudo,
+      stackDepth
+    });
+    lineNumbers.typescript!.push(ts);
+    lineNumbers.python!.push(py);
+    lineNumbers.java!.push(java);
+    lineNumbers.cpp!.push(cpp);
+  };
+
+  addStep(
+    rootVal, '-∞', '∞', null, 
+    `Initialize BST validation for the root node ${rootVal} with range (-Infinity, Infinity).`, 
+    `CALL isValidBST(root=${rootVal})`, 
+    1, 10, 11, 3, 4
+  );
+
+  function valid(nodeId: number | null, left: number, right: number, depth: number): boolean {
+    const leftStr = left === -Infinity ? '-∞' : left.toString();
+    const rightStr = right === Infinity ? '∞' : right.toString();
+
+    addStep(
+      nodeId, leftStr, rightStr, null, 
+      `Enter valid(${nodeId ?? 'null'}, ${leftStr}, ${rightStr}).`, 
+      `CALL valid(node=${nodeId ?? 'null'}, left=${leftStr}, right=${rightStr})`, 
+      depth, 2, 2, 5, 7
+    );
+
+    if (nodeId === null) {
+      addStep(
+        null, leftStr, rightStr, true, 
+        "Base case: empty node is a valid BST.", 
+        "IF node IS NULL RETURN true", 
+        depth, 3, 3, 6, 8
+      );
+      return true;
+    }
+
+    const node = tree[nodeId];
+
+    addStep(
+      nodeId, leftStr, rightStr, null, 
+      `Check if node ${nodeId} is null. It's not, so continue.`, 
+      `IF node IS NULL`, 
+      depth, 3, 3, 6, 8
+    );
+
+    const isValValid = node.val > left && node.val < right;
+    if (!isValValid) {
+      addStep(
+        nodeId, leftStr, rightStr, false, 
+        `VIOLATION! Value ${node.val} is NOT within (${leftStr}, ${rightStr}).`, 
+        `IF NOT (left < node.val < right)  →  VIOLATES BST`, 
+        depth, 4, 5, 9, 11
+      );
+      addStep(
+        nodeId, leftStr, rightStr, false, 
+        `Returning false for node ${node.val}.`, 
+        `RETURN false`, 
+        depth, 5, 6, 10, 12
+      );
+      return false;
+    }
+
+    addStep(
+      nodeId, leftStr, rightStr, null, 
+      `Check if node value ${node.val} is within range (${leftStr}, ${rightStr}). Yes (${leftStr} < ${node.val} < ${rightStr}).`, 
+      `IF (left < node.val < right)  →  VALID ✓`, 
+      depth, 4, 5, 9, 11
+    );
+
+    addStep(
+      nodeId, leftStr, rightStr, null, 
+      `Recursive call: Validate the LEFT subtree of node ${node.val}. New range is (${leftStr}, ${node.val}).`, 
+      `SET left_valid = CALL valid(node.left, left=${leftStr}, right=${node.val})`, 
+      depth, 7, 8, 12, 14
+    );
+
+    const leftValid = valid(node.left, left, node.val, depth + 1);
+    if (!leftValid) {
+      return false;
+    }
+
+    addStep(
+      nodeId, leftStr, rightStr, null, 
+      `Left subtree of ${node.val} is valid. Now validate node ${node.val}'s RIGHT subtree. New range is (${node.val}, ${rightStr}).`, 
+      `SET right_valid = CALL valid(node.right, left=${node.val}, right=${rightStr})`, 
+      depth, 8, 9, 13, 15
+    );
+
+    const rightValid = valid(node.right, node.val, right, depth + 1);
+    if (!rightValid) {
+      return false;
+    }
+
+    addStep(
+      nodeId, leftStr, rightStr, true, 
+      `Both subtrees of ${node.val} are valid. valid(${node.val}) returns true.`, 
+      `RETURN true`, 
+      depth, 7, 7, 12, 14
+    );
+    return true;
+  }
+
+  const result = valid(rootVal, -Infinity, Infinity, 1);
+  addStep(
+    rootVal, '-∞', '∞', result, 
+    `Validation complete. Final result: ${result.toString()}.`, 
+    `RETURN ${result.toString()}`, 
+    1, 10, 11, 3, 4
+  );
+
+  return { steps, stepLineNumbers: lineNumbers };
+}
+
 export const ValidateBSTVisualization = () => {
   const [testCase, setTestCase] = useState<'valid' | 'invalid'>('valid');
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
-  const code = `function isValidBST(root: TreeNode | null): boolean {
-  function valid(node: TreeNode | null, left: number, right: number): boolean {
-    if (!node) return true;
-    
-    if (!(node.val > left && node.val < right)) {
-      return false;
-    }
+  const { steps, stepLineNumbers } = useMemo(() => {
+    return generateSteps(testCase === 'valid' ? VALID_TREE : INVALID_TREE, 5);
+  }, [testCase]);
 
-    return valid(node.left, left, node.val) && 
-           valid(node.right, node.val, right);
-  }
-
-  return valid(root, -Infinity, Infinity);
-}`;
-
-  const validSteps: Step[] = [
-    { currentNode: 5, leftBound: '-∞', rightBound: '∞', isValid: null, tree: VALID_TREE, message: "Initialize BST validation for the root node 5 with range (-Infinity, Infinity).", highlightedLines: [13], stackDepth: 1 },
-    { currentNode: 5, leftBound: '-∞', rightBound: '∞', isValid: null, tree: VALID_TREE, message: "Enter valid(5, -∞, ∞).", highlightedLines: [2], stackDepth: 1 },
-    { currentNode: 5, leftBound: '-∞', rightBound: '∞', isValid: null, tree: VALID_TREE, message: "Check if node 5 is null. It's not, so continue.", highlightedLines: [3], stackDepth: 1 },
-    { currentNode: 5, leftBound: '-∞', rightBound: '∞', isValid: null, tree: VALID_TREE, message: "Check if node value 5 is within range (-∞, ∞). Yes (-∞ < 5 < ∞).", highlightedLines: [5, 6, 7], stackDepth: 1 },
-    { currentNode: 5, leftBound: '-∞', rightBound: '∞', isValid: null, tree: VALID_TREE, message: "Recursive call: Validate the LEFT subtree of node 5. New range is (-∞, 5).", highlightedLines: [9], stackDepth: 1 },
-    
-    // Node 3 (Left child of 5)
-    { currentNode: 3, leftBound: '-∞', rightBound: 5, isValid: null, tree: VALID_TREE, message: "Enter valid(3, -∞, 5).", highlightedLines: [2], stackDepth: 2 },
-    { currentNode: 3, leftBound: '-∞', rightBound: 5, isValid: null, tree: VALID_TREE, message: "Check value 3: Is -∞ < 3 < 5? Yes.", highlightedLines: [5, 6, 7], stackDepth: 2 },
-    { currentNode: 3, leftBound: '-∞', rightBound: 5, isValid: null, tree: VALID_TREE, message: "Validate node 3's LEFT subtree. New range is (-∞, 3).", highlightedLines: [9], stackDepth: 2 },
-    
-    // Node 2 (Left child of 3)
-    { currentNode: 2, leftBound: '-∞', rightBound: 3, isValid: null, tree: VALID_TREE, message: "At node 2: Is -∞ < 2 < 3? Yes.", highlightedLines: [2, 3, 5], stackDepth: 3 },
-    { currentNode: 2, leftBound: '-∞', rightBound: 3, isValid: true, tree: VALID_TREE, message: "Node 2 is a leaf. Both children return true.", highlightedLines: [9, 10], stackDepth: 3 },
-    
-    // Back to Node 3
-    { currentNode: 3, leftBound: '-∞', rightBound: 5, isValid: true, tree: VALID_TREE, message: "Left subtree of 3 is valid. Now validate node 3's RIGHT subtree. New range is (3, 5).", highlightedLines: [10], stackDepth: 2 },
-    
-    // Node 4 (Right child of 3)
-    { currentNode: 4, leftBound: 3, rightBound: 5, isValid: null, tree: VALID_TREE, message: "At node 4: Is 3 < 4 < 5? Yes.", highlightedLines: [2, 3, 5], stackDepth: 3 },
-    { currentNode: 4, leftBound: 3, rightBound: 5, isValid: true, tree: VALID_TREE, message: "Node 4 is a leaf. Both children return true.", highlightedLines: [9, 10], stackDepth: 3 },
-    
-    { currentNode: 3, leftBound: '-∞', rightBound: 5, isValid: true, tree: VALID_TREE, message: "Both subtrees of 3 are valid. valid(3) returns true.", highlightedLines: [9, 10], stackDepth: 2 },
-    
-    // Back to Root 5
-    { currentNode: 5, leftBound: '-∞', rightBound: '∞', isValid: true, tree: VALID_TREE, message: "Left subtree of 5 is valid. Now validate root 5's RIGHT subtree. New range is (5, ∞).", highlightedLines: [10], stackDepth: 1 },
-    
-    // Node 7 (Right child of 5)
-    { currentNode: 7, leftBound: 5, rightBound: '∞', isValid: null, tree: VALID_TREE, message: "At node 7: Is 5 < 7 < ∞? Yes.", highlightedLines: [2, 3, 5], stackDepth: 2 },
-    { currentNode: 7, leftBound: 5, rightBound: '∞', isValid: null, tree: VALID_TREE, message: "Validating children of 7 (nodes 6 and 8). Both satisfy their respective bounds.", highlightedLines: [9, 10], stackDepth: 2 },
-    { currentNode: 7, leftBound: 5, rightBound: '∞', isValid: true, tree: VALID_TREE, message: "Node 7 and its subtree are valid.", highlightedLines: [9, 10], stackDepth: 2 },
-    
-    { currentNode: 5, leftBound: '-∞', rightBound: '∞', isValid: true, tree: VALID_TREE, message: "All nodes satisfy the BST properties. Final result: true.", highlightedLines: [13], stackDepth: 1 }
-  ];
-
-  const invalidSteps: Step[] = [
-    { currentNode: 5, leftBound: '-∞', rightBound: '∞', isValid: null, tree: INVALID_TREE, message: "Initialize BST validation for root 5 with range (-∞, ∞).", highlightedLines: [13], stackDepth: 1 },
-    { currentNode: 5, leftBound: '-∞', rightBound: '∞', isValid: null, tree: INVALID_TREE, message: "Node 5 is within range (-∞ < 5 < ∞). Checking left subtree.", highlightedLines: [2, 3, 5], stackDepth: 1 },
-    { currentNode: 5, leftBound: '-∞', rightBound: '∞', isValid: null, tree: INVALID_TREE, message: "Recursive call: Validate LEFT subtree of 5. Range: (-∞, 5).", highlightedLines: [9], stackDepth: 1 },
-    
-    { currentNode: 1, leftBound: '-∞', rightBound: 5, isValid: true, tree: INVALID_TREE, message: "Node 1 is valid. Returning true.", highlightedLines: [2, 3, 5, 9, 10], stackDepth: 2 },
-    
-    { currentNode: 5, leftBound: '-∞', rightBound: '∞', isValid: true, tree: INVALID_TREE, message: "Left subtree valid. Now validate root 5's RIGHT subtree. Range: (5, ∞).", highlightedLines: [10], stackDepth: 1 },
-    
-    { currentNode: 6, leftBound: 5, rightBound: '∞', isValid: null, tree: INVALID_TREE, message: "At node 6: Is 5 < 6 < ∞? Yes.", highlightedLines: [2, 3, 5], stackDepth: 2 },
-    { currentNode: 6, leftBound: 5, rightBound: '∞', isValid: null, tree: INVALID_TREE, message: "Checking node 6's LEFT subtree. Range: (5, 6).", highlightedLines: [9], stackDepth: 2 },
-    
-    { currentNode: 4, leftBound: 5, rightBound: 6, isValid: null, tree: INVALID_TREE, message: "At node 4: Check if it's within range (5, 6).", highlightedLines: [2, 3, 5], stackDepth: 3 },
-    { currentNode: 4, leftBound: 5, rightBound: 6, isValid: false, tree: INVALID_TREE, message: "VIOLATION! 4 is NOT > 5. This node is in the right subtree of 5, so it must be greater than 5.", highlightedLines: [5, 6], stackDepth: 3 },
-    { currentNode: 4, leftBound: 5, rightBound: 6, isValid: false, tree: INVALID_TREE, message: "Returning false for node 4.", highlightedLines: [6], stackDepth: 3 },
-    
-    { currentNode: 6, leftBound: 5, rightBound: '∞', isValid: false, tree: INVALID_TREE, message: "Node 6's left subtree failed. valid(6) returns false.", highlightedLines: [9], stackDepth: 2 },
-    { currentNode: 5, leftBound: '-∞', rightBound: '∞', isValid: false, tree: INVALID_TREE, message: "Root 5's right subtree failed. Final result: false.", highlightedLines: [10], stackDepth: 1 },
-    { currentNode: 5, leftBound: '-∞', rightBound: '∞', isValid: false, tree: INVALID_TREE, message: "The tree is NOT a valid BST.", highlightedLines: [13], stackDepth: 1 }
-  ];
-
-  const steps = testCase === 'valid' ? validSteps : invalidSteps;
   const currentStep = steps[currentStepIndex];
+  const pseudoSteps = useMemo(() => steps.map(s => s.pseudoStep), [steps]);
 
   const variables = useMemo(() => ({
     node: currentStep.currentNode ? currentStep.currentNode : 'null',
@@ -135,10 +260,8 @@ export const ValidateBSTVisualization = () => {
   };
 
   const renderTree = () => {
-    const tree = currentStep.tree;
     const isInvalidCase = testCase === 'invalid';
 
-    // Positions for tree nodes
     const positions: Record<number, { x: number, y: number }> = isInvalidCase
       ? {
         5: { x: 200, y: 40 },
@@ -171,7 +294,6 @@ export const ValidateBSTVisualization = () => {
     return (
       <div className="w-full aspect-[400/220] relative">
         <svg viewBox="0 0 400 220" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
-          {/* Edges */}
           {edges.map((edge, i) => (
             <line
               key={i}
@@ -185,7 +307,6 @@ export const ValidateBSTVisualization = () => {
             />
           ))}
 
-          {/* Nodes */}
           {Object.entries(positions).map(([val, pos]) => {
             const value = parseInt(val);
             const isCurrent = currentStep.currentNode === value;
@@ -198,18 +319,18 @@ export const ValidateBSTVisualization = () => {
                   cy={pos.y}
                   r="18"
                   animate={{
-                    fill: isViolator ? '#ef4444' : isCurrent ? '#eab308' : 'hsl(var(--card))',
+                    fill: isViolator ? '#ef4444' : isCurrent ? '#3b82f6' : 'hsl(var(--card))',
                     scale: isCurrent ? 1.15 : 1,
-                    stroke: isCurrent ? '#eab308' : 'hsl(var(--border))'
+                    stroke: isCurrent ? '#3b82f6' : 'hsl(var(--border))'
                   }}
                   strokeWidth="2"
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0 }}
                 />
                 <text
                   x={pos.x}
                   y={pos.y + 5}
                   textAnchor="middle"
-                  className="text-[10px] font-bold fill-foreground select-none"
+                  className={`text-[10px] font-bold select-none ${isCurrent ? 'fill-white' : 'fill-foreground'}`}
                 >
                   {value}
                 </text>
@@ -222,40 +343,39 @@ export const ValidateBSTVisualization = () => {
   };
 
   return (
-    <div className="space-y-6">
-
-      <SimpleStepControls
-        currentStep={currentStepIndex}
-        totalSteps={steps.length}
-        onStepChange={setCurrentStepIndex}
-      />
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 px-2 mx-auto">
-
-        <div className="flex bg-muted rounded-lg p-1 shadow-inner border">
-          <button
-            onClick={() => handleCaseChange('valid')}
-            className={`flex items-center gap-2 px-4 py-1.5 rounded-md transition-all text-sm font-medium ${testCase === 'valid'
-              ? 'bg-card text-foreground shadow-sm'
-              : 'text-muted-foreground hover:text-foreground'
-              }`}
-          >
-            {testCase === 'valid' ? <ShieldCheck className="w-4 h-4 text-green-500" /> : <Check className="w-4 h-4" />}
-            Valid BST
-          </button>
-          <button
-            onClick={() => handleCaseChange('invalid')}
-            className={`flex items-center gap-2 px-4 py-1.5 rounded-md transition-all text-sm font-medium ${testCase === 'invalid'
-              ? 'bg-card text-foreground shadow-sm'
-              : 'text-muted-foreground hover:text-foreground'
-              }`}
-          >
-            {testCase === 'invalid' ? <ShieldAlert className="w-4 h-4 text-red-500" /> : <X className="w-4 h-4" />}
-            Invalid Case
-          </button>
+    <VisualizationLayout
+      controls={
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 w-full">
+          <SimpleStepControls
+            currentStep={currentStepIndex}
+            totalSteps={steps.length}
+            onStepChange={setCurrentStepIndex}
+          />
+          <div className="flex bg-muted rounded-lg p-1 shadow-inner border">
+            <button
+              onClick={() => handleCaseChange('valid')}
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-md transition-all text-sm font-medium ${testCase === 'valid'
+                ? 'bg-card text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+                }`}
+            >
+              {testCase === 'valid' ? <ShieldCheck className="w-4 h-4 text-green-500" /> : <Check className="w-4 h-4" />}
+              Valid BST
+            </button>
+            <button
+              onClick={() => handleCaseChange('invalid')}
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-md transition-all text-sm font-medium ${testCase === 'invalid'
+                ? 'bg-card text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+                }`}
+            >
+              {testCase === 'invalid' ? <ShieldAlert className="w-4 h-4 text-red-500" /> : <X className="w-4 h-4" />}
+              Invalid Case
+            </button>
+          </div>
         </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      }
+      leftContent={
         <div className="space-y-6">
           <Card className="p-6 bg-card/50 backdrop-blur-sm border-2 border-primary/5 shadow-lg overflow-hidden">
             {renderTree()}
@@ -283,16 +403,16 @@ export const ValidateBSTVisualization = () => {
             <VariablePanel variables={variables} />
           </div>
         </div>
-
-        <div className="lg:h-[calc(100vh-250px)] min-h-[500px]">
-          <AnimatedCodeEditor
-            code={code}
-            language="typescript"
-            highlightedLines={currentStep.highlightedLines}
-            className="h-full"
-          />
-        </div>
-      </div>
-    </div>
+      }
+      rightContent={
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={() => setCurrentStepIndex(0)}
+        />
+      }
+    />
   );
 };

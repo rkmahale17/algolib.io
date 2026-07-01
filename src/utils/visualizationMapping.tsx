@@ -56,6 +56,7 @@ export const visualizationMap: Record<string, any> = {
   'fast-slow-pointers': dynamic(() => import('@/components/visualizations/algorithms/FastSlowPointersVisualization').then(m => m.FastSlowPointersVisualization), { ssr: false }),
   'reverse-linked-list': dynamic(() => import('@/components/visualizations/algorithms/ReverseLinkedListVisualization').then(m => m.ReverseLinkedListVisualization), { ssr: false }),
   'reverse-linked-list-ii': dynamic(() => import('@/components/visualizations/algorithms/ReverseLinkedListIIVisualization').then(m => m.ReverseLinkedListIIVisualization), { ssr: false }),
+  'reverse-nodes-in-k-group': dynamic(() => import('@/components/visualizations/algorithms/ReverseNodesInKGroupVisualization').then(m => m.ReverseNodesInKGroupVisualization), { ssr: false }),
   'detect-cycle': dynamic(() => import('@/components/visualizations/algorithms/DetectCycleVisualization').then(m => m.DetectCycleVisualization), { ssr: false }),
   'detect-cycle-in-a-linked-list': dynamic(() => import('@/components/visualizations/algorithms/FastSlowPointersVisualization').then(m => m.FastSlowPointersVisualization), { ssr: false }),
   'middle-node': dynamic(() => import('@/components/visualizations/algorithms/MiddleNodeVisualization').then(m => m.MiddleNodeVisualization), { ssr: false }),
@@ -113,6 +114,8 @@ export const visualizationMap: Record<string, any> = {
   'word-break': dynamic(() => import('@/components/visualizations/algorithms/WordBreakVisualization').then(m => m.WordBreakVisualization), { ssr: false }),
   'distinct-subsequences': dynamic(() => import('@/components/visualizations/algorithms/DistinctSubsequencesVisualization').then(m => m.DistinctSubsequencesVisualization), { ssr: false }),
   'interleaving-string': dynamic(() => import('@/components/visualizations/algorithms/InterleavingStringVisualization').then(m => m.InterleavingStringVisualization), { ssr: false }),
+  // Dynamic Programming / Memoization
+  'longest-increasing-path-in-a-matrix': dynamic(() => import('@/components/visualizations/algorithms/LongestIncreasingPathInAMatrixVisualization').then(m => m.LongestIncreasingPathInAMatrixVisualization), { ssr: false }),
   'burst-balloons': dynamic(() => import('@/components/visualizations/algorithms/BurstBalloonsVisualization').then(m => m.BurstBalloonsVisualization), { ssr: false }),
 
   // Backtracking
@@ -321,6 +324,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
   'reverse-linked-list-ii': {
     title: 'Reverse Linked List II',
     description: 'Visualize reversing a sublist of a singly linked list between positions left and right.'
+  },
+  'reverse-nodes-in-k-group': {
+    title: 'Reverse Nodes in k-Group',
+    description: 'Visualize reversing nodes of a linked list k at a time, leaving remaining nodes unchanged.'
   },
   'detect-cycle-in-a-linked-list': {
     title: 'Linked List Cycle Detection',

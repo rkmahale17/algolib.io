@@ -1,11 +1,12 @@
 import { useState, useMemo } from 'react';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Info } from 'lucide-react';
+import type { VisualizationLanguageMap, StepLineNumberMap } from '@/types/visualization';
 
 interface Step {
   maxHeap: number[];
@@ -13,193 +14,233 @@ interface Step {
   second: number | null;
   resultStone: number | null;
   explanation: string;
-  highlightedLines: number[];
+  pseudoStep: string;
   variables: Record<string, any>;
   phase: 'init' | 'check' | 'sort' | 'extract_first' | 'extract_second' | 'compare' | 'push_diff' | 'done';
 }
+
+const languages: VisualizationLanguageMap = {
+  typescript: `function lastStoneWeight(stones: number[]): number {
+  const maxHeap: number[] = [...stones].sort((a, b) => b - a);
+  while (maxHeap.length > 1) {
+    maxHeap.sort((a, b) => b - a);
+    const first = maxHeap.shift()!;
+    const second = maxHeap.shift()!;
+    if (first !== second) {
+      maxHeap.push(first - second);
+    }
+  }
+  return maxHeap.length === 0 ? 0 : maxHeap[0];
+}`,
+  python: `import heapq
+
+def lastStoneWeight(stones):
+    stones = [-stone for stone in stones]
+    heapq.heapify(stones)
+    while len(stones) > 1:
+        first = -heapq.heappop(stones)
+        second = -heapq.heappop(stones)
+        if first != second:
+            heapq.heappush(stones, -(first - second))
+    return -stones[0] if stones else 0`,
+  java: `public static class Solution {
+    public int lastStoneWeight(int[] stones) {
+        PriorityQueue<Integer> maxHeap = new PriorityQueue<>((a, b) -> b - a);
+        for (int stone : stones) {
+            maxHeap.offer(stone);
+        }
+        while (maxHeap.size() > 1) {
+            int first = maxHeap.poll();
+            int second = maxHeap.poll();
+            if (first != second) {
+                maxHeap.offer(first - second);
+            }
+        }
+        return maxHeap.isEmpty() ? 0 : maxHeap.poll();
+    }
+}`,
+  cpp: `class Solution {
+public:
+    int lastStoneWeight(vector<int>& stones) {
+        priority_queue<int> maxHeap;
+        for (int stone : stones) {
+            maxHeap.push(stone);
+        }
+        while (maxHeap.size() > 1) {
+            int first = maxHeap.top();
+            maxHeap.pop();
+            int second = maxHeap.top();
+            maxHeap.pop();
+            if (first != second) {
+                maxHeap.push(first - second);
+            }
+        }
+        return maxHeap.empty() ? 0 : maxHeap.top();
+    }
+};`
+};
 
 export const LastStoneWeightVisualization = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const initialStones = [2, 7, 4, 1, 8, 1];
 
-  const steps: Step[] = useMemo(() => {
-    const s: Step[] = [];
+  const { steps, stepLineNumbers } = useMemo(() => {
+    const generatedSteps: Step[] = [];
+    const lines: StepLineNumberMap = { typescript: [], python: [], java: [], cpp: [] };
     let heap = [...initialStones];
 
-    // 1. Initial State
-    s.push({
-      maxHeap: [...heap],
-      first: null,
-      second: null,
-      resultStone: null,
-      explanation: `Receive array of stones: [${heap.join(', ')}].`,
-      highlightedLines: [1],
-      variables: { stones: `[${initialStones.join(', ')}]` },
-      phase: 'init'
-    });
+    const addStep = (
+      maxHeap: number[],
+      first: number | null,
+      second: number | null,
+      resultStone: number | null,
+      explanation: string,
+      pseudo: string,
+      vars: any,
+      phase: Step['phase'],
+      ts: number, py: number, java: number, cpp: number
+    ) => {
+      generatedSteps.push({
+        maxHeap,
+        first,
+        second,
+        resultStone,
+        explanation,
+        pseudoStep: pseudo,
+        variables: vars,
+        phase
+      });
+      lines.typescript!.push(ts);
+      lines.python!.push(py);
+      lines.java!.push(java);
+      lines.cpp!.push(cpp);
+    };
 
-    // 2. Sort descending
+    addStep(
+      [...heap], null, null, null,
+      `Receive array of stones: [${heap.join(', ')}].`,
+      "lastStoneWeight(stones)",
+      { stones: `[${initialStones.join(', ')}]` },
+      'init',
+      1, 3, 2, 3
+    );
+
     heap.sort((a, b) => b - a);
-    s.push({
-      maxHeap: [...heap],
-      first: null,
-      second: null,
-      resultStone: null,
-      explanation: `Initialize the maxHeap with the stones sorted in descending order: [${heap.join(', ')}].`,
-      highlightedLines: [2],
-      variables: { stones: `[${initialStones.join(', ')}]`, maxHeap: `[${heap.join(', ')}]` },
-      phase: 'sort'
-    });
+    addStep(
+      [...heap], null, null, null,
+      `Initialize the maxHeap with the stones sorted in descending order: [${heap.join(', ')}].`,
+      "SET maxHeap = maxHeapOf(stones)",
+      { stones: `[${initialStones.join(', ')}]`, maxHeap: `[${heap.join(', ')}]` },
+      'sort',
+      2, 4, 3, 4
+    );
 
     while (heap.length > 1) {
-      // Loop condition check
-      s.push({
-        maxHeap: [...heap],
-        first: null,
-        second: null,
-        resultStone: null,
-        explanation: `Check loop condition: heap size is ${heap.length} (> 1). Continue smashing.`,
-        highlightedLines: [4],
-        variables: { maxHeap: `[${heap.join(', ')}]`, 'maxHeap.length': heap.length },
-        phase: 'check'
-      });
+      addStep(
+        [...heap], null, null, null,
+        `Check loop condition: heap size is ${heap.length} (> 1). Continue smashing.`,
+        `WHILE maxHeap.size > 1  →  ${heap.length} > 1 (YES)`,
+        { maxHeap: `[${heap.join(', ')}]`, 'maxHeap.length': heap.length },
+        'check',
+        3, 6, 7, 8
+      );
 
-      // Sort
       heap.sort((a, b) => b - a);
-      s.push({
-        maxHeap: [...heap],
-        first: null,
-        second: null,
-        resultStone: null,
-        explanation: `Sort the heap descending to ensure heaviest stones are at the beginning: [${heap.join(', ')}].`,
-        highlightedLines: [5],
-        variables: { maxHeap: `[${heap.join(', ')}]` },
-        phase: 'sort'
-      });
+      addStep(
+        [...heap], null, null, null,
+        `Sort the heap descending to ensure heaviest stones are at the beginning: [${heap.join(', ')}].`,
+        "CALL maxHeap.sortDescending()",
+        { maxHeap: `[${heap.join(', ')}]` },
+        'sort',
+        4, 6, 7, 8
+      );
 
-      // Extract first
       const first = heap.shift()!;
-      s.push({
-        maxHeap: [...heap],
-        first,
-        second: null,
-        resultStone: null,
-        explanation: `Extract the heaviest stone: first = ${first}. Remaining heap: [${heap.join(', ')}].`,
-        highlightedLines: [7],
-        variables: { maxHeap: `[${heap.join(', ')}]`, first },
-        phase: 'extract_first'
-      });
+      addStep(
+        [...heap], first, null, null,
+        `Extract the heaviest stone: first = ${first}. Remaining heap: [${heap.join(', ')}].`,
+        `SET first = maxHeap.poll() → ${first}`,
+        { maxHeap: `[${heap.join(', ')}]`, first },
+        'extract_first',
+        5, 7, 8, 9
+      );
 
-      // Extract second
       const second = heap.shift()!;
-      s.push({
-        maxHeap: [...heap],
-        first,
-        second,
-        resultStone: null,
-        explanation: `Extract the second heaviest stone: second = ${second}. Remaining heap: [${heap.join(', ')}].`,
-        highlightedLines: [8],
-        variables: { maxHeap: `[${heap.join(', ')}]`, first, second },
-        phase: 'extract_second'
-      });
+      addStep(
+        [...heap], first, second, null,
+        `Extract the second heaviest stone: second = ${second}. Remaining heap: [${heap.join(', ')}].`,
+        `SET second = maxHeap.poll() → ${second}`,
+        { maxHeap: `[${heap.join(', ')}]`, first, second },
+        'extract_second',
+        6, 8, 9, 11
+      );
 
-      // Compare
-      s.push({
-        maxHeap: [...heap],
-        first,
-        second,
-        resultStone: null,
-        explanation: `Compare weights: first (${first}) and second (${second}). Are they different?`,
-        highlightedLines: [10],
-        variables: { first, second, 'first !== second': first !== second },
-        phase: 'compare'
-      });
+      addStep(
+        [...heap], first, second, null,
+        `Compare weights: first (${first}) and second (${second}). Are they different?`,
+        `IF first != second  →  ${first} != ${second} (YES)`,
+        { first, second, 'first !== second': first !== second },
+        'compare',
+        7, 9, 10, 13
+      );
 
       if (first !== second) {
         const diff = first - second;
         heap.push(diff);
-        s.push({
-          maxHeap: [...heap],
-          first,
-          second,
-          resultStone: diff,
-          explanation: `Since ${first} !== ${second}, a new stone of weight first - second = ${diff} is added back to the heap.`,
-          highlightedLines: [11],
-          variables: { maxHeap: `[${heap.join(', ')}]`, first, second, added: diff },
-          phase: 'push_diff'
-        });
+        addStep(
+          [...heap], first, second, diff,
+          `Since ${first} !== ${second}, a new stone of weight first - second = ${diff} is added back to the heap.`,
+          `CALL maxHeap.offer(${first} - ${second}) → ${diff}`,
+          { maxHeap: `[${heap.join(', ')}]`, first, second, added: diff },
+          'push_diff',
+          8, 10, 11, 14
+        );
       } else {
-        s.push({
-          maxHeap: [...heap],
-          first,
-          second,
-          resultStone: 0,
-          explanation: `Since both stones have the same weight (${first}), they completely destroy each other. No new stone is added.`,
-          highlightedLines: [10],
-          variables: { maxHeap: `[${heap.join(', ')}]`, first, second },
-          phase: 'push_diff'
-        });
+        addStep(
+          [...heap], first, second, 0,
+          `Since both stones have the same weight (${first}), they completely destroy each other. No new stone is added.`,
+          "NO ACTION (both destroyed)",
+          { maxHeap: `[${heap.join(', ')}]`, first, second },
+          'push_diff',
+          7, 9, 10, 13
+        );
       }
     }
 
-    // Loop end check
-    s.push({
-      maxHeap: [...heap],
-      first: null,
-      second: null,
-      resultStone: null,
-      explanation: `Check loop condition: heap size is ${heap.length} (not > 1). Exit the loop.`,
-      highlightedLines: [4],
-      variables: { maxHeap: `[${heap.join(', ')}]`, 'maxHeap.length': heap.length },
-      phase: 'check'
-    });
+    addStep(
+      [...heap], null, null, null,
+      `Check loop condition: heap size is ${heap.length} (not > 1). Exit the loop.`,
+      `WHILE maxHeap.size > 1  →  ${heap.length} > 1 (NO)`,
+      { maxHeap: `[${heap.join(', ')}]`, 'maxHeap.length': heap.length },
+      'check',
+      3, 6, 7, 8
+    );
 
-    // Final result
     const result = heap.length === 0 ? 0 : heap[0];
-    s.push({
-      maxHeap: [...heap],
-      first: null,
-      second: null,
-      resultStone: null,
-      explanation: `Game over. Return weight of last remaining stone: ${result}.`,
-      highlightedLines: [15],
-      variables: { maxHeap: `[${heap.join(', ')}]`, result },
-      phase: 'done'
-    });
+    addStep(
+      [...heap], null, null, null,
+      `Game over. Return weight of last remaining stone: ${result}.`,
+      `RETURN lastStone → ${result}`,
+      { maxHeap: `[${heap.join(', ')}]`, result },
+      'done',
+      11, 11, 14, 17
+    );
 
-    return s;
+    return { steps: generatedSteps, stepLineNumbers: lines };
   }, []);
 
-  const code = `function lastStoneWeight(stones: number[]): number {
-    const maxHeap: number[] = [...stones].sort((a, b) => b - a);
-
-    while (maxHeap.length > 1) {
-        maxHeap.sort((a, b) => b - a);
-
-        const first = maxHeap.shift()!;
-        const second = maxHeap.shift()!;
-
-        if (first !== second) {
-            maxHeap.push(first - second);
-        }
-    }
-
-    return maxHeap.length === 0 ? 0 : maxHeap[0];
-}`;
-
   const step = steps[currentStep];
+  const pseudoSteps = useMemo(() => steps.map(s => s.pseudoStep), [steps]);
 
   return (
     <VisualizationLayout
       leftContent={
         <div className="space-y-6">
-          {/* Game Board Card */}
           <Card className="p-6 bg-card/50 backdrop-blur-sm border-primary/20 relative overflow-hidden">
             <h3 className="text-sm font-semibold mb-6 text-muted-foreground uppercase tracking-widest text-center">
               Stone Smashing Game Arena
             </h3>
 
-            {/* Heap View */}
             <div className="mb-8">
               <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-4">
                 Current Heap Status (Sorted Descending)
@@ -238,14 +279,12 @@ export const LastStoneWeightVisualization = () => {
               </div>
             </div>
 
-            {/* Smash Zone */}
             <div className="relative p-6 bg-red-500/5 dark:bg-red-500/10 border-2 border-red-500/20 rounded-2xl overflow-hidden min-h-[220px] flex flex-col justify-between">
               <div className="absolute top-2 left-1/2 -translate-x-1/2 text-[10px] font-black text-red-500 uppercase tracking-widest bg-red-500/10 px-2.5 py-0.5 rounded">
                 Smash Zone
               </div>
 
               <div className="flex justify-around items-center h-full my-auto py-4">
-                {/* First Stone */}
                 <div className="flex flex-col items-center gap-2 w-1/3">
                   <span className="text-[10px] font-bold text-muted-foreground uppercase">Heaviest</span>
                   <div className="h-20 flex items-center justify-center">
@@ -270,7 +309,6 @@ export const LastStoneWeightVisualization = () => {
                   </div>
                 </div>
 
-                {/* Smash Action indicator */}
                 <div className="flex flex-col items-center justify-center">
                   {step.phase === 'compare' || step.phase === 'push_diff' ? (
                     <motion.div
@@ -285,7 +323,6 @@ export const LastStoneWeightVisualization = () => {
                   )}
                 </div>
 
-                {/* Second Stone */}
                 <div className="flex flex-col items-center gap-2 w-1/3">
                   <span className="text-[10px] font-bold text-muted-foreground uppercase">2nd Heaviest</span>
                   <div className="h-20 flex items-center justify-center">
@@ -311,7 +348,6 @@ export const LastStoneWeightVisualization = () => {
                 </div>
               </div>
 
-              {/* Smash Result Box */}
               {step.resultStone !== null && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
@@ -336,7 +372,6 @@ export const LastStoneWeightVisualization = () => {
             </div>
           </Card>
 
-          {/* Explanation Box */}
           <Card className="p-4 bg-primary/5 border-primary/20 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
             <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2 flex items-center gap-2">
@@ -346,15 +381,16 @@ export const LastStoneWeightVisualization = () => {
             <p className="text-sm text-foreground leading-relaxed font-medium">{step.explanation}</p>
           </Card>
 
-          {/* Variables Inspector */}
           <VariablePanel variables={step.variables} />
         </div>
       }
       rightContent={
-        <AnimatedCodeEditor
-          code={code}
-          language="typescript"
-          highlightedLines={step.highlightedLines}
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStep}
+          onLanguageChange={() => setCurrentStep(0)}
         />
       }
       controls={
@@ -367,3 +403,4 @@ export const LastStoneWeightVisualization = () => {
     />
   );
 };
+export default LastStoneWeightVisualization;

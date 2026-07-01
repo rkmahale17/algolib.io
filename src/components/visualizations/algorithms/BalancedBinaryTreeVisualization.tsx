@@ -2,23 +2,92 @@ import React, { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
+import type { VisualizationLanguageMap, StepLineNumberMap } from '@/types/visualization';
 
 interface Step {
   currentNodeId: string | null;
   callStack: string[];
   nodeResults: Record<string, { balanced: boolean; height: number }>;
-  highlightedLines: number[];
   explanation: string;
+  pseudoStep: string;
   variables: Record<string, any>;
 }
+
+const languages: VisualizationLanguageMap = {
+  typescript: `function isBalanced(root: TreeNode | null): boolean {
+  function dfs(node: TreeNode | null): [boolean, number] {
+    if (!node) {
+      return [true, 0];
+    }
+    const [leftBalanced, leftHeight] = dfs(node.left);
+    const [rightBalanced, rightHeight] = dfs(node.right);
+    const balanced = leftBalanced && rightBalanced && Math.abs(leftHeight - rightHeight) <= 1;
+    const height = 1 + Math.max(leftHeight, rightHeight);
+    return [balanced, height];
+  }
+  return dfs(root)[0];
+}`,
+  python: `def isBalanced(root: TreeNode | None) -> bool:
+    def dfs(node: TreeNode | None) -> tuple[bool, int]:
+        if not node:
+            return True, 0
+        left_balanced, left_height = dfs(node.left)
+        right_balanced, right_height = dfs(node.right)
+        current_node_balanced = (
+            left_balanced and
+            right_balanced and
+            abs(left_height - right_height) <= 1
+        )
+        current_node_height = 1 + max(left_height, right_height)
+        return current_node_balanced, current_node_height
+    return dfs(root)[0]`,
+  java: `public static class Solution {
+    public boolean isBalanced(TreeNode root) {
+        return dfs(root)[0] == 1;
+    }
+    private int[] dfs(TreeNode node) {
+        if (node == null) {
+            return new int[]{1, 0};
+        }
+        int[] leftResult = dfs(node.left);
+        boolean leftBalanced = (leftResult[0] == 1);
+        int leftHeight = leftResult[1];
+        int[] rightResult = dfs(node.right);
+        boolean rightBalanced = (rightResult[0] == 1);
+        int rightHeight = rightResult[1];
+        boolean currentBalanced = leftBalanced && rightBalanced && Math.abs(leftHeight - rightHeight) <= 1;
+        int currentHeight = 1 + Math.max(leftHeight, rightHeight);
+        return new int[]{(currentBalanced ? 1 : 0), currentHeight};
+    }
+}`,
+  cpp: `class Solution {
+public:
+    bool isBalanced(TreeNode* root) {
+        return dfs(root).first;
+    }
+    pair<bool, int> dfs(TreeNode* node) {
+        if (!node) {
+            return {true, 0};
+        }
+        pair<bool, int> left_result = dfs(node->left);
+        pair<bool, int> right_result = dfs(node->right);
+        bool current_node_balanced =
+            left_result.first && 
+            right_result.first && 
+            abs(left_result.second - right_result.second) <= 1;
+        int current_node_height = 1 + max(left_result.second, right_result.second);
+        return {current_node_balanced, current_node_height};
+    }
+};`
+};
 
 export const BalancedBinaryTreeVisualization: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [caseType, setCaseType] = useState<'case1' | 'case2'>('case1');
 
-  const { steps, positions, edges, nodes } = useMemo(() => {
+  const { steps, stepLineNumbers, positions, edges, nodes } = useMemo(() => {
     const case1Nodes: Record<string, any> = {
       '3': { val: 3, left: '9', right: '20' },
       '9': { val: 9, left: null, right: null },
@@ -67,18 +136,29 @@ export const BalancedBinaryTreeVisualization: React.FC = () => {
     const rootId = caseType === 'case1' ? '3' : '1';
 
     const generatedSteps: Step[] = [];
+    const lines: StepLineNumberMap = { typescript: [], python: [], java: [], cpp: [] };
     const nodeResults: Record<string, { balanced: boolean; height: number }> = {};
     const currentStack: string[] = [];
 
-    const pushStep = (nodeId: string | null, lines: number[], exp: string, vars: any = {}) => {
+    const pushStep = (
+      nodeId: string | null,
+      exp: string,
+      pseudo: string,
+      vars: any,
+      ts: number, py: number, java: number, cpp: number
+    ) => {
       generatedSteps.push({
         currentNodeId: nodeId,
         callStack: [...currentStack],
         nodeResults: { ...nodeResults },
-        highlightedLines: lines,
         explanation: exp,
+        pseudoStep: pseudo,
         variables: { ...vars }
       });
+      lines.typescript!.push(ts);
+      lines.python!.push(py);
+      lines.java!.push(java);
+      lines.cpp!.push(cpp);
     };
 
     const dfs = (nodeId: string | null, direction: string): [boolean, number] => {
@@ -87,38 +167,92 @@ export const BalancedBinaryTreeVisualization: React.FC = () => {
 
       if (!isNull) currentStack.push(nodeId);
 
-      pushStep(nodeId, [2, 3], `dfs called on ${direction}. ${isNull ? 'Node is null.' : `Node value is ${val}.`}`);
+      pushStep(
+        nodeId, 
+        `dfs called on ${direction}. ${isNull ? 'Node is null.' : `Node value is ${val}.`}`,
+        `CALL dfs(node=${isNull ? 'null' : val})`,
+        {},
+        2, 2, 5, 6
+      );
 
       if (isNull) {
-        pushStep(nodeId, [4], `Base case: null node is implicitly balanced and has height 0.`);
+        pushStep(
+          nodeId,
+          `Base case: null node is implicitly balanced and has height 0.`,
+          "RETURN [true, 0]",
+          {},
+          4, 4, 7, 8
+        );
         return [true, 0];
       }
 
-      pushStep(nodeId, [7], `Recursively calculate left subtree for node ${val}.`);
+      pushStep(
+        nodeId,
+        `Recursively calculate left subtree for node ${val}.`,
+        "CALL dfs(node.left)",
+        {},
+        6, 5, 9, 10
+      );
       const [leftBalanced, leftHeight] = dfs(activeNodes[nodeId].left, 'left child of ' + val);
 
-      pushStep(nodeId, [8], `Recursively calculate right subtree for node ${val}.`);
+      pushStep(
+        nodeId,
+        `Recursively calculate right subtree for node ${val}.`,
+        "CALL dfs(node.right)",
+        {},
+        7, 6, 12, 11
+      );
       const [rightBalanced, rightHeight] = dfs(activeNodes[nodeId].right, 'right child of ' + val);
 
       const balanced = leftBalanced && rightBalanced && Math.abs(leftHeight - rightHeight) <= 1;
-      pushStep(nodeId, [10], `Check if balanced: leftBalanced(${leftBalanced}) && rightBalanced(${rightBalanced}) && |${leftHeight} - ${rightHeight}| <= 1. Result: ${balanced}`, { leftBalanced, rightBalanced, leftHeight, rightHeight, diff: Math.abs(leftHeight - rightHeight), balanced });
+      pushStep(
+        nodeId,
+        `Check if balanced: leftBalanced(${leftBalanced}) && rightBalanced(${rightBalanced}) && |${leftHeight} - ${rightHeight}| <= 1. Result: ${balanced}`,
+        `SET balanced = left_balanced && right_balanced && |left_height - right_height| <= 1 → ${balanced}`,
+        { leftBalanced, rightBalanced, leftHeight, rightHeight, diff: Math.abs(leftHeight - rightHeight), balanced },
+        8, 7, 15, 12
+      );
 
       const height = 1 + Math.max(leftHeight, rightHeight);
-      pushStep(nodeId, [11], `Calculate height: 1 + max(${leftHeight}, ${rightHeight}) = ${height}.`, { height });
+      pushStep(
+        nodeId,
+        `Calculate height: 1 + max(${leftHeight}, ${rightHeight}) = ${height}.`,
+        `SET height = 1 + max(left_height, right_height) → ${height}`,
+        { height },
+        9, 12, 16, 16
+      );
 
       nodeResults[nodeId] = { balanced, height };
 
-      pushStep(nodeId, [13], `Return [${balanced}, ${height}] for node ${val}.`);
+      pushStep(
+        nodeId,
+        `Return [${balanced}, ${height}] for node ${val}.`,
+        `RETURN [${balanced}, ${height}]`,
+        {},
+        10, 13, 17, 17
+      );
       currentStack.pop();
 
       return [balanced, height];
     };
 
-    pushStep(null, [16], `Start post-order DFS traversal from the root.`);
+    pushStep(
+      null,
+      `Start post-order DFS traversal from the root.`,
+      "isBalanced(root)",
+      {},
+      12, 14, 2, 3
+    );
     const [isBal] = dfs(rootId, 'root');
-    pushStep(null, [16], `DFS completed. The tree is ${isBal ? 'balanced' : 'NOT balanced'}.`, { isBalanced: isBal });
+    pushStep(
+      null,
+      `DFS completed. The tree is ${isBal ? 'balanced' : 'NOT balanced'}.`,
+      `RETURN ${isBal}`,
+      { isBalanced: isBal },
+      12, 14, 3, 4
+    );
 
-    return { steps: generatedSteps, positions: activePositions, edges: activeEdges, nodes: activeNodes };
+    return { steps: generatedSteps, stepLineNumbers: lines, positions: activePositions, edges: activeEdges, nodes: activeNodes };
   }, [caseType]);
 
   const handleCaseToggle = (type: 'case1' | 'case2') => {
@@ -126,25 +260,8 @@ export const BalancedBinaryTreeVisualization: React.FC = () => {
     setCurrentStep(0);
   };
 
-  const code = `function isBalanced(root: TreeNode | null): boolean {
-  function dfs(node: TreeNode | null): [boolean, number] {
-    if (!node) {
-      return [true, 0];
-    }
-    
-    const [leftBalanced, leftHeight] = dfs(node.left);
-    const [rightBalanced, rightHeight] = dfs(node.right);
-    
-    const balanced = leftBalanced && rightBalanced && Math.abs(leftHeight - rightHeight) <= 1;
-    const height = 1 + Math.max(leftHeight, rightHeight);
-    
-    return [balanced, height];
-  }
-  
-  return dfs(root)[0];
-}`;
-
   const step = steps[currentStep];
+  const pseudoSteps = useMemo(() => steps.map(s => s.pseudoStep), [steps]);
 
   const renderTree = () => {
     const nodeIds = Object.keys(positions);
@@ -152,7 +269,6 @@ export const BalancedBinaryTreeVisualization: React.FC = () => {
     return (
       <div className="w-full aspect-[400/260] relative bg-card/60 backdrop-blur rounded-xl border border-border/50 shadow-sm flex items-center justify-center p-4">
         <svg viewBox="0 0 400 260" className="w-full h-full overflow-visible">
-          {/* Edges */}
           {edges.map(([u, v], i) => (
             <line
               key={i}
@@ -162,7 +278,6 @@ export const BalancedBinaryTreeVisualization: React.FC = () => {
             />
           ))}
           
-          {/* Nodes */}
           {nodeIds.map(id => {
             const isCurrent = id === step.currentNodeId;
             const inStack = step.callStack.includes(id);
@@ -174,7 +289,7 @@ export const BalancedBinaryTreeVisualization: React.FC = () => {
             let textColor = 'fill-foreground';
 
             if (isCurrent) {
-              fill = '#3b82f6'; // primary
+              fill = '#3b82f6';
               stroke = '#3b82f6';
               textColor = 'fill-white';
             } else if (inStack) {
@@ -182,10 +297,10 @@ export const BalancedBinaryTreeVisualization: React.FC = () => {
               stroke = '#3b82f6';
             } else if (hasResult) {
               if (result.balanced) {
-                fill = '#22c55e20'; // green
+                fill = '#22c55e20';
                 stroke = '#22c55e';
               } else {
-                fill = '#ef444420'; // red
+                fill = '#ef444420';
                 stroke = '#ef4444';
               }
             }
@@ -201,15 +316,14 @@ export const BalancedBinaryTreeVisualization: React.FC = () => {
                 />
                 <text
                   x={positions[id].x} y={positions[id].y + 5} textAnchor="middle"
-                  className={`text-[12px] font-bold select-none ${textColor} transition-colors duration-200`}
+                  className={`text-[12px] font-bold select-none \${textColor} transition-colors duration-200`}
                 >
                   {nodes[id].val}
                 </text>
-                {/* Result Label */}
                 {hasResult && !isCurrent && (
                   <text
                     x={positions[id].x + 22} y={positions[id].y - 12}
-                    className={`text-[10px] font-bold ${result.balanced ? 'fill-green-500' : 'fill-red-500'}`}
+                    className={`text-[10px] font-bold \${result.balanced ? 'fill-green-500' : 'fill-red-500'}`}
                   >
                     h:{result.height}
                   </text>
@@ -268,12 +382,15 @@ export const BalancedBinaryTreeVisualization: React.FC = () => {
         </div>
       }
       rightContent={
-        <AnimatedCodeEditor
-          code={code}
-          language="typescript"
-          highlightedLines={step.highlightedLines}
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStep}
+          onLanguageChange={() => setCurrentStep(0)}
         />
       }
     />
   );
 };
+export default BalancedBinaryTreeVisualization;

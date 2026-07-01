@@ -3,63 +3,44 @@ import { Card } from '@/components/ui/card';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { Info, CheckCircle2, Grid } from 'lucide-react';
+import type { StepLineNumberMap, VisualizationLanguageMap } from '@/types/visualization';
 
 interface Step {
   board: string[][];
   r: number | null;
   c: number | null;
   message: string;
-  lineNumber: number;
   isMatch?: boolean;
   activeDFSPath: [number, number][];
+  pseudoStep: string;
+  variables: Record<string, any>;
 }
 
-export const SurroundedRegionsVisualization = () => {
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-
-  const code = `function solve(board: string[][]): void {
+const languages: VisualizationLanguageMap = {
+  typescript: `function solve(board: string[][]): void {
+  if (board.length === 0 || board[0].length === 0) return;
   const ROWS = board.length;
   const COLS = board[0].length;
-
   const capture = (r: number, c: number): void => {
-    if (
-      r < 0 ||
-      c < 0 ||
-      r >= ROWS ||
-      c >= COLS ||
-      board[r][c] !== "O"
-    ) {
+    if (r < 0 || c < 0 || r >= ROWS || c >= COLS || board[r][c] !== "O") {
       return;
     }
-
     board[r][c] = "T";
-
     capture(r + 1, c);
     capture(r - 1, c);
     capture(r, c + 1);
     capture(r, c - 1);
   };
-
-  for (let r = 0; r < ROWS; r++) {
-    if (board[r][0] === "O") {
-      capture(r, 0);
-    }
-    if (board[r][COLS - 1] === "O") {
-      capture(r, COLS - 1);
-    }
-  }
-
   for (let c = 0; c < COLS; c++) {
-    if (board[0][c] === "O") {
-      capture(0, c);
-    }
-    if (board[ROWS - 1][c] === "O") {
-      capture(ROWS - 1, c);
-    }
+    if (board[0][c] === "O") capture(0, c);
+    if (board[ROWS - 1][c] === "O") capture(ROWS - 1, c);
   }
-
+  for (let r = 0; r < ROWS; r++) {
+    if (board[r][0] === "O") capture(r, 0);
+    if (board[r][COLS - 1] === "O") capture(r, COLS - 1);
+  }
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
       if (board[r][c] === "O") {
@@ -69,10 +50,136 @@ export const SurroundedRegionsVisualization = () => {
       }
     }
   }
-}`;
+}`,
+  python: `def solve(board: List[List[str]]) -> None:
+    if not board or not board[0]:
+        return
+    rows, cols = len(board), len(board[0])
+    def capture(r: int, c: int) -> None:
+        if r < 0 or c < 0 or r >= rows or c >= cols or board[r][c] != "O":
+            return
+        board[r][c] = "T"
+        capture(r + 1, c)
+        capture(r - 1, c)
+        capture(r, c + 1)
+        capture(r, c - 1)
+    for r in range(rows):
+        if board[r][0] == "O":
+            capture(r, 0)
+        if board[r][cols - 1] == "O":
+            capture(r, cols - 1)
+    for c in range(cols):
+        if board[0][c] == "O":
+            capture(0, c)
+        if board[rows - 1][c] == "O":
+            capture(rows - 1, c)
+    for r in range(rows):
+        for c in range(cols):
+            if board[r][c] == "O":
+                board[r][c] = "X"
+            elif board[r][c] == "T":
+                board[r][c] = "O"`,
+  java: `public static class Solution {
+    private int ROWS;
+    private int COLS;
+    private void capture(char[][] board, int r, int c) {
+        if (r < 0 || c < 0 || r >= ROWS || c >= COLS || board[r][c] != 'O') {
+            return;
+        }
+        board[r][c] = 'T';
+        capture(board, r + 1, c);
+        capture(board, r - 1, c);
+        capture(board, r, c + 1);
+        capture(board, r, c - 1);
+    }
+    public void solve(char[][] board) {
+        if (board == null || board.length == 0 || board[0].length == 0) {
+            return;
+        }
+        ROWS = board.length;
+        COLS = board[0].length;
+        for (int c = 0; c < COLS; c++) {
+            if (board[0][c] == 'O') {
+                capture(board, 0, c);
+            }
+            if (board[ROWS - 1][c] == 'O') {
+                capture(board, ROWS - 1, c);
+            }
+        }
+        for (int r = 0; r < ROWS; r++) {
+            if (board[r][0] == 'O') {
+                capture(board, r, 0);
+            }
+            if (board[r][COLS - 1] == 'O') {
+                capture(board, r, COLS - 1);
+            }
+        }
+        for (int r = 0; r < ROWS; r++) {
+            for (int c = 0; c < COLS; c++) {
+                if (board[r][c] == 'O') {
+                    board[r][c] = 'X';
+                } else if (board[r][c] == 'T') {
+                    board[r][c] = 'O';
+                }
+            }
+        }
+    }
+}`,
+  cpp: `class Solution {
+public:
+    int ROWS;
+    int COLS;
+    void capture(vector<vector<char>>& board, int r, int c) {
+        if (r < 0 || c < 0 || r >= ROWS || c >= COLS || board[r][c] != 'O') {
+            return;
+        }
+        board[r][c] = 'T';
+        capture(board, r + 1, c);
+        capture(board, r - 1, c);
+        capture(board, r, c + 1);
+        capture(board, r, c - 1);
+    }
+    void solve(vector<vector<char>>& board) {
+        if (board.empty() || board[0].empty()) {
+            return;
+        }
+        ROWS = board.size();
+        COLS = board[0].size();
+        for (int c = 0; c < COLS; ++c) {
+            if (board[0][c] == 'O') {
+                capture(board, 0, c);
+            }
+            if (board[ROWS - 1][c] == 'O') {
+                capture(board, ROWS - 1, c);
+            }
+        }
+        for (int r = 0; r < ROWS; ++r) {
+            if (board[r][0] == 'O') {
+                capture(board, r, 0);
+            }
+            if (board[r][COLS - 1] == 'O') {
+                capture(board, r, COLS - 1);
+            }
+        }
+        for (int r = 0; r < ROWS; ++r) {
+            for (int c = 0; c < COLS; ++c) {
+                if (board[r][c] == 'O') {
+                    board[r][c] = 'X';
+                } else if (board[r][c] == 'T') {
+                    board[r][c] = 'O';
+                }
+            }
+        }
+    }
+};`
+};
 
-  const steps: Step[] = useMemo(() => {
+export const SurroundedRegionsVisualization = () => {
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+
+  const { steps, stepLineNumbers } = useMemo(() => {
     const s: Step[] = [];
+    const lines: StepLineNumberMap = { typescript: [], python: [], java: [], cpp: [] };
     const board = [
       ["X", "X", "X", "X"],
       ["X", "O", "O", "X"],
@@ -83,32 +190,58 @@ export const SurroundedRegionsVisualization = () => {
     const ROWS = board.length;
     const COLS = board[0].length;
 
-    const snapshot = (
+    const addStep = (
       msg: string,
-      line: number,
+      pseudo: string,
       r: number | null,
       c: number | null,
       isMatch: boolean = false,
-      activeDFS: [number, number][] = []
+      activeDFS: [number, number][] = [],
+      ts: number, py: number, jv: number, cp: number
     ) => {
       s.push({
         board: board.map(row => [...row]),
         r,
         c,
         message: msg,
-        lineNumber: line,
+        pseudoStep: pseudo,
         isMatch,
-        activeDFSPath: [...activeDFS]
+        activeDFSPath: [...activeDFS],
+        variables: {
+          row_r: r ?? 'N/A',
+          col_c: c ?? 'N/A',
+          active_dfs_depth: activeDFS.length,
+          board_state: r !== null && c !== null && board[r]?.[c] !== undefined ? `'${board[r][c]}'` : 'N/A'
+        }
       });
+      lines.typescript!.push(ts);
+      lines.python!.push(py);
+      lines.java!.push(jv);
+      lines.cpp!.push(cp);
     };
 
-    snapshot("Initialize board state of size 4x4.", 1, null, null);
-    snapshot("Get ROWS = 4 and COLS = 4 from the board dimensions.", 2, null, null);
+    addStep(
+      "Initialize board state of size 4x4.",
+      "solve(board)",
+      null, null, false, [],
+      1, 1, 14, 15
+    );
+    addStep(
+      "Get ROWS = 4 and COLS = 4 from the board dimensions.",
+      "SET rows = len(board), cols = len(board[0])",
+      null, null, false, [],
+      3, 4, 18, 19
+    );
 
     const captureHelper = (currR: number, currC: number, path: [number, number][]) => {
       const newPath = [...path, [currR, currC] as [number, number]];
       
-      snapshot(`[DFS] Checking cell (${currR}, ${currC}) in recursion.`, 6, currR, currC, false, newPath);
+      addStep(
+        `[DFS] Checking cell (${currR}, ${currC}) in recursion.`,
+        `capture(r=${currR}, c=${currC})`,
+        currR, currC, false, newPath,
+        6, 6, 5, 6
+      );
 
       if (
         currR < 0 ||
@@ -116,84 +249,200 @@ export const SurroundedRegionsVisualization = () => {
         currR >= ROWS ||
         currC >= COLS
       ) {
-        snapshot(`[DFS] Cell (${currR}, ${currC}) is out of bounds. Return.`, 7, currR, currC, false, path);
+        addStep(
+          `[DFS] Cell (${currR}, ${currC}) is out of bounds. Return.`,
+          "IF out_of_bounds  →  RETURN",
+          currR, currC, false, path,
+          7, 7, 6, 7
+        );
         return;
       }
 
       if (board[currR][currC] !== "O") {
-        snapshot(`[DFS] Cell (${currR}, ${currC}) is '${board[currR][currC]}' (not 'O'). Return.`, 11, currR, currC, false, path);
+        addStep(
+          `[DFS] Cell (${currR}, ${currC}) is '${board[currR][currC]}' (not 'O'). Return.`,
+          `IF board[r][c] != "O"  →  RETURN`,
+          currR, currC, false, path,
+          7, 7, 6, 7
+        );
         return;
       }
 
       board[currR][currC] = "T";
-      snapshot(`[DFS] Passed! Mark cell (${currR}, ${currC}) as 'T' (connected to border).`, 16, currR, currC, true, newPath);
+      addStep(
+        `[DFS] Passed! Mark cell (${currR}, ${currC}) as 'T' (connected to border).`,
+        `board[r][c] = "T"`,
+        currR, currC, true, newPath,
+        9, 8, 8, 9
+      );
 
-      snapshot(`[DFS] Recurse Down from (${currR}, ${currC}).`, 18, currR, currC, false, newPath);
+      addStep(
+        `[DFS] Recurse Down from (${currR}, ${currC}).`,
+        "capture(r + 1, c)",
+        currR, currC, false, newPath,
+        10, 9, 9, 10
+      );
       captureHelper(currR + 1, currC, newPath);
 
-      snapshot(`[DFS] Recurse Up from (${currR}, ${currC}).`, 19, currR, currC, false, newPath);
+      addStep(
+        `[DFS] Recurse Up from (${currR}, ${currC}).`,
+        "capture(r - 1, c)",
+        currR, currC, false, newPath,
+        11, 10, 10, 11
+      );
       captureHelper(currR - 1, currC, newPath);
 
-      snapshot(`[DFS] Recurse Right from (${currR}, ${currC}).`, 20, currR, currC, false, newPath);
+      addStep(
+        `[DFS] Recurse Right from (${currR}, ${currC}).`,
+        "capture(r, c + 1)",
+        currR, currC, false, newPath,
+        12, 11, 11, 12
+      );
       captureHelper(currR, currC + 1, newPath);
 
-      snapshot(`[DFS] Recurse Left from (${currR}, ${currC}).`, 21, currR, currC, false, newPath);
+      addStep(
+        `[DFS] Recurse Left from (${currR}, ${currC}).`,
+        "capture(r, c - 1)",
+        currR, currC, false, newPath,
+        13, 12, 12, 13
+      );
       captureHelper(currR, currC - 1, newPath);
       
-      snapshot(`[DFS] Finished exploring neighbors of (${currR}, ${currC}). Backtracking.`, 22, currR, currC, false, path);
+      addStep(
+        `[DFS] Finished exploring neighbors of (${currR}, ${currC}). Backtracking.`,
+        "RETURN // backtrack",
+        currR, currC, false, path,
+        14, 12, 13, 14
+      );
     };
 
-    snapshot("Phase 1: Scan the left and right borders of the board for any 'O' cells.", 24, null, null);
-    for (let r = 0; r < ROWS; r++) {
-      snapshot(`Phase 1: Check left border cell at (${r}, 0).`, 25, r, 0);
-      if (board[r][0] === "O") {
-        snapshot(`Phase 1: Found border 'O' at (${r}, 0)! Starting DFS to trace connectivity.`, 26, r, 0, true);
-        captureHelper(r, 0, []);
-      }
-
-      snapshot(`Phase 1: Check right border cell at (${r}, ${COLS - 1}).`, 28, r, COLS - 1);
-      if (board[r][COLS - 1] === "O") {
-        snapshot(`Phase 1: Found border 'O' at (${r}, ${COLS - 1})! Starting DFS to trace connectivity.`, 29, r, COLS - 1, true);
-        captureHelper(r, COLS - 1, []);
-      }
-    }
-
-    snapshot("Phase 1: Scan the top and bottom borders of the board for any remaining border 'O's.", 33, null, null);
+    addStep(
+      "Phase 1: Scan the top and bottom borders of the board for any 'O' cells.",
+      "FOR c = 0 TO cols - 1",
+      null, null, false, [],
+      15, 18, 20, 21
+    );
     for (let c = 0; c < COLS; c++) {
-      snapshot(`Phase 1: Check top border cell at (0, ${c}).`, 34, 0, c);
+      addStep(
+        `Phase 1: Check top border cell at (0, ${c}).`,
+        `IF board[0][${c}] == "O"`,
+        0, c, false, [],
+        16, 19, 21, 22
+      );
       if (board[0][c] === "O") {
-        snapshot(`Phase 1: Found border 'O' at (0, ${c})! Starting DFS.`, 35, 0, c, true);
+        addStep(
+          `Phase 1: Found border 'O' at (0, ${c})! Starting DFS.`,
+          `capture(0, ${c})`,
+          0, c, true, [],
+          16, 20, 22, 23
+        );
         captureHelper(0, c, []);
       }
 
-      snapshot(`Phase 1: Check bottom border cell at (${ROWS - 1}, ${c}).`, 37, ROWS - 1, c);
+      addStep(
+        `Phase 1: Check bottom border cell at (${ROWS - 1}, ${c}).`,
+        `IF board[rows - 1][${c}] == "O"`,
+        ROWS - 1, c, false, [],
+        17, 21, 24, 25
+      );
       if (board[ROWS - 1][c] === "O") {
-        snapshot(`Phase 1: Found border 'O' at (${ROWS - 1}, ${c})! Starting DFS.`, 38, ROWS - 1, c, true);
+        addStep(
+          `Phase 1: Found border 'O' at (${ROWS - 1}, ${c})! Starting DFS.`,
+          `capture(rows - 1, ${c})`,
+          ROWS - 1, c, true, [],
+          17, 22, 25, 26
+        );
         captureHelper(ROWS - 1, c, []);
       }
     }
 
-    snapshot("Phase 2: Iterate through every cell. Capture surrounded 'O's to 'X', and restore 'T's back to 'O'.", 42, null, null);
+    addStep(
+      "Phase 1: Scan the left and right borders of the board for any remaining border 'O's.",
+      "FOR r = 0 TO rows - 1",
+      null, null, false, [],
+      19, 13, 28, 29
+    );
+    for (let r = 0; r < ROWS; r++) {
+      addStep(
+        `Phase 1: Check left border cell at (${r}, 0).`,
+        `IF board[${r}][0] == "O"`,
+        r, 0, false, [],
+        20, 14, 29, 30
+      );
+      if (board[r][0] === "O") {
+        addStep(
+          `Phase 1: Found border 'O' at (${r}, 0)! Starting DFS to trace connectivity.`,
+          `capture(${r}, 0)`,
+          r, 0, true, [],
+          20, 15, 30, 31
+        );
+        captureHelper(r, 0, []);
+      }
+
+      addStep(
+        `Phase 1: Check right border cell at (${r}, ${COLS - 1}).`,
+        `IF board[${r}][cols - 1] == "O"`,
+        r, COLS - 1, false, [],
+        21, 16, 32, 33
+      );
+      if (board[r][COLS - 1] === "O") {
+        addStep(
+          `Phase 1: Found border 'O' at (${r}, ${COLS - 1})! Starting DFS to trace connectivity.`,
+          `capture(${r}, cols - 1)`,
+          r, COLS - 1, true, [],
+          21, 17, 33, 34
+        );
+        captureHelper(r, COLS - 1, []);
+      }
+    }
+
+    addStep(
+      "Phase 2: Iterate through every cell. Capture surrounded 'O's to 'X', and restore 'T's back to 'O'.",
+      "FOR r = 0 TO rows - 1, c = 0 TO cols - 1",
+      null, null, false, [],
+      23, 23, 36, 37
+    );
     for (let r = 0; r < ROWS; r++) {
       for (let c = 0; c < COLS; c++) {
         const cellVal = board[r][c];
-        snapshot(`Phase 2: Inspecting cell (${r}, ${c}) with value '${cellVal}'.`, 43, r, c);
+        addStep(
+          `Phase 2: Inspecting cell (${r}, ${c}) with value '${cellVal}'.`,
+          `board[${r}][${c}]  →  '${cellVal}'`,
+          r, c, false, [],
+          24, 24, 37, 38
+        );
         if (cellVal === "O") {
           board[r][c] = "X";
-          snapshot(`Phase 2: Cell (${r}, ${c}) is 'O'. Since it was not connected to any border, it is captured! Changing to 'X'.`, 45, r, c, true);
+          addStep(
+            `Phase 2: Cell (${r}, ${c}) is 'O'. Since it was not connected to any border, it is captured! Changing to 'X'.`,
+            `board[r][c] = "X"`,
+            r, c, true, [],
+            26, 26, 39, 40
+          );
         } else if (cellVal === "T") {
           board[r][c] = "O";
-          snapshot(`Phase 2: Cell (${r}, ${c}) is 'T'. This is a border-connected 'O', so it survives. Restoring to 'O'.`, 47, r, c, true);
+          addStep(
+            `Phase 2: Cell (${r}, ${c}) is 'T'. This is a border-connected 'O', so it survives. Restoring to 'O'.`,
+            `board[r][c] = "O"`,
+            r, c, true, [],
+            28, 28, 41, 42
+          );
         }
       }
     }
 
-    snapshot("Completed Surrounded Regions execution! All surrounded regions are captured, and border-connected regions are preserved.", 51, null, null, true);
+    addStep(
+      "Completed Surrounded Regions execution! All surrounded regions are captured, and border-connected regions are preserved.",
+      "// solve completed",
+      null, null, true, [],
+      32, 28, 45, 46
+    );
 
-    return s;
+    return { steps: s, stepLineNumbers: lines };
   }, []);
 
-  const step = steps[currentStepIndex];
+  const step = steps[currentStepIndex] || steps[0];
+  const pseudoSteps = useMemo(() => steps.map((s) => s.pseudoStep), [steps]);
 
   return (
     <VisualizationLayout
@@ -206,7 +455,6 @@ export const SurroundedRegionsVisualization = () => {
 
             <div className="flex-1 flex justify-center items-center">
               <div className="flex flex-col gap-2 p-6 bg-muted/10 border border-border/50 rounded-xl relative">
-                {/* Visual Border Overlay */}
                 <div className="absolute top-0 left-0 w-full h-1 bg-primary/20 rounded-t-xl"></div>
                 <div className="absolute bottom-0 left-0 w-full h-1 bg-primary/20 rounded-b-xl"></div>
                 <div className="absolute top-0 left-0 h-full w-1 bg-primary/20 rounded-l-xl"></div>
@@ -263,7 +511,6 @@ export const SurroundedRegionsVisualization = () => {
             </div>
           </Card>
 
-          {/* Commentary Box placed AT THE BOTTOM of the visualization */}
           <Card className={`p-5 border-l-4 relative overflow-hidden transition-all duration-300 shadow-sm min-h-[120px] flex items-center ${step?.isMatch ? 'bg-primary/10 border-primary' : 'bg-accent/30 border-primary'}`}>
             <div className="flex items-start gap-4">
               <div className={`p-2.5 rounded-xl shrink-0 ${step?.isMatch ? 'bg-primary text-primary-foreground' : 'bg-primary/10 text-primary'}`}>
@@ -280,25 +527,17 @@ export const SurroundedRegionsVisualization = () => {
             </div>
           </Card>
 
-          {/* VariablePanel MUST be placed BELOW the commentary box */}
-          <VariablePanel
-            variables={{
-              row_r: step?.r ?? 'N/A',
-              col_c: step?.c ?? 'N/A',
-              active_dfs_depth: step?.activeDFSPath?.length || 0,
-              board_state: step?.r !== null && step?.c !== null && step.board[step.r]?.[step.c] !== undefined ? `'${step.board[step.r][step.c]}'` : 'N/A'
-            }}
-          />
+          <VariablePanel variables={step.variables} />
         </div>
       }
       rightContent={
-        <div className="space-y-4 h-full flex flex-col">
-          <AnimatedCodeEditor
-            code={code}
-            highlightedLines={[step?.lineNumber || 1]}
-            language="typescript"
-          />
-        </div>
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={() => setCurrentStepIndex(0)}
+        />
       }
       controls={
         <SimpleStepControls
@@ -310,3 +549,4 @@ export const SurroundedRegionsVisualization = () => {
     />
   );
 };
+export default SurroundedRegionsVisualization;

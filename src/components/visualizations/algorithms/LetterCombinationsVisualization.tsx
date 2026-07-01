@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
+import React, { useEffect, useState, useMemo } from "react";
 import { SimpleStepControls } from "../shared/SimpleStepControls";
 import { VariablePanel } from "../shared/VariablePanel";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
+import { VisualizationCodePanel } from "../shared/VisualizationCodePanel";
+import { VisualizationLayout } from "../shared/VisualizationLayout";
+import type { VisualizationLanguageMap, StepLineNumberMap } from "@/types/visualization";
 
 interface Step {
   digits: string;
@@ -14,10 +14,9 @@ interface Step {
   activeChar: string | null;
   phase: "init" | "recurse" | "base-case" | "loop" | "backtrack" | "done";
   message: string;
-  lineNumber: number;
+  pseudoStep: string;
+  variables: Record<string, any>;
 }
-
-// ─── Constants ────────────────────────────────────────────────────────────────
 
 const DIGIT_MAP: Record<string, string> = {
   "2": "abc",
@@ -59,154 +58,6 @@ const PHASE_BG: Record<string, string> = {
   done: "bg-emerald-500/10 border-emerald-500/30",
 };
 
-// ─── Step Generator ───────────────────────────────────────────────────────────
-
-function generateSteps(digits: string): Step[] {
-  const steps: Step[] = [];
-  const res: string[] = [];
-
-  steps.push({
-    digits,
-    curStr: "",
-    i: 0,
-    results: [],
-    activeDigitIndex: null,
-    activeChar: null,
-    phase: "init",
-    message: `Start: digits = "${digits}". We will build letter combinations using recursive backtracking.`,
-    lineNumber: 1,
-  });
-
-  if (!digits) {
-    steps.push({
-      digits,
-      curStr: "",
-      i: 0,
-      results: [],
-      activeDigitIndex: null,
-      activeChar: null,
-      phase: "done",
-      message: "Empty input: return [].",
-      lineNumber: 2,
-    });
-    return steps;
-  }
-
-  steps.push({
-    digits,
-    curStr: "",
-    i: 0,
-    results: [],
-    activeDigitIndex: null,
-    activeChar: null,
-    phase: "init",
-    message: `Initialize empty result array and define the digit-to-letter mapping.`,
-    lineNumber: 3,
-  });
-
-  function backtrack(i: number, curStr: string) {
-    steps.push({
-      digits,
-      curStr,
-      i,
-      results: [...res],
-      activeDigitIndex: i < digits.length ? i : null,
-      activeChar: null,
-      phase: "recurse",
-      message: `backtrack(i=${i}, curStr="${curStr}") — depth ${i} of ${digits.length}.`,
-      lineNumber: 10,
-    });
-
-    if (curStr.length === digits.length) {
-      res.push(curStr);
-      steps.push({
-        digits,
-        curStr,
-        i,
-        results: [...res],
-        activeDigitIndex: null,
-        activeChar: null,
-        phase: "base-case",
-        message: `✓ Base case! curStr "${curStr}" has length ${curStr.length} = digits.length ${digits.length}. Added to results!`,
-        lineNumber: 11,
-      });
-      return;
-    }
-
-    const letters = DIGIT_MAP[digits[i]];
-
-    steps.push({
-      digits,
-      curStr,
-      i,
-      results: [...res],
-      activeDigitIndex: i,
-      activeChar: null,
-      phase: "loop",
-      message: `Digit "${digits[i]}" maps to "${letters}". Iterating over each letter to try.`,
-      lineNumber: 15,
-    });
-
-    for (const c of letters) {
-      steps.push({
-        digits,
-        curStr,
-        i,
-        results: [...res],
-        activeDigitIndex: i,
-        activeChar: c,
-        phase: "loop",
-        message: `Choose letter "${c}" from digit "${digits[i]}". Call backtrack(${i + 1}, "${curStr + c}").`,
-        lineNumber: 16,
-      });
-
-      backtrack(i + 1, curStr + c);
-
-      steps.push({
-        digits,
-        curStr,
-        i,
-        results: [...res],
-        activeDigitIndex: i,
-        activeChar: c,
-        phase: "backtrack",
-        message: `Backtrack: finished exploring paths starting with "${curStr + c}". Try next letter for digit "${digits[i]}".`,
-        lineNumber: 17,
-      });
-    }
-  }
-
-  steps.push({
-    digits,
-    curStr: "",
-    i: 0,
-    results: [],
-    activeDigitIndex: 0,
-    activeChar: null,
-    phase: "recurse",
-    message: `Begin backtracking from index 0 with empty string.`,
-    lineNumber: 20,
-  });
-
-  backtrack(0, "");
-
-  steps.push({
-    digits,
-    curStr: "",
-    i: 0,
-    results: [...res],
-    activeDigitIndex: null,
-    activeChar: null,
-    phase: "done",
-    message: `✓ Complete! Found ${res.length} combinations: [${res.map((r) => `"${r}"`).join(", ")}]`,
-    lineNumber: 22,
-  });
-
-  return steps;
-}
-
-// ─── Phone Keypad Component ───────────────────────────────────────────────────
-
 const KEYPAD_LAYOUT = [
   ["1", "2", "3"],
   ["4", "5", "6"],
@@ -214,307 +65,226 @@ const KEYPAD_LAYOUT = [
   ["*", "0", "#"],
 ];
 
-interface KeypadProps {
-  digits: string;
-  activeDigitIndex: number | null;
-  activeChar: string | null;
-}
-
-const PhoneKeypad: React.FC<KeypadProps> = ({ digits, activeDigitIndex, activeChar }) => {
-  const activeDigit = activeDigitIndex !== null ? digits[activeDigitIndex] : null;
-
-  return (
-    <div className="flex flex-col items-center gap-3">
-      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">
-        Phone Keypad
-      </div>
-      <div
-        className="rounded-2xl p-4 shadow-2xl"
-        style={{
-          background: "linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
-          border: "1px solid rgba(100,120,200,0.3)",
-          boxShadow: "0 0 40px rgba(60,80,200,0.15), inset 0 1px 0 rgba(255,255,255,0.05)",
-        }}
-      >
-        {KEYPAD_LAYOUT.map((row, rowIdx) => (
-          <div key={rowIdx} className="flex gap-2 mb-2 last:mb-0">
-            {row.map((key) => {
-              const isActive = key === activeDigit;
-              const isInDigits = digits.includes(key) && !["0", "1", "*", "#"].includes(key);
-              const letters = DIGIT_LABELS[key] || "";
-
-              return (
-                <div
-                  key={key}
-                  className="relative flex flex-col items-center justify-center rounded-xl transition-all duration-200"
-                  style={{
-                    width: 56,
-                    height: 56,
-                    background: isActive
-                      ? "linear-gradient(135deg, #7c3aed, #4f46e5)"
-                      : isInDigits
-                      ? "linear-gradient(135deg, #1e40af, #1d4ed8)"
-                      : "linear-gradient(135deg, #1f2937, #111827)",
-                    border: isActive
-                      ? "1.5px solid #a78bfa"
-                      : isInDigits
-                      ? "1.5px solid #3b82f6"
-                      : "1.5px solid #374151",
-                    boxShadow: isActive
-                      ? "0 0 18px rgba(124,58,237,0.6), inset 0 1px 0 rgba(255,255,255,0.1)"
-                      : isInDigits
-                      ? "0 0 10px rgba(59,130,246,0.3), inset 0 1px 0 rgba(255,255,255,0.05)"
-                      : "inset 0 1px 0 rgba(255,255,255,0.03)",
-                    transform: isActive ? "scale(1.08)" : "scale(1)",
-                  }}
-                >
-                  <span
-                    className="font-bold"
-                    style={{
-                      fontSize: 18,
-                      color: isActive ? "#e9d5ff" : isInDigits ? "#93c5fd" : "#9ca3af",
-                      lineHeight: 1,
-                    }}
-                  >
-                    {key}
-                  </span>
-                  {letters && (
-                    <span
-                      style={{
-                        fontSize: 7,
-                        letterSpacing: "0.05em",
-                        color: isActive ? "#c4b5fd" : isInDigits ? "#60a5fa" : "#6b7280",
-                        lineHeight: 1,
-                        marginTop: 2,
-                      }}
-                    >
-                      {letters}
-                    </span>
-                  )}
-                  {/* Active letter indicator */}
-                  {isActive && activeChar && (
-                    <div
-                      className="absolute -top-2 -right-2 flex items-center justify-center rounded-full"
-                      style={{
-                        width: 20,
-                        height: 20,
-                        background: "linear-gradient(135deg, #f59e0b, #d97706)",
-                        border: "1px solid #fbbf24",
-                        fontSize: 10,
-                        fontWeight: 700,
-                        color: "#fff",
-                        boxShadow: "0 0 8px rgba(245,158,11,0.8)",
-                      }}
-                    >
-                      {activeChar}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// ─── Combination Builder Component ───────────────────────────────────────────
-
-interface BuilderProps {
-  digits: string;
-  curStr: string;
-  activeDigitIndex: number | null;
-  activeChar: string | null;
-}
-
-const CombinationBuilder: React.FC<BuilderProps> = ({ digits, curStr, activeDigitIndex }) => {
-  return (
-    <div className="flex flex-col gap-2">
-      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
-        Building Combination
-      </div>
-      <div className="flex gap-1 flex-wrap items-center">
-        {digits.split("").map((digit, idx) => {
-          const char = curStr[idx];
-          const isActive = idx === activeDigitIndex;
-          const isFilled = idx < curStr.length;
-          const isNext = idx === curStr.length;
-
-          return (
-            <React.Fragment key={idx}>
-              {idx > 0 && (
-                <div className="text-muted-foreground/30 text-xs">+</div>
-              )}
-              <div className="flex flex-col items-center gap-1">
-                <div
-                  className="flex flex-col items-center justify-center rounded-lg transition-all duration-200"
-                  style={{
-                    width: 44,
-                    height: 44,
-                    background: isActive
-                      ? "linear-gradient(135deg, #7c3aed33, #4f46e533)"
-                      : isFilled
-                      ? "linear-gradient(135deg, #059669, #047857)"
-                      : isNext
-                      ? "linear-gradient(135deg, #92400e33, #78350f33)"
-                      : "transparent",
-                    border: isActive
-                      ? "1.5px solid #7c3aed"
-                      : isFilled
-                      ? "1.5px solid #10b981"
-                      : isNext
-                      ? "1.5px dashed #f59e0b66"
-                      : "1.5px dashed #374151",
-                    boxShadow: isFilled && !isActive
-                      ? "0 0 8px rgba(16,185,129,0.2)"
-                      : isActive
-                      ? "0 0 12px rgba(124,58,237,0.3)"
-                      : "none",
-                  }}
-                >
-                  <span
-                    className="font-bold font-mono"
-                    style={{
-                      fontSize: 16,
-                      color: isActive
-                        ? "#a78bfa"
-                        : isFilled
-                        ? "#d1fae5"
-                        : "#4b5563",
-                    }}
-                  >
-                    {char || (isNext ? "?" : "_")}
-                  </span>
-                </div>
-                <span
-                  className="font-mono"
-                  style={{
-                    fontSize: 10,
-                    color: isActive ? "#7c3aed" : "#6b7280",
-                  }}
-                >
-                  {digit}
-                </span>
-              </div>
-            </React.Fragment>
-          );
-        })}
-        {curStr.length === digits.length && curStr.length > 0 && (
-          <div
-            className="ml-2 px-2 py-1 rounded-md text-xs font-bold"
-            style={{
-              background: "linear-gradient(135deg, #059669, #047857)",
-              color: "#d1fae5",
-              boxShadow: "0 0 10px rgba(16,185,129,0.4)",
-            }}
-          >
-            ✓
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-// ─── Results Grid ─────────────────────────────────────────────────────────────
-
-interface ResultsGridProps {
-  results: string[];
-  totalExpected: number;
-}
-
-const ResultsGrid: React.FC<ResultsGridProps> = ({ results, totalExpected }) => {
-  return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
-          Combinations Found
-        </span>
-        <span
-          className="text-xs font-mono px-2 py-0.5 rounded-full"
-          style={{
-            background: results.length > 0 ? "rgba(16,185,129,0.15)" : "rgba(100,116,139,0.15)",
-            color: results.length > 0 ? "#10b981" : "#64748b",
-            border: `1px solid ${results.length > 0 ? "rgba(16,185,129,0.3)" : "rgba(100,116,139,0.2)"}`,
-          }}
-        >
-          {results.length} / {totalExpected}
-        </span>
-      </div>
-      <div
-        className="rounded-xl p-3 min-h-[72px] flex flex-wrap gap-2 content-start overflow-y-auto"
-        style={{
-          maxHeight: 120,
-          background: "rgba(0,0,0,0.2)",
-          border: "1px solid rgba(255,255,255,0.05)",
-        }}
-      >
-        {results.length === 0 ? (
-          <span className="text-xs text-muted-foreground italic self-center">
-            No results yet…
-          </span>
-        ) : (
-          results.map((r, idx) => (
-            <div
-              key={idx}
-              className="px-3 py-1 rounded-lg font-mono text-sm font-semibold"
-              style={{
-                background: "linear-gradient(135deg, rgba(16,185,129,0.12), rgba(5,150,105,0.12))",
-                border: "1px solid rgba(16,185,129,0.3)",
-                color: "#6ee7b7",
-                boxShadow: "0 0 6px rgba(16,185,129,0.1)",
-              }}
-            >
-              "{r}"
-            </div>
-          ))
-        )}
-      </div>
-    </div>
-  );
-};
-
-// ─── Main Component ───────────────────────────────────────────────────────────
-
-export const LetterCombinationsVisualization: React.FC = () => {
-  const digits = "23";
-  const [steps, setSteps] = useState<Step[]>([]);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-
-  const code = `function letterCombinations(digits: string): string[] {
+const languages: VisualizationLanguageMap = {
+  typescript: `function letterCombinations(digits: string): string[] {
   if (!digits) return [];
-
   const res: string[] = [];
-
   const digitToChar: Record<string, string> = {
     "2": "abc", "3": "def", "4": "ghi",
     "5": "jkl", "6": "mno", "7": "pqrs",
     "8": "tuv", "9": "wxyz"
   };
-
   function backtrack(i: number, curStr: string): void {
     if (curStr.length === digits.length) {
       res.push(curStr);
       return;
     }
-
     for (const c of digitToChar[digits[i]]) {
       backtrack(i + 1, curStr + c);
     }
   }
-
   backtrack(0, "");
   return res;
-}`;
+}`,
+  python: `def letterCombinations(digits):
+    if not digits:
+        return []
+    digitToChar = {
+        "2": "abc",
+        "3": "def",
+        "4": "ghi",
+        "5": "jkl",
+        "6": "mno",
+        "7": "pqrs",
+        "8": "tuv",
+        "9": "wxyz"
+    }
+    res = []
+    def backtrack(i, curStr):
+        if len(curStr) == len(digits):
+            res.append(curStr)
+            return
+        for c in digitToChar[digits[i]]:
+            backtrack(i + 1, curStr + c)
+    backtrack(0, "")
+    return res`,
+  java: `public static class Solution {
+    public java.util.List<String> letterCombinations(String digits) {
+        java.util.List<String> res = new java.util.ArrayList<>();
+        if (digits == null || digits.length() == 0) {
+            return res;
+        }
+        String[] digitToChar = {
+            "", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"
+        };
+        backtrack(digits, 0, "", digitToChar, res);
+        return res;
+    }
+    private void backtrack(String digits, int index, String currentString, String[] digitToChar, java.util.List<String> result) {
+        if (index == digits.length()) {
+            result.add(currentString);
+            return;
+        }
+        String letters = digitToChar[digits.charAt(index) - '0'];
+        for (int i = 0; i < letters.length(); i++) {
+            backtrack(digits, index + 1, currentString + letters.charAt(i), digitToChar, result);
+        }
+    }
+}`,
+  cpp: `class Solution {
+public:
+    vector<string> letterCombinations(string digits) {
+        if (digits.empty()) return {};
+        vector<string> res;
+        unordered_map<char, string> digitToChar = {
+            {'2', "abc"}, {'3', "def"}, {'4', "ghi"},
+            {'5', "jkl"}, {'6', "mno"}, {'7', "pqrs"},
+            {'8', "tuv"}, {'9', "wxyz"}
+        };
+        function<void(int, string)> backtrack = [&](int i, string curStr) {
+            if (curStr.length() == digits.length()) {
+                res.push_back(curStr);
+                return;
+            }
+            for (char c : digitToChar[digits[i]]) {
+                backtrack(i + 1, curStr + c);
+            }
+        };
+        backtrack(0, "");
+        return res;
+    }
+};`
+};
 
-  useEffect(() => {
-    setSteps(generateSteps(digits));
-  }, []);
+export const LetterCombinationsVisualization: React.FC = () => {
+  const digits = "23";
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
-  if (steps.length === 0) return null;
+  const { steps, stepLineNumbers } = useMemo(() => {
+    const newSteps: Step[] = [];
+    const lines: StepLineNumberMap = { typescript: [], python: [], java: [], cpp: [] };
+    const res: string[] = [];
+
+    const addStep = (
+      curStr: string,
+      i: number,
+      activeDigitIndex: number | null,
+      activeChar: string | null,
+      phase: Step["phase"],
+      message: string,
+      pseudo: string,
+      vars: any,
+      ts: number, py: number, jv: number, cp: number
+    ) => {
+      newSteps.push({
+        digits,
+        curStr,
+        i,
+        results: [...res],
+        activeDigitIndex,
+        activeChar,
+        phase,
+        message,
+        pseudoStep: pseudo,
+        variables: vars
+      });
+      lines.typescript!.push(ts);
+      lines.python!.push(py);
+      lines.java!.push(jv);
+      lines.cpp!.push(cp);
+    };
+
+    addStep(
+      "", 0, null, null, "init",
+      `Start: digits = "${digits}". We will build letter combinations using recursive backtracking.`,
+      `letterCombinations(digits="${digits}")`,
+      { digits, n: digits.length },
+      1, 1, 2, 3
+    );
+
+    addStep(
+      "", 0, null, null, "init",
+      `Initialize empty result array and define the digit-to-letter mapping.`,
+      "SET res = []",
+      { res: "[]" },
+      3, 14, 3, 5
+    );
+
+    function backtrack(i: number, curStr: string) {
+      addStep(
+        curStr, i, i < digits.length ? i : null, null, "recurse",
+        `backtrack(i=${i}, curStr="${curStr}") — depth ${i} of ${digits.length}.`,
+        `CALL backtrack(i=${i}, curStr="${curStr}")`,
+        { i, curStr: `"${curStr}"` },
+        9, 15, 13, 11
+      );
+
+      if (curStr.length === digits.length) {
+        res.push(curStr);
+        addStep(
+          curStr, i, null, null, "base-case",
+          `✓ Base case! curStr "${curStr}" has length ${curStr.length} = digits.length ${digits.length}. Added to results!`,
+          `res.push("${curStr}")`,
+          { results: JSON.stringify(res) },
+          11, 17, 15, 13
+        );
+        return;
+      }
+
+      const letters = DIGIT_MAP[digits[i]];
+
+      addStep(
+        curStr, i, i, null, "loop",
+        `Digit "${digits[i]}" maps to "${letters}". Iterating over each letter to try.`,
+        `FOR c IN "${letters}"`,
+        { digit: `"${digits[i]}"`, letters: `"${letters}"` },
+        14, 19, 19, 16
+      );
+
+      for (const c of letters) {
+        addStep(
+          curStr, i, i, c, "loop",
+          `Choose letter "${c}" from digit "${digits[i]}". Call backtrack(${i + 1}, "${curStr + c}").`,
+          `backtrack(i=${i + 1}, curStr="${curStr + c}")`,
+          { activeChar: `"${c}"` },
+          15, 20, 20, 17
+        );
+
+        backtrack(i + 1, curStr + c);
+
+        addStep(
+          curStr, i, i, c, "backtrack",
+          `Backtrack: finished exploring paths starting with "${curStr + c}". Try next letter for digit "${digits[i]}".`,
+          "BACKTRACK",
+          { lastTried: `"${c}"` },
+          14, 19, 19, 16
+        );
+      }
+    }
+
+    addStep(
+      "", 0, 0, null, "recurse",
+      `Begin backtracking from index 0 with empty string.`,
+      'CALL backtrack(i=0, curStr="")',
+      { i: 0, curStr: '""' },
+      18, 21, 10, 20
+    );
+
+    backtrack(0, "");
+
+    addStep(
+      "", 0, null, null, "done",
+      `✓ Complete! Found ${res.length} combinations: [${res.map((r) => `"${r}"`).join(", ")}]`,
+      `RETURN res  →  ${JSON.stringify(res)}`,
+      { res: JSON.stringify(res) },
+      19, 22, 11, 21
+    );
+
+    return { steps: newSteps, stepLineNumbers: lines };
+  }, [digits]);
 
   const step = steps[currentStepIndex];
+  const pseudoSteps = useMemo(() => steps.map(s => s.pseudoStep), [steps]);
 
   // Calculate expected total
   const totalExpected = digits
@@ -530,42 +300,111 @@ export const LetterCombinationsVisualization: React.FC = () => {
     done: "Complete",
   };
 
+  const activeDigit = step.activeDigitIndex !== null ? digits[step.activeDigitIndex] : null;
+
   return (
-    <div className="space-y-4">
-      <SimpleStepControls
-        currentStep={currentStepIndex}
-        totalSteps={steps.length}
-        onStepChange={setCurrentStepIndex}
-      />
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* ── Left Panel ── */}
+    <VisualizationLayout
+      leftContent={
         <div className="flex flex-col gap-4">
-
-          {/* 1. Phone Keypad — top */}
           <div
-            className="rounded-xl p-4 flex flex-col items-center"
-            style={{
-              background: "rgba(15,23,42,0.6)",
-              border: "1px solid rgba(255,255,255,0.07)",
-            }}
+            className="rounded-xl p-4 flex flex-col items-center bg-card border border-border"
           >
-            <PhoneKeypad
-              digits={step.digits}
-              activeDigitIndex={step.activeDigitIndex}
-              activeChar={step.activeChar}
-            />
+            <div className="flex flex-col items-center gap-3">
+              <div className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">
+                Phone Keypad
+              </div>
+              <div
+                className="rounded-2xl p-4 shadow-2xl"
+                style={{
+                  background: "linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
+                  border: "1px solid rgba(100,120,200,0.3)",
+                  boxShadow: "0 0 40px rgba(60,80,200,0.15), inset 0 1px 0 rgba(255,255,255,0.05)",
+                }}
+              >
+                {KEYPAD_LAYOUT.map((row, rowIdx) => (
+                  <div key={rowIdx} className="flex gap-2 mb-2 last:mb-0">
+                    {row.map((key) => {
+                      const isActive = key === activeDigit;
+                      const isInDigits = digits.includes(key) && !["0", "1", "*", "#"].includes(key);
+                      const letters = DIGIT_LABELS[key] || "";
+
+                      return (
+                        <div
+                          key={key}
+                          className="relative flex flex-col items-center justify-center rounded-xl transition-all duration-200"
+                          style={{
+                            width: 56,
+                            height: 56,
+                            background: isActive
+                              ? "linear-gradient(135deg, #7c3aed, #4f46e5)"
+                              : isInDigits
+                              ? "linear-gradient(135deg, #1e40af, #1d4ed8)"
+                              : "linear-gradient(135deg, #1f2937, #111827)",
+                            border: isActive
+                              ? "1.5px solid #a78bfa"
+                              : isInDigits
+                              ? "1.5px solid #3b82f6"
+                              : "1.5px solid #374151",
+                            boxShadow: isActive
+                              ? "0 0 18px rgba(124,58,237,0.6), inset 0 1px 0 rgba(255,255,255,0.1)"
+                              : isInDigits
+                              ? "0 0 10px rgba(59,130,246,0.3), inset 0 1px 0 rgba(255,255,255,0.05)"
+                              : "inset 0 1px 0 rgba(255,255,255,0.03)",
+                            transform: isActive ? "scale(1.08)" : "scale(1)",
+                          }}
+                        >
+                          <span
+                            className="font-bold"
+                            style={{
+                              fontSize: 18,
+                              color: isActive ? "#e9d5ff" : isInDigits ? "#93c5fd" : "#9ca3af",
+                              lineHeight: 1,
+                            }}
+                          >
+                            {key}
+                          </span>
+                          {letters && (
+                            <span
+                              style={{
+                                fontSize: 7,
+                                letterSpacing: "0.05em",
+                                color: isActive ? "#c4b5fd" : isInDigits ? "#60a5fa" : "#6b7280",
+                                lineHeight: 1,
+                                marginTop: 2,
+                              }}
+                            >
+                              {letters}
+                            </span>
+                          )}
+                          {isActive && step.activeChar && (
+                            <div
+                              className="absolute -top-2 -right-2 flex items-center justify-center rounded-full"
+                              style={{
+                                width: 20,
+                                height: 20,
+                                background: "linear-gradient(135deg, #f59e0b, #d97706)",
+                                border: "1px solid #fbbf24",
+                                fontSize: 10,
+                                fontWeight: 700,
+                                color: "#fff",
+                                boxShadow: "0 0 8px rgba(245,158,11,0.8)",
+                              }}
+                            >
+                              {step.activeChar}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
-          {/* 2. Input Digits + Building Combination — below keypad */}
           <div
-            className="rounded-xl p-4 flex flex-col sm:flex-row gap-8 items-start flex-wrap"
-            style={{
-              background: "rgba(15,23,42,0.6)",
-              border: "1px solid rgba(255,255,255,0.07)",
-            }}
+            className="rounded-xl p-4 flex flex-col sm:flex-row gap-8 items-start flex-wrap bg-card border border-border"
           >
-            {/* Input Digits */}
             <div className="flex flex-col gap-1">
               <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">
                 Input Digits
@@ -614,24 +453,92 @@ export const LetterCombinationsVisualization: React.FC = () => {
               </div>
             </div>
 
-            {/* Divider */}
             <div
-              className="self-stretch w-px hidden sm:block"
-              style={{ background: "rgba(255,255,255,0.07)" }}
+              className="self-stretch w-px hidden sm:block bg-border"
             />
 
-            {/* Building Combination */}
             <div className="flex-1">
-              <CombinationBuilder
-                digits={step.digits}
-                curStr={step.curStr}
-                activeDigitIndex={step.activeDigitIndex}
-                activeChar={step.activeChar}
-              />
+              <div className="flex flex-col gap-2">
+                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
+                  Building Combination
+                </div>
+                <div className="flex gap-1 flex-wrap items-center">
+                  {step.digits.split("").map((digit, idx) => {
+                    const char = step.curStr[idx];
+                    const isActive = idx === step.activeDigitIndex;
+                    const isFilled = idx < step.curStr.length;
+                    const isNext = idx === step.curStr.length;
+
+                    return (
+                      <React.Fragment key={idx}>
+                        {idx > 0 && (
+                          <div className="text-muted-foreground/30 text-xs">+</div>
+                        )}
+                        <div className="flex flex-col items-center gap-1">
+                          <div
+                            className="flex flex-col items-center justify-center rounded-lg transition-all duration-200"
+                            style={{
+                              width: 44,
+                              height: 44,
+                              background: isActive
+                                ? "linear-gradient(135deg, #7c3aed33, #4f46e533)"
+                                : isFilled
+                                ? "linear-gradient(135deg, #059669, #047857)"
+                                : isNext
+                                ? "linear-gradient(135deg, #92400e33, #78350f33)"
+                                : "transparent",
+                              border: isActive
+                                ? "1.5px solid #7c3aed"
+                                : isFilled
+                                ? "1.5px solid #10b981"
+                                : isNext
+                                ? "1.5px dashed #f59e0b66"
+                                : "1.5px dashed #374151",
+                              boxShadow: isFilled && !isActive
+                                ? "0 0 8px rgba(16,185,129,0.2)"
+                                : isActive
+                                ? "0 0 12px rgba(124,58,237,0.3)"
+                                : "none",
+                            }}
+                          >
+                            <span
+                              className="font-bold font-mono"
+                              style={{
+                                fontSize: 16,
+                                color: isActive
+                                  ? "#a78bfa"
+                                  : isFilled
+                                  ? "#d1fae5"
+                                  : "#4b5563",
+                              }}
+                            >
+                              {char || (isNext ? "?" : "_")}
+                            </span>
+                          </div>
+                          <span
+                            className="font-mono text-[10px]"
+                            style={{
+                              color: isActive ? "#7c3aed" : "#6b7280",
+                            }}
+                          >
+                            {digit}
+                          </span>
+                        </div>
+                      </React.Fragment>
+                    );
+                  })}
+                  {step.curStr.length === step.digits.length && step.curStr.length > 0 && (
+                    <div
+                      className="ml-2 px-2 py-1 rounded-md text-xs font-bold bg-green-500 text-white shadow-md shadow-green-500/20"
+                    >
+                      ✓
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* 3. Commentary — below keypad and builder */}
           <div
             className={`rounded-xl p-4 border ${PHASE_BG[step.phase]}`}
           >
@@ -651,14 +558,9 @@ export const LetterCombinationsVisualization: React.FC = () => {
             </p>
           </div>
 
-          {/* 4. Letter options for current digit */}
           {step.activeDigitIndex !== null && step.activeDigitIndex < step.digits.length && (
             <div
-              className="rounded-xl p-4"
-              style={{
-                background: "rgba(15,23,42,0.6)",
-                border: "1px solid rgba(255,255,255,0.07)",
-              }}
+              className="rounded-xl p-4 bg-card border border-border"
             >
               <div className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-3">
                 Letters for digit &ldquo;{step.digits[step.activeDigitIndex]}&rdquo;
@@ -697,15 +599,55 @@ export const LetterCombinationsVisualization: React.FC = () => {
             </div>
           )}
 
-          {/* 5. Results + Variable panel */}
           <div
-            className="rounded-xl p-4 flex flex-col gap-4"
-            style={{
-              background: "rgba(15,23,42,0.6)",
-              border: "1px solid rgba(255,255,255,0.07)",
-            }}
+            className="rounded-xl p-4 flex flex-col gap-4 bg-card border border-border"
           >
-            <ResultsGrid results={step.results} totalExpected={totalExpected} />
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
+                  Combinations Found
+                </span>
+                <span
+                  className="text-xs font-mono px-2 py-0.5 rounded-full"
+                  style={{
+                    background: step.results.length > 0 ? "rgba(16,185,129,0.15)" : "rgba(100,116,139,0.15)",
+                    color: step.results.length > 0 ? "#10b981" : "#64748b",
+                    border: `1px solid ${step.results.length > 0 ? "rgba(16,185,129,0.3)" : "rgba(100,116,139,0.2)"}`,
+                  }}
+                >
+                  {step.results.length} / {totalExpected}
+                </span>
+              </div>
+              <div
+                className="rounded-xl p-3 min-h-[72px] flex flex-wrap gap-2 content-start overflow-y-auto"
+                style={{
+                  maxHeight: 120,
+                  background: "rgba(0,0,0,0.2)",
+                  border: "1px solid rgba(255,255,255,0.05)",
+                }}
+              >
+                {step.results.length === 0 ? (
+                  <span className="text-xs text-muted-foreground italic self-center">
+                    No results yet…
+                  </span>
+                ) : (
+                  step.results.map((r, idx) => (
+                    <div
+                      key={idx}
+                      className="px-3 py-1 rounded-lg font-mono text-sm font-semibold"
+                      style={{
+                        background: "linear-gradient(135deg, rgba(16,185,129,0.12), rgba(5,150,105,0.12))",
+                        border: "1px solid rgba(16,185,129,0.3)",
+                        color: "#6ee7b7",
+                        boxShadow: "0 0 6px rgba(16,185,129,0.1)",
+                      }}
+                    >
+                      &quot;{r}&quot;
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
             <VariablePanel
               variables={{
                 "i (digit index)": step.i,
@@ -716,14 +658,24 @@ export const LetterCombinationsVisualization: React.FC = () => {
             />
           </div>
         </div>
-
-        {/* ── Right Panel: Code Editor ── */}
-        <AnimatedCodeEditor
-          code={code}
-          highlightedLines={[step.lineNumber]}
-          language="typescript"
+      }
+      rightContent={
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={() => setCurrentStepIndex(0)}
         />
-      </div>
-    </div>
+      }
+      controls={
+        <SimpleStepControls
+          currentStep={currentStepIndex}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStepIndex}
+        />
+      }
+    />
   );
 };
+export default LetterCombinationsVisualization;

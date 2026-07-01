@@ -28,6 +28,7 @@ import {
   ListChecks,
   Lock,
   Maximize,
+  MessageSquareHeart,
   Minimize2,
   PanelLeftClose,
   Pencil,
@@ -87,6 +88,7 @@ import { TabWarning } from "@/components/TabWarning";
 import { User } from "@supabase/supabase-js";
 import { VideoTutorialCard } from "./VideoTutorialCard";
 import { ProgressiveHints } from "./ProgressiveHints";
+import { VisualizationFeedbackModal } from "../feedback/VisualizationFeedbackModal";
 import { createPortal } from "react-dom";
 import dynamic from "next/dynamic";
 import { formatMemory } from "../CodeRunner/outputHelpers";
@@ -218,6 +220,7 @@ export const ProblemDescriptionPanel = React.memo(
     const tabsScrollRef = useRef<HTMLDivElement>(null);
     const endOfDescriptionRef = useRef<HTMLDivElement>(null);
     const visualizerContainerRef = useRef<HTMLDivElement>(null);
+    const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
 
     // State for submission detail view (push/pop within submissions tab)
     const [selectedSubmissionDetail, setSelectedSubmissionDetail] = useState<Submission | null>(null);
@@ -1756,6 +1759,22 @@ export const ProblemDescriptionPanel = React.memo(
                     >
                       <Maximize className="w-4 h-4" />
                     </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="absolute top-2 right-12 z-50 h-8 w-8 rounded-full bg-background/80 backdrop-blur shadow-sm hover:bg-background group"
+                      onClick={() => setIsFeedbackModalOpen(true)}
+                      title="Rate Visualization"
+                    >
+                      <MessageSquareHeart className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                    </Button>
+                    <VisualizationFeedbackModal 
+                      isOpen={isFeedbackModalOpen}
+                      onOpenChange={setIsFeedbackModalOpen}
+                      algorithmId={algorithm?.id || ""}
+                      algorithmName={algorithm?.title}
+                      userId={user?.id}
+                    />
 
                     {/* Floating Visualization Completion Button */}
                     {!(algorithm?.is_premium || algorithm?.is_pro || (algorithm?.metadata?.is_pro && !hasPremiumAccess)) && (

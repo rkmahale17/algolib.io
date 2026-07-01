@@ -3,9 +3,10 @@ import { Card } from '@/components/ui/card';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { Info, CheckCircle2, CircleDot } from 'lucide-react';
 import { motion } from 'framer-motion';
+import type { StepLineNumberMap, VisualizationLanguageMap } from '@/types/visualization';
 
 interface Step {
   currentNodeId: string | null;
@@ -13,48 +14,97 @@ interface Step {
   maxVal: number | null;
   goodNodesCount: number;
   explanation: string;
-  lineNumber: number;
   isMatch?: boolean;
   activePath: string[];
+  pseudoStep: string;
 }
+
+const languages: VisualizationLanguageMap = {
+  typescript: `function goodNodes(root: TreeNode | null): number {
+  if (!root) return 0;
+  const dfs = (node: TreeNode | null, maxVal: number): number => {
+    if (!node) return 0;
+    let goodNodesCount = node.val >= maxVal ? 1 : 0;
+    const newMaxVal = Math.max(maxVal, node.val);
+    goodNodesCount += dfs(node.left, newMaxVal);
+    goodNodesCount += dfs(node.right, newMaxVal);
+    return goodNodesCount;
+  };
+  return dfs(root, root.val);
+}`,
+  python: `def goodNodes(root: TreeNode | None) -> int:
+    def dfs(node: TreeNode | None, max_val_on_path: int) -> int:
+        if not node:
+            return 0
+        is_current_node_good = 1 if node.val >= max_val_on_path else 0
+        new_max_val_for_children = max(max_val_on_path, node.val)
+        total_good_nodes = is_current_node_good
+        total_good_nodes += dfs(node.left, new_max_val_for_children)
+        total_good_nodes += dfs(node.right, new_max_val_for_children)
+        return total_good_nodes
+    if not root:
+        return 0
+    return dfs(root, root.val)`,
+  java: `public static class Solution {
+    public int goodNodes(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        return dfs(root, root.val);
+    }
+    private int dfs(TreeNode node, int maxVal) {
+        if (node == null) {
+            return 0;
+        }
+        int goodNodesCount = 0;
+        if (node.val >= maxVal) {
+            goodNodesCount = 1;
+        }
+        int newMaxVal = Math.max(maxVal, node.val);
+        goodNodesCount += dfs(node.left, newMaxVal);
+        goodNodesCount += dfs(node.right, newMaxVal);
+        return goodNodesCount;
+    }
+}`,
+  cpp: `class Solution {
+public:
+    int dfs(TreeNode* node, int maxValSoFar) {
+        if (!node) {
+            return 0;
+        }
+        int goodNodesCount = 0;
+        if (node->val >= maxValSoFar) {
+            goodNodesCount = 1;
+        }
+        maxValSoFar = max(maxValSoFar, node->val);
+        goodNodesCount += dfs(node->left, maxValSoFar);
+        goodNodesCount += dfs(node->right, maxValSoFar);
+        return goodNodesCount;
+    }
+    int goodNodes(TreeNode* root) {
+        if (!root) {
+            return 0;
+        }
+        return dfs(root, root->val);
+    }
+};`
+};
 
 export const CountGoodNodesVisualization = () => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
-  const code = `function goodNodes(root: TreeNode | null): number {
-  if (!root) {
-    return 0;
-  }
-
-  const dfs = (node: TreeNode | null, maxVal: number): number => {
-    if (!node) {
-      return 0;
-    }
-
-    let goodNodesCount = node.val >= maxVal ? 1 : 0;
-
-    const newMaxVal = Math.max(maxVal, node.val);
-
-    goodNodesCount += dfs(node.left, newMaxVal);
-    goodNodesCount += dfs(node.right, newMaxVal);
-
-    return goodNodesCount;
-  };
-
-  return dfs(root, root.val);
-}`;
-
-  const initialTree = {
+  const initialTree = useMemo(() => ({
     n0: { val: 3, left: 'n1', right: 'n2', label: 'Root (3)' },
     n1: { val: 1, left: 'n3', right: null, label: 'Child (1)' },
     n2: { val: 4, left: 'n4', right: 'n5', label: 'Child (4)' },
     n3: { val: 3, left: null, right: null, label: 'G-Child (3)' },
     n4: { val: 1, left: null, right: null, label: 'G-Child (1)' },
     n5: { val: 5, left: null, right: null, label: 'G-Child (5)' }
-  };
+  }), []);
 
-  const steps: Step[] = useMemo(() => {
+  const { steps, stepLineNumbers } = useMemo(() => {
     const s: Step[] = [];
+    const lines: StepLineNumberMap = { typescript: [], python: [], java: [], cpp: [] };
     const states: Record<string, 'unvisited' | 'active' | 'good' | 'bad'> = {
       n0: 'unvisited',
       n1: 'unvisited',
@@ -64,14 +114,15 @@ export const CountGoodNodesVisualization = () => {
       n5: 'unvisited'
     };
 
-    const snapshot = (
+    const addStep = (
       nodeId: string | null,
       maxVal: number | null,
       count: number,
       msg: string,
-      line: number,
+      pseudo: string,
       isMatch: boolean = false,
-      path: string[] = []
+      path: string[] = [],
+      ts: number, py: number, jv: number, cp: number
     ) => {
       s.push({
         currentNodeId: nodeId,
@@ -79,110 +130,385 @@ export const CountGoodNodesVisualization = () => {
         maxVal,
         goodNodesCount: count,
         explanation: msg,
-        lineNumber: line,
+        pseudoStep: pseudo,
         isMatch,
         activePath: [...path]
       });
+      lines.typescript!.push(ts);
+      lines.python!.push(py);
+      lines.java!.push(jv);
+      lines.cpp!.push(cp);
     };
 
-    snapshot(null, null, 0, "Start goodNodes algorithm. Check if the root node exists.", 2);
-    snapshot(null, null, 0, "Root exists. Initiate DFS starting from the root node with value 3.", 21);
+    addStep(
+      null, null, 0,
+      "Start goodNodes algorithm. Check if the root node exists.",
+      "goodNodes(root)",
+      false, [],
+      2, 11, 3, 17
+    );
+    addStep(
+      null, null, 0,
+      "Root exists. Initiate DFS starting from the root node with value 3.",
+      "dfs(root, root.val)  →  dfs(root, 3)",
+      false, [],
+      11, 13, 6, 20
+    );
 
     states.n0 = 'active';
-    snapshot('n0', 3, 0, "dfs(root, 3) called. Visiting root node 3. Current path maximum is 3.", 6, false, ['n0']);
-    snapshot('n0', 3, 0, "Check if node is null. It is not null, so proceed.", 7, false, ['n0']);
+    addStep(
+      'n0', 3, 0,
+      "dfs(root, 3) called. Visiting root node 3. Current path maximum is 3.",
+      "dfs(node=3, maxVal=3)",
+      false, ['n0'],
+      4, 3, 9, 4
+    );
     states.n0 = 'good';
-    snapshot('n0', 3, 1, "Evaluate: node.val (3) >= maxVal (3)? Yes! Root node is always a Good Node. Total Good Nodes = 1.", 11, true, ['n0']);
-    snapshot('n0', 3, 1, "Calculate new path maximum: Math.max(3, 3) = 3.", 13, false, ['n0']);
+    addStep(
+      'n0', 3, 1,
+      "Evaluate: node.val (3) >= maxVal (3)? Yes! Root node is always a Good Node. Total Good Nodes = 1.",
+      "goodNodesCount = node.val >= maxVal ? 1 : 0  →  1",
+      true, ['n0'],
+      5, 5, 13, 8
+    );
+    addStep(
+      'n0', 3, 1,
+      "Calculate new path maximum: Math.max(3, 3) = 3.",
+      "newMaxVal = max(maxVal, node.val)  →  3",
+      false, ['n0'],
+      6, 6, 16, 11
+    );
 
-    snapshot('n0', 3, 1, "Recurse into left child node (value 1) passing newMaxVal = 3.", 15, false, ['n0']);
+    addStep(
+      'n0', 3, 1,
+      "Recurse into left child node (value 1) passing newMaxVal = 3.",
+      "dfs(node.left, 3)",
+      false, ['n0'],
+      7, 8, 17, 12
+    );
     states.n1 = 'active';
-    snapshot('n1', 3, 1, "dfs(node_1, 3) called. Visiting node 1. Current path maximum is 3.", 6, false, ['n0', 'n1']);
-    snapshot('n1', 3, 1, "Check if node is null. It is not null, so proceed.", 7, false, ['n0', 'n1']);
+    addStep(
+      'n1', 3, 1,
+      "dfs(node_1, 3) called. Visiting node 1. Current path maximum is 3.",
+      "dfs(node=1, maxVal=3)",
+      false, ['n0', 'n1'],
+      4, 3, 9, 4
+    );
     states.n1 = 'bad';
-    snapshot('n1', 3, 1, "Evaluate: node.val (1) >= maxVal (3)? No. (Root 3 on this path is larger). This is NOT a Good Node. Total Good Nodes remains 1.", 11, false, ['n0', 'n1']);
-    snapshot('n1', 3, 1, "Calculate new path maximum: Math.max(3, 1) = 3.", 13, false, ['n0', 'n1']);
+    addStep(
+      'n1', 3, 1,
+      "Evaluate: node.val (1) >= maxVal (3)? No. (Root 3 on this path is larger). This is NOT a Good Node. Total Good Nodes remains 1.",
+      "goodNodesCount = node.val >= maxVal ? 1 : 0  →  0",
+      false, ['n0', 'n1'],
+      5, 5, 13, 8
+    );
+    addStep(
+      'n1', 3, 1,
+      "Calculate new path maximum: Math.max(3, 1) = 3.",
+      "newMaxVal = max(3, 1)  →  3",
+      false, ['n0', 'n1'],
+      6, 6, 16, 11
+    );
 
-    snapshot('n1', 3, 1, "Recurse into left child node (value 3) passing newMaxVal = 3.", 15, false, ['n0', 'n1']);
+    addStep(
+      'n1', 3, 1,
+      "Recurse into left child node (value 3) passing newMaxVal = 3.",
+      "dfs(node.left, 3)",
+      false, ['n0', 'n1'],
+      7, 8, 17, 12
+    );
     states.n3 = 'active';
-    snapshot('n3', 3, 1, "dfs(node_3, 3) called. Visiting node 3. Current path maximum is 3.", 6, false, ['n0', 'n1', 'n3']);
-    snapshot('n3', 3, 1, "Check if node is null. It is not null, so proceed.", 7, false, ['n0', 'n1', 'n3']);
+    addStep(
+      'n3', 3, 1,
+      "dfs(node_3, 3) called. Visiting node 3. Current path maximum is 3.",
+      "dfs(node=3, maxVal=3)",
+      false, ['n0', 'n1', 'n3'],
+      4, 3, 9, 4
+    );
     states.n3 = 'good';
-    snapshot('n3', 3, 2, "Evaluate: node.val (3) >= maxVal (3)? Yes! This is a Good Node. Total Good Nodes = 2.", 11, true, ['n0', 'n1', 'n3']);
-    snapshot('n3', 3, 2, "Calculate new path maximum: Math.max(3, 3) = 3.", 13, false, ['n0', 'n1', 'n3']);
+    addStep(
+      'n3', 3, 2,
+      "Evaluate: node.val (3) >= maxVal (3)? Yes! This is a Good Node. Total Good Nodes = 2.",
+      "goodNodesCount = node.val >= maxVal ? 1 : 0  →  1",
+      true, ['n0', 'n1', 'n3'],
+      5, 5, 13, 8
+    );
+    addStep(
+      'n3', 3, 2,
+      "Calculate new path maximum: Math.max(3, 3) = 3.",
+      "newMaxVal = max(3, 3)  →  3",
+      false, ['n0', 'n1', 'n3'],
+      6, 6, 16, 11
+    );
 
-    snapshot('n3', 3, 2, "Recurse into left child of node 3 (null).", 15, false, ['n0', 'n1', 'n3']);
-    snapshot(null, 3, 2, "Child is null. Return 0 good nodes.", 8, false, ['n0', 'n1', 'n3']);
+    addStep(
+      'n3', 3, 2,
+      "Recurse into left child of node 3 (null).",
+      "dfs(node.left, 3)",
+      false, ['n0', 'n1', 'n3'],
+      7, 8, 17, 12
+    );
+    addStep(
+      null, 3, 2,
+      "Child is null. Return 0 good nodes.",
+      "RETURN 0",
+      false, ['n0', 'n1', 'n3'],
+      4, 3, 9, 4
+    );
 
-    snapshot('n3', 3, 2, "Recurse into right child of node 3 (null).", 16, false, ['n0', 'n1', 'n3']);
-    snapshot(null, 3, 2, "Child is null. Return 0 good nodes.", 8, false, ['n0', 'n1', 'n3']);
+    addStep(
+      'n3', 3, 2,
+      "Recurse into right child of node 3 (null).",
+      "dfs(node.right, 3)",
+      false, ['n0', 'n1', 'n3'],
+      8, 9, 18, 13
+    );
+    addStep(
+      null, 3, 2,
+      "Child is null. Return 0 good nodes.",
+      "RETURN 0",
+      false, ['n0', 'n1', 'n3'],
+      4, 3, 9, 4
+    );
 
-    snapshot('n3', 3, 2, "Subtree at node 3 complete. Return goodNodesCount = 1 (this node) + 0 + 0 = 1.", 18, false, ['n0', 'n1', 'n3']);
+    addStep(
+      'n3', 3, 2,
+      "Subtree at node 3 complete. Return goodNodesCount = 1 (this node) + 0 + 0 = 1.",
+      "RETURN goodNodesCount  →  1",
+      false, ['n0', 'n1', 'n3'],
+      9, 10, 19, 14
+    );
     states.n3 = 'good';
 
     states.n1 = 'active';
-    snapshot('n1', 3, 2, "Back at node 1. Now recurse into right child of node 1 (null).", 16, false, ['n0', 'n1']);
-    snapshot(null, 3, 2, "Child is null. Return 0 good nodes.", 8, false, ['n0', 'n1']);
+    addStep(
+      'n1', 3, 2,
+      "Back at node 1. Now recurse into right child of node 1 (null).",
+      "dfs(node.right, 3)",
+      false, ['n0', 'n1'],
+      8, 9, 18, 13
+    );
+    addStep(
+      null, 3, 2,
+      "Child is null. Return 0 good nodes.",
+      "RETURN 0",
+      false, ['n0', 'n1'],
+      4, 3, 9, 4
+    );
 
-    snapshot('n1', 3, 2, "Subtree at node 1 complete. Return goodNodesCount = 0 (this node) + 1 (left subtree) + 0 = 1.", 18, false, ['n0', 'n1']);
+    addStep(
+      'n1', 3, 2,
+      "Subtree at node 1 complete. Return goodNodesCount = 0 (this node) + 1 (left subtree) + 0 = 1.",
+      "RETURN goodNodesCount  →  1",
+      false, ['n0', 'n1'],
+      9, 10, 19, 14
+    );
     states.n1 = 'bad';
 
     states.n0 = 'active';
-    snapshot('n0', 3, 2, "Back at root node 3. Now recurse into right child node (value 4) passing newMaxVal = 3.", 16, false, ['n0']);
+    addStep(
+      'n0', 3, 2,
+      "Back at root node 3. Now recurse into right child node (value 4) passing newMaxVal = 3.",
+      "dfs(node.right, 3)",
+      false, ['n0'],
+      8, 9, 18, 13
+    );
     states.n2 = 'active';
-    snapshot('n2', 3, 2, "dfs(node_2, 3) called. Visiting node 4. Current path maximum is 3.", 6, false, ['n0', 'n2']);
-    snapshot('n2', 3, 2, "Check if node is null. It is not null, so proceed.", 7, false, ['n0', 'n2']);
+    addStep(
+      'n2', 3, 2,
+      "dfs(node_2, 3) called. Visiting node 4. Current path maximum is 3.",
+      "dfs(node=4, maxVal=3)",
+      false, ['n0', 'n2'],
+      4, 3, 9, 4
+    );
     states.n2 = 'good';
-    snapshot('n2', 3, 3, "Evaluate: node.val (4) >= maxVal (3)? Yes! This is a Good Node. Total Good Nodes = 3.", 11, true, ['n0', 'n2']);
-    snapshot('n2', 4, 3, "Calculate new path maximum: Math.max(3, 4) = 4.", 13, false, ['n0', 'n2']);
+    addStep(
+      'n2', 3, 3,
+      "Evaluate: node.val (4) >= maxVal (3)? Yes! This is a Good Node. Total Good Nodes = 3.",
+      "goodNodesCount = node.val >= maxVal ? 1 : 0  →  1",
+      true, ['n0', 'n2'],
+      5, 5, 13, 8
+    );
+    addStep(
+      'n2', 4, 3,
+      "Calculate new path maximum: Math.max(3, 4) = 4.",
+      "newMaxVal = max(3, 4)  →  4",
+      false, ['n0', 'n2'],
+      6, 6, 16, 11
+    );
 
-    snapshot('n2', 4, 3, "Recurse into left child node (value 1) passing newMaxVal = 4.", 15, false, ['n0', 'n2']);
+    addStep(
+      'n2', 4, 3,
+      "Recurse into left child node (value 1) passing newMaxVal = 4.",
+      "dfs(node.left, 4)",
+      false, ['n0', 'n2'],
+      7, 8, 17, 12
+    );
     states.n4 = 'active';
-    snapshot('n4', 4, 3, "dfs(node_4, 4) called. Visiting node 1. Current path maximum is 4.", 6, false, ['n0', 'n2', 'n4']);
-    snapshot('n4', 4, 3, "Check if node is null. It is not null, so proceed.", 7, false, ['n0', 'n2', 'n4']);
+    addStep(
+      'n4', 4, 3,
+      "dfs(node_4, 4) called. Visiting node 1. Current path maximum is 4.",
+      "dfs(node=1, maxVal=4)",
+      false, ['n0', 'n2', 'n4'],
+      4, 3, 9, 4
+    );
     states.n4 = 'bad';
-    snapshot('n4', 4, 3, "Evaluate: node.val (1) >= maxVal (4)? No. (Node 4 on this path is larger). This is NOT a Good Node. Total Good Nodes remains 3.", 11, false, ['n0', 'n2', 'n4']);
-    snapshot('n4', 4, 3, "Calculate new path maximum: Math.max(4, 1) = 4.", 13, false, ['n0', 'n2', 'n4']);
+    addStep(
+      'n4', 4, 3,
+      "Evaluate: node.val (1) >= maxVal (4)? No. (Node 4 on this path is larger). This is NOT a Good Node. Total Good Nodes remains 3.",
+      "goodNodesCount = node.val >= maxVal ? 1 : 0  →  0",
+      false, ['n0', 'n2', 'n4'],
+      5, 5, 13, 8
+    );
+    addStep(
+      'n4', 4, 3,
+      "Calculate new path maximum: Math.max(4, 1) = 4.",
+      "newMaxVal = max(4, 1)  →  4",
+      false, ['n0', 'n2', 'n4'],
+      6, 6, 16, 11
+    );
 
-    snapshot('n4', 4, 3, "Recurse left child of node 1 (null).", 15, false, ['n0', 'n2', 'n4']);
-    snapshot(null, 4, 3, "Child is null. Return 0.", 8, false, ['n0', 'n2', 'n4']);
-    snapshot('n4', 4, 3, "Recurse right child of node 1 (null).", 16, false, ['n0', 'n2', 'n4']);
-    snapshot(null, 4, 3, "Child is null. Return 0.", 8, false, ['n0', 'n2', 'n4']);
+    addStep(
+      'n4', 4, 3,
+      "Recurse left child of node 1 (null).",
+      "dfs(node.left, 4)",
+      false, ['n0', 'n2', 'n4'],
+      7, 8, 17, 12
+    );
+    addStep(
+      null, 4, 3,
+      "Child is null. Return 0.",
+      "RETURN 0",
+      false, ['n0', 'n2', 'n4'],
+      4, 3, 9, 4
+    );
+    addStep(
+      'n4', 4, 3,
+      "Recurse right child of node 1 (null).",
+      "dfs(node.right, 4)",
+      false, ['n0', 'n2', 'n4'],
+      8, 9, 18, 13
+    );
+    addStep(
+      null, 4, 3,
+      "Child is null. Return 0.",
+      "RETURN 0",
+      false, ['n0', 'n2', 'n4'],
+      4, 3, 9, 4
+    );
 
-    snapshot('n4', 4, 3, "Subtree at node 1 complete. Return goodNodesCount = 0 + 0 + 0 = 0.", 18, false, ['n0', 'n2', 'n4']);
+    addStep(
+      'n4', 4, 3,
+      "Subtree at node 1 complete. Return goodNodesCount = 0 + 0 + 0 = 0.",
+      "RETURN goodNodesCount  →  0",
+      false, ['n0', 'n2', 'n4'],
+      9, 10, 19, 14
+    );
     states.n4 = 'bad';
 
     states.n2 = 'active';
-    snapshot('n2', 4, 3, "Back at node 4. Recurse into right child node (value 5) passing newMaxVal = 4.", 16, false, ['n0', 'n2']);
+    addStep(
+      'n2', 4, 3,
+      "Back at node 4. Recurse into right child node (value 5) passing newMaxVal = 4.",
+      "dfs(node.right, 4)",
+      false, ['n0', 'n2'],
+      8, 9, 18, 13
+    );
     states.n5 = 'active';
-    snapshot('n5', 4, 3, "dfs(node_5, 4) called. Visiting node 5. Current path maximum is 4.", 6, false, ['n0', 'n2', 'n5']);
-    snapshot('n5', 4, 3, "Check if node is null. It is not null, so proceed.", 7, false, ['n0', 'n2', 'n5']);
+    addStep(
+      'n5', 4, 3,
+      "dfs(node_5, 4) called. Visiting node 5. Current path maximum is 4.",
+      "dfs(node=5, maxVal=4)",
+      false, ['n0', 'n2', 'n5'],
+      4, 3, 9, 4
+    );
     states.n5 = 'good';
-    snapshot('n5', 4, 4, "Evaluate: node.val (5) >= maxVal (4)? Yes! This is a Good Node. Total Good Nodes = 4.", 11, true, ['n0', 'n2', 'n5']);
-    snapshot('n5', 5, 4, "Calculate new path maximum: Math.max(4, 5) = 5.", 13, false, ['n0', 'n2', 'n5']);
+    addStep(
+      'n5', 4, 4,
+      "Evaluate: node.val (5) >= maxVal (4)? Yes! This is a Good Node. Total Good Nodes = 4.",
+      "goodNodesCount = node.val >= maxVal ? 1 : 0  →  1",
+      true, ['n0', 'n2', 'n5'],
+      5, 5, 13, 8
+    );
+    addStep(
+      'n5', 5, 4,
+      "Calculate new path maximum: Math.max(4, 5) = 5.",
+      "newMaxVal = max(4, 5)  →  5",
+      false, ['n0', 'n2', 'n5'],
+      6, 6, 16, 11
+    );
 
-    snapshot('n5', 5, 4, "Recurse left child of node 5 (null).", 15, false, ['n0', 'n2', 'n5']);
-    snapshot(null, 5, 4, "Child is null. Return 0.", 8, false, ['n0', 'n2', 'n5']);
-    snapshot('n5', 5, 4, "Recurse right child of node 5 (null).", 16, false, ['n0', 'n2', 'n5']);
-    snapshot(null, 5, 4, "Child is null. Return 0.", 8, false, ['n0', 'n2', 'n5']);
+    addStep(
+      'n5', 5, 4,
+      "Recurse left child of node 5 (null).",
+      "dfs(node.left, 5)",
+      false, ['n0', 'n2', 'n5'],
+      7, 8, 17, 12
+    );
+    addStep(
+      null, 5, 4,
+      "Child is null. Return 0.",
+      "RETURN 0",
+      false, ['n0', 'n2', 'n5'],
+      4, 3, 9, 4
+    );
+    addStep(
+      'n5', 5, 4,
+      "Recurse right child of node 5 (null).",
+      "dfs(node.right, 5)",
+      false, ['n0', 'n2', 'n5'],
+      8, 9, 18, 13
+    );
+    addStep(
+      null, 5, 4,
+      "Child is null. Return 0.",
+      "RETURN 0",
+      false, ['n0', 'n2', 'n5'],
+      4, 3, 9, 4
+    );
 
-    snapshot('n5', 5, 4, "Subtree at node 5 complete. Return goodNodesCount = 1 (this node) + 0 + 0 = 1.", 18, false, ['n0', 'n2', 'n5']);
+    addStep(
+      'n5', 5, 4,
+      "Subtree at node 5 complete. Return goodNodesCount = 1 (this node) + 0 + 0 = 1.",
+      "RETURN goodNodesCount  →  1",
+      false, ['n0', 'n2', 'n5'],
+      9, 10, 19, 14
+    );
     states.n5 = 'good';
 
     states.n2 = 'active';
-    snapshot('n2', 4, 4, "Subtree at node 4 complete. Return goodNodesCount = 1 (this node) + 0 (left subtree) + 1 (right subtree) = 2.", 18, false, ['n0', 'n2']);
+    addStep(
+      'n2', 4, 4,
+      "Subtree at node 4 complete. Return goodNodesCount = 1 (this node) + 0 (left subtree) + 1 (right subtree) = 2.",
+      "RETURN goodNodesCount  →  2",
+      false, ['n0', 'n2'],
+      9, 10, 19, 14
+    );
     states.n2 = 'good';
 
     states.n0 = 'active';
-    snapshot('n0', 3, 4, "Subtree at root node 3 complete. Return goodNodesCount = 1 (this node) + 1 (left subtree) + 2 (right subtree) = 4.", 18, false, ['n0']);
+    addStep(
+      'n0', 3, 4,
+      "Subtree at root node 3 complete. Return goodNodesCount = 1 (this node) + 1 (left subtree) + 2 (right subtree) = 4.",
+      "RETURN goodNodesCount  →  4",
+      false, ['n0'],
+      9, 10, 19, 14
+    );
     states.n0 = 'good';
 
-    snapshot(null, 3, 4, "Algorithm execution complete! Total Good Nodes in the binary tree is 4.", 21, true);
+    addStep(
+      null, 3, 4,
+      "Algorithm execution complete! Total Good Nodes in the binary tree is 4.",
+      "RETURN 4",
+      true, [],
+      11, 13, 6, 20
+    );
 
-    return s;
-  }, []);
+    return { steps: s, stepLineNumbers: lines };
+  }, [initialTree]);
 
-  const step = steps[currentStepIndex];
+  const step = steps[currentStepIndex] || steps[0];
+  const pseudoSteps = useMemo(() => steps.map((s) => s.pseudoStep), [steps]);
 
   const positions: Record<string, { x: number; y: number }> = {
     n0: { x: 200, y: 40 },
@@ -284,7 +610,6 @@ export const CountGoodNodesVisualization = () => {
                           {nodeVal}
                         </text>
 
-                        {/* Current DFS pointer overlay */}
                         {isCurrent && (
                           <motion.circle
                             cx={pos.x}
@@ -321,7 +646,6 @@ export const CountGoodNodesVisualization = () => {
             </div>
           </Card>
 
-          {/* Commentary Box placed AT THE BOTTOM of the visualization */}
           <Card className={`p-5 border-l-4 relative overflow-hidden transition-all duration-300 shadow-sm min-h-[120px] flex items-center ${step?.isMatch ? 'bg-primary/10 border-primary' : 'bg-accent/30 border-primary'}`}>
             <div className="flex items-start gap-4">
               <div className={`p-2.5 rounded-xl shrink-0 ${step?.isMatch ? 'bg-primary text-primary-foreground' : 'bg-primary/10 text-primary'}`}>
@@ -338,7 +662,6 @@ export const CountGoodNodesVisualization = () => {
             </div>
           </Card>
 
-          {/* VariablePanel MUST be placed BELOW the commentary box */}
           <VariablePanel
             variables={{
               current_node_val: step?.currentNodeId !== null ? initialTree[step.currentNodeId as keyof typeof initialTree].val : 'N/A',
@@ -351,13 +674,13 @@ export const CountGoodNodesVisualization = () => {
         </div>
       }
       rightContent={
-        <div className="space-y-4 h-full flex flex-col">
-          <AnimatedCodeEditor
-            code={code}
-            highlightedLines={[step?.lineNumber || 1]}
-            language="typescript"
-          />
-        </div>
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={() => setCurrentStepIndex(0)}
+        />
       }
       controls={
         <SimpleStepControls
@@ -369,3 +692,4 @@ export const CountGoodNodesVisualization = () => {
     />
   );
 };
+export default CountGoodNodesVisualization;

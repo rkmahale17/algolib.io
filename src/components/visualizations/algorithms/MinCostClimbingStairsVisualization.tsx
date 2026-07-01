@@ -2,10 +2,11 @@ import React, { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
 import { Construction, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import type { StepLineNumberMap, VisualizationLanguageMap } from '@/types/visualization';
 
 interface Step {
   cost: number[];
@@ -15,112 +16,170 @@ interface Step {
   lookAhead2: number | null;
   finalAns: number | null;
   message: string;
-  highlightedLines: number[];
+  pseudoStep: string;
+  variables: Record<string, any>;
 }
+
+const languages: VisualizationLanguageMap = {
+  typescript: `function minCostClimbingStairs(cost: number[]): number {
+  cost.push(0);
+  for (let i = cost.length - 3; i >= 0; i--) {
+    cost[i] += Math.min(cost[i + 1], cost[i + 2]);
+  }
+  return Math.min(cost[0], cost[1]);
+}`,
+  python: `def minCostClimbingStairs(cost: list[int]) -> int:
+    cost.append(0)
+    for i in range(len(cost) - 3, -1, -1):
+        cost[i] += min(cost[i + 1], cost[i + 2])
+    return min(cost[0], cost[1])`,
+  java: `public static class Solution {
+    public int minCostClimbingStairs(int[] cost) {
+        int n = cost.length;
+        int minCostOneStepAway = 0;
+        int minCostTwoStepsAway = 0;
+        for (int i = n - 1; i >= 0; i--) {
+            int currentMinCostToTop = cost[i] + Math.min(minCostOneStepAway, minCostTwoStepsAway);
+            minCostTwoStepsAway = minCostOneStepAway;
+            minCostOneStepAway = currentMinCostToTop;
+        }
+        return Math.min(minCostOneStepAway, minCostTwoStepsAway);
+    }
+}`,
+  cpp: `class Solution {
+public:
+    int minCostClimbingStairs(vector<int>& cost) {
+        cost.push_back(0);
+        for (int i = cost.size() - 3; i >= 0; --i) {
+            cost[i] += min(cost[i + 1], cost[i + 2]);
+        }
+        return min(cost[0], cost[1]);
+    }
+};`
+};
 
 export const MinCostClimbingStairsVisualization: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [activeTestCase, setActiveTestCase] = useState(0);
 
-  const code = `function minCostClimbingStairs(cost: number[]): number {
-  cost.push(0);
-
-  for (let i = cost.length - 3; i >= 0; i--) {
-    cost[i] += Math.min(cost[i + 1], cost[i + 2]);
-  }
-
-  return Math.min(cost[0], cost[1]);
-}`;
-
-  const testCases = [
+  const testCases = useMemo(() => [
     { id: 'case1', name: 'Example 1', data: [1, 100, 1, 1, 1, 100, 1, 1, 100, 1] },
     { id: 'case2', name: 'Example 2', data: [10, 15, 20] }
-  ];
+  ], []);
 
-  const steps = useMemo(() => {
+  const { steps, stepLineNumbers } = useMemo(() => {
     const stepsList: Step[] = [];
+    const lines: StepLineNumberMap = { typescript: [], python: [], java: [], cpp: [] };
     const originalInput = [...testCases[activeTestCase].data];
     const cost = [...originalInput];
 
-    stepsList.push({
-      cost: [...cost],
-      originalCost: [...originalInput],
-      i: null, lookAhead1: null, lookAhead2: null, finalAns: null,
-      message: `We start with our staircase costs. We can either start at index 0 or index 1, and our goal is to reach the "top" of the floor.`,
-      highlightedLines: []
-    });
+    const addStep = (
+      i: number | null,
+      l1: number | null,
+      l2: number | null,
+      fa: number | null,
+      msg: string,
+      pseudo: string,
+      vars: any,
+      ts: number, py: number, jv: number, cp: number
+    ) => {
+      stepsList.push({
+        cost: [...cost],
+        originalCost: [...originalInput],
+        i,
+        lookAhead1: l1,
+        lookAhead2: l2,
+        finalAns: fa,
+        message: msg,
+        pseudoStep: pseudo,
+        variables: vars
+      });
+      lines.typescript!.push(ts);
+      lines.python!.push(py);
+      lines.java!.push(jv);
+      lines.cpp!.push(cp);
+    };
+
+    addStep(
+      null, null, null, null,
+      `We start with our staircase costs. We can either start at index 0 or index 1, and our goal is to reach the "top" of the floor.`,
+      `minCostClimbingStairs(cost=[${cost.join(", ")}])`,
+      { cost: `[${cost.join(", ")}]` },
+      1, 1, 2, 3
+    );
 
     cost.push(0);
     const originalWithZero = [...cost];
 
-    stepsList.push({
-      cost: [...cost],
-      originalCost: [...originalWithZero],
-      i: null, lookAhead1: null, lookAhead2: null, finalAns: null,
-      message: `We append a virtual step with cost 0 at the end. This represents the absolute top of the staircase that we need to reach.`,
-      highlightedLines: [2]
-    });
+    addStep(
+      null, null, null, null,
+      `We append a virtual step with cost 0 at the end. This represents the absolute top of the staircase that we need to reach.`,
+      "cost.push(0)  →  top of floor",
+      { cost: `[${cost.join(", ")}]` },
+      2, 2, 4, 4
+    );
 
     for (let i = cost.length - 3; i >= 0; i--) {
-      stepsList.push({
-        cost: [...cost],
-        originalCost: [...originalWithZero],
-        i: i, lookAhead1: null, lookAhead2: null, finalAns: null,
-        message: `Working backwards! We are now at step ${i}. We need to find the cheapest way to reach the top from here. We have two choices: jump 1 step or jump 2 steps.`,
-        highlightedLines: [4]
-      });
+      addStep(
+        i, null, null, null,
+        `Working backwards! We are now at step ${i}. We need to find the cheapest way to reach the top from here. We have two choices: jump 1 step or jump 2 steps.`,
+        `FOR i FROM ${cost.length - 3} DOWNTO 0  →  i = ${i}`,
+        { i, cost: `[${cost.join(", ")}]` },
+        3, 3, 6, 5
+      );
 
-      stepsList.push({
-        cost: [...cost],
-        originalCost: [...originalWithZero],
-        i: i, lookAhead1: i + 1, lookAhead2: null, finalAns: null,
-        message: `Choice 1 (Jump 1 Step): If we jump 1 step, we land on step ${i + 1}. The minimum cost from step ${i + 1} to the top is ${cost[i + 1]}.`,
-        highlightedLines: [5]
-      });
+      addStep(
+        i, i + 1, null, null,
+        `Choice 1 (Jump 1 Step): If we jump 1 step, we land on step ${i + 1}. The minimum cost from step ${i + 1} to the top is ${cost[i + 1]}.`,
+        `cost[i + 1]  →  ${cost[i + 1]}`,
+        { i, "cost[i+1]": cost[i + 1] },
+        4, 4, 7, 6
+      );
 
-      stepsList.push({
-        cost: [...cost],
-        originalCost: [...originalWithZero],
-        i: i, lookAhead1: null, lookAhead2: i + 2, finalAns: null,
-        message: `Choice 2 (Jump 2 Steps): If we jump 2 steps, we land on step ${i + 2}. The minimum cost from step ${i + 2} to the top is ${cost[i + 2]}.`,
-        highlightedLines: [5]
-      });
+      addStep(
+        i, null, i + 2, null,
+        `Choice 2 (Jump 2 Steps): If we jump 2 steps, we land on step ${i + 2}. The minimum cost from step ${i + 2} to the top is ${cost[i + 2]}.`,
+        `cost[i + 2]  →  ${cost[i + 2]}`,
+        { i, "cost[i+2]": cost[i + 2] },
+        4, 4, 7, 6
+      );
 
       const minAhead = Math.min(cost[i + 1], cost[i + 2]);
       
-      stepsList.push({
-        cost: [...cost],
-        originalCost: [...originalWithZero],
-        i: i, lookAhead1: i + 1, lookAhead2: i + 2, finalAns: null,
-        message: `Comparing the choices: ${cost[i + 1]} vs ${cost[i + 2]}. The cheaper path is ${minAhead}! We will confidently choose this optimal path.`,
-        highlightedLines: [5]
-      });
+      addStep(
+        i, i + 1, i + 2, null,
+        `Comparing the choices: ${cost[i + 1]} vs ${cost[i + 2]}. The cheaper path is ${minAhead}! We will confidently choose this optimal path.`,
+        `Math.min(cost[i+1], cost[i+2])  →  ${minAhead}`,
+        { i, "cost[i+1]": cost[i + 1], "cost[i+2]": cost[i + 2], min: minAhead },
+        4, 4, 7, 6
+      );
 
       cost[i] += minAhead;
 
-      stepsList.push({
-        cost: [...cost],
-        originalCost: [...originalWithZero],
-        i: i, lookAhead1: i + 1, lookAhead2: i + 2, finalAns: null,
-        message: `We add the optimal path cost (${minAhead}) to our current step's base cost (${originalWithZero[i]}). The absolute minimum cost to reach the top starting from step ${i} is now recorded as ${cost[i]}!`,
-        highlightedLines: [5]
-      });
+      addStep(
+        i, i + 1, i + 2, null,
+        `We add the optimal path cost (${minAhead}) to our current step's base cost (${originalWithZero[i]}). The absolute minimum cost to reach the top starting from step ${i} is now recorded as ${cost[i]}!`,
+        `cost[i] += min  →  ${cost[i]}`,
+        { i, current_min: cost[i] },
+        4, 4, 8, 6
+      );
     }
 
     const finalResult = Math.min(cost[0], cost[1]);
 
-    stepsList.push({
-      cost: [...cost],
-      originalCost: [...originalWithZero],
-      i: null, lookAhead1: 0, lookAhead2: 1, finalAns: finalResult,
-      message: `We've calculated the minimum cost from every step to the top. Since we can start at step 0 or 1, we just return the minimum of cost[0] (${cost[0]}) and cost[1] (${cost[1]}). The answer is ${finalResult}!`,
-      highlightedLines: [8]
-    });
+    addStep(
+      null, 0, 1, finalResult,
+      `We've calculated the minimum cost from every step to the top. Since we can start at step 0 or 1, we just return the minimum of cost[0] (${cost[0]}) and cost[1] (${cost[1]}). The answer is ${finalResult}!`,
+      `RETURN min(cost[0], cost[1])  →  ${finalResult}`,
+      { finalAns: finalResult },
+      6, 5, 11, 8
+    );
 
-    return stepsList;
-  }, [activeTestCase]);
+    return { steps: stepsList, stepLineNumbers: lines };
+  }, [activeTestCase, testCases]);
 
   const step = steps[currentStep];
+  const pseudoSteps = useMemo(() => steps.map((s) => s.pseudoStep), [steps]);
 
   const renderStairs = () => {
     return (
@@ -145,16 +204,13 @@ export const MinCostClimbingStairsVisualization: React.FC = () => {
           if (isCurrent) {
             bgColor = "bg-primary text-primary-foreground";
             borderColor = "border-primary";
-            textColor = "text-primary-foreground";
+            textColor = "text-primary-foreground font-bold";
           } else if (isLookAhead1 || isLookAhead2 || isFinalCompare) {
             bgColor = "bg-amber-500/20";
             borderColor = "border-amber-500 ring-2 ring-amber-500 ring-offset-2";
             textColor = "text-amber-700 dark:text-amber-400 font-bold";
           }
 
-          // Calculate height progressively. 
-          // Base height + increments.
-          // Example 2 has 10 steps, so we need to keep the height scaling reasonable.
           const stepHeight = 40 + (idx * (150 / step.cost.length));
 
           return (
@@ -163,7 +219,6 @@ export const MinCostClimbingStairsVisualization: React.FC = () => {
                 {isVirtualTop ? 'Top' : idx}
               </span>
               
-              {/* Dynamic Value */}
               <AnimatePresence mode="popLayout">
                 <motion.div
                   key={`val-${val}`}
@@ -175,13 +230,11 @@ export const MinCostClimbingStairsVisualization: React.FC = () => {
                 </motion.div>
               </AnimatePresence>
 
-              {/* Stair block */}
               <motion.div
                 layout
                 className={`w-full rounded-t-sm border-t-2 border-l-2 border-r-2 transition-colors duration-300 ${bgColor} ${borderColor} shadow-sm relative`}
                 style={{ height: `${stepHeight}px` }}
               >
-                {/* Original Cost Marker */}
                 {!isVirtualTop && step.originalCost && (
                   <div className="absolute bottom-1 w-full text-center text-[9px] opacity-50">
                     +{step.originalCost[idx]}
@@ -247,7 +300,7 @@ export const MinCostClimbingStairsVisualization: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-             <Card className="p-4 bg-primary/5 border-l-4 border-primary shadow-sm h-full flex flex-col justify-center">
+             <Card className="p-4 bg-primary/5 border border-primary/20 shadow-sm h-full flex flex-col justify-center">
                <h4 className="text-[9px] font-bold uppercase tracking-widest text-primary/80 mb-2">Commentary</h4>
                <p className="text-[13px] font-medium leading-relaxed text-foreground/90">
                  {step.message}
@@ -289,14 +342,15 @@ export const MinCostClimbingStairsVisualization: React.FC = () => {
         </div>
       }
       rightContent={
-        <Card className="h-full overflow-hidden flex flex-col shadow-sm border-border/50">
-          <AnimatedCodeEditor
-            code={code}
-            language="typescript"
-            highlightedLines={step.highlightedLines}
-          />
-        </Card>
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStep}
+          onLanguageChange={() => setCurrentStep(0)}
+        />
       }
     />
   );
 };
+export default MinCostClimbingStairsVisualization;

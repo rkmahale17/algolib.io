@@ -161,6 +161,13 @@ const Navbar = ({
     // Problem mode has its own navbar handling within this component
   }
 
+  // Prevent global Navbar instance from rendering on problem or admin pages
+  const isProblemPath = currentPath.startsWith("/problem/");
+  const isAdminPath = currentPath.startsWith("/admin/");
+  if (!isProblemMode && (isProblemPath || isAdminPath)) {
+    return null;
+  }
+
   const showCondensedMenu = windowWidth < 778;
   const listLabel =
     activeListType && activeListType !== "all"
