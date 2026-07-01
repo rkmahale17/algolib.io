@@ -2,9 +2,10 @@ import React, { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
 import { Layers } from 'lucide-react';
+import type { VisualizationLanguageMap, StepLineNumberMap } from '@/types/visualization';
 
 interface Step {
   intervals: [number, number][];
@@ -14,8 +15,87 @@ interface Step {
   currentIdx: number;
   variables: Record<string, any>;
   explanation: string;
-  highlightedLines: number[];
+  pseudoStep: string;
 }
+
+const languages: VisualizationLanguageMap = {
+  typescript: `function merge(intervals: number[][]): number[][] {
+  if (!intervals || intervals.length === 0) {
+    return [];
+  }
+  intervals.sort((a, b) => a[0] - b[0]);
+  const merged: number[][] = [];
+  let currentInterval = intervals[0];
+  for (let i = 1; i < intervals.length; i++) {
+    const nextInterval = intervals[i];
+    if (currentInterval[1] >= nextInterval[0]) {
+      currentInterval[1] = Math.max(currentInterval[1], nextInterval[1]);
+    } else {
+      merged.push(currentInterval);
+      currentInterval = nextInterval;
+    }
+  }
+  merged.push(currentInterval);
+  return merged;
+}`,
+  python: `def merge(intervals):
+    intervals.sort(key=lambda x: x[0])
+    merged = []
+    for interval in intervals:
+        if not merged or interval[0] > merged[-1][1]:
+            merged.append(interval)
+        else:
+            merged[-1][1] = max(merged[-1][1], interval[1])
+    return merged`,
+  java: `public static class Solution {
+    public int[][] merge(int[][] intervals) {
+        if (intervals.length <= 1) {
+            return intervals;
+        }
+        java.util.Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));
+        java.util.List<int[]> mergedIntervals = new java.util.ArrayList<>();
+        int[] currentInterval = intervals[0];
+        mergedIntervals.add(currentInterval);
+        for (int i = 1; i < intervals.length; i++) {
+            int[] nextInterval = intervals[i];
+            int currentEnd = currentInterval[1];
+            int nextStart = nextInterval[0];
+            int nextEnd = nextInterval[1];
+            if (currentEnd >= nextStart) {
+                currentInterval[1] = Math.max(currentEnd, nextEnd);
+            } else {
+                currentInterval = nextInterval;
+                mergedIntervals.add(currentInterval);
+            }
+        }
+        return mergedIntervals.toArray(new int[mergedIntervals.size()][]);
+    }
+}`,
+  cpp: `class Solution {
+public:
+    vector<vector<int>> merge(vector<vector<int>>& intervals) {
+        if (intervals.empty()) {
+            return {};
+        }
+        sort(intervals.begin(), intervals.end(), [](const vector<int>& a, const vector<int>& b) {
+            return a[0] < b[0];
+        });
+        vector<vector<int>> output;
+        output.push_back(intervals[0]);
+        for (size_t i = 1; i < intervals.size(); ++i) {
+            int start = intervals[i][0];
+            int end = intervals[i][1];
+            int& lastEnd = output.back()[1];
+            if (start <= lastEnd) {
+                lastEnd = max(lastEnd, end);
+            } else {
+                output.push_back({start, end});
+            }
+        }
+        return output;
+    }
+};`
+};
 
 export const MergeIntervalsVisualization: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -27,176 +107,189 @@ export const MergeIntervalsVisualization: React.FC = () => {
       : [[1, 4], [2, 3], [8, 12], [9, 10]], 
   [caseType]);
 
-  const code = `function merge(intervals: number[][]): number[][] {
-  if (!intervals || intervals.length === 0) {
-    return [];
-  }
-
-  intervals.sort((a, b) => a[0] - b[0]);
-
-  const merged: number[][] = [];
-  let currentInterval = intervals[0];
-
-  for (let i = 1; i < intervals.length; i++) {
-    const nextInterval = intervals[i];
-
-    if (currentInterval[1] >= nextInterval[0]) {
-      currentInterval[1] = Math.max(currentInterval[1], nextInterval[1]);
-    } else {
-      merged.push(currentInterval);
-      currentInterval = nextInterval;
-    }
-  }
-
-  merged.push(currentInterval);
-  return merged;
-}`;
-
-  const steps = useMemo(() => {
+  const { steps, stepLineNumbers } = useMemo(() => {
     const stepsList: Step[] = [];
+    const lines: StepLineNumberMap = { typescript: [], python: [], java: [], cpp: [] };
     const intervals = initialIntervals.map(it => [...it] as [number, number]);
-    
-    stepsList.push({
-      intervals: intervals.map(it => [...it] as [number, number]),
-      merged: [],
-      currentInterval: null,
-      nextInterval: null,
-      currentIdx: -1,
-      variables: { intervals: JSON.stringify(initialIntervals) },
-      explanation: "Given a collection of intervals, we want to merge all overlapping ones into a set of disjoint intervals.",
-      highlightedLines: [1],
-    });
 
-    stepsList.push({
-      intervals: intervals.map(it => [...it] as [number, number]),
-      merged: [],
-      currentInterval: null,
-      nextInterval: null,
-      currentIdx: -1,
-      variables: { "!intervals": !intervals, "intervals.length": intervals.length },
-      explanation: "First, we check if the input is empty or null.",
-      highlightedLines: [2, 3, 4],
-    });
+    const addStep = (
+      intervals: [number, number][],
+      merged: [number, number][],
+      currentInterval: [number, number] | null,
+      nextInterval: [number, number] | null,
+      currentIdx: number,
+      variables: Record<string, any>,
+      explanation: string,
+      pseudo: string,
+      ts: number, py: number, java: number, cpp: number
+    ) => {
+      stepsList.push({
+        intervals,
+        merged,
+        currentInterval,
+        nextInterval,
+        currentIdx,
+        variables,
+        explanation,
+        pseudoStep: pseudo
+      });
+      lines.typescript!.push(ts);
+      lines.python!.push(py);
+      lines.java!.push(java);
+      lines.cpp!.push(cpp);
+    };
+
+    addStep(
+      intervals.map(it => [...it] as [number, number]),
+      [],
+      null,
+      null,
+      -1,
+      { intervals: JSON.stringify(initialIntervals) },
+      "Given a collection of intervals, we want to merge all overlapping ones into a set of disjoint intervals.",
+      "merge(intervals)",
+      1, 1, 2, 3
+    );
+
+    addStep(
+      intervals.map(it => [...it] as [number, number]),
+      [],
+      null,
+      null,
+      -1,
+      { "!intervals": !intervals, "intervals.length": intervals.length },
+      "First, we check if the input is empty or null.",
+      "IF NOT intervals OR intervals.length == 0",
+      2, 1, 3, 4
+    );
 
     const sorted = [...intervals].sort((a, b) => a[0] - b[0]);
-    stepsList.push({
-      intervals: sorted.map(it => [...it] as [number, number]),
-      merged: [],
-      currentInterval: null,
-      nextInterval: null,
-      currentIdx: -1,
-      variables: { action: "Sorting by start time" },
-      explanation: "We sort the intervals by their start times to process them in chronological order.",
-      highlightedLines: [7],
-    });
+    addStep(
+      sorted.map(it => [...it] as [number, number]),
+      [],
+      null,
+      null,
+      -1,
+      { action: "Sorting by start time" },
+      "We sort the intervals by their start times to process them in chronological order.",
+      "intervals.sort(key=start_time)",
+      5, 2, 6, 7
+    );
 
     const merged: [number, number][] = [];
     let currentInterval: [number, number] = [...sorted[0]];
-    stepsList.push({
-      intervals: sorted.map(it => [...it] as [number, number]),
-      merged: [],
-      currentInterval: [...currentInterval],
-      nextInterval: null,
-      currentIdx: 0,
-      variables: { currentInterval: JSON.stringify(currentInterval) },
-      explanation: `Initialize 'merged' as empty and set 'currentInterval' to the first interval: [${currentInterval[0]}, ${currentInterval[1]}].`,
-      highlightedLines: [9, 10],
-    });
+    addStep(
+      sorted.map(it => [...it] as [number, number]),
+      [],
+      [...currentInterval],
+      null,
+      0,
+      { currentInterval: JSON.stringify(currentInterval) },
+      `Initialize 'merged' as empty and set 'currentInterval' to the first interval: [${currentInterval[0]}, ${currentInterval[1]}].`,
+      "SET merged = [], currentInterval = intervals[0]",
+      6, 3, 7, 10
+    );
 
     for (let i = 1; i < sorted.length; i++) {
       const nextInterval = [...sorted[i]] as [number, number];
 
-      stepsList.push({
-        intervals: sorted.map(it => [...it] as [number, number]),
-        merged: merged.map(it => [...it] as [number, number]),
-        currentInterval: [...currentInterval],
-        nextInterval: [...nextInterval],
-        currentIdx: i,
-        variables: { i, nextInterval: JSON.stringify(nextInterval) },
-        explanation: `Comparing currentInterval [${currentInterval[0]}, ${currentInterval[1]}] with nextInterval [${nextInterval[0]}, ${nextInterval[1]}].`,
-        highlightedLines: [12, 13],
-      });
+      addStep(
+        sorted.map(it => [...it] as [number, number]),
+        merged.map(it => [...it] as [number, number]),
+        [...currentInterval],
+        [...nextInterval],
+        i,
+        { i, nextInterval: JSON.stringify(nextInterval) },
+        `Comparing currentInterval [${currentInterval[0]}, ${currentInterval[1]}] with nextInterval [${nextInterval[0]}, ${nextInterval[1]}].`,
+        `SET nextInterval = intervals[${i}]`,
+        8, 4, 10, 12
+      );
 
       const overlaps = currentInterval[1] >= nextInterval[0];
 
-      stepsList.push({
-        intervals: sorted.map(it => [...it] as [number, number]),
-        merged: merged.map(it => [...it] as [number, number]),
-        currentInterval: [...currentInterval],
-        nextInterval: [...nextInterval],
-        currentIdx: i,
-        variables: { 
+      addStep(
+        sorted.map(it => [...it] as [number, number]),
+        merged.map(it => [...it] as [number, number]),
+        [...currentInterval],
+        [...nextInterval],
+        i,
+        { 
           "currentInterval.end": currentInterval[1], 
           "nextInterval.start": nextInterval[0],
           "overlaps": overlaps 
         },
-        explanation: overlaps 
+        overlaps 
           ? `Overlapping detected: currentInterval end (${currentInterval[1]}) ≥ nextInterval start (${nextInterval[0]}).`
           : `No overlap: currentInterval end (${currentInterval[1]}) < nextInterval start (${nextInterval[0]}).`,
-        highlightedLines: [15],
-      });
+        `IF currentInterval.end >= nextInterval.start  →  ${overlaps ? 'YES ✓' : 'NO ✗'}`,
+        10, 5, 15, 16
+      );
 
       if (overlaps) {
         const oldEnd = currentInterval[1];
         currentInterval[1] = Math.max(currentInterval[1], nextInterval[1]);
-        stepsList.push({
-          intervals: sorted.map(it => [...it] as [number, number]),
-          merged: merged.map(it => [...it] as [number, number]),
-          currentInterval: [...currentInterval],
-          nextInterval: [...nextInterval],
-          currentIdx: i,
-          variables: { 
+        addStep(
+          sorted.map(it => [...it] as [number, number]),
+          merged.map(it => [...it] as [number, number]),
+          [...currentInterval],
+          [...nextInterval],
+          i,
+          { 
             "prev_end": oldEnd, 
             "next_end": nextInterval[1], 
             "new_end": currentInterval[1] 
           },
-          explanation: `Merge the intervals by extending the end of currentInterval to max(${oldEnd}, ${nextInterval[1]}) = ${currentInterval[1]}.`,
-          highlightedLines: [16],
-        });
+          `Merge the intervals by extending the end of currentInterval to max(${oldEnd}, ${nextInterval[1]}) = ${currentInterval[1]}.`,
+          `SET currentInterval.end = max(currentInterval.end, nextInterval.end)`,
+          11, 8, 16, 17
+        );
       } else {
         merged.push([...currentInterval]);
         const prevCurrent = [...currentInterval];
         currentInterval = [...nextInterval];
-        stepsList.push({
-          intervals: sorted.map(it => [...it] as [number, number]),
-          merged: merged.map(it => [...it] as [number, number]),
-          currentInterval: [...currentInterval],
-          nextInterval: [...nextInterval],
-          currentIdx: i,
-          variables: { 
+        addStep(
+          sorted.map(it => [...it] as [number, number]),
+          merged.map(it => [...it] as [number, number]),
+          [...currentInterval],
+          [...nextInterval],
+          i,
+          { 
             "added_to_merged": JSON.stringify(prevCurrent), 
             "new_currentInterval": JSON.stringify(currentInterval) 
           },
-          explanation: `Push currentInterval [${prevCurrent[0]}, ${prevCurrent[1]}] to 'merged' and update currentInterval to the next one.`,
-          highlightedLines: [18, 19],
-        });
+          `Push currentInterval [${prevCurrent[0]}, ${prevCurrent[1]}] to 'merged' and update currentInterval to the next one.`,
+          `CALL merged.push(currentInterval); SET currentInterval = nextInterval`,
+          13, 6, 19, 19
+        );
       }
     }
 
     merged.push([...currentInterval]);
-    stepsList.push({
-      intervals: sorted.map(it => [...it] as [number, number]),
-      merged: merged.map(it => [...it] as [number, number]),
-      currentInterval: [...currentInterval],
-      nextInterval: null,
-      currentIdx: sorted.length,
-      variables: { action: "Final push" },
-      explanation: `Add the last remaining 'currentInterval' [${currentInterval[0]}, ${currentInterval[1]}] to the merged list.`,
-      highlightedLines: [23],
-    });
+    addStep(
+      sorted.map(it => [...it] as [number, number]),
+      merged.map(it => [...it] as [number, number]),
+      [...currentInterval],
+      null,
+      sorted.length,
+      { action: "Final push" },
+      `Add the last remaining 'currentInterval' [${currentInterval[0]}, ${currentInterval[1]}] to the merged list.`,
+      "CALL merged.push(currentInterval)",
+      17, 9, 22, 22
+    );
 
-    stepsList.push({
-      intervals: sorted.map(it => [...it] as [number, number]),
-      merged: merged.map(it => [...it] as [number, number]),
-      currentInterval: null,
-      nextInterval: null,
-      currentIdx: sorted.length,
-      variables: { result: JSON.stringify(merged) },
-      explanation: "Algorithm complete. Returning the list of merged intervals.",
-      highlightedLines: [24],
-    });
+    addStep(
+      sorted.map(it => [...it] as [number, number]),
+      merged.map(it => [...it] as [number, number]),
+      null,
+      null,
+      sorted.length,
+      { result: JSON.stringify(merged) },
+      "Algorithm complete. Returning the list of merged intervals.",
+      "RETURN merged",
+      18, 9, 22, 22
+    );
 
-    return stepsList;
+    return { steps: stepsList, stepLineNumbers: lines };
   }, [initialIntervals]);
 
   const handleCaseToggle = (type: 'case1' | 'case2') => {
@@ -205,14 +298,15 @@ export const MergeIntervalsVisualization: React.FC = () => {
   };
 
   const step = steps[currentStep];
+  const pseudoSteps = useMemo(() => steps.map(s => s.pseudoStep), [steps]);
   const TIMELINE_MAX = useMemo(() => Math.max(...initialIntervals.flat(), 1) + 2, [initialIntervals]);
 
-  const renderIntervalBar = (interval: [number, number], colorClass: string, label?: string, isLarge = false) => {
+  const renderIntervalBar = (interval: [number, number], colorClass: string, label?: string, isLarge = false, key?: string | number) => {
     const leftPct = (interval[0] / TIMELINE_MAX) * 100;
     const widthPct = ((interval[1] - interval[0]) / TIMELINE_MAX) * 100;
 
     return (
-      <div className={`flex items-center gap-3 w-full group ${isLarge ? 'h-12' : 'h-8'}`}>
+      <div key={key || label || undefined} className={`flex items-center gap-3 w-full group ${isLarge ? 'h-12' : 'h-8'}`}>
         {label && <span className="w-10 text-[10px] font-bold text-muted-foreground uppercase">{label}</span>}
         <div className="flex-1 relative h-full">
           <div className="absolute inset-0 bg-muted/20 rounded-md"></div>
@@ -220,8 +314,8 @@ export const MergeIntervalsVisualization: React.FC = () => {
             className={`absolute h-[80%] top-[10%] rounded flex items-center justify-center text-[11px] font-mono font-bold transition-all border shadow-sm px-2 ${colorClass}`}
             style={{
               left: `${leftPct}%`,
-              width: `${Math.max(widthPct, 12)}%`, // Increased minimum percentage
-              minWidth: '60px', // Guaranteed minimum width for text visibility
+              width: `${Math.max(widthPct, 12)}%`,
+              minWidth: '60px',
             }}
           >
             <span className="whitespace-nowrap overflow-visible">
@@ -271,7 +365,6 @@ export const MergeIntervalsVisualization: React.FC = () => {
             </h2>
             
             <Card className="p-6 bg-card/60 backdrop-blur border-border/50 shadow-sm space-y-8">
-              {/* Original Intervals */}
               <div className="space-y-3">
                 <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Sorted Input Intervals</div>
                 <div className="space-y-2 max-h-[180px] overflow-y-auto pr-2 custom-scrollbar">
@@ -289,7 +382,6 @@ export const MergeIntervalsVisualization: React.FC = () => {
                 </div>
               </div>
 
-              {/* Working State */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-border/50">
                 <div className="space-y-3">
                   <div className="text-[10px] font-bold uppercase tracking-widest text-primary font-black">Current Interval</div>
@@ -313,7 +405,6 @@ export const MergeIntervalsVisualization: React.FC = () => {
                 </div>
               </div>
 
-              {/* Merged Results */}
               <div className="space-y-3 pt-6 border-t border-border/50">
                 <div className="text-[10px] font-bold uppercase tracking-widest text-green-600 flex items-center gap-2">
                   Merged Results
@@ -348,14 +439,15 @@ export const MergeIntervalsVisualization: React.FC = () => {
         </div>
       }
       rightContent={
-        <Card className="h-full overflow-hidden flex flex-col shadow-sm border-border/50">
-          <AnimatedCodeEditor
-            code={code}
-            language="typescript"
-            highlightedLines={step.highlightedLines}
-          />
-        </Card>
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStep}
+          onLanguageChange={() => setCurrentStep(0)}
+        />
       }
     />
   );
 };
+export default MergeIntervalsVisualization;

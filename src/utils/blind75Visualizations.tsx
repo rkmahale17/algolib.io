@@ -24,6 +24,7 @@ const blind75Map: Record<string, React.LazyExoticComponent<React.ComponentType<a
   "container-with-most-water": React.lazy(() => import("@/components/visualizations/algorithms/ContainerWithMostWaterVisualization").then(m => ({ default: m.ContainerWithMostWaterVisualization }))),
   "best-time-to-buy-and-sell-stock": React.lazy(() => import("@/components/visualizations/algorithms/BestTimeToBuyAndSellStockVisualization").then(m => ({ default: m.BestTimeToBuyAndSellStockVisualization }))),
   "contains-duplicate": React.lazy(() => import("@/components/visualizations/algorithms/ContainsDuplicateVisualization").then(m => ({ default: m.ContainsDuplicateVisualization }))),
+  "find-the-duplicate-number": React.lazy(() => import("@/components/visualizations/algorithms/FindTheDuplicateNumberVisualization").then(m => ({ default: m.FindTheDuplicateNumberVisualization }))),
   "maximum-product-subarray": React.lazy(() => import("@/components/visualizations/algorithms/MaximumProductSubarrayVisualization").then(m => ({ default: m.MaximumProductSubarrayVisualization }))),
   "sum-of-two-integers": React.lazy(() => import("@/components/visualizations/algorithms/SumOfTwoIntegersVisualization").then(m => ({ default: m.SumOfTwoIntegersVisualization }))),
   "number-of-1-bits": React.lazy(() => import("@/components/visualizations/algorithms/NumberOf1BitsVisualization").then(m => ({ default: m.NumberOf1BitsVisualization }))),
@@ -105,6 +106,7 @@ const blind75Map: Record<string, React.LazyExoticComponent<React.ComponentType<a
   "k-closest": React.lazy(() => import("@/components/visualizations/algorithms/KClosestPointsVisualization").then(m => ({ default: m.KClosestPointsVisualization }))),
   "happy-number": React.lazy(() => import("@/components/visualizations/algorithms/HappyNumberVisualization").then(m => ({ default: m.HappyNumberVisualization }))),
   "plus-one": React.lazy(() => import("@/components/visualizations/algorithms/PlusOneVisualization").then(m => ({ default: m.PlusOneVisualization }))),
+  "car-fleet": React.lazy(() => import("@/components/visualizations/algorithms/CarFleetVisualization").then(m => ({ default: m.CarFleetVisualization }))),
 };
 
 export const renderBlind75Visualization = (algoId: string): React.ReactNode | null => {

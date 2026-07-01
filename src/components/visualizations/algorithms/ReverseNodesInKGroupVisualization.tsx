@@ -18,12 +18,14 @@ interface ListNodeData {
 interface Step {
   nodes: ListNodeData[];
   connections: Record<string, string | null>;
-  leftPrevId: string | null;
-  curId: string | null;
+  groupPrevId: string | null;
+  kthId: string | null;
+  groupNextId: string | null;
+  currId: string | null;
   prevId: string | null;
-  tmpNextId: string | null;
+  tempId: string | null;
   explanation: string;
-  phase: 'init' | 'traverse' | 'init_reverse' | 'reverse' | 'reconnect' | 'done';
+  phase: 'init' | 'loop_check' | 'reversing' | 'reconnecting' | 'done';
   pseudoStep: string;
   variables: Record<string, any>;
 }
@@ -32,110 +34,143 @@ interface TestCase {
   id: string;
   name: string;
   head: number[];
-  left: number;
-  right: number;
+  k: number;
 }
 
 const TEST_CASES: TestCase[] = [
-  { id: 'ex1', name: 'Example 1', head: [1, 2, 3, 4, 5], left: 2, right: 4 },
-  { id: 'ex2', name: 'Example 2', head: [5], left: 1, right: 1 },
-  { id: 'ex3', name: 'Reversing Front', head: [1, 2, 3, 4], left: 1, right: 3 },
-  { id: 'ex4', name: 'Whole List', head: [10, 20, 30], left: 1, right: 3 }
+  { id: 'ex1', name: 'Example 1', head: [1, 2, 3, 4, 5], k: 2 },
+  { id: 'ex2', name: 'Example 2', head: [1, 2, 3, 4, 5], k: 3 },
+  { id: 'ex3', name: 'Whole List', head: [10, 20, 30], k: 3 },
+  { id: 'ex4', name: 'Short List', head: [1, 2], k: 2 }
 ];
 
 const languages: VisualizationLanguageMap = {
-  typescript: `function reverseBetween(
-  head: ListNode | null,
-  left: number,
-  right: number
-): ListNode | null {
+  typescript: `function reverseKGroup(head: ListNode | null, k: number): ListNode | null {
   const dummy = new ListNode(0, head);
-  let leftPrev: ListNode = dummy;
-  let cur: ListNode | null = head;
-  for (let i = 0; i < left - 1; i++) {
-    leftPrev = cur!;
-    cur = cur!.next;
+  let groupPrev = dummy;
+  while (true) {
+    const kth = getKth(groupPrev, k);
+    if (!kth) {
+      break;
+    }
+    const groupNext = kth.next;
+    let prev = groupNext;
+    let curr = groupPrev.next;
+    while (curr !== groupNext) {
+      const temp = curr!.next;
+      curr!.next = prev;
+      prev = curr;
+      curr = temp;
+    }
+    const temp = groupPrev.next;
+    groupPrev.next = kth;
+    groupPrev = temp!;
   }
-  let prev: ListNode | null = null;
-  for (let i = 0; i < right - left + 1; i++) {
-    const tmpNext = cur!.next;
-    cur!.next = prev;
-    prev = cur;
-    cur = tmpNext;
-  }
-  leftPrev.next!.next = cur;
-  leftPrev.next = prev;
   return dummy.next;
+}
+function getKth(curr: ListNode | null, k: number): ListNode | null {
+  while (curr && k > 0) {
+    curr = curr.next;
+    k--;
+  }
+  return curr;
 }`,
-  python: `def reverseBetween(head: ListNode | None, left: int, right: int) -> ListNode | None:
+  python: `def reverseKGroup(head: ListNode | None, k: int) -> ListNode | None:
     dummy = ListNode(0, head)
-    left_prev = dummy
-    cur = head
-    for _ in range(left - 1):
-        left_prev = cur
-        cur = cur.next
-    start_of_reversed_segment_original = cur 
-    prev = None
-    for _ in range(right - left + 1):
-        tmp_next = cur.next
-        cur.next = prev
-        prev = cur
-        cur = tmp_next
-    start_of_reversed_segment_original.next = cur
-    left_prev.next = prev
-    return dummy.next`,
+    groupPrev = dummy
+    while True:
+        kth = getKth(groupPrev, k)
+        if not kth:
+            break
+        groupNext = kth.next
+        prev = groupNext
+        curr = groupPrev.next
+        while curr != groupNext:
+            temp = curr.next
+            curr.next = prev
+            prev = curr
+            curr = temp
+        temp = groupPrev.next
+        groupPrev.next = kth
+        groupPrev = temp
+    return dummy.next
+
+def getKth(curr: ListNode | None, k: int) -> ListNode | None:
+    while curr and k > 0:
+        curr = curr.next
+        k -= 1
+    return curr`,
   java: `public static class Solution {
-    public ListNode reverseBetween(ListNode head, int left, int right) {
+    public ListNode reverseKGroup(ListNode head, int k) {
         ListNode dummy = new ListNode(0);
         dummy.next = head;
-        ListNode leftPrev = dummy;
-        ListNode cur = head;
-        for (int i = 0; i < left - 1; i++) {
-            leftPrev = cur;
-            cur = cur.next;
+        ListNode groupPrev = dummy;
+        while (true) {
+            ListNode kth = getKth(groupPrev, k);
+            if (kth == null) {
+                break;
+            }
+            ListNode groupNext = kth.next;
+            ListNode prev = groupNext;
+            ListNode curr = groupPrev.next;
+            while (curr != groupNext) {
+                ListNode temp = curr.next;
+                curr.next = prev;
+                prev = curr;
+                curr = temp;
+            }
+            ListNode temp = groupPrev.next;
+            groupPrev.next = kth;
+            groupPrev = temp;
         }
-        ListNode sublistStart = cur;
-        ListNode prev = null;
-        for (int i = 0; i < right - left + 1; i++) {
-            ListNode tmpNext = cur.next;
-            cur.next = prev;
-            prev = cur;
-            cur = tmpNext;
-        }
-        sublistStart.next = cur;
-        leftPrev.next = prev;
         return dummy.next;
+    }
+    private static ListNode getKth(ListNode curr, int k) {
+        while (curr != null && k > 0) {
+            curr = curr.next;
+            k--;
+        }
+        return curr;
     }
 }`,
   cpp: `class Solution {
 public:
-    ListNode* reverseBetween(ListNode* head, int left, int right) {
-        ListNode* dummy = new ListNode(0);
-        dummy->next = head;
-        ListNode* leftPrev = dummy;
-        ListNode* cur = head;
-        for (int i = 0; i < left - 1; ++i) {
-            leftPrev = cur;
-            cur = cur->next;
+    ListNode* reverseKGroup(ListNode* head, int k) {
+        ListNode* dummy = new ListNode(0, head);
+        ListNode* groupPrev = dummy;
+        while (true) {
+            ListNode* kth = getKth(groupPrev, k);
+            if (!kth) {
+                break;
+            }
+            ListNode* groupNext = kth->next;
+            ListNode* prev = groupNext;
+            ListNode* curr = groupPrev->next;
+            while (curr != groupNext) {
+                ListNode* temp = curr->next;
+                curr->next = prev;
+                prev = curr;
+                curr = temp;
+            }
+            ListNode* temp = groupPrev->next;
+            groupPrev->next = kth;
+            groupPrev = temp;
         }
-        ListNode* tailOfOriginalLeftNode = cur;
-        ListNode* prev = nullptr;
-        for (int i = 0; i < right - left + 1; ++i) {
-            ListNode* tmpNext = cur->next;
-            cur->next = prev;
-            prev = cur;
-            cur = tmpNext;
-        }
-        leftPrev->next = prev;
-        tailOfOriginalLeftNode->next = cur;
         ListNode* result = dummy->next;
         delete dummy;
         return result;
     }
+    ListNode* getKth(ListNode* curr, int k) {
+        while (curr && k > 0) {
+            curr = curr->next;
+            k--;
+        }
+        return curr;
+    }
 };`
 };
 
-export const ReverseLinkedListIIVisualization = () => {
+export const ReverseNodesInKGroupVisualization = () => {
   const [selectedTestCaseId, setSelectedTestCaseId] = useState<string>(TEST_CASES[0].id);
   const selectedTestCase = useMemo(() => TEST_CASES.find(t => t.id === selectedTestCaseId) || TEST_CASES[0], [selectedTestCaseId]);
 
@@ -143,8 +178,7 @@ export const ReverseLinkedListIIVisualization = () => {
 
   const { steps, stepLineNumbers } = useMemo(() => {
     const vals = selectedTestCase.head;
-    const left = selectedTestCase.left;
-    const right = selectedTestCase.right;
+    const k = selectedTestCase.k;
 
     const newSteps: Step[] = [];
     const lines: StepLineNumberMap = { typescript: [], python: [], java: [], cpp: [] };
@@ -162,10 +196,12 @@ export const ReverseLinkedListIIVisualization = () => {
       connections[`node-${i}`] = i < vals.length - 1 ? `node-${i + 1}` : null;
     }
 
-    let leftPrevId: string | null = null;
-    let curId: string | null = null;
+    let groupPrevId: string | null = null;
+    let kthId: string | null = null;
+    let groupNextId: string | null = null;
+    let currId: string | null = null;
     let prevId: string | null = null;
-    let tmpNextId: string | null = null;
+    let tempId: string | null = null;
 
     const getVariables = () => {
       const getValStr = (id: string | null) => {
@@ -175,10 +211,12 @@ export const ReverseLinkedListIIVisualization = () => {
         return node ? `Node(${node.val})` : 'null';
       };
       return {
-        'leftPrev': getValStr(leftPrevId),
-        'cur': getValStr(curId),
+        'groupPrev': getValStr(groupPrevId),
+        'kth': getValStr(kthId),
+        'groupNext': getValStr(groupNextId),
+        'curr': getValStr(currId),
         'prev': getValStr(prevId),
-        'tmpNext': getValStr(tmpNextId),
+        'temp': getValStr(tempId),
         'dummy.next': getValStr(connections['dummy'])
       };
     };
@@ -193,10 +231,12 @@ export const ReverseLinkedListIIVisualization = () => {
       newSteps.push({
         nodes: allNodes.map(n => ({ ...n })),
         connections: { ...connections },
-        leftPrevId,
-        curId,
+        groupPrevId,
+        kthId,
+        groupNextId,
+        currId,
         prevId,
-        tmpNextId,
+        tempId,
         explanation,
         pseudoStep: pseudo,
         phase,
@@ -210,153 +250,174 @@ export const ReverseLinkedListIIVisualization = () => {
     };
 
     pushStep(
-      `Start reverseBetween function. We will reverse the list segment from position left = ${left} to right = ${right}.`,
-      `reverseBetween(head, left=${left}, right=${right})`,
+      `Start reverseKGroup function. We will reverse node groups of size k = ${k}.`,
+      `reverseKGroup(head, k=${k})`,
       'init', {},
       1, 1, 2, 3
     );
 
     pushStep(
-      `Create a dummy node (val: 0) pointing to the original head of the list. This handles edge cases when left = 1.`,
+      `Create a dummy node (val: 0) pointing to the original head of the list. This handles potential updates to the head.`,
       "dummy = ListNode(0, head)",
       'init', {},
-      6, 2, 3, 4
+      2, 2, 3, 4
     );
 
-    leftPrevId = 'dummy';
+    groupPrevId = 'dummy';
     pushStep(
-      `Initialize leftPrev pointer to the dummy node.`,
-      "left_prev = dummy",
+      `Initialize groupPrev to dummy. This pointer tracks the node right before the current k-group.`,
+      "groupPrev = dummy",
       'init', {},
-      7, 3, 5, 6
+      3, 3, 5, 5
     );
 
-    curId = 'node-0';
-    pushStep(
-      `Initialize cur pointer to the head of the list (value ${vals[0]}).`,
-      "cur = head",
-      'init', {},
-      8, 4, 6, 7
-    );
+    const getKthNode = (startId: string, count: number): string | null => {
+      let curr: string | null = startId;
+      for (let i = 0; i < count; i++) {
+        if (!curr) break;
+        curr = connections[curr];
+      }
+      return curr;
+    };
 
-    pushStep(
-      `Traverse left - 1 times to find the node preceding position 'left'.`,
-      `FOR i = 0 TO left - 2`,
-      'traverse', {},
-      9, 5, 7, 8
-    );
-
-    for (let i = 0; i < left - 1; i++) {
-      leftPrevId = curId;
+    while (true) {
       pushStep(
-        `Move leftPrev to cur (Node ${allNodes.find(n => n.id === curId)!.val}).`,
-        "left_prev = cur",
-        'traverse', {},
-        10, 6, 8, 9
+        `Determine the k-th node (k = ${k}) starting from groupPrev.`,
+        `kth = getKth(groupPrev, ${k})`,
+        'loop_check', {},
+        5, 5, 7, 7
       );
 
-      curId = connections[curId!];
+      const kth = getKthNode(groupPrevId!, k);
+      kthId = kth;
+
+      if (!kth) {
+        pushStep(
+          `There are fewer than k (${k}) nodes left after groupPrev. Reversal loop terminates.`,
+          `IF not kth: break`,
+          'loop_check', {},
+          6, 6, 8, 8
+        );
+        break;
+      }
+
       pushStep(
-        `Move cur to cur.next (Node ${curId ? allNodes.find(n => n.id === curId)!.val : 'null'}).`,
-        "cur = cur.next",
-        'traverse', {},
-        11, 7, 9, 10
+        `Found the k-th node: Node ${allNodes.find(n => n.id === kthId)!.val}.`,
+        `kth = Node(${allNodes.find(n => n.id === kthId)!.val})`,
+        'loop_check', {},
+        5, 5, 7, 7
       );
+
+      groupNextId = connections[kthId!];
+      pushStep(
+        `Store the node immediately after the current group in groupNext (${groupNextId ? allNodes.find(n => n.id === groupNextId)!.val : 'null'}).`,
+        "groupNext = kth.next",
+        'loop_check', {},
+        9, 8, 11, 11
+      );
+
+      prevId = groupNextId;
+      pushStep(
+        `Initialize prev pointer to groupNext. This makes the original first node of the group point to groupNext after reversal.`,
+        "prev = groupNext",
+        'reversing', {},
+        10, 9, 12, 12
+      );
+
+      currId = connections[groupPrevId!];
+      pushStep(
+        `Initialize curr pointer to the first node of the current group (${currId ? allNodes.find(n => n.id === currId)!.val : 'null'}).`,
+        "curr = groupPrev.next",
+        'reversing', {},
+        11, 10, 13, 13
+      );
+
+      while (currId !== groupNextId) {
+        pushStep(
+          `Check loop condition: curr (${currId ? allNodes.find(n => n.id === currId)!.val : 'null'}) !== groupNext (${groupNextId ? allNodes.find(n => n.id === groupNextId)!.val : 'null'})`,
+          `WHILE curr != groupNext`,
+          'reversing', {},
+          12, 11, 14, 14
+        );
+
+        tempId = connections[currId!];
+        pushStep(
+          `Store curr's original next node in temp (${tempId ? allNodes.find(n => n.id === tempId)!.val : 'null'}).`,
+          "temp = curr.next",
+          'reversing', {},
+          13, 12, 15, 15
+        );
+
+        connections[currId!] = prevId;
+        pushStep(
+          `Reverse pointer: Point curr (${allNodes.find(n => n.id === currId)!.val}) to prev (${prevId ? allNodes.find(n => n.id === prevId)!.val : 'null'}).`,
+          "curr.next = prev",
+          'reversing', {},
+          14, 13, 16, 16
+        );
+
+        prevId = currId;
+        pushStep(
+          `Move prev pointer forward to curr (Node ${allNodes.find(n => n.id === currId)!.val}).`,
+          "prev = curr",
+          'reversing', {},
+          15, 14, 17, 17
+        );
+
+        currId = tempId;
+        pushStep(
+          `Move curr pointer forward to temp (${currId ? allNodes.find(n => n.id === currId)!.val : 'null'}).`,
+          "curr = temp",
+          'reversing', {},
+          16, 15, 18, 18
+        );
+      }
+
+      tempId = null;
+      pushStep(
+        `Finished reversing current group. Prepare to reconnect.`,
+        `// reversal loop finished`,
+        'reversing', {},
+        12, 11, 14, 14
+      );
+
+      const originalHeadId = connections[groupPrevId!];
+      tempId = originalHeadId;
+      pushStep(
+        `Store original head of the group (Node ${allNodes.find(n => n.id === originalHeadId)!.val}) in temp. This will become the tail of the reversed segment.`,
+        "temp = groupPrev.next",
+        'reconnecting', {},
+        18, 16, 20, 20
+      );
+
+      connections[groupPrevId!] = kthId;
+      pushStep(
+        `Connect groupPrev (Node ${groupPrevId === 'dummy' ? 'dummy' : allNodes.find(n => n.id === groupPrevId)!.val}) to the new head of the reversed group (Node ${allNodes.find(n => n.id === kthId)!.val}).`,
+        "groupPrev.next = kth",
+        'reconnecting', {},
+        19, 17, 21, 21
+      );
+
+      groupPrevId = tempId;
+      tempId = null;
+      pushStep(
+        `Update groupPrev to point to the tail of the reversed group (Node ${allNodes.find(n => n.id === groupPrevId)!.val}) in preparation for the next group.`,
+        "groupPrev = temp",
+        'reconnecting', {},
+        20, 18, 22, 22
+      );
+
+      kthId = null;
+      groupNextId = null;
+      currId = null;
+      prevId = null;
     }
 
     pushStep(
-      `Keep track of the sublist start node. This will become the tail of the reversed sublist.`,
-      `sublist_start = cur  →  Node(${curId ? allNodes.find(n => n.id === curId)!.val : 'null'})`,
-      'init_reverse', {},
-      11, 8, 11, 12
-    );
-
-    prevId = null;
-    pushStep(
-      `Initialize prev pointer to null. This will act as the new next-target as we reverse connections.`,
-      "prev = None",
-      'init_reverse', {},
-      13, 9, 12, 13
-    );
-
-    pushStep(
-      `Start the reversal loop to run right - left + 1 = ${right - left + 1} times.`,
-      `FOR i = 0 TO ${right - left}`,
-      'reverse', {},
-      14, 10, 13, 14
-    );
-
-    for (let i = 0; i < right - left + 1; i++) {
-      pushStep(
-        `Reversal iteration ${i + 1}: current node to process is cur (value ${allNodes.find(n => n.id === curId)!.val}).`,
-        `// i = ${i}`,
-        'reverse', {},
-        14, 10, 13, 14
-      );
-
-      tmpNextId = connections[curId!];
-      pushStep(
-        `Store cur.next in tmpNext (${tmpNextId ? allNodes.find(n => n.id === tmpNextId)!.val : 'null'}) to avoid losing the rest of the list.`,
-        "tmp_next = cur.next",
-        'reverse', {},
-        15, 11, 14, 15
-      );
-
-      connections[curId!] = prevId;
-      pushStep(
-        `Reverse connection: Point cur's next to prev (${prevId ? allNodes.find(n => n.id === prevId)!.val : 'null'}).`,
-        "cur.next = prev",
-        'reverse', {},
-        16, 12, 15, 16
-      );
-
-      prevId = curId;
-      pushStep(
-        `Move prev forward to cur (Node ${allNodes.find(n => n.id === curId)!.val}).`,
-        "prev = cur",
-        'reverse', {},
-        17, 13, 16, 17
-      );
-
-      curId = tmpNextId;
-      pushStep(
-        `Move cur forward to tmpNext (${curId ? allNodes.find(n => n.id === curId)!.val : 'null'}).`,
-        "cur = tmp_next",
-        'reverse', {},
-        18, 14, 17, 18
-      );
-    }
-
-    tmpNextId = null;
-    pushStep(
-      `Finished sublist reversal. Pointers are prepared for reconnection.`,
-      `// reversal loop finished`,
-      'reverse', {},
-      14, 10, 13, 14
-    );
-
-    const originalLeftNodeId = connections[leftPrevId!];
-    connections[originalLeftNodeId!] = curId;
-    pushStep(
-      `Connect the tail of the reversed sublist (Node ${allNodes.find(n => n.id === originalLeftNodeId)!.val}) to the node after the sublist (Node ${curId ? allNodes.find(n => n.id === curId)!.val : 'null'}).`,
-      `sublist_start.next = cur`,
-      'reconnect', {},
-      20, 15, 19, 21
-    );
-
-    connections[leftPrevId!] = prevId;
-    pushStep(
-      `Connect the node preceding the sublist (Node ${leftPrevId === 'dummy' ? 'dummy' : allNodes.find(n => n.id === leftPrevId)!.val}) to the new head of the reversed sublist (Node ${prevId ? allNodes.find(n => n.id === prevId)!.val : 'null'}).`,
-      `left_prev.next = prev`,
-      'reconnect', {},
-      21, 16, 20, 20
-    );
-
-    pushStep(
-      `Return dummy.next (Node ${connections['dummy'] ? allNodes.find(n => n.id === connections['dummy'])!.val : 'null'}) as the new head of the list.`,
+      `Return dummy.next (Node ${connections['dummy'] ? allNodes.find(n => n.id === connections['dummy'])!.val : 'null'}) as the head of the modified list.`,
       `RETURN dummy.next`,
       'done', {},
-      22, 17, 21, 22
+      22, 19, 24, 24
     );
 
     return { steps: newSteps, stepLineNumbers: lines };
@@ -377,16 +438,18 @@ export const ReverseLinkedListIIVisualization = () => {
 
   if (steps.length === 0) return null;
 
-  const { leftPrevId, curId, prevId, tmpNextId } = currentStep;
+  const { groupPrevId, kthId, groupNextId, currId, prevId, tempId } = currentStep;
 
   const getCardStyles = (node: ListNodeData) => {
-    const isCur = curId === node.id;
+    const isGrpPrev = groupPrevId === node.id;
+    const isKth = kthId === node.id;
+    const isGrpNext = groupNextId === node.id;
+    const isCur = currId === node.id;
     const isPrev = prevId === node.id;
-    const isLeftPrev = leftPrevId === node.id;
-    const isTmpNext = tmpNextId === node.id;
+    const isTemp = tempId === node.id;
 
     if (node.isDummy) {
-      if (isLeftPrev) {
+      if (isGrpPrev) {
         return 'bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-400 font-extrabold ring-2 ring-emerald-500/20';
       }
       return 'bg-muted/80 border-dashed border-muted-foreground/30 text-muted-foreground font-medium';
@@ -398,11 +461,17 @@ export const ReverseLinkedListIIVisualization = () => {
     if (isPrev) {
       return 'bg-indigo-500/10 border-indigo-500 text-indigo-700 dark:text-indigo-400 font-extrabold ring-2 ring-indigo-500/20';
     }
-    if (isLeftPrev) {
+    if (isGrpPrev) {
       return 'bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-400 font-extrabold ring-2 ring-emerald-500/20';
     }
-    if (isTmpNext) {
+    if (isKth) {
       return 'bg-rose-500/10 border-rose-500 text-rose-700 dark:text-rose-400 font-extrabold ring-2 ring-rose-500/20';
+    }
+    if (isGrpNext) {
+      return 'bg-cyan-500/10 border-cyan-500 text-cyan-700 dark:text-cyan-400 font-extrabold ring-2 ring-cyan-500/20';
+    }
+    if (isTemp) {
+      return 'bg-violet-500/10 border-violet-500 text-violet-700 dark:text-violet-400 font-extrabold ring-2 ring-violet-500/20';
     }
 
     return 'bg-card border-border text-foreground';
@@ -481,7 +550,7 @@ export const ReverseLinkedListIIVisualization = () => {
               }`}
             >
               <CheckCircle2 className="w-3.5 h-3.5" />
-              {tc.name} (L:{tc.left}, R:{tc.right})
+              {tc.name} (k = {tc.k})
             </button>
           ))}
         </div>
@@ -498,19 +567,27 @@ export const ReverseLinkedListIIVisualization = () => {
               <div className="flex flex-wrap gap-4 text-xs">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded bg-emerald-500" />
-                  <span className="font-semibold text-foreground">leftPrev</span>
+                  <span className="font-semibold text-foreground">groupPrev</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded bg-rose-500" />
+                  <span className="font-semibold text-foreground">kth</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded bg-cyan-500" />
+                  <span className="font-semibold text-foreground">groupNext</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded bg-amber-500" />
-                  <span className="font-semibold text-foreground">cur</span>
+                  <span className="font-semibold text-foreground">curr</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded bg-indigo-500" />
                   <span className="font-semibold text-foreground">prev</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded bg-rose-500" />
-                  <span className="font-semibold text-foreground">tmpNext</span>
+                  <span className="w-2.5 h-2.5 rounded bg-violet-500" />
+                  <span className="font-semibold text-foreground">temp</span>
                 </div>
               </div>
             </Card>
@@ -532,15 +609,25 @@ export const ReverseLinkedListIIVisualization = () => {
                           {node.isDummy ? 'dummy' : node.val}
                         </motion.div>
 
-                        <div className="flex flex-col gap-0.5 items-center mt-2 h-16 justify-start">
-                          {leftPrevId === node.id && (
+                        <div className="flex flex-col gap-0.5 items-center mt-2 h-20 justify-start">
+                          {groupPrevId === node.id && (
                             <span className="bg-emerald-500 text-white text-[7px] px-1 py-0.5 rounded font-extrabold uppercase shadow-sm">
-                              leftPrev
+                              groupPrev
                             </span>
                           )}
-                          {curId === node.id && (
+                          {kthId === node.id && (
+                            <span className="bg-rose-500 text-white text-[7px] px-1 py-0.5 rounded font-extrabold uppercase shadow-sm">
+                              kth
+                            </span>
+                          )}
+                          {groupNextId === node.id && (
+                            <span className="bg-cyan-500 text-white text-[7px] px-1 py-0.5 rounded font-extrabold uppercase shadow-sm">
+                              groupNext
+                            </span>
+                          )}
+                          {currId === node.id && (
                             <span className="bg-amber-500 text-white text-[7px] px-1 py-0.5 rounded font-extrabold uppercase shadow-sm">
-                              cur
+                              curr
                             </span>
                           )}
                           {prevId === node.id && (
@@ -548,9 +635,9 @@ export const ReverseLinkedListIIVisualization = () => {
                               prev
                             </span>
                           )}
-                          {tmpNextId === node.id && (
-                            <span className="bg-rose-500 text-white text-[7px] px-1 py-0.5 rounded font-extrabold uppercase shadow-sm">
-                              tmpNext
+                          {tempId === node.id && (
+                            <span className="bg-violet-500 text-white text-[7px] px-1 py-0.5 rounded font-extrabold uppercase shadow-sm">
+                              temp
                             </span>
                           )}
                         </div>
@@ -569,7 +656,7 @@ export const ReverseLinkedListIIVisualization = () => {
                     <div className="w-10 h-10 rounded-md border border-dashed border-border flex items-center justify-center font-bold text-xs bg-muted/20 text-muted-foreground">
                       null
                     </div>
-                    <div className="h-16 mt-2" />
+                    <div className="h-20 mt-2" />
                   </div>
                 </div>
               </div>
@@ -616,4 +703,4 @@ export const ReverseLinkedListIIVisualization = () => {
     </div>
   );
 };
-export default ReverseLinkedListIIVisualization;
+export default ReverseNodesInKGroupVisualization;

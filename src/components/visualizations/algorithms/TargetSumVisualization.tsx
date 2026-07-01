@@ -1,8 +1,10 @@
-import { useEffect, useRef, useState } from "react";
-
-import { AnimatedCodeEditor } from "../shared/AnimatedCodeEditor";
-import { StepControls } from "../shared/StepControls";
+import { useState, useMemo } from "react";
+import { SimpleStepControls } from "../shared/SimpleStepControls";
 import { VariablePanel } from "../shared/VariablePanel";
+import { VisualizationCodePanel } from "../shared/VisualizationCodePanel";
+import { VisualizationLayout } from "../shared/VisualizationLayout";
+import { Card } from "@/components/ui/card";
+import type { VisualizationLanguageMap, StepLineNumberMap } from "@/types/visualization";
 
 interface Step {
   dp: number[];
@@ -12,249 +14,243 @@ interface Step {
   i: number;
   j: number | null;
   message: string;
-  lineNumber: number;
+  pseudoStep: string;
+  variables: Record<string, any>;
 }
 
-export const TargetSumVisualization = () => {
-  const [steps, setSteps] = useState<Step[]>([]);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  const code = `function findTargetSumWays(nums: number[], target: number): number {
-    let sum = 0;
-    for (const num of nums) {
-        sum += num;
+const languages: VisualizationLanguageMap = {
+  typescript: `function findTargetSumWays(nums: number[], target: number): number {
+  let sum = 0;
+  for (const num of nums) {
+    sum += num;
+  }
+  if (Math.abs(target) > sum) return 0;
+  if ((sum + target) % 2 !== 0) return 0;
+  const newTarget = (sum + target) / 2;
+  const dp: number[] = new Array(newTarget + 1).fill(0);
+  dp[0] = 1;
+  for (const num of nums) {
+    for (let j = newTarget; j >= num; j--) {
+      dp[j] += dp[j - num];
     }
-    if (Math.abs(target) > sum) {
-        return 0;
-    }
-    if ((sum + target) % 2 !== 0) {
-        return 0;
-    }
-    const newTarget = (sum + target) / 2;
-    const dp: number[] = new Array(newTarget + 1).fill(0);
-    dp[0] = 1;
-    for (const num of nums) {
-        for (let j = newTarget; j >= num; j--) {
-            dp[j] += dp[j - num];
+  }
+  return dp[newTarget];
+}`,
+  python: `def findTargetSumWays(nums: list[int], target: int) -> int:
+    total_sum = sum(nums)
+    if (total_sum + target) % 2 != 0 or abs(target) > total_sum:
+        return 0
+    positive_sum = (total_sum + target) // 2
+    dp = [0] * (positive_sum + 1)
+    dp[0] = 1
+    for num in nums:
+        for i in range(positive_sum, num - 1, -1):
+            dp[i] += dp[i - num]
+    return dp[positive_sum]`,
+  java: `public static class Solution {
+    public int findTargetSumWays(int[] nums, int target) {
+        int sum = 0;
+        for (int num : nums) {
+            sum += num;
         }
+        if (Math.abs(target) > sum) {
+            return 0;
+        }
+        if ((sum + target) % 2 != 0) {
+            return 0;
+        }
+        int newTarget = (sum + target) / 2;
+        int[] dp = new int[newTarget + 1];
+        dp[0] = 1;
+        for (int num : nums) {
+            for (int i = newTarget; i >= num; i--) {
+                dp[i] += dp[i - num];
+            }
+        }
+        return dp[newTarget];
     }
-    return dp[newTarget];
-}`;
+}`,
+  cpp: `class Solution {
+public:
+    int findTargetSumWays(vector<int>& nums, int target) {
+        int sum = 0;
+        for (int num : nums) {
+            sum += num;
+        }
+        if (sum < abs(target) || (sum + target) % 2 != 0) {
+            return 0;
+        }
+        int newTarget = (sum + target) / 2;
+        vector<int> dp(newTarget + 1, 0);
+        dp[0] = 1;
+        for (int num : nums) {
+            for (int i = newTarget; i >= num; i--) {
+                dp[i] += dp[i - num];
+            }
+        }
+        return dp[newTarget];
+    }
+};`
+};
 
-  const generateSteps = () => {
-    const nums = [1, 1, 2];
-    const target = 0;
+export const TargetSumVisualization = () => {
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+
+  const nums = useMemo(() => [1, 1, 2], []);
+  const target = 0;
+
+  const { steps, stepLineNumbers } = useMemo(() => {
     const newSteps: Step[] = [];
+    const lines: StepLineNumberMap = { typescript: [], python: [], java: [], cpp: [] };
+
+    const addStep = (
+      dp: number[],
+      i: number,
+      j: number | null,
+      message: string,
+      pseudo: string,
+      vars: any,
+      ts: number, py: number, jv: number, cp: number
+    ) => {
+      newSteps.push({
+        dp: [...dp],
+        nums,
+        target,
+        newTarget: (sum + target) / 2,
+        i,
+        j,
+        message,
+        pseudoStep: pseudo,
+        variables: vars
+      });
+      lines.typescript!.push(ts);
+      lines.python!.push(py);
+      lines.java!.push(jv);
+      lines.cpp!.push(cp);
+    };
 
     let sum = 0;
     for (const num of nums) {
       sum += num;
     }
 
-    newSteps.push({
-      dp: [],
-      nums,
-      target,
-      newTarget: -1,
-      i: -1,
-      j: null,
-      message: `Welcome! We have numbers [${nums.join(", ")}] and we want them to add up to ${target} by putting + or - in front of them. The sum of all numbers is ${sum}.`,
-      lineNumber: 2,
-    });
+    addStep(
+      [], -1, null,
+      `Welcome! We have numbers [${nums.join(", ")}] and we want them to add up to ${target} by putting + or - in front of them. The sum of all numbers is ${sum}.`,
+      `findTargetSumWays(nums=[${nums.join(",")}], target=${target})`,
+      { nums: `[${nums.join(", ")}]`, target },
+      1, 1, 2, 3
+    );
+
+    addStep(
+      [], -1, null,
+      `Sum up the input array. Total sum is ${sum}.`,
+      `SET sum = sum(nums)  →  ${sum}`,
+      { sum },
+      2, 2, 3, 4
+    );
 
     if (Math.abs(target) > sum) {
-      newSteps.push({
-        dp: [],
-        nums,
-        target,
-        newTarget: -1,
-        i: -1,
-        j: null,
-        message: `Oops! Our target ${target} is bigger than our total sum ${sum}. It's impossible to reach!`,
-        lineNumber: 6,
-      });
-      setSteps(newSteps);
-      return;
+      addStep(
+        [], -1, null,
+        `Oops! Our target ${target} is bigger than our total sum ${sum}. It's impossible to reach!`,
+        `IF Math.abs(target) > sum  →  ${Math.abs(target)} > ${sum}`,
+        { target, sum },
+        6, 3, 7, 8
+      );
+      return { steps: newSteps, stepLineNumbers: lines };
     }
 
     if ((sum + target) % 2 !== 0) {
-      newSteps.push({
-        dp: [],
-        nums,
-        target,
-        newTarget: -1,
-        i: -1,
-        j: null,
-        message: `Math trick: The sum (${sum}) plus target (${target}) is odd, so we can't divide it evenly into + and - groups. Target is impossible!`,
-        lineNumber: 9,
-      });
-      setSteps(newSteps);
-      return;
+      addStep(
+        [], -1, null,
+        `Math trick: The sum (${sum}) plus target (${target}) is odd, so we can't divide it evenly into + and - groups. Target is impossible!`,
+        `IF (sum + target) % 2 != 0  →  (${sum} + ${target}) % 2 != 0`,
+        { target, sum },
+        7, 3, 10, 8
+      );
+      return { steps: newSteps, stepLineNumbers: lines };
     }
 
     const newTarget = (sum + target) / 2;
-    newSteps.push({
-      dp: [],
-      nums,
-      target,
-      newTarget,
-      i: -1,
-      j: null,
-      message: `Magic Math Trick! Instead of guessing + or -, we just need to find a group of numbers that add up exactly to (sum + target) / 2. Here, that's ${newTarget}!`,
-      lineNumber: 12,
-    });
+    addStep(
+      [], -1, null,
+      `Magic Math Trick! Instead of guessing + or -, we just need to find a group of numbers that add up exactly to (sum + target) / 2. Here, that's ${newTarget}!`,
+      `SET newTarget = (sum + target) / 2  →  ${newTarget}`,
+      { newTarget },
+      8, 5, 13, 11
+    );
 
     const dp: number[] = new Array(newTarget + 1).fill(0);
-    newSteps.push({
-      dp: [...dp],
-      nums,
-      target,
-      newTarget,
-      i: -1,
-      j: null,
-      message: `Let's make a row of boxes from 0 to ${newTarget}. Each box will hold "how many ways can we make this sum?". We start with 0 ways.`,
-      lineNumber: 13,
-    });
+    addStep(
+      dp, -1, null,
+      `Let's make a row of boxes from 0 to ${newTarget}. Each box will hold "how many ways can we make this sum?". We start with 0 ways.`,
+      `SET dp = [0] * (${newTarget} + 1)`,
+      { dp: `[${dp.join(", ")}]` },
+      9, 6, 14, 12
+    );
 
     dp[0] = 1;
-    newSteps.push({
-      dp: [...dp],
-      nums,
-      target,
-      newTarget,
-      i: -1,
-      j: null,
-      message: `There is exactly 1 way to make a sum of 0: just don't pick any numbers! So we put a '1' in the 0 box.`,
-      lineNumber: 14,
-    });
+    addStep(
+      dp, -1, null,
+      `There is exactly 1 way to make a sum of 0: just don't pick any numbers! So we put a '1' in the 0 box.`,
+      "dp[0] = 1",
+      { dp: `[${dp.join(", ")}]` },
+      10, 7, 15, 13
+    );
 
     for (let idx = 0; idx < nums.length; idx++) {
       const num = nums[idx];
-      newSteps.push({
-        dp: [...dp],
-        nums,
-        target,
-        newTarget,
-        i: idx,
-        j: null,
-        message: `Now let's look at our number: ${num}.`,
-        lineNumber: 15,
-      });
+      addStep(
+        dp, idx, null,
+        `Now let's look at our number: ${num}.`,
+        `FOR num IN nums  →  num = ${num}`,
+        { idx, num },
+        11, 8, 16, 14
+      );
 
       for (let j = newTarget; j >= num; j--) {
-        newSteps.push({
-          dp: [...dp],
-          nums,
-          target,
-          newTarget,
-          i: idx,
-          j,
-          message: `Can we make sum ${j} using our number ${num}? We just need to check if we already figured out how to make sum ${j - num}!`,
-          lineNumber: 16,
-        });
+        addStep(
+          dp, idx, j,
+          `Can we make sum ${j} using our number ${num}? We just need to check if we already figured out how to make sum ${j - num}!`,
+          `FOR j FROM ${newTarget} DOWNTO ${num}  →  j = ${j}`,
+          { idx, num, j, prevWays: dp[j - num] },
+          12, 9, 17, 15
+        );
 
         const prevWays = dp[j - num];
-        if (prevWays > 0) {
-          dp[j] += prevWays;
-          newSteps.push({
-            dp: [...dp],
-            nums,
-            target,
-            newTarget,
-            i: idx,
-            j,
-            message: `Yes! There are ${prevWays} ways to make sum ${j - num}. If we just add our number ${num} to them, we make sum ${j}! So we add ${prevWays} to box ${j}.`,
-            lineNumber: 17,
-          });
-        } else {
-          newSteps.push({
-            dp: [...dp],
-            nums,
-            target,
-            newTarget,
-            i: idx,
-            j,
-            message: `Oh no! We have 0 ways to make sum ${j - num}. Adding ${num} won't help us make sum ${j}. Box ${j} stays the same.`,
-            lineNumber: 17,
-          });
-        }
+        dp[j] += prevWays;
+        addStep(
+          dp, idx, j,
+          prevWays > 0
+            ? `Yes! There are ${prevWays} ways to make sum ${j - num}. If we just add our number ${num} to them, we make sum ${j}! So we add ${prevWays} to box ${j}.`
+            : `Oh no! We have 0 ways to make sum ${j - num}. Adding ${num} won't help us make sum ${j}. Box ${j} stays the same.`,
+          `dp[${j}] += dp[${j - num}]  →  ${dp[j]}`,
+          { idx, num, j, prevWays, updated: dp[j] },
+          13, 10, 18, 16
+        );
       }
     }
 
-    newSteps.push({
-      dp: [...dp],
-      nums,
-      target,
-      newTarget,
-      i: -1,
-      j: null,
-      message: `All done! The number in the last box tells us there are ${dp[newTarget]} ways to reach our target sum!`,
-      lineNumber: 20,
-    });
+    addStep(
+      dp, -1, null,
+      `All done! The number in the last box tells us there are ${dp[newTarget]} ways to reach our target sum!`,
+      `RETURN dp[${newTarget}]  →  ${dp[newTarget]}`,
+      { result: dp[newTarget] },
+      16, 11, 21, 19
+    );
 
-    setSteps(newSteps);
-    setCurrentStepIndex(0);
-  };
-
-  useEffect(() => {
-    generateSteps();
-  }, []);
-
-  useEffect(() => {
-    if (isPlaying && currentStepIndex < steps.length - 1) {
-      intervalRef.current = setInterval(() => {
-        setCurrentStepIndex((prev) => {
-          if (prev >= steps.length - 1) {
-            setIsPlaying(false);
-            return prev;
-          }
-          return prev + 1;
-        });
-      }, 1000 / speed);
-    } else {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    }
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [isPlaying, currentStepIndex, steps.length, speed]);
-
-  const handlePlay = () => setIsPlaying(true);
-  const handlePause = () => setIsPlaying(false);
-  const handleStepForward = () =>
-    currentStepIndex < steps.length - 1 &&
-    setCurrentStepIndex((prev) => prev + 1);
-  const handleStepBack = () =>
-    currentStepIndex > 0 && setCurrentStepIndex((prev) => prev - 1);
-  const handleReset = () => {
-    setCurrentStepIndex(0);
-    setIsPlaying(false);
-    generateSteps();
-  };
+    return { steps: newSteps, stepLineNumbers: lines };
+  }, [nums]);
 
   if (steps.length === 0) return null;
   const currentStep = steps[currentStepIndex];
+  const pseudoSteps = useMemo(() => steps.map(s => s.pseudoStep), [steps]);
 
   return (
-    <div className="space-y-6">
-      <StepControls
-        isPlaying={isPlaying}
-        onPlay={handlePlay}
-        onPause={handlePause}
-        onStepForward={handleStepForward}
-        onStepBack={handleStepBack}
-        onReset={handleReset}
-        speed={speed}
-        onSpeedChange={setSpeed}
-        currentStep={currentStepIndex}
-        totalSteps={steps.length - 1}
-      />
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-4">
+    <VisualizationLayout
+      leftContent={
+        <div className="space-y-6">
           <div className="bg-muted/30 rounded-lg border border-border/50 p-6 overflow-hidden flex justify-center w-full">
             <div className="space-y-6 w-full">
               {currentStep.dp.length > 0 && (
@@ -323,15 +319,24 @@ export const TargetSumVisualization = () => {
             </div>
           </div>
         </div>
-
-        <div className="space-y-4">
-          <AnimatedCodeEditor
-            code={code}
-            highlightedLines={[currentStep.lineNumber]}
-            language="TypeScript"
-          />
-        </div>
-      </div>
-    </div>
+      }
+      rightContent={
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={() => setCurrentStepIndex(0)}
+        />
+      }
+      controls={
+        <SimpleStepControls
+          currentStep={currentStepIndex}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStepIndex}
+        />
+      }
+    />
   );
 };
+export default TargetSumVisualization;

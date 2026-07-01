@@ -2,10 +2,11 @@ import React, { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
 import { TreeDeciduous, Activity, Target } from 'lucide-react';
 import { motion } from 'framer-motion';
+import type { VisualizationLanguageMap, StepLineNumberMap } from '@/types/visualization';
 
 interface TreeNode {
   val: number;
@@ -21,30 +22,72 @@ interface Step {
   rightMax: number | string;
   returnValue: number | string;
   explanation: string;
-  highlightedLines: number[];
+  pseudoStep: string;
   completedNodes: number[];
 }
 
-export const BinaryTreeMaximumPathSumVisualization: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-
-  const code = `function maxPathSum(root: TreeNode | null): number {
+const languages: VisualizationLanguageMap = {
+  typescript: `function maxPathSum(root: TreeNode | null): number {
   let res = -Infinity;
-
   function dfs(node: TreeNode | null): number {
     if (!node) return 0;
-
     let leftMax = Math.max(dfs(node.left), 0);
     let rightMax = Math.max(dfs(node.right), 0);
-
     res = Math.max(res, node.val + leftMax + rightMax);
-
     return node.val + Math.max(leftMax, rightMax);
   }
-
   dfs(root);
   return res;
-}`;
+}`,
+  python: `def maxPathSum(root: 'TreeNode') -> int:
+    res = float('-inf')
+    def dfs(node):
+        nonlocal res
+        if not node:
+            return 0
+        left_max = max(dfs(node.left), 0)
+        right_max = max(dfs(node.right), 0)
+        res = max(res, node.val + left_max + right_max)
+        return node.val + max(left_max, right_max)
+    dfs(root)
+    return res`,
+  java: `public static class Solution {
+    public int maxPathSum(TreeNode root) {
+        int[] res = new int[] {Integer.MIN_VALUE};
+        dfs(root, res);
+        return res[0];
+    }
+    private int dfs(TreeNode node, int[] res) {
+        if (node == null) return 0;
+        int leftMax = dfs(node.left, res);
+        int rightMax = dfs(node.right, res);
+        leftMax = Math.max(leftMax, 0);
+        rightMax = Math.max(rightMax, 0);
+        res[0] = Math.max(res[0], node.val + leftMax + rightMax);
+        return node.val + Math.max(leftMax, rightMax);
+    }
+}`,
+  cpp: `class Solution {
+public:
+    int maxSum = INT_MIN;
+    int maxPathSum(TreeNode* root) {
+        dfs(root);
+        return maxSum;
+    }
+    int dfs(TreeNode* node) {
+        if (!node) {
+            return 0;
+        }
+        int left = max(0, dfs(node->left));
+        int right = max(0, dfs(node->right));
+        maxSum = max(maxSum, node->val + left + right);
+        return node->val + max(left, right);
+    }
+};`
+};
+
+export const BinaryTreeMaximumPathSumVisualization: React.FC = () => {
+  const [currentStep, setCurrentStep] = useState(0);
 
   const tree: TreeNode = {
     val: -10,
@@ -58,12 +101,22 @@ export const BinaryTreeMaximumPathSumVisualization: React.FC = () => {
     },
   };
 
-  const steps = useMemo(() => {
+  const { steps, stepLineNumbers } = useMemo(() => {
     const s: Step[] = [];
+    const lines: StepLineNumberMap = { typescript: [], python: [], java: [], cpp: [] };
+    
     let res = -Infinity;
     const completed: number[] = [];
 
-    function addStep(node: TreeNode | null, left: any, right: any, ret: any, msg: string, lines: number[]) {
+    function addStep(
+      node: TreeNode | null, 
+      left: any, 
+      right: any, 
+      ret: any, 
+      msg: string, 
+      pseudo: string,
+      ts: number, py: number, java: number, cpp: number
+    ) {
       s.push({
         activeNodeId: node ? node.id : null,
         maxPathFound: res,
@@ -71,52 +124,94 @@ export const BinaryTreeMaximumPathSumVisualization: React.FC = () => {
         rightMax: right ?? '-',
         returnValue: ret ?? '-',
         explanation: msg,
-        highlightedLines: lines,
+        pseudoStep: pseudo,
         completedNodes: [...completed]
       });
+      lines.typescript!.push(ts);
+      lines.python!.push(py);
+      lines.java!.push(java);
+      lines.cpp!.push(cpp);
     }
 
-    addStep(null, null, null, null, "Initialize global maximum res = -Infinity.", [2]);
+    addStep(
+      null, null, null, null, 
+      "Initialize global maximum res = -Infinity.", 
+      "SET res = -∞",
+      2, 2, 3, 3
+    );
 
     function dfs(node: TreeNode | null): number {
       if (!node) {
-        addStep(null, null, null, 0, "Base case: node is null, return 0.", [5]);
+        addStep(
+          null, null, null, 0, 
+          "Base case: node is null, return 0.", 
+          "IF node IS NULL RETURN 0",
+          4, 5, 8, 9
+        );
         return 0;
       }
 
-      addStep(node, null, null, null, `Visiting node ${node.val}. Calculating max path through children.`, [4, 7, 8]);
+      addStep(
+        node, null, null, null, 
+        `Visiting node ${node.val}. Calculating max path through children.`, 
+        `CALL dfs(node)`,
+        3, 3, 7, 8
+      );
       
       const left = Math.max(dfs(node.left), 0);
-      addStep(node, left, null, null, `Left child of ${node.val} processed. Max path from left: ${left}.`, [7]);
+      addStep(
+        node, left, null, null, 
+        `Left child of ${node.val} processed. Max path from left: ${left}.`, 
+        `SET left_max = max(dfs(node.left), 0)`,
+        5, 7, 9, 12
+      );
 
       const right = Math.max(dfs(node.right), 0);
-      addStep(node, left, right, null, `Right child of ${node.val} processed. Max path from right: ${right}.`, [8]);
+      addStep(
+        node, left, right, null, 
+        `Right child of ${node.val} processed. Max path from right: ${right}.`, 
+        `SET right_max = max(dfs(node.right), 0)`,
+        6, 8, 10, 13
+      );
 
       const oldRes = res;
       const currentPathSum = node.val + left + right;
       res = Math.max(res, currentPathSum);
 
-      addStep(node, left, right, null, 
+      addStep(
+        node, left, right, null, 
         currentPathSum > oldRes 
           ? `Found new max path sum! max(${oldRes === -Infinity ? '-∞' : oldRes}, ${node.val} + ${left} + ${right}) = ${res}.`
           : `Global max remains ${res}. (Current path sum: ${currentPathSum}).`, 
-        [10]
+        `UPDATE res = max(res, node.val + left + right)`,
+        7, 9, 13, 14
       );
 
       const ret = node.val + Math.max(left, right);
-      addStep(node, left, right, ret, `Returning ${ret} as the max path that can be extended to this node's parent.`, [12]);
+      addStep(
+        node, left, right, ret, 
+        `Returning ${ret} as the max path that can be extended to this node's parent.`, 
+        `RETURN node.val + max(left, right)`,
+        8, 10, 14, 15
+      );
       
       completed.push(node.id);
       return ret;
     }
 
     dfs(tree);
-    addStep(null, null, null, res, `DFS complete. Final maximum path sum is ${res}.`, [16]);
+    addStep(
+      null, null, null, res, 
+      `DFS complete. Final maximum path sum is ${res}.`, 
+      `RETURN res`,
+      11, 12, 5, 6
+    );
 
-    return s;
+    return { steps: s, stepLineNumbers: lines };
   }, []);
 
   const step = steps[currentStep];
+  const pseudoSteps = useMemo(() => steps.map(s => s.pseudoStep), [steps]);
 
   const renderTree = () => {
     const positions: Record<number, { x: number, y: number }> = {
@@ -246,13 +341,13 @@ export const BinaryTreeMaximumPathSumVisualization: React.FC = () => {
         </div>
       }
       rightContent={
-        <Card className="h-full overflow-hidden flex flex-col shadow-sm border-border/50">
-          <AnimatedCodeEditor
-            code={code}
-            language="typescript"
-            highlightedLines={step.highlightedLines}
-          />
-        </Card>
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStep}
+          onLanguageChange={() => setCurrentStep(0)}
+        />
       }
     />
   );

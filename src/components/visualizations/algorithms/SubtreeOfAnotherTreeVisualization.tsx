@@ -2,14 +2,18 @@ import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { VariablePanel } from '../shared/VariablePanel';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, X, Trees, GitBranch, Binary, Search } from 'lucide-react';
+import { Check, X, Trees, Search } from 'lucide-react';
+import type { VisualizationLanguageMap, StepLineNumberMap } from '@/types/visualization';
 
 interface TreeNode {
   val: number;
   left: TreeNode | null;
   right: TreeNode | null;
+  id?: string;
+  index?: number;
 }
 
 interface Step {
@@ -20,7 +24,7 @@ interface Step {
   checking: string;
   result: boolean | null;
   message: string;
-  highlightedLines: number[];
+  pseudoStep: string;
   found: boolean;
 }
 
@@ -60,7 +64,8 @@ const testCases: TestCase[] = [
   }
 ];
 
-const code = `function isSubtree(root: TreeNode | null, subRoot: TreeNode | null): boolean {
+const languages: VisualizationLanguageMap = {
+  typescript: `function isSubtree(root: TreeNode | null, subRoot: TreeNode | null): boolean {
   if (!subRoot) return true;
   if (!root) return false;
   if (sameTree(root, subRoot)) return true;
@@ -73,7 +78,55 @@ function sameTree(root: TreeNode | null, subRoot: TreeNode | null): boolean {
     return sameTree(root.left, subRoot.left) && sameTree(root.right, subRoot.right);
   }
   return false;
-}`;
+}`,
+  python: `def isSubtree(root: TreeNode | None, subRoot: TreeNode | None) -> bool:
+    if not subRoot:
+        return True
+    if not root:
+        return False
+    if sameTree(root, subRoot):
+        return True
+    return isSubtree(root.left, subRoot) or isSubtree(root.right, subRoot)
+
+def sameTree(root1: TreeNode | None, root2: TreeNode | None) -> bool:
+    if not root1 and not root2:
+        return True
+    if root1 and root2 and root1.val == root2.val:
+        return sameTree(root1.left, root2.left) and sameTree(root1.right, root2.right)
+    return False`,
+  java: `public static class Solution {
+    public boolean isSubtree(TreeNode root, TreeNode subRoot) {
+        if (subRoot == null) return true;
+        if (root == null) return false;
+        if (sameTree(root, subRoot)) return true;
+        return isSubtree(root.left, subRoot) || isSubtree(root.right, subRoot);
+    }
+    private boolean sameTree(TreeNode root, TreeNode subRoot) {
+        if (root == null && subRoot == null) return true;
+        if (root != null && subRoot != null && root.val == subRoot.val) {
+            return sameTree(root.left, subRoot.left) && sameTree(root.right, subRoot.right);
+        }
+        return false;
+    }
+}`,
+  cpp: `class Solution {
+public:
+    bool isSubtree(TreeNode* root, TreeNode* subRoot) {
+        if (subRoot == nullptr) return true;
+        if (root == nullptr) return false;
+        if (sameTree(root, subRoot)) return true;
+        return isSubtree(root->left, subRoot) || isSubtree(root->right, subRoot);
+    }
+private:
+    bool sameTree(TreeNode* root, TreeNode* subRoot) {
+        if (root == nullptr && subRoot == nullptr) return true;
+        if (root != nullptr && subRoot != nullptr && root->val == subRoot->val) {
+            return sameTree(root->left, subRoot->left) && sameTree(root->right, subRoot->right);
+        }
+        return false;
+    }
+};`
+};
 
 const buildTreeWithIds = (arr: (number | null)[], prefix: string) => {
   if (!arr.length || arr[0] === null) return null;
@@ -126,11 +179,41 @@ export const SubtreeOfAnotherTreeVisualization = () => {
   const [testCase, setTestCase] = useState<TestCase>(testCases[0]);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
-  const steps = useMemo(() => {
+  const { steps, stepLineNumbers } = useMemo(() => {
     const s: Step[] = [];
+    const lines: StepLineNumberMap = { typescript: [], python: [], java: [], cpp: [] };
 
     const rootTree = buildTreeWithIds(testCase.root, 'root');
     const subRootTree = buildTreeWithIds(testCase.subRoot, 'subRoot');
+
+    const addStep = (
+      rootNodeId: string | null,
+      subRootNodeId: string | null,
+      rootVal: number | string | null,
+      subRootVal: number | string | null,
+      checking: string,
+      result: boolean | null,
+      message: string,
+      found: boolean,
+      pseudo: string,
+      ts: number, py: number, java: number, cpp: number
+    ) => {
+      s.push({
+        rootNodeId,
+        subRootNodeId,
+        rootVal,
+        subRootVal,
+        checking,
+        result,
+        message,
+        found,
+        pseudoStep: pseudo
+      });
+      lines.typescript!.push(ts);
+      lines.python!.push(py);
+      lines.java!.push(java);
+      lines.cpp!.push(cpp);
+    };
 
     const checkSame = (p: any, q: any, rootNodeId: string): boolean => {
       const pVal = p?.val ?? 'null';
@@ -138,79 +221,84 @@ export const SubtreeOfAnotherTreeVisualization = () => {
       const pId = p?.id || null;
       const qId = q?.id || null;
 
-      s.push({
+      addStep(
         rootNodeId,
-        subRootNodeId: qId,
-        rootVal: pVal,
-        subRootVal: qVal,
-        checking: 'sameTree-entry',
-        result: null,
-        message: `Calling sameTree to compare nodes: ${pVal} and ${qVal}`,
-        highlightedLines: [8],
-        found: false
-      });
+        qId,
+        pVal,
+        qVal,
+        'sameTree-entry',
+        null,
+        `Calling sameTree to compare nodes: ${pVal} and ${qVal}`,
+        false,
+        `CALL sameTree(root=${pVal}, subRoot=${qVal})`,
+        8, 10, 8, 10
+      );
 
       if (!p && !q) {
-        s.push({
+        addStep(
           rootNodeId,
-          subRootNodeId: qId,
-          rootVal: pVal,
-          subRootVal: qVal,
-          checking: 'sameTree-null-base',
-          result: true,
-          message: "Both nodes are null. They are identical.",
-          highlightedLines: [9],
-          found: false
-        });
+          qId,
+          pVal,
+          qVal,
+          'sameTree-null-base',
+          true,
+          "Both nodes are null. They are identical.",
+          false,
+          "IF root IS NULL AND subRoot IS NULL RETURN true",
+          9, 11, 9, 11
+        );
         return true;
       }
 
       if (p && q && p.val === q.val) {
-        s.push({
+        addStep(
           rootNodeId,
-          subRootNodeId: qId,
-          rootVal: pVal,
-          subRootVal: qVal,
-          checking: 'sameTree-val-match',
-          result: null,
-          message: `Values both match (${pVal}). Now recursively checking left and right children.`,
-          highlightedLines: [10, 11],
-          found: false
-        });
+          qId,
+          pVal,
+          qVal,
+          'sameTree-val-match',
+          null,
+          `Values both match (${pVal}). Now recursively checking left and right children.`,
+          false,
+          `IF root.val == subRoot.val (${pVal} == ${qVal})  →  YES ✓`,
+          10, 13, 10, 12
+        );
 
         const left = checkSame(p.left, q.left, rootNodeId);
         if (!left) return false;
         const right = checkSame(p.right, q.right, rootNodeId);
 
         if (right) {
-          s.push({
+          addStep(
             rootNodeId,
-            subRootNodeId: qId,
-            rootVal: pVal,
-            subRootVal: qVal,
-            checking: 'sameTree-result-true',
-            result: true,
-            message: `Node ${pVal} and its children match completely with the subtree fragment.`,
-            highlightedLines: [11],
-            found: false
-          });
+            qId,
+            pVal,
+            qVal,
+            'sameTree-result-true',
+            true,
+            `Node ${pVal} and its children match completely with the subtree fragment.`,
+            false,
+            "RETURN sameTree(left) AND sameTree(right)  →  true",
+            11, 14, 11, 13
+          );
         }
         return right;
       }
 
-      s.push({
+      addStep(
         rootNodeId,
-        subRootNodeId: qId,
-        rootVal: pVal,
-        subRootVal: qVal,
-        checking: 'sameTree-false',
-        result: false,
-        message: p && q
+        qId,
+        pVal,
+        qVal,
+        'sameTree-false',
+        false,
+        p && q
           ? `Values differ: ${pVal} !== ${qVal}. Not the same tree.`
           : `One node is null while the other is not. Not the same tree.`,
-        highlightedLines: [13],
-        found: false
-      });
+        false,
+        "RETURN false",
+        13, 15, 13, 15
+      );
       return false;
     };
 
@@ -219,113 +307,121 @@ export const SubtreeOfAnotherTreeVisualization = () => {
       const nodeId = node?.id || null;
       const subRootVal = subRoot?.val ?? 'null';
 
-      s.push({
-        rootNodeId: nodeId,
-        subRootNodeId: subRoot?.id || null,
-        rootVal: nodeVal,
-        subRootVal: subRootVal,
-        checking: 'isSubtree-entry',
-        result: null,
-        message: `Checking if subtree exists starting from node ${nodeVal}`,
-        highlightedLines: [1],
-        found: false
-      });
+      addStep(
+        nodeId,
+        subRoot?.id || null,
+        nodeVal,
+        subRootVal,
+        'isSubtree-entry',
+        null,
+        `Checking if subtree exists starting from node ${nodeVal}`,
+        false,
+        `CALL isSubtree(root=${nodeVal}, subRoot=${subRootVal})`,
+        1, 1, 2, 3
+      );
 
       if (!subRoot) {
-        s.push({
-          rootNodeId: nodeId,
-          subRootNodeId: null,
-          rootVal: nodeVal,
-          subRootVal: 'null',
-          checking: 'isSubtree-null-sub',
-          result: true,
-          message: "subRoot is null. A null tree is a subtree of any tree.",
-          highlightedLines: [2],
-          found: false
-        });
+        addStep(
+          nodeId,
+          null,
+          nodeVal,
+          'null',
+          'isSubtree-null-sub',
+          true,
+          "subRoot is null. A null tree is a subtree of any tree.",
+          false,
+          "IF subRoot IS NULL RETURN true",
+          2, 2, 3, 4
+        );
         return true;
       }
 
       if (!node) {
-        s.push({
-          rootNodeId: nodeId,
-          subRootNodeId: subRoot.id,
-          rootVal: 'null',
-          subRootVal: subRootVal,
-          checking: 'isSubtree-null-root',
-          result: false,
-          message: "Reached null in main tree, but subRoot is not null. Cannot be a subtree here.",
-          highlightedLines: [3],
-          found: false
-        });
+        addStep(
+          nodeId,
+          subRoot.id,
+          'null',
+          subRootVal,
+          'isSubtree-null-root',
+          false,
+          "Reached null in main tree, but subRoot is not null. Cannot be a subtree here.",
+          false,
+          "IF root IS NULL RETURN false",
+          3, 4, 4, 5
+        );
         return false;
       }
 
-      s.push({
-        rootNodeId: nodeId,
-        subRootNodeId: subRoot.id,
-        rootVal: nodeVal,
-        subRootVal: subRootVal,
-        checking: 'isSubtree-check-same',
-        result: null,
-        message: `Comparing current root node ${nodeVal} with subtree root ${subRootVal}.`,
-        highlightedLines: [4],
-        found: false
-      });
+      addStep(
+        nodeId,
+        subRoot.id,
+        nodeVal,
+        subRootVal,
+        'isSubtree-check-same',
+        null,
+        `Comparing current root node ${nodeVal} with subtree root ${subRootVal}.`,
+        false,
+        "IF sameTree(root, subRoot)  →  CALL sameTree",
+        4, 6, 5, 6
+      );
 
       if (checkSame(node, subRoot, nodeId)) {
-        s.push({
-          rootNodeId: nodeId,
-          subRootNodeId: subRoot.id,
-          rootVal: nodeVal,
-          subRootVal: subRootVal,
-          checking: 'isSubtree-found',
-          result: true,
-          message: `Match found! Subtree exists starting at node ${nodeVal}.`,
-          highlightedLines: [4],
-          found: true
-        });
+        addStep(
+          nodeId,
+          subRoot.id,
+          nodeVal,
+          subRootVal,
+          'isSubtree-found',
+          true,
+          `Match found! Subtree exists starting at node ${nodeVal}.`,
+          true,
+          "IF sameTree(root, subRoot)  →  RETURN true",
+          4, 7, 5, 6
+        );
         return true;
       }
 
-      s.push({
-        rootNodeId: nodeId,
-        subRootNodeId: subRoot.id,
-        rootVal: nodeVal,
-        subRootVal: subRootVal,
-        checking: 'isSubtree-recurse',
-        result: null,
-        message: `Node ${nodeVal} matched partially or not at all. Now checking left or right subtrees.`,
-        highlightedLines: [5],
-        found: false
-      });
+      addStep(
+        nodeId,
+        subRoot.id,
+        nodeVal,
+        subRootVal,
+        'isSubtree-recurse',
+        null,
+        `Node ${nodeVal} matched partially or not at all. Now checking left or right subtrees.`,
+        false,
+        "RETURN isSubtree(root.left) OR isSubtree(root.right)",
+        5, 8, 6, 7
+      );
 
       const left = findSubtree(node.left, subRoot);
       if (left) return true;
       const right = findSubtree(node.right, subRoot);
 
       if (right) {
-        s.push({
-          rootNodeId: nodeId,
-          subRootNodeId: subRoot.id,
-          rootVal: nodeVal,
-          subRootVal: subRootVal,
-          checking: 'isSubtree-found-recursive',
-          result: true,
-          message: "Subtree found in one of the lower branches!",
-          highlightedLines: [5],
-          found: true
-        });
+        addStep(
+          nodeId,
+          subRoot.id,
+          nodeVal,
+          subRootVal,
+          'isSubtree-found-recursive',
+          true,
+          "Subtree found in one of the lower branches!",
+          true,
+          "RETURN true",
+          5, 8, 6, 7
+        );
       }
 
       return right;
     };
 
     findSubtree(rootTree, subRootTree);
-    return s;
+    return { steps: s, stepLineNumbers: lines };
   }, [testCase]);
 
   const currentStep = steps[currentStepIndex];
+  const pseudoSteps = useMemo(() => steps.map(s => s.pseudoStep), [steps]);
 
   const rootTreeData = useMemo(() => getTreePositions(buildTreeWithIds(testCase.root, 'root')), [testCase.root]);
   const subRootTreeData = useMemo(() => getTreePositions(buildTreeWithIds(testCase.subRoot, 'subRoot')), [testCase.subRoot]);
@@ -396,99 +492,97 @@ export const SubtreeOfAnotherTreeVisualization = () => {
   );
 
   return (
-    <div className="flex flex-col gap-6">
-
-      <SimpleStepControls
-        currentStep={currentStepIndex}
-        totalSteps={steps.length}
-        onStepChange={setCurrentStepIndex}
-      />
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-
-        <div className="flex bg-muted/50 p-1 rounded-xl border border-border">
-          {testCases.map((tc) => {
-            const Icon = tc.icon;
-            const isSelected = testCase.id === tc.id;
-            return (
-              <button
-                key={tc.id}
-                onClick={() => handleTestCaseChange(tc)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${isSelected
-                    ? 'bg-background text-primary shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
-                  }`}
-              >
-                <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-primary' : 'text-muted-foreground'}`} />
-                {tc.name}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-6">
-          <Card className="p-6 border-primary/10 shadow-xl bg-gradient-to-b from-background to-primary/5">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="text-lg font-bold tracking-tight">Tree Comparison</h3>
-                <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider">{testCase.description}</p>
-              </div>
-              <AnimatePresence mode="wait">
-                {currentStep.found && (
-                  <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.8, opacity: 0 }}
-                    className="flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-500 shadow-sm"
-                  >
-                    <Check className="w-3.5 h-3.5" />
-                    <span className="text-[10px] font-bold uppercase tracking-wider">Subtree Found</span>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            <div className="flex gap-4 mb-8">
-              <TreeDisplay
-                data={rootTreeData}
-                activeNodeId={currentStep.rootNodeId}
-                title="Main Tree (root)"
-              />
-              <TreeDisplay
-                data={subRootTreeData}
-                activeNodeId={currentStep.subRootNodeId}
-                title="Subtree (subRoot)"
-              />
-            </div>
-
-            <div className="space-y-4">
-              <Card className="p-4 bg-primary/5 border-primary/20 shadow-inner">
-                <p className="text-sm leading-relaxed text-foreground/90 font-medium">
-                  {currentStep.message}
-                </p>
-              </Card>
-
-              <VariablePanel
-                variables={{
-                  'root': currentStep.rootVal,
-                  'subRoot': currentStep.subRootVal,
-                  'status': currentStep.checking,
-                  'step': `${currentStepIndex + 1} / ${steps.length}`
-                }}
-              />
-            </div>
-          </Card>
-        </div>
-
-        <Card className="border-primary/10 shadow-xl overflow-hidden bg-[#1e1e1e]">
-          <AnimatedCodeEditor
-            code={code}
-            language="typescript"
-            highlightedLines={currentStep.highlightedLines}
+    <VisualizationLayout
+      controls={
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 w-full">
+          <SimpleStepControls
+            currentStep={currentStepIndex}
+            totalSteps={steps.length}
+            onStepChange={setCurrentStepIndex}
           />
+          <div className="flex bg-muted/50 p-1 rounded-xl border border-border">
+            {testCases.map((tc) => {
+              const Icon = tc.icon;
+              const isSelected = testCase.id === tc.id;
+              return (
+                <button
+                  key={tc.id}
+                  onClick={() => handleTestCaseChange(tc)}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${isSelected
+                      ? 'bg-background text-primary shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
+                    }`}
+                >
+                  <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-primary' : 'text-muted-foreground'}`} />
+                  {tc.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      }
+      leftContent={
+        <Card className="p-6 border-primary/10 shadow-xl bg-gradient-to-b from-background to-primary/5">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-lg font-bold tracking-tight">Tree Comparison</h3>
+              <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider">{testCase.description}</p>
+            </div>
+            <AnimatePresence mode="wait">
+              {currentStep.found && (
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.8, opacity: 0 }}
+                  className="flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-500 shadow-sm"
+                >
+                  <Check className="w-3.5 h-3.5" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider">Subtree Found</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          <div className="flex gap-4 mb-8">
+            <TreeDisplay
+              data={rootTreeData}
+              activeNodeId={currentStep.rootNodeId}
+              title="Main Tree (root)"
+            />
+            <TreeDisplay
+              data={subRootTreeData}
+              activeNodeId={currentStep.subRootNodeId}
+              title="Subtree (subRoot)"
+            />
+          </div>
+
+          <div className="space-y-4">
+            <Card className="p-4 bg-primary/5 border-primary/20 shadow-inner">
+              <p className="text-sm leading-relaxed text-foreground/90 font-medium">
+                {currentStep.message}
+              </p>
+            </Card>
+
+            <VariablePanel
+              variables={{
+                'root': currentStep.rootVal,
+                'subRoot': currentStep.subRootVal,
+                'status': currentStep.checking,
+                'step': `${currentStepIndex + 1} / ${steps.length}`
+              }}
+            />
+          </div>
         </Card>
-      </div>
-    </div>
+      }
+      rightContent={
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={() => setCurrentStepIndex(0)}
+        />
+      }
+    />
   );
 };

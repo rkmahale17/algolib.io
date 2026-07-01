@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { VariablePanel } from '../shared/VariablePanel';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
-import { motion, AnimatePresence } from 'framer-motion';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
+import { VisualizationLayout } from '../shared/VisualizationLayout';
+import { motion } from 'framer-motion';
+import type { VisualizationLanguageMap, StepLineNumberMap } from '@/types/visualization';
 
 interface Step {
   cur: number | null;
@@ -13,66 +15,127 @@ interface Step {
   visitedNodes: number[];
   foundNode: number | null;
   message: string;
-  highlightedLines: number[];
+  pseudoStep: string;
 }
 
-export const KthSmallestInBSTVisualization = () => {
-  const code = `function kthSmallest(root: TreeNode | null, k: number): number {
-    let n = 0
-    const stack: TreeNode[] = []
-    let cur: TreeNode | null = root
-
-    while (cur !== null || stack.length > 0) {
-        while (cur !== null) {
-            stack.push(cur)
-            cur = cur.left
-        }
-
-        cur = stack.pop()!
-        n++
-
-        if (n === k) {
-            return cur.val
-        }
-
-        cur = cur.right
+const languages: VisualizationLanguageMap = {
+  typescript: `function kthSmallest(root: TreeNode | null, k: number): number {
+  let n = 0;
+  const stack: TreeNode[] = [];
+  let cur: TreeNode | null = root;
+  while (cur !== null || stack.length > 0) {
+    while (cur !== null) {
+      stack.push(cur);
+      cur = cur.left;
     }
-    return -1
-}`;
+    cur = stack.pop()!;
+    n++;
+    if (n === k) {
+      return cur.val;
+    }
+    cur = cur.right;
+  }
+  return -1;
+}`,
+  python: `def kthSmallest(root: TreeNode | None, k: int) -> int:
+    n = 0
+    stack = []
+    cur = root
+    while cur or stack:
+        while cur:
+            stack.append(cur)
+            cur = cur.left
+        cur = stack.pop()
+        n += 1
+        if n == k:
+            return cur.val
+        cur = cur.right
+    return -1`,
+  java: `public static class Solution {
+    public int kthSmallest(TreeNode root, int k) {
+        int n = 0;
+        java.util.Stack<TreeNode> stack = new java.util.Stack<>();
+        TreeNode cur = root;
+        while (cur != null || !stack.isEmpty()) {
+            while (cur != null) {
+                stack.push(cur);
+                cur = cur.left;
+            }
+            cur = stack.pop();
+            n++;
+            if (n == k) {
+                return cur.val;
+            }
+            cur = cur.right;
+        }
+        return -1;
+    }
+}`,
+  cpp: `class Solution {
+public:
+    int kthSmallest(TreeNode* root, int k) {
+        stack<TreeNode*> st;
+        TreeNode* curr = root;
+        while (true) {
+            while (curr) {
+                st.push(curr);
+                curr = curr->left;
+            }
+            curr = st.top();
+            st.pop();
+            k--;
+            if (k == 0) {
+                return curr->val;
+            }
+            curr = curr->right;
+        }
+    }
+};`
+};
 
-  const steps: Step[] = [
-    { cur: 3, stack: [], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "Initialize. n = 0, k = 3, cur = root (3).", highlightedLines: [1, 2, 3, 4] },
-    { cur: 3, stack: [], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "Enter loop: cur is not null or stack is not empty.", highlightedLines: [6] },
-    { cur: 3, stack: [], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "cur (3) is not null, entering inner loop to find leftmost node.", highlightedLines: [7] },
-    { cur: 3, stack: [3], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "Push current node 3 onto the stack.", highlightedLines: [8] },
-    { cur: 1, stack: [3], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "Move to the left child of 3 (node 1).", highlightedLines: [9] },
-    { cur: 1, stack: [3], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "cur (1) is not null, continue inner loop.", highlightedLines: [7] },
-    { cur: 1, stack: [3, 1], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "Push current node 1 onto the stack.", highlightedLines: [8] },
-    { cur: null, stack: [3, 1], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "Move to the left child of 1 (null).", highlightedLines: [9] },
-    { cur: null, stack: [3, 1], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "cur is null, exit inner loop.", highlightedLines: [7] },
-    { cur: 1, stack: [3], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "Pop from stack: node 1 is the smallest in this subtree.", highlightedLines: [12] },
-    { cur: 1, stack: [3], n: 1, k: 3, visitedNodes: [1], foundNode: null, message: "Increment counter n to 1.", highlightedLines: [13] },
-    { cur: 1, stack: [3], n: 1, k: 3, visitedNodes: [1], foundNode: null, message: "Check if n (1) is equal to k (3). Not yet.", highlightedLines: [15] },
-    { cur: 2, stack: [3], n: 1, k: 3, visitedNodes: [1], foundNode: null, message: "Move to the right child of 1 (node 2).", highlightedLines: [19] },
-    { cur: 2, stack: [3], n: 1, k: 3, visitedNodes: [1], foundNode: null, message: "Next iteration: cur (2) is not null.", highlightedLines: [6] },
-    { cur: 2, stack: [3], n: 1, k: 3, visitedNodes: [1], foundNode: null, message: "cur (2) is not null, enter inner loop.", highlightedLines: [7] },
-    { cur: 2, stack: [3, 2], n: 1, k: 3, visitedNodes: [1], foundNode: null, message: "Push node 2 onto the stack.", highlightedLines: [8] },
-    { cur: null, stack: [3, 2], n: 1, k: 3, visitedNodes: [1], foundNode: null, message: "Move to the left child of 2 (null).", highlightedLines: [9] },
-    { cur: null, stack: [3, 2], n: 1, k: 3, visitedNodes: [1], foundNode: null, message: "cur is null, exit inner loop.", highlightedLines: [7] },
-    { cur: 2, stack: [3], n: 1, k: 3, visitedNodes: [1], foundNode: null, message: "Pop from stack: node 2 is next in order.", highlightedLines: [12] },
-    { cur: 2, stack: [3], n: 2, k: 3, visitedNodes: [1, 2], foundNode: null, message: "Increment counter n to 2.", highlightedLines: [13] },
-    { cur: 2, stack: [3], n: 2, k: 3, visitedNodes: [1, 2], foundNode: null, message: "Check if n (2) is equal to k (3). Not yet.", highlightedLines: [15] },
-    { cur: null, stack: [3], n: 2, k: 3, visitedNodes: [1, 2], foundNode: null, message: "Move to the right child of 2 (null).", highlightedLines: [19] },
-    { cur: null, stack: [3], n: 2, k: 3, visitedNodes: [1, 2], foundNode: null, message: "Next iteration: stack is not empty.", highlightedLines: [6] },
-    { cur: null, stack: [3], n: 2, k: 3, visitedNodes: [1, 2], foundNode: null, message: "cur is null, skip inner loop.", highlightedLines: [7] },
-    { cur: 3, stack: [], n: 2, k: 3, visitedNodes: [1, 2], foundNode: null, message: "Pop from stack: node 3 is next in order.", highlightedLines: [12] },
-    { cur: 3, stack: [], n: 3, k: 3, visitedNodes: [1, 2, 3], foundNode: null, message: "Increment counter n to 3.", highlightedLines: [13] },
-    { cur: 3, stack: [], n: 3, k: 3, visitedNodes: [1, 2, 3], foundNode: 3, message: "n (3) is equal to k (3)! Found the 3rd smallest element.", highlightedLines: [15, 16] },
-    { cur: 3, stack: [], n: 3, k: 3, visitedNodes: [1, 2, 3], foundNode: 3, message: "3rd smallest element in the BST is 3.", highlightedLines: [16] }
-  ];
+const stepLineNumbers: StepLineNumberMap = {
+  typescript: [4, 5, 6, 7, 8, 6, 7, 8, 6, 10, 11, 12, 15, 5, 6, 7, 8, 6, 10, 11, 12, 15, 5, 6, 10, 11, 12, 13],
+  python: [4, 5, 6, 7, 8, 6, 7, 8, 6, 9, 10, 11, 13, 5, 6, 7, 8, 6, 9, 10, 11, 13, 5, 6, 9, 10, 11, 12],
+  java: [5, 6, 7, 8, 9, 7, 8, 9, 7, 11, 12, 13, 16, 6, 7, 8, 9, 7, 11, 12, 13, 16, 6, 7, 11, 12, 13, 14],
+  cpp: [5, 6, 7, 8, 9, 7, 8, 9, 7, 11, 12, 13, 17, 6, 7, 8, 9, 7, 11, 12, 13, 17, 6, 7, 11, 12, 14, 15]
+};
 
+const steps: Step[] = [
+  { cur: 3, stack: [], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "Initialize. n = 0, k = 3, cur = root (3).", pseudoStep: "SET n = 0, cur = root" },
+  { cur: 3, stack: [], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "Enter loop: cur is not null or stack is not empty.", pseudoStep: "WHILE cur IS NOT NULL OR stack IS NOT EMPTY" },
+  { cur: 3, stack: [], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "cur (3) is not null, entering inner loop to find leftmost node.", pseudoStep: "WHILE cur IS NOT NULL" },
+  { cur: 3, stack: [3], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "Push current node 3 onto the stack.", pseudoStep: "CALL stack.push(cur)" },
+  { cur: 1, stack: [3], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "Move to the left child of 3 (node 1).", pseudoStep: "SET cur = cur.left" },
+  { cur: 1, stack: [3], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "cur (1) is not null, continue inner loop.", pseudoStep: "WHILE cur IS NOT NULL" },
+  { cur: 1, stack: [3, 1], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "Push current node 1 onto the stack.", pseudoStep: "CALL stack.push(cur)" },
+  { cur: null, stack: [3, 1], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "Move to the left child of 1 (null).", pseudoStep: "SET cur = cur.left" },
+  { cur: null, stack: [3, 1], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "cur is null, exit inner loop.", pseudoStep: "WHILE cur IS NOT NULL  →  NO ✗" },
+  { cur: 1, stack: [3], n: 0, k: 3, visitedNodes: [], foundNode: null, message: "Pop from stack: node 1 is the smallest in this subtree.", pseudoStep: "SET cur = stack.pop()" },
+  { cur: 1, stack: [3], n: 1, k: 3, visitedNodes: [1], foundNode: null, message: "Increment counter n to 1.", pseudoStep: "SET n = n + 1" },
+  { cur: 1, stack: [3], n: 1, k: 3, visitedNodes: [1], foundNode: null, message: "Check if n (1) is equal to k (3). Not yet.", pseudoStep: "IF n == k  →  NO ✗" },
+  { cur: 2, stack: [3], n: 1, k: 3, visitedNodes: [1], foundNode: null, message: "Move to the right child of 1 (node 2).", pseudoStep: "SET cur = cur.right" },
+  { cur: 2, stack: [3], n: 1, k: 3, visitedNodes: [1], foundNode: null, message: "Next iteration: cur (2) is not null.", pseudoStep: "WHILE cur IS NOT NULL OR stack IS NOT EMPTY" },
+  { cur: 2, stack: [3], n: 1, k: 3, visitedNodes: [1], foundNode: null, message: "cur (2) is not null, enter inner loop.", pseudoStep: "WHILE cur IS NOT NULL" },
+  { cur: 2, stack: [3, 2], n: 1, k: 3, visitedNodes: [1], foundNode: null, message: "Push node 2 onto the stack.", pseudoStep: "CALL stack.push(cur)" },
+  { cur: null, stack: [3, 2], n: 1, k: 3, visitedNodes: [1], foundNode: null, message: "Move to the left child of 2 (null).", pseudoStep: "SET cur = cur.left" },
+  { cur: null, stack: [3, 2], n: 1, k: 3, visitedNodes: [1], foundNode: null, message: "cur is null, exit inner loop.", pseudoStep: "WHILE cur IS NOT NULL  →  NO ✗" },
+  { cur: 2, stack: [3], n: 1, k: 3, visitedNodes: [1], foundNode: null, message: "Pop from stack: node 2 is next in order.", pseudoStep: "SET cur = stack.pop()" },
+  { cur: 2, stack: [3], n: 2, k: 3, visitedNodes: [1, 2], foundNode: null, message: "Increment counter n to 2.", pseudoStep: "SET n = n + 1" },
+  { cur: 2, stack: [3], n: 2, k: 3, visitedNodes: [1, 2], foundNode: null, message: "Check if n (2) is equal to k (3). Not yet.", pseudoStep: "IF n == k  →  NO ✗" },
+  { cur: null, stack: [3], n: 2, k: 3, visitedNodes: [1, 2], foundNode: null, message: "Move to the right child of 2 (null).", pseudoStep: "SET cur = cur.right" },
+  { cur: null, stack: [3], n: 2, k: 3, visitedNodes: [1, 2], foundNode: null, message: "Next iteration: stack is not empty.", pseudoStep: "WHILE cur IS NOT NULL OR stack IS NOT EMPTY" },
+  { cur: null, stack: [3], n: 2, k: 3, visitedNodes: [1, 2], foundNode: null, message: "cur is null, skip inner loop.", pseudoStep: "WHILE cur IS NOT NULL  →  NO ✗" },
+  { cur: 3, stack: [], n: 2, k: 3, visitedNodes: [1, 2], foundNode: null, message: "Pop from stack: node 3 is next in order.", pseudoStep: "SET cur = stack.pop()" },
+  { cur: 3, stack: [], n: 3, k: 3, visitedNodes: [1, 2, 3], foundNode: null, message: "Increment counter n to 3.", pseudoStep: "SET n = n + 1" },
+  { cur: 3, stack: [], n: 3, k: 3, visitedNodes: [1, 2, 3], foundNode: 3, message: "n (3) is equal to k (3)! Found the 3rd smallest element.", pseudoStep: "IF n == k  →  YES ✓" },
+  { cur: 3, stack: [], n: 3, k: 3, visitedNodes: [1, 2, 3], foundNode: 3, message: "3rd smallest element in the BST is 3.", pseudoStep: "RETURN cur.val" }
+];
+
+export const KthSmallestInBSTVisualization = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const step = steps[currentStep];
+
+  const pseudoSteps = useMemo(() => steps.map(s => s.pseudoStep), []);
 
   const treeData = [
     { id: 3, x: 200, y: 50, left: 1, right: 4 },
@@ -84,7 +147,6 @@ export const KthSmallestInBSTVisualization = () => {
   const renderTree = () => {
     return (
       <svg viewBox="0 0 400 250" className="w-full h-auto max-w-[400px] mx-auto">
-        {/* Connections */}
         <line x1="200" y1="50" x2="120" y2="120" stroke="currentColor" className="text-muted-foreground/30" strokeWidth="2" />
         <line x1="200" y1="50" x2="280" y2="120" stroke="currentColor" className="text-muted-foreground/30" strokeWidth="2" />
         <line x1="120" y1="120" x2="180" y2="190" stroke="currentColor" className="text-muted-foreground/30" strokeWidth="2" />
@@ -135,15 +197,16 @@ export const KthSmallestInBSTVisualization = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      <SimpleStepControls
-        currentStep={currentStep}
-        totalSteps={steps.length}
-        onStepChange={setCurrentStep}
-      />
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-6">
+    <VisualizationLayout
+      controls={
+        <SimpleStepControls
+          currentStep={currentStep}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStep}
+        />
+      }
+      leftContent={
+        <div className="space-y-6 flex flex-col h-full">
           <Card className="p-6 relative overflow-hidden">
             <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Tree Visualization</div>
             {renderTree()}
@@ -169,18 +232,9 @@ export const KthSmallestInBSTVisualization = () => {
 
           <div className="space-y-4">
             <Card className="p-4 bg-primary/5 border-primary/10">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={currentStep}
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
-                  transition={{ duration: 0 }}
-                  className="text-sm leading-relaxed"
-                >
-                  {step.message}
-                </motion.div>
-              </AnimatePresence>
+              <div className="text-sm leading-relaxed">
+                {step.message}
+              </div>
             </Card>
 
             <VariablePanel
@@ -194,15 +248,16 @@ export const KthSmallestInBSTVisualization = () => {
             />
           </div>
         </div>
-
-        <Card className="overflow-hidden border-none shadow-none bg-transparent">
-          <AnimatedCodeEditor
-            code={code}
-            language="typescript"
-            highlightedLines={step.highlightedLines}
-          />
-        </Card>
-      </div>
-    </div>
+      }
+      rightContent={
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStep}
+          onLanguageChange={() => setCurrentStep(0)}
+        />
+      }
+    />
   );
 };

@@ -1,11 +1,12 @@
 import { useState, useMemo } from 'react';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Info, HelpCircle } from 'lucide-react';
+import type { VisualizationLanguageMap, StepLineNumberMap } from '@/types/visualization';
 
 interface HeapNode {
   distance: number;
@@ -22,18 +23,95 @@ interface Step {
   i: number | null;
   current: HeapNode | null;
   explanation: string;
-  highlightedLines: number[];
+  pseudoStep: string;
   variables: Record<string, any>;
   pointStatuses: ('idle' | 'active' | 'heap' | 'result' | 'discarded')[];
 }
+
+const languages: VisualizationLanguageMap = {
+  typescript: `function kClosest(points: number[][], k: number): number[][] {
+  const minHeap: number[][] = [];
+  const compare = (a: number[], b: number[]): number => {
+    return a[0] - b[0];
+  };
+  const getDistance = (point: number[]): number => {
+    return point[0] * point[0] + point[1] * point[1];
+  };
+  for (const point of points) {
+    const distance = getDistance(point);
+    minHeap.push([distance, point[0], point[1]]);
+    minHeap.sort(compare);
+  }
+  const result: number[][] = [];
+  for (let i = 0; i < k; i++) {
+    const current = minHeap.shift();
+    if (current) {
+      result.push([current[1], current[2]]);
+    }
+  }
+  return result;
+}`,
+  python: `import heapq
+
+def kClosest(points, k):
+    heap = []
+    for (x, y) in points:
+        dist = -(x * x + y * y)
+        if len(heap) == k:
+            heapq.heappushpop(heap, (dist, x, y))
+        else:
+            heapq.heappush(heap, (dist, x, y))
+    result = []
+    for (dist, x, y) in heap:
+        result.append([x, y])
+    return result`,
+  java: `public static class Solution {
+    public int[][] kClosest(int[][] points, int k) {
+        PriorityQueue<int[]> minHeap = new PriorityQueue<>((a, b) -> a[0] - b[0]);
+        for (int[] point : points) {
+            int x = point[0];
+            int y = point[1];
+            int dist = (x * x) + (y * y);
+            minHeap.offer(new int[]{dist, x, y});
+        }
+        int[][] res = new int[k][2];
+        for (int i = 0; i < k; i++) {
+            int[] current = minHeap.poll();
+            res[i][0] = current[1];
+            res[i][1] = current[2];
+        }
+        return res;
+    }
+}`,
+  cpp: `class Solution {
+public:
+    vector<vector<int>> kClosest(vector<vector<int>>& points, int k) {
+        priority_queue<vector<int>, vector<vector<int>>, greater<vector<int>>> minHeap;
+        for (auto& point : points) {
+            int x = point[0];
+            int y = point[1];
+            int dist = (x * x) + (y * y);
+            minHeap.push({dist, x, y});
+        }
+        vector<vector<int>> result;
+        for (int i = 0; i < k; i++) {
+            auto current = minHeap.top();
+            minHeap.pop();
+            result.push_back({current[1], current[2]});
+        }
+        return result;
+    }
+};`
+};
 
 export const KClosestPointsVisualization = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const initialPoints = useMemo(() => [[3, 3], [5, -1], [-2, 4], [1, 2], [-1, -1]], []);
   const k = 2;
 
-  const steps: Step[] = useMemo(() => {
-    const s: Step[] = [];
+  const { steps, stepLineNumbers } = useMemo(() => {
+    const stepsList: Step[] = [];
+    const lines: StepLineNumberMap = { typescript: [], python: [], java: [], cpp: [] };
     const points = [...initialPoints];
     let heap: HeapNode[] = [];
     let result: number[][] = [];
@@ -59,263 +137,200 @@ export const KClosestPointsVisualization = () => {
       });
     };
 
-    // Step 0: Init
-    s.push({
-      minHeap: [],
-      result: [],
-      points: points,
-      activePointIdx: null,
-      activeDistance: null,
-      i: null,
-      current: null,
-      explanation: "Initialize an empty array minHeap to store the points sorted by their distance from the origin.",
-      highlightedLines: [1, 2],
-      variables: {
+    const addStep = (
+      minHeap: HeapNode[],
+      res: number[][],
+      activePointIdx: number | null,
+      activeDistance: number | null,
+      i: number | null,
+      current: HeapNode | null,
+      explanation: string,
+      pseudo: string,
+      vars: any,
+      status: Step['pointStatuses'],
+      ts: number, py: number, java: number, cpp: number
+    ) => {
+      stepsList.push({
+        minHeap,
+        result: res,
+        points,
+        activePointIdx,
+        activeDistance,
+        i,
+        current,
+        explanation,
+        pseudoStep: pseudo,
+        variables: vars,
+        pointStatuses: status
+      });
+      lines.typescript!.push(ts);
+      lines.python!.push(py);
+      lines.java!.push(java);
+      lines.cpp!.push(cpp);
+    };
+
+    addStep(
+      [], [], null, null, null, null,
+      "Initialize an empty array minHeap to store the points sorted by their distance from the origin.",
+      "SET minHeap = []",
+      {
         points: '[[3, 3], [5, -1], [-2, 4], [1, 2], [-1, -1]]',
         k: k,
         minHeap: '[]',
         result: '[]'
       },
-      pointStatuses: points.map(() => 'idle')
-    });
+      points.map(() => 'idle'),
+      2, 4, 3, 4
+    );
 
-    // Loop through points
     for (let idx = 0; idx < points.length; idx++) {
       const p = points[idx];
       const dist = p[0] * p[0] + p[1] * p[1];
 
-      // Step A: check_point (loop head)
-      s.push({
-        minHeap: [...heap],
-        result: [],
-        points: points,
-        activePointIdx: idx,
-        activeDistance: null,
-        i: null,
-        current: null,
-        explanation: `Iterate over the points. Current point being evaluated is [${p[0]}, ${p[1]}].`,
-        highlightedLines: [12],
-        variables: {
+      addStep(
+        [...heap], [], idx, null, null, null,
+        `Iterate over the points. Current point being evaluated is [${p[0]}, ${p[1]}].`,
+        `FOR point IN points  →  point = [${p[0]}, ${p[1]}]`,
+        {
           minHeap: `[${heap.map(h => `[${h.distance}, ${h.x}, ${h.y}]`).join(', ')}]`,
           result: '[]',
           'current point': `[${p[0]}, ${p[1]}]`
         },
-        pointStatuses: getStatuses(idx, 'points')
-      });
+        getStatuses(idx, 'points'),
+        9, 5, 4, 5
+      );
 
-      // Step B: calc_distance
-      s.push({
-        minHeap: [...heap],
-        result: [],
-        points: points,
-        activePointIdx: idx,
-        activeDistance: dist,
-        i: null,
-        current: null,
-        explanation: `Calculate squared distance (d²) from origin for [${p[0]}, ${p[1]}]: x² + y² = ${p[0]}² + (${p[1]})² = ${p[0] * p[0]} + ${p[1] * p[1]} = ${dist}.`,
-        highlightedLines: [13, 8, 9, 10],
-        variables: {
+      addStep(
+        [...heap], [], idx, dist, null, null,
+        `Calculate squared distance (d²) from origin for [${p[0]}, ${p[1]}]: x² + y² = ${p[0]}² + (${p[1]})² = ${p[0] * p[0]} + ${p[1] * p[1]} = ${dist}.`,
+        `SET distance = point.x^2 + point.y^2  →  ${dist}`,
+        {
           minHeap: `[${heap.map(h => `[${h.distance}, ${h.x}, ${h.y}]`).join(', ')}]`,
           result: '[]',
           'current point': `[${p[0]}, ${p[1]}]`,
           'distance (d²)': dist
         },
-        pointStatuses: getStatuses(idx, 'points')
-      });
+        getStatuses(idx, 'points'),
+        10, 6, 7, 8
+      );
 
-      // Step C: push_heap
       const newHeapNode = { distance: dist, x: p[0], y: p[1] };
       heap.push(newHeapNode);
-      s.push({
-        minHeap: [...heap],
-        result: [],
-        points: points,
-        activePointIdx: idx,
-        activeDistance: dist,
-        i: null,
-        current: null,
-        explanation: `Push the node [${dist}, ${p[0]}, ${p[1]}] onto the minHeap array.`,
-        highlightedLines: [14],
-        variables: {
+      addStep(
+        [...heap], [], idx, dist, null, null,
+        `Push the node [${dist}, ${p[0]}, ${p[1]}] onto the minHeap array.`,
+        `CALL minHeap.push([distance, point])`,
+        {
           minHeap: `[${heap.map(h => `[${h.distance}, ${h.x}, ${h.y}]`).join(', ')}]`,
           result: '[]',
           'current point': `[${p[0]}, ${p[1]}]`,
           'distance (d²)': dist
         },
-        pointStatuses: getStatuses(idx, 'points')
-      });
+        getStatuses(idx, 'points'),
+        11, 8, 8, 9
+      );
 
-      // Step D: sort_heap
       heap.sort((a, b) => a.distance - b.distance);
-      s.push({
-        minHeap: [...heap],
-        result: [],
-        points: points,
-        activePointIdx: null,
-        activeDistance: null,
-        i: null,
-        current: null,
-        explanation: `Sort the minHeap ascending by distance so the closest element moves to the front. Heap is now: [${heap.map(h => `[${h.distance}, ${h.x}, ${h.y}]`).join(', ')}].`,
-        highlightedLines: [15, 4, 5, 6],
-        variables: {
+      addStep(
+        [...heap], [], null, null, null, null,
+        `Sort the minHeap ascending by distance so the closest element moves to the front. Heap is now: [${heap.map(h => `[${h.distance}, ${h.x}, ${h.y}]`).join(', ')}].`,
+        "CALL minHeap.sortAscending()",
+        {
           minHeap: `[${heap.map(h => `[${h.distance}, ${h.x}, ${h.y}]`).join(', ')}]`,
           result: '[]'
         },
-        pointStatuses: getStatuses(null, 'points')
-      });
+        getStatuses(null, 'points'),
+        12, 10, 8, 9
+      );
     }
 
-    // Step E: Init result array
-    s.push({
-      minHeap: [...heap],
-      result: [],
-      points: points,
-      activePointIdx: null,
-      activeDistance: null,
-      i: null,
-      current: null,
-      explanation: "All points have been processed and sorted in the heap. Initialize an empty result array.",
-      highlightedLines: [18],
-      variables: {
+    addStep(
+      [...heap], [], null, null, null, null,
+      "All points have been processed and sorted in the heap. Initialize an empty result array.",
+      "SET result = []",
+      {
         minHeap: `[${heap.map(h => `[${h.distance}, ${h.x}, ${h.y}]`).join(', ')}]`,
         result: '[]'
       },
-      pointStatuses: getStatuses(null, 'pop')
-    });
+      getStatuses(null, 'pop'),
+      14, 11, 10, 11
+    );
 
-    // Extract K closest points
     for (let i = 0; i < k; i++) {
-      // Step F: loop check
-      s.push({
-        minHeap: [...heap],
-        result: [...result],
-        points: points,
-        activePointIdx: null,
-        activeDistance: null,
-        i: i,
-        current: null,
-        explanation: `Check extraction loop condition: i = ${i} < k (${k}). Proceed to pull the next closest point.`,
-        highlightedLines: [19],
-        variables: {
+      addStep(
+        [...heap], [...result], null, null, i, null,
+        `Check extraction loop condition: i = ${i} < k (${k}). Proceed to pull the next closest point.`,
+        `FOR i FROM 0 TO k-1  →  i = ${i}`,
+        {
           minHeap: `[${heap.map(h => `[${h.distance}, ${h.x}, ${h.y}]`).join(', ')}]`,
           result: `[${result.map(r => `[${r.join(',')}]`).join(', ')}]`,
           i: i
         },
-        pointStatuses: getStatuses(null, 'pop')
-      });
+        getStatuses(null, 'pop'),
+        15, 12, 11, 12
+      );
 
-      // Step G: shift/pop heap
       const current = heap.shift()!;
       const originalIdx = points.findIndex(pt => pt[0] === current.x && pt[1] === current.y);
-      s.push({
-        minHeap: [...heap],
-        result: [...result],
-        points: points,
-        activePointIdx: originalIdx,
-        activeDistance: current.distance,
-        i: i,
-        current: current,
-        explanation: `Extract (shift) the front element from the minHeap: [${current.distance}, ${current.x}, ${current.y}] (closest remaining point).`,
-        highlightedLines: [20],
-        variables: {
+      addStep(
+        [...heap], [...result], originalIdx, current.distance, i, current,
+        `Extract (shift) the front element from the minHeap: [${current.distance}, ${current.x}, ${current.y}] (closest remaining point).`,
+        "SET current = minHeap.shift()",
+        {
           minHeap: `[${heap.map(h => `[${h.distance}, ${h.x}, ${h.y}]`).join(', ')}]`,
           result: `[${result.map(r => `[${r.join(',')}]`).join(', ')}]`,
           i: i,
           current: `[${current.distance}, ${current.x}, ${current.y}]`
         },
-        pointStatuses: getStatuses(originalIdx, 'pop')
-      });
+        getStatuses(originalIdx, 'pop'),
+        16, 13, 12, 13
+      );
 
-      // Step H: push to result
       result.push([current.x, current.y]);
-      s.push({
-        minHeap: [...heap],
-        result: [...result],
-        points: points,
-        activePointIdx: null,
-        activeDistance: null,
-        i: i,
-        current: current,
-        explanation: `Push the extracted coordinates [${current.x}, ${current.y}] to the result list.`,
-        highlightedLines: [21, 22, 23],
-        variables: {
+      addStep(
+        [...heap], [...result], null, null, i, current,
+        `Push the extracted coordinates [${current.x}, ${current.y}] to the result list.`,
+        `CALL result.push([current.x, current.y])`,
+        {
           minHeap: `[${heap.map(h => `[${h.distance}, ${h.x}, ${h.y}]`).join(', ')}]`,
           result: `[${result.map(r => `[${r.join(',')}]`).join(', ')}]`,
           i: i,
           current: `[${current.distance}, ${current.x}, ${current.y}]`
         },
-        pointStatuses: getStatuses(null, 'pop')
-      });
+        getStatuses(null, 'pop'),
+        18, 13, 13, 15
+      );
     }
 
-    // Step I: loop check exit
-    s.push({
-      minHeap: [...heap],
-      result: [...result],
-      points: points,
-      activePointIdx: null,
-      activeDistance: null,
-      i: k,
-      current: null,
-      explanation: `Check loop condition: i = ${k} is not < k (${k}). Exit extraction loop.`,
-      highlightedLines: [19],
-      variables: {
+    addStep(
+      [...heap], [...result], null, null, k, null,
+      `Check loop condition: i = ${k} is not < k (${k}). Exit extraction loop.`,
+      `FOR i FROM 0 TO k-1  →  i = ${k} (NO)`,
+      {
         minHeap: `[${heap.map(h => `[${h.distance}, ${h.x}, ${h.y}]`).join(', ')}]`,
         result: `[${result.map(r => `[${r.join(',')}]`).join(', ')}]`,
         i: k
       },
-      pointStatuses: getStatuses(null, 'pop')
-    });
+      getStatuses(null, 'pop'),
+      15, 12, 11, 12
+    );
 
-    // Step J: return result
-    s.push({
-      minHeap: [...heap],
-      result: [...result],
-      points: points,
-      activePointIdx: null,
-      activeDistance: null,
-      i: null,
-      current: null,
-      explanation: `Algorithm complete. Return the final result containing the k closest points: [${result.map(r => `[${r.join(',')}]`).join(', ')}].`,
-      highlightedLines: [26],
-      variables: {
+    addStep(
+      [...heap], [...result], null, null, null, null,
+      `Algorithm complete. Return the final result containing the k closest points: [${result.map(r => `[${r.join(',')}]`).join(', ')}].`,
+      "RETURN result",
+      {
         result: `[${result.map(r => `[${r.join(',')}]`).join(', ')}]`
       },
-      pointStatuses: getStatuses(null, 'done')
-    });
+      getStatuses(null, 'done'),
+      21, 14, 16, 17
+    );
 
-    return s;
+    return { steps: stepsList, stepLineNumbers: lines };
   }, [initialPoints]);
 
-  const code = `function kClosest(points: number[][], k: number): number[][] {
-    const minHeap: number[][] = [];
-
-    const compare = (a: number[], b: number[]): number => {
-        return a[0] - b[0];
-    };
-
-    const getDistance = (point: number[]): number => {
-        return point[0] * point[0] + point[1] * point[1];
-    };
-
-    for (const point of points) {
-        const distance = getDistance(point);
-        minHeap.push([distance, point[0], point[1]]);
-        minHeap.sort(compare);
-    }
-
-    const result: number[][] = [];
-    for (let i = 0; i < k; i++) {
-        const current = minHeap.shift();
-        if (current) {
-            result.push([current[1], current[2]]);
-        }
-    }
-
-    return result;
-}`;
-
   const step = steps[currentStep];
+  const pseudoSteps = useMemo(() => steps.map(s => s.pseudoStep), [steps]);
 
   // SVG dimensions & grid scaling details
   const svgSize = 320;
@@ -338,24 +353,20 @@ export const KClosestPointsVisualization = () => {
     <VisualizationLayout
       leftContent={
         <div className="space-y-6">
-          {/* Main Visual Arena */}
           <Card className="p-6 bg-card/50 backdrop-blur-sm border-primary/20 relative overflow-hidden flex flex-col items-center">
             <h3 className="text-xs font-semibold mb-4 text-muted-foreground uppercase tracking-widest text-center self-stretch">
               X-Y Coordinate Plane
             </h3>
 
-            {/* SVG Interactive Plane */}
             <div className="relative border border-border/60 bg-muted/10 rounded-2xl p-2 w-[340px] h-[340px] flex items-center justify-center shadow-inner">
               <svg width={svgSize} height={svgSize} className="overflow-visible select-none">
-                {/* Horizontal & Vertical grid lines */}
                 {Array.from({ length: 13 }).map((_, idx) => {
                   const val = idx - 6;
-                  if (val === 0) return null; // Skip axis
+                  if (val === 0) return null;
                   const sx = toSvgX(val);
                   const sy = toSvgY(val);
                   return (
                     <g key={`grid-${val}`}>
-                      {/* Vertical line */}
                       <line
                         x1={sx}
                         y1={0}
@@ -364,7 +375,6 @@ export const KClosestPointsVisualization = () => {
                         className="stroke-muted/30 stroke-[1]"
                         strokeDasharray="2,4"
                       />
-                      {/* Horizontal line */}
                       <line
                         x1={0}
                         y1={sy}
@@ -377,7 +387,6 @@ export const KClosestPointsVisualization = () => {
                   );
                 })}
 
-                {/* Main Axes */}
                 <line
                   x1={0}
                   y1={halfSize}
@@ -393,10 +402,8 @@ export const KClosestPointsVisualization = () => {
                   className="stroke-muted-foreground/40 stroke-[1.5]"
                 />
 
-                {/* Axes Label Ticks */}
                 {[-5, -3, 3, 5].map((val) => (
                   <g key={`axis-tick-${val}`}>
-                    {/* X axis tick */}
                     <line
                       x1={toSvgX(val)}
                       y1={halfSize - 3}
@@ -413,7 +420,6 @@ export const KClosestPointsVisualization = () => {
                       {val}
                     </text>
 
-                    {/* Y axis tick */}
                     <line
                       x1={halfSize - 3}
                       y1={toSvgY(val)}
@@ -432,7 +438,6 @@ export const KClosestPointsVisualization = () => {
                   </g>
                 ))}
 
-                {/* Concentric Boundary Circles */}
                 {circles.map((c, idx) => {
                   const radiusPixels = c.rVal * scale;
                   const isActiveRadius = step.activeDistance !== null && Math.abs(c.rVal * c.rVal - step.activeDistance) < 0.1;
@@ -444,7 +449,7 @@ export const KClosestPointsVisualization = () => {
                       cy={halfSize}
                       r={radiusPixels}
                       fill="none"
-                      className={`transition-all duration-100 ${
+                      className={`transition-all duration-100 \${
                         isActiveRadius
                           ? 'stroke-amber-500/40 stroke-[2] stroke-dash-animated'
                           : 'stroke-primary/5 stroke-[1]'
@@ -454,7 +459,6 @@ export const KClosestPointsVisualization = () => {
                   );
                 })}
 
-                {/* Pulsing Glowing Origin (0,0) */}
                 <circle
                   cx={halfSize}
                   cy={halfSize}
@@ -468,7 +472,6 @@ export const KClosestPointsVisualization = () => {
                   className="fill-indigo-500"
                 />
 
-                {/* Active point distance vector line */}
                 {step.activePointIdx !== null && (
                   <motion.line
                     initial={{ x2: halfSize, y2: halfSize }}
@@ -484,21 +487,17 @@ export const KClosestPointsVisualization = () => {
                   />
                 )}
 
-                {/* Plot the coordinate points */}
                 {step.points.map((pt, idx) => {
                   const sx = toSvgX(pt[0]);
                   const sy = toSvgY(pt[1]);
                   const status = step.pointStatuses[idx];
 
-                  // Visual configurations based on state
                   let dotClass = 'fill-muted stroke-muted-foreground/30 stroke-[1.5]';
                   let ringColor = 'transparent';
-                  let ringScale = 1;
 
                   if (status === 'active') {
                     dotClass = 'fill-amber-500 stroke-amber-200 stroke-[2] drop-shadow-[0_0_8px_rgba(245,158,11,0.8)]';
                     ringColor = 'rgba(245,158,11,0.4)';
-                    ringScale = 1.6;
                   } else if (status === 'heap') {
                     dotClass = 'fill-violet-600 stroke-violet-300 stroke-[1.5] drop-shadow-[0_0_4px_rgba(124,58,237,0.4)]';
                   } else if (status === 'result') {
@@ -511,7 +510,6 @@ export const KClosestPointsVisualization = () => {
 
                   return (
                     <g key={`pt-${idx}`}>
-                      {/* Active outer pulse ring */}
                       {status === 'active' && (
                         <circle
                           cx={sx}
@@ -525,20 +523,18 @@ export const KClosestPointsVisualization = () => {
                         />
                       )}
 
-                      {/* Main point circle */}
                       <circle
                         cx={sx}
                         cy={sy}
                         r={status === 'active' ? 7.5 : 6}
-                        className={`transition-all duration-100 ${dotClass}`}
+                        className={`transition-all duration-100 \${dotClass}`}
                       />
 
-                      {/* Point coordinates text tag */}
                       <text
                         x={sx}
                         y={sy - 12}
                         textAnchor="middle"
-                        className={`text-[9px] font-bold transition-all duration-100 ${
+                        className={`text-[9px] font-bold transition-all duration-100 \${
                           status === 'active'
                             ? 'fill-amber-500 dark:fill-amber-400 font-extrabold text-[10px]'
                             : status === 'result'
@@ -557,7 +553,6 @@ export const KClosestPointsVisualization = () => {
             </div>
           </Card>
 
-          {/* Interactive Guide Commentary */}
           <Card className="p-4 bg-primary/5 border-primary/20 relative overflow-hidden min-h-[96px] flex flex-col justify-center">
             <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
             <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-1.5 flex items-center gap-1.5">
@@ -569,7 +564,6 @@ export const KClosestPointsVisualization = () => {
             </p>
           </Card>
 
-          {/* Min-Heap Status Bar */}
           <Card className="p-4 bg-card border border-border/80 rounded-xl space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">
@@ -585,7 +579,7 @@ export const KClosestPointsVisualization = () => {
               <AnimatePresence mode="popLayout">
                 {step.minHeap.map((node, index) => (
                   <motion.div
-                    key={`heap-${node.x}-${node.y}-${index}`}
+                    key={`heap-\${node.x}-\${node.y}-\${index}`}
                     layout
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -610,14 +604,13 @@ export const KClosestPointsVisualization = () => {
             </div>
           </Card>
 
-          {/* Result Panel */}
           <Card className="p-4 bg-card border border-border/80 rounded-xl space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">
                 Final Closest Points (k = {k})
               </span>
               <div className="flex items-center gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 border border-emerald-300 animate-pulse" />
+                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 border border-emerald-300" />
                 <span className="text-[10px] text-muted-foreground uppercase font-bold">Closest K</span>
               </div>
             </div>
@@ -626,7 +619,7 @@ export const KClosestPointsVisualization = () => {
               <AnimatePresence mode="popLayout">
                 {step.result.map((pt, index) => (
                   <motion.div
-                    key={`res-${pt[0]}-${pt[1]}-${index}`}
+                    key={`res-\${pt[0]}-\${pt[1]}-\${index}`}
                     layout
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -651,15 +644,16 @@ export const KClosestPointsVisualization = () => {
             </div>
           </Card>
 
-          {/* Variables Inspector */}
           <VariablePanel variables={step.variables} />
         </div>
       }
       rightContent={
-        <AnimatedCodeEditor
-          code={code}
-          language="typescript"
-          highlightedLines={step.highlightedLines}
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStep}
+          onLanguageChange={() => setCurrentStep(0)}
         />
       }
       controls={
@@ -672,3 +666,4 @@ export const KClosestPointsVisualization = () => {
     />
   );
 };
+export default KClosestPointsVisualization;

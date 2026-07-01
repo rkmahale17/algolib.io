@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { ArrowDown, ArrowUp, Info } from 'lucide-react';
+import type { VisualizationLanguageMap, StepLineNumberMap } from '@/types/visualization';
 
 interface Step {
   small: number[];
@@ -13,121 +14,119 @@ interface Step {
   num: number | null;
   median: number | null;
   explanation: string;
-  highlightedLines: number[];
+  pseudoStep: string;
   variables: Record<string, any>;
 }
 
-export const FindMedianFromDataStreamVisualization = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [steps, setSteps] = useState<Step[]>([]);
-
-  const code = `class Heap {
-  private data: number[] = [];
-  private comparator: (a: number, b: number) => boolean;
-
-  constructor(comparator: (a: number, b: number) => boolean) {
-    this.comparator = comparator;
-  }
-
-  size(): number {
-    return this.data.length;
-  }
-
-  peek(): number {
-    return this.data[0];
-  }
-
-  push(val: number): void {
-    this.data.push(val);
-    this.heapifyUp();
-  }
-
-  pop(): number {
-    const top = this.data[0];
-    const last = this.data.pop()!;
-    if (this.data.length > 0) {
-      this.data[0] = last;
-      this.heapifyDown();
-    }
-    return top;
-  }
-
-  private heapifyUp(): void {
-    let i = this.data.length - 1;
-    while (i > 0) {
-      const parent = Math.floor((i - 1) / 2);
-      if (this.comparator(this.data[i], this.data[parent])) {
-        [this.data[i], this.data[parent]] = [this.data[parent], this.data[i]];
-        i = parent;
-      } else break;
-    }
-  }
-
-  private heapifyDown(): void {
-    let i = 0;
-    const n = this.data.length;
-
-    while (true) {
-      let left = 2 * i + 1;
-      let right = 2 * i + 2;
-      let best = i;
-
-      if (left < n && this.comparator(this.data[left], this.data[best])) {
-        best = left;
-      }
-      if (right < n && this.comparator(this.data[right], this.data[best])) {
-        best = right;
-      }
-
-      if (best !== i) {
-        [this.data[i], this.data[best]] = [this.data[best], this.data[i]];
-        i = best;
-      } else break;
-    }
-  }
-}
-
-class MedianFinder {
-  private small: Heap;
-  private large: Heap;
-
-  constructor() {
-    this.small = new Heap((a, b) => a > b);
-    this.large = new Heap((a, b) => a < b);
-  }
-
+const languages: VisualizationLanguageMap = {
+  typescript: `class MedianFinder {
+  private small: number[] = [];
+  private large: number[] = [];
+  constructor() {}
   addNum(num: number): void {
     this.small.push(num);
-
-    if (this.small.size() && this.large.size() &&
-        this.small.peek() > this.large.peek()) {
-      this.large.push(this.small.pop());
+    this.small.sort((a, b) => b - a);
+    if (this.large.length > 0 && this.small[0] > this.large[0]) {
+      this.large.push(this.small.shift()!);
+      this.large.sort((a, b) => a - b);
     }
-
-    if (this.small.size() > this.large.size() + 1) {
-      this.large.push(this.small.pop());
-    }
-
-    if (this.large.size() > this.small.size() + 1) {
-      this.small.push(this.large.pop());
+    if (this.small.length > this.large.length + 1) {
+      this.large.push(this.small.shift()!);
+      this.large.sort((a, b) => a - b);
+    } else if (this.large.length > this.small.length + 1) {
+      this.small.push(this.large.shift()!);
+      this.small.sort((a, b) => b - a);
     }
   }
-
   findMedian(): number {
-    if (this.small.size() > this.large.size()) {
-      return this.small.peek();
-    }
-
-    if (this.large.size() > this.small.size()) {
-      return this.large.peek();
-    }
-
-    return (this.small.peek() + this.large.peek()) / 2;
+    if (this.small.length > this.large.length) return this.small[0];
+    if (this.large.length > this.small.length) return this.large[0];
+    return (this.small[0] + this.large[0]) / 2.0;
   }
-}`;
+}`,
+  python: `class MedianFinder:
+    def __init__(self):
+        self.small = []
+        self.large = []
+    def addNum(self, num: int) -> None:
+        heapq.heappush(self.small, -num)
+        if self.large and (-self.small[0] > self.large[0]):
+            heapq.heappush(self.large, -heapq.heappop(self.small))
+        if len(self.small) > len(self.large) + 1:
+            heapq.heappush(self.large, -heapq.heappop(self.small))
+        elif len(self.large) > len(self.small) + 1:
+            heapq.heappush(self.small, -heapq.heappop(self.large))
+    def findMedian(self) -> float:
+        if len(self.small) > len(self.large):
+            return -self.small[0]
+        elif len(self.large) > len(self.small):
+            return self.large[0]
+        else:
+            return (-self.small[0] + self.large[0]) / 2.0`,
+  java: `public static class Solution {
+    public static class MedianFinder {
+        private PriorityQueue<Integer> small;
+        private PriorityQueue<Integer> large;
+        public MedianFinder() {
+            this.small = new PriorityQueue<>((a, b) -> b - a);
+            this.large = new PriorityQueue<>();
+        }
+        public void addNum(int num) {
+            small.offer(num);
+            if (!large.isEmpty() && small.peek() > large.peek()) {
+                large.offer(small.poll());
+            }
+            if (small.size() > large.size() + 1) {
+                large.offer(small.poll());
+            } else if (large.size() > small.size() + 1) {
+                small.offer(large.poll());
+            }
+        }
+        public double findMedian() {
+            if (small.size() > large.size()) {
+                return small.peek();
+            } else if (large.size() > small.size()) {
+                return large.peek();
+            } else {
+                return (small.peek() + large.peek()) / 2.0;
+            }
+        }
+    }
+}`,
+  cpp: `class Solution {
+private:
+    priority_queue<int> small;
+    priority_queue<int, vector<int>, greater<int>> large;
+public:
+    Solution() {}
+    void addNum(int num) {
+        small.push(num);
+        if (!small.empty() && !large.empty() && small.top() > large.top()) {
+            large.push(small.top());
+            small.pop();
+        }
+        if (small.size() > large.size() + 1) {
+            large.push(small.top());
+            small.pop();
+        } else if (large.size() > small.size() + 1) {
+            small.push(large.top());
+            large.pop();
+        }
+    }
+    double findMedian() {
+        if (small.size() > large.size()) return small.top();
+        if (large.size() > small.size()) return large.top();
+        return (small.top() + large.top()) / 2.0;
+    }
+};`
+};
 
-  const generateSteps = () => {
+export const FindMedianFromDataStreamVisualization = () => {
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const [{ steps, stepLineNumbers }] = useState(() => {
     const s: Step[] = [];
+    const lines: StepLineNumberMap = { typescript: [], python: [], java: [], cpp: [] };
     const inputs = [5, 10, 2, 8, 3, 7];
     let smallHeap: number[] = [];
     let largeHeap: number[] = [];
@@ -139,155 +138,187 @@ class MedianFinder {
       return (sH[0] + lH[0]) / 2;
     };
 
-    // Initial state
-    s.push({
-      small: [],
-      large: [],
-      num: null,
-      median: null,
-      explanation: "Initialize two heaps: Max-Heap (small) and Min-Heap (large).",
-      highlightedLines: [71, 72, 73, 74],
-      variables: { smallSize: 0, largeSize: 0 }
-    });
+    const addStep = (
+      small: number[],
+      large: number[],
+      num: number | null,
+      median: number | null,
+      explanation: string,
+      pseudo: string,
+      variables: Record<string, any>,
+      ts: number, py: number, java: number, cpp: number
+    ) => {
+      s.push({
+        small,
+        large,
+        num,
+        median,
+        explanation,
+        pseudoStep: pseudo,
+        variables
+      });
+      lines.typescript!.push(ts);
+      lines.python!.push(py);
+      lines.java!.push(java);
+      lines.cpp!.push(cpp);
+    };
+
+    addStep(
+      [], [], null, null,
+      "Initialize two heaps: Max-Heap (small) and Min-Heap (large).",
+      "SET small = Heap(max), large = Heap(min)",
+      { smallSize: 0, largeSize: 0 },
+      4, 2, 5, 6
+    );
 
     inputs.forEach((num) => {
-      // Step: Start addNum
-      s.push({
-        small: [...smallHeap],
-        large: [...largeHeap],
+      addStep(
+        [...smallHeap],
+        [...largeHeap],
         num,
-        median: getMedian(smallHeap, largeHeap),
-        explanation: `Calling addNum(${num}).`,
-        highlightedLines: [76],
-        variables: { num, smallSize: smallHeap.length, largeSize: largeHeap.length }
-      });
+        getMedian(smallHeap, largeHeap),
+        `Calling addNum(${num}).`,
+        `CALL addNum(num=${num})`,
+        { num, smallSize: smallHeap.length, largeSize: largeHeap.length },
+        5, 5, 9, 7
+      );
 
-      // Step: Push to small
       smallHeap.push(num);
-      smallHeap.sort((a, b) => b - a); // Simulate max heap
-      s.push({
-        small: [...smallHeap],
-        large: [...largeHeap],
+      smallHeap.sort((a, b) => b - a);
+      addStep(
+        [...smallHeap],
+        [...largeHeap],
         num,
-        median: getMedian(smallHeap, largeHeap),
-        explanation: `Push ${num} to the small (max) heap.`,
-        highlightedLines: [77],
-        variables: { num, small: `[${smallHeap.join(', ')}]`, smallSize: smallHeap.length }
-      });
+        getMedian(smallHeap, largeHeap),
+        `Push ${num} to the small (max) heap.`,
+        `CALL small.push(${num})`,
+        { num, small: `[${smallHeap.join(', ')}]`, smallSize: smallHeap.length },
+        6, 6, 10, 8
+      );
 
-      // Step: Check ordering
-      s.push({
-        small: [...smallHeap],
-        large: [...largeHeap],
+      addStep(
+        [...smallHeap],
+        [...largeHeap],
         num,
-        median: getMedian(smallHeap, largeHeap),
-        explanation: "Check if max element of small heap is greater than min element of large heap.",
-        highlightedLines: [79, 80],
-        variables: { smallMax: smallHeap[0], largeMin: largeHeap[0] || 'N/A' }
-      });
+        getMedian(smallHeap, largeHeap),
+        "Check if max element of small heap is greater than min element of large heap.",
+        `IF small.peek() > large.peek()  →  ${largeHeap.length > 0 ? (smallHeap[0] > largeHeap[0] ? 'YES ✓' : 'NO ✗') : 'N/A'}`,
+        { smallMax: smallHeap[0], largeMin: largeHeap[0] || 'N/A' },
+        8, 7, 11, 9
+      );
 
       if (smallHeap.length && largeHeap.length && smallHeap[0] > largeHeap[0]) {
         const val = smallHeap.shift()!;
         largeHeap.push(val);
-        largeHeap.sort((a, b) => a - b); // Simulate min heap
-        s.push({
-          small: [...smallHeap],
-          large: [...largeHeap],
+        largeHeap.sort((a, b) => a - b);
+        addStep(
+          [...smallHeap],
+          [...largeHeap],
           num,
-          median: getMedian(smallHeap, largeHeap),
-          explanation: `Max of small (${val}) > min of large. Move ${val} to large heap to maintain ordering.`,
-          highlightedLines: [81],
-          variables: { small: `[${smallHeap.join(', ')}]`, large: `[${largeHeap.join(', ')}]` }
-        });
+          getMedian(smallHeap, largeHeap),
+          `Max of small (${val}) > min of large. Move ${val} to large heap to maintain ordering.`,
+          `CALL large.push(small.pop())`,
+          { small: `[${smallHeap.join(', ')}]`, large: `[${largeHeap.join(', ')}]` },
+          9, 8, 12, 10
+        );
       }
 
-      // Step: Balance sizes (small too big)
-      s.push({
-        small: [...smallHeap],
-        large: [...largeHeap],
+      addStep(
+        [...smallHeap],
+        [...largeHeap],
         num,
-        median: getMedian(smallHeap, largeHeap),
-        explanation: "Check if small heap size > large heap size + 1.",
-        highlightedLines: [84],
-        variables: { smallSize: smallHeap.length, largeSize: largeHeap.length }
-      });
+        getMedian(smallHeap, largeHeap),
+        "Check if small heap size > large heap size + 1.",
+        `IF small.size() > large.size() + 1  →  ${smallHeap.length > largeHeap.length + 1 ? 'YES ✓' : 'NO ✗'}`,
+        { smallSize: smallHeap.length, largeSize: largeHeap.length },
+        12, 9, 14, 13
+      );
 
       if (smallHeap.length > largeHeap.length + 1) {
         const val = smallHeap.shift()!;
         largeHeap.push(val);
         largeHeap.sort((a, b) => a - b);
-        s.push({
-          small: [...smallHeap],
-          large: [...largeHeap],
+        addStep(
+          [...smallHeap],
+          [...largeHeap],
           num,
-          median: getMedian(smallHeap, largeHeap),
-          explanation: `Small heap is too large. Move max element (${val}) to large heap.`,
-          highlightedLines: [85],
-          variables: { small: `[${smallHeap.join(', ')}]`, large: `[${largeHeap.join(', ')}]` }
-        });
+          getMedian(smallHeap, largeHeap),
+          `Small heap is too large. Move max element (${val}) to large heap.`,
+          `CALL large.push(small.pop())`,
+          { small: `[${smallHeap.join(', ')}]`, large: `[${largeHeap.join(', ')}]` },
+          13, 10, 15, 14
+        );
       }
 
-      // Step: Balance sizes (large too big)
-      s.push({
-        small: [...smallHeap],
-        large: [...largeHeap],
+      addStep(
+        [...smallHeap],
+        [...largeHeap],
         num,
-        median: getMedian(smallHeap, largeHeap),
-        explanation: "Check if large heap size > small heap size + 1.",
-        highlightedLines: [88],
-        variables: { smallSize: smallHeap.length, largeSize: largeHeap.length }
-      });
+        getMedian(smallHeap, largeHeap),
+        "Check if large heap size > small heap size + 1.",
+        `IF large.size() > small.size() + 1  →  ${largeHeap.length > smallHeap.length + 1 ? 'YES ✓' : 'NO ✗'}`,
+        { smallSize: smallHeap.length, largeSize: largeHeap.length },
+        15, 11, 16, 16
+      );
 
       if (largeHeap.length > smallHeap.length + 1) {
         const val = largeHeap.shift()!;
         smallHeap.push(val);
         smallHeap.sort((a, b) => b - a);
-        s.push({
-          small: [...smallHeap],
-          large: [...largeHeap],
+        addStep(
+          [...smallHeap],
+          [...largeHeap],
           num,
-          median: getMedian(smallHeap, largeHeap),
-          explanation: `Large heap is too large. Move min element (${val}) to small heap.`,
-          highlightedLines: [89],
-          variables: { small: `[${smallHeap.join(', ')}]`, large: `[${largeHeap.join(', ')}]` }
-        });
+          getMedian(smallHeap, largeHeap),
+          `Large heap is too large. Move min element (${val}) to small heap.`,
+          `CALL small.push(large.pop())`,
+          { small: `[${smallHeap.join(', ')}]`, large: `[${largeHeap.join(', ')}]` },
+          16, 12, 17, 17
+        );
       }
 
-      // Step: findMedian Call
       const finalMedian = getMedian(smallHeap, largeHeap);
-      s.push({
-        small: [...smallHeap],
-        large: [...largeHeap],
-        num: null,
-        median: finalMedian,
-        explanation: `Calling findMedian(). Heaps are balanced and ordered.`,
-        highlightedLines: [93],
-        variables: { smallSize: smallHeap.length, largeSize: largeHeap.length }
-      });
+      addStep(
+        [...smallHeap],
+        [...largeHeap],
+        null,
+        finalMedian,
+        `Calling findMedian(). Heaps are balanced and ordered.`,
+        `CALL findMedian()`,
+        { smallSize: smallHeap.length, largeSize: largeHeap.length },
+        20, 13, 20, 21
+      );
 
-      s.push({
-        small: [...smallHeap],
-        large: [...largeHeap],
-        num: null,
-        median: finalMedian,
-        explanation: `Median is ${finalMedian}.`,
-        highlightedLines: smallHeap.length > largeHeap.length ? [95] : (largeHeap.length > smallHeap.length ? [99] : [102]),
-        variables: { median: finalMedian }
-      });
+      addStep(
+        [...smallHeap],
+        [...largeHeap],
+        null,
+        finalMedian,
+        `Median is ${finalMedian}.`,
+        `RETURN median → ${finalMedian}`,
+        { median: finalMedian },
+        smallHeap.length > largeHeap.length ? 21 : (largeHeap.length > smallHeap.length ? 22 : 23),
+        smallHeap.length > largeHeap.length ? 14 : (largeHeap.length > smallHeap.length ? 16 : 18),
+        smallHeap.length > largeHeap.length ? 21 : (largeHeap.length > smallHeap.length ? 23 : 25),
+        smallHeap.length > largeHeap.length ? 22 : (largeHeap.length > smallHeap.length ? 23 : 24)
+      );
     });
 
-    setSteps(s);
-  };
+    return { steps: s, stepLineNumbers: lines };
+  });
 
-  useEffect(() => {
-    generateSteps();
-  }, []);
-
-  if (steps.length === 0) return null;
   const step = steps[currentStep];
+  const pseudoSteps = useMemo(() => steps.map(s => s.pseudoStep), [steps]);
 
   return (
     <VisualizationLayout
+      controls={
+        <SimpleStepControls
+          currentStep={currentStep}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStep}
+        />
+      }
       leftContent={
         <div className="space-y-6">
           <Card className="p-6 bg-card/50 backdrop-blur-sm border-primary/20">
@@ -296,7 +327,6 @@ class MedianFinder {
             </div>
 
             <div className="grid grid-cols-2 gap-8 relative">
-              {/* Small Heap (Max Heap) */}
               <div className="flex flex-col items-center gap-4">
                 <div className="flex items-center gap-2 text-blue-500 font-bold text-xs uppercase">
                   <span>Small Heap</span>
@@ -306,7 +336,7 @@ class MedianFinder {
                   <AnimatePresence mode="popLayout">
                     {step.small.map((val, idx) => (
                       <motion.div
-                        key={`small-${val}-${idx}`}
+                        key={`small-\${val}-\${idx}`}
                         layout
                         initial={{ opacity: 0, scale: 0.8, y: 20 }}
                         animate={{
@@ -317,7 +347,7 @@ class MedianFinder {
                           borderColor: idx === 0 ? "rgb(59, 130, 246)" : "var(--border)"
                         }}
                         exit={{ opacity: 0, scale: 0.5, y: -20 }}
-                        className={`w-10 h-10 rounded-lg flex items-center justify-center border-2 font-bold shadow-sm ${
+                        className={`w-10 h-10 rounded-lg flex items-center justify-center border-2 font-bold shadow-sm \${
                           idx === 0 ? "z-10 shadow-blue-500/20" : ""
                         }`}
                       >
@@ -338,14 +368,12 @@ class MedianFinder {
                 </div>
               </div>
 
-              {/* Center Divider/Property */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
                 <div className="bg-background border-2 border-primary/20 rounded-full p-2 shadow-xl">
                   <span className="text-xs font-black text-primary">≤</span>
                 </div>
               </div>
 
-              {/* Large Heap (Min Heap) */}
               <div className="flex flex-col items-center gap-4">
                 <div className="flex items-center gap-2 text-green-500 font-bold text-xs uppercase">
                   <ArrowDown className="w-3 h-3" />
@@ -355,7 +383,7 @@ class MedianFinder {
                   <AnimatePresence mode="popLayout">
                     {step.large.map((val, idx) => (
                       <motion.div
-                        key={`large-${val}-${idx}`}
+                        key={`large-\${val}-\${idx}`}
                         layout
                         initial={{ opacity: 0, scale: 0.8, y: -20 }}
                         animate={{
@@ -366,7 +394,7 @@ class MedianFinder {
                           borderColor: idx === 0 ? "rgb(34, 197, 94)" : "var(--border)"
                         }}
                         exit={{ opacity: 0, scale: 0.5, y: 20 }}
-                        className={`w-10 h-10 rounded-lg flex items-center justify-center border-2 font-bold shadow-sm ${
+                        className={`w-10 h-10 rounded-lg flex items-center justify-center border-2 font-bold shadow-sm \${
                           idx === 0 ? "z-10 shadow-green-500/20" : ""
                         }`}
                       >
@@ -396,7 +424,7 @@ class MedianFinder {
                     {step.median !== null ? step.median : '-'}
                   </span>
                 </div>
-                <div className={`p-2 rounded-full ${step.num ? 'bg-primary/10 animate-pulse' : 'bg-muted'}`}>
+                <div className={`p-2 rounded-full \${step.num ? 'bg-primary/10 animate-pulse' : 'bg-muted'}`}>
                   {step.num ? (
                     <span className="text-xs font-bold text-primary px-2">Adding: {step.num}</span>
                   ) : (
@@ -425,17 +453,12 @@ class MedianFinder {
         </div>
       }
       rightContent={
-        <AnimatedCodeEditor
-          code={code}
-          language="typescript"
-          highlightedLines={step.highlightedLines}
-        />
-      }
-      controls={
-        <SimpleStepControls
-          currentStep={currentStep}
-          totalSteps={steps.length}
-          onStepChange={setCurrentStep}
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStep}
+          onLanguageChange={() => setCurrentStep(0)}
         />
       }
     />

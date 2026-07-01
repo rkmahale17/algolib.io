@@ -2,9 +2,10 @@ import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
 import { CheckCircle2, Search, BrainCircuit, Network, Layers } from 'lucide-react';
+import type { VisualizationLanguageMap, StepLineNumberMap } from '@/types/visualization';
 
 interface Step {
   board: string[][];
@@ -12,7 +13,7 @@ interface Step {
   currentPos: [number, number] | null;
   found: string[];
   message: string;
-  lineNumber: number;
+  pseudoStep: string;
 }
 
 class VisualTrieNode {
@@ -22,51 +23,39 @@ class VisualTrieNode {
   char: string = '';
 }
 
-export const WordSearchIIVisualization = () => {
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-
-  const code = `class TrieNode {
+const languages: VisualizationLanguageMap = {
+  typescript: `class TrieNode {
   children: Map<string, TrieNode>;
   isWord: boolean;
   word: string | null;
-
   constructor() {
     this.children = new Map();
     this.isWord = false;
     this.word = null;
   }
-
   addWord(word: string): void {
     let cur: TrieNode = this;
-
     for (const c of word) {
       if (!cur.children.has(c)) {
         cur.children.set(c, new TrieNode());
       }
       cur = cur.children.get(c)!;
     }
-
     cur.isWord = true;
     cur.word = word;
   }
 }
-
 function findWords(board: string[][], words: string[]): string[] {
   const root = new TrieNode();
-
   for (const w of words) {
     root.addWord(w);
   }
-
   const ROWS = board.length;
   const COLS = board[0].length;
-
   const res: string[] = [];
   const visit = new Set<string>();
-
   const dfs = (r: number, c: number, node: TrieNode): void => {
     const key = \`\${r},\${c}\`;
-
     if (
       r < 0 ||
       c < 0 ||
@@ -77,32 +66,183 @@ function findWords(board: string[][], words: string[]): string[] {
     ) {
       return;
     }
-
     visit.add(key);
-
     const nextNode = node.children.get(board[r][c])!;
-
     if (nextNode.isWord) {
       res.push(nextNode.word!);
       nextNode.isWord = false;
     }
-
     dfs(r + 1, c, nextNode);
     dfs(r - 1, c, nextNode);
     dfs(r, c + 1, nextNode);
     dfs(r, c - 1, nextNode);
-
     visit.delete(key);
   };
-
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
       dfs(r, c, root);
     }
   }
-
   return res;
-}`;
+}`,
+  python: `class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.is_word = False
+    def add_word(self, word):
+        cur = self
+        for c in word:
+            if c not in cur.children:
+                cur.children[c] = TrieNode()
+            cur = cur.children[c]
+        cur.is_word = True
+
+def findWords(board, words):
+    root = TrieNode()
+    for word in words:
+        root.add_word(word)
+    ROWS, COLS = len(board), len(board[0])
+    res = set()
+    visit = set()
+    def dfs(r, c, node, word):
+        if (
+            r < 0
+            or c < 0
+            or r >= ROWS
+            or c >= COLS
+            or (r, c) in visit
+            or board[r][c] not in node.children
+        ):
+            return
+        visit.add((r, c))
+        node = node.children[board[r][c]]
+        word += board[r][c]
+        if node.is_word:
+            res.add(word)
+        dfs(r + 1, c, node, word)
+        dfs(r - 1, c, node, word)
+        dfs(r, c + 0, node, word)
+        dfs(r, c - 1, node, word)
+        visit.remove((r, c))
+    for r in range(ROWS):
+        for c in range(COLS):
+            dfs(r, c, root, "")
+    return list(res)`,
+  java: `public static class Solution {
+    class TrieNode {
+        Map<Character, TrieNode> children;
+        boolean isWord;
+        public TrieNode() {
+            this.children = new HashMap<>();
+            this.isWord = false;
+        }
+        public void addWord(String word) {
+            TrieNode cur = this;
+            for (char c : word.toCharArray()) {
+                if (!cur.children.containsKey(c)) {
+                    cur.children.put(c, new TrieNode());
+                }
+                cur = cur.children.get(c);
+            }
+            cur.isWord = true;
+        }
+    }
+    public List<String> findWords(char[][] board, String[] words) {
+        TrieNode root = new TrieNode();
+        for (String w : words) {
+            root.addWord(w);
+        }
+        int ROWS = board.length;
+        int COLS = board[0].length;
+        Set<String> res = new HashSet<>();
+        Set<String> visit = new HashSet<>();
+        for (int r = 0; r < ROWS; r++) {
+            for (int c = 0; c < COLS; c++) {
+                dfs(r, c, root, "", board, res, visit);
+            }
+        }
+        return new ArrayList<>(res);
+    }
+    private void dfs(int r, int c, TrieNode node, String word, char[][] board, Set<String> res, Set<String> visit) {
+        int ROWS = board.length;
+        int COLS = board[0].length;
+        String key = r + "," + c;
+        if (
+            r < 0 ||
+            c < 0 ||
+            r >= ROWS ||
+            c >= COLS ||
+            visit.contains(key) ||
+            !node.children.containsKey(board[r][c])
+        ) {
+            return;
+        }
+        visit.add(key);
+        node = node.children.get(board[r][c]);
+        word += board[r][c];
+        if (node.isWord) {
+            res.add(word);
+        }
+        dfs(r + 1, c, node, word, board, res, visit);
+        dfs(r - 1, c, node, word, board, res, visit);
+        dfs(r, c + 1, node, word, board, res, visit);
+        dfs(r, c - 1, node, word, board, res, visit);
+        visit.remove(key);
+    }
+}`,
+  cpp: `class Solution {
+public:
+    struct TrieNode {
+        unordered_map<char, TrieNode*> children;
+        string word = "";
+    };
+    void dfs(vector<vector<char>>& board, int r, int c, TrieNode* node, set<string>& result) {
+        if (r < 0 || r >= board.size() || c < 0 || c >= board[0].size()) return;
+        char ch = board[r][c];
+        if (ch == '#' || node->children.find(ch) == node->children.end()) return;
+        node = node->children[ch];
+        if (!node->word.empty()) {
+            result.insert(node->word);
+        }
+        board[r][c] = '#';
+        dfs(board, r+1, c, node, result);
+        dfs(board, r-1, c, node, result);
+        dfs(board, r, c+1, node, result);
+        dfs(board, r, c-1, node, result);
+        board[r][c] = ch;
+    }
+    vector<string> findWords(vector<vector<char>>& board, vector<string>& words) {
+        TrieNode* root = new TrieNode();
+        for (const string& word : words) {
+            TrieNode* node = root;
+            for (char c : word) {
+                if (node->children.find(c) == node->children.end()) {
+                    node->children[c] = new TrieNode();
+                }
+                node = node->children[c];
+            }
+            node->word = word;
+        }
+        set<string> result;
+        for (int r = 0; r < board.size(); r++) {
+            for (int c = 0; c < board[0].size(); c++) {
+                dfs(board, r, c, root, result);
+            }
+        }
+        return vector<string>(result.begin(), result.end());
+    }
+};`
+};
+
+const stepLineNumbers: StepLineNumberMap = {
+  typescript: [1, 25, 25, 25, 25, 57, 43, 39, 43, 43, 43, 46, 53, 53, 57, 43, 43, 43, 46, 60],
+  python: [1, 16, 16, 16, 16, 42, 30, 27, 30, 30, 30, 33, 39, 39, 42, 30, 30, 30, 33, 43],
+  java: [3, 24, 24, 24, 24, 32, 51, 47, 51, 51, 51, 54, 61, 61, 32, 51, 51, 51, 54, 35],
+  cpp: [3, 32, 32, 32, 32, 37, 15, 10, 15, 15, 15, 12, 20, 20, 37, 15, 15, 15, 12, 40]
+};
+
+export const WordSearchIIVisualization = () => {
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
   const steps = useMemo(() => {
     const sArray: Step[] = [];
@@ -120,18 +260,18 @@ function findWords(board: string[][], words: string[]): string[] {
     const res: string[] = [];
     const visit = new Set<string>();
 
-    const snap = (msg: string, line: number, r: number | null = null, c: number | null = null) => {
+    const snap = (msg: string, pseudo: string, r: number | null = null, c: number | null = null) => {
       sArray.push({
         board: board.map(row => [...row]),
         visit: new Set(visit),
         currentPos: r !== null && c !== null ? [r, c] : null,
         found: [...res],
         message: msg,
-        lineNumber: line
+        pseudoStep: pseudo
       });
     };
 
-    snap("Initializing the Trie structure to efficiently search for multiple words.", 28);
+    snap("Initializing the Trie structure to efficiently search for multiple words.", "SET root = NEW TrieNode()");
 
     for (const w of words) {
         let cur = root;
@@ -145,120 +285,84 @@ function findWords(board: string[][], words: string[]): string[] {
         }
         cur.isWord = true;
         cur.word = w;
-        snap(`Added "${w}" to the Trie. This enables prefix-based pruning.`, 31);
+        snap(`Added "${w}" to the Trie. This enables prefix-based pruning.`, `CALL root.addWord("${w}")`);
     }
 
-    const dfs = (r: number, c: number, node: VisualTrieNode, prefix: string) => {
-      const char = board[r][c];
-      const key = `${r},${c}`;
-      
-      if (!node.children.has(char)) {
-         snap(`At (${r},${c}), "${char}" is not a child of "${prefix}" in Trie. Pruning.`, 49, r, c);
-         return;
-      }
+    snap("Iterating through the board to start DFS from every cell.", "FOR r = 0 TO ROWS, c = 0 TO COLS");
 
-      const nextNode = node.children.get(char)!;
-      const nextPrefix = prefix + char;
-
-      visit.add(key);
-      snap(`Exploring cell (${r},${c}) with character '${char}'. Current prefix: "${nextPrefix}".`, 54, r, c);
-
-      if (nextNode.isWord) {
-        res.push(nextNode.word!);
-        nextNode.isWord = false; 
-        snap(`Found word "${nextNode.word}"! Adding to results.`, 59, r, c);
-      }
-
-      // Explore 4 directions
-      const directions = [[1, 0], [-1, 0], [0, 1], [0, -1]];
-      for (let i = 0; i < directions.length; i++) {
-        const [dr, dc] = directions[i];
-        const nr = r + dr, nc = c + dc;
-        
-        if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && !visit.has(`${nr},${nc}`)) {
-             dfs(nr, nc, nextNode, nextPrefix);
-        }
-      }
-
-      visit.delete(key);
-      snap(`Backtracking from (${r},${c}). Removing "${char}" from current path.`, 68, r, c);
-    };
-
-    snap("Iterating through the board to start DFS from every cell.", 71);
-
-    // Show discovery of 'oath'
-    // (0,0) 'o' -> (1,0) 'e' (fails) -> (0,1) 'a' etc.
-    // Let's just simulate the successful path for 'oath' clearly
-    // board[0][0] = 'o'
-    // board[0][1] = 'a'
-    // board[1][1] = 't'
-    // board[2][1] = 'h'
-    
     // (0,0) 'o'
     const oNode = root.children.get('o')!;
     visit.add("0,0");
-    snap("Starting DFS from (0,0) with 'o'.", 54, 0, 0);
+    snap("Starting DFS from (0,0) with 'o'.", "CALL dfs(r=0, c=0, node=root)", 0, 0);
     
-    // (1,0) 'e'
-    const eNode_fail = oNode.children.get('e'); // Doesn't exist in 'o' children for "oath"
+    // (1,0) 'e' (fails)
+    const eNode_fail = oNode.children.get('e');
     if (!eNode_fail) {
-        snap("Checking neighbor (1,0) 'e'. Not in Trie under 'o'. Skipping.", 49, 1, 0);
+        snap("Checking neighbor (1,0) 'e'. Not in Trie under 'o'. Skipping.", "IF NOT node.children.has('e')  →  PRUNE", 1, 0);
     }
 
     // (0,1) 'a'
     const aNode = oNode.children.get('a')!;
     visit.add("0,1");
-    snap("Exploring neighbor (0,1) 'a'. Prefix: 'oa'.", 54, 0, 1);
+    snap("Exploring neighbor (0,1) 'a'. Prefix: 'oa'.", "CALL dfs(r=0, c=1, node=oNode)", 0, 1);
     
     // (1,1) 't'
     const tNode = aNode.children.get('t')!;
     visit.add("1,1");
-    snap("Exploring neighbor (1,1) 't'. Prefix: 'oat'.", 54, 1, 1);
+    snap("Exploring neighbor (1,1) 't'. Prefix: 'oat'.", "CALL dfs(r=1, c=1, node=aNode)", 1, 1);
     
     // (2,1) 'h'
     const hNode = tNode.children.get('h')!;
     visit.add("2,1");
-    snap("Exploring neighbor (2,1) 'h'. Prefix: 'oath'.", 54, 2, 1);
+    snap("Exploring neighbor (2,1) 'h'. Prefix: 'oath'.", "CALL dfs(r=2, c=1, node=tNode)", 2, 1);
     
     res.push("oath");
     hNode.isWord = false;
-    snap("Success! 'oath' is a complete word in our Trie.", 59, 2, 1);
+    snap("Success! 'oath' is a complete word in our Trie.", 'IF nextNode.isWord  →  res.push("oath")', 2, 1);
     
     // Backtrack h
     visit.delete("2,1");
-    snap("Backtracking from 'h'.", 68, 2, 1);
+    snap("Backtracking from 'h'.", 'visit.delete("2,1") (backtrack)', 2, 1);
     
     // Backtrack t
     visit.delete("1,1");
-    snap("Backtracking from 't'.", 68, 1, 1);
+    snap("Backtracking from 't'.", 'visit.delete("1,1") (backtrack)', 1, 1);
 
     // Show 'eat'
-    snap("Continuing search... Finding 'eat' starting from (1,0) 'e'.", 71);
+    snap("Continuing search... Finding 'eat' starting from (1,0) 'e'.", "FOR r = 1, c = 0");
     visit.add("1,0");
     const eNode = root.children.get('e')!;
-    snap("Starting DFS from (1,0) 'e'.", 54, 1, 0);
+    snap("Starting DFS from (1,0) 'e'.", "CALL dfs(r=1, c=0, node=root)", 1, 0);
     
     visit.add("1,1");
     const aNode2 = eNode.children.get('a')!;
-    snap("Exploring (1,1) 'a'. Prefix: 'ea'.", 54, 1, 1);
+    snap("Exploring (1,1) 'a'. Prefix: 'ea'.", "CALL dfs(r=1, c=1, node=eNode)", 1, 1);
     
     visit.add("1,2");
     const tNode2 = aNode2.children.get('t')!;
-    snap("Exploring (1,2) 't'. Prefix: 'eat'.", 54, 1, 2);
+    snap("Exploring (1,2) 't'. Prefix: 'eat'.", "CALL dfs(r=1, c=2, node=aNode2)", 1, 2);
     
     res.push("eat");
     tNode2.isWord = false;
-    snap("Found 'eat'!", 59, 1, 2);
+    snap("Found 'eat'!", 'IF nextNode.isWord  →  res.push("eat")', 1, 2);
 
-    snap("All possible paths explored. Search finished.", 77);
+    snap("All possible paths explored. Search finished.", "RETURN res");
 
     return sArray;
   }, []);
 
   const step = steps[currentStepIndex];
+  const pseudoSteps = useMemo(() => steps.map(s => s.pseudoStep), [steps]);
 
   return (
     <VisualizationLayout
+      controls={
+        <SimpleStepControls
+          currentStep={currentStepIndex}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStepIndex}
+        />
+      }
       leftContent={
         <div className="space-y-4">
           <Card className="p-5 bg-card/50 backdrop-blur-sm border-primary/20 shadow-lg shadow-primary/5">
@@ -318,8 +422,8 @@ function findWords(board: string[][], words: string[]): string[] {
                             <div key={i} className="flex items-center gap-2 text-xs text-green-600 font-bold bg-green-500/5 p-1.5 rounded border border-green-500/20">
                                <CheckCircle2 className="w-3 h-3" /> {word}
                             </div>
-                         ))}
-                         {step.found.length === 0 && <span className="text-[10px] italic text-muted-foreground">Searching...</span>}
+                          ))}
+                          {step.found.length === 0 && <span className="text-[10px] italic text-muted-foreground">Searching...</span>}
                       </div>
                    </div>
                 </div>
@@ -327,17 +431,17 @@ function findWords(board: string[][], words: string[]): string[] {
             </div>
           </Card>
 
-          <Card className={`p-4 border-l-4 relative overflow-hidden transition-all duration-300 shadow-sm flex items-center ${step?.lineNumber >= 54 && step?.lineNumber <= 66 ? 'bg-primary/10 border-primary' : 'bg-accent/30 border-primary'}`}>
+          <Card className="p-4 border-l-4 border-primary relative overflow-hidden transition-all duration-300 shadow-sm flex items-center bg-primary/5">
             <div className="flex items-start gap-4">
-              <div className={`p-2.5 rounded-xl shrink-0 ${step?.lineNumber >= 54 && step?.lineNumber <= 66 ? 'bg-primary text-primary-foreground' : 'bg-primary/10 text-primary'}`}>
-                {step?.lineNumber >= 59 ? <CheckCircle2 className="w-5 h-5" /> : <Search className="w-5 h-5" />}
+              <div className="p-2.5 rounded-xl shrink-0 bg-primary/10 text-primary">
+                {step.found.length > 0 ? <CheckCircle2 className="w-5 h-5" /> : <Search className="w-5 h-5" />}
               </div>
               <div className="space-y-1">
                 <h4 className="text-[9px] font-bold uppercase tracking-[0.12em] text-primary/80">
                   Execution Detail
                 </h4>
                 <p className="text-xs font-medium leading-relaxed text-foreground/90 leading-tight">
-                  {step?.message}
+                  {step.message}
                 </p>
               </div>
             </div>
@@ -354,19 +458,12 @@ function findWords(board: string[][], words: string[]): string[] {
         </div>
       }
       rightContent={
-        <div className="space-y-4 h-full flex flex-col">
-          <AnimatedCodeEditor
-            code={code}
-            highlightedLines={[step?.lineNumber || 1]}
-            language="typescript"
-          />
-        </div>
-      }
-      controls={
-        <SimpleStepControls
-          currentStep={currentStepIndex}
-          totalSteps={steps.length}
-          onStepChange={setCurrentStepIndex}
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStepIndex}
+          onLanguageChange={() => setCurrentStepIndex(0)}
         />
       }
     />

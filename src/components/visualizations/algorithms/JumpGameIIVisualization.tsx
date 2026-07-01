@@ -2,9 +2,10 @@ import React, { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
 import { User } from 'lucide-react';
+import type { VisualizationLanguageMap, StepLineNumberMap } from '@/types/visualization';
 
 interface Step {
   nums: number[];
@@ -14,8 +15,74 @@ interface Step {
   jumps: number;
   variables: Record<string, any>;
   explanation: string;
-  highlightedLines: number[];
+  pseudoStep: string;
 }
+
+const languages: VisualizationLanguageMap = {
+  typescript: `function jump(nums: number[]): number {
+  let res = 0;
+  let l = 0;
+  let r = 0;
+  while (r < nums.length - 1) {
+    let farthest = 0;
+    for (let i = l; i <= r; i++) {
+      farthest = Math.max(farthest, i + nums[i]);
+    }
+    l = r + 1;
+    r = farthest;
+    res++;
+  }
+  return res;
+}`,
+  python: `def jump(nums):
+    res = 0
+    l = 0
+    r = 0
+    while r < len(nums) - 1:
+        farthest = 0
+        for i in range(l, r + 1):
+            farthest = max(farthest, i + nums[i])
+        l = r + 1
+        r = farthest
+        res += 1
+    return res`,
+  java: `public static class Solution {
+    public int jump(int[] nums) {
+        int res = 0;
+        int l = 0;
+        int r = 0;
+        while (r < nums.length - 1) {
+            int farthest = 0;
+            for (int i = l; i <= r; i++) {
+                farthest = Math.max(farthest, i + nums[i]);
+            }
+            l = r + 1;
+            r = farthest;
+            res++;
+        }
+        return res;
+    }
+}`,
+  cpp: `class Solution {
+public:
+    int jump(vector<int>& nums) {
+        int n = nums.size();
+        int res = 0;
+        int l = 0;
+        int r = 0;
+        while (r < n - 1) {
+            int farthest = 0;
+            for (int i = l; i <= r; i++) {
+                farthest = max(farthest, i + nums[i]);
+            }
+            l = r + 1;
+            r = farthest;
+            res++;
+        }
+        return res;
+    }
+};`
+};
 
 export const JumpGameIIVisualization: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -25,104 +92,113 @@ export const JumpGameIIVisualization: React.FC = () => {
     caseType === 'case1' ? [2, 3, 1, 1, 4] : [2, 1, 1, 1, 4], 
   [caseType]);
 
-  const code = `function jump(nums: number[]): number {
-  let jumps = 0;
-  let currentEnd = 0;
-  let farthest = 0;
-  for (let i = 0; i < nums.length - 1; i++) {
-    farthest = Math.max(farthest, i + nums[i]);
-    if (i === currentEnd) {
-      jumps++;
-      currentEnd = farthest;
-    }
-  }
-  return jumps;
-}`;
-
-  const steps = useMemo(() => {
-    const stepsList: Step[] = [];
+  const { steps, stepLineNumbers } = useMemo(() => {
+    const s: Step[] = [];
+    const lines: StepLineNumberMap = { typescript: [], python: [], java: [], cpp: [] };
     const n = nums.length;
-    let jumps = 0;
-    let currentEnd = 0;
-    let farthest = 0;
+    let res = 0;
+    let l = 0;
+    let r = 0;
 
-    stepsList.push({
-      nums,
-      i: null,
-      currentEnd,
-      farthest,
-      jumps,
-      variables: { jumps, currentEnd, farthest, "nums.length": n },
-      explanation: `Initialize variables. We start at index 0. 'jumps' tracks total jumps made. 'currentEnd' tracks the maximum reachable index with the current number of jumps. 'farthest' tracks the maximum reachable index we have discovered so far.`,
-      highlightedLines: [2, 3, 4]
-    });
-
-    for (let i = 0; i < n - 1; i++) {
-      stepsList.push({
+    const addStep = (
+      i: number | null,
+      currentEnd: number,
+      farthest: number,
+      jumps: number,
+      msg: string,
+      pseudo: string,
+      variables: Record<string, any>,
+      ts: number, py: number, java: number, cpp: number
+    ) => {
+      s.push({
         nums,
         i,
         currentEnd,
         farthest,
         jumps,
-        variables: { i, "nums[i]": nums[i], jumps, currentEnd, farthest },
-        explanation: `Iterating through the array. We are currently at index ${i}.`,
-        highlightedLines: [5]
+        variables,
+        explanation: msg,
+        pseudoStep: pseudo
       });
+      lines.typescript!.push(ts);
+      lines.python!.push(py);
+      lines.java!.push(java);
+      lines.cpp!.push(cpp);
+    };
 
-      const nextFarthest = Math.max(farthest, i + nums[i]);
-      const updatedFarthest = nextFarthest > farthest;
-      farthest = nextFarthest;
+    // Initialize
+    addStep(
+      null, r, 0, res,
+      `Initialize variables. 'res' (jumps) = 0. Current window range is [l=${l}, r=${r}].`,
+      "SET res = 0, l = 0, r = 0",
+      { res, l, r },
+      2, 2, 3, 5
+    );
 
-      stepsList.push({
-        nums,
-        i,
-        currentEnd,
-        farthest,
-        jumps,
-        variables: { i, "nums[i]": nums[i], jumps, currentEnd, farthest },
-        explanation: `From index ${i}, we can reach up to index ${i} + ${nums[i]} = ${i + nums[i]}.` + (updatedFarthest ? ` We update 'farthest' to ${farthest} because it's further than our previous known farthest reach.` : ` 'farthest' remains ${farthest} as this doesn't extend our maximum reach.`),
-        highlightedLines: [6]
-      });
+    while (r < n - 1) {
+      // While loop condition check
+      addStep(
+        null, r, 0, res,
+        `Check while loop condition: r (${r}) < nums.length - 1 (${n - 1}) → True. We haven't reached the end.`,
+        `WHILE r < nums.length - 1  →  ${r} < ${n - 1} (YES)`,
+        { r, "nums.length - 1": n - 1 },
+        5, 5, 6, 8
+      );
 
-      stepsList.push({
-        nums,
-        i,
-        currentEnd,
-        farthest,
-        jumps,
-        variables: { i, jumps, currentEnd, farthest, "i === currentEnd": i === currentEnd },
-        explanation: `Check if we have reached 'currentEnd' (${currentEnd}). 'currentEnd' is the boundary of our current jump window.`,
-        highlightedLines: [7]
-      });
+      let farthest = 0;
+      // Initialize farthest
+      addStep(
+        null, r, farthest, res,
+        `Initialize 'farthest = 0'. We will scan the current range [l=${l}, r=${r}] to find the furthest index we can reach.`,
+        "SET farthest = 0",
+        { l, r, farthest },
+        6, 6, 7, 9
+      );
 
-      if (i === currentEnd) {
-        jumps++;
-        currentEnd = farthest;
-        stepsList.push({
-          nums,
-          i,
-          currentEnd,
-          farthest,
-          jumps,
-          variables: { i, jumps, currentEnd, farthest },
-          explanation: `We reached the end of our current jump window (index ${i}). We must take a jump here to continue. We increment 'jumps' to ${jumps} and update our 'currentEnd' boundary to our 'farthest' known reach (${currentEnd}).`,
-          highlightedLines: [8, 9]
-        });
+      for (let i = l; i <= r; i++) {
+        farthest = Math.max(farthest, i + nums[i]);
+        // Inner loop iteration
+        addStep(
+          i, r, farthest, res,
+          `At index ${i}: nums[${i}] = ${nums[i]}. Farthest reachable index from here is ${i} + ${nums[i]} = ${i + nums[i]}. Update 'farthest' = ${farthest}.`,
+          `SET farthest = max(farthest, ${i} + nums[${i}]) → ${farthest}`,
+          { i, "nums[i]": nums[i], farthest },
+          8, 8, 9, 11
+        );
       }
+
+      l = r + 1;
+      r = farthest;
+      res++;
+      // Update window range and increment jump count
+      addStep(
+        null, r, farthest, res,
+        `Update next jump window: l = r + 1 = ${l}. r = farthest = ${r}. Increment jumps 'res' = ${res}.`,
+        `SET l = r + 1, r = farthest, res = res + 1`,
+        { l, r, res },
+        10, 9, 11, 13
+      );
     }
 
-    stepsList.push({
-      nums,
-      i: nums.length - 1, // Show the final position
-      currentEnd,
-      farthest,
-      jumps,
-      variables: { jumps },
-      explanation: `We have processed up to the second-to-last element. We are guaranteed to reach the end. The minimum number of jumps required is ${jumps}.`,
-      highlightedLines: [12]
-    });
+    // Loop terminates
+    addStep(
+      null, r, 0, res,
+      `Check while loop condition: r (${r}) < nums.length - 1 (${n - 1}) → False. We have reached or exceeded the last index!`,
+      `WHILE r < nums.length - 1  →  ${r} < ${n - 1} (NO)`,
+      { r, "nums.length - 1": n - 1 },
+      5, 5, 6, 8
+    );
 
-    return stepsList;
+    // Return result
+    addStep(
+      null, r, 0, res,
+      `Return the minimum number of jumps required: ${res}.`,
+      `RETURN res → ${res}`,
+      { res },
+      14, 12, 15, 17
+    );
+
+    return { steps: s, stepLineNumbers: lines };
   }, [nums]);
 
   const handleCaseToggle = (type: 'case1' | 'case2') => {
@@ -131,9 +207,17 @@ export const JumpGameIIVisualization: React.FC = () => {
   };
 
   const step = steps[currentStep];
+  const pseudoSteps = useMemo(() => steps.map(s => s.pseudoStep), [steps]);
 
   return (
     <VisualizationLayout
+      controls={
+        <SimpleStepControls
+          currentStep={currentStep}
+          totalSteps={steps.length}
+          onStepChange={setCurrentStep}
+        />
+      }
       leftContent={
         <div className="space-y-4 flex flex-col h-full">
           <div className="flex gap-2 mb-2">
@@ -162,7 +246,6 @@ export const JumpGameIIVisualization: React.FC = () => {
             <Card className="p-8 bg-card/60 backdrop-blur border-border/50 shadow-sm overflow-hidden relative">
               <div className="mb-8 mt-12 relative">
                 
-                {/* Connection lines for reachability */}
                 {step.i !== null && step.farthest > step.i && (
                   <div className="absolute top-[-30px] left-0 w-full h-[30px] overflow-hidden opacity-30 pointer-events-none">
                      <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0 }}>
@@ -186,9 +269,8 @@ export const JumpGameIIVisualization: React.FC = () => {
                     
                     return (
                       <div key={idx} className="flex flex-col items-center gap-1 group relative w-10">
-                        {/* Jumping Person Icon */}
                         <div 
-                          className={`absolute -top-10 transition-all duration-300 ease-in-out ${
+                          className={`absolute -top-10 transition-all duration-300 ease-in-out \${
                             isCurrent ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
                           }`}
                         >
@@ -198,7 +280,7 @@ export const JumpGameIIVisualization: React.FC = () => {
                         </div>
 
                         <div 
-                          className={`w-10 h-10 flex items-center justify-center rounded border-2 font-black transition-colors duration-0 ${
+                          className={`w-10 h-10 flex items-center justify-center rounded border-2 font-black transition-colors duration-0 \${
                             isCurrent ? "border-orange-500 bg-orange-100 text-black shadow-md z-10" :
                             inCurrentWindow ? "border-blue-300 bg-blue-50 text-blue-900" :
                             "border-gray-200 bg-white text-black"
@@ -238,21 +320,12 @@ export const JumpGameIIVisualization: React.FC = () => {
         </div>
       }
       rightContent={
-        <div className="h-full flex flex-col">
-           <Card className="flex-1 overflow-hidden flex flex-col shadow-sm border-border/50">
-             <AnimatedCodeEditor
-               code={code}
-               language="typescript"
-               highlightedLines={step.highlightedLines}
-             />
-           </Card>
-        </div>
-      }
-      controls={
-        <SimpleStepControls
-          currentStep={currentStep}
-          totalSteps={steps.length}
-          onStepChange={setCurrentStep}
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStep}
+          onLanguageChange={() => setCurrentStep(0)}
         />
       }
     />

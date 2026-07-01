@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
+import type { StepLineNumberMap, VisualizationLanguageMap } from '@/types/visualization';
 
 interface Step {
   s: string;
@@ -14,186 +15,232 @@ interface Step {
   currentI: number;
   phase: 'init' | 'buildMap' | 'initPartition' | 'partition' | 'done';
   explanation: string;
-  highlightedLines: number[];
-  lineExecution: string;
+  pseudoStep: string;
   variables: Record<string, any>;
 }
 
-export const PartitionLabelsVisualization = () => {
-  const [steps, setSteps] = useState<Step[]>([]);
-  const [currentStep, setCurrentStep] = useState(0);
-
-  const code = `function partitionLabels(s: string): number[] {
+const languages: VisualizationLanguageMap = {
+  typescript: `function partitionLabels(s: string): number[] {
   const lastIndex = new Map<string, number>();
-
   for (let i = 0; i < s.length; i++) {
     lastIndex.set(s[i], i);
   }
-
   const result: number[] = [];
   let currentPartitionSize = 0;
   let farthestReach = 0;
-
   for (let i = 0; i < s.length; i++) {
     currentPartitionSize++;
     farthestReach = Math.max(farthestReach, lastIndex.get(s[i])!);
-
     if (i === farthestReach) {
       result.push(currentPartitionSize);
       currentPartitionSize = 0;
     }
   }
-
   return result;
-}`;
+}`,
+  python: `def partitionLabels(s: str) -> list[int]:
+    last_index = {}
+    for i, char in enumerate(s):
+        last_index[char] = i
+    result = []
+    size = 0
+    end = 0
+    for i, char in enumerate(s):
+        size += 1
+        end = max(end, last_index[char])
+        if i == end:
+            result.append(size)
+            size = 0
+    return result`,
+  java: `public static class Solution {
+    public List<Integer> partitionLabels(String s) {
+        Map<Character, Integer> lastIndex = new HashMap<>();
+        for (int i = 0; i < s.length; i++) {
+            lastIndex.put(s.charAt(i), i);
+        }
+        List<Integer> result = new ArrayList<>();
+        int currentPartitionSize = 0;
+        int farthestReach = 0;
+        for (int i = 0; i < s.length; i++) {
+            currentPartitionSize++;
+            farthestReach = Math.max(farthestReach, lastIndex.get(s.charAt(i)));
+            if (i == farthestReach) {
+                result.add(currentPartitionSize);
+                currentPartitionSize = 0;
+            }
+        }
+        return result;
+    }
+}`,
+  cpp: `class Solution {
+public:
+    vector<int> partitionLabels(string s) {
+        vector<int> lastIndex(26, 0);
+        for (int i = 0; i < s.length; ++i) {
+            lastIndex[s[i] - 'a'] = i;
+        }
+        vector<int> result;
+        int partitionSize = 0;
+        int currentPartitionEnd = 0;
+        for (int i = 0; i < s.length; ++i) {
+            partitionSize++;
+            currentPartitionEnd = max(currentPartitionEnd, lastIndex[s[i] - 'a']);
+            if (i == currentPartitionEnd) {
+                result.push_back(partitionSize);
+                partitionSize = 0;
+            }
+        }
+        return result;
+    }
+};`
+};
 
-  const generateSteps = () => {
-    const s = "abacbdeed";
+export const PartitionLabelsVisualization = () => {
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const sWord = "abacbdeed";
+
+  const { steps, stepLineNumbers } = useMemo(() => {
+    const s = sWord;
     const newSteps: Step[] = [];
     const lastIndex: Record<string, number> = {};
-    
-    newSteps.push({
-      s,
-      lastIndex: { ...lastIndex },
-      result: [],
-      currentPartitionSize: 0,
-      farthestReach: 0,
-      currentI: -1,
-      phase: 'init',
-      explanation: "To ensure each letter appears in at most one part, we first need to know the absolute LAST time every character appears in the string. We initialize an empty map 'lastIndex' to record this.",
-      highlightedLines: [2],
-      lineExecution: "const lastIndex = new Map<string, number>();",
-      variables: {}
-    });
+    const lines: StepLineNumberMap = { typescript: [], python: [], java: [], cpp: [] };
 
-    for (let i = 0; i < s.length; i++) {
-      lastIndex[s[i]] = i;
+    const addStep = (
+      phase: 'init' | 'buildMap' | 'initPartition' | 'partition' | 'done',
+      explanation: string,
+      pseudo: string,
+      vars: any,
+      currI: number,
+      cps: number,
+      fr: number,
+      resArr: number[],
+      ts: number, py: number, jv: number, cp: number
+    ) => {
       newSteps.push({
         s,
         lastIndex: { ...lastIndex },
-        result: [],
-        currentPartitionSize: 0,
-        farthestReach: 0,
-        currentI: i,
-        phase: 'buildMap',
-        explanation: `Scanning the string to record the latest index for each character. For '${s[i]}', we update its last known index to ${i}. This tells us that any partition containing '${s[i]}' CANNOT be closed before index ${i}.`,
-        highlightedLines: [4, 5],
-        lineExecution: `lastIndex.set('${s[i]}', ${i});`,
-        variables: { i, 's[i]': s[i] }
+        result: [...resArr],
+        currentPartitionSize: cps,
+        farthestReach: fr,
+        currentI: currI,
+        phase,
+        explanation,
+        pseudoStep: pseudo,
+        variables: vars
       });
+      lines.typescript!.push(ts);
+      lines.python!.push(py);
+      lines.java!.push(jv);
+      lines.cpp!.push(cp);
+    };
+
+    addStep(
+      'init',
+      "To ensure each letter appears in at most one part, we first need to know the absolute LAST time every character appears in the string.",
+      `partitionLabels(s="${s}")`,
+      { s: `"${s}"` },
+      -1, 0, 0, [],
+      1, 1, 2, 3
+    );
+
+    addStep(
+      'init',
+      "Initialize lastIndex map.",
+      "SET last_index = {}",
+      { last_index: "{}" },
+      -1, 0, 0, [],
+      2, 2, 3, 4
+    );
+
+    for (let i = 0; i < s.length; i++) {
+      lastIndex[s[i]] = i;
+      addStep(
+        'buildMap',
+        `Scanning: For '${s[i]}', we update its last known index to ${i}. Any partition containing '${s[i]}' cannot close before index ${i}.`,
+        `FOR i, char IN enumerate(s)  →  last_index['${s[i]}'] = ${i}`,
+        { i, char: s[i], last_index: JSON.stringify(lastIndex) },
+        i, 0, 0, [],
+        4, 4, 5, 6
+      );
     }
 
     const result: number[] = [];
     let currentPartitionSize = 0;
     let farthestReach = 0;
 
-    newSteps.push({
-      s,
-      lastIndex: { ...lastIndex },
-      result: [...result],
-      currentPartitionSize,
-      farthestReach,
-      currentI: -1,
-      phase: 'initPartition',
-      explanation: "Now that we know the last occurrence of every character, we can greedily build partitions. We use 'farthestReach' to track how far the current partition MUST stretch to safely include all its characters.",
-      highlightedLines: [8, 9, 10],
-      lineExecution: "const result = []; let currentPartitionSize = 0; let farthestReach = 0;",
-      variables: { currentPartitionSize, farthestReach }
-    });
+    addStep(
+      'initPartition',
+      "Initialize partitioning variables: result list, current size accumulator, and farthestReach pointer.",
+      "SET result = [], size = 0, end = 0",
+      { size: currentPartitionSize, end: farthestReach },
+      -1, currentPartitionSize, farthestReach, result,
+      7, 5, 8, 9
+    );
 
     for (let i = 0; i < s.length; i++) {
       const char = s[i];
       currentPartitionSize++;
       
-      newSteps.push({
-        s,
-        lastIndex: { ...lastIndex },
-        result: [...result],
-        currentPartitionSize,
-        farthestReach,
-        currentI: i,
-        phase: 'partition',
-        explanation: `At index ${i}, we encounter '${char}'. Our current partition size grows to ${currentPartitionSize}.`,
-        highlightedLines: [12, 13],
-        lineExecution: `currentPartitionSize++; // ${currentPartitionSize}`,
-        variables: { i, char, currentPartitionSize, farthestReach }
-      });
+      addStep(
+        'partition',
+        `At index ${i}, we encounter '${char}'. Our current partition size grows to ${currentPartitionSize}.`,
+        `FOR i, char IN enumerate(s)  →  size += 1  →  size = ${currentPartitionSize}`,
+        { i, char, size: currentPartitionSize, end: farthestReach },
+        i, currentPartitionSize, farthestReach, result,
+        10, 9, 11, 12
+      );
 
       const lastOcc = lastIndex[char];
       const prevFarthest = farthestReach;
       farthestReach = Math.max(farthestReach, lastOcc);
 
-      newSteps.push({
-        s,
-        lastIndex: { ...lastIndex },
-        result: [...result],
-        currentPartitionSize,
-        farthestReach,
-        currentI: i,
-        phase: 'partition',
-        explanation: `We look up '${char}' in our map. Its very last appearance in the entire string is at index ${lastOcc}. Therefore, this current partition CANNOT be closed until at least index ${lastOcc}. We expand 'farthestReach' to max(${prevFarthest}, ${lastOcc}) = ${farthestReach}.`,
-        highlightedLines: [14],
-        lineExecution: `farthestReach = Math.max(${prevFarthest}, ${lastOcc}); // ${farthestReach}`,
-        variables: { i, char, currentPartitionSize, farthestReach, lastOcc }
-      });
+      addStep(
+        'partition',
+        `We look up '${char}' in our map. Its last appearance is at index ${lastOcc}. We expand 'farthestReach' to max(${prevFarthest}, ${lastOcc}) = ${farthestReach}.`,
+        `SET end = max(end, last_index['${char}'])  →  end = ${farthestReach}`,
+        { i, char, size: currentPartitionSize, end: farthestReach, lastOcc },
+        i, currentPartitionSize, farthestReach, result,
+        11, 10, 12, 13
+      );
 
-      newSteps.push({
-        s,
-        lastIndex: { ...lastIndex },
-        result: [...result],
-        currentPartitionSize,
-        farthestReach,
-        currentI: i,
-        phase: 'partition',
-        explanation: `Are we allowed to close the partition here? We check if our current index ${i} has caught up to 'farthestReach' (${farthestReach}).`,
-        highlightedLines: [16],
-        lineExecution: `if (${i} === ${farthestReach})`,
-        variables: { i, farthestReach, isMatch: i === farthestReach }
-      });
+      addStep(
+        'partition',
+        `Are we allowed to close the partition here? We check if our current index ${i} has caught up to 'farthestReach' (${farthestReach}).`,
+        `IF i == end  →  ${i} == ${farthestReach}`,
+        { i, end: farthestReach, match: i === farthestReach },
+        i, currentPartitionSize, farthestReach, result,
+        12, 11, 13, 14
+      );
 
       if (i === farthestReach) {
         result.push(currentPartitionSize);
-        newSteps.push({
-          s,
-          lastIndex: { ...lastIndex },
-          result: [...result],
-          currentPartitionSize: 0,
-          farthestReach,
-          currentI: i,
-          phase: 'partition',
-          explanation: `Yes, ${i} === ${farthestReach}! This means every character we've seen so far in this partition does NOT appear anywhere later in the string. We can safely seal this partition. We record its size (${currentPartitionSize}) and prepare for a new one.`,
-          highlightedLines: [17, 18],
-          lineExecution: `result.push(${currentPartitionSize}); currentPartitionSize = 0;`,
-          variables: { result: JSON.stringify(result) }
-        });
         currentPartitionSize = 0;
+        addStep(
+          'partition',
+          `Yes, ${i} === ${farthestReach}! Every character in this partition does not appear later. We record its size (${result[result.length - 1]}) and reset size for the next partition.`,
+          `result.append(size)  →  size = 0`,
+          { result: JSON.stringify(result) },
+          i, currentPartitionSize, farthestReach, result,
+          14, 13, 15, 16
+        );
       }
     }
 
-    newSteps.push({
-      s,
-      lastIndex: { ...lastIndex },
-      result: [...result],
-      currentPartitionSize,
-      farthestReach,
-      currentI: -1,
-      phase: 'done',
-      explanation: `We have processed all characters. Our greedy strategy successfully found the optimal cuts. The final partition sizes are: ${JSON.stringify(result)}.`,
-      highlightedLines: [22],
-      lineExecution: "return result;",
-      variables: { result: JSON.stringify(result) }
-    });
+    addStep(
+      'done',
+      `We have processed all characters. The final partition sizes are: ${JSON.stringify(result)}.`,
+      `RETURN result  →  ${JSON.stringify(result)}`,
+      { result: JSON.stringify(result) },
+      -1, currentPartitionSize, farthestReach, result,
+      17, 14, 18, 19
+    );
 
-    setSteps(newSteps);
-    setCurrentStep(0);
-  };
+    return { steps: newSteps, stepLineNumbers: lines };
+  }, [sWord]);
 
-  useEffect(() => {
-    generateSteps();
-  }, []);
-
-  if (steps.length === 0) return null;
   const step = steps[currentStep];
+  const pseudoSteps = useMemo(() => steps.map((s) => s.pseudoStep), [steps]);
 
   const renderString = () => {
     const { s, result, currentI, farthestReach, phase } = step;
@@ -261,18 +308,18 @@ export const PartitionLabelsVisualization = () => {
     <VisualizationLayout
       leftContent={
         <div className="space-y-4">
-          <Card className="p-4">
+          <Card className="p-6">
             <h3 className="text-sm font-semibold mb-3">String Partitioning</h3>
             {renderString()}
           </Card>
 
-          <Card className="p-4">
+          <Card className="p-6">
             <h3 className="text-sm font-semibold mb-3">Last Index Map</h3>
             {renderMap()}
           </Card>
 
           {step.result.length > 0 && (
-            <Card className="p-4">
+            <Card className="p-6">
               <h3 className="text-sm font-semibold mb-3">Result</h3>
               <div className="flex gap-2 text-lg">
                 <span className="text-muted-foreground font-mono">[</span>
@@ -287,30 +334,28 @@ export const PartitionLabelsVisualization = () => {
             </Card>
           )}
 
-          <div key={`execution-${currentStep}`}>
-            <Card className="p-4 bg-muted/50">
-              <div className="space-y-2">
-                <div className="text-sm font-semibold text-primary">Current Execution:</div>
-                <div className="text-sm font-mono bg-background/50 p-2 rounded">
-                  {step.lineExecution}
-                </div>
-                <div className="text-sm text-foreground pt-2">
-                  {step.explanation}
-                </div>
-              </div>
-            </Card>
-          </div>
+          <Card className="p-4 bg-primary/5 border border-primary/20">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Algorithm Logic</h4>
+            <p className="text-sm text-foreground leading-relaxed font-medium">{step.explanation}</p>
+          </Card>
 
-          <div key={`variables-${currentStep}`}>
-            <VariablePanel variables={step.variables} />
-          </div>
+          <VariablePanel
+            variables={{
+              i: step.currentI !== -1 ? step.currentI : '-',
+              num: step.currentI >= 0 && step.currentI < step.s.length ? step.s[step.currentI] : '-',
+              farthestReach: step.farthestReach,
+              currentPartitionSize: step.currentPartitionSize
+            }}
+          />
         </div>
       }
       rightContent={
-        <AnimatedCodeEditor
-          code={code}
-          language="typescript"
-          highlightedLines={step.highlightedLines}
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStep}
+          onLanguageChange={() => setCurrentStep(0)}
         />
       }
       controls={
@@ -323,3 +368,4 @@ export const PartitionLabelsVisualization = () => {
     />
   );
 };
+export default PartitionLabelsVisualization;

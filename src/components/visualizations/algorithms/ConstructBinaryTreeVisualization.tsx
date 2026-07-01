@@ -2,10 +2,11 @@ import React, { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
-import { TreeDeciduous, Braces, Compass } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { TreeDeciduous, Braces } from 'lucide-react';
+import { motion } from 'framer-motion';
+import type { VisualizationLanguageMap, StepLineNumberMap } from '@/types/visualization';
 
 interface TreeNode {
   val: number;
@@ -16,7 +17,7 @@ interface TreeNode {
 
 interface Step {
   message: string;
-  highlightedLines: number[];
+  pseudoStep: string;
   variables: Record<string, any>;
   builtNodes: string[];
   currentNodeId: string | null;
@@ -24,150 +25,250 @@ interface Step {
   inorder: number[];
 }
 
-export const ConstructBinaryTreeVisualization: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-
-  const code = `function buildTree(preorder: number[], inorder: number[]): TreeNode | null {
+const languages: VisualizationLanguageMap = {
+  typescript: `function buildTree(preorder: number[], inorder: number[]): TreeNode | null {
   if (!preorder.length || !inorder.length) return null;
-
   const rootVal = preorder[0];
   const root = new TreeNode(rootVal);
   const mid = inorder.indexOf(rootVal);
-
   root.left = buildTree(
-    preorder.slice(1, mid + 1), 
+    preorder.slice(1, mid + 1),
     inorder.slice(0, mid)
   );
   root.right = buildTree(
-    preorder.slice(mid + 1), 
+    preorder.slice(mid + 1),
     inorder.slice(mid + 1)
   );
-
   return root;
-}`;
+}`,
+  python: `def buildTree(preorder: List[int], inorder: List[int]) -> Optional[TreeNode]:
+    if not preorder or not inorder:
+        return None
+    root = TreeNode(preorder[0])
+    mid = inorder.index(preorder[0])
+    root.left = buildTree(preorder[1:mid + 1], inorder[:mid])
+    root.right = buildTree(preorder[mid + 1:], inorder[mid + 1:])
+    return root`,
+  java: `public static class Solution {
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        if (preorder == null || inorder == null || preorder.length == 0 || inorder.length == 0) {
+            return null;
+        }
+        return buildTreeHelper(preorder, inorder, 0, 0, inorder.length - 1);
+    }
+    private TreeNode buildTreeHelper(int[] preorder, int[] inorder, int preStart, int inStart, int inEnd) {
+        if (preStart > preorder.length - 1 || inStart > inEnd) {
+            return null;
+        }
+        TreeNode root = new TreeNode(preorder[preStart]);
+        int inIndex = 0;
+        for (int i = inStart; i <= inEnd; i++) {
+            if (inorder[i] == root.val) {
+                inIndex = i;
+                break;
+            }
+        }
+        root.left = buildTreeHelper(preorder, inorder, preStart + 1, inStart, inIndex - 1);
+        root.right = buildTreeHelper(preorder, inorder, preStart + inIndex - inStart + 1, inIndex + 1, inEnd);
+        return root;
+    }
+}`,
+  cpp: `class Solution {
+public:
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        if (preorder.empty() || inorder.empty()) {
+            return nullptr;
+        }
+        return buildTreeHelper(preorder, inorder, 0, 0, inorder.size() - 1);
+    }
+private:
+    TreeNode* buildTreeHelper(
+        vector<int>& preorder,
+        vector<int>& inorder,
+        int preStart,
+        int inStart,
+        int inEnd
+    ) {
+        if (preStart > preorder.size() - 1 || inStart > inEnd) {
+            return nullptr;
+        }
+        TreeNode* root = new TreeNode(preorder[preStart]);
+        int inIndex = 0;
+        for (int i = inStart; i <= inEnd; i++) {
+            if (inorder[i] == root->val) {
+                inIndex = i;
+                break;
+            }
+        }
+        root->left = buildTreeHelper(
+            preorder,
+            inorder,
+            preStart + 1,
+            inStart,
+            inIndex - 1
+        );
+        root->right = buildTreeHelper(
+            preorder,
+            inorder,
+            preStart + inIndex - inStart + 1,
+            inIndex + 1,
+            inEnd
+        );
+        return root;
+    }
+};`
+};
 
-  const steps = useMemo(() => {
+export const ConstructBinaryTreeVisualization: React.FC = () => {
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const { steps, stepLineNumbers } = useMemo(() => {
     const preorder = [3, 9, 20, 15, 7];
     const inorder = [9, 3, 15, 20, 7];
     const generatedSteps: Step[] = [];
     const builtNodes: string[] = [];
+    const lines: StepLineNumberMap = { typescript: [], python: [], java: [], cpp: [] };
     let idCounter = 0;
 
-    function build(pre: number[], ino: number[]): TreeNode | null {
-      const preStr = `[${pre.join(',')}]`;
-      const inoStr = `[${ino.join(',')}]`;
-
+    function addStep(
+      msg: string,
+      pseudo: string,
+      variables: Record<string, any>,
+      currentNodeId: string | null,
+      pre: number[],
+      ino: number[],
+      ts: number, py: number, java: number, cpp: number
+    ) {
       generatedSteps.push({
-        message: `Calling buildTree with preorder=${preStr} and inorder=${inoStr}`,
-        highlightedLines: [1],
-        variables: { preorder: preStr, inorder: inoStr },
+        message: msg,
+        pseudoStep: pseudo,
+        variables,
         builtNodes: [...builtNodes],
-        currentNodeId: null,
+        currentNodeId,
         preorder: [...pre],
         inorder: [...ino]
       });
+      lines.typescript!.push(ts);
+      lines.python!.push(py);
+      lines.java!.push(java);
+      lines.cpp!.push(cpp);
+    }
+
+    function build(pre: number[], ino: number[], isRootCall: boolean): TreeNode | null {
+      const preStr = `[${pre.join(',')}]`;
+      const inoStr = `[${ino.join(',')}]`;
+
+      addStep(
+        `Calling buildTree with preorder=${preStr} and inorder=${inoStr}`,
+        `CALL buildTree(preorder=${preStr}, inorder=${inoStr})`,
+        { preorder: preStr, inorder: inoStr },
+        null,
+        pre,
+        ino,
+        1, 1, isRootCall ? 2 : 8, isRootCall ? 3 : 10
+      );
 
       if (!pre.length || !ino.length) {
-        generatedSteps.push({
-          message: "Empty input detected. Returning null for this branch.",
-          highlightedLines: [2],
-          variables: { 'pre.length': pre.length, 'ino.length': ino.length },
-          builtNodes: [...builtNodes],
-          currentNodeId: null,
-          preorder: [...pre],
-          inorder: [...ino]
-        });
+        addStep(
+          "Empty input detected. Returning null for this branch.",
+          "IF preorder IS EMPTY OR inorder IS EMPTY RETURN NULL",
+          { 'pre.length': pre.length, 'ino.length': ino.length },
+          null,
+          pre,
+          ino,
+          2, 2, isRootCall ? 3 : 9, isRootCall ? 4 : 17
+        );
         return null;
       }
 
       const rootVal = pre[0];
       const nodeId = `node-${idCounter++}`;
 
-      generatedSteps.push({
-        message: `Root value is preorder[0] = ${rootVal}.`,
-        highlightedLines: [4],
-        variables: { rootVal },
-        builtNodes: [...builtNodes],
-        currentNodeId: nodeId,
-        preorder: [...pre],
-        inorder: [...ino]
-      });
+      addStep(
+        `Root value is preorder[0] = ${rootVal}.`,
+        `SET rootVal = preorder[0] → ${rootVal}`,
+        { rootVal },
+        nodeId,
+        pre,
+        ino,
+        3, 4, 12, 20
+      );
 
       const root: TreeNode = { val: rootVal, left: null, right: null, id: nodeId };
       builtNodes.push(nodeId);
 
-      generatedSteps.push({
-        message: `Created TreeNode(${rootVal}).`,
-        highlightedLines: [5],
-        variables: { rootVal, node: `TreeNode(${rootVal})` },
-        builtNodes: [...builtNodes],
-        currentNodeId: nodeId,
-        preorder: [...pre],
-        inorder: [...ino]
-      });
+      addStep(
+        `Created TreeNode(${rootVal}).`,
+        `SET root = NEW TreeNode(${rootVal})`,
+        { rootVal, node: `TreeNode(${rootVal})` },
+        nodeId,
+        pre,
+        ino,
+        4, 4, 12, 20
+      );
 
       const mid = ino.indexOf(rootVal);
-      generatedSteps.push({
-        message: `Found ${rootVal} at index ${mid} in inorder array. This partitions left and right subtrees.`,
-        highlightedLines: [6],
-        variables: { rootVal, mid, inorder: inoStr },
-        builtNodes: [...builtNodes],
-        currentNodeId: nodeId,
-        preorder: [...pre],
-        inorder: [...ino]
-      });
+      addStep(
+        `Found ${rootVal} at index ${mid} in inorder array. This partitions left and right subtrees.`,
+        `SET mid = inorder.indexOf(${rootVal}) → ${mid}`,
+        { rootVal, mid, inorder: inoStr },
+        nodeId,
+        pre,
+        ino,
+        5, 5, 14, 22
+      );
 
-      generatedSteps.push({
-        message: `Recursively constructing left subtree...`,
-        highlightedLines: [8, 9, 10, 11],
-        variables: {
+      addStep(
+        `Recursively constructing left subtree...`,
+        `SET root.left = CALL buildTree(preorder[1:${mid + 1}], inorder[0:${mid}])`,
+        {
           'leftPre': `[${pre.slice(1, mid + 1).join(',')}]`,
           'leftIno': `[${ino.slice(0, mid).join(',')}]`
         },
-        builtNodes: [...builtNodes],
-        currentNodeId: nodeId,
-        preorder: [...pre],
-        inorder: [...ino]
-      });
+        nodeId,
+        pre,
+        ino,
+        6, 6, 20, 28
+      );
 
-      root.left = build(pre.slice(1, mid + 1), ino.slice(0, mid));
+      root.left = build(pre.slice(1, mid + 1), ino.slice(0, mid), false);
 
-      generatedSteps.push({
-        message: `Left subtree for node ${rootVal} complete. Now constructing right subtree...`,
-        highlightedLines: [12, 13, 14, 15],
-        variables: {
+      addStep(
+        `Left subtree for node ${rootVal} complete. Now constructing right subtree...`,
+        `SET root.right = CALL buildTree(preorder[${mid + 1}:], inorder[${mid + 1}:])`,
+        {
           'rightPre': `[${pre.slice(mid + 1).join(',')}]`,
           'rightIno': `[${ino.slice(mid + 1).join(',')}]`
         },
-        builtNodes: [...builtNodes],
-        currentNodeId: nodeId,
-        preorder: [...pre],
-        inorder: [...ino]
-      });
+        nodeId,
+        pre,
+        ino,
+        10, 7, 21, 35
+      );
 
-      root.right = build(pre.slice(mid + 1), ino.slice(mid + 1));
+      root.right = build(pre.slice(mid + 1), ino.slice(mid + 1), false);
 
-      generatedSteps.push({
-        message: `Successfully constructed tree rooted at ${rootVal}. Returning node.`,
-        highlightedLines: [17],
-        variables: { rootVal, 'root.left': root.left?.val ?? 'null', 'root.right': root.right?.val ?? 'null' },
-        builtNodes: [...builtNodes],
-        currentNodeId: nodeId,
-        preorder: [...pre],
-        inorder: [...ino]
-      });
+      addStep(
+        `Successfully constructed tree rooted at ${rootVal}. Returning node.`,
+        `RETURN root`,
+        { rootVal, 'root.left': root.left?.val ?? 'null', 'root.right': root.right?.val ?? 'null' },
+        nodeId,
+        pre,
+        ino,
+        14, 8, 22, 42
+      );
 
       return root;
     }
 
-    build(preorder, inorder);
-    return generatedSteps;
+    build(preorder, inorder, true);
+    return { steps: generatedSteps, stepLineNumbers: lines };
   }, []);
 
   const step = steps[currentStep];
+  const pseudoSteps = useMemo(() => steps.map(s => s.pseudoStep), [steps]);
 
   const renderTree = () => {
-    // Static positions for the known final structure for demo purposes
     const positions: Record<string, { x: number, y: number, val: number }> = {
       'node-0': { x: 200, y: 40, val: 3 },
       'node-1': { x: 100, y: 120, val: 9 },
@@ -291,13 +392,13 @@ export const ConstructBinaryTreeVisualization: React.FC = () => {
         </div>
       }
       rightContent={
-        <Card className="h-full overflow-hidden flex flex-col shadow-sm border-border/50">
-          <AnimatedCodeEditor
-            code={code}
-            language="typescript"
-            highlightedLines={step.highlightedLines}
-          />
-        </Card>
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStep}
+          onLanguageChange={() => setCurrentStep(0)}
+        />
       }
     />
   );

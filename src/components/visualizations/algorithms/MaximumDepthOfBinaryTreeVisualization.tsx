@@ -2,16 +2,11 @@ import React, { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { SimpleStepControls } from '../shared/SimpleStepControls';
 import { VariablePanel } from '../shared/VariablePanel';
-import { AnimatedCodeEditor } from '../shared/AnimatedCodeEditor';
+import { VisualizationCodePanel } from '../shared/VisualizationCodePanel';
 import { VisualizationLayout } from '../shared/VisualizationLayout';
 import { TreeDeciduous, Inbox, Maximize2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-interface TreeNode {
-  val: number;
-  left: TreeNode | null;
-  right: TreeNode | null;
-}
+import type { VisualizationLanguageMap, StepLineNumberMap } from '@/types/visualization';
 
 interface Step {
   currentNodeVal: number | null;
@@ -20,8 +15,73 @@ interface Step {
   queue: { val: number; depth: number }[];
   variables: Record<string, any>;
   explanation: string;
-  highlightedLines: number[];
+  pseudoStep: string;
 }
+
+const languages: VisualizationLanguageMap = {
+  typescript: `function maxDepth(root: TreeNode | null): number {
+  if (!root) {
+    return 0;
+  }
+  let max = 0;
+  const queue: [TreeNode, number][] = [[root, 1]];
+  while (queue.length > 0) {
+    const [node, depth] = queue.shift()!;
+    max = Math.max(max, depth);
+    if (node.left) {
+      queue.push([node.left, depth + 1]);
+    }
+    if (node.right) {
+      queue.push([node.right, depth + 1]);
+    }
+  }
+  return max;
+}`,
+  python: `def maxDepth(root: TreeNode | None) -> int:
+    if not root:
+        return 0
+    stack = [(root, 1)]
+    res = 0
+    while stack:
+        node, depth = stack.pop()
+        if node:
+            res = max(res, depth)
+            stack.append((node.left, depth + 1))
+            stack.append((node.right, depth + 1))
+    return res`,
+  java: `public static class Solution {
+    public int maxDepth(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        int leftDepth = maxDepth(root.left);
+        int rightDepth = maxDepth(root.right);
+        return Math.max(leftDepth, rightDepth) + 1;
+    }
+}`,
+  cpp: `class Solution {
+public:
+    int maxDepth(TreeNode* root) {
+        if (!root) return 0;
+        int depth = 0;
+        vector<pair<TreeNode*, int>> stack;
+        stack.push_back({root, 1});
+        while (!stack.empty()) {
+            TreeNode* node = stack.back().first;
+            int currentDepth = stack.back().second;
+            stack.pop_back();
+            depth = max(depth, currentDepth);
+            if (node->left) {
+                stack.push_back({node->left, currentDepth + 1});
+            }
+            if (node->right) {
+                stack.push_back({node->right, currentDepth + 1});
+            }
+        }
+        return depth;
+    }
+};`
+};
 
 export const MaximumDepthOfBinaryTreeVisualization: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -51,157 +111,140 @@ export const MaximumDepthOfBinaryTreeVisualization: React.FC = () => {
     }
   }, [caseType]);
 
-  const code = `function maxDepth(root: TreeNode | null): number {
-  if (!root) {
-    return 0;
-  }
-
-  let max = 0;
-  const queue: [TreeNode, number][] = [[root, 1]];
-
-  while (queue.length > 0) {
-    const [node, depth] = queue.shift()!;
-    max = Math.max(max, depth);
-
-    if (node.left) {
-      queue.push([node.left, depth + 1]);
-    }
-    if (node.right) {
-      queue.push([node.right, depth + 1]);
-    }
-  }
-
-  return max;
-}`;
-
-  const steps = useMemo(() => {
+  const { steps, stepLineNumbers } = useMemo(() => {
     const stepsList: Step[] = [];
+    const lines: StepLineNumberMap = { typescript: [], python: [], java: [], cpp: [] };
     const root = treeData;
-    
+
+    const addStep = (
+      nodeVal: number | null,
+      maxDepth: number,
+      depth: number,
+      q: { val: number; depth: number }[],
+      variables: Record<string, any>,
+      explanation: string,
+      pseudo: string,
+      ts: number, py: number, java: number, cpp: number
+    ) => {
+      stepsList.push({
+        currentNodeVal: nodeVal,
+        maxDepthFound: maxDepth,
+        currentDepth: depth,
+        queue: q,
+        variables,
+        explanation,
+        pseudoStep: pseudo
+      });
+      lines.typescript!.push(ts);
+      lines.python!.push(py);
+      lines.java!.push(java);
+      lines.cpp!.push(cpp);
+    };
+
     if (!root) {
-        stepsList.push({
-          currentNodeVal: null,
-          maxDepthFound: 0,
-          currentDepth: 0,
-          queue: [],
-          variables: { root: "null" },
-          explanation: "Root is null, return 0.",
-          highlightedLines: [2, 3, 4]
-        });
-        return stepsList;
+        addStep(
+          null, 0, 0, [],
+          { root: "null" },
+          "Root is null, return 0.",
+          "IF NOT root  →  RETURN 0",
+          2, 2, 3, 4
+        );
+        return { steps: stepsList, stepLineNumbers: lines };
     }
 
     let max = 0;
     const queue: [any, number][] = [[root, 1]];
 
-    stepsList.push({
-      currentNodeVal: null,
-      maxDepthFound: 0,
-      currentDepth: 0,
-      queue: [[root.val, 1]].map(q => ({ val: q[0], depth: q[1] })),
-      variables: { max, "queue": "[[root, 1]]" },
-      explanation: "Initialize max to 0 and a queue with the root node at depth 1.",
-      highlightedLines: [6, 7]
-    });
+    addStep(
+      null, 0, 0, [[root.val, 1]].map(q => ({ val: q[0], depth: q[1] })),
+      { max, "queue": "[[root, 1]]" },
+      "Initialize max to 0 and a queue with the root node at depth 1.",
+      "SET max = 0, queue = [[root, 1]]",
+      6, 4, 5, 5
+    );
 
     while (queue.length > 0) {
-        stepsList.push({
-          currentNodeVal: null,
-          maxDepthFound: max,
-          currentDepth: 0,
-          queue: queue.map(q => ({ val: q[0].val, depth: q[1] })),
-          variables: { "queue.length": queue.length, max },
-          explanation: "Queue is not empty, continuing BFS traversal.",
-          highlightedLines: [9]
-        });
+        addStep(
+          null, max, 0, queue.map(q => ({ val: q[0].val, depth: q[1] })),
+          { "queue.length": queue.length, max },
+          "Queue is not empty, continuing BFS traversal.",
+          "WHILE queue IS NOT EMPTY",
+          7, 6, 6, 8
+        );
 
         const [node, depth] = queue.shift()!;
         
-        stepsList.push({
-          currentNodeVal: node.val,
-          maxDepthFound: max,
-          currentDepth: depth,
-          queue: queue.map(q => ({ val: q[0].val, depth: q[1] })),
-          variables: { node: node.val, depth, max },
-          explanation: `Dequeue node ${node.val} at depth ${depth}.`,
-          highlightedLines: [10]
-        });
+        addStep(
+          node.val, max, depth, queue.map(q => ({ val: q[0].val, depth: q[1] })),
+          { node: node.val, depth, max },
+          `Dequeue node ${node.val} at depth ${depth}.`,
+          "SET [node, depth] = queue.shift()",
+          8, 7, 6, 9
+        );
 
         const oldMax = max;
         max = Math.max(max, depth);
 
-        stepsList.push({
-          currentNodeVal: node.val,
-          maxDepthFound: max,
-          currentDepth: depth,
-          queue: queue.map(q => ({ val: q[0].val, depth: q[1] })),
-          variables: { depth, "prev_max": oldMax, "new_max": max },
-          explanation: `Update maximum depth encountered so far: max(${oldMax}, ${depth}) = ${max}.`,
-          highlightedLines: [11]
-        });
+        addStep(
+          node.val, max, depth, queue.map(q => ({ val: q[0].val, depth: q[1] })),
+          { depth, "prev_max": oldMax, "new_max": max },
+          `Update maximum depth encountered so far: max(${oldMax}, ${depth}) = ${max}.`,
+          `SET max = max(max, depth) → ${max}`,
+          9, 9, 8, 12
+        );
 
-        stepsList.push({
-          currentNodeVal: node.val,
-          maxDepthFound: max,
-          currentDepth: depth,
-          queue: queue.map(q => ({ val: q[0].val, depth: q[1] })),
-          variables: { "node.left": node.left ? node.left.val : "null" },
-          explanation: node.left 
+        addStep(
+          node.val, max, depth, queue.map(q => ({ val: q[0].val, depth: q[1] })),
+          { "node.left": node.left ? node.left.val : "null" },
+          node.left 
             ? `Left child exists (${node.left.val}). Enqueue it with depth ${depth + 1}.`
             : `No left child for node ${node.val}.`,
-          highlightedLines: [13]
-        });
+          `IF node.left  →  ${node.left ? 'YES ✓' : 'NO ✗'}`,
+          10, 10, 6, 13
+        );
 
         if (node.left) {
             queue.push([node.left, depth + 1]);
-            stepsList.push({
-              currentNodeVal: node.val,
-              maxDepthFound: max,
-              currentDepth: depth,
-              queue: queue.map(q => ({ val: q[0].val, depth: q[1] })),
-              variables: { added: node.left.val, depth: depth + 1 },
-              explanation: `Pushed [${node.left.val}, ${depth + 1}] to the queue.`,
-              highlightedLines: [14]
-            });
+            addStep(
+              node.val, max, depth, queue.map(q => ({ val: q[0].val, depth: q[1] })),
+              { added: node.left.val, depth: depth + 1 },
+              `Pushed [${node.left.val}, ${depth + 1}] to the queue.`,
+              `CALL queue.push([node.left, depth + 1])`,
+              11, 10, 6, 14
+            );
         }
 
-        stepsList.push({
-          currentNodeVal: node.val,
-          maxDepthFound: max,
-          currentDepth: depth,
-          queue: queue.map(q => ({ val: q[0].val, depth: q[1] })),
-          variables: { "node.right": node.right ? node.right.val : "null" },
-          explanation: node.right 
+        addStep(
+          node.val, max, depth, queue.map(q => ({ val: q[0].val, depth: q[1] })),
+          { "node.right": node.right ? node.right.val : "null" },
+          node.right 
             ? `Right child exists (${node.right.val}). Enqueue it with depth ${depth + 1}.`
             : `No right child for node ${node.val}.`,
-          highlightedLines: [16]
-        });
+          `IF node.right  →  ${node.right ? 'YES ✓' : 'NO ✗'}`,
+          13, 11, 7, 16
+        );
 
         if (node.right) {
             queue.push([node.right, depth + 1]);
-            stepsList.push({
-              currentNodeVal: node.val,
-              maxDepthFound: max,
-              currentDepth: depth,
-              queue: queue.map(q => ({ val: q[0].val, depth: q[1] })),
-              variables: { added: node.right.val, depth: depth + 1 },
-              explanation: `Pushed [${node.right.val}, ${depth + 1}] to the queue.`,
-              highlightedLines: [17]
-            });
+            addStep(
+              node.val, max, depth, queue.map(q => ({ val: q[0].val, depth: q[1] })),
+              { added: node.right.val, depth: depth + 1 },
+              `Pushed [${node.right.val}, ${depth + 1}] to the queue.`,
+              `CALL queue.push([node.right, depth + 1])`,
+              14, 11, 7, 17
+            );
         }
     }
 
-    stepsList.push({
-      currentNodeVal: null,
-      maxDepthFound: max,
-      currentDepth: 0,
-      queue: [],
-      variables: { return: max },
-      explanation: `All nodes processed. The final maximum depth is ${max}.`,
-      highlightedLines: [21]
-    });
+    addStep(
+      null, max, 0, [],
+      { return: max },
+      `All nodes processed. The final maximum depth is ${max}.`,
+      `RETURN max → ${max}`,
+      17, 12, 8, 20
+    );
 
-    return stepsList;
+    return { steps: stepsList, stepLineNumbers: lines };
   }, [treeData]);
 
   const handleCaseToggle = (type: 'case1' | 'case2') => {
@@ -210,6 +253,7 @@ export const MaximumDepthOfBinaryTreeVisualization: React.FC = () => {
   };
 
   const step = steps[currentStep];
+  const pseudoSteps = useMemo(() => steps.map(s => s.pseudoStep), [steps]);
 
   const renderTree = () => {
     const positions: Record<number, { x: number, y: number }> = caseType === 'case1' 
@@ -367,14 +411,15 @@ export const MaximumDepthOfBinaryTreeVisualization: React.FC = () => {
         </div>
       }
       rightContent={
-        <Card className="h-full overflow-hidden flex flex-col shadow-sm border-border/50">
-          <AnimatedCodeEditor
-            code={code}
-            language="typescript"
-            highlightedLines={step.highlightedLines}
-          />
-        </Card>
+        <VisualizationCodePanel
+          languages={languages}
+          stepLineNumbers={stepLineNumbers}
+          pseudoSteps={pseudoSteps}
+          activeStepIndex={currentStep}
+          onLanguageChange={() => setCurrentStep(0)}
+        />
       }
     />
   );
 };
+export default MaximumDepthOfBinaryTreeVisualization;
