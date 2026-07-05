@@ -363,18 +363,19 @@ export const MultiplyStringsVisualization = () => {
             <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Algorithm Logic</h4>
             <p className="text-sm text-foreground leading-relaxed font-medium">{step.explanation}</p>
           </Card>
-
-          <VariablePanel variables={step.variables} />
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
+          <VariablePanel variables={step.variables} />
+        </div>
       }
       controls={
         <SimpleStepControls

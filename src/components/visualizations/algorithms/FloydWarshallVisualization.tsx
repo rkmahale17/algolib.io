@@ -266,7 +266,7 @@ export const FloydWarshallVisualization = () => {
                         return (
                           <td
                             key={j}
-                            className={`border border-border w-12 h-12 text-center font-mono text-sm transition-colors duration-200 ${isCurrentCell
+                            className={`border border-border w-8 h-8 text-center font-mono text-xs transition-colors duration-200 ${isCurrentCell
                               ? 'bg-primary text-primary-foreground font-bold'
                               : isKNode
                                 ? 'bg-amber-500/20 text-amber-500 border-amber-500/50'
@@ -295,6 +295,17 @@ export const FloydWarshallVisualization = () => {
             <p className="text-sm font-medium text-foreground">{currentStep.explanation}</p>
           </div>
 
+        </div>
+
+        {/* Right Column: Code & Pseudocode Display and Variables */}
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={handleReset}
+          />
           <VariablePanel
             variables={{
               k: currentStep.k >= 0 ? currentStep.k : 'N/A',
@@ -304,14 +315,6 @@ export const FloydWarshallVisualization = () => {
             }}
           />
         </div>
-
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={handleReset}
-        />
       </div>
     </div>
   );

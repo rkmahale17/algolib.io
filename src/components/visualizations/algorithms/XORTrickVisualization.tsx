@@ -207,13 +207,13 @@ export const XORTrickVisualization: React.FC = () => {
                 {currentStep.nums.map((val, idx) => (
                   <div
                     key={idx}
-                    className={`w-14 h-14 flex flex-col items-center justify-center rounded-xl border-2 font-bold transition-all relative ${
+                    className={`w-8 h-8 flex flex-col items-center justify-center rounded-lg border-2 text-xs font-bold transition-all relative ${
                       idx === currentStep.i
                         ? "bg-primary text-primary-foreground border-primary scale-110 shadow-lg z-10"
                         : "bg-muted/50 border-border text-foreground"
                     }`}
                   >
-                    <span className="text-xl">{val}</span>
+                    <span>{val}</span>
                   </div>
                 ))}
               </div>
@@ -262,13 +262,23 @@ export const XORTrickVisualization: React.FC = () => {
             </div>
           </div>
 
+        </div>
+
+        {/* Right Column: Code, Logic, and Variables */}
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={handleReset}
+          />
           <div className="p-4 bg-primary/5 border border-primary/20 rounded-xl">
             <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Algorithm Logic</h4>
             <p className="text-sm text-foreground leading-relaxed font-medium">
               {currentStep.message}
             </p>
           </div>
-
           <VariablePanel
             variables={{
               i: currentStep.i === -1 ? "N/A" : currentStep.i,
@@ -278,14 +288,6 @@ export const XORTrickVisualization: React.FC = () => {
             }}
           />
         </div>
-
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={handleReset}
-        />
       </div>
     </div>
   );

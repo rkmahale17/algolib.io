@@ -362,8 +362,8 @@ export const HandOfStraightsVisualization = () => {
                     key={cardObj.id} 
                     className={`flex flex-col items-center gap-2 transition-all duration-300 ${cardObj.val === step.activeCardVal && !cardObj.used ? 'scale-110' : ''} ${cardObj.used ? 'opacity-20 scale-90 grayscale' : ''}`}
                   >
-                    <div className={`relative w-12 h-16 sm:w-14 sm:h-20 rounded-md flex items-center justify-center border-2 shadow-md ${cardObj.val === step.activeCardVal && !cardObj.used ? 'bg-primary/20 border-primary shadow-primary/30' : 'bg-card border-border'}`}>
-                      <span className="text-xl sm:text-2xl font-bold text-foreground">{cardObj.val}</span>
+                    <div className={`relative w-8 h-8 rounded-md flex items-center justify-center border-2 shadow-sm ${cardObj.val === step.activeCardVal && !cardObj.used ? 'bg-primary/20 border-primary shadow-primary/30' : 'bg-card border-border'}`}>
+                      <span className="text-xs font-bold text-foreground">{cardObj.val}</span>
                     </div>
                   </div>
                 ))}
@@ -376,7 +376,7 @@ export const HandOfStraightsVisualization = () => {
                       {step.groups.map((group, gIdx) => (
                         <div key={gIdx} className="flex gap-1 p-3 bg-green-500/10 rounded-xl border-2 border-green-500/30 shadow-inner">
                           {group.map((c, cIdx) => (
-                             <div key={cIdx} className="w-8 h-12 bg-green-500/20 rounded-md flex items-center justify-center border-2 border-green-500/40 font-bold text-green-700 dark:text-green-400 text-sm">
+                             <div key={cIdx} className="w-8 h-8 bg-green-500/20 rounded-md flex items-center justify-center border-2 border-green-500/40 font-bold text-green-700 dark:text-green-400 text-xs">
                                {c}
                              </div>
                           ))}
@@ -385,7 +385,7 @@ export const HandOfStraightsVisualization = () => {
                       {step.currentGroup.length > 0 && (
                         <div className="flex gap-1 p-3 bg-yellow-500/10 rounded-xl border-2 border-yellow-500/30 border-dashed animate-pulse">
                           {step.currentGroup.map((c, cIdx) => (
-                             <div key={cIdx} className="w-8 h-12 bg-yellow-500/20 rounded-md flex items-center justify-center border-2 border-yellow-500/40 font-bold text-yellow-700 dark:text-yellow-400 text-sm">
+                             <div key={cIdx} className="w-8 h-8 bg-yellow-500/20 rounded-md flex items-center justify-center border-2 border-yellow-500/40 font-bold text-yellow-700 dark:text-yellow-400 text-xs">
                                {c}
                              </div>
                           ))}
@@ -400,18 +400,19 @@ export const HandOfStraightsVisualization = () => {
               <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Algorithm Logic</h4>
               <p className="text-sm text-foreground leading-relaxed font-medium">{step.explanation}</p>
             </Card>
-
             <VariablePanel variables={step.variables} />
           </div>
         }
         rightContent={
-          <VisualizationCodePanel
-            languages={languages}
-            stepLineNumbers={stepLineNumbers}
-            pseudoSteps={pseudoSteps}
-            activeStepIndex={currentStepIndex}
-            onLanguageChange={() => setCurrentStepIndex(0)}
-          />
+          <div className="space-y-4">
+            <VisualizationCodePanel
+              languages={languages}
+              stepLineNumbers={stepLineNumbers}
+              pseudoSteps={pseudoSteps}
+              activeStepIndex={currentStepIndex}
+              onLanguageChange={() => setCurrentStepIndex(0)}
+            />
+          </div>
         }
         controls={
           <SimpleStepControls

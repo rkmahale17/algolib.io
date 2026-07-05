@@ -304,7 +304,7 @@ export const SlidingWindowMaxVisualization = () => {
                 return (
                   <div
                     key={idx}
-                    className={`relative flex flex-col items-center z-10 w-10 shrink-0 mb-4
+                    className={`relative flex flex-col items-center z-10 w-8 shrink-0 mb-4
                       ${isInWindow && nextIsInWindow && !isR ? '' : 'mr-2'}
                     `}
                   >
@@ -330,7 +330,7 @@ export const SlidingWindowMaxVisualization = () => {
                           : (isL ? "10px 0 0 10px" : (isR ? "0 10px 10px 0" : (isInWindow ? "0px" : "10px")))
                       }}
                       transition={{ duration: 0.1 }}
-                      className={`w-10 h-10 border-2 flex items-center justify-center text-sm font-black transition-all
+                      className={`w-8 h-8 border-2 flex items-center justify-center text-xs font-black transition-all
                         ${isInWindow && !isL && !isR ? 'border-x-0' : ''}
                         ${isInWindow && isL && !isR ? 'border-r-0' : ''}
                         ${isInWindow && isR && !isL ? 'border-l-0' : ''}
@@ -423,17 +423,19 @@ export const SlidingWindowMaxVisualization = () => {
             <p className="text-sm font-medium text-foreground">{step.explanation}</p>
           </div>
 
-          <VariablePanel variables={step.variables} />
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={handleReset}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={handleReset}
+          />
+          <VariablePanel variables={step.variables} />
+        </div>
       }
       controls={
         <StepControls

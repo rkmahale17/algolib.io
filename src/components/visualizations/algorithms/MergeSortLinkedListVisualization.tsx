@@ -384,8 +384,8 @@ export const MergeSortLinkedListVisualization = () => {
                         >
                             {isDummy ? 'D' : node.val}
                             {isTail && (
-                                <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[8px] px-1 rounded-sm z-10 font-bold uppercase">
-                                    TAIL
+                                <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[8px] px-1 rounded-sm z-10 font-bold">
+                                    Tail
                                 </div>
                             )}
                         </div>
@@ -518,17 +518,19 @@ export const MergeSortLinkedListVisualization = () => {
                         </div>
                     </div>
 
-                    <VariablePanel variables={currentStep.variables} />
                 </div>
 
-                {/* Right Column: Code & Pseudocode Display */}
-                <VisualizationCodePanel
-                    languages={languages}
-                    stepLineNumbers={stepLineNumbers}
-                    pseudoSteps={pseudoSteps}
-                    activeStepIndex={currentStepIndex}
-                    onLanguageChange={handleReset}
-                />
+                {/* Right Column: Code & Pseudocode Display and Variables */}
+                <div className="space-y-4">
+                    <VisualizationCodePanel
+                        languages={languages}
+                        stepLineNumbers={stepLineNumbers}
+                        pseudoSteps={pseudoSteps}
+                        activeStepIndex={currentStepIndex}
+                        onLanguageChange={handleReset}
+                    />
+                    <VariablePanel variables={currentStep.variables} />
+                </div>
             </div>
         </div>
     );

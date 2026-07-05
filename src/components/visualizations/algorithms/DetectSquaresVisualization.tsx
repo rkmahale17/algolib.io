@@ -735,6 +735,26 @@ export const DetectSquaresVisualization: React.FC = () => {
                 X-Y Plane Visualization
               </span>
 
+              <div className="flex flex-col gap-2 mb-4 self-start w-full">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                  Points Database Array
+                </span>
+                <div className="flex gap-1.5 overflow-x-auto pb-2 w-full">
+                  {currentStep.pts.map((pt, idx) => (
+                    <div
+                      key={idx}
+                      className="w-8 h-8 rounded-lg border bg-muted/40 border-border flex flex-col items-center justify-center font-mono text-[8px] font-bold text-foreground/80 shrink-0 animate-in zoom-in"
+                    >
+                      <span>{pt[0]}</span>
+                      <span className="border-t border-border/60 w-4/5 text-center mt-0.5 pt-0.5">{pt[1]}</span>
+                    </div>
+                  ))}
+                  {currentStep.pts.length === 0 && (
+                    <span className="text-xs text-muted-foreground/50 italic">No points added yet</span>
+                  )}
+                </div>
+              </div>
+
               <div className="relative bg-muted/5 rounded-xl border border-border/30 p-2">
                 <svg width={WIDTH} height={HEIGHT} className="max-w-full">
                   {/* Vertical Grid Lines */}
@@ -1005,7 +1025,17 @@ export const DetectSquaresVisualization: React.FC = () => {
                 </svg>
               </div>
             </Card>
-
+          </div>
+        }
+        rightContent={
+          <div className="space-y-4">
+            <VisualizationCodePanel
+              languages={languages}
+              stepLineNumbers={stepLineNumbers}
+              pseudoSteps={pseudoSteps}
+              activeStepIndex={currentStepIndex}
+              onLanguageChange={() => setCurrentStepIndex(0)}
+            />
             {/* Narrative Commentary Box */}
             <Card className="p-4 border-l-4 border-primary bg-primary/5 shadow-sm flex items-center min-h-[70px]">
               <div className="flex items-start gap-4">
@@ -1025,15 +1055,6 @@ export const DetectSquaresVisualization: React.FC = () => {
 
             <VariablePanel variables={currentStep.variables} />
           </div>
-        }
-        rightContent={
-          <VisualizationCodePanel
-            languages={languages}
-            stepLineNumbers={stepLineNumbers}
-            pseudoSteps={pseudoSteps}
-            activeStepIndex={currentStepIndex}
-            onLanguageChange={() => setCurrentStepIndex(0)}
-          />
         }
         controls={
           <SimpleStepControls

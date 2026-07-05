@@ -328,12 +328,21 @@ export const AddTwoNumbersVisualization: React.FC = () => {
                </div>
              </div>
           </div>
-
           <Card className="p-4 bg-primary/5 border border-primary/20 mb-6">
             <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Algorithm Logic</h4>
             <p className="text-sm text-foreground leading-relaxed font-medium">{step.message}</p>
           </Card>
-
+        </div>
+      }
+      rightContent={
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
           <VariablePanel
             variables={{
               "v1 (Chain 1)": step.v1 !== null ? step.v1 : "null",
@@ -343,15 +352,6 @@ export const AddTwoNumbersVisualization: React.FC = () => {
             }}
           />
         </div>
-      }
-      rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
       }
       controls={
         <SimpleStepControls

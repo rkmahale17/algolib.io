@@ -273,7 +273,7 @@ export const SubsetsVisualization: React.FC = () => {
               {currentStep.nums.map((val, idx) => (
                 <div
                   key={idx}
-                  className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
+                  className={`w-8 h-8 flex items-center justify-center rounded-lg border-2 text-xs font-bold transition-all ${
                     idx === currentStep.i
                       ? "bg-primary/20 border-primary scale-110 z-10 text-foreground"
                       : "bg-card border-border text-foreground"
@@ -285,18 +285,18 @@ export const SubsetsVisualization: React.FC = () => {
             </div>
 
             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Current Subset</h3>
-            <div className="flex gap-2 mb-6 min-h-[3rem]">
+            <div className="flex gap-2 mb-6 min-h-[2rem]">
               {currentStep.subset.length > 0 ? (
                 currentStep.subset.map((val, idx) => (
                   <div
                     key={idx}
-                    className="w-12 h-12 flex items-center justify-center text-primary-foreground font-bold rounded-lg border-2 bg-primary border-primary transition-all animate-in zoom-in"
+                    className="w-8 h-8 flex items-center justify-center text-primary-foreground text-xs font-bold rounded-lg border-2 bg-primary border-primary transition-all animate-in zoom-in"
                   >
                     {val}
                   </div>
                 ))
               ) : (
-                <div className="text-muted-foreground italic flex items-center h-12 px-2">Empty []</div>
+                <div className="text-muted-foreground italic flex items-center h-8 px-2 text-xs">Empty []</div>
               )}
             </div>
 
@@ -322,6 +322,17 @@ export const SubsetsVisualization: React.FC = () => {
             </p>
           </div>
 
+        </div>
+
+        {/* Right Column: Code & Pseudocode Display and Variables */}
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={handleReset}
+          />
           <VariablePanel
             variables={{
               "i (index)": currentStep.i,
@@ -330,14 +341,6 @@ export const SubsetsVisualization: React.FC = () => {
             }}
           />
         </div>
-
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={handleReset}
-        />
       </div>
     </div>
   );

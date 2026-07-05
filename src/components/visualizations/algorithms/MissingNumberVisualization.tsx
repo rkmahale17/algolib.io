@@ -141,7 +141,7 @@ export const MissingNumberVisualization = () => {
                 {step.array.map((value, index) => (
                   <div key={index} className="flex flex-col items-center gap-2">
                     <div
-                      className={`w-14 h-14 rounded-lg flex items-center justify-center font-bold border-2 transition-all duration-200 ${step.highlighting.includes(index)
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs border-2 transition-all duration-200 ${step.highlighting.includes(index)
                         ? 'bg-primary border-primary text-primary-foreground scale-105 shadow-md'
                         : 'bg-muted/30 border-border text-foreground'
                         }`}
@@ -151,8 +151,8 @@ export const MissingNumberVisualization = () => {
                     <span className="text-xs text-muted-foreground font-mono">i = {index}</span>
                   </div>
                 ))}
-                <div className="flex flex-col items-center gap-2 opacity-50 border border-dashed rounded-lg p-2">
-                  <div className="w-12 h-12 flex items-center justify-center text-xs text-center text-muted-foreground font-mono">
+                <div className="flex flex-col items-center gap-2 opacity-50 border border-dashed rounded-lg p-1">
+                  <div className="w-8 h-8 flex items-center justify-center text-[10px] text-center text-muted-foreground font-mono">
                     n = {nums.length}
                   </div>
                 </div>
@@ -173,8 +173,6 @@ export const MissingNumberVisualization = () => {
               <p className="text-sm text-foreground leading-relaxed font-medium min-h-[40px]">{step.explanation}</p>
             </Card>
 
-            <VariablePanel variables={step.variables} />
-
             <Card className="p-4 bg-muted/20 border border-border/40 rounded-lg text-xs space-y-1.5 text-muted-foreground leading-relaxed">
               <h4 className="font-bold text-muted-foreground uppercase text-[10px] tracking-wider mb-2">Why this works</h4>
               <p>Consider the sum of indices [0...n] and sum of values in array. Missing Number = Sum(0...n) - Sum(nums).</p>
@@ -184,13 +182,16 @@ export const MissingNumberVisualization = () => {
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
+          <VariablePanel variables={step.variables} />
+        </div>
       }
       controls={
         <SimpleStepControls

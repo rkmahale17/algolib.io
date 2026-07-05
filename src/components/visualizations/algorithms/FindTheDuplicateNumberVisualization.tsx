@@ -493,8 +493,6 @@ export const FindTheDuplicateNumberVisualization: React.FC = () => {
             </div>
           </Card>
 
-          <VariablePanel variables={step.variables} />
-
           <div className="p-3 bg-primary/5 rounded-lg border border-primary/10 flex items-start gap-2.5">
             <HelpCircle size={16} className="text-primary shrink-0 mt-0.5" />
             <div className="text-[11px] text-muted-foreground leading-normal">
@@ -504,13 +502,16 @@ export const FindTheDuplicateNumberVisualization: React.FC = () => {
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStep}
-          onLanguageChange={() => setCurrentStep(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStep}
+            onLanguageChange={() => setCurrentStep(0)}
+          />
+          <VariablePanel variables={step.variables} />
+        </div>
       }
     />
   );

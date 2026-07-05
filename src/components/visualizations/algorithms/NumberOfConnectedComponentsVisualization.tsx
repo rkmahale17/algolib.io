@@ -404,7 +404,7 @@ export const NumberOfConnectedComponentsVisualization: React.FC = () => {
 
                 return (
                   <g key={`node-${i}`}>
-                    {isRoot && <text x={x} y={y - r - 5} textAnchor="middle" fill="#10b981" fontSize="9" fontWeight="bold">ROOT</text>}
+                    {isRoot && <text x={x} y={y - r - 5} textAnchor="middle" fill="#10b981" fontSize="9" fontWeight="bold">Root</text>}
                     <circle
                       cx={x} cy={y} r={r}
                       fill={s.fill}
@@ -457,18 +457,19 @@ export const NumberOfConnectedComponentsVisualization: React.FC = () => {
               </div>
             </div>
           </Card>
-
-          <VariablePanel variables={{ ...step.variables, 'Components Count': step.result }} />
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={handleReset}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={handleReset}
+          />
+          <VariablePanel variables={{ ...step.variables, 'Components Count': step.result }} />
+        </div>
       }
       controls={
         <SimpleStepControls

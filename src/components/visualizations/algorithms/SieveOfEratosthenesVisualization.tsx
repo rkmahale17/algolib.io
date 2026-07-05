@@ -275,13 +275,13 @@ export const SieveOfEratosthenesVisualization = () => {
                       <motion.div
                         key={idx}
                         layout
-                        className={`w-8 h-8 xxs:w-9 xxs:h-9 xs:w-10 xs:h-10 sm:w-12 sm:h-12 rounded-lg flex flex-col items-center justify-center border-2 transition-all relative ${isI || isJ ? "shadow-lg z-10 scale-110" : ""}`}
+                        className={`w-8 h-8 rounded-lg flex flex-col items-center justify-center border-2 transition-all relative ${isI || isJ ? "shadow-lg z-10 scale-110" : ""}`}
                         style={{
                           backgroundColor: bgColor,
                           borderColor: borderColor
                         }}
                       >
-                        <span className={`text-[10px] xs:text-xs sm:text-sm font-bold ${!isPrimeVal && idx > 1 ? "text-muted-foreground line-through" : ""}`}>{idx}</span>
+                        <span className={`text-xs font-semibold ${!isPrimeVal && idx > 1 ? "text-muted-foreground line-through" : ""}`}>{idx}</span>
                         <div className="absolute -bottom-2.5 flex flex-col items-center">
                           {isI && <span className="text-[8px] font-black text-white uppercase bg-purple-600 px-1 rounded">i</span>}
                           {isJ && <span className="text-[8px] font-black text-white uppercase bg-red-600 px-1 rounded">mark</span>}
@@ -314,13 +314,6 @@ export const SieveOfEratosthenesVisualization = () => {
           </div>
 
           <div className="space-y-4 mt-auto">
-            <Card className="p-4 bg-primary/5 border-primary/20">
-              <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Execution Flow</h4>
-              <p className="text-sm text-foreground leading-relaxed font-medium min-h-[40px]">{step.explanation}</p>
-            </Card>
-
-            <VariablePanel variables={step.variables} />
-
             {step.primes.length > 0 && (
               <Card className="p-4 bg-green-500/5 border-green-500/20">
                 <h4 className="text-xs font-bold uppercase tracking-widest text-green-600 mb-2">Primes Array</h4>
@@ -335,13 +328,20 @@ export const SieveOfEratosthenesVisualization = () => {
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
+          <Card className="p-4 bg-primary/5 border-primary/20">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Execution Flow</h4>
+            <p className="text-sm text-foreground leading-relaxed font-medium min-h-[40px]">{step.explanation}</p>
+          </Card>
+          <VariablePanel variables={step.variables} />
+        </div>
       }
       controls={
         <SimpleStepControls

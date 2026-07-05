@@ -283,27 +283,25 @@ export const RemoveNthNodeVisualization = () => {
             </div>
             {step.explanation}
           </div>
-
-          {/* Variable Panel (below the commentary box) */}
-          <div className="pt-2">
-            <VariablePanel
-              variables={{
-                "n": step.nVar,
-                "left": step.left === -1 ? 'dummy node [val: 0]' : step.left !== null ? `node[${step.left}] -> ${step.list[step.left]}` : 'null',
-                "right": step.right !== null ? `node[${step.right}] -> ${step.list[step.right]}` : 'null',
-              }}
-            />
-          </div>
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
+          <VariablePanel
+            variables={{
+              "n": step.nVar,
+              "left": step.left === -1 ? 'dummy node [val: 0]' : step.left !== null ? `node[${step.left}] -> ${step.list[step.left]}` : 'null',
+              "right": step.right !== null ? `node[${step.right}] -> ${step.list[step.right]}` : 'null',
+            }}
+          />
+        </div>
       }
       controls={
         <SimpleStepControls

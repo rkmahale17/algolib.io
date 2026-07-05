@@ -280,13 +280,13 @@ export const JumpGameIIVisualization: React.FC = () => {
                         </div>
 
                         <div 
-                          className={`w-10 h-10 flex items-center justify-center rounded border-2 font-black transition-colors duration-0 \${
+                          className={`w-8 h-8 flex items-center justify-center rounded border-2 font-black transition-colors duration-0 ${
                             isCurrent ? "border-orange-500 bg-orange-100 text-black shadow-md z-10" :
                             inCurrentWindow ? "border-blue-300 bg-blue-50 text-blue-900" :
                             "border-gray-200 bg-white text-black"
                           }`}
                         >
-                          <span className="text-sm">{num}</span>
+                          <span className="text-xs">{num}</span>
                         </div>
                         <div className="h-6 flex flex-col items-center justify-start mt-1 gap-0.5">
                           {isCurrent && <div className="text-[9px] font-black text-orange-700 bg-orange-200 px-1.5 rounded-sm uppercase tracking-tighter shadow-sm">i</div>}
@@ -312,21 +312,20 @@ export const JumpGameIIVisualization: React.FC = () => {
                   </p>
                 </div>
              </Card>
-             
-             <div className="p-1">
-               <VariablePanel variables={step.variables} />
-             </div>
           </div>
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStep}
-          onLanguageChange={() => setCurrentStep(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStep}
+            onLanguageChange={() => setCurrentStep(0)}
+          />
+          <VariablePanel variables={step.variables} />
+        </div>
       }
     />
   );

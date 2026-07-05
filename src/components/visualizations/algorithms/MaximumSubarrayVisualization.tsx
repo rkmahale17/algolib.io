@@ -418,77 +418,79 @@ export const MaximumSubarrayVisualization = () => {
                 Visualizing Subarray Sum Growth
               </h3>
 
-              <div className="grid grid-cols-9 gap-1 sm:gap-2 h-48 mb-16 relative w-full max-w-2xl mx-auto items-end">
-                <AnimatePresence mode="popLayout">
-                  {currentStep.array.map((value, index) => {
-                    const isCurrent = index === currentStep.i;
-                    const isInBestRange = index >= currentStep.bestRange[0] && index <= currentStep.bestRange[1];
+              <div className="overflow-x-auto pb-4 custom-scrollbar">
+                <div className="grid grid-cols-9 gap-1 sm:gap-2 h-48 mb-16 relative w-full min-w-[380px] max-w-2xl mx-auto items-end">
+                  <AnimatePresence mode="popLayout">
+                    {currentStep.array.map((value, index) => {
+                      const isCurrent = index === currentStep.i;
+                      const isInBestRange = index >= currentStep.bestRange[0] && index <= currentStep.bestRange[1];
 
-                    return (
-                      <div key={index} className="flex flex-col items-center gap-2 relative w-full">
-                        <motion.div
-                          className={`w-5 rounded-t-lg transition-all duration-300 ${value < 0 ? 'bg-red-500/30' : 'bg-blue-500/30'
-                            } ${isCurrent ? 'ring-4 ring-primary/40 ring-offset-2 ring-offset-background' : ''}`}
-                          initial={{ height: 0 }}
-                          animate={{
-                            height: Math.abs(value) * 15 + 20,
-                            backgroundColor: isCurrent
-                              ? 'var(--primary)'
-                              : (value < 0 ? 'rgba(239, 68, 68, 0.3)' : 'rgba(59, 130, 246, 0.3)')
-                          }}
-                          transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-                        />
-
-                        <motion.div
-                          className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm border-2 transition-all duration-300 ${isCurrent
-                              ? 'bg-primary text-primary-foreground border-primary scale-110 shadow-xl shadow-primary/30 z-10'
-                              : 'bg-muted/50 border-border text-foreground hover:bg-muted'
-                            }`}
-                          animate={{
-                            scale: isCurrent ? 1.15 : 1,
-                            borderColor: isInBestRange ? 'var(--primary)' : 'rgba(148, 163, 184, 0.3)'
-                          }}
-                        >
-                          {value}
-                        </motion.div>
-
-                        <span className="text-[10px] font-mono text-muted-foreground tracking-tighter">{index}</span>
-
-                        {isInBestRange && (
+                      return (
+                        <div key={index} className="flex flex-col items-center gap-2 relative w-full">
                           <motion.div
-                            layoutId="best-marker"
-                            className="absolute -bottom-6 sm:-bottom-8 w-8 h-1.5 bg-primary rounded-full"
-                            initial={{ opacity: 0, scaleX: 0 }}
-                            animate={{ opacity: 1, scaleX: 1 }}
+                            className={`w-5 rounded-t-lg transition-all duration-300 ${value < 0 ? 'bg-red-500/30' : 'bg-blue-500/30'
+                              } ${isCurrent ? 'ring-4 ring-primary/40 ring-offset-2 ring-offset-background' : ''}`}
+                            initial={{ height: 0 }}
+                            animate={{
+                              height: Math.abs(value) * 15 + 20,
+                              backgroundColor: isCurrent
+                                ? 'var(--primary)'
+                                : (value < 0 ? 'rgba(239, 68, 68, 0.3)' : 'rgba(59, 130, 246, 0.3)')
+                            }}
+                            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
                           />
-                        )}
-                      </div>
-                    );
-                  })}
-                </AnimatePresence>
 
-                {currentStep.curRange[0] !== -1 && (
-                  <div className="absolute bottom-[24px] pointer-events-none grid grid-cols-9 gap-1 sm:gap-2 w-full left-0 right-0 h-12">
-                    <motion.div
-                      layout
-                      className="border-2 border-dashed border-indigo-500 bg-indigo-500/5 rounded-xl relative w-full h-full"
-                      style={{
-                        gridColumnStart: currentStep.curRange[0] + 1,
-                        gridColumnEnd: currentStep.curRange[1] + 2,
-                      }}
-                      initial={false}
-                      transition={{ type: 'spring', stiffness: 150, damping: 20 }}
-                    >
+                          <motion.div
+                            className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm border-2 transition-all duration-300 ${isCurrent
+                                ? 'bg-primary text-primary-foreground border-primary scale-110 shadow-xl shadow-primary/30 z-10'
+                                : 'bg-muted/50 border-border text-foreground hover:bg-muted'
+                              }`}
+                            animate={{
+                              scale: isCurrent ? 1.15 : 1,
+                              borderColor: isInBestRange ? 'var(--primary)' : 'rgba(148, 163, 184, 0.3)'
+                            }}
+                          >
+                            {value}
+                          </motion.div>
+
+                          <span className="text-[10px] font-mono text-muted-foreground tracking-tighter">{index}</span>
+
+                          {isInBestRange && (
+                            <motion.div
+                              layoutId="best-marker"
+                              className="absolute -bottom-6 sm:-bottom-8 w-8 h-1.5 bg-primary rounded-full"
+                              initial={{ opacity: 0, scaleX: 0 }}
+                              animate={{ opacity: 1, scaleX: 1 }}
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </AnimatePresence>
+
+                  {currentStep.curRange[0] !== -1 && (
+                    <div className="absolute bottom-[24px] pointer-events-none grid grid-cols-9 gap-1 sm:gap-2 w-full left-0 right-0 h-12">
                       <motion.div
-                        className="absolute -top-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-indigo-500 text-[10px] font-bold text-white shadow-sm whitespace-nowrap"
-                        initial={{ opacity: 0, scale: 0.5 }}
-                        animate={{ opacity: 1, scale: 1 }}
+                        layout
+                        className="border-2 border-dashed border-indigo-500 bg-indigo-500/5 rounded-xl relative w-full h-full"
+                        style={{
+                          gridColumnStart: currentStep.curRange[0] + 1,
+                          gridColumnEnd: currentStep.curRange[1] + 2,
+                        }}
+                        initial={false}
+                        transition={{ type: 'spring', stiffness: 150, damping: 20 }}
                       >
-                        Sum: {currentStep.curSum}
+                        <motion.div
+                          className="absolute -top-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-indigo-500 text-[10px] font-bold text-white shadow-sm whitespace-nowrap"
+                          initial={{ opacity: 0, scale: 0.5 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                        >
+                          Sum: {currentStep.curSum}
+                        </motion.div>
                       </motion.div>
-                    </motion.div>
-                  </div>
-                )}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4 mt-8 pt-6 border-t border-border/50">
@@ -594,17 +596,6 @@ export const MaximumSubarrayVisualization = () => {
                 )}
               </div>
             </Card>
-
-            <div className="bg-muted/50 rounded-lg border p-4">
-              <h3 className="font-semibold mb-2 text-sm text-foreground">Kadane's Algorithm Strategy:</h3>
-              <div className="text-xs space-y-1 text-muted-foreground">
-                <p>• Track running current sum (`curSum`) and overall maximum sum (`maxSub`)</p>
-                <p>• If `curSum` falls below 0 → reset it to 0 (since negative values hurt subsequent sums)</p>
-                <p>• Add the current element to `curSum` and update `maxSub` if it exceeds the record</p>
-                <p>• Time: O(n) · Space: O(1)</p>
-              </div>
-            </div>
-
           </div>
         </div>
       }
@@ -626,6 +617,15 @@ export const MaximumSubarrayVisualization = () => {
                 range: `[${currentStep.bestRange[0]}, ${currentStep.bestRange[1]}]`
               }}
             />
+          <div className="bg-muted/50 rounded-lg border p-4">
+            <h3 className="font-semibold mb-2 text-sm text-foreground">Kadane's Algorithm Strategy:</h3>
+            <div className="text-xs space-y-1 text-muted-foreground">
+              <p>• Track running current sum (`curSum`) and overall maximum sum (`maxSub`)</p>
+              <p>• If `curSum` falls below 0 → reset it to 0 (since negative values hurt subsequent sums)</p>
+              <p>• Add the current element to `curSum` and update `maxSub` if it exceeds the record</p>
+              <p>• Time: O(n) · Space: O(1)</p>
+            </div>
+          </div>
         </div>
       }
     />

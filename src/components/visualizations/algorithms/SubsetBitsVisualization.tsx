@@ -285,13 +285,13 @@ export const SubsetBitsVisualization: React.FC = () => {
                               ? "var(--accent)"
                               : isBitActive ? "var(--primary)" : "var(--muted)",
                           }}
-                          className={`w-14 h-14 rounded-xl flex items-center justify-center border-2 transition-colors ${
+                          className={`w-8 h-8 rounded-lg flex items-center justify-center border-2 transition-colors ${
                             isBitActive
                               ? "border-primary text-primary-foreground shadow-[0_0_15px_rgba(var(--primary),0.3)]"
                               : "border-border text-muted-foreground"
                           }`}
                         >
-                          <span className="text-2xl font-bold">{isBitActive ? '1' : '0'}</span>
+                          <span className="text-xs font-bold">{isBitActive ? '1' : '0'}</span>
                         </motion.div>
                         <span className="text-[10px] uppercase font-bold text-muted-foreground">Bit {bitIdx}</span>
                       </div>
@@ -304,10 +304,10 @@ export const SubsetBitsVisualization: React.FC = () => {
 
           <Card className="p-6 bg-card/50 border shadow-sm">
             <h3 className="text-sm font-semibold mb-4 text-muted-foreground uppercase tracking-wider">Current Working Subset</h3>
-            <div className="flex flex-wrap gap-2 min-h-[64px] p-4 bg-muted/20 rounded-xl border border-dashed border-primary/30 items-center justify-center">
+            <div className="flex flex-wrap gap-2 min-h-[48px] p-2 bg-muted/20 rounded-xl border border-dashed border-primary/30 items-center justify-center">
               <AnimatePresence mode="popLayout">
                 {currentStep.currentSubset.length === 0 ? (
-                  <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-muted-foreground italic text-sm">Empty Set (∅)</motion.span>
+                  <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-muted-foreground italic text-xs">Empty Set (∅)</motion.span>
                 ) : (
                   currentStep.currentSubset.map((val) => (
                     <motion.div
@@ -316,7 +316,7 @@ export const SubsetBitsVisualization: React.FC = () => {
                       initial={{ scale: 0, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       exit={{ scale: 0, opacity: 0 }}
-                      className="w-12 h-12 bg-primary/20 text-primary border-2 border-primary/50 rounded-lg flex items-center justify-center font-bold shadow-sm"
+                      className="w-8 h-8 bg-primary/20 text-primary border-2 border-primary/50 rounded-lg flex items-center justify-center font-bold text-xs shadow-sm"
                     >
                       {val}
                     </motion.div>
@@ -326,41 +326,41 @@ export const SubsetBitsVisualization: React.FC = () => {
             </div>
           </Card>
 
+          <div className="p-4 bg-card border border-border rounded-xl">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">All Subsets Found ({currentStep.allSubsets.length})</h3>
+            <div className="flex flex-wrap gap-1.5 max-h-[120px] overflow-y-auto pr-2 custom-scrollbar">
+              {currentStep.allSubsets.map((sub, idx) => (
+                <span key={idx} className="px-2 py-1 bg-muted text-[10px] rounded border border-border/50 font-mono text-foreground">
+                  [{sub.join(', ') || '∅'}]
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Code, Logic, and Variables */}
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={handleReset}
+          />
           <div className="p-4 bg-primary/5 border border-primary/20 rounded-xl">
             <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Algorithm Logic</h4>
             <p className="text-sm text-foreground leading-relaxed font-medium">{currentStep.explanation}</p>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 bg-card border border-border rounded-xl">
-              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">All Subsets Found ({currentStep.allSubsets.length})</h3>
-              <div className="flex flex-wrap gap-1.5 max-h-[120px] overflow-y-auto pr-2 custom-scrollbar">
-                {currentStep.allSubsets.map((sub, idx) => (
-                  <span key={idx} className="px-2 py-1 bg-muted text-[10px] rounded border border-border/50 font-mono text-foreground">
-                    [{sub.join(', ') || '∅'}]
-                  </span>
-                ))}
-              </div>
-            </div>
-            <VariablePanel
-              variables={{
-                nums: currentStep.nums,
-                mask: currentStep.mask === -1 ? "None" : `${currentStep.mask} (binary: ${currentStep.mask.toString(2).padStart(currentStep.nums.length, '0')})`,
-                i: currentStep.i === -1 ? "None" : currentStep.i,
-                "bit set": currentStep.i === -1 ? "None" : (currentStep.bitSet ? "true" : "false"),
-                "current subset": currentStep.currentSubset,
-              }}
-            />
-          </div>
+          <VariablePanel
+            variables={{
+              nums: currentStep.nums,
+              mask: currentStep.mask === -1 ? "None" : `${currentStep.mask} (binary: ${currentStep.mask.toString(2).padStart(currentStep.nums.length, '0')})`,
+              i: currentStep.i === -1 ? "None" : currentStep.i,
+              "bit set": currentStep.i === -1 ? "None" : (currentStep.bitSet ? "true" : "false"),
+              "current subset": currentStep.currentSubset,
+            }}
+          />
         </div>
-
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={handleReset}
-        />
       </div>
     </div>
   );

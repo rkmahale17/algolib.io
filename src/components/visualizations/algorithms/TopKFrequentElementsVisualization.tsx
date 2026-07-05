@@ -385,19 +385,20 @@ export const TopKFrequentElementsVisualization = () => {
                 </AnimatePresence>
               </div>
             </Card>
-
-            <VariablePanel variables={variables} />
           </div>
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
+          <VariablePanel variables={variables} />
+        </div>
       }
     />
   );

@@ -323,6 +323,17 @@ export const KnapsackVisualization: React.FC = () => {
             </div>
           </div>
 
+        </div>
+
+        {/* Right Column: Code Display and Variables */}
+        <div className="lg:col-span-5 space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={handleReset}
+          />
           <VariablePanel
             variables={{
               i: currentStep.i !== -1 ? currentStep.i : '-',
@@ -330,17 +341,6 @@ export const KnapsackVisualization: React.FC = () => {
               a: currentStep.w !== 0 ? currentStep.w : '-',
               ways: currentStep.value
             }}
-          />
-        </div>
-
-        {/* Right Column: Code Display */}
-        <div className="lg:col-span-5">
-          <VisualizationCodePanel
-            languages={languages}
-            stepLineNumbers={stepLineNumbers}
-            pseudoSteps={pseudoSteps}
-            activeStepIndex={currentStepIndex}
-            onLanguageChange={handleReset}
           />
         </div>
       </div>

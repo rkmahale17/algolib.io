@@ -368,8 +368,6 @@ export const KaratsubaVisualization = () => {
               <p className="text-sm text-foreground leading-relaxed font-medium min-h-[40px]">{step.explanation}</p>
             </Card>
 
-            <VariablePanel variables={step.variables} />
-
             <Card className="p-4 bg-muted/20 border-dashed border-border">
               <h4 className="text-[10px] font-black uppercase text-muted-foreground mb-3 flex items-center">
                 <span className="mr-2">Recursion Stack</span>
@@ -394,13 +392,16 @@ export const KaratsubaVisualization = () => {
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
+          <VariablePanel variables={step.variables} />
+        </div>
       }
       controls={
         <SimpleStepControls

@@ -343,16 +343,6 @@ export const MaximumProductSubarrayVisualization = () => {
               <h4 className="text-[10px] font-bold uppercase tracking-widest text-primary mb-2">Step Explanation</h4>
               <p className="text-sm font-medium leading-relaxed min-h-[40px]">{currentStep.message}</p>
             </Card>
-            <VariablePanel
-              variables={{
-                index_i: currentStep.i >= currentStep.array.length ? 'N/A' : currentStep.i,
-                value_n: currentStep.i >= currentStep.array.length ? 'N/A' : currentStep.array[currentStep.i],
-                maxProd: currentStep.maxProduct,
-                'tempMax': currentStep.tempMax ?? 'N/A',
-                curMax: currentStep.currentMax,
-                curMin: currentStep.currentMin,
-              }}
-            />
             <div className="p-4 rounded-xl bg-muted/30 border border-border/50 flex gap-3">
               <Info className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
               <p className="text-[11px] text-muted-foreground leading-relaxed italic">
@@ -363,13 +353,25 @@ export const MaximumProductSubarrayVisualization = () => {
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
+          <VariablePanel
+            variables={{
+              index_i: currentStep.i >= currentStep.array.length ? 'N/A' : currentStep.i,
+              value_n: currentStep.i >= currentStep.array.length ? 'N/A' : currentStep.array[currentStep.i],
+              maxProd: currentStep.maxProduct,
+              'tempMax': currentStep.tempMax ?? 'N/A',
+              curMax: currentStep.currentMax,
+              curMin: currentStep.currentMin,
+            }}
+          />
+        </div>
       }
     />
   );

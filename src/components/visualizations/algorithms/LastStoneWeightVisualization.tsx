@@ -371,7 +371,17 @@ export const LastStoneWeightVisualization = () => {
               )}
             </div>
           </Card>
-
+        </div>
+      }
+      rightContent={
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStep}
+            onLanguageChange={() => setCurrentStep(0)}
+          />
           <Card className="p-4 bg-primary/5 border-primary/20 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
             <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2 flex items-center gap-2">
@@ -380,18 +390,8 @@ export const LastStoneWeightVisualization = () => {
             </h4>
             <p className="text-sm text-foreground leading-relaxed font-medium">{step.explanation}</p>
           </Card>
-
           <VariablePanel variables={step.variables} />
         </div>
-      }
-      rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStep}
-          onLanguageChange={() => setCurrentStep(0)}
-        />
       }
       controls={
         <SimpleStepControls

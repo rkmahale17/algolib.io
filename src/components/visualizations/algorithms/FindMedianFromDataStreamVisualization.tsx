@@ -443,8 +443,6 @@ export const FindMedianFromDataStreamVisualization = () => {
             <p className="text-sm text-foreground leading-relaxed font-medium">{step.explanation}</p>
           </Card>
 
-          <VariablePanel variables={step.variables} />
-
           <Card className="p-4 bg-muted/20 border-dashed border-border text-[10px] text-muted-foreground">
             <p>• <span className="text-blue-500 font-bold">Small Heap</span>: Rebalance by pushing/popping from top (Max).</p>
             <p>• <span className="text-green-500 font-bold">Large Heap</span>: Stores the larger half (Min on top).</p>
@@ -453,13 +451,16 @@ export const FindMedianFromDataStreamVisualization = () => {
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStep}
-          onLanguageChange={() => setCurrentStep(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStep}
+            onLanguageChange={() => setCurrentStep(0)}
+          />
+          <VariablePanel variables={step.variables} />
+        </div>
       }
     />
   );

@@ -331,6 +331,17 @@ export const MinCostClimbingStairsVisualization: React.FC = () => {
              </Card>
           </div>
 
+        </div>
+      }
+      rightContent={
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStep}
+            onLanguageChange={() => setCurrentStep(0)}
+          />
           <VariablePanel
             variables={{
               "current step (i)": step.i !== null ? step.i : "N/A",
@@ -340,15 +351,6 @@ export const MinCostClimbingStairsVisualization: React.FC = () => {
             }}
           />
         </div>
-      }
-      rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStep}
-          onLanguageChange={() => setCurrentStep(0)}
-        />
       }
     />
   );

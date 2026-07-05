@@ -640,6 +640,7 @@ export const PermutationInStringVisualization = () => {
                 </div>
               </div>
             </Card>
+            <VariablePanel variables={currentStep.variables} />
           </div>
         }
         rightContent={
@@ -651,7 +652,6 @@ export const PermutationInStringVisualization = () => {
               activeStepIndex={currentStepIndex}
               onLanguageChange={() => setCurrentStepIndex(0)}
             />
-            <VariablePanel variables={currentStep.variables} />
           </div>
         }
         controls={

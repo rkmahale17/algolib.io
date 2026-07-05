@@ -437,7 +437,7 @@ export const MaxAreaOfIslandVisualization: React.FC = () => {
                   {/* Column Labels */}
                   <div className="flex gap-3 pl-8 mb-2">
                     {[0, 1, 2, 3].map(colIdx => (
-                      <div key={colIdx} className="w-14 text-center text-xs font-mono font-semibold text-muted-foreground/60">
+                      <div key={colIdx} className="w-8 text-center text-xs font-mono font-semibold text-muted-foreground/60">
                         c={colIdx}
                       </div>
                     ))}
@@ -477,7 +477,7 @@ export const MaxAreaOfIslandVisualization: React.FC = () => {
                             return (
                               <div
                                 key={colIdx}
-                                className={`w-14 h-14 rounded-xl flex items-center justify-center font-bold text-lg border-2 transition-all duration-200 ${cellClasses}`}
+                                className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs border-2 transition-all duration-200 ${cellClasses}`}
                               >
                                 {val}
                               </div>
@@ -550,19 +550,19 @@ export const MaxAreaOfIslandVisualization: React.FC = () => {
                 </div>
               </div>
             </Card>
-
-            {/* Variable Panel - Placed below Commentary Box */}
-            <VariablePanel variables={step.variables} />
           </div>
         }
         rightContent={
-          <VisualizationCodePanel
-            languages={languages}
-            stepLineNumbers={stepLineNumbers}
-            pseudoSteps={pseudoSteps}
-            activeStepIndex={currentStep}
-            onLanguageChange={() => setCurrentStep(0)}
-          />
+          <div className="space-y-4">
+            <VisualizationCodePanel
+              languages={languages}
+              stepLineNumbers={stepLineNumbers}
+              pseudoSteps={pseudoSteps}
+              activeStepIndex={currentStep}
+              onLanguageChange={() => setCurrentStep(0)}
+            />
+            <VariablePanel variables={step.variables} />
+          </div>
         }
         controls={
           <SimpleStepControls

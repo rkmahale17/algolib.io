@@ -300,29 +300,29 @@ export const PermutationsVisualization: React.FC = () => {
         <div className="space-y-4">
           <div className="bg-card rounded-lg p-6 border shadow-sm">
             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Frame nums</h3>
-            <div className="flex gap-2 mb-6 min-h-[3rem]">
+            <div className="flex gap-2 mb-6 min-h-[2rem]">
               {currentStep.nums.length > 0 ? (
                 currentStep.nums.map((val, idx) => (
                   <div
                     key={idx}
-                    className="w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold bg-card border-border text-foreground transition-all animate-in zoom-in"
+                    className="w-8 h-8 flex items-center justify-center rounded-lg border-2 text-xs font-bold bg-card border-border text-foreground transition-all animate-in zoom-in"
                   >
                     {val}
                   </div>
                 ))
               ) : (
-                <div className="text-muted-foreground italic flex items-center px-2">Empty Array</div>
+                <div className="text-muted-foreground italic flex items-center px-2 text-xs">Empty Array</div>
               )}
             </div>
 
             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Extracted 'n'</h3>
-            <div className="flex gap-2 mb-6 min-h-[3rem]">
+            <div className="flex gap-2 mb-6 min-h-[2rem]">
               {currentStep.n !== null ? (
-                <div className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-accent/20 border-accent font-bold text-accent-foreground transition-all animate-in slide-in-from-left">
+                <div className="w-8 h-8 flex items-center justify-center rounded-lg border-2 bg-accent/20 border-accent text-xs font-bold text-accent-foreground transition-all animate-in slide-in-from-left">
                   {currentStep.n}
                 </div>
               ) : (
-                <div className="text-muted-foreground italic flex items-center px-2">None</div>
+                <div className="text-muted-foreground italic flex items-center px-2 text-xs">None</div>
               )}
             </div>
 
@@ -343,6 +343,17 @@ export const PermutationsVisualization: React.FC = () => {
             </p>
           </div>
 
+        </div>
+
+        {/* Right Column: Code & Pseudocode Display and Variables */}
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={handleReset}
+          />
           <VariablePanel
             variables={{
               'nums.length': currentStep.nums.length,
@@ -352,14 +363,6 @@ export const PermutationsVisualization: React.FC = () => {
             }}
           />
         </div>
-
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={handleReset}
-        />
       </div>
     </div>
   );

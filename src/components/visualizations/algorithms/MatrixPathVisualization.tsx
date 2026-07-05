@@ -228,7 +228,7 @@ export const MatrixPathVisualization: React.FC = () => {
                   return (
                     <div
                       key={`${rIdx}-${cIdx}`}
-                      className={`w-12 h-14 flex flex-col items-center justify-center rounded-lg border-2 font-mono text-sm transition-all duration-300 shadow-sm relative ${cellClass}`}
+                      className={`w-8 h-8 flex flex-col items-center justify-center rounded-lg border-2 font-mono text-xs transition-all duration-300 shadow-sm relative ${cellClass}`}
                     >
                       {rIdx === 0 && cIdx === 0 && (
                         <span className="absolute -top-4 text-[8px] font-bold text-primary uppercase whitespace-nowrap">
@@ -240,7 +240,7 @@ export const MatrixPathVisualization: React.FC = () => {
                           Target
                         </span>
                       )}
-                      <span className="text-base">{val > 0 ? val : ''}</span>
+                      <span className="text-xs font-semibold">{val > 0 ? val : ''}</span>
                     </div>
                   );
                 })
@@ -297,11 +297,10 @@ export const MatrixPathVisualization: React.FC = () => {
             </div>
           </div>
 
-          <VariablePanel variables={currentStep.variables} />
         </div>
 
-        {/* Right Column: Code Display */}
-        <div className="lg:col-span-5">
+        {/* Right Column: Code Display and Variables */}
+        <div className="lg:col-span-5 space-y-4">
           <VisualizationCodePanel
             languages={languages}
             stepLineNumbers={stepLineNumbers}
@@ -309,6 +308,7 @@ export const MatrixPathVisualization: React.FC = () => {
             activeStepIndex={currentStepIndex}
             onLanguageChange={handleReset}
           />
+          <VariablePanel variables={currentStep.variables} />
         </div>
       </div>
     </div>

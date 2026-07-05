@@ -554,6 +554,17 @@ export const HuffmanCodingVisualization: React.FC = () => {
             </div>
           </div>
 
+        </div>
+
+        {/* Right Column: Code Display and Variables */}
+        <div className="lg:col-span-5 space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={handleReset}
+          />
           <VariablePanel
             variables={{
               nodes_in_heap: currentStep.heap.length,
@@ -565,17 +576,6 @@ export const HuffmanCodingVisualization: React.FC = () => {
                   : 'Codes Generation',
               chars_encoded: Object.keys(currentStep.codes).length
             }}
-          />
-        </div>
-
-        {/* Right Column: Code Display */}
-        <div className="lg:col-span-5">
-          <VisualizationCodePanel
-            languages={languages}
-            stepLineNumbers={stepLineNumbers}
-            pseudoSteps={pseudoSteps}
-            activeStepIndex={currentStepIndex}
-            onLanguageChange={handleReset}
           />
         </div>
       </div>

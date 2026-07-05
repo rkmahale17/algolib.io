@@ -114,6 +114,11 @@ export const VisualizationCodePanel = ({
 
   const activeCode = languages[activeLanguage] ?? '';
 
+  const computedHeight = useMemo(() => {
+    const lineCount = activeCode.split('\n').length;
+    return `${Math.min(Math.max(lineCount * 20 + 32, 200), 600)}px`;
+  }, [activeCode]);
+
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(activeCode);
@@ -128,7 +133,7 @@ export const VisualizationCodePanel = ({
   if (availableLanguages.length === 0 && pseudoSteps.length === 0) return null;
 
   return (
-    <div className={`flex flex-col rounded-lg border border-border overflow-hidden bg-card ${className}`}>
+    <div className={`flex flex-col rounded-lg border border-border overflow-hidden bg-card h-fit self-start w-full ${className}`}>
 
       {/* ── Single unified header bar ── */}
       <div className="bg-muted border-b border-border flex items-center h-10 shrink-0">
@@ -218,13 +223,15 @@ export const VisualizationCodePanel = ({
           isBlurred={isBlurred}
           onBlurChange={handleBlurChange}
           className="rounded-none border-0"
+          height={computedHeight}
         />
       ) : (
         <PseudocodeView
           steps={pseudoSteps}
           activeIndex={activeStepIndex}
           hideHeader={true}
-          className="rounded-none border-0 h-[500px]"
+          className="rounded-none border-0"
+          style={{ height: computedHeight }}
         />
       )}
     </div>

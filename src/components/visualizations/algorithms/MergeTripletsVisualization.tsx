@@ -516,25 +516,25 @@ export const MergeTripletsVisualization = () => {
 
             </div>
 
-            {/* Commentary Box */}
             <Card className="p-4 bg-primary/5 border border-primary/20">
               <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Algorithm Logic</h4>
               <p className="text-sm text-foreground leading-relaxed font-medium">
                 {currentStep.explanation}
               </p>
             </Card>
-
-            <VariablePanel variables={currentStep.variables} />
           </div>
         }
         rightContent={
-          <VisualizationCodePanel
-            languages={languages}
-            stepLineNumbers={stepLineNumbers}
-            pseudoSteps={pseudoSteps}
-            activeStepIndex={currentStepIndex}
-            onLanguageChange={() => setCurrentStepIndex(0)}
-          />
+          <div className="space-y-4">
+            <VisualizationCodePanel
+              languages={languages}
+              stepLineNumbers={stepLineNumbers}
+              pseudoSteps={pseudoSteps}
+              activeStepIndex={currentStepIndex}
+              onLanguageChange={() => setCurrentStepIndex(0)}
+            />
+            <VariablePanel variables={currentStep.variables} />
+          </div>
         }
         controls={
           <SimpleStepControls

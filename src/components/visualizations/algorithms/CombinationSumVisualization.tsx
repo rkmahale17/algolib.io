@@ -397,24 +397,19 @@ export const CombinationSumVisualization = () => {
             </Card>
           </motion.div>
 
-          <motion.div
-            key={`variables-${currentStep}`}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3, delay: 0.3 }}
-          >
-            <VariablePanel variables={step.variables} />
-          </motion.div>
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStep}
-          onLanguageChange={() => setCurrentStep(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStep}
+            onLanguageChange={() => setCurrentStep(0)}
+          />
+          <VariablePanel variables={step.variables} />
+        </div>
       }
     />
   );

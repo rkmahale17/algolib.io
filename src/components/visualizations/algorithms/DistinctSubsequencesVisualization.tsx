@@ -293,6 +293,17 @@ export const DistinctSubsequencesVisualization: React.FC = () => {
             </p>
           </Card>
 
+        </div>
+      }
+      rightContent={
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
           <VariablePanel
             variables={{
               "long word (s)": step.s,
@@ -304,15 +315,6 @@ export const DistinctSubsequencesVisualization: React.FC = () => {
             }}
           />
         </div>
-      }
-      rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
       }
       controls={
         <SimpleStepControls

@@ -339,32 +339,31 @@ export const GenerateParenthesesVisualization: React.FC = () => {
             </div>
           </div>
 
-          <div className="mt-auto">
             <Card className="p-4 bg-primary/5 border border-primary/20 mb-6">
               <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Algorithm Logic</h4>
               <p className="text-sm text-foreground leading-relaxed font-medium">{currentStep.message}</p>
             </Card>
-
-            <div className="rounded-xl overflow-hidden border border-muted bg-card shadow-sm">
-              <VariablePanel
-                variables={{
-                  "n (Pairs)": currentStep.n,
-                  "openN (Used '(')": currentStep.openN,
-                  "closedN (Used ')')": currentStep.closedN,
-                }}
-              />
-            </div>
           </div>
-        </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
+          <div className="rounded-xl overflow-hidden border border-muted bg-card shadow-sm">
+            <VariablePanel
+              variables={{
+                "n (Pairs)": currentStep.n,
+                "openN (Used '(')": currentStep.openN,
+                "closedN (Used ')')": currentStep.closedN,
+              }}
+            />
+          </div>
+        </div>
       }
       controls={
         <SimpleStepControls

@@ -338,7 +338,17 @@ export const PartitionLabelsVisualization = () => {
             <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Algorithm Logic</h4>
             <p className="text-sm text-foreground leading-relaxed font-medium">{step.explanation}</p>
           </Card>
-
+        </div>
+      }
+      rightContent={
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStep}
+            onLanguageChange={() => setCurrentStep(0)}
+          />
           <VariablePanel
             variables={{
               i: step.currentI !== -1 ? step.currentI : '-',
@@ -348,15 +358,6 @@ export const PartitionLabelsVisualization = () => {
             }}
           />
         </div>
-      }
-      rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStep}
-          onLanguageChange={() => setCurrentStep(0)}
-        />
       }
       controls={
         <SimpleStepControls

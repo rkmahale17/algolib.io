@@ -248,17 +248,6 @@ export const LISVisualization: React.FC = () => {
               </p>
             </Card>
 
-            <VariablePanel
-              variables={{
-                i: step.currentIndex !== -1 ? step.currentIndex : '-',
-                j: step.compareIndex !== undefined ? step.compareIndex : '-',
-                'nums[i]': step.currentIndex !== -1 ? step.array[step.currentIndex] : '-',
-                'nums[j]': step.compareIndex !== undefined ? step.array[step.compareIndex] : '-',
-                'LIS[i]': step.currentIndex !== -1 ? step.dp[step.currentIndex] : '-',
-                max_lis: step.maxLength
-              }}
-            />
-
             <Card className="p-4 bg-muted/20 border border-border/40 rounded-lg text-xs space-y-1.5 text-muted-foreground leading-relaxed">
               <h4 className="font-bold text-muted-foreground uppercase text-[10px] tracking-wider mb-2">
                 Why this works
@@ -277,13 +266,25 @@ export const LISVisualization: React.FC = () => {
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
+          <VariablePanel
+            variables={{
+              i: step.currentIndex !== -1 ? step.currentIndex : '-',
+              j: step.compareIndex !== undefined ? step.compareIndex : '-',
+              'nums[i]': step.currentIndex !== -1 ? step.array[step.currentIndex] : '-',
+              'nums[j]': step.compareIndex !== undefined ? step.array[step.compareIndex] : '-',
+              'LIS[i]': step.currentIndex !== -1 ? step.dp[step.currentIndex] : '-',
+              max_lis: step.maxLength
+            }}
+          />
+        </div>
       }
       controls={
         <SimpleStepControls

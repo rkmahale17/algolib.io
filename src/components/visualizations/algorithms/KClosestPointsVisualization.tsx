@@ -619,7 +619,7 @@ export const KClosestPointsVisualization = () => {
               <AnimatePresence mode="popLayout">
                 {step.result.map((pt, index) => (
                   <motion.div
-                    key={`res-\${pt[0]}-\${pt[1]}-\${index}`}
+                    key={`res-${pt[0]}-${pt[1]}-${index}`}
                     layout
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -643,18 +643,29 @@ export const KClosestPointsVisualization = () => {
               )}
             </div>
           </Card>
-
-          <VariablePanel variables={step.variables} />
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStep}
-          onLanguageChange={() => setCurrentStep(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStep}
+            onLanguageChange={() => setCurrentStep(0)}
+          />
+          <Card className="p-4 bg-primary/5 border-primary/20 relative overflow-hidden min-h-[96px] flex flex-col justify-center">
+            <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
+            <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-1.5 flex items-center gap-1.5">
+              <Info className="w-3.5 h-3.5" />
+              Interactive Guide
+            </h4>
+            <p className="text-sm text-foreground leading-relaxed font-medium transition-all duration-100">
+              {step.explanation}
+            </p>
+          </Card>
+          <VariablePanel variables={step.variables} />
+        </div>
       }
       controls={
         <SimpleStepControls

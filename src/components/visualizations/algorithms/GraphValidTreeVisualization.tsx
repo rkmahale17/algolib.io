@@ -384,7 +384,17 @@ export const GraphValidTreeVisualization: React.FC = () => {
               </div>
             </div>
           </Card>
-
+        </div>
+      }
+      rightContent={
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={handleReset}
+          />
           <VariablePanel
             variables={{
               "Current Node Context": step.currentNode !== null ? `node=${step.currentNode}, parent=${step.parent}` : 'null',
@@ -395,15 +405,6 @@ export const GraphValidTreeVisualization: React.FC = () => {
             }}
           />
         </div>
-      }
-      rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={handleReset}
-        />
       }
       controls={
         <SimpleStepControls

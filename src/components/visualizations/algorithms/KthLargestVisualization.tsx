@@ -389,13 +389,13 @@ export const KthLargestVisualization: React.FC = () => {
                           : "var(--card)",
                         borderColor: isPivot || isCurrentPivot ? "hsl(var(--primary))" : "var(--border)"
                       }}
-                      className={`w-12 h-12 rounded-lg flex flex-col items-center justify-center border-2 transition-all relative ${
+                      className={`w-8 h-8 rounded-lg flex flex-col items-center justify-center border-2 transition-all relative ${
                         isP || isI || targetMatch || isPivot
                           ? "shadow-lg z-10 text-white font-bold"
                           : "text-foreground"
                       }`}
                     >
-                      <span className="text-base font-bold">{num}</span>
+                      <span className="text-xs font-bold">{num}</span>
                       <div className="absolute -bottom-6 flex flex-col items-center">
                         {isP && <span className="text-[10px] font-black text-white uppercase bg-green-500 w-4 h-4 rounded-full flex items-center justify-center shadow-sm">p</span>}
                         {isI && <span className="text-[10px] font-black text-white uppercase bg-purple-500 w-4 h-4 rounded-full flex items-center justify-center shadow-sm">i</span>}
@@ -424,8 +424,6 @@ export const KthLargestVisualization: React.FC = () => {
             <p className="text-sm text-foreground leading-relaxed font-medium">{currentStep.explanation}</p>
           </div>
 
-          <VariablePanel variables={currentStep.variables} />
-
           <Card className="p-4 bg-muted/20 border-dashed border-border text-[10px] text-muted-foreground space-y-1">
             <p>• <span className="text-green-600 dark:text-green-400 font-bold">p pointer</span>: Elements to the left of p are guaranteed to be ≤ pivot.</p>
             <p>• <span className="text-purple-600 dark:text-purple-400 font-bold">i pointer</span>: Currently scanning element at this index.</p>
@@ -433,13 +431,17 @@ export const KthLargestVisualization: React.FC = () => {
           </Card>
         </div>
 
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={handleReset}
-        />
+        {/* Right Column: Code Display and Variables */}
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={handleReset}
+          />
+          <VariablePanel variables={currentStep.variables} />
+        </div>
       </div>
     </div>
   );

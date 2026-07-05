@@ -228,7 +228,17 @@ export const InvertBinaryTreeVisualization: React.FC = () => {
                   </div>
                </Card>
             </div>
-
+          </div>
+        }
+        rightContent={
+          <div className="space-y-4">
+            <VisualizationCodePanel
+              languages={languages}
+              stepLineNumbers={stepLineNumbers}
+              pseudoSteps={pseudoSteps}
+              activeStepIndex={currentStepIndex}
+              onLanguageChange={() => setCurrentStepIndex(0)}
+            />
             <VariablePanel
               variables={{
                 currentNode: step.currentNode,
@@ -238,15 +248,6 @@ export const InvertBinaryTreeVisualization: React.FC = () => {
               }}
             />
           </div>
-        }
-        rightContent={
-          <VisualizationCodePanel
-            languages={languages}
-            stepLineNumbers={stepLineNumbers}
-            pseudoSteps={pseudoSteps}
-            activeStepIndex={currentStepIndex}
-            onLanguageChange={() => setCurrentStepIndex(0)}
-          />
         }
       />
     </div>

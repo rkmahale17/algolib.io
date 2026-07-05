@@ -432,20 +432,19 @@ export const MergeIntervalsVisualization: React.FC = () => {
               </p>
             </div>
           </Card>
-
-          <div className="p-1">
-            <VariablePanel variables={step.variables} />
-          </div>
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStep}
-          onLanguageChange={() => setCurrentStep(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStep}
+            onLanguageChange={() => setCurrentStep(0)}
+          />
+          <VariablePanel variables={step.variables} />
+        </div>
       }
     />
   );

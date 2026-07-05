@@ -440,7 +440,17 @@ export const FindTheHighestAltitudeVisualization: React.FC = () => {
                 </div>
               </div>
             </div>
-
+          </div>
+        }
+        rightContent={
+          <div className="space-y-4">
+            <VisualizationCodePanel
+              languages={languages}
+              stepLineNumbers={stepLineNumbers}
+              pseudoSteps={pseudoSteps}
+              activeStepIndex={currentStepIndex}
+              onLanguageChange={() => setCurrentStepIndex(0)}
+            />
             {/* Commentary Box at the bottom */}
             <Card className="p-4 border-l-4 border-primary bg-primary/5 shadow-sm flex items-center min-h-[70px]">
               <div className="flex items-start gap-4">
@@ -461,15 +471,6 @@ export const FindTheHighestAltitudeVisualization: React.FC = () => {
             {/* VariablePanel below commentary */}
             <VariablePanel variables={step.variables} />
           </div>
-        }
-        rightContent={
-          <VisualizationCodePanel
-            languages={languages}
-            stepLineNumbers={stepLineNumbers}
-            pseudoSteps={pseudoSteps}
-            activeStepIndex={currentStepIndex}
-            onLanguageChange={() => setCurrentStepIndex(0)}
-          />
         }
       />
     </div>

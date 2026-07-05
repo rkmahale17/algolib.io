@@ -360,6 +360,17 @@ export const ActivitySelectionVisualization: React.FC = () => {
             </div>
           </div>
 
+        </div>
+      }
+      rightContent={
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={handleReset}
+          />
           <VariablePanel
             variables={{
               current_activity: currentStep.current !== -1 ? `Interval ${currentStep.current}` : 'None',
@@ -369,15 +380,6 @@ export const ActivitySelectionVisualization: React.FC = () => {
             }}
           />
         </div>
-      }
-      rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={handleReset}
-        />
       }
       controls={
         <SimpleStepControls

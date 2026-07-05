@@ -362,7 +362,7 @@ export const DutchNationalFlagVisualization = () => {
                       {isHigh && <div className="font-semibold text-blue-500">High</div>}
                     </div>
                     <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold text-lg transition-all duration-300 ${getColorClass(
+                      className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-xs transition-all duration-300 ${getColorClass(
                         value
                       )} ${isMid ? 'shadow-lg shadow-primary/50 scale-110 ring-4 ring-primary' :
                         isLow || isHigh ? 'scale-105' : ''
@@ -406,6 +406,17 @@ export const DutchNationalFlagVisualization = () => {
             </div>
           </div>
 
+        </div>
+
+        {/* Right: code / pseudocode panel and variables */}
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={handleReset}
+          />
           <VariablePanel
             variables={{
               low: currentStep.low,
@@ -415,15 +426,6 @@ export const DutchNationalFlagVisualization = () => {
             }}
           />
         </div>
-
-        {/* Right: code / pseudocode panel */}
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={handleReset}
-        />
       </div>
     </div>
   );

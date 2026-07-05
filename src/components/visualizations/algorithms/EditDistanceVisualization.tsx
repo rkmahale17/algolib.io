@@ -278,14 +278,14 @@ export const EditDistanceVisualization: React.FC = () => {
               <table className="w-full text-xs border-collapse">
                 <thead>
                   <tr>
-                    <th className="border border-border p-2 bg-muted/50 w-10 text-muted-foreground font-mono"></th>
+                    <th className="border border-border p-2 bg-muted/50 w-8 text-muted-foreground font-mono"></th>
                     {currentStep.word2.split('').map((char, idx) => (
-                      <th key={idx} className="border border-border p-2 bg-muted w-10 text-center font-mono text-muted-foreground">
+                      <th key={idx} className="border border-border p-2 bg-muted w-8 text-center font-mono text-muted-foreground">
                         {char}
                         <div className="text-[10px] opacity-60 font-normal">{idx}</div>
                       </th>
                     ))}
-                    <th className="border border-border p-2 bg-muted w-10 text-center text-muted-foreground font-mono">
+                    <th className="border border-border p-2 bg-muted w-8 text-center text-muted-foreground font-mono">
                       ∅
                       <div className="text-[10px] opacity-60 font-normal">{currentStep.word2.length}</div>
                     </th>
@@ -294,7 +294,7 @@ export const EditDistanceVisualization: React.FC = () => {
                 <tbody>
                   {currentStep.dp.map((row, rIdx) => (
                     <tr key={rIdx}>
-                      <td className="border border-border p-2 bg-muted font-semibold text-center w-10 font-mono text-foreground">
+                      <td className="border border-border p-2 bg-muted font-semibold text-center w-8 font-mono text-foreground">
                         {rIdx < currentStep.word1.length ? (
                           <>
                             {currentStep.word1[rIdx]}
@@ -318,7 +318,7 @@ export const EditDistanceVisualization: React.FC = () => {
                         return (
                           <td
                             key={cIdx}
-                            className={`border border-border p-2 text-center transition-all duration-300 w-10 h-10 ${cellClass}`}
+                            className={`border border-border p-2 text-center transition-all duration-300 w-8 h-8 text-[10px] ${cellClass}`}
                           >
                             {val === Infinity ? '∞' : val}
                           </td>
@@ -365,6 +365,17 @@ export const EditDistanceVisualization: React.FC = () => {
             </div>
           </div>
 
+        </div>
+
+        {/* Right Column: Code Display and Variables */}
+        <div className="lg:col-span-5 space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={handleReset}
+          />
           <VariablePanel
             variables={{
               i: currentStep.i !== -1 ? currentStep.i : 'done',
@@ -374,17 +385,6 @@ export const EditDistanceVisualization: React.FC = () => {
               'word2[j]': currentStep.j >= 0 && currentStep.j < currentStep.word2.length ? currentStep.word2[currentStep.j] : '-',
               ans: currentStep.dp[0][0]
             }}
-          />
-        </div>
-
-        {/* Right Column: Code Display */}
-        <div className="lg:col-span-5">
-          <VisualizationCodePanel
-            languages={languages}
-            stepLineNumbers={stepLineNumbers}
-            pseudoSteps={pseudoSteps}
-            activeStepIndex={currentStepIndex}
-            onLanguageChange={handleReset}
           />
         </div>
       </div>

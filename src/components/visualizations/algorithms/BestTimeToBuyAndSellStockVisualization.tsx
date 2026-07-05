@@ -263,18 +263,20 @@ export const BestTimeToBuyAndSellStockVisualization = () => {
                 {currentStep.explanation}
               </p>
             </Card>
-            <VariablePanel variables={currentStep.variables} />
           </div>
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
+          <VariablePanel variables={currentStep.variables} />
+        </div>
       }
       controls={
         <SimpleStepControls

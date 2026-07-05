@@ -503,10 +503,10 @@ export const ReconstructItineraryVisualization: React.FC = () => {
               <div className="flex flex-wrap items-center gap-2.5 p-3 bg-muted/20 border border-border/50 rounded-xl min-h-[52px]">
                 {step.result.map((airport, idx) => (
                   <React.Fragment key={idx}>
-                    {idx > 0 && <span className="text-muted-foreground/30 text-sm font-bold">➔</span>}
-                    <div className={`px-3 py-1 rounded-lg text-xs font-mono font-bold flex items-center gap-1 border shadow-sm transition-all duration-200 ${
+                    {idx > 0 && <span className="text-muted-foreground/30 text-xs font-bold">➔</span>}
+                    <div className={`w-8 h-8 rounded-lg text-[10px] font-mono font-bold flex items-center justify-center border shadow-sm transition-all duration-200 ${
                       idx === step.result.length - 1 && step.dfsStack.length > 0
-                        ? 'bg-amber-500/25 border-amber-500 text-amber-700 dark:text-amber-300 scale-102'
+                        ? 'bg-amber-500/25 border-amber-500 text-amber-700 dark:text-amber-300'
                         : 'bg-background border-border text-foreground/80'
                     }`}>
                       {airport}
@@ -540,7 +540,17 @@ export const ReconstructItineraryVisualization: React.FC = () => {
                 )}
               </div>
             </Card>
-
+          </div>
+        }
+        rightContent={
+          <div className="space-y-4">
+            <VisualizationCodePanel
+              languages={languages}
+              stepLineNumbers={stepLineNumbers}
+              pseudoSteps={pseudoSteps}
+              activeStepIndex={currentStep}
+              onLanguageChange={() => setCurrentStep(0)}
+            />
             {/* Commentary */}
             <Card className={`p-4 border-l-4 relative overflow-hidden transition-all duration-305 shadow-sm min-h-[70px] flex items-center ${
               step.isMatch ? 'bg-primary/10 border-primary' : 'bg-primary/5 border-primary/20'
@@ -563,15 +573,6 @@ export const ReconstructItineraryVisualization: React.FC = () => {
             {/* Variables Panel */}
             <VariablePanel variables={step.variables} />
           </div>
-        }
-        rightContent={
-          <VisualizationCodePanel
-            languages={languages}
-            stepLineNumbers={stepLineNumbers}
-            pseudoSteps={pseudoSteps}
-            activeStepIndex={currentStep}
-            onLanguageChange={() => setCurrentStep(0)}
-          />
         }
         controls={
           <SimpleStepControls

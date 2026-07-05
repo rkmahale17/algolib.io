@@ -275,7 +275,7 @@ export const CyclicSortVisualization = () => {
                     {value}
                   </div>
                   <div className="flex flex-col items-center min-h-[2.5rem]">
-                    <span className="text-[8px] uppercase font-bold text-muted-foreground/70 tracking-tighter">Idx {index}</span>
+                    <span className="text-[8px] uppercase font-bold text-muted-foreground/70 tracking-tighter">{index}</span>
                     <div className="flex flex-col gap-0.5 mt-0.5 items-center">
                       {index === currentStep.i && (
                         <span className="text-[10px] font-bold text-blue-500 animate-pulse whitespace-nowrap">i</span>
@@ -305,6 +305,17 @@ export const CyclicSortVisualization = () => {
             </div>
           </div>
 
+        </div>
+
+        {/* Right: code / pseudocode panel and variables */}
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={handleReset}
+          />
           <VariablePanel
             variables={{
               i: currentStep.i < currentStep.array.length ? currentStep.i : 'done',
@@ -315,15 +326,6 @@ export const CyclicSortVisualization = () => {
             }}
           />
         </div>
-
-        {/* Right: code / pseudocode panel */}
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={handleReset}
-        />
       </div>
     </div>
   );

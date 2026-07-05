@@ -562,26 +562,27 @@ export const SubtreeOfAnotherTreeVisualization = () => {
                 {currentStep.message}
               </p>
             </Card>
-
-            <VariablePanel
-              variables={{
-                'root': currentStep.rootVal,
-                'subRoot': currentStep.subRootVal,
-                'status': currentStep.checking,
-                'step': `${currentStepIndex + 1} / ${steps.length}`
-              }}
-            />
           </div>
         </Card>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
+          <VariablePanel
+            variables={{
+              'root': currentStep.rootVal,
+              'subRoot': currentStep.subRootVal,
+              'status': currentStep.checking,
+              'step': `${currentStepIndex + 1} / ${steps.length}`
+            }}
+          />
+        </div>
       }
     />
   );

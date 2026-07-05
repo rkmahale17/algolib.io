@@ -212,25 +212,24 @@ export const GCDVisualization = () => {
             </Card>
           </div>
 
-          <div className="space-y-4 mt-auto">
-            <Card className="p-6 bg-primary/5 border-primary/20 relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
-              <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-3">Euclidean Insight</h4>
-              <p className="text-sm font-medium leading-relaxed min-h-[40px]">{step.explanation}</p>
-            </Card>
-
-            <VariablePanel variables={step.variables} />
-          </div>
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
+          <Card className="p-6 bg-primary/5 border-primary/20 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
+            <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-3">Euclidean Insight</h4>
+            <p className="text-sm font-medium leading-relaxed min-h-[40px]">{step.explanation}</p>
+          </Card>
+          <VariablePanel variables={step.variables} />
+        </div>
       }
       controls={
         <SimpleStepControls
