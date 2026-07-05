@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Code2, MessageSquare, Database, ArrowRight, Activity, ShieldCheck, Users, Mail } from "lucide-react";
+import { Code2, MessageSquare, Database, ArrowRight, Activity, ShieldCheck, Users, Mail, Megaphone } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAlgorithms } from "@/hooks/useAlgorithms";
 
@@ -69,6 +69,15 @@ export default function AdminDashboard() {
       color: "text-rose-500",
       bgColor: "bg-rose-500/10",
       gradient: "from-rose-500/20 to-pink-500/20"
+    },
+    {
+      title: "Announcements",
+      description: "Manage global platform announcements shown to users.",
+      icon: Megaphone,
+      path: "/admin/announcements",
+      color: "text-purple-500",
+      bgColor: "bg-purple-500/10",
+      gradient: "from-purple-500/20 to-fuchsia-500/20"
     }
   ];
 

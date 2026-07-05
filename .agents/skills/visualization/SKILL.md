@@ -34,6 +34,8 @@ When creating or updating the visualization, rigidly follow these rules:
 12. **Test Case Selection:** Only implement multiple test cases (and the selection UI) if explicitly requested by the user.
 13. **Pedagogical Layout:** Ensure that the descriptive commentary box is placed **at the bottom** of the visualization to provide immediate context for the current state, and the `VariablePanel` MUST be placed **below** the commentary box.
 14. **Include `pseudoStep`** in every Step object (see multi-language pattern below).
+15. **Array Box Sizing:** Always use `w-8 h-8` for array element boxes to maintain consistent, readable dimensions across visualizations.
+16. **No Uppercase Text:** Do not use all-caps text or the `uppercase` CSS class for words, labels, or headings in the visualization UI. Use standard sentence or title casing. (Note: pseudocode keywords still follow the ALL-CAPS rule in their specific section).
 
 ### 3. Multi-Language + Pseudocode Pattern (REQUIRED for all visualization updates)
 

@@ -32,11 +32,11 @@ export const RecommendedProblems = ({ algorithms }: RecommendedProblemsProps) =>
           
           const reasonBadge = (
             <div className="flex flex-wrap items-center gap-2 mb-2">
-              <div className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold tracking-wide bg-[#84cc16]/10 text-[#65a30d] dark:text-[#84cc16] border border-[#84cc16]/20">
+              <div className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold tracking-wide bg-muted/50 text-muted-foreground border border-border/50">
                 {rec.reason}
               </div>
               {rec.confidence && (
-                <div className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide bg-primary/10 text-primary border border-primary/20">
+                <div className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide bg-muted/50 text-muted-foreground border border-border/50">
                   {rec.confidence}
                 </div>
               )}
