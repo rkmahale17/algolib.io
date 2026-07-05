@@ -10,6 +10,7 @@ import { FeedbackButton } from "@/components/FeedbackButton";
 import { GoogleAnalytics } from '@next/third-parties/google';
 import PostHogPageView from "./PostHogPageView";
 import AdminViewToggle from "@/admin/components/AdminViewToggle";
+import { AnnouncementStack } from "@/components/AnnouncementStack";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -64,6 +65,7 @@ export default function RootLayout({
           </SidebarInset>
           <AdminViewToggle />
           <FeedbackButton />
+          <AnnouncementStack />
         </Providers>
       </body>
     </html>

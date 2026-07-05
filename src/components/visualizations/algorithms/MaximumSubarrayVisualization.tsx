@@ -71,7 +71,7 @@ const languages: VisualizationLanguageMap = {
 };
 
 function generateVisualizationData() {
-  const nums = [2, -1, 3, -4, 2];
+  const nums = [-2, 1, -3, 4, -1, 2, 1, -5, 4];
   const steps: Step[] = [];
 
   let maxSub = nums[0];
@@ -414,11 +414,11 @@ export const MaximumSubarrayVisualization = () => {
         <div className="space-y-6 flex flex-col h-full">
           <div>
             <Card className="p-8 bg-card/50 backdrop-blur-sm border-border/50 relative overflow-hidden min-h-[400px]">
-              <h3 className="text-xs font-semibold mb-8 text-muted-foreground uppercase tracking-widest text-center">
+              <h3 className="text-xs font-semibold mb-8 text-muted-foreground text-center">
                 Visualizing Subarray Sum Growth
               </h3>
 
-              <div className="grid grid-cols-5 gap-2 sm:gap-3 h-48 mb-16 relative w-full max-w-md mx-auto items-end">
+              <div className="grid grid-cols-9 gap-1 sm:gap-2 h-48 mb-16 relative w-full max-w-2xl mx-auto items-end">
                 <AnimatePresence mode="popLayout">
                   {currentStep.array.map((value, index) => {
                     const isCurrent = index === currentStep.i;
@@ -427,11 +427,11 @@ export const MaximumSubarrayVisualization = () => {
                     return (
                       <div key={index} className="flex flex-col items-center gap-2 relative w-full">
                         <motion.div
-                          className={`w-full max-w-[3rem] rounded-t-lg transition-all duration-300 ${value < 0 ? 'bg-red-500/30' : 'bg-blue-500/30'
+                          className={`w-5 rounded-t-lg transition-all duration-300 ${value < 0 ? 'bg-red-500/30' : 'bg-blue-500/30'
                             } ${isCurrent ? 'ring-4 ring-primary/40 ring-offset-2 ring-offset-background' : ''}`}
                           initial={{ height: 0 }}
                           animate={{
-                            height: Math.abs(value) * 20 + 30,
+                            height: Math.abs(value) * 15 + 20,
                             backgroundColor: isCurrent
                               ? 'var(--primary)'
                               : (value < 0 ? 'rgba(239, 68, 68, 0.3)' : 'rgba(59, 130, 246, 0.3)')
@@ -440,7 +440,7 @@ export const MaximumSubarrayVisualization = () => {
                         />
 
                         <motion.div
-                          className={`w-full max-w-[3rem] h-10 sm:h-12 rounded-lg flex items-center justify-center font-bold text-sm sm:text-lg border-2 transition-all duration-300 ${isCurrent
+                          className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm border-2 transition-all duration-300 ${isCurrent
                               ? 'bg-primary text-primary-foreground border-primary scale-110 shadow-xl shadow-primary/30 z-10'
                               : 'bg-muted/50 border-border text-foreground hover:bg-muted'
                             }`}
@@ -452,13 +452,12 @@ export const MaximumSubarrayVisualization = () => {
                           {value}
                         </motion.div>
 
-                        <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-tighter hidden sm:inline">idx {index}</span>
-                        <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-tighter sm:hidden">{index}</span>
+                        <span className="text-[10px] font-mono text-muted-foreground tracking-tighter">{index}</span>
 
                         {isInBestRange && (
                           <motion.div
                             layoutId="best-marker"
-                            className="absolute -bottom-6 sm:-bottom-8 w-full max-w-[3rem] h-1.5 bg-primary rounded-full"
+                            className="absolute -bottom-6 sm:-bottom-8 w-8 h-1.5 bg-primary rounded-full"
                             initial={{ opacity: 0, scaleX: 0 }}
                             animate={{ opacity: 1, scaleX: 1 }}
                           />
@@ -469,7 +468,7 @@ export const MaximumSubarrayVisualization = () => {
                 </AnimatePresence>
 
                 {currentStep.curRange[0] !== -1 && (
-                  <div className="absolute bottom-[56px] sm:bottom-[66px] pointer-events-none grid grid-cols-5 gap-2 sm:gap-3 w-full left-0 right-0 h-14 sm:h-16">
+                  <div className="absolute bottom-[24px] pointer-events-none grid grid-cols-9 gap-1 sm:gap-2 w-full left-0 right-0 h-12">
                     <motion.div
                       layout
                       className="border-2 border-dashed border-indigo-500 bg-indigo-500/5 rounded-xl relative w-full h-full"
@@ -512,7 +511,7 @@ export const MaximumSubarrayVisualization = () => {
                       }`}
                     animate={currentStep.isMaxUpdate ? { scale: [1, 1.1, 1] } : {}}
                   >
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase">Record Max SubSum</span>
+                    <span className="text-[10px] font-bold text-muted-foreground">MaxSum</span>
                     <span className={`text-2xl font-black ${currentStep.isMaxUpdate ? 'text-primary' : 'text-foreground'}`}>
                       {currentStep.maxSub}
                     </span>
@@ -531,7 +530,7 @@ export const MaximumSubarrayVisualization = () => {
                       <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${phaseDetails.dotColor}`} />
                       <span className={`relative inline-flex rounded-full h-2 w-2 ${phaseDetails.dotColor}`} />
                     </span>
-                    <span className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">
+                    <span className="text-[10px] font-bold text-muted-foreground">
                       {phaseDetails.label}
                     </span>
                   </div>
@@ -553,7 +552,7 @@ export const MaximumSubarrayVisualization = () => {
                   </motion.div>
 
                   <div className="space-y-2 flex-1 min-w-0">
-                    <h4 className="text-[11px] font-bold uppercase tracking-widest text-primary/70">
+                    <h4 className="text-[11px] font-bold text-primary/70">
                       Algorithm commentary
                     </h4>
                     <AnimatePresence mode="wait">
@@ -606,26 +605,28 @@ export const MaximumSubarrayVisualization = () => {
               </div>
             </div>
 
-            <VariablePanel
-              variables={{
-                index_i: currentStep.i === -1 || currentStep.i >= currentStep.array.length ? '-' : currentStep.i,
-                value_n: currentStep.i === -1 || currentStep.i >= currentStep.array.length ? '-' : currentStep.array[currentStep.i],
-                curSum: currentStep.curSum,
-                bestMax: currentStep.maxSub,
-                bestRange: `[${currentStep.bestRange[0]}, ${currentStep.bestRange[1]}]`
-              }}
-            />
           </div>
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
+        <div className="flex flex-col gap-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
+          <VariablePanel
+            variables={{
+                index: currentStep.i === -1 || currentStep.i >= currentStep.array.length ? '-' : currentStep.i,
+                value: currentStep.i === -1 || currentStep.i >= currentStep.array.length ? '-' : currentStep.array[currentStep.i],
+                curSum: currentStep.curSum,
+                maxSum: currentStep.maxSub,
+                range: `[${currentStep.bestRange[0]}, ${currentStep.bestRange[1]}]`
+              }}
+            />
+        </div>
       }
     />
   );
