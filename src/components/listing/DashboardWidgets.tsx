@@ -1,18 +1,19 @@
 "use client";
 
-import { Flame, Trophy } from "lucide-react";
 import { eachDayOfInterval, format, parseISO } from "date-fns";
+import { useMemo } from "react";
 
 import { Card } from "@/components/ui/card";
+import { ContributionGraph } from "@/components/listing/ContributionGraph";
 import { ContinueLearningCard } from "@/components/listing/ContinueLearningCard";
+import { DashboardHero } from "@/components/listing/DashboardHero";
 import { DIFFICULTY_MAP } from "@/types/algorithm";
 import { ProblemOfTheDay } from "@/components/listing/ProblemOfTheDay";
 import { RecommendedProblems } from "@/components/listing/RecommendedProblems";
 import { SolvedProgressCard } from "@/components/profile/SolvedProgressCard";
-import { StreakCalendar } from "@/components/profile/StreakCalendar";
+import { WeeklyInsights } from "@/components/listing/WeeklyInsights";
 import { useApp } from "@/contexts/AppContext";
 import { useAppSelector } from "@/store/hooks";
-import { useMemo } from "react";
 import { useProblemOfTheDay } from "@/hooks/useProblemOfTheDay";
 
 export const DashboardWidgets = () => {
@@ -29,12 +30,9 @@ export const DashboardWidgets = () => {
   const potd = useProblemOfTheDay(algorithms);
 
   const overallStats = useMemo(() => {
-    let easySolved = 0,
-      easyTotal = 0;
-    let mediumSolved = 0,
-      mediumTotal = 0;
-    let hardSolved = 0,
-      hardTotal = 0;
+    let easySolved = 0, easyTotal = 0;
+    let mediumSolved = 0, mediumTotal = 0;
+    let hardSolved = 0, hardTotal = 0;
 
     algorithms.forEach((algo) => {
       const rawDiff = algo.difficulty?.toLowerCase() || "";
@@ -56,12 +54,9 @@ export const DashboardWidgets = () => {
     return {
       totalSolved: easySolved + mediumSolved + hardSolved,
       totalQuestions: algorithms.length,
-      easySolved,
-      easyTotal,
-      mediumSolved,
-      mediumTotal,
-      hardSolved,
-      hardTotal,
+      easySolved, easyTotal,
+      mediumSolved, mediumTotal,
+      hardSolved, hardTotal,
     };
   }, [algorithms, progressMap]);
 
@@ -93,8 +88,6 @@ export const DashboardWidgets = () => {
   }, [userProgressData, algorithms]);
 
   const { currentStreak, maxStreak } = useMemo(() => {
-    let current = 0;
-    let max = 0;
     const sortedDates = [...submissionsData].sort(
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
     );
@@ -104,6 +97,7 @@ export const DashboardWidgets = () => {
     const today = new Date();
     const days = eachDayOfInterval({ start: firstDate, end: today });
     let streak = 0;
+    let max = 0;
     days.forEach((day) => {
       const dateStr = format(day, "yyyy-MM-dd");
       if (submissionMap.get(dateStr)) {
@@ -113,37 +107,35 @@ export const DashboardWidgets = () => {
         streak = 0;
       }
     });
-    current = streak;
-    return { currentStreak: current, maxStreak: max };
+    return { currentStreak: streak, maxStreak: max };
   }, [submissionsData]);
 
   const continueLearningAlgo = useMemo(() => {
     if (!userProgressData || userProgressData.length === 0) return null;
-
-    // Sort progress data by last_viewed_at or updated_at (descending)
     const sorted = [...userProgressData].sort((a, b) => {
       const timeA = new Date(a.last_viewed_at || a.updated_at).getTime();
       const timeB = new Date(b.last_viewed_at || b.updated_at).getTime();
       return timeB - timeA;
     });
-
-    // Find the most recent incomplete algorithm first
     const incomplete = sorted.find((p) => !p.completed);
     const target = incomplete || sorted[0];
-
     if (!target) return null;
-
-    // Find the actual algorithm object
     const algo = algorithms.find((a) => a.id === target.algorithm_id);
     if (!algo) return null;
-
-    return {
-      algorithm: algo,
-      progress: target,
-    };
+    return { algorithm: algo, progress: target };
   }, [userProgressData, algorithms]);
 
-  // Only display if user is logged in, and data has loaded
+  // Compute next milestone for hero
+  const getNextMilestone = (solved: number) => {
+    if (solved < 5) return 5;
+    if (solved < 10) return 10;
+    if (solved < 25) return 25;
+    if (solved < 50) return 50;
+    if (solved < 100) return 100;
+    return Math.ceil((solved + 1) / 50) * 50;
+  };
+  const nextMilestone = getNextMilestone(overallStats.totalSolved);
+
   if (isAlgosLoading || algorithms.length === 0) {
     return null;
   }
@@ -152,75 +144,60 @@ export const DashboardWidgets = () => {
     potd?.problem && progressMap?.[potd.problem.id] !== "solved";
 
   return (
-    <div className="w-full max-w-[820px] mx-auto space-y-6 mb-8 mt-2 px-2 sm:px-0">
-      {/* Progress & Calendar Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 w-full items-stretch">
-        {/* Progress Card */}
+    <div className="w-full max-w-[820px] mx-auto space-y-4 mb-8 mt-2 px-2 sm:px-0">
+      {/* ① Personalized Hero */}
+      <DashboardHero
+        currentStreak={currentStreak}
+        nextMilestone={nextMilestone}
+        totalSolved={overallStats.totalSolved}
+        submissionsData={submissionsData}
+      />
+
+      {/* ② Continue Learning — BIGGEST card, primary focus */}
+      {continueLearningAlgo && (
+        <ContinueLearningCard
+          algorithm={continueLearningAlgo.algorithm}
+          progress={continueLearningAlgo.progress}
+        />
+      )}
+
+      {/* ③ Progress + Contribution Graph — side by side */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-4 w-full items-stretch">
+        {/* Progress panel */}
         <div className="min-w-0 flex flex-col h-full">
           <Card className="bg-card border-border/40 shadow-sm overflow-hidden flex flex-col h-full rounded-xl">
-            <div className="px-4 py-3 border-b border-border/40 shrink-0 bg-muted/20">
-              <h3 className="font-normal text-[13px] text-foreground/80">
-                Overall Progress
-              </h3>
+            <div className="px-4 py-2.5 border-b border-border/40 shrink-0 bg-muted/20">
+              <h3 className="font-semibold text-[13px] text-foreground/80">Overall Progress</h3>
             </div>
-            <div className="flex-1 flex flex-col justify-center py-2">
-              <SolvedProgressCard {...overallStats} compact />
-            </div>
-            {/* Streaks */}
-            <div className="border-t border-border/30 px-4 py-3.5 bg-muted/5 flex items-center justify-around divide-x divide-border/30 gap-2 shrink-0">
-              <div className="flex-1 flex flex-col items-center justify-center text-center min-w-0">
-                <span className="text-[11px] sm:text-[12px] text-muted-foreground font-normal mb-1 truncate">
-                  Current Streak
-                </span>
-                <div className="flex items-center justify-center gap-1.5">
-                  <Flame className="w-4.5 h-4.5 text-foreground shrink-0" />
-                  <span className="text-md sm:text-lg font-normal text-foreground tracking-tight truncate">
-                    {currentStreak}
-                  </span>
-                  <span className="text-[10px] sm:text-xs text-muted-foreground/80 font-normal pb-0.5">
-                    days
-                  </span>
-                </div>
-              </div>
-              <div className="flex-1 flex flex-col items-center justify-center text-center min-w-0">
-                <span className="text-[11px] sm:text-[12px] text-muted-foreground font-normal mb-1 truncate">
-                  Best Streak
-                </span>
-                <div className="flex items-center justify-center gap-1.5">
-                  <Trophy className="w-4.5 h-4.5 text-foreground shrink-0" />
-                  <span className="text-md sm:text-lg font-normal text-foreground tracking-tight truncate">
-                    {maxStreak}
-                  </span>
-                  <span className="text-[10px] sm:text-xs text-muted-foreground/80 font-normal pb-0.5">
-                    days
-                  </span>
-                </div>
-              </div>
+            <div className="flex-1 flex flex-col justify-center">
+              <SolvedProgressCard
+                {...overallStats}
+                compact
+                currentStreak={currentStreak}
+                maxStreak={maxStreak}
+              />
             </div>
           </Card>
         </div>
 
-        {/* Streak Calendar */}
-        <div className="w-full max-w-[320px] mx-auto lg:mx-0 flex-none shrink-0 h-full">
-          <StreakCalendar submissions={submissionsData} />
+        {/* Contribution graph */}
+        <div className="w-full lg:w-[240px] flex-none shrink-0 h-full">
+          <ContributionGraph submissions={submissionsData} weeks={10} />
         </div>
       </div>
-      {/* Continue Learning & Recommended Problems */}
-      <div className="space-y-4 w-full">
-        {continueLearningAlgo && (
-          <ContinueLearningCard
-            algorithm={continueLearningAlgo.algorithm}
-            progress={continueLearningAlgo.progress}
-          />
-        )}
-        <RecommendedProblems algorithms={algorithms} />
-      </div>
-      {/* Daily Challenge (POTD) Card */}
+
+      {/* ④ Recommended Problems */}
+      <RecommendedProblems algorithms={algorithms} />
+
+      {/* ⑤ Daily Challenge */}
       {isPOTDUnsolved && (
         <div className="w-full">
           <ProblemOfTheDay potd={potd} progressMap={progressMap} />
         </div>
       )}
+
+      {/* ⑥ Weekly Insights */}
+      <WeeklyInsights submissionsData={submissionsData} />
     </div>
   );
 };

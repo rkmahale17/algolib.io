@@ -130,14 +130,7 @@ export default function Page() {
       />
       <div className="min-h-screen bg-white dark:bg-black text-[#1A1A1A] dark:text-white overflow-x-hidden relative w-full">
         <HeroSection />
-        <section className="mt-[6rem] m-auto  p-4 block relative min-h-screen max-w-[1200px]  mb-8 bg-card rounded-xl border border-border/40 shadow-sm ">
-          <h4 className="font-medium text-xl pl-6 mt-4 mb-4">
-            👋 Welcome back,
-          </h4>
-          <h5 className="text-base text-muted-foreground pl-8 mb-8">
-            Continue building your problem-solving intuition.
-          </h5>
-
+        <section className="mt-[6rem] m-auto p-4 pt-6 block relative max-w-[1200px] mb-8">
           <DashboardWidgets />
         </section>
 
