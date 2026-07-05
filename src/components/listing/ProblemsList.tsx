@@ -7,17 +7,15 @@ import { useApp } from '@/contexts/AppContext';
 import { useAppSelector } from "@/store/hooks";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { getGroupedByCategory, normalizeCategory, resolveAlgoCategories, slugifyCategory } from "@/constants/categories";
-import { Brain, Target, ListFilter, SearchX, RotateCcw, Flame, Trophy, ArrowUp } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { SolvedProgressCard } from "@/components/profile/SolvedProgressCard";
+import { Brain, Target, ListFilter, SearchX, RotateCcw, ArrowUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ProOverlay } from "@/components/ProOverlay";
 import { Button } from "@/components/ui/button";
 import { ProblemFilterPopup } from "@/components/ProblemFilterPopup";
 import { RecommendedProblems } from "@/components/listing/RecommendedProblems";
 import { ContinueLearningCard } from "@/components/listing/ContinueLearningCard";
+import { ListingDashboardWidgets } from "@/components/listing/ListingDashboardWidgets";
 import { supabase } from "@/integrations/supabase/client";
-import { StreakCalendar } from "@/components/profile/StreakCalendar";
 import { parseISO, eachDayOfInterval, format } from 'date-fns';
 
 interface ProblemsListProps {
@@ -582,51 +580,11 @@ export const ProblemsList = ({
         />
       }
       progressWidget={
-        !isLoading && overallStats.totalQuestions > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 w-full mt-[-10px] items-stretch max-w-[820px] mx-auto">
-            {/* Progress Stats */}
-            <div className="min-w-0 flex flex-col h-full">
-              <Card className="bg-card border-border/40 shadow-sm overflow-hidden flex flex-col h-full rounded-xl">
-                <div className="px-4 py-3 border-b border-border/40 shrink-0 bg-muted/20">
-                  <h3 className="font-normal text-[13px] text-foreground/80">{progressTitle}</h3>
-                </div>
-                <div className="flex-1 flex flex-col justify-center py-2">
-                  <SolvedProgressCard
-                    {...overallStats}
-                    compact
-                  />
-                </div>
-                {/* Streaks */}
-                <div className="border-t border-border/30 px-4 py-3.5 bg-muted/5 flex items-center justify-around divide-x divide-border/30 gap-2 shrink-0">
-                    {/* Current Streak */}
-                    <div className="flex-1 flex flex-col items-center justify-center text-center min-w-0">
-                        <span className="text-[11px] sm:text-[12px] text-muted-foreground font-normal mb-1 truncate">Current Streak</span>
-                        <div className="flex items-center justify-center gap-1.5">
-                            <Flame className="w-4.5 h-4.5 text-foreground shrink-0" />
-                            <span className="text-md sm:text-lg font-normal text-foreground tracking-tight truncate">{currentStreak}</span>
-                            <span className="text-[10px] sm:text-xs text-muted-foreground/80 font-normal pb-0.5">days</span>
-                        </div>
-                    </div>
-                    {/* Best Streak */}
-                    <div className="flex-1 flex flex-col items-center justify-center text-center min-w-0">
-                        <span className="text-[11px] sm:text-[12px] text-muted-foreground font-normal mb-1 truncate">Best Streak</span>
-                        <div className="flex items-center justify-center gap-1.5">
-                            <Trophy className="w-4.5 h-4.5 text-foreground shrink-0" />
-                            <span className="text-md sm:text-lg font-normal text-foreground tracking-tight truncate">{maxStreak}</span>
-                            <span className="text-[10px] sm:text-xs text-muted-foreground/80 font-normal pb-0.5">days</span>
-                        </div>
-                    </div>
-                </div>
-              </Card>
-            </div>
-
-            {/* Calendar */}
-            <div className="w-full max-w-[320px] mx-auto lg:mx-0 flex-none shrink-0 h-full">
-              <StreakCalendar 
-                submissions={submissionsData} 
-              />
-            </div>
-          </div>
+        !isLoading && algorithms.length > 0 ? (
+          <ListingDashboardWidgets
+            algorithms={algorithms}
+            progressTitle={progressTitle}
+          />
         ) : undefined
       }
       recommendedWidget={
