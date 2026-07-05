@@ -438,7 +438,17 @@ export const BinaryTreeRightSideViewVisualization: React.FC = () => {
                {step.result.length === 0 && <span className="text-xs text-muted-foreground italic">No nodes processed yet</span>}
              </div>
           </Card>
-
+        </div>
+      }
+      rightContent={
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStep}
+            onLanguageChange={() => setCurrentStep(0)}
+          />
           <VariablePanel
             variables={{
               levelSize: step.levelSize,
@@ -448,15 +458,6 @@ export const BinaryTreeRightSideViewVisualization: React.FC = () => {
             }}
           />
         </div>
-      }
-      rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStep}
-          onLanguageChange={() => setCurrentStep(0)}
-        />
       }
     />
   );

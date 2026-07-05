@@ -307,6 +307,17 @@ export const BurstBalloonsVisualization: React.FC = () => {
             </p>
           </Card>
 
+        </div>
+      }
+      rightContent={
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
           <VariablePanel
             variables={{
               "current length (len)": currentStep.len > 0 ? currentStep.len : "-",
@@ -317,15 +328,6 @@ export const BurstBalloonsVisualization: React.FC = () => {
             }}
           />
         </div>
-      }
-      rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
       }
       controls={
         <SimpleStepControls

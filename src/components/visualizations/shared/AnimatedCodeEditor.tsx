@@ -21,6 +21,8 @@ interface AnimatedCodeEditorProps {
   isBlurred?: boolean;
   /** Called when blur should toggle — only used when hideHeader=true */
   onBlurChange?: (val: boolean) => void;
+  /** Custom height for the editor. If not provided, dynamic height is calculated from the code lines. */
+  height?: string;
 }
 
 const getLanguageDisplayName = (lang: string) => {
@@ -43,6 +45,7 @@ export const AnimatedCodeEditor = ({
   hideHeader = false,
   isBlurred: isBlurredProp,
   onBlurChange,
+  height,
 }: AnimatedCodeEditorProps) => {
   const { theme, resolvedTheme } = useTheme();
   const colorRef = useRef<HTMLDivElement>(null);
@@ -105,12 +108,19 @@ export const AnimatedCodeEditor = ({
 
   const isDark = mounted ? (resolvedTheme || theme) === 'dark' : false;
 
+  // Calculate height dynamically if not provided
+  const editorHeight = React.useMemo(() => {
+    if (height) return height;
+    const lineCount = code.split('\n').length;
+    return `${Math.min(Math.max(lineCount * 20 + 32, 200), 600)}px`;
+  }, [code, height]);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className={`rounded-lg border border-border overflow-hidden bg-card ${className}`}
+      className={`rounded-lg border border-border overflow-hidden bg-card h-fit self-start w-full ${className}`}
     >
       <div ref={colorRef} className="bg-primary hidden" />
 
@@ -147,7 +157,7 @@ export const AnimatedCodeEditor = ({
         </div>
       )}
 
-      <div className="h-[500px] relative">
+      <div className="relative" style={{ height: editorHeight }}>
         {!isReady && (
           <div className={`absolute inset-0 z-10 animate-shimmer ${isDark ? 'bg-[#1e1e1e]' : 'bg-white'}`} />
         )}
@@ -158,7 +168,7 @@ export const AnimatedCodeEditor = ({
             theme={isDark ? 'vs-dark' : 'light'}
             highlightedLines={(highlightedLines || []).map(l => Math.max(1, l))}
             readOnly={true}
-            height="500px"
+            height={editorHeight}
             primaryColor={primaryColor}
             onReady={() => setIsReady(true)}
           />

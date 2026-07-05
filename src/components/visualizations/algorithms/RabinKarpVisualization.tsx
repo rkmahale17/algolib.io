@@ -503,7 +503,7 @@ export const RabinKarpVisualization = () => {
                                   : 'var(--border)',
                             scale: isI ? 1.1 : 1,
                           }}
-                          className="w-9 h-9 border-2 rounded-lg flex items-center justify-center text-sm font-bold"
+                          className="w-8 h-8 border-2 rounded-lg flex items-center justify-center text-xs font-bold"
                         >
                           {char}
                         </motion.div>
@@ -544,7 +544,7 @@ export const RabinKarpVisualization = () => {
                                   : 'var(--border)',
                             scale: isJ || isLpsI ? 1.1 : 1,
                           }}
-                          className="w-9 h-9 border-2 rounded-lg flex items-center justify-center text-sm font-bold"
+                          className="w-8 h-8 border-2 rounded-lg flex items-center justify-center text-xs font-bold"
                         >
                           {char}
                         </motion.div>
@@ -579,7 +579,7 @@ export const RabinKarpVisualization = () => {
                               ? 'rgb(168, 85, 247)'
                               : 'var(--border)',
                         }}
-                        className="w-9 h-9 flex items-center justify-center rounded-lg border-2 bg-muted/20 font-bold text-sm"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border-2 bg-muted/20 font-bold text-xs"
                       >
                         {currentStep.lps[idx] ?? 0}
                       </motion.div>
@@ -620,18 +620,19 @@ export const RabinKarpVisualization = () => {
             <h4 className="text-[10px] font-bold uppercase tracking-widest text-primary mb-1.5 ml-2">Step</h4>
             <p className="text-sm font-medium leading-relaxed ml-2">{currentStep.explanation}</p>
           </motion.div>
-
-          <VariablePanel variables={currentStep.variables} />
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
+          <VariablePanel variables={currentStep.variables} />
+        </div>
       }
       controls={
         <SimpleStepControls

@@ -541,7 +541,7 @@ export const UnionFindByRankVisualization = () => {
                     <g key={i}>
                       {isRoot && (
                         <text x={pos.x} y={pos.y - r - 6} textAnchor="middle" fill="#34d399" fontSize={8} fontWeight="bold">
-                          ROOT
+                          Root
                         </text>
                       )}
                       <circle cx={pos.x} cy={pos.y} r={r} fill={isDefault ? undefined : fill} stroke={isDefault ? undefined : stroke} strokeWidth={isActive ? 3 : 2} className={isDefault ? "fill-muted stroke-border" : ""} />
@@ -626,18 +626,20 @@ export const UnionFindByRankVisualization = () => {
                 </div>
               </Card>
             </div>
-            <VariablePanel variables={currentStep.variables} />
           </div>
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
+          <VariablePanel variables={currentStep.variables} />
+        </div>
       }
       controls={
         <SimpleStepControls

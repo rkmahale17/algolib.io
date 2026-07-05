@@ -448,28 +448,26 @@ export const SameTreeVisualization = () => {
               </div>
               {currentStep.explanation}
             </div>
-
-            {/* Variable Panel (below the commentary box) */}
-            <div className="pt-2">
-              <VariablePanel
-                variables={{
-                  'p.val': currentStep.pVal,
-                  'q.val': currentStep.qVal,
-                  'checking': currentStep.checking,
-                  'step': `${currentStepIndex + 1} / ${steps.length}`
-                }}
-              />
-            </div>
           </div>
         }
         rightContent={
-          <VisualizationCodePanel
-            languages={languages}
-            stepLineNumbers={stepLineNumbers}
-            pseudoSteps={pseudoSteps}
-            activeStepIndex={currentStepIndex}
-            onLanguageChange={() => setCurrentStepIndex(0)}
-          />
+          <div className="space-y-4">
+            <VisualizationCodePanel
+              languages={languages}
+              stepLineNumbers={stepLineNumbers}
+              pseudoSteps={pseudoSteps}
+              activeStepIndex={currentStepIndex}
+              onLanguageChange={() => setCurrentStepIndex(0)}
+            />
+            <VariablePanel
+              variables={{
+                'p.val': currentStep.pVal,
+                'q.val': currentStep.qVal,
+                'checking': currentStep.checking,
+                'step': `${currentStepIndex + 1} / ${steps.length}`
+              }}
+            />
+          </div>
         }
       />
     </div>

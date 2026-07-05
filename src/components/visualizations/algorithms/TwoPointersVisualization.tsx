@@ -415,18 +415,19 @@ export const TwoPointersVisualization = () => {
               </div>
             </div>
           </div>
-
-          <VariablePanel variables={currentStep.variables} />
         </div>
 
-        {/* Right Column: Code & Pseudocode Display */}
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={handleReset}
-        />
+        {/* Right Column: Code & Pseudocode Display and Variables */}
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={handleReset}
+          />
+          <VariablePanel variables={currentStep.variables} />
+        </div>
       </div>
     </div>
   );

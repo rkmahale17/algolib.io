@@ -206,7 +206,7 @@ export const CountingBitsVisualization = () => {
                       const isHighlighted = currentStep.highlights.includes(index);
                       return (
                         <div key={index} className="flex flex-col items-center gap-1">
-                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm border-2 transition-all duration-300 ${
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs border-2 transition-all duration-300 ${
                             isHighlighted
                               ? 'bg-primary/20 border-primary text-primary scale-110 shadow-lg'
                               : 'bg-muted/50 border-border text-foreground'
@@ -230,24 +230,24 @@ export const CountingBitsVisualization = () => {
             </Card>
           </div>
 
-          <div className="mt-auto space-y-4">
-            <Card className="p-4 bg-primary/5 border-primary/20 relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
-              <h4 className="text-[10px] font-bold uppercase tracking-widest text-primary mb-2">Step Explanation</h4>
-              <p className="text-sm font-medium leading-relaxed min-h-[40px]">{currentStep.explanation}</p>
-            </Card>
-            <VariablePanel variables={currentStep.variables} />
-          </div>
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
+          <Card className="p-4 bg-primary/5 border-primary/20 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
+            <h4 className="text-[10px] font-bold uppercase tracking-widest text-primary mb-2">Step Explanation</h4>
+            <p className="text-sm font-medium leading-relaxed min-h-[40px]">{currentStep.explanation}</p>
+          </Card>
+          <VariablePanel variables={currentStep.variables} />
+        </div>
       }
     />
   );

@@ -454,7 +454,7 @@ export const FenwickTreeVisualization: React.FC = () => {
                         [{idx}]
                       </div>
                       <div
-                        className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all duration-200 ${idx === step.highlightedArrayIndex
+                        className={`w-8 h-8 flex items-center justify-center rounded-lg border-2 text-xs font-bold transition-all duration-200 ${idx === step.highlightedArrayIndex
                           ? "bg-primary/20 border-primary scale-105 shadow-md"
                           : "bg-muted/30 border-border"
                           }`}
@@ -477,7 +477,7 @@ export const FenwickTreeVisualization: React.FC = () => {
                           [{treeIdx}]
                         </div>
                         <div
-                          className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all duration-200 ${treeIdx === step.highlightedTreeIndex
+                          className={`w-8 h-8 flex items-center justify-center rounded-lg border-2 text-xs font-bold transition-all duration-200 ${treeIdx === step.highlightedTreeIndex
                             ? "bg-green-500/20 border-green-500 scale-105 shadow-md"
                             : val !== 0
                               ? "bg-blue-500/10 border-blue-500/30"
@@ -499,26 +499,27 @@ export const FenwickTreeVisualization: React.FC = () => {
               <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Step Explanation</h4>
               <p className="text-sm text-foreground leading-relaxed font-medium min-h-[40px]">{step.message}</p>
             </Card>
-
-            <VariablePanel
-              variables={{
-                operation: step.operation,
-                index: step.index,
-                value: step.value,
-                currentSum: step.sum,
-              }}
-            />
           </div>
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
+          <VariablePanel
+            variables={{
+              operation: step.operation,
+              index: step.index,
+              value: step.value,
+              currentSum: step.sum,
+            }}
+          />
+        </div>
       }
       controls={
         <SimpleStepControls

@@ -276,7 +276,7 @@ export const CombinationsVisualization: React.FC = () => {
               {Array.from({ length: currentStep.n }, (_, i) => i + 1).map((val) => (
                 <div
                   key={val}
-                  className={`w-12 h-12 flex items-center justify-center rounded-lg border-2 font-bold transition-all ${
+                  className={`w-8 h-8 flex items-center justify-center rounded-lg border-2 text-xs font-bold transition-all ${
                     val === currentStep.i
                       ? "bg-primary/20 border-primary scale-110 text-foreground"
                       : currentStep.comb.includes(val)
@@ -290,18 +290,18 @@ export const CombinationsVisualization: React.FC = () => {
             </div>
 
             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Current Combination ({currentStep.comb.length}/{currentStep.k})</h3>
-            <div className="flex gap-2 mb-6 min-h-[3rem] flex-wrap">
+            <div className="flex gap-2 mb-6 min-h-[2rem] flex-wrap">
               {currentStep.comb.length > 0 ? (
                 currentStep.comb.map((val, idx) => (
                   <div
                     key={idx}
-                    className="w-12 h-12 flex items-center justify-center rounded-lg border-2 bg-blue-500/20 border-blue-500 text-foreground font-bold animate-in zoom-in"
+                    className="w-8 h-8 flex items-center justify-center rounded-lg border-2 bg-blue-500/20 border-blue-500 text-foreground text-xs font-bold animate-in zoom-in"
                   >
                     {val}
                   </div>
                 ))
               ) : (
-                <div className="text-muted-foreground italic h-12 flex items-center">Empty</div>
+                <div className="text-muted-foreground italic h-8 flex items-center text-xs">Empty</div>
               )}
             </div>
 
@@ -326,6 +326,17 @@ export const CombinationsVisualization: React.FC = () => {
             </p>
           </div>
 
+        </div>
+
+        {/* Right Column: Code & Pseudocode Display and Variables */}
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={handleReset}
+          />
           <VariablePanel
             variables={{
               'n': currentStep.n,
@@ -336,14 +347,6 @@ export const CombinationsVisualization: React.FC = () => {
             }}
           />
         </div>
-
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={handleReset}
-        />
       </div>
     </div>
   );

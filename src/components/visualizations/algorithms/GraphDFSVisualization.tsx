@@ -322,16 +322,19 @@ export const GraphDFSVisualization = () => {
             <p className="text-sm font-medium text-foreground">{currentStep.explanation}</p>
           </div>
 
-          <VariablePanel variables={currentStep.variables} />
         </div>
 
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={handleReset}
-        />
+        {/* Right Column: Code & Pseudocode Display and Variables */}
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={handleReset}
+          />
+          <VariablePanel variables={currentStep.variables} />
+        </div>
       </div>
     </div>
   );

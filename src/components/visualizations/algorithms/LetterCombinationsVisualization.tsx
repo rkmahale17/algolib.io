@@ -599,6 +599,17 @@ export const LetterCombinationsVisualization: React.FC = () => {
             </div>
           )}
 
+        </div>
+      }
+      rightContent={
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
           <div
             className="rounded-xl p-4 flex flex-col gap-4 bg-card border border-border"
           >
@@ -658,15 +669,6 @@ export const LetterCombinationsVisualization: React.FC = () => {
             />
           </div>
         </div>
-      }
-      rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
       }
       controls={
         <SimpleStepControls

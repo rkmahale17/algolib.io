@@ -398,28 +398,29 @@ export const ContainerWithMostWaterVisualization = () => {
               <h4 className="text-[10px] font-bold uppercase tracking-widest text-primary mb-2">Step Explanation</h4>
               <p className="text-sm font-medium leading-relaxed min-h-[40px]">{currentStep.explanation}</p>
             </Card>
-
-            <VariablePanel
-              variables={{
-                left: currentStep.left,
-                right: currentStep.right,
-                width: currentStep.width,
-                currentHeight: currentStep.currentHeight,
-                currentArea: currentStep.currentArea,
-                maxArea: currentStep.maxArea
-              }}
-            />
           </div>
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
+          <VariablePanel
+            variables={{
+              left: currentStep.left,
+              right: currentStep.right,
+              width: currentStep.width,
+              currentHeight: currentStep.currentHeight,
+              currentArea: currentStep.currentArea,
+              maxArea: currentStep.maxArea
+            }}
+          />
+        </div>
       }
     />
   );

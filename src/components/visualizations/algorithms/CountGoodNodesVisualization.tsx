@@ -661,7 +661,17 @@ export const CountGoodNodesVisualization = () => {
               </div>
             </div>
           </Card>
-
+        </div>
+      }
+      rightContent={
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
           <VariablePanel
             variables={{
               current_node_val: step?.currentNodeId !== null ? initialTree[step.currentNodeId as keyof typeof initialTree].val : 'N/A',
@@ -672,15 +682,6 @@ export const CountGoodNodesVisualization = () => {
             }}
           />
         </div>
-      }
-      rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
       }
       controls={
         <SimpleStepControls

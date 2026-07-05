@@ -602,6 +602,17 @@ export const AStarVisualization = () => {
             <p className="text-sm font-medium text-foreground">{currentStep.explanation}</p>
           </div>
 
+        </div>
+
+        {/* Right Column: Code & Pseudocode Display and Variables */}
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={handleReset}
+          />
           <VariablePanel
             variables={{
               'Current Node': currentStep.current ? `(${currentStep.current.x}, ${currentStep.current.y})` : 'None',
@@ -611,14 +622,6 @@ export const AStarVisualization = () => {
             }}
           />
         </div>
-
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={handleReset}
-        />
       </div>
     </div>
   );

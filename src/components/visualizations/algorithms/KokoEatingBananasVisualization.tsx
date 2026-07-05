@@ -315,7 +315,26 @@ export const KokoEatingBananasVisualization: React.FC = () => {
                 </div>
 
                 <div>
-                  <h4 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-4">Banana Piles</h4>
+                  <div className="flex justify-between items-center mb-4">
+                    <h4 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Banana Piles Array</h4>
+                    <div className="flex gap-1.5">
+                      {piles.map((pileSize, idx) => {
+                        const isCurrent = step.currentPileIdx === idx;
+                        return (
+                          <div
+                            key={idx}
+                            className={`w-8 h-8 rounded-lg border flex items-center justify-center font-mono text-xs font-bold transition-all ${
+                              isCurrent
+                                ? 'bg-primary border-primary text-primary-foreground scale-110 shadow-md'
+                                : 'bg-muted/50 border-border text-foreground/80'
+                            }`}
+                          >
+                            {pileSize}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                   <div className="grid grid-cols-4 gap-4 h-56 items-end border-b border-border/50 pb-2">
                     {piles.map((pileSize, idx) => {
                       const isCurrent = step.currentPileIdx === idx;
@@ -440,35 +459,34 @@ export const KokoEatingBananasVisualization: React.FC = () => {
               </Card>
             </div>
 
-            <div className="space-y-4">
-              <Card className="p-4 border-l-4 border-primary bg-primary/5 shadow-sm text-foreground flex items-center min-h-[70px]">
-                <div className="flex items-start gap-4">
-                  <div className="p-2 rounded-xl shrink-0 bg-primary/10 text-primary">
-                    <Info className="w-4 h-4" />
-                  </div>
-                  <div className="space-y-1">
-                    <h4 className="text-[9px] font-bold uppercase tracking-[0.12em] text-primary/80">
-                      Step Narrative
-                    </h4>
-                    <p className="text-xs font-medium leading-relaxed text-foreground/90">
-                      {step.explanation}
-                    </p>
-                  </div>
+            <Card className="p-4 border-l-4 border-primary bg-primary/5 shadow-sm text-foreground flex items-center min-h-[70px]">
+              <div className="flex items-start gap-4">
+                <div className="p-2 rounded-xl shrink-0 bg-primary/10 text-primary">
+                  <Info className="w-4 h-4" />
                 </div>
-              </Card>
-              
-              <VariablePanel variables={step.variables} />
-            </div>
+                <div className="space-y-1">
+                  <h4 className="text-[9px] font-bold uppercase tracking-[0.12em] text-primary/80">
+                    Step Narrative
+                  </h4>
+                  <p className="text-xs font-medium leading-relaxed text-foreground/90">
+                    {step.explanation}
+                  </p>
+                </div>
+              </div>
+            </Card>
           </div>
         }
         rightContent={
-          <VisualizationCodePanel
-            languages={languages}
-            stepLineNumbers={stepLineNumbers}
-            pseudoSteps={pseudoSteps}
-            activeStepIndex={currentStep}
-            onLanguageChange={() => setCurrentStep(0)}
-          />
+          <div className="space-y-4">
+            <VisualizationCodePanel
+              languages={languages}
+              stepLineNumbers={stepLineNumbers}
+              pseudoSteps={pseudoSteps}
+              activeStepIndex={currentStep}
+              onLanguageChange={() => setCurrentStep(0)}
+            />
+            <VariablePanel variables={step.variables} />
+          </div>
         }
         controls={
           <SimpleStepControls

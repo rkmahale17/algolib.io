@@ -361,6 +361,17 @@ export const BFSLevelOrderVisualization = () => {
             <p className="text-sm text-foreground font-medium">{currentStep.message}</p>
           </div>
 
+        </div>
+
+        {/* Right: code / pseudocode panel and variables */}
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={handleReset}
+          />
           <VariablePanel
             variables={{
               current: currentStep.currentNode ?? 'null',
@@ -370,15 +381,6 @@ export const BFSLevelOrderVisualization = () => {
             }}
           />
         </div>
-
-        {/* Right: code / pseudocode panel */}
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={handleReset}
-        />
       </div>
     </div>
   );

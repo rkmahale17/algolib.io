@@ -329,7 +329,17 @@ export const BinaryTreeMaximumPathSumVisualization: React.FC = () => {
                 </span>
              </div>
           </Card>
-
+        </div>
+      }
+      rightContent={
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStep}
+            onLanguageChange={() => setCurrentStep(0)}
+          />
           <VariablePanel
             variables={step.activeNodeId !== null ? {
               "activeNode": tree.id === step.activeNodeId ? tree.val : "...", // simplified
@@ -339,15 +349,6 @@ export const BinaryTreeMaximumPathSumVisualization: React.FC = () => {
             } : { "res": step.maxPathFound }}
           />
         </div>
-      }
-      rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStep}
-          onLanguageChange={() => setCurrentStep(0)}
-        />
       }
     />
   );

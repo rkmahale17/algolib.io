@@ -278,7 +278,7 @@ export const ProductOfArrayExceptSelfVisualization = () => {
                   <div className="flex items-center justify-center gap-2 flex-wrap">
                     {currentStep.array.map((value, index) => (
                       <div key={index} className="flex flex-col items-center gap-1">
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm border-2 transition-all duration-300 ${
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs border-2 transition-all duration-300 ${
                           currentStep.highlights.includes(index)
                             ? 'bg-primary/20 border-primary text-primary scale-110 shadow-lg'
                             : 'bg-muted/50 border-border text-foreground'
@@ -296,7 +296,7 @@ export const ProductOfArrayExceptSelfVisualization = () => {
                   <div className="flex items-center justify-center gap-2 flex-wrap">
                     {currentStep.result.map((value, index) => (
                       <div key={index} className="flex flex-col items-center gap-1">
-                        <div className={`w-14 h-10 rounded-lg flex items-center justify-center font-mono font-bold text-sm border-2 transition-all duration-300 ${
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-mono font-bold text-xs border-2 transition-all duration-300 ${
                           currentStep.highlights.includes(index)
                             ? 'bg-primary/25 border-primary text-primary scale-110 shadow-lg'
                             : 'bg-muted/50 border-border text-foreground'
@@ -318,18 +318,20 @@ export const ProductOfArrayExceptSelfVisualization = () => {
               <h4 className="text-[10px] font-bold uppercase tracking-widest text-primary mb-2">Step Explanation</h4>
               <p className="text-sm font-medium leading-relaxed min-h-[40px]">{currentStep.explanation}</p>
             </Card>
-            <VariablePanel variables={currentStep.variables} />
           </div>
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
+          <VariablePanel variables={currentStep.variables} />
+        </div>
       }
     />
   );

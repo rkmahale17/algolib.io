@@ -200,25 +200,23 @@ export const ReverseBitsVisualization = () => {
               </div>
             </Card>
           </div>
-
-          <div className="space-y-4 mt-auto">
-            <Card className="p-4 bg-primary/5 border-primary/20">
-              <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Step Explanation</h4>
-              <p className="text-sm text-foreground leading-relaxed font-medium min-h-[40px]">{step.explanation}</p>
-            </Card>
-
-            <VariablePanel variables={step.variables} />
-          </div>
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
+          <Card className="p-4 bg-primary/5 border-primary/20">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Step Explanation</h4>
+            <p className="text-sm text-foreground leading-relaxed font-medium min-h-[40px]">{step.explanation}</p>
+          </Card>
+          <VariablePanel variables={step.variables} />
+        </div>
       }
       controls={
         <SimpleStepControls

@@ -12,6 +12,7 @@ interface PseudocodeViewProps {
   activeIndex: number;
   className?: string;
   hideHeader?: boolean;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -24,6 +25,7 @@ export const PseudocodeView = ({
   activeIndex,
   className = '',
   hideHeader = false,
+  style,
 }: PseudocodeViewProps) => {
   const activeRef = React.useRef<HTMLDivElement>(null);
 
@@ -35,6 +37,7 @@ export const PseudocodeView = ({
   return (
     <div
       className={`rounded-lg border border-border overflow-hidden bg-card flex flex-col ${className}`}
+      style={style}
     >
       {/* Header */}
       {!hideHeader && (

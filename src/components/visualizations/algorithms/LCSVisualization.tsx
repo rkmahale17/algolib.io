@@ -209,14 +209,14 @@ export const LCSVisualization: React.FC = () => {
                 <table className="w-full text-xs border-collapse">
                   <thead>
                     <tr>
-                      <th className="border border-border p-2 bg-muted/50 w-10 text-muted-foreground font-mono"></th>
+                      <th className="border border-border p-2 bg-muted/50 w-8 text-muted-foreground font-mono"></th>
                       {step.text2.split('').map((char, idx) => (
-                        <th key={idx} className="border border-border p-2 bg-muted w-10 text-center font-mono text-muted-foreground">
+                        <th key={idx} className="border border-border p-2 bg-muted w-8 text-center font-mono text-muted-foreground">
                           {char}
                           <div className="text-[10px] opacity-60 font-normal">{idx}</div>
                         </th>
                       ))}
-                      <th className="border border-border p-2 bg-muted w-10 text-center text-muted-foreground font-mono">
+                      <th className="border border-border p-2 bg-muted w-8 text-center text-muted-foreground font-mono">
                         ∅
                         <div className="text-[10px] opacity-60 font-normal">{step.text2.length}</div>
                       </th>
@@ -225,7 +225,7 @@ export const LCSVisualization: React.FC = () => {
                   <tbody>
                     {step.dp.map((row, rowIdx) => (
                       <tr key={rowIdx}>
-                        <td className="border border-border p-2 bg-muted font-semibold text-center w-10 font-mono text-foreground">
+                        <td className="border border-border p-2 bg-muted font-semibold text-center w-8 font-mono text-foreground">
                           {rowIdx < step.text1.length ? (
                             <>
                               {step.text1[rowIdx]}
@@ -255,7 +255,7 @@ export const LCSVisualization: React.FC = () => {
                           return (
                             <td
                               key={colIdx}
-                              className={`border border-border p-2 text-center transition-all duration-300 w-10 h-10 ${cellClass}`}
+                              className={`border border-border p-2 text-center transition-all duration-300 w-8 h-8 text-[10px] ${cellClass}`}
                             >
                               {val}
                             </td>
@@ -277,16 +277,6 @@ export const LCSVisualization: React.FC = () => {
               </p>
             </Card>
 
-            <VariablePanel
-              variables={{
-                i: step.i !== -1 ? step.i : '-',
-                j: step.j !== -1 ? step.j : '-',
-                'text1[i]': step.i >= 0 && step.i < step.text1.length ? step.text1[step.i] : '-',
-                'text2[j]': step.j >= 0 && step.j < step.text2.length ? step.text2[step.j] : '-',
-                'dp[i][j]': step.i !== -1 ? step.dp[step.i][step.j] : step.dp[0][0]
-              }}
-            />
-
             <Card className="p-4 bg-muted/20 border border-border/40 rounded-lg text-xs space-y-1.5 text-muted-foreground leading-relaxed">
               <h4 className="font-bold text-muted-foreground uppercase text-[10px] tracking-wider mb-2">
                 Why this works
@@ -305,13 +295,24 @@ export const LCSVisualization: React.FC = () => {
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
+          <VariablePanel
+            variables={{
+              i: step.i !== -1 ? step.i : '-',
+              j: step.j !== -1 ? step.j : '-',
+              'text1[i]': step.i >= 0 && step.i < step.text1.length ? step.text1[step.i] : '-',
+              'text2[j]': step.j >= 0 && step.j < step.text2.length ? step.text2[step.j] : '-',
+              'dp[i][j]': step.i !== -1 ? step.dp[step.i][step.j] : step.dp[0][0]
+            }}
+          />
+        </div>
       }
       controls={
         <SimpleStepControls

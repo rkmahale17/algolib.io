@@ -330,6 +330,17 @@ export const SubsetsIIVisualization: React.FC = () => {
             <p className="text-sm text-foreground leading-relaxed font-medium">{currentStep.message}</p>
           </Card>
 
+        </div>
+      }
+      rightContent={
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={generated.stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
           <VariablePanel
             variables={{
               "i (backtrack index)": currentStep.i,
@@ -339,15 +350,6 @@ export const SubsetsIIVisualization: React.FC = () => {
             }}
           />
         </div>
-      }
-      rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={generated.stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
       }
       controls={
         <SimpleStepControls

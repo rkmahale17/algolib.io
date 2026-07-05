@@ -502,8 +502,6 @@ export const MinStackVisualization = () => {
                 </div>
               </div>
             </Card>
-
-            {/* Narrative Commentary Box */}
             <Card className="p-4 border-l-4 border-primary bg-primary/5 shadow-sm flex items-center min-h-[70px]">
               <div className="flex items-start gap-4">
                 <div className="p-2 rounded-xl shrink-0 bg-primary/10 text-primary">
@@ -519,18 +517,19 @@ export const MinStackVisualization = () => {
                 </div>
               </div>
             </Card>
-
-            <VariablePanel variables={currentStep.variables} />
           </div>
         }
         rightContent={
-          <VisualizationCodePanel
-            languages={languages}
-            stepLineNumbers={stepLineNumbers}
-            pseudoSteps={pseudoSteps}
-            activeStepIndex={currentStepIndex}
-            onLanguageChange={() => setCurrentStepIndex(0)}
-          />
+          <div className="space-y-4">
+            <VisualizationCodePanel
+              languages={languages}
+              stepLineNumbers={stepLineNumbers}
+              pseudoSteps={pseudoSteps}
+              activeStepIndex={currentStepIndex}
+              onLanguageChange={() => setCurrentStepIndex(0)}
+            />
+            <VariablePanel variables={currentStep.variables} />
+          </div>
         }
         controls={
           <SimpleStepControls

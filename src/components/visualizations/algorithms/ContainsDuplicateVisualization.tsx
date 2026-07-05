@@ -198,12 +198,12 @@ export const ContainsDuplicateVisualization: React.FC = () => {
                     return (
                       <div key={idx} className="flex flex-col items-center gap-2">
                         <div 
-                          className={`w-12 h-12 flex items-center justify-center rounded-xl border-2 font-black transition-colors duration-0 shadow-sm ${
+                          className={`w-8 h-8 flex items-center justify-center rounded-lg border-2 font-black transition-colors duration-0 shadow-sm ${
                             isCurrent ? "border-orange-500 bg-orange-100 text-black scale-110 z-10 shadow-lg" :
                             "border-gray-100 bg-white text-black"
                           }`}
                         >
-                          <span className="text-xl">{num}</span>
+                          <span className="text-xs font-semibold">{num}</span>
                         </div>
                         {isCurrent && <div className="text-[9px] font-black text-orange-700 bg-orange-200 px-1.5 rounded uppercase tracking-tighter">i</div>}
                       </div>
@@ -238,18 +238,20 @@ export const ContainsDuplicateVisualization: React.FC = () => {
                 {currentStep.explanation}
               </p>
             </Card>
-            <VariablePanel variables={currentStep.variables} />
           </div>
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
+          <VariablePanel variables={currentStep.variables} />
+        </div>
       }
       controls={
         <SimpleStepControls

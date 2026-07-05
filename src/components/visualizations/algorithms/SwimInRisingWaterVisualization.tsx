@@ -353,7 +353,7 @@ export const SwimInRisingWaterVisualization: React.FC = () => {
                         return (
                           <div key={c} className="flex flex-col items-center">
                             <div
-                              className={`w-16 h-16 rounded-xl flex flex-col items-center justify-center border transition-all duration-150 relative select-none ${
+                              className={`w-8 h-8 rounded-lg flex flex-col items-center justify-center border transition-all duration-150 relative select-none ${
                                 isActive
                                   ? 'scale-110 shadow-2xl ring-4 ring-yellow-400 border-yellow-500 z-20 bg-yellow-500/10'
                                   : isNeighbor
@@ -365,21 +365,16 @@ export const SwimInRisingWaterVisualization: React.FC = () => {
                             >
                               {/* Water backdrop graphic for visited */}
                               {isVisited && !isActive && !isNeighbor && (
-                                <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-blue-500/10 to-transparent rounded-b-xl" />
+                                <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-blue-500/10 to-transparent rounded-b-lg" />
                               )}
 
                               {/* Active swimmer icon */}
                               {isActive && (
-                                <Navigation className="w-4 h-4 text-yellow-500 rotate-45 mb-0.5 animate-bounce" />
+                                <Navigation className="w-3 h-3 text-yellow-500 rotate-45 animate-bounce" />
                               )}
 
-                              <span className="text-lg font-bold font-mono">
+                              <span className="text-xs font-bold font-mono">
                                 {elevation}
-                              </span>
-
-                              {/* Coordinate Label */}
-                              <span className="absolute bottom-1 right-1 text-[8px] font-mono opacity-50">
-                                {r},{c}
                               </span>
                             </div>
                           </div>
@@ -436,7 +431,6 @@ export const SwimInRisingWaterVisualization: React.FC = () => {
                 </div>
               </div>
             </Card>
-
             {/* Commentary Box */}
             <Card className={`p-4 border-l-4 transition-all duration-300 shadow-sm min-h-[70px] flex items-center ${step.isMatch ? 'bg-primary/10 border-primary' : 'bg-primary/5 border-primary/20'}`}>
               <div className="flex items-start gap-4">
@@ -453,18 +447,19 @@ export const SwimInRisingWaterVisualization: React.FC = () => {
                 </div>
               </div>
             </Card>
-
-            <VariablePanel variables={step.variables} />
           </div>
         }
         rightContent={
-          <VisualizationCodePanel
-            languages={languages}
-            stepLineNumbers={stepLineNumbers}
-            pseudoSteps={pseudoSteps}
-            activeStepIndex={currentStepIndex}
-            onLanguageChange={() => setCurrentStepIndex(0)}
-          />
+          <div className="space-y-4">
+            <VisualizationCodePanel
+              languages={languages}
+              stepLineNumbers={stepLineNumbers}
+              pseudoSteps={pseudoSteps}
+              activeStepIndex={currentStepIndex}
+              onLanguageChange={() => setCurrentStepIndex(0)}
+            />
+            <VariablePanel variables={step.variables} />
+          </div>
         }
         controls={
           <SimpleStepControls

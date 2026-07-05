@@ -449,7 +449,7 @@ export const RottingOrangesVisualization: React.FC = () => {
                         return (
                           <div key={c} className="flex flex-col items-center">
                             <div
-                              className={`w-16 h-16 rounded-xl flex items-center justify-center border transition-all duration-150 relative select-none ${
+                              className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-all duration-150 relative select-none ${
                                 isActive
                                   ? 'scale-110 shadow-2xl ring-4 ring-orange-500 border-orange-500 z-20'
                                   : isNeighbor
@@ -460,13 +460,13 @@ export const RottingOrangesVisualization: React.FC = () => {
                               {/* Inner node design */}
                               {val === 0 ? (
                                 // Empty Cell
-                                <div className="w-full h-full rounded-xl bg-muted/5 border-2 border-dashed border-muted-foreground/15 flex items-center justify-center text-[10px] text-muted-foreground/30 font-mono">
+                                <div className="w-full h-full rounded-lg bg-muted/5 border border-dashed border-muted-foreground/15 flex items-center justify-center text-[8px] text-muted-foreground/30 font-mono">
                                   0
                                 </div>
                               ) : val === 1 ? (
                                 // Fresh Orange
                                 <div className="flex flex-col items-center justify-center">
-                                  <svg className="w-10 h-10 drop-shadow-md" viewBox="0 0 24 24" fill="none">
+                                  <svg className="w-5 h-5 drop-shadow-sm" viewBox="0 0 24 24" fill="none">
                                     <path d="M12 2C13 3 14 5.5 12.5 7C11.5 8 10 7.5 10 7C10 6 11 3 12 2Z" fill="#22c55e" />
                                     <circle cx="12" cy="14" r="7" fill="url(#fresh-orange-grad)" />
                                     <path d="M12 7V9" stroke="#78350f" strokeWidth="1.5" strokeLinecap="round" />
@@ -481,7 +481,7 @@ export const RottingOrangesVisualization: React.FC = () => {
                               ) : (
                                 // Rotten Orange
                                 <div className="flex flex-col items-center justify-center animate-wiggle">
-                                  <svg className="w-10 h-10 drop-shadow-md" viewBox="0 0 24 24" fill="none">
+                                  <svg className="w-5 h-5 drop-shadow-sm" viewBox="0 0 24 24" fill="none">
                                     <path d="M12 2C12.5 3 13 4.5 12.2 5.2C11.6 5.8 10.8 5.5 10.8 5.2C10.8 4.6 11.4 3 12 2Z" fill="#78716c" />
                                     <circle cx="12" cy="14" r="7" fill="url(#rotten-orange-grad)" />
                                     <path d="M12 5V9" stroke="#451a03" strokeWidth="1.5" strokeLinecap="round" />
@@ -498,11 +498,6 @@ export const RottingOrangesVisualization: React.FC = () => {
                                   </svg>
                                 </div>
                               )}
-
-                              {/* Label showing coordinates in corner */}
-                              <span className="absolute bottom-1 right-1 text-[8px] font-mono text-muted-foreground/60">
-                                {r},{c}
-                              </span>
                             </div>
                           </div>
                         );
@@ -573,18 +568,19 @@ export const RottingOrangesVisualization: React.FC = () => {
                 </div>
               </div>
             </Card>
-
-            <VariablePanel variables={step.variables} />
           </div>
         }
         rightContent={
-          <VisualizationCodePanel
-            languages={languages}
-            stepLineNumbers={stepLineNumbers}
-            pseudoSteps={pseudoSteps}
-            activeStepIndex={currentStepIndex}
-            onLanguageChange={() => setCurrentStepIndex(0)}
-          />
+          <div className="space-y-4">
+            <VisualizationCodePanel
+              languages={languages}
+              stepLineNumbers={stepLineNumbers}
+              pseudoSteps={pseudoSteps}
+              activeStepIndex={currentStepIndex}
+              onLanguageChange={() => setCurrentStepIndex(0)}
+            />
+            <VariablePanel variables={step.variables} />
+          </div>
         }
         controls={
           <SimpleStepControls

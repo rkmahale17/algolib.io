@@ -522,6 +522,17 @@ export const GasStationVisualization: React.FC = () => {
             </div>
           </div>
 
+        </div>
+
+        {/* Right Column: Code Display and Variables */}
+        <div className="lg:col-span-5 space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={handleReset}
+          />
           <VariablePanel
             variables={{
               res: currentStep.res,
@@ -529,17 +540,6 @@ export const GasStationVisualization: React.FC = () => {
               totalGas: currentStep.totalGas,
               totalCost: currentStep.totalCost
             }}
-          />
-        </div>
-
-        {/* Right Column: Code Display */}
-        <div className="lg:col-span-5">
-          <VisualizationCodePanel
-            languages={languages}
-            stepLineNumbers={stepLineNumbers}
-            pseudoSteps={pseudoSteps}
-            activeStepIndex={currentStepIndex}
-            onLanguageChange={handleReset}
           />
         </div>
       </div>

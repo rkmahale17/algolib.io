@@ -645,16 +645,12 @@ export const InterleavingStringVisualization: React.FC = () => {
                           return (
                             <td
                               key={c}
-                              className={`border border-border p-2 text-center text-xs font-semibold select-none transition-all ${cellClass} ${
+                              className={`border border-border p-1 text-center text-xs font-semibold select-none transition-all w-8 h-8 ${cellClass} ${
                                 isCurrent ? 'ring-2 ring-primary ring-inset font-black' : ''
                               }`}
-                              style={{ minWidth: '40px', height: '40px' }}
                             >
                               <div className="flex flex-col items-center justify-center h-full">
-                                <span className="text-xs">{symbol}</span>
-                                <span className="text-[8px] text-muted-foreground/40 font-mono">
-                                  ({r},{c})
-                                </span>
+                                <span className="text-[10px]">{symbol}</span>
                               </div>
                             </td>
                           );
@@ -665,7 +661,17 @@ export const InterleavingStringVisualization: React.FC = () => {
                 </table>
               </div>
             </Card>
-
+          </div>
+        }
+        rightContent={
+          <div className="space-y-4">
+            <VisualizationCodePanel
+              languages={languages}
+              stepLineNumbers={stepLineNumbers}
+              pseudoSteps={pseudoSteps}
+              activeStepIndex={currentStep}
+              onLanguageChange={() => setCurrentStep(0)}
+            />
             {/* Educational Commentary */}
             <Card className="p-4 border-l-4 border-primary bg-primary/5 shadow-sm flex items-center min-h-[70px]">
               <div className="flex items-start gap-4">
@@ -686,15 +692,6 @@ export const InterleavingStringVisualization: React.FC = () => {
             {/* Variable Panel */}
             <VariablePanel variables={step.variables} />
           </div>
-        }
-        rightContent={
-          <VisualizationCodePanel
-            languages={languages}
-            stepLineNumbers={stepLineNumbers}
-            pseudoSteps={pseudoSteps}
-            activeStepIndex={currentStep}
-            onLanguageChange={() => setCurrentStep(0)}
-          />
         }
       />
     </div>

@@ -277,7 +277,7 @@ export const LongestConsecutiveSequenceVisualization: React.FC = () => {
                 return (
                   <div
                     key={idx}
-                    className={`w-12 h-12 rounded-lg flex items-center justify-center font-mono text-sm border-2 transition-all duration-300 ${
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center font-mono text-xs border-2 transition-all duration-300 ${
                       isCurrent ? "border-orange-500 bg-orange-500/10 text-orange-600 dark:text-orange-400 font-bold scale-105" :
                       isChecking ? "border-blue-500 bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold scale-105" :
                       "border-border bg-muted/20 text-muted-foreground"
@@ -302,7 +302,7 @@ export const LongestConsecutiveSequenceVisualization: React.FC = () => {
                   return (
                     <div
                       key={idx}
-                      className={`w-12 h-12 rounded-lg flex items-center justify-center font-mono text-sm border-2 transition-all duration-300 ${
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center font-mono text-xs border-2 transition-all duration-300 ${
                         isCurrent ? "border-orange-500 bg-orange-500/10 text-orange-600 dark:text-orange-400 font-bold scale-105" :
                         isChecking ? "border-blue-500 bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold scale-105" :
                         "border-border bg-secondary/50 text-foreground/80"
@@ -349,18 +349,19 @@ export const LongestConsecutiveSequenceVisualization: React.FC = () => {
               </div>
             </div>
           </Card>
-
-          <VariablePanel variables={step.variables} />
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={handleReset}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={handleReset}
+          />
+          <VariablePanel variables={step.variables} />
+        </div>
       }
       controls={
         <SimpleStepControls

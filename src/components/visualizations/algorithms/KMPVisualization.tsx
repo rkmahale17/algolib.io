@@ -473,7 +473,7 @@ export const KMPVisualization = () => {
                               scale: isCurrent || isMatchedResult ? 1.05 : 1,
                               y: isCurrent ? -2 : 0
                             }}
-                            className={`w-10 h-10 border-2 rounded-lg flex items-center justify-center text-sm font-bold transition-all backdrop-blur-md
+                            className={`w-8 h-8 border-2 rounded-lg flex items-center justify-center text-xs font-bold transition-all backdrop-blur-md
                               ${isCurrent ? 'z-10 ring-2 ring-primary/20' : 'z-0'}
                             `}
                           >
@@ -539,7 +539,7 @@ export const KMPVisualization = () => {
                               scale: isCurrent || isLPSMatch || isLPSLen ? 1.05 : 1,
                               y: isCurrent ? 2 : 0
                             }}
-                            className={`w-10 h-10 border-2 rounded-lg flex items-center justify-center text-sm font-bold transition-all backdrop-blur-md
+                            className={`w-8 h-8 border-2 rounded-lg flex items-center justify-center text-xs font-bold transition-all backdrop-blur-md
                               ${isCurrent ? 'z-10 ring-2 ring-blue-500/20' : 'z-0'}
                             `}
                           >
@@ -592,7 +592,7 @@ export const KMPVisualization = () => {
                             borderColor: step.phase === 'lps' && idx === step.lps_i ? "rgb(168, 85, 247)" : "rgba(255, 255, 255, 0.05)",
                             scale: step.phase === 'lps' && idx === step.lps_i ? 1.05 : 1
                           }}
-                          className="w-9 h-9 flex items-center justify-center rounded-lg border bg-muted/20 font-bold text-sm backdrop-blur-sm"
+                          className="w-8 h-8 flex items-center justify-center rounded-lg border bg-muted/20 font-bold text-xs backdrop-blur-sm"
                         >
                           {step.lps[idx] !== undefined ? step.lps[idx] : 0}
                         </motion.div>
@@ -610,19 +610,20 @@ export const KMPVisualization = () => {
               <h4 className="text-[10px] font-bold uppercase tracking-widest text-primary mb-2">Explanation</h4>
               <p className="text-sm font-medium leading-relaxed min-h-[40px]">{step.explanation}</p>
             </Card>
-
-            <VariablePanel variables={step.variables} />
           </div>
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
+          <VariablePanel variables={step.variables} />
+        </div>
       }
       controls={
         <SimpleStepControls

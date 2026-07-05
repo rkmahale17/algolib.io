@@ -338,18 +338,19 @@ export const MeetingRoomsVisualization: React.FC = () => {
               </div>
             </div>
           </div>
-
-          <VariablePanel variables={currentStep.variables} />
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={handleReset}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={handleReset}
+          />
+          <VariablePanel variables={currentStep.variables} />
+        </div>
       }
       controls={
         <SimpleStepControls

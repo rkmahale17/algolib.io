@@ -678,6 +678,7 @@ export const ReverseNodesInKGroupVisualization = () => {
                 </div>
               </div>
             </Card>
+            <VariablePanel variables={currentStep.variables} />
           </div>
         }
         rightContent={
@@ -689,7 +690,6 @@ export const ReverseNodesInKGroupVisualization = () => {
               activeStepIndex={currentStepIndex}
               onLanguageChange={() => setCurrentStepIndex(0)}
             />
-            <VariablePanel variables={currentStep.variables} />
           </div>
         }
         controls={

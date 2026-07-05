@@ -328,8 +328,6 @@ export const HappyNumberVisualization = () => {
             <p className="text-sm text-foreground leading-relaxed font-medium">{step.explanation}</p>
           </Card>
 
-          <VariablePanel variables={step.variables} />
-
           <Card className="p-5 bg-card border border-border rounded-xl relative overflow-hidden group hover:bg-muted/20 transition-colors">
             <h3 className="text-sm font-bold mb-3 flex items-center gap-2">
               <span className="text-primary">✨</span> The Philosophy of Happy Numbers
@@ -346,13 +344,16 @@ export const HappyNumberVisualization = () => {
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
+          <VariablePanel variables={step.variables} />
+        </div>
       }
       controls={
         <SimpleStepControls

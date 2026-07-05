@@ -346,27 +346,25 @@ export const ValidAnagramVisualization: React.FC = () => {
               </div>
               {currentStep.explanation}
             </div>
-
-            {/* Variable Panel (below the commentary box) */}
-            <div className="pt-2">
-              <VariablePanel
-                variables={{
-                  "Current Index i": currentStep.i === -1 ? "N/A" : currentStep.i,
-                  "Processing Char": currentStep.highlightChar || currentStep.compareChar || "None",
-                  "Status": currentStep.isAnagram === undefined ? "Processing..." : (currentStep.isAnagram ? "Anagram ✓" : "Not Anagram ✗")
-                }}
-              />
-            </div>
           </div>
         }
         rightContent={
-          <VisualizationCodePanel
-            languages={languages}
-            stepLineNumbers={stepLineNumbers}
-            pseudoSteps={pseudoSteps}
-            activeStepIndex={currentStepIndex}
-            onLanguageChange={() => setCurrentStepIndex(0)}
-          />
+          <div className="space-y-4">
+            <VisualizationCodePanel
+              languages={languages}
+              stepLineNumbers={stepLineNumbers}
+              pseudoSteps={pseudoSteps}
+              activeStepIndex={currentStepIndex}
+              onLanguageChange={() => setCurrentStepIndex(0)}
+            />
+            <VariablePanel
+              variables={{
+                "Current Index i": currentStep.i === -1 ? "N/A" : currentStep.i,
+                "Processing Char": currentStep.highlightChar || currentStep.compareChar || "None",
+                "Status": currentStep.isAnagram === undefined ? "Processing..." : (currentStep.isAnagram ? "Anagram ✓" : "Not Anagram ✗")
+              }}
+            />
+          </div>
         }
       />
     </div>

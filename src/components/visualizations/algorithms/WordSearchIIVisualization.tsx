@@ -430,7 +430,25 @@ export const WordSearchIIVisualization = () => {
               </div>
             </div>
           </Card>
-
+          <VariablePanel
+            variables={{
+              "Current Pos": step.currentPos ? `(${step.currentPos[0]}, ${step.currentPos[1]})` : 'null',
+              "Visited Count": step.visit.size,
+              "Words Found": step.found.length,
+              "Trie Status": "Constructed"
+            }}
+          />
+        </div>
+      }
+      rightContent={
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
           <Card className="p-4 border-l-4 border-primary relative overflow-hidden transition-all duration-300 shadow-sm flex items-center bg-primary/5">
             <div className="flex items-start gap-4">
               <div className="p-2.5 rounded-xl shrink-0 bg-primary/10 text-primary">
@@ -446,25 +464,7 @@ export const WordSearchIIVisualization = () => {
               </div>
             </div>
           </Card>
-
-          <VariablePanel
-            variables={{
-              "Current Pos": step.currentPos ? `(${step.currentPos[0]}, ${step.currentPos[1]})` : 'null',
-              "Visited Count": step.visit.size,
-              "Words Found": step.found.length,
-              "Trie Status": "Constructed"
-            }}
-          />
         </div>
-      }
-      rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
       }
     />
   );

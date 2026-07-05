@@ -206,14 +206,14 @@ export const JumpGameVisualization: React.FC = () => {
                 return (
                   <div key={idx} className="flex flex-col items-center gap-1.5 group relative">
                     <div 
-                      className={`w-10 h-10 flex items-center justify-center rounded-lg border-2 font-black transition-all duration-300 ${
+                      className={`w-8 h-8 flex items-center justify-center rounded-lg border-2 font-black transition-all duration-300 ${
                         isGoal ? "border-green-500 bg-green-500/10 text-green-600 dark:text-green-400 shadow-sm scale-105" :
                         isCurrent ? "border-orange-500 bg-orange-500/10 text-orange-600 dark:text-orange-400 scale-110 z-10 font-bold" :
                         isPassed ? "border-border/30 bg-muted/10 text-muted-foreground/30" :
                         "border-border bg-muted/20 text-muted-foreground"
                       }`}
                     >
-                      <span className="text-sm font-mono">{num}</span>
+                      <span className="text-xs font-mono">{num}</span>
                     </div>
                     <div className="h-4 flex items-center">
                       {isGoal && <div className="text-[8px] font-bold text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-950/50 px-1 rounded uppercase">Goal</div>}
@@ -258,18 +258,19 @@ export const JumpGameVisualization: React.FC = () => {
               </div>
             </div>
           </Card>
-
-          <VariablePanel variables={step.variables} />
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={handleReset}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={handleReset}
+          />
+          <VariablePanel variables={step.variables} />
+        </div>
       }
       controls={
         <SimpleStepControls

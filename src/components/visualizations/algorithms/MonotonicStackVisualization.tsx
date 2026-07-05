@@ -483,6 +483,17 @@ export const MonotonicStackVisualization = () => {
             </div>
           </div>
 
+        </div>
+
+        {/* Right: code / pseudocode panel and variables */}
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={handleReset}
+          />
           <VariablePanel
             variables={{
               i: currentStep.currentIndex >= 0 && currentStep.currentIndex <= currentStep.heights.length ? currentStep.currentIndex : '-',
@@ -495,15 +506,6 @@ export const MonotonicStackVisualization = () => {
             }}
           />
         </div>
-
-        {/* Right: code / pseudocode panel */}
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={handleReset}
-        />
       </div>
     </div>
   );

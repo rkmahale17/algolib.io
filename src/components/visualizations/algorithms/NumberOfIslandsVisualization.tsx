@@ -273,7 +273,7 @@ export const NumberOfIslandsVisualization: React.FC = () => {
                         return (
                           <div key={c} className="flex flex-col items-center">
                             <div
-                              className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm border-2 transition-all duration-300 z-10 ${
+                              className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs border-2 transition-all duration-300 z-10 ${
                                 isCurrent ? 'scale-110 shadow-md ring-2 ring-primary ring-offset-1 z-20' : ''
                               } ${
                                 isSubmerged ? 'bg-indigo-500/20 border-indigo-500 text-indigo-600 dark:text-indigo-400 font-bold' : 
@@ -339,7 +339,17 @@ export const NumberOfIslandsVisualization: React.FC = () => {
               </div>
             </div>
           </Card>
-
+        </div>
+      }
+      rightContent={
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={handleReset}
+          />
           <VariablePanel
             variables={{
               row: step?.r ?? 'null',
@@ -348,15 +358,6 @@ export const NumberOfIslandsVisualization: React.FC = () => {
             }}
           />
         </div>
-      }
-      rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={handleReset}
-        />
       }
       controls={
         <SimpleStepControls

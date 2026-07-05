@@ -275,7 +275,7 @@ export const SparseTableVisualization = () => {
                     return (
                       <div
                         key={idx}
-                        className={`relative w-10 h-10 flex flex-col items-center justify-center rounded-lg border-2 font-mono text-sm transition-all duration-300
+                        className={`relative w-8 h-8 flex flex-col items-center justify-center rounded-lg border-2 font-mono text-xs transition-all duration-300
                           ${isActive ? 'bg-primary border-primary text-primary-foreground scale-105 z-10' :
                             isQuery ? 'bg-blue-500/20 border-blue-500 text-foreground' :
                               'bg-muted/30 border-border text-muted-foreground opacity-60'}
@@ -355,24 +355,23 @@ export const SparseTableVisualization = () => {
             </Card>
           </div>
 
-          <div className="space-y-4 mt-auto">
-            <Card className="p-4 bg-primary/5 border-primary/20">
-              <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Step Explanation</h4>
-              <p className="text-sm text-foreground leading-relaxed font-medium min-h-[40px]">{step.explanation}</p>
-            </Card>
-
-            <VariablePanel variables={step.variables} />
-          </div>
         </div>
       }
       rightContent={
-        <VisualizationCodePanel
-          languages={languages}
-          stepLineNumbers={stepLineNumbers}
-          pseudoSteps={pseudoSteps}
-          activeStepIndex={currentStepIndex}
-          onLanguageChange={() => setCurrentStepIndex(0)}
-        />
+        <div className="space-y-4">
+          <VisualizationCodePanel
+            languages={languages}
+            stepLineNumbers={stepLineNumbers}
+            pseudoSteps={pseudoSteps}
+            activeStepIndex={currentStepIndex}
+            onLanguageChange={() => setCurrentStepIndex(0)}
+          />
+          <Card className="p-4 bg-primary/5 border-primary/20">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Step Explanation</h4>
+            <p className="text-sm text-foreground leading-relaxed font-medium min-h-[40px]">{step.explanation}</p>
+          </Card>
+          <VariablePanel variables={step.variables} />
+        </div>
       }
       controls={
         <SimpleStepControls
