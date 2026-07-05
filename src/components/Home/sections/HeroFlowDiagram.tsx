@@ -2,13 +2,9 @@
 
 import {
   ArrowRight,
-  BookOpen,
   Brain,
   Check,
-  Code2,
-  Eye,
   Lightbulb,
-  Pause,
   PenTool,
   Play,
 } from "lucide-react";
@@ -40,7 +36,7 @@ export function HeroFlowDiagram() {
         <motion.circle
           cx="400"
           cy="120"
-          r="6"
+          r="5"
           className="fill-green-800 dark:fill-[#EAFF96] drop-shadow-[0_0_8px_rgba(22,101,52,0.5)] dark:drop-shadow-[0_0_15px_rgba(234,255,150,0.5)]"
           initial={{ rotate: 0 }}
           animate={{ rotate: 360 }}
@@ -50,7 +46,7 @@ export function HeroFlowDiagram() {
         <motion.circle
           cx="400"
           cy="120"
-          r="6"
+          r="5"
           className="fill-green-800 dark:fill-[#EAFF96] drop-shadow-[0_0_8px_rgba(22,101,52,0.5)] dark:drop-shadow-[0_0_15px_rgba(234,255,150,0.5)]"
           initial={{ rotate: 120 }}
           animate={{ rotate: 480 }}
@@ -60,7 +56,7 @@ export function HeroFlowDiagram() {
         <motion.circle
           cx="400"
           cy="120"
-          r="6"
+          r="5"
           className="fill-green-800 dark:fill-[#EAFF96] drop-shadow-[0_0_8px_rgba(22,101,52,0.5)] dark:drop-shadow-[0_0_15px_rgba(234,255,150,0.5)]"
           initial={{ rotate: 240 }}
           animate={{ rotate: 600 }}
@@ -71,130 +67,98 @@ export function HeroFlowDiagram() {
 
       {/* Central Node */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center text-center z-20">
-        <div className="w-20 h-20 rounded-full bg-black/60 border border-primary/30 flex items-center justify-center shadow-[0_0_30px_rgba(163,230,57,0.2)] mb-4 backdrop-blur-md">
-          <Brain className="w-10 h-10 text-primary animate-pulse" />
+        <div className="w-16 h-16 rounded-full bg-black/60 border border-primary/30 flex items-center justify-center shadow-[0_0_30px_rgba(163,230,57,0.2)] mb-3 backdrop-blur-md">
+          <Brain className="w-8 h-8 text-primary animate-pulse" />
         </div>
-        <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-1">
+        <h3 className="text-base font-semibold text-zinc-900 dark:text-white mb-0.5">
           Understand
           <br />
           Deeply
         </h3>
-        <p className="text-sm text-zinc-500 dark:text-gray-400">
-          Build intuition. Not
-          <br />
-          just solutions.
+        <p className="text-xs text-zinc-500 dark:text-gray-400">
+          Build intuition.
         </p>
       </div>
 
+      {/* ── Shared badge style ──
+          Number badge is now INLINE in the same flex row as the title,
+          so it's always vertically centred with the heading text.      */}
+
       {/* 1. Read Card (Top Left) */}
       <motion.div
-        className="absolute top-[8%] left-[8%] z-30 cursor-pointer hover:scale-105 transition-transform duration-300"
+        className="absolute top-[12%] left-[12%] z-30 cursor-pointer hover:scale-105 transition-transform duration-300"
         onClick={() =>
-          document
-            .getElementById("playground")
-            ?.scrollIntoView({ behavior: "smooth" })
+          document.getElementById("playground")?.scrollIntoView({ behavior: "smooth" })
         }
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
       >
-        <div className="flex items-center gap-3 mb-2 -translate-y-6">
-          <div className="w-8 h-8 rounded-full border border-primary/50 flex items-center justify-center text-primary font-bold text-sm bg-white dark:bg-black/80">
-            1
-          </div>
-          <span className="text-zinc-900 dark:text-white font-medium">
-            Read
-          </span>
-        </div>
-        <div className="w-[280px] bg-white dark:bg-[#111111]/90 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-2xl backdrop-blur-md relative">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-zinc-900 dark:text-white font-medium text-sm">
-              Two Sum II
+        <div className="w-[220px] bg-white dark:bg-[#111111]/90 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-2xl backdrop-blur-md">
+          {/* Header row — badge + title inline */}
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-6 h-6 rounded-full border border-primary/50 flex items-center justify-center text-primary font-bold text-xs bg-white dark:bg-black/80 shrink-0 leading-none">
+              1
+            </div>
+            <span className="text-zinc-900 dark:text-white font-semibold text-sm leading-none">
+              Read
             </span>
-            <span className="text-[10px] text-yellow-600 dark:text-yellow-400 bg-yellow-400/10 px-2 py-0.5 rounded">
+            <span className="text-[10px] text-yellow-600 dark:text-yellow-400 bg-yellow-400/10 px-1.5 py-0.5 rounded ml-auto">
               Medium
             </span>
           </div>
-          <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed mb-4">
-            Given a{" "}
-            <strong className="text-zinc-900 dark:text-zinc-200">
-              1-indexed
-            </strong>{" "}
-            array of integers{" "}
-            <code className="text-zinc-900 dark:text-zinc-200">numbers</code>{" "}
-            that is already{" "}
-            <strong className="text-zinc-900 dark:text-zinc-200">sorted</strong>
-            , find two numbers that add up to target.
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+            Sorted array — find two numbers that sum to target.
           </p>
-          <div className="space-y-1.5 opacity-40">
-            <div className="h-1.5 w-full bg-zinc-300 dark:bg-zinc-800 rounded-full"></div>
-            <div className="h-1.5 w-3/4 bg-zinc-300 dark:bg-zinc-800 rounded-full"></div>
+          <div className="mt-3 space-y-1 opacity-30">
+            <div className="h-1 w-full bg-zinc-300 dark:bg-zinc-700 rounded-full" />
+            <div className="h-1 w-2/3 bg-zinc-300 dark:bg-zinc-700 rounded-full" />
           </div>
         </div>
       </motion.div>
 
       {/* 2. Visualize Card (Top Right) */}
       <motion.div
-        className="absolute top-[10%] right-[4%] z-30 cursor-pointer hover:scale-105 transition-transform duration-300"
+        className="absolute top-[12%] right-[6%] z-30 cursor-pointer hover:scale-105 transition-transform duration-300"
         onClick={() =>
-          document
-            .getElementById("visualize")
-            ?.scrollIntoView({ behavior: "smooth" })
+          document.getElementById("visualize")?.scrollIntoView({ behavior: "smooth" })
         }
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
       >
-        <div className="flex items-center gap-3 mb-2 -translate-y-6">
-          <div className="w-8 h-8 rounded-full border border-primary/50 flex items-center justify-center text-primary font-bold text-sm bg-white dark:bg-black/80">
-            2
-          </div>
-          <span className="text-zinc-900 dark:text-white font-medium">
-            Visualize
-          </span>
-        </div>
-        <div className="w-[260px] bg-white dark:bg-[#111111]/90 border border-primary/20 dark:border-primary/30 rounded-xl p-5 shadow-[0_0_20px_rgba(163,230,57,0.1)] backdrop-blur-md">
-          <div className="flex justify-center gap-1 mb-6">
-            <div className="w-10 h-10 border border-primary bg-primary/10 dark:bg-primary/20 flex flex-col items-center justify-center text-zinc-900 dark:text-white text-sm relative">
+        <div className="w-[220px] bg-white dark:bg-[#111111]/90 border border-primary/20 dark:border-primary/30 rounded-xl p-4 shadow-[0_0_20px_rgba(163,230,57,0.1)] backdrop-blur-md">
+          {/* Header row */}
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-6 h-6 rounded-full border border-primary/50 flex items-center justify-center text-primary font-bold text-xs bg-white dark:bg-black/80 shrink-0 leading-none">
               2
-              <div className="absolute -bottom-6 flex flex-col items-center">
-                <div className="w-0.5 h-2 bg-primary"></div>
-                <span className="text-xs text-zinc-500 dark:text-gray-400">
-                  L
-                </span>
-              </div>
             </div>
-            <div className="w-10 h-10 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-900 dark:text-white text-sm">
-              7
+            <span className="text-zinc-900 dark:text-white font-semibold text-sm leading-none">
+              Visualize
+            </span>
+          </div>
+          <div className="flex justify-center gap-1 mb-3">
+            <div className="w-8 h-8 border border-primary bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-zinc-900 dark:text-white text-xs relative">
+              2
+              <span className="absolute -bottom-4 text-[9px] text-zinc-500">L</span>
             </div>
-            <div className="w-10 h-10 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-900 dark:text-white text-sm">
-              11
-            </div>
-            <div className="w-10 h-10 border border-primary bg-primary/10 dark:bg-primary/20 flex flex-col items-center justify-center text-zinc-900 dark:text-white text-sm relative">
+            <div className="w-8 h-8 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-900 dark:text-white text-xs">7</div>
+            <div className="w-8 h-8 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-900 dark:text-white text-xs">11</div>
+            <div className="w-8 h-8 border border-primary bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-zinc-900 dark:text-white text-xs relative">
               15
-              <div className="absolute -bottom-6 flex flex-col items-center">
-                <div className="w-0.5 h-2 bg-primary"></div>
-                <span className="text-xs text-zinc-500 dark:text-gray-400">
-                  R
-                </span>
-              </div>
+              <span className="absolute -bottom-4 text-[9px] text-zinc-500">R</span>
             </div>
           </div>
-          <div className="flex justify-end text-xs text-primary font-medium mb-6">
+          <div className="flex justify-end text-xs text-primary font-medium mt-5 mb-2">
             target = 9
           </div>
-
-          {/* Mock Player */}
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
-              <Play className="w-3 h-3 text-primary ml-0.5" />
-            </div>
-            <div className="w-4 h-4 flex items-center justify-center">
-              <Pause className="w-3 h-3 text-zinc-400 dark:text-gray-500" />
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center">
+              <Play className="w-2.5 h-2.5 text-primary ml-0.5" />
             </div>
             <div className="flex-1 h-1 bg-zinc-200 dark:bg-zinc-800 rounded-full relative">
-              <div className="absolute left-0 top-0 h-full w-1/2 bg-primary rounded-full"></div>
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-primary rounded-full shadow-[0_0_5px_#a3e639]"></div>
+              <div className="absolute left-0 top-0 h-full w-1/2 bg-primary rounded-full" />
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-primary rounded-full shadow-[0_0_5px_#a3e639]" />
             </div>
           </div>
         </div>
@@ -202,216 +166,114 @@ export function HeroFlowDiagram() {
 
       {/* 3. Think Card (Middle Right) */}
       <motion.div
-        className="absolute top-[44%] right-[-10%] z-30 cursor-pointer hover:scale-105 transition-transform duration-300"
+        className="absolute top-[44%] right-[4%] z-30 cursor-pointer hover:scale-105 transition-transform duration-300"
         onClick={() =>
-          document
-            .getElementById("thinkpad")
-            ?.scrollIntoView({ behavior: "smooth" })
+          document.getElementById("thinkpad")?.scrollIntoView({ behavior: "smooth" })
         }
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
       >
-        <div className="flex items-center gap-3 mb-2 -translate-y-6">
-          <div className="w-8 h-8 rounded-full border border-[#F97316]/50 flex items-center justify-center text-[#F97316] font-bold text-sm bg-white dark:bg-black/80">
-            3
+        <div className="w-[210px] bg-white dark:bg-[#111111]/90 border border-zinc-200 dark:border-[#F97316]/30 rounded-xl p-4 shadow-[0_0_20px_rgba(249,115,22,0.1)] backdrop-blur-md relative">
+          {/* Header row */}
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-6 h-6 rounded-full border border-[#F97316]/50 flex items-center justify-center text-[#F97316] font-bold text-xs bg-white dark:bg-black/80 shrink-0 leading-none">
+              3
+            </div>
+            <span className="text-zinc-900 dark:text-white font-semibold text-sm leading-none">
+              Think
+            </span>
           </div>
-          <span className="text-zinc-900 dark:text-white font-medium">
-            Think
-          </span>
-        </div>
-        <div className="w-[250px] bg-white dark:bg-[#111111]/90 border border-zinc-200 dark:border-[#F97316]/30 rounded-xl p-5 shadow-[0_0_20px_rgba(249,115,22,0.1)] backdrop-blur-md relative">
-          <span className="text-[#F97316] font-medium text-sm block mb-3">
-            Idea:
-          </span>
-          <p className="text-xs text-zinc-700 dark:text-gray-300 leading-relaxed font-[var(--font-caveat)] text-base tracking-wide mb-4">
-            Array is sorted! Use two pointers at opposite ends.
+          <p className="text-xs text-zinc-700 dark:text-gray-300 leading-relaxed font-[var(--font-caveat)] text-sm tracking-wide">
+            Use two pointers. Move R left if sum &gt; target, L right if sum &lt; target.
           </p>
-          <p className="text-xs text-zinc-700 dark:text-gray-300 leading-relaxed font-[var(--font-caveat)] text-base tracking-wide">
-            If sum &gt; target, move R left.
-            <br />
-            If sum &lt; target, move L right.
-          </p>
-          <Lightbulb className="w-8 h-8 text-[#F97316] absolute bottom-4 right-4 opacity-30 dark:opacity-50" />
+          <Lightbulb className="w-5 h-5 text-[#F97316] absolute bottom-3 right-3 opacity-40" />
         </div>
       </motion.div>
 
       {/* 4. Thinkpad Card (Bottom Right) */}
       <motion.div
-        className="absolute bottom-[-8%] right-[15%] z-30 cursor-pointer hover:scale-105 transition-transform duration-300"
+        className="absolute bottom-[5%] right-[15%] z-30 cursor-pointer hover:scale-105 transition-transform duration-300"
         onClick={() =>
-          document
-            .getElementById("thinkpad")
-            ?.scrollIntoView({ behavior: "smooth" })
+          document.getElementById("thinkpad")?.scrollIntoView({ behavior: "smooth" })
         }
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.7 }}
       >
-        <div className="flex items-center gap-3 mb-2 -translate-y-6">
-          <div className="w-8 h-8 rounded-full border border-[#A855F7]/50 flex items-center justify-center text-[#A855F7] font-bold text-sm bg-white dark:bg-black/80">
-            4
+        <div className="w-[200px] bg-white dark:bg-[#111111]/90 border-2 border-dashed border-zinc-300 dark:border-[#A855F7]/30 rounded-xl p-3 shadow-2xl backdrop-blur-md -rotate-2">
+          {/* Header row */}
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-6 h-6 rounded-full border border-[#A855F7]/50 flex items-center justify-center text-[#A855F7] font-bold text-xs bg-white dark:bg-black/80 shrink-0 leading-none">
+              4
+            </div>
+            <span className="text-[#A855F7] font-[var(--font-caveat)] text-lg leading-none">
+              Thinkpad
+            </span>
           </div>
-          <span className="text-zinc-900 dark:text-white font-medium">
-            Thinkpad
-          </span>
-        </div>
-        <div className="w-[240px] bg-white dark:bg-[#111111]/90 border-2 border-dashed border-zinc-300 dark:border-[#A855F7]/30 rounded-xl p-3 shadow-2xl backdrop-blur-md -rotate-2">
-          <span className="text-[#A855F7] font-[var(--font-caveat)] text-2xl block mb-2 -rotate-1">
-            Two Pointers
-          </span>
-          <div className="flex items-start gap-4 font-[var(--font-caveat)] text-zinc-700 dark:text-gray-300 text-xl">
-            <div className="flex flex-col gap-2 w-full">
-              <div className="flex items-center justify-between w-full rotate-1">
-                <span className="text-zinc-600 dark:text-gray-400">
-                  L=2, R=15
-                </span>
-                <svg
-                  width="24"
-                  height="12"
-                  viewBox="0 0 24 12"
-                  fill="none"
-                  className="text-gray-500"
-                >
-                  <path
-                    d="M1 6C6.5 5.5 12 6.5 18 6M18 6C16.5 4.5 15 2 15 2M18 6C16.5 7.5 15 10 15 10"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                <span className="text-zinc-600 dark:text-gray-400">
-                  17 &gt; 9 (R--)
-                </span>
-              </div>
-              <div className="flex items-center justify-between w-full -rotate-2">
-                <span className="text-zinc-600 dark:text-gray-400">
-                  L=2, R=11
-                </span>
-                <svg
-                  width="24"
-                  height="12"
-                  viewBox="0 0 24 12"
-                  fill="none"
-                  className="text-gray-500"
-                >
-                  <path
-                    d="M1 6C6.5 5.5 12 6.5 18 6M18 6C16.5 4.5 15 2 15 2M18 6C16.5 7.5 15 10 15 10"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                <span className="text-zinc-600 dark:text-gray-400">
-                  13 &gt; 9 (R--)
-                </span>
-              </div>
-              <div className="flex items-center justify-between w-full rotate-2">
-                <span className="text-green-600 dark:text-[#a3e639]">
-                  L=2, R=7
-                </span>
-                <svg
-                  width="24"
-                  height="12"
-                  viewBox="0 0 24 12"
-                  fill="none"
-                  className="text-gray-500"
-                >
-                  <path
-                    d="M1 6C6.5 5.5 12 6.5 18 6M18 6C16.5 4.5 15 2 15 2M18 6C16.5 7.5 15 10 15 10"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                <span className="text-[#A855F7] relative">
-                  9 == 9
-                  <svg
-                    className="absolute -right-6 -top-1 text-green-500 dark:text-green-400 w-5 h-5 -rotate-12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                  >
-                    <path
-                      d="M5 13l4 4L19 7"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </span>
-              </div>
+          <div className="font-[var(--font-caveat)] text-zinc-700 dark:text-gray-300 text-base space-y-1.5">
+            <div className="flex items-center justify-between rotate-1">
+              <span className="text-zinc-500 dark:text-gray-400 text-sm">L=2, R=15</span>
+              <span className="text-zinc-500 dark:text-gray-400 text-sm">17 &gt; 9</span>
+            </div>
+            <div className="flex items-center justify-between -rotate-1">
+              <span className="text-zinc-500 dark:text-gray-400 text-sm">L=2, R=11</span>
+              <span className="text-zinc-500 dark:text-gray-400 text-sm">13 &gt; 9</span>
+            </div>
+            <div className="flex items-center justify-between rotate-1">
+              <span className="text-green-600 dark:text-[#a3e639] text-sm">L=2, R=7</span>
+              <span className="text-[#A855F7] text-sm flex items-center gap-1">
+                9 == 9 <Check className="w-3 h-3 text-green-500" />
+              </span>
             </div>
           </div>
-          {/* Mini Toolbar */}
-          <div className="flex items-center gap-3 mt-2 pt-2 border-t border-zinc-200 dark:border-zinc-800 text-zinc-400 dark:text-gray-500">
-            <PenTool className="w-4 h-4 text-primary" />
-            <div className="w-3 h-3 rounded-full bg-primary ml-auto"></div>
-            <div className="w-3 h-3 rounded-full bg-[#F97316]"></div>
-            <div className="w-3 h-3 rounded-full bg-[#A855F7]"></div>
+          <div className="flex items-center gap-2 mt-2 pt-2 border-t border-zinc-200 dark:border-zinc-800">
+            <PenTool className="w-3 h-3 text-primary" />
+            <div className="w-2.5 h-2.5 rounded-full bg-primary ml-auto" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#F97316]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#A855F7]" />
           </div>
         </div>
       </motion.div>
 
       {/* 5. Code Card (Bottom Left) */}
       <motion.div
-        className="absolute bottom-[-12%] left-[8%] z-30 cursor-pointer hover:scale-105 transition-transform duration-300"
+        className="absolute bottom-[5%] left-[8%] z-30 cursor-pointer hover:scale-105 transition-transform duration-300"
         onClick={() =>
-          document
-            .getElementById("playground")
-            ?.scrollIntoView({ behavior: "smooth" })
+          document.getElementById("playground")?.scrollIntoView({ behavior: "smooth" })
         }
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.9 }}
       >
-        <div className="flex items-center gap-3 mb-2 -translate-y-6">
-          <div className="w-8 h-8 rounded-full border border-[#3B82F6]/50 flex items-center justify-center text-[#3B82F6] font-bold text-sm bg-white dark:bg-black/80">
-            5
-          </div>
-          <span className="text-zinc-900 dark:text-white font-medium">
-            Code
-          </span>
-        </div>
-        <div className="w-[280px] bg-white dark:bg-[#111111]/90 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl backdrop-blur-md overflow-hidden flex flex-col">
-          <div className="px-4 py-2 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50 dark:bg-black/50">
-            <span className="text-xs text-zinc-500 dark:text-gray-400">
-              Python
+        <div className="w-[220px] bg-white dark:bg-[#111111]/90 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl backdrop-blur-md overflow-hidden">
+          {/* Header bar — badge + title inline */}
+          <div className="px-3 py-2 border-b border-zinc-200 dark:border-zinc-800 flex items-center gap-2 bg-zinc-50 dark:bg-black/50">
+            <div className="w-6 h-6 rounded-full border border-[#3B82F6]/50 flex items-center justify-center text-[#3B82F6] font-bold text-xs bg-white dark:bg-black/80 shrink-0 leading-none">
+              5
+            </div>
+            <span className="text-xs text-zinc-500 dark:text-gray-400 leading-none">
+              Code · Python
             </span>
           </div>
-          <div className="p-4 text-xs font-mono leading-relaxed text-zinc-700 dark:text-zinc-300">
+          <div className="p-3 text-xs font-mono leading-relaxed text-zinc-700 dark:text-zinc-300">
             <span className="text-[#A855F7]">def</span>{" "}
             <span className="text-[#3B82F6]">twoSum</span>
-            <span className="text-zinc-900 dark:text-white">
-              (nums, target):
-            </span>
+            <span className="text-zinc-900 dark:text-white">(nums, target):</span>
             <br />
-            &nbsp;&nbsp;l, r = 0, <span className="text-[#3B82F6]">len</span>
-            (nums) - 1
+            &nbsp;&nbsp;l, r = 0, <span className="text-[#3B82F6]">len</span>(nums) - 1
             <br />
-            &nbsp;&nbsp;<span className="text-[#A855F7]">while</span>&nbsp;l
-            &lt; r:
+            &nbsp;&nbsp;<span className="text-[#A855F7]">while</span>&nbsp;l &lt; r:
             <br />
             &nbsp;&nbsp;&nbsp;&nbsp;s = nums[l] + nums[r]
             <br />
-            &nbsp;&nbsp;&nbsp;&nbsp;<span className="text-[#A855F7]">if</span>
-            &nbsp;s == target:
+            &nbsp;&nbsp;&nbsp;&nbsp;<span className="text-[#A855F7]">if</span>&nbsp;s == target:
             <br />
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <span className="text-[#A855F7]">return</span>&nbsp;[l+1, r+1]
-            <br />
-            &nbsp;&nbsp;&nbsp;&nbsp;<span className="text-[#A855F7]">elif</span>
-            &nbsp;s &lt; target: l += 1
-            <br />
-            &nbsp;&nbsp;&nbsp;&nbsp;<span className="text-[#A855F7]">else</span>
-            :&nbsp;r -= 1
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className="text-[#A855F7]">return</span>&nbsp;[l+1, r+1]
           </div>
-          <div className="px-4 py-3 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50 dark:bg-black/30">
-            <div className="flex items-center gap-1.5 bg-primary/20 text-primary px-3 py-1 rounded text-xs font-medium">
-              <Play className="w-3 h-3 fill-current" />
+          <div className="px-3 py-2 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50 dark:bg-black/30">
+            <div className="flex items-center gap-1 bg-primary/20 text-primary px-2 py-0.5 rounded text-xs font-medium">
+              <Play className="w-2.5 h-2.5 fill-current" />
               Run
             </div>
             <div className="flex items-center gap-1 text-xs text-primary font-medium">
@@ -424,50 +286,40 @@ export function HeroFlowDiagram() {
 
       {/* 6. Review Card (Middle Left) */}
       <motion.div
-        className="absolute top-[35%] left-[-6%] z-30 cursor-pointer hover:scale-105 transition-transform duration-300"
+        className="absolute top-[35%] left-[-2%] z-30 cursor-pointer hover:scale-105 transition-transform duration-300"
         onClick={() =>
-          document
-            .getElementById("playground")
-            ?.scrollIntoView({ behavior: "smooth" })
+          document.getElementById("playground")?.scrollIntoView({ behavior: "smooth" })
         }
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.1 }}
       >
-        <div className="flex items-center gap-3 mb-2 -translate-y-6">
-          <div className="w-8 h-8 rounded-full border border-[#3B82F6]/50 flex items-center justify-center text-[#3B82F6] font-bold text-sm bg-white dark:bg-black/80">
-            6
-          </div>
-          <span className="text-zinc-900 dark:text-white font-medium">
-            Review
-          </span>
-        </div>
-        <div className="w-[240px] bg-white dark:bg-[#111111]/90 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-2xl backdrop-blur-md">
-          <div className="flex items-center gap-2 mb-4">
-            <Lightbulb className="w-4 h-4 text-zinc-400 dark:text-gray-400" />
-            <span className="text-sm font-medium text-zinc-900 dark:text-gray-200">
-              Optimal Solution
+        <div className="w-[200px] bg-white dark:bg-[#111111]/90 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-2xl backdrop-blur-md">
+          {/* Header row */}
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-6 h-6 rounded-full border border-[#3B82F6]/50 flex items-center justify-center text-[#3B82F6] font-bold text-xs bg-white dark:bg-black/80 shrink-0 leading-none">
+              6
+            </div>
+            <Lightbulb className="w-3.5 h-3.5 text-zinc-400 dark:text-gray-400 shrink-0" />
+            <span className="text-sm font-semibold text-zinc-900 dark:text-gray-200 leading-none">
+              Review
             </span>
           </div>
-          <div className="space-y-2 text-xs text-zinc-600 dark:text-gray-400">
-            <div className="flex items-center gap-2">
-              <Check className="w-3.5 h-3.5 text-primary" />
-              <span>Time Complexity: O(n)</span>
+          <div className="space-y-1.5 text-xs text-zinc-600 dark:text-gray-400">
+            <div className="flex items-center gap-1.5">
+              <Check className="w-3 h-3 text-primary shrink-0" />
+              <span>Time: O(n)</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Check className="w-3.5 h-3.5 text-primary" />
-              <span>Space Complexity: O(1)</span>
+            <div className="flex items-center gap-1.5">
+              <Check className="w-3 h-3 text-primary shrink-0" />
+              <span>Space: O(1)</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Check className="w-3.5 h-3.5 text-primary" />
-              <span>Pointers save auxiliary space</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Check className="w-3.5 h-3.5 text-primary" />
-              <span>Single pass solution</span>
+            <div className="flex items-center gap-1.5">
+              <Check className="w-3 h-3 text-primary shrink-0" />
+              <span>Single pass</span>
             </div>
           </div>
-          <div className="mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-800 text-primary text-xs font-medium flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity">
+          <div className="mt-3 pt-3 border-t border-zinc-200 dark:border-zinc-800 text-primary text-xs font-medium flex items-center gap-1">
             Learn More <ArrowRight className="w-3 h-3" />
           </div>
         </div>
