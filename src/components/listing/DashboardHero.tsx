@@ -66,44 +66,7 @@ function getDelightMessage(
   return null;
 }
 
-/* ── Daily goals ── */
-function computeDailyGoals(
-  submissionsData: { date: string; count: number; activities?: any[] }[],
-  progressData: any[],
-  currentStreak: number,
-) {
-  const today = format(new Date(), 'yyyy-MM-dd');
-  const todayEntry = submissionsData.find((s) => s.date === today);
-  const solvedToday = (todayEntry?.count ?? 0) > 0;
-  const stepCompletedToday = progressData.some((p) => {
-    const updated = p.last_viewed_at || p.updated_at;
-    if (!updated) return false;
-    return format(new Date(updated), 'yyyy-MM-dd') === today;
-  });
 
-  return [
-    {
-      label: "Solve today's challenge",
-      done: solvedToday,
-      xp: XP_VALUES.code_submitted,
-    },
-    {
-      label: 'Solve 1 Easy problem',
-      done: false, // Placeholder, can be computed later
-      xp: XP_VALUES.problem_solved_easy,
-    },
-    {
-      label: 'Read a Visual Guide',
-      done: stepCompletedToday,
-      xp: XP_VALUES.problem_read,
-    },
-    {
-      label: 'Keep your streak alive',
-      done: currentStreak > 0,
-      xp: XP_VALUES.daily_login,
-    },
-  ];
-}
 
 export const DashboardHero = ({
   currentStreak,
@@ -122,17 +85,13 @@ export const DashboardHero = ({
   const level = useMemo(() => getLevel(totalSolved), [totalSolved]);
   const levelNumber = useMemo(() => getLevelNumber(totalSolved), [totalSolved]);
 
-  const dailyGoals = useMemo(
-    () => computeDailyGoals(submissionsData, progressData, currentStreak),
-    [submissionsData, progressData, currentStreak],
-  );
 
   const delight = useMemo(
     () => getDelightMessage(submissionsData, currentStreak, progressData),
     [submissionsData, currentStreak, progressData],
   );
 
-  const goalsCompleted = dailyGoals.filter((g) => g.done).length;
+
   const left = nextMilestone - totalSolved;
   const milestonePct = Math.min(Math.round((totalSolved / nextMilestone) * 100), 100);
 
@@ -199,20 +158,7 @@ export const DashboardHero = ({
             {/* XP Widget */}
             <XPWidget />
 
-            {/* Daily goal pill */}
-            <div
-              className={cn(
-                'flex items-center gap-1.5 px-3 py-2 rounded-lg border',
-                goalsCompleted === dailyGoals.length
-                  ? 'bg-primary/10 border-primary/20 text-primary'
-                  : 'bg-muted/40 border-border/30 text-muted-foreground',
-              )}
-            >
-              <Zap className="w-4 h-4 shrink-0" />
-              <span className="text-xs font-bold">
-                {goalsCompleted}/{dailyGoals.length} Daily Goals
-              </span>
-            </div>
+
           </div>
 
           {/* Next milestone progress bar */}
@@ -233,40 +179,7 @@ export const DashboardHero = ({
           </div>
         </div>
 
-        {/* ── Daily Goals — GitHub issues style ── */}
-        <div className="border-t border-border/30 px-5 py-3 bg-muted/5">
-          <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2.5">
-            Today's Goals
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-            {dailyGoals.map((goal, i) => (
-              <div
-                key={i}
-                className={cn(
-                  'flex items-center gap-2.5 px-3 py-2 rounded-lg border transition-colors text-sm font-medium',
-                  goal.done
-                    ? 'bg-primary/5 border-primary/20 text-foreground'
-                    : 'bg-background border-border/40 text-muted-foreground',
-                )}
-              >
-                {goal.done ? (
-                  <CheckCircle2 className="w-4 h-4 shrink-0 text-primary" />
-                ) : (
-                  <Circle className="w-4 h-4 shrink-0 text-muted-foreground/40" />
-                )}
-                <span className="flex-1 text-xs leading-snug">{goal.label}</span>
-                <span className={cn(
-                  'text-[10px] font-bold px-1.5 py-0.5 rounded-md shrink-0',
-                  goal.done
-                    ? 'bg-primary/15 text-primary'
-                    : 'bg-muted/60 text-muted-foreground/60',
-                )}>
-                  +{goal.xp} XP
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
+
       </div>
     </div>
   );

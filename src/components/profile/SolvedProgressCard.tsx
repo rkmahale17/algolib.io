@@ -232,29 +232,7 @@ export const SolvedProgressCard = ({
       </div>
 
 
-      {/* ── Next Milestone ── */}
-      <div className="border-t border-border/30 px-4 py-3 bg-muted/5 space-y-1.5">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
-            <Medal className="w-3.5 h-3.5 text-primary" />
-            <span className="text-[11px] font-semibold text-foreground/80">
-              Next Milestone
-            </span>
-          </div>
-          <span className="text-[11px] text-muted-foreground tabular-nums">
-            <span className="font-bold text-foreground">{nextMilestone}</span> problems
-            {left > 0 && (
-              <span className="text-muted-foreground/60"> · {left} left</span>
-            )}
-          </span>
-        </div>
-        <div className="h-1.5 w-full bg-muted/40 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-primary rounded-full transition-all duration-700"
-            style={{ width: `${milestonePct}%` }}
-          />
-        </div>
-      </div>
+
     </div>
   );
 };

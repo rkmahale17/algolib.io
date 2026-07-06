@@ -64,11 +64,7 @@ export const RecommendedProblems = ({ algorithms }: RecommendedProblemsProps) =>
             {headerText}
           </span>
         </div>
-        {recommendations[0]?.confidence && (
-          <span className="text-[10px] font-bold text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full">
-            ⭐ {recommendations[0].confidence}
-          </span>
-        )}
+
       </div>
 
       {/* Recommendation cards */}
@@ -99,11 +95,7 @@ export const RecommendedProblems = ({ algorithms }: RecommendedProblemsProps) =>
               {/* Problem row */}
               <div className="flex items-center justify-between gap-3">
                 <div className="flex-1 min-w-0 space-y-1.5">
-                  {idx === 0 && (
-                    <div className="text-[10px] font-bold text-primary uppercase tracking-wider">
-                      Next Best Problem
-                    </div>
-                  )}
+
                   <h4 className="text-sm font-semibold text-foreground truncate">
                     {algo.title || algo.name}
                   </h4>

@@ -140,16 +140,12 @@ export const ContinueLearningCard = ({
 
   return (
     <div className="w-full max-w-[820px] mx-auto bg-card border border-primary/25 rounded-xl shadow-sm overflow-hidden relative group transition-all duration-300 hover:shadow-md hover:border-primary/40 mb-2">
-      {/* Subtle glow */}
-      <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 rounded-full filter blur-3xl pointer-events-none transition-all group-hover:bg-primary/10" />
+
 
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-border/30 bg-muted/10">
         <div className="flex items-center gap-2">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
-          </span>
+
           <span className="text-xs font-semibold tracking-wider text-foreground/80 uppercase">
             Continue Learning
           </span>
