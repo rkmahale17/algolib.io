@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileSidebar } from "@/components/profile/ProfileSidebar";
 import { SolvedProgressCard } from "@/components/profile/SolvedProgressCard";
-import { BadgesCard } from "@/components/profile/BadgesCard";
+import { BadgesPanel } from "@/components/xp/BadgesPanel";
 import { SubmissionHeatmap } from "@/components/profile/SubmissionHeatmap";
 import { RecentSubmissions } from "@/components/profile/RecentSubmissions";
 import { PremiumLoader } from "@/components/PremiumLoader";
@@ -351,12 +351,13 @@ const PublicProfileClient = ({ username }: PublicProfileClientProps) => {
                   mediumTotal={stats.mediumTotal}
                   hardSolved={stats.hardSolved}
                   hardTotal={stats.hardTotal}
+                  userId={profile.id}
                 />
               </div>
 
               {/* Badges (1/3) */}
               <div className="rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm">
-                <BadgesCard badges={[]} />
+                <BadgesPanel userId={profile.id} />
               </div>
             </div>
 

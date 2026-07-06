@@ -51,15 +51,15 @@ const STEPS = [
   },
 ] as const;
 
-function computeProgress(progress: UserAlgorithmData): number {
+function computeProgress(progress: UserAlgorithmData): { pct: number; stepsCompleted: number } {
   let done = 0;
   if (progress.solution_completed) done++;
   if (progress.visualization_completed) done++;
   if (progress.drawing_completed || progress.completed) done++;
-  if (progress.completed) done++; // code step counts as complete once completed
-  // review: we don't track it separately — include if completed
   if (progress.completed) done++;
-  return Math.min(Math.round((done / STEPS.length) * 100), 100);
+  if (progress.completed) done++;
+  const stepsCompleted = Math.min(done, STEPS.length);
+  return { pct: Math.min(Math.round((stepsCompleted / STEPS.length) * 100), 100), stepsCompleted };
 }
 
 function isStepDone(
@@ -88,7 +88,8 @@ export const ContinueLearningCard = ({
     ? `/problem/${algorithm.slug}`
     : `/problem/${algorithm.id}`;
 
-  const pct = computeProgress(progress);
+  const { pct, stepsCompleted } = computeProgress(progress);
+  const currentStepName = stepsCompleted < STEPS.length ? STEPS[stepsCompleted].label : 'Complete';
 
   const handleToggleSolution = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -173,24 +174,30 @@ export const ContinueLearningCard = ({
       </div>
 
       <div className="p-5 sm:p-6 space-y-4">
-        {/* Title + progress % */}
+        {/* Title + step counter */}
         <div className="flex items-start justify-between gap-3">
           <h3 className="text-base sm:text-lg font-semibold text-foreground group-hover:text-primary transition-colors duration-200 leading-snug">
             {algorithm.title || algorithm.name}
           </h3>
-          <span className="text-2xl font-bold text-primary tabular-nums shrink-0 leading-none">
-            {pct}%
-          </span>
+          <div className="text-right shrink-0">
+            <div className="text-lg font-bold text-primary tabular-nums leading-none">
+              Step {Math.min(stepsCompleted + 1, STEPS.length)} of {STEPS.length}
+            </div>
+            <div className="text-[11px] text-muted-foreground mt-0.5 font-medium">
+              {pct === 100 ? 'All steps done!' : `${currentStepName} up next`}
+            </div>
+          </div>
         </div>
 
         {/* Progress bar */}
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <div className="h-2.5 w-full bg-muted/50 rounded-full overflow-hidden">
             <div
               className="h-full rounded-full bg-primary transition-all duration-700"
               style={{ width: `${pct}%` }}
             />
           </div>
+          <div className="text-[10px] text-muted-foreground/60 font-medium text-right">{pct}% complete</div>
         </div>
 
         {/* Steps: numbered timeline (horizontal on desktop, wrapping on mobile) */}
@@ -225,9 +232,9 @@ export const ContinueLearningCard = ({
                         : 'bg-background border-muted-foreground/30 text-muted-foreground/60',
                     )}
                   >
-                    {done ? <Check className="w-2.5 h-2.5 stroke-[3]" /> : i + 1}
+                    {done ? <Check className="w-3 h-3 stroke-[3]" /> : i + 1}
                   </span>
-                  <Icon className="w-3 h-3 shrink-0" />
+                  <Icon className="w-3.5 h-3.5 shrink-0" />
                   {step.label}
                 </button>
 
@@ -249,9 +256,9 @@ export const ContinueLearningCard = ({
         <div className="flex justify-end pt-1">
           <Link
             href={targetUrl}
-            className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-primary text-primary-foreground font-semibold text-sm shadow-sm hover:bg-primary/90 hover:shadow-[0_0_16px_rgba(var(--primary-rgb),0.25)] transition-all duration-200 active:scale-95"
+            className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-md hover:bg-primary/90 hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)] transition-all duration-200 active:scale-95"
           >
-            {pct === 100 ? 'Review' : 'Continue'}
+            {pct === 100 ? '🎉 Review Journey' : pct === 0 ? '▶ Begin Journey' : '▶ Resume Journey'}
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

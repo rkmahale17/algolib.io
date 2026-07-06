@@ -1,6 +1,8 @@
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { cn } from "@/lib/utils";
-import { Flame, Trophy, Medal } from "lucide-react";
+import { Medal, Trophy, TrendingUp } from "lucide-react";
+import { useGlobalRank } from "@/hooks/useGlobalRank";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface SolvedProgressCardProps {
   totalSolved: number;
@@ -14,6 +16,7 @@ interface SolvedProgressCardProps {
   compact?: boolean;
   currentStreak?: number;
   maxStreak?: number;
+  userId?: string;
 }
 
 const DifficultyBar = ({
@@ -21,21 +24,19 @@ const DifficultyBar = ({
   solved,
   total,
   textColor,
-  barColor,
+  trackBg,
+  fillBg,
   compact,
 }: {
   label: string;
   solved: number;
   total: number;
   textColor: string;
-  barColor: string;
+  trackBg: string;   // static Tailwind class for the empty track
+  fillBg: string;    // static Tailwind class for the filled portion
   compact?: boolean;
 }) => {
   const pct = total > 0 ? (solved / total) * 100 : 0;
-  // Build block string: filled blocks + empty blocks (GitHub-style)
-  const BLOCKS = compact ? 8 : 10;
-  const filled = Math.round((pct / 100) * BLOCKS);
-  const empty = BLOCKS - filled;
 
   return (
     <div className="space-y-1">
@@ -46,9 +47,9 @@ const DifficultyBar = ({
           <span className="text-muted-foreground/50">/{total}</span>
         </span>
       </div>
-      <div className={cn("h-1.5 rounded-full overflow-hidden", barColor + "/15")}>
+      <div className={cn("h-1.5 rounded-full overflow-hidden", trackBg)}>
         <div
-          className={cn("h-full rounded-full transition-all duration-700", barColor)}
+          className={cn("h-full rounded-full transition-all duration-700", fillBg)}
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -77,10 +78,13 @@ export const SolvedProgressCard = ({
   compact = false,
   currentStreak = 0,
   maxStreak = 0,
+  userId,
 }: SolvedProgressCardProps) => {
   const size = compact ? 110 : 180;
   const outerR = compact ? 50 : 82;
   const innerR = compact ? 42 : 70;
+
+  const { data: rankData, isLoading: rankLoading } = useGlobalRank(userId);
 
   // 2-color ring: solved (primary/green) + remaining (muted)
   const chartData = [
@@ -94,10 +98,55 @@ export const SolvedProgressCard = ({
 
   return (
     <div className="flex flex-col h-full w-full justify-between">
+      {/* ── User Ranking Section ── */}
+      {!compact && (
+        <div className="px-6 pt-5 pb-3 flex items-center justify-between border-b border-border/40 animate-in slide-in-from-top-4 fade-in duration-700 bg-gradient-to-r from-transparent via-primary/5 to-transparent">
+          <div className="flex items-center gap-3">
+            <div className={cn(
+              "w-9 h-9 rounded-full flex items-center justify-center border shadow-[0_0_15px_rgba(var(--primary),0.2)]",
+              rankData ? "bg-primary/10 border-primary/20 text-primary" : "bg-muted text-muted-foreground opacity-50 grayscale"
+            )}>
+              <Trophy className="w-4 h-4 drop-shadow-md" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Global Rank</span>
+              {rankLoading ? (
+                <Skeleton className="h-5 w-24 mt-1" />
+              ) : rankData ? (
+                <span className="text-base font-bold text-foreground leading-tight tabular-nums">
+                  #{rankData.rank.toLocaleString()} <span className="text-xs text-zinc-600 font-medium">/ {rankData.total_users >= 1000 ? (rankData.total_users / 1000).toFixed(1) + 'k' : rankData.total_users}</span>
+                </span>
+              ) : (
+                <span className="text-sm font-bold text-muted-foreground leading-tight">
+                  Unranked
+                </span>
+              )}
+            </div>
+          </div>
+          
+          <div className="flex flex-col items-end">
+            <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Percentile</span>
+            {rankLoading ? (
+              <Skeleton className="h-5 w-16 mt-1" />
+            ) : rankData ? (
+              <span className="text-sm font-bold text-primary flex items-center gap-1 leading-tight">
+                <TrendingUp className="w-3.5 h-3.5" />
+                Top {rankData.percentile}%
+              </span>
+            ) : (
+              <span className="text-sm font-bold text-muted-foreground flex items-center gap-1 leading-tight">
+                <TrendingUp className="w-3.5 h-3.5 opacity-50" />
+                --
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
       <div
         className={cn(
           "flex items-center gap-4 sm:gap-6 flex-col sm:flex-row flex-1",
-          compact ? "px-4 pt-4 pb-2" : "p-6",
+          compact ? "px-4 pt-4 pb-2" : "px-6 py-5",
         )}
       >
         {/* ── 2-color Donut Ring ── */}
@@ -150,14 +199,15 @@ export const SolvedProgressCard = ({
           </div>
         </div>
 
-        {/* ── Difficulty Bars (GitHub-style) ── */}
+        {/* ── Difficulty Bars ── */}
         <div className="flex-1 w-full flex flex-col justify-center gap-3.5">
           <DifficultyBar
             label="Easy"
             solved={easySolved}
             total={easyTotal}
             textColor="text-green-500"
-            barColor="bg-green-500"
+            trackBg="bg-green-500/15"
+            fillBg="bg-green-500"
             compact={compact}
           />
           <DifficultyBar
@@ -165,7 +215,8 @@ export const SolvedProgressCard = ({
             solved={mediumSolved}
             total={mediumTotal}
             textColor="text-yellow-500"
-            barColor="bg-yellow-500"
+            trackBg="bg-yellow-500/15"
+            fillBg="bg-yellow-500"
             compact={compact}
           />
           <DifficultyBar
@@ -173,39 +224,13 @@ export const SolvedProgressCard = ({
             solved={hardSolved}
             total={hardTotal}
             textColor="text-red-500"
-            barColor="bg-red-500"
+            trackBg="bg-red-500/15"
+            fillBg="bg-red-500"
             compact={compact}
           />
         </div>
       </div>
 
-      {/* ── Streak row ── */}
-      <div className="border-t border-border/30 px-4 py-2.5 bg-muted/5 flex items-center justify-around divide-x divide-border/30 gap-2 shrink-0">
-        <div className="flex-1 flex flex-col items-center justify-center text-center min-w-0">
-          <span className="text-[10px] text-muted-foreground font-normal mb-0.5">
-            Current Streak
-          </span>
-          <div className="flex items-center justify-center gap-1">
-            <Flame className="w-3.5 h-3.5 text-orange-500 shrink-0" />
-            <span className="text-sm font-semibold text-foreground tabular-nums">
-              {currentStreak}
-            </span>
-            <span className="text-[10px] text-muted-foreground/70">days</span>
-          </div>
-        </div>
-        <div className="flex-1 flex flex-col items-center justify-center text-center min-w-0">
-          <span className="text-[10px] text-muted-foreground font-normal mb-0.5">
-            Best Streak
-          </span>
-          <div className="flex items-center justify-center gap-1">
-            <Trophy className="w-3.5 h-3.5 text-yellow-500 shrink-0" />
-            <span className="text-sm font-semibold text-foreground tabular-nums">
-              {maxStreak}
-            </span>
-            <span className="text-[10px] text-muted-foreground/70">days</span>
-          </div>
-        </div>
-      </div>
 
       {/* ── Next Milestone ── */}
       <div className="border-t border-border/30 px-4 py-3 bg-muted/5 space-y-1.5">

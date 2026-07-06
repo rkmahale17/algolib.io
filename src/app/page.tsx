@@ -50,9 +50,9 @@ const Footer = dynamic(() =>
 );
 
 export const metadata: Metadata = {
-  title: "Rulcode | Master Algorithms & Coding Interviews",
+  title: "Rulcode – Learn Data Structures & Algorithms with Interactive Visualizations",
   description:
-    "Accelerate your coding prep with interactive visualizations and multi-language solutions. Master Blind 75 and 200+ algorithms visually.",
+    "Learn Data Structures & Algorithms with interactive visualizations, step-by-step explanations, hints, multiple programming languages, Blind 75, NeetCode 150, and coding interview preparation.",
   keywords: [
     "algorithms",
     "open source",
@@ -68,9 +68,9 @@ export const metadata: Metadata = {
     "Rulcode.com",
   ],
   openGraph: {
-    title: "Rulcode | Master Algorithms & Coding Interviews",
+    title: "Rulcode – Learn Data Structures & Algorithms with Interactive Visualizations",
     description:
-      "Accelerate your coding prep with interactive visualizations and multi-language solutions. Master Blind 75 and 200+ algorithms visually.",
+      "Learn Data Structures & Algorithms with interactive visualizations, step-by-step explanations, hints, multiple programming languages, Blind 75, NeetCode 150, and coding interview preparation.",
     type: "website",
     url: "https://rulcode.com/",
     images: ["https://rulcode.com/og-image.png"],
@@ -79,9 +79,9 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     site: "@rulcode_com",
-    title: "Rulcode | Master Algorithms & Coding Interviews",
+    title: "Rulcode – Learn Data Structures & Algorithms with Interactive Visualizations",
     description:
-      "Accelerate your coding prep with interactive visualizations and multi-language solutions. Master Blind 75 and 200+ algorithms visually.",
+      "Learn Data Structures & Algorithms with interactive visualizations, step-by-step explanations, hints, multiple programming languages, Blind 75, NeetCode 150, and coding interview preparation.",
     images: ["https://rulcode.com/og-image.png"],
   },
 };
@@ -117,6 +117,18 @@ export default function Page() {
           url: "https://rulcode.com/android-chrome-512x512.png",
         },
         sameAs: ["https://github.com/rkmahale17/rulcode.com"],
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://rulcode.com/#breadcrumb",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: "https://rulcode.com/",
+          },
+        ],
       },
     ],
   };

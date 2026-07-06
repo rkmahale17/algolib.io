@@ -1,6 +1,7 @@
 // Helper functions for user_algorithm_data table operations
 
 import { supabase } from '@/integrations/supabase/client';
+import { awardXP } from './xpHelpers';
 import type {
     UserAlgorithmData,
     InsertUserAlgorithmData,
@@ -144,6 +145,26 @@ export async function updateProgress(
         return false;
     }
 
+    // Award XP if just completed
+    if (progressData.completed === true) {
+        // We need the difficulty to award the right XP.
+        // We can fetch it quickly from algorithms table.
+        const { data: algoData } = await supabase
+            .from('algorithms')
+            .select('difficulty')
+            .eq('id', algorithmId)
+            .maybeSingle();
+            
+        let eventType: 'problem_solved_easy' | 'problem_solved_medium' | 'problem_solved_hard' = 'problem_solved_medium';
+        if (algoData?.difficulty) {
+            const diff = algoData.difficulty.toLowerCase();
+            if (diff === 'easy') eventType = 'problem_solved_easy';
+            if (diff === 'hard') eventType = 'problem_solved_hard';
+        }
+        
+        await awardXP(userId, eventType, algorithmId);
+    }
+
     return true;
 }
 
@@ -231,6 +252,11 @@ export async function addSubmission(
     if (error) {
         console.error('Error adding submission:', error);
         return false;
+    }
+
+    // Award XP on successful submission
+    if (submission.status === 'passed') {
+        await awardXP(userId, 'code_submitted', algorithmId);
     }
 
     return true;
@@ -403,6 +429,10 @@ export async function updateVisualizationProgress(
         return false;
     }
 
+    if (completed) {
+        await awardXP(userId, 'problem_visualized', algorithmId);
+    }
+
     return true;
 }
 
@@ -437,6 +467,10 @@ export async function updateDrawingProgress(
         return false;
     }
 
+    if (completed) {
+        await awardXP(userId, 'problem_thinkpad', algorithmId);
+    }
+
     return true;
 }
 
@@ -469,6 +503,10 @@ export async function updateSolutionProgress(
     if (error) {
         console.error('Error updating solution progress:', error);
         return false;
+    }
+
+    if (completed) {
+        await awardXP(userId, 'problem_read', algorithmId);
     }
 
     return true;
