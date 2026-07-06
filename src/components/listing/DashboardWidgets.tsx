@@ -175,6 +175,7 @@ export const DashboardWidgets = () => {
                 compact
                 currentStreak={currentStreak}
                 maxStreak={maxStreak}
+                userId={user?.id}
               />
             </div>
           </Card>
@@ -182,7 +183,7 @@ export const DashboardWidgets = () => {
 
         {/* Contribution graph */}
         <div className="w-full lg:w-[240px] flex-none shrink-0 h-full">
-          <ContributionGraph submissions={submissionsData} weeks={10} />
+          <ContributionGraph submissions={submissionsData} weeks={10} currentStreak={currentStreak} maxStreak={maxStreak} />
         </div>
       </div>
 

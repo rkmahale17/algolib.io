@@ -24,6 +24,7 @@ import { SolvedProgressCard } from '@/components/profile/SolvedProgressCard';
 import { WeeklyInsights } from '@/components/listing/WeeklyInsights';
 import { DIFFICULTY_MAP } from '@/types/algorithm';
 import { useAppSelector } from '@/store/hooks';
+import { useApp } from '@/contexts/AppContext';
 
 interface ListingDashboardWidgetsProps {
   /** The filtered set of algorithms for this listing page */
@@ -45,6 +46,7 @@ export const ListingDashboardWidgets = ({
   algorithms,
   progressTitle = 'Progress',
 }: ListingDashboardWidgetsProps) => {
+  const { user } = useApp();
   const userProgressData = useAppSelector((state) => state.userProgress.data);
   const progressMap = useAppSelector((state) => state.userProgress.progressMap);
 
@@ -146,6 +148,7 @@ export const ListingDashboardWidgets = ({
                 compact
                 currentStreak={currentStreak}
                 maxStreak={maxStreak}
+                userId={user?.id}
               />
             </div>
           </Card>
@@ -153,7 +156,7 @@ export const ListingDashboardWidgets = ({
 
         {/* Contribution graph */}
         <div className="w-full lg:w-[240px] flex-none shrink-0 h-full">
-          <ContributionGraph submissions={submissionsData} weeks={10} />
+          <ContributionGraph submissions={submissionsData} weeks={10} currentStreak={currentStreak} maxStreak={maxStreak} />
         </div>
       </div>
 

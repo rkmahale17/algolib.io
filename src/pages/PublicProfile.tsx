@@ -411,6 +411,7 @@ const PublicProfile = () => {
                   mediumTotal={stats.mediumTotal}
                   hardSolved={stats.hardSolved}
                   hardTotal={stats.hardTotal}
+                  userId={profile.id}
                 />
               </div>
 

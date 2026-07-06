@@ -7,7 +7,7 @@ export function Footer() {
   return (
     <footer className="border-t bg-background">
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* About Section */}
           <div className="space-y-3">
             <h3 className="font-semibold text-foreground">RulCode</h3>
@@ -18,6 +18,53 @@ export function Footer() {
               <Heart className="w-4 h-4 text-red-500" />
               <span>100% Developer Centric</span>
             </div>
+          </div>
+
+          {/* Practice & Learn */}
+          <div className="space-y-3">
+            <h3 className="font-semibold text-foreground">Practice & Learn</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/guides/time-complexity" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Learn
+                </Link>
+              </li>
+              <li>
+                <Link href="/dsa/problems" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Problems
+                </Link>
+              </li>
+              <li>
+                <Link href="/dsa/visual-library" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Visual Library
+                </Link>
+              </li>
+              <li>
+                <Link href="/dsa/core" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Roadmaps
+                </Link>
+              </li>
+              <li>
+                <Link href="/dsa/blind-75" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Blind 75
+                </Link>
+              </li>
+              <li>
+                <Link href="/dsa/rulcode-150" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Rulcode 150
+                </Link>
+              </li>
+              <li>
+                <Link href="/database" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  SQL
+                </Link>
+              </li>
+              <li>
+                <Link href="/guides" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Guides
+                </Link>
+              </li>
+            </ul>
           </div>
 
           {/* Community */}
@@ -60,13 +107,8 @@ export function Footer() {
 
           {/* Legal */}
           <div className="space-y-3">
-            <h3 className="font-semibold text-foreground">Pricing & Legal</h3>
+            <h3 className="font-semibold text-foreground">Legal</h3>
             <ul className="space-y-2">
-              <li>
-                <Link href="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Pricing
-                </Link>
-              </li>
               <li>
                 <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Privacy Policy

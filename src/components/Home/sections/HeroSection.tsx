@@ -37,7 +37,10 @@ export function HeroSection() {
             {/* Subheadline with styled links */}
             <div className="text-[17px] text-zinc-600 dark:text-gray-400 mb-12 max-w-xl leading-relaxed">
               <p className="mb-6">
-                A learn-first platform for coding interviews.
+                <strong>A learn-first platform for coding interviews.</strong> The ultimate <strong>Data Structures</strong> and <strong>Algorithms</strong> platform for your next <strong>Coding Interview</strong>. Master <strong>LeetCode</strong> patterns with our <strong>Interactive Visualizations</strong>.
+              </p>
+              <p className="mb-6">
+                Conquer <strong>Blind 75</strong> and <strong>Rulcode 150</strong>. From basic arrays to advanced <strong>Dynamic Programming</strong> and <strong>Graph Algorithms</strong>, prepare effectively for tech interviews and <strong>Competitive Programming</strong>.
               </p>
               <p>
                 Read the problem,{" "}
@@ -47,28 +50,21 @@ export function HeroSection() {
                 >
                   Visualize
                 </Link>{" "}
-                the solution, think through the approach, sketch your ideas in{" "}
+                the solution, sketch your ideas in{" "}
                 <Link
                   href="#thinkpad"
                   className="text-zinc-900 dark:text-white underline decoration-primary underline-offset-4 hover:opacity-80 transition-all"
                 >
                   Thinkpad
                 </Link>
-                , write{" "}
+                , and{" "}
                 <Link
                   href="/problem/kadanes-algorithm"
                   className="text-zinc-900 dark:text-white underline decoration-primary underline-offset-4 hover:opacity-80 transition-all"
                 >
                   code
                 </Link>
-                , and{" "}
-                <Link
-                  href="/problem/kadanes-algorithm?tab=solution"
-                  className="text-zinc-900 dark:text-white underline decoration-primary underline-offset-4 hover:opacity-80 transition-all"
-                >
-                  review
-                </Link>{" "}
-                expert solutions.
+                .
               </p>
             </div>
 

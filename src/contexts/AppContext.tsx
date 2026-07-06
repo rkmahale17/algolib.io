@@ -13,6 +13,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setUser, setProfile, setAuthLoading } from '@/store/slices/authSlice';
 import { setProgressData, updateProgressItem, removeProgressItem, fetchUserProgress, clearProgress } from '@/store/slices/userProgressSlice';
 import { fetchAllAlgorithms } from '@/store/slices/algorithmsSlice';
+import { awardXP } from '@/utils/xpHelpers';
 
 interface Algorithm {
   id: string;
@@ -208,6 +209,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         if (currentUser) {
           // Await profile fetch before marking auth as finished loading
           await fetchProfile(currentUser.id);
+          awardXP(currentUser.id, 'daily_login').catch(console.error);
         }
         dispatch(setAuthLoading(false));
       }
