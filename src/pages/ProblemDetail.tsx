@@ -403,7 +403,7 @@ const ProblemDetail: React.FC = () => {
             ) : (
               /* Tablet/Desktop View (>= 480px): Resizable Panels */
               <div className={`h-full ${showHorizontalScroll ? 'min-w-[778px]' : 'w-full'}`}>
-                <ResizablePanelGroup direction="horizontal" className="h-full">
+                <ResizablePanelGroup direction="horizontal" className="h-full" autoSaveId="problem-panels-layout">
                   {/* Left Panel */}
                   <ResizablePanel
                     ref={layout.leftPanelRef}

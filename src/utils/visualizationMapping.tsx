@@ -65,6 +65,7 @@ export const visualizationMap: Record<string, any> = {
   'merge-k-lists': dynamic(() => import('@/components/visualizations/algorithms/MergeKSortedListsVisualization').then(m => m.MergeKSortedListsVisualization), { ssr: false }),
   'merge-k-sorted-lists': dynamic(() => import('@/components/visualizations/algorithms/MergeKSortedListsVisualization').then(m => m.MergeKSortedListsVisualization), { ssr: false }),
   'add-two-numbers': dynamic(() => import('@/components/visualizations/algorithms/AddTwoNumbersVisualization').then(m => m.AddTwoNumbersVisualization), { ssr: false }),
+  'add-two-numbers-ii': dynamic(() => import('@/components/visualizations/algorithms/AddTwoNumbersIIVisualization').then(m => m.AddTwoNumbersIIVisualization), { ssr: false }),
   'copy-list-with-random-pointer': dynamic(() => import('@/components/visualizations/algorithms/CopyListWithRandomPointerVisualization').then(m => m.CopyListWithRandomPointerVisualization), { ssr: false }),
 
   // Graph Algorithms
@@ -344,6 +345,10 @@ export const visualizationMetadataMap: Record<string, { title: string; descripti
   'add-two-numbers': {
     title: 'Add Two Numbers',
     description: 'Visualize adding two numbers represented by linked lists, carrying over digits just like manual addition.'
+  },
+  'add-two-numbers-ii': {
+    title: 'Add Two Numbers II',
+    description: 'Visualize using stacks to reverse and add two numbers represented by linked lists with most significant digits first.'
   },
   'copy-list-with-random-pointer': {
     title: 'Copy List with Random Pointer',

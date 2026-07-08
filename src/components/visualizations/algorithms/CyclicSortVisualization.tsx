@@ -281,7 +281,7 @@ export const CyclicSortVisualization = () => {
                         <span className="text-[10px] font-bold text-blue-500 animate-pulse whitespace-nowrap">i</span>
                       )}
                       {index === currentStep.correctIndex && (
-                        <span className="text-[10px] font-bold text-blue-500 animate-pulse whitespace-nowrap">Target</span>
+                        <span className="text-[10px] font-bold text-blue-500 animate-pulse whitespace-nowrap">correctIndex</span>
                       )}
                     </div>
                   </div>
@@ -320,8 +320,8 @@ export const CyclicSortVisualization = () => {
             variables={{
               i: currentStep.i < currentStep.array.length ? currentStep.i : 'done',
               'nums[i]': currentStep.i < currentStep.array.length ? currentStep.array[currentStep.i] : '-',
-              targetIndex: currentStep.correctIndex >= 0 ? currentStep.correctIndex : '-',
-              'nums[target]': currentStep.correctIndex >= 0 ? currentStep.array[currentStep.correctIndex] : '-',
+              correctIndex: currentStep.correctIndex >= 0 ? currentStep.correctIndex : '-',
+              'nums[correctIndex]': currentStep.correctIndex >= 0 ? currentStep.array[currentStep.correctIndex] : '-',
               array: JSON.stringify(currentStep.array)
             }}
           />
