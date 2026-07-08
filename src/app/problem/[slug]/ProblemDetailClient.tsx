@@ -742,7 +742,7 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({
             <div
               className={`h-full ${showHorizontalScroll ? "min-w-[778px]" : "w-full"}`}
             >
-              <ResizablePanelGroup direction="horizontal" className="h-full">
+              <ResizablePanelGroup direction="horizontal" className="h-full" autoSaveId="problem-panels-layout">
                 <ResizablePanel
                   ref={layout.leftPanelRef}
                   defaultSize={40}
