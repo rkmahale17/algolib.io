@@ -189,11 +189,11 @@ export function ProblemsSection() {
               asChild
             >
               <Link
-                href="/dsa/get-started"
+                href="/problems"
                 onClick={() =>
                   handleCtaClick(
                     "Explore Practice",
-                    "/dsa/get-started",
+                    "/problems",
                     "problems_section_cta",
                   )
                 }

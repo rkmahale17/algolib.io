@@ -5,13 +5,13 @@ import { useMemo } from "react";
 
 import { Card } from "@/components/ui/card";
 import { ContributionGraph } from "@/components/listing/ContributionGraph";
-import { ContinueLearningCard } from "@/components/listing/ContinueLearningCard";
 import { DashboardHero } from "@/components/listing/DashboardHero";
 import { DIFFICULTY_MAP } from "@/types/algorithm";
 import { ProblemOfTheDay } from "@/components/listing/ProblemOfTheDay";
 import { RecommendedProblems } from "@/components/listing/RecommendedProblems";
 import { SolvedProgressCard } from "@/components/profile/SolvedProgressCard";
-import { WeeklyInsights } from "@/components/listing/WeeklyInsights";
+import { TrendingUp } from "lucide-react";
+
 import { useApp } from "@/contexts/AppContext";
 import { useAppSelector } from "@/store/hooks";
 import { useProblemOfTheDay } from "@/hooks/useProblemOfTheDay";
@@ -153,13 +153,7 @@ export const DashboardWidgets = () => {
         submissionsData={submissionsData}
       />
 
-      {/* ② Continue Learning — BIGGEST card, primary focus */}
-      {continueLearningAlgo && (
-        <ContinueLearningCard
-          algorithm={continueLearningAlgo.algorithm}
-          progress={continueLearningAlgo.progress}
-        />
-      )}
+
 
       {/* ③ Progress + Contribution Graph — side by side */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-4 w-full items-stretch">
@@ -167,7 +161,9 @@ export const DashboardWidgets = () => {
         <div className="min-w-0 flex flex-col h-full">
           <Card className="bg-card border-border/40 shadow-sm overflow-hidden flex flex-col h-full rounded-xl">
             <div className="px-4 py-2.5 border-b border-border/40 shrink-0 bg-muted/20">
-              <h3 className="font-semibold text-[13px] text-foreground/80">Overall Progress</h3>
+              <h3 className="font-semibold text-[13px] text-foreground tracking-tight flex items-center gap-1.5">
+                <TrendingUp className="w-4 h-4 text-foreground" /> Learning Progress
+              </h3>
             </div>
             <div className="flex-1 flex flex-col justify-center">
               <SolvedProgressCard
@@ -190,6 +186,8 @@ export const DashboardWidgets = () => {
       {/* ④ Recommended Problems */}
       <RecommendedProblems algorithms={algorithms} />
 
+
+
       {/* ⑤ Daily Challenge */}
       {isPOTDUnsolved && (
         <div className="w-full">
@@ -197,8 +195,7 @@ export const DashboardWidgets = () => {
         </div>
       )}
 
-      {/* ⑥ Weekly Insights */}
-      <WeeklyInsights submissionsData={submissionsData} />
+
     </div>
   );
 };

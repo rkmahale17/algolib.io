@@ -95,7 +95,7 @@ export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp
                 : compact
                     ? "flex items-center gap-2.5 px-3 py-2.5 transition-all duration-300 ease-out"
                     : "flex items-center gap-3 sm:gap-6 p-4 sm:p-6 transition-all duration-500 ease-out",
-            "bg-card hover:bg-accent/60 dark:hover:bg-accent/30 transition-colors duration-300",
+            "bg-card hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors duration-300",
             noBorder
                 ? "border-none"
                 : cn(
@@ -127,7 +127,7 @@ export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp
                 {/* Content */}
                 {isPOTD ? (
                     <div className="flex-1 min-w-0 flex flex-row items-center justify-between gap-4">
-                        <h3 className="font-normal text-foreground group-hover:text-black dark:group-hover:text-primary transition-colors duration-300 truncate text-[16px]">
+                        <h3 className="font-normal text-foreground transition-colors duration-300 truncate text-[16px]">
                             <span>{truncatedTitle}</span>
                         </h3>
                         <div className="flex items-center gap-2 shrink-0">
@@ -157,7 +157,7 @@ export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp
                         )}
                         <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 min-w-0">
                             <h3 className={cn(
-                                "font-normal text-foreground group-hover:text-black dark:group-hover:text-primary transition-colors duration-300 truncate",
+                                "font-normal text-foreground transition-colors duration-300 truncate",
                                 compact ? "text-[13px]" : "text-[16px]"
                             )}>
                                 <span>{truncatedTitle}</span>

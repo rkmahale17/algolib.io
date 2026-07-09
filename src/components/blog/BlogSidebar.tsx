@@ -16,7 +16,7 @@ const relatedLinks = [
   },
   {
     title: "Learning Roadmap",
-    link: "/dsa/get-started",
+    link: "/problems",
     icon: Layers,
   },
 ];

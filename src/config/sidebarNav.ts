@@ -41,7 +41,7 @@ export function getGuideUrl(categoryId: string, slug: string): string {
 
 // ─── DSA nav items ────────────────────────────────────────────────────────────
 export const DSA_ITEMS = [
-  { id: "get-started", title: "Get started", icon: Rocket, url: "/dsa/get-started" },
+  { id: "problems", title: "Problems", icon: Rocket, url: "/problems" },
   { id: "core-patterns", title: "Core patterns", icon: Target, url: "/dsa/core" },
   { id: "blind-75", title: "Blind 75", icon: Brain, url: "/dsa/blind-75" },
   { id: "rulcode-150", title: "Rulcode 150", icon: Layers, url: "/dsa/rulcode-150" },
@@ -152,7 +152,6 @@ export const DSA_NAV_SECTIONS = [
 export const SIDEBAR_ROUTES = [
   "/dsa/problems",
   "/problems",
-  "/dsa/get-started",
   "/dsa/blind-75",
   "/dsa/rulcode-150",
   "/dsa/core",

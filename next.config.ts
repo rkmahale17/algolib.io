@@ -45,6 +45,15 @@ const nextConfig: NextConfig = {
       '@radix-ui/react-tooltip'
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/dsa/get-started',
+        destination: '/problems',
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     const rewrites = [
       {

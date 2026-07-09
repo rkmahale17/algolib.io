@@ -143,10 +143,10 @@ export const ContinueLearningCard = ({
 
 
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-border/30 bg-muted/10">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-border/30 bg-muted/10">
         <div className="flex items-center gap-2">
 
-          <span className="text-xs font-semibold tracking-wider text-foreground/80 uppercase">
+          <span className="text-xs font-semibold tracking-wider text-foreground/80">
             Continue Learning
           </span>
         </div>
@@ -169,7 +169,7 @@ export const ContinueLearningCard = ({
         </div>
       </div>
 
-      <div className="p-5 sm:p-6 space-y-4">
+      <div className="p-4 sm:p-5 space-y-3">
         {/* Title + step counter */}
         <div className="flex items-start justify-between gap-3">
           <h3 className="text-base sm:text-lg font-semibold text-foreground group-hover:text-primary transition-colors duration-200 leading-snug">

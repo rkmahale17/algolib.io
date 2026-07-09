@@ -21,16 +21,22 @@ import { Card } from '@/components/ui/card';
 import { ContributionGraph } from '@/components/listing/ContributionGraph';
 import { DashboardHero } from '@/components/listing/DashboardHero';
 import { SolvedProgressCard } from '@/components/profile/SolvedProgressCard';
-import { WeeklyInsights } from '@/components/listing/WeeklyInsights';
+
 import { DIFFICULTY_MAP } from '@/types/algorithm';
 import { useAppSelector } from '@/store/hooks';
 import { useApp } from '@/contexts/AppContext';
+import Link from 'next/link';
+import { ArrowRight, TrendingUp } from 'lucide-react';
+import { trackEvent } from '@/lib/analytics';
+import { usePostHog } from '@posthog/react';
 
 interface ListingDashboardWidgetsProps {
   /** The filtered set of algorithms for this listing page */
   algorithms: any[];
   /** Label shown in the card header (e.g. "Blind 75 Progress") */
   progressTitle?: string;
+  hideHero?: boolean;
+  hideHeroPracticeButton?: boolean;
 }
 
 function getNextMilestone(solved: number): number {
@@ -44,11 +50,28 @@ function getNextMilestone(solved: number): number {
 
 export const ListingDashboardWidgets = ({
   algorithms,
-  progressTitle = 'Progress',
+  progressTitle = 'Learning Progress',
+  hideHero = false,
+  hideHeroPracticeButton = false,
 }: ListingDashboardWidgetsProps) => {
   const { user } = useApp();
   const userProgressData = useAppSelector((state) => state.userProgress.data);
   const progressMap = useAppSelector((state) => state.userProgress.progressMap);
+  const { items: allAlgorithms } = useAppSelector((state) => state.algorithms);
+  const posthog = usePostHog();
+
+  const continueLearningAlgo = useMemo(() => {
+    if (!userProgressData || userProgressData.length === 0) return null;
+    const sorted = [...userProgressData].sort((a, b) => {
+      const timeA = new Date(a.last_viewed_at || a.updated_at).getTime();
+      const timeB = new Date(b.last_viewed_at || b.updated_at).getTime();
+      return timeB - timeA;
+    });
+    const incomplete = sorted.find((p) => !p.completed);
+    const target = incomplete || sorted[0];
+    if (!target) return null;
+    return allAlgorithms.find((a) => a.id === target.algorithm_id) || null;
+  }, [userProgressData, allAlgorithms]);
 
   /* ── Per-list progress stats ── */
   const overallStats = useMemo(() => {
@@ -126,13 +149,43 @@ export const ListingDashboardWidgets = ({
 
   return (
     <div className="w-full max-w-[820px] mx-auto space-y-4 mb-4">
+      {/* ⓪ Continue Learning Minimal Box */}
+      {user && continueLearningAlgo && (
+        <Link
+          href={continueLearningAlgo.slug ? `/problem/${continueLearningAlgo.slug}` : `/problem/${continueLearningAlgo.id}`}
+          onClick={() =>
+            trackEvent(posthog, "home_cta_clicked", {
+              cta_label: "Continue Learning Box",
+              destination: continueLearningAlgo.slug || continueLearningAlgo.id,
+              section: "listing_dashboard",
+            })
+          }
+          className="flex items-center gap-4 px-5 py-3 rounded-xl bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/80 hover:border-primary/40 transition-all hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.1)] group max-w-[280px]"
+        >
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-bold text-primary tracking-wider mb-0.5">
+              Continue
+            </p>
+            <p className="text-sm font-semibold text-zinc-900 dark:text-white truncate">
+              {continueLearningAlgo.title || continueLearningAlgo.name}
+            </p>
+          </div>
+          <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-black transition-all shrink-0">
+            <ArrowRight className="w-3.5 h-3.5" />
+          </div>
+        </Link>
+      )}
+
       {/* ① Personalized Hero */}
-      <DashboardHero
-        currentStreak={currentStreak}
-        nextMilestone={nextMilestone}
-        totalSolved={overallStats.totalSolved}
-        submissionsData={submissionsData}
-      />
+      {!hideHero && (
+        <DashboardHero
+          currentStreak={currentStreak}
+          nextMilestone={nextMilestone}
+          totalSolved={overallStats.totalSolved}
+          submissionsData={submissionsData}
+          hidePracticeButton={hideHeroPracticeButton}
+        />
+      )}
 
       {/* ② Progress + Contribution Graph */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-4 w-full items-stretch">
@@ -140,7 +193,9 @@ export const ListingDashboardWidgets = ({
         <div className="min-w-0 flex flex-col h-full">
           <Card className="bg-card border-border/40 shadow-sm overflow-hidden flex flex-col h-full rounded-xl">
             <div className="px-4 py-2.5 border-b border-border/40 shrink-0 bg-muted/20">
-              <h3 className="font-semibold text-[13px] text-foreground/80">{progressTitle}</h3>
+              <h3 className="font-semibold text-[13px] text-foreground tracking-tight flex items-center gap-1.5">
+                <TrendingUp className="w-4 h-4 text-foreground" /> {progressTitle}
+              </h3>
             </div>
             <div className="flex-1 flex flex-col justify-center">
               <SolvedProgressCard
@@ -160,8 +215,7 @@ export const ListingDashboardWidgets = ({
         </div>
       </div>
 
-      {/* ③ Weekly Insights */}
-      <WeeklyInsights submissionsData={submissionsData} />
+
     </div>
   );
 };

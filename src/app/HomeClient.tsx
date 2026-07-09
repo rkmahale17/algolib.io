@@ -176,7 +176,7 @@ export default function HomeClient({ type = 'all' }: HomeClientProps) {
 
                   <div className="flex justify-center">
                     <Button size="lg" className="rounded-full px-8 py-6 text-base bg-primary hover:bg-primary/90 text-black transition-all hover:scale-105 active:scale-95 shadow-xl shadow-primary/20" asChild>
-                      <Link href="/dsa/get-started" onClick={() => handleCtaClick('Get Started', '/dsa/get-started', 'hero_cta')}>
+                      <Link href="/problems" onClick={() => handleCtaClick('Get Started', '/problems', 'hero_cta')}>
                         Get Started <ArrowRight className="ml-2 w-5 h-5" />
                       </Link>
                     </Button>

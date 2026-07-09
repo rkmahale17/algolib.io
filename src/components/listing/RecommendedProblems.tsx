@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useAppSelector } from '@/store/hooks';
 import { useMemo } from 'react';
+import { PremiumProblemCard } from '@/components/listing/PremiumProblemCard';
 
 interface RecommendedProblemsProps {
   algorithms: AlgorithmListItem[];
@@ -55,85 +56,44 @@ export const RecommendedProblems = ({ algorithms }: RecommendedProblemsProps) =>
     : 'Next Best Problems';
 
   return (
-    <div className="w-full max-w-[820px] mx-auto bg-card border border-border/40 rounded-xl shadow-sm overflow-hidden flex flex-col mb-4">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-border/30 px-5 py-3 bg-muted/10">
-        <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-primary" />
-          <span className="text-sm font-semibold tracking-wide text-foreground/90">
-            {headerText}
-          </span>
-        </div>
-
+    <div className="w-full max-w-[820px] mx-auto flex flex-col mb-4">
+      <div className="px-4 py-2.5 border-x border-t border-border/40 shrink-0 bg-card rounded-t-xl flex flex-col gap-0.5 relative overflow-hidden">
+        <div className="absolute inset-0 bg-muted/20 pointer-events-none" />
+        <h3 className="font-semibold text-[13px] text-foreground tracking-tight flex items-center gap-1.5 relative z-10">
+          <Sparkles className="w-4 h-4 text-foreground" /> {headerText}
+        </h3>
+        <p className="text-[11px] text-muted-foreground ml-5 relative z-10">
+          Curated from what you've already solved.
+        </p>
       </div>
 
       {/* Recommendation cards */}
-      <div className="flex flex-col divide-y divide-border/20">
+      <div className="flex flex-col">
         {recommendations.slice(0, 2).map((rec, idx) => {
           const algo = rec.algorithm;
-          const status = progressMap?.[algo.id] || 'none';
-          const rawDiff =
-            algo.mappedDifficulty ||
-            DIFFICULTY_MAP[algo.difficulty?.toLowerCase()] ||
-            'Medium';
-          const displayDiff = rawDiff === 'Medium' ? 'Med' : rawDiff;
-          const diffStyle = difficultyColors[displayDiff] || difficultyColors['Med'];
-          const estimatedTime = getEstimatedTime(algo.difficulty);
-          const targetUrl = algo.slug ? `/problem/${algo.slug}` : `/problem/${algo.id}`;
+          const status = (progressMap?.[algo.id] || 'none') as any;
 
           let ctaText = 'Start';
           if (status === 'attempted') ctaText = 'Resume';
           else if (status === 'solved') ctaText = 'Review';
 
           return (
-            <div key={algo.id} className="px-5 py-4 flex flex-col gap-2.5">
-              {/* Personalized reason */}
-              <p className="text-[11px] text-muted-foreground leading-relaxed italic">
-                {rec.reason}
-              </p>
-
-              {/* Problem row */}
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex-1 min-w-0 space-y-1.5">
-
-                  <h4 className="text-sm font-semibold text-foreground truncate">
-                    {algo.title || algo.name}
-                  </h4>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    {/* Difficulty */}
-                    <span
-                      className={cn(
-                        'text-[10px] font-semibold px-2 py-0.5 rounded-full border',
-                        diffStyle.text, diffStyle.bg, diffStyle.border,
-                      )}
-                    >
-                      {displayDiff}
-                    </span>
-                    {/* Time */}
-                    <span className="flex items-center gap-1 text-[10px] text-muted-foreground font-medium">
-                      <Clock className="w-3.5 h-3.5" />
-                      {estimatedTime}
-                    </span>
-                    {/* Premium */}
-                    {algo.is_premium && (
-                      <span className="flex items-center gap-1 text-[10px] text-primary font-medium">
-                        <Lock className="w-3.5 h-3.5" />
-                        Pro
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* CTA */}
-                <Link
-                  href={targetUrl}
-                  className="shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-muted/50 hover:bg-primary hover:text-primary-foreground border border-border/40 hover:border-primary text-foreground/80 font-semibold text-xs transition-all duration-200 active:scale-95"
-                >
-                  {ctaText}
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            </div>
+            <PremiumProblemCard
+              key={algo.id}
+              algorithm={algo}
+              status={status}
+              index={idx}
+              isFirst={false}
+              isLast={idx === 1 || idx === recommendations.length - 1}
+              disableRounding={false}
+              reasonBadge={
+                <span className="text-[11px] text-muted-foreground italic mb-1 inline-block bg-muted/30 px-2 py-0.5 rounded-md border border-border/40">
+                  {rec.reason}
+                </span>
+              }
+              ctaText={ctaText}
+              showEstimatedTime={true}
+            />
           );
         })}
       </div>

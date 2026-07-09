@@ -13,7 +13,7 @@ import { ProOverlay } from "@/components/ProOverlay";
 import { Button } from "@/components/ui/button";
 import { ProblemFilterPopup } from "@/components/ProblemFilterPopup";
 import { RecommendedProblems } from "@/components/listing/RecommendedProblems";
-import { ContinueLearningCard } from "@/components/listing/ContinueLearningCard";
+
 import { ListingDashboardWidgets } from "@/components/listing/ListingDashboardWidgets";
 import { supabase } from "@/integrations/supabase/client";
 import { parseISO, eachDayOfInterval, format } from 'date-fns';
@@ -50,7 +50,7 @@ export const ProblemsList = ({
   initialCategoryWise = false,
   headerSlot,
   footerSlot,
-  progressTitle = "Progress",
+  progressTitle = "Learning Progress",
   isLoading = false,
   icon,
   initialSelectedTopics = EMPTY_ARRAY,
@@ -381,31 +381,6 @@ export const ProblemsList = ({
     };
   }, [filteredAndSortedAlgorithms, progressMap]);
 
-  const continueLearningAlgo = useMemo(() => {
-    if (!userProgressData || userProgressData.length === 0) return null;
-    
-    // Sort progress data by last_viewed_at or updated_at (descending)
-    const sorted = [...userProgressData].sort((a, b) => {
-      const timeA = new Date(a.last_viewed_at || a.updated_at).getTime();
-      const timeB = new Date(b.last_viewed_at || b.updated_at).getTime();
-      return timeB - timeA;
-    });
-
-    // Find the most recent incomplete algorithm first
-    const incomplete = sorted.find(p => !p.completed);
-    const target = incomplete || sorted[0];
-    
-    if (!target) return null;
-    
-    // Find the actual algorithm object
-    const algo = algorithms.find(a => a.id === target.algorithm_id);
-    if (!algo) return null;
-    
-    return {
-      algorithm: algo,
-      progress: target
-    };
-  }, [userProgressData, algorithms]);
 
   const getProgressBarColor = (percentage: number) => {
     if (percentage === 0) return 'bg-transparent';
@@ -584,18 +559,14 @@ export const ProblemsList = ({
           <ListingDashboardWidgets
             algorithms={algorithms}
             progressTitle={progressTitle}
+            hideHero={['core', 'blind', 'blind75', 'blind150', 'rulcode150', 'sql-basics', 'sql'].includes(listType || '')}
+            hideHeroPracticeButton={true}
           />
         ) : undefined
       }
       recommendedWidget={
         showRecommendation && !isLoading ? (
           <div className="space-y-4 w-full">
-            {continueLearningAlgo && (
-              <ContinueLearningCard
-                algorithm={continueLearningAlgo.algorithm}
-                progress={continueLearningAlgo.progress}
-              />
-            )}
             <RecommendedProblems algorithms={algorithms} />
           </div>
         ) : null

@@ -67,12 +67,12 @@ export const ContributionGraph = ({
 
   return (
     <Card className="border-border/40 bg-card shadow-sm flex flex-col w-full overflow-hidden rounded-xl h-full">
-      <CardHeader className="p-3 pb-1 shrink-0">
-        <CardTitle className="text-[13px] font-semibold text-foreground/80 tracking-tight">
-          Activity
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-3 pt-1 flex-1 flex flex-col gap-2">
+      <div className="px-4 py-2.5 border-b border-border/40 shrink-0 bg-muted/20">
+        <h3 className="font-semibold text-[13px] text-foreground tracking-tight flex items-center gap-1.5">
+          <Flame className="w-4 h-4 text-foreground" /> Consistency Tracker
+        </h3>
+      </div>
+      <CardContent className="p-4 flex-1 flex flex-col gap-2">
         {/* Day labels + grid */}
         <div className="flex gap-1">
           <div className="flex flex-col gap-[3px] justify-between pr-1 shrink-0">
@@ -123,21 +123,26 @@ export const ContributionGraph = ({
           <span className="text-[9px] text-muted-foreground/50">More</span>
         </div>
 
-        {/* ── Stat pills ── */}
-        <div className="mt-auto pt-1 border-t border-border/20 flex flex-col gap-1.5">
-          <div className="flex items-center justify-between text-[11px]">
-            <div className="flex items-center gap-1 text-orange-500 font-semibold">
-              <Flame className="w-3.5 h-3.5" />
-              <span>{currentStreak} day streak</span>
-            </div>
-            <div className="flex items-center gap-1 text-muted-foreground font-medium">
-              <Trophy className="w-3 h-3 text-yellow-500" />
-              <span>Best: {maxStreak}</span>
-            </div>
+        <div className="mt-auto pt-3 border-t border-border/20 flex items-center justify-between gap-1">
+          <div className="flex items-center gap-1 text-foreground font-semibold text-[10px] px-2 h-6 bg-muted/30 border border-border/80 rounded-full whitespace-nowrap shrink-0">
+            <Flame className="w-3 h-3 text-muted-foreground shrink-0" />
+            <span className="flex items-center gap-1">
+              Streak
+              <div className="w-px h-2.5 bg-border/50 mx-0.5" />
+              <span className="font-mono text-[13px] font-bold text-orange-500 leading-none tracking-tight">
+                {currentStreak}
+              </span> 
+            </span>
           </div>
-          <div className="flex items-center gap-1 text-[11px] text-muted-foreground font-medium">
-            <TrendingUp className="w-3 h-3 text-primary" />
-            <span>This week: <strong className="text-foreground">{solvedThisWeek}</strong> solved</span>
+          <div className="flex items-center gap-1 text-foreground font-semibold text-[10px] px-2 h-6 bg-muted/30 border border-border/80 rounded-full whitespace-nowrap shrink-0">
+            <Trophy className="w-3 h-3 text-muted-foreground shrink-0" />
+            <span className="flex items-center gap-1">
+              Best 
+              <div className="w-px h-2.5 bg-border/50 mx-0.5" />
+              <span className="font-mono text-[13px] font-bold text-primary leading-none tracking-tight">
+                {maxStreak}
+              </span>
+            </span>
           </div>
         </div>
       </CardContent>

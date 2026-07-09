@@ -543,7 +543,7 @@ const Navbar = ({
               {/* ───────────────────────────────────────────────────────────────── */}
               {currentPath === "/" ? (
                 <Link
-                  href="/dsa/get-started"
+                  href="/problems"
                   className="font-normal hover:bg-muted hover:text-foreground rounded-lg px-3 py-1.5 transition-all shutter-click"
                   onClick={closeMenus}
                 >
