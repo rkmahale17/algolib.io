@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useAlgorithms } from "@/hooks/useAlgorithms";
 import { ListType } from "@/types/algorithm";
 import { Layers, Target, Brain, ChevronDown } from "lucide-react";
@@ -15,6 +16,8 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { normalizeCategory } from "@/constants/categories";
+import { normalizeCompany } from "@/constants/companies";
 
 import { useApp } from "@/contexts/AppContext";
 import { useProblemOfTheDay } from '@/hooks/useProblemOfTheDay';
@@ -25,6 +28,19 @@ const GetStartedClient = () => {
   const { profile, progressMap } = useApp();
   const [activeTab, setActiveTab] = useState("all");
   const isMobile = useIsMobile();
+  const searchParams = useSearchParams();
+
+  const topicFilter = searchParams.get("topic");
+  const rawCompanyFilter = searchParams.get("company");
+
+  const initialTopics = useMemo(
+    () => (topicFilter ? [topicFilter] : []),
+    [topicFilter]
+  );
+  const initialCompanies = useMemo(
+    () => (rawCompanyFilter ? [normalizeCompany(rawCompanyFilter)] : []),
+    [rawCompanyFilter]
+  );
 
   const isUserAdmin = profile?.role === 'admin';
 
@@ -91,8 +107,10 @@ const GetStartedClient = () => {
       description="Explore our comprehensive library of coding problems. Whether you're mastering fundamental patterns or preparing for top-tier technical interviews, we've got you covered."
       listType={activeTab as any}
       isLoading={isLoading}
-      showRecommendation={activeTab === "all"}
+      showRecommendation={activeTab === "all" && initialTopics.length === 0 && initialCompanies.length === 0}
       initialCategoryWise={activeTab !== "all"}
+      initialSelectedTopics={initialTopics}
+      initialSelectedCompanies={initialCompanies}
       icon={activeIcon}
       potd={activeTab === "all" ? potd : undefined}
       stickyHeaderSlot={
