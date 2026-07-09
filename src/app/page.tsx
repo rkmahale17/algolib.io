@@ -7,16 +7,9 @@ import { InteractiveSandboxTeaser } from "@/components/Home/sections/Interactive
 import { Metadata } from "next";
 import { ProblemsSection } from "@/components/Home/sections/ProblemsSection";
 import Script from "next/script";
-import { SprintsAndTracksSection } from "@/components/Home/sections/SprintsAndTracksSection";
-import { TopicRoadmapSection } from "@/components/Home/sections/TopicRoadmapSection";
 import dynamic from "next/dynamic";
 
 // ── Below-the-fold sections (lazy loaded to reduce initial bundle) ───────────
-const WorkspaceSection = dynamic(() =>
-  import("@/components/Home/sections/WorkspaceSection").then((m) => ({
-    default: m.WorkspaceSection,
-  })),
-);
 const ScratchpadSection = dynamic(() =>
   import("@/components/Home/sections/ScratchpadSection").then((m) => ({
     default: m.ScratchpadSection,
@@ -27,16 +20,17 @@ const FeedbackSection = dynamic(() =>
     default: m.FeedbackSection,
   })),
 );
+const TestimonialsSection = dynamic(() =>
+  import("@/components/Home/sections/TestimonialsSection").then((m) => ({
+    default: m.TestimonialsSection,
+  })),
+);
 const CommunitySection = dynamic(() =>
   import("@/components/Home/sections/CommunitySection").then((m) => ({
     default: m.CommunitySection,
   })),
 );
-const CraftingSection = dynamic(() =>
-  import("@/components/Home/sections/CraftingSection").then((m) => ({
-    default: m.CraftingSection,
-  })),
-);
+
 const BottomCTA = dynamic(() =>
   import("@/components/Home/sections/BottomCTA").then((m) => ({
     default: m.BottomCTA,
@@ -47,6 +41,11 @@ const FAQ = dynamic(() =>
 );
 const Footer = dynamic(() =>
   import("@/components/Footer").then((m) => ({ default: m.Footer })),
+);
+const PracticeQuestionBankSection = dynamic(() =>
+  import("@/components/Home/sections/PracticeQuestionBankSection").then((m) => ({
+    default: m.PracticeQuestionBankSection,
+  })),
 );
 
 export const metadata: Metadata = {
@@ -172,19 +171,15 @@ export default function Page() {
             <div id="problems">
               <ProblemsSection />
             </div>
-            <SprintsAndTracksSection />
           </>
         )}
-        <TopicRoadmapSection />
+        <PracticeQuestionBankSection />
         <div id="playground">
           <HomeClient type="platform-preview" />
         </div>
-        <div id="workspace">
-          <WorkspaceSection />
-        </div>
+        <TestimonialsSection />
         <FeedbackSection />
         <CommunitySection />
-        <CraftingSection />
         <BottomCTA />
         <FAQ />
         <Footer />
