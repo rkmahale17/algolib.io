@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
 
 export default function DSAPage() {
-    redirect('/dsa/get-started');
+    redirect('/problems');
 }

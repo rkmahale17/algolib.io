@@ -2,7 +2,7 @@
 
 import { useXP } from '@/hooks/useXP';
 import { cn } from '@/lib/utils';
-import { Star } from 'lucide-react';
+import { Coins } from 'lucide-react';
 
 export const XPWidget = () => {
   const { totalXP, xpBadge, activityBadge, isLoading } = useXP();
@@ -14,18 +14,18 @@ export const XPWidget = () => {
   }
 
   return (
-    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-card border border-border/40 shadow-sm">
-      <Star className="w-4 h-4 text-amber-400" />
+    <div className="flex items-center gap-2 px-4 h-8 rounded-full bg-muted/30 border border-border/80 text-foreground shrink-0">
+      <Coins className="w-4 h-4 text-muted-foreground" />
       <span className="text-xs font-bold text-foreground">
-        {totalXP.toLocaleString()} <span className="text-muted-foreground font-medium">XP</span>
+        <span className="text-yellow-500">{totalXP.toLocaleString()}</span> <span className="text-muted-foreground font-medium">Points</span>
       </span>
       
       {/* Show latest XP badge if any */}
       {xpBadge && (
         <>
           <div className="w-px h-3 bg-border/50 mx-1" />
-          <div className="flex items-center gap-1 cursor-default" title={xpBadge.name}>
-            <span className="text-sm">{xpBadge.icon}</span>
+          <div className="flex items-center gap-1 cursor-default text-xs font-bold text-muted-foreground" title={xpBadge.name}>
+            Rank <span className="text-sm ml-0.5">{xpBadge.icon}</span>
           </div>
         </>
       )}

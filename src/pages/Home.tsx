@@ -139,7 +139,7 @@ const Home = () => {
               <div className="flex flex-wrap items-center gap-6 mb-8">
                 <div className="flex flex-col gap-4">
                   <Button className=" text-black rounded-full bg-primary hover:bg-primary/80 transition-colors " asChild>
-                    <NextLink href="/dsa/get-started">
+                    <NextLink href="/problems">
                       Get started now <ArrowRight className="ml-2 w-6 h-6" />
                     </NextLink>
                   </Button>
@@ -264,7 +264,7 @@ const Home = () => {
 
                   <div className="flex justify-center">
                     <Button size="lg" className="rounded-full px-8 py-6 text-base bg-primary hover:bg-primary/90 text-black transition-all hover:scale-105 active:scale-95 shadow-xl shadow-primary/20" asChild>
-                      <NextLink href="/dsa/get-started">
+                      <NextLink href="/problems">
                         Get Started <ArrowRight className="ml-2 w-5 h-5" />
                       </NextLink>
                     </Button>

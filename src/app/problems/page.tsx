@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     title: "All Practice - Master DSA | RulCode",
     description:
       "Explore our comprehensive bank of 200+ coding problems and curated patterns.",
-    url: "https://rulcode.com/dsa/get-started",
+    url: "https://rulcode.com/problems",
   },
 };
 

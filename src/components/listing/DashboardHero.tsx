@@ -1,7 +1,8 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Flame, CheckCircle2, Circle, Star, Zap, TrendingUp } from 'lucide-react';
+import { Flame, CheckCircle2, Circle, Star, Zap, TrendingUp, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useApp } from '@/contexts/AppContext';
 import { useAppSelector } from '@/store/hooks';
@@ -14,6 +15,7 @@ interface DashboardHeroProps {
   nextMilestone: number;
   totalSolved: number;
   submissionsData: { date: string; count: number; activities?: any[] }[];
+  hidePracticeButton?: boolean;
 }
 
 /* ── Level system ── */
@@ -73,8 +75,9 @@ export const DashboardHero = ({
   nextMilestone,
   totalSolved,
   submissionsData,
+  hidePracticeButton,
 }: DashboardHeroProps) => {
-  const { user, profile } = useApp();
+  const { user, profile, hasPremiumAccess } = useApp();
   const { data: progressData } = useAppSelector((state) => state.userProgress);
 
   const firstName = useMemo(() => {
@@ -133,21 +136,15 @@ export const DashboardHero = ({
           {/* Stats row: Level + Solved + Daily Goal */}
           <div className="flex flex-wrap items-center gap-3 pt-2">
             {/* Level badge */}
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20">
-              <Star className="w-4 h-4 text-indigo-400 shrink-0" />
-              <div className="leading-none">
-                <div className="text-xs font-bold text-indigo-300">
-                  Level {levelNumber} · {level.label}
-                </div>
-              </div>
+            <div className="flex items-center gap-2 px-4 h-8 rounded-full bg-muted/30 border border-border/80 text-foreground shrink-0">
+              <Star className="w-4 h-4 text-muted-foreground shrink-0" />
+              <span className="text-xs font-bold">Level <span className="text-indigo-400">{levelNumber}</span> · {level.label}</span>
             </div>
 
             {/* Problems solved */}
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-              <TrendingUp className="w-4 h-4 text-emerald-400 shrink-0" />
-              <div className="leading-none">
-                <span className="text-xs font-bold text-emerald-400">{totalSolved} Problems Solved</span>
-              </div>
+            <div className="flex items-center gap-2 px-4 h-8 rounded-full bg-muted/30 border border-border/80 text-foreground shrink-0">
+              <TrendingUp className="w-4 h-4 text-muted-foreground shrink-0" />
+              <span className="text-xs font-bold"><span className="text-emerald-400">{totalSolved}</span> Problems Solved</span>
             </div>
 
             {/* XP Widget */}
@@ -155,28 +152,49 @@ export const DashboardHero = ({
             
             {/* Right: streak badge */}
             {currentStreak > 0 && (
-              <div className="flex items-center gap-1.5 bg-orange-500/10 border border-orange-500/20 text-orange-500 px-4 py-2 rounded-full text-xs font-bold shrink-0">
-                <Flame className="w-4 h-4" />
-                <span>{currentStreak} Day Streak</span>
+              <div className="flex items-center gap-2 px-4 h-8 rounded-full bg-muted/30 border border-border/80 text-foreground shrink-0">
+                <Flame className="w-4 h-4 text-muted-foreground shrink-0" />
+                <span className="text-xs font-bold flex items-center gap-1.5 whitespace-nowrap shrink-0">
+                  Day Streak
+                  <div className="w-px h-3 bg-border/50 mx-0.5" />
+                  <span className="font-mono text-[14px] font-bold text-orange-500 leading-none tracking-tight">
+                    {currentStreak}
+                  </span> 
+                </span>
               </div>
             )}
           </div>
 
-          {/* Next milestone progress bar */}
-          <div className="space-y-3 pt-4">
-            <div className="flex items-center justify-between text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">
-              <span>Next Milestone</span>
-              <span className="normal-case tracking-normal">
-                <strong className="text-foreground">{totalSolved}/{nextMilestone}</strong> problems
-                {left > 0 && <span className="text-muted-foreground/60"> · {left} to go</span>}
-              </span>
+          {/* Bottom row: Next milestone progress bar + CTA */}
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pt-4">
+            {/* Progress Bar Area */}
+            <div className="space-y-3 flex-1 w-full max-w-[400px]">
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <span className="text-foreground font-semibold">Next Milestone</span>
+                <span className="text-muted-foreground/40 text-xs">•</span>
+                <span>
+                  <strong className="text-foreground">{totalSolved}/{nextMilestone}</strong> problems
+                  {left > 0 && <span className="text-muted-foreground/60"> · {left} to go</span>}
+                </span>
+              </div>
+              <div className="h-2.5 w-full bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-primary rounded-full transition-all duration-700"
+                  style={{ width: `${milestonePct}%` }}
+                />
+              </div>
             </div>
-            <div className="h-2.5 w-full bg-muted/30 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-primary rounded-full transition-all duration-700"
-                style={{ width: `${milestonePct}%` }}
-              />
-            </div>
+
+            {/* Big Practice CTA */}
+            {!hidePracticeButton && hasPremiumAccess && (
+              <Link
+                href="/problems"
+                className="group flex items-center justify-center gap-2 rounded-xl px-8 py-3.5 text-base bg-zinc-950 dark:bg-white hover:bg-zinc-900 dark:hover:bg-zinc-100 text-white dark:text-black font-medium tracking-tight transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-xl shrink-0"
+              >
+                Practice
+                <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
+              </Link>
+            )}
           </div>
         </div>
 

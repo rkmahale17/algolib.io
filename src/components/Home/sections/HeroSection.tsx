@@ -13,7 +13,7 @@ import { useAppSelector } from "@/store/hooks";
 
 export function HeroSection() {
   const posthog = usePostHog();
-  const { user } = useApp();
+  const { user, hasPremiumAccess } = useApp();
   const { items: algorithms } = useAppSelector((state) => state.algorithms);
   const { data: userProgressData } = useAppSelector((state) => state.userProgress);
 
@@ -93,18 +93,33 @@ export function HeroSection() {
                 className="rounded-full px-8 py-6 text-base font-semibold bg-primary hover:bg-primary/90 text-black transition-all hover:scale-105 active:scale-95 shadow-[0_0_30px_hsl(var(--primary)/0.3)]"
                 asChild
               >
-                <Link
-                  href="/dsa/get-started"
-                  onClick={() =>
-                    trackEvent(posthog, "home_cta_clicked", {
-                      cta_label: "Start Learning",
-                      destination: "/dsa/get-started",
-                      section: "hero",
-                    })
-                  }
-                >
-                  Start Learning <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
+                {hasPremiumAccess ? (
+                  <Link
+                    href="/problems"
+                    onClick={() =>
+                      trackEvent(posthog, "home_cta_clicked", {
+                        cta_label: "Practice",
+                        destination: "/problems",
+                        section: "hero",
+                      })
+                    }
+                  >
+                    Practice <ArrowRight className="ml-2 w-5 h-5" />
+                  </Link>
+                ) : (
+                  <Link
+                    href="/pricing"
+                    onClick={() =>
+                      trackEvent(posthog, "home_cta_clicked", {
+                        cta_label: "Go Pro",
+                        destination: "/pricing",
+                        section: "hero",
+                      })
+                    }
+                  >
+                    Go Pro <ArrowRight className="ml-2 w-5 h-5" />
+                  </Link>
+                )}
               </Button>
 
               {user && continueLearningAlgo && (

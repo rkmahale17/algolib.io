@@ -10,6 +10,7 @@ import { DIFFICULTY_MAP } from "@/types/algorithm";
 import { ProblemOfTheDay } from "@/components/listing/ProblemOfTheDay";
 import { RecommendedProblems } from "@/components/listing/RecommendedProblems";
 import { SolvedProgressCard } from "@/components/profile/SolvedProgressCard";
+import { TrendingUp } from "lucide-react";
 
 import { useApp } from "@/contexts/AppContext";
 import { useAppSelector } from "@/store/hooks";
@@ -160,7 +161,9 @@ export const DashboardWidgets = () => {
         <div className="min-w-0 flex flex-col h-full">
           <Card className="bg-card border-border/40 shadow-sm overflow-hidden flex flex-col h-full rounded-xl">
             <div className="px-4 py-2.5 border-b border-border/40 shrink-0 bg-muted/20">
-              <h3 className="font-semibold text-[13px] text-foreground/80">📈 Learning Progress</h3>
+              <h3 className="font-semibold text-[13px] text-foreground tracking-tight flex items-center gap-1.5">
+                <TrendingUp className="w-4 h-4 text-foreground" /> Learning Progress
+              </h3>
             </div>
             <div className="flex-1 flex flex-col justify-center">
               <SolvedProgressCard

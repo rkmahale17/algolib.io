@@ -32,10 +32,22 @@ export const ProblemOfTheDay = ({ potd, progressMap }: ProblemOfTheDayProps) => 
   const formatTime = (value: number) => value.toString().padStart(2, '0');
 
   return (
-    <Link
-        href={problem.slug ? `/problem/${problem.slug}` : `/problem/${problem.id}`}
-        className="group block relative w-full mb-8 bg-card rounded-xl border border-border/40 shadow-sm overflow-hidden transition-colors hover:bg-muted/20 hover:border-border/80"
-    >
+    <div className="w-full max-w-[820px] mx-auto flex flex-col mb-4">
+      {/* Header */}
+      <div className="px-4 py-2.5 border border-border/40 shrink-0 bg-card rounded-t-xl flex flex-col gap-0.5 relative overflow-hidden">
+        <div className="absolute inset-0 bg-muted/20 pointer-events-none" />
+        <h3 className="font-semibold text-[13px] text-foreground tracking-tight flex items-center gap-1.5 relative z-10">
+          <Flame className="w-4 h-4 text-foreground" /> Daily Challenge
+        </h3>
+        <p className="text-[11px] text-muted-foreground ml-5 relative z-10">
+          New problem every 24 hours to keep your skills sharp.
+        </p>
+      </div>
+
+      <Link
+          href={problem.slug ? `/problem/${problem.slug}` : `/problem/${problem.id}`}
+          className="group block relative w-full bg-card rounded-b-xl border-x border-b border-border/40 shadow-sm overflow-hidden transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900"
+      >
         <div className="flex items-center gap-4 justify-between px-6 py-4 md:px-8 md:py-5 md:gap-6">
             {/* Status Icon */}
             <div className="shrink-0 pt-1">
@@ -98,5 +110,6 @@ export const ProblemOfTheDay = ({ potd, progressMap }: ProblemOfTheDayProps) => 
             </div>
         </div>
     </Link>
+    </div>
   );
 };

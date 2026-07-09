@@ -48,8 +48,9 @@ export const ProblemsList = ({
   showRecommendation = false,
   showCategoryToggle = true,
   initialCategoryWise = false,
+  headerSlot,
   footerSlot,
-  progressTitle = "📈 Learning Progress",
+  progressTitle = "Learning Progress",
   isLoading = false,
   icon,
   initialSelectedTopics = EMPTY_ARRAY,
@@ -558,6 +559,8 @@ export const ProblemsList = ({
           <ListingDashboardWidgets
             algorithms={algorithms}
             progressTitle={progressTitle}
+            hideHero={['core', 'blind', 'blind75', 'blind150', 'rulcode150', 'sql-basics', 'sql'].includes(listType || '')}
+            hideHeroPracticeButton={true}
           />
         ) : undefined
       }
