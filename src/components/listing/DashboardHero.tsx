@@ -186,7 +186,7 @@ export const DashboardHero = ({
             </div>
 
             {/* Big Practice CTA */}
-            {!hidePracticeButton && hasPremiumAccess && (
+            {!hidePracticeButton && (
               <Link
                 href="/problems"
                 className="group flex items-center justify-center gap-2 rounded-xl px-8 py-3.5 text-base bg-zinc-950 dark:bg-white hover:bg-zinc-900 dark:hover:bg-zinc-100 text-white dark:text-black font-medium tracking-tight transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-xl shrink-0"
