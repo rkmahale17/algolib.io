@@ -68,8 +68,8 @@ export const ContributionGraph = ({
   return (
     <Card className="border-border/40 bg-card shadow-sm flex flex-col w-full overflow-hidden rounded-xl h-full">
       <CardHeader className="p-3 pb-1 shrink-0">
-        <CardTitle className="text-[13px] font-semibold text-foreground/80 tracking-tight">
-          Activity
+        <CardTitle className="text-[13px] font-semibold text-foreground/80 tracking-tight flex items-center gap-1.5">
+          🔥 Consistency Tracker
         </CardTitle>
       </CardHeader>
       <CardContent className="p-3 pt-1 flex-1 flex flex-col gap-2">

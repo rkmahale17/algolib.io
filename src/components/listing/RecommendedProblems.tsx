@@ -57,14 +57,16 @@ export const RecommendedProblems = ({ algorithms }: RecommendedProblemsProps) =>
   return (
     <div className="w-full max-w-[820px] mx-auto bg-card border border-border/40 rounded-xl shadow-sm overflow-hidden flex flex-col mb-4">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-border/30 px-5 py-3 bg-muted/10">
-        <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-primary" />
-          <span className="text-sm font-semibold tracking-wide text-foreground/90">
+      <div className="px-5 pt-5 pb-3">
+        <div className="flex items-center gap-2 mb-1">
+          <Sparkles className="w-4 h-4 text-indigo-400" />
+          <span className="text-sm font-bold tracking-wide text-foreground">
             {headerText}
           </span>
         </div>
-
+        <p className="text-xs text-muted-foreground">
+          Curated from what you've already solved.
+        </p>
       </div>
 
       {/* Recommendation cards */}
@@ -86,24 +88,25 @@ export const RecommendedProblems = ({ algorithms }: RecommendedProblemsProps) =>
           else if (status === 'solved') ctaText = 'Review';
 
           return (
-            <div key={algo.id} className="px-5 py-4 flex flex-col gap-2.5">
-              {/* Personalized reason */}
-              <p className="text-[11px] text-muted-foreground leading-relaxed italic">
-                {rec.reason}
-              </p>
+            <div key={algo.id} className="px-5 py-3">
+              <div className="bg-muted/20 border border-border/40 rounded-2xl p-4 flex flex-col gap-2">
+                {/* Personalized reason */}
+                <p className="text-[11px] text-muted-foreground italic">
+                  {rec.reason}
+                </p>
 
               {/* Problem row */}
               <div className="flex items-center justify-between gap-3">
                 <div className="flex-1 min-w-0 space-y-1.5">
 
-                  <h4 className="text-sm font-semibold text-foreground truncate">
+                  <h4 className="text-sm font-bold text-foreground truncate">
                     {algo.title || algo.name}
                   </h4>
-                  <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex items-center gap-2 flex-wrap mt-1.5">
                     {/* Difficulty */}
                     <span
                       className={cn(
-                        'text-[10px] font-semibold px-2 py-0.5 rounded-full border',
+                        'text-[10px] font-bold px-2.5 py-0.5 rounded-full border',
                         diffStyle.text, diffStyle.bg, diffStyle.border,
                       )}
                     >
@@ -111,13 +114,13 @@ export const RecommendedProblems = ({ algorithms }: RecommendedProblemsProps) =>
                     </span>
                     {/* Time */}
                     <span className="flex items-center gap-1 text-[10px] text-muted-foreground font-medium">
-                      <Clock className="w-3.5 h-3.5" />
+                      <Clock className="w-3 h-3" />
                       {estimatedTime}
                     </span>
                     {/* Premium */}
                     {algo.is_premium && (
                       <span className="flex items-center gap-1 text-[10px] text-primary font-medium">
-                        <Lock className="w-3.5 h-3.5" />
+                        <Lock className="w-3 h-3" />
                         Pro
                       </span>
                     )}
@@ -127,13 +130,14 @@ export const RecommendedProblems = ({ algorithms }: RecommendedProblemsProps) =>
                 {/* CTA */}
                 <Link
                   href={targetUrl}
-                  className="shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-muted/50 hover:bg-primary hover:text-primary-foreground border border-border/40 hover:border-primary text-foreground/80 font-semibold text-xs transition-all duration-200 active:scale-95"
+                  className="shrink-0 flex items-center gap-1 px-4 py-2 rounded-xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/80 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-foreground font-bold text-xs transition-all duration-200 active:scale-95 shadow-sm hover:shadow"
                 >
                   {ctaText}
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>
+          </div>
           );
         })}
       </div>

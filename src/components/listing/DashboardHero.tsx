@@ -110,67 +110,68 @@ export const DashboardHero = ({
       <div className="rounded-xl border border-border/40 bg-card shadow-sm overflow-hidden">
         {/* Top row: greeting + badges */}
         <div className="px-5 pt-5 pb-4 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-            {/* Left: greeting */}
-            <div className="space-y-0.5">
-              <h2 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
-                👋 Welcome back,{' '}
-                <span className="text-primary">{firstName}</span>
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                {left <= 0
-                  ? "You've crushed your current milestone! Keep going 🚀"
-                  : left === 1
-                  ? `You're 1 problem away from your next milestone.`
-                  : `${left} problems away from your next milestone.`}
-              </p>
-            </div>
-
-            {/* Right: streak badge */}
-            {currentStreak > 0 && (
-              <div className="flex items-center gap-1.5 bg-orange-500/10 border border-orange-500/20 text-orange-500 px-3 py-1.5 rounded-full text-sm font-bold shrink-0 self-start">
-                <Flame className="w-4 h-4" />
-                <span>{currentStreak} Day Streak</span>
-              </div>
-            )}
+          <div className="flex flex-col gap-1">
+            <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
+              Welcome back, <span className="text-primary">{firstName}</span> 👋
+            </h2>
+            <p className="text-sm text-muted-foreground/80 leading-relaxed mt-1">
+              {left <= 0 ? (
+                "You've crushed your current milestone! Keep going 🚀"
+              ) : (
+                <>
+                  <span className="text-foreground font-bold mr-1">
+                    {left === 1 ? '1 problem' : `${left} problems`}
+                  </span>
+                  away from your next milestone.
+                </>
+              )}
+              <br />
+              Keep solving consistently to unlock new achievements.
+            </p>
           </div>
 
           {/* Stats row: Level + Solved + Daily Goal */}
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3 pt-2">
             {/* Level badge */}
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/40 border border-border/30">
-              <Star className="w-4 h-4 text-amber-400 shrink-0" />
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20">
+              <Star className="w-4 h-4 text-indigo-400 shrink-0" />
               <div className="leading-none">
-                <div className={cn('text-xs font-bold', level.color)}>
+                <div className="text-xs font-bold text-indigo-300">
                   Level {levelNumber} · {level.label}
                 </div>
               </div>
             </div>
 
             {/* Problems solved */}
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/40 border border-border/30">
-              <TrendingUp className="w-4 h-4 text-primary shrink-0" />
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+              <TrendingUp className="w-4 h-4 text-emerald-400 shrink-0" />
               <div className="leading-none">
-                <span className="text-xs font-bold text-foreground">{totalSolved} Problems Solved</span>
+                <span className="text-xs font-bold text-emerald-400">{totalSolved} Problems Solved</span>
               </div>
             </div>
 
             {/* XP Widget */}
             <XPWidget />
-
-
+            
+            {/* Right: streak badge */}
+            {currentStreak > 0 && (
+              <div className="flex items-center gap-1.5 bg-orange-500/10 border border-orange-500/20 text-orange-500 px-4 py-2 rounded-full text-xs font-bold shrink-0">
+                <Flame className="w-4 h-4" />
+                <span>{currentStreak} Day Streak</span>
+              </div>
+            )}
           </div>
 
           {/* Next milestone progress bar */}
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-semibold text-foreground/70">Next Milestone</span>
-              <span className="tabular-nums text-muted-foreground font-medium">
-                <strong className="text-foreground">{totalSolved}</strong>/{nextMilestone} problems
+          <div className="space-y-3 pt-4">
+            <div className="flex items-center justify-between text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">
+              <span>Next Milestone</span>
+              <span className="normal-case tracking-normal">
+                <strong className="text-foreground">{totalSolved}/{nextMilestone}</strong> problems
                 {left > 0 && <span className="text-muted-foreground/60"> · {left} to go</span>}
               </span>
             </div>
-            <div className="h-2 w-full bg-muted/40 rounded-full overflow-hidden">
+            <div className="h-2.5 w-full bg-muted/30 rounded-full overflow-hidden">
               <div
                 className="h-full bg-primary rounded-full transition-all duration-700"
                 style={{ width: `${milestonePct}%` }}
