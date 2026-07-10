@@ -25,19 +25,21 @@ export const pricingData = {
     subscriptionPlans: [
         {
             id: "3month",
-            title: "3 Month Subscription",
-            price: "$9.99",
-            period: "/3 months",
-            periodSubLabel: "Billed every 3 months",
-            buttonText: "Buy now",
-            productId: "3monthly",
-            hasTrial: true,
+            title: "Free Plan",
+            price: "$0",
+            period: "",
+            periodSubLabel: "Forever free",
+            buttonText: "Start Learning",
+            productId: "free",
+            hasTrial: false,
             originalPrice: undefined,
             discountText: undefined,
             features: [
-                "Full access to all premium problems",
-                "Ideal for short-term prep (placements / interviews)",
-                "$3.33/month"
+                "Access to free problems",
+                "x Company-wise Questions",
+                "x Interactive Visualizations for free",
+                "x ThinkPad for free problems",
+                "x Future Updates"
             ]
         },
         {
@@ -52,26 +54,37 @@ export const pricingData = {
             originalPrice: undefined,
             discountText: undefined,
             features: [
-                "Everything in Pro",
-                "Enough time to build strong problem-solving skills",
-                "$3.33/month"
+                "All Premium Problems",
+                "Company-wise Questions",
+                "Interactive Visualizations",
+                "ThinkPad",
+                "Future Updates"
             ]
         },
         {
             id: "annual",
-            title: "Annual Subscription",
-            badge: "RECOMMENDED",
+            title: "Annual Plan",
+            badge: "⭐ Most Popular",
+            trustedText: "★★★★★ Trusted by 500+ Developers",
+            saveText: "Save 25%",
             price: "$29.99",
             period: "/year",
-            periodSubLabel: "Billed yearly ($29.99)",
+            periodSubLabel: "Only $2.50/month",
             buttonText: "Buy now",
             productId: "yearly",
             hasTrial: true,
             originalPrice: undefined,
             discountText: undefined,
             features: [
-                "Full year uninterrupted access",
-                "Cheapest at $2.50/month",
+                "Annual No disruption",
+                "Discord Doubt Solve",
+                "Learning Guidance in one to one call",
+                "All Premium Problems",
+                "Company-wise Questions",
+                "Interactive Visualizations",
+                "ThinkPad",
+                "Future Updates",
+                "Get renew same price as we have right now"
             ],
         }
     ],

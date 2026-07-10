@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
-import { Check, Info, Calendar, CreditCard, AlertCircle, ArrowRight, Sparkles, HelpCircle } from 'lucide-react';
+import { Check, Info, Calendar, CreditCard, AlertCircle, ArrowRight, Sparkles, HelpCircle, Copy, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -300,14 +300,19 @@ const PricingClient = () => {
         )}
 
         {/* Subscriptions Grid */}
-        <div id="pricing-grid" className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-24">
+        <div id="pricing-grid" className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 items-center">
           {pricingData.subscriptionPlans.map((plan) => {
+            const isFreePlan = plan.productId === "free";
             const isCurrentPlan = isPremium && profile?.subscription_duration === plan.productId;
+            const isAnnual = plan.id === "annual";
 
             return (
               <div key={plan.id} className={cn(
-                "border rounded-2xl bg-card p-8 flex flex-col relative group transition-all duration-300",
-                isCurrentPlan ? "border-2 border-primary shadow-xl shadow-primary/5 z-10" : "border-border hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1 z-0"
+                "rounded-2xl p-8 flex flex-col relative group transition-all duration-300",
+                isAnnual 
+                  ? "border-[3px] border-green-500 bg-card/90 shadow-2xl z-10 py-12 md:-my-6 bg-gradient-to-b from-green-500/5 to-transparent" 
+                  : "border border-border bg-card hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1 z-0",
+                isCurrentPlan && !isAnnual ? "border-2 border-primary shadow-xl shadow-primary/5 z-10" : ""
               )}>
                 {plan.badge && !isCurrentPlan && (
                   <div className="absolute -top-3 right-6 bg-[#dcf65b] text-[#558600] text-[10px] tracking-wider font-bold px-2.5 py-1 rounded shadow-sm uppercase z-10 subpixel-antialiased">
@@ -323,7 +328,14 @@ const PricingClient = () => {
                 )}
 
                 <div className="flex items-center justify-between mb-4">
-                  <div className="font-semibold text-lg">{plan.title}</div>
+                  <div className="flex flex-col gap-1.5">
+                    {(plan as any).trustedText && (
+                      <div className="text-[11px] font-bold text-amber-500 tracking-wider uppercase">
+                        {(plan as any).trustedText}
+                      </div>
+                    )}
+                    <div className="font-semibold text-lg">{plan.title}</div>
+                  </div>
                 </div>
 
                 <div className="flex flex-col gap-1 min-h-[72px]">
@@ -341,8 +353,13 @@ const PricingClient = () => {
                   </div>
                 </div>
 
-                <div className="text-sm text-muted-foreground mb-4 mt-2 h-5">
-                  {plan.periodSubLabel}
+                <div className="text-sm text-muted-foreground mb-4 mt-2 h-5 flex items-center gap-2">
+                  <span>{plan.periodSubLabel}</span>
+                  {(plan as any).saveText && (
+                    <span className="text-[10px] font-bold text-green-600 bg-green-500/10 px-2 py-0.5 rounded border border-green-500/20 uppercase tracking-wide">
+                      {(plan as any).saveText}
+                    </span>
+                  )}
                 </div>
 
                  {plan.hasTrial && !hasBoughtBefore && (
@@ -364,15 +381,21 @@ const PricingClient = () => {
                       ? "bg-secondary text-secondary-foreground border-transparent cursor-default hover:bg-secondary"
                       : "bg-gradient-to-r from-primary to-primary/95 text-primary-foreground border-t-transparent border-x-transparent shadow-primary/20 hover:shadow-primary/40 active:scale-[0.98] active:border-b-2 transition-all"
                   )}
-                  onClick={() => !isCurrentPlan && handleUpgrade(plan.productId)}
-                  disabled={isUpgrading || isCurrentPlan}
+                  onClick={() => {
+                    if (isFreePlan) {
+                      router.push('/problems');
+                    } else if (!isCurrentPlan) {
+                      handleUpgrade(plan.productId);
+                    }
+                  }}
+                  disabled={isUpgrading || (isCurrentPlan && !isFreePlan)}
                 >
                   {isUpgrading && activePlanId === plan.productId ? (
                     <span className="flex items-center gap-2 justify-center">
                       <span className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent" />
                       Processing...
                     </span>
-                  ) : isCurrentPlan ? (
+                  ) : isCurrentPlan && !isFreePlan ? (
                     <>
                       <Check className="w-5 h-5 stroke-[3]" />
                       Active Plan
@@ -380,9 +403,11 @@ const PricingClient = () => {
                   ) : (
                     <span className="flex items-center gap-2 justify-center">
                       <span className="font-semibold tracking-wide">
-                        {hasBoughtBefore
-                          ? (profile?.subscription_duration === plan.productId ? "Renew" : "Buy Now")
-                          : (plan.hasTrial ? "Start 14-day free trial" : "Buy Now")}
+                        {isFreePlan 
+                          ? "Start Learning"
+                          : hasBoughtBefore
+                            ? (profile?.subscription_duration === plan.productId ? "Renew" : "Get Pro")
+                            : (plan.hasTrial ? "Start 14-day free trial" : "Get Pro")}
                       </span>
                       <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1 shrink-0" />
                     </span>
@@ -390,17 +415,87 @@ const PricingClient = () => {
                 </Button>
 
                 <ul className="space-y-4 mb-auto">
-                  {plan.features.map((feature, fidx) => (
-                    <li key={fidx} className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
-                      <span className="text-sm text-muted-foreground leading-snug">{feature} </span>
-                    </li>
-                  ))}
+                  {plan.features.map((feature, fidx) => {
+                    const isExcluded = feature.startsWith("x ");
+                    const text = isExcluded ? feature.substring(2) : feature;
+                    
+                    return (
+                      <li key={fidx} className={cn("flex items-start gap-3", isExcluded ? "opacity-60" : "")}>
+                        {isExcluded ? (
+                          <X className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" />
+                        ) : (
+                          <Check className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
+                        )}
+                        <span className="text-sm text-muted-foreground leading-snug">{text}</span>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             );
           })}
         </div>
+
+        {/* Trust Badges Section */}
+        <div className="flex flex-wrap items-center justify-center gap-x-6 md:gap-x-12 gap-y-4 mb-16 text-sm font-medium text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <Check className="w-4 h-4 text-green-500 shrink-0" />
+            <span>Cancel anytime</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Check className="w-4 h-4 text-green-500 shrink-0" />
+            <span>Secure payments</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Check className="w-4 h-4 text-green-500 shrink-0" />
+            <span>Instant access after payment</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Check className="w-4 h-4 text-green-500 shrink-0" />
+            <span>New problems added every week</span>
+          </div>
+        </div>
+
+        {/* Mini Promo Cards (Below Pricing) */}
+        {!isPremium && (
+          <div className="flex flex-col sm:flex-row gap-6 mb-24 max-w-4xl mx-auto">
+            {/* Flash Sale Mini Card */}
+            <div className="flex-1 border border-border rounded-2xl bg-card/50 p-6 flex flex-col justify-center hover:border-primary/50 transition-colors">
+              <div className="w-fit bg-red-500/10 text-red-500 text-xs font-bold px-3 py-1 rounded-full mb-4 border border-red-500/20">
+                🔥 Limited Time
+              </div>
+              <div className="flex items-baseline gap-1.5 mb-2">
+                <span className="text-5xl font-bold tracking-tight">10%</span>
+                <span className="text-sm font-medium text-muted-foreground uppercase tracking-widest">OFF</span>
+              </div>
+              <div className="text-sm text-muted-foreground font-medium mb-6">Valid till July 31</div>
+              <div 
+                className="flex items-center gap-2 text-[15px] font-semibold cursor-pointer hover:opacity-80 transition-opacity w-fit" 
+                onClick={() => { 
+                  navigator.clipboard.writeText('FLASH10'); 
+                  toast.success('Coupon code copied!'); 
+                }}
+              >
+                FLASH10 <Copy className="w-4 h-4 text-muted-foreground" />
+              </div>
+            </div>
+
+            {/* Student Mini Card */}
+            <div className="flex-1 border border-border rounded-2xl bg-card/50 p-6 flex flex-col justify-center hover:border-primary/50 transition-colors">
+              <div className="w-fit bg-muted text-foreground text-sm font-bold px-3 py-1 rounded-full mb-6 border border-border">
+                🎓 Student?
+              </div>
+              <div className="flex items-baseline gap-1.5 mb-8">
+                <span className="text-2xl font-bold tracking-tight mr-1">Get</span>
+                <span className="text-5xl font-bold tracking-tight">30%</span>
+                <span className="text-sm font-medium text-muted-foreground uppercase tracking-widest">OFF</span>
+              </div>
+              <a href="mailto:support@rulcode.com" className="flex items-center gap-2 text-[15px] font-semibold hover:text-primary transition-colors w-fit">
+                Verify your college email <ArrowRight className="w-4 h-4" />
+              </a>
+            </div>
+          </div>
+        )}
 
         {/* Social Proof Banner */}
         {!isPremium && (
