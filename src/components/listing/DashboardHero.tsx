@@ -114,9 +114,16 @@ export const DashboardHero = ({
         {/* Top row: greeting + badges */}
         <div className="px-5 pt-5 pb-4 space-y-4">
           <div className="flex flex-col gap-1">
-            <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
-              Welcome back, <span className="text-primary">{firstName}</span> 👋
-            </h2>
+            <div className="flex items-center gap-3 flex-wrap">
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
+                Welcome back, <span className="text-primary">{firstName}</span> 👋
+              </h2>
+              {hasPremiumAccess && (
+                <span className="text-xs font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20 px-2 py-0.5 rounded uppercase tracking-wider translate-y-0.5">
+                  PRO
+                </span>
+              )}
+            </div>
             <p className="text-sm text-muted-foreground/80 leading-relaxed mt-1">
               {left <= 0 ? (
                 "You've crushed your current milestone! Keep going 🚀"

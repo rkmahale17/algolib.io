@@ -33,11 +33,11 @@ export interface BadgeConfig {
 }
 
 export const XP_BADGES: BadgeConfig[] = [
-  { id: 'xp_100', name: 'Rising Coder', threshold: 100, icon: '🥉', color: 'text-orange-600', hexColor: '#a15b3c', tier: 1, description: 'Earned 100 XP', type: 'xp' },
-  { id: 'xp_500', name: 'Consistent Learner', threshold: 500, icon: '🥈', color: 'text-slate-400', hexColor: '#8091a5', tier: 2, description: 'Earned 500 XP', type: 'xp' },
-  { id: 'xp_1000', name: 'Algorithm Ace', threshold: 1000, icon: '🥇', color: 'text-yellow-500', hexColor: '#dca43b', tier: 3, description: 'Earned 1,000 XP', type: 'xp' },
-  { id: 'xp_5000', name: 'Problem Crusher', threshold: 5000, icon: '💎', color: 'text-purple-500', hexColor: '#7b40a5', tier: 4, description: 'Earned 5,000 XP', type: 'xp' },
-  { id: 'xp_10000', name: 'DSA Legend', threshold: 10000, icon: '👑', color: 'text-emerald-500', hexColor: '#53a835', tier: 5, description: 'Earned 10,000 XP', type: 'xp' },
+  { id: 'xp_100', name: 'Rising Coder', threshold: 100, icon: '🥉', color: 'text-orange-600', hexColor: '#a15b3c', tier: 1, description: 'Earned 100 Points', type: 'xp' },
+  { id: 'xp_500', name: 'Consistent Learner', threshold: 500, icon: '🥈', color: 'text-slate-400', hexColor: '#8091a5', tier: 2, description: 'Earned 500 Points', type: 'xp' },
+  { id: 'xp_1000', name: 'Algorithm Ace', threshold: 1000, icon: '🥇', color: 'text-yellow-500', hexColor: '#dca43b', tier: 3, description: 'Earned 1,000 Points', type: 'xp' },
+  { id: 'xp_5000', name: 'Problem Crusher', threshold: 5000, icon: '💎', color: 'text-purple-500', hexColor: '#7b40a5', tier: 4, description: 'Earned 5,000 Points', type: 'xp' },
+  { id: 'xp_10000', name: 'DSA Legend', threshold: 10000, icon: '👑', color: 'text-emerald-500', hexColor: '#53a835', tier: 5, description: 'Earned 10,000 Points', type: 'xp' },
 ];
 
 export const ACTIVITY_BADGES: BadgeConfig[] = [

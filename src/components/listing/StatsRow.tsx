@@ -4,6 +4,7 @@ import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Flame, TrendingUp, Star, CheckCircle2 } from 'lucide-react';
 import { useGlobalRank } from '@/hooks/useGlobalRank';
+import { useXP } from '@/hooks/useXP';
 import { useApp } from '@/contexts/AppContext';
 
 interface StatsRowProps {
@@ -15,6 +16,9 @@ interface StatsRowProps {
 export const StatsRow = ({ totalSolved, solvedThisWeek, currentStreak }: StatsRowProps) => {
   const { user } = useApp();
   const { data: rankData } = useGlobalRank(user?.id);
+  const { totalXP } = useXP(user?.id);
+  
+  const hasEnoughXP = totalXP >= 500;
 
   const statItems = [
     {
@@ -34,8 +38,8 @@ export const StatsRow = ({ totalSolved, solvedThisWeek, currentStreak }: StatsRo
     },
     {
       icon: <Star className="w-4 h-4 text-indigo-400" />,
-      value: rankData ? `#${rankData.rank.toLocaleString()}` : 'Unranked',
-      label: rankData ? `Global rank · Top ${rankData.percentile}%` : 'Solve to rank',
+      value: (hasEnoughXP && rankData) ? `#${rankData.rank.toLocaleString()}` : 'Unranked',
+      label: (hasEnoughXP && rankData) ? `Global rank · Top ${rankData.percentile}%` : (totalXP < 500 ? `${totalXP}/500 Points to rank` : 'Solve to rank'),
     }
   ];
 

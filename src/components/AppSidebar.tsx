@@ -431,7 +431,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             isActive={searchParams.get("problem") === (algo.slug || algo.id)}
                             onClick={closeMobileNav}
                             badge={(algo.is_pro || algo.is_premium) && (
-                              <span className="text-[9px] font-bold bg-primary/10 text-primary px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0">
+                              <span className="text-[9px] font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20 px-1.5 py-0.5 rounded-sm uppercase tracking-wider shrink-0">
                                 PRO
                               </span>
                             )}
@@ -621,7 +621,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 isActive={searchParams.get("problem") === (algo.slug || algo.id)}
                                 onClick={closeMobileNav}
                                 badge={(algo.is_pro || algo.is_premium) && (
-                                  <span className="text-[9px] font-bold bg-primary/10 text-primary px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0">
+                                  <span className="text-[9px] font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20 px-1.5 py-0.5 rounded-sm uppercase tracking-wider shrink-0">
                                     PRO
                                   </span>
                                 )}

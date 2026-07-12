@@ -26,7 +26,7 @@ import { FeatureGuard } from "./FeatureGuard";
 
 const UserMenu = () => {
     const router = useRouter();
-    const { user, profile } = useApp();
+    const { user, profile, hasPremiumAccess } = useApp();
     const isAdmin = profile?.role === 'admin';
 
     const handleSignOut = async () => {
@@ -60,7 +60,11 @@ const UserMenu = () => {
                 <DropdownMenuTrigger asChild>
                     <Button
                         variant="outline"
-                        className="relative h-8 w-8 rounded-full border border-border/60 bg-background/50 p-0 overflow-hidden flex items-center justify-center hover:bg-muted/80 transition-colors"
+                        className={`relative h-8 w-8 rounded-full border bg-background/50 p-0 overflow-hidden flex items-center justify-center hover:bg-muted/80 transition-colors ${
+                            hasPremiumAccess
+                                ? "border-amber-500/50 shadow-[0_0_10px_rgba(245,158,11,0.3)] ring-1 ring-amber-500/20"
+                                : "border-border/60"
+                        }`}
                     >
                         <Avatar className="h-7 w-7">
                             <AvatarImage src={profile?.avatar_url || user?.user_metadata?.avatar_url || undefined} alt={profile?.full_name || user?.user_metadata?.full_name || "User"} className="object-cover" />
@@ -73,8 +77,13 @@ const UserMenu = () => {
                 <DropdownMenuContent align="end" className="w-56">
                     <DropdownMenuLabel>
                         <div className="flex flex-col space-y-1">
-                            <p className="text-sm font-medium leading-none">
+                            <p className="text-sm font-medium leading-none flex items-center gap-2">
                                 {user.user_metadata?.full_name || "User"}
+                                {hasPremiumAccess && (
+                                    <span className="text-[9px] font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20 px-1.5 py-0.5 rounded-sm uppercase tracking-wider">
+                                        PRO
+                                    </span>
+                                )}
                             </p>
                             <p className="text-xs leading-none text-muted-foreground truncate max-w-full">
                                 {user.email}

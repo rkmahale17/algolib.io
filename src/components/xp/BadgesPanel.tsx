@@ -38,7 +38,7 @@ const ShieldCard = ({ badge, isEarned, currentValue, children }: { badge: BadgeC
         {/* Main Shield Body */}
         <path 
           d="M 5 10 C 5 4, 9 0, 15 0 L 85 0 C 91 0, 95 4, 95 10 L 95 105 C 95 110, 92 114, 88 116 L 55 128 C 52 129, 48 129, 45 128 L 12 116 C 8 114, 5 110, 5 105 Z" 
-          fill="#111216" 
+          className="fill-zinc-50 dark:fill-[#111216]"
           stroke={color}
           strokeWidth="1.5"
           strokeOpacity={isEarned ? "0.4" : "0.2"}
@@ -60,9 +60,9 @@ const ShieldCard = ({ badge, isEarned, currentValue, children }: { badge: BadgeC
               <span>{currentValue}</span>
               <span>{badge.threshold}</span>
             </div>
-            <div className="h-1 w-full bg-zinc-800 rounded-full overflow-hidden">
+            <div className="h-1 w-full bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
               <div 
-                className="h-full bg-zinc-600 rounded-full"
+                className="h-full bg-zinc-400 dark:bg-zinc-600 rounded-full"
                 style={{ width: `${Math.min(100, Math.max(0, (currentValue / badge.threshold) * 100))}%` }}
               />
             </div>
@@ -98,19 +98,19 @@ const BadgeItem = ({
           RULCODE
         </div>
         
-        <h4 className="text-sm sm:text-base font-bold mb-1 text-white leading-tight px-1">
+        <h4 className="text-sm sm:text-base font-bold mb-1 text-zinc-900 dark:text-white leading-tight px-1">
           {badge.name}
         </h4>
         
-        <p className="text-[10px] sm:text-xs text-zinc-400 mb-3">
+        <p className="text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-400 mb-3">
           {badge.description}
         </p>
         
         {/* Pill at the bottom */}
         {isEarned && (
-          <div className="mt-auto flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-black/60 border border-white/10 shadow-inner">
+          <div className="mt-auto flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-zinc-100 dark:bg-black/60 border border-zinc-200 dark:border-white/10 shadow-inner">
             <Icon className="w-3 h-3" style={{ color: badge.hexColor }} fill={badge.hexColor} fillOpacity={0.2} />
-            <span className="text-xs font-semibold text-zinc-200">{badge.threshold.toLocaleString()}</span>
+            <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">{badge.threshold.toLocaleString()}</span>
           </div>
         )}
       </div>
@@ -126,10 +126,10 @@ const BadgeItem = ({
           {innerContent}
         </button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md bg-zinc-950 border-zinc-800 text-white overflow-hidden p-0 gap-0">
+      <DialogContent className="sm:max-w-md bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white overflow-hidden p-0 gap-0">
         <DialogTitle className="sr-only">Achievement Unlocked</DialogTitle>
         <div className="relative w-full flex flex-col items-center justify-center py-16 px-8 text-center min-h-[420px]">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300%] h-[300px] bg-gradient-to-b from-white/10 to-transparent blur-[50px] pointer-events-none rounded-[100%]" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300%] h-[300px] bg-gradient-to-b from-zinc-100 dark:from-white/10 to-transparent blur-[50px] pointer-events-none rounded-[100%]" />
           <div className="relative z-10 flex flex-col items-center h-full w-full justify-center">
             <h2 className="text-2xl md:text-3xl font-light text-primary mb-12 animate-in slide-in-from-bottom-2 fade-in duration-700">
               Congratulations
@@ -143,11 +143,11 @@ const BadgeItem = ({
               <Sparkles className="absolute top-1/2 -translate-y-1/2 -right-12 w-4 h-4 text-white animate-pulse delay-500" />
             </div>
 
-            <h3 className="text-xl md:text-2xl font-semibold text-zinc-100 mb-3 animate-in slide-in-from-bottom-2 fade-in duration-700 delay-150">
+            <h3 className="text-xl md:text-2xl font-semibold text-zinc-900 dark:text-zinc-100 mb-3 animate-in slide-in-from-bottom-2 fade-in duration-700 delay-150">
               {badge.name} Badge!
             </h3>
             
-            <div className="text-sm tracking-widest text-zinc-400 uppercase font-medium animate-in fade-in duration-700 delay-700">
+            <div className="text-sm tracking-widest text-zinc-500 dark:text-zinc-400 uppercase font-medium animate-in fade-in duration-700 delay-700">
               {badge.description.replace('Earned for ', '')}
             </div>
           </div>
@@ -202,7 +202,7 @@ export const BadgesPanel = ({ userId }: { userId?: string }) => {
             </DialogTrigger>
             
             {/* The Full View All Modal */}
-            <DialogContent className="max-w-[1200px] w-[95vw] bg-[#0a0c10] border-zinc-800 p-6 sm:p-10 max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-[1200px] w-[95vw] bg-white dark:bg-[#0a0c10] border-zinc-200 dark:border-zinc-800 p-6 sm:p-10 max-h-[90vh] overflow-y-auto">
               <DialogTitle className="sr-only">All Achievements</DialogTitle>
               
               <div className="w-full mx-auto space-y-12">
@@ -241,7 +241,7 @@ export const BadgesPanel = ({ userId }: { userId?: string }) => {
       </CardHeader>
       
       {/* Top badges displayed on the profile card */}
-      <CardContent className="p-5 flex-1 flex flex-col justify-center bg-[#0a0c10]">
+      <CardContent className="p-5 flex-1 flex flex-col justify-center bg-white dark:bg-[#0a0c10]">
         <div className="grid grid-cols-2 gap-4 h-full">
           {/* Highest XP Badge */}
           {hasXpBadge ? (

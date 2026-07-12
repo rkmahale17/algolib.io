@@ -2,6 +2,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { cn } from "@/lib/utils";
 import { Medal, Trophy, TrendingUp } from "lucide-react";
 import { useGlobalRank } from "@/hooks/useGlobalRank";
+import { useXP } from "@/hooks/useXP";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface SolvedProgressCardProps {
@@ -85,6 +86,9 @@ export const SolvedProgressCard = ({
   const innerR = compact ? 42 : 70;
 
   const { data: rankData, isLoading: rankLoading } = useGlobalRank(userId);
+  const { totalXP, isLoading: xpLoading } = useXP(userId);
+
+  const hasEnoughXP = totalXP >= 500;
 
   // 2-color ring: solved (primary/green) + remaining (muted)
   const chartData = [
@@ -110,15 +114,15 @@ export const SolvedProgressCard = ({
             </div>
             <div className="flex flex-col">
               <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Global Rank</span>
-              {rankLoading ? (
+              {rankLoading || xpLoading ? (
                 <Skeleton className="h-5 w-24 mt-1" />
-              ) : rankData ? (
+              ) : (hasEnoughXP && rankData) ? (
                 <span className="text-base font-bold text-foreground leading-tight tabular-nums">
                   #{rankData.rank.toLocaleString()} <span className="text-xs text-zinc-600 font-medium">/ {rankData.total_users >= 1000 ? (rankData.total_users / 1000).toFixed(1) + 'k' : rankData.total_users}</span>
                 </span>
               ) : (
                 <span className="text-sm font-bold text-muted-foreground leading-tight">
-                  Unranked
+                  {totalXP < 500 ? `${totalXP}/500 Points to rank` : 'Unranked'}
                 </span>
               )}
             </div>
@@ -126,9 +130,9 @@ export const SolvedProgressCard = ({
           
           <div className="flex flex-col items-end">
             <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Percentile</span>
-            {rankLoading ? (
+            {rankLoading || xpLoading ? (
               <Skeleton className="h-5 w-16 mt-1" />
-            ) : rankData ? (
+            ) : (hasEnoughXP && rankData) ? (
               <span className="text-sm font-bold text-primary flex items-center gap-1 leading-tight">
                 <TrendingUp className="w-3.5 h-3.5" />
                 Top {rankData.percentile}%

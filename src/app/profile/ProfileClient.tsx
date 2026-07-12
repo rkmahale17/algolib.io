@@ -15,7 +15,7 @@ import Link from 'next/link';
 import { useApp } from '@/contexts/AppContext';
 
 const ProfileClient = () => {
-  const { profile: appProfile, hasPremiumAccess } = useApp();
+  const { profile: appProfile, hasPremiumAccess, refreshProfile } = useApp();
   const router = useRouter();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -87,8 +87,13 @@ const ProfileClient = () => {
               open={isEditOpen}
               onOpenChange={setIsEditOpen}
               profile={profile}
-              onSave={() => {
-                fetchProfileData();
+              onSave={async (newUsername) => {
+                await refreshProfile();
+                if (newUsername && newUsername !== profile.username) {
+                  router.push(`/profile/${newUsername}`);
+                } else {
+                  fetchProfileData();
+                }
                 setIsEditOpen(false);
               }}
             />

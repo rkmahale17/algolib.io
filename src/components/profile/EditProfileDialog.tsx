@@ -14,7 +14,7 @@ interface EditProfileDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     profile: Profile;
-    onSave: () => void;
+    onSave: (newUsername?: string) => void;
 }
 
 export const EditProfileDialog = ({ open, onOpenChange, profile, onSave }: EditProfileDialogProps) => {
@@ -124,7 +124,7 @@ export const EditProfileDialog = ({ open, onOpenChange, profile, onSave }: EditP
 
             if (error) throw error;
             toast.success("Profile updated successfully");
-            onSave();
+            onSave(formData.username);
         } catch (error) {
             toast.error("Failed to update profile");
             console.error(error);
