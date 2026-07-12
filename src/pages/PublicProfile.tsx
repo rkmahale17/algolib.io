@@ -93,7 +93,7 @@ const PublicProfile = () => {
   const router = useRouter();
   const params = useParams();
   const username = params?.username as string | undefined;
-  const { user: currentUser, profile: currentUserProfile } = useApp();
+  const { user: currentUser, profile: currentUserProfile, refreshProfile } = useApp();
   const { data: algoMeta } = useAlgorithms();
   const isUserAdmin = currentUserProfile?.role === "admin";
   const allAlgorithms = useMemo(
@@ -285,9 +285,14 @@ const PublicProfile = () => {
     }
   };
 
-  const handleProfileUpdate = () => {
+  const handleProfileUpdate = async (newUsername?: string) => {
     setIsEditOpen(false);
-    fetchPublicProfile();
+    await refreshProfile();
+    if (newUsername && newUsername !== username) {
+      router.push(`/profile/${newUsername}`);
+    } else {
+      fetchPublicProfile();
+    }
   };
 
   if (loading) return <PremiumLoader text="Loading Profile..." />;

@@ -10,8 +10,10 @@ import { toast } from "sonner";
 import { EditProfileDialog } from "@/components/profile/EditProfileDialog";
 
 import { cn } from "@/lib/utils";
+import { useApp } from "@/contexts/AppContext";
 
 const ProfileEdit = () => {
+  const { refreshProfile } = useApp();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -77,8 +79,13 @@ const ProfileEdit = () => {
               open={isEditOpen}
               onOpenChange={setIsEditOpen}
               profile={profile}
-              onSave={() => {
-                fetchProfileData();
+              onSave={async (newUsername) => {
+                await refreshProfile();
+                if (newUsername && newUsername !== profile.username) {
+                  router.push(`/profile/${newUsername}`);
+                } else {
+                  fetchProfileData();
+                }
                 setIsEditOpen(false);
               }}
             />

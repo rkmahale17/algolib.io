@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { Check, ArrowRight, Lock, Flame, FileCode2, Layout, Calendar, Clock } from "lucide-react";
+import { Check, ArrowRight, Lock, Unlock, Flame, FileCode2, Layout, Calendar, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AlgorithmListItem, DIFFICULTY_MAP } from "@/types/algorithm";
 import { Badge } from "@/components/ui/badge";
 import { CollapsibleCategories } from "./CollapsibleCategories";
+import { useApp } from "@/contexts/AppContext";
 
 interface PremiumProblemCardProps {
     algorithm: AlgorithmListItem;
@@ -39,7 +40,7 @@ const getEstimatedTime = (difficulty: string) => {
     return '25 min';
 };
 
-const StatusIcon = ({ status, isPremium, displayNo, isPOTD }: { status: string; isPremium?: boolean; displayNo: number; isPOTD?: boolean }) => {
+const StatusIcon = ({ status, isPremium, hasAccess, displayNo, isPOTD }: { status: string; isPremium?: boolean; hasAccess?: boolean; displayNo: number; isPOTD?: boolean }) => {
     if (status === 'solved') {
         if (isPremium) {
             return (
@@ -47,9 +48,11 @@ const StatusIcon = ({ status, isPremium, displayNo, isPOTD }: { status: string; 
                     <div className="w-9 h-9 rounded-full flex items-center justify-center bg-green-500 text-white shadow-sm">
                         <Check className="w-4.5 h-4.5" strokeWidth={3} />
                     </div>
-                    <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-primary text-primary-foreground border border-background flex items-center justify-center shadow-sm">
-                        <Lock className="w-2 h-2" strokeWidth={3} />
-                    </div>
+                    {!hasAccess && (
+                        <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-primary text-primary-foreground border border-background flex items-center justify-center shadow-sm">
+                            <Lock className="w-2 h-2" strokeWidth={2} />
+                        </div>
+                    )}
                 </div>
             );
         }
@@ -66,11 +69,20 @@ const StatusIcon = ({ status, isPremium, displayNo, isPOTD }: { status: string; 
             </div>
         );
     }
-    if (isPremium) return (
-        <div className="w-9 h-9 rounded-full flex items-center justify-center border border-primary/20 bg-primary/10 text-primary shadow-sm shadow-primary/5">
-            <Lock className="w-3.5 h-3.5 text-primary" strokeWidth={2} />
-        </div>
-    );
+    if (isPremium) {
+        if (!hasAccess) {
+            return (
+                <div className="w-9 h-9 rounded-full flex items-center justify-center border border-primary/20 bg-primary/10 text-primary shadow-sm shadow-primary/5">
+                    <Lock className="w-3.5 h-3.5 text-primary" strokeWidth={2} />
+                </div>
+            );
+        }
+        return (
+            <div className="w-9 h-9 rounded-full flex items-center justify-center border border-amber-500/30 bg-amber-500/10 text-amber-600 shadow-sm shadow-amber-500/5 font-sans text-[14px] font-medium">
+                {displayNo}
+            </div>
+        );
+    }
     return (
         <div className="w-9 h-9 rounded-full flex items-center justify-center border border-border/60 text-muted-foreground transition-colors font-sans text-[14px] font-medium bg-muted/5">
             {displayNo}
@@ -79,6 +91,7 @@ const StatusIcon = ({ status, isPremium, displayNo, isPOTD }: { status: string; 
 };
 
 export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp, index, isFirst, isLast, disableRounding, onCategoryClick, onClick, isSelected, compact, isPOTD, potdCountdown, reasonBadge, showEstimatedTime, ctaText, noBorder }: PremiumProblemCardProps) => {
+    const { hasPremiumAccess } = useApp();
     const isPremium = isPremiumProp ?? (algorithm.is_premium || algorithm.is_pro || algorithm.metadata?.is_pro);
     const rawDifficulty = algorithm.mappedDifficulty || DIFFICULTY_MAP[algorithm.difficulty?.toLowerCase()] || 'Medium';
     const displayDifficulty = rawDifficulty === 'Medium' ? 'Med' : rawDifficulty;
@@ -120,7 +133,7 @@ export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp
                             <Check className="w-3 h-3" strokeWidth={3} style={{ opacity: status === 'solved' ? 1 : 0.3 }} />
                         </div>
                     ) : (
-                        <StatusIcon status={status} isPremium={isPremium} displayNo={algorithm.serial_no || index + 1} isPOTD={isPOTD} />
+                        <StatusIcon status={status} isPremium={isPremium} hasAccess={hasPremiumAccess} displayNo={algorithm.serial_no || index + 1} isPOTD={isPOTD} />
                     )}
                 </div>
 

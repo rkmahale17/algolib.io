@@ -47,9 +47,11 @@ export const AlgorithmCard = ({ algorithm, status, isPremium, index, isSidebar, 
                                 <div className={cn("rounded-full bg-green-500 flex items-center justify-center text-white shadow-lg shadow-green-500/20", isSidebar ? "w-6 h-6" : "w-9 h-9")}>
                                     <Check className={cn("stroke-[3]", isSidebar ? "w-4 h-4" : "w-4.5 h-4.5")} />
                                 </div>
-                                <div className={cn("absolute rounded-full bg-primary text-primary-foreground border border-background flex items-center justify-center shadow-sm", isSidebar ? "-bottom-0.5 -right-0.5 w-3 h-3" : "-bottom-0.5 -right-0.5 w-3.5 h-3.5")}>
-                                    <Lock className={cn(isSidebar ? "w-1.5 h-1.5" : "w-2 h-2")} strokeWidth={3} />
-                                </div>
+                                {!hasPremiumAccess && (
+                                    <div className={cn("absolute rounded-full bg-primary text-primary-foreground border border-background flex items-center justify-center shadow-sm", isSidebar ? "-bottom-0.5 -right-0.5 w-3 h-3" : "-bottom-0.5 -right-0.5 w-3.5 h-3.5")}>
+                                        <Lock className={cn(isSidebar ? "w-1.5 h-1.5" : "w-2 h-2")} strokeWidth={3} />
+                                    </div>
+                                )}
                             </div>
                         ) : (
                             <div className={cn("rounded-full bg-green-500 flex items-center justify-center text-white shadow-lg shadow-green-500/20", isSidebar ? "w-6 h-6" : "w-9 h-9")}>
@@ -57,11 +59,17 @@ export const AlgorithmCard = ({ algorithm, status, isPremium, index, isSidebar, 
                             </div>
                         )
                     ) : isPremium ? (
-                        <div className={cn("rounded-full border border-primary/20 bg-primary/10 flex items-center justify-center text-primary shadow-sm shadow-primary/5", isSidebar ? "w-6 h-6" : "w-9 h-9")}>
-                            <Lock className={cn(isSidebar ? "w-3 h-3" : "w-3.5 h-3.5")} strokeWidth={2} />
-                        </div>
+                        !hasPremiumAccess ? (
+                            <div className={cn("rounded-full border border-primary/20 bg-primary/10 flex items-center justify-center text-primary shadow-sm shadow-primary/5", isSidebar ? "w-6 h-6" : "w-9 h-9")}>
+                                <Lock className={cn(isSidebar ? "w-3 h-3" : "w-3.5 h-3.5")} strokeWidth={2} />
+                            </div>
+                        ) : (
+                            <div className={cn("rounded-full border border-amber-500/30 bg-amber-500/10 flex items-center justify-center text-amber-600 shadow-sm shadow-amber-500/5 transition-colors font-sans font-medium", isSidebar ? "w-6 h-6 text-[10px]" : "w-9 h-9 text-[14px]")}>
+                                {serialNo}
+                            </div>
+                        )
                     ) : (
-                        <div className={cn("rounded-full border border-border/60 flex items-center justify-center text-muted-foreground transition-colors font-sans text-[14px] font-medium bg-muted/5", isSidebar ? "w-6 h-6 text-[10px]" : "w-9 h-9")}>
+                        <div className={cn("rounded-full border border-border/60 flex items-center justify-center text-muted-foreground transition-colors font-sans font-medium bg-muted/5", isSidebar ? "w-6 h-6 text-[10px]" : "w-9 h-9 text-[14px]")}>
                             {serialNo}
                         </div>
                     )}

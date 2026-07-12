@@ -56,7 +56,7 @@ export async function awardXP(
     
     // Successfully awarded
     if (xpAmount > 0) {
-      toast.success(`+${xpAmount} XP`, {
+      toast.success(`+${xpAmount} Points`, {
         description: `Earned for ${dbEventType.replace(/_/g, ' ')}`,
         icon: '🌟',
       });

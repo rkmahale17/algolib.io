@@ -146,7 +146,7 @@ export default function VisualLibraryClient() {
                     {activeAlgorithm.name}
                   </h1>
                   {(activeAlgorithm?.is_premium || activeAlgorithm?.is_pro || activeAlgorithm?.metadata?.is_pro) && (
-                    <Badge className="bg-primary/10 text-primary border-primary/20 text-[11px] font-bold px-2.5 py-0.5 uppercase tracking-wide rounded-full h-6">
+                    <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20 text-[11px] font-bold px-2.5 py-0.5 uppercase tracking-wide rounded-sm h-6">
                       PRO
                     </Badge>
                   )}

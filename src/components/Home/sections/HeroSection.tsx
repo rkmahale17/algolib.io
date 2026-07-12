@@ -55,35 +55,54 @@ export function HeroSection() {
             {/* Subheadline with styled links */}
             <div className="text-[17px] text-zinc-600 dark:text-gray-400 mb-12 max-w-xl leading-relaxed">
               <p className="mb-6">
-                <strong>A learn-first platform for coding interviews.</strong> The ultimate <strong>Data Structures</strong> and <strong>Algorithms</strong> platform for your next <strong>Coding Interview</strong>. Master <strong>LeetCode</strong> patterns with our <strong>Interactive Visualizations</strong>.
-              </p>
-              <p className="mb-6">
-                Conquer <strong>Blind 75</strong> and <strong>Rulcode 150</strong>. From basic arrays to advanced <strong>Dynamic Programming</strong> and <strong>Graph Algorithms</strong>, prepare effectively for tech interviews and <strong>Competitive Programming</strong>.
-              </p>
-              <p>
-                Read the problem,{" "}
-                <Link
-                  href="#visualization"
-                  className="text-zinc-900 dark:text-white underline decoration-primary underline-offset-4 hover:opacity-80 transition-all"
-                >
-                  Visualize
-                </Link>{" "}
-                the solution, sketch your ideas in{" "}
-                <Link
-                  href="#thinkpad"
-                  className="text-zinc-900 dark:text-white underline decoration-primary underline-offset-4 hover:opacity-80 transition-all"
-                >
-                  Thinkpad
-                </Link>
-                , and{" "}
+                Understand the pattern before you write the{" "}
                 <Link
                   href="/problem/kadanes-algorithm"
                   className="text-zinc-900 dark:text-white underline decoration-primary underline-offset-4 hover:opacity-80 transition-all"
                 >
                   code
+                </Link>{" "}
+                — with{" "}
+                <Link
+                  href="#visualization"
+                  className="text-zinc-900 dark:text-white underline decoration-primary underline-offset-4 hover:opacity-80 transition-all"
+                >
+                  visualizations
                 </Link>
-                .
+                , a{" "}
+                <Link
+                  href="#thinkpad"
+                  className="text-zinc-900 dark:text-white underline decoration-primary underline-offset-4 hover:opacity-80 transition-all"
+                >
+                  thinkpad
+                </Link>{" "}
+                to sketch your logic, and 220+ problems.
               </p>
+
+              <div className="pt-6 border-t border-zinc-200 dark:border-white/10">
+                <Link href="#testimonials" className="group block">
+                  <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-4 group-hover:text-zinc-800 dark:group-hover:text-zinc-200 transition-colors">
+                    Join engineers from <strong className="text-zinc-700 dark:text-zinc-300">Google</strong>, <strong className="text-zinc-700 dark:text-zinc-300">Meta</strong>, <strong className="text-zinc-700 dark:text-zinc-300">OpenAI</strong>, and top tech companies cracking their coding interviews.
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-white/10 shadow-sm flex items-center justify-center transition-all duration-300 group-hover:shadow-md group-hover:border-zinc-300 dark:group-hover:border-white/20 group-hover:-translate-y-0.5">
+                      <img src="/icons/companies/google.svg" alt="Google" className="w-4 h-4 object-contain dark:invert opacity-60 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                    <div className="w-10 h-10 rounded-full bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-white/10 shadow-sm flex items-center justify-center transition-all duration-300 group-hover:shadow-md group-hover:border-zinc-300 dark:group-hover:border-white/20 group-hover:-translate-y-0.5 delay-[50ms]">
+                      <img src="/icons/companies/meta.svg" alt="Meta" className="w-4 h-4 object-contain dark:invert opacity-60 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                    <div className="w-10 h-10 rounded-full bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-white/10 shadow-sm flex items-center justify-center transition-all duration-300 group-hover:shadow-md group-hover:border-zinc-300 dark:group-hover:border-white/20 group-hover:-translate-y-0.5 delay-[100ms]">
+                      <img src="/icons/companies/amazon.svg" alt="Amazon" className="w-4 h-4 object-contain dark:invert opacity-60 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                    <div className="w-10 h-10 rounded-full bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-white/10 shadow-sm flex items-center justify-center transition-all duration-300 group-hover:shadow-md group-hover:border-zinc-300 dark:group-hover:border-white/20 group-hover:-translate-y-0.5 delay-[150ms]">
+                      <img src="/icons/companies/netflix.svg" alt="Netflix" className="w-4 h-4 object-contain dark:invert opacity-60 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                    <div className="w-10 h-10 rounded-full bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-white/10 shadow-sm flex items-center justify-center transition-all duration-300 group-hover:shadow-md group-hover:border-zinc-300 dark:group-hover:border-white/20 group-hover:-translate-y-0.5 delay-[200ms]">
+                      <img src="/icons/companies/microsoft.svg" alt="Microsoft" className="w-4 h-4 object-contain dark:invert opacity-60 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                  </div>
+                </Link>
+              </div>
             </div>
 
             {/* Buttons */}

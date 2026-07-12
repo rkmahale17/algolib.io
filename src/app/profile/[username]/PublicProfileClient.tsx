@@ -131,7 +131,7 @@ const ErrorCard = ({
 // ── Main component ────────────────────────────────────────────────
 const PublicProfileClient = ({ username }: PublicProfileClientProps) => {
   const router = useRouter();
-  const { user: currentUser, profile: currentUserProfile } = useApp();
+  const { user: currentUser, profile: currentUserProfile, refreshProfile } = useApp();
   const { data: algoMeta } = useAlgorithms();
   const isUserAdmin = currentUserProfile?.role === "admin";
 
@@ -408,7 +408,15 @@ const PublicProfileClient = ({ username }: PublicProfileClientProps) => {
           open={isEditOpen}
           onOpenChange={setIsEditOpen}
           profile={profile}
-          onSave={() => { setIsEditOpen(false); fetchPublicProfile(); }}
+          onSave={async (newUsername) => { 
+            setIsEditOpen(false); 
+            await refreshProfile();
+            if (newUsername && newUsername !== username) {
+              router.push(`/profile/${newUsername}`);
+            } else {
+              fetchPublicProfile(); 
+            }
+          }}
         />
       )}
 

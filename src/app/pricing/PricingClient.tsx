@@ -286,21 +286,21 @@ const PricingClient = () => {
 
         {/* Career Investment Message Card */}
         {!isPremium && (
-          <div className="mb-8 p-6 rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 via-card to-card shadow-sm flex flex-col md:flex-row items-start md:items-center gap-4">
+          <div className="mb-12 p-6 rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 via-card to-card shadow-sm flex flex-col md:flex-row items-start md:items-center gap-4">
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
               <Sparkles className="w-5 h-5 text-primary animate-pulse" />
             </div>
             <div className="space-y-1">
               <h3 className="font-semibold text-base text-foreground">An Investment in Your Future</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                There is nothing more valuable than preparing yourself to secure a role at a top-tier company. High-quality preparation is the ultimate multiplier for your career—making this purchase a negligible, high-yield investment compared to the career return and growth you will secure.
+                There is nothing more valuable than preparing yourself to secure a role at a top-tier company. <br className="hidden md:block" /> High-quality preparation is the ultimate multiplier for your career—making this purchase a negligible, high-yield investment compared to the career return and growth you will secure.
               </p>
             </div>
           </div>
         )}
 
         {/* Subscriptions Grid */}
-        <div id="pricing-grid" className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 items-center">
+        <div id="pricing-grid" className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 items-center">
           {pricingData.subscriptionPlans.map((plan) => {
             const isFreePlan = plan.productId === "free";
             const isCurrentPlan = isPremium && profile?.subscription_duration === plan.productId;
@@ -310,12 +310,12 @@ const PricingClient = () => {
               <div key={plan.id} className={cn(
                 "rounded-2xl p-8 flex flex-col relative group transition-all duration-300",
                 isAnnual 
-                  ? "border-[3px] border-green-500 bg-card/90 shadow-2xl z-10 py-12 md:-my-6 bg-gradient-to-b from-green-500/5 to-transparent" 
+                  ? "border-[3px] border-green-500 bg-card/90 shadow-2xl z-10 bg-gradient-to-b from-green-500/5 to-transparent" 
                   : "border border-border bg-card hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1 z-0",
                 isCurrentPlan && !isAnnual ? "border-2 border-primary shadow-xl shadow-primary/5 z-10" : ""
               )}>
                 {plan.badge && !isCurrentPlan && (
-                  <div className="absolute -top-3 right-6 bg-[#dcf65b] text-[#558600] text-[10px] tracking-wider font-bold px-2.5 py-1 rounded shadow-sm uppercase z-10 subpixel-antialiased">
+                  <div className="absolute -top-3 right-6 bg-[#dcf65b] text-zinc-950 text-[10px] tracking-wider font-bold px-2.5 py-1 rounded shadow-sm uppercase z-10 subpixel-antialiased">
                     {plan.badge}
                   </div>
                 )}
@@ -437,20 +437,20 @@ const PricingClient = () => {
         </div>
 
         {/* Trust Badges Section */}
-        <div className="flex flex-wrap items-center justify-center gap-x-6 md:gap-x-12 gap-y-4 mb-16 text-sm font-medium text-muted-foreground">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4 mb-16 text-sm font-medium text-muted-foreground">
+          <div className="flex items-center gap-2 bg-muted/40 border border-border/50 px-4 py-2 rounded-full shadow-sm">
             <Check className="w-4 h-4 text-green-500 shrink-0" />
             <span>Cancel anytime</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 bg-muted/40 border border-border/50 px-4 py-2 rounded-full shadow-sm">
             <Check className="w-4 h-4 text-green-500 shrink-0" />
             <span>Secure payments</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 bg-muted/40 border border-border/50 px-4 py-2 rounded-full shadow-sm">
             <Check className="w-4 h-4 text-green-500 shrink-0" />
             <span>Instant access after payment</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 bg-muted/40 border border-border/50 px-4 py-2 rounded-full shadow-sm">
             <Check className="w-4 h-4 text-green-500 shrink-0" />
             <span>New problems added every week</span>
           </div>
