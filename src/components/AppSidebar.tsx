@@ -230,7 +230,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const isCollapsed = state === "collapsed" && !isMobile;
   const isGuides = isGuideRoute(pathname);
   const isVisualLibrary = pathname?.startsWith("/dsa/visual-library");
-  const isPractice = pathname?.startsWith("/dsa") && !isVisualLibrary;
+  const isPractice =
+    (pathname?.startsWith("/dsa") ||
+      pathname?.startsWith("/problems") ||
+      pathname?.startsWith("/problem/")) &&
+    !isVisualLibrary;
   const isDatabase = pathname?.startsWith("/database");
   const isDashboard = pathname?.startsWith("/dashboard");
   const isProfile = pathname?.startsWith("/profile");

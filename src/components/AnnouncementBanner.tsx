@@ -38,34 +38,46 @@ export const AnnouncementBanner: React.FC<AnnouncementBannerProps> = ({
       initial={{ opacity: 0, y: 50, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
-      className="relative w-54 sm:w-[250px] h-[200px] flex flex-col rounded-xl border border-[#C0C0C0] bg-background shadow-lg text-foreground overflow-hidden group pointer-events-auto"
+      className={`relative h-[145px] flex rounded-2xl border border-white/10 bg-[#1c1c1c] shadow-2xl text-foreground overflow-hidden group pointer-events-auto ${
+        announcement.image_url ? 'w-[350px]' : 'w-[280px]'
+      }`}
     >
-      {/* Header section */}
-      <div className="flex justify-between items-center px-4 py-2 border-b border-border">
-        <h3
-          className="font-semibold text-sm pr-2 truncate text-orange-500"
-          dangerouslySetInnerHTML={{ __html: announcement.title }}
-        />
-        <button
-          onClick={() => onDismiss(announcement.id)}
-          className="p-1.5 shrink-0 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-          aria-label="Close announcement"
-        >
-          <X size={16} />
-        </button>
-      </div>
-
-      {/* Main Content section */}
-      <div className="p-4 flex-1 overflow-y-auto">
-        {announcement.image_url && (
+      {/* Left side: Image (if exists) */}
+      {announcement.image_url && (
+        <div className="w-[143px] h-full shrink-0 border-r border-white/5 bg-zinc-800">
           <img
             src={announcement.image_url}
-            alt={announcement.title}
-            className="w-full max-h-[150px] object-cover mb-4 rounded-lg border border-border shadow-sm"
+            alt="Feature update"
+            className="w-full h-full object-cover"
           />
-        )}
+        </div>
+      )}
+
+      {/* Right side: Content */}
+      <div className="flex-1 flex flex-col p-4 relative min-w-0">
+        {/* Header: Label & Close Button */}
+        <div className="flex justify-between items-start mb-2">
+          <span className="text-[10px] font-bold tracking-widest text-[#e45a33] uppercase">
+            New Feature
+          </span>
+          <button
+            onClick={() => onDismiss(announcement.id)}
+            className="p-1 -mt-1 -mr-2 shrink-0 rounded-md text-zinc-400 hover:text-white hover:bg-white/10 transition-colors"
+            aria-label="Close announcement"
+          >
+            <X size={14} />
+          </button>
+        </div>
+
+        {/* Title */}
+        <h3
+          className="font-bold text-[14px] leading-tight text-white mb-1.5 line-clamp-2"
+          dangerouslySetInnerHTML={{ __html: announcement.title }}
+        />
+
+        {/* Body */}
         <div
-          className="text-sm text-muted-foreground leading-relaxed"
+          className="text-[12px] leading-snug text-zinc-400 line-clamp-3"
           dangerouslySetInnerHTML={{ __html: announcement.body }}
         />
       </div>

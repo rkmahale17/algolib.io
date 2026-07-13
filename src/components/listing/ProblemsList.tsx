@@ -11,7 +11,7 @@ import { Brain, Target, ListFilter, SearchX, RotateCcw, ArrowUp } from "lucide-r
 import { cn } from "@/lib/utils";
 import { ProOverlay } from "@/components/ProOverlay";
 import { Button } from "@/components/ui/button";
-import { ProblemFilterPopup } from "@/components/ProblemFilterPopup";
+import { ProblemFilterPopup, TOPIC_ICONS } from "@/components/ProblemFilterPopup";
 import { RecommendedProblems } from "@/components/listing/RecommendedProblems";
 
 import { ListingDashboardWidgets } from "@/components/listing/ListingDashboardWidgets";
@@ -419,24 +419,42 @@ export const ProblemsList = ({
     setSelectedDifficulties(prev => prev.includes(difficulty) ? prev.filter(d => d !== difficulty) : [...prev, difficulty]);
   };
 
-  const allTopics = useMemo(() => {
+  const { allTopics, topicCounts } = useMemo(() => {
+    const counts: Record<string, number> = {};
     const categories = algorithms.flatMap(algo => {
       if (!algo.category) return [];
       const rawCats = algo.category.split(',').map((c: string) => c.trim());
-      return resolveAlgoCategories(rawCats);
+      const resolved = resolveAlgoCategories(rawCats);
+      Array.from(new Set(resolved)).forEach(c => {
+         counts[c] = (counts[c] || 0) + 1;
+      });
+      return resolved;
     }).filter(Boolean);
-    return Array.from(new Set(categories)).sort();
+    return { allTopics: Array.from(new Set(categories)).sort(), topicCounts: counts };
   }, [algorithms]);
 
-  const allCompanies = useMemo(() => {
+  const { allCompanies, companyCounts } = useMemo(() => {
+    const counts: Record<string, number> = {};
     const comps = new Set<string>();
     algorithms.forEach(algo => {
       const c = algo.metadata?.companies;
       if (Array.isArray(c)) {
+        Array.from(new Set(c)).forEach(comp => {
+           counts[comp] = (counts[comp] || 0) + 1;
+        });
         c.forEach(comp => comps.add(comp));
       }
     });
-    return Array.from(comps).sort();
+    return { allCompanies: Array.from(comps).sort(), companyCounts: counts };
+  }, [algorithms]);
+
+  const difficultyCounts = useMemo(() => {
+    const counts: Record<string, number> = { easy: 0, medium: 0, hard: 0 };
+    algorithms.forEach(algo => {
+       const mapped = DIFFICULTY_MAP[algo.difficulty?.toLowerCase()] || 'Medium';
+       counts[mapped.toLowerCase()] = (counts[mapped.toLowerCase()] || 0) + 1;
+    });
+    return counts;
   }, [algorithms]);
 
   const totalHours = useMemo(() => {
@@ -521,6 +539,9 @@ export const ProblemsList = ({
       selectedCompanies={selectedCompanies}
       onCompanyToggle={handleCompanyToggle}
       companies={allCompanies}
+      topicCounts={topicCounts}
+      companyCounts={companyCounts}
+      difficultyCounts={difficultyCounts}
       selectedDifficulties={selectedDifficulties}
       onDifficultyToggle={handleDifficultyToggle}
       showRecommendation={showRecommendation}
@@ -539,6 +560,9 @@ export const ProblemsList = ({
           setFilters={handleSetPopupFilters}
           topics={allTopics}
           companies={allCompanies}
+          topicCounts={topicCounts}
+          companyCounts={companyCounts}
+          difficultyCounts={difficultyCounts}
           trigger={
             <Button
               variant="outline"
@@ -758,19 +782,21 @@ export const ProblemsList = ({
                     index === currentGroupedAlgos.length - 1 && "border-b-0"
                   )}
                 >
-                  <AccordionTrigger className="px-3 sm:px-6 py-4 sm:py-5 hover:no-underline hover:bg-accent hover:text-accent-foreground transition-all duration-300 group data-[state=open]:bg-muted/20 data-[state=open]:border-b border-border/10">
+                  <AccordionTrigger className="px-3 sm:px-6 py-3 sm:py-4 hover:no-underline hover:bg-accent hover:text-accent-foreground transition-all duration-300 group data-[state=open]:bg-muted/20 data-[state=open]:border-b border-border/10">
                     <div className="flex items-center justify-between w-full pr-1 sm:pr-4 gap-2 sm:gap-6 min-w-0">
                       <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/5 flex items-center justify-center border border-primary/10 shrink-0">
-                          {listType === 'core' ? <Target className="w-4 h-4 sm:w-5 sm:h-5 text-primary/60" /> : <Brain className="w-4 h-4 sm:w-5 sm:h-5 text-primary/60" />}
-                        </div>
+                        {(() => {
+                          const Icon = TOPIC_ICONS[category] || (listType === 'core' ? Target : Brain);
+                          return (
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/5 flex items-center justify-center border border-primary/10 shrink-0">
+                              <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-primary/60" />
+                            </div>
+                          );
+                        })()}
                         <div className="text-left min-w-0">
-                          <h3 className="font-medium text-[14px] sm:text-[16px] leading-tight mb-1 break-words">
+                          <h3 className="font-semibold text-sm sm:text-[15px] leading-tight break-words text-foreground/90 truncate">
                             {category}
                           </h3>
-                          <p className="text-[10px] sm:text-[11px] text-muted-foreground font-normal line-clamp-1">
-                            {algos.length} essential problems
-                          </p>
                         </div>
                       </div>
                       
@@ -781,7 +807,7 @@ export const ProblemsList = ({
                           <span>{statsByCategory[category].total}</span>
                           <span className="ml-0.5 sm:ml-1 text-[9px] opacity-70 hidden min-[400px]:inline">Solved</span>
                         </div>
-                        <div className="h-1.5 w-16 xs:w-20 sm:w-32 bg-muted/40 rounded-full overflow-hidden border border-border/10 shadow-inner">
+                        <div className="h-1.5 w-16 xs:w-20 sm:w-32 bg-muted/60 dark:bg-zinc-800/80 rounded-full overflow-hidden border border-border/20 shadow-inner">
                           <div 
                             className={cn(
                               "h-full rounded-full transition-all duration-1000",
@@ -796,19 +822,65 @@ export const ProblemsList = ({
                   </AccordionTrigger>
                   <AccordionContent className="px-0 pb-0 bg-muted/5">
                     <div className="flex flex-col">
-                      {algos.map((algo, index) => (
-                        <PremiumProblemCard
-                          key={algo.id}
-                          algorithm={algo}
-                          status={(progressMap?.[algo.id] || 'none') as any}
-                          index={index}
-                          isPremium={algo.is_premium}
-                          isFirst={index === 0}
-                          isLast={index === algos.length - 1}
-                          disableRounding={true}
-                          onCategoryClick={handleCategoryClick}
-                        />
-                      ))}
+                      {algos.map((algo, index) => {
+                        const isSolved = progressMap?.[algo.id] === 'solved';
+                        const isFirstProblem = index === 0;
+                        const isLastProblem = index === algos.length - 1;
+                        const isPathActive = algos.slice(index).some(p => progressMap?.[p.id] === 'solved');
+                        const isNextPathActive = !isLastProblem && algos.slice(index + 1).some(p => progressMap?.[p.id] === 'solved');
+
+                        return (
+                          <div key={algo.id} className="relative pl-[44px] pr-3 sm:pr-4 pb-3 last:pb-0 pt-3">
+                            {/* Upper Vertical Line */}
+                            <div
+                              className={cn(
+                                "absolute left-[30px] w-[2px] -translate-x-1/2 transition-colors duration-500",
+                                isFirstProblem ? "top-[-16px] h-[calc(50%+16px)]" : "top-0 h-1/2",
+                                isPathActive
+                                  ? "border-l-2 border-green-500/80 border-solid"
+                                  : "border-l-2 border-muted-foreground/30 border-dashed"
+                              )}
+                            />
+                            
+                            {/* Lower Vertical Line (not for last item) */}
+                            {!isLastProblem && (
+                              <div
+                                className={cn(
+                                  "absolute left-[30px] top-1/2 bottom-0 w-[2px] -translate-x-1/2 transition-colors duration-500",
+                                  isNextPathActive
+                                    ? "border-l-2 border-green-500/80 border-solid"
+                                    : "border-l-2 border-muted-foreground/30 border-dashed"
+                                )}
+                              />
+                            )}
+
+                            {/* Horizontal Branch Line */}
+                            <div
+                              className={cn(
+                                "absolute left-[30px] top-1/2 w-[26px] h-[2px] -translate-y-1/2 transition-colors duration-500",
+                                isSolved
+                                  ? "border-t-2 border-green-500/80 border-solid"
+                                  : "border-t-2 border-muted-foreground/30 border-dashed"
+                              )}
+                            />
+
+                            <PremiumProblemCard
+                              algorithm={algo}
+                              status={(progressMap?.[algo.id] || 'none') as any}
+                              index={index}
+                              isPremium={algo.is_premium}
+                              isFirst={true}
+                              isLast={true}
+                              disableRounding={true}
+                              compact={true}
+                              showDetailsInCompact={true}
+                              hideCategoryTags={true}
+                              transparentBg={true}
+                              onCategoryClick={handleCategoryClick}
+                            />
+                          </div>
+                        );
+                      })}
                     </div>
                   </AccordionContent>
                 </AccordionItem>

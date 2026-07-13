@@ -15,8 +15,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Trash2, Edit } from "lucide-react";
+import { Plus, Trash2, Edit, Eye } from "lucide-react";
 import { toast } from "sonner";
+import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import {
   Dialog,
   DialogContent,
@@ -39,6 +40,7 @@ export default function AdminAnnouncements() {
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [previewAnnouncement, setPreviewAnnouncement] = useState<Announcement | null>(null);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -243,6 +245,14 @@ export default function AdminAnnouncements() {
                     <Button
                       variant="ghost"
                       size="icon"
+                      onClick={() => setPreviewAnnouncement(ann)}
+                      title="Preview"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       onClick={() => handleOpenDialog(ann)}
                     >
                       <Edit className="h-4 w-4" />
@@ -262,6 +272,26 @@ export default function AdminAnnouncements() {
           </TableBody>
         </Table>
       </div>
+
+      {/* Preview Dialog */}
+      <Dialog open={!!previewAnnouncement} onOpenChange={(open) => !open && setPreviewAnnouncement(null)}>
+        <DialogContent className="sm:max-w-md flex flex-col items-center justify-center p-8 bg-transparent border-none shadow-none [&>button]:hidden">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Preview Announcement</DialogTitle>
+          </DialogHeader>
+          {previewAnnouncement && (
+            <div className="relative">
+              <AnnouncementBanner
+                announcement={{
+                  ...previewAnnouncement,
+                  updated_at: new Date().toISOString()
+                }}
+                onDismiss={() => setPreviewAnnouncement(null)}
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

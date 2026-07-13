@@ -132,7 +132,7 @@ export const SubmissionHeatmap = ({
   }, [selectedYear, submissionMap]);
 
   const getColor = (count: number) => {
-    if (count === 0) return "bg-zinc-800/80 dark:bg-zinc-800 hover:bg-zinc-700";
+    if (count === 0) return "bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700";
     if (count === 1) return "bg-green-500/30 hover:bg-green-500/50";
     if (count <= 3) return "bg-green-500/50 hover:bg-green-500/70";
     if (count <= 5) return "bg-green-500/75 hover:bg-green-500/90";
@@ -291,7 +291,7 @@ export const SubmissionHeatmap = ({
           {/* Legend */}
           <div className="flex items-center gap-1.5 mt-3 text-[10px] text-muted-foreground/50 justify-end">
             <span>Less</span>
-            {["bg-zinc-800/80", "bg-green-500/30", "bg-green-500/50", "bg-green-500/75", "bg-green-500"].map(
+            {["bg-zinc-100 dark:bg-zinc-800/80", "bg-green-500/30", "bg-green-500/50", "bg-green-500/75", "bg-green-500"].map(
               (cls, i) => (
                 <div key={i} className={cn("w-[10px] h-[10px] rounded-[2px]", cls)} />
               )

@@ -89,6 +89,9 @@ export default function RoadmapClient() {
   // Selected problem ID for the right side details
   const [selectedProblemId, setSelectedProblemId] = useState<string | null>(null);
 
+  // Key to trigger highlight animation on the right side panel
+  const [highlightKey, setHighlightKey] = useState(0);
+
   // Modal dialog state for mobile and tablet viewports
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -174,6 +177,7 @@ export default function RoadmapClient() {
 
   const handleProblemClick = (problemId: string) => {
     setSelectedProblemId(problemId);
+    setHighlightKey(prev => prev + 1);
     
     // Find category and expand it
     const categoryTuple = categories.find(([_, problems]) => problems.some(p => p.id === problemId));
@@ -708,10 +712,10 @@ export default function RoadmapClient() {
                     router.push(`/problem/${selectedProblem.slug || selectedProblem.id}${tabQuery}`);
                     setIsModalOpen(false);
                   }}
-                  className="text-sm font-semibold h-10 px-5 rounded-lg shadow-sm"
+                  className="group text-sm font-semibold h-10 px-5 rounded-lg shadow-sm transition-all duration-300 hover:scale-[1.02] active:scale-95 hover:shadow-md"
                 >
                   Open Problem
-                  <ChevronRight className="w-4 h-4 ml-1.5" />
+                  <ChevronRight className="w-4 h-4 ml-1.5 transition-transform duration-300 group-hover:translate-x-1" />
                 </Button>
               </div>
             </div>
@@ -925,7 +929,7 @@ export default function RoadmapClient() {
                               )}
                             </div>
                             <span className="font-semibold text-sm sm:text-[15px] text-foreground/90 truncate">
-                              {catIdx + 1}. {catName}
+                              {catName}
                             </span>
                           </div>
                           
@@ -1052,7 +1056,10 @@ export default function RoadmapClient() {
               </Card>
 
               {selectedProblem ? (
-                <Card className="p-5 border-border/40 shadow-sm rounded-2xl bg-card space-y-6 w-full">
+                <Card 
+                  key={highlightKey}
+                  className="p-5 border-border/40 shadow-sm rounded-2xl bg-card space-y-6 w-full animate-in fade-in zoom-in-[0.98] slide-in-from-right-2 duration-300"
+                >
                   {renderProblemDetailContent(false)}
                 </Card>
               ) : (
