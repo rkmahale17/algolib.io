@@ -2010,13 +2010,21 @@ export const ProblemDescriptionPanel = React.memo(
                     disabled={true}
                   >
                     <div className="flex-1 overflow-hidden relative flex flex-col p-0 h-full">
-                      <BrainstormSection
-                        algorithmId={algorithm.id || algorithm.slug || ""}
-                        algorithmTitle={algorithm.title || algorithm.name || ""}
-                        controls={algorithm.controls?.brainstorm}
-                        drawingCompleted={drawingCompleted}
-                        onToggleDrawingCompleted={onToggleDrawingCompleted}
-                      />
+                      {(algorithm?.is_premium ||
+                        algorithm?.is_pro ||
+                        algorithm?.metadata?.is_pro) &&
+                      !hasPremiumAccess &&
+                      !isPlatformPreview ? (
+                        <ProOverlay className="rounded-none border-0 flex-1 h-full" />
+                      ) : (
+                        <BrainstormSection
+                          algorithmId={algorithm.id || algorithm.slug || ""}
+                          algorithmTitle={algorithm.title || algorithm.name || ""}
+                          controls={algorithm.controls?.brainstorm}
+                          drawingCompleted={drawingCompleted}
+                          onToggleDrawingCompleted={onToggleDrawingCompleted}
+                        />
+                      )}
                     </div>
                   </AuthGuard>
                 </TabsContent>
