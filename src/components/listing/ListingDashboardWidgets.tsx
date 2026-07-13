@@ -21,6 +21,8 @@ import { Card } from '@/components/ui/card';
 import { ContributionGraph } from '@/components/listing/ContributionGraph';
 import { DashboardHero } from '@/components/listing/DashboardHero';
 import { SolvedProgressCard } from '@/components/profile/SolvedProgressCard';
+import { RecommendedProblems } from '@/components/listing/RecommendedProblems';
+import { cn } from '@/lib/utils';
 
 import { DIFFICULTY_MAP } from '@/types/algorithm';
 import { useAppSelector } from '@/store/hooks';
@@ -37,6 +39,7 @@ interface ListingDashboardWidgetsProps {
   progressTitle?: string;
   hideHero?: boolean;
   hideHeroPracticeButton?: boolean;
+  showRecommendation?: boolean;
 }
 
 function getNextMilestone(solved: number): number {
@@ -53,6 +56,7 @@ export const ListingDashboardWidgets = ({
   progressTitle = 'Learning Progress',
   hideHero = false,
   hideHeroPracticeButton = false,
+  showRecommendation = false,
 }: ListingDashboardWidgetsProps) => {
   const { user } = useApp();
   const userProgressData = useAppSelector((state) => state.userProgress.data);
@@ -148,74 +152,124 @@ export const ListingDashboardWidgets = ({
   if (algorithms.length === 0) return null;
 
   return (
-    <div className="w-full max-w-[820px] mx-auto space-y-4 mb-4">
-      {/* ⓪ Continue Learning Minimal Box */}
+    <div className="w-full mb-4">
+      {/* ⓪ Continue Learning Minimal Box (Full width on top) */}
       {user && continueLearningAlgo && (
-        <Link
-          href={continueLearningAlgo.slug ? `/problem/${continueLearningAlgo.slug}` : `/problem/${continueLearningAlgo.id}`}
-          onClick={() =>
-            trackEvent(posthog, "home_cta_clicked", {
-              cta_label: "Continue Learning Box",
-              destination: continueLearningAlgo.slug || continueLearningAlgo.id,
-              section: "listing_dashboard",
-            })
-          }
-          className="flex items-center gap-4 px-5 py-3 rounded-xl bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/80 hover:border-primary/40 transition-all hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.1)] group max-w-[280px]"
-        >
-          <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-bold text-primary tracking-wider mb-0.5">
-              Continue
-            </p>
-            <p className="text-sm font-semibold text-zinc-900 dark:text-white truncate">
-              {continueLearningAlgo.title || continueLearningAlgo.name}
-            </p>
-          </div>
-          <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-black transition-all shrink-0">
-            <ArrowRight className="w-3.5 h-3.5" />
-          </div>
-        </Link>
-      )}
-
-      {/* ① Personalized Hero */}
-      {!hideHero && (
-        <DashboardHero
-          currentStreak={currentStreak}
-          nextMilestone={nextMilestone}
-          totalSolved={overallStats.totalSolved}
-          submissionsData={submissionsData}
-          hidePracticeButton={hideHeroPracticeButton}
-        />
-      )}
-
-      {/* ② Progress + Contribution Graph */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-4 w-full items-stretch">
-        {/* Progress card */}
-        <div className="min-w-0 flex flex-col h-full">
-          <Card className="bg-card border-border/40 shadow-sm overflow-hidden flex flex-col h-full rounded-xl">
-            <div className="px-4 py-2.5 border-b border-border/40 shrink-0 bg-muted/20">
-              <h3 className="font-semibold text-[13px] text-foreground tracking-tight flex items-center gap-1.5">
-                <TrendingUp className="w-4 h-4 text-foreground" /> {progressTitle}
-              </h3>
+        <div className="mb-4">
+          <Link
+            href={continueLearningAlgo.slug ? `/problem/${continueLearningAlgo.slug}` : `/problem/${continueLearningAlgo.id}`}
+            onClick={() =>
+              trackEvent(posthog, "home_cta_clicked", {
+                cta_label: "Continue Learning Box",
+                destination: continueLearningAlgo.slug || continueLearningAlgo.id,
+                section: "listing_dashboard",
+              })
+            }
+            className="flex items-center gap-4 px-5 py-3 rounded-xl bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/80 hover:border-primary/40 transition-all hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.1)] group max-w-[280px]"
+          >
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-bold text-primary tracking-wider mb-0.5">
+                Continue
+              </p>
+              <p className="text-sm font-semibold text-zinc-900 dark:text-white truncate">
+                {continueLearningAlgo.title || continueLearningAlgo.name}
+              </p>
             </div>
-            <div className="flex-1 flex flex-col justify-center">
-              <SolvedProgressCard
-                {...overallStats}
-                compact
+            <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-black transition-all shrink-0">
+              <ArrowRight className="w-3.5 h-3.5" />
+            </div>
+          </Link>
+        </div>
+      )}
+
+      {/* Dynamic Layout */}
+      {showRecommendation ? (
+        <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-6 items-start">
+          {/* Left Column (Hero & Progress) */}
+          <div className="space-y-4 min-w-0 w-full">
+            {/* ① Personalized Hero */}
+            {!hideHero && (
+              <DashboardHero
                 currentStreak={currentStreak}
-                maxStreak={maxStreak}
-                userId={user?.id}
+                nextMilestone={nextMilestone}
+                totalSolved={overallStats.totalSolved}
+                submissionsData={submissionsData}
+                hidePracticeButton={hideHeroPracticeButton}
               />
+            )}
+
+            {/* ② Progress Card */}
+            <Card className="bg-card border-border/40 shadow-sm overflow-hidden flex flex-col rounded-xl h-full">
+              <div className="px-4 py-2.5 border-b border-border/40 shrink-0 bg-muted/20">
+                <h3 className="font-semibold text-[13px] text-foreground tracking-tight flex items-center gap-1.5">
+                  <TrendingUp className="w-4 h-4 text-foreground" /> {progressTitle}
+                </h3>
+              </div>
+              <div className="flex-1 flex flex-col justify-center p-4">
+                <SolvedProgressCard
+                  {...overallStats}
+                  compact
+                  currentStreak={currentStreak}
+                  maxStreak={maxStreak}
+                  userId={user?.id}
+                />
+              </div>
+            </Card>
+          </div>
+
+          {/* Right Column (Recommendations & Consistency) */}
+          <div className="space-y-4 min-w-0 w-full">
+            {/* Recommended Problems */}
+            <RecommendedProblems algorithms={algorithms} />
+
+            {/* Consistency Tracker */}
+            <div className="w-full max-w-[260px] mx-auto xl:mx-0">
+              <ContributionGraph submissions={submissionsData} weeks={12} currentStreak={currentStreak} maxStreak={maxStreak} />
             </div>
-          </Card>
+          </div>
         </div>
+      ) : (
+        <div className="space-y-4 min-w-0 w-full">
+          {/* ① Personalized Hero */}
+          {!hideHero && (
+            <DashboardHero
+              currentStreak={currentStreak}
+              nextMilestone={nextMilestone}
+              totalSolved={overallStats.totalSolved}
+              submissionsData={submissionsData}
+              hidePracticeButton={hideHeroPracticeButton}
+            />
+          )}
 
-        {/* Contribution graph */}
-        <div className="w-full lg:w-[240px] flex-none shrink-0 h-full">
-          <ContributionGraph submissions={submissionsData} weeks={10} currentStreak={currentStreak} maxStreak={maxStreak} />
+          {/* ② Progress + Contribution Graph */}
+          <div className="grid grid-cols-1 xl:grid-cols-[1fr_260px] gap-4 w-full items-stretch">
+            {/* Progress card */}
+            <div className="min-w-0 flex flex-col h-full">
+              <Card className="bg-card border-border/40 shadow-sm overflow-hidden flex flex-col h-full rounded-xl">
+                <div className="px-4 py-2.5 border-b border-border/40 shrink-0 bg-muted/20">
+                  <h3 className="font-semibold text-[13px] text-foreground tracking-tight flex items-center gap-1.5">
+                    <TrendingUp className="w-4 h-4 text-foreground" /> {progressTitle}
+                  </h3>
+                </div>
+                <div className="flex-1 flex flex-col justify-center">
+                  <SolvedProgressCard
+                    {...overallStats}
+                    compact
+                    currentStreak={currentStreak}
+                    maxStreak={maxStreak}
+                    userId={user?.id}
+                  />
+                </div>
+              </Card>
+            </div>
+
+            {/* Contribution graph */}
+            <div className="w-full xl:w-[260px] flex-none shrink-0 h-full max-w-[260px] mx-auto xl:max-w-none xl:mx-0">
+              <ContributionGraph submissions={submissionsData} weeks={12} currentStreak={currentStreak} maxStreak={maxStreak} />
+            </div>
+          </div>
         </div>
-      </div>
-
-
+      )}
     </div>
   );
 };

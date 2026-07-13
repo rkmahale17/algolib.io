@@ -179,15 +179,21 @@ export const ListingLayout = ({
                             />
 
                             <div className="space-y-6">
-                                {progressWidget && (
-                                    <div className="w-full">
-                                        {progressWidget}
-                                    </div>
-                                )}
-
-                                {recommendedWidget && (
-                                    <div className="w-full">
-                                        {recommendedWidget}
+                                {(progressWidget || recommendedWidget) && (
+                                    <div className={cn(
+                                        "w-full",
+                                        progressWidget && recommendedWidget ? "grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start" : "flex flex-col"
+                                    )}>
+                                        {progressWidget && (
+                                            <div className="w-full min-w-0">
+                                                {progressWidget}
+                                            </div>
+                                        )}
+                                        {recommendedWidget && (
+                                            <div className="w-full min-w-0">
+                                                {recommendedWidget}
+                                            </div>
+                                        )}
                                     </div>
                                 )}
 
