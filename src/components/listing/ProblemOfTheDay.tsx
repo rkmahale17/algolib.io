@@ -32,7 +32,7 @@ export const ProblemOfTheDay = ({ potd, progressMap }: ProblemOfTheDayProps) => 
   const formatTime = (value: number) => value.toString().padStart(2, '0');
 
   return (
-    <div className="w-full max-w-[820px] mx-auto flex flex-col mb-4">
+    <div className="w-full flex flex-col mb-4">
       {/* Header */}
       <div className="px-4 py-2.5 border border-border/40 shrink-0 bg-card rounded-t-xl flex flex-col gap-0.5 relative overflow-hidden">
         <div className="absolute inset-0 bg-muted/20 pointer-events-none" />

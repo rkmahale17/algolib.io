@@ -144,58 +144,60 @@ export const DashboardWidgets = () => {
     potd?.problem && progressMap?.[potd.problem.id] !== "solved";
 
   return (
-    <div className="w-full max-w-[820px] mx-auto space-y-4 mb-8 mt-2 px-2 sm:px-0">
-      {/* ① Personalized Hero */}
-      <DashboardHero
-        currentStreak={currentStreak}
-        nextMilestone={nextMilestone}
-        totalSolved={overallStats.totalSolved}
-        submissionsData={submissionsData}
-      />
+    <div className="w-full max-w-[1200px] mx-auto space-y-4 mb-8 mt-2 px-2 sm:px-0">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6 items-start">
+        {/* Left Column */}
+        <div className="space-y-6 min-w-0">
+          {/* ① Personalized Hero */}
+          <DashboardHero
+            currentStreak={currentStreak}
+            nextMilestone={nextMilestone}
+            totalSolved={overallStats.totalSolved}
+            submissionsData={submissionsData}
+          />
 
-
-
-      {/* ③ Progress + Contribution Graph — side by side */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-4 w-full items-stretch">
-        {/* Progress panel */}
-        <div className="min-w-0 flex flex-col h-full">
-          <Card className="bg-card border-border/40 shadow-sm overflow-hidden flex flex-col h-full rounded-xl">
-            <div className="px-4 py-2.5 border-b border-border/40 shrink-0 bg-muted/20">
-              <h3 className="font-semibold text-[13px] text-foreground tracking-tight flex items-center gap-1.5">
-                <TrendingUp className="w-4 h-4 text-foreground" /> Learning Progress
-              </h3>
+          {/* ③ Progress + Contribution Graph — side by side */}
+          <div className="grid grid-cols-1 xl:grid-cols-[1fr_240px] gap-4 w-full items-stretch">
+            {/* Progress panel */}
+            <div className="min-w-0 flex flex-col h-full">
+              <Card className="bg-card border-border/40 shadow-sm overflow-hidden flex flex-col h-full rounded-xl">
+                <div className="px-4 py-2.5 border-b border-border/40 shrink-0 bg-muted/20">
+                  <h3 className="font-semibold text-[13px] text-foreground tracking-tight flex items-center gap-1.5">
+                    <TrendingUp className="w-4 h-4 text-foreground" /> Learning Progress
+                  </h3>
+                </div>
+                <div className="flex-1 flex flex-col justify-center">
+                  <SolvedProgressCard
+                    {...overallStats}
+                    compact
+                    currentStreak={currentStreak}
+                    maxStreak={maxStreak}
+                    userId={user?.id}
+                  />
+                </div>
+              </Card>
             </div>
-            <div className="flex-1 flex flex-col justify-center">
-              <SolvedProgressCard
-                {...overallStats}
-                compact
-                currentStreak={currentStreak}
-                maxStreak={maxStreak}
-                userId={user?.id}
-              />
+
+            {/* Contribution graph */}
+            <div className="w-full xl:w-[240px] flex-none shrink-0 h-full">
+              <ContributionGraph submissions={submissionsData} weeks={10} currentStreak={currentStreak} maxStreak={maxStreak} />
             </div>
-          </Card>
+          </div>
         </div>
 
-        {/* Contribution graph */}
-        <div className="w-full lg:w-[240px] flex-none shrink-0 h-full">
-          <ContributionGraph submissions={submissionsData} weeks={10} currentStreak={currentStreak} maxStreak={maxStreak} />
+        {/* Right Column */}
+        <div className="space-y-6 min-w-0">
+          {/* ④ Recommended Problems */}
+          <RecommendedProblems algorithms={algorithms} />
+
+          {/* ⑤ Daily Challenge */}
+          {isPOTDUnsolved && (
+            <div className="w-full">
+              <ProblemOfTheDay potd={potd} progressMap={progressMap} />
+            </div>
+          )}
         </div>
       </div>
-
-      {/* ④ Recommended Problems */}
-      <RecommendedProblems algorithms={algorithms} />
-
-
-
-      {/* ⑤ Daily Challenge */}
-      {isPOTDUnsolved && (
-        <div className="w-full">
-          <ProblemOfTheDay potd={potd} progressMap={progressMap} />
-        </div>
-      )}
-
-
     </div>
   );
 };
