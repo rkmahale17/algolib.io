@@ -12,6 +12,7 @@
     "generate-sitemap": "tsx generate-sitemap.ts"
   },
   "dependencies": {
+    "@excalidraw/excalidraw": "^0.18.1",
     "@hookform/resolvers": "^3.10.0",
     "@monaco-editor/react": "^4.7.0",
     "@next/third-parties": "^16.2.7",
@@ -79,7 +80,6 @@
     "supabase": "^2.76.9",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
-    "tldraw": "^3.9.0",
     "vaul": "^0.9.9",
     "zod": "^3.25.76"
   },

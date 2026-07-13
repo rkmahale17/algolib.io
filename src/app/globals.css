@@ -328,10 +328,6 @@
   background: hsl(var(--primary) / 0.8);
 }
 
-.tldraw-rulcode .tlui-layout__bottom {
-  position: relative !important;
-  bottom: 65px !important;
-}
 
 /* Rich Text / Prose Styling */
 /* Headings */

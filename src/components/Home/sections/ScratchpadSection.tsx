@@ -87,7 +87,7 @@ export function ScratchpadSection() {
                             Stuck in thinking? Try our Thinkpad
                         </h2>
                         <p className="text-gray-500 dark:text-gray-400 text-base md:text-lg mb-10 leading-relaxed font-medium">
-                            Sometimes code isn&apos;t enough. Our built-in Thinkpad lets you <strong className="text-gray-700 dark:text-gray-200">draw, sketch</strong>, and <strong className="text-gray-700 dark:text-gray-200">take notes</strong> alongside complex algorithms before you start typing. It&apos;s the perfect tool for when you need to visualize logic that&apos;s hard to hold in your head.
+                            Sometimes code isn&apos;t enough. Our built-in Thinkpad, powered by your favorite drawing tool <strong className="text-gray-700 dark:text-gray-200">Excalidraw</strong>, lets you <strong className="text-gray-700 dark:text-gray-200">draw, sketch</strong>, and <strong className="text-gray-700 dark:text-gray-200">take notes</strong>{" "}alongside complex algorithms before you start typing. It&apos;s the perfect tool for when you need to visualize logic that&apos;s hard to hold in your head.
                         </p>
                         <div className="space-y-4 mb-10">
                             {[
