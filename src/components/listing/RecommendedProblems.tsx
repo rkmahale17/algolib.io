@@ -56,7 +56,7 @@ export const RecommendedProblems = ({ algorithms }: RecommendedProblemsProps) =>
     : 'Next Best Problems';
 
   return (
-    <div className="w-full max-w-[820px] mx-auto flex flex-col mb-4">
+    <div className="w-full flex flex-col mb-4">
       <div className="px-4 py-2.5 border-x border-t border-border/40 shrink-0 bg-card rounded-t-xl flex flex-col gap-0.5 relative overflow-hidden">
         <div className="absolute inset-0 bg-muted/20 pointer-events-none" />
         <h3 className="font-semibold text-[13px] text-foreground tracking-tight flex items-center gap-1.5 relative z-10">

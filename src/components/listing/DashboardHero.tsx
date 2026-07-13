@@ -99,9 +99,8 @@ export const DashboardHero = ({
   const milestonePct = Math.min(Math.round((totalSolved / nextMilestone) * 100), 100);
 
   return (
-    <div className="w-full max-w-[820px] mx-auto mb-5 px-2 sm:px-0 space-y-3">
+    <div className="w-full space-y-3">
 
-      {/* ── Delight banner ── */}
       {delight && (
         <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-primary/5 border border-primary/15 text-sm text-foreground/80 font-medium animate-in fade-in slide-in-from-top-2 duration-500">
           <span className="text-base shrink-0">{delight.emoji}</span>
