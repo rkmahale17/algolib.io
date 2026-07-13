@@ -1,12 +1,13 @@
 import { useRecommendedProblems } from '@/hooks/useRecommendedProblems';
 import { AlgorithmListItem, DIFFICULTY_MAP } from '@/types/algorithm';
 import { useApp } from '@/contexts/AppContext';
-import { ArrowRight, Clock, Lock, Sparkles } from 'lucide-react';
+import { ArrowRight, Clock, Lock, Sparkles, Info } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useAppSelector } from '@/store/hooks';
 import { useMemo } from 'react';
 import { PremiumProblemCard } from '@/components/listing/PremiumProblemCard';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface RecommendedProblemsProps {
   algorithms: AlgorithmListItem[];
@@ -87,12 +88,22 @@ export const RecommendedProblems = ({ algorithms }: RecommendedProblemsProps) =>
               isLast={idx === 1 || idx === recommendations.length - 1}
               disableRounding={false}
               reasonBadge={
-                <span className="text-[11px] text-muted-foreground italic mb-1 inline-block bg-muted/30 px-2 py-0.5 rounded-md border border-border/40">
-                  {rec.reason}
-                </span>
+                <TooltipProvider delayDuration={200}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button onClick={(e) => e.preventDefault()} className="flex items-center justify-center cursor-help text-muted-foreground/50 hover:text-foreground transition-colors outline-none focus:ring-0 ml-0.5">
+                        <Info className="w-4 h-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="text-xs bg-zinc-950 dark:bg-zinc-900 text-white border-zinc-800 max-w-[220px] font-medium leading-relaxed shadow-xl py-2 px-3 z-[100]">
+                      {rec.reason}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               }
               ctaText={ctaText}
               showEstimatedTime={true}
+              hideAction={true}
             />
           );
         })}

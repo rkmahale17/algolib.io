@@ -585,16 +585,11 @@ export const ProblemsList = ({
             progressTitle={progressTitle}
             hideHero={['core', 'blind', 'blind75', 'blind150', 'rulcode150', 'sql-basics', 'sql'].includes(listType || '')}
             hideHeroPracticeButton={true}
+            showRecommendation={showRecommendation}
           />
         ) : undefined
       }
-      recommendedWidget={
-        showRecommendation && !isLoading ? (
-          <div className="space-y-4 w-full">
-            <RecommendedProblems algorithms={algorithms} />
-          </div>
-        ) : null
-      }
+      recommendedWidget={null}
     >
       {/* Anchor for scroll-to-top */}
       <div ref={listTopRef} className="w-full h-0 pointer-events-none" aria-hidden="true" />

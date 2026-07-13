@@ -851,6 +851,51 @@ const Navbar = ({
                             </div>
                           </div>
                         )}
+
+                        {activePracticeTab === "rulcode150" && (
+                          <div className="flex flex-col gap-8">
+                            <Link
+                              href="/dsa/rulcode-150"
+                              className="group flex items-start gap-5 relative shutter-click"
+                              onClick={() => {
+                                closeMenus();
+                                trackEvent(posthog, "home_cta_clicked", {
+                                  cta_label: "Rulcode 150",
+                                  destination: "/dsa/rulcode-150",
+                                  section: "navbar_practice",
+                                });
+                              }}
+                            >
+                              <div className="p-3 bg-muted/50 rounded-xl group-hover:bg-primary/10 transition-colors border border-border/50 shrink-0">
+                                <Code2 className="w-5 h-5 text-foreground group-hover:text-primary" />
+                              </div>
+                              <div className="flex-1 pr-8">
+                                <h4 className="text-[15px] font-semibold mb-1.5 text-foreground group-hover:text-primary transition-colors tracking-tight">
+                                  Rulcode 150
+                                </h4>
+                                <p className="text-[13px] text-muted-foreground mb-3 leading-relaxed max-w-[320px]">
+                                  Comprehensive list of 150 top questions
+                                  covering all major algorithms and data structures.
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                  <Badge
+                                    variant="secondary"
+                                    className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5"
+                                  >
+                                    Comprehensive
+                                  </Badge>
+                                  <Badge
+                                    variant="secondary"
+                                    className="bg-muted text-[11px] font-normal hover:bg-muted/80 border-transparent px-2.5 py-0.5"
+                                  >
+                                    Interview Prep
+                                  </Badge>
+                                </div>
+                              </div>
+                              <ChevronRight className="w-5 h-5 text-muted-foreground/30 absolute right-0 top-1/2 -translate-y-1/2 group-hover:translate-x-1 group-hover:text-primary transition-all" />
+                            </Link>
+                          </div>
+                        )}
                       </div>
                     </DropdownMenuContent>
                   </DropdownMenu>

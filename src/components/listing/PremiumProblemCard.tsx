@@ -27,6 +27,7 @@ interface PremiumProblemCardProps {
     showDetailsInCompact?: boolean;
     hideCategoryTags?: boolean;
     transparentBg?: boolean;
+    hideAction?: boolean;
 }
 
 const difficultyColors: Record<string, string> = {
@@ -93,7 +94,7 @@ const StatusIcon = ({ status, isPremium, hasAccess, displayNo, isPOTD }: { statu
     );
 };
 
-export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp, index, isFirst, isLast, disableRounding, onCategoryClick, onClick, isSelected, compact, isPOTD, potdCountdown, reasonBadge, showEstimatedTime, ctaText, noBorder, showDetailsInCompact, hideCategoryTags, transparentBg }: PremiumProblemCardProps) => {
+export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp, index, isFirst, isLast, disableRounding, onCategoryClick, onClick, isSelected, compact, isPOTD, potdCountdown, reasonBadge, showEstimatedTime, ctaText, noBorder, showDetailsInCompact, hideCategoryTags, transparentBg, hideAction }: PremiumProblemCardProps) => {
     const { hasPremiumAccess } = useApp();
     const isPremium = isPremiumProp ?? (algorithm.is_premium || algorithm.is_pro || algorithm.metadata?.is_pro);
     const rawDifficulty = algorithm.mappedDifficulty || DIFFICULTY_MAP[algorithm.difficulty?.toLowerCase()] || 'Medium';
@@ -168,21 +169,19 @@ export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp
                     </div>
                 ) : (
                     <div className={cn("flex-1 min-w-0", !compact && "space-y-1 sm:space-y-2")}>
-                        {reasonBadge && (
-                            <div className="flex">
-                                {reasonBadge}
-                            </div>
-                        )}
                         <div className={cn(
                             "flex min-w-0",
                             showDetailsInCompact ? "flex-wrap items-center gap-x-3 gap-y-1.5" : "flex-col sm:flex-row sm:items-center gap-1 sm:gap-3"
                         )}>
                             <h3 className={cn(
-                                "font-normal text-foreground transition-colors duration-300",
+                                "font-normal text-foreground transition-colors duration-300 flex items-center gap-1.5",
                                 compact ? "text-[13px]" : "text-[16px]",
                                 showDetailsInCompact ? "shrink-0 max-w-full truncate" : "truncate"
                             )}>
                                 <span>{truncatedTitle}</span>
+                                {reasonBadge && (
+                                    <span className="shrink-0">{reasonBadge}</span>
+                                )}
                             </h3>
 
                             {showDetailsInCompact && (
@@ -211,38 +210,44 @@ export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp
                         </div>
 
                         {!compact && (
-                        <div className="meta-info-row flex flex-wrap items-center gap-x-4 sm:gap-x-8 gap-y-1.5 text-[11px] sm:text-xs font-normal pt-1 w-full">
-                            {/* Difficulty */}
-                            <div className="difficulty-badge flex items-center shrink-0">
-                                <Badge
-                                    variant="outline"
-                                    className={cn(
-                                        "font-semibold px-3 py-0.5 h-6 rounded-full text-[10px] sm:text-[11px] select-none cursor-default border justify-center w-14 transition-all duration-300",
-                                        displayDifficulty === "Easy" && "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/30 group-hover:bg-green-500/20 group-hover:border-green-500/50 group-hover:shadow-[0_0_8px_rgba(34,197,94,0.4)]",
-                                        displayDifficulty === "Med" && "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/30 group-hover:bg-yellow-500/20 group-hover:border-yellow-500/50 group-hover:shadow-[0_0_8px_rgba(234,179,8,0.4)]",
-                                        displayDifficulty === "Hard" && "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30 group-hover:bg-red-500/20 group-hover:border-red-500/50 group-hover:shadow-[0_0_8px_rgba(239,68,68,0.4)]"
-                                    )}
-                                >
-                                    {displayDifficulty}
-                                </Badge>
+                        <div className="flex flex-col gap-1.5 pt-1 w-full">
+                            {/* Row 1: Difficulty & Time */}
+                            <div className="meta-info-row flex flex-nowrap items-center gap-x-3 sm:gap-x-4 text-[11px] sm:text-xs font-normal w-full overflow-hidden">
+                                {/* Difficulty */}
+                                <div className="difficulty-badge flex items-center shrink-0">
+                                    <Badge
+                                        variant="outline"
+                                        className={cn(
+                                            "font-semibold px-3 py-0.5 h-6 rounded-full text-[10px] sm:text-[11px] select-none cursor-default border justify-center w-14 transition-all duration-300",
+                                            displayDifficulty === "Easy" && "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/30 group-hover:bg-green-500/20 group-hover:border-green-500/50 group-hover:shadow-[0_0_8px_rgba(34,197,94,0.4)]",
+                                            displayDifficulty === "Med" && "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/30 group-hover:bg-yellow-500/20 group-hover:border-yellow-500/50 group-hover:shadow-[0_0_8px_rgba(234,179,8,0.4)]",
+                                            displayDifficulty === "Hard" && "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30 group-hover:bg-red-500/20 group-hover:border-red-500/50 group-hover:shadow-[0_0_8px_rgba(239,68,68,0.4)]"
+                                        )}
+                                    >
+                                        {displayDifficulty}
+                                    </Badge>
+                                </div>
+
+                                {/* Estimated Time */}
+                                {showEstimatedTime && (
+                                    <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-muted-foreground/80 bg-muted/40 px-2 py-0.5 rounded-full border border-border/30 h-6 select-none cursor-default shrink-0">
+                                        <Clock className="w-3.5 h-3.5 text-muted-foreground/60" />
+                                        <span>{getEstimatedTime(rawDifficulty)}</span>
+                                    </div>
+                                )}
                             </div>
 
-                            {/* Estimated Time */}
-                            {showEstimatedTime && (
-                                <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-muted-foreground/80 bg-muted/40 px-2 py-0.5 rounded-full border border-border/30 h-6 select-none cursor-default">
-                                    <Clock className="w-3.5 h-3.5 text-muted-foreground/60" />
-                                    <span>{getEstimatedTime(rawDifficulty)}</span>
-                                </div>
-                            )}
-
-                            {/* Category */}
+                            {/* Row 2: Category */}
                             {!isPOTD && !hideCategoryTags && (() => {
                                 const categories = (algorithm.category || '').split(',').map(c => c.trim()).filter(Boolean);
+                                if (categories.length === 0) return null;
                                 return (
-                                    <CollapsibleCategories
-                                        categories={categories}
-                                        onCategoryClick={onCategoryClick}
-                                    />
+                                    <div className="meta-info-row flex flex-nowrap items-center w-full overflow-hidden">
+                                        <CollapsibleCategories
+                                            categories={categories}
+                                            onCategoryClick={onCategoryClick}
+                                        />
+                                    </div>
                                 );
                             })()}
                         </div>
@@ -251,21 +256,23 @@ export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp
                 )}
 
                 {/* Action Indicator */}
-                {compact && !showDetailsInCompact ? (
-                    <div className="shrink-0 text-muted-foreground/30 group-hover:text-primary transition-colors group-hover:translate-x-1 transition-transform">
-                        <ArrowRight className="w-3.5 h-3.5" strokeWidth={2} />
-                    </div>
-                ) : (
-                    <div className="shrink-0 flex items-center gap-3 justify-center">
-                        {ctaText && (
-                            <span className="hidden xs:inline-flex items-center gap-1 text-[10px] font-semibold tracking-wide px-3 py-1 rounded-md bg-muted/50 text-muted-foreground border border-border/50 group-hover:bg-foreground group-hover:text-background transition-all duration-300">
-                                {ctaText}
-                            </span>
-                        )}
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-muted-foreground/30 group-hover:text-foreground group-hover:bg-muted/50 group-hover:shadow-sm transition-all duration-300 transform group-hover:translate-x-1.5 border border-transparent group-hover:border-border/50">
-                            <ArrowRight className="w-4 sm:w-5 h-4 sm:h-5" strokeWidth={2} />
+                {!hideAction && (
+                    compact && !showDetailsInCompact ? (
+                        <div className="shrink-0 text-muted-foreground/30 group-hover:text-primary transition-colors group-hover:translate-x-1 transition-transform">
+                            <ArrowRight className="w-3.5 h-3.5" strokeWidth={2} />
                         </div>
-                    </div>
+                    ) : (
+                        <div className="shrink-0 flex items-center gap-3 justify-center">
+                            {ctaText && (
+                                <span className="hidden xs:inline-flex items-center gap-1 text-[10px] font-semibold tracking-wide px-3 py-1 rounded-md bg-muted/50 text-muted-foreground border border-border/50 group-hover:bg-foreground group-hover:text-background transition-all duration-300">
+                                    {ctaText}
+                                </span>
+                            )}
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-muted-foreground/30 group-hover:text-foreground group-hover:bg-muted/50 group-hover:shadow-sm transition-all duration-300 transform group-hover:translate-x-1.5 border border-transparent group-hover:border-border/50">
+                                <ArrowRight className="w-4 sm:w-5 h-4 sm:h-5" strokeWidth={2} />
+                            </div>
+                        </div>
+                    )
                 )}
             </div>
     );
