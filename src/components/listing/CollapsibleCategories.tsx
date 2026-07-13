@@ -25,6 +25,7 @@ export const CollapsibleCategories = ({ categories, onCategoryClick, isSidebar }
             const difficultyBadge = parentRow.querySelector('.difficulty-badge');
             const likesBadge = parentRow.querySelector('.likes-badge');
             const serialBadge = parentRow.querySelector('.serial-badge');
+            const timeBadge = parentRow.querySelector('.time-badge');
 
             const currentTop = container.getBoundingClientRect().top;
             const isSameLine = (el: Element | null) => {
@@ -35,9 +36,10 @@ export const CollapsibleCategories = ({ categories, onCategoryClick, isSidebar }
             const diffWidth = (difficultyBadge && isSameLine(difficultyBadge)) ? difficultyBadge.getBoundingClientRect().width : 0;
             const likesWidth = (likesBadge && isSameLine(likesBadge)) ? likesBadge.getBoundingClientRect().width : 0;
             const serialWidth = (serialBadge && isSameLine(serialBadge)) ? serialBadge.getBoundingClientRect().width : 0;
+            const timeWidth = (timeBadge && isSameLine(timeBadge)) ? timeBadge.getBoundingClientRect().width : 0;
 
             const safetyMargin = isSidebar ? 20 : 60;
-            const availableWidth = parentWidth - diffWidth - likesWidth - serialWidth - safetyMargin;
+            const availableWidth = parentWidth - diffWidth - likesWidth - serialWidth - timeWidth - safetyMargin;
 
             const measureContainer = container.querySelector('.measure-container');
             if (!measureContainer) return;

@@ -28,6 +28,7 @@ interface PremiumProblemCardProps {
     hideCategoryTags?: boolean;
     transparentBg?: boolean;
     hideAction?: boolean;
+    categoriesOnSeparateRow?: boolean;
 }
 
 const difficultyColors: Record<string, string> = {
@@ -94,7 +95,7 @@ const StatusIcon = ({ status, isPremium, hasAccess, displayNo, isPOTD }: { statu
     );
 };
 
-export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp, index, isFirst, isLast, disableRounding, onCategoryClick, onClick, isSelected, compact, isPOTD, potdCountdown, reasonBadge, showEstimatedTime, ctaText, noBorder, showDetailsInCompact, hideCategoryTags, transparentBg, hideAction }: PremiumProblemCardProps) => {
+export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp, index, isFirst, isLast, disableRounding, onCategoryClick, onClick, isSelected, compact, isPOTD, potdCountdown, reasonBadge, showEstimatedTime, ctaText, noBorder, showDetailsInCompact, hideCategoryTags, transparentBg, hideAction, categoriesOnSeparateRow }: PremiumProblemCardProps) => {
     const { hasPremiumAccess } = useApp();
     const isPremium = isPremiumProp ?? (algorithm.is_premium || algorithm.is_pro || algorithm.metadata?.is_pro);
     const rawDifficulty = algorithm.mappedDifficulty || DIFFICULTY_MAP[algorithm.difficulty?.toLowerCase()] || 'Medium';
@@ -210,47 +211,73 @@ export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp
                         </div>
 
                         {!compact && (
-                        <div className="flex flex-col gap-1.5 pt-1 w-full">
-                            {/* Row 1: Difficulty & Time */}
-                            <div className="meta-info-row flex flex-nowrap items-center gap-x-3 sm:gap-x-4 text-[11px] sm:text-xs font-normal w-full overflow-hidden">
-                                {/* Difficulty */}
-                                <div className="difficulty-badge flex items-center shrink-0">
-                                    <Badge
-                                        variant="outline"
-                                        className={cn(
-                                            "font-semibold px-3 py-0.5 h-6 rounded-full text-[10px] sm:text-[11px] select-none cursor-default border justify-center w-14 transition-all duration-300",
-                                            displayDifficulty === "Easy" && "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/30 group-hover:bg-green-500/20 group-hover:border-green-500/50 group-hover:shadow-[0_0_8px_rgba(34,197,94,0.4)]",
-                                            displayDifficulty === "Med" && "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/30 group-hover:bg-yellow-500/20 group-hover:border-yellow-500/50 group-hover:shadow-[0_0_8px_rgba(234,179,8,0.4)]",
-                                            displayDifficulty === "Hard" && "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30 group-hover:bg-red-500/20 group-hover:border-red-500/50 group-hover:shadow-[0_0_8px_rgba(239,68,68,0.4)]"
+                            <>
+                                {(() => {
+                                const difficultyAndTime = (
+                                    <>
+                                        {/* Difficulty */}
+                                        <div className="difficulty-badge flex items-center shrink-0">
+                                            <Badge
+                                                variant="outline"
+                                                className={cn(
+                                                    "font-semibold px-3 py-0.5 h-6 rounded-full text-[10px] sm:text-[11px] select-none cursor-default border justify-center w-14 transition-all duration-300",
+                                                    displayDifficulty === "Easy" && "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/30 group-hover:bg-green-500/20 group-hover:border-green-500/50 group-hover:shadow-[0_0_8px_rgba(34,197,94,0.4)]",
+                                                    displayDifficulty === "Med" && "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/30 group-hover:bg-yellow-500/20 group-hover:border-yellow-500/50 group-hover:shadow-[0_0_8px_rgba(234,179,8,0.4)]",
+                                                    displayDifficulty === "Hard" && "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30 group-hover:bg-red-500/20 group-hover:border-red-500/50 group-hover:shadow-[0_0_8px_rgba(239,68,68,0.4)]"
+                                                )}
+                                            >
+                                                {displayDifficulty}
+                                            </Badge>
+                                        </div>
+
+                                        {/* Estimated Time */}
+                                        {showEstimatedTime && (
+                                            <div className="time-badge flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-muted-foreground/80 bg-muted/40 px-2 py-0.5 rounded-full border border-border/30 h-6 select-none cursor-default shrink-0">
+                                                <Clock className="w-3.5 h-3.5 text-muted-foreground/60" />
+                                                <span>{getEstimatedTime(rawDifficulty)}</span>
+                                            </div>
                                         )}
-                                    >
-                                        {displayDifficulty}
-                                    </Badge>
-                                </div>
+                                    </>
+                                );
 
-                                {/* Estimated Time */}
-                                {showEstimatedTime && (
-                                    <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-muted-foreground/80 bg-muted/40 px-2 py-0.5 rounded-full border border-border/30 h-6 select-none cursor-default shrink-0">
-                                        <Clock className="w-3.5 h-3.5 text-muted-foreground/60" />
-                                        <span>{getEstimatedTime(rawDifficulty)}</span>
-                                    </div>
-                                )}
-                            </div>
+                                const categories = (!isPOTD && !hideCategoryTags) ? (algorithm.category || '').split(',').map(c => c.trim()).filter(Boolean) : [];
+                                const hasCategories = categories.length > 0;
 
-                            {/* Row 2: Category */}
-                            {!isPOTD && !hideCategoryTags && (() => {
-                                const categories = (algorithm.category || '').split(',').map(c => c.trim()).filter(Boolean);
-                                if (categories.length === 0) return null;
+                                if (categoriesOnSeparateRow) {
+                                    return (
+                                        <div className="flex flex-col gap-1.5 pt-1 w-full">
+                                            <div className="meta-info-row flex flex-nowrap items-center gap-x-3 sm:gap-x-4 text-[11px] sm:text-xs font-normal w-full overflow-hidden">
+                                                {difficultyAndTime}
+                                            </div>
+                                            {hasCategories && (
+                                                <div className="meta-info-row flex flex-nowrap items-center w-full overflow-hidden">
+                                                    <CollapsibleCategories
+                                                        categories={categories}
+                                                        onCategoryClick={onCategoryClick}
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                }
+
                                 return (
-                                    <div className="meta-info-row flex flex-nowrap items-center w-full overflow-hidden">
-                                        <CollapsibleCategories
-                                            categories={categories}
-                                            onCategoryClick={onCategoryClick}
-                                        />
+                                    <div className="flex pt-1 w-full">
+                                        <div className="meta-info-row flex flex-nowrap items-center gap-x-2 sm:gap-x-3 text-[11px] sm:text-xs font-normal w-full overflow-hidden">
+                                            {difficultyAndTime}
+                                            {hasCategories && (
+                                                <div className="flex items-center min-w-0 flex-1">
+                                                    <CollapsibleCategories
+                                                        categories={categories}
+                                                        onCategoryClick={onCategoryClick}
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 );
-                            })()}
-                        </div>
+                                })()}
+                            </>
                         )}
                     </div>
                 )}
