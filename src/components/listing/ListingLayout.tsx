@@ -42,6 +42,9 @@ interface ListingLayoutProps {
     selectedCompanies: string[];
     onCompanyToggle: (company: string) => void;
     companies?: string[];
+    topicCounts?: Record<string, number>;
+    companyCounts?: Record<string, number>;
+    difficultyCounts?: Record<string, number>;
     selectedDifficulties: string[];
     onDifficultyToggle: (difficulty: string) => void;
     showRecommendation?: boolean;
@@ -70,6 +73,9 @@ interface FilterContentProps {
     selectedCompanies: string[];
     onCompanyToggle: (company: string) => void;
     companies?: string[];
+    topicCounts?: Record<string, number>;
+    companyCounts?: Record<string, number>;
+    difficultyCounts?: Record<string, number>;
     selectedDifficulties: string[];
     onDifficultyToggle: (difficulty: string) => void;
 }
@@ -81,6 +87,9 @@ const FilterContent = ({
     selectedCompanies,
     onCompanyToggle,
     companies,
+    topicCounts,
+    companyCounts,
+    difficultyCounts,
     selectedDifficulties,
     onDifficultyToggle
 }: FilterContentProps) => (
@@ -97,6 +106,9 @@ const FilterContent = ({
             selectedCompanies={selectedCompanies}
             onCompanyToggle={onCompanyToggle}
             companies={companies}
+            topicCounts={topicCounts}
+            companyCounts={companyCounts}
+            difficultyCounts={difficultyCounts}
             selectedDifficulties={selectedDifficulties}
             onDifficultyToggle={onDifficultyToggle}
         />
@@ -116,6 +128,9 @@ export const ListingLayout = ({
     selectedCompanies,
     onCompanyToggle,
     companies,
+    topicCounts,
+    companyCounts,
+    difficultyCounts,
     selectedDifficulties,
     onDifficultyToggle,
     showRecommendation,
@@ -142,6 +157,9 @@ export const ListingLayout = ({
         selectedCompanies,
         onCompanyToggle,
         companies,
+        topicCounts,
+        companyCounts,
+        difficultyCounts,
         selectedDifficulties,
         onDifficultyToggle
     };
@@ -453,6 +471,28 @@ export const ListingLayout = ({
                                             )}
                                             </div>
                                         )}
+
+                                    {/* Selected Filters Chips */}
+                                    {(selectedTopics.length > 0 || (companies && selectedCompanies.length > 0)) && (
+                                        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border/30 w-full mt-2">
+                                            {selectedTopics.map(topic => (
+                                                <div key={`topic-${topic}`} className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted/50 border border-border/60 text-foreground/80 hover:text-foreground text-[11px] font-medium transition-colors">
+                                                    <span>{topic}</span>
+                                                    <button onClick={() => onTopicToggle(topic)} className="text-muted-foreground/70 hover:text-foreground rounded-full transition-colors">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                                                    </button>
+                                                </div>
+                                            ))}
+                                            {(companies && selectedCompanies.length > 0) && selectedCompanies.map(company => (
+                                                <div key={`company-${company}`} className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted/50 border border-border/60 text-foreground/80 hover:text-foreground text-[11px] font-medium transition-colors">
+                                                    <span>{company}</span>
+                                                    <button onClick={() => onCompanyToggle(company)} className="text-muted-foreground/70 hover:text-foreground rounded-full transition-colors">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="flex flex-col gap-0 min-w-0">

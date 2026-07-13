@@ -24,6 +24,9 @@ interface PremiumProblemCardProps {
     showEstimatedTime?: boolean;
     ctaText?: string;
     noBorder?: boolean;
+    showDetailsInCompact?: boolean;
+    hideCategoryTags?: boolean;
+    transparentBg?: boolean;
 }
 
 const difficultyColors: Record<string, string> = {
@@ -90,7 +93,7 @@ const StatusIcon = ({ status, isPremium, hasAccess, displayNo, isPOTD }: { statu
     );
 };
 
-export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp, index, isFirst, isLast, disableRounding, onCategoryClick, onClick, isSelected, compact, isPOTD, potdCountdown, reasonBadge, showEstimatedTime, ctaText, noBorder }: PremiumProblemCardProps) => {
+export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp, index, isFirst, isLast, disableRounding, onCategoryClick, onClick, isSelected, compact, isPOTD, potdCountdown, reasonBadge, showEstimatedTime, ctaText, noBorder, showDetailsInCompact, hideCategoryTags, transparentBg }: PremiumProblemCardProps) => {
     const { hasPremiumAccess } = useApp();
     const isPremium = isPremiumProp ?? (algorithm.is_premium || algorithm.is_pro || algorithm.metadata?.is_pro);
     const rawDifficulty = algorithm.mappedDifficulty || DIFFICULTY_MAP[algorithm.difficulty?.toLowerCase()] || 'Medium';
@@ -108,7 +111,9 @@ export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp
                 : compact
                     ? "flex items-center gap-2.5 px-3 py-2.5 transition-all duration-300 ease-out"
                     : "flex items-center gap-3 sm:gap-6 p-4 sm:p-6 transition-all duration-500 ease-out",
-            "bg-card hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors duration-300",
+            transparentBg
+                ? "hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors duration-300"
+                : "bg-card hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors duration-300",
             noBorder
                 ? "border-none"
                 : cn(
@@ -122,8 +127,8 @@ export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp
             isSelected && "bg-muted dark:bg-muted/60"
         )}>
                 {/* Status Indicator */}
-                <div className={compact ? "shrink-0" : "shrink-0 scale-90 sm:scale-100"}>
-                    {compact ? (
+                <div className={compact && !showDetailsInCompact ? "shrink-0" : "shrink-0 scale-90 sm:scale-100"}>
+                    {compact && !showDetailsInCompact ? (
                         <div className={cn(
                             'w-5 h-5 rounded-full flex items-center justify-center border transition-all duration-300',
                             status === 'solved'
@@ -168,13 +173,41 @@ export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp
                                 {reasonBadge}
                             </div>
                         )}
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 min-w-0">
+                        <div className={cn(
+                            "flex min-w-0",
+                            showDetailsInCompact ? "flex-wrap items-center gap-x-3 gap-y-1.5" : "flex-col sm:flex-row sm:items-center gap-1 sm:gap-3"
+                        )}>
                             <h3 className={cn(
-                                "font-normal text-foreground transition-colors duration-300 truncate",
-                                compact ? "text-[13px]" : "text-[16px]"
+                                "font-normal text-foreground transition-colors duration-300",
+                                compact ? "text-[13px]" : "text-[16px]",
+                                showDetailsInCompact ? "shrink-0 max-w-full truncate" : "truncate"
                             )}>
                                 <span>{truncatedTitle}</span>
                             </h3>
+
+                            {showDetailsInCompact && (
+                                <div className="flex items-center gap-2 ml-auto">
+                                    <div className="difficulty-badge flex items-center shrink-0">
+                                        <Badge
+                                            variant="outline"
+                                            className={cn(
+                                                "font-semibold px-3 py-0.5 h-6 rounded-full text-[10px] sm:text-[11px] select-none cursor-default border justify-center w-14 transition-all duration-300",
+                                                displayDifficulty === "Easy" && "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/30 group-hover:bg-green-500/20 group-hover:border-green-500/50 group-hover:shadow-[0_0_8px_rgba(34,197,94,0.4)]",
+                                                displayDifficulty === "Med" && "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/30 group-hover:bg-yellow-500/20 group-hover:border-yellow-500/50 group-hover:shadow-[0_0_8px_rgba(234,179,8,0.4)]",
+                                                displayDifficulty === "Hard" && "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30 group-hover:bg-red-500/20 group-hover:border-red-500/50 group-hover:shadow-[0_0_8px_rgba(239,68,68,0.4)]"
+                                            )}
+                                        >
+                                            {displayDifficulty}
+                                        </Badge>
+                                    </div>
+                                    {showEstimatedTime && (
+                                        <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-muted-foreground/80 bg-muted/40 px-2 py-0.5 rounded-full border border-border/30 h-6 select-none cursor-default">
+                                            <Clock className="w-3.5 h-3.5 text-muted-foreground/60" />
+                                            <span>{getEstimatedTime(rawDifficulty)}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
 
                         {!compact && (
@@ -203,7 +236,7 @@ export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp
                             )}
 
                             {/* Category */}
-                            {!isPOTD && (() => {
+                            {!isPOTD && !hideCategoryTags && (() => {
                                 const categories = (algorithm.category || '').split(',').map(c => c.trim()).filter(Boolean);
                                 return (
                                     <CollapsibleCategories
@@ -218,7 +251,7 @@ export const PremiumProblemCard = ({ algorithm, status, isPremium: isPremiumProp
                 )}
 
                 {/* Action Indicator */}
-                {compact ? (
+                {compact && !showDetailsInCompact ? (
                     <div className="shrink-0 text-muted-foreground/30 group-hover:text-primary transition-colors group-hover:translate-x-1 transition-transform">
                         <ArrowRight className="w-3.5 h-3.5" strokeWidth={2} />
                     </div>

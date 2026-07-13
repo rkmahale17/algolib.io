@@ -17,9 +17,10 @@ interface FilterSectionProps {
     hasInfo?: boolean;
     isPremium?: boolean;
     isLocked?: boolean;
+    counts?: Record<string, number>;
 }
 
-const FilterSection = ({ title, items, selectedItems, onToggle, columns = 2, hasInfo = false, isPremium = false, isLocked = false }: FilterSectionProps) => (
+const FilterSection = ({ title, items, selectedItems, onToggle, columns = 2, hasInfo = false, isPremium = false, isLocked = false, counts = {} }: FilterSectionProps) => (
     <AccordionItem value={title.toLowerCase()} className="border-none">
         <AccordionTrigger className={cn("hover:no-underline py-4 group [&>svg]:hidden", isLocked && "opacity-70 pointer-events-none")}>
             <div className="flex items-center justify-between w-full pr-4">
@@ -53,7 +54,7 @@ const FilterSection = ({ title, items, selectedItems, onToggle, columns = 2, has
                         data-pro-filter={isLocked ? "true" : "false"}
                     >
                         <Checkbox
-                            id={item}
+                            id={`sidebar-filter-${title}-${item}`}
                             checked={selectedItems.includes(item)}
                             onCheckedChange={() => !isLocked && onToggle(item)}
                             className="w-3.5 h-3.5 rounded-none border-foreground/30 border bg-background shadow-none data-[state=checked]:bg-[#dfff5e] data-[state=checked]:border-[#dfff5e] data-[state=checked]:text-black"
@@ -66,10 +67,13 @@ const FilterSection = ({ title, items, selectedItems, onToggle, columns = 2, has
                                 />
                             )}
                             <Label
-                                htmlFor={item}
-                                className="text-xs font-normal leading-none text-muted-foreground/90 group-hover/item:text-foreground transition-colors cursor-pointer"
+                                htmlFor={`sidebar-filter-${title}-${item}`}
+                                className="flex-1 text-xs font-normal leading-none text-muted-foreground/90 group-hover/item:text-foreground transition-colors cursor-pointer flex items-center gap-1.5 min-w-0"
                             >
-                                {item}
+                                <span className="truncate">{item}</span>
+                                {counts[item] !== undefined && (
+                                    <span className="text-[10px] text-muted-foreground/70 tabular-nums shrink-0">({counts[item]})</span>
+                                )}
                             </Label>
                         </div>
                     </div>
@@ -88,6 +92,9 @@ interface ProblemSidebarFiltersProps {
     companies?: string[];
     selectedDifficulties: string[];
     onDifficultyToggle: (difficulty: string) => void;
+    topicCounts?: Record<string, number>;
+    companyCounts?: Record<string, number>;
+    difficultyCounts?: Record<string, number>;
 }
 
 export const ProblemSidebarFilters = ({
@@ -98,7 +105,10 @@ export const ProblemSidebarFilters = ({
     onCompanyToggle,
     companies,
     selectedDifficulties,
-    onDifficultyToggle
+    onDifficultyToggle,
+    topicCounts = {},
+    companyCounts = {},
+    difficultyCounts = {}
 }: ProblemSidebarFiltersProps) => {
     const { hasPremiumAccess } = useApp();
     const displayTopics = topics || [];
@@ -113,6 +123,7 @@ export const ProblemSidebarFilters = ({
                     selectedItems={selectedTopics}
                     onToggle={onTopicToggle}
                     columns={2}
+                    counts={topicCounts}
                 />
 
                 {displayCompanies.length > 0 && (
@@ -124,6 +135,7 @@ export const ProblemSidebarFilters = ({
                         columns={2}
                         isPremium={true}
                         isLocked={false}
+                        counts={companyCounts}
                     />
                 )}
 
@@ -140,16 +152,19 @@ export const ProblemSidebarFilters = ({
                             {['Easy', 'Medium', 'Hard'].map((diff) => (
                                 <div key={diff} className="flex items-center space-x-3 group cursor-pointer group/item">
                                     <Checkbox
-                                        id={diff}
+                                        id={`sidebar-filter-difficulty-${diff}`}
                                         checked={selectedDifficulties.includes(diff)}
                                         onCheckedChange={() => onDifficultyToggle(diff)}
                                         className="w-3.5 h-3.5 rounded-none border-foreground/30 border bg-background shadow-none data-[state=checked]:bg-[#dfff5e] data-[state=checked]:border-[#dfff5e] data-[state=checked]:text-black"
                                     />
                                     <Label
-                                        htmlFor={diff}
-                                        className="text-xs font-normal leading-none text-muted-foreground/90 group-hover/item:text-foreground transition-colors cursor-pointer"
+                                        htmlFor={`sidebar-filter-difficulty-${diff}`}
+                                        className="text-xs font-normal leading-none text-muted-foreground/90 group-hover/item:text-foreground transition-colors cursor-pointer flex items-center gap-1.5"
                                     >
-                                        {diff}
+                                        <span>{diff}</span>
+                                        {difficultyCounts[diff.toLowerCase()] !== undefined && (
+                                            <span className="text-[10px] text-muted-foreground/70 tabular-nums shrink-0">({difficultyCounts[diff.toLowerCase()]})</span>
+                                        )}
                                     </Label>
                                 </div>
                             ))}

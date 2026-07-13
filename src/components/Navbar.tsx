@@ -532,6 +532,32 @@ const Navbar = ({
                             </div>
                           </div>
                         )}
+
+                        {activeLearnTab === "database" && (
+                          <div className="flex flex-col gap-6">
+                            <div className="text-xs font-bold text-muted-foreground/40 uppercase tracking-[0.2em]">
+                              Database
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                              {GUIDE_GROUPS.find((g) => g.id === "database")
+                                ?.guides.slice(0, 5)
+                                .map((guide) => (
+                                  <Link
+                                    key={guide.slug}
+                                    href={`/guides/database/${guide.slug}`}
+                                    className="px-3 py-2 rounded-lg hover:bg-primary/5 transition-all flex items-center justify-between group shutter-click"
+                                    onClick={closeMenus}
+                                  >
+                                    <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">
+                                      {guide.title}
+                                    </span>
+                                    <ArrowUpRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                                  </Link>
+                                ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </DropdownMenuContent>
                   </DropdownMenu>

@@ -31,10 +31,13 @@ interface ProblemFilterPopupProps {
     trigger: React.ReactNode;
     topics?: string[];
     companies?: string[];
+    topicCounts?: Record<string, number>;
+    companyCounts?: Record<string, number>;
+    difficultyCounts?: Record<string, number>;
 }
 
 export const TOPIC_ICONS: Record<string, React.ElementType> = {
-    "Arrays & Hashing": Layers,
+    "Arrays & Hashing": Box,
     "Two Pointers": Compass,
     "Sliding Window": Zap,
     "Stack": Layers,
@@ -54,7 +57,10 @@ export const TOPIC_ICONS: Record<string, React.ElementType> = {
     "Math & Geometry": Calculator,
 };
 
-export const ProblemFilterPopup = ({ filters, setFilters, trigger, topics = [], companies = [] }: ProblemFilterPopupProps) => {
+export const ProblemFilterPopup = ({ 
+    filters, setFilters, trigger, topics = [], companies = [],
+    topicCounts = {}, companyCounts = {}, difficultyCounts = {}
+}: ProblemFilterPopupProps) => {
     const [matchMode, setMatchMode] = React.useState<'all' | 'any'>('all');
 
     const handleReset = () => {
@@ -73,23 +79,25 @@ export const ProblemFilterPopup = ({ filters, setFilters, trigger, topics = [], 
             return {
                 label: topic,
                 value: topic,
+                count: topicCounts[topic] || 0,
                 icon: <Icon className="w-3.5 h-3.5 opacity-70" />
             };
         });
-    }, [topics]);
+    }, [topics, topicCounts]);
 
     const companyOptions = React.useMemo(() => {
         return companies.map(company => ({
             label: company,
             value: company,
+            count: companyCounts[company] || 0,
             icon: <CompanyIcon company={slugifyCompany(company)} className="w-3.5 h-3.5 opacity-70 grayscale group-hover:grayscale-0" forceLoad={true} />
         }));
-    }, [companies]);
+    }, [companies, companyCounts]);
 
     const difficultyOptions = [
-        { label: 'Easy', value: 'easy' },
-        { label: 'Medium', value: 'medium' },
-        { label: 'Hard', value: 'hard' },
+        { label: 'Easy', value: 'easy', count: difficultyCounts['easy'] || 0 },
+        { label: 'Medium', value: 'medium', count: difficultyCounts['medium'] || 0 },
+        { label: 'Hard', value: 'hard', count: difficultyCounts['hard'] || 0 },
     ];
 
     const toggleArrayItem = (arr: string[], item: string) => {
@@ -154,7 +162,7 @@ export const ProblemFilterPopup = ({ filters, setFilters, trigger, topics = [], 
         id: string;
         selected: string[];
         onToggle: (value: string) => void;
-        options: { label: string; value: string }[];
+        options: { label: string; value: string; count?: number; icon?: React.ReactNode }[];
     }) => {
         const displayLabel = getMultiLabel(selected, options);
         const hasSelection = selected.length > 0;
@@ -163,7 +171,7 @@ export const ProblemFilterPopup = ({ filters, setFilters, trigger, topics = [], 
             <div className="flex items-center gap-4 py-2 group">
                 <div className="flex items-center gap-2 w-28">
                     <Checkbox
-                        id={id}
+                        id={`popup-filter-${id}`}
                         checked={hasSelection}
                         onCheckedChange={() => {
                             if (hasSelection) {
@@ -176,7 +184,7 @@ export const ProblemFilterPopup = ({ filters, setFilters, trigger, topics = [], 
                     <div className="text-muted-foreground/60 group-hover:text-foreground transition-colors">
                         {icon}
                     </div>
-                    <label htmlFor={id} className="text-[11px] font-normal text-muted-foreground/80 group-hover:text-foreground cursor-pointer whitespace-nowrap uppercase tracking-wider">
+                    <label htmlFor={`popup-filter-${id}`} className="text-[11px] font-normal text-muted-foreground/80 group-hover:text-foreground cursor-pointer whitespace-nowrap uppercase tracking-wider">
                         {label}
                     </label>
                 </div>
@@ -219,7 +227,10 @@ export const ProblemFilterPopup = ({ filters, setFilters, trigger, topics = [], 
                                 >
                                     <div className="flex items-center gap-2">
                                         {opt.icon && <div className="shrink-0">{opt.icon}</div>}
-                                        <span>{opt.label}</span>
+                                        <span className="flex-1">{opt.label}</span>
+                                        {opt.count !== undefined && (
+                                            <span className="text-[10px] text-muted-foreground/70 tabular-nums">({opt.count})</span>
+                                        )}
                                     </div>
                                 </DropdownMenuCheckboxItem>
                             ))}
@@ -305,6 +316,39 @@ export const ProblemFilterPopup = ({ filters, setFilters, trigger, topics = [], 
                             ]}
                         />
                     </div>
+
+                    {/* Selected Filters Summary */}
+                    {(filters.status !== 'all' || filters.language !== 'all' || filters.difficulty.length > 0 || filters.topics.length > 0 || (filters.companies && filters.companies.length > 0)) && (
+                        <div className="pt-3 pb-1 border-t border-border/50">
+                            <div className="flex flex-wrap gap-1.5">
+                                {filters.status !== 'all' && (
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-muted text-muted-foreground border border-border">
+                                        Status: {filters.status}
+                                    </span>
+                                )}
+                                {filters.language !== 'all' && (
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-muted text-muted-foreground border border-border">
+                                        Lang: {filters.language}
+                                    </span>
+                                )}
+                                {filters.difficulty.map(d => (
+                                    <span key={`diff-${d}`} className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-muted text-muted-foreground border border-border">
+                                        {difficultyOptions.find(o => o.value === d)?.label || d}
+                                    </span>
+                                ))}
+                                {filters.topics.map(t => (
+                                    <span key={`topic-${t}`} className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-muted text-muted-foreground border border-border">
+                                        {t}
+                                    </span>
+                                ))}
+                                {(filters.companies || []).map(c => (
+                                    <span key={`comp-${c}`} className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-muted text-muted-foreground border border-border">
+                                        {c}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     <div className="pt-4 border-t border-border flex justify-center">
                         <Button
