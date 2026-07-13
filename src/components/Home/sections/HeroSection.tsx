@@ -31,7 +31,7 @@ export function HeroSection() {
   }, [userProgressData, algorithms]);
 
   return (
-    <div className="relative pt-16 pb-16 lg:pt-24 lg:pb-24 overflow-hidden">
+    <div className="relative pt-4 pb-16 lg:pt-8 lg:pb-24 overflow-hidden">
       <div className="w-full max-w-[1700px] mx-auto px-4 relative z-10">
         <div className="grid grid-cols-1 xl:grid-cols-[1fr_1.2fr] gap-12 items-center animate-in fade-in slide-in-from-bottom duration-1000">
           {/* Left Column: Text Content */}
