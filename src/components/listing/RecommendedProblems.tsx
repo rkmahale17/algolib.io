@@ -104,6 +104,7 @@ export const RecommendedProblems = ({ algorithms }: RecommendedProblemsProps) =>
               ctaText={ctaText}
               showEstimatedTime={true}
               hideAction={true}
+              categoriesOnSeparateRow={true}
             />
           );
         })}
