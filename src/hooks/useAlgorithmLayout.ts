@@ -41,7 +41,7 @@ interface UseAlgorithmLayoutReturn {
 
 const BASE_LEFT_TABS = ["description"];
 const BASE_RIGHT_TABS = ["editor"];
-const DEFAULT_LEFT_TABS = ["description", "rula", "visualizations", "solutions", "submissions"];
+const DEFAULT_LEFT_TABS = ["description", "visualizations", "solutions", "submissions", "rula"];
 const DEFAULT_RIGHT_TABS = ["editor", "thinkpad"];
 
 export const useAlgorithmLayout = (): UseAlgorithmLayoutReturn => {
@@ -281,13 +281,7 @@ export const useAlgorithmLayout = (): UseAlgorithmLayoutReturn => {
                 
                 let currentLeft = [...leftTabs];
                 if (!currentLeft.includes("rula")) {
-                    // Try to insert after description
-                    const descIndex = currentLeft.indexOf("description");
-                    if (descIndex !== -1) {
-                        currentLeft.splice(descIndex + 1, 0, "rula");
-                    } else {
-                        currentLeft.unshift("rula");
-                    }
+                    currentLeft.push("rula");
                     leftChanged = true;
                 }
                 
