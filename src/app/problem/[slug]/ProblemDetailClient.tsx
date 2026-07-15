@@ -1,7 +1,7 @@
 "use client";
 
 import { AlignLeft, Maximize, Minimize2, RotateCcw } from "lucide-react";
-import { ArrowDown, ArrowLeft, Code2 } from "lucide-react";
+import { ArrowDown, ArrowLeft, Code2, Check, PanelRightClose, Bot } from "lucide-react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 // Components
 import {
@@ -534,7 +534,13 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({
             layout.addTab("left", "submissions");
           }
         }}
-        hideToolbar={!layout.isMobile}
+        onOpenRula={() => {
+          if (!layout.leftTabs.includes("rula")) {
+            layout.addTab("left", "rula");
+          }
+          layout.setActiveLeftTab("rula");
+        }}
+        hideToolbar={!layout.isMobile && !layout.isCodeRunnerMaximized}
       />
     ),
     [
@@ -607,6 +613,13 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({
           handleShare={interactions.handleShare}
           onToggleSidebar={() => setIsSidebarOpen(true)}
           activeListType={activeListType}
+          onOpenBuddy={() => {
+            if (layout.leftTabs.includes("rula")) {
+              layout.setActiveLeftTab("rula");
+            } else {
+              layout.setActiveRightTab("rula");
+            }
+          }}
         />
 
         {isUnpublished && (
@@ -685,6 +698,14 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({
                       onToggleVisualizationCompleted={interactions.toggleVisualizationCompletion}
                       onToggleDrawingCompleted={interactions.toggleDrawingCompletion}
                       onToggleSolutionCompleted={interactions.toggleSolutionCompletion}
+                      currentCode={interactions.savedCode}
+                      language={interactions.selectedLanguage}
+                      onCopyToEditor={(code: string) => {
+                        interactions.handleCodeChange(code);
+                        if (!layout.leftTabs.includes("editor") && !layout.rightTabs.includes("editor")) {
+                           layout.addTab("right", "editor");
+                        }
+                      }}
                     />
                   </div>
                 </div>
@@ -792,6 +813,14 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({
                         onToggleVisualizationCompleted={interactions.toggleVisualizationCompletion}
                         onToggleDrawingCompleted={interactions.toggleDrawingCompletion}
                         onToggleSolutionCompleted={interactions.toggleSolutionCompletion}
+                        currentCode={interactions.savedCode}
+                        language={interactions.selectedLanguage}
+                        onCopyToEditor={(code: string) => {
+                          interactions.handleCodeChange(code);
+                          if (!layout.leftTabs.includes("editor") && !layout.rightTabs.includes("editor")) {
+                             layout.addTab("right", "editor");
+                          }
+                        }}
                       />
                     </div>
                   </div>
@@ -849,6 +878,14 @@ const ProblemDetailClient: React.FC<ProblemDetailClientProps> = ({
                         onToggleVisualizationCompleted={interactions.toggleVisualizationCompletion}
                         onToggleDrawingCompleted={interactions.toggleDrawingCompletion}
                         onToggleSolutionCompleted={interactions.toggleSolutionCompletion}
+                        currentCode={interactions.savedCode}
+                        language={interactions.selectedLanguage}
+                        onCopyToEditor={(code: string) => {
+                          interactions.handleCodeChange(code);
+                          if (!layout.leftTabs.includes("editor") && !layout.rightTabs.includes("editor")) {
+                             layout.addTab("right", "editor");
+                          }
+                        }}
                       />
                     </div>
                   </div>

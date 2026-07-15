@@ -39,6 +39,7 @@ export const pricingData = {
                 "x Company-wise Questions",
                 "x Interactive Visualizations for free",
                 "x ThinkPad for free problems",
+                "x Rula AI Assistance",
                 "x Future Updates"
             ]
         },
@@ -58,6 +59,7 @@ export const pricingData = {
                 "Company-wise Questions",
                 "Interactive Visualizations",
                 "ThinkPad",
+                "Rula AI Assistance",
                 "Future Updates"
             ]
         },
@@ -83,6 +85,7 @@ export const pricingData = {
                 "Company-wise Questions",
                 "Interactive Visualizations",
                 "ThinkPad",
+                "Rula AI Assistance",
                 "Future Updates",
                 "Get renew same price as we have right now"
             ],

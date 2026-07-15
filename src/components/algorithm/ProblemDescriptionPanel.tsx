@@ -43,6 +43,7 @@ import {
   Zap,
   Plus,
   X,
+  Bot,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -96,6 +97,7 @@ import { SubmissionDetailView } from "../submission/SubmissionDetailView";
 import { isTreeType } from "@/utils/treeUtils";
 import { renderBlind75Visualization } from "@/utils/blind75Visualizations";
 import { useFeatureFlag } from "@/contexts/FeatureFlagContext";
+import { RulaPanel } from "../ai/RulaPanel";
 
 // Lazy components via next/dynamic to avoid SSR issues
 const TreeDiagram = dynamic(
@@ -173,6 +175,11 @@ interface ProblemDescriptionPanelProps {
   onToggleVisualizationCompleted?: () => void;
   onToggleDrawingCompleted?: () => void;
   onToggleSolutionCompleted?: () => void;
+  
+  // AI Assistant Props
+  currentCode?: string;
+  language?: string;
+  onCopyToEditor?: (code: string) => void;
 }
 
 export const ProblemDescriptionPanel = React.memo(
@@ -212,6 +219,9 @@ export const ProblemDescriptionPanel = React.memo(
     onToggleVisualizationCompleted,
     onToggleDrawingCompleted,
     onToggleSolutionCompleted,
+    currentCode,
+    language,
+    onCopyToEditor,
   }: ProblemDescriptionPanelProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const topicsRef = useRef<HTMLDivElement>(null);
@@ -221,6 +231,11 @@ export const ProblemDescriptionPanel = React.memo(
     const endOfDescriptionRef = useRef<HTMLDivElement>(null);
     const visualizerContainerRef = useRef<HTMLDivElement>(null);
     const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+
+    // Client-only mount guard to prevent hydration mismatch for data that
+    // is null during SSR but resolves on the client (e.g. nextProblem)
+    const [isMounted, setIsMounted] = useState(false);
+    useEffect(() => { setIsMounted(true); }, []);
 
     // State for submission detail view (push/pop within submissions tab)
     const [selectedSubmissionDetail, setSelectedSubmissionDetail] = useState<Submission | null>(null);
@@ -349,6 +364,7 @@ export const ProblemDescriptionPanel = React.memo(
       { id: "submissions", label: "Submissions", icon: History },
       { id: "thinkpad", label: "Thinkpad", icon: Book },
       { id: "editor", label: "Code", icon: Code2 },
+      { id: "rula", label: "Buddy", icon: Sparkles },
     ];
 
     const isSqlProblem = algorithm?.problemType === 'sql' || algorithm?.problem_type === 'sql' || algorithm?.problem_type === 'SQL' || algorithm?.problemType === 'SQL';
@@ -1627,9 +1643,9 @@ export const ProblemDescriptionPanel = React.memo(
                   </FeatureGuard>
 
                   {/* Next & Similar Problems Combined Card */}
-                  {(nextProblem || (algorithm?.problems_to_solve?.internal && algorithm.problems_to_solve.internal.length > 0 && (!algorithm?.controls || algorithm.controls?.content?.practice_problems !== false))) && (
+                  {((isMounted && nextProblem) || (algorithm?.problems_to_solve?.internal && algorithm.problems_to_solve.internal.length > 0 && (!algorithm?.controls || algorithm.controls?.content?.practice_problems !== false))) && (
                     <Card className="p-4 sm:p-6 glass-card overflow-hidden max-w-[600px] flex flex-col gap-6">
-                      {nextProblem && (
+                      {isMounted && nextProblem && (
                         <div>
                           <h3 className="text-sm font-medium text-muted-foreground mb-3 transition-colors">
                             Next problem to solve
@@ -1663,7 +1679,7 @@ export const ProblemDescriptionPanel = React.memo(
                         </div>
                       )}
 
-                      {nextProblem &&
+                      {isMounted && nextProblem &&
                         algorithm?.problems_to_solve?.internal &&
                         algorithm.problems_to_solve.internal.length > 0 &&
                         (!algorithm?.controls ||
@@ -2030,8 +2046,21 @@ export const ProblemDescriptionPanel = React.memo(
                 </TabsContent>
               )}
 
+            <TabsContent value="rula" className="h-full m-0 data-[state=inactive]:hidden flex flex-col">
+               <RulaPanel 
+                  algorithmId={algorithm?.id || algorithm?.slug || ''}
+                  algorithmData={algorithm}
+                  currentCode={currentCode || ""}
+                  language={language || "typescript"}
+                  onClose={() => {}}
+                  hasPremiumAccess={hasPremiumAccess}
+                  onOpenVisualizations={() => setActiveTab("visualizations")}
+                  onCopyToEditor={onCopyToEditor}
+               />
+            </TabsContent>
+
             {/* Bottom Action Bar - Ultra Slim Capsule (Visible across all tabs) */}
-            {activeTab !== "thinkpad" && activeTab !== "editor" && (
+            {false && activeTab !== "thinkpad" && activeTab !== "editor" && (
               <div className="absolute bottom-[2px] left-0 right-0 z-10 flex justify-center pointer-events-none px-4">
               <div className="pointer-events-auto max-w-full overflow-x-auto no-scrollbar flex items-center gap-1 p-0.5 bg-background/60 backdrop-blur-xl border border-border/50 shadow-lg rounded-full animate-in fade-in slide-in-from-bottom-4 duration-300">
                 {/* Like Button */}

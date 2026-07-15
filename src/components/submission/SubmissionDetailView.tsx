@@ -10,6 +10,8 @@ import { FailureDetails } from './FailureDetails';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Loader2, Code2, Timer, Cpu, Check, Copy, FlaskConical, X } from 'lucide-react';
+import { useApp } from '@/contexts/AppContext';
+import { AIReviewCard } from '../ai/AIReviewCard';
 
 interface SubmissionDetailViewProps {
     submission: Submission;
@@ -34,6 +36,8 @@ export function SubmissionDetailView({
         setIsCopied(true);
         setTimeout(() => setIsCopied(false), 2000);
     };
+
+    const { hasPremiumAccess } = useApp();
 
     const { data: stats, isLoading: statsLoading } = useSubmissionStats({
         algorithmId,
@@ -153,6 +157,16 @@ export function SubmissionDetailView({
                                     percentile={stats.runtime.percentile}
                                     optimalTimeComplexity={optimalTimeComplexity}
                                     optimalSpaceComplexity={optimalSpaceComplexity}
+                                />
+                                
+                                {/* AI Review */}
+                                <AIReviewCard
+                                    algorithmId={algorithmId}
+                                    submissionId={submission.id}
+                                    code={submission.code}
+                                    language={submission.language}
+                                    problemDescription={`Problem ID: ${algorithmId}`} // Can be enhanced by fetching full problem description if needed
+                                    hasPremiumAccess={hasPremiumAccess}
                                 />
                             </>
                         ) : null}

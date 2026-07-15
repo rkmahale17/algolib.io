@@ -659,3 +659,36 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Hide scrollbar until hover utility */
+.hover-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.3s;
+}
+.hover-scrollbar:hover {
+  scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
+}
+.hover-scrollbar::-webkit-scrollbar {
+  height: 4px;
+  width: 4px;
+}
+.hover-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.hover-scrollbar::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 4px;
+}
+.hover-scrollbar:hover::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+}
+.hover-scrollbar:hover::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Fix Radix ScrollArea viewport overflow - its internal div uses display:table
+   which causes children to expand beyond the parent width */
+[data-radix-scroll-area-viewport] > div {
+  display: block !important;
+}

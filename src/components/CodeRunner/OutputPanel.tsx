@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Loader2, Terminal, FlaskConical, Clock, Plus, Check, CheckCircle2, XCircle, X, AlertTriangle, History, Code, ChevronUp, ChevronDown, Minimize2, Minimize, Maximize } from "lucide-react";
+import { Loader2, Terminal, FlaskConical, Clock, Plus, Check, CheckCircle2, XCircle, X, AlertTriangle, History, Code, ChevronUp, ChevronDown, Minimize2, Minimize, Maximize, Sparkles } from "lucide-react";
 import { Algorithm } from '@/types/algorithm';
 import { Button } from "@/components/ui/button";
 import { FeatureGuard } from "@/components/FeatureGuard";
@@ -243,6 +243,7 @@ interface OutputPanelProps {
   // State Lifting
   activeTestCaseTab?: string;
   onTestCaseTabChange?: (val: string) => void;
+  onOpenRula?: () => void;
   onToggleExpand?: () => void;
   isExpanded?: boolean;
   onMaximize?: () => void;
@@ -275,6 +276,7 @@ export const OutputPanel = React.memo(({
   onSelectSubmission,
   activeTestCaseTab: controlledActiveTestCaseTab,
   onTestCaseTabChange,
+  onOpenRula,
   onToggleExpand,
   isExpanded,
   onMaximize,
@@ -350,12 +352,32 @@ export const OutputPanel = React.memo(({
 
         {/* Fixed Right Actions */}
         <div className="flex items-center pr-1 shrink-0 bg-background/50 h-full shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)] z-10">
+          {onOpenRula && (
+            <TooltipProvider delayDuration={0}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onOpenRula}
+                    className="h-9 w-9 text-amber-500 hover:text-amber-600 hover:bg-amber-500/10 rounded-none border-l border-border/50"
+                    title="Ask Buddy"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Ask Buddy</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
           {onMaximize && (
             <Button
               variant="ghost"
               size="icon"
               onClick={onMaximize}
-              className="h-9 w-9 text-muted-foreground hover:text-foreground rounded-none"
+              className="h-9 w-9 text-muted-foreground hover:text-foreground rounded-none border-l border-border/50"
               title={isMaximized ? "Restore to panel" : "Maximize output"}
             >
               {isMaximized ? <Minimize2 className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
