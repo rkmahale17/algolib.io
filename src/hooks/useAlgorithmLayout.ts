@@ -41,7 +41,7 @@ interface UseAlgorithmLayoutReturn {
 
 const BASE_LEFT_TABS = ["description"];
 const BASE_RIGHT_TABS = ["editor"];
-const DEFAULT_LEFT_TABS = ["description", "visualizations", "solutions", "submissions"];
+const DEFAULT_LEFT_TABS = ["description", "visualizations", "solutions", "submissions", "rula"];
 const DEFAULT_RIGHT_TABS = ["editor", "thinkpad"];
 
 export const useAlgorithmLayout = (): UseAlgorithmLayoutReturn => {
@@ -272,6 +272,24 @@ export const useAlgorithmLayout = (): UseAlgorithmLayoutReturn => {
                     localStorage.setItem("dsa-layout-right-tabs", JSON.stringify(currentRight));
                 }
                 localStorage.setItem("dsa-layout-migrated-thinkpad-v4", "true");
+            }
+
+            // Migration: Add rula to left panel for existing users
+            const migratedRula = localStorage.getItem("dsa-layout-migrated-rula-v5");
+            if (!migratedRula) {
+                let leftChanged = false;
+                
+                let currentLeft = [...leftTabs];
+                if (!currentLeft.includes("rula")) {
+                    currentLeft.push("rula");
+                    leftChanged = true;
+                }
+                
+                if (leftChanged) {
+                    setLeftTabs(currentLeft);
+                    localStorage.setItem("dsa-layout-left-tabs", JSON.stringify(currentLeft));
+                }
+                localStorage.setItem("dsa-layout-migrated-rula-v5", "true");
             }
         }
     }, [leftTabs, rightTabs, activeLeftTab, setActiveLeftTab]);
