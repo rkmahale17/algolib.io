@@ -27,7 +27,17 @@ export const PatternOutputPanel: React.FC<PatternOutputPanelProps> = ({
   isExpanded = false,
   onToggleExpand
 }) => {
-  if (!isOpen || !result) return null;
+  if (!isOpen) return null;
+
+  if (!result) {
+    return (
+      <div className="h-full w-full bg-background flex flex-col items-center justify-center text-muted-foreground p-6">
+        <BookOpen className="w-12 h-12 mb-4 opacity-20" />
+        <p className="text-sm font-medium">Submit your guess to view pattern analysis.</p>
+        <p className="text-xs opacity-70 mt-1 text-center max-w-sm">Select the patterns you think apply to this problem and click Submit below.</p>
+      </div>
+    );
+  }
 
   const isPass = result === 'pass';
   
@@ -35,16 +45,10 @@ export const PatternOutputPanel: React.FC<PatternOutputPanelProps> = ({
   const allInvolvedPatterns = Array.from(new Set([...selectedPatterns, ...correctPatterns]));
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ y: "100%", opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: "100%", opacity: 0 }}
-        transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+      <div
         className={cn(
-            "absolute bottom-0 left-0 right-0 z-50 bg-background border-t shadow-2xl flex flex-col",
-            isPass ? "border-green-500/30" : "border-red-500/30",
-            isExpanded ? "h-full" : "h-[45vh]"
+            "h-full w-full z-50 bg-background flex flex-col overflow-hidden",
+            isPass ? "border-green-500/30" : "border-red-500/30"
         )}
       >
         {/* Header */}
@@ -96,11 +100,26 @@ export const PatternOutputPanel: React.FC<PatternOutputPanelProps> = ({
                     || explanations[pattern.toLowerCase()]
                     || ((pattern === 'Array' || pattern === 'Hash Map') ? (explanations['Arrays & Hashing'] || explanations['arrays & hashing']) : null);
                   
+                  const isArrayOnlyAnswer = correctPatterns.length === 1 && correctPatterns.includes('Array');
+                  const isArrayOptional = pattern === 'Array' && !isArrayOnlyAnswer;
+                  
                   let statusCardClass = "";
                   let icon = null;
                   let statusText = "";
+                  let customMessage = "";
                   
-                  if (wasSelected && isCorrect) {
+                  if (isArrayOptional) {
+                    if (wasSelected) {
+                      statusCardClass = "bg-blue-500/5 border-blue-500/20 ring-1 ring-blue-500/10";
+                      icon = <CheckCircle2 className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />;
+                      statusText = "Optional (Selected)";
+                    } else {
+                      statusCardClass = "bg-slate-500/5 border-slate-500/20 ring-1 ring-slate-500/10";
+                      icon = <CheckCircle2 className="w-4 h-4 text-slate-500 mt-0.5 shrink-0 opacity-50" />;
+                      statusText = "Optional (Not Selected)";
+                    }
+                    customMessage = "Array is considered an optional selection for this problem. You are not penalized whether you select it or not.";
+                  } else if (wasSelected && isCorrect) {
                     statusCardClass = "bg-green-500/5 border-green-500/20 ring-1 ring-green-500/10";
                     icon = <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />;
                     statusText = "Correctly Identified";
@@ -122,6 +141,7 @@ export const PatternOutputPanel: React.FC<PatternOutputPanelProps> = ({
                           <span className="font-semibold text-sm">{pattern}</span>
                           <span className={cn(
                             "text-xs px-2 py-0.5 rounded-full font-medium border",
+                            isArrayOptional ? (wasSelected ? "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20" : "bg-slate-500/10 text-slate-700 dark:text-slate-400 border-slate-500/20") :
                             wasSelected && isCorrect ? "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20" :
                             wasSelected && !isCorrect ? "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20" :
                             "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20"
@@ -133,10 +153,14 @@ export const PatternOutputPanel: React.FC<PatternOutputPanelProps> = ({
                         {explanation ? (
                           <div className="text-sm text-muted-foreground leading-relaxed mt-2 prose prose-sm dark:prose-invert max-w-none">
                               <RichText content={explanation} />
+                              {isArrayOptional && (
+                                <p className="mt-2 text-blue-600 dark:text-blue-400 font-medium italic opacity-90">{customMessage}</p>
+                              )}
                           </div>
                         ) : (
                           <p className="text-sm text-muted-foreground italic mt-2">
-                            {isCorrect 
+                            {isArrayOptional ? customMessage :
+                             isCorrect 
                                 ? "This pattern is part of the optimal solution for this problem." 
                                 : "This pattern is not typically used to solve this problem optimally."}
                           </p>
@@ -163,7 +187,6 @@ export const PatternOutputPanel: React.FC<PatternOutputPanelProps> = ({
             
           </div>
         </ScrollArea>
-      </motion.div>
-    </AnimatePresence>
+      </div>
   );
 };

@@ -9,10 +9,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 interface PatternGuessPanelProps {
   algorithm: any;
-  onSubmit: (selected: string[]) => void;
-  isSubmitting?: boolean;
-  initialSelected?: string[];
+  selected: Set<string>;
+  onToggle: (pattern: string) => void;
   submittedState?: 'idle' | 'submitted';
+  searchQuery?: string;
 }
 
 const PATTERN_DESCRIPTIONS: Record<string, string> = {
@@ -37,48 +37,48 @@ const PATTERN_DESCRIPTIONS: Record<string, string> = {
   "Heap / Priority Queue": "Dynamically retrieve the max or min element efficiently.",
   "Advanced Algorithms": "Complex topics like Union Find or Topological Sort.",
   "Design Pattern": "Implement custom data structures or architectural patterns.",
-  "Sorting": "Arrange elements in a specific order to optimize searching or processing."
+  "Sorting": "Arrange elements in a specific order to optimize searching or processing.",
+  "Divide and Conquer": "Break a problem into smaller subproblems, solve them, and combine their results.",
+  "BFS": "Explore a graph or tree level by level, typically using a queue.",
+  "DFS": "Explore a graph or tree as far as possible along each branch before backtracking."
 };
 
 const GUESS_DISPLAY_ORDER = [
   "Array",
   "Hash Map",
   "Sorting",
-  ...CATEGORY_ORDER.filter(c => c !== "Arrays & Hashing")
+  ...CATEGORY_ORDER.filter(c => c !== "Arrays & Hashing"),
+  "Divide and Conquer",
+  "BFS",
+  "DFS"
 ];
 
 export const PatternGuessPanel: React.FC<PatternGuessPanelProps> = ({
   algorithm,
-  onSubmit,
-  isSubmitting = false,
-  initialSelected = [],
-  submittedState = 'idle'
+  selected,
+  onToggle,
+  submittedState = 'idle',
+  searchQuery = ''
 }) => {
-  const [selected, setSelected] = useState<Set<string>>(new Set(initialSelected));
-
-  // Reset selected if initialSelected changes (e.g. from loaded history)
-  useEffect(() => {
-    setSelected(new Set(initialSelected));
-  }, [initialSelected]);
-
-  const togglePattern = (pattern: string) => {
-    if (submittedState === 'submitted') return; // Lock if submitted (optional)
+  React.useEffect(() => {
+    if (!searchQuery) return;
     
-    const newSelected = new Set(selected);
-    if (newSelected.has(pattern)) {
-      newSelected.delete(pattern);
-    } else {
-      newSelected.add(pattern);
-    }
-    setSelected(newSelected);
-  };
+    const query = searchQuery.toLowerCase();
+    const match = GUESS_DISPLAY_ORDER.find(pattern => 
+      pattern.toLowerCase().includes(query) || 
+      (PATTERN_DESCRIPTIONS[pattern] && PATTERN_DESCRIPTIONS[pattern].toLowerCase().includes(query))
+    );
 
-  const handleSubmit = () => {
-    onSubmit(Array.from(selected));
-  };
+    if (match) {
+      const el = document.getElementById(`pattern-${match.replace(/\s+/g, '-')}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }, [searchQuery]);
 
   return (
-    <div className="h-full flex flex-col bg-background relative overflow-hidden">
+    <div className="h-full w-full flex flex-col bg-background relative overflow-hidden">
       {/* Tab-like header matching the left panel */}
       <div className="px-0 shrink-0 border-b bg-background/50 relative flex items-center justify-between h-9">
         <div className="flex-1 min-w-0 relative h-9 flex items-center">
@@ -105,24 +105,36 @@ export const PatternGuessPanel: React.FC<PatternGuessPanelProps> = ({
             </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-24 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-8 max-w-4xl mx-auto">
           {GUESS_DISPLAY_ORDER.map((pattern, index) => {
             const isSelected = selected.has(pattern);
-            const Icon = TOPIC_ICONS[pattern] || (pattern === 'Array' ? TOPIC_ICONS['Arrays & Hashing'] : pattern === 'Hash Map' ? TOPIC_ICONS['Arrays & Hashing'] : pattern === 'Sorting' ? TOPIC_ICONS['Math & Geometry'] : Folder);
+            const Icon = TOPIC_ICONS[pattern] || (
+              pattern === 'Array' || pattern === 'Hash Map' ? TOPIC_ICONS['Arrays & Hashing'] :
+              pattern === 'Sorting' || pattern === 'Divide and Conquer' ? TOPIC_ICONS['Math & Geometry'] :
+              pattern === 'BFS' || pattern === 'DFS' ? TOPIC_ICONS['Graphs'] :
+              Folder
+            );
             
+            const isSearchMatch = searchQuery && (
+              pattern.toLowerCase().includes(searchQuery.toLowerCase()) || 
+              (PATTERN_DESCRIPTIONS[pattern] && PATTERN_DESCRIPTIONS[pattern].toLowerCase().includes(searchQuery.toLowerCase()))
+            );
+
             return (
               <motion.button
+                id={`pattern-${pattern.replace(/\s+/g, '-')}`}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2, delay: index * 0.02 }}
                 key={pattern}
-                onClick={() => togglePattern(pattern)}
+                onClick={() => onToggle(pattern)}
                 className={cn(
                   "relative flex items-start gap-3.5 p-4 text-left transition-all duration-200 overflow-hidden group",
                   "border rounded-lg",
                   isSelected 
-                    ? "border-primary bg-primary/10 shadow-[0_4px_15px_rgba(var(--primary),0.1)] ring-1 ring-primary/20" 
-                    : "border-border bg-card/60 hover:bg-accent/40 hover:border-primary/40 shadow-sm hover:shadow-md"
+                    ? "border-primary bg-primary/10 shadow-[0_4px_15px_hsl(var(--primary)/0.1)] ring-1 ring-primary/20" 
+                    : "border-border bg-card/60 hover:bg-accent/40 hover:border-primary/40 shadow-sm hover:shadow-md",
+                  isSearchMatch && !isSelected && "!border-primary !ring-2 !ring-primary !bg-primary/20 shadow-[0_0_20px] shadow-primary/30 z-10"
                 )}
               >
                 {/* Active gradient background */}
@@ -159,29 +171,6 @@ export const PatternGuessPanel: React.FC<PatternGuessPanelProps> = ({
           })}
         </div>
       </ScrollArea>
-
-      <div className="absolute bottom-0 left-0 right-0 py-2 px-4 bg-background border-t shadow-[0_-8px_30px_rgba(0,0,0,0.12)] z-20 flex items-center justify-center">
-        <Button 
-            size="sm" 
-            onClick={handleSubmit}
-            disabled={isSubmitting || selected.size === 0}
-            className={cn(
-                "h-9 px-5 text-xs rounded-md border relative overflow-hidden transition-all duration-300 font-bold shrink-0 shadow-sm",
-                selected.size > 0
-                    ? "bg-primary text-black hover:text-black border-primary/20 hover:bg-primary/90 hover:shadow-[0_0_20px_rgba(var(--primary),0.4)]"
-                    : "bg-zinc-400 text-black border-border opacity-60"
-            )}
-        >
-            <div className="relative z-10 flex items-center gap-2">
-                {isSubmitting ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                ) : (
-                    <Send className="w-3.5 h-3.5" />
-                )}
-                <span>Submit</span>
-            </div>
-        </Button>
-      </div>
     </div>
   );
 };

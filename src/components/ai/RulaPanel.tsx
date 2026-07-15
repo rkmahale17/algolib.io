@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Sparkles, Lightbulb, Brain, Route, CheckCircle2, User as UserIcon, ArrowUp, X, Loader2, Copy, ThumbsUp, ThumbsDown, Eye, Wrench } from 'lucide-react';
+import { Sparkles, Lightbulb, Brain, Route, CheckCircle2, User as UserIcon, ArrowUp, X, Loader2, Copy, ThumbsUp, ThumbsDown, Eye, Wrench, Bug } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -390,6 +390,12 @@ export const RulaPanel: React.FC<RulaPanelProps> = ({
                                                                     />
                                                                     <div className="absolute top-2 right-2 flex gap-2">
                                                                         {onCopyToEditor && (
+                                                                            (() => {
+                                                                                const lines = codeString.split('\n');
+                                                                                const isFull = lines.length > 15 || ['class ', 'def ', 'function ', 'func ', 'public ', 'impl ', 'object ', 'struct '].some(kw => codeString.includes(kw));
+                                                                                return isFull;
+                                                                            })()
+                                                                        ) && (
                                                                             <Button size="sm" variant="secondary" className="h-7 text-xs bg-primary/20 hover:bg-primary text-primary font-medium rounded border border-primary/30 hover:text-primary-foreground shadow-sm transition-colors"
                                                                                 title="Apply to editor"
                                                                                 onClick={() => onCopyToEditor(codeString)}>
@@ -434,6 +440,9 @@ export const RulaPanel: React.FC<RulaPanelProps> = ({
                                         </Button>
                                         <Button variant="ghost" size="icon" className={`h-6 w-6 rounded-full ${msg.feedback === 'dislike' ? 'text-destructive bg-destructive/10' : 'text-muted-foreground hover:text-destructive hover:bg-destructive/10'}`} onClick={() => handleFeedback(msg.id, 'dislike')} title="Not helpful">
                                             <ThumbsDown className="w-3 h-3" />
+                                        </Button>
+                                        <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full text-muted-foreground hover:text-orange-500 hover:bg-orange-500/10" onClick={() => window.open('https://github.com/rkmahale17/algolib.io/issues/new?title=AI%20Response%20Bug&body=Please%20describe%20the%20issue%20with%20the%20AI%20response.%0A%0AProblem:%20' + algorithmId, '_blank')} title="Report AI Bug">
+                                            <Bug className="w-3 h-3" />
                                         </Button>
                                         {onOpenVisualizations && algorithmData?.problemType !== 'sql' && algorithmData?.problem_type !== 'sql' && (
                                             <Button variant="ghost" size="sm" className="h-6 text-[10px] gap-1 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 ml-auto" onClick={onOpenVisualizations} title="Open Visualizations">

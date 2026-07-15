@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import { ImperativePanelHandle } from "react-resizable-panels";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import Navbar from "@/components/Navbar";
 import { Paywall } from "@/components/Paywall";
@@ -18,7 +19,8 @@ import { useUserAlgorithmData } from "@/hooks/useUserAlgorithmData";
 import { updatePatternAssessmentProgress } from "@/utils/userAlgorithmDataHelpers";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Lock } from "lucide-react";
+import { Lock, ChevronUp, ChevronDown, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { CATEGORY_ORDER, resolveAlgoCategories } from '@/constants/categories';
 
 interface PatternGuessClientProps {
@@ -61,6 +63,8 @@ const PatternGuessClient: React.FC<PatternGuessClientProps> = ({
   });
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [selectedGuessPatterns, setSelectedGuessPatterns] = useState<Set<string>>(new Set());
+  const [searchQuery, setSearchQuery] = useState("");
 
   // -- Pattern Guess State --
   const [outputPanelState, setOutputPanelState] = useState<{
@@ -74,6 +78,19 @@ const PatternGuessClient: React.FC<PatternGuessClientProps> = ({
     selectedPatterns: [],
     isExpanded: false
   });
+  
+  const bottomPanelRef = useRef<ImperativePanelHandle>(null);
+
+  const handleToggleExpand = () => {
+    if (outputPanelState.isExpanded) {
+      bottomPanelRef.current?.resize(40);
+      setOutputPanelState(prev => ({ ...prev, isExpanded: false }));
+    } else {
+      bottomPanelRef.current?.resize(100);
+      setOutputPanelState(prev => ({ ...prev, isExpanded: true }));
+    }
+  };
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const rawCategories = activeAlgorithm?.categories || [];
@@ -84,7 +101,8 @@ const PatternGuessClient: React.FC<PatternGuessClientProps> = ({
       "Binary Search", "Stack", "Linked List", "Intervals", "Backtracking",
       "Trees", "Graphs", "Tries", "Greedy", "Dynamic Programming",
       "Math & Geometry", "Bit Manipulation", "Heap / Priority Queue",
-      "Advanced Algorithms", "Design Pattern"
+      "Advanced Algorithms", "Design Pattern", "Divide and Conquer",
+      "BFS", "DFS"
     ]);
 
     const result = new Set<string>();
@@ -97,8 +115,8 @@ const PatternGuessClient: React.FC<PatternGuessClientProps> = ({
       "binary search tree": "Trees",
       "binary tree": "Trees",
       "graph": "Graphs",
-      "bfs": "Graphs",
-      "dfs": "Graphs",
+      "bfs": "BFS",
+      "dfs": "DFS",
       "trie": "Tries",
       "priority queue": "Heap / Priority Queue",
       "heap": "Heap / Priority Queue",
@@ -121,7 +139,10 @@ const PatternGuessClient: React.FC<PatternGuessClientProps> = ({
       "bucket sort": "Sorting",
       "quick select": "Sorting",
       "quickselect": "Sorting",
-      "arrays and sorting": "Sorting"
+      "arrays and sorting": "Sorting",
+      "divide and conquer": "Divide and Conquer",
+      "divide & conquer": "Divide and Conquer",
+      "divide conquer": "Divide and Conquer"
     };
 
     rawCategories.forEach((c: string) => {
@@ -153,13 +174,21 @@ const PatternGuessClient: React.FC<PatternGuessClientProps> = ({
 
   const explanations = activeAlgorithm?.metadata?.pattern_explanations || {};
 
-  const handleSubmitPatterns = async (selected: string[]) => {
+  const handleSubmitPatterns = async () => {
+    const selected = Array.from(selectedGuessPatterns);
     setIsSubmitting(true);
     
     // Evaluate
     // Correct if all selected are in correctPatterns AND all correctPatterns are selected
     const selectedSet = new Set(selected.map(p => p.toLowerCase()));
     const correctSet = new Set(correctPatterns.map(p => p.toLowerCase()));
+    
+    // Ignore 'Array' in evaluation unless it is the ONLY correct pattern
+    const correctHasOnlyArray = correctSet.size === 1 && correctSet.has('array');
+    if (!correctHasOnlyArray) {
+      selectedSet.delete('array');
+      correctSet.delete('array');
+    }
     
     let isPass = true;
     if (selectedSet.size !== correctSet.size) {
@@ -196,6 +225,15 @@ const PatternGuessClient: React.FC<PatternGuessClientProps> = ({
       result: isPass ? 'pass' : 'fail',
       selectedPatterns: selected,
       isExpanded: false
+    });
+  };
+
+  const handleTogglePattern = (pattern: string) => {
+    setSelectedGuessPatterns(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(pattern)) newSet.delete(pattern);
+      else newSet.add(pattern);
+      return newSet;
     });
   };
 
@@ -338,24 +376,86 @@ const PatternGuessClient: React.FC<PatternGuessClientProps> = ({
             >
                <div className="h-full pt-0 pl-0 pr-0 sm:pt-0 sm:pl-0 sm:pr-0 pb-1.5 sm:pb-2 mr-2">
                  <div className="h-full rounded-lg overflow-hidden border border-border/70 shadow-md bg-card/30 backdrop-blur-sm relative flex flex-col">
-                   <PatternGuessPanel 
-                      algorithm={activeAlgorithm}
-                      onSubmit={handleSubmitPatterns}
-                      isSubmitting={isSubmitting}
-                      initialSelected={outputPanelState.selectedPatterns.length > 0 ? outputPanelState.selectedPatterns : []}
-                      submittedState={outputPanelState.isOpen ? 'submitted' : 'idle'}
-                   />
+                   <div className="flex-1 min-h-0 flex flex-col">
+                     <ResizablePanelGroup direction="vertical" className="h-full">
+                       <ResizablePanel defaultSize={outputPanelState.isOpen ? (outputPanelState.isExpanded ? 0 : 50) : 100} minSize={20}>
+                         <PatternGuessPanel 
+                            algorithm={activeAlgorithm}
+                            selected={selectedGuessPatterns}
+                            onToggle={handleTogglePattern}
+                            submittedState={outputPanelState.isOpen ? 'submitted' : 'idle'}
+                            searchQuery={searchQuery}
+                         />
+                       </ResizablePanel>
 
-                   <PatternOutputPanel 
-                      isOpen={outputPanelState.isOpen}
-                      onClose={() => setOutputPanelState(prev => ({...prev, isOpen: false}))}
-                      result={outputPanelState.result}
-                      selectedPatterns={outputPanelState.selectedPatterns}
-                      correctPatterns={correctPatterns}
-                      explanations={explanations}
-                      isExpanded={outputPanelState.isExpanded}
-                      onToggleExpand={() => setOutputPanelState(prev => ({...prev, isExpanded: !prev.isExpanded}))}
-                   />
+                       {outputPanelState.isOpen && (
+                         <>
+                           <ResizableHandle withHandle className="bg-muted/50 hover:bg-primary/20 data-[resize-handle-active]:bg-primary/40 transition-colors z-50" />
+                           <ResizablePanel ref={bottomPanelRef} defaultSize={outputPanelState.isExpanded ? 100 : 50} minSize={20}>
+                             <PatternOutputPanel 
+                                isOpen={true}
+                                onClose={() => setOutputPanelState(prev => ({...prev, isOpen: false}))}
+                                result={outputPanelState.result}
+                                selectedPatterns={outputPanelState.selectedPatterns}
+                                correctPatterns={correctPatterns}
+                                explanations={explanations}
+                                isExpanded={outputPanelState.isExpanded}
+                                onToggleExpand={handleToggleExpand}
+                             />
+                           </ResizablePanel>
+                         </>
+                       )}
+                     </ResizablePanelGroup>
+                   </div>
+                   
+                   {/* Custom Footer mimicking RunnerFooter */}
+                   <div className="flex items-center pl-0 pr-1 bg-background border-t border-border shrink-0 z-20 h-10 relative">
+                       <div className="flex-1 flex justify-start items-center gap-2">
+                           <button
+                               onClick={() => {
+                                   if (!outputPanelState.isOpen) {
+                                       setOutputPanelState(prev => ({...prev, isOpen: true, isExpanded: true}));
+                                   } else {
+                                       setOutputPanelState(prev => ({...prev, isOpen: false}));
+                                   }
+                               }}
+                               className="flex items-center gap-2 text-xs font-semibold py-1.5 pl-4 pr-3 rounded-md hover:bg-muted transition-colors text-foreground/80 hover:text-foreground group h-[40px]"
+                           >
+                               <span>Console</span>
+                               {outputPanelState.isOpen ? (
+                                   <ChevronDown className="w-4 h-4 text-muted-foreground group-hover:text-foreground" />
+                               ) : (
+                                   <ChevronUp className="w-4 h-4 text-muted-foreground group-hover:text-foreground" />
+                               )}
+                           </button>
+                           
+                           <div className="relative hidden sm:block">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                              <input 
+                                 type="text" 
+                                 placeholder="Search pattern..." 
+                                 value={searchQuery}
+                                 onChange={(e) => setSearchQuery(e.target.value)}
+                                 className="h-7 w-32 sm:w-48 bg-muted/50 border border-border rounded-md pl-8 pr-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary transition-all duration-200"
+                              />
+                           </div>
+                       </div>
+                       <div className="flex-none flex justify-center gap-2 pr-4 sm:pr-2">
+                           <Button 
+                               size="sm" 
+                               onClick={handleSubmitPatterns}
+                               disabled={isSubmitting || selectedGuessPatterns.size === 0}
+                               className="h-8 px-5 text-xs font-bold rounded-md bg-primary text-black hover:text-black hover:bg-primary/90 shadow-sm"
+                           >
+                               {isSubmitting ? (
+                                   <div className="flex items-center gap-2"><div className="w-3.5 h-3.5 border-2 border-black/30 border-t-black rounded-full animate-spin" /> Submitting...</div>
+                               ) : (
+                                   <div className="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg> Submit</div>
+                               )}
+                           </Button>
+                       </div>
+                       <div className="flex-1 flex justify-end"></div>
+                   </div>
                  </div>
                </div>
             </ResizablePanel>
