@@ -20,6 +20,8 @@ export interface UserAlgorithmData {
     visualization_completed: boolean;
     drawing_completed: boolean;
     solution_completed: boolean;
+    pattern_assessment_completed?: boolean;
+    pattern_assessment_history?: any[];
 }
 
 // Code storage structure (multi-language support)
@@ -141,6 +143,8 @@ export interface InsertUserAlgorithmData {
     visualization_completed?: boolean;
     drawing_completed?: boolean;
     solution_completed?: boolean;
+    pattern_assessment_completed?: boolean;
+    pattern_assessment_history?: any[];
 }
 
 // Distribution bucket for runtime/memory histogram charts

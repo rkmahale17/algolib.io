@@ -13,6 +13,7 @@ export const LIST_TYPE_LABELS: Record<string, string> = {
     [ListType.Blind75]: 'Blind 75',
     [ListType.Blind150]: 'Rulcode 150',
     [ListType.SqlBasics]: 'SQL Basics',
+    'pattern-guess': 'Guess the Pattern',
 };
 
 export const DIFFICULTY_MAP: Record<string, string> = {
@@ -70,8 +71,14 @@ export interface Algorithm {
     input_schema: any;
     problems_to_solve: any;
     tutorials: any;
-    metadata: any;
-    controls: any;
+    metadata: {
+        pattern_explanations?: Record<string, string>;
+        [key: string]: any;
+    };
+    controls: {
+        has_pattern_guess?: boolean;
+        [key: string]: any;
+    };
     list_type?: string;
     list_types?: string[];
     problemType?: string;

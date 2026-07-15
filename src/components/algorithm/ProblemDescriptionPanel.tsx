@@ -165,6 +165,7 @@ interface ProblemDescriptionPanelProps {
   onAddTab?: (tabId: string) => void;
   onRemoveTab?: (tabId: string) => void;
   onActivateTab?: (tabId: string) => void;
+  isPatternGuessContext?: boolean;
   editorContent?: React.ReactNode;
   rightHeaderContent?: React.ReactNode;
 
@@ -207,10 +208,11 @@ export const ProblemDescriptionPanel = React.memo(
     isSubmissionsLoading = false,
     onSelectSubmission,
     panelId = "left",
-    tabs,
+    tabs = BASE_LEFT_TABS,
     onAddTab,
     onRemoveTab,
     onActivateTab,
+    isPatternGuessContext = false,
     editorContent,
     rightHeaderContent,
     visualizationCompleted = false,
@@ -576,6 +578,7 @@ export const ProblemDescriptionPanel = React.memo(
                                   .filter(t => {
                                     if (activeTabsList.includes(t.id)) return false;
                                     if (isSqlProblem && (t.id === 'thinkpad' || t.id === 'visualizations')) return false;
+                                    if (isPatternGuessContext && (t.id === 'buddy' || t.id === 'visualizations' || t.id === 'thinkpad' || t.id === 'submissions')) return false;
                                     if (t.id === 'thinkpad') {
                                       return isBrainstormEnabled && algorithm?.controls?.brainstorm !== false;
                                     }
@@ -693,7 +696,7 @@ export const ProblemDescriptionPanel = React.memo(
                                   e.stopPropagation();
                                   setSelectedSubmissionDetail(null);
                                   if (activeTab === "submission_detail") {
-                                    setActiveTab("submissions");
+                          handleToolCardClick("submissions");
                                   }
                                 }}
                               >
@@ -750,7 +753,7 @@ export const ProblemDescriptionPanel = React.memo(
                   {/* Title & Progress */}
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <div className="flex items-center gap-3 mb-2">
+                      <div className="flex items-center gap-3 mb-2 flex-wrap">
                         <h1 className="text-md font-medium">
                           {
                             <span className="font-medium text-md mr-1">
@@ -761,13 +764,15 @@ export const ProblemDescriptionPanel = React.memo(
                           }
                           {algorithm.name}
                         </h1>
-                        {(algorithm?.is_premium ||
-                          algorithm?.is_pro ||
-                          algorithm?.metadata?.is_pro) && (
-                          <Badge className="bg-primary/10 text-primary border-primary/20 text-[10px] sm:text-[11px] font-bold px-3 py-0.5 uppercase tracking-wide h-6 rounded-full">
-                            PRO
-                          </Badge>
-                        )}
+                        <div className="flex items-center gap-2">
+                          {(algorithm?.is_premium ||
+                            algorithm?.is_pro ||
+                            algorithm?.metadata?.is_pro) && (
+                            <Badge className="bg-primary/10 text-primary border-primary/20 text-[10px] sm:text-[11px] font-bold px-3 py-0.5 uppercase tracking-wide h-6 rounded-full">
+                              PRO
+                            </Badge>
+                          )}
+                        </div>
                       </div>
 
                       {/* Difficulty and Company Tags */}
@@ -858,7 +863,7 @@ export const ProblemDescriptionPanel = React.memo(
                              <div className="bg-primary rounded-full p-0.5 mr-1.5 flex items-center justify-center text-primary-foreground shadow-sm">
                                <Check className="w-2.5 h-2.5 stroke-[3]" />
                              </div>
-                             Solved
+                             {isPatternGuessContext ? "Identified Pattern" : "Solved"}
                            </Badge>
                          )}
                      </div>
@@ -2005,7 +2010,7 @@ export const ProblemDescriptionPanel = React.memo(
                     algorithmId={algorithm?.id || algorithm?.slug || ''}
                     onBack={() => {
                       setSelectedSubmissionDetail(null);
-                      setActiveTab("submissions");
+                      handleToolCardClick("submissions");
                     }}
                     optimalTimeComplexity={algorithm?.metadata?.timeComplexity}
                     optimalSpaceComplexity={algorithm?.metadata?.spaceComplexity}
@@ -2054,7 +2059,7 @@ export const ProblemDescriptionPanel = React.memo(
                   language={language || "typescript"}
                   onClose={() => {}}
                   hasPremiumAccess={hasPremiumAccess}
-                  onOpenVisualizations={() => setActiveTab("visualizations")}
+                  onOpenVisualizations={() => handleToolCardClick("visualizations")}
                   onCopyToEditor={onCopyToEditor}
                />
             </TabsContent>
