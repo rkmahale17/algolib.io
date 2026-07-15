@@ -22,13 +22,17 @@ Deno.serve(async (req) => {
       input_schema, // Required for 'test_cases', 'solutions', 'starter_code'
       implementations: inputImplementations, // For 'enhance_comments'
       lang: targetLang, // For 'starter_code'
+      // For pattern_explanations
+      title,
+      description,
+      categories,
     } = await req.json();
     const apiKey = Deno.env.get("GEMINI_API_KEY");
 
     if (!apiKey) {
       throw new Error("GEMINI_API_KEY is not set");
     }
-    if (!topic) {
+    if (!topic && !['pattern_explanations', 'enhance_comments'].includes(target)) {
       throw new Error("Topic is required");
     }
 
@@ -328,8 +332,57 @@ Deno.serve(async (req) => {
         }
     `;
 
+    // 6. PATTERN EXPLANATIONS PROMPT
+    const patternExplanationsPrompt = (t: string, d: string, c: string[]) => `
+        You are an expert DSA instructor creating content for the "Guess the Pattern" assessment.
+        Given the problem title, description, and selected categories/patterns, generate explanations for why these patterns apply.
+
+        Problem Title: ${t}
+        Problem Description: 
+        ${d}
+
+        Selected Patterns: ${c.join(', ')}
+
+        Instructions:
+        Generate a structured JSON object where keys are the pattern names. Also, include a "General" key that explains the basic intuition, data types involved, and the core solution logic.
+        The values should be clear, detailed explanations (suitable for a student) written in HTML format.
+        Ensure the keys exactly match the selected patterns.
+
+        CRITICAL: For the "General" key, you MUST strictly follow this exact sequence and structure (adapt the brackets to the actual problem):
+
+        <p>The '${t}' problem asks us to find...</p>
+        <p><strong>Basic Intuition (Brute-Force):</strong></p>
+        <p>[Explain the straightforward approach...]</p>
+        <p>Time Complexity: O(...) due to...</p>
+        <p>Space Complexity: O(...) as...</p>
+        
+        <p><strong>Optimized Intuition ([Primary Pattern]):</strong></p>
+        <p>[Explain the optimized perspective...]</p>
+        
+        <p><strong>Data Types Involved:</strong></p>
+        <ul>
+          <li><code>[var1]</code>: [description]</li>
+          <li><code>[var2]</code>: [description]</li>
+        </ul>
+        
+        <p><strong>Core Solution Logic ([Primary Pattern]):</strong></p>
+        <ol>
+          <li>[Step 1]</li>
+          <li>[Step 2]</li>
+        </ol>
+        <p>Time Complexity: O(...) on average...</p>
+        <p>Space Complexity: O(...) in the worst case...</p>
+
+        Output FORMAT (strictly JSON, no markdown codeblocks):
+        {
+          "General": "STRICTLY FOLLOW THE HTML SEQUENCE SPECIFIED ABOVE...",
+          "Pattern Name 1": "Why this pattern applies...",
+          "Pattern Name 2": "Why this pattern applies..."
+        }
+    `;
+
     // --- EXECUTE BASED ON TARGET ---
-    console.log(`Starting Generation... Mode: ${target}, Topic: ${topic}`);
+    console.log(`Starting Generation... Mode: ${target}, Topic: ${topic || title}`);
 
     let responseData = {};
 
@@ -398,6 +451,11 @@ Deno.serve(async (req) => {
       if (!referenceCode || !targetLang) throw new Error("referenceCode and lang are required for starter_code");
       responseData = await generateChunk(starterCodePrompt(referenceCode, targetLang));
       if (!responseData) throw new Error("Failed to generate starter code.");
+
+    } else if (target === "pattern_explanations") {
+      if (!title || !description || !categories) throw new Error("title, description, and categories are required for pattern_explanations");
+      responseData = await generateChunk(patternExplanationsPrompt(title, description, categories));
+      if (!responseData) throw new Error("Failed to generate pattern explanations.");
 
     } else if (target === "all") {
       // Legacy Monolithic Mode (Optional, for backward compat or one-shot)

@@ -55,6 +55,7 @@ interface CodeRunnerProps {
   setSubmissions?: React.Dispatch<React.SetStateAction<Submission[]>>;
   isPlatformPreview?: boolean;
   hideToolbar?: boolean;
+  onOpenRula?: () => void;
 }
 
 export interface CodeRunnerRef {
@@ -91,7 +92,8 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
   onSubmissionStart,
   setSubmissions: setSubmissionsProp,
   isPlatformPreview = false,
-  hideToolbar = false
+  hideToolbar = false,
+  onOpenRula
 }, ref) => {
   const posthog = usePostHog();
   const isLimitExceeded = useFeatureFlag("todays_limit_exceed");
@@ -428,6 +430,7 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
           controls={controls}
           activeTestCaseTab={activeTestCaseTab}
           onTestCaseTabChange={setActiveTestCaseTab}
+          onOpenRula={onOpenRula}
         />
       </div>
 
@@ -481,29 +484,31 @@ export const CodeRunner = React.forwardRef<CodeRunnerRef, CodeRunnerProps>(({
         />
       )}
 
-      <EditorPane
-        activeEditorTab={activeEditorTab}
-        code={code}
-        onCodeChange={(newCode) => {
-          setCode(newCode);
-          onCodeChange?.(newCode);
-        }}
-        language={language}
-        problemId={algorithmId}
-        isMobile={isMobile || false}
-        isLoading={isLoadingProp || false}
-        settings={settings}
-        viewingSubmission={viewingSubmission}
-        editorRef={editorRef}
-        brainstormProps={brainstormProps}
-        onShortcut={handleShortcut}
-      />
+      <div className="relative flex-1 flex flex-col min-h-0">
+        <EditorPane
+          activeEditorTab={activeEditorTab}
+          code={code}
+          onCodeChange={(newCode) => {
+            setCode(newCode);
+            onCodeChange?.(newCode);
+          }}
+          language={language}
+          problemId={algorithmId}
+          isMobile={isMobile || false}
+          isLoading={isLoadingProp || false}
+          settings={settings}
+          viewingSubmission={viewingSubmission}
+          editorRef={editorRef}
+          brainstormProps={brainstormProps}
+          onShortcut={handleShortcut}
+        />
+      </div>
     </Tabs>
   );
 
   const content = (
     <div ref={containerRef} className={`w-full bg-background shadow-sm flex flex-col ${isFullscreen
-      ? 'fixed inset-0 z-40 h-screen w-screen rounded-none border-0'
+      ? 'fixed inset-0 z-50 h-screen w-screen rounded-none border-0'
       : `border rounded-lg overflow-hidden ${className || 'h-[calc(100vh-100px)]'}`
       }`}>
       {isMobile ? (

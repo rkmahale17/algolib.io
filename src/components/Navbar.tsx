@@ -30,6 +30,7 @@ import {
   Target,
   Timer,
   User,
+  Sparkles,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -92,6 +93,7 @@ interface NavbarProps {
   hideFeedback?: boolean;
   hideShare?: boolean;
   className?: string;
+  onOpenBuddy?: () => void;
 }
 
 const Navbar = ({
@@ -113,6 +115,7 @@ const Navbar = ({
   hideFeedback = false,
   hideShare = false,
   className,
+  onOpenBuddy,
 }: NavbarProps) => {
   const [mounted, setMounted] = useState(false);
   const { profile, user, hasPremiumAccess, setActiveListType } = useApp();
@@ -950,6 +953,29 @@ const Navbar = ({
                   <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </button>
               </div>
+              {onOpenBuddy && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        onClick={() => {
+                          trackEvent(posthog, "ai_buddy_clicked", {
+                            location: "navbar_problem_nav",
+                            algorithm_slug: algorithm?.slug || algorithm?.id,
+                          });
+                          onOpenBuddy();
+                        }}
+                        className="flex items-center justify-center h-8 w-8 ml-1.5 rounded-md hover:bg-primary/20 bg-secondary/50 border border-border shadow-sm transition-colors text-primary shrink-0"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="text-xs">
+                      <p>Buddy</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
             </div>
           )}
 

@@ -8,6 +8,7 @@ import { SolvedProgressCard } from "@/components/profile/SolvedProgressCard";
 import { BadgesPanel } from "@/components/xp/BadgesPanel";
 import { SubmissionHeatmap } from "@/components/profile/SubmissionHeatmap";
 import { RecentSubmissions } from "@/components/profile/RecentSubmissions";
+import { AIProfileScan } from "@/components/ai/AIProfileScan";
 import { PremiumLoader } from "@/components/PremiumLoader";
 import type { Profile } from "@/types/profile";
 import { DIFFICULTY_MAP } from "@/types/algorithm";
@@ -131,7 +132,7 @@ const ErrorCard = ({
 // ── Main component ────────────────────────────────────────────────
 const PublicProfileClient = ({ username }: PublicProfileClientProps) => {
   const router = useRouter();
-  const { user: currentUser, profile: currentUserProfile, refreshProfile } = useApp();
+  const { user: currentUser, profile: currentUserProfile, refreshProfile, hasPremiumAccess } = useApp();
   const { data: algoMeta } = useAlgorithms();
   const isUserAdmin = currentUserProfile?.role === "admin";
 
@@ -369,6 +370,17 @@ const PublicProfileClient = ({ username }: PublicProfileClientProps) => {
                 maxStreak={stats.longestStreak}
               />
             </div>
+
+            {/* ROW 2.5: AI Profile Scan (Own Profile Only) */}
+            {isOwnProfile && (
+              <div className="rounded-2xl overflow-hidden">
+                <AIProfileScan 
+                  userId={profile.id} 
+                  stats={stats} 
+                  hasPremiumAccess={hasPremiumAccess} 
+                />
+              </div>
+            )}
 
             {/* ROW 3: Recent Submissions */}
             <div className="rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm overflow-hidden">

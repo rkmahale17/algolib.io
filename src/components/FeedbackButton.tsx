@@ -9,7 +9,7 @@ export function FeedbackButton() {
   const pathname = usePathname();
 
   // Hide on problem pages as per request
-  if (pathname?.startsWith("/problem/")) {
+  if (pathname?.startsWith("/problem/") || pathname?.startsWith("/pattern-guess/")) {
     return null;
   }
 

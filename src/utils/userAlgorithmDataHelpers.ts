@@ -34,7 +34,7 @@ export async function getUserAlgorithmData(
 
     const { data, error } = await supabase
         .from('user_algorithm_data')
-        .select('id, user_id, algorithm_id, completed, code, submissions, notes, whiteboard_data, updated_at, visualization_completed, drawing_completed, solution_completed')
+        .select('id, user_id, algorithm_id, completed, code, submissions, notes, whiteboard_data, updated_at, visualization_completed, drawing_completed, solution_completed, pattern_assessment_completed, pattern_assessment_history')
         .eq('user_id', userId)
         .in('algorithm_id', idsToFetch);
 
@@ -526,7 +526,7 @@ export async function getAllUserAlgorithmData(
 
     const { data, error } = await supabase
         .from('user_algorithm_data')
-        .select('id, algorithm_id, completed, submissions, visualization_completed, drawing_completed, solution_completed, updated_at, last_viewed_at')
+        .select('id, algorithm_id, completed, submissions, visualization_completed, drawing_completed, solution_completed, pattern_assessment_completed, updated_at, last_viewed_at')
         .eq('user_id', userId);
 
     if (error) {
@@ -558,4 +558,45 @@ export async function getCompletedCount(userId: string): Promise<number> {
     }
 
     return count || 0;
+}
+
+/**
+ * Update pattern assessment progress status and history
+ */
+export async function updatePatternAssessmentProgress(
+    userId: string,
+    algorithmId: string,
+    completed: boolean,
+    historyUpdate?: any[]
+): Promise<boolean> {
+    if (!supabase) {
+        console.warn('Supabase not available');
+        return false;
+    }
+
+    const payload: any = {
+        user_id: userId,
+        algorithm_id: algorithmId,
+        pattern_assessment_completed: completed,
+    };
+
+    if (historyUpdate !== undefined) {
+        payload.pattern_assessment_history = historyUpdate;
+    }
+
+    const { error } = await supabase
+        .from('user_algorithm_data')
+        .upsert(
+            payload,
+            {
+                onConflict: 'user_id,algorithm_id',
+            }
+        );
+
+    if (error) {
+        console.error('Error updating pattern assessment progress:', error);
+        return false;
+    }
+
+    return true;
 }

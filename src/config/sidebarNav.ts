@@ -45,6 +45,7 @@ export const DSA_ITEMS = [
   { id: "core-patterns", title: "Core patterns", icon: Target, url: "/dsa/core" },
   { id: "blind-75", title: "Blind 75", icon: Brain, url: "/dsa/blind-75" },
   { id: "rulcode-150", title: "Rulcode 150", icon: Layers, url: "/dsa/rulcode-150" },
+  { id: "pattern-guess", title: "Guess the Pattern", icon: Brain, url: "/dsa/pattern-guess" },
 ] as const;
 
 // ─── Database nav items ───────────────────────────────────────────────────────
@@ -158,6 +159,7 @@ export const SIDEBAR_ROUTES = [
   "/dsa/query",
   "/dsa/visual-library",
   "/dsa/roadmap",
+  "/dsa/pattern-guess",
   "/dashboard",
   "/database",
 ];

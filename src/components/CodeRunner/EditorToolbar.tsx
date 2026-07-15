@@ -1,7 +1,7 @@
 import React from "react";
 import {
     Code, Book, X, RotateCcw, AlignLeft,
-    Maximize, Minimize2, PanelRightClose
+    Maximize, Minimize2, PanelRightClose, Bot
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -36,6 +36,8 @@ interface EditorToolbarProps {
         algorithmTitle: string;
         controls?: any;
     };
+    onToggleQween?: () => void;
+    isQweenOpen?: boolean;
 }
 
 export const EditorToolbar: React.FC<EditorToolbarProps> = ({
@@ -58,7 +60,9 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
     setIsScratchpadOpen,
     settings,
     updateSetting,
-    brainstormProps
+    brainstormProps,
+    onToggleQween,
+    isQweenOpen
 }) => {
     return (
         <div className="flex items-center justify-between px-0 border-b bg-muted/40 h-9 shrink-0 gap-2">
@@ -167,6 +171,24 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent side="bottom">Format code</TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                )}
+                
+                {onToggleQween && (
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    variant={isQweenOpen ? "default" : "ghost"}
+                                    size="icon"
+                                    className={`h-8 w-8 ${isQweenOpen ? 'bg-primary text-primary-foreground' : 'text-amber-500 hover:text-amber-600 hover:bg-amber-500/10'}`}
+                                    onClick={onToggleQween}
+                                >
+                                    <Bot className="w-4 h-4" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">Ask QWEEN (AI Assistant)</TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
                 )}

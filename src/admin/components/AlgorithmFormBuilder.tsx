@@ -37,6 +37,7 @@ const ProblemsEditor = dynamic(() => import("./ProblemsEditor").then(mod => mod.
 const AlgorithmPreview = dynamic(() => import("@/components/AlgorithmPreview").then(mod => mod.AlgorithmPreview), { ssr: false });
 const TutorialsEditor = dynamic(() => import("./TutorialsEditor").then(mod => mod.TutorialsEditor), { ssr: false });
 const ControlsEditor = dynamic(() => import("./ControlsEditor").then(mod => mod.ControlsEditor), { ssr: false });
+const PatternAssessmentEditor = dynamic(() => import("./PatternAssessmentEditor").then(mod => mod.PatternAssessmentEditor), { ssr: false });
 // Special handling for named export and the constant
 import { DEFAULT_CONTROLS } from "./ControlsEditor";
 
@@ -520,6 +521,9 @@ export function AlgorithmFormBuilder({
                   <TabsTrigger value="tutorials" className="text-xs">
                     Tutorials
                   </TabsTrigger>
+                  <TabsTrigger value="pattern" className="text-xs">
+                    Pattern
+                  </TabsTrigger>
                   <TabsTrigger value="controls" className="text-xs">
                     Controls
                   </TabsTrigger>
@@ -881,6 +885,23 @@ export function AlgorithmFormBuilder({
                   <TutorialsEditor
                     tutorials={formData.tutorials}
                     onChange={(tutorials) => setFormData({ ...formData, tutorials })}
+                  />
+                </TabsContent>
+
+                {/* Pattern Assessment Tab */}
+                <TabsContent value="pattern" className="space-y-4">
+                  <PatternAssessmentEditor 
+                    hasPatternGuess={formData.controls.has_pattern_guess || false}
+                    setHasPatternGuess={(val: boolean) => setFormData({
+                      ...formData,
+                      controls: { ...formData.controls, has_pattern_guess: val }
+                    })}
+                    patternExplanations={formData.metadata.pattern_explanations || {}}
+                    setPatternExplanations={(val: Record<string, string>) => setFormData({
+                      ...formData,
+                      metadata: { ...formData.metadata, pattern_explanations: val }
+                    })}
+                    algorithmData={formData}
                   />
                 </TabsContent>
 
